@@ -2,10 +2,21 @@ name: Daily Codex Analysis
 
 on:
   schedule:
-    # 00:13 UTC = 09:13 Asia/Seoul
-    - cron: "13 0 * * *"
+    # 10:00 UTC = 19:00 Asia/Seoul (US ticker run)
+    - cron: "0 10 * * *"
+    # 23:00 UTC = 08:00 Asia/Seoul (KR ticker run)
+    - cron: "0 23 * * *"
   workflow_dispatch:
     inputs:
+      profile:
+        description: "Run profile: us / kr / all (default all)"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - us
+          - kr
       tickers:
         description: "Optional comma-separated tickers override"
         required: false
@@ -30,7 +41,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  analyze:
+  analyze_us:
+    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 10 * * *') }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
@@ -218,7 +230,237 @@ jobs:
             throw "Missing config/scheduled_analysis.toml. Copy config/scheduled_analysis.example.toml, set your real tickers, and commit the file before enabling the schedule."
           }
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions")
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-us")
+
+          if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
+            $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
+          } else {
+            Write-Warning "TRADINGAGENTS_ARCHIVE_DIR is not set. Run history will live under the repository checkout unless the config overrides it."
+          }
+
+          $manualTickers = "${{ github.event.inputs.tickers }}"
+          if (-not [string]::IsNullOrWhiteSpace($manualTickers)) {
+            $args += @("--tickers", $manualTickers)
+          }
+
+          $manualTradeDate = "${{ github.event.inputs.trade_date }}"
+          if (-not [string]::IsNullOrWhiteSpace($manualTradeDate)) {
+            $args += @("--trade-date", $manualTradeDate)
+          }
+
+          $siteOnly = "${{ github.event.inputs.site_only }}"
+          if ($siteOnly -eq "true") {
+            $args += "--site-only"
+          }
+
+          python @args
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      - name: Add Git Bash to PATH for Pages packaging
+        run: |
+          $gitBinCandidates = @(
+            "C:\Program Files\Git\bin",
+            "C:\Program Files\Git\usr\bin"
+          )
+
+          foreach ($candidate in $gitBinCandidates) {
+            if (Test-Path (Join-Path $candidate "bash.exe")) {
+              Add-Content -Path $env:GITHUB_PATH -Value $candidate
+              Write-Host "Added Git Bash path: $candidate"
+              exit 0
+            }
+          }
+
+  analyze_kr:
+    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
+    runs-on: [self-hosted, Windows]
+    timeout-minutes: 240
+    defaults:
+      run:
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+    env:
+      PYTHONUTF8: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
+      TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      CODEX_BINARY: ${{ vars.CODEX_BINARY }}
+      CODEX_HOME: ${{ vars.CODEX_HOME }}
+      ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+      OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install TradingAgents
+        run: |
+          python -m pip install --upgrade pip
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -m pip install -e .
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      - name: Resolve Codex runtime
+        run: |
+          $siteOnly = "${{ github.event.inputs.site_only }}"
+          if ($siteOnly -eq "true") {
+            Write-Host "Skipping Codex runtime resolution because site_only=true."
+            exit 0
+          }
+          function Test-CodexCandidate {
+            param([string]$Candidate)
+
+            if ([string]::IsNullOrWhiteSpace($Candidate) -or -not (Test-Path $Candidate)) {
+              return $false
+            }
+
+            try {
+              & $Candidate --version | Out-Null
+              return ($LASTEXITCODE -eq 0)
+            } catch {
+              Write-Warning "Codex candidate failed: $Candidate :: $($_.Exception.Message)"
+              return $false
+            }
+          }
+
+          $candidates = [System.Collections.Generic.List[string]]::new()
+
+          if (-not [string]::IsNullOrWhiteSpace($env:CODEX_BINARY)) {
+            $candidates.Add($env:CODEX_BINARY)
+          }
+
+          $candidates.Add((Join-Path $env:USERPROFILE ".codex\\.sandbox-bin\\codex.exe"))
+
+          Get-ChildItem -Path "C:\Users\*\\.codex\\.sandbox-bin\\codex.exe" -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            ForEach-Object { $candidates.Add($_.FullName) }
+
+          Get-ChildItem -Path "C:\Users\*\\.vscode\\extensions\\openai.chatgpt-*\\bin\\windows-x86_64\\codex.exe" -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            ForEach-Object { $candidates.Add($_.FullName) }
+
+          $resolvedBinary = $null
+          foreach ($candidate in $candidates) {
+            if (Test-CodexCandidate $candidate) {
+              $resolvedBinary = $candidate
+              break
+            }
+          }
+
+          if (-not $resolvedBinary) {
+            throw "Could not find a usable Codex binary. Set the CODEX_BINARY repository variable or install Codex for the runner service account."
+          }
+
+          Add-Content -Path $env:GITHUB_ENV -Value "CODEX_BINARY=$resolvedBinary"
+          Write-Host "Resolved Codex binary: $resolvedBinary"
+
+          $resolvedHome = $env:CODEX_HOME
+          if ([string]::IsNullOrWhiteSpace($resolvedHome) -and $resolvedBinary -like "*.codex\\.sandbox-bin\\codex.exe") {
+            $resolvedHome = Split-Path (Split-Path $resolvedBinary -Parent) -Parent
+          }
+
+          if (-not [string]::IsNullOrWhiteSpace($resolvedHome)) {
+            Add-Content -Path $env:GITHUB_ENV -Value "CODEX_HOME=$resolvedHome"
+            Write-Host "Using CODEX_HOME: $resolvedHome"
+          }
+
+      - name: Verify Codex login and model availability
+        if: ${{ github.event.inputs.site_only != 'true' }}
+        run: |
+          $siteOnly = "${{ github.event.inputs.site_only }}"
+          if ($siteOnly -eq "true") {
+            Write-Host "Skipping Codex preflight because site_only=true."
+            exit 0
+          }
+
+          $workspaceDir = Join-Path $env:GITHUB_WORKSPACE ".codex-preflight"
+          $script = @"
+          import os
+          from tradingagents.llm_clients.codex_app_server import CodexAppServerAuthError, CodexAppServerBinaryError
+          from tradingagents.llm_clients.codex_preflight import run_codex_preflight
+
+          workspace_dir = r"$workspaceDir"
+          summary_path = os.getenv("GITHUB_STEP_SUMMARY")
+
+          def write_summary(lines):
+              if not summary_path:
+                  return
+              with open(summary_path, "a", encoding="utf-8") as handle:
+                  handle.write("\n".join(lines) + "\n")
+
+          try:
+              result = run_codex_preflight(
+                  codex_binary=None,
+                  model="gpt-5.4",
+                  request_timeout=30.0,
+                  workspace_dir=workspace_dir,
+                  cleanup_threads=True,
+              )
+          except CodexAppServerAuthError as exc:
+              message = (
+                  "Codex is installed but not logged in for the runner. "
+                  "Run `codex login` or `codex login --device-auth` on the runner machine, "
+                  "then retry the workflow."
+              )
+              print(f"::error::{message}")
+              print(exc)
+              write_summary(
+                  [
+                      "## Codex login required",
+                      "",
+                      message,
+                  ]
+              )
+              raise SystemExit(1)
+          except CodexAppServerBinaryError as exc:
+              message = (
+                  "A usable Codex binary is not available for the runner. "
+                  "Check the `CODEX_BINARY` repository variable or install Codex for the runner service account."
+              )
+              print(f"::error::{message}")
+              print(exc)
+              write_summary(
+                  [
+                      "## Codex runtime issue",
+                      "",
+                      message,
+                      "",
+                      str(exc),
+                  ]
+              )
+              raise SystemExit(1)
+
+          print("Codex account:", result.account)
+          print("First available models:", ", ".join(result.models[:8]))
+          write_summary(
+              [
+                  "## Codex preflight passed",
+                  "",
+                  f"- Account: {result.account}",
+                  f"- Models: {', '.join(result.models[:8])}",
+                  f"- Binary: {os.getenv('CODEX_BINARY', '(auto)')}",
+              ]
+          )
+          "@
+          $script | python -
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      - name: Run scheduled analysis and build site
+        run: |
+          $configPath = "config/scheduled_analysis_korea.toml"
+          if (-not (Test-Path $configPath)) {
+            throw "Missing config/scheduled_analysis_korea.toml. Add the file before enabling the KR schedule."
+          }
+
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-kr")
 
           if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
             $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
