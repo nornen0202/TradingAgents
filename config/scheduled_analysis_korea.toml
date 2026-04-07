@@ -1,5 +1,5 @@
 [run]
-tickers = ["AAPL", "ETN", "ETHU", "FANG", "GEV", "GLDM", "GOOGL", "LLY", "MU", "NVDA", "ORCL", "RSP", "TSLA", "TSM", "VRT", "VXUS"]
+tickers = ["000660.KS", "005380.KS", "005930.KS", "010950.KS", "012450.KS", "034020.KS", "042700.KS", "058470.KS", "064400.KS", "095340.KS", "278470.KS", "396500.KS"]
 analysts = ["market", "social", "news", "fundamentals"]
 output_language = "Korean"
 trade_date_mode = "latest_available"
@@ -23,12 +23,11 @@ codex_max_retries = 2
 codex_cleanup_threads = true
 
 [storage]
-# For a self-hosted runner, it is better to override this to a persistent absolute path
-# via the TRADINGAGENTS_ARCHIVE_DIR repository variable or by editing this file.
+# Keep run history in a dedicated archive for the KR schedule.
 archive_dir = "./.runtime/tradingagents-archive"
 site_dir = "./site"
 
 [site]
-title = "TradingAgents Daily Reports"
-subtitle = "Self-hosted Codex automation for scheduled multi-ticker analysis"
+title = "TradingAgents Daily Reports - KR"
+subtitle = "Self-hosted Codex automation for scheduled KR-market multi-ticker analysis"
 max_runs_on_homepage = 30
