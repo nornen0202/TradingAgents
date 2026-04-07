@@ -509,7 +509,8 @@ jobs:
           path: site
 
   deploy:
-    needs: analyze
+    needs: [analyze_us, analyze_kr]
+    if: ${{ always() && (needs.analyze_us.result == 'success' || needs.analyze_kr.result == 'success') }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
