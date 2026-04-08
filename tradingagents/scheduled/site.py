@@ -163,9 +163,11 @@ def _render_run_page(manifest: dict[str, Any], settings: SiteSettings) -> str:
                 <a href="{_escape(ticker_summary['ticker'])}.html">{_escape(ticker_summary['ticker'])}</a>
                 <span class="status {ticker_summary['status']}">{_escape(ticker_summary['status'])}</span>
               </div>
+              <p><strong>Company</strong><span>{_escape(_ticker_display_label(ticker_summary))}</span></p>
               <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
               <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
               <p><strong>Duration</strong><span>{ticker_summary.get('duration_seconds', 0):.1f}s</span></p>
+              <p><strong>Quality flags</strong><span>{_escape(', '.join(ticker_summary.get('quality_flags') or []) or '-')}</span></p>
               <p><strong>Decision</strong><span>{_escape(ticker_summary.get('decision') or ticker_summary.get('error') or '-')}</span></p>
             </article>
             """
@@ -239,7 +241,7 @@ def _render_ticker_page(
     <section class="hero compact">
       <div>
         <p class="eyebrow">Ticker report</p>
-        <h1>{_escape(ticker_summary['ticker'])}</h1>
+        <h1>{_escape(_ticker_display_label(ticker_summary))}</h1>
         <p class="subtitle">Analysis {_escape(ticker_summary.get('analysis_date') or '-')} / Market {_escape(ticker_summary.get('trade_date') or '-')} / {_escape(ticker_summary['status'])}</p>
       </div>
       <div class="hero-card">
@@ -248,6 +250,7 @@ def _render_ticker_page(
         <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
         <p><strong>Decision</strong><span>{_escape(ticker_summary.get('decision') or '-')}</span></p>
         <p><strong>Duration</strong><span>{ticker_summary.get('duration_seconds', 0):.1f}s</span></p>
+        <p><strong>Quality flags</strong><span>{_escape(', '.join(ticker_summary.get('quality_flags') or []) or '-')}</span></p>
         <p><strong>LLM calls</strong><span>{ticker_summary.get('metrics', {}).get('llm_calls', 0)}</span></p>
         <p><strong>Tool calls</strong><span>{ticker_summary.get('metrics', {}).get('tool_calls', 0)}</span></p>
       </div>
@@ -269,7 +272,7 @@ def _render_ticker_page(
     </section>
     """
     return _page_template(
-        f"{ticker_summary['ticker']} | {settings.title}",
+        f"{_ticker_display_label(ticker_summary)} | {settings.title}",
         body,
         prefix="../../",
     )
@@ -291,6 +294,14 @@ def _page_template(title: str, body: str, *, prefix: str) -> str:
 </body>
 </html>
 """
+
+
+def _ticker_display_label(ticker_summary: dict[str, Any]) -> str:
+    ticker = str(ticker_summary.get("ticker") or "").strip()
+    ticker_name = str(ticker_summary.get("ticker_name") or "").strip()
+    if ticker_name and ticker and ticker_name.upper() != ticker.upper():
+        return f"{ticker_name} ({ticker})"
+    return ticker_name or ticker or "-"
 
 
 def _render_markdown(content: str) -> str:
