@@ -239,6 +239,10 @@ def _run_single_ticker(
             copied_graph_log.write_text(graph_log.read_text(encoding="utf-8"), encoding="utf-8")
 
         metrics = stats_handler.get_stats()
+        quality_flags: list[str] = []
+        if metrics.get("tool_calls", 0) == 0:
+            quality_flags.append("no_tool_calls_detected")
+            print(f"::warning::No tool calls were recorded for {ticker}; report quality may be degraded.")
         analysis_payload = {
             "ticker": ticker,
             "ticker_name": (
@@ -253,6 +257,7 @@ def _run_single_ticker(
             "finished_at": datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
             "duration_seconds": round(perf_counter() - timer_start, 2),
             "metrics": metrics,
+            "quality_flags": quality_flags,
             "provider": config.llm.provider,
             "models": {
                 "quick_model": config.llm.quick_model,
@@ -273,6 +278,7 @@ def _run_single_ticker(
             "finished_at": analysis_payload["finished_at"],
             "duration_seconds": analysis_payload["duration_seconds"],
             "metrics": metrics,
+            "quality_flags": quality_flags,
             "artifacts": {
                 "analysis_json": _relative_to_run(run_dir, analysis_path),
                 "report_markdown": _relative_to_run(run_dir, report_file),

@@ -167,6 +167,7 @@ def _render_run_page(manifest: dict[str, Any], settings: SiteSettings) -> str:
               <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
               <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
               <p><strong>Duration</strong><span>{ticker_summary.get('duration_seconds', 0):.1f}s</span></p>
+              <p><strong>Quality flags</strong><span>{_escape(', '.join(ticker_summary.get('quality_flags') or []) or '-')}</span></p>
               <p><strong>Decision</strong><span>{_escape(ticker_summary.get('decision') or ticker_summary.get('error') or '-')}</span></p>
             </article>
             """
@@ -249,6 +250,7 @@ def _render_ticker_page(
         <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
         <p><strong>Decision</strong><span>{_escape(ticker_summary.get('decision') or '-')}</span></p>
         <p><strong>Duration</strong><span>{ticker_summary.get('duration_seconds', 0):.1f}s</span></p>
+        <p><strong>Quality flags</strong><span>{_escape(', '.join(ticker_summary.get('quality_flags') or []) or '-')}</span></p>
         <p><strong>LLM calls</strong><span>{ticker_summary.get('metrics', {}).get('llm_calls', 0)}</span></p>
         <p><strong>Tool calls</strong><span>{ticker_summary.get('metrics', {}).get('tool_calls', 0)}</span></p>
       </div>
