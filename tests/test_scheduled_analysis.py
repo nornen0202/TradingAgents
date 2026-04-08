@@ -98,6 +98,9 @@ site_dir = "{site_dir.as_posix()}"
 [site]
 title = "Daily Reports"
 subtitle = "Automated"
+
+[ticker_names]
+NVDA = "NVIDIA Override"
 """,
                 encoding="utf-8",
             )
@@ -130,7 +133,7 @@ subtitle = "Automated"
             self.assertIn("Daily Reports", index_html)
             self.assertIn("partial failure", index_html)
             self.assertIn("NVDA", run_html)
-            self.assertIn("NVIDIA Corporation (NVDA)", run_html)
+            self.assertIn("NVIDIA Override (NVDA)", run_html)
             self.assertIn("Rendered report", ticker_html)
             self.assertIn("Analysis date", ticker_html)
             self.assertIn("NVIDIA Corporation (NVDA)", ticker_html)
