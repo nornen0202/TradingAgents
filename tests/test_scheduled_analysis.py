@@ -30,6 +30,7 @@ class _FakeTradingAgentsGraph:
 
         final_state = {
             "company_of_interest": ticker,
+            "instrument_profile": {"display_name": "NVIDIA Corporation"},
             "trade_date": trade_date,
             "analysis_date": analysis_date or trade_date,
             "market_report": f"## Market\n{ticker} market analysis",
@@ -119,8 +120,10 @@ subtitle = "Automated"
             self.assertIn("Daily Reports", index_html)
             self.assertIn("partial failure", index_html)
             self.assertIn("NVDA", run_html)
+            self.assertIn("NVIDIA Corporation (NVDA)", run_html)
             self.assertIn("Rendered report", ticker_html)
             self.assertIn("Analysis date", ticker_html)
+            self.assertIn("NVIDIA Corporation (NVDA)", ticker_html)
             self.assertTrue((site_dir / "downloads" / manifest["run_id"] / "NVDA" / "complete_report.md").exists())
 
     def test_main_site_only_rebuilds_from_existing_archive(self):
@@ -164,6 +167,7 @@ subtitle = "Automated"
                         "tickers": [
                             {
                                 "ticker": "NVDA",
+                                "ticker_name": "NVIDIA Corporation",
                                 "status": "success",
                                 "analysis_date": "2026-04-05",
                                 "trade_date": "2026-04-04",
@@ -208,7 +212,8 @@ site_dir = "{site_dir.as_posix()}"
 
             self.assertEqual(exit_code, 0)
             self.assertTrue((site_dir / "index.html").exists())
-            self.assertIn("NVDA", (site_dir / "runs" / "20260405T091300_seed" / "NVDA.html").read_text(encoding="utf-8"))
+            ticker_page = (site_dir / "runs" / "20260405T091300_seed" / "NVDA.html").read_text(encoding="utf-8")
+            self.assertIn("NVIDIA Corporation (NVDA)", ticker_page)
 
 
 if __name__ == "__main__":
