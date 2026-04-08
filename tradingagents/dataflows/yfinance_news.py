@@ -45,7 +45,7 @@ def _extract_article_fields(article: dict) -> dict:
     """Extract article data from yfinance news format."""
     if "content" in article:
         content = article["content"]
-        provider = content.get("provider", {})
+        provider = content.get("provider") or {}
         url_obj = content.get("canonicalUrl") or content.get("clickThroughUrl") or {}
         return {
             "title": content.get("title", "No title"),
