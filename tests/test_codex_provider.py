@@ -242,6 +242,43 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(result.content, "Final decision")
         self.assertEqual(session.started, 1)
 
+    def test_plain_response_captures_usage_metadata_from_notifications(self):
+        session = FakeCodexSession(responses=['{"answer":"With usage"}'])
+
+        original_invoke = session.invoke
+
+        def invoke_with_usage(**kwargs):
+            result = original_invoke(**kwargs)
+            return CodexInvocationResult(
+                final_text=result.final_text,
+                notifications=[
+                    {
+                        "method": "turn/completed",
+                        "params": {
+                            "turn": {
+                                "id": "abc",
+                                "status": "completed",
+                                "usage": {"input_tokens": 11, "output_tokens": 7},
+                            }
+                        },
+                    }
+                ],
+            )
+
+        session.invoke = invoke_with_usage
+        llm = create_llm_client(
+            "codex",
+            "gpt-5.4",
+            codex_binary="C:/fake/codex",
+            codex_workspace_dir="C:/tmp/codex-workspace",
+            session_factory=lambda **kwargs: session,
+            preflight_runner=lambda **kwargs: None,
+        ).get_llm()
+
+        result = llm.invoke("Give me the final answer.")
+        self.assertEqual(result.usage_metadata["input_tokens"], 11)
+        self.assertEqual(result.usage_metadata["output_tokens"], 7)
+
     def test_invoke_accepts_openai_style_message_dicts(self):
         session = FakeCodexSession(
             responses=['{"answer":"From dict transcript"}'],

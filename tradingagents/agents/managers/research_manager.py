@@ -28,9 +28,11 @@ def create_research_manager(llm, memory):
 
 Your job:
 - weigh the strongest bullish and bearish evidence
-- reduce action bias; use NO_TRADE when the evidence is too weak or conflicted
+- separate directional stance (portfolio_stance) from immediate action (entry_action)
+- use NO_TRADE only when immediate action is not justified today; this can still coexist with a bullish stance and WAIT
+- when evidence is positive but setup is incomplete, prefer portfolio_stance=BULLISH with entry_action=WAIT (or STARTER only with clear trigger logic)
 - focus on evidence arbitration rather than rhetorical style
-- make the catalysts and invalidators explicit
+- make catalysts, invalidators, watchlist_triggers, and data_coverage explicit
 
 Use these objective reports for grounding:
 Market Report:
