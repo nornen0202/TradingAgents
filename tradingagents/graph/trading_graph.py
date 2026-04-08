@@ -91,6 +91,11 @@ class TradingAgentsGraph:
             base_url=self.config.get("backend_url"),
             **llm_kwargs,
         )
+        output_model = (
+            self.config.get("output_think_llm")
+            or self.config.get("output_model")
+            or self.config["quick_think_llm"]
+        )
         quick_client = create_llm_client(
             provider=self.config["llm_provider"],
             model=self.config["quick_think_llm"],
@@ -99,7 +104,7 @@ class TradingAgentsGraph:
         )
         output_client = create_llm_client(
             provider=self.config["llm_provider"],
-            model=self.config["output_think_llm"],
+            model=output_model,
             base_url=self.config.get("backend_url"),
             **llm_kwargs,
         )
@@ -328,12 +333,17 @@ class TradingAgentsGraph:
         localized = dict(final_state)
 
         def maybe_localize(content: str, *, content_type: str) -> str:
+            localization_llm = getattr(self, "output_thinking_llm", None) or getattr(
+                self, "quick_thinking_llm", None
+            )
             try:
                 parse_structured_decision(content)
                 return content
             except StructuredDecisionValidationError:
+                if localization_llm is None:
+                    return content
                 return rewrite_in_output_language(
-                    self.output_thinking_llm,
+                    localization_llm,
                     content,
                     content_type=content_type,
                 )
