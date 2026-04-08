@@ -287,6 +287,7 @@ def _run_single_ticker(
             "models": {
                 "quick_model": config.llm.quick_model,
                 "deep_model": config.llm.deep_model,
+                "output_model": config.llm.output_model,
             },
         }
         analysis_path = ticker_dir / "analysis.json"
@@ -351,6 +352,7 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     graph_config["llm_provider"] = config.llm.provider
     graph_config["quick_think_llm"] = config.llm.quick_model
     graph_config["deep_think_llm"] = config.llm.deep_model
+    graph_config["output_think_llm"] = config.llm.output_model
     graph_config["max_debate_rounds"] = config.run.max_debate_rounds
     graph_config["max_risk_discuss_rounds"] = config.run.max_risk_discuss_rounds
     graph_config["output_language"] = config.run.output_language
@@ -412,6 +414,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "provider": config.llm.provider,
         "quick_model": config.llm.quick_model,
         "deep_model": config.llm.deep_model,
+        "output_model": config.llm.output_model,
         "codex_reasoning_effort": config.llm.codex_reasoning_effort,
         "output_language": config.run.output_language,
         "analysts": list(config.run.analysts),
