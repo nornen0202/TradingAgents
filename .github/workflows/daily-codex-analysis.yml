@@ -1,11 +1,6 @@
 name: Daily Codex Analysis
 
 on:
-  schedule:
-    # 10:00 UTC = 19:00 Asia/Seoul (US ticker run)
-    - cron: "0 10 * * *"
-    # 23:00 UTC = 08:00 Asia/Seoul (KR ticker run)
-    - cron: "0 23 * * *"
   workflow_dispatch:
     inputs:
       profile:
@@ -42,7 +37,7 @@ concurrency:
 
 jobs:
   analyze_us:
-    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 10 * * *') }}
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us') }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
@@ -274,13 +269,13 @@ jobs:
           throw "bash.exe was not found under the expected Git for Windows directories."
 
       - name: Upload GitHub Pages artifact
-        if: ${{ github.event_name == 'schedule' || github.event.inputs.profile == 'us' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us') }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   analyze_kr:
-    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr') }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
@@ -512,7 +507,7 @@ jobs:
           throw "bash.exe was not found under the expected Git for Windows directories."
 
       - name: Upload GitHub Pages artifact
-        if: ${{ github.event_name == 'schedule' || github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all') }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
