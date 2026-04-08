@@ -20,15 +20,60 @@ class DecisionRating(str, Enum):
     NO_TRADE = "NO_TRADE"
 
 
+class PortfolioStance(str, Enum):
+    BEARISH = "BEARISH"
+    NEUTRAL = "NEUTRAL"
+    BULLISH = "BULLISH"
+
+
+class EntryAction(str, Enum):
+    NONE = "NONE"
+    WAIT = "WAIT"
+    STARTER = "STARTER"
+    ADD = "ADD"
+    EXIT = "EXIT"
+
+
+class SetupQuality(str, Enum):
+    WEAK = "WEAK"
+    DEVELOPING = "DEVELOPING"
+    COMPELLING = "COMPELLING"
+
+
 class TimeHorizon(str, Enum):
     SHORT = "short"
     MEDIUM = "medium"
     LONG = "long"
 
 
+class SocialSource(str, Enum):
+    DEDICATED = "dedicated"
+    NEWS_DERIVED = "news_derived"
+    UNAVAILABLE = "unavailable"
+
+
+@dataclass(frozen=True)
+class DataCoverage:
+    company_news_count: int
+    disclosures_count: int
+    social_source: SocialSource
+    macro_items_count: int
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "company_news_count": self.company_news_count,
+            "disclosures_count": self.disclosures_count,
+            "social_source": self.social_source.value,
+            "macro_items_count": self.macro_items_count,
+        }
+
+
 @dataclass(frozen=True)
 class StructuredDecision:
     rating: DecisionRating
+    portfolio_stance: PortfolioStance
+    entry_action: EntryAction
+    setup_quality: SetupQuality
     confidence: float
     time_horizon: TimeHorizon
     entry_logic: str
@@ -37,10 +82,15 @@ class StructuredDecision:
     risk_limits: str
     catalysts: tuple[str, ...]
     invalidators: tuple[str, ...]
+    watchlist_triggers: tuple[str, ...]
+    data_coverage: DataCoverage
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "rating": self.rating.value,
+            "portfolio_stance": self.portfolio_stance.value,
+            "entry_action": self.entry_action.value,
+            "setup_quality": self.setup_quality.value,
             "confidence": self.confidence,
             "time_horizon": self.time_horizon.value,
             "entry_logic": self.entry_logic,
@@ -49,6 +99,8 @@ class StructuredDecision:
             "risk_limits": self.risk_limits,
             "catalysts": list(self.catalysts),
             "invalidators": list(self.invalidators),
+            "watchlist_triggers": list(self.watchlist_triggers),
+            "data_coverage": self.data_coverage.to_dict(),
         }
 
     def to_json(self, *, indent: int = 2) -> str:
@@ -60,7 +112,10 @@ def build_decision_output_instructions(context: str) -> str:
         f"Return only one valid JSON object for the {context}. "
         "Do not wrap it in markdown fences. "
         "The schema is: "
-        '{"rating":"BUY | OVERWEIGHT | HOLD | UNDERWEIGHT | SELL | NO_TRADE",'
+        '{"rating":"NO_TRADE | UNDERWEIGHT | HOLD | OVERWEIGHT | BUY | SELL",'
+        '"portfolio_stance":"BEARISH | NEUTRAL | BULLISH",'
+        '"entry_action":"NONE | WAIT | STARTER | ADD | EXIT",'
+        '"setup_quality":"WEAK | DEVELOPING | COMPELLING",'
         '"confidence":0.0,'
         '"time_horizon":"short | medium | long",'
         '"entry_logic":"...",'
@@ -68,8 +123,12 @@ def build_decision_output_instructions(context: str) -> str:
         '"position_sizing":"...",'
         '"risk_limits":"...",'
         '"catalysts":["..."],'
-        '"invalidators":["..."]}. '
-        "Use an uppercase rating, confidence between 0 and 1 inclusive, and concise but specific strings."
+        '"invalidators":["..."],'
+        '"watchlist_triggers":["..."],'
+        '"data_coverage":{"company_news_count":0,"disclosures_count":0,"social_source":"dedicated | news_derived | unavailable","macro_items_count":0}}. '
+        "Keep rating as legacy compatibility only. Use portfolio_stance for directional view, and entry_action for immediate action. "
+        "NO_TRADE should mean no immediate action basis, not necessarily bearish stance. "
+        "Use uppercase enum fields, confidence between 0 and 1 inclusive, and concise but specific strings."
     )
 
 
@@ -129,6 +188,16 @@ def _require_string_list(data: Mapping[str, Any], field_name: str) -> tuple[str,
     return tuple(normalized)
 
 
+def _infer_stance_action_from_rating(rating: DecisionRating) -> tuple[PortfolioStance, EntryAction, SetupQuality]:
+    if rating in {DecisionRating.BUY, DecisionRating.OVERWEIGHT}:
+        return PortfolioStance.BULLISH, EntryAction.ADD, SetupQuality.COMPELLING
+    if rating == DecisionRating.HOLD:
+        return PortfolioStance.NEUTRAL, EntryAction.WAIT, SetupQuality.DEVELOPING
+    if rating in {DecisionRating.UNDERWEIGHT, DecisionRating.SELL}:
+        return PortfolioStance.BEARISH, EntryAction.EXIT, SetupQuality.WEAK
+    return PortfolioStance.NEUTRAL, EntryAction.NONE, SetupQuality.DEVELOPING
+
+
 def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDecision:
     data = _extract_json_object(payload)
     missing_fields = {
@@ -165,8 +234,42 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
             f"Unsupported time horizon: {data.get('time_horizon')!r}."
         ) from exc
 
+    inferred_stance, inferred_entry, inferred_setup = _infer_stance_action_from_rating(rating)
+
+    try:
+        portfolio_stance = PortfolioStance(str(data.get("portfolio_stance", inferred_stance.value)).strip().upper())
+    except ValueError as exc:
+        raise StructuredDecisionValidationError(
+            f"Unsupported portfolio stance: {data.get('portfolio_stance')!r}."
+        ) from exc
+
+    try:
+        entry_action = EntryAction(str(data.get("entry_action", inferred_entry.value)).strip().upper())
+    except ValueError as exc:
+        raise StructuredDecisionValidationError(
+            f"Unsupported entry action: {data.get('entry_action')!r}."
+        ) from exc
+
+    try:
+        setup_quality = SetupQuality(str(data.get("setup_quality", inferred_setup.value)).strip().upper())
+    except ValueError as exc:
+        raise StructuredDecisionValidationError(
+            f"Unsupported setup quality: {data.get('setup_quality')!r}."
+        ) from exc
+
+    raw_coverage = data.get("data_coverage") if isinstance(data.get("data_coverage"), Mapping) else {}
+    try:
+        social_source = SocialSource(str(raw_coverage.get("social_source", "unavailable")).strip().lower())
+    except ValueError as exc:
+        raise StructuredDecisionValidationError(
+            f"Unsupported social source: {raw_coverage.get('social_source')!r}."
+        ) from exc
+
     return StructuredDecision(
         rating=rating,
+        portfolio_stance=portfolio_stance,
+        entry_action=entry_action,
+        setup_quality=setup_quality,
         confidence=confidence,
         time_horizon=time_horizon,
         entry_logic=_require_string(data, "entry_logic"),
@@ -175,6 +278,13 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
         risk_limits=_require_string(data, "risk_limits"),
         catalysts=_require_string_list(data, "catalysts"),
         invalidators=_require_string_list(data, "invalidators"),
+        watchlist_triggers=_require_string_list(data, "watchlist_triggers") if "watchlist_triggers" in data else tuple(),
+        data_coverage=DataCoverage(
+            company_news_count=max(0, int(raw_coverage.get("company_news_count", 0) or 0)),
+            disclosures_count=max(0, int(raw_coverage.get("disclosures_count", 0) or 0)),
+            social_source=social_source,
+            macro_items_count=max(0, int(raw_coverage.get("macro_items_count", 0) or 0)),
+        ),
     )
 
 
