@@ -271,6 +271,14 @@ jobs:
             }
           }
 
+          throw "bash.exe was not found under the expected Git for Windows directories."
+
+      - name: Upload GitHub Pages artifact
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.profile == 'us' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
   analyze_kr:
     if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
     runs-on: [self-hosted, Windows]
@@ -504,12 +512,16 @@ jobs:
           throw "bash.exe was not found under the expected Git for Windows directories."
 
       - name: Upload GitHub Pages artifact
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   deploy:
-    needs: analyze
+    needs:
+      - analyze_us
+      - analyze_kr
+    if: ${{ always() && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && (needs.analyze_us.result == 'success' || needs.analyze_kr.result == 'success') }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
