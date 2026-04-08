@@ -23,7 +23,26 @@ class StructuredDecisionTests(unittest.TestCase):
         processor = SignalProcessor(None)
 
         self.assertEqual(decision.rating.value, "BUY")
+        self.assertEqual(decision.portfolio_stance.value, "BULLISH")
         self.assertEqual(processor.process_signal(payload), "BUY")
+
+    def test_legacy_schema_defaults_new_fields(self):
+        payload = """
+        {
+          "rating": "NO_TRADE",
+          "confidence": 0.52,
+          "time_horizon": "short",
+          "entry_logic": "Wait for setup.",
+          "exit_logic": "N/A",
+          "position_sizing": "0%",
+          "risk_limits": "No new risk.",
+          "catalysts": ["Breakout confirmation"],
+          "invalidators": ["Support loss"]
+        }
+        """
+        decision = parse_structured_decision(payload)
+        self.assertEqual(decision.entry_action.value, "NONE")
+        self.assertEqual(decision.data_coverage.social_source.value, "unavailable")
 
     def test_invalid_schema_raises_validation_error(self):
         payload = '{"confidence": 0.5, "time_horizon": "short"}'

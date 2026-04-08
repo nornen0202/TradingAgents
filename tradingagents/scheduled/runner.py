@@ -14,7 +14,9 @@ import yfinance as yf
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
+from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry
 from tradingagents.graph.trading_graph import TradingAgentsGraph
+from tradingagents.schemas import parse_structured_decision
 from tradingagents.reporting import save_report_bundle
 
 from .config import ScheduledAnalysisConfig, load_scheduled_config, with_overrides
@@ -109,6 +111,8 @@ def execute_scheduled_run(
         },
         "tickers": ticker_summaries,
     }
+    manifest["batch_metrics"] = _compute_batch_metrics(ticker_summaries)
+    manifest["warnings"] = _compute_batch_warnings(manifest["batch_metrics"])
 
     _write_json(run_dir / "run.json", manifest)
     _write_json(config.storage.archive_dir / "latest-run.json", manifest)
@@ -191,12 +195,19 @@ def _run_single_ticker(
 ) -> dict[str, Any]:
     ticker_dir = run_dir / "tickers" / ticker
     ticker_dir.mkdir(parents=True, exist_ok=True)
+    resolved_name = ticker
+    try:
+        resolved_name = resolve_instrument(ticker).display_name
+    except Exception:
+        resolved_name = ticker
+    resolved_name = config.run.ticker_name_overrides.get(ticker, resolved_name)
 
     ticker_started = datetime.now(ZoneInfo(config.run.timezone))
     timer_start = perf_counter()
     analysis_date = ticker_started.date().isoformat()
 
     try:
+        reset_tool_telemetry()
         trade_date = resolve_trade_date(ticker, config)
         stats_handler = StatsCallbackHandler()
         graph = TradingAgentsGraph(
@@ -210,6 +221,7 @@ def _run_single_ticker(
             trade_date,
             analysis_date=analysis_date,
         )
+        structured_decision = str(final_state.get("final_trade_decision") or decision)
 
         report_dir = ticker_dir / "report"
         report_file = save_report_bundle(
@@ -234,16 +246,43 @@ def _run_single_ticker(
             copied_graph_log.write_text(graph_log.read_text(encoding="utf-8"), encoding="utf-8")
 
         metrics = stats_handler.get_stats()
+        tool_events = snapshot_tool_telemetry()
+        tool_by_vendor: dict[str, int] = {}
+        fallback_count = 0
+        for event in tool_events:
+            tool_by_vendor[event["vendor"]] = tool_by_vendor.get(event["vendor"], 0) + 1
+            if event.get("fallback"):
+                fallback_count += 1
+        quality_flags: list[str] = []
+        effective_tool_calls = max(int(metrics.get("tool_calls", 0) or 0), len(tool_events))
+        if effective_tool_calls == 0:
+            quality_flags.append("no_tool_calls_detected")
+            print(f"::warning::No tool calls were recorded for {ticker}; report quality may be degraded.")
+        if not metrics.get("tokens_available", False):
+            quality_flags.append("token_usage_unavailable")
         analysis_payload = {
             "ticker": ticker,
+            "ticker_name": (
+                config.run.ticker_name_overrides.get(ticker)
+                or
+                ((final_state.get("instrument_profile") or {}).get("display_name"))
+                or resolved_name
+            ),
             "status": "success",
             "trade_date": trade_date,
             "analysis_date": analysis_date,
-            "decision": str(decision),
+            "decision": structured_decision,
             "started_at": ticker_started.isoformat(),
             "finished_at": datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
             "duration_seconds": round(perf_counter() - timer_start, 2),
-            "metrics": metrics,
+            "metrics": {**metrics, "tool_calls": effective_tool_calls},
+            "tool_telemetry": {
+                "total_tool_calls": effective_tool_calls,
+                "vendor_calls": tool_by_vendor,
+                "fallback_count": fallback_count,
+                "events": tool_events,
+            },
+            "quality_flags": quality_flags,
             "provider": config.llm.provider,
             "models": {
                 "quick_model": config.llm.quick_model,
@@ -255,14 +294,17 @@ def _run_single_ticker(
 
         return {
             "ticker": ticker,
+            "ticker_name": analysis_payload["ticker_name"],
             "status": "success",
             "trade_date": trade_date,
             "analysis_date": analysis_date,
-            "decision": str(decision),
+            "decision": structured_decision,
             "started_at": ticker_started.isoformat(),
             "finished_at": analysis_payload["finished_at"],
             "duration_seconds": analysis_payload["duration_seconds"],
-            "metrics": metrics,
+            "metrics": {**metrics, "tool_calls": effective_tool_calls},
+            "tool_telemetry": analysis_payload["tool_telemetry"],
+            "quality_flags": quality_flags,
             "artifacts": {
                 "analysis_json": _relative_to_run(run_dir, analysis_path),
                 "report_markdown": _relative_to_run(run_dir, report_file),
@@ -273,6 +315,7 @@ def _run_single_ticker(
     except Exception as exc:
         error_payload = {
             "ticker": ticker,
+            "ticker_name": resolved_name,
             "status": "failed",
             "analysis_date": analysis_date,
             "error": str(exc),
@@ -286,6 +329,7 @@ def _run_single_ticker(
 
         return {
             "ticker": ticker,
+            "ticker_name": resolved_name,
             "status": "failed",
             "analysis_date": analysis_date,
             "trade_date": None,
@@ -316,6 +360,15 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     graph_config["codex_request_timeout"] = config.llm.codex_request_timeout
     graph_config["codex_max_retries"] = config.llm.codex_max_retries
     graph_config["codex_cleanup_threads"] = config.llm.codex_cleanup_threads
+    if config.run.timezone == "Asia/Seoul":
+        graph_config["market_country"] = "KR"
+        graph_config["timezone"] = "Asia/Seoul"
+        graph_config["tool_vendors"] = {
+            "get_company_news": "naver,yfinance,alpha_vantage",
+            "get_disclosures": "opendart",
+            "get_macro_news": "ecos,alpha_vantage,yfinance",
+            "get_social_sentiment": "naver,yfinance",
+        }
     if config.llm.codex_workspace_dir:
         graph_config["codex_workspace_dir"] = config.llm.codex_workspace_dir
     if config.llm.codex_binary:
@@ -365,7 +418,66 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "trade_date_mode": config.run.trade_date_mode,
         "max_debate_rounds": config.run.max_debate_rounds,
         "max_risk_discuss_rounds": config.run.max_risk_discuss_rounds,
+        "ticker_name_overrides_count": len(config.run.ticker_name_overrides),
     }
+
+
+def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, Any]:
+    successful = [item for item in ticker_summaries if item.get("status") == "success"]
+    decision_distribution: dict[str, int] = {}
+    stance_distribution: dict[str, int] = {}
+    entry_action_distribution: dict[str, int] = {}
+    confidences: list[float] = []
+    zero_company_news = 0
+
+    for item in successful:
+        raw = item.get("decision")
+        if isinstance(raw, str) and raw.strip().startswith("{"):
+            try:
+                parsed = parse_structured_decision(raw)
+                decision_distribution[parsed.rating.value] = decision_distribution.get(parsed.rating.value, 0) + 1
+                stance_distribution[parsed.portfolio_stance.value] = stance_distribution.get(parsed.portfolio_stance.value, 0) + 1
+                entry_action_distribution[parsed.entry_action.value] = entry_action_distribution.get(parsed.entry_action.value, 0) + 1
+                confidences.append(parsed.confidence)
+                if parsed.data_coverage.company_news_count == 0:
+                    zero_company_news += 1
+                continue
+            except Exception:
+                pass
+        value = str(raw or "UNKNOWN")
+        decision_distribution[value] = decision_distribution.get(value, 0) + 1
+
+    total = len(successful)
+    avg_confidence = (sum(confidences) / len(confidences)) if confidences else None
+    return {
+        "decision_distribution": decision_distribution,
+        "stance_distribution": stance_distribution,
+        "entry_action_distribution": entry_action_distribution,
+        "avg_confidence": avg_confidence,
+        "company_news_zero_ratio": (zero_company_news / total) if total else None,
+    }
+
+
+def _compute_batch_warnings(batch_metrics: dict[str, Any]) -> list[str]:
+    warnings: list[str] = []
+    decision_distribution = batch_metrics.get("decision_distribution") or {}
+    total = sum(int(v) for v in decision_distribution.values())
+    if total < 10:
+        return warnings
+
+    no_trade_count = int(decision_distribution.get("NO_TRADE", 0))
+    no_trade_ratio = no_trade_count / total if total else 0.0
+    if no_trade_ratio >= 0.8:
+        warnings.append(
+            f"High NO_TRADE concentration: {no_trade_count}/{total} ({no_trade_ratio:.0%})."
+        )
+        bullish = int((batch_metrics.get("stance_distribution") or {}).get("BULLISH", 0))
+        waiting = int((batch_metrics.get("entry_action_distribution") or {}).get("WAIT", 0))
+        if (bullish / total) >= 0.3 or (waiting / total) >= 0.3:
+            warnings.append(
+                "Legacy NO_TRADE concentration coexists with constructive stance/action signals; calibrate stance-action mapping."
+            )
+    return warnings
 
 
 def _build_run_id(started_at: datetime, run_label: str) -> str:

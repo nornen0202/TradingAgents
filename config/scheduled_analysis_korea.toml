@@ -1,11 +1,11 @@
 [run]
-tickers = ["000660.KS", "005380.KS", "005930.KS", "010950.KS", "012450.KS", "034020.KS", "042700.KS", "058470.KS", "064400.KS", "095340.KS", "278470.KS", "396500.KS"]
+tickers = ["000660.KS", "005380.KS", "005930.KS", "010950.KS", "012450.KS", "034020.KS", "042700.KS", "058470.KQ", "064400.KS", "095340.KS", "278470.KS"]
 analysts = ["market", "social", "news", "fundamentals"]
 output_language = "Korean"
 trade_date_mode = "latest_available"
 timezone = "Asia/Seoul"
-max_debate_rounds = 1
-max_risk_discuss_rounds = 1
+max_debate_rounds = 2
+max_risk_discuss_rounds = 2
 latest_market_data_lookback_days = 14
 continue_on_ticker_error = true
 
@@ -31,3 +31,24 @@ site_dir = "./site"
 title = "TradingAgents Daily Reports - KR"
 subtitle = "Self-hosted Codex automation for scheduled KR-market multi-ticker analysis"
 max_runs_on_homepage = 30
+
+[notes]
+market_country = "KR"
+timezone = "Asia/Seoul"
+vendor_priority_get_company_news = "naver,yfinance,alpha_vantage"
+vendor_priority_get_disclosures = "opendart"
+vendor_priority_get_macro_news = "ecos,alpha_vantage,yfinance"
+vendor_priority_get_social_sentiment = "naver,yfinance"
+
+[ticker_names]
+"000660.KS" = "SK하이닉스"
+"005380.KS" = "현대차"
+"005930.KS" = "삼성전자"
+"010950.KS" = "S-Oil"
+"012450.KS" = "한화에어로스페이스"
+"034020.KS" = "두산에너빌리티"
+"042700.KS" = "한미반도체"
+"058470.KQ" = "리노공업"
+"064400.KS" = "LG CNS"
+"095340.KS" = "ISC"
+"278470.KS" = "에이피알"

@@ -6,6 +6,47 @@ import yfinance as yf
 import os
 from .stockstats_utils import StockstatsUtils, _clean_dataframe, yf_retry, load_ohlcv, filter_financials_by_date
 
+
+def _build_yfinance_symbol_candidates(raw_ticker: str) -> list[str]:
+    normalized = (raw_ticker or "").strip().upper()
+    if not normalized:
+        return []
+
+    candidates: list[str] = [normalized]
+
+    if "." in normalized:
+        base, suffix = normalized.split(".", 1)
+        if base.isdigit() and len(base) == 6 and suffix in {"KS", "KQ"}:
+            if base not in candidates:
+                candidates.append(base)
+            alt_suffix = "KQ" if suffix == "KS" else "KS"
+            alt_symbol = f"{base}.{alt_suffix}"
+            if alt_symbol not in candidates:
+                candidates.append(alt_symbol)
+    elif normalized.isdigit() and len(normalized) == 6:
+        candidates.extend([f"{normalized}.KS", f"{normalized}.KQ"])
+
+    deduped: list[str] = []
+    for candidate in candidates:
+        if candidate not in deduped:
+            deduped.append(candidate)
+    return deduped
+
+
+def _resolve_info_with_symbol_fallback(raw_ticker: str) -> tuple[str | None, dict | None, list[str]]:
+    attempts: list[str] = []
+    for candidate in _build_yfinance_symbol_candidates(raw_ticker):
+        ticker_obj = yf.Ticker(candidate)
+        try:
+            info = yf_retry(lambda: ticker_obj.info)
+        except Exception as exc:
+            attempts.append(f"{candidate}: {exc}")
+            continue
+        if info:
+            return candidate, info, attempts
+        attempts.append(f"{candidate}: empty info")
+    return None, None, attempts
+
 def get_YFin_data_online(
     symbol: Annotated[str, "ticker symbol of the company"],
     start_date: Annotated[str, "Start date in yyyy-mm-dd format"],
@@ -251,11 +292,14 @@ def get_fundamentals(
 ):
     """Get company fundamentals overview from yfinance."""
     try:
-        ticker_obj = yf.Ticker(ticker.upper())
-        info = yf_retry(lambda: ticker_obj.info)
+        resolved_ticker, info, attempts = _resolve_info_with_symbol_fallback(ticker)
 
         if not info:
-            return f"No fundamentals data found for symbol '{ticker}'"
+            attempt_summary = "; ".join(attempts)
+            return (
+                f"No fundamentals data found for symbol '{ticker}'. "
+                f"Attempted Yahoo Finance symbols: {attempt_summary}"
+            )
 
         fields = [
             ("Name", info.get("longName")),
@@ -293,7 +337,7 @@ def get_fundamentals(
             if value is not None:
                 lines.append(f"{label}: {value}")
 
-        header = f"# Company Fundamentals for {ticker.upper()}\n"
+        header = f"# Company Fundamentals for {resolved_ticker or ticker.upper()}\n"
         header += f"# Data retrieved on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
 
         return header + "\n".join(lines)

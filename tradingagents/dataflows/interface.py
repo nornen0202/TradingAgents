@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import threading
 from datetime import datetime
 from typing import Any
 
@@ -157,6 +159,39 @@ _SEMANTIC_EMPTY_MARKERS = (
     "no social provider",
     "no social sentiment",
 )
+
+_TELEMETRY_LOCK = threading.Lock()
+_TOOL_TELEMETRY_EVENTS: list[dict[str, Any]] = []
+
+
+def reset_tool_telemetry() -> None:
+    with _TELEMETRY_LOCK:
+        _TOOL_TELEMETRY_EVENTS.clear()
+
+
+def snapshot_tool_telemetry() -> list[dict[str, Any]]:
+    with _TELEMETRY_LOCK:
+        return [event.copy() for event in _TOOL_TELEMETRY_EVENTS]
+
+
+def _record_tool_telemetry(
+    *,
+    method: str,
+    vendor: str,
+    status: str,
+    fallback: bool,
+    note: str | None = None,
+) -> None:
+    with _TELEMETRY_LOCK:
+        _TOOL_TELEMETRY_EVENTS.append(
+            {
+                "method": method,
+                "vendor": vendor,
+                "status": status,
+                "fallback": fallback,
+                "note": note,
+            }
+        )
 
 
 def get_category_for_method(method: str) -> str:
@@ -330,16 +365,53 @@ def route_to_vendor(method: str, *args, **kwargs):
             result = vendor_impl(*args, **kwargs)
             if should_fallback(result, method):
                 last_result = result
-                fallback_notes.append(f"{vendor}: empty or unusable result")
+                note = f"{vendor}: empty or unusable result"
+                _record_tool_telemetry(
+                    method=method,
+                    vendor=vendor,
+                    status="fallback",
+                    fallback=True,
+                    note=note,
+                )
+                fallback_notes.append(note)
+                _emit_vendor_fallback_log(method, note)
                 continue
+            _record_tool_telemetry(
+                method=method,
+                vendor=vendor,
+                status="success",
+                fallback=False,
+            )
             return result
         except VendorInputError:
+            _record_tool_telemetry(
+                method=method,
+                vendor=vendor,
+                status="input_error",
+                fallback=False,
+            )
             raise
         except Exception as exc:
             if should_fallback(exc, method):
                 last_exception = exc
-                fallback_notes.append(f"{vendor}: {exc}")
+                note = f"{vendor}: {exc}"
+                _record_tool_telemetry(
+                    method=method,
+                    vendor=vendor,
+                    status="fallback",
+                    fallback=True,
+                    note=note,
+                )
+                fallback_notes.append(note)
+                _emit_vendor_fallback_log(method, note)
                 continue
+            _record_tool_telemetry(
+                method=method,
+                vendor=vendor,
+                status="error",
+                fallback=False,
+                note=str(exc),
+            )
             raise
 
     if last_result is not None:
@@ -347,6 +419,27 @@ def route_to_vendor(method: str, *args, **kwargs):
 
     if last_exception is not None:
         note = " | ".join(fallback_notes)
+        if method == "get_disclosures":
+            return "No disclosures found (provider unavailable)."
+        if method == "get_social_sentiment":
+            return "No social sentiment data found (provider unavailable)."
         raise RuntimeError(f"No available vendor for '{method}'. Fallback attempts: {note}") from last_exception
 
+    if method == "get_disclosures":
+        return "No disclosures found (provider unavailable)."
+    if method == "get_social_sentiment":
+        return "No social sentiment data found (provider unavailable)."
+
     raise RuntimeError(f"No available vendor for '{method}'.")
+
+
+def _emit_vendor_fallback_log(method: str, note: str) -> None:
+    """Emit fallback diagnostics for CI logs without exposing secret values."""
+    if method not in {"get_disclosures", "get_social_sentiment"}:
+        return
+
+    message = f"Vendor fallback for {method}: {note}"
+    if os.getenv("GITHUB_ACTIONS") == "true":
+        print(f"::warning::{message}")
+        return
+    print(f"[vendor-fallback] {message}")

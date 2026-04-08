@@ -17,6 +17,16 @@ class _FakeStatsHandler:
         }
 
 
+class _ZeroToolStatsHandler:
+    def get_stats(self):
+        return {
+            "llm_calls": 5,
+            "tool_calls": 0,
+            "tokens_in": 100,
+            "tokens_out": 200,
+        }
+
+
 class _FakeTradingAgentsGraph:
     def __init__(self, selected_analysts, debug=False, config=None, callbacks=None):
         self.selected_analysts = selected_analysts
@@ -30,6 +40,7 @@ class _FakeTradingAgentsGraph:
 
         final_state = {
             "company_of_interest": ticker,
+            "instrument_profile": {"display_name": "NVIDIA Corporation"},
             "trade_date": trade_date,
             "analysis_date": analysis_date or trade_date,
             "market_report": f"## Market\n{ticker} market analysis",
@@ -87,6 +98,9 @@ site_dir = "{site_dir.as_posix()}"
 [site]
 title = "Daily Reports"
 subtitle = "Automated"
+
+[ticker_names]
+NVDA = "NVIDIA Override"
 """,
                 encoding="utf-8",
             )
@@ -119,8 +133,11 @@ subtitle = "Automated"
             self.assertIn("Daily Reports", index_html)
             self.assertIn("partial failure", index_html)
             self.assertIn("NVDA", run_html)
+            self.assertIn("NVIDIA Override (NVDA)", run_html)
             self.assertIn("Rendered report", ticker_html)
             self.assertIn("Analysis date", ticker_html)
+            self.assertIn("NVIDIA Override (NVDA)", ticker_html)
+            self.assertIn("Quality flags", ticker_html)
             self.assertTrue((site_dir / "downloads" / manifest["run_id"] / "NVDA" / "complete_report.md").exists())
 
     def test_main_site_only_rebuilds_from_existing_archive(self):
@@ -164,6 +181,7 @@ subtitle = "Automated"
                         "tickers": [
                             {
                                 "ticker": "NVDA",
+                                "ticker_name": "NVIDIA Corporation",
                                 "status": "success",
                                 "analysis_date": "2026-04-05",
                                 "trade_date": "2026-04-04",
@@ -208,7 +226,42 @@ site_dir = "{site_dir.as_posix()}"
 
             self.assertEqual(exit_code, 0)
             self.assertTrue((site_dir / "index.html").exists())
-            self.assertIn("NVDA", (site_dir / "runs" / "20260405T091300_seed" / "NVDA.html").read_text(encoding="utf-8"))
+            ticker_page = (site_dir / "runs" / "20260405T091300_seed" / "NVDA.html").read_text(encoding="utf-8")
+            self.assertIn("NVIDIA Corporation (NVDA)", ticker_page)
+
+    def test_execute_scheduled_run_marks_quality_flag_when_no_tool_calls(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["NVDA"]
+continue_on_ticker_error = true
+
+[llm]
+provider = "codex"
+quick_model = "gpt-5.4"
+deep_model = "gpt-5.4"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+            with (
+                patch("tradingagents.scheduled.runner.TradingAgentsGraph", _FakeTradingAgentsGraph),
+                patch("tradingagents.scheduled.runner.StatsCallbackHandler", _ZeroToolStatsHandler),
+                patch("tradingagents.scheduled.runner.resolve_trade_date", return_value="2026-04-04"),
+            ):
+                manifest = execute_scheduled_run(config, run_label="quality")
+
+            ticker_summary = manifest["tickers"][0]
+            self.assertIn("no_tool_calls_detected", ticker_summary.get("quality_flags", []))
 
 
 if __name__ == "__main__":

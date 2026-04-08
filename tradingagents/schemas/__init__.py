@@ -1,5 +1,8 @@
 from .decision import (
     DecisionRating,
+    EntryAction,
+    PortfolioStance,
+    SetupQuality,
     StructuredDecision,
     StructuredDecisionValidationError,
     TimeHorizon,
@@ -10,6 +13,9 @@ from .decision import (
 
 __all__ = [
     "DecisionRating",
+    "EntryAction",
+    "PortfolioStance",
+    "SetupQuality",
     "StructuredDecision",
     "StructuredDecisionValidationError",
     "TimeHorizon",

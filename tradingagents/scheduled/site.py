@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import SiteSettings
+from tradingagents.schemas import parse_structured_decision
 
 try:
     from markdown_it import MarkdownIt
@@ -139,7 +140,13 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
             """
         )
 
-    body = latest_html + f"""
+    warning_html = ""
+    if latest and latest.get("warnings"):
+        warning_html = "".join(
+            f"<div class='warning-banner'>{_escape(warning)}</div>" for warning in latest.get("warnings", [])
+        )
+
+    body = latest_html + warning_html + f"""
     <section class="section">
       <div class="section-head">
         <h2>Recent runs</h2>
@@ -163,10 +170,14 @@ def _render_run_page(manifest: dict[str, Any], settings: SiteSettings) -> str:
                 <a href="{_escape(ticker_summary['ticker'])}.html">{_escape(ticker_summary['ticker'])}</a>
                 <span class="status {ticker_summary['status']}">{_escape(ticker_summary['status'])}</span>
               </div>
+              <p><strong>Company</strong><span>{_escape(_ticker_display_label(ticker_summary))}</span></p>
               <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
               <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
               <p><strong>Duration</strong><span>{ticker_summary.get('duration_seconds', 0):.1f}s</span></p>
-              <p><strong>Decision</strong><span>{_escape(ticker_summary.get('decision') or ticker_summary.get('error') or '-')}</span></p>
+              <p><strong>Quality flags</strong><span>{_escape(', '.join(ticker_summary.get('quality_flags') or []) or '-')}</span></p>
+              <p><strong>Decision</strong><span>{_escape(_legacy_decision(ticker_summary.get('decision') or ticker_summary.get('error')))}</span></p>
+              <p><strong>Stance</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'portfolio_stance'))}</span></p>
+              <p><strong>Entry action</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'entry_action'))}</span></p>
             </article>
             """
         )
@@ -239,17 +250,24 @@ def _render_ticker_page(
     <section class="hero compact">
       <div>
         <p class="eyebrow">Ticker report</p>
-        <h1>{_escape(ticker_summary['ticker'])}</h1>
+        <h1>{_escape(_ticker_display_label(ticker_summary))}</h1>
         <p class="subtitle">Analysis {_escape(ticker_summary.get('analysis_date') or '-')} / Market {_escape(ticker_summary.get('trade_date') or '-')} / {_escape(ticker_summary['status'])}</p>
       </div>
       <div class="hero-card">
         <div class="status {ticker_summary['status']}">{_escape(ticker_summary['status'])}</div>
         <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
         <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
-        <p><strong>Decision</strong><span>{_escape(ticker_summary.get('decision') or '-')}</span></p>
+        <p><strong>Decision</strong><span>{_escape(_legacy_decision(ticker_summary.get('decision')))}</span></p>
+        <p><strong>Portfolio stance</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'portfolio_stance'))}</span></p>
+        <p><strong>Entry action</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'entry_action'))}</span></p>
+        <p><strong>Setup quality</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'setup_quality'))}</span></p>
         <p><strong>Duration</strong><span>{ticker_summary.get('duration_seconds', 0):.1f}s</span></p>
-        <p><strong>LLM calls</strong><span>{ticker_summary.get('metrics', {}).get('llm_calls', 0)}</span></p>
-        <p><strong>Tool calls</strong><span>{ticker_summary.get('metrics', {}).get('tool_calls', 0)}</span></p>
+        <p><strong>Quality flags</strong><span>{_escape(', '.join(ticker_summary.get('quality_flags') or []) or '-')}</span></p>
+        <p><strong>LLM calls</strong><span>{ticker_summary.get('metrics', {}).get('llm_calls', 'unavailable')}</span></p>
+        <p><strong>Tool calls</strong><span>{ticker_summary.get('metrics', {}).get('tool_calls', 'unavailable')}</span></p>
+        <p><strong>Token usage</strong><span>{_token_usage_label(ticker_summary.get('metrics', {}))}</span></p>
+        <p><strong>Vendor calls</strong><span>{_escape(_vendor_counts_label(ticker_summary.get('tool_telemetry', {}).get('vendor_calls')))}</span></p>
+        <p><strong>Fallback count</strong><span>{ticker_summary.get('tool_telemetry', {}).get('fallback_count', 'unavailable')}</span></p>
       </div>
     </section>
     <section class="section">
@@ -269,7 +287,7 @@ def _render_ticker_page(
     </section>
     """
     return _page_template(
-        f"{ticker_summary['ticker']} | {settings.title}",
+        f"{_ticker_display_label(ticker_summary)} | {settings.title}",
         body,
         prefix="../../",
     )
@@ -291,6 +309,50 @@ def _page_template(title: str, body: str, *, prefix: str) -> str:
 </body>
 </html>
 """
+
+
+def _ticker_display_label(ticker_summary: dict[str, Any]) -> str:
+    ticker = str(ticker_summary.get("ticker") or "").strip()
+    ticker_name = str(ticker_summary.get("ticker_name") or "").strip()
+    if ticker_name and ticker and ticker_name.upper() != ticker.upper():
+        return f"{ticker_name} ({ticker})"
+    return ticker_name or ticker or "-"
+
+
+def _decision_field(raw_decision: Any, field: str) -> str:
+    if not isinstance(raw_decision, str) or not raw_decision.strip().startswith("{"):
+        return "-"
+    try:
+        decision = parse_structured_decision(raw_decision)
+    except Exception:
+        return "-"
+    mapping = {
+        "portfolio_stance": decision.portfolio_stance.value,
+        "entry_action": decision.entry_action.value,
+        "setup_quality": decision.setup_quality.value,
+    }
+    return mapping.get(field, "-")
+
+
+def _legacy_decision(raw_decision: Any) -> str:
+    if not isinstance(raw_decision, str) or not raw_decision.strip().startswith("{"):
+        return str(raw_decision or "-")
+    try:
+        return parse_structured_decision(raw_decision).rating.value
+    except Exception:
+        return str(raw_decision or "-")
+
+
+def _token_usage_label(metrics: dict[str, Any]) -> str:
+    if not metrics.get("tokens_available", False):
+        return "unavailable"
+    return f"in={metrics.get('tokens_in', 0)} / out={metrics.get('tokens_out', 0)}"
+
+
+def _vendor_counts_label(counts: dict[str, int] | None) -> str:
+    if not counts:
+        return "unavailable"
+    return ", ".join(f"{vendor}:{count}" for vendor, count in sorted(counts.items()))
 
 
 def _render_markdown(content: str) -> str:
@@ -431,6 +493,15 @@ a { color: inherit; }
   justify-content: space-between;
   gap: 16px;
   align-items: baseline;
+}
+
+.warning-banner {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(196, 106, 28, 0.4);
+  background: rgba(196, 106, 28, 0.12);
+  color: #7a3f0b;
 }
 
 .run-grid, .ticker-grid {

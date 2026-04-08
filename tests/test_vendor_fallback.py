@@ -1,4 +1,5 @@
 import unittest
+import os
 from unittest.mock import patch
 
 from tradingagents.dataflows.alpha_vantage_common import AlphaVantageRateLimitError
@@ -71,6 +72,37 @@ class VendorFallbackTests(unittest.TestCase):
         with self.assertRaises(VendorInputError):
             route_to_vendor("get_company_news", "AAPL", "2026/04/01", "2026-04-02")
 
+    def test_disclosures_degrade_gracefully_when_provider_missing(self):
+        with patch("tradingagents.dataflows.interface.get_vendor", return_value="opendart"), patch.dict(
+            "tradingagents.dataflows.interface.VENDOR_METHODS",
+            {
+                "get_disclosures": {
+                    "opendart": lambda *_args, **_kwargs: (_ for _ in ()).throw(VendorConfigurationError("missing opendart key")),
+                }
+            },
+            clear=False,
+        ):
+            result = route_to_vendor("get_disclosures", "000660", "2026-04-01", "2026-04-02")
+
+        self.assertIn("No disclosures found", result)
+        self.assertIn("provider unavailable", result)
+
+    def test_social_sentiment_returns_unavailable_when_all_vendors_fail(self):
+        with patch("tradingagents.dataflows.interface.get_vendor", return_value="naver,yfinance"), patch.dict(
+            "tradingagents.dataflows.interface.VENDOR_METHODS",
+            {
+                "get_social_sentiment": {
+                    "naver": lambda *_args, **_kwargs: (_ for _ in ()).throw(VendorConfigurationError("missing naver key")),
+                    "yfinance": lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("yfinance outage")),
+                }
+            },
+            clear=False,
+        ):
+            result = route_to_vendor("get_social_sentiment", "000660", "2026-04-01", "2026-04-02")
+
+        self.assertIn("No social sentiment data found", result)
+        self.assertIn("provider unavailable", result)
+
     def test_social_sentiment_degrades_gracefully_when_primary_provider_missing(self):
         with patch("tradingagents.dataflows.interface.get_vendor", return_value="naver,yfinance"), patch.dict(
             "tradingagents.dataflows.interface.VENDOR_METHODS",
@@ -86,6 +118,23 @@ class VendorFallbackTests(unittest.TestCase):
 
         self.assertIn("Dedicated social provider unavailable", result)
         self.assertIn("news-derived sentiment", result)
+
+    def test_social_sentiment_fallback_emits_github_actions_warning_log(self):
+        with patch("tradingagents.dataflows.interface.get_vendor", return_value="naver,yfinance"), patch.dict(
+            "tradingagents.dataflows.interface.VENDOR_METHODS",
+            {
+                "get_social_sentiment": {
+                    "naver": lambda *_args, **_kwargs: (_ for _ in ()).throw(VendorConfigurationError("missing naver key")),
+                    "yfinance": lambda *_args, **_kwargs: "ok",
+                }
+            },
+            clear=False,
+        ), patch.dict(os.environ, {"GITHUB_ACTIONS": "true"}, clear=False), patch("builtins.print") as mocked_print:
+            route_to_vendor("get_social_sentiment", "000660", "2026-04-01", "2026-04-02")
+
+        mocked_print.assert_any_call(
+            "::warning::Vendor fallback for get_social_sentiment: naver: missing naver key"
+        )
 
 
 if __name__ == "__main__":
