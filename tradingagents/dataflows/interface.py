@@ -347,6 +347,15 @@ def route_to_vendor(method: str, *args, **kwargs):
 
     if last_exception is not None:
         note = " | ".join(fallback_notes)
+        if method == "get_disclosures":
+            return "No disclosures found (provider unavailable)."
+        if method == "get_social_sentiment":
+            return "No social sentiment data found (provider unavailable)."
         raise RuntimeError(f"No available vendor for '{method}'. Fallback attempts: {note}") from last_exception
+
+    if method == "get_disclosures":
+        return "No disclosures found (provider unavailable)."
+    if method == "get_social_sentiment":
+        return "No social sentiment data found (provider unavailable)."
 
     raise RuntimeError(f"No available vendor for '{method}'.")

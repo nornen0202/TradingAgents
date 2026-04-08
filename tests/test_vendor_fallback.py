@@ -71,6 +71,37 @@ class VendorFallbackTests(unittest.TestCase):
         with self.assertRaises(VendorInputError):
             route_to_vendor("get_company_news", "AAPL", "2026/04/01", "2026-04-02")
 
+    def test_disclosures_degrade_gracefully_when_provider_missing(self):
+        with patch("tradingagents.dataflows.interface.get_vendor", return_value="opendart"), patch.dict(
+            "tradingagents.dataflows.interface.VENDOR_METHODS",
+            {
+                "get_disclosures": {
+                    "opendart": lambda *_args, **_kwargs: (_ for _ in ()).throw(VendorConfigurationError("missing opendart key")),
+                }
+            },
+            clear=False,
+        ):
+            result = route_to_vendor("get_disclosures", "000660", "2026-04-01", "2026-04-02")
+
+        self.assertIn("No disclosures found", result)
+        self.assertIn("provider unavailable", result)
+
+    def test_social_sentiment_returns_unavailable_when_all_vendors_fail(self):
+        with patch("tradingagents.dataflows.interface.get_vendor", return_value="naver,yfinance"), patch.dict(
+            "tradingagents.dataflows.interface.VENDOR_METHODS",
+            {
+                "get_social_sentiment": {
+                    "naver": lambda *_args, **_kwargs: (_ for _ in ()).throw(VendorConfigurationError("missing naver key")),
+                    "yfinance": lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("yfinance outage")),
+                }
+            },
+            clear=False,
+        ):
+            result = route_to_vendor("get_social_sentiment", "000660", "2026-04-01", "2026-04-02")
+
+        self.assertIn("No social sentiment data found", result)
+        self.assertIn("provider unavailable", result)
+
     def test_social_sentiment_degrades_gracefully_when_primary_provider_missing(self):
         with patch("tradingagents.dataflows.interface.get_vendor", return_value="naver,yfinance"), patch.dict(
             "tradingagents.dataflows.interface.VENDOR_METHODS",
