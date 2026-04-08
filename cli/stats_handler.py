@@ -65,6 +65,9 @@ class StatsCallbackHandler(BaseCallbackHandler):
             message = generation.message
             if isinstance(message, AIMessage) and hasattr(message, "usage_metadata"):
                 usage_metadata = message.usage_metadata
+            if not usage_metadata and isinstance(message, AIMessage):
+                response_metadata = getattr(message, "response_metadata", {}) or {}
+                usage_metadata = response_metadata.get("token_usage")
 
         if usage_metadata:
             with self._lock:

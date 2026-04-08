@@ -200,6 +200,7 @@ def _run_single_ticker(
         resolved_name = resolve_instrument(ticker).display_name
     except Exception:
         resolved_name = ticker
+    resolved_name = config.run.ticker_name_overrides.get(ticker, resolved_name)
 
     ticker_started = datetime.now(ZoneInfo(config.run.timezone))
     timer_start = perf_counter()
@@ -262,6 +263,8 @@ def _run_single_ticker(
         analysis_payload = {
             "ticker": ticker,
             "ticker_name": (
+                config.run.ticker_name_overrides.get(ticker)
+                or
                 ((final_state.get("instrument_profile") or {}).get("display_name"))
                 or resolved_name
             ),
@@ -415,6 +418,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "trade_date_mode": config.run.trade_date_mode,
         "max_debate_rounds": config.run.max_debate_rounds,
         "max_risk_discuss_rounds": config.run.max_risk_discuss_rounds,
+        "ticker_name_overrides_count": len(config.run.ticker_name_overrides),
     }
 
 
