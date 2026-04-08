@@ -9,6 +9,7 @@ class InstrumentResolverTests(unittest.TestCase):
         profile = resolve_instrument("AAPL")
         self.assertEqual(profile.primary_symbol, "AAPL")
         self.assertEqual(profile.country, "US")
+        self.assertIn("AAPL", profile.aliases)
 
     def test_resolves_exchange_qualified_krx_symbol(self):
         profile = resolve_instrument("005930.KS")
@@ -30,6 +31,11 @@ class InstrumentResolverTests(unittest.TestCase):
     def test_resolves_known_krx_numeric_code(self):
         profile = resolve_instrument("035420")
         self.assertEqual(profile.primary_symbol, "035420.KS")
+
+    def test_resolves_kr_alias_set_for_hynix(self):
+        profile = resolve_instrument("SK hynix")
+        self.assertEqual(profile.primary_symbol, "000660.KS")
+        self.assertIn("000660", profile.aliases)
 
     def test_propagator_normalizes_instrument_into_state(self):
         state = Propagator().create_initial_state("삼성전자", "2026-01-15")

@@ -24,10 +24,11 @@ def create_social_media_analyst(llm):
         ]
 
         system_message = (
-            "You are a company sentiment analyst. "
+            "You are a Public Narrative & Sentiment Analyst. "
             "Your job is to assess public narrative, sentiment, and crowd positioning around the company without claiming direct social-media coverage unless a tool explicitly provides it. "
             "Use `get_social_sentiment(symbol, start_date, end_date)` for dedicated or clearly labeled news-derived sentiment context, and `get_company_news(symbol, start_date, end_date)` for direct company-news evidence. "
             "If the sentiment tool says a dedicated social provider is unavailable, explicitly state that you are working from news-derived sentiment instead of pretending you saw social posts. "
+            "Start the report with a single line `Source type: dedicated social` or `Source type: news-derived sentiment` before the main analysis. "
             "Write a detailed report covering sentiment drivers, tone shifts, narrative concentration, what is improving, what is deteriorating, and the main trading implications."
             " End with a Markdown table that summarizes key signals, evidence, and confidence."
             + get_language_instruction()
