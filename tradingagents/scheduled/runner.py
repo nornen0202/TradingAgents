@@ -191,6 +191,11 @@ def _run_single_ticker(
 ) -> dict[str, Any]:
     ticker_dir = run_dir / "tickers" / ticker
     ticker_dir.mkdir(parents=True, exist_ok=True)
+    resolved_name = ticker
+    try:
+        resolved_name = resolve_instrument(ticker).display_name
+    except Exception:
+        resolved_name = ticker
 
     ticker_started = datetime.now(ZoneInfo(config.run.timezone))
     timer_start = perf_counter()
@@ -236,6 +241,10 @@ def _run_single_ticker(
         metrics = stats_handler.get_stats()
         analysis_payload = {
             "ticker": ticker,
+            "ticker_name": (
+                ((final_state.get("instrument_profile") or {}).get("display_name"))
+                or resolved_name
+            ),
             "status": "success",
             "trade_date": trade_date,
             "analysis_date": analysis_date,
@@ -255,6 +264,7 @@ def _run_single_ticker(
 
         return {
             "ticker": ticker,
+            "ticker_name": analysis_payload["ticker_name"],
             "status": "success",
             "trade_date": trade_date,
             "analysis_date": analysis_date,
@@ -273,6 +283,7 @@ def _run_single_ticker(
     except Exception as exc:
         error_payload = {
             "ticker": ticker,
+            "ticker_name": resolved_name,
             "status": "failed",
             "analysis_date": analysis_date,
             "error": str(exc),
@@ -286,6 +297,7 @@ def _run_single_ticker(
 
         return {
             "ticker": ticker,
+            "ticker_name": resolved_name,
             "status": "failed",
             "analysis_date": analysis_date,
             "trade_date": None,
