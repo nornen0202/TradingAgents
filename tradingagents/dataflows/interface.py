@@ -5,8 +5,6 @@ import threading
 from datetime import datetime
 from typing import Any
 
-from tradingagents.agents.utils.instrument_resolver import resolve_instrument
-
 from .alpha_vantage import (
     get_balance_sheet as get_alpha_vantage_balance_sheet,
     get_cashflow as get_alpha_vantage_cashflow,
@@ -237,6 +235,8 @@ def _prioritize_market_specific_vendors(method: str, vendor_chain: list[str], ar
             reordered.insert(0, vendor_name)
 
     try:
+        from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+
         if method in {"get_news", "get_company_news", "get_social_sentiment", "get_disclosures"}:
             symbol = kwargs.get("symbol") or kwargs.get("ticker") or (args[0] if args else None)
             if isinstance(symbol, str):

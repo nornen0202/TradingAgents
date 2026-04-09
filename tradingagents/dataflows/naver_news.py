@@ -7,8 +7,6 @@ from email.utils import parsedate_to_datetime
 
 import requests
 
-from tradingagents.agents.utils.instrument_resolver import resolve_instrument
-
 from .api_keys import get_api_key
 from .config import get_config
 from .news_models import NewsItem, dedupe_news_items, filter_news_items_by_date, format_news_items_report
@@ -31,6 +29,25 @@ def _get_headers() -> dict[str, str]:
         "X-Naver-Client-Id": client_id,
         "X-Naver-Client-Secret": client_secret,
     }
+
+
+def validate_naver_credentials(*, sample_query: str = "삼성전자") -> None:
+    try:
+        response = requests.get(
+            _NAVER_NEWS_ENDPOINT,
+            headers=_get_headers(),
+            params={"query": sample_query, "display": 1, "sort": "date"},
+            timeout=float(get_config().get("vendor_timeout", 15)),
+        )
+        if response.status_code in {401, 403}:
+            raise VendorConfigurationError(
+                f"Naver News credentials were rejected ({response.status_code} {response.reason})."
+            )
+        response.raise_for_status()
+    except VendorConfigurationError:
+        raise
+    except requests.RequestException as exc:
+        raise VendorTransientError(f"Naver News validation request failed: {exc}") from exc
 
 
 def normalize_naver_article(article: dict, *, fallback_symbol: str) -> NewsItem:
@@ -58,6 +75,8 @@ def normalize_naver_article(article: dict, *, fallback_symbol: str) -> NewsItem:
 
 
 def fetch_company_news_naver(symbol: str, start_date: str, end_date: str, display: int = 20) -> list[NewsItem]:
+    from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+
     profile = resolve_instrument(symbol)
     query_candidates = [symbol]
     if profile.country == "KR":
@@ -80,7 +99,13 @@ def fetch_company_news_naver(symbol: str, start_date: str, end_date: str, displa
                 params={"query": query, "display": display, "sort": "date"},
                 timeout=float(get_config().get("vendor_timeout", 15)),
             )
+            if response.status_code in {401, 403}:
+                raise VendorConfigurationError(
+                    f"Naver News credentials were rejected ({response.status_code} {response.reason})."
+                )
             response.raise_for_status()
+        except VendorConfigurationError:
+            raise
         except requests.RequestException as exc:
             raise VendorTransientError(f"Naver News request failed: {exc}") from exc
         payload = response.json()

@@ -5,11 +5,10 @@ from datetime import datetime
 from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
+from zipfile import BadZipFile
 import io
 
 import requests
-
-from tradingagents.agents.utils.instrument_resolver import is_krx_symbol, resolve_instrument
 
 from .api_keys import get_api_key
 from .config import get_config
@@ -25,6 +24,10 @@ def _get_opendart_key() -> str:
     if not api_key:
         raise VendorConfigurationError("OpenDART API key is not configured.")
     return api_key
+
+
+def validate_opendart_credentials() -> None:
+    _download_corp_code_map()
 
 
 def _corp_code_cache_path() -> Path:
@@ -44,9 +47,14 @@ def _download_corp_code_map() -> dict[str, str]:
     except requests.RequestException as exc:
         raise VendorTransientError(f"OpenDART corpCode download failed: {exc}") from exc
 
-    with ZipFile(io.BytesIO(response.content)) as zipped:
-        xml_name = zipped.namelist()[0]
-        xml_bytes = zipped.read(xml_name)
+    try:
+        with ZipFile(io.BytesIO(response.content)) as zipped:
+            xml_name = zipped.namelist()[0]
+            xml_bytes = zipped.read(xml_name)
+    except (BadZipFile, ET.ParseError, IndexError) as exc:
+        raise VendorConfigurationError(
+            "OpenDART credentials were rejected or returned an invalid corpCode payload."
+        ) from exc
 
     root = ET.fromstring(xml_bytes)
     corp_codes: dict[str, str] = {}
@@ -71,6 +79,8 @@ def _load_corp_code_map() -> dict[str, str]:
 
 
 def _resolve_corp_code(symbol: str) -> tuple[str | None, str | None]:
+    from tradingagents.agents.utils.instrument_resolver import is_krx_symbol, resolve_instrument
+
     profile = resolve_instrument(symbol)
     if profile.country != "KR" and not is_krx_symbol(profile.primary_symbol):
         return None, None
