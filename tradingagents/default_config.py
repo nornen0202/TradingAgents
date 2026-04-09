@@ -29,6 +29,17 @@ DEFAULT_CONFIG = {
     # Output language for analyst reports and final decision
     # Internal agent debate stays in English for reasoning quality
     "output_language": "English",
+    "translation": {
+        "backend": "nllb_ct2",
+        "model": "nllb-200-distilled-600m",
+        "model_path": os.getenv("TRADINGAGENTS_TRANSLATION_MODEL_PATH"),
+        "tokenizer_path": os.getenv("TRADINGAGENTS_TRANSLATION_TOKENIZER_PATH"),
+        "device": os.getenv("TRADINGAGENTS_TRANSLATION_DEVICE", "auto"),
+        "compute_type": "auto",
+        "max_chunk_chars": 1800,
+        "allow_llm_fallback": True,
+        "allow_large_model": False,
+    },
     # Debate and discussion settings
     "max_debate_rounds": 1,
     "max_risk_discuss_rounds": 1,

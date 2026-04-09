@@ -1,6 +1,13 @@
 from langchain_core.messages import HumanMessage, RemoveMessage, ToolMessage
 import re
 
+from tradingagents.translation import (
+    TranslationBackendError,
+    get_translation_settings,
+    should_skip_translation,
+    translate_with_backend,
+)
+
 # Import tools from separate utility files
 from tradingagents.agents.utils.core_stock_tools import (
     get_stock_data
@@ -61,6 +68,19 @@ def rewrite_in_output_language(llm, content: str, *, content_type: str = "report
     lang = get_output_language()
     if lang.lower() == "english":
         return content
+    if should_skip_translation(content, lang):
+        return _normalize_localized_finance_terms(content, lang)
+
+    settings = get_translation_settings()
+    if settings.backend != "llm":
+        try:
+            translated = translate_with_backend(content, lang)
+        except TranslationBackendError:
+            if not settings.allow_llm_fallback:
+                raise
+        else:
+            if translated.strip():
+                return _normalize_localized_finance_terms(translated, lang)
 
     messages = [
         (
@@ -159,13 +179,14 @@ def needs_initial_tool_call(messages) -> bool:
 
 
 def bind_tools_for_analyst(llm, tools, *, force_tool_call: bool):
-    """Bind tools and require at least one call on the first analyst turn when supported."""
+    """Bind tools and require at least one tool call on the first analyst turn when supported."""
     if not force_tool_call:
         return llm.bind_tools(tools)
     try:
         return llm.bind_tools(tools, tool_choice="required")
     except TypeError:
         return llm.bind_tools(tools)
+
 
 def create_msg_delete():
     def delete_messages(state):
@@ -181,6 +202,3 @@ def create_msg_delete():
         return {"messages": removal_operations + [placeholder]}
 
     return delete_messages
-
-
-        

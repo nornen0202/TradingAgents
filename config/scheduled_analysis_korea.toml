@@ -23,6 +23,15 @@ codex_request_timeout = 180.0
 codex_max_retries = 2
 codex_cleanup_threads = true
 
+[translation]
+backend = "nllb_ct2"
+model = "nllb-200-distilled-600m"
+device = "auto"
+compute_type = "auto"
+max_chunk_chars = 1800
+allow_llm_fallback = true
+allow_large_model = false
+
 [storage]
 # Keep run history in a dedicated archive for the KR schedule.
 archive_dir = "./.runtime/tradingagents-archive"

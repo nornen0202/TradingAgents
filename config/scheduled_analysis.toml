@@ -23,6 +23,15 @@ codex_request_timeout = 180.0
 codex_max_retries = 2
 codex_cleanup_threads = true
 
+[translation]
+backend = "nllb_ct2"
+model = "nllb-200-distilled-600m"
+device = "auto"
+compute_type = "auto"
+max_chunk_chars = 1800
+allow_llm_fallback = true
+allow_large_model = false
+
 [storage]
 # For a self-hosted runner, it is better to override this to a persistent absolute path
 # via the TRADINGAGENTS_ARCHIVE_DIR repository variable or by editing this file.

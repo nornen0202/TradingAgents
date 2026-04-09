@@ -325,7 +325,7 @@ class TradingAgentsGraph:
         return self.signal_processor.process_signal(full_signal)
 
     def _localize_final_state(self, final_state: Dict[str, Any]) -> Dict[str, Any]:
-        """Rewrite persisted user-facing outputs into the configured output language."""
+        """Rewrite only the persisted report-facing outputs into the configured output language."""
         language = get_output_language()
         if language.lower() == "english":
             return final_state
@@ -353,9 +353,7 @@ class TradingAgentsGraph:
             ("sentiment_report", "social sentiment report"),
             ("news_report", "news analyst report"),
             ("fundamentals_report", "fundamentals analyst report"),
-            ("investment_plan", "research manager investment plan"),
             ("trader_investment_plan", "trader plan"),
-            ("final_trade_decision", "portfolio manager final decision"),
         ):
             localized[field_name] = maybe_localize(
                 localized.get(field_name, ""),
@@ -366,8 +364,6 @@ class TradingAgentsGraph:
         for field_name, content_type in (
             ("bull_history", "bull researcher debate history"),
             ("bear_history", "bear researcher debate history"),
-            ("history", "investment debate transcript"),
-            ("current_response", "investment debate latest response"),
             ("judge_decision", "research manager decision"),
         ):
             investment_debate[field_name] = maybe_localize(
@@ -381,10 +377,6 @@ class TradingAgentsGraph:
             ("aggressive_history", "aggressive risk analyst debate history"),
             ("conservative_history", "conservative risk analyst debate history"),
             ("neutral_history", "neutral risk analyst debate history"),
-            ("history", "risk debate transcript"),
-            ("current_aggressive_response", "aggressive risk analyst latest response"),
-            ("current_conservative_response", "conservative risk analyst latest response"),
-            ("current_neutral_response", "neutral risk analyst latest response"),
             ("judge_decision", "portfolio manager decision"),
         ):
             risk_debate[field_name] = maybe_localize(

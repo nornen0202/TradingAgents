@@ -356,6 +356,17 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     graph_config["max_debate_rounds"] = config.run.max_debate_rounds
     graph_config["max_risk_discuss_rounds"] = config.run.max_risk_discuss_rounds
     graph_config["output_language"] = config.run.output_language
+    graph_config["translation"] = {
+        "backend": config.translation.backend,
+        "model": config.translation.model,
+        "model_path": config.translation.model_path,
+        "tokenizer_path": config.translation.tokenizer_path,
+        "device": config.translation.device,
+        "compute_type": config.translation.compute_type,
+        "max_chunk_chars": config.translation.max_chunk_chars,
+        "allow_llm_fallback": config.translation.allow_llm_fallback,
+        "allow_large_model": config.translation.allow_large_model,
+    }
     graph_config["codex_reasoning_effort"] = config.llm.codex_reasoning_effort
     graph_config["codex_summary"] = config.llm.codex_summary
     graph_config["codex_personality"] = config.llm.codex_personality
@@ -417,6 +428,8 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "output_model": config.llm.output_model,
         "codex_reasoning_effort": config.llm.codex_reasoning_effort,
         "output_language": config.run.output_language,
+        "translation_backend": config.translation.backend,
+        "translation_model": config.translation.model,
         "analysts": list(config.run.analysts),
         "trade_date_mode": config.run.trade_date_mode,
         "max_debate_rounds": config.run.max_debate_rounds,
