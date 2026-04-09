@@ -26,6 +26,7 @@ class RunSettings:
     max_risk_discuss_rounds: int = 1
     latest_market_data_lookback_days: int = 14
     continue_on_ticker_error: bool = True
+    ticker_name_overrides: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,7 @@ class LLMSettings:
     provider: str = "codex"
     deep_model: str = "gpt-5.4"
     quick_model: str = "gpt-5.4"
+    output_model: str = "gpt-5.2"
     codex_reasoning_effort: str = "medium"
     codex_summary: str = "none"
     codex_personality: str = "none"
@@ -129,11 +131,13 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             max_risk_discuss_rounds=int(run_raw.get("max_risk_discuss_rounds", 1)),
             latest_market_data_lookback_days=int(run_raw.get("latest_market_data_lookback_days", 14)),
             continue_on_ticker_error=bool(run_raw.get("continue_on_ticker_error", True)),
+            ticker_name_overrides=_normalize_ticker_name_overrides(raw.get("ticker_names") or {}),
         ),
         llm=LLMSettings(
             provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
             deep_model=str(llm_raw.get("deep_model", "gpt-5.4")).strip() or "gpt-5.4",
             quick_model=str(llm_raw.get("quick_model", "gpt-5.4")).strip() or "gpt-5.4",
+            output_model=str(llm_raw.get("output_model", "gpt-5.2")).strip() or "gpt-5.2",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_summary=str(llm_raw.get("codex_summary", "none")).strip() or "none",
             codex_personality=str(llm_raw.get("codex_personality", "none")).strip() or "none",
@@ -223,6 +227,16 @@ def _normalize_analysts(values: Iterable[str]) -> list[str]:
         seen.add(analyst)
         normalized.append(analyst)
     return normalized or list(ALL_ANALYSTS)
+
+
+def _normalize_ticker_name_overrides(values: dict[str, object]) -> dict[str, str]:
+    normalized: dict[str, str] = {}
+    for key, value in (values or {}).items():
+        ticker = normalize_ticker_symbol(str(key))
+        name = str(value).strip()
+        if ticker and name:
+            normalized[ticker] = name
+    return normalized
 
 
 def _resolve_path(value: str | os.PathLike[str], base_dir: Path) -> Path:

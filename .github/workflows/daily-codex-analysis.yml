@@ -1,11 +1,6 @@
 name: Daily Codex Analysis
 
 on:
-  schedule:
-    # 10:00 UTC = 19:00 Asia/Seoul (US ticker run)
-    - cron: "0 10 * * *"
-    # 23:00 UTC = 08:00 Asia/Seoul (KR ticker run)
-    - cron: "0 23 * * *"
   workflow_dispatch:
     inputs:
       profile:
@@ -42,13 +37,14 @@ concurrency:
 
 jobs:
   analyze_us:
-    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 10 * * *') }}
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us') }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
       run:
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
@@ -65,13 +61,13 @@ jobs:
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
@@ -275,14 +271,23 @@ jobs:
             }
           }
 
+          throw "bash.exe was not found under the expected Git for Windows directories."
+
+      - name: Upload GitHub Pages artifact
+        if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us') }}
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
   analyze_kr:
-    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
+    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr') }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
       run:
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
@@ -299,13 +304,13 @@ jobs:
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
@@ -314,6 +319,36 @@ jobs:
           python -m pip install --upgrade pip
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python -m pip install -e ".[translation]"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      - name: Validate KR vendor credentials
+        if: ${{ github.event.inputs.site_only != 'true' }}
+        run: |
+          $script = @"
+          from tradingagents.dataflows.naver_news import validate_naver_credentials
+          from tradingagents.dataflows.opendart import validate_opendart_credentials
+          from tradingagents.dataflows.vendor_exceptions import VendorConfigurationError, VendorTransientError
+
+          checks = (
+              ("Naver News", validate_naver_credentials),
+              ("OpenDART", validate_opendart_credentials),
+          )
+
+          failures = []
+          for label, validator in checks:
+              try:
+                  validator()
+                  print(f"{label}: OK")
+              except (VendorConfigurationError, VendorTransientError) as exc:
+                  failures.append(f"{label}: {exc}")
+
+          if failures:
+              print("::error::KR vendor preflight failed. Fix the repository secrets before re-running.")
+              for failure in failures:
+                  print(f"::error::{failure}")
+              raise SystemExit(1)
+          "@
+          $script | python -
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
       - name: Resolve Codex runtime
@@ -512,17 +547,23 @@ jobs:
           throw "bash.exe was not found under the expected Git for Windows directories."
 
       - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all') }}
+        uses: actions/upload-pages-artifact@v4
         with:
           path: site
 
   deploy:
-    needs: analyze
+    needs:
+      - analyze_us
+      - analyze_kr
+    if: ${{ always() && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && (needs.analyze_us.result == 'success' || needs.analyze_kr.result == 'success') }}
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

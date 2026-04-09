@@ -1,4 +1,4 @@
-from langchain_core.messages import HumanMessage, RemoveMessage
+from langchain_core.messages import HumanMessage, RemoveMessage, ToolMessage
 import re
 
 from tradingagents.translation import (

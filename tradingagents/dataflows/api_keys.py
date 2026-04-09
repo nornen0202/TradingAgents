@@ -12,9 +12,53 @@ _DOC_ENV_MAP = {
     "OPENDART_API_KEY": "OpenDart",
 }
 
+_ENV_ALIASES = {
+    "ALPHA_VANTAGE_API_KEY": ("ALPHA_VANTAGE_API_KEY", "ALPHA_VANTAGE_KEY"),
+    "NAVER_CLIENT_ID": ("NAVER_CLIENT_ID", "NAVER_API_CLIENT_ID"),
+    "NAVER_CLIENT_SECRET": ("NAVER_CLIENT_SECRET", "NAVER_API_CLIENT_SECRET"),
+    "OPENDART_API_KEY": ("OPENDART_API_KEY", "OPEN_DART_API_KEY", "OPENDART_KEY"),
+}
+
+_PLACEHOLDER_VALUES = {
+    "[REDACTED]",
+    "<REDACTED>",
+    "REDACTED",
+    "[YOUR_KEY]",
+    "<YOUR_KEY>",
+    "YOUR_KEY",
+    "CHANGEME",
+    "CHANGE_ME",
+    "TODO",
+    "TBD",
+}
+
 
 def _get_api_keys_doc_path() -> Path:
     return Path(__file__).resolve().parents[2] / "Docs" / "list_api_keys.md"
+
+
+def _normalize_key_value(value: str | None) -> str | None:
+    if value is None:
+        return None
+
+    normalized = value.strip()
+    if not normalized:
+        return None
+
+    if (
+        len(normalized) >= 2
+        and normalized[0] == normalized[-1]
+        and normalized[0] in {'"', "'"}
+    ):
+        normalized = normalized[1:-1].strip()
+
+    if "\\n" in normalized and "\n" not in normalized:
+        normalized = normalized.replace("\\n", "")
+
+    normalized = normalized.strip()
+    if normalized.upper() in _PLACEHOLDER_VALUES:
+        return None
+    return normalized or None
 
 
 @lru_cache(maxsize=1)
@@ -34,13 +78,17 @@ def _load_documented_keys() -> dict[str, str]:
 
         if line.startswith("Alpha Vantage:"):
             _, value = line.split(":", 1)
-            parsed["ALPHA_VANTAGE_API_KEY"] = value.strip()
+            normalized = _normalize_key_value(value)
+            if normalized:
+                parsed["ALPHA_VANTAGE_API_KEY"] = normalized
             current_section = None
             continue
 
         if line.startswith("OpenDart:"):
             _, value = line.split(":", 1)
-            parsed["OPENDART_API_KEY"] = value.strip()
+            normalized = _normalize_key_value(value)
+            if normalized:
+                parsed["OPENDART_API_KEY"] = normalized
             current_section = None
             continue
 
@@ -51,22 +99,26 @@ def _load_documented_keys() -> dict[str, str]:
         if line.startswith("-") and ":" in line and current_section == "Naver":
             key, value = line[1:].split(":", 1)
             normalized_key = key.strip().lower()
+            normalized_value = _normalize_key_value(value)
+            if not normalized_value:
+                continue
             if normalized_key == "client id":
-                parsed["NAVER_CLIENT_ID"] = value.strip()
+                parsed["NAVER_CLIENT_ID"] = normalized_value
             elif normalized_key == "client secret":
-                parsed["NAVER_CLIENT_SECRET"] = value.strip()
+                parsed["NAVER_CLIENT_SECRET"] = normalized_value
             continue
 
     return parsed
 
 
 def get_api_key(env_name: str) -> str | None:
-    value = os.getenv(env_name)
-    if value:
-        return value.strip()
+    for candidate in _ENV_ALIASES.get(env_name, (env_name,)):
+        normalized = _normalize_key_value(os.getenv(candidate))
+        if normalized:
+            return normalized
 
-    documented = _load_documented_keys().get(env_name)
+    documented = _normalize_key_value(_load_documented_keys().get(env_name))
     if documented:
-        return documented.strip()
+        return documented
 
     return None
