@@ -80,6 +80,11 @@ quick_model = "gpt-5.4"
 deep_model = "gpt-5.4"
 codex_reasoning_effort = "medium"
 
+[translation]
+backend = "nllb_ct2"
+model = "nllb-200-distilled-600m"
+allow_llm_fallback = true
+
 [storage]
 archive_dir = "{archive_dir.as_posix()}"
 site_dir = "{site_dir.as_posix()}"
@@ -105,6 +110,8 @@ subtitle = "Automated"
             self.assertEqual(manifest["settings"]["provider"], "codex")
             self.assertEqual(manifest["settings"]["deep_model"], "gpt-5.4")
             self.assertEqual(manifest["settings"]["quick_model"], "gpt-5.4")
+            self.assertEqual(manifest["settings"]["translation_backend"], "nllb_ct2")
+            self.assertEqual(manifest["settings"]["translation_model"], "nllb-200-distilled-600m")
             self.assertEqual(manifest["tickers"][0]["analysis_date"], manifest["started_at"][:10])
 
             run_dir = archive_dir / "runs" / manifest["started_at"][:4] / manifest["run_id"]
@@ -151,6 +158,8 @@ subtitle = "Automated"
                             "deep_model": "gpt-5.4",
                             "codex_reasoning_effort": "medium",
                             "output_language": "Korean",
+                            "translation_backend": "nllb_ct2",
+                            "translation_model": "nllb-200-distilled-600m",
                             "analysts": ["market", "social", "news", "fundamentals"],
                             "trade_date_mode": "latest_available",
                             "max_debate_rounds": 1,

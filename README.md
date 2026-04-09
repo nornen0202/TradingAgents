@@ -120,6 +120,11 @@ Install the package and its dependencies:
 pip install .
 ```
 
+To enable the default local translation backend for Korean scheduled reports:
+```bash
+pip install ".[translation]"
+```
+
 Windows PowerShell quickstart (validated in this repository):
 ```powershell
 Set-Location C:\Projects\TradingAgents
@@ -166,6 +171,26 @@ codex login --device-auth
 ```
 
 TradingAgents talks directly to `codex app-server` over stdio and relies on Codex-managed credentials (for example `~/.codex/auth.json` when file-backed auth is enabled). If auth is missing, the provider fails with a message telling you to run `codex login`.
+
+### Local translation backend
+
+Scheduled configs in this repository now default to `NLLB-200-distilled-600M + CTranslate2` for report localization, with LLM fallback enabled when the local model is unavailable.
+
+- Recommended default for personal or non-commercial use: `translation.backend = "nllb_ct2"` and `translation.model = "nllb-200-distilled-600m"`
+- Optional large-model path: `translation.backend = "madlad_ct2"` and `translation.model = "madlad-400-3b"`
+- `madlad_ct2` is guarded by `translation.allow_large_model = true` (or `TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL=1`) so it is not enabled accidentally on undersized runners
+- Point `TRADINGAGENTS_TRANSLATION_MODEL_PATH` at a converted CTranslate2 model directory on your self-hosted runner
+- Optionally point `TRADINGAGENTS_TRANSLATION_TOKENIZER_PATH` at a local tokenizer cache; otherwise the default Hugging Face tokenizer id is used
+
+For GitHub Actions on self-hosted Windows runners, set these repository variables when you want local translation enabled:
+```text
+TRADINGAGENTS_TRANSLATION_MODEL_PATH=C:\models\nllb-200-distilled-600m-ct2
+TRADINGAGENTS_TRANSLATION_TOKENIZER_PATH=C:\models\nllb-200-distilled-600m
+TRADINGAGENTS_TRANSLATION_DEVICE=auto
+TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL=0
+```
+
+The localization pass now only rewrites the 12 report-facing fields that are actually rendered in the archived markdown bundle, and it skips translation when the content already appears to be Korean.
 
 Recommended `~/.codex/config.toml` for TradingAgents:
 ```toml

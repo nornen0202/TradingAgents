@@ -32,6 +32,13 @@ dependencies = [
     "yfinance>=0.2.63",
 ]
 
+[project.optional-dependencies]
+translation = [
+    "ctranslate2>=4.6.0",
+    "sentencepiece>=0.2.0",
+    "transformers>=4.46.0",
+]
+
 [project.scripts]
 tradingagents = "cli.main:app"
 tradingagents-scheduled = "tradingagents.scheduled.runner:main"

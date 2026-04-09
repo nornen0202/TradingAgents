@@ -44,6 +44,19 @@ class LLMSettings:
 
 
 @dataclass(frozen=True)
+class TranslationSettings:
+    backend: str = "nllb_ct2"
+    model: str = "nllb-200-distilled-600m"
+    model_path: str | None = None
+    tokenizer_path: str | None = None
+    device: str = "auto"
+    compute_type: str = "auto"
+    max_chunk_chars: int = 1800
+    allow_llm_fallback: bool = True
+    allow_large_model: bool = False
+
+
+@dataclass(frozen=True)
 class StorageSettings:
     archive_dir: Path
     site_dir: Path
@@ -60,6 +73,7 @@ class SiteSettings:
 class ScheduledAnalysisConfig:
     run: RunSettings
     llm: LLMSettings
+    translation: TranslationSettings
     storage: StorageSettings
     site: SiteSettings
     config_path: Path
@@ -72,6 +86,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
 
     run_raw = raw.get("run") or {}
     llm_raw = raw.get("llm") or {}
+    translation_raw = raw.get("translation") or {}
     storage_raw = raw.get("storage") or {}
     site_raw = raw.get("site") or {}
 
@@ -127,6 +142,18 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             codex_cleanup_threads=bool(llm_raw.get("codex_cleanup_threads", True)),
             codex_workspace_dir=_optional_string(llm_raw.get("codex_workspace_dir")),
             codex_binary=_optional_string(llm_raw.get("codex_binary")),
+        ),
+        translation=TranslationSettings(
+            backend=str(translation_raw.get("backend", "nllb_ct2")).strip().lower() or "nllb_ct2",
+            model=str(translation_raw.get("model", "nllb-200-distilled-600m")).strip()
+            or "nllb-200-distilled-600m",
+            model_path=_optional_string(translation_raw.get("model_path")),
+            tokenizer_path=_optional_string(translation_raw.get("tokenizer_path")),
+            device=str(translation_raw.get("device", "auto")).strip() or "auto",
+            compute_type=str(translation_raw.get("compute_type", "auto")).strip() or "auto",
+            max_chunk_chars=max(400, int(translation_raw.get("max_chunk_chars", 1800))),
+            allow_llm_fallback=bool(translation_raw.get("allow_llm_fallback", True)),
+            allow_large_model=bool(translation_raw.get("allow_large_model", False)),
         ),
         storage=StorageSettings(
             archive_dir=archive_dir,

@@ -3,8 +3,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from tradingagents.agents.utils.agent_utils import rewrite_in_output_language
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.reporting import save_report_bundle
+from tradingagents.translation import should_skip_translation
 
 
 class ReportLocalizationTests(unittest.TestCase):
@@ -23,8 +25,8 @@ class ReportLocalizationTests(unittest.TestCase):
             },
             "trader_investment_plan": "트레이딩 계획",
             "risk_debate_state": {
-                "aggressive_history": "공격적 의견",
-                "conservative_history": "보수적 의견",
+                "aggressive_history": "공격형 의견",
+                "conservative_history": "보수형 의견",
                 "neutral_history": "중립 의견",
                 "judge_decision": "포트폴리오 최종 판단",
             },
@@ -43,11 +45,11 @@ class ReportLocalizationTests(unittest.TestCase):
         self.assertIn("생성 시각", report_text)
         self.assertIn("분석 기준일: 2026-04-06", report_text)
         self.assertIn("시장 데이터 기준일: 2026-04-02", report_text)
-        self.assertIn("애널리스트 팀 리포트", report_text)
-        self.assertIn("포트폴리오 매니저 최종 판단", report_text)
+        self.assertIn("I. 애널리스트 팀 리포트", report_text)
+        self.assertIn("V. 포트폴리오 매니저 최종 판단", report_text)
         self.assertIn("시장 애널리스트", report_text)
 
-    def test_localize_final_state_rewrites_user_facing_fields(self):
+    def test_localize_final_state_rewrites_only_report_fields(self):
         graph = TradingAgentsGraph.__new__(TradingAgentsGraph)
         graph.quick_thinking_llm = object()
         final_state = {
@@ -87,15 +89,28 @@ class ReportLocalizationTests(unittest.TestCase):
             localized = graph._localize_final_state(final_state)
 
         self.assertEqual(localized["market_report"], "KO::market analyst report::market")
-        self.assertEqual(localized["investment_plan"], "KO::research manager investment plan::investment plan")
+        self.assertEqual(localized["trader_investment_plan"], "KO::trader plan::trader plan")
+        self.assertEqual(localized["investment_plan"], "investment plan")
+        self.assertEqual(localized["final_trade_decision"], "final decision")
         self.assertEqual(
             localized["investment_debate_state"]["judge_decision"],
             "KO::research manager decision::manager decision",
         )
-        self.assertEqual(
-            localized["risk_debate_state"]["current_neutral_response"],
-            "KO::neutral risk analyst latest response::neutral latest",
-        )
+        self.assertEqual(localized["investment_debate_state"]["history"], "debate history")
+        self.assertEqual(localized["risk_debate_state"]["current_neutral_response"], "neutral latest")
+
+    def test_skip_translation_for_already_korean_text(self):
+        self.assertTrue(should_skip_translation("시장 보고서 본문입니다.\n매수 의견 유지.", "Korean"))
+        self.assertFalse(should_skip_translation("## Market\nKeep buy rating.", "Korean"))
+
+        with (
+            patch("tradingagents.agents.utils.agent_utils.get_output_language", return_value="Korean"),
+            patch("tradingagents.agents.utils.agent_utils.translate_with_backend") as translate_mock,
+        ):
+            localized = rewrite_in_output_language(object(), "시장 보고서 본문입니다.\n매수 의견 유지.")
+
+        self.assertEqual(localized, "시장 보고서 본문입니다.\n매수 의견 유지.")
+        translate_mock.assert_not_called()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,13 @@
 from langchain_core.messages import HumanMessage, RemoveMessage
 import re
 
+from tradingagents.translation import (
+    TranslationBackendError,
+    get_translation_settings,
+    should_skip_translation,
+    translate_with_backend,
+)
+
 # Import tools from separate utility files
 from tradingagents.agents.utils.core_stock_tools import (
     get_stock_data
@@ -61,6 +68,19 @@ def rewrite_in_output_language(llm, content: str, *, content_type: str = "report
     lang = get_output_language()
     if lang.lower() == "english":
         return content
+    if should_skip_translation(content, lang):
+        return _normalize_localized_finance_terms(content, lang)
+
+    settings = get_translation_settings()
+    if settings.backend != "llm":
+        try:
+            translated = translate_with_backend(content, lang)
+        except TranslationBackendError:
+            if not settings.allow_llm_fallback:
+                raise
+        else:
+            if translated.strip():
+                return _normalize_localized_finance_terms(translated, lang)
 
     messages = [
         (
@@ -147,6 +167,7 @@ def get_memory_matches(memory, current_situation: str, n_matches: int | None = N
     """Retrieve memory matches while respecting configurable defaults."""
     return memory.get_memories(current_situation, n_matches=n_matches)
 
+
 def create_msg_delete():
     def delete_messages(state):
         """Clear messages and add placeholder for Anthropic compatibility"""
@@ -161,6 +182,3 @@ def create_msg_delete():
         return {"messages": removal_operations + [placeholder]}
 
     return delete_messages
-
-
-        
