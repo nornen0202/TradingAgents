@@ -168,6 +168,26 @@ def get_memory_matches(memory, current_situation: str, n_matches: int | None = N
     return memory.get_memories(current_situation, n_matches=n_matches)
 
 
+def needs_initial_tool_call(messages) -> bool:
+    """Return True until at least one tool result exists in the message history."""
+    for message in messages or []:
+        if isinstance(message, ToolMessage):
+            return False
+        if getattr(message, "type", "") == "tool":
+            return False
+    return True
+
+
+def bind_tools_for_analyst(llm, tools, *, force_tool_call: bool):
+    """Bind tools and require at least one tool call on the first analyst turn when supported."""
+    if not force_tool_call:
+        return llm.bind_tools(tools)
+    try:
+        return llm.bind_tools(tools, tool_choice="required")
+    except TypeError:
+        return llm.bind_tools(tools)
+
+
 def create_msg_delete():
     def delete_messages(state):
         """Clear messages and add placeholder for Anthropic compatibility"""
