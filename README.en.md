@@ -68,7 +68,7 @@ Current default model roles on `main` are:
 
 - `quick_think_llm`: `gpt-5.4-mini`
 - `deep_think_llm`: `gpt-5.4`
-- `output_think_llm`: `gpt-5.2`
+- `output_think_llm`: `gpt-5.4`
 
 Example:
 
@@ -80,7 +80,7 @@ config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
 config["quick_think_llm"] = "gpt-5.4-mini"
 config["deep_think_llm"] = "gpt-5.4"
-config["output_think_llm"] = "gpt-5.2"
+config["output_think_llm"] = "gpt-5.4"
 
 graph = TradingAgentsGraph(debug=True, config=config)
 final_state, decision = graph.propagate("NVDA", "2026-01-15")
@@ -104,7 +104,8 @@ TradingAgents resolves credentials in this order:
 
 1. environment variables
 2. `.env` values loaded by the CLI
-3. documentation fallback from [Docs/list_api_keys.md](Docs/list_api_keys.md) for selected vendors
+3. local JSON fallback from [config/api_keys.json](config/api_keys.json)
+4. legacy markdown fallback from `Docs/list_api_keys.md` for older setups
 
 ### 1. Environment variables or `.env`
 
@@ -140,9 +141,9 @@ ECOS_API_KEY=
 KRX_API_KEY=
 ```
 
-### 2. `Docs/list_api_keys.md` fallback
+### 2. `config/api_keys.json` fallback
 
-Based on [tradingagents/dataflows/api_keys.py](tradingagents/dataflows/api_keys.py), the project can also read these values from [Docs/list_api_keys.md](Docs/list_api_keys.md):
+Based on [tradingagents/dataflows/api_keys.py](tradingagents/dataflows/api_keys.py), the project can also read these values from a local [config/api_keys.json](config/api_keys.json) file. Start from [config/api_keys.example.json](config/api_keys.example.json):
 
 - `ALPHA_VANTAGE_API_KEY`
 - `NAVER_CLIENT_ID`
@@ -151,17 +152,22 @@ Based on [tradingagents/dataflows/api_keys.py](tradingagents/dataflows/api_keys.
 
 Expected format:
 
-```md
-Alpha Vantage: your-alpha-vantage-key
-
-Naver:
-- Client ID: your-client-id
-- Client Secret: your-client-secret
-
-OpenDart: your-opendart-key
+```json
+{
+  "ALPHA_VANTAGE_API_KEY": "your-alpha-vantage-key",
+  "NAVER_CLIENT_ID": "your-client-id",
+  "NAVER_CLIENT_SECRET": "your-client-secret",
+  "OPENDART_API_KEY": "your-opendart-key"
+}
 ```
 
-### 3. Supported environment variable aliases
+If you keep a non-standard location, point `TRADINGAGENTS_API_KEYS_PATH` at it.
+
+### 3. Legacy `Docs/list_api_keys.md` fallback
+
+Older clones can still use the previous markdown file format as a compatibility fallback, but new setups should prefer `config/api_keys.json`.
+
+### 4. Supported environment variable aliases
 
 The latest implementation also accepts these aliases:
 
@@ -173,7 +179,8 @@ The latest implementation also accepts these aliases:
 Notes:
 
 - placeholder values such as `REDACTED`, `TODO`, and `CHANGEME` are ignored
-- for GitHub Actions or shared environments, prefer repository secrets or runner environment variables over committing keys into docs
+- GitHub Actions in this repository already injects vendor keys through workflow secrets, so the job does not depend on a committed `config/api_keys.json`
+- for shared environments, prefer repository secrets or runner environment variables over storing live keys in version control
 
 ## Codex Provider
 

@@ -34,7 +34,7 @@ class LLMSettings:
     provider: str = "codex"
     deep_model: str = "gpt-5.4"
     quick_model: str = "gpt-5.4"
-    output_model: str = "gpt-5.2"
+    output_model: str = "gpt-5.4"
     codex_reasoning_effort: str = "medium"
     codex_summary: str = "none"
     codex_personality: str = "none"
@@ -137,7 +137,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
             deep_model=str(llm_raw.get("deep_model", "gpt-5.4")).strip() or "gpt-5.4",
             quick_model=str(llm_raw.get("quick_model", "gpt-5.4")).strip() or "gpt-5.4",
-            output_model=str(llm_raw.get("output_model", "gpt-5.2")).strip() or "gpt-5.2",
+            output_model=str(llm_raw.get("output_model", "gpt-5.4")).strip() or "gpt-5.4",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_summary=str(llm_raw.get("codex_summary", "none")).strip() or "none",
             codex_personality=str(llm_raw.get("codex_personality", "none")).strip() or "none",

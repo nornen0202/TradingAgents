@@ -65,7 +65,7 @@ docker compose --profile ollama run --rm tradingagents-ollama
 
 - `quick_think_llm`: `gpt-5.4-mini`
 - `deep_think_llm`: `gpt-5.4`
-- `output_think_llm`: `gpt-5.2`
+- `output_think_llm`: `gpt-5.4`
 
 예시:
 
@@ -77,7 +77,7 @@ config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
 config["quick_think_llm"] = "gpt-5.4-mini"
 config["deep_think_llm"] = "gpt-5.4"
-config["output_think_llm"] = "gpt-5.2"
+config["output_think_llm"] = "gpt-5.4"
 
 graph = TradingAgentsGraph(debug=True, config=config)
 final_state, decision = graph.propagate("NVDA", "2026-01-15")
@@ -101,7 +101,8 @@ TradingAgents는 API 키를 다음 순서로 찾습니다.
 
 1. 환경 변수
 2. CLI가 자동 로드하는 `.env`
-3. 일부 공급자에 한해 [Docs/list_api_keys.md](Docs/list_api_keys.md) 문서 fallback
+3. 로컬 [config/api_keys.json](config/api_keys.json) fallback
+4. 구버전 호환용 `Docs/list_api_keys.md` fallback
 
 ### 1. 환경 변수 또는 `.env`
 
@@ -137,28 +138,33 @@ ECOS_API_KEY=
 KRX_API_KEY=
 ```
 
-### 2. `Docs/list_api_keys.md` 문서 fallback
+### 2. `config/api_keys.json` fallback
 
-[api_keys.py](tradingagents/dataflows/api_keys.py) 기준으로 아래 값은 문서 파일에서도 읽습니다.
+[api_keys.py](tradingagents/dataflows/api_keys.py) 기준으로 아래 값은 로컬 [config/api_keys.json](config/api_keys.json) 파일에서도 읽습니다. 시작할 때는 [config/api_keys.example.json](config/api_keys.example.json)을 복사해서 쓰면 됩니다.
 
 - `ALPHA_VANTAGE_API_KEY`
 - `NAVER_CLIENT_ID`
 - `NAVER_CLIENT_SECRET`
 - `OPENDART_API_KEY`
 
-즉 [Docs/list_api_keys.md](Docs/list_api_keys.md)에 아래 형식으로 적혀 있으면 자동 인식됩니다.
+예시는 아래 형식입니다.
 
-```md
-Alpha Vantage: your-alpha-vantage-key
-
-Naver:
-- Client ID: your-client-id
-- Client Secret: your-client-secret
-
-OpenDart: your-opendart-key
+```json
+{
+  "ALPHA_VANTAGE_API_KEY": "your-alpha-vantage-key",
+  "NAVER_CLIENT_ID": "your-client-id",
+  "NAVER_CLIENT_SECRET": "your-client-secret",
+  "OPENDART_API_KEY": "your-opendart-key"
+}
 ```
 
-### 3. 지원하는 환경 변수 alias
+기본 위치가 아니라면 `TRADINGAGENTS_API_KEYS_PATH`로 경로를 지정할 수 있습니다.
+
+### 3. 레거시 `Docs/list_api_keys.md` fallback
+
+이전 클론은 기존 Markdown 형식도 계속 읽을 수 있지만, 새 설정은 `config/api_keys.json`을 권장합니다.
+
+### 4. 지원하는 환경 변수 alias
 
 최신 구현은 일부 alias 이름도 허용합니다.
 
@@ -170,7 +176,8 @@ OpenDart: your-opendart-key
 주의:
 
 - placeholder 값이나 `REDACTED`, `TODO`, `CHANGEME` 같은 값은 무시됩니다.
-- GitHub Actions나 공유 저장소에서는 API 키를 README나 `Docs/list_api_keys.md`에 커밋하지 말고, Secrets 또는 runner 환경 변수로 넣는 편이 안전합니다.
+- 이 저장소의 GitHub Actions는 이미 workflow secrets를 통해 vendor 키를 주입하므로, 커밋된 `config/api_keys.json`이 없어도 실행에 의존하지 않습니다.
+- 공유 환경에서는 API 키를 Git에 올리기보다 Secrets 또는 runner 환경 변수로 넣는 편이 안전합니다.
 
 ## Codex provider
 

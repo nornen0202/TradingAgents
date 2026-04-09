@@ -12,7 +12,7 @@ DEFAULT_CONFIG = {
     "llm_provider": "openai",
     "deep_think_llm": "gpt-5.4",
     "quick_think_llm": "gpt-5.4-mini",
-    "output_think_llm": "gpt-5.2",
+    "output_think_llm": "gpt-5.4",
     "backend_url": "https://api.openai.com/v1",
     # Provider-specific thinking configuration
     "google_thinking_level": None,      # "high", "minimal", etc.
@@ -67,5 +67,8 @@ DEFAULT_CONFIG = {
         # Example: "get_macro_news": "ecos,alpha_vantage,yfinance",
         # Example: "get_stock_data": "alpha_vantage",
     },
-    "api_keys_path": str(Path(__file__).resolve().parents[1] / "Docs" / "list_api_keys.md"),
+    "api_keys_path": os.getenv(
+        "TRADINGAGENTS_API_KEYS_PATH",
+        str(Path(__file__).resolve().parents[1] / "config" / "api_keys.json"),
+    ),
 }
