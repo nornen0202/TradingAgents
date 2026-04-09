@@ -1,131 +1,33 @@
-<p align="center">
-  <img src="assets/TauricResearch.png" style="width: 60%; height: auto;">
-</p>
+# TradingAgents: 멀티 에이전트 LLM 금융 트레이딩 프레임워크
 
-<div align="center" style="line-height: 1;">
-  <a href="https://arxiv.org/abs/2412.20138" target="_blank"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2412.20138-B31B1B?logo=arxiv"/></a>
-  <a href="https://discord.com/invite/hk9PGKShPK" target="_blank"><img alt="Discord" src="https://img.shields.io/badge/Discord-TradingResearch-7289da?logo=discord&logoColor=white&color=7289da"/></a>
-  <a href="./assets/wechat.png" target="_blank"><img alt="WeChat" src="https://img.shields.io/badge/WeChat-TauricResearch-brightgreen?logo=wechat&logoColor=white"/></a>
-  <a href="https://x.com/TauricResearch" target="_blank"><img alt="X Follow" src="https://img.shields.io/badge/X-TauricResearch-white?logo=x&logoColor=white"/></a>
-  <br>
-  <a href="https://github.com/TauricResearch/" target="_blank"><img alt="Community" src="https://img.shields.io/badge/Join_GitHub_Community-TauricResearch-14C290?logo=discourse"/></a>
-</div>
+영문 문서: [README.en.md](README.en.md)
 
-<div align="center">
-  <!-- Keep these links. Translations will automatically update with the README. -->
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=de">Deutsch</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=es">Español</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=fr">français</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=ja">日本語</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=ko">한국어</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=pt">Português</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=ru">Русский</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=zh">中文</a>
-</div>
+## 소개
 
----
+TradingAgents는 실제 트레이딩 조직의 협업 구조를 반영한 멀티 에이전트 분석 프레임워크입니다. 펀더멘털, 뉴스, 센티먼트, 시장 분석가가 각각 리포트를 만들고, 리서처와 트레이더, 리스크 관리 팀, 포트폴리오 매니저가 이를 종합해 최종 투자 판단을 만듭니다.
 
-# TradingAgents: Multi-Agents LLM Financial Trading Framework
+현재 `main` 브랜치 기준 구현에는 다음이 반영되어 있습니다.
 
-Korean documentation: [README.ko.md](README.ko.md)
+- 다중 LLM provider 지원: `openai`, `codex`, `google`, `anthropic`, `xai`, `openrouter`, `ollama`
+- 분리된 모델 역할: `quick_think_llm`, `deep_think_llm`, `output_think_llm`
+- 구조화된 최종 의사결정 스키마와 품질 지표
+- 비대화형 스케줄 실행과 정적 리포트 사이트 생성
+- 한국어 출력용 로컬 번역 백엔드 기본값: `NLLB-200-distilled-600M + CTranslate2`
+- 한국/미국 티커 스케줄 설정, `ticker_names` 오버라이드, `quality_flags`, `batch_metrics`, `warnings`
 
-## News
-- [2026-03] **TradingAgents v0.2.3** released with multi-language support, GPT-5.4 family models, unified model catalog, backtesting date fidelity, and proxy support.
-- [2026-03] **TradingAgents v0.2.2** released with GPT-5.4/Gemini 3.1/Claude 4.6 model coverage, five-tier rating scale, OpenAI Responses API, Anthropic effort control, and cross-platform stability.
-- [2026-02] **TradingAgents v0.2.0** released with multi-provider LLM support (GPT-5.x, Gemini 3.x, Claude 4.x, Grok 4.x) and improved system architecture.
-- [2026-01] **Trading-R1** [Technical Report](https://arxiv.org/abs/2509.11420) released, with [Terminal](https://github.com/TauricResearch/Trading-R1) expected to land soon.
+이 프로젝트는 연구 목적입니다. 실제 투자 판단이나 자문 용도로 사용하면 안 되며, 결과는 모델, 데이터, 프롬프트, 시장 상황에 따라 크게 달라질 수 있습니다.
 
-<div align="center">
-<a href="https://www.star-history.com/#TauricResearch/TradingAgents&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TauricResearch/TradingAgents&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TauricResearch/TradingAgents&type=Date" />
-   <img alt="TradingAgents Star History" src="https://api.star-history.com/svg?repos=TauricResearch/TradingAgents&type=Date" style="width: 80%; height: auto;" />
- </picture>
-</a>
-</div>
+## 빠른 시작
 
-> 🎉 **TradingAgents** officially released! We have received numerous inquiries about the work, and we would like to express our thanks for the enthusiasm in our community.
->
-> So we decided to fully open-source the framework. Looking forward to building impactful projects with you!
+### 저장소 클론
 
-<div align="center">
-
-🚀 [TradingAgents](#tradingagents-framework) | ⚡ [Installation & CLI](#installation-and-cli) | 🎬 [Demo](https://www.youtube.com/watch?v=90gr5lwjIho) | 📦 [Package Usage](#tradingagents-package) | 🤝 [Contributing](#contributing) | 📄 [Citation](#citation)
-
-</div>
-
-## TradingAgents Framework
-
-TradingAgents is a multi-agent trading framework that mirrors the dynamics of real-world trading firms. By deploying specialized LLM-powered agents: from fundamental analysts, sentiment experts, and technical analysts, to trader, risk management team, the platform collaboratively evaluates market conditions and informs trading decisions. Moreover, these agents engage in dynamic discussions to pinpoint the optimal strategy.
-
-<p align="center">
-  <img src="assets/schema.png" style="width: 100%; height: auto;">
-</p>
-
-> TradingAgents framework is designed for research purposes. Trading performance may vary based on many factors, including the chosen backbone language models, model temperature, trading periods, the quality of data, and other non-deterministic factors. [It is not intended as financial, investment, or trading advice.](https://tauric.ai/disclaimer/)
-
-Our framework decomposes complex trading tasks into specialized roles. This ensures the system achieves a robust, scalable approach to market analysis and decision-making.
-
-### Analyst Team
-- Fundamentals Analyst: Evaluates company financials and performance metrics, identifying intrinsic values and potential red flags.
-- Sentiment Analyst: Analyzes social media and public sentiment using sentiment scoring algorithms to gauge short-term market mood.
-- News Analyst: Monitors global news and macroeconomic indicators, interpreting the impact of events on market conditions.
-- Technical Analyst: Utilizes technical indicators (like MACD and RSI) to detect trading patterns and forecast price movements.
-
-<p align="center">
-  <img src="assets/analyst.png" width="100%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-### Researcher Team
-- Comprises both bullish and bearish researchers who critically assess the insights provided by the Analyst Team. Through structured debates, they balance potential gains against inherent risks.
-
-<p align="center">
-  <img src="assets/researcher.png" width="70%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-### Trader Agent
-- Composes reports from the analysts and researchers to make informed trading decisions. It determines the timing and magnitude of trades based on comprehensive market insights.
-
-<p align="center">
-  <img src="assets/trader.png" width="70%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-### Risk Management and Portfolio Manager
-- Continuously evaluates portfolio risk by assessing market volatility, liquidity, and other risk factors. The risk management team evaluates and adjusts trading strategies, providing assessment reports to the Portfolio Manager for final decision.
-- The Portfolio Manager approves/rejects the transaction proposal. If approved, the order will be sent to the simulated exchange and executed.
-
-<p align="center">
-  <img src="assets/risk.png" width="70%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-## Installation and CLI
-
-### Installation
-
-Clone TradingAgents:
-```bash
+```powershell
 git clone https://github.com/TauricResearch/TradingAgents.git
-cd TradingAgents
+Set-Location TradingAgents
 ```
 
-Create a virtual environment in any of your favorite environment managers:
-```bash
-conda create -n tradingagents python=3.13
-conda activate tradingagents
-```
+### Windows PowerShell 권장 설치
 
-Install the package and its dependencies:
-```bash
-pip install .
-```
-
-To enable the default local translation backend for Korean scheduled reports:
-```bash
-pip install ".[translation]"
-```
-
-Windows PowerShell quickstart (validated in this repository):
 ```powershell
 Set-Location C:\Projects\TradingAgents
 py -3.13 -m venv .venv-codex
@@ -135,186 +37,55 @@ python -m pip install -e . --no-cache-dir
 tradingagents --help
 ```
 
+한국어 스케줄 리포트를 로컬 번역기로 처리하려면 translation extras까지 설치합니다.
+
+```powershell
+python -m pip install -e ".[translation]"
+```
+
 ### Docker
 
-Alternatively, run with Docker:
-```bash
-cp .env.example .env  # add your API keys
+```powershell
+Copy-Item .env.example .env
+notepad .env
 docker compose run --rm tradingagents
 ```
 
-For local models with Ollama:
-```bash
+Ollama 프로필:
+
+```powershell
 docker compose --profile ollama run --rm tradingagents-ollama
 ```
 
-### Required APIs
+## LLM 설정
 
-TradingAgents supports multiple LLM providers. Set the API key for your chosen provider:
+기본 설정은 [default_config.py](tradingagents/default_config.py)에 있습니다.
 
-```bash
-export OPENAI_API_KEY=...          # OpenAI (GPT)
-export GOOGLE_API_KEY=...          # Google (Gemini)
-export ANTHROPIC_API_KEY=...       # Anthropic (Claude)
-export XAI_API_KEY=...             # xAI (Grok)
-export OPENROUTER_API_KEY=...      # OpenRouter
-export ALPHA_VANTAGE_API_KEY=...   # Alpha Vantage
-```
+최신 `main` 기준 기본 모델 역할은 아래와 같습니다.
 
-For local models, configure Ollama with `llm_provider: "ollama"` in your config.
+- `quick_think_llm`: `gpt-5.4-mini`
+- `deep_think_llm`: `gpt-5.4`
+- `output_think_llm`: `gpt-5.2`
 
-For the local `codex` provider, no API key is required. Authenticate once with Codex instead:
-```bash
-codex login
-# or
-codex login --device-auth
-```
-
-TradingAgents talks directly to `codex app-server` over stdio and relies on Codex-managed credentials (for example `~/.codex/auth.json` when file-backed auth is enabled). If auth is missing, the provider fails with a message telling you to run `codex login`.
-
-### Local translation backend
-
-Scheduled configs in this repository now default to `NLLB-200-distilled-600M + CTranslate2` for report localization, with LLM fallback enabled when the local model is unavailable.
-
-- Recommended default for personal or non-commercial use: `translation.backend = "nllb_ct2"` and `translation.model = "nllb-200-distilled-600m"`
-- Optional large-model path: `translation.backend = "madlad_ct2"` and `translation.model = "madlad-400-3b"`
-- `madlad_ct2` is guarded by `translation.allow_large_model = true` (or `TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL=1`) so it is not enabled accidentally on undersized runners
-- Point `TRADINGAGENTS_TRANSLATION_MODEL_PATH` at a converted CTranslate2 model directory on your self-hosted runner
-- Optionally point `TRADINGAGENTS_TRANSLATION_TOKENIZER_PATH` at a local tokenizer cache; otherwise the default Hugging Face tokenizer id is used
-
-For GitHub Actions on self-hosted Windows runners, set these repository variables when you want local translation enabled:
-```text
-TRADINGAGENTS_TRANSLATION_MODEL_PATH=C:\models\nllb-200-distilled-600m-ct2
-TRADINGAGENTS_TRANSLATION_TOKENIZER_PATH=C:\models\nllb-200-distilled-600m
-TRADINGAGENTS_TRANSLATION_DEVICE=auto
-TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL=0
-```
-
-The localization pass now only rewrites the 12 report-facing fields that are actually rendered in the archived markdown bundle, and it skips translation when the content already appears to be Korean.
-
-Recommended `~/.codex/config.toml` for TradingAgents:
-```toml
-approval_policy = "never"
-sandbox_mode = "read-only"
-web_search = "disabled"
-personality = "none"
-cli_auth_credentials_store = "file"
-```
-
-Important notes for `codex`:
-- TradingAgents keeps its own LangGraph `ToolNode` execution. It does not use Codex dynamic tools.
-- Each model invocation uses a fresh ephemeral Codex thread to avoid context bleed across agents.
-- The default Codex workspace is a dedicated neutral directory under `~/.codex/tradingagents-workspace`, not your repo root.
-
-Windows PowerShell notes for `codex`:
-```powershell
-where.exe codex
-codex --version
-codex login
-```
-
-If `codex` is not recognized in the VS Code terminal, reload the VS Code window after updating your terminal PATH or use the full `codex.exe` path returned by `where.exe codex`.
-TradingAgents also tries to auto-discover `codex.exe` from common Windows locations such as the VS Code OpenAI extension install path. You can override detection explicitly with:
-```powershell
-$env:CODEX_BINARY = "C:\full\path\to\codex.exe"
-```
-
-Alternatively, copy `.env.example` to `.env` and fill in your keys:
-```bash
-cp .env.example .env
-```
-
-### CLI Usage
-
-Launch the interactive CLI:
-```bash
-tradingagents          # installed command
-python -m cli.main     # alternative: run directly from source
-```
-You will see a screen where you can select your desired tickers, analysis date, LLM provider, research depth, and more.
-
-Windows PowerShell run commands:
-```powershell
-Set-Location C:\Projects\TradingAgents
-.\.venv-codex\Scripts\Activate.ps1
-tradingagents
-```
-
-Alternative:
-```powershell
-Set-Location C:\Projects\TradingAgents
-.\.venv-codex\Scripts\Activate.ps1
-python -m cli.main
-```
-
-Validated Codex smoke checks:
-```powershell
-Set-Location C:\Projects\TradingAgents
-.\.venv-codex\Scripts\Activate.ps1
-tradingagents --help
-```
-
-The local Codex provider was also validated with:
-- a plain `llm.invoke(...)` call
-- an OpenAI-style `list[dict]` invoke path
-- a `bind_tools()` tool-call path
-- a minimal `TradingAgentsGraph(...).propagate(...)` smoke run that returned a final decision
-
-<p align="center">
-  <img src="assets/cli/cli_init.png" width="100%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-An interface will appear showing results as they load, letting you track the agent's progress as it runs.
-
-<p align="center">
-  <img src="assets/cli/cli_news.png" width="100%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-<p align="center">
-  <img src="assets/cli/cli_transaction.png" width="100%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-## TradingAgents Package
-
-### Implementation Details
-
-We built TradingAgents with LangGraph to ensure flexibility and modularity. The framework supports multiple LLM providers: OpenAI, Codex, Google, Anthropic, xAI, OpenRouter, and Ollama.
-
-### Python Usage
-
-To use TradingAgents inside your code, you can import the `tradingagents` module and initialize a `TradingAgentsGraph()` object. The `.propagate()` function will return a decision. You can run `main.py`, here's also a quick example:
-
-```python
-from tradingagents.graph.trading_graph import TradingAgentsGraph
-from tradingagents.default_config import DEFAULT_CONFIG
-
-ta = TradingAgentsGraph(debug=True, config=DEFAULT_CONFIG.copy())
-
-# forward propagate
-_, decision = ta.propagate("NVDA", "2026-01-15")
-print(decision)
-```
-
-You can also adjust the default configuration to set your own choice of LLMs, debate rounds, etc.
+예시:
 
 ```python
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.default_config import DEFAULT_CONFIG
 
 config = DEFAULT_CONFIG.copy()
-config["llm_provider"] = "openai"        # openai, codex, google, anthropic, xai, openrouter, ollama
-config["deep_think_llm"] = "gpt-5.4"     # Model for complex reasoning
-config["quick_think_llm"] = "gpt-5.4-mini" # Model for quick tasks
-config["max_debate_rounds"] = 2
+config["llm_provider"] = "codex"
+config["quick_think_llm"] = "gpt-5.4-mini"
+config["deep_think_llm"] = "gpt-5.4"
+config["output_think_llm"] = "gpt-5.2"
 
-ta = TradingAgentsGraph(debug=True, config=config)
-_, decision = ta.propagate("NVDA", "2026-01-15")
+graph = TradingAgentsGraph(debug=True, config=config)
+final_state, decision = graph.propagate("NVDA", "2026-01-15")
 print(decision)
 ```
 
-See `tradingagents/default_config.py` for all configuration options.
+`codex` provider에서는 아래 설정도 추가로 지원합니다.
 
-When using `llm_provider = "codex"`, these extra config knobs are available:
 - `codex_binary`
 - `codex_reasoning_effort`
 - `codex_summary`
@@ -324,22 +95,209 @@ When using `llm_provider = "codex"`, these extra config knobs are available:
 - `codex_max_retries`
 - `codex_cleanup_threads`
 
-## Contributing
+## API 키 설정 방법
 
-We welcome contributions from the community! Whether it's fixing a bug, improving documentation, or suggesting a new feature, your input helps make this project better. If you are interested in this line of research, please consider joining our open-source financial AI research community [Tauric Research](https://tauric.ai/).
+TradingAgents는 API 키를 다음 순서로 찾습니다.
 
-## Citation
+1. 환경 변수
+2. CLI가 자동 로드하는 `.env`
+3. 일부 공급자에 한해 [Docs/list_api_keys.md](Docs/list_api_keys.md) 문서 fallback
 
-Please reference our work if you find *TradingAgents* provides you with some help :)
+### 1. 환경 변수 또는 `.env`
 
+일반적으로는 이 방식이 가장 권장됩니다.
+
+```powershell
+$env:OPENAI_API_KEY = "..."
+$env:GOOGLE_API_KEY = "..."
+$env:ANTHROPIC_API_KEY = "..."
+$env:XAI_API_KEY = "..."
+$env:OPENROUTER_API_KEY = "..."
+$env:ALPHA_VANTAGE_API_KEY = "..."
+$env:NAVER_CLIENT_ID = "..."
+$env:NAVER_CLIENT_SECRET = "..."
+$env:OPENDART_API_KEY = "..."
+$env:ECOS_API_KEY = "..."
+$env:KRX_API_KEY = "..."
 ```
-@misc{xiao2025tradingagentsmultiagentsllmfinancial,
-      title={TradingAgents: Multi-Agents LLM Financial Trading Framework}, 
-      author={Yijia Xiao and Edward Sun and Di Luo and Wei Wang},
-      year={2025},
-      eprint={2412.20138},
-      archivePrefix={arXiv},
-      primaryClass={q-fin.TR},
-      url={https://arxiv.org/abs/2412.20138}, 
-}
+
+`.env`를 쓸 때는 저장소 루트에 아래처럼 넣으면 CLI가 자동으로 읽습니다.
+
+```dotenv
+OPENAI_API_KEY=
+GOOGLE_API_KEY=
+ANTHROPIC_API_KEY=
+XAI_API_KEY=
+OPENROUTER_API_KEY=
+ALPHA_VANTAGE_API_KEY=
+NAVER_CLIENT_ID=
+NAVER_CLIENT_SECRET=
+OPENDART_API_KEY=
+ECOS_API_KEY=
+KRX_API_KEY=
 ```
+
+### 2. `Docs/list_api_keys.md` 문서 fallback
+
+[api_keys.py](tradingagents/dataflows/api_keys.py) 기준으로 아래 값은 문서 파일에서도 읽습니다.
+
+- `ALPHA_VANTAGE_API_KEY`
+- `NAVER_CLIENT_ID`
+- `NAVER_CLIENT_SECRET`
+- `OPENDART_API_KEY`
+
+즉 [Docs/list_api_keys.md](Docs/list_api_keys.md)에 아래 형식으로 적혀 있으면 자동 인식됩니다.
+
+```md
+Alpha Vantage: your-alpha-vantage-key
+
+Naver:
+- Client ID: your-client-id
+- Client Secret: your-client-secret
+
+OpenDart: your-opendart-key
+```
+
+### 3. 지원하는 환경 변수 alias
+
+최신 구현은 일부 alias 이름도 허용합니다.
+
+- Alpha Vantage: `ALPHA_VANTAGE_API_KEY`, `ALPHA_VANTAGE_KEY`
+- Naver Client ID: `NAVER_CLIENT_ID`, `NAVER_API_CLIENT_ID`
+- Naver Client Secret: `NAVER_CLIENT_SECRET`, `NAVER_API_CLIENT_SECRET`
+- OpenDart: `OPENDART_API_KEY`, `OPEN_DART_API_KEY`, `OPENDART_KEY`
+
+주의:
+
+- placeholder 값이나 `REDACTED`, `TODO`, `CHANGEME` 같은 값은 무시됩니다.
+- GitHub Actions나 공유 저장소에서는 API 키를 README나 `Docs/list_api_keys.md`에 커밋하지 말고, Secrets 또는 runner 환경 변수로 넣는 편이 안전합니다.
+
+## Codex provider
+
+`codex` provider는 OpenAI API 키 대신 Codex CLI 로그인이 필요합니다.
+
+```powershell
+where.exe codex
+codex --version
+codex login
+```
+
+또는:
+
+```powershell
+codex login --device-auth
+```
+
+권장 `~/.codex/config.toml` 예시:
+
+```toml
+approval_policy = "never"
+sandbox_mode = "read-only"
+web_search = "disabled"
+personality = "none"
+cli_auth_credentials_store = "file"
+```
+
+참고:
+
+- TradingAgents는 `codex app-server`와 stdio로 직접 통신합니다.
+- Codex dynamic tools는 사용하지 않습니다.
+- 각 호출은 새로운 ephemeral Codex thread로 실행됩니다.
+- 기본 작업 디렉터리는 `~/.codex/tradingagents-workspace`입니다.
+
+Windows에서 자동 탐지를 덮어쓰려면:
+
+```powershell
+$env:CODEX_BINARY = "C:\full\path\to\codex.exe"
+```
+
+## 스케줄 분석과 정적 리포트 사이트
+
+비대화형 실행은 [scheduled_analysis.toml](config/scheduled_analysis.toml) 계열 설정으로 동작합니다.
+
+최신 `main` 기준 주요 필드:
+
+- `[run]`
+  - `tickers`
+  - `analysts`
+  - `output_language`
+  - `trade_date_mode`
+  - `timezone`
+  - `max_debate_rounds`
+  - `max_risk_discuss_rounds`
+  - `continue_on_ticker_error`
+- `[llm]`
+  - `provider`
+  - `quick_model`
+  - `deep_model`
+  - `output_model`
+- `[translation]`
+  - `backend`
+  - `model`
+  - `model_path`
+  - `tokenizer_path`
+  - `device`
+  - `allow_llm_fallback`
+  - `allow_large_model`
+- `[storage]`
+  - `archive_dir`
+  - `site_dir`
+- `[ticker_names]`
+  - 티커 표시 이름 오버라이드
+
+실행 예시:
+
+```powershell
+.\.venv-codex\Scripts\Activate.ps1
+python -m tradingagents.scheduled --config config/scheduled_analysis.toml
+```
+
+또는:
+
+```powershell
+tradingagents-scheduled --config config/scheduled_analysis.toml
+```
+
+생성 결과에는 `run.json`, 티커별 `analysis.json`, `final_state.json`, markdown 리포트, `quality_flags`, `batch_metrics`, `warnings`가 포함됩니다.
+
+## 로컬 번역 백엔드
+
+최신 `main` 기준 스케줄 리포트의 기본 로컬 번역 경로는 `nllb_ct2`입니다.
+
+- 기본 추천: `translation.backend = "nllb_ct2"`
+- 기본 모델: `translation.model = "nllb-200-distilled-600m"`
+- 대형 대안: `translation.backend = "madlad_ct2"`, `translation.model = "madlad-400-3b"`
+- `madlad_ct2`는 `allow_large_model = true`가 아니면 막혀 있습니다.
+- 이미 한국어처럼 보이는 텍스트는 skip합니다.
+- 실제 리포트에 렌더링되는 12개 필드만 번역합니다.
+
+GitHub Actions self-hosted runner에서 로컬 번역을 쓰려면 repository variables 예시는 다음과 같습니다.
+
+```text
+TRADINGAGENTS_TRANSLATION_MODEL_PATH=C:\models\nllb-200-distilled-600m-ct2
+TRADINGAGENTS_TRANSLATION_TOKENIZER_PATH=C:\models\nllb-200-distilled-600m
+TRADINGAGENTS_TRANSLATION_DEVICE=auto
+TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL=0
+```
+
+## CLI
+
+```powershell
+Set-Location C:\Projects\TradingAgents
+.\.venv-codex\Scripts\Activate.ps1
+tradingagents
+```
+
+대안:
+
+```powershell
+python -m cli.main
+```
+
+## 기여
+
+버그 수정, 문서 개선, 기능 제안 등 모든 형태의 기여를 환영합니다.
+
+## 인용
+
+논문/인용 정보는 [README.en.md](README.en.md)의 Citation 섹션을 참고해 주세요.
