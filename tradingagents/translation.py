@@ -163,6 +163,10 @@ def translate_with_backend(content: str, language: str) -> str:
     return "".join(translated_chunks)
 
 
+def _prepare_transformers_runtime() -> None:
+    os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
+
+
 def _translate_chunk(
     chunk: str,
     settings: TranslationSettings,
@@ -176,6 +180,7 @@ def _translate_chunk(
             "ctranslate2 is not installed. Install ctranslate2, sentencepiece, and transformers to use local translation."
         ) from exc
 
+    _prepare_transformers_runtime()
     try:
         from transformers import AutoTokenizer
     except ImportError as exc:

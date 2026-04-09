@@ -1,3 +1,4 @@
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -6,7 +7,7 @@ from unittest.mock import patch
 from tradingagents.agents.utils.agent_utils import rewrite_in_output_language
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.reporting import save_report_bundle
-from tradingagents.translation import should_skip_translation
+from tradingagents.translation import _prepare_transformers_runtime, should_skip_translation
 
 
 class ReportLocalizationTests(unittest.TestCase):
@@ -111,6 +112,12 @@ class ReportLocalizationTests(unittest.TestCase):
 
         self.assertEqual(localized, "시장 보고서 본문입니다.\n매수 의견 유지.")
         translate_mock.assert_not_called()
+
+
+    def test_prepare_transformers_runtime_suppresses_advisory_warning(self):
+        with patch.dict("os.environ", {}, clear=True):
+            _prepare_transformers_runtime()
+            self.assertEqual(os.environ.get("TRANSFORMERS_NO_ADVISORY_WARNINGS"), "1")
 
 
 if __name__ == "__main__":
