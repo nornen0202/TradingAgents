@@ -19,6 +19,19 @@ _ENV_ALIASES = {
     "OPENDART_API_KEY": ("OPENDART_API_KEY", "OPEN_DART_API_KEY", "OPENDART_KEY"),
 }
 
+_PLACEHOLDER_VALUES = {
+    "[REDACTED]",
+    "<REDACTED>",
+    "REDACTED",
+    "[YOUR_KEY]",
+    "<YOUR_KEY>",
+    "YOUR_KEY",
+    "CHANGEME",
+    "CHANGE_ME",
+    "TODO",
+    "TBD",
+}
+
 
 def _get_api_keys_doc_path() -> Path:
     return Path(__file__).resolve().parents[2] / "Docs" / "list_api_keys.md"
@@ -43,6 +56,8 @@ def _normalize_key_value(value: str | None) -> str | None:
         normalized = normalized.replace("\\n", "")
 
     normalized = normalized.strip()
+    if normalized.upper() in _PLACEHOLDER_VALUES:
+        return None
     return normalized or None
 
 
