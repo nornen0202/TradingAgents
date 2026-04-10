@@ -1,6 +1,11 @@
 name: Daily Codex Analysis
 
 on:
+  schedule:
+    # 08:00 KST daily (23:00 UTC previous day) -> KR analysis
+    - cron: '0 23 * * *'
+    # 20:00 KST daily (11:00 UTC) -> US analysis
+    - cron: '0 11 * * *'
   workflow_dispatch:
     inputs:
       profile:
@@ -37,7 +42,7 @@ concurrency:
 
 jobs:
   analyze_us:
-    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us') }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *') }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
@@ -311,13 +316,13 @@ jobs:
           throw "bash.exe was not found under the expected Git for Windows directories."
 
       - name: Upload GitHub Pages artifact
-        if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us') }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *') }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           path: site
 
   analyze_kr:
-    if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr') }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
@@ -710,7 +715,7 @@ jobs:
           throw "bash.exe was not found under the expected Git for Windows directories."
 
       - name: Upload GitHub Pages artifact
-        if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all') }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           path: site
