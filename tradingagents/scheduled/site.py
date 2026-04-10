@@ -161,6 +161,12 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
 
 
 def _render_run_page(manifest: dict[str, Any], settings: SiteSettings) -> str:
+    portfolio_status = manifest.get("portfolio") or {"status": "unknown"}
+    portfolio_status_label = str(portfolio_status.get("status") or "unknown").replace("_", " ")
+    portfolio_note = (
+        "Private portfolio artifacts are intentionally excluded from the public Pages site."
+        " Download the workflow artifact named `kr-portfolio-private-<run_id>` for account snapshots/reports."
+    )
     ticker_cards = []
     for ticker_summary in manifest.get("tickers", []):
         ticker_cards.append(
@@ -197,6 +203,20 @@ def _render_run_page(manifest: dict[str, Any], settings: SiteSettings) -> str:
         <p><strong>Quick model</strong><span>{_escape(manifest['settings']['quick_model'])}</span></p>
         <p><strong>Language</strong><span>{_escape(manifest['settings']['output_language'])}</span></p>
       </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>Portfolio pipeline</h2>
+      </div>
+      <article class="run-card">
+        <div class="run-card-header">
+          <span>Status</span>
+          <span class="status {_escape(str(portfolio_status.get('status') or 'unknown'))}">{_escape(portfolio_status_label)}</span>
+        </div>
+        <p><strong>Profile</strong><span>{_escape(str(portfolio_status.get('profile') or '-'))}</span></p>
+        <p><strong>Output mode</strong><span>Private artifact only</span></p>
+        <p>{_escape(portfolio_note)}</p>
+      </article>
     </section>
     <section class="section">
       <div class="section-head">
