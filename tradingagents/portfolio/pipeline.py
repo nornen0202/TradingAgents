@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from .action_judge import arbitrate_portfolio_actions
 from .allocation import build_recommendation
 from .candidates import build_portfolio_candidates
 from .csv_import import load_snapshot_from_positions_csv
@@ -13,6 +14,7 @@ from .kis import PortfolioConfigurationError, load_account_snapshot_from_kis
 from .manual_snapshot import load_manual_snapshot
 from .profiles import load_portfolio_profile
 from .reporting import render_portfolio_report_markdown
+from .semantic_judge import build_semantic_verdicts
 from .state_store import save_portfolio_outputs
 
 
@@ -21,6 +23,7 @@ def run_portfolio_pipeline(
     run_dir: Path,
     manifest: dict[str, Any],
     portfolio_settings: Any,
+    llm_settings: Any | None = None,
 ) -> dict[str, Any]:
     if not getattr(portfolio_settings, "enabled", False):
         return {"status": "disabled"}
@@ -39,9 +42,21 @@ def run_portfolio_pipeline(
             manifest=manifest,
             watch_tickers=profile.watch_tickers,
         )
-        all_warnings = list(manifest.get("warnings") or []) + list(candidate_warnings) + list(snapshot.warnings)
-        gated_candidates = apply_gates(
+        semantic_candidates, semantic_verdicts, semantic_warnings = build_semantic_verdicts(
             candidates=candidates,
+            run_dir=run_dir,
+            manifest=manifest,
+            llm_settings=llm_settings,
+            portfolio_settings=portfolio_settings,
+        )
+        all_warnings = (
+            list(manifest.get("warnings") or [])
+            + list(candidate_warnings)
+            + list(semantic_warnings)
+            + list(snapshot.warnings)
+        )
+        gated_candidates = apply_gates(
+            candidates=semantic_candidates,
             snapshot=snapshot,
             batch_metrics=manifest.get("batch_metrics") or {},
             warnings=all_warnings,
@@ -55,6 +70,16 @@ def run_portfolio_pipeline(
             profile=profile,
             report_date=str(manifest.get("started_at") or "")[:10],
         )
+        recommendation, action_judge_payload, action_judge_warnings = arbitrate_portfolio_actions(
+            recommendation=recommendation,
+            candidates=scored_candidates,
+            snapshot=snapshot,
+            batch_metrics=manifest.get("batch_metrics") or {},
+            warnings=all_warnings,
+            llm_settings=llm_settings,
+            portfolio_settings=portfolio_settings,
+        )
+        all_warnings.extend(action_judge_warnings)
         markdown = render_portfolio_report_markdown(
             snapshot=snapshot,
             recommendation=recommendation,
@@ -66,6 +91,8 @@ def run_portfolio_pipeline(
             candidates=scored_candidates,
             recommendation=recommendation,
             portfolio_report_markdown=markdown,
+            semantic_verdicts=semantic_verdicts,
+            action_judge_payload=action_judge_payload,
             batch_metrics=manifest.get("batch_metrics") or {},
             warnings=all_warnings,
         )

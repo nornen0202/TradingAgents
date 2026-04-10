@@ -11,6 +11,48 @@ from tradingagents.translation import _prepare_transformers_runtime, should_skip
 
 
 class ReportLocalizationTests(unittest.TestCase):
+    def test_save_report_bundle_formats_structured_decision_without_raw_json_details(self):
+        structured_decision = """
+<details>
+<summary>원본 구조화 JSON 보기</summary>
+{"rating":"NO_TRADE","portfolio_stance":"BULLISH","entry_action":"WAIT","setup_quality":"DEVELOPING","confidence":0.66,"time_horizon":"medium","entry_logic":"breakout after confirmation","exit_logic":"support break","position_sizing":"starter","risk_limits":"1R","catalysts":["earnings revision"],"invalidators":["support break"],"watchlist_triggers":["breakout confirmation"],"data_coverage":{"company_news_count":5,"disclosures_count":1,"social_source":"dedicated","macro_items_count":3}}
+</details>
+        """.strip()
+        final_state = {
+            "analysis_date": "2026-04-06",
+            "trade_date": "2026-04-02",
+            "market_report": "시장 보고서 본문",
+            "sentiment_report": "소셜 보고서 본문",
+            "news_report": "뉴스 보고서 본문",
+            "fundamentals_report": "펀더멘털 보고서 본문",
+            "investment_debate_state": {
+                "bull_history": "강세 의견",
+                "bear_history": "약세 의견",
+                "judge_decision": structured_decision,
+            },
+            "trader_investment_plan": "트레이딩 계획",
+            "risk_debate_state": {
+                "aggressive_history": "공격형 의견",
+                "conservative_history": "보수형 의견",
+                "neutral_history": "중립 의견",
+                "judge_decision": structured_decision,
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = save_report_bundle(
+                final_state,
+                "GOOGL",
+                Path(tmpdir),
+                language="Korean",
+            )
+            report_text = report_path.read_text(encoding="utf-8")
+
+        self.assertNotIn("원본 구조화 JSON 보기", report_text)
+        self.assertIn("포트폴리오 stance", report_text)
+        self.assertIn("엔트리 액션", report_text)
+        self.assertIn("breakout after confirmation", report_text)
+
     def test_save_report_bundle_uses_korean_labels(self):
         final_state = {
             "analysis_date": "2026-04-06",

@@ -105,6 +105,11 @@ def build_recommendation(
                     "score_now": round(candidate.score_now, 4),
                     "score_triggered": round(candidate.score_triggered, 4),
                 },
+                decision_source=candidate.decision_source,
+                timing_readiness=round(candidate.timing_readiness, 4),
+                reason_codes=candidate.reason_codes,
+                review_required=candidate.review_required,
+                trigger_type=str(candidate.trigger_profile.get("primary_trigger_type") or "") or None,
                 gate_reasons=candidate.gate_reasons,
                 sector=candidate.sector,
             )
@@ -156,13 +161,27 @@ def _score_candidate(
         * max(min(candidate.confidence, 1.0), 0.05)
     )
     immediacy = _IMMEDIACY_WEIGHTS.get(candidate.entry_action, 0.0)
+    thesis_multiplier = 0.70 + (max(min(candidate.thesis_strength, 1.0), 0.0) * 0.60)
+    timing_readiness = max(min(candidate.timing_readiness, 1.0), 0.0)
+    timing_now = max(immediacy, timing_readiness * (0.40 if candidate.entry_action == "WAIT" else 0.85))
+    timing_triggered = max(timing_readiness, 0.20 if candidate.trigger_conditions else 0.0)
     coverage_score = _coverage_score(candidate, batch_metrics, warnings)
     turnover_penalty = 0.08 if not candidate.is_held else 0.02
     current_weight = candidate.market_value_krw / max(snapshot.account_value_krw, 1)
     concentration_penalty = max(current_weight - snapshot.constraints.max_single_name_weight, 0.0) * 1.5
 
-    score_now = conviction * immediacy * coverage_score - turnover_penalty - concentration_penalty
-    score_triggered = conviction * coverage_score - concentration_penalty
+    score_now = (
+        conviction * timing_now * coverage_score * thesis_multiplier
+        - turnover_penalty
+        - concentration_penalty
+    )
+    score_triggered = (
+        conviction * timing_triggered * coverage_score * thesis_multiplier
+        - concentration_penalty
+    )
+    if candidate.review_required and not candidate.is_held:
+        score_now = min(score_now, 0.0)
+        score_triggered *= 0.75
 
     return PortfolioCandidate(
         **{
@@ -172,6 +191,9 @@ def _score_candidate(
             "data_health": {
                 **candidate.data_health,
                 "coverage_score": coverage_score,
+                "thesis_multiplier": round(thesis_multiplier, 4),
+                "timing_now": round(timing_now, 4),
+                "timing_triggered": round(timing_triggered, 4),
             },
         }
     )
@@ -196,6 +218,8 @@ def _coverage_score(candidate: PortfolioCandidate, batch_metrics: dict[str, Any]
         coverage = min(coverage, 0.20)
     if candidate.vendor_health.get("fallback_count", 0) >= 2:
         coverage -= 0.10
+    if candidate.review_required:
+        coverage -= 0.08
 
     if (batch_metrics.get("company_news_zero_ratio") or 0) >= 0.5:
         coverage -= 0.05

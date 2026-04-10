@@ -14,6 +14,8 @@ def save_portfolio_outputs(
     candidates: list[PortfolioCandidate],
     recommendation: PortfolioRecommendation,
     portfolio_report_markdown: str,
+    semantic_verdicts: list[dict[str, Any]],
+    action_judge_payload: dict[str, Any],
     batch_metrics: dict[str, Any],
     warnings: list[str],
 ) -> dict[str, str]:
@@ -21,15 +23,19 @@ def save_portfolio_outputs(
 
     account_snapshot_path = private_dir / "account_snapshot.json"
     candidates_path = private_dir / "portfolio_candidates.json"
+    semantic_verdicts_path = private_dir / "portfolio_semantic_verdicts.json"
     report_path = private_dir / "portfolio_report.json"
     report_markdown_path = private_dir / "portfolio_report.md"
+    action_judge_path = private_dir / "portfolio_action_judge.json"
     proposed_orders_path = private_dir / "proposed_orders.json"
     audit_path = private_dir / "decision_audit.json"
 
     _write_json(account_snapshot_path, snapshot.to_dict())
     _write_json(candidates_path, {"candidates": [candidate.to_dict() for candidate in candidates]})
+    _write_json(semantic_verdicts_path, {"verdicts": semantic_verdicts})
     _write_json(report_path, recommendation.to_dict())
     report_markdown_path.write_text(portfolio_report_markdown, encoding="utf-8")
+    _write_json(action_judge_path, action_judge_payload)
     _write_json(proposed_orders_path, {"orders": _build_proposed_orders(snapshot, recommendation)})
     _write_json(
         audit_path,
@@ -40,6 +46,8 @@ def save_portfolio_outputs(
             "stance_distribution": batch_metrics.get("stance_distribution") or {},
             "entry_action_distribution": batch_metrics.get("entry_action_distribution") or {},
             "warnings": list(warnings),
+            "semantic_verdicts": semantic_verdicts,
+            "action_judge": action_judge_payload,
             "candidates": [candidate.to_dict() for candidate in candidates],
             "actions": [action.to_dict() for action in recommendation.actions],
         },
@@ -47,8 +55,10 @@ def save_portfolio_outputs(
     return {
         "account_snapshot_json": account_snapshot_path.as_posix(),
         "portfolio_candidates_json": candidates_path.as_posix(),
+        "portfolio_semantic_verdicts_json": semantic_verdicts_path.as_posix(),
         "portfolio_report_json": report_path.as_posix(),
         "portfolio_report_md": report_markdown_path.as_posix(),
+        "portfolio_action_judge_json": action_judge_path.as_posix(),
         "proposed_orders_json": proposed_orders_path.as_posix(),
         "decision_audit_json": audit_path.as_posix(),
     }

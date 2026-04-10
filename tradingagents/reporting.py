@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import datetime as dt
-import json
+import re
 from pathlib import Path
 from typing import Any, Mapping
 
-from tradingagents.schemas import StructuredDecisionValidationError, parse_structured_decision
+from tradingagents.schemas import parse_structured_decision
 
 
 def save_report_bundle(
@@ -35,7 +35,7 @@ def save_report_bundle(
         ("news.md", labels["news_analyst"], "news_report"),
         ("fundamentals.md", labels["fundamentals_analyst"], "fundamentals_report"),
     ):
-        content = _format_report_content(_coerce_text(final_state.get(key)), language=language)
+        content = _coerce_text(final_state.get(key))
         if not content:
             continue
         analysts_dir.mkdir(exist_ok=True)
@@ -56,7 +56,7 @@ def save_report_bundle(
         ("bear.md", labels["bear_researcher"], "bear_history"),
         ("manager.md", labels["research_manager"], "judge_decision"),
     ):
-        content = _format_report_content(_coerce_text(debate.get(key)), language=language)
+        content = _format_section_content(_coerce_text(debate.get(key)), labels)
         if not content:
             continue
         research_dir.mkdir(exist_ok=True)
@@ -69,10 +69,7 @@ def save_report_bundle(
             + "\n\n".join(f"### {title}\n{content}" for title, content in research_parts)
         )
 
-    trader_plan = _format_report_content(
-        _coerce_text(final_state.get("trader_investment_plan")),
-        language=language,
-    )
+    trader_plan = _format_section_content(_coerce_text(final_state.get("trader_investment_plan")), labels)
     if trader_plan:
         trading_dir = save_path / "3_trading"
         trading_dir.mkdir(exist_ok=True)
@@ -89,7 +86,7 @@ def save_report_bundle(
         ("conservative.md", labels["conservative_analyst"], "conservative_history"),
         ("neutral.md", labels["neutral_analyst"], "neutral_history"),
     ):
-        content = _format_report_content(_coerce_text(risk.get(key)), language=language)
+        content = _format_section_content(_coerce_text(risk.get(key)), labels)
         if not content:
             continue
         risk_dir.mkdir(exist_ok=True)
@@ -102,7 +99,7 @@ def save_report_bundle(
             + "\n\n".join(f"### {title}\n{content}" for title, content in risk_parts)
         )
 
-    portfolio_decision = _format_report_content(_coerce_text(risk.get("judge_decision")), language=language)
+    portfolio_decision = _format_section_content(_coerce_text(risk.get("judge_decision")), labels)
     if portfolio_decision:
         portfolio_dir = save_path / "5_portfolio"
         portfolio_dir.mkdir(exist_ok=True)
@@ -138,83 +135,61 @@ def _write_text(path: Path, content: str) -> None:
     path.write_text(content, encoding="utf-8")
 
 
-def _format_report_content(content: str, *, language: str) -> str:
-    if not content:
-        return content
+def _format_section_content(content: str, labels: dict[str, str]) -> str:
+    sanitized = _strip_raw_json_details(content)
+    if not sanitized:
+        return ""
     try:
-        decision = parse_structured_decision(content)
-    except StructuredDecisionValidationError:
-        return content
+        decision = parse_structured_decision(sanitized)
+    except Exception:
+        return sanitized
 
-    is_korean = str(language).strip().lower() == "korean"
-    rating_map = {
-        "BUY": "매수",
-        "OVERWEIGHT": "비중 확대",
-        "HOLD": "보유",
-        "UNDERWEIGHT": "비중 축소",
-        "SELL": "매도",
-        "NO_TRADE": "관망",
-    }
-    stance_map = {"BULLISH": "상승", "NEUTRAL": "중립", "BEARISH": "하락"}
-    action_map = {"NONE": "없음", "WAIT": "대기", "STARTER": "시작 진입", "ADD": "추가 매수", "EXIT": "청산"}
-    setup_map = {"WEAK": "약함", "DEVELOPING": "진행 중", "COMPELLING": "매우 유효"}
-
-    def localize_enum(value: str, mapping: dict[str, str]) -> str:
-        if not is_korean:
-            return value
-        return f"{mapping.get(value, value)} ({value})"
-
-    lines = [
-        "### 🧭 핵심 판단" if is_korean else "### 🧭 Key Decision",
-        (
-            f"- **{localize_enum(decision.rating.value, rating_map)}** · "
-            f"**{localize_enum(decision.portfolio_stance.value, stance_map)}** · "
-            f"**{localize_enum(decision.entry_action.value, action_map)}**"
-        ),
-        (
-            f"- **설정 품질:** {localize_enum(decision.setup_quality.value, setup_map)}  "
-            f"| **신뢰도:** `{decision.confidence:.2f}`  "
-            f"| **시간축:** `{decision.time_horizon.value}`"
-            if is_korean
-            else f"- **Setup quality:** {decision.setup_quality.value}  "
-            f"| **Confidence:** `{decision.confidence:.2f}`  "
-            f"| **Horizon:** `{decision.time_horizon.value}`"
-        ),
-        "",
-        f"**{'진입 로직' if is_korean else 'Entry logic'}**",
-        f"- {decision.entry_logic}",
-        "",
-        f"**{'청산 로직' if is_korean else 'Exit logic'}**",
-        f"- {decision.exit_logic}",
-        "",
-        f"**{'포지션 사이징' if is_korean else 'Position sizing'}**",
-        f"- {decision.position_sizing}",
-        "",
-        f"**{'리스크 한도' if is_korean else 'Risk limits'}**",
-        f"- {decision.risk_limits}",
-        "",
-        f"**{'핵심 촉매' if is_korean else 'Catalysts'}**",
-    ]
-    lines.extend(f"- {item}" for item in decision.catalysts)
-    lines.extend(["", f"**{'무효화 조건' if is_korean else 'Invalidators'}**"])
-    lines.extend(f"- {item}" for item in decision.invalidators)
-    if decision.watchlist_triggers:
-        lines.extend(["", f"**{'관찰 트리거' if is_korean else 'Watchlist triggers'}**"])
-        lines.extend(f"- {item}" for item in decision.watchlist_triggers)
-
-    lines.extend(
+    catalysts = ", ".join(decision.catalysts) or "-"
+    invalidators = ", ".join(decision.invalidators) or "-"
+    triggers = ", ".join(decision.watchlist_triggers) or "-"
+    coverage = decision.data_coverage.to_dict()
+    return "\n".join(
         [
-            "",
-            "<details>",
-            f"<summary>{'원본 구조화 JSON 보기' if is_korean else 'Show raw structured JSON'}</summary>",
-            "",
-            "```json",
-            json.dumps(decision.to_dict(), ensure_ascii=False, indent=2),
-            "```",
-            "</details>",
+            f"- {labels['decision_rating']}: `{decision.rating.value}`",
+            f"- {labels['decision_stance']}: `{decision.portfolio_stance.value}`",
+            f"- {labels['decision_entry_action']}: `{decision.entry_action.value}`",
+            f"- {labels['decision_setup_quality']}: `{decision.setup_quality.value}`",
+            f"- {labels['decision_confidence']}: `{decision.confidence:.2f}`",
+            f"- {labels['decision_time_horizon']}: `{decision.time_horizon.value}`",
+            f"- {labels['decision_entry_logic']}: {decision.entry_logic}",
+            f"- {labels['decision_exit_logic']}: {decision.exit_logic}",
+            f"- {labels['decision_position_sizing']}: {decision.position_sizing}",
+            f"- {labels['decision_risk_limits']}: {decision.risk_limits}",
+            f"- {labels['decision_catalysts']}: {catalysts}",
+            f"- {labels['decision_invalidators']}: {invalidators}",
+            f"- {labels['decision_watchlist_triggers']}: {triggers}",
+            (
+                f"- {labels['decision_data_coverage']}: "
+                f"company_news={coverage['company_news_count']}, "
+                f"disclosures={coverage['disclosures_count']}, "
+                f"social_source={coverage['social_source']}, "
+                f"macro_items={coverage['macro_items_count']}"
+            ),
         ]
     )
-    return "\n".join(lines)
+
+
+def _strip_raw_json_details(content: str) -> str:
+    if not content:
+        return ""
+    pattern = re.compile(
+        r"<details>\s*<summary>.*?JSON.*?</summary>\s*(.*?)\s*</details>",
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    match = pattern.search(content)
+    if not match:
+        return content.strip()
+
+    candidate = match.group(1).strip()
+    fenced_match = re.match(r"^```(?:json)?\s*(.*?)\s*```$", candidate, flags=re.IGNORECASE | re.DOTALL)
+    if fenced_match:
+        candidate = fenced_match.group(1).strip()
+    return candidate or content.strip()
 
 
 def _labels_for(language: str) -> dict[str, str]:
@@ -241,6 +216,20 @@ def _labels_for(language: str) -> dict[str, str]:
             "conservative_analyst": "보수형 리스크 애널리스트",
             "neutral_analyst": "중립 리스크 애널리스트",
             "portfolio_manager": "포트폴리오 매니저",
+            "decision_rating": "레거시 rating",
+            "decision_stance": "포트폴리오 stance",
+            "decision_entry_action": "엔트리 액션",
+            "decision_setup_quality": "셋업 품질",
+            "decision_confidence": "확신도",
+            "decision_time_horizon": "시간축",
+            "decision_entry_logic": "진입 논리",
+            "decision_exit_logic": "청산 논리",
+            "decision_position_sizing": "포지션 크기",
+            "decision_risk_limits": "리스크 한도",
+            "decision_catalysts": "상승 촉매",
+            "decision_invalidators": "무효화 조건",
+            "decision_watchlist_triggers": "관찰 트리거",
+            "decision_data_coverage": "데이터 커버리지",
         }
 
     return {
@@ -265,4 +254,18 @@ def _labels_for(language: str) -> dict[str, str]:
         "conservative_analyst": "Conservative Analyst",
         "neutral_analyst": "Neutral Analyst",
         "portfolio_manager": "Portfolio Manager",
+        "decision_rating": "Legacy rating",
+        "decision_stance": "Portfolio stance",
+        "decision_entry_action": "Entry action",
+        "decision_setup_quality": "Setup quality",
+        "decision_confidence": "Confidence",
+        "decision_time_horizon": "Time horizon",
+        "decision_entry_logic": "Entry logic",
+        "decision_exit_logic": "Exit logic",
+        "decision_position_sizing": "Position sizing",
+        "decision_risk_limits": "Risk limits",
+        "decision_catalysts": "Catalysts",
+        "decision_invalidators": "Invalidators",
+        "decision_watchlist_triggers": "Watchlist triggers",
+        "decision_data_coverage": "Data coverage",
     }

@@ -10,15 +10,28 @@ def render_portfolio_report_markdown(
     candidates: list[PortfolioCandidate],
 ) -> str:
     action_rows = [
-        "| 종목 | 현재 평가금액 | 액션 now | 금액 now | 액션 if triggered | 금액 if triggered | 우선순위 |",
-        "|---|---:|---|---:|---|---:|---:|",
+        "| 종목 | 현재 평가금액 | 액션 now | 금액 now | 액션 if triggered | 금액 if triggered | 우선순위 | 판단 경로 | 근거 |",
+        "|---|---:|---|---:|---|---:|---:|---|---|",
     ]
     for action in recommendation.actions:
         current_value = snapshot.find_position(action.canonical_ticker)
         action_rows.append(
             f"| {action.display_name} | {int(current_value.market_value_krw if current_value else 0):,} | "
             f"{action.action_now} | {action.delta_krw_now:,} | {action.action_if_triggered} | "
-            f"{action.delta_krw_if_triggered:,} | {action.priority} |"
+            f"{action.delta_krw_if_triggered:,} | {action.priority} | {action.decision_source} | "
+            f"{action.rationale} |"
+        )
+
+    judgment_rows = [
+        "| 종목 | timing_readiness | trigger_type | review_required | reason_codes | gate_reasons |",
+        "|---|---:|---|---|---|---|",
+    ]
+    for action in recommendation.actions:
+        judgment_rows.append(
+            f"| {action.display_name} | {action.timing_readiness:.2f} | {action.trigger_type or '-'} | "
+            f"{'yes' if action.review_required else 'no'} | "
+            f"{', '.join(action.reason_codes) or '-'} | "
+            f"{', '.join(action.gate_reasons) or '-'} |"
         )
 
     health_rows = [
@@ -50,6 +63,10 @@ def render_portfolio_report_markdown(
             "## 액션 요약",
             "",
             *action_rows,
+            "",
+            "## 판단 메타데이터",
+            "",
+            *judgment_rows,
             "",
             "## Data Health / Source Health",
             "",

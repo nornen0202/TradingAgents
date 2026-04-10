@@ -159,6 +159,21 @@ NVDA = "NVIDIA Override"
             analysis_dir = run_dir / "tickers" / "NVDA"
             (analysis_dir / "analysis.json").write_text("{}", encoding="utf-8")
             (analysis_dir / "final_state.json").write_text("{}", encoding="utf-8")
+            private_dir = run_dir / "portfolio-private"
+            private_dir.mkdir(parents=True, exist_ok=True)
+            (private_dir / "portfolio_report.md").write_text("# Portfolio report", encoding="utf-8")
+            (private_dir / "portfolio_report.json").write_text("{}", encoding="utf-8")
+            (private_dir / "status.json").write_text(
+                json.dumps(
+                    {
+                        "status": "success",
+                        "profile": "kr_kis_default",
+                        "generated_at": "2026-04-05T09:21:00+09:00",
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
             (run_dir / "run.json").write_text(
                 json.dumps(
                     {
@@ -236,7 +251,9 @@ site_dir = "{site_dir.as_posix()}"
             self.assertEqual(exit_code, 0)
             self.assertTrue((site_dir / "index.html").exists())
             ticker_page = (site_dir / "runs" / "20260405T091300_seed" / "NVDA.html").read_text(encoding="utf-8")
+            portfolio_page = (site_dir / "runs" / "20260405T091300_seed" / "portfolio.html").read_text(encoding="utf-8")
             self.assertIn("NVIDIA Corporation (NVDA)", ticker_page)
+            self.assertIn("Rendered account report", portfolio_page)
 
     def test_execute_scheduled_run_marks_quality_flag_when_no_tool_calls(self):
         with tempfile.TemporaryDirectory() as tmpdir:

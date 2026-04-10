@@ -120,6 +120,7 @@ def execute_scheduled_run(
             run_dir=run_dir,
             manifest=manifest,
             portfolio_settings=config.portfolio,
+            llm_settings=config.llm,
         )
         manifest["portfolio"] = portfolio_status
         if portfolio_status.get("status") == "failed":
