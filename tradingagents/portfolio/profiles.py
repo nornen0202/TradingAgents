@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import os
-import tomllib
 from pathlib import Path
 from typing import Any
 
 from tradingagents.dataflows.api_keys import get_api_key
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - Python < 3.11 fallback
+    import tomli as tomllib
 
 from .account_models import AccountConstraints, PortfolioProfile
 from .instrument_identity import resolve_identity

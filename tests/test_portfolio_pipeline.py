@@ -196,6 +196,7 @@ continue_on_error = false
 
             run_dir = archive_dir / "runs" / manifest["started_at"][:4] / manifest["run_id"]
             private_dir = run_dir / "portfolio-private"
+            self.assertEqual((manifest.get("portfolio") or {}).get("status"), "success")
             self.assertTrue((private_dir / "status.json").exists())
             self.assertTrue((private_dir / "account_snapshot.json").exists())
             self.assertTrue((private_dir / "portfolio_candidates.json").exists())
@@ -381,6 +382,10 @@ action_judge_top_n = 2
             self.assertEqual(report_payload["actions"][0]["decision_source"], "RULE+DEEP+CODEX")
             self.assertIn("semiconductor_priority", report_payload["actions"][0]["reason_codes"])
             self.assertIn("Account report", public_portfolio_page)
+
+            published_portfolio_dir = site_dir / "downloads" / manifest["run_id"] / "portfolio"
+            self.assertTrue((published_portfolio_dir / "portfolio_report.md").exists())
+            self.assertTrue((published_portfolio_dir / "portfolio_report.json").exists())
 
 
 if __name__ == "__main__":

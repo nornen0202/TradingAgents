@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+import os
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any
 
 import requests
@@ -33,6 +35,10 @@ class KisClient:
         environment: str = "real",
         session: requests.Session | None = None,
         timeout_seconds: float = 15.0,
+        token_ttl_seconds_default: int | None = None,
+        token_refresh_skew_seconds: int | None = None,
+        token_file_cache_enabled: bool | None = None,
+        token_cache_path: str | Path | None = None,
     ) -> None:
         self.app_key = app_key
         self.app_secret = app_secret
@@ -41,6 +47,25 @@ class KisClient:
         self.session = session or requests.Session()
         self.timeout_seconds = timeout_seconds
         self._access_token: str | None = None
+        self._token_expires_at: datetime | None = None
+        self._token_ttl_seconds_default = max(
+            60,
+            int(token_ttl_seconds_default or os.getenv("KIS_TOKEN_TTL_SECONDS_DEFAULT", "86400")),
+        )
+        self._token_refresh_skew_seconds = max(
+            0,
+            int(token_refresh_skew_seconds or os.getenv("KIS_TOKEN_REFRESH_SKEW_SECONDS", "1200")),
+        )
+        self._token_file_cache_enabled = (
+            _read_bool_env("KIS_TOKEN_FILE_CACHE_ENABLED", default=True)
+            if token_file_cache_enabled is None
+            else bool(token_file_cache_enabled)
+        )
+        self._token_cache_path = (
+            Path(token_cache_path).expanduser()
+            if token_cache_path
+            else _default_token_cache_path(environment=self.environment, app_key=self.app_key)
+        )
 
     @classmethod
     def from_api_keys(cls, *, environment: str = "real") -> "KisClient":
@@ -53,7 +78,12 @@ class KisClient:
             )
         return cls(app_key=app_key, app_secret=app_secret, environment=environment)
 
-    def issue_access_token(self) -> str:
+    def issue_access_token(self, *, force: bool = False) -> str:
+        if not force:
+            cached = self._load_cached_token()
+            if cached:
+                return cached
+
         response = self.session.post(
             f"{self.base_url}/oauth2/tokenP",
             headers={"content-type": "application/json"},
@@ -71,11 +101,26 @@ class KisClient:
         token = str(payload.get("access_token") or "").strip()
         if not token:
             raise KisApiError(f"KIS token response did not include access_token: {payload}")
+        expires_in = _parse_positive_int(payload.get("expires_in"), default=self._token_ttl_seconds_default)
+        now = datetime.now(timezone.utc)
         self._access_token = token
+        self._token_expires_at = now + timedelta(seconds=expires_in)
+        self._save_cached_token()
         return token
 
     def ensure_access_token(self) -> str:
-        return self._access_token or self.issue_access_token()
+        if self._is_token_usable():
+            return self._access_token or self.issue_access_token(force=True)
+
+        cached = self._load_cached_token()
+        if cached:
+            return cached
+
+        return self.issue_access_token(force=True)
+
+    def invalidate_access_token(self) -> None:
+        self._access_token = None
+        self._token_expires_at = None
 
     def request_json(
         self,
@@ -87,32 +132,90 @@ class KisClient:
         body: dict[str, Any] | None = None,
         tr_cont: str = "",
     ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
-        headers = {
-            "content-type": "application/json",
-            "authorization": f"Bearer {self.ensure_access_token()}",
-            "appkey": self.app_key,
-            "appsecret": self.app_secret,
-            "tr_id": tr_id,
-            "custtype": "P",
-            "tr_cont": tr_cont,
-        }
         url = f"{self.base_url}{path}"
-        response = self.session.request(
-            method=method.upper(),
-            url=url,
-            headers=headers,
-            params=params,
-            json=body,
-            timeout=self.timeout_seconds,
-        )
-        response.raise_for_status()
-        payload = response.json()
-        rt_cd = str(payload.get("rt_cd", "0"))
-        if rt_cd not in {"0", ""}:
-            raise KisApiError(
-                f"KIS API error for {path}: {payload.get('msg_cd')} {payload.get('msg1')}"
+        for attempt in range(2):
+            headers = {
+                "content-type": "application/json",
+                "authorization": f"Bearer {self.ensure_access_token()}",
+                "appkey": self.app_key,
+                "appsecret": self.app_secret,
+                "tr_id": tr_id,
+                "custtype": "P",
+                "tr_cont": tr_cont,
+            }
+            response = self.session.request(
+                method=method.upper(),
+                url=url,
+                headers=headers,
+                params=params,
+                json=body,
+                timeout=self.timeout_seconds,
             )
-        return payload, response.headers
+            if response.status_code == 401 and attempt == 0:
+                self.invalidate_access_token()
+                self.issue_access_token(force=True)
+                continue
+
+            response.raise_for_status()
+            payload = response.json()
+            rt_cd = str(payload.get("rt_cd", "0"))
+            if rt_cd not in {"0", ""}:
+                if attempt == 0 and _looks_like_auth_error(payload):
+                    self.invalidate_access_token()
+                    self.issue_access_token(force=True)
+                    continue
+                raise KisApiError(
+                    f"KIS API error for {path}: {payload.get('msg_cd')} {payload.get('msg1')}"
+                )
+            return payload, response.headers
+
+        raise KisApiError(f"KIS API authentication retry exhausted for path: {path}")
+
+    def _is_token_usable(self) -> bool:
+        if not self._access_token or not self._token_expires_at:
+            return False
+        refresh_at = self._token_expires_at - timedelta(seconds=self._token_refresh_skew_seconds)
+        return datetime.now(timezone.utc) < refresh_at
+
+    def _load_cached_token(self) -> str | None:
+        if not self._token_file_cache_enabled or not self._token_cache_path.exists():
+            return None
+        try:
+            payload = json.loads(self._token_cache_path.read_text(encoding="utf-8"))
+            token = str(payload.get("access_token") or "").strip()
+            expires_at_raw = str(payload.get("expires_at") or "").strip()
+            if not token or not expires_at_raw:
+                return None
+            expires_at = datetime.fromisoformat(expires_at_raw)
+            if expires_at.tzinfo is None:
+                expires_at = expires_at.replace(tzinfo=timezone.utc)
+            self._access_token = token
+            self._token_expires_at = expires_at.astimezone(timezone.utc)
+            if not self._is_token_usable():
+                return None
+            return token
+        except Exception:
+            return None
+
+    def _save_cached_token(self) -> None:
+        if (
+            not self._token_file_cache_enabled
+            or not self._access_token
+            or self._token_expires_at is None
+        ):
+            return
+        payload = {
+            "access_token": self._access_token,
+            "expires_at": self._token_expires_at.astimezone(timezone.utc).isoformat(),
+            "issued_at": datetime.now(timezone.utc).isoformat(),
+            "source": "api",
+        }
+        try:
+            self._token_cache_path.parent.mkdir(parents=True, exist_ok=True)
+            self._token_cache_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+            os.chmod(self._token_cache_path, 0o600)
+        except Exception:
+            return
 
     def fetch_balance(self, *, account_no: str, product_code: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         tr_id = "VTTC8434R" if self.environment == "demo" else "TTTC8434R"
@@ -321,3 +424,29 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
         constraints=profile.constraints,
         warnings=tuple(warnings),
     )
+
+
+def _parse_positive_int(value: object, *, default: int) -> int:
+    try:
+        parsed = int(value)
+        return parsed if parsed > 0 else default
+    except (TypeError, ValueError):
+        return default
+
+
+def _read_bool_env(name: str, *, default: bool) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() not in {"0", "false", "no", "off"}
+
+
+def _default_token_cache_path(*, environment: str, app_key: str) -> Path:
+    key_prefix = (app_key or "unknown").strip()[:8] or "unknown"
+    return Path.home() / ".cache" / "tradingagents" / f"kis_token_{environment}_{key_prefix}.json"
+
+
+def _looks_like_auth_error(payload: dict[str, Any]) -> bool:
+    message = f"{payload.get('msg_cd', '')} {payload.get('msg1', '')}".lower()
+    auth_markers = ("auth", "token", "access", "expired", "만료", "토큰", "인증")
+    return any(marker in message for marker in auth_markers)

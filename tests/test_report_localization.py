@@ -161,6 +161,28 @@ class ReportLocalizationTests(unittest.TestCase):
             _prepare_transformers_runtime()
             self.assertEqual(os.environ.get("TRANSFORMERS_NO_ADVISORY_WARNINGS"), "1")
 
+    def test_llm_rewrite_prompt_warns_against_holiday_inference(self):
+        class _FakeLlm:
+            def __init__(self):
+                self.messages = None
+
+            def invoke(self, messages):
+                self.messages = messages
+                return type("Reply", (), {"content": "재작성 결과"})()
+
+        llm = _FakeLlm()
+        with (
+            patch("tradingagents.agents.utils.agent_utils.get_output_language", return_value="Korean"),
+            patch(
+                "tradingagents.agents.utils.agent_utils.get_translation_settings",
+                return_value=type("Settings", (), {"backend": "llm", "allow_llm_fallback": True})(),
+            ),
+        ):
+            localized = rewrite_in_output_language(llm, "Market report body.")
+
+        self.assertEqual(localized, "재작성 결과")
+        self.assertIn("Do not infer that a date is a market holiday", llm.messages[0][1])
+
 
 if __name__ == "__main__":
     unittest.main()

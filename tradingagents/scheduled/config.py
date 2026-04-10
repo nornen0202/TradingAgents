@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 import os
-import tomllib
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Iterable
 from zoneinfo import ZoneInfo
 
 from cli.utils import normalize_ticker_symbol
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - Python < 3.11 fallback
+    import tomli as tomllib
 
 
 ALL_ANALYSTS = ("market", "social", "news", "fundamentals")

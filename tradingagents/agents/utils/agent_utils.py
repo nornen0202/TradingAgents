@@ -56,7 +56,13 @@ def get_output_language() -> str:
     return str(get_config().get("output_language", "English")).strip() or "English"
 
 
-def rewrite_in_output_language(llm, content: str, *, content_type: str = "report") -> str:
+def rewrite_in_output_language(
+    llm,
+    content: str,
+    *,
+    content_type: str = "report",
+    force_llm_backend: bool = False,
+) -> str:
     """Rewrite already-generated content into the configured output language.
 
     This lets the graph keep English-centric reasoning prompts where useful while
@@ -72,7 +78,7 @@ def rewrite_in_output_language(llm, content: str, *, content_type: str = "report
         return _normalize_localized_finance_terms(content, lang)
 
     settings = get_translation_settings()
-    if settings.backend != "llm":
+    if settings.backend != "llm" and not force_llm_backend:
         try:
             translated = translate_with_backend(content, lang)
         except TranslationBackendError:
@@ -92,6 +98,8 @@ def rewrite_in_output_language(llm, content: str, *, content_type: str = "report
             "Do not leave English article titles or English section names in the output unless they are unavoidable proper nouns or acronyms. "
             "Keep only unavoidable Latin-script proper nouns or acronyms such as ticker symbols, company names, product names, RSI, MACD, ATR, EBITDA, and CAPEX. "
             "If the source contains English control phrases or analyst role labels, rewrite them into natural user-facing target-language labels. "
+            "Do not infer that a date is a market holiday just because analysis_date and trade_date differ; "
+            "when dates differ, describe it as data-cutoff timing unless a closure is explicitly supported by evidence. "
             "Output only the rewritten content.",
         ),
         ("human", content),

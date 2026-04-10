@@ -178,13 +178,18 @@ def _strip_raw_json_details(content: str) -> str:
     if not content:
         return ""
     pattern = re.compile(
-        r"<details>\s*<summary>원본 구조화 JSON 보기</summary>\s*(.*?)\s*</details>",
+        r"<details>\s*<summary>.*?JSON.*?</summary>\s*(.*?)\s*</details>",
         flags=re.IGNORECASE | re.DOTALL,
     )
     match = pattern.search(content)
-    if match:
-        return match.group(1).strip()
-    return content.strip()
+    if not match:
+        return content.strip()
+
+    candidate = match.group(1).strip()
+    fenced_match = re.match(r"^```(?:json)?\s*(.*?)\s*```$", candidate, flags=re.IGNORECASE | re.DOTALL)
+    if fenced_match:
+        candidate = fenced_match.group(1).strip()
+    return candidate or content.strip()
 
 
 def _labels_for(language: str) -> dict[str, str]:

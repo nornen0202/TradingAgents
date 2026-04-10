@@ -115,8 +115,6 @@ def execute_scheduled_run(
     manifest["batch_metrics"] = _compute_batch_metrics(ticker_summaries)
     manifest["warnings"] = _compute_batch_warnings(manifest["batch_metrics"])
 
-    _write_json(run_dir / "run.json", manifest)
-    _write_json(config.storage.archive_dir / "latest-run.json", manifest)
     if config.portfolio.enabled and config.portfolio.profile_path:
         portfolio_status = run_portfolio_pipeline(
             run_dir=run_dir,
@@ -124,11 +122,17 @@ def execute_scheduled_run(
             portfolio_settings=config.portfolio,
             llm_settings=config.llm,
         )
+        manifest["portfolio"] = portfolio_status
         if portfolio_status.get("status") == "failed":
             print(
                 "::warning::Portfolio pipeline failed: "
                 f"{portfolio_status.get('error', 'unknown error')}"
             )
+    else:
+        manifest["portfolio"] = {"status": "disabled"}
+
+    _write_json(run_dir / "run.json", manifest)
+    _write_json(config.storage.archive_dir / "latest-run.json", manifest)
     build_site(config.storage.archive_dir, config.storage.site_dir, config.site)
     return manifest
 
@@ -148,7 +152,7 @@ def resolve_trade_date(
     if mode == "previous_business_day":
         return _previous_business_day(now.date()).isoformat()
 
-    normalized_symbol = (ticker or "").strip().upper()
+    normalized_symbol = (normalized_symbol or "").strip().upper()
     if not _looks_like_yahoo_ticker_format(normalized_symbol):
         raise RuntimeError(
             f"Could not resolve the latest available trade date for {ticker} ({normalized_symbol}); "
