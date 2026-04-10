@@ -317,6 +317,18 @@ jobs:
 
       - name: Upload GitHub Pages artifact
         if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *') }}
+        # Self-hosted runners can intermittently lose DNS resolution to GitHub's
+        # artifact service endpoints, which surfaces as ENOTFOUND from
+        # actions/upload-artifact. Preflight + retry reduces flaky failures.
+        id: upload_pages_us
+        timeout-minutes: 15
+        continue-on-error: true
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: site
+
+      - name: Retry GitHub Pages artifact upload after transient network failure (US)
+        if: ${{ ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *')) && steps.upload_pages_us.outcome == 'failure' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           path: site
@@ -715,7 +727,22 @@ jobs:
           throw "bash.exe was not found under the expected Git for Windows directories."
 
       - name: Upload GitHub Pages artifact
-        if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
+        # NOTE:
+        # upload-pages-artifact uses the fixed default artifact name "github-pages".
+        # When profile == "all", both analyze_us and analyze_kr jobs used to execute
+        # this step in the same workflow run, which causes a 409 Conflict because only
+        # one artifact with that name can exist per run.
+        # To avoid duplicate uploads, keep US as the single publisher for profile=all.
+        if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'kr') || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
+        id: upload_pages_kr
+        timeout-minutes: 15
+        continue-on-error: true
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: site
+
+      - name: Retry GitHub Pages artifact upload after transient network failure (KR)
+        if: ${{ ((github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'kr') || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *')) && steps.upload_pages_kr.outcome == 'failure' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           path: site
