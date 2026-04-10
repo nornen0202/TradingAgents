@@ -42,7 +42,9 @@ concurrency:
 
 jobs:
   analyze_us:
-    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *') }}
+    needs:
+      - analyze_kr
+    if: ${{ always() && ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *')) && needs.analyze_kr.result != 'failure' && needs.analyze_kr.result != 'cancelled' }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
