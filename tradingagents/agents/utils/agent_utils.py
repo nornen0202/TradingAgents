@@ -92,8 +92,6 @@ def rewrite_in_output_language(llm, content: str, *, content_type: str = "report
             "Do not leave English article titles or English section names in the output unless they are unavoidable proper nouns or acronyms. "
             "Keep only unavoidable Latin-script proper nouns or acronyms such as ticker symbols, company names, product names, RSI, MACD, ATR, EBITDA, and CAPEX. "
             "If the source contains English control phrases or analyst role labels, rewrite them into natural user-facing target-language labels. "
-            "Do not infer that a date is a market holiday just because analysis_date and trade_date differ; "
-            "when dates differ, describe it as data-cutoff timing unless a closure is explicitly supported by evidence. "
             "Output only the rewritten content.",
         ),
         ("human", content),

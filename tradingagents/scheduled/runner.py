@@ -151,7 +151,7 @@ def resolve_trade_date(
     if mode == "previous_business_day":
         return _previous_business_day(now.date()).isoformat()
 
-    normalized_symbol = (normalized_symbol or "").strip().upper()
+    normalized_symbol = (ticker or "").strip().upper()
     if not _looks_like_yahoo_ticker_format(normalized_symbol):
         raise RuntimeError(
             f"Could not resolve the latest available trade date for {ticker} ({normalized_symbol}); "
