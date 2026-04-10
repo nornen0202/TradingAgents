@@ -30,6 +30,15 @@ class ApiKeysTests(unittest.TestCase):
             with patch.dict("os.environ", {"TRADINGAGENTS_API_KEYS_PATH": path}, clear=True):
                 self.assertEqual(api_keys.get_api_key("OPENDART_API_KEY"), "json-key")
 
+    def test_reads_utf8_bom_json_fallback(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = f"{temp_dir}/api_keys.json"
+            with open(path, "w", encoding="utf-8-sig") as handle:
+                json.dump({"KIS_Developers_APP_KEY": "kis-key"}, handle)
+
+            with patch.dict("os.environ", {"TRADINGAGENTS_API_KEYS_PATH": path}, clear=True):
+                self.assertEqual(api_keys.get_api_key("KIS_APP_KEY"), "kis-key")
+
     def test_legacy_markdown_fallback_still_works(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             path = f"{temp_dir}/list_api_keys.md"
@@ -44,6 +53,26 @@ class ApiKeysTests(unittest.TestCase):
 
             with patch.dict("os.environ", {"TRADINGAGENTS_API_KEYS_PATH": path}, clear=True):
                 self.assertEqual(api_keys.get_api_key("NAVER_CLIENT_SECRET"), "naver-secret")
+
+    def test_reads_kis_developers_aliases_from_json(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = f"{temp_dir}/api_keys.json"
+            with open(path, "w", encoding="utf-8") as handle:
+                json.dump(
+                    {
+                        "KIS_Developers_APP_KEY": "kis-app-key",
+                        "KIS_Developers_APP_SECRET": "kis-app-secret",
+                        "KIS_Developers_ACCOUNT_NO": "12345678",
+                        "KIS_Developers_PRODUCT_CODE": "01",
+                    },
+                    handle,
+                )
+
+            with patch.dict("os.environ", {"TRADINGAGENTS_API_KEYS_PATH": path}, clear=True):
+                self.assertEqual(api_keys.get_api_key("KIS_APP_KEY"), "kis-app-key")
+                self.assertEqual(api_keys.get_api_key("KIS_APP_SECRET"), "kis-app-secret")
+                self.assertEqual(api_keys.get_api_key("KIS_ACCOUNT_NO"), "12345678")
+                self.assertEqual(api_keys.get_api_key("KIS_PRODUCT_CODE"), "01")
 
 
 if __name__ == "__main__":
