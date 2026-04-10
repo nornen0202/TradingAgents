@@ -153,6 +153,12 @@ class PortfolioCandidate:
     entry_action: str
     setup_quality: str
     rationale: str
+    trigger_profile: dict[str, Any] = field(default_factory=dict)
+    decision_source: str = "RULE_ONLY"
+    thesis_strength: float = 0.0
+    timing_readiness: float = 0.0
+    reason_codes: tuple[str, ...] = tuple()
+    review_required: bool = False
     score_now: float = 0.0
     score_triggered: float = 0.0
     gate_reasons: tuple[str, ...] = tuple()
@@ -181,6 +187,11 @@ class PortfolioAction:
     trigger_conditions: tuple[str, ...]
     rationale: str
     data_health: dict[str, Any]
+    decision_source: str = "RULE_ONLY"
+    timing_readiness: float = 0.0
+    reason_codes: tuple[str, ...] = tuple()
+    review_required: bool = False
+    trigger_type: str | None = None
     gate_reasons: tuple[str, ...] = tuple()
     sector: str | None = None
 

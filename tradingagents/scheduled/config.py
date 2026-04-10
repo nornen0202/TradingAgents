@@ -77,6 +77,9 @@ class PortfolioSettings:
     profile_path: Path | None = None
     profile_name: str = "kr_kis_default"
     continue_on_error: bool = True
+    semantic_judge_enabled: bool = False
+    action_judge_enabled: bool = False
+    action_judge_top_n: int = 5
 
 
 @dataclass(frozen=True)
@@ -193,6 +196,9 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             ),
             profile_name=str(portfolio_raw.get("profile_name", "kr_kis_default")).strip() or "kr_kis_default",
             continue_on_error=bool(portfolio_raw.get("continue_on_error", True)),
+            semantic_judge_enabled=bool(portfolio_raw.get("semantic_judge_enabled", False)),
+            action_judge_enabled=bool(portfolio_raw.get("action_judge_enabled", False)),
+            action_judge_top_n=max(1, int(portfolio_raw.get("action_judge_top_n", 5))),
         ),
         config_path=config_path,
     )

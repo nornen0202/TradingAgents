@@ -199,15 +199,188 @@ continue_on_error = false
             self.assertTrue((private_dir / "status.json").exists())
             self.assertTrue((private_dir / "account_snapshot.json").exists())
             self.assertTrue((private_dir / "portfolio_candidates.json").exists())
+            self.assertTrue((private_dir / "portfolio_semantic_verdicts.json").exists())
             self.assertTrue((private_dir / "portfolio_report.json").exists())
             self.assertTrue((private_dir / "portfolio_report.md").exists())
+            self.assertTrue((private_dir / "portfolio_action_judge.json").exists())
             self.assertTrue((private_dir / "proposed_orders.json").exists())
             self.assertTrue((private_dir / "decision_audit.json").exists())
 
             report_payload = json.loads((private_dir / "portfolio_report.json").read_text(encoding="utf-8"))
+            report_markdown = (private_dir / "portfolio_report.md").read_text(encoding="utf-8")
+            public_portfolio_page = (site_dir / "runs" / manifest["run_id"] / "portfolio.html").read_text(encoding="utf-8")
             self.assertEqual(report_payload["snapshot_id"], "20260410T073000_manual_test")
             self.assertEqual(report_payload["market_regime"], "constructive_but_selective")
             self.assertGreaterEqual(len(report_payload["actions"]), 2)
+            self.assertIn("판단 경로", report_markdown)
+            self.assertIn("Rendered account report", public_portfolio_page)
+            self.assertIn("TradingAgents 계좌 운용 리포트", public_portfolio_page)
+
+    def test_execute_scheduled_run_applies_portfolio_llm_judges_when_enabled(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            manual_snapshot_path = root / "manual_snapshot.json"
+            profile_path = root / "portfolio_profiles.toml"
+            config_path = root / "scheduled_analysis.toml"
+
+            manual_snapshot_path.write_text(
+                json.dumps(
+                    {
+                        "snapshot_id": "20260410T073000_manual_test",
+                        "as_of": "2026-04-10T07:30:00+09:00",
+                        "broker": "manual",
+                        "account_id": "manual-test",
+                        "currency": "KRW",
+                        "settled_cash_krw": 3000000,
+                        "available_cash_krw": 3000000,
+                        "buying_power_krw": 3000000,
+                        "positions": [
+                            {
+                                "broker_symbol": "000660",
+                                "canonical_ticker": "000660.KS",
+                                "display_name": "SK하이닉스",
+                                "sector": "Semiconductors",
+                                "quantity": 10,
+                                "available_qty": 10,
+                                "avg_cost_krw": 180000,
+                                "market_price_krw": 200000,
+                                "market_value_krw": 2000000,
+                                "unrealized_pnl_krw": 200000,
+                            }
+                        ],
+                        "constraints": {
+                            "min_cash_buffer_krw": 2500000,
+                            "min_trade_krw": 100000,
+                            "max_single_name_weight": 0.35,
+                            "max_sector_weight": 0.50,
+                            "max_daily_turnover_ratio": 0.30,
+                            "max_order_count_per_day": 5,
+                            "respect_existing_weights_softly": True,
+                        },
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            profile_path.write_text(
+                f"""
+[profiles.manual_test]
+enabled = true
+broker = "manual"
+broker_environment = "real"
+read_only = true
+manual_snapshot_path = "{manual_snapshot_path.as_posix()}"
+private_output_dirname = "portfolio-private"
+watch_tickers = ["000660.KS", "005930.KS"]
+trigger_budget_krw = 500000
+min_cash_buffer_krw = 2500000
+min_trade_krw = 100000
+max_single_name_weight = 0.35
+max_sector_weight = 0.50
+max_daily_turnover_ratio = 0.30
+max_order_count_per_day = 5
+respect_existing_weights_softly = true
+continue_on_error = false
+""",
+                encoding="utf-8",
+            )
+
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["000660.KS", "005930.KS"]
+continue_on_ticker_error = true
+
+[llm]
+provider = "codex"
+quick_model = "gpt-5.4-mini"
+deep_model = "gpt-5.4"
+output_model = "gpt-5.4"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+
+[portfolio]
+enabled = true
+profile_path = "{profile_path.as_posix()}"
+profile_name = "manual_test"
+continue_on_error = false
+semantic_judge_enabled = true
+action_judge_enabled = true
+action_judge_top_n = 2
+""",
+                encoding="utf-8",
+            )
+
+            config = load_scheduled_config(config_path)
+            with (
+                patch("tradingagents.scheduled.runner.TradingAgentsGraph", _FakeStructuredDecisionGraph),
+                patch("tradingagents.scheduled.runner.StatsCallbackHandler", _FakeStatsHandler),
+                patch("tradingagents.scheduled.runner.resolve_trade_date", return_value="2026-04-09"),
+                patch("tradingagents.portfolio.semantic_judge._create_semantic_llm", return_value=object()),
+                patch(
+                    "tradingagents.portfolio.semantic_judge._invoke_semantic_llm",
+                    side_effect=[
+                        {
+                            "thesis_strength": 0.84,
+                            "timing_readiness": 0.46,
+                            "trigger_type": "breakout_confirmation",
+                            "trigger_horizon": "days_to_weeks",
+                            "trigger_quality": 0.79,
+                            "thesis_state": "constructive_but_not_confirmed",
+                            "semantic_summary": "논지는 강하지만 타이밍 확인 전이라 조건부 증액이 적절합니다.",
+                            "counter_evidence": ["즉시 추격 매수 근거 부족"],
+                            "reason_codes": ["bullish_thesis_intact", "timing_not_confirmed"],
+                            "review_required": False,
+                        },
+                        {
+                            "thesis_strength": 0.72,
+                            "timing_readiness": 0.41,
+                            "trigger_type": "watch_only",
+                            "trigger_horizon": "days_to_weeks",
+                            "trigger_quality": 0.65,
+                            "thesis_state": "constructive_but_not_confirmed",
+                            "semantic_summary": "보유 전환보다 관찰 우선이 적절합니다.",
+                            "counter_evidence": [],
+                            "reason_codes": ["conditional_trigger_preferred"],
+                            "review_required": False,
+                        },
+                    ],
+                ),
+                patch("tradingagents.portfolio.action_judge._create_action_llm", return_value=object()),
+                patch(
+                    "tradingagents.portfolio.action_judge._invoke_action_llm",
+                    return_value={
+                        "priority_order": ["000660.KS", "005930.KS"],
+                        "reason_by_ticker": {
+                            "000660.KS": {
+                                "summary": "반도체 내 우선순위가 가장 높아 1순위 유지가 적절합니다.",
+                                "reason_codes": ["semiconductor_priority"],
+                                "review_required": False,
+                            }
+                        },
+                        "portfolio_note": "반도체 익스포저는 높지만 현 시점에서는 SK하이닉스가 상대 우위입니다.",
+                    },
+                ),
+            ):
+                manifest = execute_scheduled_run(config, run_label="portfolio-judge-test")
+
+            run_dir = archive_dir / "runs" / manifest["started_at"][:4] / manifest["run_id"]
+            private_dir = run_dir / "portfolio-private"
+            report_payload = json.loads((private_dir / "portfolio_report.json").read_text(encoding="utf-8"))
+            semantic_payload = json.loads((private_dir / "portfolio_semantic_verdicts.json").read_text(encoding="utf-8"))
+            action_payload = json.loads((private_dir / "portfolio_action_judge.json").read_text(encoding="utf-8"))
+            public_portfolio_page = (site_dir / "runs" / manifest["run_id"] / "portfolio.html").read_text(encoding="utf-8")
+
+            self.assertEqual(action_payload["status"], "success")
+            self.assertGreaterEqual(len(semantic_payload["verdicts"]), 2)
+            self.assertEqual(report_payload["actions"][0]["decision_source"], "RULE+DEEP+CODEX")
+            self.assertIn("semiconductor_priority", report_payload["actions"][0]["reason_codes"])
+            self.assertIn("Account report", public_portfolio_page)
 
 
 if __name__ == "__main__":

@@ -397,6 +397,13 @@ MVP 우선순위:
       "yfinance": 2
     },
     "fallback_count": 1
+  },
+  "trigger_profile": {
+    "primary_trigger_type": "breakout_confirmation",
+    "trigger_horizon": "days_to_weeks",
+    "entry_readiness": 0.42,
+    "thesis_state": "constructive_but_not_confirmed",
+    "semantic_summary": "업황과 수급 해석은 우호적이지만 추세 재확인 전 증액은 이르다"
   }
 }
 ```
@@ -421,6 +428,17 @@ MVP 우선순위:
     "중기 추세 회복 확인",
     "품질 플래그 악화 없음"
   ],
+  "decision_source": "RULE_PLUS_DEEP_PLUS_CODEX",
+  "timing_readiness": 0.42,
+  "reason_codes": [
+    "bullish_thesis_intact",
+    "timing_not_confirmed",
+    "wait_heavy_batch"
+  ],
+  "gate_reasons": [
+    "wait_heavy_batch_reduce_immediate_entries"
+  ],
+  "review_required": false,
   "rationale": "방향성은 긍정적이지만 즉시 증액 근거보다 조건부 추가 근거가 더 강함",
   "data_health": {
     "coverage_score": 0.84,
@@ -655,6 +673,78 @@ delta_if_triggered_i =
 - 하루 만에 완전 뒤집기 방지
 - `turnover_penalty`로 급변만 억제
 
+### 10.7 현재 main 기준 rule-only 구조의 한계
+
+최신 `main`에는 이미 아래 흐름이 들어와 있다.
+
+- `tradingagents/portfolio/candidates.py`
+- `tradingagents/portfolio/gates.py`
+- `tradingagents/portfolio/allocation.py`
+- `tradingagents/portfolio/reporting.py`
+
+이 흐름은 MVP로 매우 적절하지만, **11.2 종목별 액션 테이블의 최종 판정까지 전부 룰만으로 닫아버리면** 아래 한계가 남는다.
+
+- 같은 `BULLISH + WAIT`라도 "돌파 직전", "뉴스 부족", "실적 이벤트 대기", "기존 보유라 유지"를 서로 구분하기 어렵다.
+- `trigger_conditions`가 문자열 리스트라서, 어떤 트리거가 가격형인지 이벤트형인지, 신뢰할 만한지, 시한이 있는지 기계적으로 해석하기 어렵다.
+- 보유 종목, 미체결 주문, 섹터 편중, 배치 전체의 `WAIT` 집중 현상이 동시에 얽힐 때 룰 가중치만으로 우선순위를 안정적으로 설명하기 어렵다.
+- 현재 점수식은 `conviction * immediacy * coverage` 중심이라, "논지는 강하지만 실행 타이밍만 부족한 종목"과 "논지 자체가 약한 종목"이 둘 다 `HOLD`로 뭉개질 수 있다.
+- 리포트에 보이는 `rationale`가 실제 점수 계산 경로와 분리되면, 사람이 봤을 때는 비슷해 보여도 내부 우선순위는 크게 달라지는 설명 불일치가 생길 수 있다.
+- 룰만으로는 애널리스트 토론 히스토리, 트레이더 계획, invalidator/catalyst의 질적 차이를 충분히 활용하지 못한다.
+
+즉, **하드 제약은 룰이 맡고, 모호한 의미 해석과 우선순위 정렬은 LLM이 보조**하는 구조가 더 적합하다.
+
+### 10.8 권장 구조: Deterministic + LLM-deep + Codex gpt-5.4
+
+권장안은 룰을 버리는 것이 아니라, 룰과 LLM의 역할을 분리하는 것이다.
+
+1. `Hard Gates`
+   - 계좌/브로커 제약, 최소 현금, 단일 종목 비중, 섹터 비중, 미체결 주문 중복, `no_tool_calls_detected` 같은 금지 조건은 무조건 deterministic하게 처리한다.
+2. `Rule Pre-Score`
+   - 현재의 `stance`, `entry_action`, `setup_quality`, `confidence`, `coverage`, `fallback_count`, batch metric으로 `score_now_base`, `score_triggered_base`를 계산한다.
+3. `LLM-deep Semantic Judge`
+   - 종목 단위로 `final_state.json`, `analysis.json`, `StructuredDecision`, trigger 문구를 읽고 아래를 구조화한다.
+   - `thesis_strength`
+   - `timing_readiness`
+   - `trigger_type`
+   - `trigger_quality`
+   - `counter_evidence`
+   - `review_required`
+   - 이 단계는 **현재 deep_model (`gpt-5.4`)**을 그대로 쓰는 것이 가장 자연스럽다. 이미 TradingAgents가 종목별 장문 컨텍스트를 생성하고 있으므로, 같은 종목 컨텍스트를 다시 이용해 "실행 가능성 의미 해석" 전용 JSON만 추가로 받으면 된다.
+4. `Codex gpt-5.4 Portfolio Arbiter`
+   - 종목별 semantic verdict와 계좌 스냅샷, batch metric, gate 결과를 모아 **포트폴리오 단위 충돌 해소**를 수행한다.
+   - 예: 반도체 편중인 상태에서 `삼성전자`와 `SK하이닉스`가 둘 다 `ADD_IF_TRIGGERED` 후보일 때, 어느 쪽을 1순위로 둘지, 둘 다 둘지, 하나를 `WATCH_TRIGGER`로 낮출지 판단한다.
+   - 이 단계는 **Codex provider의 `gpt-5.4`**를 후처리 judge로 두는 것이 적합하다. 이유는 포트폴리오 전체 컨텍스트를 한 번에 보고, 긴 reasoning을 거쳐도 최종 출력은 좁은 JSON schema로 강제할 수 있기 때문이다.
+5. `Deterministic Clamp`
+   - LLM이 제안한 액션도 마지막에는 다시 룰에 끼워 넣는다.
+   - `delta_krw_now`, `delta_krw_if_triggered`, `target_weight_*`, 주문 건수, 최소 주문 금액은 deterministic하게 clip한다.
+   - LLM이 gate를 넘지 못하면 액션을 낮추고 `gate_reasons`를 남긴다.
+
+요약하면:
+
+```text
+hard_gates -> rule_scores -> deep_semantic_verdict -> codex_portfolio_arbiter -> deterministic_clamp -> report
+```
+
+### 10.9 모델 호출 정책과 fallback
+
+비용과 안정성을 위해 모든 종목에 항상 LLM 후처리를 거는 것은 권장하지 않는다.
+
+- `LLM-deep`은 아래 후보에 우선 적용한다.
+  - `action_now` 또는 `action_if_triggered`가 0이 아닌 종목
+  - `BULLISH + WAIT` 또는 `BEARISH + EXIT`처럼 의미 해석 차이가 큰 종목
+  - `quality_flags`, `fallback_count`, `pending_orders` 때문에 사람이 다시 보고 싶어질 만한 종목
+- `Codex gpt-5.4` arbiter는 아래 경우에만 호출해도 충분하다.
+  - top N 후보만 다시 정렬할 때
+  - 섹터 편중/현금 제약/중복 트리거가 겹칠 때
+  - rule score와 deep semantic verdict가 충돌할 때
+
+fallback 정책:
+
+- deep/codex 호출 실패 시 `decision_source = RULE_ONLY_FALLBACK`
+- 신규 진입 후보는 fallback 시 `delta_krw_now = 0`으로 더 보수적으로 내린다
+- `review_required = true`를 자동 부여해 사람이 표에서 즉시 식별할 수 있게 한다
+- 결과 artifact에 judge 입력/출력 JSON을 남겨 재현 가능성을 확보한다
+
 ## 11. 리포트 형식
 
 ### 11.1 상단 요약
@@ -667,11 +757,46 @@ delta_if_triggered_i =
 
 ### 11.2 종목별 액션 테이블
 
-| 종목 | 현재 평가금액 | 액션 now | 금액 now | 액션 if triggered | 금액 if triggered | 우선순위 | 근거 |
-|---|---:|---|---:|---|---:|---:|---|
-| 삼성전자 | 1,000,000 | HOLD | 0 | STARTER_IF_TRIGGERED | 200,000 | 2 | 방향성은 긍정적이나 즉시 진입 근거는 약함 |
-| SK하이닉스 | 2,000,000 | HOLD | 0 | ADD_IF_TRIGGERED | 300,000 | 1 | BULLISH + WAIT, 조건부 추가 후보 |
-| 에이피알 | 1,000,000 | HOLD | 0 | WATCH_TRIGGER | 0 | 3 | 변동성 확인 전 추가 자제 |
+11.2는 단순 render 단계가 아니라, **계좌 기준 최종 액션 판정 뷰**여야 한다. 각 행은 아래 순서로 만들어지는 것을 권장한다.
+
+1. rule pre-classification
+   - `candidates.py`, `gates.py`, `allocation.py` 결과로 기본 액션 후보와 금액 범위를 계산
+2. deep semantic verdict
+   - `deep_model`이 종목별 논지 강도, 타이밍 준비도, 트리거 유형을 구조화
+3. codex portfolio arbitration
+   - `codex gpt-5.4`가 계좌 전체 맥락에서 우선순위, 중복 후보, 설명 문구를 정리
+4. deterministic clamp
+   - 제약 위반 시 액션/금액을 다시 clip하고 `gate_reasons`를 남김
+5. report compaction
+   - 표에는 1줄 근거만, 상세 근거는 JSON/tooltip/펼침 행으로 분리
+
+표의 기본 컬럼은 아래를 권장한다.
+
+| 종목 | 현재 평가금액 | 액션 now | 금액 now | 액션 if triggered | 금액 if triggered | 우선순위 | 판단 경로 | 근거 |
+|---|---:|---|---:|---|---:|---:|---|---|
+| 삼성전자 | 1,000,000 | HOLD | 0 | STARTER_IF_TRIGGERED | 200,000 | 2 | RULE+DEEP | 방향성은 긍정적이나 즉시 진입보다 추세 확인이 우선 |
+| SK하이닉스 | 2,000,000 | HOLD | 0 | ADD_IF_TRIGGERED | 300,000 | 1 | RULE+DEEP+CODEX | 논지는 강하나 타이밍은 미완성, 반도체 내 우선순위는 가장 높음 |
+| 에이피알 | 1,000,000 | HOLD | 0 | WATCH_TRIGGER | 0 | 3 | RULE+DEEP | 변동성 안정과 뉴스 품질 확인 전 추가 자제 |
+
+`판단 경로`는 최소한 아래 값을 지원하는 것이 좋다.
+
+- `RULE_ONLY`
+- `RULE+DEEP`
+- `RULE+DEEP+CODEX`
+- `RULE_ONLY_FALLBACK`
+- `MANUAL_REVIEW`
+
+표 바로 아래 또는 HTML 상세 행에는 아래 보조 필드를 붙이는 것을 권장한다.
+
+- `timing_readiness`
+- `trigger_type`
+- `trigger_conditions`
+- `reason_codes`
+- `gate_reasons`
+- `review_required`
+- `coverage_score`
+
+이렇게 해야 사용자가 단순히 "무슨 액션인가"뿐 아니라, **왜 지금은 보류이고 어떤 조건이 충족되면 승격되는지**를 한눈에 이해할 수 있다.
 
 ### 11.3 Data Health / Source Health
 
@@ -752,6 +877,8 @@ delta_if_triggered_i =
 - `tradingagents/portfolio/account_models.py`
 - `tradingagents/portfolio/instrument_identity.py`
 - `tradingagents/portfolio/candidates.py`
+- `tradingagents/portfolio/semantic_judge.py`
+- `tradingagents/portfolio/action_judge.py`
 - `tradingagents/portfolio/gates.py`
 - `tradingagents/portfolio/allocation.py`
 - `tradingagents/portfolio/state_store.py`
@@ -792,7 +919,9 @@ MVP에서는 계좌 상태를 `AgentState`에 넣지 않는다.
 
 - `account_snapshot.json`
 - `portfolio_candidates.json`
+- `portfolio_semantic_verdicts.json`
 - `portfolio_report.json`
+- `portfolio_action_judge.json`
 - `proposed_orders.json`
 - `decision_audit.json`
 

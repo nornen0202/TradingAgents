@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -35,11 +36,17 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
 
     for manifest in manifests:
         run_dir = Path(manifest["_run_dir"])
+        portfolio_summary = _load_portfolio_summary(run_dir)
         _copy_artifacts(site_dir, run_dir, manifest)
         _write_text(
             site_dir / "runs" / manifest["run_id"] / "index.html",
-            _render_run_page(manifest, settings),
+            _render_run_page(manifest, settings, portfolio_summary=portfolio_summary),
         )
+        if portfolio_summary.get("status_path"):
+            _write_text(
+                site_dir / "runs" / manifest["run_id"] / "portfolio.html",
+                _render_portfolio_page(manifest, settings, portfolio_summary=portfolio_summary),
+            )
         for ticker_summary in manifest.get("tickers", []):
             _write_text(
                 site_dir / "runs" / manifest["run_id"] / f"{ticker_summary['ticker']}.html",
@@ -86,9 +93,23 @@ def _copy_artifacts(site_dir: Path, run_dir: Path, manifest: dict[str, Any]) -> 
             if source.is_file():
                 shutil.copy2(source, download_dir / source.name)
 
+    portfolio_dir = run_dir / "portfolio-private"
+    if portfolio_dir.exists():
+        download_dir = site_dir / "downloads" / manifest["run_id"] / "portfolio"
+        download_dir.mkdir(parents=True, exist_ok=True)
+        for source in portfolio_dir.iterdir():
+            if source.is_file():
+                shutil.copy2(source, download_dir / source.name)
+
 
 def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) -> str:
     latest = manifests[0] if manifests else None
+    latest_portfolio = _load_portfolio_summary(Path(latest["_run_dir"])) if latest else {}
+    latest_portfolio_link = (
+        f"<a class=\"button\" href=\"runs/{_escape(latest['run_id'])}/portfolio.html\">Open account report</a>"
+        if latest and latest_portfolio.get("status_path")
+        else ""
+    )
     latest_html = (
         f"""
         <section class="hero">
@@ -105,6 +126,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
             <p><strong>Success</strong><span>{latest['summary']['successful_tickers']}</span></p>
             <p><strong>Failed</strong><span>{latest['summary']['failed_tickers']}</span></p>
             <a class="button" href="runs/{_escape(latest['run_id'])}/index.html">Open latest run</a>
+            {latest_portfolio_link}
           </div>
         </section>
         """
@@ -126,6 +148,12 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
 
     cards = []
     for manifest in manifests[: settings.max_runs_on_homepage]:
+        portfolio_summary = _load_portfolio_summary(Path(manifest["_run_dir"]))
+        portfolio_link = (
+            f"<p><a href=\"runs/{_escape(manifest['run_id'])}/portfolio.html\">Account report</a></p>"
+            if portfolio_summary.get("status_path")
+            else ""
+        )
         cards.append(
             f"""
             <article class="run-card">
@@ -136,6 +164,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
               <p>{_escape(manifest['started_at'])}</p>
               <p>{manifest['summary']['successful_tickers']} succeeded, {manifest['summary']['failed_tickers']} failed</p>
               <p>{_escape(manifest['settings']['provider'])} / {_escape(manifest['settings']['deep_model'])}</p>
+              {portfolio_link}
             </article>
             """
         )
@@ -160,7 +189,13 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
     return _page_template(settings.title, body, prefix="")
 
 
-def _render_run_page(manifest: dict[str, Any], settings: SiteSettings) -> str:
+def _render_run_page(
+    manifest: dict[str, Any],
+    settings: SiteSettings,
+    *,
+    portfolio_summary: dict[str, Any] | None = None,
+) -> str:
+    portfolio_summary = portfolio_summary or {}
     ticker_cards = []
     for ticker_summary in manifest.get("tickers", []):
         ticker_cards.append(
@@ -181,6 +216,28 @@ def _render_run_page(manifest: dict[str, Any], settings: SiteSettings) -> str:
             </article>
             """
         )
+
+    portfolio_html = ""
+    if portfolio_summary.get("status_path"):
+        portfolio_html = f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>Account report</h2>
+        <p>{_escape(portfolio_summary.get('status', 'unknown'))}</p>
+      </div>
+      <div class="ticker-grid">
+        <article class="ticker-card">
+          <div class="ticker-card-header">
+            <a href="portfolio.html">portfolio.html</a>
+            <span class="status {portfolio_summary.get('status_class', 'pending')}">{_escape(str(portfolio_summary.get('status', 'unknown')).replace('_', ' '))}</span>
+          </div>
+          <p><strong>Profile</strong><span>{_escape(portfolio_summary.get('profile') or '-')}</span></p>
+          <p><strong>Generated</strong><span>{_escape(portfolio_summary.get('generated_at') or '-')}</span></p>
+          <p><strong>Artifacts</strong><span>{portfolio_summary.get('artifact_count', 0)}</span></p>
+        </article>
+      </div>
+    </section>
+        """
 
     body = f"""
     <nav class="breadcrumbs"><a href="../../index.html">Home</a></nav>
@@ -207,8 +264,75 @@ def _render_run_page(manifest: dict[str, Any], settings: SiteSettings) -> str:
         {''.join(ticker_cards)}
       </div>
     </section>
+    {portfolio_html}
     """
     return _page_template(f"{manifest['run_id']} | {settings.title}", body, prefix="../../")
+
+
+def _render_portfolio_page(
+    manifest: dict[str, Any],
+    settings: SiteSettings,
+    *,
+    portfolio_summary: dict[str, Any],
+) -> str:
+    report_html = "<p class='empty'>No portfolio markdown report was generated.</p>"
+    report_path = portfolio_summary.get("portfolio_report_md")
+    if isinstance(report_path, Path) and report_path.exists():
+        report_html = _render_markdown(report_path.read_text(encoding="utf-8"))
+
+    download_links = []
+    for source in portfolio_summary.get("downloadable_files", []):
+        if not isinstance(source, Path):
+            continue
+        download_links.append(
+            f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
+        )
+
+    failure_html = ""
+    if portfolio_summary.get("status") == "failed":
+        failure_html = (
+            "<section class='section'>"
+            "<div class='section-head'><h2>Failure</h2></div>"
+            f"<pre class='error-block'>{_escape(portfolio_summary.get('error') or 'Unknown error')}</pre>"
+            "</section>"
+        )
+
+    body = f"""
+    <nav class="breadcrumbs">
+      <a href="../../index.html">Home</a>
+      <a href="index.html">{_escape(manifest['run_id'])}</a>
+    </nav>
+    <section class="hero compact">
+      <div>
+        <p class="eyebrow">Account report</p>
+        <h1>{_escape(manifest['run_id'])}</h1>
+        <p class="subtitle">{_escape(portfolio_summary.get('profile') or 'portfolio')} / {_escape(portfolio_summary.get('status') or 'unknown')}</p>
+      </div>
+      <div class="hero-card">
+        <div class="status {portfolio_summary.get('status_class', 'pending')}">{_escape(str(portfolio_summary.get('status') or 'unknown').replace('_', ' '))}</div>
+        <p><strong>Profile</strong><span>{_escape(portfolio_summary.get('profile') or '-')}</span></p>
+        <p><strong>Generated</strong><span>{_escape(portfolio_summary.get('generated_at') or '-')}</span></p>
+        <p><strong>Report markdown</strong><span>{_escape(_yes_no(bool(portfolio_summary.get('portfolio_report_md'))))}</span></p>
+        <p><strong>Report JSON</strong><span>{_escape(_yes_no(bool(portfolio_summary.get('portfolio_report_json'))))}</span></p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>Artifacts</h2>
+      </div>
+      <div class="pill-row">
+        {''.join(download_links) if download_links else "<span class='empty'>No downloadable artifacts</span>"}
+      </div>
+    </section>
+    {failure_html}
+    <section class="section prose">
+      <div class="section-head">
+        <h2>Rendered account report</h2>
+      </div>
+      {report_html}
+    </section>
+    """
+    return _page_template(f"{manifest['run_id']} account report | {settings.title}", body, prefix="../../")
 
 
 def _render_ticker_page(
@@ -355,7 +479,50 @@ def _vendor_counts_label(counts: dict[str, int] | None) -> str:
     return ", ".join(f"{vendor}:{count}" for vendor, count in sorted(counts.items()))
 
 
+def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
+    private_dir = run_dir / "portfolio-private"
+    status_path = private_dir / "status.json"
+    if not status_path.exists():
+        return {}
+
+    payload = json.loads(status_path.read_text(encoding="utf-8"))
+    report_md = private_dir / "portfolio_report.md"
+    report_json = private_dir / "portfolio_report.json"
+    files = sorted(path for path in private_dir.iterdir() if path.is_file())
+    return {
+        "status_path": status_path,
+        "status": str(payload.get("status") or "unknown"),
+        "status_class": _status_class(str(payload.get("status") or "unknown")),
+        "profile": payload.get("profile"),
+        "generated_at": payload.get("generated_at"),
+        "error": payload.get("error"),
+        "portfolio_report_md": report_md if report_md.exists() else None,
+        "portfolio_report_json": report_json if report_json.exists() else None,
+        "downloadable_files": files,
+        "artifact_count": len(files),
+    }
+
+
+def _status_class(status: str) -> str:
+    normalized = (status or "").strip().lower()
+    if normalized == "success":
+        return "success"
+    if normalized in {"failed", "failure"}:
+        return "failed"
+    return "pending"
+
+
+def _yes_no(value: bool) -> str:
+    return "yes" if value else "no"
+
+
 def _render_markdown(content: str) -> str:
+    content = re.sub(
+        r"<details>\s*<summary>원본 구조화 JSON 보기</summary>.*?</details>",
+        "",
+        content or "",
+        flags=re.IGNORECASE | re.DOTALL,
+    ).strip()
     if _MARKDOWN is None:
         return f"<pre>{_escape(content)}</pre>"
     return _MARKDOWN.render(content)

@@ -44,3 +44,12 @@ site_dir = "./site"
 title = "TradingAgents Daily Reports"
 subtitle = "Self-hosted Codex automation for scheduled multi-ticker analysis"
 max_runs_on_homepage = 30
+
+[portfolio]
+enabled = false
+profile_path = "portfolio_profiles.toml"
+profile_name = "kr_kis_default"
+continue_on_error = true
+semantic_judge_enabled = false
+action_judge_enabled = false
+action_judge_top_n = 5
