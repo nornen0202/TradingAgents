@@ -332,19 +332,56 @@ class TradingAgentsGraph:
 
         localized = dict(final_state)
 
-        def maybe_localize(content: str, *, content_type: str) -> str:
-            localization_llm = getattr(self, "output_thinking_llm", None) or getattr(
-                self, "quick_thinking_llm", None
-            )
+        def maybe_localize(content: str, *, content_type: str, force_llm_backend: bool = False) -> str:
+            if force_llm_backend:
+                localization_llm = getattr(self, "quick_thinking_llm", None) or getattr(
+                    self, "output_thinking_llm", None
+                )
+            else:
+                localization_llm = getattr(self, "output_thinking_llm", None) or getattr(
+                    self, "quick_thinking_llm", None
+                )
             if localization_llm is None:
                 return content
 
             def localize_text(text: str, *, text_content_type: str) -> str:
-                return rewrite_in_output_language(
-                    localization_llm,
-                    text,
-                    content_type=text_content_type,
+                try:
+                    return rewrite_in_output_language(
+                        localization_llm,
+                        text,
+                        content_type=text_content_type,
+                        force_llm_backend=force_llm_backend,
+                    )
+                except TypeError as exc:
+                    if "force_llm_backend" not in str(exc):
+                        raise
+                    return rewrite_in_output_language(
+                        localization_llm,
+                        text,
+                        content_type=text_content_type,
+                    )
+
+            try:
+                structured = parse_structured_decision(content)
+            except StructuredDecisionValidationError:
+                return localize_text(content, text_content_type=content_type)
+
+            payload = structured.to_dict()
+            for field_name in ("entry_logic", "exit_logic", "position_sizing", "risk_limits"):
+                payload[field_name] = localize_text(
+                    str(payload.get(field_name) or ""),
+                    text_content_type=f"{content_type} {field_name.replace('_', ' ')}",
                 )
+            for field_name in ("catalysts", "invalidators", "watchlist_triggers"):
+                payload[field_name] = [
+                    localize_text(
+                        str(item),
+                        text_content_type=f"{content_type} {field_name.replace('_', ' ')} item",
+                    )
+                    for item in (payload.get(field_name) or [])
+                    if str(item).strip()
+                ]
+            return json.dumps(payload, indent=2, ensure_ascii=False)
 
             try:
                 structured = parse_structured_decision(content)
@@ -402,6 +439,7 @@ class TradingAgentsGraph:
             risk_debate[field_name] = maybe_localize(
                 risk_debate.get(field_name, ""),
                 content_type=content_type,
+                force_llm_backend=(field_name == "judge_decision"),
             )
         localized["risk_debate_state"] = risk_debate
 
