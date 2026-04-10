@@ -42,7 +42,10 @@ concurrency:
 
 jobs:
   analyze_us:
-    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *') }}
+    needs:
+      - analyze_kr
+      - deploy_kr
+    if: ${{ always() && ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *')) && needs.analyze_kr.result != 'failure' && needs.analyze_kr.result != 'cancelled' && needs.deploy_kr.result != 'failure' && needs.deploy_kr.result != 'cancelled' }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
@@ -317,8 +320,22 @@ jobs:
 
       - name: Upload GitHub Pages artifact
         if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *') }}
+        # Self-hosted runners can intermittently lose DNS resolution to GitHub's
+        # artifact service endpoints, which surfaces as ENOTFOUND from
+        # actions/upload-artifact. Preflight + retry reduces flaky failures.
+        id: upload_pages_us
+        timeout-minutes: 15
+        continue-on-error: true
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
+          name: github-pages-us
+          path: site
+
+      - name: Retry GitHub Pages artifact upload after transient network failure (US)
+        if: ${{ ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *')) && steps.upload_pages_us.outcome == 'failure' }}
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          name: github-pages-us
           path: site
 
   analyze_kr:
@@ -715,9 +732,26 @@ jobs:
           throw "bash.exe was not found under the expected Git for Windows directories."
 
       - name: Upload GitHub Pages artifact
+        # NOTE:
+        # upload-pages-artifact defaults to artifact name "github-pages".
+        # We use explicit region-specific artifact names to avoid 409 conflicts
+        # and to support two deployments during profile=all runs.
+        # Use a KR-specific artifact name so all-mode can run an intermediate deploy
+        # before US analysis without artifact naming collisions.
         if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
+        id: upload_pages_kr
+        timeout-minutes: 15
+        continue-on-error: true
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
+          name: github-pages-kr
+          path: site
+
+      - name: Retry GitHub Pages artifact upload after transient network failure (KR)
+        if: ${{ ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *')) && steps.upload_pages_kr.outcome == 'failure' }}
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          name: github-pages-kr
           path: site
 
       - name: Upload private account artifact
@@ -728,11 +762,29 @@ jobs:
           path: portfolio-artifacts
           if-no-files-found: warn
 
+  deploy_kr:
+    needs:
+      - analyze_kr
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'all' && needs.analyze_kr.result == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy KR snapshot to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-kr
+
   deploy:
     needs:
       - analyze_us
       - analyze_kr
-    if: ${{ always() && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && (needs.analyze_us.result == 'success' || needs.analyze_kr.result == 'success') }}
+      - deploy_kr
+    if: ${{ always() && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && ((github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'all' && needs.analyze_us.result == 'success' && needs.deploy_kr.result == 'success') || (github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'us' && needs.analyze_us.result == 'success') || (github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'kr' && needs.analyze_kr.result == 'success') || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *' && needs.analyze_us.result == 'success') || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *' && needs.analyze_kr.result == 'success')) }}
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -743,3 +795,5 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+        with:
+          artifact_name: ${{ (needs.analyze_us.result == 'success' && 'github-pages-us') || 'github-pages-kr' }}
