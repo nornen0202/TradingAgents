@@ -82,9 +82,28 @@ def _copy_artifacts(site_dir: Path, run_dir: Path, manifest: dict[str, Any]) -> 
         for relative_path in (ticker_summary.get("artifacts") or {}).values():
             if not relative_path:
                 continue
-            source = run_dir / relative_path
+            source = _resolve_artifact_source(run_dir, relative_path)
             if source.is_file():
                 shutil.copy2(source, download_dir / source.name)
+
+    portfolio = manifest.get("portfolio") or {}
+    portfolio_artifacts = portfolio.get("artifacts") or {}
+    if portfolio_artifacts:
+        download_dir = site_dir / "downloads" / manifest["run_id"] / "portfolio"
+        download_dir.mkdir(parents=True, exist_ok=True)
+        for artifact_path in portfolio_artifacts.values():
+            if not artifact_path:
+                continue
+            source = _resolve_artifact_source(run_dir, artifact_path)
+            if source.is_file():
+                shutil.copy2(source, download_dir / source.name)
+
+
+def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
+    candidate = Path(str(path_value))
+    if candidate.is_absolute():
+        return candidate
+    return run_dir / candidate
 
 
 def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) -> str:
@@ -161,6 +180,17 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
 
 
 def _render_run_page(manifest: dict[str, Any], settings: SiteSettings) -> str:
+    portfolio_status = manifest.get("portfolio") or {"status": "unknown"}
+    portfolio_status_label = str(portfolio_status.get("status") or "unknown").replace("_", " ")
+    portfolio_artifacts = portfolio_status.get("artifacts") or {}
+    portfolio_links = []
+    for artifact_path in portfolio_artifacts.values():
+        if not artifact_path:
+            continue
+        artifact_name = Path(str(artifact_path)).name
+        portfolio_links.append(
+            f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(artifact_name)}'>{_escape(artifact_name)}</a>"
+        )
     ticker_cards = []
     for ticker_summary in manifest.get("tickers", []):
         ticker_cards.append(
@@ -197,6 +227,22 @@ def _render_run_page(manifest: dict[str, Any], settings: SiteSettings) -> str:
         <p><strong>Quick model</strong><span>{_escape(manifest['settings']['quick_model'])}</span></p>
         <p><strong>Language</strong><span>{_escape(manifest['settings']['output_language'])}</span></p>
       </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>Portfolio pipeline</h2>
+      </div>
+      <article class="run-card">
+        <div class="run-card-header">
+          <span>Status</span>
+          <span class="status {_escape(str(portfolio_status.get('status') or 'unknown'))}">{_escape(portfolio_status_label)}</span>
+        </div>
+        <p><strong>Profile</strong><span>{_escape(str(portfolio_status.get('profile') or '-'))}</span></p>
+        <p><strong>Output mode</strong><span>Published on Pages</span></p>
+        <div class="pill-row">
+          {''.join(portfolio_links) if portfolio_links else "<span class='empty'>No portfolio artifacts</span>"}
+        </div>
+      </article>
     </section>
     <section class="section">
       <div class="section-head">
