@@ -196,6 +196,7 @@ continue_on_error = false
 
             run_dir = archive_dir / "runs" / manifest["started_at"][:4] / manifest["run_id"]
             private_dir = run_dir / "portfolio-private"
+            self.assertEqual((manifest.get("portfolio") or {}).get("status"), "success")
             self.assertTrue((private_dir / "status.json").exists())
             self.assertTrue((private_dir / "account_snapshot.json").exists())
             self.assertTrue((private_dir / "portfolio_candidates.json").exists())
