@@ -56,7 +56,13 @@ def get_output_language() -> str:
     return str(get_config().get("output_language", "English")).strip() or "English"
 
 
-def rewrite_in_output_language(llm, content: str, *, content_type: str = "report") -> str:
+def rewrite_in_output_language(
+    llm,
+    content: str,
+    *,
+    content_type: str = "report",
+    force_llm_backend: bool = False,
+) -> str:
     """Rewrite already-generated content into the configured output language.
 
     This lets the graph keep English-centric reasoning prompts where useful while
@@ -72,7 +78,7 @@ def rewrite_in_output_language(llm, content: str, *, content_type: str = "report
         return _normalize_localized_finance_terms(content, lang)
 
     settings = get_translation_settings()
-    if settings.backend != "llm":
+    if settings.backend != "llm" and not force_llm_backend:
         try:
             translated = translate_with_backend(content, lang)
         except TranslationBackendError:
