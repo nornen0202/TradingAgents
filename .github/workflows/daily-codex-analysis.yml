@@ -79,6 +79,42 @@ jobs:
           python -m pip install -e ".[translation]"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
+      - name: Materialize runtime API keys
+        if: ${{ github.event.inputs.site_only != 'true' }}
+        run: |
+          $runtimePath = Join-Path $env:RUNNER_TEMP "tradingagents-api-keys.json"
+          $payload = [ordered]@{}
+          $aliasGroups = [ordered]@{
+            "ALPHA_VANTAGE_API_KEY" = @("ALPHA_VANTAGE_API_KEY")
+            "NAVER_CLIENT_ID" = @("NAVER_CLIENT_ID")
+            "NAVER_CLIENT_SECRET" = @("NAVER_CLIENT_SECRET")
+            "OPENDART_API_KEY" = @("OPENDART_API_KEY")
+            "KIS_APP_KEY" = @("KIS_APP_KEY", "KIS_Developers_APP_KEY")
+            "KIS_APP_SECRET" = @("KIS_APP_SECRET", "KIS_Developers_APP_SECRET")
+            "KIS_ACCOUNT_NO" = @("KIS_ACCOUNT_NO", "KIS_Developers_ACCOUNT_NO")
+            "KIS_PRODUCT_CODE" = @("KIS_PRODUCT_CODE", "KIS_Developers_PRODUCT_CODE")
+          }
+
+          foreach ($canonicalName in $aliasGroups.Keys) {
+            foreach ($candidate in $aliasGroups[$canonicalName]) {
+              $value = [Environment]::GetEnvironmentVariable($candidate)
+              if (-not [string]::IsNullOrWhiteSpace($value)) {
+                $payload[$canonicalName] = $value
+                $payload[$candidate] = $value
+                break
+              }
+            }
+          }
+
+          if ($payload.Count -eq 0) {
+            Write-Warning "No GitHub Actions secrets were available for TradingAgents API keys. Runtime will rely on fallback discovery only."
+            exit 0
+          }
+
+          $payload | ConvertTo-Json | Set-Content -Path $runtimePath -Encoding UTF8
+          Add-Content -Path $env:GITHUB_ENV -Value "TRADINGAGENTS_API_KEYS_PATH=$runtimePath"
+          Write-Host "Materialized TradingAgents API keys for runtime use."
+
       - name: Resolve Codex runtime
         run: |
           $siteOnly = "${{ github.event.inputs.site_only }}"
@@ -276,7 +312,7 @@ jobs:
 
       - name: Upload GitHub Pages artifact
         if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us') }}
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           path: site
 
@@ -301,6 +337,10 @@ jobs:
       TRADINGAGENTS_TRANSLATION_DEVICE: ${{ vars.TRADINGAGENTS_TRANSLATION_DEVICE }}
       TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL: ${{ vars.TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL }}
       ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+      KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+      KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+      KIS_ACCOUNT_NO: ${{ secrets.KIS_ACCOUNT_NO }}
+      KIS_PRODUCT_CODE: ${{ secrets.KIS_PRODUCT_CODE }}
       NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
       NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
@@ -323,10 +363,47 @@ jobs:
           python -m pip install -e ".[translation]"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
-      - name: Validate KR vendor credentials
+      - name: Materialize runtime API keys
+        if: ${{ github.event.inputs.site_only != 'true' }}
+        run: |
+          $runtimePath = Join-Path $env:RUNNER_TEMP "tradingagents-api-keys.json"
+          $payload = [ordered]@{}
+          $aliasGroups = [ordered]@{
+            "ALPHA_VANTAGE_API_KEY" = @("ALPHA_VANTAGE_API_KEY")
+            "NAVER_CLIENT_ID" = @("NAVER_CLIENT_ID")
+            "NAVER_CLIENT_SECRET" = @("NAVER_CLIENT_SECRET")
+            "OPENDART_API_KEY" = @("OPENDART_API_KEY")
+            "KIS_APP_KEY" = @("KIS_APP_KEY", "KIS_Developers_APP_KEY")
+            "KIS_APP_SECRET" = @("KIS_APP_SECRET", "KIS_Developers_APP_SECRET")
+            "KIS_ACCOUNT_NO" = @("KIS_ACCOUNT_NO", "KIS_Developers_ACCOUNT_NO")
+            "KIS_PRODUCT_CODE" = @("KIS_PRODUCT_CODE", "KIS_Developers_PRODUCT_CODE")
+          }
+
+          foreach ($canonicalName in $aliasGroups.Keys) {
+            foreach ($candidate in $aliasGroups[$canonicalName]) {
+              $value = [Environment]::GetEnvironmentVariable($candidate)
+              if (-not [string]::IsNullOrWhiteSpace($value)) {
+                $payload[$canonicalName] = $value
+                $payload[$candidate] = $value
+                break
+              }
+            }
+          }
+
+          if ($payload.Count -eq 0) {
+            Write-Warning "No GitHub Actions secrets were available for TradingAgents API keys. Runtime will rely on fallback discovery only."
+            exit 0
+          }
+
+          $payload | ConvertTo-Json | Set-Content -Path $runtimePath -Encoding UTF8
+          Add-Content -Path $env:GITHUB_ENV -Value "TRADINGAGENTS_API_KEYS_PATH=$runtimePath"
+          Write-Host "Materialized TradingAgents API keys for runtime use."
+
+      - name: Report KR vendor credential status
         if: ${{ github.event.inputs.site_only != 'true' }}
         run: |
           $script = @"
+          import os
           from tradingagents.dataflows.naver_news import validate_naver_credentials
           from tradingagents.dataflows.opendart import validate_opendart_credentials
           from tradingagents.dataflows.vendor_exceptions import VendorConfigurationError, VendorTransientError
@@ -336,19 +413,37 @@ jobs:
               ("OpenDART", validate_opendart_credentials),
           )
 
+          summary_path = os.getenv("GITHUB_STEP_SUMMARY")
+          summary_lines = [
+              "## KR vendor credential status",
+              "",
+          ]
           failures = []
           for label, validator in checks:
               try:
                   validator()
                   print(f"{label}: OK")
+                  summary_lines.append(f"- {label}: OK")
               except (VendorConfigurationError, VendorTransientError) as exc:
-                  failures.append(f"{label}: {exc}")
+                  message = f"{label}: {exc}"
+                  failures.append(message)
+                  print(f"::warning::{message}")
+                  summary_lines.append(f"- {label}: warning - {exc}")
 
           if failures:
-              print("::error::KR vendor preflight failed. Fix the repository secrets before re-running.")
-              for failure in failures:
-                  print(f"::error::{failure}")
-              raise SystemExit(1)
+              print("KR vendor preflight completed with warnings. Analysis will continue using fallback routing where possible.")
+              summary_lines.extend(
+                  [
+                      "",
+                      "Analysis will continue, but KR data coverage may degrade until the missing vendors are restored.",
+                  ]
+              )
+          else:
+              print("KR vendor preflight passed.")
+
+          if summary_path:
+              with open(summary_path, "a", encoding="utf-8") as handle:
+                  handle.write("\\n".join(summary_lines) + "\\n")
           "@
           $script | python -
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
@@ -498,6 +593,38 @@ jobs:
           $script | python -
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
+      - name: Validate KIS credentials for account report
+        if: ${{ github.event.inputs.site_only != 'true' }}
+        run: |
+          $script = @"
+          from tradingagents.dataflows.api_keys import get_api_key
+          from tradingagents.portfolio import validate_kis_credentials
+
+          app_key = get_api_key("KIS_APP_KEY")
+          app_secret = get_api_key("KIS_APP_SECRET")
+          if not app_key or not app_secret:
+              print("::warning::KIS credentials are not configured. The account portfolio report will be skipped until KIS_APP_KEY/KIS_APP_SECRET are available.")
+              raise SystemExit(0)
+
+          result = validate_kis_credentials(require_account=False)
+          print("KIS auth preflight:", result)
+
+          account_no = get_api_key("KIS_ACCOUNT_NO")
+          product_code = get_api_key("KIS_PRODUCT_CODE") or "01"
+          if not account_no:
+              print("::warning::KIS account number is not configured. Broker auth works, but live account snapshot will skip/fallback until KIS_ACCOUNT_NO is set.")
+              raise SystemExit(0)
+
+          account_result = validate_kis_credentials(
+              require_account=True,
+              account_no=account_no,
+              product_code=product_code,
+          )
+          print("KIS account snapshot preflight:", account_result)
+          "@
+          $script | python -
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
       - name: Run scheduled analysis and build site
         run: |
           $configPath = "config/scheduled_analysis_korea.toml"
@@ -531,6 +658,25 @@ jobs:
           python @args
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
+      - name: Collect private account artifacts
+        if: ${{ always() }}
+        run: |
+          $archiveRoot = $env:TRADINGAGENTS_ARCHIVE_DIR
+          if ([string]::IsNullOrWhiteSpace($archiveRoot)) {
+            $archiveRoot = Join-Path $env:GITHUB_WORKSPACE ".runtime\tradingagents-archive"
+          }
+
+          $destination = Join-Path $env:GITHUB_WORKSPACE "portfolio-artifacts"
+          New-Item -ItemType Directory -Force -Path $destination | Out-Null
+
+          Get-ChildItem -Path $archiveRoot -Recurse -Directory -Filter "portfolio-private" -ErrorAction SilentlyContinue |
+            ForEach-Object {
+              $runId = Split-Path $_.Parent -Leaf
+              $target = Join-Path $destination $runId
+              New-Item -ItemType Directory -Force -Path $target | Out-Null
+              Copy-Item -Path (Join-Path $_.FullName "*") -Destination $target -Recurse -Force -ErrorAction SilentlyContinue
+            }
+
       - name: Add Git Bash to PATH for Pages packaging
         run: |
           $gitBinCandidates = @(
@@ -550,9 +696,17 @@ jobs:
 
       - name: Upload GitHub Pages artifact
         if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all') }}
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           path: site
+
+      - name: Upload private account artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: kr-portfolio-private-${{ github.run_id }}
+          path: portfolio-artifacts
+          if-no-files-found: warn
 
   deploy:
     needs:

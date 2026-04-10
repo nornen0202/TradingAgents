@@ -16,6 +16,7 @@ from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry
 from tradingagents.graph.trading_graph import TradingAgentsGraph
+from tradingagents.portfolio import run_portfolio_pipeline
 from tradingagents.schemas import parse_structured_decision
 from tradingagents.reporting import save_report_bundle
 
@@ -116,6 +117,17 @@ def execute_scheduled_run(
 
     _write_json(run_dir / "run.json", manifest)
     _write_json(config.storage.archive_dir / "latest-run.json", manifest)
+    if config.portfolio.enabled and config.portfolio.profile_path:
+        portfolio_status = run_portfolio_pipeline(
+            run_dir=run_dir,
+            manifest=manifest,
+            portfolio_settings=config.portfolio,
+        )
+        if portfolio_status.get("status") == "failed":
+            print(
+                "::warning::Portfolio pipeline failed: "
+                f"{portfolio_status.get('error', 'unknown error')}"
+            )
     build_site(config.storage.archive_dir, config.storage.site_dir, config.site)
     return manifest
 
@@ -520,6 +532,6 @@ def _relative_to_run(run_dir: Path, path: Path | None) -> str | None:
     return path.relative_to(run_dir).as_posix()
 
 
-def _write_json(path: Path, payload: dict[str, Any]) -> None:
+def _write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")

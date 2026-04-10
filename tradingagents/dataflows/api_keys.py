@@ -8,6 +8,10 @@ from pathlib import Path
 
 _DOC_ENV_MAP = {
     "ALPHA_VANTAGE_API_KEY": "Alpha Vantage",
+    "KIS_APP_KEY": "KIS Developers App Key",
+    "KIS_APP_SECRET": "KIS Developers App Secret",
+    "KIS_ACCOUNT_NO": "KIS Account Number",
+    "KIS_PRODUCT_CODE": "KIS Product Code",
     "NAVER_CLIENT_ID": "Naver.Client ID",
     "NAVER_CLIENT_SECRET": "Naver.Client Secret",
     "OPENDART_API_KEY": "OpenDart",
@@ -15,6 +19,10 @@ _DOC_ENV_MAP = {
 
 _ENV_ALIASES = {
     "ALPHA_VANTAGE_API_KEY": ("ALPHA_VANTAGE_API_KEY", "ALPHA_VANTAGE_KEY"),
+    "KIS_APP_KEY": ("KIS_APP_KEY", "KIS_Developers_APP_KEY"),
+    "KIS_APP_SECRET": ("KIS_APP_SECRET", "KIS_Developers_APP_SECRET"),
+    "KIS_ACCOUNT_NO": ("KIS_ACCOUNT_NO", "KIS_Developers_ACCOUNT_NO"),
+    "KIS_PRODUCT_CODE": ("KIS_PRODUCT_CODE", "KIS_Developers_PRODUCT_CODE"),
     "NAVER_CLIENT_ID": ("NAVER_CLIENT_ID", "NAVER_API_CLIENT_ID"),
     "NAVER_CLIENT_SECRET": ("NAVER_CLIENT_SECRET", "NAVER_API_CLIENT_SECRET"),
     "OPENDART_API_KEY": ("OPENDART_API_KEY", "OPEN_DART_API_KEY", "OPENDART_KEY"),
@@ -77,7 +85,7 @@ def _normalize_file_value(value: object) -> str | None:
 
 def _load_json_keys(path: Path) -> dict[str, str]:
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return {}
 

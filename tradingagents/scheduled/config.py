@@ -72,12 +72,21 @@ class SiteSettings:
 
 
 @dataclass(frozen=True)
+class PortfolioSettings:
+    enabled: bool = False
+    profile_path: Path | None = None
+    profile_name: str = "kr_kis_default"
+    continue_on_error: bool = True
+
+
+@dataclass(frozen=True)
 class ScheduledAnalysisConfig:
     run: RunSettings
     llm: LLMSettings
     translation: TranslationSettings
     storage: StorageSettings
     site: SiteSettings
+    portfolio: PortfolioSettings
     config_path: Path
 
 
@@ -91,6 +100,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     translation_raw = raw.get("translation") or {}
     storage_raw = raw.get("storage") or {}
     site_raw = raw.get("site") or {}
+    portfolio_raw = raw.get("portfolio") or {}
 
     tickers = _normalize_tickers(run_raw.get("tickers") or [])
     if not tickers:
@@ -173,6 +183,16 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             ).strip()
             or "Automated multi-agent market analysis powered by Codex",
             max_runs_on_homepage=int(site_raw.get("max_runs_on_homepage", 30)),
+        ),
+        portfolio=PortfolioSettings(
+            enabled=bool(portfolio_raw.get("enabled", False)),
+            profile_path=(
+                _resolve_path(portfolio_raw.get("profile_path", "portfolio_profiles.toml"), base_dir)
+                if portfolio_raw.get("enabled", False) or portfolio_raw.get("profile_path")
+                else None
+            ),
+            profile_name=str(portfolio_raw.get("profile_name", "kr_kis_default")).strip() or "kr_kis_default",
+            continue_on_error=bool(portfolio_raw.get("continue_on_error", True)),
         ),
         config_path=config_path,
     )
