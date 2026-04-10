@@ -383,6 +383,28 @@ class TradingAgentsGraph:
                 ]
             return json.dumps(payload, indent=2, ensure_ascii=False)
 
+            try:
+                structured = parse_structured_decision(content)
+            except StructuredDecisionValidationError:
+                return localize_text(content, text_content_type=content_type)
+
+            payload = structured.to_dict()
+            for field_name in ("entry_logic", "exit_logic", "position_sizing", "risk_limits"):
+                payload[field_name] = localize_text(
+                    str(payload.get(field_name) or ""),
+                    text_content_type=f"{content_type} {field_name.replace('_', ' ')}",
+                )
+            for field_name in ("catalysts", "invalidators", "watchlist_triggers"):
+                payload[field_name] = [
+                    localize_text(
+                        str(item),
+                        text_content_type=f"{content_type} {field_name.replace('_', ' ')} item",
+                    )
+                    for item in (payload.get(field_name) or [])
+                    if str(item).strip()
+                ]
+            return json.dumps(payload, indent=2, ensure_ascii=False)
+
         for field_name, content_type in (
             ("market_report", "market analyst report"),
             ("sentiment_report", "social sentiment report"),
