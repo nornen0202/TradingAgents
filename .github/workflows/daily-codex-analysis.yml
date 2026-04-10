@@ -598,7 +598,7 @@ jobs:
         run: |
           $script = @"
           from tradingagents.dataflows.api_keys import get_api_key
-          from tradingagents.portfolio import validate_kis_credentials
+          from tradingagents.portfolio.kis import KisClient
 
           app_key = get_api_key("KIS_APP_KEY")
           app_secret = get_api_key("KIS_APP_SECRET")
@@ -606,8 +606,13 @@ jobs:
               print("::warning::KIS credentials are not configured. The account portfolio report will be skipped until KIS_APP_KEY/KIS_APP_SECRET are available.")
               raise SystemExit(0)
 
-          result = validate_kis_credentials(require_account=False)
-          print("KIS auth preflight:", result)
+          try:
+              client = KisClient.from_api_keys()
+              token = client.issue_access_token()
+              print("KIS auth preflight:", {"environment": client.environment, "token_issued": bool(token)})
+          except Exception as exc:
+              print(f"::warning::KIS auth preflight failed: {exc}. KR analysis will continue, but the account portfolio report may be skipped.")
+              raise SystemExit(0)
 
           account_no = get_api_key("KIS_ACCOUNT_NO")
           product_code = get_api_key("KIS_PRODUCT_CODE") or "01"
@@ -615,11 +620,21 @@ jobs:
               print("::warning::KIS account number is not configured. Broker auth works, but live account snapshot will skip/fallback until KIS_ACCOUNT_NO is set.")
               raise SystemExit(0)
 
-          account_result = validate_kis_credentials(
-              require_account=True,
-              account_no=account_no,
-              product_code=product_code,
-          )
+          try:
+              positions, summary = client.fetch_balance(
+                  account_no=account_no,
+                  product_code=product_code,
+              )
+          except Exception as exc:
+              print(f"::warning::KIS account snapshot preflight failed: {exc}. KR analysis will continue, but the account portfolio report may be skipped.")
+              raise SystemExit(0)
+
+          account_result = {
+              "environment": client.environment,
+              "token_issued": bool(token),
+              "positions_count": len(positions),
+              "summary_fields": sorted((summary or {}).keys()),
+          }
           print("KIS account snapshot preflight:", account_result)
           "@
           $script | python -
