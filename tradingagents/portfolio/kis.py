@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -345,18 +346,25 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
 
     client = KisClient.from_api_keys(environment=profile.broker_environment)
     now = datetime.now().astimezone()
+    warnings: list[str] = []
     positions_payload, summary_payload = client.fetch_balance(
         account_no=profile.account_no,
         product_code=profile.product_code,
     )
-    pending_payload = client.fetch_pending_orders(
-        account_no=profile.account_no,
-        product_code=profile.product_code,
-        query_date=now,
-    )
+    try:
+        pending_payload = client.fetch_pending_orders(
+            account_no=profile.account_no,
+            product_code=profile.product_code,
+            query_date=now,
+        )
+    except Exception as exc:
+        pending_payload = []
+        warnings.append(
+            "KIS pending-order lookup failed; continuing with balance-only account snapshot. "
+            f"reason={_summarize_optional_kis_error(exc)}"
+        )
 
     positions: list[Position] = []
-    warnings: list[str] = []
     for item in positions_payload:
         broker_symbol = str(item.get("pdno") or "").strip()
         holding_qty = float(item.get("hldg_qty", 0) or 0)
@@ -457,6 +465,19 @@ def _looks_like_auth_error(payload: dict[str, Any]) -> bool:
     message = f"{payload.get('msg_cd', '')} {payload.get('msg1', '')}".lower()
     auth_markers = ("auth", "token", "access", "expired", "만료", "토큰", "인증")
     return any(marker in message for marker in auth_markers)
+
+
+def _summarize_optional_kis_error(exc: Exception) -> str:
+    if isinstance(exc, requests.HTTPError):
+        response = exc.response
+        if response is not None:
+            status = str(getattr(response, "status_code", "") or "").strip()
+            reason = str(getattr(response, "reason", "") or "").strip()
+            return " ".join(part for part in (status, reason) if part) or "HTTPError"
+    text = str(exc).strip() or exc.__class__.__name__
+    text = re.sub(r"(CANO=)[^&\s]+", r"\1***", text)
+    text = re.sub(r"(ACNT_PRDT_CD=)[^&\s]+", r"\1***", text)
+    return text[:240]
 
 
 def _extract_cash_snapshot(

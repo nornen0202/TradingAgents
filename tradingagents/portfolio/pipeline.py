@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from .action_judge import arbitrate_portfolio_actions
+from .account_models import AccountSnapshot
 from .allocation import build_recommendation
 from .candidates import build_portfolio_candidates
 from .csv_import import load_snapshot_from_positions_csv
@@ -128,6 +129,8 @@ def _load_snapshot(profile) -> Any:
         return load_manual_snapshot(profile.manual_snapshot_path)
     if profile.broker == "csv":
         return load_snapshot_from_positions_csv(profile)
+    if profile.broker in {"watchlist", "paper", "none"}:
+        return _load_watchlist_only_snapshot(profile)
     if profile.broker == "kis":
         try:
             return load_account_snapshot_from_kis(profile)
@@ -138,6 +141,32 @@ def _load_snapshot(profile) -> Any:
                 return load_snapshot_from_positions_csv(profile)
             raise
     raise PortfolioConfigurationError(f"Unsupported portfolio broker '{profile.broker}'.")
+
+
+def _load_watchlist_only_snapshot(profile) -> AccountSnapshot:
+    now = datetime.now().astimezone()
+    return AccountSnapshot(
+        snapshot_id=f"{now.strftime('%Y%m%dT%H%M%S')}_watchlist_{profile.name}",
+        as_of=now.isoformat(),
+        broker=profile.broker,
+        account_id=profile.name,
+        currency="KRW",
+        settled_cash_krw=0,
+        available_cash_krw=0,
+        buying_power_krw=0,
+        total_equity_krw=0,
+        snapshot_health="WATCHLIST_ONLY",
+        cash_diagnostics={
+            "source": "watchlist_only_profile",
+            "reason": "No broker account snapshot is configured for this scheduled profile.",
+        },
+        pending_orders=tuple(),
+        positions=tuple(),
+        constraints=profile.constraints,
+        warnings=(
+            "No broker account snapshot is configured; generated a watchlist-only account report.",
+        ),
+    )
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:

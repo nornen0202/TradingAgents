@@ -485,6 +485,79 @@ continue_on_error = false
 
             self.assertEqual((manifest.get("portfolio") or {}).get("status"), "watchlist_only")
 
+    def test_execute_scheduled_run_generates_watchlist_only_profile_report(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            profile_path = root / "portfolio_profiles.toml"
+            config_path = root / "scheduled_analysis.toml"
+
+            profile_path.write_text(
+                """
+[profiles.us_watchlist]
+enabled = true
+broker = "watchlist"
+broker_environment = "real"
+read_only = true
+private_output_dirname = "portfolio-private"
+watch_tickers = ["AAPL"]
+trigger_budget_krw = 0
+min_cash_buffer_krw = 0
+min_trade_krw = 100000
+max_single_name_weight = 0.35
+max_sector_weight = 0.50
+max_daily_turnover_ratio = 0.30
+max_order_count_per_day = 5
+respect_existing_weights_softly = true
+continue_on_error = false
+""",
+                encoding="utf-8",
+            )
+
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["AAPL"]
+continue_on_ticker_error = true
+
+[llm]
+provider = "codex"
+quick_model = "gpt-5.4-mini"
+deep_model = "gpt-5.4"
+output_model = "gpt-5.4"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+
+[portfolio]
+enabled = true
+profile_path = "{profile_path.as_posix()}"
+profile_name = "us_watchlist"
+continue_on_error = false
+""",
+                encoding="utf-8",
+            )
+
+            config = load_scheduled_config(config_path)
+            with (
+                patch("tradingagents.scheduled.runner.TradingAgentsGraph", _FakeStructuredDecisionGraph),
+                patch("tradingagents.scheduled.runner.StatsCallbackHandler", _FakeStatsHandler),
+                patch("tradingagents.scheduled.runner.resolve_trade_date", return_value="2026-04-09"),
+            ):
+                manifest = execute_scheduled_run(config, run_label="portfolio-us-watchlist-test")
+
+            run_dir = archive_dir / "runs" / manifest["started_at"][:4] / manifest["run_id"]
+            private_dir = run_dir / "portfolio-private"
+            status_payload = json.loads((private_dir / "status.json").read_text(encoding="utf-8"))
+            snapshot_payload = json.loads((private_dir / "account_snapshot.json").read_text(encoding="utf-8"))
+            public_portfolio_page = (site_dir / "runs" / manifest["run_id"] / "portfolio.html").read_text(encoding="utf-8")
+
+            self.assertEqual(status_payload["status"], "watchlist_only")
+            self.assertEqual(snapshot_payload["snapshot_health"], "WATCHLIST_ONLY")
+            self.assertIn("Rendered account report", public_portfolio_page)
+
 
 if __name__ == "__main__":
     unittest.main()
