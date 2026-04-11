@@ -235,11 +235,17 @@ Important current fields include:
   - `max_debate_rounds`
   - `max_risk_discuss_rounds`
   - `continue_on_ticker_error`
+  - `report_polisher_enabled`: defaults to `true`; uses `output_model` for one final investor-facing polish pass and falls back to a template summary on failure.
 - `[llm]`
   - `provider`
   - `quick_model`
   - `deep_model`
   - `output_model`
+- `[portfolio]`
+  - `enabled`
+  - `semantic_judge_enabled`
+  - `action_judge_enabled`
+  - `report_polisher_enabled`: defaults to `true`; adds an investor-facing summary to account and watchlist reports.
 - `[translation]`
   - `backend`
   - `model`

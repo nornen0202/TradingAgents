@@ -5,6 +5,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from tradingagents.report_writer import polish_portfolio_report_markdown
+
 from .action_judge import arbitrate_portfolio_actions
 from .account_models import AccountSnapshot
 from .allocation import build_recommendation
@@ -86,6 +88,14 @@ def run_portfolio_pipeline(
             recommendation=recommendation,
             candidates=scored_candidates,
         )
+        markdown, report_writer_payload = polish_portfolio_report_markdown(
+            markdown,
+            snapshot=snapshot,
+            recommendation=recommendation,
+            language=str((manifest.get("settings") or {}).get("output_language") or "Korean"),
+            llm_settings=llm_settings,
+            enabled=bool(getattr(portfolio_settings, "report_polisher_enabled", True)),
+        )
         artifact_paths = save_portfolio_outputs(
             private_dir=private_dir,
             snapshot=snapshot,
@@ -94,6 +104,7 @@ def run_portfolio_pipeline(
             portfolio_report_markdown=markdown,
             semantic_verdicts=semantic_verdicts,
             action_judge_payload=action_judge_payload,
+            report_writer_payload=report_writer_payload,
             batch_metrics=manifest.get("batch_metrics") or {},
             warnings=all_warnings,
         )
@@ -102,6 +113,7 @@ def run_portfolio_pipeline(
             "status": status_value,
             "profile": profile.name,
             "snapshot_health": snapshot.snapshot_health,
+            "report_writer": report_writer_payload,
             "private_output_dir": private_dir.as_posix(),
             "artifacts": artifact_paths,
             "generated_at": datetime.now().astimezone().isoformat(),

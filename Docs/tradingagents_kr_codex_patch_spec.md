@@ -374,14 +374,14 @@ main 기본 설정은 `max_debate_rounds=2`, `max_risk_discuss_rounds=2`, `enabl
 ## P2. 모델 구성 관련 원칙
 
 ### 현재 상태
-- main 기본값은 deep=`gpt-5.4`, quick=`gpt-5.4-mini`
-- 이번 KR 실행도 같은 조합으로 돌았다.
+- 현재 PR 기본값은 deep=`gpt-5.4`, quick=`gpt-5.4`, output=`gpt-5.4`다.
+- 과거 KR 실행은 deep=`gpt-5.4`, quick=`gpt-5.4-mini` 조합으로 돌았다.
 
 ### 지침
 이 패치의 1차 목표는 **모델 교체가 아니라 의사결정 구조 보정**이다.
 
 즉,
-- 이번 패치에서는 deep/quick 조합을 그대로 유지해도 된다.
+- 비용/시간 제약이 크면 별도 설정에서 quick 모델만 낮추는 선택지를 검토한다.
 - 먼저 schema/data/telemetry를 고친 뒤,
 - 그 다음에 필요하면 모델 비용 최적화를 다시 논의한다.
 

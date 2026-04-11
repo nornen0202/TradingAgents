@@ -137,8 +137,9 @@ def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
 def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) -> str:
     latest = manifests[0] if manifests else None
     latest_portfolio = _load_portfolio_summary(Path(latest["_run_dir"])) if latest else {}
+    latest_portfolio_label = _portfolio_report_label(latest_portfolio)
     latest_portfolio_link = (
-        f"<a class=\"button\" href=\"runs/{_escape(latest['run_id'])}/portfolio.html\">Open account report</a>"
+        f"<a class=\"button\" href=\"runs/{_escape(latest['run_id'])}/portfolio.html\">Open {_escape(latest_portfolio_label.lower())}</a>"
         if latest and latest_portfolio.get("status_path")
         else ""
     )
@@ -181,8 +182,9 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
     cards = []
     for manifest in manifests[: settings.max_runs_on_homepage]:
         portfolio_summary = _load_portfolio_summary(Path(manifest["_run_dir"]))
+        portfolio_label = _portfolio_report_label(portfolio_summary)
         portfolio_link = (
-            f"<p><a href=\"runs/{_escape(manifest['run_id'])}/portfolio.html\">Account report</a></p>"
+            f"<p><a href=\"runs/{_escape(manifest['run_id'])}/portfolio.html\">{_escape(portfolio_label)}</a></p>"
             if portfolio_summary.get("status_path")
             else ""
         )
@@ -235,6 +237,7 @@ def _render_run_page(
     portfolio_status_class = _status_class(portfolio_status_value)
     portfolio_status_label = _portfolio_status_label(portfolio_status_value)
     portfolio_profile = portfolio_status.get("profile") or portfolio_summary.get("profile") or "-"
+    portfolio_label = _portfolio_report_label(portfolio_summary)
     language = _manifest_language(manifest)
 
     portfolio_links: list[str] = []
@@ -277,12 +280,12 @@ def _render_run_page(
         rendered_page = (
             "<a class='pill' href='portfolio.html'>portfolio.html</a>"
             if portfolio_summary.get("status_path")
-            else "<span class='empty'>No published account report</span>"
+            else f"<span class='empty'>No published {_escape(portfolio_label.lower())}</span>"
         )
         portfolio_html = f"""
     <section class="section">
       <div class="section-head">
-        <h2>Account report</h2>
+        <h2>{_escape(portfolio_label)}</h2>
       </div>
       <article class="run-card">
         <div class="run-card-header">
@@ -364,8 +367,9 @@ def _render_portfolio_page(
     snapshot_mode = (
         present_snapshot_mode(str(portfolio_summary.get("snapshot_health")), language="English")
         if portfolio_summary.get("snapshot_health")
-        else "Account report"
+        else _portfolio_report_label(portfolio_summary)
     )
+    portfolio_label = _portfolio_report_label(portfolio_summary)
 
     body = f"""
     <nav class="breadcrumbs">
@@ -374,7 +378,7 @@ def _render_portfolio_page(
     </nav>
     <section class="hero compact">
       <div>
-        <p class="eyebrow">Account report</p>
+        <p class="eyebrow">{_escape(portfolio_label)}</p>
         <h1>{_escape(manifest['run_id'])}</h1>
         <p class="subtitle">{_escape(status_label)}</p>
       </div>
@@ -387,13 +391,13 @@ def _render_portfolio_page(
     {failure_html}
     <section class="section prose">
       <div class="section-head">
-        <h2>Account report</h2>
+        <h2>{_escape(portfolio_label)}</h2>
       </div>
       {report_html}
     </section>
     {downloads_html}
     """
-    return _page_template(f"{manifest['run_id']} account report | {settings.title}", body, prefix="../../")
+    return _page_template(f"{manifest['run_id']} {portfolio_label.lower()} | {settings.title}", body, prefix="../../")
 
 
 def _render_ticker_page(
@@ -538,6 +542,14 @@ def _portfolio_status_label(status: str) -> str:
         "disabled": "Disabled",
     }
     return mapping.get(normalized, normalized.replace("_", " ").title() if normalized else "Unknown")
+
+
+def _portfolio_report_label(portfolio_summary: dict[str, Any]) -> str:
+    status = str(portfolio_summary.get("status") or "").strip().lower()
+    snapshot_health = str(portfolio_summary.get("snapshot_health") or "").strip().upper()
+    if status == "watchlist_only" or snapshot_health == "WATCHLIST_ONLY":
+        return "Watchlist report"
+    return "Account report"
 
 
 def _ticker_display_label(ticker_summary: dict[str, Any]) -> str:

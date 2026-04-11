@@ -28,6 +28,13 @@ def save_report_bundle(
 
     sections: list[str] = []
 
+    investor_summary = _coerce_text(final_state.get("investor_summary_report"))
+    if investor_summary:
+        summary_dir = save_path / "0_summary"
+        summary_dir.mkdir(exist_ok=True)
+        _write_text(summary_dir / "investor_summary.md", investor_summary)
+        sections.append(investor_summary)
+
     analysts_dir = save_path / "1_analysts"
     analyst_parts: list[tuple[str, str]] = []
     for file_name, title, key in (
