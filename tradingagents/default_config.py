@@ -11,7 +11,7 @@ DEFAULT_CONFIG = {
     # LLM settings
     "llm_provider": "openai",
     "deep_think_llm": "gpt-5.4",
-    "quick_think_llm": "gpt-5.4-mini",
+    "quick_think_llm": "gpt-5.4",
     "output_think_llm": "gpt-5.4",
     "backend_url": "https://api.openai.com/v1",
     # Provider-specific thinking configuration

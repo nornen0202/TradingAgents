@@ -9,6 +9,14 @@ from pathlib import Path
 from typing import Any
 
 from .config import SiteSettings
+from tradingagents.presentation import (
+    present_action_summary,
+    present_data_status,
+    present_decision_payload,
+    present_investment_view,
+    present_snapshot_mode,
+    sanitize_investor_text,
+)
 from tradingagents.schemas import parse_structured_decision
 
 try:
@@ -187,7 +195,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
               </div>
               <p>{_escape(manifest['started_at'])}</p>
               <p>{manifest['summary']['successful_tickers']} succeeded, {manifest['summary']['failed_tickers']} failed</p>
-              <p>{_escape(manifest['settings']['provider'])} / {_escape(manifest['settings']['deep_model'])}</p>
+              <p>{_escape(manifest['settings'].get('output_language', '-'))} report</p>
               {portfolio_link}
             </article>
             """
@@ -225,7 +233,9 @@ def _render_run_page(
         portfolio_status.get("status") or portfolio_summary.get("status") or "unknown"
     ).strip()
     portfolio_status_class = _status_class(portfolio_status_value)
+    portfolio_status_label = _portfolio_status_label(portfolio_status_value)
     portfolio_profile = portfolio_status.get("profile") or portfolio_summary.get("profile") or "-"
+    language = _manifest_language(manifest)
 
     portfolio_links: list[str] = []
     for artifact_path in (portfolio_status.get("artifacts") or {}).values():
@@ -255,11 +265,9 @@ def _render_run_page(
               <p><strong>Company</strong><span>{_escape(_ticker_display_label(ticker_summary))}</span></p>
               <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
               <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
-              <p><strong>Duration</strong><span>{ticker_summary.get('duration_seconds', 0):.1f}s</span></p>
-              <p><strong>Quality flags</strong><span>{_escape(', '.join(ticker_summary.get('quality_flags') or []) or '-')}</span></p>
-              <p><strong>Decision</strong><span>{_escape(_legacy_decision(ticker_summary.get('decision') or ticker_summary.get('error')))}</span></p>
-              <p><strong>Stance</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'portfolio_stance'))}</span></p>
-              <p><strong>Entry action</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'entry_action'))}</span></p>
+              <p><strong>Investment view</strong><span>{_escape(present_investment_view(ticker_summary.get('decision') or ticker_summary.get('error'), language=language))}</span></p>
+              <p><strong>Today</strong><span>{_escape(present_action_summary(ticker_summary.get('decision'), language=language))}</span></p>
+              <p><strong>Source status</strong><span>{_escape(present_data_status(ticker_summary.get('decision'), quality_flags=ticker_summary.get('quality_flags'), language=language))}</span></p>
             </article>
             """
         )
@@ -274,17 +282,17 @@ def _render_run_page(
         portfolio_html = f"""
     <section class="section">
       <div class="section-head">
-        <h2>Portfolio pipeline</h2>
+        <h2>Account report</h2>
       </div>
       <article class="run-card">
         <div class="run-card-header">
           <span>Status</span>
-          <span class="status {portfolio_status_class}">{_escape(portfolio_status_value.replace('_', ' '))}</span>
+          <span class="status {portfolio_status_class}">{_escape(portfolio_status_label)}</span>
         </div>
         <p><strong>Profile</strong><span>{_escape(str(portfolio_profile))}</span></p>
-        <p><strong>Rendered page</strong><span>{rendered_page}</span></p>
+        <p><strong>Report page</strong><span>{rendered_page}</span></p>
         <div class="pill-row">
-          {''.join(portfolio_links) if portfolio_links else "<span class='empty'>No portfolio artifacts</span>"}
+          {''.join(portfolio_links) if portfolio_links else "<span class='empty'>No downloads</span>"}
         </div>
       </article>
     </section>
@@ -300,10 +308,9 @@ def _render_run_page(
       </div>
       <div class="hero-card">
         <div class="status {manifest['status']}">{_escape(manifest['status'].replace('_', ' '))}</div>
-        <p><strong>Provider</strong><span>{_escape(manifest['settings']['provider'])}</span></p>
-        <p><strong>Deep model</strong><span>{_escape(manifest['settings']['deep_model'])}</span></p>
-        <p><strong>Quick model</strong><span>{_escape(manifest['settings']['quick_model'])}</span></p>
-        <p><strong>Language</strong><span>{_escape(manifest['settings']['output_language'])}</span></p>
+        <p><strong>Started</strong><span>{_escape(manifest['started_at'])}</span></p>
+        <p><strong>Report language</strong><span>{_escape(manifest['settings'].get('output_language', '-'))}</span></p>
+        <p><strong>Tickers</strong><span>{manifest['summary']['successful_tickers']} success / {manifest['summary']['failed_tickers']} failed</span></p>
       </div>
     </section>
     {portfolio_html}
@@ -348,6 +355,18 @@ def _render_portfolio_page(
             "</section>"
         )
 
+    downloads_html = _download_details_html(
+        download_links,
+        summary="Source files",
+        empty_text="No downloadable files",
+    )
+    status_label = _portfolio_status_label(str(portfolio_summary.get("status") or "unknown"))
+    snapshot_mode = (
+        present_snapshot_mode(str(portfolio_summary.get("snapshot_health")), language="English")
+        if portfolio_summary.get("snapshot_health")
+        else "Account report"
+    )
+
     body = f"""
     <nav class="breadcrumbs">
       <a href="../../index.html">Home</a>
@@ -357,31 +376,22 @@ def _render_portfolio_page(
       <div>
         <p class="eyebrow">Account report</p>
         <h1>{_escape(manifest['run_id'])}</h1>
-        <p class="subtitle">{_escape(portfolio_summary.get('profile') or 'portfolio')} / {_escape(portfolio_summary.get('status') or 'unknown')}</p>
+        <p class="subtitle">{_escape(status_label)}</p>
       </div>
       <div class="hero-card">
-        <div class="status {portfolio_summary.get('status_class', 'pending')}">{_escape(str(portfolio_summary.get('status') or 'unknown').replace('_', ' '))}</div>
-        <p><strong>Profile</strong><span>{_escape(portfolio_summary.get('profile') or '-')}</span></p>
+        <div class="status {portfolio_summary.get('status_class', 'pending')}">{_escape(status_label)}</div>
+        <p><strong>Account mode</strong><span>{_escape(snapshot_mode)}</span></p>
         <p><strong>Generated</strong><span>{_escape(portfolio_summary.get('generated_at') or '-')}</span></p>
-        <p><strong>Report markdown</strong><span>{_escape(_yes_no(bool(portfolio_summary.get('portfolio_report_md'))))}</span></p>
-        <p><strong>Report JSON</strong><span>{_escape(_yes_no(bool(portfolio_summary.get('portfolio_report_json'))))}</span></p>
-      </div>
-    </section>
-    <section class="section">
-      <div class="section-head">
-        <h2>Artifacts</h2>
-      </div>
-      <div class="pill-row">
-        {''.join(download_links) if download_links else "<span class='empty'>No downloadable artifacts</span>"}
       </div>
     </section>
     {failure_html}
     <section class="section prose">
       <div class="section-head">
-        <h2>Rendered account report</h2>
+        <h2>Account report</h2>
       </div>
       {report_html}
     </section>
+    {downloads_html}
     """
     return _page_template(f"{manifest['run_id']} account report | {settings.title}", body, prefix="../../")
 
@@ -392,6 +402,7 @@ def _render_ticker_page(
     settings: SiteSettings,
 ) -> str:
     run_dir = Path(manifest["_run_dir"])
+    language = _manifest_language(manifest)
     report_html = "<p class='empty'>No report markdown was generated for this ticker.</p>"
     report_relative = (ticker_summary.get("artifacts") or {}).get("report_markdown")
     if report_relative:
@@ -407,6 +418,11 @@ def _render_ticker_page(
         download_links.append(
             f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/{_escape(ticker_summary['ticker'])}/{_escape(artifact_name)}'>{_escape(artifact_name)}</a>"
         )
+    downloads_html = _download_details_html(
+        download_links,
+        summary="Source files",
+        empty_text="No downloadable files",
+    )
 
     failure_html = ""
     if ticker_summary["status"] != "success":
@@ -432,35 +448,21 @@ def _render_ticker_page(
         <div class="status {ticker_summary['status']}">{_escape(ticker_summary['status'])}</div>
         <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
         <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
-        <p><strong>Decision</strong><span>{_escape(_legacy_decision(ticker_summary.get('decision')))}</span></p>
-        <p><strong>Decision scope</strong><span>ticker-only, account-independent</span></p>
-        <p><strong>Portfolio stance</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'portfolio_stance'))}</span></p>
-        <p><strong>Entry action</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'entry_action'))}</span></p>
-        <p><strong>Setup quality</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'setup_quality'))}</span></p>
-        <p><strong>Duration</strong><span>{ticker_summary.get('duration_seconds', 0):.1f}s</span></p>
-        <p><strong>Quality flags</strong><span>{_escape(', '.join(ticker_summary.get('quality_flags') or []) or '-')}</span></p>
-        <p><strong>LLM calls</strong><span>{ticker_summary.get('metrics', {}).get('llm_calls', 'unavailable')}</span></p>
-        <p><strong>Tool calls</strong><span>{ticker_summary.get('metrics', {}).get('tool_calls', 'unavailable')}</span></p>
-        <p><strong>Token usage</strong><span>{_token_usage_label(ticker_summary.get('metrics', {}))}</span></p>
-        <p><strong>Vendor calls</strong><span>{_escape(_vendor_counts_label(ticker_summary.get('tool_telemetry', {}).get('vendor_calls')))}</span></p>
-        <p><strong>Fallback count</strong><span>{ticker_summary.get('tool_telemetry', {}).get('fallback_count', 'unavailable')}</span></p>
-      </div>
-    </section>
-    <section class="section">
-      <div class="section-head">
-        <h2>Artifacts</h2>
-      </div>
-      <div class="pill-row">
-        {''.join(download_links) if download_links else "<span class='empty'>No downloadable artifacts</span>"}
+        <p><strong>Investment view</strong><span>{_escape(present_investment_view(ticker_summary.get('decision'), language=language))}</span></p>
+        <p><strong>Today</strong><span>{_escape(present_action_summary(ticker_summary.get('decision'), language=language))}</span></p>
+        <p><strong>Market view</strong><span>{_escape(_decision_market_view(ticker_summary.get('decision'), language=language))}</span></p>
+        <p><strong>Key condition</strong><span>{_escape(_decision_primary_condition(ticker_summary.get('decision'), language=language))}</span></p>
+        <p><strong>Source status</strong><span>{_escape(present_data_status(ticker_summary.get('decision'), quality_flags=ticker_summary.get('quality_flags'), language=language))}</span></p>
       </div>
     </section>
     {failure_html}
     <section class="section prose">
       <div class="section-head">
-        <h2>Rendered report</h2>
+        <h2>Report</h2>
       </div>
       {report_html}
     </section>
+    {downloads_html}
     """
     return _page_template(
         f"{_ticker_display_label(ticker_summary)} | {settings.title}",
@@ -487,48 +489,63 @@ def _page_template(title: str, body: str, *, prefix: str) -> str:
 """
 
 
-def _ticker_display_label(ticker_summary: dict[str, Any]) -> str:
-    ticker = str(ticker_summary.get("ticker") or "").strip()
-    ticker_name = str(ticker_summary.get("ticker_name") or "").strip()
-    if ticker_name and ticker and ticker_name.upper() != ticker.upper():
-        return f"{ticker_name} ({ticker})"
-    return ticker_name or ticker or "-"
+def _manifest_language(manifest: dict[str, Any]) -> str:
+    return str((manifest.get("settings") or {}).get("output_language") or "English")
 
 
-def _decision_field(raw_decision: Any, field: str) -> str:
+def _decision_market_view(raw_decision: Any, *, language: str) -> str:
+    presentation = present_decision_payload(raw_decision, language=language)
+    return presentation.market_view if presentation else "-"
+
+
+def _decision_primary_condition(raw_decision: Any, *, language: str) -> str:
     if not isinstance(raw_decision, str) or not raw_decision.strip().startswith("{"):
         return "-"
     try:
         decision = parse_structured_decision(raw_decision)
     except Exception:
         return "-"
+    for values in (decision.watchlist_triggers, decision.catalysts, decision.invalidators):
+        for value in values:
+            text = sanitize_investor_text(value, language=language)
+            if text and text not in {"-", "없음", "None"}:
+                return text
+    return "-"
+
+
+def _download_details_html(links: list[str], *, summary: str, empty_text: str) -> str:
+    return f"""
+    <section class="section downloads">
+      <details>
+        <summary>{_escape(summary)}</summary>
+        <div class="pill-row">
+          {''.join(links) if links else f"<span class='empty'>{_escape(empty_text)}</span>"}
+        </div>
+      </details>
+    </section>
+    """
+
+
+def _portfolio_status_label(status: str) -> str:
+    normalized = str(status or "").strip().lower()
     mapping = {
-        "portfolio_stance": decision.portfolio_stance.value,
-        "entry_action": decision.entry_action.value,
-        "setup_quality": decision.setup_quality.value,
+        "success": "Ready",
+        "watchlist_only": "Watchlist only",
+        "capital_constrained": "Cash constrained",
+        "degraded": "Needs review",
+        "failed": "Failed",
+        "failure": "Failed",
+        "disabled": "Disabled",
     }
-    return mapping.get(field, "-")
+    return mapping.get(normalized, normalized.replace("_", " ").title() if normalized else "Unknown")
 
 
-def _legacy_decision(raw_decision: Any) -> str:
-    if not isinstance(raw_decision, str) or not raw_decision.strip().startswith("{"):
-        return str(raw_decision or "-")
-    try:
-        return parse_structured_decision(raw_decision).rating.value
-    except Exception:
-        return str(raw_decision or "-")
-
-
-def _token_usage_label(metrics: dict[str, Any]) -> str:
-    if not metrics.get("tokens_available", False):
-        return "unavailable"
-    return f"in={metrics.get('tokens_in', 0)} / out={metrics.get('tokens_out', 0)}"
-
-
-def _vendor_counts_label(counts: dict[str, int] | None) -> str:
-    if not counts:
-        return "unavailable"
-    return ", ".join(f"{vendor}:{count}" for vendor, count in sorted(counts.items()))
+def _ticker_display_label(ticker_summary: dict[str, Any]) -> str:
+    ticker = str(ticker_summary.get("ticker") or "").strip()
+    ticker_name = str(ticker_summary.get("ticker_name") or "").strip()
+    if ticker_name and ticker and ticker_name.upper() != ticker.upper():
+        return f"{ticker_name} ({ticker})"
+    return ticker_name or ticker or "-"
 
 
 def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
@@ -546,6 +563,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "status": str(payload.get("status") or "unknown"),
         "status_class": _status_class(str(payload.get("status") or "unknown")),
         "profile": payload.get("profile"),
+        "snapshot_health": payload.get("snapshot_health"),
         "generated_at": payload.get("generated_at"),
         "error": payload.get("error"),
         "portfolio_report_md": report_md if report_md.exists() else None,
@@ -564,10 +582,6 @@ def _status_class(status: str) -> str:
     if normalized in {"failed", "failure"}:
         return "failed"
     return "pending"
-
-
-def _yes_no(value: bool) -> str:
-    return "yes" if value else "no"
 
 
 def _render_markdown(content: str) -> str:

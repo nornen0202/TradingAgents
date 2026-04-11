@@ -49,9 +49,15 @@ class ReportLocalizationTests(unittest.TestCase):
             report_text = report_path.read_text(encoding="utf-8")
 
         self.assertNotIn("원본 구조화 JSON 보기", report_text)
-        self.assertIn("포트폴리오 stance", report_text)
-        self.assertIn("엔트리 액션", report_text)
-        self.assertIn("Decision scope", report_text)
+        self.assertIn("투자 의견", report_text)
+        self.assertIn("오늘의 판단", report_text)
+        self.assertIn("자료 상태", report_text)
+        self.assertNotIn("포트폴리오 stance", report_text)
+        self.assertNotIn("엔트리 액션", report_text)
+        self.assertNotIn("Decision scope", report_text)
+        self.assertNotIn("DEVELOPING", report_text)
+        self.assertNotIn("0.66", report_text)
+        self.assertNotIn("time_horizon", report_text)
         self.assertIn("breakout after confirmation", report_text)
 
     def test_save_report_bundle_uses_korean_labels(self):
@@ -133,8 +139,12 @@ class ReportLocalizationTests(unittest.TestCase):
             )
             report_text = report_path.read_text(encoding="utf-8")
 
-        self.assertIn("Legacy rating: `BUY`", report_text)
-        self.assertIn("Decision scope", report_text)
+        self.assertIn("Investment view: `Buy`", report_text)
+        self.assertIn("Today: Starter position candidate", report_text)
+        self.assertNotIn("Legacy rating", report_text)
+        self.assertNotIn("Decision scope", report_text)
+        self.assertNotIn("COMPELLING", report_text)
+        self.assertNotIn("0.82", report_text)
 
     def test_localize_final_state_rewrites_only_report_fields(self):
         graph = TradingAgentsGraph.__new__(TradingAgentsGraph)

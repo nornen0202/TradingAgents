@@ -1,0 +1,319 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any
+
+from tradingagents.schemas import StructuredDecision, parse_structured_decision
+
+
+@dataclass(frozen=True)
+class DecisionPresentation:
+    investment_view: str
+    market_view: str
+    action_summary: str
+    setup_summary: str
+    conviction_label: str
+    horizon_label: str
+    data_status: str
+
+
+def is_korean(language: str | None) -> bool:
+    return str(language or "").strip().lower() == "korean"
+
+
+def present_decision(decision: StructuredDecision, *, language: str = "English") -> DecisionPresentation:
+    korean = is_korean(language)
+    return DecisionPresentation(
+        investment_view=_rating_label(decision.rating.value, korean),
+        market_view=_stance_label(decision.portfolio_stance.value, korean),
+        action_summary=_action_label(decision.entry_action.value, korean),
+        setup_summary=_setup_label(decision.setup_quality.value, korean),
+        conviction_label=_conviction_label(decision.confidence, korean),
+        horizon_label=_horizon_label(decision.time_horizon.value, korean),
+        data_status=_data_status(decision, korean),
+    )
+
+
+def present_decision_payload(raw_decision: Any, *, language: str = "English") -> DecisionPresentation | None:
+    if not isinstance(raw_decision, str) or not raw_decision.strip().startswith("{"):
+        return None
+    try:
+        return present_decision(parse_structured_decision(raw_decision), language=language)
+    except Exception:
+        return None
+
+
+def present_investment_view(raw_decision: Any, *, language: str = "English") -> str:
+    presentation = present_decision_payload(raw_decision, language=language)
+    if presentation is not None:
+        return presentation.investment_view
+    value = str(raw_decision or "-").strip()
+    if not value or value == "-":
+        return "-"
+    return _rating_label(value.upper(), is_korean(language))
+
+
+def present_action_summary(raw_decision: Any, *, language: str = "English") -> str:
+    presentation = present_decision_payload(raw_decision, language=language)
+    if presentation is not None:
+        return presentation.action_summary
+    value = str(raw_decision or "").strip().upper()
+    if not value:
+        return "-"
+    korean = is_korean(language)
+    if korean:
+        mapping = {
+            "BUY": "매수 검토",
+            "OVERWEIGHT": "분할 증액 검토",
+            "HOLD": "보유 유지",
+            "UNDERWEIGHT": "일부 축소 검토",
+            "SELL": "청산 검토",
+            "NO_TRADE": "관망",
+        }
+        return mapping.get(value, _humanize_code(value, korean=True))
+    mapping = {
+        "BUY": "Consider buying",
+        "OVERWEIGHT": "Consider gradual add",
+        "HOLD": "Hold",
+        "UNDERWEIGHT": "Consider trimming",
+        "SELL": "Consider exit",
+        "NO_TRADE": "Wait",
+    }
+    return mapping.get(value, _humanize_code(value, korean=False))
+
+
+def present_data_status(
+    raw_decision: Any,
+    *,
+    quality_flags: list[str] | tuple[str, ...] | None = None,
+    language: str = "English",
+) -> str:
+    korean = is_korean(language)
+    if quality_flags:
+        return "일부 자료 확인 필요" if korean else "Some source checks needed"
+    presentation = present_decision_payload(raw_decision, language=language)
+    if presentation is not None:
+        return presentation.data_status
+    return "정상" if korean else "Available"
+
+
+def present_account_action(action: str, *, conditional: bool = False, language: str = "Korean") -> str:
+    korean = is_korean(language)
+    normalized = str(action or "").strip().upper()
+    if korean:
+        mapping = {
+            "ADD_NOW": "지금 추가 매수",
+            "STARTER_NOW": "소액 신규 진입",
+            "REDUCE_NOW": "일부 축소",
+            "TRIM_NOW": "일부 이익 실현",
+            "EXIT_NOW": "청산 검토",
+            "HOLD": "보유 유지",
+            "WATCH": "관찰 유지",
+            "NONE": "추가 행동 없음",
+            "ADD_IF_TRIGGERED": "조건 충족 시 추가 매수",
+            "STARTER_IF_TRIGGERED": "조건 충족 시 소액 진입",
+            "REDUCE_IF_TRIGGERED": "조건 이탈 시 축소",
+            "EXIT_IF_TRIGGERED": "조건 이탈 시 청산 검토",
+            "WATCH_TRIGGER": "조건 확인 후 검토",
+        }
+        return mapping.get(normalized, _humanize_code(normalized, korean=True))
+
+    mapping = {
+        "ADD_NOW": "Add now",
+        "STARTER_NOW": "Open starter position",
+        "REDUCE_NOW": "Reduce now",
+        "TRIM_NOW": "Trim now",
+        "EXIT_NOW": "Consider exit",
+        "HOLD": "Hold",
+        "WATCH": "Watch",
+        "NONE": "No further action",
+        "ADD_IF_TRIGGERED": "Add if triggered",
+        "STARTER_IF_TRIGGERED": "Start if triggered",
+        "REDUCE_IF_TRIGGERED": "Reduce if triggered",
+        "EXIT_IF_TRIGGERED": "Exit if triggered",
+        "WATCH_TRIGGER": "Review if triggered",
+    }
+    return mapping.get(normalized, _humanize_code(normalized, korean=False))
+
+
+def present_market_regime(value: str, *, language: str = "Korean") -> str:
+    korean = is_korean(language)
+    normalized = str(value or "").strip().lower()
+    if korean:
+        mapping = {
+            "constructive_but_selective": "우호적이지만 선별 필요",
+            "constructive": "우호적",
+            "defensive": "방어적",
+            "mixed": "혼조",
+        }
+        return mapping.get(normalized, _humanize_code(normalized, korean=True))
+
+    mapping = {
+        "constructive_but_selective": "Constructive but selective",
+        "constructive": "Constructive",
+        "defensive": "Defensive",
+        "mixed": "Mixed",
+    }
+    return mapping.get(normalized, _humanize_code(normalized, korean=False))
+
+
+def present_snapshot_mode(value: str, *, language: str = "Korean") -> str:
+    korean = is_korean(language)
+    normalized = str(value or "").strip().upper()
+    if korean:
+        mapping = {
+            "VALID": "계좌 기준",
+            "WATCHLIST_ONLY": "관심종목 전용",
+            "CAPITAL_CONSTRAINED": "현금 제약",
+            "INVALID_SNAPSHOT": "확인 필요",
+        }
+        return mapping.get(normalized, "확인 필요")
+
+    mapping = {
+        "VALID": "Account-aware",
+        "WATCHLIST_ONLY": "Watchlist only",
+        "CAPITAL_CONSTRAINED": "Capital constrained",
+        "INVALID_SNAPSHOT": "Needs review",
+    }
+    return mapping.get(normalized, "Needs review")
+
+
+def present_review_required(value: bool, *, language: str = "Korean") -> str:
+    if is_korean(language):
+        return "예" if value else "아니오"
+    return "Yes" if value else "No"
+
+
+def sanitize_investor_text(value: Any, *, language: str = "Korean") -> str:
+    text = str(value or "").strip()
+    if not text:
+        return "없음" if is_korean(language) else "None"
+
+    lower = text.lower()
+    if any(token in lower for token in ("semantic_judge", "rule_only", "fallback", "vendor", "tool", "token")):
+        return "일부 분석 자료 또는 자동 판단 결과는 확인이 필요합니다." if is_korean(language) else "Some source or automation checks need review."
+    if "no broker account snapshot" in lower or "watchlist-only" in lower:
+        return "실계좌 스냅샷 없이 관심종목 기준으로 작성했습니다." if is_korean(language) else "Prepared from a watchlist without a live account snapshot."
+    if "no_trade" in lower:
+        return "즉시 실행보다 관찰 신호가 많은 장입니다." if is_korean(language) else "Signals favor patience over immediate action."
+    return text.replace("_", " ")
+
+
+def _rating_label(value: str, korean: bool) -> str:
+    normalized = str(value or "").strip().upper()
+    if korean:
+        mapping = {
+            "BUY": "매수",
+            "OVERWEIGHT": "비중 확대",
+            "HOLD": "보유",
+            "UNDERWEIGHT": "비중 축소",
+            "SELL": "매도",
+            "NO_TRADE": "관망",
+        }
+        return mapping.get(normalized, _humanize_code(normalized, korean=True))
+
+    mapping = {
+        "BUY": "Buy",
+        "OVERWEIGHT": "Overweight",
+        "HOLD": "Hold",
+        "UNDERWEIGHT": "Underweight",
+        "SELL": "Sell",
+        "NO_TRADE": "No immediate trade",
+    }
+    return mapping.get(normalized, _humanize_code(normalized, korean=False))
+
+
+def _stance_label(value: str, korean: bool) -> str:
+    normalized = str(value or "").strip().upper()
+    if korean:
+        return {
+            "BULLISH": "상승 우위",
+            "NEUTRAL": "중립",
+            "BEARISH": "하방 리스크 우위",
+        }.get(normalized, _humanize_code(normalized, korean=True))
+    return {
+        "BULLISH": "Constructive",
+        "NEUTRAL": "Balanced",
+        "BEARISH": "Defensive",
+    }.get(normalized, _humanize_code(normalized, korean=False))
+
+
+def _action_label(value: str, korean: bool) -> str:
+    normalized = str(value or "").strip().upper()
+    if korean:
+        return {
+            "NONE": "추가 행동 없음",
+            "WAIT": "조건 확인 후 검토",
+            "STARTER": "소액/분할 진입 후보",
+            "ADD": "추가 매수 후보",
+            "EXIT": "비중 축소 또는 청산 검토",
+        }.get(normalized, _humanize_code(normalized, korean=True))
+    return {
+        "NONE": "No further action",
+        "WAIT": "Wait for confirmation",
+        "STARTER": "Starter position candidate",
+        "ADD": "Add candidate",
+        "EXIT": "Reduce or exit",
+    }.get(normalized, _humanize_code(normalized, korean=False))
+
+
+def _setup_label(value: str, korean: bool) -> str:
+    normalized = str(value or "").strip().upper()
+    if korean:
+        return {
+            "WEAK": "근거 약함",
+            "DEVELOPING": "조건 확인 필요",
+            "COMPELLING": "실행 근거 양호",
+        }.get(normalized, _humanize_code(normalized, korean=True))
+    return {
+        "WEAK": "Weak evidence",
+        "DEVELOPING": "Needs confirmation",
+        "COMPELLING": "Actionable evidence",
+    }.get(normalized, _humanize_code(normalized, korean=False))
+
+
+def _conviction_label(confidence: float, korean: bool) -> str:
+    if confidence >= 0.75:
+        return "높음" if korean else "High"
+    if confidence >= 0.55:
+        return "보통" if korean else "Moderate"
+    return "낮음" if korean else "Low"
+
+
+def _horizon_label(value: str, korean: bool) -> str:
+    normalized = str(value or "").strip().lower()
+    if korean:
+        return {
+            "short": "단기",
+            "medium": "중기",
+            "long": "장기",
+        }.get(normalized, _humanize_code(normalized, korean=True))
+    return {
+        "short": "Short term",
+        "medium": "Medium term",
+        "long": "Long term",
+    }.get(normalized, _humanize_code(normalized, korean=False))
+
+
+def _data_status(decision: StructuredDecision, korean: bool) -> str:
+    coverage = decision.data_coverage
+    limited = (
+        coverage.company_news_count <= 0
+        or coverage.social_source.value == "unavailable"
+        or coverage.macro_items_count <= 0
+    )
+    if korean:
+        label = "일부 제한 있음" if limited else "정상"
+        return f"{label} (기업 뉴스 {coverage.company_news_count}건, 공시 {coverage.disclosures_count}건)"
+    label = "Some limits" if limited else "Available"
+    return f"{label} (company news {coverage.company_news_count}, filings {coverage.disclosures_count})"
+
+
+def _humanize_code(value: str, *, korean: bool) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return "-"
+    humanized = text.replace("_", " ").strip().lower()
+    if korean:
+        return humanized
+    return humanized.capitalize()

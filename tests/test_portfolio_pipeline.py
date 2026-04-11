@@ -169,7 +169,7 @@ continue_on_ticker_error = true
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4-mini"
+quick_model = "gpt-5.4"
 deep_model = "gpt-5.4"
 output_model = "gpt-5.4"
 
@@ -215,8 +215,17 @@ continue_on_error = false
             self.assertEqual(report_payload["market_regime"], "constructive_but_selective")
             self.assertGreaterEqual(len(report_payload["actions"]), 2)
             self.assertEqual(audit_payload["snapshot_health"], "VALID")
-            self.assertIn("판단 경로", report_markdown)
-            self.assertIn("Rendered account report", public_portfolio_page)
+            self.assertIn("핵심 요약", report_markdown)
+            self.assertIn("지금 할 일", report_markdown)
+            self.assertIn("조건 충족 시", report_markdown)
+            self.assertNotIn("판단 경로", report_markdown)
+            self.assertNotIn("RULE_ONLY", report_markdown)
+            self.assertNotIn("timing_readiness", report_markdown)
+            self.assertNotIn("reason_codes", report_markdown)
+            self.assertNotIn("Data Health", report_markdown)
+            self.assertIn("Account report", public_portfolio_page)
+            self.assertNotIn("RULE_ONLY", public_portfolio_page)
+            self.assertNotIn("timing_readiness", public_portfolio_page)
             self.assertIn("TradingAgents 계좌 운용 리포트", public_portfolio_page)
 
     def test_execute_scheduled_run_applies_portfolio_llm_judges_when_enabled(self):
@@ -299,7 +308,7 @@ continue_on_ticker_error = true
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4-mini"
+quick_model = "gpt-5.4"
 deep_model = "gpt-5.4"
 output_model = "gpt-5.4"
 
@@ -458,7 +467,7 @@ continue_on_ticker_error = true
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4-mini"
+quick_model = "gpt-5.4"
 deep_model = "gpt-5.4"
 output_model = "gpt-5.4"
 
@@ -523,7 +532,7 @@ continue_on_ticker_error = true
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4-mini"
+quick_model = "gpt-5.4"
 deep_model = "gpt-5.4"
 output_model = "gpt-5.4"
 
@@ -556,7 +565,7 @@ continue_on_error = false
 
             self.assertEqual(status_payload["status"], "watchlist_only")
             self.assertEqual(snapshot_payload["snapshot_health"], "WATCHLIST_ONLY")
-            self.assertIn("Rendered account report", public_portfolio_page)
+            self.assertIn("Account report", public_portfolio_page)
 
 
 if __name__ == "__main__":

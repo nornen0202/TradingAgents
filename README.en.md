@@ -66,7 +66,7 @@ The base config lives in [tradingagents/default_config.py](tradingagents/default
 
 Current default model roles on `main` are:
 
-- `quick_think_llm`: `gpt-5.4-mini`
+- `quick_think_llm`: `gpt-5.4`
 - `deep_think_llm`: `gpt-5.4`
 - `output_think_llm`: `gpt-5.4`
 
@@ -78,7 +78,7 @@ from tradingagents.default_config import DEFAULT_CONFIG
 
 config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
-config["quick_think_llm"] = "gpt-5.4-mini"
+config["quick_think_llm"] = "gpt-5.4"
 config["deep_think_llm"] = "gpt-5.4"
 config["output_think_llm"] = "gpt-5.4"
 
