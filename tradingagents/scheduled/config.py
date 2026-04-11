@@ -30,6 +30,7 @@ class RunSettings:
     max_risk_discuss_rounds: int = 1
     latest_market_data_lookback_days: int = 14
     continue_on_ticker_error: bool = True
+    report_polisher_enabled: bool = True
     ticker_name_overrides: dict[str, str] = field(default_factory=dict)
 
 
@@ -84,6 +85,7 @@ class PortfolioSettings:
     semantic_judge_enabled: bool = False
     action_judge_enabled: bool = False
     action_judge_top_n: int = 5
+    report_polisher_enabled: bool = True
 
 
 @dataclass(frozen=True)
@@ -148,6 +150,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             max_risk_discuss_rounds=int(run_raw.get("max_risk_discuss_rounds", 1)),
             latest_market_data_lookback_days=int(run_raw.get("latest_market_data_lookback_days", 14)),
             continue_on_ticker_error=bool(run_raw.get("continue_on_ticker_error", True)),
+            report_polisher_enabled=bool(run_raw.get("report_polisher_enabled", True)),
             ticker_name_overrides=_normalize_ticker_name_overrides(raw.get("ticker_names") or {}),
         ),
         llm=LLMSettings(
@@ -203,6 +206,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             semantic_judge_enabled=bool(portfolio_raw.get("semantic_judge_enabled", False)),
             action_judge_enabled=bool(portfolio_raw.get("action_judge_enabled", False)),
             action_judge_top_n=max(1, int(portfolio_raw.get("action_judge_top_n", 5))),
+            report_polisher_enabled=bool(portfolio_raw.get("report_polisher_enabled", True)),
         ),
         config_path=config_path,
     )

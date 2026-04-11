@@ -166,6 +166,7 @@ continue_on_error = false
 [run]
 tickers = ["000660.KS", "005930.KS"]
 continue_on_ticker_error = true
+report_polisher_enabled = false
 
 [llm]
 provider = "codex"
@@ -182,6 +183,7 @@ enabled = true
 profile_path = "{profile_path.as_posix()}"
 profile_name = "manual_test"
 continue_on_error = false
+report_polisher_enabled = false
 """,
                 encoding="utf-8",
             )
@@ -305,6 +307,7 @@ continue_on_error = false
 [run]
 tickers = ["000660.KS", "005930.KS"]
 continue_on_ticker_error = true
+report_polisher_enabled = false
 
 [llm]
 provider = "codex"
@@ -324,6 +327,7 @@ continue_on_error = false
 semantic_judge_enabled = true
 action_judge_enabled = true
 action_judge_top_n = 2
+report_polisher_enabled = false
 """,
                 encoding="utf-8",
             )
@@ -464,6 +468,7 @@ continue_on_error = false
 [run]
 tickers = ["000660.KS"]
 continue_on_ticker_error = true
+report_polisher_enabled = false
 
 [llm]
 provider = "codex"
@@ -480,6 +485,7 @@ enabled = true
 profile_path = "{profile_path.as_posix()}"
 profile_name = "manual_watchlist"
 continue_on_error = false
+report_polisher_enabled = false
 """,
                 encoding="utf-8",
             )
@@ -529,6 +535,7 @@ continue_on_error = false
 [run]
 tickers = ["AAPL"]
 continue_on_ticker_error = true
+report_polisher_enabled = false
 
 [llm]
 provider = "codex"
@@ -545,6 +552,7 @@ enabled = true
 profile_path = "{profile_path.as_posix()}"
 profile_name = "us_watchlist"
 continue_on_error = false
+report_polisher_enabled = false
 """,
                 encoding="utf-8",
             )
@@ -565,7 +573,8 @@ continue_on_error = false
 
             self.assertEqual(status_payload["status"], "watchlist_only")
             self.assertEqual(snapshot_payload["snapshot_health"], "WATCHLIST_ONLY")
-            self.assertIn("Account report", public_portfolio_page)
+            self.assertIn("Watchlist report", public_portfolio_page)
+            self.assertIn("TradingAgents 포트폴리오 워치리스트 리포트", public_portfolio_page)
 
 
 if __name__ == "__main__":

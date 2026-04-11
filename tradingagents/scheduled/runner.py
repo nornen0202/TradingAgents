@@ -18,6 +18,7 @@ from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.portfolio import run_portfolio_pipeline
+from tradingagents.report_writer import polish_ticker_report
 from tradingagents.schemas import parse_structured_decision
 from tradingagents.reporting import save_report_bundle
 
@@ -240,6 +241,13 @@ def _run_single_ticker(
             analysis_date=analysis_date,
         )
         structured_decision = _select_public_decision(final_state, decision)
+        final_state, report_writer_payload = polish_ticker_report(
+            final_state,
+            ticker=ticker,
+            language=config.run.output_language,
+            llm_settings=config.llm,
+            enabled=config.run.report_polisher_enabled,
+        )
 
         report_dir = ticker_dir / "report"
         report_file = save_report_bundle(
@@ -301,6 +309,7 @@ def _run_single_ticker(
                 "events": tool_events,
             },
             "quality_flags": quality_flags,
+            "report_writer": report_writer_payload,
             "provider": config.llm.provider,
             "models": {
                 "quick_model": config.llm.quick_model,
@@ -324,6 +333,7 @@ def _run_single_ticker(
             "metrics": {**metrics, "tool_calls": effective_tool_calls},
             "tool_telemetry": analysis_payload["tool_telemetry"],
             "quality_flags": quality_flags,
+            "report_writer": report_writer_payload,
             "artifacts": {
                 "analysis_json": _relative_to_run(run_dir, analysis_path),
                 "report_markdown": _relative_to_run(run_dir, report_file),
@@ -455,6 +465,8 @@ def _serialize_final_state(final_state: dict[str, Any]) -> dict[str, Any]:
             "judge_decision": risk_debate.get("judge_decision", ""),
         },
         "final_trade_decision": final_state.get("final_trade_decision", ""),
+        "investor_summary_report": final_state.get("investor_summary_report", ""),
+        "investor_writer_status": final_state.get("investor_writer_status", {}),
     }
 
 
@@ -472,6 +484,8 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "trade_date_mode": config.run.trade_date_mode,
         "max_debate_rounds": config.run.max_debate_rounds,
         "max_risk_discuss_rounds": config.run.max_risk_discuss_rounds,
+        "report_polisher_enabled": config.run.report_polisher_enabled,
+        "portfolio_report_polisher_enabled": config.portfolio.report_polisher_enabled,
         "ticker_name_overrides_count": len(config.run.ticker_name_overrides),
     }
 

@@ -69,6 +69,27 @@ class _FakeTradingAgentsGraph:
 
 
 class ScheduledAnalysisTests(unittest.TestCase):
+    def test_load_scheduled_config_enables_report_polisher_by_default(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            config_path.write_text(
+                """
+[run]
+tickers = ["NVDA"]
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+""",
+                encoding="utf-8",
+            )
+
+            config = load_scheduled_config(config_path)
+
+            self.assertTrue(config.run.report_polisher_enabled)
+            self.assertTrue(config.portfolio.report_polisher_enabled)
+
     def test_execute_scheduled_run_archives_outputs_and_builds_site(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -84,6 +105,7 @@ output_language = "Korean"
 trade_date_mode = "latest_available"
 timezone = "Asia/Seoul"
 continue_on_ticker_error = true
+report_polisher_enabled = false
 
 [llm]
 provider = "codex"
@@ -274,6 +296,7 @@ site_dir = "{site_dir.as_posix()}"
 [run]
 tickers = ["NVDA"]
 continue_on_ticker_error = true
+report_polisher_enabled = false
 
 [llm]
 provider = "codex"

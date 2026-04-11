@@ -233,11 +233,17 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
   - `max_debate_rounds`
   - `max_risk_discuss_rounds`
   - `continue_on_ticker_error`
+  - `report_polisher_enabled`: 기본 `true`. `output_model`로 투자자용 요약을 한 번 더 정제하고, 실패 시 템플릿 요약으로 대체합니다.
 - `[llm]`
   - `provider`
   - `quick_model`
   - `deep_model`
   - `output_model`
+- `[portfolio]`
+  - `enabled`
+  - `semantic_judge_enabled`
+  - `action_judge_enabled`
+  - `report_polisher_enabled`: 기본 `true`. 계좌/워치리스트 리포트 상단에 투자자용 요약을 추가합니다.
 - `[translation]`
   - `backend`
   - `model`
