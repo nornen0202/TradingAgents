@@ -139,7 +139,7 @@ def _build_single_candidate(
             "macro_items_count": 0,
         }
         trigger_conditions = tuple()
-        warnings.append(f"{canonical_ticker}: missing analysis; defaulting to HOLD/WATCH.")
+        warnings.append(f"{canonical_ticker}: missing analysis; defaulting to NEUTRAL/WAIT before portfolio action translation.")
 
     is_held = position is not None
     action_now, action_if_triggered = _translate_actions(

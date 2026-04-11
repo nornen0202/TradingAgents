@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 import json
 import traceback
 from datetime import date, datetime, timedelta
@@ -238,7 +239,7 @@ def _run_single_ticker(
             trade_date,
             analysis_date=analysis_date,
         )
-        structured_decision = str(final_state.get("final_trade_decision") or decision)
+        structured_decision = _select_public_decision(final_state, decision)
 
         report_dir = ticker_dir / "report"
         report_file = save_report_bundle(
@@ -364,7 +365,7 @@ def _run_single_ticker(
 
 
 def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> dict[str, Any]:
-    graph_config = DEFAULT_CONFIG.copy()
+    graph_config = deepcopy(DEFAULT_CONFIG)
     graph_config["results_dir"] = str(engine_results_dir)
     graph_config["llm_provider"] = config.llm.provider
     graph_config["quick_think_llm"] = config.llm.quick_model
@@ -404,6 +405,26 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     if config.llm.codex_binary:
         graph_config["codex_binary"] = config.llm.codex_binary
     return graph_config
+
+
+def _select_public_decision(final_state: dict[str, Any], decision: Any) -> str:
+    decision_candidates = [
+        final_state.get("final_trade_decision"),
+        (final_state.get("risk_debate_state") or {}).get("judge_decision"),
+        (final_state.get("investment_debate_state") or {}).get("judge_decision"),
+    ]
+    for candidate in decision_candidates:
+        if not isinstance(candidate, str):
+            continue
+        stripped = candidate.strip()
+        if not stripped.startswith("{"):
+            continue
+        try:
+            parse_structured_decision(stripped)
+            return stripped
+        except Exception:
+            continue
+    return str(decision or final_state.get("final_trade_decision") or "-")
 
 
 def _serialize_final_state(final_state: dict[str, Any]) -> dict[str, Any]:
@@ -494,22 +515,35 @@ def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, 
 def _compute_batch_warnings(batch_metrics: dict[str, Any]) -> list[str]:
     warnings: list[str] = []
     decision_distribution = batch_metrics.get("decision_distribution") or {}
+    stance_distribution = batch_metrics.get("stance_distribution") or {}
+    entry_action_distribution = batch_metrics.get("entry_action_distribution") or {}
     total = sum(int(v) for v in decision_distribution.values())
     if total < 10:
         return warnings
 
     no_trade_count = int(decision_distribution.get("NO_TRADE", 0))
     no_trade_ratio = no_trade_count / total if total else 0.0
+    bullish = int(stance_distribution.get("BULLISH", 0))
+    waiting = int(entry_action_distribution.get("WAIT", 0))
+    bullish_ratio = bullish / total if total else 0.0
+    wait_ratio = waiting / total if total else 0.0
     if no_trade_ratio >= 0.8:
         warnings.append(
             f"High NO_TRADE concentration: {no_trade_count}/{total} ({no_trade_ratio:.0%})."
         )
-        bullish = int((batch_metrics.get("stance_distribution") or {}).get("BULLISH", 0))
-        waiting = int((batch_metrics.get("entry_action_distribution") or {}).get("WAIT", 0))
-        if (bullish / total) >= 0.3 or (waiting / total) >= 0.3:
+        if bullish_ratio >= 0.3 or wait_ratio >= 0.3:
             warnings.append(
                 "Legacy NO_TRADE concentration coexists with constructive stance/action signals; calibrate stance-action mapping."
             )
+    if wait_ratio >= 0.8 and bullish_ratio >= 0.5:
+        warnings.append(
+            f"Wait-heavy constructive batch: WAIT {waiting}/{total} with BULLISH {bullish}/{total}; review entry-action calibration."
+        )
+    buy_like_count = int(decision_distribution.get("BUY", 0)) + int(decision_distribution.get("OVERWEIGHT", 0))
+    if wait_ratio >= 0.6 and bullish_ratio >= 0.5 and buy_like_count == 0:
+        warnings.append(
+            "Constructive batch produced no BUY/OVERWEIGHT ratings; review rating calibration against stance and entry_action outputs."
+        )
     return warnings
 
 

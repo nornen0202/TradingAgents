@@ -406,9 +406,13 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
             )
         )
 
-    settled_cash = int(float(summary_payload.get("dnca_tot_amt", 0) or 0))
-    available_cash = settled_cash
-    buying_power = settled_cash
+    positions_market_value = sum(position.market_value_krw for position in positions)
+    cash_snapshot = _extract_cash_snapshot(
+        summary_payload=summary_payload,
+        positions_market_value=positions_market_value,
+        profile=profile,
+    )
+    warnings.extend(cash_snapshot["warnings"])
 
     return AccountSnapshot(
         snapshot_id=f"{now.strftime('%Y%m%dT%H%M%S')}_kis_{profile.account_no}-{profile.product_code}",
@@ -416,9 +420,12 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
         broker="kis",
         account_id=f"{profile.account_no}-{profile.product_code}",
         currency="KRW",
-        settled_cash_krw=settled_cash,
-        available_cash_krw=available_cash,
-        buying_power_krw=buying_power,
+        settled_cash_krw=int(cash_snapshot["settled_cash_krw"]),
+        available_cash_krw=int(cash_snapshot["available_cash_krw"]),
+        buying_power_krw=int(cash_snapshot["buying_power_krw"]),
+        total_equity_krw=int(cash_snapshot["total_equity_krw"]),
+        snapshot_health=str(cash_snapshot["snapshot_health"]),
+        cash_diagnostics=dict(cash_snapshot["cash_diagnostics"]),
         pending_orders=tuple(pending_orders),
         positions=tuple(positions),
         constraints=profile.constraints,
@@ -450,3 +457,120 @@ def _looks_like_auth_error(payload: dict[str, Any]) -> bool:
     message = f"{payload.get('msg_cd', '')} {payload.get('msg1', '')}".lower()
     auth_markers = ("auth", "token", "access", "expired", "만료", "토큰", "인증")
     return any(marker in message for marker in auth_markers)
+
+
+def _extract_cash_snapshot(
+    *,
+    summary_payload: dict[str, Any],
+    positions_market_value: int,
+    profile: PortfolioProfile,
+) -> dict[str, Any]:
+    cash_fields = _parse_numeric_fields(
+        summary_payload,
+        {
+            "dnca_tot_amt",
+            "ord_psbl_amt",
+            "ord_psbl_cash",
+            "buy_psbl_amt",
+            "buy_psbl_cash",
+            "tot_evlu_amt",
+            "nass_amt",
+            "tot_asst_amt",
+        },
+    )
+    settled_cash = _first_numeric(summary_payload, ("dnca_tot_amt", "ord_psbl_cash", "ord_psbl_amt")) or 0
+    available_cash = _first_numeric(
+        summary_payload,
+        ("ord_psbl_cash", "ord_psbl_amt", "buy_psbl_cash", "buy_psbl_amt", "dnca_tot_amt"),
+    ) or settled_cash
+    buying_power = _first_numeric(
+        summary_payload,
+        ("buy_psbl_amt", "buy_psbl_cash", "ord_psbl_amt", "ord_psbl_cash", "dnca_tot_amt"),
+    ) or available_cash
+    reported_equity = _first_numeric(summary_payload, ("tot_evlu_amt", "nass_amt", "tot_asst_amt"))
+    total_equity = max(
+        int(reported_equity or 0),
+        int(positions_market_value + max(settled_cash, available_cash, buying_power, 0)),
+    )
+
+    snapshot_health = "VALID"
+    warnings: list[str] = []
+    if not summary_payload:
+        snapshot_health = "INVALID_SNAPSHOT"
+        warnings.append("KIS balance summary payload was empty.")
+    elif not cash_fields and positions_market_value == 0:
+        snapshot_health = "INVALID_SNAPSHOT"
+        warnings.append("Could not parse numeric cash or equity fields from KIS balance summary.")
+    elif positions_market_value == 0 and max(available_cash, buying_power, settled_cash) < profile.constraints.min_trade_krw:
+        snapshot_health = "WATCHLIST_ONLY"
+        warnings.append(
+            "Account snapshot has no positions and insufficient cash for the configured minimum trade; portfolio output is watchlist-only."
+        )
+    elif max(available_cash, buying_power) < profile.constraints.min_trade_krw:
+        snapshot_health = "CAPITAL_CONSTRAINED"
+        warnings.append("Account snapshot has insufficient deployable cash for the configured minimum trade.")
+
+    if reported_equity is None:
+        warnings.append("KIS summary did not expose a trusted total-equity field; account value fell back to cash plus positions.")
+
+    return {
+        "settled_cash_krw": int(settled_cash),
+        "available_cash_krw": int(available_cash),
+        "buying_power_krw": int(buying_power),
+        "total_equity_krw": int(total_equity),
+        "snapshot_health": snapshot_health,
+        "warnings": warnings,
+        "cash_diagnostics": {
+            "summary_fields_present": sorted(summary_payload.keys()),
+            "parsed_numeric_fields": cash_fields,
+            "positions_market_value_krw": int(positions_market_value),
+            "selected_fields": {
+                "settled_cash": _selected_field(summary_payload, ("dnca_tot_amt", "ord_psbl_cash", "ord_psbl_amt")),
+                "available_cash": _selected_field(
+                    summary_payload,
+                    ("ord_psbl_cash", "ord_psbl_amt", "buy_psbl_cash", "buy_psbl_amt", "dnca_tot_amt"),
+                ),
+                "buying_power": _selected_field(
+                    summary_payload,
+                    ("buy_psbl_amt", "buy_psbl_cash", "ord_psbl_amt", "ord_psbl_cash", "dnca_tot_amt"),
+                ),
+                "total_equity": _selected_field(summary_payload, ("tot_evlu_amt", "nass_amt", "tot_asst_amt")),
+            },
+        },
+    }
+
+
+def _parse_numeric_fields(payload: dict[str, Any], allowed_keys: set[str]) -> dict[str, int]:
+    parsed: dict[str, int] = {}
+    for key, value in payload.items():
+        if key not in allowed_keys:
+            continue
+        numeric = _maybe_int(value)
+        if numeric is None:
+            continue
+        parsed[key] = numeric
+    return parsed
+
+
+def _selected_field(payload: dict[str, Any], keys: tuple[str, ...]) -> str | None:
+    for key in keys:
+        if _maybe_int(payload.get(key)) is not None:
+            return key
+    return None
+
+
+def _first_numeric(payload: dict[str, Any], keys: tuple[str, ...]) -> int | None:
+    for key in keys:
+        numeric = _maybe_int(payload.get(key))
+        if numeric is not None:
+            return numeric
+    return None
+
+
+def _maybe_int(value: object) -> int | None:
+    if value in (None, ""):
+        return None
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return None

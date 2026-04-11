@@ -31,6 +31,7 @@ Your job:
 - separate directional stance (portfolio_stance) from immediate action (entry_action)
 - use NO_TRADE only when immediate action is not justified today; this can still coexist with a bullish stance and WAIT
 - when evidence is positive but setup is incomplete, prefer portfolio_stance=BULLISH with entry_action=WAIT (or STARTER only with clear trigger logic)
+- when evidence is strong and timing is confirmed today, do not avoid BUY/OVERWEIGHT solely because NO_TRADE is available
 - focus on evidence arbitration rather than rhetorical style
 - make catalysts, invalidators, watchlist_triggers, and data_coverage explicit
 

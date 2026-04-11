@@ -20,7 +20,7 @@ class StructuredDecisionTests(unittest.TestCase):
         }
         """
         decision = parse_structured_decision(payload)
-        processor = SignalProcessor(None)
+        processor = SignalProcessor()
 
         self.assertEqual(decision.rating.value, "BUY")
         self.assertEqual(decision.portfolio_stance.value, "BULLISH")

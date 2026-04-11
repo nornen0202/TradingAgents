@@ -433,6 +433,7 @@ def _render_ticker_page(
         <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
         <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
         <p><strong>Decision</strong><span>{_escape(_legacy_decision(ticker_summary.get('decision')))}</span></p>
+        <p><strong>Decision scope</strong><span>ticker-only, account-independent</span></p>
         <p><strong>Portfolio stance</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'portfolio_stance'))}</span></p>
         <p><strong>Entry action</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'entry_action'))}</span></p>
         <p><strong>Setup quality</strong><span>{_escape(_decision_field(ticker_summary.get('decision'), 'setup_quality'))}</span></p>
@@ -558,6 +559,8 @@ def _status_class(status: str) -> str:
     normalized = (status or "").strip().lower()
     if normalized == "success":
         return "success"
+    if normalized in {"watchlist_only", "capital_constrained", "degraded"}:
+        return "partial_failure"
     if normalized in {"failed", "failure"}:
         return "failed"
     return "pending"

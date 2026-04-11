@@ -96,9 +96,11 @@ def run_portfolio_pipeline(
             batch_metrics=manifest.get("batch_metrics") or {},
             warnings=all_warnings,
         )
+        status_value = _derive_pipeline_status(snapshot)
         status = {
-            "status": "success",
+            "status": status_value,
             "profile": profile.name,
+            "snapshot_health": snapshot.snapshot_health,
             "private_output_dir": private_dir.as_posix(),
             "artifacts": artifact_paths,
             "generated_at": datetime.now().astimezone().isoformat(),
@@ -141,3 +143,13 @@ def _load_snapshot(profile) -> Any:
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _derive_pipeline_status(snapshot) -> str:
+    if snapshot.snapshot_health == "INVALID_SNAPSHOT":
+        return "degraded"
+    if snapshot.snapshot_health == "WATCHLIST_ONLY":
+        return "watchlist_only"
+    if snapshot.snapshot_health == "CAPITAL_CONSTRAINED":
+        return "capital_constrained"
+    return "success"

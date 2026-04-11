@@ -90,6 +90,9 @@ class AccountSnapshot:
     settled_cash_krw: int
     available_cash_krw: int
     buying_power_krw: int
+    total_equity_krw: int | None = None
+    snapshot_health: str = "VALID"
+    cash_diagnostics: dict[str, Any] = field(default_factory=dict)
     pending_orders: tuple[PendingOrder, ...] = tuple()
     positions: tuple[Position, ...] = tuple()
     constraints: AccountConstraints = field(default_factory=AccountConstraints)
@@ -97,7 +100,9 @@ class AccountSnapshot:
 
     @property
     def account_value_krw(self) -> int:
-        return int(self.available_cash_krw + sum(position.market_value_krw for position in self.positions))
+        if self.total_equity_krw is not None and int(self.total_equity_krw) > 0:
+            return int(self.total_equity_krw)
+        return int(max(self.available_cash_krw, 0) + sum(position.market_value_krw for position in self.positions))
 
     def find_position(self, canonical_ticker: str) -> Position | None:
         for position in self.positions:
