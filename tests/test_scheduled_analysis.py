@@ -141,12 +141,17 @@ NVDA = "NVIDIA Override"
             self.assertIn("partial failure", index_html)
             self.assertIn("NVDA", run_html)
             self.assertIn("NVIDIA Override (NVDA)", run_html)
-            self.assertIn("Rendered report", ticker_html)
+            self.assertIn("Report", ticker_html)
             self.assertIn("Analysis date", ticker_html)
-            self.assertIn("<strong>Decision</strong><span>BUY</span>", ticker_html)
-            self.assertIn("Decision scope", ticker_html)
+            self.assertIn("<strong>Investment view</strong><span>매수</span>", ticker_html)
+            self.assertIn("<strong>Today</strong><span>매수 검토</span>", ticker_html)
+            self.assertNotIn("Decision scope", ticker_html)
+            self.assertNotIn("Setup quality", ticker_html)
+            self.assertNotIn("LLM calls", ticker_html)
+            self.assertNotIn("Token usage", ticker_html)
+            self.assertNotIn("Fallback count", ticker_html)
             self.assertIn("NVIDIA Override (NVDA)", ticker_html)
-            self.assertIn("Quality flags", ticker_html)
+            self.assertNotIn("Quality flags", ticker_html)
             self.assertTrue((site_dir / "downloads" / manifest["run_id"] / "NVDA" / "complete_report.md").exists())
 
     def test_main_site_only_rebuilds_from_existing_archive(self):
@@ -255,8 +260,8 @@ site_dir = "{site_dir.as_posix()}"
             ticker_page = (site_dir / "runs" / "20260405T091300_seed" / "NVDA.html").read_text(encoding="utf-8")
             portfolio_page = (site_dir / "runs" / "20260405T091300_seed" / "portfolio.html").read_text(encoding="utf-8")
             self.assertIn("NVIDIA Corporation (NVDA)", ticker_page)
-            self.assertIn("<strong>Decision</strong><span>BUY</span>", ticker_page)
-            self.assertIn("Rendered account report", portfolio_page)
+            self.assertIn("<strong>Investment view</strong><span>매수</span>", ticker_page)
+            self.assertIn("Account report", portfolio_page)
 
     def test_execute_scheduled_run_marks_quality_flag_when_no_tool_calls(self):
         with tempfile.TemporaryDirectory() as tmpdir:

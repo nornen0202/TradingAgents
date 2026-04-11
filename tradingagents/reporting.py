@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 from typing import Any, Mapping
 
+from tradingagents.presentation import present_decision, sanitize_investor_text
 from tradingagents.schemas import parse_structured_decision
 
 
@@ -144,35 +145,43 @@ def _format_section_content(content: str, labels: dict[str, str]) -> str:
     except Exception:
         return sanitized
 
-    catalysts = ", ".join(decision.catalysts) or "-"
-    invalidators = ", ".join(decision.invalidators) or "-"
-    triggers = ", ".join(decision.watchlist_triggers) or "-"
-    coverage = decision.data_coverage.to_dict()
-    return "\n".join(
-        [
-            f"- {labels['decision_rating']}: `{decision.rating.value}`",
-            "- Decision scope: ticker-only final judgment derived from the analyst, research, trading, and risk pipeline; account-aware actions live in the account report.",
-            f"- {labels['decision_stance']}: `{decision.portfolio_stance.value}`",
-            f"- {labels['decision_entry_action']}: `{decision.entry_action.value}`",
-            f"- {labels['decision_setup_quality']}: `{decision.setup_quality.value}`",
-            f"- {labels['decision_confidence']}: `{decision.confidence:.2f}`",
-            f"- {labels['decision_time_horizon']}: `{decision.time_horizon.value}`",
-            f"- {labels['decision_entry_logic']}: {decision.entry_logic}",
-            f"- {labels['decision_exit_logic']}: {decision.exit_logic}",
-            f"- {labels['decision_position_sizing']}: {decision.position_sizing}",
-            f"- {labels['decision_risk_limits']}: {decision.risk_limits}",
-            f"- {labels['decision_catalysts']}: {catalysts}",
-            f"- {labels['decision_invalidators']}: {invalidators}",
-            f"- {labels['decision_watchlist_triggers']}: {triggers}",
-            (
-                f"- {labels['decision_data_coverage']}: "
-                f"company_news={coverage['company_news_count']}, "
-                f"disclosures={coverage['disclosures_count']}, "
-                f"social_source={coverage['social_source']}, "
-                f"macro_items={coverage['macro_items_count']}"
-            ),
-        ]
-    )
+    presentation = present_decision(decision, language=labels["language"])
+    lines = [
+        f"#### {labels['decision_heading']}",
+        f"- {labels['decision_investment_view']}: `{presentation.investment_view}`",
+        f"- {labels['decision_action_summary']}: {presentation.action_summary}",
+        f"- {labels['decision_market_view']}: {presentation.market_view}",
+        f"- {labels['decision_readiness']}: {presentation.setup_summary}",
+        f"- {labels['decision_conviction']}: {presentation.conviction_label}",
+        f"- {labels['decision_horizon']}: {presentation.horizon_label}",
+        f"- {labels['decision_data_status']}: {presentation.data_status}",
+        "",
+        f"**{labels['decision_entry_logic']}**",
+        f"- {sanitize_investor_text(decision.entry_logic, language=labels['language'])}",
+        "",
+        f"**{labels['decision_exit_logic']}**",
+        f"- {sanitize_investor_text(decision.exit_logic, language=labels['language'])}",
+        "",
+        f"**{labels['decision_position_sizing']}**",
+        f"- {sanitize_investor_text(decision.position_sizing, language=labels['language'])}",
+        "",
+        f"**{labels['decision_risk_limits']}**",
+        f"- {sanitize_investor_text(decision.risk_limits, language=labels['language'])}",
+        "",
+        f"**{labels['decision_catalysts']}**",
+    ]
+    catalysts = decision.catalysts or (labels["none"],)
+    invalidators = decision.invalidators or (labels["none"],)
+    lines.extend(f"- {sanitize_investor_text(item, language=labels['language'])}" for item in catalysts)
+    lines.extend(["", f"**{labels['decision_invalidators']}**"])
+    lines.extend(f"- {sanitize_investor_text(item, language=labels['language'])}" for item in invalidators)
+    if decision.watchlist_triggers:
+        lines.extend(["", f"**{labels['decision_watchlist_triggers']}**"])
+        lines.extend(
+            f"- {sanitize_investor_text(item, language=labels['language'])}"
+            for item in decision.watchlist_triggers
+        )
+    return "\n".join(lines)
 
 
 def _strip_raw_json_details(content: str) -> str:
@@ -196,7 +205,9 @@ def _strip_raw_json_details(content: str) -> str:
 def _labels_for(language: str) -> dict[str, str]:
     if str(language).strip().lower() == "korean":
         return {
+            "language": "Korean",
             "report_title": "트레이딩 분석 리포트",
+            "none": "없음",
             "generated_at": "생성 시각",
             "analysis_date": "분석 기준일",
             "trade_date": "시장 데이터 기준일",
@@ -217,12 +228,14 @@ def _labels_for(language: str) -> dict[str, str]:
             "conservative_analyst": "보수형 리스크 애널리스트",
             "neutral_analyst": "중립 리스크 애널리스트",
             "portfolio_manager": "포트폴리오 매니저",
-            "decision_rating": "레거시 rating",
-            "decision_stance": "포트폴리오 stance",
-            "decision_entry_action": "엔트리 액션",
-            "decision_setup_quality": "셋업 품질",
-            "decision_confidence": "확신도",
-            "decision_time_horizon": "시간축",
+            "decision_heading": "핵심 판단",
+            "decision_investment_view": "투자 의견",
+            "decision_action_summary": "오늘의 판단",
+            "decision_market_view": "방향성",
+            "decision_readiness": "실행 준비도",
+            "decision_conviction": "판단 강도",
+            "decision_horizon": "운용 기간",
+            "decision_data_status": "자료 상태",
             "decision_entry_logic": "진입 논리",
             "decision_exit_logic": "청산 논리",
             "decision_position_sizing": "포지션 크기",
@@ -230,11 +243,12 @@ def _labels_for(language: str) -> dict[str, str]:
             "decision_catalysts": "상승 촉매",
             "decision_invalidators": "무효화 조건",
             "decision_watchlist_triggers": "관찰 트리거",
-            "decision_data_coverage": "데이터 커버리지",
         }
 
     return {
+        "language": "English",
         "report_title": "Trading Analysis Report",
+        "none": "None",
         "generated_at": "Generated",
         "analysis_date": "Analysis date",
         "trade_date": "Market data date",
@@ -255,12 +269,14 @@ def _labels_for(language: str) -> dict[str, str]:
         "conservative_analyst": "Conservative Analyst",
         "neutral_analyst": "Neutral Analyst",
         "portfolio_manager": "Portfolio Manager",
-        "decision_rating": "Legacy rating",
-        "decision_stance": "Portfolio stance",
-        "decision_entry_action": "Entry action",
-        "decision_setup_quality": "Setup quality",
-        "decision_confidence": "Confidence",
-        "decision_time_horizon": "Time horizon",
+        "decision_heading": "Key Decision",
+        "decision_investment_view": "Investment view",
+        "decision_action_summary": "Today",
+        "decision_market_view": "Market view",
+        "decision_readiness": "Execution readiness",
+        "decision_conviction": "Conviction",
+        "decision_horizon": "Operating horizon",
+        "decision_data_status": "Source status",
         "decision_entry_logic": "Entry logic",
         "decision_exit_logic": "Exit logic",
         "decision_position_sizing": "Position sizing",
@@ -268,5 +284,4 @@ def _labels_for(language: str) -> dict[str, str]:
         "decision_catalysts": "Catalysts",
         "decision_invalidators": "Invalidators",
         "decision_watchlist_triggers": "Watchlist triggers",
-        "decision_data_coverage": "Data coverage",
     }
