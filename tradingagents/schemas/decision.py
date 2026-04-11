@@ -128,6 +128,7 @@ def build_decision_output_instructions(context: str) -> str:
         '"data_coverage":{"company_news_count":0,"disclosures_count":0,"social_source":"dedicated | news_derived | unavailable","macro_items_count":0}}. '
         "Keep rating as legacy compatibility only. Use portfolio_stance for directional view, and entry_action for immediate action. "
         "NO_TRADE should mean no immediate action basis, not necessarily bearish stance. "
+        "Use BUY or OVERWEIGHT when the thesis is strong and the entry setup is actionable today; do not default to NO_TRADE just because it is available. "
         "Use uppercase enum fields, confidence between 0 and 1 inclusive, and concise but specific strings."
     )
 

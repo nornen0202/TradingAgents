@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from .action_judge import arbitrate_portfolio_actions
+from .account_models import AccountSnapshot
 from .allocation import build_recommendation
 from .candidates import build_portfolio_candidates
 from .csv_import import load_snapshot_from_positions_csv
@@ -96,9 +97,11 @@ def run_portfolio_pipeline(
             batch_metrics=manifest.get("batch_metrics") or {},
             warnings=all_warnings,
         )
+        status_value = _derive_pipeline_status(snapshot)
         status = {
-            "status": "success",
+            "status": status_value,
             "profile": profile.name,
+            "snapshot_health": snapshot.snapshot_health,
             "private_output_dir": private_dir.as_posix(),
             "artifacts": artifact_paths,
             "generated_at": datetime.now().astimezone().isoformat(),
@@ -126,6 +129,8 @@ def _load_snapshot(profile) -> Any:
         return load_manual_snapshot(profile.manual_snapshot_path)
     if profile.broker == "csv":
         return load_snapshot_from_positions_csv(profile)
+    if profile.broker in {"watchlist", "paper", "none"}:
+        return _load_watchlist_only_snapshot(profile)
     if profile.broker == "kis":
         try:
             return load_account_snapshot_from_kis(profile)
@@ -138,6 +143,42 @@ def _load_snapshot(profile) -> Any:
     raise PortfolioConfigurationError(f"Unsupported portfolio broker '{profile.broker}'.")
 
 
+def _load_watchlist_only_snapshot(profile) -> AccountSnapshot:
+    now = datetime.now().astimezone()
+    return AccountSnapshot(
+        snapshot_id=f"{now.strftime('%Y%m%dT%H%M%S')}_watchlist_{profile.name}",
+        as_of=now.isoformat(),
+        broker=profile.broker,
+        account_id=profile.name,
+        currency="KRW",
+        settled_cash_krw=0,
+        available_cash_krw=0,
+        buying_power_krw=0,
+        total_equity_krw=0,
+        snapshot_health="WATCHLIST_ONLY",
+        cash_diagnostics={
+            "source": "watchlist_only_profile",
+            "reason": "No broker account snapshot is configured for this scheduled profile.",
+        },
+        pending_orders=tuple(),
+        positions=tuple(),
+        constraints=profile.constraints,
+        warnings=(
+            "No broker account snapshot is configured; generated a watchlist-only account report.",
+        ),
+    )
+
+
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _derive_pipeline_status(snapshot) -> str:
+    if snapshot.snapshot_health == "INVALID_SNAPSHOT":
+        return "degraded"
+    if snapshot.snapshot_health == "WATCHLIST_ONLY":
+        return "watchlist_only"
+    if snapshot.snapshot_health == "CAPITAL_CONSTRAINED":
+        return "capital_constrained"
+    return "success"

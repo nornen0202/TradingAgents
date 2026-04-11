@@ -1,9 +1,11 @@
 # TradingAgents/graph/trading_graph.py
 
 import os
+from copy import deepcopy
 from pathlib import Path
 import json
 from datetime import date
+import re
 from typing import Dict, Any, Tuple, List, Optional
 
 from langgraph.prebuilt import ToolNode
@@ -52,7 +54,7 @@ class TradingAgentsGraph:
 
     def __init__(
         self,
-        selected_analysts=["market", "social", "news", "fundamentals"],
+        selected_analysts: Optional[List[str]] = None,
         debug=False,
         config: Dict[str, Any] = None,
         callbacks: Optional[List] = None,
@@ -66,7 +68,7 @@ class TradingAgentsGraph:
             callbacks: Optional list of callback handlers (e.g., for tracking LLM/tool stats)
         """
         self.debug = debug
-        self.config = config or DEFAULT_CONFIG
+        self.config = deepcopy(config) if config is not None else deepcopy(DEFAULT_CONFIG)
         self.callbacks = callbacks or []
 
         # Update the interface's config
@@ -142,7 +144,7 @@ class TradingAgentsGraph:
 
         self.propagator = Propagator(self.config["max_recur_limit"])
         self.reflector = Reflector(self.quick_thinking_llm)
-        self.signal_processor = SignalProcessor(self.quick_thinking_llm)
+        self.signal_processor = SignalProcessor()
 
         # State tracking
         self.curr_state = None
@@ -150,7 +152,7 @@ class TradingAgentsGraph:
         self.log_states_dict = {}  # date to full state dict
 
         # Set up the graph
-        self.graph = self.graph_setup.setup_graph(selected_analysts)
+        self.graph = self.graph_setup.setup_graph(selected_analysts or ["market", "social", "news", "fundamentals"])
 
     def _get_provider_kwargs(self) -> Dict[str, Any]:
         """Get provider-specific kwargs for LLM client creation."""
@@ -345,8 +347,9 @@ class TradingAgentsGraph:
                 return content
 
             def localize_text(text: str, *, text_content_type: str) -> str:
+                localized_text: str
                 try:
-                    return rewrite_in_output_language(
+                    localized_text = rewrite_in_output_language(
                         localization_llm,
                         text,
                         content_type=text_content_type,
@@ -355,33 +358,14 @@ class TradingAgentsGraph:
                 except TypeError as exc:
                     if "force_llm_backend" not in str(exc):
                         raise
-                    return rewrite_in_output_language(
+                    localized_text = rewrite_in_output_language(
                         localization_llm,
                         text,
                         content_type=text_content_type,
                     )
-
-            try:
-                structured = parse_structured_decision(content)
-            except StructuredDecisionValidationError:
-                return localize_text(content, text_content_type=content_type)
-
-            payload = structured.to_dict()
-            for field_name in ("entry_logic", "exit_logic", "position_sizing", "risk_limits"):
-                payload[field_name] = localize_text(
-                    str(payload.get(field_name) or ""),
-                    text_content_type=f"{content_type} {field_name.replace('_', ' ')}",
-                )
-            for field_name in ("catalysts", "invalidators", "watchlist_triggers"):
-                payload[field_name] = [
-                    localize_text(
-                        str(item),
-                        text_content_type=f"{content_type} {field_name.replace('_', ' ')} item",
-                    )
-                    for item in (payload.get(field_name) or [])
-                    if str(item).strip()
-                ]
-            return json.dumps(payload, indent=2, ensure_ascii=False)
+                if _contains_unexpected_script_noise(localized_text, language):
+                    return text
+                return localized_text
 
             try:
                 structured = parse_structured_decision(content)
@@ -444,3 +428,12 @@ class TradingAgentsGraph:
         localized["risk_debate_state"] = risk_debate
 
         return localized
+
+
+def _contains_unexpected_script_noise(text: str, language: str) -> bool:
+    if not text:
+        return False
+    normalized_language = str(language or "").strip().lower()
+    if normalized_language != "korean":
+        return False
+    return bool(re.search(r"[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u0400-\u04FF]", text))

@@ -151,6 +151,7 @@ def _format_section_content(content: str, labels: dict[str, str]) -> str:
     return "\n".join(
         [
             f"- {labels['decision_rating']}: `{decision.rating.value}`",
+            "- Decision scope: ticker-only final judgment derived from the analyst, research, trading, and risk pipeline; account-aware actions live in the account report.",
             f"- {labels['decision_stance']}: `{decision.portfolio_stance.value}`",
             f"- {labels['decision_entry_action']}: `{decision.entry_action.value}`",
             f"- {labels['decision_setup_quality']}: `{decision.setup_quality.value}`",

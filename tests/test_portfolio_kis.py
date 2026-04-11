@@ -1,7 +1,16 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from tradingagents.portfolio.kis import KisClient, PortfolioConfigurationError, validate_kis_credentials
+import requests
+
+from tradingagents.portfolio.account_models import AccountConstraints, PortfolioProfile
+from tradingagents.portfolio.kis import (
+    KisClient,
+    PortfolioConfigurationError,
+    _extract_cash_snapshot,
+    load_account_snapshot_from_kis,
+    validate_kis_credentials,
+)
 
 
 class PortfolioKisTests(unittest.TestCase):
@@ -89,6 +98,103 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(payload["rt_cd"], "0")
         self.assertEqual(session.post.call_count, 2)
         self.assertEqual(session.request.call_count, 2)
+
+    def test_extract_cash_snapshot_marks_watchlist_only_when_cash_is_below_min_trade(self):
+        profile = PortfolioProfile(
+            name="kis-test",
+            enabled=True,
+            broker="kis",
+            broker_environment="real",
+            read_only=True,
+            account_no="12345678",
+            product_code="01",
+            manual_snapshot_path=None,
+            csv_positions_path=None,
+            private_output_dirname="portfolio-private",
+            watch_tickers=tuple(),
+            trigger_budget_krw=500000,
+            constraints=AccountConstraints(min_cash_buffer_krw=2500000, min_trade_krw=100000),
+        )
+
+        snapshot = _extract_cash_snapshot(
+            summary_payload={"dnca_tot_amt": "2", "tot_evlu_amt": "2"},
+            positions_market_value=0,
+            profile=profile,
+        )
+
+        self.assertEqual(snapshot["snapshot_health"], "WATCHLIST_ONLY")
+        self.assertEqual(snapshot["available_cash_krw"], 2)
+        self.assertEqual(snapshot["total_equity_krw"], 2)
+
+    def test_extract_cash_snapshot_prefers_reported_total_equity_when_present(self):
+        profile = PortfolioProfile(
+            name="kis-test",
+            enabled=True,
+            broker="kis",
+            broker_environment="real",
+            read_only=True,
+            account_no="12345678",
+            product_code="01",
+            manual_snapshot_path=None,
+            csv_positions_path=None,
+            private_output_dirname="portfolio-private",
+            watch_tickers=tuple(),
+            trigger_budget_krw=500000,
+            constraints=AccountConstraints(min_cash_buffer_krw=0, min_trade_krw=100000),
+        )
+
+        snapshot = _extract_cash_snapshot(
+            summary_payload={"dnca_tot_amt": "300000", "tot_evlu_amt": "5200000", "ord_psbl_amt": "300000"},
+            positions_market_value=2000000,
+            profile=profile,
+        )
+
+        self.assertEqual(snapshot["snapshot_health"], "VALID")
+        self.assertEqual(snapshot["total_equity_krw"], 5200000)
+        self.assertEqual(snapshot["cash_diagnostics"]["selected_fields"]["total_equity"], "tot_evlu_amt")
+
+    @patch("tradingagents.portfolio.kis.KisClient.from_api_keys")
+    def test_load_account_snapshot_continues_when_pending_orders_fail(self, mock_from_api_keys):
+        response = Mock()
+        response.status_code = 500
+        response.reason = "Internal Server Error"
+        pending_error = requests.HTTPError(
+            "500 Server Error: Internal Server Error for url: "
+            "https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/trading/inquire-daily-ccld"
+            "?CANO=12345678&ACNT_PRDT_CD=01"
+        )
+        pending_error.response = response
+
+        client = Mock()
+        client.fetch_balance.return_value = (
+            [],
+            {"dnca_tot_amt": "300000", "ord_psbl_amt": "300000", "tot_evlu_amt": "300000"},
+        )
+        client.fetch_pending_orders.side_effect = pending_error
+        mock_from_api_keys.return_value = client
+
+        profile = PortfolioProfile(
+            name="kis-test",
+            enabled=True,
+            broker="kis",
+            broker_environment="real",
+            read_only=True,
+            account_no="12345678",
+            product_code="01",
+            manual_snapshot_path=None,
+            csv_positions_path=None,
+            private_output_dirname="portfolio-private",
+            watch_tickers=tuple(),
+            trigger_budget_krw=500000,
+            constraints=AccountConstraints(min_cash_buffer_krw=0, min_trade_krw=100000),
+        )
+
+        snapshot = load_account_snapshot_from_kis(profile)
+
+        self.assertEqual(snapshot.snapshot_health, "VALID")
+        self.assertEqual(snapshot.pending_orders, tuple())
+        self.assertTrue(any("pending-order lookup failed" in warning for warning in snapshot.warnings))
+        self.assertFalse(any("12345678" in warning for warning in snapshot.warnings))
 
 
 if __name__ == "__main__":

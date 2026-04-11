@@ -29,15 +29,18 @@ def apply_gates(
         quality_flags = set(candidate.quality_flags)
         company_news_count = int(candidate.data_coverage.get("company_news_count", 0) or 0)
         fallback_count = int(candidate.vendor_health.get("fallback_count", 0) or 0)
+        review_required = candidate.review_required
 
         if candidate.snapshot_id != snapshot.snapshot_id:
             reasons.append("snapshot_id_mismatch")
         if not candidate.is_held and "no_tool_calls_detected" in quality_flags:
             reasons.append("blocked_new_entries_no_tool_calls")
+            review_required = True
         if not candidate.is_held and company_news_count == 0:
             reasons.append("blocked_new_entries_company_news_zero")
         if fallback_count >= 3:
             reasons.append("high_fallback_count")
+            review_required = True
         if not candidate.is_held and wait_ratio >= 0.7 and bullish_ratio >= 0.5:
             reasons.append("wait_heavy_batch_reduce_immediate_entries")
 
@@ -52,10 +55,17 @@ def apply_gates(
         if any("data" in warning.lower() or "vendor" in warning.lower() for warning in warnings):
             reasons.append("batch_warning_present")
 
+        action_now, action_if_triggered = _apply_gate_actions(
+            candidate=candidate,
+            reasons=reasons,
+        )
         gated.append(
             PortfolioCandidate(
                 **{
                     **candidate.__dict__,
+                    "suggested_action_now": action_now,
+                    "suggested_action_if_triggered": action_if_triggered,
+                    "review_required": review_required,
                     "gate_reasons": tuple(dict.fromkeys(reasons)),
                 }
             )
@@ -83,3 +93,26 @@ def _ratio(distribution: dict[str, Any] | None, key: str) -> float:
     if total <= 0:
         return 0.0
     return int(distribution.get(key, 0) or 0) / total
+
+
+def _apply_gate_actions(*, candidate: PortfolioCandidate, reasons: list[str]) -> tuple[str, str]:
+    action_now = candidate.suggested_action_now
+    action_if_triggered = candidate.suggested_action_if_triggered
+    reason_set = set(reasons)
+
+    if not candidate.is_held:
+        hard_now_blockers = {
+            "blocked_new_entries_no_tool_calls",
+            "blocked_new_entries_company_news_zero",
+            "high_fallback_count",
+        }
+        if action_now in {"ADD_NOW", "STARTER_NOW"} and reason_set & hard_now_blockers:
+            action_now = "WATCH"
+            if action_if_triggered == "NONE":
+                action_if_triggered = "WATCH_TRIGGER"
+        if action_now in {"ADD_NOW", "STARTER_NOW"} and "wait_heavy_batch_reduce_immediate_entries" in reason_set:
+            action_now = "WATCH"
+            if action_if_triggered == "NONE":
+                action_if_triggered = "STARTER_IF_TRIGGERED"
+
+    return action_now, action_if_triggered

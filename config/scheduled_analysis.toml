@@ -43,6 +43,15 @@ title = "TradingAgents Daily Reports"
 subtitle = "Self-hosted Codex automation for scheduled multi-ticker analysis"
 max_runs_on_homepage = 30
 
+[portfolio]
+enabled = true
+profile_path = "portfolio_profiles.toml"
+profile_name = "us_watchlist_default"
+continue_on_error = true
+semantic_judge_enabled = true
+action_judge_enabled = true
+action_judge_top_n = 5
+
 [ticker_names]
 AAPL = "Apple"
 ETN = "Eaton"

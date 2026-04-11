@@ -37,6 +37,7 @@ Use the common decision schema and be explicit about rating (legacy), portfolio_
 NO_TRADE is allowed as a legacy rating, but do not collapse all outcomes into NO_TRADE.
 Always distinguish: (1) directional stance, (2) immediate entry decision, (3) watchlist maintenance triggers, and (4) whether a starter could be justified when conditions are met.
 If the thesis is constructive but timing is incomplete, keep stance constructive and set entry_action=WAIT.
+If the thesis is constructive and timing is confirmed today, allow BUY or OVERWEIGHT rather than defaulting to HOLD/NO_TRADE.
 
 Context:
 - Research Manager investment plan JSON: {research_plan}

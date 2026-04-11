@@ -119,6 +119,11 @@ def build_recommendation(
         key=lambda item: (abs(item.delta_krw_now), abs(item.delta_krw_if_triggered), -item.priority),
         reverse=True,
     )
+    actions = _apply_execution_constraints(actions, snapshot)
+    actions.sort(
+        key=lambda item: (abs(item.delta_krw_now), abs(item.delta_krw_if_triggered), -item.priority),
+        reverse=True,
+    )
     prioritized = tuple(
         PortfolioAction(**{**action.__dict__, "priority": index})
         for index, action in enumerate(actions, start=1)
@@ -143,6 +148,7 @@ def build_recommendation(
             "entry_action_distribution": batch_metrics.get("entry_action_distribution") or {},
             "avg_confidence": batch_metrics.get("avg_confidence"),
             "company_news_zero_ratio": batch_metrics.get("company_news_zero_ratio"),
+            "snapshot_health": snapshot.snapshot_health,
             "warning_flags": list(warnings),
         },
     )
@@ -167,6 +173,8 @@ def _score_candidate(
     timing_triggered = max(timing_readiness, 0.20 if candidate.trigger_conditions else 0.0)
     coverage_score = _coverage_score(candidate, batch_metrics, warnings)
     turnover_penalty = 0.08 if not candidate.is_held else 0.02
+    if snapshot.constraints.respect_existing_weights_softly:
+        turnover_penalty += 0.03 if not candidate.is_held else -0.01
     current_weight = candidate.market_value_krw / max(snapshot.account_value_krw, 1)
     concentration_penalty = max(current_weight - snapshot.constraints.max_single_name_weight, 0.0) * 1.5
 
@@ -212,8 +220,6 @@ def _coverage_score(candidate: PortfolioCandidate, batch_metrics: dict[str, Any]
         coverage -= 0.15
 
     quality_flags = set(candidate.quality_flags)
-    if "token_usage_unavailable" in quality_flags:
-        coverage -= 0.05
     if "no_tool_calls_detected" in quality_flags:
         coverage = min(coverage, 0.20)
     if candidate.vendor_health.get("fallback_count", 0) >= 2:
@@ -297,6 +303,72 @@ def _normalize_triggered_action(candidate: PortfolioCandidate, delta_triggered: 
     if candidate.suggested_action_if_triggered in {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"} and delta_triggered == 0:
         return "NONE"
     return candidate.suggested_action_if_triggered
+
+
+def _apply_execution_constraints(
+    actions: list[PortfolioAction],
+    snapshot: AccountSnapshot,
+) -> list[PortfolioAction]:
+    account_value = max(snapshot.account_value_krw, 1)
+    turnover_limit = int(snapshot.constraints.max_daily_turnover_ratio * account_value)
+    order_limit = max(0, snapshot.constraints.max_order_count_per_day)
+    turnover_used = 0
+    orders_used = 0
+    constrained: list[PortfolioAction] = []
+
+    for action in actions:
+        delta_now = int(action.delta_krw_now)
+        gate_reasons = list(action.gate_reasons)
+        current_position = snapshot.find_position(action.canonical_ticker)
+        current_value = int(current_position.market_value_krw if current_position else 0)
+        proposed_turnover = abs(delta_now)
+        remaining_turnover = max(turnover_limit - turnover_used, 0)
+
+        if delta_now != 0 and turnover_limit <= 0:
+            delta_now = 0
+            gate_reasons.append("max_daily_turnover_ratio_cap")
+        if delta_now != 0 and turnover_limit > 0 and proposed_turnover > remaining_turnover:
+            delta_now = _signed_clip(delta_now, remaining_turnover)
+            gate_reasons.append("max_daily_turnover_ratio_cap")
+        if delta_now != 0 and order_limit <= 0:
+            delta_now = 0
+            gate_reasons.append("max_order_count_per_day_cap")
+        if delta_now != 0 and order_limit > 0 and orders_used >= order_limit:
+            delta_now = 0
+            gate_reasons.append("max_order_count_per_day_cap")
+        if 0 < abs(delta_now) < snapshot.constraints.min_trade_krw:
+            delta_now = 0
+            gate_reasons.append("min_trade_floor_after_caps")
+
+        if delta_now != 0:
+            turnover_used += abs(delta_now)
+            orders_used += 1
+
+        constrained.append(
+            PortfolioAction(
+                **{
+                    **action.__dict__,
+                    "action_now": _normalize_action_value(action.action_now, delta_now),
+                    "delta_krw_now": delta_now,
+                    "target_weight_now": round(_weight_after_delta(current_value, delta_now, account_value), 4),
+                    "gate_reasons": tuple(dict.fromkeys(gate_reasons)),
+                }
+            )
+        )
+
+    return constrained
+
+
+def _normalize_action_value(action_now: str, delta_now: int) -> str:
+    if action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"} and delta_now == 0:
+        return "HOLD"
+    return action_now
+
+
+def _signed_clip(value: int, magnitude: int) -> int:
+    if magnitude <= 0:
+        return 0
+    return magnitude if value > 0 else -magnitude
 
 
 def _weight_after_delta(current_value: int, delta: int, account_value: int) -> float:

@@ -50,6 +50,11 @@ def account_snapshot_from_payload(payload: dict[str, Any]) -> AccountSnapshot:
         settled_cash_krw=int(float(payload.get("settled_cash_krw", payload.get("available_cash_krw", 0)) or 0)),
         available_cash_krw=int(float(payload.get("available_cash_krw", 0) or 0)),
         buying_power_krw=int(float(payload.get("buying_power_krw", payload.get("available_cash_krw", 0)) or 0)),
+        total_equity_krw=_optional_int(
+            payload.get("total_equity_krw", payload.get("account_value_krw"))
+        ),
+        snapshot_health=str(payload.get("snapshot_health") or "VALID"),
+        cash_diagnostics=dict(payload.get("cash_diagnostics") or {}),
         pending_orders=pending_orders,
         positions=positions,
         constraints=AccountConstraints(
@@ -70,3 +75,12 @@ def _optional_text(value: object) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _optional_int(value: object) -> int | None:
+    if value in (None, ""):
+        return None
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return None

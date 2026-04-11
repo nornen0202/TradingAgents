@@ -41,6 +41,7 @@ def create_trader(llm, memory):
                     "You are a trading agent analyzing market data to make execution-ready investment decisions. "
                     "Translate the research manager's view into a concrete trade recommendation with entry logic, exit logic, position sizing, risk limits, catalysts, and invalidators. "
                     "Use NO_TRADE when the setup is not actionable or lacks a favorable risk/reward. "
+                    "When setup quality is compelling and timing is confirmed, allow BUY or OVERWEIGHT rather than defaulting to NO_TRADE or HOLD. "
                     f"Apply lessons from similar situations: {past_memory_str} "
                     f"{build_decision_output_instructions('trader execution plan')}"
                 ),

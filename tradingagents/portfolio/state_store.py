@@ -41,7 +41,9 @@ def save_portfolio_outputs(
         audit_path,
         {
             "snapshot_id": snapshot.snapshot_id,
+            "snapshot_health": snapshot.snapshot_health,
             "account_value_krw": snapshot.account_value_krw,
+            "cash_diagnostics": snapshot.cash_diagnostics,
             "decision_distribution": batch_metrics.get("decision_distribution") or {},
             "stance_distribution": batch_metrics.get("stance_distribution") or {},
             "entry_action_distribution": batch_metrics.get("entry_action_distribution") or {},
