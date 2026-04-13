@@ -38,7 +38,7 @@ def run_portfolio_pipeline(
     private_dir = run_dir / profile.private_output_dirname
     status_path = private_dir / "status.json"
     try:
-        snapshot = _load_snapshot(profile)
+        snapshot = load_snapshot_for_profile(profile)
         candidates, candidate_warnings = build_portfolio_candidates(
             snapshot=snapshot,
             run_dir=run_dir,
@@ -113,6 +113,7 @@ def run_portfolio_pipeline(
             "status": status_value,
             "profile": profile.name,
             "snapshot_health": snapshot.snapshot_health,
+            "watchlist_reason": _derive_watchlist_reason(snapshot),
             "report_writer": report_writer_payload,
             "private_output_dir": private_dir.as_posix(),
             "artifacts": artifact_paths,
@@ -134,7 +135,7 @@ def run_portfolio_pipeline(
         raise
 
 
-def _load_snapshot(profile) -> Any:
+def load_snapshot_for_profile(profile) -> Any:
     if profile.broker == "manual":
         if not profile.manual_snapshot_path:
             raise PortfolioConfigurationError("manual broker profile requires manual_snapshot_path.")
@@ -194,3 +195,21 @@ def _derive_pipeline_status(snapshot) -> str:
     if snapshot.snapshot_health == "CAPITAL_CONSTRAINED":
         return "capital_constrained"
     return "success"
+
+
+def _derive_watchlist_reason(snapshot) -> str | None:
+    if str(getattr(snapshot, "snapshot_health", "")).strip().upper() != "WATCHLIST_ONLY":
+        return None
+
+    diagnostics = getattr(snapshot, "cash_diagnostics", {}) or {}
+    source = str(diagnostics.get("source") or "").strip().lower() if isinstance(diagnostics, dict) else ""
+    warnings = [str(item).strip().lower() for item in (getattr(snapshot, "warnings", ()) or ()) if str(item).strip()]
+    warning_blob = " ".join(warnings)
+
+    if source == "watchlist_only_profile" or "no broker account snapshot is configured" in warning_blob:
+        return "NO_BROKER_SNAPSHOT"
+    if "no positions" in warning_blob and "insufficient cash" in warning_blob:
+        return "LOW_CAPITAL_EMPTY_ACCOUNT"
+    if "insufficient cash" in warning_blob:
+        return "LOW_CAPITAL"
+    return "WATCHLIST_POLICY"

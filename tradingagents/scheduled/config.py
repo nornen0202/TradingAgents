@@ -16,11 +16,13 @@ except ModuleNotFoundError:  # pragma: no cover - Python < 3.11 fallback
 
 ALL_ANALYSTS = ("market", "social", "news", "fundamentals")
 VALID_TRADE_DATE_MODES = {"latest_available", "today", "previous_business_day", "explicit"}
+VALID_TICKER_UNIVERSE_MODES = {"config_only", "config_plus_account", "account_only"}
 
 
 @dataclass(frozen=True)
 class RunSettings:
     tickers: list[str]
+    ticker_universe_mode: str = "config_only"
     analysts: list[str] = field(default_factory=lambda: list(ALL_ANALYSTS))
     output_language: str = "Korean"
     trade_date_mode: str = "latest_available"
@@ -141,6 +143,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     return ScheduledAnalysisConfig(
         run=RunSettings(
             tickers=tickers,
+            ticker_universe_mode=_normalize_ticker_universe_mode(run_raw.get("ticker_universe_mode", "config_only")),
             analysts=analysts,
             output_language=str(run_raw.get("output_language", "Korean")).strip() or "Korean",
             trade_date_mode=trade_date_mode,
@@ -218,6 +221,7 @@ def with_overrides(
     archive_dir: str | Path | None = None,
     site_dir: str | Path | None = None,
     tickers: Iterable[str] | None = None,
+    ticker_universe_mode: str | None = None,
     trade_date: str | None = None,
 ) -> ScheduledAnalysisConfig:
     run = config.run
@@ -225,6 +229,8 @@ def with_overrides(
 
     if tickers is not None:
         run = replace(run, tickers=_normalize_tickers(tickers))
+    if ticker_universe_mode:
+        run = replace(run, ticker_universe_mode=_normalize_ticker_universe_mode(ticker_universe_mode))
     if trade_date:
         run = replace(run, trade_date_mode="explicit", explicit_trade_date=_validate_trade_date(trade_date))
     if archive_dir:
@@ -245,6 +251,16 @@ def _normalize_tickers(values: Iterable[str]) -> list[str]:
         seen.add(ticker)
         normalized.append(ticker)
     return normalized
+
+
+def _normalize_ticker_universe_mode(value: object) -> str:
+    mode = str(value or "config_only").strip().lower()
+    if mode not in VALID_TICKER_UNIVERSE_MODES:
+        raise ValueError(
+            f"Unsupported ticker_universe_mode '{mode}'. "
+            f"Expected one of: {', '.join(sorted(VALID_TICKER_UNIVERSE_MODES))}."
+        )
+    return mode
 
 
 def _normalize_analysts(values: Iterable[str]) -> list[str]:

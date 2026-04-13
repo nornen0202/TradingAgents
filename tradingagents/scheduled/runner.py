@@ -17,7 +17,8 @@ from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry
 from tradingagents.graph.trading_graph import TradingAgentsGraph
-from tradingagents.portfolio import run_portfolio_pipeline
+from tradingagents.portfolio import load_snapshot_for_profile, run_portfolio_pipeline
+from tradingagents.portfolio.profiles import load_portfolio_profile
 from tradingagents.report_writer import polish_ticker_report
 from tradingagents.schemas import parse_structured_decision
 from tradingagents.reporting import save_report_bundle
@@ -34,6 +35,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--archive-dir", help="Override archive directory for run history.")
     parser.add_argument("--site-dir", help="Override generated site output directory.")
     parser.add_argument("--tickers", help="Comma-separated ticker override.")
+    parser.add_argument(
+        "--ticker-universe-mode",
+        choices=("config_only", "config_plus_account", "account_only"),
+        help="Ticker source mode: config_only / config_plus_account / account_only.",
+    )
     parser.add_argument("--trade-date", help="Optional YYYY-MM-DD override for all tickers.")
     parser.add_argument("--site-only", action="store_true", help="Only rebuild the static site from archived runs.")
     parser.add_argument("--strict", action="store_true", help="Return a non-zero exit code if any ticker fails.")
@@ -45,6 +51,7 @@ def main(argv: list[str] | None = None) -> int:
         archive_dir=args.archive_dir,
         site_dir=args.site_dir,
         tickers=_parse_ticker_override(args.tickers),
+        ticker_universe_mode=args.ticker_universe_mode,
         trade_date=args.trade_date,
     )
 
@@ -74,10 +81,11 @@ def execute_scheduled_run(
     run_dir = config.storage.archive_dir / "runs" / started_at.strftime("%Y") / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
 
+    run_tickers = _resolve_run_tickers(config)
     ticker_summaries: list[dict[str, Any]] = []
     engine_results_dir = run_dir / "engine-results"
 
-    for ticker in config.run.tickers:
+    for ticker in run_tickers:
         ticker_summary = _run_single_ticker(
             config=config,
             ticker=ticker,
@@ -482,12 +490,57 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "translation_model": config.translation.model,
         "analysts": list(config.run.analysts),
         "trade_date_mode": config.run.trade_date_mode,
+        "ticker_universe_mode": config.run.ticker_universe_mode,
+        "configured_ticker_count": len(config.run.tickers),
         "max_debate_rounds": config.run.max_debate_rounds,
         "max_risk_discuss_rounds": config.run.max_risk_discuss_rounds,
         "report_polisher_enabled": config.run.report_polisher_enabled,
         "portfolio_report_polisher_enabled": config.portfolio.report_polisher_enabled,
         "ticker_name_overrides_count": len(config.run.ticker_name_overrides),
     }
+
+
+def _resolve_run_tickers(config: ScheduledAnalysisConfig) -> list[str]:
+    configured = list(config.run.tickers)
+    mode = str(config.run.ticker_universe_mode or "config_only").strip().lower()
+    if mode == "config_only":
+        return configured
+
+    if not config.portfolio.enabled or not config.portfolio.profile_path:
+        print(
+            "::warning::ticker_universe_mode requested account tickers, but portfolio profile is disabled; "
+            "falling back to configured tickers."
+        )
+        return configured
+
+    try:
+        profile = load_portfolio_profile(config.portfolio.profile_path, config.portfolio.profile_name)
+        snapshot = load_snapshot_for_profile(profile)
+    except Exception as exc:
+        print(
+            "::warning::Could not load account snapshot for ticker_universe_mode "
+            f"'{mode}': {exc}. Falling back to configured tickers."
+        )
+        return configured
+
+    account_tickers = sorted(
+        {str(position.canonical_ticker).strip().upper() for position in snapshot.positions if position.canonical_ticker}
+    )
+    if mode == "account_only":
+        if account_tickers:
+            return account_tickers
+        print("::warning::ticker_universe_mode=account_only produced no account holdings; using configured tickers.")
+        return configured
+
+    merged: list[str] = []
+    seen: set[str] = set()
+    for ticker in [*configured, *account_tickers]:
+        normalized = str(ticker or "").strip().upper()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        merged.append(normalized)
+    return merged or configured
 
 
 def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, Any]:
