@@ -253,12 +253,37 @@ def _fallback_portfolio_payload(
         "key_risks": [sanitize_investor_text(item, language=language) for item in recommendation.portfolio_risks[:2]],
         "watch_next": watch_next[:3],
         "confidence_text": "보통" if korean else "Moderate",
-        "data_caveat_text": (
-            "실계좌 스냅샷 없이 관심종목 기준으로 작성했습니다."
-            if snapshot.snapshot_health == "WATCHLIST_ONLY"
-            else ("계좌 데이터 기준으로 작성했습니다." if korean else "Prepared from account data.")
-        ),
+        "data_caveat_text": _portfolio_data_caveat_text(snapshot=snapshot, language=language),
     }
+
+
+def _portfolio_data_caveat_text(*, snapshot: Any, language: str) -> str:
+    korean = is_korean(language)
+    if str(getattr(snapshot, "snapshot_health", "")).strip().upper() != "WATCHLIST_ONLY":
+        return "계좌 데이터 기준으로 작성했습니다." if korean else "Prepared from account data."
+
+    diagnostics = getattr(snapshot, "cash_diagnostics", {}) or {}
+    source = str(diagnostics.get("source") or "").strip().lower() if isinstance(diagnostics, dict) else ""
+    warnings = [str(item).strip().lower() for item in (getattr(snapshot, "warnings", ()) or ()) if str(item).strip()]
+    warning_blob = " ".join(warnings)
+
+    if source == "watchlist_only_profile" or "no broker account snapshot is configured" in warning_blob:
+        return (
+            "실계좌 스냅샷 없이 관심종목 기준으로 작성했습니다."
+            if korean
+            else "Prepared from a watchlist without a live account snapshot."
+        )
+    if "no positions" in warning_blob and "insufficient cash" in warning_blob:
+        return (
+            "실계좌 스냅샷은 조회됐지만 보유 종목/가용 현금이 최소 거래 기준보다 작아 관심종목 기준으로 작성했습니다."
+            if korean
+            else "A live account snapshot was loaded, but holdings/cash were below the minimum trade threshold, so this report is watchlist-based."
+        )
+    return (
+        "계좌 스냅샷 제약으로 관심종목 중심으로 작성했습니다."
+        if korean
+        else "Account snapshot constraints resulted in a watchlist-oriented report."
+    )
 
 
 def _build_ticker_prompt(

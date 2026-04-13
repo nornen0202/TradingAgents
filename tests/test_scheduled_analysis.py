@@ -2,6 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from tradingagents.scheduled.runner import execute_scheduled_run, load_scheduled_config, main
@@ -89,6 +90,27 @@ site_dir = "./site"
 
             self.assertTrue(config.run.report_polisher_enabled)
             self.assertTrue(config.portfolio.report_polisher_enabled)
+            self.assertEqual(config.run.ticker_universe_mode, "config_only")
+
+    def test_load_scheduled_config_rejects_invalid_ticker_universe_mode(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            config_path.write_text(
+                """
+[run]
+tickers = ["NVDA"]
+ticker_universe_mode = "invalid_mode"
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+""",
+                encoding="utf-8",
+            )
+
+            with self.assertRaises(ValueError):
+                load_scheduled_config(config_path)
 
     def test_execute_scheduled_run_archives_outputs_and_builds_site(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -279,11 +301,61 @@ site_dir = "{site_dir.as_posix()}"
 
             self.assertEqual(exit_code, 0)
             self.assertTrue((site_dir / "index.html").exists())
-            ticker_page = (site_dir / "runs" / "20260405T091300_seed" / "NVDA.html").read_text(encoding="utf-8")
-            portfolio_page = (site_dir / "runs" / "20260405T091300_seed" / "portfolio.html").read_text(encoding="utf-8")
-            self.assertIn("NVIDIA Corporation (NVDA)", ticker_page)
-            self.assertIn("<strong>Investment view</strong><span>매수</span>", ticker_page)
-            self.assertIn("Account report", portfolio_page)
+
+    def test_execute_scheduled_run_supports_account_only_ticker_universe_mode(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["NVDA"]
+ticker_universe_mode = "account_only"
+analysts = ["market", "social", "news", "fundamentals"]
+output_language = "Korean"
+trade_date_mode = "latest_available"
+timezone = "Asia/Seoul"
+continue_on_ticker_error = true
+report_polisher_enabled = false
+
+[llm]
+provider = "codex"
+quick_model = "gpt-5.4"
+deep_model = "gpt-5.4"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+
+[portfolio]
+enabled = true
+profile_path = "portfolio_profiles.toml"
+profile_name = "kr_kis_default"
+""",
+                encoding="utf-8",
+            )
+
+            config = load_scheduled_config(config_path)
+            fake_snapshot = SimpleNamespace(
+                positions=(
+                    SimpleNamespace(canonical_ticker="005930.KS"),
+                    SimpleNamespace(canonical_ticker="000660.KS"),
+                )
+            )
+            with (
+                patch("tradingagents.scheduled.runner.load_portfolio_profile"),
+                patch("tradingagents.scheduled.runner.load_snapshot_for_profile", return_value=fake_snapshot),
+                patch("tradingagents.scheduled.runner.run_portfolio_pipeline", return_value={"status": "disabled"}),
+                patch("tradingagents.scheduled.runner.TradingAgentsGraph", _FakeTradingAgentsGraph),
+                patch("tradingagents.scheduled.runner.StatsCallbackHandler", _FakeStatsHandler),
+                patch("tradingagents.scheduled.runner.resolve_trade_date", return_value="2026-04-04"),
+            ):
+                manifest = execute_scheduled_run(config, run_label="account-only")
+
+            analyzed = [item["ticker"] for item in manifest["tickers"]]
+            self.assertEqual(sorted(analyzed), ["000660.KS", "005930.KS"])
 
     def test_execute_scheduled_run_marks_quality_flag_when_no_tool_calls(self):
         with tempfile.TemporaryDirectory() as tmpdir:

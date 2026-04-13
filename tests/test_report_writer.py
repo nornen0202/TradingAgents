@@ -4,7 +4,11 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from tradingagents.portfolio.account_models import AccountSnapshot, PortfolioAction, PortfolioRecommendation
-from tradingagents.report_writer import polish_portfolio_report_markdown, polish_ticker_report
+from tradingagents.report_writer import (
+    _portfolio_data_caveat_text,
+    polish_portfolio_report_markdown,
+    polish_ticker_report,
+)
 
 
 class _FakeLLM:
@@ -175,6 +179,39 @@ class ReportWriterTests(unittest.TestCase):
         self.assertLess(markdown.index("## 투자자 요약"), markdown.index("## 핵심 요약"))
         self.assertIn("워치리스트 모드", markdown)
         self.assertNotIn("RULE_ONLY", markdown)
+
+    def test_portfolio_writer_describes_low_capital_watchlist_mode(self):
+        snapshot = AccountSnapshot(
+            snapshot_id="snapshot-2",
+            as_of="2026-04-13T10:39:00+09:00",
+            broker="kis",
+            account_id="masked",
+            currency="KRW",
+            settled_cash_krw=2,
+            available_cash_krw=2,
+            buying_power_krw=2,
+            total_equity_krw=2,
+            snapshot_health="WATCHLIST_ONLY",
+            warnings=(
+                "Account snapshot has no positions and insufficient cash for the configured minimum trade; portfolio output is watchlist-only.",
+            ),
+        )
+        recommendation = PortfolioRecommendation(
+            snapshot_id="snapshot-2",
+            report_date="2026-04-13",
+            account_value_krw=2,
+            recommended_cash_after_now_krw=2,
+            recommended_cash_after_triggered_krw=2,
+            market_regime="mixed",
+            actions=tuple(),
+            portfolio_risks=tuple(),
+            data_health_summary={},
+        )
+
+        self.assertIn(
+            "실계좌 스냅샷은 조회됐지만",
+            _portfolio_data_caveat_text(snapshot=snapshot, language="Korean"),
+        )
 
 
 if __name__ == "__main__":

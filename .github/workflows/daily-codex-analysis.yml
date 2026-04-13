@@ -2,10 +2,10 @@ name: Daily Codex Analysis
 
 on:
   schedule:
-    # 08:00 KST daily (23:00 UTC previous day) -> KR analysis
-    - cron: '0 23 * * *'
-    # 20:00 KST daily (11:00 UTC) -> US analysis
-    - cron: '0 11 * * *'
+    # 09:30 KST weekdays (00:30 UTC) -> KR analysis
+    - cron: '30 0 * * 1-5'
+    # 20:00 KST weekdays (11:00 UTC) -> US analysis
+    - cron: '0 11 * * 1-5'
   workflow_dispatch:
     inputs:
       profile:
@@ -21,6 +21,15 @@ on:
         description: "Optional comma-separated tickers override"
         required: false
         type: string
+      ticker_universe_mode:
+        description: "Ticker source mode: config_only / config_plus_account / account_only"
+        required: false
+        default: "config_only"
+        type: choice
+        options:
+          - config_only
+          - config_plus_account
+          - account_only
       trade_date:
         description: "Optional YYYY-MM-DD trade date override"
         required: false
@@ -45,7 +54,7 @@ jobs:
     needs:
       - analyze_kr
       - deploy_kr
-    if: ${{ always() && ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *')) && needs.analyze_kr.result != 'failure' && needs.analyze_kr.result != 'cancelled' && needs.deploy_kr.result != 'failure' && needs.deploy_kr.result != 'cancelled' }}
+    if: ${{ always() && ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * 1-5')) && needs.analyze_kr.result != 'failure' && needs.analyze_kr.result != 'cancelled' && needs.deploy_kr.result != 'failure' && needs.deploy_kr.result != 'cancelled' }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
@@ -288,6 +297,11 @@ jobs:
             $args += @("--tickers", $manualTickers)
           }
 
+          $tickerUniverseMode = "${{ github.event.inputs.ticker_universe_mode }}"
+          if (-not [string]::IsNullOrWhiteSpace($tickerUniverseMode)) {
+            $args += @("--ticker-universe-mode", $tickerUniverseMode)
+          }
+
           $manualTradeDate = "${{ github.event.inputs.trade_date }}"
           if (-not [string]::IsNullOrWhiteSpace($manualTradeDate)) {
             $args += @("--trade-date", $manualTradeDate)
@@ -319,7 +333,7 @@ jobs:
           throw "bash.exe was not found under the expected Git for Windows directories."
 
       - name: Upload GitHub Pages artifact
-        if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *') }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * 1-5') }}
         # Self-hosted runners can intermittently lose DNS resolution to GitHub's
         # artifact service endpoints, which surfaces as ENOTFOUND from
         # actions/upload-artifact. Preflight + retry reduces flaky failures.
@@ -332,14 +346,14 @@ jobs:
           path: site
 
       - name: Retry GitHub Pages artifact upload after transient network failure (US)
-        if: ${{ ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *')) && steps.upload_pages_us.outcome == 'failure' }}
+        if: ${{ ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * 1-5')) && steps.upload_pages_us.outcome == 'failure' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-us
           path: site
 
   analyze_kr:
-    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) || (github.event_name == 'schedule' && github.event.schedule == '30 0 * * 1-5') }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 240
     defaults:
@@ -682,6 +696,11 @@ jobs:
             $args += @("--tickers", $manualTickers)
           }
 
+          $tickerUniverseMode = "${{ github.event.inputs.ticker_universe_mode }}"
+          if (-not [string]::IsNullOrWhiteSpace($tickerUniverseMode)) {
+            $args += @("--ticker-universe-mode", $tickerUniverseMode)
+          }
+
           $manualTradeDate = "${{ github.event.inputs.trade_date }}"
           if (-not [string]::IsNullOrWhiteSpace($manualTradeDate)) {
             $args += @("--trade-date", $manualTradeDate)
@@ -738,7 +757,7 @@ jobs:
         # and to support two deployments during profile=all runs.
         # Use a KR-specific artifact name so all-mode can run an intermediate deploy
         # before US analysis without artifact naming collisions.
-        if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *') }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all')) || (github.event_name == 'schedule' && github.event.schedule == '30 0 * * 1-5') }}
         id: upload_pages_kr
         timeout-minutes: 15
         continue-on-error: true
@@ -748,7 +767,7 @@ jobs:
           path: site
 
       - name: Retry GitHub Pages artifact upload after transient network failure (KR)
-        if: ${{ ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all')) || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *')) && steps.upload_pages_kr.outcome == 'failure' }}
+        if: ${{ ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'kr' || github.event.inputs.profile == 'all')) || (github.event_name == 'schedule' && github.event.schedule == '30 0 * * 1-5')) && steps.upload_pages_kr.outcome == 'failure' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-kr
@@ -784,7 +803,7 @@ jobs:
       - analyze_us
       - analyze_kr
       - deploy_kr
-    if: ${{ always() && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && ((github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'all' && needs.analyze_us.result == 'success' && needs.deploy_kr.result == 'success') || (github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'us' && needs.analyze_us.result == 'success') || (github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'kr' && needs.analyze_kr.result == 'success') || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * *' && needs.analyze_us.result == 'success') || (github.event_name == 'schedule' && github.event.schedule == '0 23 * * *' && needs.analyze_kr.result == 'success')) }}
+    if: ${{ always() && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && ((github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'all' && needs.analyze_us.result == 'success' && needs.deploy_kr.result == 'success') || (github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'us' && needs.analyze_us.result == 'success') || (github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'kr' && needs.analyze_kr.result == 'success') || (github.event_name == 'schedule' && github.event.schedule == '0 11 * * 1-5' && needs.analyze_us.result == 'success') || (github.event_name == 'schedule' && github.event.schedule == '30 0 * * 1-5' && needs.analyze_kr.result == 'success')) }}
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
