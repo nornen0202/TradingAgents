@@ -16,11 +16,30 @@ from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry
+from tradingagents.dataflows.intraday_market import fetch_intraday_market_snapshot
+from tradingagents.execution.contract_builder import build_execution_contract
+from tradingagents.execution.overlay import evaluate_execution_state
+from tradingagents.execution.reporting import (
+    render_execution_summary_markdown,
+    render_execution_update_markdown,
+)
+from tradingagents.execution.selective_rerun import collect_event_signals, find_selective_rerun_targets
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.portfolio import load_snapshot_for_profile, run_portfolio_pipeline
 from tradingagents.portfolio.profiles import load_portfolio_profile
 from tradingagents.report_writer import polish_ticker_report
-from tradingagents.schemas import parse_structured_decision
+from tradingagents.schemas import (
+    ActionIfTriggered,
+    BreakoutConfirmation,
+    EventGuard,
+    ExecutionContract,
+    PullbackBuyZone,
+    LevelBasis,
+    PrimarySetup,
+    SessionVWAPPreference,
+    ThesisState,
+    parse_structured_decision,
+)
 from tradingagents.reporting import save_report_bundle
 
 from .config import ScheduledAnalysisConfig, load_scheduled_config, with_overrides
@@ -93,9 +112,45 @@ def execute_scheduled_run(
             engine_results_dir=engine_results_dir,
         )
         ticker_summaries.append(ticker_summary)
-
         if ticker_summary["status"] != "success" and not config.run.continue_on_ticker_error:
             break
+
+    execution_updates: dict[str, dict[str, Any]] = {}
+    if config.execution.execution_refresh_enabled:
+        execution_updates = _run_execution_overlay_passes(
+            config=config,
+            run_dir=run_dir,
+            ticker_summaries=ticker_summaries,
+            checkpoints=list(config.execution.execution_refresh_checkpoints_kst) or ["post_research"],
+        )
+
+    event_signals = collect_event_signals(run_dir=run_dir, ticker_summaries=ticker_summaries)
+    selective_rerun_targets: dict[str, list[str]] = {}
+    selective_rerun_results: list[dict[str, Any]] = []
+    if config.execution.execution_selective_rerun_enabled and execution_updates:
+        selective_rerun_targets = find_selective_rerun_targets(
+            contracts=_load_execution_contracts_for_run(run_dir, ticker_summaries),
+            updates={key: _ExecutionUpdateShim(val) for key, val in execution_updates.items() if not key.startswith("_")},
+            event_signals=event_signals,
+        )
+        if selective_rerun_targets:
+            selective_rerun_results = _run_selective_rerun(
+                config=config,
+                run_dir=run_dir,
+                engine_results_dir=engine_results_dir,
+                ticker_summaries=ticker_summaries,
+                targets=selective_rerun_targets,
+            )
+            rerun_updates = _run_execution_overlay_passes(
+                config=config,
+                run_dir=run_dir,
+                ticker_summaries=ticker_summaries,
+                checkpoints=["selective_rerun"],
+            )
+            execution_updates.update(
+                {key: val for key, val in rerun_updates.items() if not key.startswith("_")}
+            )
+            execution_updates["_latest_checkpoint"] = {"value": "selective_rerun"}
 
     finished_at = datetime.now(tz)
     failures = sum(1 for item in ticker_summaries if item["status"] != "success")
@@ -124,6 +179,28 @@ def execute_scheduled_run(
     }
     manifest["batch_metrics"] = _compute_batch_metrics(ticker_summaries)
     manifest["warnings"] = _compute_batch_warnings(manifest["batch_metrics"])
+    if event_signals:
+        manifest["event_signals"] = event_signals
+    if execution_updates:
+        latest_checkpoint = str((execution_updates.get("_latest_checkpoint") or {}).get("value") or "post_research")
+        manifest["execution"] = _build_execution_summary(
+            run_id=run_id,
+            ticker_updates=execution_updates,
+            checkpoint=latest_checkpoint,
+        )
+        _write_json(run_dir / "execution_summary.json", manifest["execution"])
+        (run_dir / "execution_summary.md").write_text(
+            render_execution_summary_markdown(
+                run_id=run_id,
+                checkpoint=latest_checkpoint,
+                updates=[_ExecutionUpdateShim(item) for key, item in execution_updates.items() if not key.startswith("_")],
+            ),
+            encoding="utf-8",
+        )
+    if selective_rerun_targets:
+        manifest["selective_rerun_targets"] = selective_rerun_targets
+    if selective_rerun_results:
+        manifest["selective_rerun_results"] = selective_rerun_results
 
     if config.portfolio.enabled and config.portfolio.profile_path:
         portfolio_status = run_portfolio_pipeline(
@@ -327,6 +404,17 @@ def _run_single_ticker(
         }
         analysis_path = ticker_dir / "analysis.json"
         _write_json(analysis_path, analysis_payload)
+        execution_artifacts: dict[str, str] = {}
+        execution_contract_payload = None
+        execution_update_payload = None
+        try:
+            contract = build_execution_contract(ticker=ticker, analysis_payload=analysis_payload)
+            execution_contract_payload = contract.to_dict()
+            execution_contract_path = ticker_dir / "execution_contract.json"
+            _write_json(execution_contract_path, execution_contract_payload)
+            execution_artifacts["execution_contract_json"] = _relative_to_run(run_dir, execution_contract_path)
+        except Exception as exc:
+            print(f"::warning::Execution contract build failed for {ticker}: {exc}")
 
         return {
             "ticker": ticker,
@@ -342,11 +430,14 @@ def _run_single_ticker(
             "tool_telemetry": analysis_payload["tool_telemetry"],
             "quality_flags": quality_flags,
             "report_writer": report_writer_payload,
+            "execution_contract": execution_contract_payload,
+            "execution_update": execution_update_payload,
             "artifacts": {
                 "analysis_json": _relative_to_run(run_dir, analysis_path),
                 "report_markdown": _relative_to_run(run_dir, report_file),
                 "final_state_json": _relative_to_run(run_dir, final_state_path),
                 "graph_log_json": _relative_to_run(run_dir, copied_graph_log) if copied_graph_log else None,
+                **execution_artifacts,
             },
         }
     except Exception as exc:
@@ -497,6 +588,10 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "report_polisher_enabled": config.run.report_polisher_enabled,
         "portfolio_report_polisher_enabled": config.portfolio.report_polisher_enabled,
         "ticker_name_overrides_count": len(config.run.ticker_name_overrides),
+        "codex_workspace_dir": config.llm.codex_workspace_dir,
+        "execution_refresh_enabled": config.execution.execution_refresh_enabled,
+        "execution_refresh_checkpoints_kst": list(config.execution.execution_refresh_checkpoints_kst),
+        "execution_max_data_age_seconds": config.execution.execution_max_data_age_seconds,
     }
 
 
@@ -641,3 +736,225 @@ def _relative_to_run(run_dir: Path, path: Path | None) -> str | None:
 def _write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _run_selective_rerun(
+    *,
+    config: ScheduledAnalysisConfig,
+    run_dir: Path,
+    engine_results_dir: Path,
+    ticker_summaries: list[dict[str, Any]],
+    targets: dict[str, list[str]],
+) -> list[dict[str, Any]]:
+    index_by_ticker = {
+        str(item.get("ticker") or "").strip().upper(): idx
+        for idx, item in enumerate(ticker_summaries)
+    }
+    results: list[dict[str, Any]] = []
+    for ticker, reasons in sorted(targets.items()):
+        index = index_by_ticker.get(str(ticker).upper())
+        if index is None:
+            continue
+        rerun_summary = _run_single_ticker(
+            config=config,
+            ticker=ticker,
+            run_dir=run_dir,
+            engine_results_dir=engine_results_dir,
+        )
+        rerun_summary["selective_rerun"] = {
+            "trigger_reasons": list(reasons),
+            "rerun_at": datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
+        }
+        ticker_summaries[index] = rerun_summary
+        results.append(
+            {
+                "ticker": ticker,
+                "reasons": list(reasons),
+                "status": rerun_summary.get("status"),
+            }
+        )
+    return results
+
+
+def _run_execution_overlay_passes(
+    *,
+    config: ScheduledAnalysisConfig,
+    run_dir: Path,
+    ticker_summaries: list[dict[str, Any]],
+    checkpoints: list[str],
+) -> dict[str, dict[str, Any]]:
+    updates_by_ticker: dict[str, dict[str, Any]] = {}
+    llm_model = config.execution.execution_llm_summary_model
+    for checkpoint in checkpoints:
+        checkpoint_label = str(checkpoint).strip() or "post_research"
+        for summary in ticker_summaries:
+            if summary.get("status") != "success":
+                continue
+            ticker = str(summary.get("ticker") or "").strip().upper()
+            if not ticker:
+                continue
+            artifacts = summary.get("artifacts") or {}
+            summary["artifacts"] = artifacts
+            contract_rel = artifacts.get("execution_contract_json")
+            if not contract_rel:
+                continue
+            contract_path = run_dir / contract_rel
+            if not contract_path.exists():
+                continue
+            try:
+                contract_dict = json.loads(contract_path.read_text(encoding="utf-8"))
+                contract = _ExecutionContractShim(contract_dict).to_contract()
+                market = fetch_intraday_market_snapshot(ticker, interval="5m")
+                update = evaluate_execution_state(
+                    contract,
+                    market,
+                    now=datetime.now(ZoneInfo(config.run.timezone)),
+                    max_data_age_seconds=config.execution.execution_max_data_age_seconds,
+                    refresh_checkpoint=checkpoint_label,
+                )
+                update_payload = update.to_dict()
+                ticker_dir = run_dir / "tickers" / ticker
+                checkpoint_dir = ticker_dir / "execution" / "checkpoints"
+                _write_json(checkpoint_dir / f"execution_update_{checkpoint_label}.json", update_payload)
+                update_path = ticker_dir / "execution_update.json"
+                _write_json(update_path, update_payload)
+                summary["artifacts"]["execution_update_json"] = _relative_to_run(run_dir, update_path)
+
+                md_path = ticker_dir / "execution_update.md"
+                md_text = render_execution_update_markdown(
+                    contract,
+                    update,
+                    llm_settings=config.llm,
+                    llm_model=llm_model,
+                    thesis_summary=str((summary.get("decision") or "")[:500]),
+                )
+                md_path.write_text(md_text, encoding="utf-8")
+                summary["artifacts"]["execution_update_md"] = _relative_to_run(run_dir, md_path)
+                summary["execution_update"] = update_payload
+                updates_by_ticker[ticker] = update_payload
+            except Exception as exc:
+                print(f"::warning::Execution overlay checkpoint '{checkpoint_label}' failed for {ticker}: {exc}")
+        updates_by_ticker["_latest_checkpoint"] = {"value": checkpoint_label}
+    return updates_by_ticker
+
+
+def _load_execution_contracts_for_run(
+    run_dir: Path,
+    ticker_summaries: list[dict[str, Any]],
+) -> dict[str, Any]:
+    loaded: dict[str, Any] = {}
+    for summary in ticker_summaries:
+        if summary.get("status") != "success":
+            continue
+        ticker = str(summary.get("ticker") or "").strip().upper()
+        artifacts = summary.get("artifacts") or {}
+        rel_path = artifacts.get("execution_contract_json")
+        if not rel_path:
+            continue
+        path = run_dir / rel_path
+        if not path.exists():
+            continue
+        try:
+            loaded[ticker] = _ExecutionContractShim(json.loads(path.read_text(encoding="utf-8")))
+        except Exception:
+            continue
+    return loaded
+
+
+def _build_execution_summary(
+    *,
+    run_id: str,
+    ticker_updates: dict[str, dict[str, Any]],
+    checkpoint: str,
+) -> dict[str, Any]:
+    ticker_updates = {k: v for k, v in ticker_updates.items() if not k.startswith("_")}
+    actionable_now = sorted(
+        [ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "ACTIONABLE_NOW"]
+    )
+    pending_close = sorted(
+        [ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "TRIGGERED_PENDING_CLOSE"]
+    )
+    wait = sorted([ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "WAIT"])
+    invalidated = sorted(
+        [ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "INVALIDATED"]
+    )
+    degraded = sorted(
+        [ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "DEGRADED"]
+    )
+    first = next(iter(ticker_updates.values()))
+    return {
+        "run_id": run_id,
+        "refresh_checkpoint": checkpoint,
+        "execution_asof": first.get("execution_asof"),
+        "actionable_now": actionable_now,
+        "triggered_pending_close": pending_close,
+        "wait": wait,
+        "invalidated": invalidated,
+        "degraded": degraded,
+        "top_priority_order": actionable_now + pending_close + wait + invalidated + degraded,
+        "market_regime": "constructive_but_selective" if actionable_now else "wait_and_watch",
+        "notes": [
+            "Do not treat pre-open report as executable without overlay refresh.",
+            "Close-confirmation setups remain pending until end-of-day.",
+        ],
+    }
+
+
+class _ExecutionUpdateShim:
+    def __init__(self, payload: dict[str, Any]):
+        self.ticker = str(payload.get("ticker") or "")
+        self.decision_state = type("State", (), {"value": str(payload.get("decision_state") or "WAIT")})()
+
+
+class _ExecutionContractShim:
+    def __init__(self, payload: dict[str, Any]):
+        self.payload = payload
+        self.event_guard = payload.get("event_guard")
+
+    def to_contract(self) -> ExecutionContract:
+        guard_payload = self.payload.get("event_guard") or {}
+        guard = EventGuard(
+            earnings_date=guard_payload.get("earnings_date"),
+            block_new_position_within_days=int(guard_payload.get("block_new_position_within_days", 0) or 0),
+            allow_add_only_after_event=bool(guard_payload.get("allow_add_only_after_event", False)),
+            requires_post_event_rerun=bool(guard_payload.get("requires_post_event_rerun", False)),
+        )
+        return ExecutionContract(
+            ticker=str(self.payload.get("ticker") or ""),
+            analysis_asof=str(self.payload.get("analysis_asof") or ""),
+            market_data_asof=str(self.payload.get("market_data_asof") or ""),
+            level_basis=LevelBasis(str(self.payload.get("level_basis") or "daily_close")),
+            thesis_state=ThesisState(str(self.payload.get("thesis_state") or "neutral")),
+            primary_setup=PrimarySetup(str(self.payload.get("primary_setup") or "watch_only")),
+            portfolio_stance=str(self.payload.get("portfolio_stance") or "NEUTRAL"),
+            entry_action_base=str(self.payload.get("entry_action_base") or "WAIT"),
+            setup_quality=str(self.payload.get("setup_quality") or "DEVELOPING"),
+            confidence=float(self.payload.get("confidence") or 0.4),
+            action_if_triggered=ActionIfTriggered(str(self.payload.get("action_if_triggered") or "NONE")),
+            starter_fraction_of_target=self.payload.get("starter_fraction_of_target"),
+            breakout_level=self.payload.get("breakout_level"),
+            breakout_confirmation=(
+                BreakoutConfirmation(str(self.payload.get("breakout_confirmation")))
+                if self.payload.get("breakout_confirmation")
+                else None
+            ),
+            pullback_buy_zone=(
+                PullbackBuyZone(
+                    low=float((self.payload.get("pullback_buy_zone") or {}).get("low")),
+                    high=float((self.payload.get("pullback_buy_zone") or {}).get("high")),
+                )
+                if isinstance(self.payload.get("pullback_buy_zone"), dict)
+                and (self.payload.get("pullback_buy_zone") or {}).get("low") is not None
+                and (self.payload.get("pullback_buy_zone") or {}).get("high") is not None
+                else None
+            ),
+            invalid_if_close_below=self.payload.get("invalid_if_close_below"),
+            invalid_if_intraday_below=self.payload.get("invalid_if_intraday_below"),
+            min_relative_volume=self.payload.get("min_relative_volume"),
+            session_vwap_preference=SessionVWAPPreference(
+                str(self.payload.get("session_vwap_preference") or "indifferent")
+            ),
+            event_guard=guard,
+            reason_codes=tuple(self.payload.get("reason_codes") or []),
+            notes=tuple(self.payload.get("notes") or []),
+        )
