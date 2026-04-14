@@ -270,6 +270,9 @@ def _render_run_page(
               <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
               <p><strong>Investment view</strong><span>{_escape(present_investment_view(ticker_summary.get('decision') or ticker_summary.get('error'), language=language))}</span></p>
               <p><strong>Today</strong><span>{_escape(present_action_summary(ticker_summary.get('decision'), language=language))}</span></p>
+              <p><strong>Execution As-Of</strong><span>{_escape(_execution_value(ticker_summary, 'execution_asof', default='not refreshed'))}</span></p>
+              <p><strong>Decision State</strong><span>{_escape(_execution_display_state(ticker_summary))}</span></p>
+              <p><strong>Staleness</strong><span>{_escape(_execution_staleness(ticker_summary))}</span></p>
               <p><strong>Source status</strong><span>{_escape(present_data_status(ticker_summary.get('decision'), quality_flags=ticker_summary.get('quality_flags'), language=language))}</span></p>
             </article>
             """
@@ -336,6 +339,8 @@ def _render_portfolio_page(
     *,
     portfolio_summary: dict[str, Any],
 ) -> str:
+    run_dir = Path(manifest["_run_dir"])
+    execution_summary = _load_execution_summary(run_dir)
     report_html = "<p class='empty'>No portfolio markdown report was generated.</p>"
     report_path = portfolio_summary.get("portfolio_report_md")
     if isinstance(report_path, Path) and report_path.exists():
@@ -395,6 +400,7 @@ def _render_portfolio_page(
       </div>
       {report_html}
     </section>
+    {_render_execution_summary_section(execution_summary)}
     {downloads_html}
     """
     return _page_template(f"{manifest['run_id']} {portfolio_label.lower()} | {settings.title}", body, prefix="../../")
@@ -450,8 +456,13 @@ def _render_ticker_page(
       </div>
       <div class="hero-card">
         <div class="status {ticker_summary['status']}">{_escape(ticker_summary['status'])}</div>
+        <p><strong>Snapshot</strong><span>{_escape(_execution_badge_label(ticker_summary))}</span></p>
         <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
         <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
+        <p><strong>Execution As-Of</strong><span>{_escape(_execution_value(ticker_summary, 'execution_asof', default='not refreshed'))}</span></p>
+        <p><strong>Decision State</strong><span>{_escape(_execution_display_state(ticker_summary))}</span></p>
+        <p><strong>Staleness</strong><span>{_escape(_execution_staleness(ticker_summary))}</span></p>
+        <p><strong>Data health</strong><span>{_escape(_execution_value(ticker_summary, 'data_health', default='unknown'))}</span></p>
         <p><strong>Investment view</strong><span>{_escape(present_investment_view(ticker_summary.get('decision'), language=language))}</span></p>
         <p><strong>Today</strong><span>{_escape(present_action_summary(ticker_summary.get('decision'), language=language))}</span></p>
         <p><strong>Market view</strong><span>{_escape(_decision_market_view(ticker_summary.get('decision'), language=language))}</span></p>
@@ -530,6 +541,45 @@ def _download_details_html(links: list[str], *, summary: str, empty_text: str) -
     """
 
 
+def _execution_payload(ticker_summary: dict[str, Any]) -> dict[str, Any]:
+    payload = ticker_summary.get("execution_update")
+    return payload if isinstance(payload, dict) else {}
+
+
+def _execution_value(ticker_summary: dict[str, Any], key: str, *, default: str) -> str:
+    payload = _execution_payload(ticker_summary)
+    value = payload.get(key)
+    return default if value in (None, "") else str(value)
+
+
+def _execution_staleness(ticker_summary: dict[str, Any]) -> str:
+    payload = _execution_payload(ticker_summary)
+    value = payload.get("staleness_seconds")
+    if value is None:
+        return "not refreshed"
+    return f"{value}s"
+
+
+def _execution_badge_label(ticker_summary: dict[str, Any]) -> str:
+    payload = _execution_payload(ticker_summary)
+    return "Intraday refreshed" if payload else "Pre-open snapshot"
+
+
+def _execution_display_state(ticker_summary: dict[str, Any]) -> str:
+    payload = _execution_payload(ticker_summary)
+    if not payload:
+        return "WAIT (not refreshed)"
+    state = str(payload.get("decision_state") or "WAIT")
+    staleness = payload.get("staleness_seconds")
+    try:
+        stale = int(staleness) > 180
+    except Exception:
+        stale = False
+    if stale and state == "ACTIONABLE_NOW":
+        return "WAIT (stale overlay)"
+    return state
+
+
 def _portfolio_status_label(status: str) -> str:
     normalized = str(status or "").strip().lower()
     mapping = {
@@ -583,6 +633,41 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "downloadable_files": files,
         "artifact_count": len(files),
     }
+
+
+def _load_execution_summary(run_dir: Path) -> dict[str, Any]:
+    path = run_dir / "execution_summary.json"
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _render_execution_summary_section(summary: dict[str, Any]) -> str:
+    if not summary:
+        return ""
+    def _join(values: Any) -> str:
+        if not isinstance(values, list) or not values:
+            return "-"
+        return ", ".join(str(item) for item in values)
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>Execution overlay</h2>
+      </div>
+      <article class="run-card">
+        <p><strong>Refresh checkpoint</strong><span>{_escape(summary.get('refresh_checkpoint') or '-')}</span></p>
+        <p><strong>Execution As-Of</strong><span>{_escape(summary.get('execution_asof') or '-')}</span></p>
+        <p><strong>Actionable now</strong><span>{_escape(_join(summary.get('actionable_now')))}</span></p>
+        <p><strong>Triggered pending close</strong><span>{_escape(_join(summary.get('triggered_pending_close')))}</span></p>
+        <p><strong>Watch / wait</strong><span>{_escape(_join(summary.get('wait')))}</span></p>
+        <p><strong>Invalidated</strong><span>{_escape(_join(summary.get('invalidated')))}</span></p>
+        <p><strong>Degraded</strong><span>{_escape(_join(summary.get('degraded')))}</span></p>
+      </article>
+    </section>
+    """
 
 
 def _status_class(status: str) -> str:

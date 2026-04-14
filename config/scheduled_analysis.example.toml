@@ -2,6 +2,7 @@
 
 [run]
 tickers = ["NVDA", "MSFT", "TSLA"]
+run_mode = "full" # full / overlay_only / selective_rerun_only
 ticker_universe_mode = "config_only"
 analysts = ["market", "social", "news", "fundamentals"]
 output_language = "Korean"
@@ -56,3 +57,12 @@ semantic_judge_enabled = false
 action_judge_enabled = false
 action_judge_top_n = 5
 report_polisher_enabled = true
+
+[execution]
+enabled = true
+checkpoints_kst = ["22:35", "22:50", "23:30"]
+max_data_age_seconds = 180
+publish_badges = true
+publish_debug = false
+selective_rerun_enabled = true
+llm_summary_model = "gpt-5.4-mini"

@@ -284,7 +284,7 @@ jobs:
             throw "Missing config/scheduled_analysis.toml. Copy config/scheduled_analysis.example.toml, set your real tickers, and commit the file before enabling the schedule."
           }
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-us")
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", "full", "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-us")
 
           if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
             $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
@@ -683,7 +683,7 @@ jobs:
             throw "Missing config/scheduled_analysis_korea.toml. Add the file before enabling the KR schedule."
           }
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-kr")
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", "full", "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-kr")
 
           if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
             $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)

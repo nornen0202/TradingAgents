@@ -226,6 +226,7 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 
 - `[run]`
   - `tickers`
+  - `run_mode`: `full | overlay_only | selective_rerun_only`
   - `analysts`
   - `output_language`
   - `trade_date_mode`
@@ -257,6 +258,81 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
   - `site_dir`
 - `[ticker_names]`
   - 티커 표시 이름 오버라이드
+
+- `[execution]` (장중 deterministic overlay)
+  - `enabled`: `true`면 종목 리서치 후 `execution_contract.json` 생성 + 장중 overlay refresh 수행
+  - `checkpoints_kst`: 예) `["22:35", "22:50", "23:30"]`
+  - `max_data_age_seconds`: stale data fail-closed 기준
+  - `publish_badges`: 사이트 배지/상태 노출
+  - `selective_rerun_enabled`: 이벤트/무효화 기반 selective rerun
+  - `llm_summary_model`: execution markdown 설명 모델 (기본 `gpt-5.4-mini`)
+
+### 장중 하이브리드 구조(Research + Deterministic Overlay + Selective Rerun)
+
+현재 스케줄 러너는 다음 순서로 동작합니다.
+
+1. **기존 종목 리서치 유지**: 기존 multi-agent 분석 파이프라인 실행
+2. **Execution contract 생성**: 리서치 결과에서 `execution_contract.json` 생성
+3. **Deterministic overlay refresh**: intraday snapshot + contract로 `execution_update.json` 갱신
+4. **예외적 selective rerun**: 이벤트 신호/무효화 종목만 재분석 후 overlay 재평가
+
+즉 “전체 종목 full rerun 반복”이 아니라, **기본은 경량 overlay**, 예외만 rerun하는 하이브리드 구조입니다.
+
+### run_mode 운영 권장 (실무)
+
+- `full`:
+  - 종목 full research + overlay + (옵션) selective rerun 실행
+  - 보통 하루 1회 기준 리포트 생성용
+- `overlay_only`:
+  - 최신 full run 산출물을 재사용하고 full research는 건너뜀
+  - overlay만 갱신해서 최신 시세 반영
+  - selective rerun은 **후보(`selective_rerun_targets`)만 생성**
+- `selective_rerun_only`:
+  - 운영자가 판단해 수동 트리거할 때 사용
+  - 후보 종목만 selective rerun 실제 실행 후 overlay 재평가
+
+권장 패턴:
+1) 하루 1회 `full`  
+2) 2시간 단위 `overlay_only`  
+3) 필요 시 수동 `selective_rerun_only`
+
+참고: 저장소에는 2시간 단위 overlay 전용 워크플로우 예시(.github/workflows/intraday-overlay-refresh.yml)가 포함되어 있습니다.
+
+### checkpoints_kst 동작 방식 (중요)
+
+`checkpoints_kst = ["22:35", "22:50", "23:30"]`를 넣었다고 해서, 프로세스가 백그라운드에서 해당 시각까지 대기한 뒤 자동으로 액션을 수행하지는 않습니다.
+
+- 러너는 **실행 시점의 KST 현재시간**을 기준으로,
+- `현재시간 >= checkpoint` 인 항목만 그 실행에서 수행합니다.
+
+예시:
+
+- 22:40 KST에 한 번 실행 -> `22:35`만 수행
+- 22:55 KST에 한 번 실행 -> `22:35`, `22:50` 수행
+- 23:35 KST에 한 번 실행 -> `22:35`, `22:50`, `23:30` 수행
+
+따라서 “각 checkpoint를 실제 시각별로 따로 실행”하려면 GitHub Actions를 checkpoint 시각별로 분리 스케줄하거나, workflow_dispatch를 해당 시각에 수동 실행해야 합니다.
+
+### GitHub Actions에서 실질 검증하는 방법
+
+권장 검증 순서:
+
+1. `Actions > Daily Codex Analysis > Run workflow`
+   - `profile = us`
+   - `tickers = TSM,NVDA` (작은 배치 권장)
+   - `site_only = false`
+2. 실행 후 archive의 최신 run 폴더에서 아래 파일 확인
+   - 종목별:
+     - `tickers/<TICKER>/execution_contract.json`
+     - `tickers/<TICKER>/execution_update.json`
+     - `tickers/<TICKER>/execution/checkpoints/execution_update_<checkpoint>.json`
+     - `tickers/<TICKER>/execution_update.md`
+   - 런 단위:
+     - `execution_summary.json`, `execution_summary.md`
+     - `run.json`의 `event_signals`, `selective_rerun_targets`, `selective_rerun_results`
+3. 생성된 site에서 아래 UI 확인
+   - `Execution As-Of`, `Decision State`, `Staleness`
+   - Portfolio 페이지의 `Execution overlay` 섹션
 
 실행 예시:
 
