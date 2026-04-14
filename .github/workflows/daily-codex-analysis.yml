@@ -2,10 +2,10 @@ name: Daily Codex Analysis
 
 on:
   schedule:
-    # 09:30 KST weekdays (00:30 UTC) -> KR analysis
-    - cron: '30 0 * * 1-5'
-    # 20:00 KST weekdays (11:00 UTC) -> US analysis
-    - cron: '0 11 * * 1-5'
+    # 10:00 KST weekdays (01:00 UTC) -> KR analysis
+    - cron: '0 1 * * 1-5'
+    # 23:00 KST weekdays (14:00 UTC) -> US analysis
+    - cron: '0 14 * * 1-5'
   workflow_dispatch:
     inputs:
       profile:
