@@ -89,7 +89,7 @@ jobs:
             $runMode = "overlay_only"
           }
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--label", "github-actions-overlay-us")
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-overlay-us")
 
           if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
             $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
@@ -127,14 +127,14 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-overlay-us
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
       - name: Retry GitHub Pages artifact upload after transient network failure (US)
         if: ${{ steps.upload_pages_us.outcome == 'failure' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-overlay-us
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
   overlay_refresh_kr:
     if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) }}
@@ -191,7 +191,7 @@ jobs:
             $runMode = "overlay_only"
           }
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--label", "github-actions-overlay-kr")
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-overlay-kr")
 
           if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
             $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
@@ -229,14 +229,14 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-overlay-kr
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
       - name: Retry GitHub Pages artifact upload after transient network failure (KR)
         if: ${{ steps.upload_pages_kr.outcome == 'failure' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-overlay-kr
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
   deploy_overlay_kr:
     needs:
