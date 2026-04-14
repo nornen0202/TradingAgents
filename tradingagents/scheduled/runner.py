@@ -177,48 +177,6 @@ def execute_scheduled_run(
             )
             execution_updates["_latest_checkpoint"] = {"value": "selective_rerun"}
 
-    execution_updates: dict[str, dict[str, Any]] = {}
-    if config.execution.execution_refresh_enabled:
-        now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
-        selected_checkpoints = _select_due_checkpoints(
-            now_kst=now_kst,
-            checkpoints=list(config.execution.execution_refresh_checkpoints_kst),
-        )
-        execution_updates = _run_execution_overlay_passes(
-            config=config,
-            run_dir=run_dir,
-            ticker_summaries=ticker_summaries,
-            checkpoints=selected_checkpoints,
-        )
-
-    event_signals = collect_event_signals(run_dir=run_dir, ticker_summaries=ticker_summaries)
-    selective_rerun_targets: dict[str, list[str]] = {}
-    selective_rerun_results: list[dict[str, Any]] = []
-    if config.execution.execution_selective_rerun_enabled and execution_updates:
-        selective_rerun_targets = find_selective_rerun_targets(
-            contracts=_load_execution_contracts_for_run(run_dir, ticker_summaries),
-            updates={key: _ExecutionUpdateShim(val) for key, val in execution_updates.items() if not key.startswith("_")},
-            event_signals=event_signals,
-        )
-        if selective_rerun_targets:
-            selective_rerun_results = _run_selective_rerun(
-                config=config,
-                run_dir=run_dir,
-                engine_results_dir=engine_results_dir,
-                ticker_summaries=ticker_summaries,
-                targets=selective_rerun_targets,
-            )
-            rerun_updates = _run_execution_overlay_passes(
-                config=config,
-                run_dir=run_dir,
-                ticker_summaries=ticker_summaries,
-                checkpoints=["selective_rerun"],
-            )
-            execution_updates.update(
-                {key: val for key, val in rerun_updates.items() if not key.startswith("_")}
-            )
-            execution_updates["_latest_checkpoint"] = {"value": "selective_rerun"}
-
     finished_at = datetime.now(tz)
     failures = sum(1 for item in ticker_summaries if item["status"] != "success")
     successes = len(ticker_summaries) - failures
@@ -815,7 +773,7 @@ def _bootstrap_overlay_inputs_from_latest_run(
     run_dir: Path,
     tickers: list[str],
 ) -> tuple[list[dict[str, Any]], str | None]:
-    source_manifest = _resolve_latest_overlay_source_manifest(config.storage.archive_dir)
+    source_manifest = _resolve_latest_overlay_source_manifest(config.storage.archive_dir, tickers=tickers)
     if source_manifest is None:
         raise RuntimeError("overlay_only/selective_rerun_only requires an existing latest-run.json from a prior full run.")
     source_run_id = str(source_manifest.get("run_id") or "")
@@ -880,24 +838,66 @@ def _bootstrap_overlay_inputs_from_latest_run(
     return summaries, source_run_id
 
 
-def _resolve_latest_overlay_source_manifest(archive_dir: Path) -> dict[str, Any] | None:
+def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[str] | None = None) -> dict[str, Any] | None:
     latest_manifest_path = archive_dir / "latest-run.json"
     if not latest_manifest_path.exists():
         return None
 
     candidate = json.loads(latest_manifest_path.read_text(encoding="utf-8"))
     run_mode = str((((candidate.get("settings") or {}).get("run_mode")) or "full")).strip().lower()
-    if run_mode == "full":
+    if run_mode == "full" and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers):
         return candidate
 
     source_run_id = str(candidate.get("overlay_source_run_id") or "").strip()
-    if not source_run_id:
-        return candidate
+    if source_run_id:
+        source_manifest_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
+        if source_manifest_path is not None:
+            resolved = json.loads(source_manifest_path.read_text(encoding="utf-8"))
+            if _manifest_has_bootstrap_ready_ticker(resolved, tickers=tickers):
+                return resolved
 
-    source_manifest_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
-    if source_manifest_path is None:
-        return candidate
-    return json.loads(source_manifest_path.read_text(encoding="utf-8"))
+    latest_full = _find_latest_full_run_manifest(archive_dir, tickers=tickers)
+    if latest_full is not None:
+        return latest_full
+
+    # Preserve prior behavior when no better candidate exists.
+    return candidate
+
+
+def _manifest_has_bootstrap_ready_ticker(manifest: dict[str, Any], *, tickers: list[str] | None) -> bool:
+    target_tickers = {str(item).strip().upper() for item in (tickers or []) if str(item).strip()}
+    for source in manifest.get("tickers", []):
+        ticker = str(source.get("ticker") or "").strip().upper()
+        if not ticker:
+            continue
+        if target_tickers and ticker not in target_tickers:
+            continue
+        if source.get("status") != "success":
+            continue
+        artifacts = source.get("artifacts") or {}
+        if artifacts.get("analysis_json"):
+            return True
+    return False
+
+
+def _find_latest_full_run_manifest(archive_dir: Path, *, tickers: list[str] | None = None) -> dict[str, Any] | None:
+    runs_dir = archive_dir / "runs"
+    if not runs_dir.exists():
+        return None
+    year_dirs = sorted((path for path in runs_dir.iterdir() if path.is_dir()), reverse=True)
+    for year_dir in year_dirs:
+        run_dirs = sorted((path for path in year_dir.iterdir() if path.is_dir()), reverse=True)
+        for run_dir in run_dirs:
+            manifest_path = run_dir / "run.json"
+            if not manifest_path.exists():
+                continue
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            run_mode = str((((manifest.get("settings") or {}).get("run_mode")) or "full")).strip().lower()
+            if run_mode != "full":
+                continue
+            if _manifest_has_bootstrap_ready_ticker(manifest, tickers=tickers):
+                return manifest
+    return None
 
 
 def _find_run_manifest_path_by_run_id(archive_dir: Path, run_id: str) -> Path | None:
