@@ -15,6 +15,7 @@ def render_execution_update_markdown(
     llm_settings: Any | None = None,
     llm_model: str | None = None,
     thesis_summary: str | None = None,
+    include_reason_codes: bool = False,
 ) -> str:
     lines = [
         f"# {update.ticker} Intraday Execution Update",
@@ -27,11 +28,11 @@ def render_execution_update_markdown(
         f"- Decision If Triggered: **{update.decision_if_triggered.value}**",
         f"- Staleness: `{update.staleness_seconds}s`",
         f"- Data Health: `{update.data_health}`",
-        "",
-        "## Reason Codes",
     ]
-    for code in update.reason_codes:
-        lines.append(f"- `{code}`")
+    if include_reason_codes:
+        lines.extend(["", "## Reason Codes"])
+        for code in update.reason_codes:
+            lines.append(f"- `{code}`")
     llm_summary = _generate_llm_summary(
         contract=contract,
         update=update,

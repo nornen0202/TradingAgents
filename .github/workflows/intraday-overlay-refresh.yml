@@ -1,0 +1,155 @@
+name: Intraday Overlay Refresh
+
+on:
+  schedule:
+    # Every 2 hours on weekdays (UTC). Tune as needed for local market session windows.
+    - cron: '0 */2 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "Run profile: us / kr / all (default all)"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - us
+          - kr
+      run_mode:
+        description: "overlay_only / selective_rerun_only"
+        required: false
+        default: "overlay_only"
+        type: choice
+        options:
+          - overlay_only
+          - selective_rerun_only
+      tickers:
+        description: "Optional comma-separated tickers override"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  overlay_refresh_us:
+    if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) }}
+    runs-on: [self-hosted, Windows]
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+    env:
+      PYTHONUTF8: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
+      CODEX_BINARY: ${{ vars.CODEX_BINARY }}
+      CODEX_HOME: ${{ vars.CODEX_HOME }}
+      ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+      OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install TradingAgents
+        run: |
+          python -m pip install --upgrade pip
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -m pip install -e ".[translation]"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      - name: Run overlay refresh mode
+        run: |
+          $configPath = "config/scheduled_analysis.toml"
+          if (-not (Test-Path $configPath)) {
+            throw "Missing config/scheduled_analysis.toml."
+          }
+
+          $runMode = "${{ github.event.inputs.run_mode }}"
+          if ([string]::IsNullOrWhiteSpace($runMode)) {
+            $runMode = "overlay_only"
+          }
+
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--label", "github-actions-overlay-us")
+
+          if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
+            $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
+          }
+
+          $manualTickers = "${{ github.event.inputs.tickers }}"
+          if (-not [string]::IsNullOrWhiteSpace($manualTickers)) {
+            $args += @("--tickers", $manualTickers)
+          }
+
+          python @args
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+  overlay_refresh_kr:
+    if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) }}
+    runs-on: [self-hosted, Windows]
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+    env:
+      PYTHONUTF8: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
+      CODEX_BINARY: ${{ vars.CODEX_BINARY }}
+      CODEX_HOME: ${{ vars.CODEX_HOME }}
+      ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+      OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install TradingAgents
+        run: |
+          python -m pip install --upgrade pip
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -m pip install -e ".[translation]"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      - name: Run overlay refresh mode
+        run: |
+          $configPath = "config/scheduled_analysis_korea.toml"
+          if (-not (Test-Path $configPath)) {
+            throw "Missing config/scheduled_analysis_korea.toml."
+          }
+
+          $runMode = "${{ github.event.inputs.run_mode }}"
+          if ([string]::IsNullOrWhiteSpace($runMode)) {
+            $runMode = "overlay_only"
+          }
+
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--label", "github-actions-overlay-kr")
+
+          if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
+            $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
+          }
+
+          $manualTickers = "${{ github.event.inputs.tickers }}"
+          if (-not [string]::IsNullOrWhiteSpace($manualTickers)) {
+            $args += @("--tickers", $manualTickers)
+          }
+
+          python @args
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }

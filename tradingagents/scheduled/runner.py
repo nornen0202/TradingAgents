@@ -60,6 +60,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Ticker source mode: config_only / config_plus_account / account_only.",
     )
     parser.add_argument("--trade-date", help="Optional YYYY-MM-DD override for all tickers.")
+    parser.add_argument(
+        "--run-mode",
+        choices=("full", "overlay_only", "selective_rerun_only"),
+        help="Execution mode: full / overlay_only / selective_rerun_only.",
+    )
     parser.add_argument("--site-only", action="store_true", help="Only rebuild the static site from archived runs.")
     parser.add_argument("--strict", action="store_true", help="Return a non-zero exit code if any ticker fails.")
     parser.add_argument("--label", default="github-actions", help="Run label for archived metadata.")
@@ -72,6 +77,7 @@ def main(argv: list[str] | None = None) -> int:
         tickers=_parse_ticker_override(args.tickers),
         ticker_universe_mode=args.ticker_universe_mode,
         trade_date=args.trade_date,
+        run_mode=args.run_mode,
     )
 
     if args.site_only:
@@ -103,17 +109,73 @@ def execute_scheduled_run(
     run_tickers = _resolve_run_tickers(config)
     ticker_summaries: list[dict[str, Any]] = []
     engine_results_dir = run_dir / "engine-results"
-
-    for ticker in run_tickers:
-        ticker_summary = _run_single_ticker(
-            config=config,
-            ticker=ticker,
-            run_dir=run_dir,
-            engine_results_dir=engine_results_dir,
+    run_mode = str(config.run.run_mode or "full").strip().lower()
+    source_run_id: str | None = None
+    if run_mode == "selective_rerun_only" and not config.execution.execution_refresh_enabled:
+        raise RuntimeError(
+            "run_mode=selective_rerun_only requires [execution].enabled=true to compute rerun targets."
         )
-        ticker_summaries.append(ticker_summary)
-        if ticker_summary["status"] != "success" and not config.run.continue_on_ticker_error:
-            break
+
+    if run_mode == "full":
+        for ticker in run_tickers:
+            ticker_summary = _run_single_ticker(
+                config=config,
+                ticker=ticker,
+                run_dir=run_dir,
+                engine_results_dir=engine_results_dir,
+            )
+            ticker_summaries.append(ticker_summary)
+            if ticker_summary["status"] != "success" and not config.run.continue_on_ticker_error:
+                break
+    else:
+        ticker_summaries, source_run_id = _bootstrap_overlay_inputs_from_latest_run(
+            config=config,
+            run_dir=run_dir,
+            tickers=run_tickers,
+        )
+
+    execution_updates: dict[str, dict[str, Any]] = {}
+    if config.execution.execution_refresh_enabled:
+        now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
+        selected_checkpoints = _select_due_checkpoints(
+            now_kst=now_kst,
+            checkpoints=list(config.execution.execution_refresh_checkpoints_kst),
+        )
+        execution_updates = _run_execution_overlay_passes(
+            config=config,
+            run_dir=run_dir,
+            ticker_summaries=ticker_summaries,
+            checkpoints=selected_checkpoints,
+        )
+
+    event_signals = collect_event_signals(run_dir=run_dir, ticker_summaries=ticker_summaries)
+    selective_rerun_targets: dict[str, list[str]] = {}
+    selective_rerun_results: list[dict[str, Any]] = []
+    if config.execution.execution_selective_rerun_enabled and execution_updates:
+        selective_rerun_targets = find_selective_rerun_targets(
+            contracts=_load_execution_contracts_for_run(run_dir, ticker_summaries),
+            updates={key: _ExecutionUpdateShim(val) for key, val in execution_updates.items() if not key.startswith("_")},
+            event_signals=event_signals,
+        )
+        should_execute_selective_rerun = run_mode in {"full", "selective_rerun_only"}
+        if selective_rerun_targets and should_execute_selective_rerun:
+            selective_rerun_results = _run_selective_rerun(
+                config=config,
+                run_dir=run_dir,
+                engine_results_dir=engine_results_dir,
+                ticker_summaries=ticker_summaries,
+                targets=selective_rerun_targets,
+            )
+            rerun_updates = _run_execution_overlay_passes(
+                config=config,
+                run_dir=run_dir,
+                ticker_summaries=ticker_summaries,
+                checkpoints=["selective_rerun"],
+            )
+            execution_updates.update(
+                {key: val for key, val in rerun_updates.items() if not key.startswith("_")}
+            )
+            execution_updates["_latest_checkpoint"] = {"value": "selective_rerun"}
 
     execution_updates: dict[str, dict[str, Any]] = {}
     if config.execution.execution_refresh_enabled:
@@ -186,6 +248,8 @@ def execute_scheduled_run(
     manifest["warnings"] = _compute_batch_warnings(manifest["batch_metrics"])
     if event_signals:
         manifest["event_signals"] = event_signals
+    if source_run_id:
+        manifest["overlay_source_run_id"] = source_run_id
     if execution_updates:
         latest_checkpoint = str((execution_updates.get("_latest_checkpoint") or {}).get("value") or "post_research")
         manifest["execution"] = _build_execution_summary(
@@ -587,6 +651,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "analysts": list(config.run.analysts),
         "trade_date_mode": config.run.trade_date_mode,
         "ticker_universe_mode": config.run.ticker_universe_mode,
+        "run_mode": config.run.run_mode,
         "configured_ticker_count": len(config.run.tickers),
         "max_debate_rounds": config.run.max_debate_rounds,
         "max_risk_discuss_rounds": config.run.max_risk_discuss_rounds,
@@ -597,6 +662,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "execution_refresh_enabled": config.execution.execution_refresh_enabled,
         "execution_refresh_checkpoints_kst": list(config.execution.execution_refresh_checkpoints_kst),
         "execution_max_data_age_seconds": config.execution.execution_max_data_age_seconds,
+        "execution_publish_debug": config.execution.execution_publish_debug,
     }
 
 
@@ -743,6 +809,110 @@ def _write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _bootstrap_overlay_inputs_from_latest_run(
+    *,
+    config: ScheduledAnalysisConfig,
+    run_dir: Path,
+    tickers: list[str],
+) -> tuple[list[dict[str, Any]], str | None]:
+    source_manifest = _resolve_latest_overlay_source_manifest(config.storage.archive_dir)
+    if source_manifest is None:
+        raise RuntimeError("overlay_only/selective_rerun_only requires an existing latest-run.json from a prior full run.")
+    source_run_id = str(source_manifest.get("run_id") or "")
+    source_started_at = str(source_manifest.get("started_at") or "")
+    if not source_run_id or len(source_started_at) < 4:
+        raise RuntimeError("latest-run.json is missing run_id/started_at required for overlay bootstrap.")
+    source_run_dir = config.storage.archive_dir / "runs" / source_started_at[:4] / source_run_id
+    summaries: list[dict[str, Any]] = []
+    target_tickers = {str(item).strip().upper() for item in tickers}
+    for source in source_manifest.get("tickers", []):
+        ticker = str(source.get("ticker") or "").strip().upper()
+        if not ticker or (target_tickers and ticker not in target_tickers):
+            continue
+        if source.get("status") != "success":
+            continue
+        artifacts = source.get("artifacts") or {}
+        analysis_rel = artifacts.get("analysis_json")
+        if not analysis_rel:
+            continue
+        source_analysis = source_run_dir / analysis_rel
+        if not source_analysis.exists():
+            continue
+        target_ticker_dir = run_dir / "tickers" / ticker
+        target_ticker_dir.mkdir(parents=True, exist_ok=True)
+        target_analysis = target_ticker_dir / "analysis.json"
+        target_analysis.write_text(source_analysis.read_text(encoding="utf-8"), encoding="utf-8")
+
+        contract_rel = artifacts.get("execution_contract_json")
+        target_contract = target_ticker_dir / "execution_contract.json"
+        if contract_rel and (source_run_dir / contract_rel).exists():
+            target_contract.write_text((source_run_dir / contract_rel).read_text(encoding="utf-8"), encoding="utf-8")
+        else:
+            analysis_payload = json.loads(target_analysis.read_text(encoding="utf-8"))
+            contract = build_execution_contract(ticker=ticker, analysis_payload=analysis_payload)
+            _write_json(target_contract, contract.to_dict())
+
+        summaries.append(
+            {
+                "ticker": ticker,
+                "ticker_name": source.get("ticker_name") or ticker,
+                "status": "success",
+                "trade_date": source.get("trade_date"),
+                "analysis_date": source.get("analysis_date"),
+                "decision": source.get("decision"),
+                "started_at": datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
+                "finished_at": datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
+                "duration_seconds": 0.0,
+                "metrics": {"llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0},
+                "tool_telemetry": {"total_tool_calls": 0, "vendor_calls": {}, "fallback_count": 0, "events": []},
+                "quality_flags": ("overlay_only_mode",),
+                "report_writer": {"mode": "skipped_overlay_only"},
+                "execution_contract": None,
+                "execution_update": None,
+                "artifacts": {
+                    "analysis_json": _relative_to_run(run_dir, target_analysis),
+                    "execution_contract_json": _relative_to_run(run_dir, target_contract),
+                },
+            }
+        )
+    if not summaries:
+        raise RuntimeError("No successful tickers available in latest run to bootstrap overlay-only mode.")
+    return summaries, source_run_id
+
+
+def _resolve_latest_overlay_source_manifest(archive_dir: Path) -> dict[str, Any] | None:
+    latest_manifest_path = archive_dir / "latest-run.json"
+    if not latest_manifest_path.exists():
+        return None
+
+    candidate = json.loads(latest_manifest_path.read_text(encoding="utf-8"))
+    run_mode = str((((candidate.get("settings") or {}).get("run_mode")) or "full")).strip().lower()
+    if run_mode == "full":
+        return candidate
+
+    source_run_id = str(candidate.get("overlay_source_run_id") or "").strip()
+    if not source_run_id:
+        return candidate
+
+    source_manifest_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
+    if source_manifest_path is None:
+        return candidate
+    return json.loads(source_manifest_path.read_text(encoding="utf-8"))
+
+
+def _find_run_manifest_path_by_run_id(archive_dir: Path, run_id: str) -> Path | None:
+    runs_dir = archive_dir / "runs"
+    if not runs_dir.exists():
+        return None
+    for year_dir in sorted(runs_dir.iterdir()):
+        if not year_dir.is_dir():
+            continue
+        candidate = year_dir / run_id / "run.json"
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def _select_due_checkpoints(*, now_kst: datetime, checkpoints: list[str]) -> list[str]:
     normalized = [str(item).strip() for item in checkpoints if str(item).strip()]
     if not normalized:
@@ -758,8 +928,9 @@ def _select_due_checkpoints(*, now_kst: datetime, checkpoints: list[str]) -> lis
         if (now_kst.hour, now_kst.minute) >= (hour, minute):
             due.append(item)
     if due:
-        return due
-    # If none are due yet, run the first checkpoint only once as a pre-open refresh marker.
+        # Minimize API usage: execute only the most recent due checkpoint in this run.
+        return [due[-1]]
+    # If none are due yet, run the first configured checkpoint once as a pre-open marker.
     return [normalized[0]]
 
 
@@ -852,6 +1023,7 @@ def _run_execution_overlay_passes(
                     llm_settings=config.llm,
                     llm_model=llm_model,
                     thesis_summary=str((summary.get("decision") or "")[:500]),
+                    include_reason_codes=config.execution.execution_publish_debug,
                 )
                 md_path.write_text(md_text, encoding="utf-8")
                 summary["artifacts"]["execution_update_md"] = _relative_to_run(run_dir, md_path)

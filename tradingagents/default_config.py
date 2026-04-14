@@ -27,9 +27,10 @@ DEFAULT_CONFIG = {
     "codex_max_retries": 2,
     "codex_cleanup_threads": True,
     "execution_refresh_enabled": False,
-    "execution_refresh_checkpoints_kst": ["22:35", "22:50", "23:30"],
+    "execution_refresh_checkpoints_kst": ["23:35"],
     "execution_max_data_age_seconds": 180,
     "execution_publish_badges": True,
+    "execution_publish_debug": False,
     "execution_llm_summary_model": "gpt-5.4-mini",
     "execution_selective_rerun_enabled": True,
     # Output language for analyst reports and final decision

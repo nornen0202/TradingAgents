@@ -17,6 +17,7 @@ except ModuleNotFoundError:  # pragma: no cover - Python < 3.11 fallback
 ALL_ANALYSTS = ("market", "social", "news", "fundamentals")
 VALID_TRADE_DATE_MODES = {"latest_available", "today", "previous_business_day", "explicit"}
 VALID_TICKER_UNIVERSE_MODES = {"config_only", "config_plus_account", "account_only"}
+VALID_RUN_MODES = {"full", "overlay_only", "selective_rerun_only"}
 
 
 @dataclass(frozen=True)
@@ -34,6 +35,7 @@ class RunSettings:
     continue_on_ticker_error: bool = True
     report_polisher_enabled: bool = True
     ticker_name_overrides: dict[str, str] = field(default_factory=dict)
+    run_mode: str = "full"
 
 
 @dataclass(frozen=True)
@@ -81,11 +83,12 @@ class SiteSettings:
 @dataclass(frozen=True)
 class ExecutionSettings:
     execution_refresh_enabled: bool = False
-    execution_refresh_checkpoints_kst: tuple[str, ...] = ("22:35", "22:50", "23:30")
+    execution_refresh_checkpoints_kst: tuple[str, ...] = ("23:35",)
     execution_max_data_age_seconds: int = 180
     execution_publish_badges: bool = True
     execution_selective_rerun_enabled: bool = True
     execution_llm_summary_model: str | None = "gpt-5.4-mini"
+    execution_publish_debug: bool = False
 
 
 @dataclass(frozen=True)
@@ -167,6 +170,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             continue_on_ticker_error=bool(run_raw.get("continue_on_ticker_error", True)),
             report_polisher_enabled=bool(run_raw.get("report_polisher_enabled", True)),
             ticker_name_overrides=_normalize_ticker_name_overrides(raw.get("ticker_names") or {}),
+            run_mode=_normalize_run_mode(run_raw.get("run_mode", "full")),
         ),
         llm=LLMSettings(
             provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
@@ -225,11 +229,12 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         ),
         execution=ExecutionSettings(
             execution_refresh_enabled=bool(execution_raw.get("enabled", False)),
-            execution_refresh_checkpoints_kst=tuple(execution_raw.get("checkpoints_kst", ("22:35", "22:50", "23:30"))),
+            execution_refresh_checkpoints_kst=tuple(execution_raw.get("checkpoints_kst", ("23:35",))),
             execution_max_data_age_seconds=max(30, int(execution_raw.get("max_data_age_seconds", 180))),
             execution_publish_badges=bool(execution_raw.get("publish_badges", True)),
             execution_selective_rerun_enabled=bool(execution_raw.get("selective_rerun_enabled", True)),
             execution_llm_summary_model=_optional_string(execution_raw.get("llm_summary_model")) or "gpt-5.4-mini",
+            execution_publish_debug=bool(execution_raw.get("publish_debug", False)),
         ),
         config_path=config_path,
     )
@@ -243,6 +248,7 @@ def with_overrides(
     tickers: Iterable[str] | None = None,
     ticker_universe_mode: str | None = None,
     trade_date: str | None = None,
+    run_mode: str | None = None,
 ) -> ScheduledAnalysisConfig:
     run = config.run
     storage = config.storage
@@ -253,6 +259,8 @@ def with_overrides(
         run = replace(run, ticker_universe_mode=_normalize_ticker_universe_mode(ticker_universe_mode))
     if trade_date:
         run = replace(run, trade_date_mode="explicit", explicit_trade_date=_validate_trade_date(trade_date))
+    if run_mode:
+        run = replace(run, run_mode=_normalize_run_mode(run_mode))
     if archive_dir:
         storage = replace(storage, archive_dir=Path(archive_dir).expanduser().resolve())
     if site_dir:
@@ -279,6 +287,16 @@ def _normalize_ticker_universe_mode(value: object) -> str:
         raise ValueError(
             f"Unsupported ticker_universe_mode '{mode}'. "
             f"Expected one of: {', '.join(sorted(VALID_TICKER_UNIVERSE_MODES))}."
+        )
+    return mode
+
+
+def _normalize_run_mode(value: object) -> str:
+    mode = str(value or "full").strip().lower()
+    if mode not in VALID_RUN_MODES:
+        raise ValueError(
+            f"Unsupported run_mode '{mode}'. "
+            f"Expected one of: {', '.join(sorted(VALID_RUN_MODES))}."
         )
     return mode
 
