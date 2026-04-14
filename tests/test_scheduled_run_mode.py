@@ -214,3 +214,108 @@ enabled = false
         assert False, "expected RuntimeError when selective_rerun_only runs with execution disabled"
     except RuntimeError as exc:
         assert "requires [execution].enabled=true" in str(exc)
+
+
+def test_overlay_only_mode_falls_back_to_latest_matching_full_run(tmp_path: Path):
+    archive_dir = tmp_path / "archive"
+    archive_dir.mkdir(parents=True, exist_ok=True)
+
+    latest_full_run_dir = archive_dir / "runs" / "2026" / "20260414T235900_full_us"
+    latest_full_run_ticker_dir = latest_full_run_dir / "tickers" / "AAPL"
+    latest_full_run_ticker_dir.mkdir(parents=True, exist_ok=True)
+    (latest_full_run_ticker_dir / "analysis.json").write_text(
+        json.dumps({"ticker": "AAPL", "decision": "HOLD", "trade_date": "2026-04-14"}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (latest_full_run_dir / "run.json").write_text(
+        json.dumps(
+            {
+                "run_id": "20260414T235900_full_us",
+                "started_at": "2026-04-14T23:59:00+09:00",
+                "settings": {"run_mode": "full"},
+                "tickers": [
+                    {
+                        "ticker": "AAPL",
+                        "status": "success",
+                        "decision": "HOLD",
+                        "artifacts": {"analysis_json": "tickers/AAPL/analysis.json"},
+                    }
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    matching_full_run_dir = archive_dir / "runs" / "2026" / "20260414T220000_full_kr"
+    matching_ticker_dir = matching_full_run_dir / "tickers" / "005930.KS"
+    matching_ticker_dir.mkdir(parents=True, exist_ok=True)
+    (matching_ticker_dir / "analysis.json").write_text(
+        json.dumps({"ticker": "005930.KS", "decision": "BUY", "trade_date": "2026-04-14"}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (matching_full_run_dir / "run.json").write_text(
+        json.dumps(
+            {
+                "run_id": "20260414T220000_full_kr",
+                "started_at": "2026-04-14T22:00:00+09:00",
+                "settings": {"run_mode": "full"},
+                "tickers": [
+                    {
+                        "ticker": "005930.KS",
+                        "status": "success",
+                        "decision": "BUY",
+                        "artifacts": {"analysis_json": "tickers/005930.KS/analysis.json"},
+                    }
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    # latest-run points to a full run, but with non-overlapping tickers for this KR overlay request.
+    (archive_dir / "latest-run.json").write_text(
+        json.dumps(
+            {
+                "run_id": "20260414T235900_full_us",
+                "started_at": "2026-04-14T23:59:00+09:00",
+                "settings": {"run_mode": "full"},
+                "tickers": [
+                    {
+                        "ticker": "AAPL",
+                        "status": "success",
+                        "decision": "HOLD",
+                        "artifacts": {"analysis_json": "tickers/AAPL/analysis.json"},
+                    }
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["005930.KS"]
+run_mode = "overlay_only"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = false
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+
+    with patch("tradingagents.scheduled.runner.build_site", return_value=[]):
+        manifest = execute_scheduled_run(config, run_label="overlay-fallback-test")
+
+    assert manifest["overlay_source_run_id"] == "20260414T220000_full_kr"
+    assert manifest["tickers"][0]["ticker"] == "005930.KS"
+    assert manifest["tickers"][0]["decision"] == "BUY"
