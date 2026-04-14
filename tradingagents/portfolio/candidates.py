@@ -53,6 +53,11 @@ def _load_analysis_by_ticker(run_dir: Path, manifest: dict[str, Any]) -> dict[st
         if not analysis_path.exists():
             continue
         payload = json.loads(analysis_path.read_text(encoding="utf-8"))
+        execution_update_path = artifacts.get("execution_update_json")
+        if execution_update_path:
+            execution_path = run_dir / execution_update_path
+            if execution_path.exists():
+                payload["execution_update"] = json.loads(execution_path.read_text(encoding="utf-8"))
         try:
             identity = resolve_identity(
                 str(payload.get("ticker") or ticker_summary.get("ticker") or ""),
@@ -147,6 +152,14 @@ def _build_single_candidate(
         stance=stance,
         entry_action=entry_action,
     )
+    execution_update = (analysis or {}).get("execution_update") if analysis else None
+    if isinstance(execution_update, dict):
+        action_now, action_if_triggered = _apply_execution_overlay_actions(
+            action_now=action_now,
+            action_if_triggered=action_if_triggered,
+            execution_update=execution_update,
+            is_held=is_held,
+        )
     rationale = _build_rationale(
         stance=stance,
         entry_action=entry_action,
@@ -221,3 +234,34 @@ def _build_rationale(*, stance: str, entry_action: str, is_held: bool, analysis_
     if stance == "BEARISH" and entry_action == "EXIT":
         return "약세 판단과 청산 액션이 동시에 강해 비중 축소 또는 청산 우선순위가 높습니다."
     return "즉시 강한 액션보다 관찰 또는 유지 중심으로 해석했습니다."
+
+
+def _apply_execution_overlay_actions(
+    *,
+    action_now: str,
+    action_if_triggered: str,
+    execution_update: dict[str, Any],
+    is_held: bool,
+) -> tuple[str, str]:
+    decision_state = str(execution_update.get("decision_state") or "").upper()
+    decision_now = str(execution_update.get("decision_now") or "").upper()
+
+    if decision_state == "DEGRADED":
+        return ("HOLD" if is_held else "WATCH", "NONE")
+    if decision_state == "INVALIDATED":
+        return ("REDUCE_NOW" if is_held else "WATCH", "EXIT_IF_TRIGGERED" if is_held else "NONE")
+    if decision_state == "TRIGGERED_PENDING_CLOSE":
+        if is_held:
+            return ("HOLD", "ADD_IF_TRIGGERED")
+        return ("WATCH", "STARTER_IF_TRIGGERED")
+    if decision_state == "ACTIONABLE_NOW":
+        mapping = {
+            "STARTER_NOW": "STARTER_NOW",
+            "ADD_NOW": "ADD_NOW",
+            "REDUCE_NOW": "REDUCE_NOW",
+            "EXIT_NOW": "EXIT_NOW",
+        }
+        promoted = mapping.get(decision_now)
+        if promoted:
+            return (promoted, "NONE")
+    return action_now, action_if_triggered
