@@ -89,7 +89,7 @@ jobs:
             $runMode = "overlay_only"
           }
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-overlay-us")
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--site-dir", "site", "--label", "github-actions-overlay-us")
 
           if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
             $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
@@ -120,6 +120,12 @@ jobs:
 
           throw "bash.exe was not found under the expected Git for Windows directories."
 
+      - name: Verify site output directory exists (US)
+        run: |
+          if (-not (Test-Path "site")) {
+            throw "Expected site output directory 'site' was not created."
+          }
+
       - name: Upload GitHub Pages artifact (US)
         id: upload_pages_us
         timeout-minutes: 15
@@ -127,14 +133,14 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-overlay-us
-          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
+          path: site
 
       - name: Retry GitHub Pages artifact upload after transient network failure (US)
         if: ${{ steps.upload_pages_us.outcome == 'failure' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-overlay-us
-          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
+          path: site
 
   overlay_refresh_kr:
     if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) }}
@@ -191,7 +197,7 @@ jobs:
             $runMode = "overlay_only"
           }
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-overlay-kr")
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--site-dir", "site", "--label", "github-actions-overlay-kr")
 
           if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
             $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
@@ -222,6 +228,12 @@ jobs:
 
           throw "bash.exe was not found under the expected Git for Windows directories."
 
+      - name: Verify site output directory exists (KR)
+        run: |
+          if (-not (Test-Path "site")) {
+            throw "Expected site output directory 'site' was not created."
+          }
+
       - name: Upload GitHub Pages artifact (KR)
         id: upload_pages_kr
         timeout-minutes: 15
@@ -229,14 +241,14 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-overlay-kr
-          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
+          path: site
 
       - name: Retry GitHub Pages artifact upload after transient network failure (KR)
         if: ${{ steps.upload_pages_kr.outcome == 'failure' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-overlay-kr
-          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
+          path: site
 
   deploy_overlay_kr:
     needs:
