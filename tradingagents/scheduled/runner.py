@@ -177,6 +177,48 @@ def execute_scheduled_run(
             )
             execution_updates["_latest_checkpoint"] = {"value": "selective_rerun"}
 
+    execution_updates: dict[str, dict[str, Any]] = {}
+    if config.execution.execution_refresh_enabled:
+        now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
+        selected_checkpoints = _select_due_checkpoints(
+            now_kst=now_kst,
+            checkpoints=list(config.execution.execution_refresh_checkpoints_kst),
+        )
+        execution_updates = _run_execution_overlay_passes(
+            config=config,
+            run_dir=run_dir,
+            ticker_summaries=ticker_summaries,
+            checkpoints=selected_checkpoints,
+        )
+
+    event_signals = collect_event_signals(run_dir=run_dir, ticker_summaries=ticker_summaries)
+    selective_rerun_targets: dict[str, list[str]] = {}
+    selective_rerun_results: list[dict[str, Any]] = []
+    if config.execution.execution_selective_rerun_enabled and execution_updates:
+        selective_rerun_targets = find_selective_rerun_targets(
+            contracts=_load_execution_contracts_for_run(run_dir, ticker_summaries),
+            updates={key: _ExecutionUpdateShim(val) for key, val in execution_updates.items() if not key.startswith("_")},
+            event_signals=event_signals,
+        )
+        if selective_rerun_targets:
+            selective_rerun_results = _run_selective_rerun(
+                config=config,
+                run_dir=run_dir,
+                engine_results_dir=engine_results_dir,
+                ticker_summaries=ticker_summaries,
+                targets=selective_rerun_targets,
+            )
+            rerun_updates = _run_execution_overlay_passes(
+                config=config,
+                run_dir=run_dir,
+                ticker_summaries=ticker_summaries,
+                checkpoints=["selective_rerun"],
+            )
+            execution_updates.update(
+                {key: val for key, val in rerun_updates.items() if not key.startswith("_")}
+            )
+            execution_updates["_latest_checkpoint"] = {"value": "selective_rerun"}
+
     finished_at = datetime.now(tz)
     failures = sum(1 for item in ticker_summaries if item["status"] != "success")
     successes = len(ticker_summaries) - failures
