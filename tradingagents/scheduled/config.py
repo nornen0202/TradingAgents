@@ -48,7 +48,7 @@ class LLMSettings:
     codex_request_timeout: float = 180.0
     codex_max_retries: int = 2
     codex_cleanup_threads: bool = True
-    codex_workspace_dir: str | None = None
+    codex_workspace_dir: str | None = str(Path.home() / ".codex" / "tradingagents-workspace")
     codex_binary: str | None = None
 
 
@@ -79,6 +79,16 @@ class SiteSettings:
 
 
 @dataclass(frozen=True)
+class ExecutionSettings:
+    execution_refresh_enabled: bool = False
+    execution_refresh_checkpoints_kst: tuple[str, ...] = ("22:35", "22:50", "23:30")
+    execution_max_data_age_seconds: int = 180
+    execution_publish_badges: bool = True
+    execution_selective_rerun_enabled: bool = True
+    execution_llm_summary_model: str | None = "gpt-5.4-mini"
+
+
+@dataclass(frozen=True)
 class PortfolioSettings:
     enabled: bool = False
     profile_path: Path | None = None
@@ -98,6 +108,7 @@ class ScheduledAnalysisConfig:
     storage: StorageSettings
     site: SiteSettings
     portfolio: PortfolioSettings
+    execution: ExecutionSettings
     config_path: Path
 
 
@@ -112,6 +123,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     storage_raw = raw.get("storage") or {}
     site_raw = raw.get("site") or {}
     portfolio_raw = raw.get("portfolio") or {}
+    execution_raw = raw.get("execution") or {}
 
     tickers = _normalize_tickers(run_raw.get("tickers") or [])
     if not tickers:
@@ -167,7 +179,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             codex_request_timeout=float(llm_raw.get("codex_request_timeout", 180.0)),
             codex_max_retries=int(llm_raw.get("codex_max_retries", 2)),
             codex_cleanup_threads=bool(llm_raw.get("codex_cleanup_threads", True)),
-            codex_workspace_dir=_optional_string(llm_raw.get("codex_workspace_dir")),
+            codex_workspace_dir=_optional_string(llm_raw.get("codex_workspace_dir")) or str(Path.home() / ".codex" / "tradingagents-workspace"),
             codex_binary=_optional_string(llm_raw.get("codex_binary")),
         ),
         translation=TranslationSettings(
@@ -210,6 +222,14 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             action_judge_enabled=bool(portfolio_raw.get("action_judge_enabled", False)),
             action_judge_top_n=max(1, int(portfolio_raw.get("action_judge_top_n", 5))),
             report_polisher_enabled=bool(portfolio_raw.get("report_polisher_enabled", True)),
+        ),
+        execution=ExecutionSettings(
+            execution_refresh_enabled=bool(execution_raw.get("enabled", False)),
+            execution_refresh_checkpoints_kst=tuple(execution_raw.get("checkpoints_kst", ("22:35", "22:50", "23:30"))),
+            execution_max_data_age_seconds=max(30, int(execution_raw.get("max_data_age_seconds", 180))),
+            execution_publish_badges=bool(execution_raw.get("publish_badges", True)),
+            execution_selective_rerun_enabled=bool(execution_raw.get("selective_rerun_enabled", True)),
+            execution_llm_summary_model=_optional_string(execution_raw.get("llm_summary_model")) or "gpt-5.4-mini",
         ),
         config_path=config_path,
     )
