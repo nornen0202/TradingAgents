@@ -8,6 +8,10 @@ from .codex_chat_model import CodexChatModel
 from .validators import validate_model
 
 
+def _default_codex_workspace_dir() -> str:
+    return str(Path.home() / ".codex" / "tradingagents-workspace")
+
+
 class CodexClient(BaseLLMClient):
     """Client wrapper for the local Codex app-server provider."""
 
@@ -22,10 +26,7 @@ class CodexClient(BaseLLMClient):
             codex_reasoning_effort=self.kwargs.get("codex_reasoning_effort"),
             codex_summary=self.kwargs.get("codex_summary"),
             codex_personality=self.kwargs.get("codex_personality"),
-            codex_workspace_dir=self.kwargs.get(
-                "codex_workspace_dir",
-                str(Path.home() / ".codex" / "tradingagents-workspace"),
-            ),
+            codex_workspace_dir=self.kwargs.get("codex_workspace_dir") or _default_codex_workspace_dir(),
             codex_request_timeout=self.kwargs.get("codex_request_timeout", 120.0),
             codex_max_retries=self.kwargs.get("codex_max_retries", 2),
             codex_cleanup_threads=self.kwargs.get("codex_cleanup_threads", True),

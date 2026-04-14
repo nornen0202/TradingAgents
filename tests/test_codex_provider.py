@@ -575,6 +575,24 @@ class CodexProviderTests(unittest.TestCase):
 
         self.assertEqual(captured["codex_binary"], "C:/resolved/codex.exe")
 
+    def test_codex_client_defaults_workspace_when_none_is_passed(self):
+        captured = {}
+
+        def preflight_runner(**kwargs):
+            captured["workspace_dir"] = kwargs["workspace_dir"]
+
+        llm = create_llm_client(
+            provider="codex",
+            model="gpt-5.4",
+            codex_workspace_dir=None,
+            preflight_runner=preflight_runner,
+            session_factory=FakeCodexSession,
+        ).get_llm()
+
+        self.assertIsInstance(llm.codex_workspace_dir, str)
+        self.assertTrue(llm.codex_workspace_dir)
+        self.assertEqual(captured["workspace_dir"], llm.codex_workspace_dir)
+
 
 if __name__ == "__main__":
     unittest.main()

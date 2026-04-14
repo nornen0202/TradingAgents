@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from copy import deepcopy
 import json
+import shutil
 import traceback
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -115,6 +116,11 @@ def execute_scheduled_run(
         raise RuntimeError(
             "run_mode=selective_rerun_only requires [execution].enabled=true to compute rerun targets."
         )
+    if run_mode == "overlay_only" and not config.execution.execution_refresh_enabled:
+        raise RuntimeError(
+            "run_mode=overlay_only requires [execution].enabled=true to refresh execution overlays. "
+            "Use run_mode=full for research-only runs or enable [execution] in the scheduled config."
+        )
 
     if run_mode == "full":
         for ticker in run_tickers:
@@ -147,6 +153,13 @@ def execute_scheduled_run(
             ticker_summaries=ticker_summaries,
             checkpoints=selected_checkpoints,
         )
+        if run_mode in {"overlay_only", "selective_rerun_only"} and not _has_ticker_execution_updates(
+            execution_updates
+        ):
+            raise RuntimeError(
+                f"run_mode={run_mode} produced no execution updates. "
+                "Check execution_contract artifacts and intraday market data availability."
+            )
 
     event_signals = collect_event_signals(run_dir=run_dir, ticker_summaries=ticker_summaries)
     selective_rerun_targets: dict[str, list[str]] = {}
@@ -762,6 +775,13 @@ def _relative_to_run(run_dir: Path, path: Path | None) -> str | None:
     return path.relative_to(run_dir).as_posix()
 
 
+def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
+    candidate = Path(str(path_value))
+    if candidate.is_absolute():
+        return candidate
+    return run_dir / candidate
+
+
 def _write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -800,6 +820,17 @@ def _bootstrap_overlay_inputs_from_latest_run(
         target_ticker_dir.mkdir(parents=True, exist_ok=True)
         target_analysis = target_ticker_dir / "analysis.json"
         target_analysis.write_text(source_analysis.read_text(encoding="utf-8"), encoding="utf-8")
+        copied_source_artifacts: dict[str, str] = {}
+        for artifact_key in ("report_markdown", "final_state_json", "graph_log_json"):
+            copied_artifact = _copy_bootstrap_artifact(
+                source_run_dir=source_run_dir,
+                run_dir=run_dir,
+                target_ticker_dir=target_ticker_dir,
+                artifacts=artifacts,
+                artifact_key=artifact_key,
+            )
+            if copied_artifact:
+                copied_source_artifacts[artifact_key] = copied_artifact
 
         contract_rel = artifacts.get("execution_contract_json")
         target_contract = target_ticker_dir / "execution_contract.json"
@@ -829,6 +860,7 @@ def _bootstrap_overlay_inputs_from_latest_run(
                 "execution_update": None,
                 "artifacts": {
                     "analysis_json": _relative_to_run(run_dir, target_analysis),
+                    **copied_source_artifacts,
                     "execution_contract_json": _relative_to_run(run_dir, target_contract),
                 },
             }
@@ -836,6 +868,32 @@ def _bootstrap_overlay_inputs_from_latest_run(
     if not summaries:
         raise RuntimeError("No successful tickers available in latest run to bootstrap overlay-only mode.")
     return summaries, source_run_id
+
+
+def _copy_bootstrap_artifact(
+    *,
+    source_run_dir: Path,
+    run_dir: Path,
+    target_ticker_dir: Path,
+    artifacts: dict[str, Any],
+    artifact_key: str,
+) -> str | None:
+    source_rel = artifacts.get(artifact_key)
+    if not source_rel:
+        return None
+    source_path = _resolve_artifact_source(source_run_dir, source_rel)
+    if not source_path.is_file():
+        return None
+
+    if artifact_key == "report_markdown":
+        target_path = target_ticker_dir / "report" / source_path.name
+    elif artifact_key == "final_state_json":
+        target_path = target_ticker_dir / "final_state.json"
+    else:
+        target_path = target_ticker_dir / source_path.name
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source_path, target_path)
+    return _relative_to_run(run_dir, target_path)
 
 
 def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[str] | None = None) -> dict[str, Any] | None:
@@ -911,6 +969,10 @@ def _find_run_manifest_path_by_run_id(archive_dir: Path, run_id: str) -> Path | 
         if candidate.exists():
             return candidate
     return None
+
+
+def _has_ticker_execution_updates(execution_updates: dict[str, dict[str, Any]]) -> bool:
+    return any(not str(key).startswith("_") for key in execution_updates)
 
 
 def _select_due_checkpoints(*, now_kst: datetime, checkpoints: list[str]) -> list[str]:
