@@ -50,6 +50,14 @@ jobs:
       NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
       NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
+      KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+      KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+      KIS_ACCOUNT_NO: ${{ secrets.KIS_ACCOUNT_NO }}
+      KIS_PRODUCT_CODE: ${{ secrets.KIS_PRODUCT_CODE }}
+      KIS_Developers_APP_KEY: ${{ secrets.KIS_Developers_APP_KEY }}
+      KIS_Developers_APP_SECRET: ${{ secrets.KIS_Developers_APP_SECRET }}
+      KIS_Developers_ACCOUNT_NO: ${{ secrets.KIS_Developers_ACCOUNT_NO }}
+      KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
 
     steps:
       - name: Check out repository
@@ -111,6 +119,14 @@ jobs:
       NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
       NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
+      KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+      KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+      KIS_ACCOUNT_NO: ${{ secrets.KIS_ACCOUNT_NO }}
+      KIS_PRODUCT_CODE: ${{ secrets.KIS_PRODUCT_CODE }}
+      KIS_Developers_APP_KEY: ${{ secrets.KIS_Developers_APP_KEY }}
+      KIS_Developers_APP_SECRET: ${{ secrets.KIS_Developers_APP_SECRET }}
+      KIS_Developers_ACCOUNT_NO: ${{ secrets.KIS_Developers_ACCOUNT_NO }}
+      KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
 
     steps:
       - name: Check out repository
