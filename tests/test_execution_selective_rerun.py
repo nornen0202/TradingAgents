@@ -40,7 +40,14 @@ def test_collect_event_signals_detects_keywords(tmp_path: Path):
         }
     ]
 
-    signals = collect_event_signals(run_dir=run_dir, ticker_summaries=summaries)
+    import tradingagents.execution.selective_rerun as module
+
+    original = module._fetch_fresh_headlines
+    module._fetch_fresh_headlines = lambda _ticker: ""
+    try:
+        signals = collect_event_signals(run_dir=run_dir, ticker_summaries=summaries)
+    finally:
+        module._fetch_fresh_headlines = original
 
     assert signals["TSM"] == ["earnings", "guidance"]
 

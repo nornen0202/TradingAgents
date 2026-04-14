@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 from enum import Enum
 from typing import Any
 
@@ -234,6 +234,6 @@ def is_event_guard_active(event_guard: EventGuard | None, now: datetime) -> bool
         event_day = date.fromisoformat(event_guard.earnings_date)
     except ValueError:
         return False
-    now_day = now.astimezone(timezone.utc).date()
+    now_day = now.date()
     delta = (event_day - now_day).days
-    return delta <= int(event_guard.block_new_position_within_days)
+    return 0 <= delta <= int(event_guard.block_new_position_within_days)

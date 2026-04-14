@@ -117,11 +117,16 @@ def execute_scheduled_run(
 
     execution_updates: dict[str, dict[str, Any]] = {}
     if config.execution.execution_refresh_enabled:
+        now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
+        selected_checkpoints = _select_due_checkpoints(
+            now_kst=now_kst,
+            checkpoints=list(config.execution.execution_refresh_checkpoints_kst),
+        )
         execution_updates = _run_execution_overlay_passes(
             config=config,
             run_dir=run_dir,
             ticker_summaries=ticker_summaries,
-            checkpoints=list(config.execution.execution_refresh_checkpoints_kst) or ["post_research"],
+            checkpoints=selected_checkpoints,
         )
 
     event_signals = collect_event_signals(run_dir=run_dir, ticker_summaries=ticker_summaries)
@@ -738,6 +743,26 @@ def _write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _select_due_checkpoints(*, now_kst: datetime, checkpoints: list[str]) -> list[str]:
+    normalized = [str(item).strip() for item in checkpoints if str(item).strip()]
+    if not normalized:
+        return ["post_research"]
+    due: list[str] = []
+    for item in normalized:
+        try:
+            hour_text, minute_text = item.split(":")
+            hour = int(hour_text)
+            minute = int(minute_text)
+        except Exception:
+            continue
+        if (now_kst.hour, now_kst.minute) >= (hour, minute):
+            due.append(item)
+    if due:
+        return due
+    # If none are due yet, run the first checkpoint only once as a pre-open refresh marker.
+    return [normalized[0]]
+
+
 def _run_selective_rerun(
     *,
     config: ScheduledAnalysisConfig,
@@ -868,6 +893,20 @@ def _build_execution_summary(
     checkpoint: str,
 ) -> dict[str, Any]:
     ticker_updates = {k: v for k, v in ticker_updates.items() if not k.startswith("_")}
+    if not ticker_updates:
+        return {
+            "run_id": run_id,
+            "refresh_checkpoint": checkpoint,
+            "execution_asof": None,
+            "actionable_now": [],
+            "triggered_pending_close": [],
+            "wait": [],
+            "invalidated": [],
+            "degraded": [],
+            "top_priority_order": [],
+            "market_regime": "degraded",
+            "notes": ["Execution overlay produced no ticker updates."],
+        }
     actionable_now = sorted(
         [ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "ACTIONABLE_NOW"]
     )

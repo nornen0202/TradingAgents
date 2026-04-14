@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+import yfinance as yf
+
 from tradingagents.schemas import ExecutionContract, ExecutionUpdate
 
 
@@ -71,6 +73,7 @@ def collect_event_signals(
         text_fields = [
             str(payload.get("decision") or ""),
             json.dumps((payload.get("tool_telemetry") or {}).get("events") or [], ensure_ascii=False),
+            _fetch_fresh_headlines(ticker),
         ]
         joined = " ".join(text_fields).lower()
         detected: set[str] = set()
@@ -80,3 +83,16 @@ def collect_event_signals(
         if detected:
             signals[ticker] = sorted(detected)
     return signals
+
+
+def _fetch_fresh_headlines(ticker: str) -> str:
+    try:
+        news_items = yf.Ticker(ticker).news or []
+    except Exception:
+        return ""
+    headlines: list[str] = []
+    for item in news_items[:10]:
+        title = str((item or {}).get("title") or "").strip()
+        if title:
+            headlines.append(title)
+    return " | ".join(headlines)

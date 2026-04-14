@@ -61,7 +61,10 @@ def evaluate_execution_state(
             refresh_checkpoint=refresh_checkpoint,
         )
 
-    if contract.invalid_if_intraday_below is not None and market.last_price < contract.invalid_if_intraday_below:
+    intraday_low = market.day_low if market.day_low is not None else market.last_price
+    intraday_high = market.day_high if market.day_high is not None else market.last_price
+
+    if contract.invalid_if_intraday_below is not None and intraday_low < contract.invalid_if_intraday_below:
         trigger_status["invalidated"] = True
         reason_codes.append("intraday_invalidation_breached")
         return _build_update(
@@ -80,7 +83,7 @@ def evaluate_execution_state(
     decision_state = DecisionState.WAIT
     decision_now = DecisionNow.NONE
 
-    if contract.breakout_level is not None and market.last_price >= contract.breakout_level:
+    if contract.breakout_level is not None and intraday_high >= contract.breakout_level:
         trigger_status["breakout_hit_intraday"] = True
         rvol_ok = contract.min_relative_volume is None or ((market.relative_volume or 0.0) >= contract.min_relative_volume)
         if rvol_ok:
@@ -89,9 +92,13 @@ def evaluate_execution_state(
                 trigger_status["close_confirmation_pending"] = True
                 reason_codes.append("close_confirmation_required")
             else:
-                decision_state = DecisionState.ACTIONABLE_NOW
-                decision_now = _decision_now_from_action(contract.action_if_triggered)
-                reason_codes.append("breakout_confirmed")
+                if market.last_price >= contract.breakout_level:
+                    decision_state = DecisionState.ACTIONABLE_NOW
+                    decision_now = _decision_now_from_action(contract.action_if_triggered)
+                    reason_codes.append("breakout_confirmed")
+                else:
+                    decision_state = DecisionState.ARMED
+                    reason_codes.append("breakout_hit_but_not_holding_level")
         else:
             decision_state = DecisionState.ARMED
             reason_codes.append("relative_volume_unconfirmed")

@@ -248,12 +248,18 @@ def _apply_execution_overlay_actions(
 
     if decision_state == "DEGRADED":
         return ("HOLD" if is_held else "WATCH", "NONE")
+    if decision_state == "INVALIDATED":
+        return ("REDUCE_NOW" if is_held else "WATCH", "EXIT_IF_TRIGGERED" if is_held else "NONE")
+    if decision_state == "TRIGGERED_PENDING_CLOSE":
+        if is_held:
+            return ("HOLD", "ADD_IF_TRIGGERED")
+        return ("WATCH", "STARTER_IF_TRIGGERED")
     if decision_state == "ACTIONABLE_NOW":
         mapping = {
             "STARTER_NOW": "STARTER_NOW",
             "ADD_NOW": "ADD_NOW",
             "REDUCE_NOW": "REDUCE_NOW",
-            "EXIT_NOW": "REDUCE_NOW",
+            "EXIT_NOW": "EXIT_NOW",
         }
         promoted = mapping.get(decision_now)
         if promoted:

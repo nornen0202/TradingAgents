@@ -85,7 +85,7 @@ class ExecutionSettings:
     execution_max_data_age_seconds: int = 180
     execution_publish_badges: bool = True
     execution_selective_rerun_enabled: bool = True
-    execution_llm_summary_model: str | None = None
+    execution_llm_summary_model: str | None = "gpt-5.4-mini"
 
 
 @dataclass(frozen=True)
@@ -229,7 +229,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             execution_max_data_age_seconds=max(30, int(execution_raw.get("max_data_age_seconds", 180))),
             execution_publish_badges=bool(execution_raw.get("publish_badges", True)),
             execution_selective_rerun_enabled=bool(execution_raw.get("selective_rerun_enabled", True)),
-            execution_llm_summary_model=_optional_string(execution_raw.get("llm_summary_model")),
+            execution_llm_summary_model=_optional_string(execution_raw.get("llm_summary_model")) or "gpt-5.4-mini",
         ),
         config_path=config_path,
     )
