@@ -250,29 +250,95 @@ jobs:
           name: github-pages-overlay-kr
           path: site
 
-  deploy_overlay_kr:
-    needs:
-      - overlay_refresh_kr
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'all' && needs.overlay_refresh_kr.result == 'success' }}
-    runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy KR overlay snapshot to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
-        with:
-          artifact_name: github-pages-overlay-kr
-
-  deploy_overlay:
+  publish_overlay_site:
     needs:
       - overlay_refresh_us
       - overlay_refresh_kr
-      - deploy_overlay_kr
-    if: ${{ always() && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && ((github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'all' && needs.overlay_refresh_us.result == 'success' && needs.deploy_overlay_kr.result == 'success') || (github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'us' && needs.overlay_refresh_us.result == 'success') || (github.event_name == 'workflow_dispatch' && github.event.inputs.profile == 'kr' && needs.overlay_refresh_kr.result == 'success') || (github.event_name == 'schedule' && needs.overlay_refresh_us.result == 'success')) }}
+    if: ${{ always() && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && (needs.overlay_refresh_us.result == 'success' || needs.overlay_refresh_kr.result == 'success') }}
+    runs-on: [self-hosted, Windows]
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+    env:
+      PYTHONUTF8: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install TradingAgents
+        run: |
+          python -m pip install --upgrade pip
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -m pip install -e ".[translation]"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      - name: Rebuild final merged overlay site
+        run: |
+          $profile = "${{ github.event.inputs.profile }}"
+          $configPath = "config/scheduled_analysis.toml"
+          if ("${{ github.event_name }}" -eq "workflow_dispatch" -and $profile -eq "kr") {
+            $configPath = "config/scheduled_analysis_korea.toml"
+          }
+
+          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--site-only", "--site-dir", "site")
+          if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
+            $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
+          }
+
+          python @args
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      - name: Add Git Bash to PATH for Pages packaging
+        run: |
+          $gitBinCandidates = @(
+            "C:\Program Files\Git\bin",
+            "C:\Program Files\Git\usr\bin"
+          )
+
+          foreach ($candidate in $gitBinCandidates) {
+            if (Test-Path (Join-Path $candidate "bash.exe")) {
+              Add-Content -Path $env:GITHUB_PATH -Value $candidate
+              Write-Host "Added Git Bash path: $candidate"
+              exit 0
+            }
+          }
+
+          throw "bash.exe was not found under the expected Git for Windows directories."
+
+      - name: Verify final site output directory exists
+        run: |
+          if (-not (Test-Path "site")) {
+            throw "Expected site output directory 'site' was not created."
+          }
+
+      - name: Upload final GitHub Pages artifact
+        id: upload_pages_final
+        timeout-minutes: 15
+        continue-on-error: true
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          name: github-pages-overlay
+          path: site
+
+      - name: Retry final GitHub Pages artifact upload after transient network failure
+        if: ${{ steps.upload_pages_final.outcome == 'failure' }}
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          name: github-pages-overlay
+          path: site
+
+  deploy_overlay:
+    needs:
+      - publish_overlay_site
+    if: ${{ needs.publish_overlay_site.result == 'success' }}
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -284,4 +350,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v5
         with:
-          artifact_name: ${{ (needs.overlay_refresh_us.result == 'success' && 'github-pages-overlay-us') || 'github-pages-overlay-kr' }}
+          artifact_name: github-pages-overlay
