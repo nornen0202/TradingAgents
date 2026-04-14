@@ -296,7 +296,7 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 2) 2시간 단위 `overlay_only`  
 3) 필요 시 수동 `selective_rerun_only`
 
-참고: 저장소에는 2시간 단위 overlay 전용 워크플로우 예시(.github/workflows/intraday-overlay-refresh.yml)가 포함되어 있습니다.
+참고: 저장소에는 2시간 단위 overlay 전용 워크플로우(.github/workflows/intraday-overlay-refresh.yml)가 포함되어 있으며, `profile` 입력으로 `us/kr/all`을 선택해 미국장·한국장을 분리/동시 운영할 수 있습니다.
 
 ### checkpoints_kst 동작 방식 (중요)
 
