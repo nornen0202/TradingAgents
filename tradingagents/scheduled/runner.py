@@ -886,8 +886,9 @@ def _select_due_checkpoints(*, now_kst: datetime, checkpoints: list[str]) -> lis
         if (now_kst.hour, now_kst.minute) >= (hour, minute):
             due.append(item)
     if due:
-        return due
-    # If none are due yet, run the first checkpoint only once as a pre-open refresh marker.
+        # Minimize API usage: execute only the most recent due checkpoint in this run.
+        return [due[-1]]
+    # If none are due yet, run the first configured checkpoint once as a pre-open marker.
     return [normalized[0]]
 
 

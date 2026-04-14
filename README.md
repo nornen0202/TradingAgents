@@ -261,7 +261,7 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 
 - `[execution]` (장중 deterministic overlay)
   - `enabled`: `true`면 종목 리서치 후 `execution_contract.json` 생성 + 장중 overlay refresh 수행
-  - `checkpoints_kst`: 예) `["22:35", "22:50", "23:30"]`
+  - `checkpoints_kst`: 예) `["23:35"]` (API 호출 절약을 위해 1회 체크포인트 권장)
   - `max_data_age_seconds`: stale data fail-closed 기준
   - `publish_badges`: 사이트 배지/상태 노출
   - `selective_rerun_enabled`: 이벤트/무효화 기반 selective rerun
@@ -300,16 +300,19 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 
 ### checkpoints_kst 동작 방식 (중요)
 
-`checkpoints_kst = ["22:35", "22:50", "23:30"]`를 넣었다고 해서, 프로세스가 백그라운드에서 해당 시각까지 대기한 뒤 자동으로 액션을 수행하지는 않습니다.
+`checkpoints_kst`는 백그라운드 스케줄러가 아닙니다. 프로세스가 해당 시각까지 대기했다가 자동 실행하지 않습니다.
 
 - 러너는 **실행 시점의 KST 현재시간**을 기준으로,
-- `현재시간 >= checkpoint` 인 항목만 그 실행에서 수행합니다.
+- `현재시간 >= checkpoint` 인 항목 중 **가장 늦은 1개만** 그 실행에서 수행합니다.
 
 예시:
 
-- 22:40 KST에 한 번 실행 -> `22:35`만 수행
-- 22:55 KST에 한 번 실행 -> `22:35`, `22:50` 수행
-- 23:35 KST에 한 번 실행 -> `22:35`, `22:50`, `23:30` 수행
+- `checkpoints_kst = ["22:35", "22:50", "23:30"]`일 때
+  - 22:40 KST에 한 번 실행 -> `22:35`만 수행
+  - 22:55 KST에 한 번 실행 -> `22:50`만 수행
+  - 23:35 KST에 한 번 실행 -> `23:30`만 수행
+- `checkpoints_kst = ["23:35"]`일 때
+  - 23:35 KST에 한 번 실행 -> `23:35`만 수행
 
 따라서 “각 checkpoint를 실제 시각별로 따로 실행”하려면 GitHub Actions를 checkpoint 시각별로 분리 스케줄하거나, workflow_dispatch를 해당 시각에 수동 실행해야 합니다.
 

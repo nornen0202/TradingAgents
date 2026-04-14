@@ -83,7 +83,7 @@ class SiteSettings:
 @dataclass(frozen=True)
 class ExecutionSettings:
     execution_refresh_enabled: bool = False
-    execution_refresh_checkpoints_kst: tuple[str, ...] = ("22:35", "22:50", "23:30")
+    execution_refresh_checkpoints_kst: tuple[str, ...] = ("23:35",)
     execution_max_data_age_seconds: int = 180
     execution_publish_badges: bool = True
     execution_selective_rerun_enabled: bool = True
@@ -229,7 +229,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         ),
         execution=ExecutionSettings(
             execution_refresh_enabled=bool(execution_raw.get("enabled", False)),
-            execution_refresh_checkpoints_kst=tuple(execution_raw.get("checkpoints_kst", ("22:35", "22:50", "23:30"))),
+            execution_refresh_checkpoints_kst=tuple(execution_raw.get("checkpoints_kst", ("23:35",))),
             execution_max_data_age_seconds=max(30, int(execution_raw.get("max_data_age_seconds", 180))),
             execution_publish_badges=bool(execution_raw.get("publish_badges", True)),
             execution_selective_rerun_enabled=bool(execution_raw.get("selective_rerun_enabled", True)),

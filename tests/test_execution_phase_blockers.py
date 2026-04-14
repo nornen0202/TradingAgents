@@ -79,7 +79,7 @@ def test_build_execution_summary_handles_empty_updates():
 def test_due_checkpoint_selection_uses_current_time():
     now_kst = datetime(2026, 4, 14, 22, 52)
     selected = _select_due_checkpoints(now_kst=now_kst, checkpoints=["22:35", "22:50", "23:30"])
-    assert selected == ["22:35", "22:50"]
+    assert selected == ["22:50"]
 
 
 def test_candidate_mapping_invalidated_state():
