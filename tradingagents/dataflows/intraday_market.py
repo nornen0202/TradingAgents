@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 import yfinance as yf
 
 from tradingagents.schemas import IntradayMarketSnapshot
+from .stockstats_utils import yf_retry
 
 
 def fetch_intraday_market_snapshot(
@@ -14,7 +15,8 @@ def fetch_intraday_market_snapshot(
     interval: str = "5m",
     market_timezone: str = "US/Eastern",
 ) -> IntradayMarketSnapshot:
-    history = yf.Ticker(ticker).history(period="1d", interval=interval, auto_adjust=False)
+    ticker_obj = yf.Ticker(ticker)
+    history = yf_retry(lambda: ticker_obj.history(period="1d", interval=interval, auto_adjust=False))
     if history.empty:
         raise RuntimeError(f"No intraday data available for ticker '{ticker}'.")
 
@@ -37,8 +39,11 @@ def fetch_intraday_market_snapshot(
     session_vwap = float(vwap_series.iloc[-1]) if not vwap_series.empty else None
 
     avg20_volume = None
-    daily = yf.Ticker(ticker).history(period="3mo", interval="1d", auto_adjust=False)
-    if not daily.empty and "Volume" in daily:
+    try:
+        daily = yf_retry(lambda: ticker_obj.history(period="3mo", interval="1d", auto_adjust=False))
+    except Exception:
+        daily = None
+    if daily is not None and not daily.empty and "Volume" in daily:
         avg20_volume = float(daily["Volume"].tail(20).mean())
 
     intraday_volume = int(volumes.sum())

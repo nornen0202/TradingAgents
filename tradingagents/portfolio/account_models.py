@@ -132,6 +132,7 @@ class PortfolioProfile:
     trigger_budget_krw: int
     constraints: AccountConstraints
     continue_on_error: bool = True
+    market_scope: str = "kr"
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)

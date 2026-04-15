@@ -13,22 +13,50 @@ logger = logging.getLogger(__name__)
 
 
 def yf_retry(func, max_retries=3, base_delay=2.0):
-    """Execute a yfinance call with exponential backoff on rate limits.
-
-    yfinance raises YFRateLimitError on HTTP 429 responses but does not
-    retry them internally. This wrapper adds retry logic specifically
-    for rate limits. Other exceptions propagate immediately.
-    """
+    """Execute a yfinance call with exponential backoff on transient vendor errors."""
     for attempt in range(max_retries + 1):
         try:
             return func()
-        except YFRateLimitError:
-            if attempt < max_retries:
-                delay = base_delay * (2 ** attempt)
-                logger.warning(f"Yahoo Finance rate limited, retrying in {delay:.0f}s (attempt {attempt + 1}/{max_retries})")
-                time.sleep(delay)
-            else:
+        except Exception as exc:
+            if not is_retryable_yfinance_error(exc) or attempt >= max_retries:
                 raise
+            delay = base_delay * (2 ** attempt)
+            logger.warning(
+                "Yahoo Finance transient error, retrying in %.0fs (attempt %s/%s): %s",
+                delay,
+                attempt + 1,
+                max_retries,
+                _summarize_yfinance_error(exc),
+            )
+            time.sleep(delay)
+
+
+def is_retryable_yfinance_error(exc: Exception) -> bool:
+    if isinstance(exc, YFRateLimitError):
+        return True
+    text = f"{exc.__class__.__module__}.{exc.__class__.__name__}: {exc}".lower()
+    retry_markers = (
+        "timeout",
+        "timed out",
+        "operation timed out",
+        "curl: (28)",
+        "failed to perform",
+        "rate limit",
+        "too many requests",
+        "invalid crumb",
+        "unauthorized",
+        "temporarily unavailable",
+        "connection aborted",
+        "connection reset",
+        "remote end closed connection",
+        "'nonetype' object is not subscriptable",
+    )
+    return any(marker in text for marker in retry_markers)
+
+
+def _summarize_yfinance_error(exc: Exception) -> str:
+    text = str(exc).strip() or exc.__class__.__name__
+    return text[:240]
 
 
 def _clean_dataframe(data: pd.DataFrame) -> pd.DataFrame:

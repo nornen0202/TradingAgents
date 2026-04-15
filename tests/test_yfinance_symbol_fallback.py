@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 
+from tradingagents.dataflows.stockstats_utils import yf_retry
 from tradingagents.dataflows.y_finance import _build_yfinance_symbol_candidates, get_fundamentals
 
 
@@ -27,6 +28,18 @@ class YFinanceSymbolFallbackTests(unittest.TestCase):
 
         self.assertIn("# Company Fundamentals for 058470.KQ", result)
         self.assertIn("Name: Sample KR Co", result)
+
+    def test_yf_retry_retries_none_chart_payload_type_error(self):
+        attempts = []
+
+        def flaky_call():
+            attempts.append(1)
+            if len(attempts) == 1:
+                raise TypeError("'NoneType' object is not subscriptable")
+            return "ok"
+
+        self.assertEqual(yf_retry(flaky_call, max_retries=1, base_delay=0), "ok")
+        self.assertEqual(len(attempts), 2)
 
 
 if __name__ == "__main__":
