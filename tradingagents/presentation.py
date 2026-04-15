@@ -15,6 +15,7 @@ class DecisionPresentation:
     conviction_label: str
     horizon_label: str
     data_status: str
+    primary_condition: str
 
 
 def is_korean(language: str | None) -> bool:
@@ -23,14 +24,16 @@ def is_korean(language: str | None) -> bool:
 
 def present_decision(decision: StructuredDecision, *, language: str = "English") -> DecisionPresentation:
     korean = is_korean(language)
+    primary_condition = _primary_condition(decision, korean)
     return DecisionPresentation(
         investment_view=_rating_label(decision.rating.value, korean),
         market_view=_stance_label(decision.portfolio_stance.value, korean),
-        action_summary=_action_label(decision.entry_action.value, korean),
+        action_summary=_action_label(decision.entry_action.value, korean, condition=primary_condition),
         setup_summary=_setup_label(decision.setup_quality.value, korean),
         conviction_label=_conviction_label(decision.confidence, korean),
         horizon_label=_horizon_label(decision.time_horizon.value, korean),
         data_status=_data_status(decision, korean),
+        primary_condition=primary_condition,
     )
 
 
@@ -80,6 +83,13 @@ def present_action_summary(raw_decision: Any, *, language: str = "English") -> s
         "NO_TRADE": "Wait",
     }
     return mapping.get(value, _humanize_code(value, korean=False))
+
+
+def present_primary_condition(raw_decision: Any, *, language: str = "English") -> str:
+    presentation = present_decision_payload(raw_decision, language=language)
+    if presentation is not None:
+        return presentation.primary_condition
+    return "-"
 
 
 def present_data_status(
@@ -238,23 +248,49 @@ def _stance_label(value: str, korean: bool) -> str:
     }.get(normalized, _humanize_code(normalized, korean=False))
 
 
-def _action_label(value: str, korean: bool) -> str:
+def _action_label(value: str, korean: bool, *, condition: str | None = None) -> str:
     normalized = str(value or "").strip().upper()
     if korean:
-        return {
+        label = {
             "NONE": "추가 행동 없음",
             "WAIT": "조건 확인 후 검토",
             "STARTER": "소액/분할 진입 후보",
             "ADD": "추가 매수 후보",
             "EXIT": "비중 축소 또는 청산 검토",
         }.get(normalized, _humanize_code(normalized, korean=True))
-    return {
-        "NONE": "No further action",
-        "WAIT": "Wait for confirmation",
-        "STARTER": "Starter position candidate",
-        "ADD": "Add candidate",
-        "EXIT": "Reduce or exit",
-    }.get(normalized, _humanize_code(normalized, korean=False))
+    else:
+        label = {
+            "NONE": "No further action",
+            "WAIT": "Wait for confirmation",
+            "STARTER": "Starter position candidate",
+            "ADD": "Add candidate",
+            "EXIT": "Reduce or exit",
+        }.get(normalized, _humanize_code(normalized, korean=False))
+    if normalized == "WAIT" and _has_condition_text(condition):
+        return f"{label}: {_shorten_condition(str(condition))}"
+    return label
+
+
+def _primary_condition(decision: StructuredDecision, korean: bool) -> str:
+    language = "Korean" if korean else "English"
+    for values in (decision.watchlist_triggers, decision.catalysts, decision.invalidators):
+        for value in values:
+            text = sanitize_investor_text(value, language=language)
+            if _has_condition_text(text):
+                return _shorten_condition(text)
+    return "-"
+
+
+def _has_condition_text(value: str | None) -> bool:
+    text = str(value or "").strip()
+    return bool(text) and text not in {"-", "None", "없음"}
+
+
+def _shorten_condition(value: str, *, max_chars: int = 140) -> str:
+    text = " ".join(str(value or "").split())
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 3].rstrip() + "..."
 
 
 def _setup_label(value: str, korean: bool) -> str:

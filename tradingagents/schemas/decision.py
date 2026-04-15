@@ -126,8 +126,11 @@ def build_decision_output_instructions(context: str) -> str:
         '"invalidators":["..."],'
         '"watchlist_triggers":["..."],'
         '"data_coverage":{"company_news_count":0,"disclosures_count":0,"social_source":"dedicated | news_derived | unavailable","macro_items_count":0}}. '
-        "Keep rating as legacy compatibility only. Use portfolio_stance for directional view, and entry_action for immediate action. "
-        "NO_TRADE should mean no immediate action basis, not necessarily bearish stance. "
+        "Treat rating as the legacy medium-term investment/allocation view, not the same-day execution action. "
+        "Use portfolio_stance for directional view, and entry_action for immediate action today. "
+        "Do not use NO_TRADE solely because entry_action is WAIT. "
+        "For constructive but unconfirmed setups, prefer HOLD or OVERWEIGHT with portfolio_stance=BULLISH and entry_action=WAIT when the evidence supports watchlist or held exposure. "
+        "Reserve NO_TRADE for weak, contradictory, or insufficient theses, no favorable setup to monitor, or data quality gaps that make the view non-investable. "
         "Use BUY or OVERWEIGHT when the thesis is strong and the entry setup is actionable today; do not default to NO_TRADE just because it is available. "
         "Use uppercase enum fields, confidence between 0 and 1 inclusive, and concise but specific strings."
     )

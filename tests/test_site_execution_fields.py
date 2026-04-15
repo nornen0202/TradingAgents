@@ -1,4 +1,8 @@
-from tradingagents.scheduled.site import _execution_badge_label, _execution_display_state
+from tradingagents.scheduled.site import (
+    _execution_badge_label,
+    _execution_display_state,
+    _execution_staleness,
+)
 
 
 def test_execution_badge_defaults_to_preopen():
@@ -17,3 +21,18 @@ def test_execution_display_state_blocks_stale_actionable():
         },
     }
     assert _execution_display_state(ticker_summary) == "WAIT (stale overlay)"
+
+
+def test_execution_display_state_explains_stale_degraded():
+    ticker_summary = {
+        "ticker": "TSM",
+        "status": "success",
+        "execution_update": {
+            "decision_state": "DEGRADED",
+            "reason_codes": ["stale_market_data"],
+            "data_health": "STALE",
+            "staleness_seconds": 10848,
+        },
+    }
+    assert _execution_display_state(ticker_summary) == "DEGRADED (stale market data)"
+    assert _execution_staleness(ticker_summary) == "3h 0m 48s"

@@ -14,10 +14,9 @@ from tradingagents.presentation import (
     present_data_status,
     present_decision_payload,
     present_investment_view,
+    present_primary_condition,
     present_snapshot_mode,
-    sanitize_investor_text,
 )
-from tradingagents.schemas import parse_structured_decision
 
 try:
     from markdown_it import MarkdownIt
@@ -270,6 +269,8 @@ def _render_run_page(
               <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
               <p><strong>Investment view</strong><span>{_escape(present_investment_view(ticker_summary.get('decision') or ticker_summary.get('error'), language=language))}</span></p>
               <p><strong>Today</strong><span>{_escape(present_action_summary(ticker_summary.get('decision'), language=language))}</span></p>
+              <p><strong>Market view</strong><span>{_escape(_decision_market_view(ticker_summary.get('decision'), language=language))}</span></p>
+              <p class="long-field"><strong>Key condition</strong><span>{_escape(_decision_primary_condition(ticker_summary.get('decision'), language=language))}</span></p>
               <p><strong>Execution As-Of</strong><span>{_escape(_execution_value(ticker_summary, 'execution_asof', default='not refreshed'))}</span></p>
               <p><strong>Decision State</strong><span>{_escape(_execution_display_state(ticker_summary))}</span></p>
               <p><strong>Staleness</strong><span>{_escape(_execution_staleness(ticker_summary))}</span></p>
@@ -514,18 +515,7 @@ def _decision_market_view(raw_decision: Any, *, language: str) -> str:
 
 
 def _decision_primary_condition(raw_decision: Any, *, language: str) -> str:
-    if not isinstance(raw_decision, str) or not raw_decision.strip().startswith("{"):
-        return "-"
-    try:
-        decision = parse_structured_decision(raw_decision)
-    except Exception:
-        return "-"
-    for values in (decision.watchlist_triggers, decision.catalysts, decision.invalidators):
-        for value in values:
-            text = sanitize_investor_text(value, language=language)
-            if text and text not in {"-", "없음", "None"}:
-                return text
-    return "-"
+    return present_primary_condition(raw_decision, language=language)
 
 
 def _download_details_html(links: list[str], *, summary: str, empty_text: str) -> str:
@@ -557,7 +547,17 @@ def _execution_staleness(ticker_summary: dict[str, Any]) -> str:
     value = payload.get("staleness_seconds")
     if value is None:
         return "not refreshed"
-    return f"{value}s"
+    try:
+        seconds = int(value)
+    except Exception:
+        return f"{value}s"
+    if seconds < 60:
+        return f"{seconds}s"
+    minutes, remainder = divmod(seconds, 60)
+    if minutes < 60:
+        return f"{minutes}m {remainder}s"
+    hours, minutes = divmod(minutes, 60)
+    return f"{hours}h {minutes}m {remainder}s"
 
 
 def _execution_badge_label(ticker_summary: dict[str, Any]) -> str:
@@ -570,6 +570,10 @@ def _execution_display_state(ticker_summary: dict[str, Any]) -> str:
     if not payload:
         return "WAIT (not refreshed)"
     state = str(payload.get("decision_state") or "WAIT")
+    reason_codes = {str(item) for item in (payload.get("reason_codes") or [])}
+    data_health = str(payload.get("data_health") or "").upper()
+    if state == "DEGRADED" and ("stale_market_data" in reason_codes or data_health == "STALE"):
+        return "DEGRADED (stale market data)"
     staleness = payload.get("staleness_seconds")
     try:
         stale = int(staleness) > 180
@@ -789,6 +793,20 @@ a { color: inherit; }
   justify-content: space-between;
   gap: 12px;
   margin: 10px 0;
+}
+
+.hero-card p span, .ticker-card p span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.ticker-card p.long-field {
+  align-items: flex-start;
+}
+
+.ticker-card p.long-field strong {
+  flex: 0 0 auto;
 }
 
 .status {
