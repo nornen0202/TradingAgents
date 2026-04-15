@@ -24,8 +24,9 @@ def test_intraday_snapshot_tool_returns_json_payload(monkeypatch):
 
     payload = get_intraday_snapshot.func("000660.KS", "5m")
     data = json.loads(payload)
-    assert data["ticker"] == "000660.KS"
-    assert data["volume"] == 1234567
+    assert data["ok"] is True
+    assert data["symbol"] == "000660.KS"
+    assert data["snapshot"]["volume"] == 1234567
 
 
 def test_intraday_snapshot_tool_returns_readable_error(monkeypatch):
@@ -38,4 +39,7 @@ def test_intraday_snapshot_tool_returns_readable_error(monkeypatch):
     )
 
     payload = get_intraday_snapshot.func("005930.KS", "5m")
-    assert "Intraday snapshot unavailable for 005930.KS" in payload
+    data = json.loads(payload)
+    assert data["ok"] is False
+    assert data["symbol"] == "005930.KS"
+    assert "no intraday data available" in data["error"]

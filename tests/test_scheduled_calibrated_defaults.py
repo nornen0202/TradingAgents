@@ -23,3 +23,25 @@ site_dir = "./site"
     assert config.llm.deep_model == "gpt-5.4"
     assert config.llm.quick_model == "gpt-5.4-mini"
     assert config.llm.output_model == "gpt-5.4-mini"
+
+
+def test_empty_execution_checkpoints_fall_back_to_market_defaults(tmp_path: Path):
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        """
+[run]
+tickers = ["AAPL"]
+market = "US"
+
+[execution]
+enabled = true
+checkpoints_kst = []
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    assert len(config.execution.execution_refresh_checkpoints_kst) == 3

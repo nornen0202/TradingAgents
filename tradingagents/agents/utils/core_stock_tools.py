@@ -36,5 +36,21 @@ def get_intraday_snapshot(
     try:
         snapshot = fetch_intraday_market_snapshot(symbol, interval=interval)
     except Exception as exc:
-        return f"Intraday snapshot unavailable for {symbol}: {exc}"
-    return json.dumps(snapshot.to_dict(), ensure_ascii=False)
+        return json.dumps(
+            {
+                "ok": False,
+                "symbol": symbol,
+                "interval": interval,
+                "error": str(exc),
+            },
+            ensure_ascii=False,
+        )
+    return json.dumps(
+        {
+            "ok": True,
+            "symbol": symbol,
+            "interval": interval,
+            "snapshot": snapshot.to_dict(),
+        },
+        ensure_ascii=False,
+    )

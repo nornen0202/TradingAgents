@@ -193,7 +193,7 @@ NVDA = "NVIDIA Override"
             self.assertIn("Report", ticker_html)
             self.assertIn("Analysis date", ticker_html)
             self.assertIn("<strong>Investment view</strong><span>매수</span>", ticker_html)
-            self.assertIn("<strong>Today</strong><span>매수 검토</span>", ticker_html)
+            self.assertIn("<strong>Today</strong><span>장 시작 전 스냅샷, 장중 데이터 대기</span>", ticker_html)
             self.assertNotIn("Decision scope", ticker_html)
             self.assertNotIn("Setup quality", ticker_html)
             self.assertNotIn("LLM calls", ticker_html)

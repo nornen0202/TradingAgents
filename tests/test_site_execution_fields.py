@@ -5,7 +5,9 @@ from tradingagents.scheduled.site import (
     _compute_health_metrics,
     _execution_badge_label,
     _execution_display_state,
+    _execution_stale_threshold_seconds,
     _execution_staleness,
+    _today_summary,
     _historical_view_label,
     _portfolio_review_required_label,
 )
@@ -27,6 +29,7 @@ def test_execution_display_state_blocks_stale_actionable():
         },
     }
     assert _execution_display_state(ticker_summary) == "WAIT (stale overlay)"
+    assert _execution_display_state(ticker_summary, stale_after_seconds=1200) == "ACTIONABLE_NOW"
 
 
 def test_execution_display_state_explains_stale_degraded():
@@ -75,3 +78,18 @@ def test_historical_view_label_uses_published_time_age():
     older_manifest = {"finished_at": (now - timedelta(hours=12)).isoformat()}
     assert _historical_view_label(recent_manifest) == "no"
     assert _historical_view_label(older_manifest) == "yes"
+
+
+def test_stale_threshold_reads_manifest_setting():
+    manifest = {"settings": {"execution_max_data_age_seconds": 300}}
+    assert _execution_stale_threshold_seconds(manifest) == 300
+
+
+def test_today_summary_reflects_degraded_and_preopen_states():
+    degraded = {
+        "execution_update": {"decision_state": "DEGRADED"},
+        "decision": '{"rating":"HOLD","portfolio_stance":"BULLISH","entry_action":"WAIT","setup_quality":"DEVELOPING","confidence":0.6,"watchlist_triggers":[],"catalysts":[],"invalidators":[],"data_coverage":{"company_news_count":1,"disclosures_count":1,"social_source":"available","macro_items_count":1}}',
+    }
+    pre_open = {"decision": degraded["decision"]}
+    assert "보수적 관찰" in _today_summary(degraded, language="Korean")
+    assert "장 시작 전 스냅샷" in _today_summary(pre_open, language="Korean")

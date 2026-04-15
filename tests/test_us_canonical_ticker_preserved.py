@@ -37,3 +37,33 @@ def test_resolve_identity_prefers_symbol_over_display_name(monkeypatch):
     monkeypatch.setattr("tradingagents.portfolio.instrument_identity.resolve_instrument", _fake_resolve)
     identity = resolve_identity("AAPL", "Apple")
     assert identity.canonical_ticker == "AAPL"
+
+
+def test_resolve_identity_preserves_us_symbol_when_name_is_ambiguous(monkeypatch):
+    def _fake_resolve(value: str):
+        normalized = str(value).upper()
+        if normalized == "ETN":
+            return SimpleNamespace(
+                primary_symbol="ETN",
+                yahoo_symbol="ETN",
+                krx_code=None,
+                dart_corp_code=None,
+                display_name="Eaton Corporation",
+                exchange="NYSE",
+                country="US",
+                currency="USD",
+            )
+        return SimpleNamespace(
+            primary_symbol="EATON",
+            yahoo_symbol="EATON",
+            krx_code=None,
+            dart_corp_code=None,
+            display_name="Eaton",
+            exchange="NYSE",
+            country="US",
+            currency="USD",
+        )
+
+    monkeypatch.setattr("tradingagents.portfolio.instrument_identity.resolve_instrument", _fake_resolve)
+    identity = resolve_identity("ETN", "Eaton")
+    assert identity.canonical_ticker == "ETN"

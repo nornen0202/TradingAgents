@@ -43,7 +43,12 @@ from tradingagents.schemas import (
 )
 from tradingagents.reporting import save_report_bundle
 
-from .config import ScheduledAnalysisConfig, load_scheduled_config, with_overrides
+from .config import (
+    ScheduledAnalysisConfig,
+    _default_execution_checkpoints_kst,
+    load_scheduled_config,
+    with_overrides,
+)
 from .site import build_site
 
 
@@ -145,7 +150,7 @@ def execute_scheduled_run(
         now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
         selected_checkpoints, overlay_phase = _select_due_checkpoints(
             now_kst=now_kst,
-            checkpoints=list(config.execution.execution_refresh_checkpoints_kst),
+            checkpoints=_effective_execution_checkpoints(config),
         )
         manifest_overlay_phase = {
             "name": overlay_phase,
@@ -430,11 +435,21 @@ def _run_single_ticker(
                 fallback_count += 1
         quality_flags: list[str] = []
         effective_tool_calls = max(int(metrics.get("tool_calls", 0) or 0), len(tool_events))
+        called_tools = _collect_called_tool_names(final_state)
         if effective_tool_calls == 0:
             quality_flags.append("no_tool_calls_detected")
             print(f"::warning::No tool calls were recorded for {ticker}; report quality may be degraded.")
         if not metrics.get("tokens_available", False):
             quality_flags.append("token_usage_unavailable")
+        if (
+            "market" in config.run.analysts
+            and trade_date == analysis_date
+            and "get_intraday_snapshot" not in called_tools
+        ):
+            quality_flags.append("intraday_snapshot_missing_same_day")
+            print(
+                f"::warning::{ticker} same-day analysis completed without get_intraday_snapshot tool usage."
+            )
         analysis_payload = {
             "ticker": ticker,
             "ticker_name": (
@@ -456,6 +471,8 @@ def _run_single_ticker(
                 "vendor_calls": tool_by_vendor,
                 "fallback_count": fallback_count,
                 "events": tool_events,
+                "called_tools": sorted(called_tools),
+                "intraday_snapshot_used": "get_intraday_snapshot" in called_tools,
             },
             "quality_flags": quality_flags,
             "report_writer": report_writer_payload,
@@ -712,11 +729,35 @@ def _resolve_run_tickers(config: ScheduledAnalysisConfig) -> list[str]:
 
 def _ticker_identity_key(ticker: str) -> str:
     normalized = str(ticker or "").strip().upper()
+    if len(normalized) == 6 and normalized.isdigit():
+        return f"KR:{normalized}"
     if normalized.endswith(".KS") or normalized.endswith(".KQ"):
         base = normalized[:-3]
         if len(base) == 6 and base.isdigit():
             return f"KR:{base}"
     return normalized
+
+
+def _effective_execution_checkpoints(config: ScheduledAnalysisConfig) -> list[str]:
+    configured = [str(item).strip() for item in config.execution.execution_refresh_checkpoints_kst if str(item).strip()]
+    if configured:
+        return configured
+    return list(_default_execution_checkpoints_kst(config.run.market))
+
+
+def _collect_called_tool_names(final_state: dict[str, Any]) -> set[str]:
+    names: set[str] = set()
+    for message in (final_state.get("messages") or []):
+        tool_calls = message.get("tool_calls") if isinstance(message, dict) else getattr(message, "tool_calls", None)
+        if not tool_calls:
+            continue
+        for tool_call in tool_calls:
+            name = tool_call.get("name") if isinstance(tool_call, dict) else getattr(tool_call, "name", None)
+            if not name and hasattr(tool_call, "get"):
+                name = tool_call.get("name")
+            if name:
+                names.add(str(name))
+    return names
 
 
 def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, Any]:

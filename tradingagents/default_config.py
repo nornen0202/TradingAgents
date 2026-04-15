@@ -27,7 +27,8 @@ DEFAULT_CONFIG = {
     "codex_max_retries": 2,
     "codex_cleanup_threads": True,
     "execution_refresh_enabled": False,
-    "execution_refresh_checkpoints_kst": ["23:35"],
+    # Empty means "derive by market defaults" in scheduled runner/config paths.
+    "execution_refresh_checkpoints_kst": [],
     "execution_max_data_age_seconds": 180,
     "execution_publish_badges": True,
     "execution_publish_debug": False,

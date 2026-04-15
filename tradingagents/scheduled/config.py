@@ -89,7 +89,7 @@ class SiteSettings:
 @dataclass(frozen=True)
 class ExecutionSettings:
     execution_refresh_enabled: bool = False
-    execution_refresh_checkpoints_kst: tuple[str, ...] = DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET["KR"]
+    execution_refresh_checkpoints_kst: tuple[str, ...] = tuple()
     execution_max_data_age_seconds: int = 180
     execution_publish_badges: bool = True
     execution_selective_rerun_enabled: bool = True
@@ -239,7 +239,10 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         ),
         execution=ExecutionSettings(
             execution_refresh_enabled=bool(execution_raw.get("enabled", False)),
-            execution_refresh_checkpoints_kst=tuple(execution_raw.get("checkpoints_kst", default_checkpoints)),
+            execution_refresh_checkpoints_kst=_normalize_execution_checkpoints(
+                execution_raw.get("checkpoints_kst"),
+                default_checkpoints=default_checkpoints,
+            ),
             execution_max_data_age_seconds=max(30, int(execution_raw.get("max_data_age_seconds", 180))),
             execution_publish_badges=bool(execution_raw.get("publish_badges", True)),
             execution_selective_rerun_enabled=bool(execution_raw.get("selective_rerun_enabled", True)),
@@ -342,11 +345,24 @@ def _normalize_tickers(values: Iterable[str]) -> list[str]:
 
 def _ticker_identity_key(ticker: str) -> str:
     normalized = str(ticker or "").strip().upper()
+    if len(normalized) == 6 and normalized.isdigit():
+        return f"KR:{normalized}"
     if normalized.endswith(".KS") or normalized.endswith(".KQ"):
         base = normalized[:-3]
         if len(base) == 6 and base.isdigit():
             return f"KR:{base}"
     return normalized
+
+
+def _normalize_execution_checkpoints(
+    raw_value: object,
+    *,
+    default_checkpoints: tuple[str, ...],
+) -> tuple[str, ...]:
+    if raw_value is None:
+        return default_checkpoints
+    values = tuple(str(item).strip() for item in (raw_value or []) if str(item).strip())
+    return values or default_checkpoints
 
 
 def _normalize_ticker_universe_mode(value: object) -> str:
