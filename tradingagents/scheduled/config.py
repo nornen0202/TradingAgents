@@ -28,6 +28,7 @@ DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET: dict[str, tuple[str, ...]] = {
 @dataclass(frozen=True)
 class RunSettings:
     tickers: list[str]
+    market: str = "AUTO"
     ticker_universe_mode: str = "config_only"
     analysts: list[str] = field(default_factory=lambda: list(ALL_ANALYSTS))
     output_language: str = "Korean"
@@ -155,7 +156,8 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
 
     timezone_name = str(run_raw.get("timezone", "Asia/Seoul")).strip()
     ZoneInfo(timezone_name)
-    market_code = _infer_market_code(timezone_name)
+    declared_market = str(run_raw.get("market", "AUTO")).strip().upper() or "AUTO"
+    market_code = _normalize_market_code(declared_market, timezone_name=timezone_name)
     default_checkpoints = _default_execution_checkpoints_kst(market_code)
 
     base_dir = config_path.parent
@@ -165,6 +167,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     return ScheduledAnalysisConfig(
         run=RunSettings(
             tickers=tickers,
+            market=market_code,
             ticker_universe_mode=_normalize_ticker_universe_mode(run_raw.get("ticker_universe_mode", "config_only")),
             analysts=analysts,
             output_language=str(run_raw.get("output_language", "Korean")).strip() or "Korean",
@@ -254,6 +257,13 @@ def _infer_market_code(timezone_name: str) -> str:
     if normalized.startswith("america/"):
         return "US"
     return "KR"
+
+
+def _normalize_market_code(value: str, *, timezone_name: str) -> str:
+    market = str(value or "").strip().upper()
+    if market in {"US", "KR"}:
+        return market
+    return _infer_market_code(timezone_name)
 
 
 def _default_execution_checkpoints_kst(market_code: str) -> tuple[str, ...]:

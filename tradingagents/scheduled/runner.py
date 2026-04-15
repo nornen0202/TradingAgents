@@ -646,6 +646,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "analysts": list(config.run.analysts),
         "trade_date_mode": config.run.trade_date_mode,
         "ticker_universe_mode": config.run.ticker_universe_mode,
+        "market": config.run.market,
         "run_mode": config.run.run_mode,
         "configured_ticker_count": len(config.run.tickers),
         "max_debate_rounds": config.run.max_debate_rounds,

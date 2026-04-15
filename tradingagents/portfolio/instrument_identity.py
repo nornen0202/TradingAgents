@@ -27,10 +27,13 @@ def resolve_identity(broker_symbol: str, display_name: str | None = None) -> Ins
             continue
         try:
             profile = resolve_instrument(candidate)
+            canonical = str(profile.primary_symbol or "").strip().upper()
+            if _looks_like_symbol(broker_symbol) and not _looks_like_symbol(canonical):
+                canonical = broker_symbol.upper()
             return InstrumentIdentity(
                 broker_symbol=broker_symbol or profile.krx_code or profile.primary_symbol,
-                canonical_ticker=profile.primary_symbol,
-                yahoo_symbol=profile.yahoo_symbol or profile.primary_symbol,
+                canonical_ticker=canonical or profile.primary_symbol,
+                yahoo_symbol=profile.yahoo_symbol or canonical or profile.primary_symbol,
                 krx_code=profile.krx_code,
                 dart_corp_code=profile.dart_corp_code,
                 display_name=profile.display_name,

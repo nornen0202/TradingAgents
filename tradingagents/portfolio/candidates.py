@@ -263,7 +263,10 @@ def _apply_execution_overlay_actions(
     decision_now = str(execution_update.get("decision_now") or "").upper()
 
     if decision_state == "DEGRADED":
-        return ("HOLD" if is_held else "WATCH", "NONE")
+        if is_held:
+            return ("HOLD", "ADD_IF_TRIGGERED" if action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"} else action_if_triggered)
+        preserved_trigger = action_if_triggered if action_if_triggered in {"STARTER_IF_TRIGGERED", "ADD_IF_TRIGGERED", "WATCH_TRIGGER"} else "WATCH_TRIGGER"
+        return ("WATCH", preserved_trigger)
     if decision_state == "INVALIDATED":
         return ("REDUCE_NOW" if is_held else "WATCH", "EXIT_IF_TRIGGERED" if is_held else "NONE")
     if decision_state == "TRIGGERED_PENDING_CLOSE":

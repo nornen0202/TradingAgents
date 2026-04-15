@@ -689,7 +689,30 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
     payload = json.loads(status_path.read_text(encoding="utf-8"))
     report_md = private_dir / "portfolio_report.md"
     report_json = private_dir / "portfolio_report.json"
+    candidates_json = private_dir / "portfolio_candidates.json"
     files = sorted(path for path in private_dir.iterdir() if path.is_file())
+    candidate_symbols: list[str] = []
+    candidate_pairs: list[dict[str, str]] = []
+    if candidates_json.exists():
+        try:
+            payload_candidates = json.loads(candidates_json.read_text(encoding="utf-8"))
+            for candidate in (payload_candidates.get("candidates") or []):
+                if not isinstance(candidate, dict):
+                    continue
+                instrument = candidate.get("instrument") or {}
+                symbol = instrument.get("canonical_ticker") or candidate.get("canonical_ticker")
+                broker_symbol = instrument.get("broker_symbol") or candidate.get("broker_symbol")
+                if symbol:
+                    candidate_symbols.append(str(symbol))
+                if symbol or broker_symbol:
+                    candidate_pairs.append(
+                        {
+                            "broker_symbol": str(broker_symbol or ""),
+                            "canonical_ticker": str(symbol or ""),
+                        }
+                    )
+        except Exception:
+            candidate_symbols = []
     return {
         "status_path": status_path,
         "status": str(payload.get("status") or "unknown"),
@@ -701,6 +724,8 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "error": payload.get("error"),
         "portfolio_report_md": report_md if report_md.exists() else None,
         "portfolio_report_json": report_json if report_json.exists() else None,
+        "candidate_canonical_symbols": candidate_symbols,
+        "candidate_identity_pairs": candidate_pairs,
         "downloadable_files": files,
         "artifact_count": len(files),
     }
@@ -781,7 +806,30 @@ def _compute_health_metrics(*, manifest: dict[str, Any], portfolio_summary: dict
         f"company_news_zero_ratio={coverage_ratio:.0%}" if isinstance(coverage_ratio, (float, int)) else "unknown"
     )
     identity_integrity = "ok"
-    if any(not _looks_like_symbol(str(item.get("ticker") or "")) for item in (manifest.get("tickers") or [])):
+    manifest_symbols_ok = not any(
+        not _looks_like_symbol(str(item.get("ticker") or "")) for item in (manifest.get("tickers") or [])
+    )
+    portfolio_symbols = [str(value) for value in (portfolio_summary.get("candidate_canonical_symbols") or []) if str(value).strip()]
+    portfolio_symbols_ok = not any(not _looks_like_symbol(value) for value in portfolio_symbols)
+    candidate_pairs = portfolio_summary.get("candidate_identity_pairs") or []
+    canonical_mismatch_count = 0
+    for pair in candidate_pairs:
+        if not isinstance(pair, dict):
+            continue
+        broker_symbol = str(pair.get("broker_symbol") or "").strip().upper()
+        canonical_ticker = str(pair.get("canonical_ticker") or "").strip().upper()
+        if not broker_symbol or not canonical_ticker:
+            continue
+        if not _looks_like_symbol(broker_symbol) or not _looks_like_symbol(canonical_ticker):
+            continue
+        if canonical_ticker == broker_symbol:
+            continue
+        if canonical_ticker.startswith(f"{broker_symbol}."):
+            continue
+        canonical_mismatch_count += 1
+    if not manifest_symbols_ok and not portfolio_symbols_ok:
+        identity_integrity = "critical"
+    elif not manifest_symbols_ok or not portfolio_symbols_ok or canonical_mismatch_count > 0:
         identity_integrity = "warning"
     return {
         "overlay_health": phase,
