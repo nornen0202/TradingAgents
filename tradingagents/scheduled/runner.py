@@ -18,6 +18,7 @@ from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry
 from tradingagents.dataflows.intraday_market import fetch_intraday_market_snapshot
+from tradingagents.dataflows.stockstats_utils import is_retryable_yfinance_error, yf_retry
 from tradingagents.execution.contract_builder import build_execution_contract
 from tradingagents.execution.overlay import evaluate_execution_state
 from tradingagents.execution.reporting import (
@@ -315,11 +316,21 @@ def resolve_trade_date(
             "symbol format looks invalid for Yahoo Finance. Expected examples: AAPL, BRK.B, 005930.KS."
         )
 
-    history = yf.Ticker(normalized_symbol).history(
-        period=f"{config.run.latest_market_data_lookback_days}d",
-        interval="1d",
-        auto_adjust=False,
-    )
+    try:
+        history = _fetch_recent_trade_date_history(
+            normalized_symbol,
+            lookback_days=config.run.latest_market_data_lookback_days,
+        )
+    except Exception as exc:
+        if not is_retryable_yfinance_error(exc):
+            raise
+        fallback_date = _previous_business_day(now.date()).isoformat()
+        print(
+            "::warning::"
+            f"Yahoo Finance latest-trade-date lookup failed for {ticker} ({normalized_symbol}); "
+            f"using previous business day {fallback_date}. reason={_summarize_exception(exc)}"
+        )
+        return fallback_date
     if history.empty:
         symbol_hint = _ticker_hint(normalized_symbol)
         raise RuntimeError(
@@ -333,6 +344,40 @@ def resolve_trade_date(
     if not isinstance(last_date, date):
         raise RuntimeError(f"Unexpected trade date index value for {ticker}: {last_index!r}")
     return last_date.isoformat()
+
+
+def _fetch_recent_trade_date_history(symbol: str, *, lookback_days: int) -> Any:
+    period = f"{max(1, int(lookback_days))}d"
+    ticker = yf.Ticker(symbol)
+    try:
+        history = yf_retry(
+            lambda: ticker.history(
+                period=period,
+                interval="1d",
+                auto_adjust=False,
+            )
+        )
+    except Exception as first_exc:
+        try:
+            downloaded = yf_retry(
+                lambda: yf.download(
+                    symbol,
+                    period=period,
+                    interval="1d",
+                    progress=False,
+                    auto_adjust=False,
+                    multi_level_index=False,
+                    threads=False,
+                )
+            )
+        except Exception:
+            raise first_exc
+        if downloaded is not None and not downloaded.empty:
+            return downloaded
+        raise first_exc
+    if history is None:
+        raise RuntimeError(f"Yahoo Finance returned no history payload for {symbol}.")
+    return history
 
 
 def _looks_like_yahoo_ticker_format(symbol: str) -> bool:
@@ -357,6 +402,11 @@ def _ticker_hint(symbol: str) -> str:
         normalized,
         " The symbol may be wrong (typo or delisted) or currently unavailable on Yahoo Finance.",
     )
+
+
+def _summarize_exception(exc: Exception) -> str:
+    text = str(exc).strip() or exc.__class__.__name__
+    return text.replace("\n", " ")[:240]
 
 
 def _run_single_ticker(

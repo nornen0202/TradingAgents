@@ -262,6 +262,87 @@ class KisClient:
 
         return positions, summary
 
+    def fetch_overseas_present_balance(
+        self,
+        *,
+        account_no: str,
+        product_code: str,
+        won_currency: bool = True,
+        country_code: str = "840",
+        market_code: str = "00",
+        inquiry_type: str = "00",
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        tr_id = "VTRP6504R" if self.environment == "demo" else "CTRP6504R"
+        params = {
+            "CANO": account_no,
+            "ACNT_PRDT_CD": product_code,
+            "WCRC_FRCR_DVSN_CD": "01" if won_currency else "02",
+            "NATN_CD": country_code,
+            "TR_MKET_CD": market_code,
+            "INQR_DVSN_CD": inquiry_type,
+        }
+        positions: list[dict[str, Any]] = []
+        summary: dict[str, Any] = {}
+        tr_cont = ""
+
+        while True:
+            payload, headers = self.request_json(
+                method="GET",
+                path="/uapi/overseas-stock/v1/trading/inquire-present-balance",
+                tr_id=tr_id,
+                params=params,
+                tr_cont=tr_cont,
+            )
+            positions.extend(_coerce_records(payload.get("output1")))
+            summary_records = _coerce_records(payload.get("output3")) or _coerce_records(payload.get("output2"))
+            if summary_records:
+                summary = summary_records[0]
+            tr_cont_header = str(headers.get("tr_cont") or "")
+            if tr_cont_header not in {"M", "F"}:
+                break
+            tr_cont = "N"
+
+        return positions, summary
+
+    def fetch_overseas_pending_orders(
+        self,
+        *,
+        account_no: str,
+        product_code: str,
+        exchange_code: str = "NASD",
+    ) -> list[dict[str, Any]]:
+        tr_id = "TTTS3018R"
+        params = {
+            "CANO": account_no,
+            "ACNT_PRDT_CD": product_code,
+            "OVRS_EXCG_CD": exchange_code,
+            "SORT_SQN": "DS",
+            "CTX_AREA_FK200": "",
+            "CTX_AREA_NK200": "",
+        }
+        orders: list[dict[str, Any]] = []
+        tr_cont = ""
+
+        while True:
+            payload, headers = self.request_json(
+                method="GET",
+                path="/uapi/overseas-stock/v1/trading/inquire-nccs",
+                tr_id=tr_id,
+                params=params,
+                tr_cont=tr_cont,
+            )
+            orders.extend(_coerce_records(payload.get("output")))
+            tr_cont_header = str(headers.get("tr_cont") or "")
+            next_fk = str(payload.get("ctx_area_fk200") or "")
+            next_nk = str(payload.get("ctx_area_nk200") or "")
+            if tr_cont_header not in {"M", "F"}:
+                break
+            params["CTX_AREA_FK200"] = next_fk
+            params["CTX_AREA_NK200"] = next_nk
+            tr_cont = "N"
+
+        return orders
+
     def fetch_pending_orders(
         self,
         *,
@@ -347,69 +428,65 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
     client = KisClient.from_api_keys(environment=profile.broker_environment)
     now = datetime.now().astimezone()
     warnings: list[str] = []
-    positions_payload, summary_payload = client.fetch_balance(
-        account_no=profile.account_no,
-        product_code=profile.product_code,
-    )
-    try:
-        pending_payload = client.fetch_pending_orders(
+    market_scope = str(getattr(profile, "market_scope", "kr") or "kr").strip().lower()
+    if market_scope in {"us", "overseas"}:
+        positions_payload, summary_payload = client.fetch_overseas_present_balance(
             account_no=profile.account_no,
             product_code=profile.product_code,
-            query_date=now,
         )
-    except Exception as exc:
-        pending_payload = []
-        warnings.append(
-            "KIS pending-order lookup failed; continuing with balance-only account snapshot. "
-            f"reason={_summarize_optional_kis_error(exc)}"
-        )
-
-    positions: list[Position] = []
-    for item in positions_payload:
-        broker_symbol = str(item.get("pdno") or "").strip()
-        holding_qty = float(item.get("hldg_qty", 0) or 0)
-        if not broker_symbol:
-            continue
         try:
-            identity = resolve_identity(broker_symbol, str(item.get("prdt_name") or "").strip() or None)
-        except Exception:
-            warnings.append(f"Could not resolve broker symbol '{broker_symbol}'.")
-            continue
-        positions.append(
-            Position(
-                broker_symbol=broker_symbol,
-                canonical_ticker=identity.canonical_ticker,
-                display_name=identity.display_name,
-                sector=None,
-                quantity=holding_qty,
-                available_qty=float(item.get("ord_psbl_qty", holding_qty) or holding_qty),
-                avg_cost_krw=int(float(item.get("pchs_avg_pric", 0) or 0)),
-                market_price_krw=int(float(item.get("prpr", 0) or 0)),
-                market_value_krw=int(float(item.get("evlu_amt", 0) or 0)),
-                unrealized_pnl_krw=int(float(item.get("evlu_pfls_amt", 0) or 0)),
+            pending_payload = client.fetch_overseas_pending_orders(
+                account_no=profile.account_no,
+                product_code=profile.product_code,
             )
+        except Exception as exc:
+            pending_payload = []
+            warnings.append(
+                "KIS overseas pending-order lookup failed; continuing with balance-only account snapshot. "
+                f"reason={_summarize_optional_kis_error(exc)}"
+            )
+        positions = _build_overseas_positions(positions_payload, warnings=warnings)
+    else:
+        positions_payload, summary_payload = client.fetch_balance(
+            account_no=profile.account_no,
+            product_code=profile.product_code,
         )
+        try:
+            pending_payload = client.fetch_pending_orders(
+                account_no=profile.account_no,
+                product_code=profile.product_code,
+                query_date=now,
+            )
+        except Exception as exc:
+            pending_payload = []
+            warnings.append(
+                "KIS pending-order lookup failed; continuing with balance-only account snapshot. "
+                f"reason={_summarize_optional_kis_error(exc)}"
+            )
+        positions = _build_domestic_positions(positions_payload, warnings=warnings)
 
     pending_orders: list[PendingOrder] = []
     for item in pending_payload:
-        broker_symbol = str(item.get("pdno") or "").strip()
+        broker_symbol = str(item.get("pdno") or item.get("ovrs_pdno") or "").strip()
         identity_ticker = None
         if broker_symbol:
             try:
                 identity_ticker = resolve_identity(
                     broker_symbol,
-                    str(item.get("prdt_name") or "").strip() or None,
+                    str(item.get("prdt_name") or item.get("ovrs_item_name") or "").strip() or None,
                 ).canonical_ticker
             except Exception:
                 identity_ticker = None
+        side_code = str(item.get("sll_buy_dvsn_cd") or item.get("sll_buy_dvsn") or "").strip()
+        side_name = str(item.get("sll_buy_dvsn_name") or "").strip().lower()
         pending_orders.append(
             PendingOrder(
                 broker_order_id=str(item.get("odno") or ""),
                 broker_symbol=broker_symbol,
                 canonical_ticker=identity_ticker,
-                side="buy" if str(item.get("sll_buy_dvsn_cd") or "") == "02" else "sell",
-                qty=float(item.get("ord_qty", item.get("tot_ccld_qty", 0)) or 0),
-                remaining_qty=float(item.get("nccs_qty", item.get("rmn_qty", 0)) or 0),
+                side="buy" if side_code == "02" or "buy" in side_name else "sell",
+                qty=_first_float(item, ("ord_qty", "ft_ord_qty", "tot_ccld_qty")) or 0.0,
+                remaining_qty=_first_float(item, ("nccs_qty", "rmn_qty")) or 0.0,
                 status=str(item.get("ord_stat_name") or item.get("ccld_dvsn_name") or "open"),
             )
         )
@@ -439,6 +516,132 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
         constraints=profile.constraints,
         warnings=tuple(warnings),
     )
+
+
+def _build_domestic_positions(
+    positions_payload: list[dict[str, Any]],
+    *,
+    warnings: list[str],
+) -> list[Position]:
+    positions: list[Position] = []
+    for item in positions_payload:
+        broker_symbol = str(item.get("pdno") or "").strip()
+        holding_qty = _first_float(item, ("hldg_qty",)) or 0.0
+        if not broker_symbol:
+            continue
+        try:
+            identity = resolve_identity(broker_symbol, str(item.get("prdt_name") or "").strip() or None)
+        except Exception:
+            warnings.append(f"Could not resolve broker symbol '{broker_symbol}'.")
+            continue
+        positions.append(
+            Position(
+                broker_symbol=broker_symbol,
+                canonical_ticker=identity.canonical_ticker,
+                display_name=identity.display_name,
+                sector=None,
+                quantity=holding_qty,
+                available_qty=_first_float(item, ("ord_psbl_qty",)) or holding_qty,
+                avg_cost_krw=int(_first_float(item, ("pchs_avg_pric",)) or 0),
+                market_price_krw=int(_first_float(item, ("prpr",)) or 0),
+                market_value_krw=int(_first_float(item, ("evlu_amt",)) or 0),
+                unrealized_pnl_krw=int(_first_float(item, ("evlu_pfls_amt",)) or 0),
+            )
+        )
+    return positions
+
+
+def _build_overseas_positions(
+    positions_payload: list[dict[str, Any]],
+    *,
+    warnings: list[str],
+) -> list[Position]:
+    positions: list[Position] = []
+    for item in positions_payload:
+        broker_symbol = str(item.get("pdno") or item.get("ovrs_pdno") or item.get("std_pdno") or "").strip()
+        display_name = str(item.get("ovrs_item_name") or item.get("prdt_name") or "").strip() or None
+        holding_qty = _first_float(item, ("cblc_qty13", "ovrs_cblc_qty", "hldg_qty")) or 0.0
+        if not broker_symbol:
+            continue
+        try:
+            identity = resolve_identity(broker_symbol, display_name)
+        except Exception:
+            warnings.append(f"Could not resolve overseas broker symbol '{broker_symbol}'.")
+            continue
+
+        exchange_rate = _first_float(item, ("bass_exrt", "frst_bltn_exrt"))
+        avg_cost = _unit_price_krw(item, ("avg_unpr3", "pchs_avg_pric"), exchange_rate=exchange_rate)
+        market_price = _unit_price_krw(item, ("ovrs_now_pric1", "now_pric2", "prpr"), exchange_rate=exchange_rate)
+        market_value = _first_int(
+            item,
+            (
+                "frcr_evlu_amt2",
+                "ovrs_stck_evlu_amt",
+                "evlu_amt_smtl",
+                "evlu_amt_smtl_amt",
+            ),
+        )
+        if market_value is None and market_price is not None:
+            market_value = int(round(market_price * holding_qty))
+
+        positions.append(
+            Position(
+                broker_symbol=broker_symbol,
+                canonical_ticker=identity.canonical_ticker,
+                display_name=display_name or identity.display_name,
+                sector=None,
+                quantity=holding_qty,
+                available_qty=_first_float(item, ("ord_psbl_qty1", "ord_psbl_qty")) or holding_qty,
+                avg_cost_krw=int(avg_cost or 0),
+                market_price_krw=int(market_price or 0),
+                market_value_krw=int(market_value or 0),
+                unrealized_pnl_krw=int(
+                    _first_float(item, ("evlu_pfls_amt2", "frcr_evlu_pfls_amt", "evlu_pfls_amt")) or 0
+                ),
+            )
+        )
+    return positions
+
+
+def _coerce_records(value: Any) -> list[dict[str, Any]]:
+    if isinstance(value, list):
+        return [item for item in value if isinstance(item, dict)]
+    if isinstance(value, dict):
+        return [value] if value else []
+    return []
+
+
+def _first_float(payload: dict[str, Any], keys: tuple[str, ...]) -> float | None:
+    for key in keys:
+        value = payload.get(key)
+        if value in (None, ""):
+            continue
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def _first_int(payload: dict[str, Any], keys: tuple[str, ...]) -> int | None:
+    value = _first_float(payload, keys)
+    if value is None:
+        return None
+    return int(round(value))
+
+
+def _unit_price_krw(
+    payload: dict[str, Any],
+    keys: tuple[str, ...],
+    *,
+    exchange_rate: float | None,
+) -> float | None:
+    value = _first_float(payload, keys)
+    if value is None:
+        return None
+    if exchange_rate and exchange_rate > 0:
+        return value * exchange_rate
+    return value
 
 
 def _parse_positive_int(value: object, *, default: int) -> int:
@@ -490,25 +693,58 @@ def _extract_cash_snapshot(
         summary_payload,
         {
             "dnca_tot_amt",
+            "dncl_amt",
             "ord_psbl_amt",
             "ord_psbl_cash",
             "buy_psbl_amt",
             "buy_psbl_cash",
+            "buy_mgn_amt",
+            "tot_dncl_amt",
             "tot_evlu_amt",
             "nass_amt",
             "tot_asst_amt",
+            "wdrw_psbl_tot_amt",
+            "frcr_use_psbl_amt",
+            "evlu_amt_smtl_amt",
+            "frcr_evlu_tota",
+            "pchs_amt_smtl_amt",
         },
     )
-    settled_cash = _first_numeric(summary_payload, ("dnca_tot_amt", "ord_psbl_cash", "ord_psbl_amt")) or 0
+    settled_cash = (
+        _first_numeric(summary_payload, ("dnca_tot_amt", "dncl_amt", "tot_dncl_amt", "ord_psbl_cash", "ord_psbl_amt"))
+        or 0
+    )
     available_cash = _first_numeric(
         summary_payload,
-        ("ord_psbl_cash", "ord_psbl_amt", "buy_psbl_cash", "buy_psbl_amt", "dnca_tot_amt"),
+        (
+            "ord_psbl_cash",
+            "ord_psbl_amt",
+            "buy_psbl_cash",
+            "buy_psbl_amt",
+            "wdrw_psbl_tot_amt",
+            "frcr_use_psbl_amt",
+            "dnca_tot_amt",
+            "dncl_amt",
+            "tot_dncl_amt",
+        ),
     ) or settled_cash
     buying_power = _first_numeric(
         summary_payload,
-        ("buy_psbl_amt", "buy_psbl_cash", "ord_psbl_amt", "ord_psbl_cash", "dnca_tot_amt"),
+        (
+            "buy_psbl_amt",
+            "buy_psbl_cash",
+            "ord_psbl_amt",
+            "ord_psbl_cash",
+            "frcr_use_psbl_amt",
+            "wdrw_psbl_tot_amt",
+            "buy_mgn_amt",
+            "dnca_tot_amt",
+        ),
     ) or available_cash
-    reported_equity = _first_numeric(summary_payload, ("tot_evlu_amt", "nass_amt", "tot_asst_amt"))
+    reported_equity = _first_numeric(
+        summary_payload,
+        ("tot_evlu_amt", "nass_amt", "tot_asst_amt", "evlu_amt_smtl_amt", "frcr_evlu_tota"),
+    )
     total_equity = max(
         int(reported_equity or 0),
         int(positions_market_value + max(settled_cash, available_cash, buying_power, 0)),
@@ -546,16 +782,41 @@ def _extract_cash_snapshot(
             "parsed_numeric_fields": cash_fields,
             "positions_market_value_krw": int(positions_market_value),
             "selected_fields": {
-                "settled_cash": _selected_field(summary_payload, ("dnca_tot_amt", "ord_psbl_cash", "ord_psbl_amt")),
+                "settled_cash": _selected_field(
+                    summary_payload,
+                    ("dnca_tot_amt", "dncl_amt", "tot_dncl_amt", "ord_psbl_cash", "ord_psbl_amt"),
+                ),
                 "available_cash": _selected_field(
                     summary_payload,
-                    ("ord_psbl_cash", "ord_psbl_amt", "buy_psbl_cash", "buy_psbl_amt", "dnca_tot_amt"),
+                    (
+                        "ord_psbl_cash",
+                        "ord_psbl_amt",
+                        "buy_psbl_cash",
+                        "buy_psbl_amt",
+                        "wdrw_psbl_tot_amt",
+                        "frcr_use_psbl_amt",
+                        "dnca_tot_amt",
+                        "dncl_amt",
+                        "tot_dncl_amt",
+                    ),
                 ),
                 "buying_power": _selected_field(
                     summary_payload,
-                    ("buy_psbl_amt", "buy_psbl_cash", "ord_psbl_amt", "ord_psbl_cash", "dnca_tot_amt"),
+                    (
+                        "buy_psbl_amt",
+                        "buy_psbl_cash",
+                        "ord_psbl_amt",
+                        "ord_psbl_cash",
+                        "frcr_use_psbl_amt",
+                        "wdrw_psbl_tot_amt",
+                        "buy_mgn_amt",
+                        "dnca_tot_amt",
+                    ),
                 ),
-                "total_equity": _selected_field(summary_payload, ("tot_evlu_amt", "nass_amt", "tot_asst_amt")),
+                "total_equity": _selected_field(
+                    summary_payload,
+                    ("tot_evlu_amt", "nass_amt", "tot_asst_amt", "evlu_amt_smtl_amt", "frcr_evlu_tota"),
+                ),
             },
         },
     }

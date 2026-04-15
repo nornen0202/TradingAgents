@@ -1,11 +1,12 @@
 import json
 import tempfile
 import unittest
+from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from tradingagents.scheduled.runner import execute_scheduled_run, load_scheduled_config, main
+from tradingagents.scheduled.runner import execute_scheduled_run, load_scheduled_config, main, resolve_trade_date
 
 
 class _FakeStatsHandler:
@@ -111,6 +112,37 @@ site_dir = "./site"
 
             with self.assertRaises(ValueError):
                 load_scheduled_config(config_path)
+
+    def test_resolve_trade_date_falls_back_when_yfinance_latest_lookup_is_transient(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            config_path.write_text(
+                """
+[run]
+tickers = ["NVDA"]
+trade_date_mode = "latest_available"
+latest_market_data_lookback_days = 14
+timezone = "Asia/Seoul"
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+
+            with (
+                patch(
+                    "tradingagents.scheduled.runner._fetch_recent_trade_date_history",
+                    side_effect=TypeError("'NoneType' object is not subscriptable"),
+                ),
+                patch("tradingagents.scheduled.runner._previous_business_day", return_value=date(2026, 4, 15)),
+            ):
+                trade_date = resolve_trade_date("NVDA", config)
+
+        self.assertEqual(trade_date, "2026-04-15")
 
     def test_execute_scheduled_run_archives_outputs_and_builds_site(self):
         with tempfile.TemporaryDirectory() as tmpdir:

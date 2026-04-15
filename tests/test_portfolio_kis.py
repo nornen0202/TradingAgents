@@ -1,4 +1,5 @@
 import unittest
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 import requests
@@ -99,6 +100,42 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(session.post.call_count, 2)
         self.assertEqual(session.request.call_count, 2)
 
+    def test_fetch_overseas_present_balance_uses_documented_endpoint_and_paginates(self):
+        client = KisClient(
+            app_key="app-key",
+            app_secret="app-secret",
+            session=Mock(),
+            token_file_cache_enabled=False,
+        )
+        client.request_json = Mock(
+            side_effect=[
+                (
+                    {"output1": [{"pdno": "AAPL"}], "output3": [{"tot_asst_amt": "1"}]},
+                    {"tr_cont": "M"},
+                ),
+                (
+                    {"output1": [{"pdno": "MSFT"}], "output3": [{"tot_asst_amt": "2"}]},
+                    {"tr_cont": ""},
+                ),
+            ]
+        )
+
+        positions, summary = client.fetch_overseas_present_balance(
+            account_no="12345678",
+            product_code="01",
+        )
+
+        self.assertEqual([item["pdno"] for item in positions], ["AAPL", "MSFT"])
+        self.assertEqual(summary["tot_asst_amt"], "2")
+        self.assertEqual(
+            client.request_json.call_args_list[0].kwargs["path"],
+            "/uapi/overseas-stock/v1/trading/inquire-present-balance",
+        )
+        self.assertEqual(client.request_json.call_args_list[0].kwargs["tr_id"], "CTRP6504R")
+        self.assertEqual(client.request_json.call_args_list[0].kwargs["params"]["NATN_CD"], "840")
+        self.assertEqual(client.request_json.call_args_list[0].kwargs["tr_cont"], "")
+        self.assertEqual(client.request_json.call_args_list[1].kwargs["tr_cont"], "N")
+
     def test_extract_cash_snapshot_marks_watchlist_only_when_cash_is_below_min_trade(self):
         profile = PortfolioProfile(
             name="kis-test",
@@ -153,6 +190,36 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(snapshot["total_equity_krw"], 5200000)
         self.assertEqual(snapshot["cash_diagnostics"]["selected_fields"]["total_equity"], "tot_evlu_amt")
 
+    def test_extract_cash_snapshot_accepts_overseas_summary_fields(self):
+        profile = PortfolioProfile(
+            name="kis-us-test",
+            enabled=True,
+            broker="kis",
+            broker_environment="real",
+            read_only=True,
+            account_no="12345678",
+            product_code="01",
+            manual_snapshot_path=None,
+            csv_positions_path=None,
+            private_output_dirname="portfolio-private",
+            watch_tickers=tuple(),
+            trigger_budget_krw=500000,
+            constraints=AccountConstraints(min_cash_buffer_krw=0, min_trade_krw=100000),
+            market_scope="us",
+        )
+
+        snapshot = _extract_cash_snapshot(
+            summary_payload={"dncl_amt": "100000", "wdrw_psbl_tot_amt": "90000", "tot_asst_amt": "490000"},
+            positions_market_value=390000,
+            profile=profile,
+        )
+
+        self.assertEqual(snapshot["snapshot_health"], "CAPITAL_CONSTRAINED")
+        self.assertEqual(snapshot["settled_cash_krw"], 100000)
+        self.assertEqual(snapshot["available_cash_krw"], 90000)
+        self.assertEqual(snapshot["total_equity_krw"], 490000)
+        self.assertEqual(snapshot["cash_diagnostics"]["selected_fields"]["total_equity"], "tot_asst_amt")
+
     @patch("tradingagents.portfolio.kis.KisClient.from_api_keys")
     def test_load_account_snapshot_continues_when_pending_orders_fail(self, mock_from_api_keys):
         response = Mock()
@@ -195,6 +262,61 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(snapshot.pending_orders, tuple())
         self.assertTrue(any("pending-order lookup failed" in warning for warning in snapshot.warnings))
         self.assertFalse(any("12345678" in warning for warning in snapshot.warnings))
+
+    @patch("tradingagents.portfolio.kis.resolve_identity")
+    @patch("tradingagents.portfolio.kis.KisClient.from_api_keys")
+    def test_load_account_snapshot_uses_overseas_kis_balance_for_us_profile(self, mock_from_api_keys, mock_resolve):
+        mock_resolve.return_value = SimpleNamespace(
+            canonical_ticker="AAPL",
+            display_name="Apple Inc.",
+        )
+        client = Mock()
+        client.fetch_overseas_present_balance.return_value = (
+            [
+                {
+                    "pdno": "AAPL",
+                    "ovrs_item_name": "Apple Inc.",
+                    "cblc_qty13": "2",
+                    "ord_psbl_qty1": "1",
+                    "avg_unpr3": "100",
+                    "ovrs_now_pric1": "150",
+                    "bass_exrt": "1300",
+                    "frcr_evlu_amt2": "390000",
+                    "evlu_pfls_amt2": "90000",
+                }
+            ],
+            {"dncl_amt": "100000", "wdrw_psbl_tot_amt": "100000", "tot_asst_amt": "490000"},
+        )
+        client.fetch_overseas_pending_orders.return_value = []
+        mock_from_api_keys.return_value = client
+
+        profile = PortfolioProfile(
+            name="kis-us-test",
+            enabled=True,
+            broker="kis",
+            broker_environment="real",
+            read_only=True,
+            account_no="12345678",
+            product_code="01",
+            manual_snapshot_path=None,
+            csv_positions_path=None,
+            private_output_dirname="portfolio-private",
+            watch_tickers=("AAPL",),
+            trigger_budget_krw=500000,
+            constraints=AccountConstraints(min_cash_buffer_krw=0, min_trade_krw=100000),
+            market_scope="us",
+        )
+
+        snapshot = load_account_snapshot_from_kis(profile)
+
+        client.fetch_balance.assert_not_called()
+        client.fetch_overseas_present_balance.assert_called_once_with(account_no="12345678", product_code="01")
+        self.assertEqual(snapshot.snapshot_health, "VALID")
+        self.assertEqual(len(snapshot.positions), 1)
+        self.assertEqual(snapshot.positions[0].canonical_ticker, "AAPL")
+        self.assertEqual(snapshot.positions[0].display_name, "Apple Inc.")
+        self.assertEqual(snapshot.positions[0].market_value_krw, 390000)
+        self.assertEqual(snapshot.total_equity_krw, 490000)
 
 
 if __name__ == "__main__":

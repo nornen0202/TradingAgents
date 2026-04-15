@@ -30,6 +30,12 @@ def load_portfolio_profile(path: str | Path, profile_name: str) -> PortfolioProf
 
     watch_tickers = tuple(_normalize_watch_ticker(item) for item in (payload.get("watch_tickers") or []))
     watch_tickers = tuple(item for item in watch_tickers if item)
+    broker = str(payload.get("broker", "kis")).strip().lower() or "kis"
+    market_scope = _normalize_market_scope(
+        payload.get("market_scope") or payload.get("market"),
+        broker=broker,
+        watch_tickers=watch_tickers,
+    )
 
     constraints = AccountConstraints(
         min_cash_buffer_krw=_to_int(payload.get("min_cash_buffer_krw"), default=0),
@@ -44,7 +50,7 @@ def load_portfolio_profile(path: str | Path, profile_name: str) -> PortfolioProf
     return PortfolioProfile(
         name=profile_name,
         enabled=bool(payload.get("enabled", False)),
-        broker=str(payload.get("broker", "kis")).strip().lower() or "kis",
+        broker=broker,
         broker_environment=str(payload.get("broker_environment", "real")).strip().lower() or "real",
         read_only=bool(payload.get("read_only", True)),
         account_no=_first_non_empty(
@@ -67,6 +73,7 @@ def load_portfolio_profile(path: str | Path, profile_name: str) -> PortfolioProf
         trigger_budget_krw=max(0, _to_int(payload.get("trigger_budget_krw"), default=500_000)),
         constraints=constraints,
         continue_on_error=bool(payload.get("continue_on_error", True)),
+        market_scope=market_scope,
     )
 
 
@@ -103,6 +110,42 @@ def _first_non_empty(*values: str | None) -> str | None:
         if value:
             return value
     return None
+
+
+def _normalize_market_scope(value: object, *, broker: str, watch_tickers: tuple[str, ...]) -> str:
+    text = _normalize_text(value)
+    if text:
+        normalized = text.strip().lower()
+        aliases = {
+            "domestic": "kr",
+            "korea": "kr",
+            "krx": "kr",
+            "overseas": "us",
+            "usa": "us",
+            "united_states": "us",
+            "united-states": "us",
+        }
+        normalized = aliases.get(normalized, normalized)
+        if normalized in {"kr", "us", "all"}:
+            return normalized
+    if broker in {"watchlist", "paper", "none"} and _looks_like_us_watchlist(watch_tickers):
+        return "us"
+    if _looks_like_us_watchlist(watch_tickers):
+        return "us"
+    return "kr"
+
+
+def _looks_like_us_watchlist(watch_tickers: tuple[str, ...]) -> bool:
+    if not watch_tickers:
+        return False
+    has_us = False
+    for ticker in watch_tickers:
+        symbol = str(ticker or "").strip().upper()
+        if symbol.endswith((".KS", ".KQ")) or (len(symbol) == 6 and symbol.isdigit()):
+            return False
+        if symbol:
+            has_us = True
+    return has_us
 
 
 def _to_int(value: Any, *, default: int) -> int:

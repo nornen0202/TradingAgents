@@ -346,7 +346,7 @@ jobs:
   deploy_overlay:
     needs:
       - publish_overlay_site
-    if: ${{ needs.publish_overlay_site.result == 'success' }}
+    if: ${{ always() && needs.publish_overlay_site.result == 'success' }}
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
