@@ -45,14 +45,18 @@ csv_positions_path = ""
 private_output_dirname = "portfolio-private"
 watch_tickers = [
   "AAPL",
+  "COST",
   "ETN",
   "ETHU",
   "FANG",
   "GEV",
   "GLDM",
   "GOOGL",
+  "LHX",
   "LLY",
+  "LRCX",
   "MU",
+  "NET",
   "NVDA",
   "ORCL",
   "RSP",
@@ -63,45 +67,6 @@ watch_tickers = [
 ]
 trigger_budget_krw = 500000
 min_cash_buffer_krw = 2500000
-min_trade_krw = 100000
-max_single_name_weight = 0.35
-max_sector_weight = 0.50
-max_daily_turnover_ratio = 0.30
-max_order_count_per_day = 5
-respect_existing_weights_softly = true
-continue_on_error = true
-
-[profiles.us_watchlist_default]
-enabled = true
-broker = "watchlist"
-broker_environment = "real"
-read_only = true
-market_scope = "us"
-account_no = "68944660"
-product_code = "01"
-manual_snapshot_path = ""
-csv_positions_path = ""
-private_output_dirname = "portfolio-private"
-watch_tickers = [
-  "AAPL",
-  "ETN",
-  "ETHU",
-  "FANG",
-  "GEV",
-  "GLDM",
-  "GOOGL",
-  "LLY",
-  "MU",
-  "NVDA",
-  "ORCL",
-  "RSP",
-  "TSLA",
-  "TSM",
-  "VRT",
-  "VXUS",
-]
-trigger_budget_krw = 0
-min_cash_buffer_krw = 0
 min_trade_krw = 100000
 max_single_name_weight = 0.35
 max_sector_weight = 0.50
