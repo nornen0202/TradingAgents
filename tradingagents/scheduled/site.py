@@ -4,7 +4,7 @@ import html
 import json
 import re
 import shutil
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -245,6 +245,7 @@ def _render_run_page(
     portfolio_profile = portfolio_status.get("profile") or portfolio_summary.get("profile") or "-"
     portfolio_label = _portfolio_report_label(portfolio_summary)
     language = _manifest_language(manifest)
+    stale_after_seconds = _execution_stale_threshold_seconds(manifest)
 
     portfolio_links: list[str] = []
     for artifact_path in (portfolio_status.get("artifacts") or {}).values():
@@ -277,14 +278,18 @@ def _render_run_page(
               <p><strong>Investment view</strong><span>{_escape(present_investment_view(ticker_summary.get('decision') or ticker_summary.get('error'), language=language))}</span></p>
               <p><strong>Portfolio stance</strong><span>{_escape(_decision_structured_value(ticker_summary.get('decision'), 'portfolio_stance'))}</span></p>
               <p><strong>Entry action</strong><span>{_escape(_decision_structured_value(ticker_summary.get('decision'), 'entry_action'))}</span></p>
-              <p><strong>Today</strong><span>{_escape(_today_summary(ticker_summary, language=language))}</span></p>
+              <p><strong>Today</strong><span>{_escape(_today_summary(ticker_summary, language=language, stale_after_seconds=stale_after_seconds))}</span></p>
               <p><strong>Market view</strong><span>{_escape(_decision_market_view(ticker_summary.get('decision'), language=language))}</span></p>
               <p><strong>Decision source</strong><span>{_escape(_decision_source_label(ticker_summary))}</span></p>
-              <p><strong>Review required</strong><span>{_escape(_review_required_label(ticker_summary))}</span></p>
+              <p><strong>Analysis review</strong><span>{_escape(_analysis_review_required_label(ticker_summary))}</span></p>
+              <p><strong>Portfolio review</strong><span>{_escape(_portfolio_review_required_label(ticker_summary))}</span></p>
+              <p><strong>Analysis As-Of</strong><span>{_escape(_analysis_asof_label(ticker_summary))}</span></p>
               <p class="long-field"><strong>Key condition</strong><span>{_escape(_decision_primary_condition(ticker_summary.get('decision'), language=language))}</span></p>
-              <p class="long-field"><strong>Trigger summary</strong><span>{_escape(_trigger_summary(ticker_summary, language=language))}</span></p>
+              <p class="long-field"><strong>Trigger summary</strong><span>{_escape(_trigger_summary(ticker_summary, language=language, stale_after_seconds=stale_after_seconds))}</span></p>
               <p><strong>Execution As-Of</strong><span>{_escape(_execution_value(ticker_summary, 'execution_asof', default='not refreshed'))}</span></p>
-              <p><strong>Decision State</strong><span>{_escape(_execution_display_state(ticker_summary))}</span></p>
+              <p><strong>Published At</strong><span>{_escape(_published_at_label(manifest))}</span></p>
+              <p><strong>Historical view</strong><span>{_escape(_historical_view_label(manifest))}</span></p>
+              <p><strong>Decision State</strong><span>{_escape(_execution_display_state(ticker_summary, stale_after_seconds=stale_after_seconds))}</span></p>
               <p><strong>Staleness</strong><span>{_escape(_execution_staleness(ticker_summary))}</span></p>
               <p><strong>Source status</strong><span>{_escape(present_data_status(ticker_summary.get('decision'), quality_flags=ticker_summary.get('quality_flags'), language=language))}</span></p>
             </article>
@@ -427,6 +432,7 @@ def _render_ticker_page(
 ) -> str:
     run_dir = Path(manifest["_run_dir"])
     language = _manifest_language(manifest)
+    stale_after_seconds = _execution_stale_threshold_seconds(manifest)
     report_html = "<p class='empty'>No report markdown was generated for this ticker.</p>"
     report_relative = (ticker_summary.get("artifacts") or {}).get("report_markdown")
     if report_relative:
@@ -473,19 +479,23 @@ def _render_ticker_page(
         <p><strong>Snapshot</strong><span>{_escape(_execution_badge_label(ticker_summary))}</span></p>
         <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
         <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
+        <p><strong>Analysis As-Of</strong><span>{_escape(_analysis_asof_label(ticker_summary))}</span></p>
         <p><strong>Execution As-Of</strong><span>{_escape(_execution_value(ticker_summary, 'execution_asof', default='not refreshed'))}</span></p>
-        <p><strong>Decision State</strong><span>{_escape(_execution_display_state(ticker_summary))}</span></p>
+        <p><strong>Published At</strong><span>{_escape(_published_at_label(manifest))}</span></p>
+        <p><strong>Historical view</strong><span>{_escape(_historical_view_label(manifest))}</span></p>
+        <p><strong>Decision State</strong><span>{_escape(_execution_display_state(ticker_summary, stale_after_seconds=stale_after_seconds))}</span></p>
         <p><strong>Staleness</strong><span>{_escape(_execution_staleness(ticker_summary))}</span></p>
         <p><strong>Data health</strong><span>{_escape(_execution_value(ticker_summary, 'data_health', default='unknown'))}</span></p>
         <p><strong>Investment view</strong><span>{_escape(present_investment_view(ticker_summary.get('decision'), language=language))}</span></p>
         <p><strong>Portfolio stance</strong><span>{_escape(_decision_structured_value(ticker_summary.get('decision'), 'portfolio_stance'))}</span></p>
         <p><strong>Entry action</strong><span>{_escape(_decision_structured_value(ticker_summary.get('decision'), 'entry_action'))}</span></p>
-        <p><strong>Today</strong><span>{_escape(_today_summary(ticker_summary, language=language))}</span></p>
+        <p><strong>Today</strong><span>{_escape(_today_summary(ticker_summary, language=language, stale_after_seconds=stale_after_seconds))}</span></p>
         <p><strong>Decision source</strong><span>{_escape(_decision_source_label(ticker_summary))}</span></p>
-        <p><strong>Review required</strong><span>{_escape(_review_required_label(ticker_summary))}</span></p>
+        <p><strong>Analysis review</strong><span>{_escape(_analysis_review_required_label(ticker_summary))}</span></p>
+        <p><strong>Portfolio review</strong><span>{_escape(_portfolio_review_required_label(ticker_summary))}</span></p>
         <p><strong>Market view</strong><span>{_escape(_decision_market_view(ticker_summary.get('decision'), language=language))}</span></p>
         <p><strong>Key condition</strong><span>{_escape(_decision_primary_condition(ticker_summary.get('decision'), language=language))}</span></p>
-        <p><strong>Trigger summary</strong><span>{_escape(_trigger_summary(ticker_summary, language=language))}</span></p>
+        <p><strong>Trigger summary</strong><span>{_escape(_trigger_summary(ticker_summary, language=language, stale_after_seconds=stale_after_seconds))}</span></p>
         <p><strong>Source status</strong><span>{_escape(present_data_status(ticker_summary.get('decision'), quality_flags=ticker_summary.get('quality_flags'), language=language))}</span></p>
       </div>
     </section>
@@ -554,6 +564,15 @@ def _execution_payload(ticker_summary: dict[str, Any]) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
+def _execution_stale_threshold_seconds(manifest: dict[str, Any]) -> int:
+    settings = manifest.get("settings") or {}
+    raw = settings.get("execution_max_data_age_seconds")
+    try:
+        return max(int(raw), 30)
+    except Exception:
+        return 180
+
+
 def _execution_value(ticker_summary: dict[str, Any], key: str, *, default: str) -> str:
     payload = _execution_payload(ticker_summary)
     value = payload.get(key)
@@ -585,7 +604,7 @@ def _execution_badge_label(ticker_summary: dict[str, Any]) -> str:
     return "PRE_OPEN SNAPSHOT"
 
 
-def _execution_display_state(ticker_summary: dict[str, Any]) -> str:
+def _execution_display_state(ticker_summary: dict[str, Any], *, stale_after_seconds: int = 180) -> str:
     payload = _execution_payload(ticker_summary)
     if not payload:
         return "WAIT (not refreshed)"
@@ -596,7 +615,7 @@ def _execution_display_state(ticker_summary: dict[str, Any]) -> str:
         return "DEGRADED (stale market data)"
     staleness = payload.get("staleness_seconds")
     try:
-        stale = int(staleness) > 180
+        stale = int(staleness) > max(int(stale_after_seconds), 0)
     except Exception:
         stale = False
     if stale and state == "ACTIONABLE_NOW":
@@ -604,13 +623,33 @@ def _execution_display_state(ticker_summary: dict[str, Any]) -> str:
     return state
 
 
-def _today_summary(ticker_summary: dict[str, Any], *, language: str) -> str:
+def _today_summary(
+    ticker_summary: dict[str, Any],
+    *,
+    language: str,
+    stale_after_seconds: int = 180,
+) -> str:
     payload = _execution_payload(ticker_summary)
+    is_korean = language.lower().startswith("korean")
+    if not payload:
+        return "장 시작 전 스냅샷, 장중 데이터 대기" if is_korean else "Pre-open snapshot; waiting for intraday refresh"
+
+    review_required = bool(payload.get("review_required")) or bool(ticker_summary.get("review_required"))
+    decision_source = str(payload.get("decision_source") or ticker_summary.get("decision_source") or "").upper()
     decision_state = str(payload.get("decision_state") or "").upper()
+    if review_required:
+        return "검토 필요 플래그로 수동 검토 우선" if is_korean else "Manual review required before action"
+    if "RULE_ONLY_FALLBACK" in decision_source:
+        return "규칙 기반 대체 판단, 데이터 재확인 필요" if is_korean else "Rule fallback; verify data before action"
+    if decision_state == "DEGRADED":
+        return "데이터 신선도 저하로 보수적 관찰" if is_korean else "Degraded freshness; stay defensive"
     if decision_state == "ACTIONABLE_NOW":
         return "오늘 바로 검토" if language.lower().startswith("korean") else "Review now"
     if decision_state == "TRIGGERED_PENDING_CLOSE":
         return "종가 확인 필요" if language.lower().startswith("korean") else "Await close confirmation"
+    display_state = _execution_display_state(ticker_summary, stale_after_seconds=stale_after_seconds)
+    if display_state == "WAIT (stale overlay)":
+        return "신호는 있으나 stale로 실행 보류" if is_korean else "Signal present but stale overlay blocks action"
     stance = _decision_structured_value(ticker_summary.get("decision"), "portfolio_stance").upper()
     entry_action = _decision_structured_value(ticker_summary.get("decision"), "entry_action").upper()
     if stance == "BULLISH" and entry_action == "WAIT":
@@ -636,17 +675,54 @@ def _decision_source_label(ticker_summary: dict[str, Any]) -> str:
     return str(payload.get("decision_source") or ticker_summary.get("decision_source") or "analysis")
 
 
-def _review_required_label(ticker_summary: dict[str, Any]) -> str:
-    payload = _execution_payload(ticker_summary)
-    value = payload.get("review_required")
-    if value is None:
-        value = ticker_summary.get("review_required")
+def _analysis_review_required_label(ticker_summary: dict[str, Any]) -> str:
+    value = ticker_summary.get("review_required")
     return "yes" if bool(value) else "no"
 
 
-def _trigger_summary(ticker_summary: dict[str, Any], *, language: str) -> str:
+def _portfolio_review_required_label(ticker_summary: dict[str, Any]) -> str:
+    payload = _execution_payload(ticker_summary)
+    value = payload.get("review_required")
+    return "yes" if bool(value) else "no"
+
+
+def _analysis_asof_label(ticker_summary: dict[str, Any]) -> str:
+    value = ticker_summary.get("finished_at") or ticker_summary.get("started_at")
+    return str(value or "-")
+
+
+def _published_at_label(manifest: dict[str, Any]) -> str:
+    value = manifest.get("finished_at") or manifest.get("started_at")
+    return str(value or "-")
+
+
+def _historical_view_label(manifest: dict[str, Any]) -> str:
+    published_raw = manifest.get("finished_at") or manifest.get("started_at")
+    if not published_raw:
+        return "unknown"
+    try:
+        published_at = _parse_iso_datetime(str(published_raw))
+    except ValueError:
+        return "unknown"
+    age_seconds = (datetime.now(timezone.utc) - published_at.astimezone(timezone.utc)).total_seconds()
+    return "yes" if age_seconds >= 6 * 3600 else "no"
+
+
+def _parse_iso_datetime(value: str) -> datetime:
+    text = str(value or "").strip()
+    if not text:
+        raise ValueError("missing datetime")
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    parsed = datetime.fromisoformat(text)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def _trigger_summary(ticker_summary: dict[str, Any], *, language: str, stale_after_seconds: int = 180) -> str:
     key = _decision_primary_condition(ticker_summary.get("decision"), language=language)
-    state = _execution_display_state(ticker_summary)
+    state = _execution_display_state(ticker_summary, stale_after_seconds=stale_after_seconds)
     return f"{state} · {key}"
 
 
