@@ -28,7 +28,7 @@ def build_semantic_verdicts(
         try:
             llm = _create_semantic_llm(llm_settings)
         except Exception as exc:
-            warnings.append(f"semantic_judge_unavailable: {exc}")
+            warnings.append(_friendly_semantic_warning("semantic_judge_unavailable", exc))
 
     judged: list[PortfolioCandidate] = []
     verdicts: list[dict[str, Any]] = []
@@ -50,7 +50,10 @@ def build_semantic_verdicts(
                 verdict["reason_codes"] = list(
                     dict.fromkeys([*verdict.get("reason_codes", []), "semantic_judge_fallback"])
                 )
-                warnings.append(f"{candidate.instrument.canonical_ticker}: semantic_judge_failed ({exc})")
+                warnings.append(
+                    f"{candidate.instrument.canonical_ticker}: "
+                    f"{_friendly_semantic_warning('semantic_judge_failed', exc)}"
+                )
         elif semantic_llm_enabled and _should_call_semantic_llm(candidate):
             decision_source = "RULE_ONLY_FALLBACK"
             verdict["review_required"] = True
@@ -98,6 +101,17 @@ def build_semantic_verdicts(
         )
 
     return judged, verdicts, warnings
+
+
+def _friendly_semantic_warning(code: str, exc: Exception | None = None) -> str:
+    message = str(exc or "").lower()
+    if "refresh token" in message:
+        detail = "LLM judge session expired while refreshing credentials."
+    elif "timeout" in message:
+        detail = "LLM judge timed out before producing a verdict."
+    else:
+        detail = "LLM judge is unavailable; using rule-only fallback."
+    return f"{code}: {detail}"
 
 
 def _load_context_by_ticker(run_dir: Path, manifest: dict[str, Any]) -> dict[str, dict[str, Any]]:

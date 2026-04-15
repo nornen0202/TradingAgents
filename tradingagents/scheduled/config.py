@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field, replace
+from datetime import datetime, time
 from pathlib import Path
 from typing import Iterable
 from zoneinfo import ZoneInfo
@@ -18,11 +19,16 @@ ALL_ANALYSTS = ("market", "social", "news", "fundamentals")
 VALID_TRADE_DATE_MODES = {"latest_available", "today", "previous_business_day", "explicit"}
 VALID_TICKER_UNIVERSE_MODES = {"config_only", "config_plus_account", "account_only"}
 VALID_RUN_MODES = {"full", "overlay_only", "selective_rerun_only"}
+DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET: dict[str, tuple[str, ...]] = {
+    # KST anchors intentionally map to (pre-open, intraday, post-close) semantics.
+    "KR": ("09:20", "12:00", "15:40"),
+}
 
 
 @dataclass(frozen=True)
 class RunSettings:
     tickers: list[str]
+    market: str = "AUTO"
     ticker_universe_mode: str = "config_only"
     analysts: list[str] = field(default_factory=lambda: list(ALL_ANALYSTS))
     output_language: str = "Korean"
@@ -83,7 +89,7 @@ class SiteSettings:
 @dataclass(frozen=True)
 class ExecutionSettings:
     execution_refresh_enabled: bool = False
-    execution_refresh_checkpoints_kst: tuple[str, ...] = ("23:35",)
+    execution_refresh_checkpoints_kst: tuple[str, ...] = DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET["KR"]
     execution_max_data_age_seconds: int = 180
     execution_publish_badges: bool = True
     execution_selective_rerun_enabled: bool = True
@@ -150,6 +156,9 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
 
     timezone_name = str(run_raw.get("timezone", "Asia/Seoul")).strip()
     ZoneInfo(timezone_name)
+    declared_market = str(run_raw.get("market", "AUTO")).strip().upper() or "AUTO"
+    market_code = _normalize_market_code(declared_market, timezone_name=timezone_name)
+    default_checkpoints = _default_execution_checkpoints_kst(market_code)
 
     base_dir = config_path.parent
     archive_dir = _resolve_path(storage_raw.get("archive_dir", ".tradingagents-scheduled/archive"), base_dir)
@@ -158,6 +167,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     return ScheduledAnalysisConfig(
         run=RunSettings(
             tickers=tickers,
+            market=market_code,
             ticker_universe_mode=_normalize_ticker_universe_mode(run_raw.get("ticker_universe_mode", "config_only")),
             analysts=analysts,
             output_language=str(run_raw.get("output_language", "Korean")).strip() or "Korean",
@@ -229,7 +239,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         ),
         execution=ExecutionSettings(
             execution_refresh_enabled=bool(execution_raw.get("enabled", False)),
-            execution_refresh_checkpoints_kst=tuple(execution_raw.get("checkpoints_kst", ("23:35",))),
+            execution_refresh_checkpoints_kst=tuple(execution_raw.get("checkpoints_kst", default_checkpoints)),
             execution_max_data_age_seconds=max(30, int(execution_raw.get("max_data_age_seconds", 180))),
             execution_publish_badges=bool(execution_raw.get("publish_badges", True)),
             execution_selective_rerun_enabled=bool(execution_raw.get("selective_rerun_enabled", True)),
@@ -238,6 +248,50 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         ),
         config_path=config_path,
     )
+
+
+def _infer_market_code(timezone_name: str) -> str:
+    normalized = str(timezone_name or "").strip().lower()
+    if normalized in {"asia/seoul", "asia/tokyo"}:
+        return "KR"
+    if normalized.startswith("america/"):
+        return "US"
+    return "KR"
+
+
+def _normalize_market_code(value: str, *, timezone_name: str) -> str:
+    market = str(value or "").strip().upper()
+    if market in {"US", "KR"}:
+        return market
+    return _infer_market_code(timezone_name)
+
+
+def _default_execution_checkpoints_kst(market_code: str) -> tuple[str, ...]:
+    normalized = str(market_code or "").strip().upper()
+    if normalized == "US":
+        # US checkpoints are derived from New York regular session anchors:
+        # pre-open (09:20 ET), early-session checkpoint (10:00 ET), near-close (15:30 ET),
+        # then converted to KST with DST awareness.
+        return _convert_market_times_to_kst(
+            market_timezone="America/New_York",
+            anchor_times=(time(9, 20), time(10, 0), time(15, 30)),
+        )
+    return DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET["KR"]
+
+
+def _convert_market_times_to_kst(
+    *,
+    market_timezone: str,
+    anchor_times: tuple[time, ...],
+) -> tuple[str, ...]:
+    market_tz = ZoneInfo(market_timezone)
+    kst_tz = ZoneInfo("Asia/Seoul")
+    market_now = datetime.now(market_tz)
+    result: list[str] = []
+    for anchor in anchor_times:
+        market_dt = datetime.combine(market_now.date(), anchor, tzinfo=market_tz)
+        result.append(market_dt.astimezone(kst_tz).strftime("%H:%M"))
+    return tuple(result)
 
 
 def with_overrides(

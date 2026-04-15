@@ -143,23 +143,30 @@ def execute_scheduled_run(
     execution_updates: dict[str, dict[str, Any]] = {}
     if config.execution.execution_refresh_enabled:
         now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
-        selected_checkpoints = _select_due_checkpoints(
+        selected_checkpoints, overlay_phase = _select_due_checkpoints(
             now_kst=now_kst,
             checkpoints=list(config.execution.execution_refresh_checkpoints_kst),
         )
+        manifest_overlay_phase = {
+            "name": overlay_phase,
+            "selected_checkpoints": list(selected_checkpoints),
+            "now_kst": now_kst.isoformat(),
+        }
         execution_updates = _run_execution_overlay_passes(
             config=config,
             run_dir=run_dir,
             ticker_summaries=ticker_summaries,
             checkpoints=selected_checkpoints,
         )
-        if run_mode in {"overlay_only", "selective_rerun_only"} and not _has_ticker_execution_updates(
+        if run_mode in {"overlay_only", "selective_rerun_only"} and selected_checkpoints and not _has_ticker_execution_updates(
             execution_updates
         ):
             raise RuntimeError(
                 f"run_mode={run_mode} produced no execution updates. "
                 "Check execution_contract artifacts and intraday market data availability."
             )
+    else:
+        manifest_overlay_phase = {"name": "DISABLED", "selected_checkpoints": []}
 
     event_signals = collect_event_signals(run_dir=run_dir, ticker_summaries=ticker_summaries)
     selective_rerun_targets: dict[str, list[str]] = {}
@@ -228,6 +235,7 @@ def execute_scheduled_run(
             ticker_updates=execution_updates,
             checkpoint=latest_checkpoint,
         )
+        manifest["execution"]["overlay_phase"] = manifest_overlay_phase
         _write_json(run_dir / "execution_summary.json", manifest["execution"])
         (run_dir / "execution_summary.md").write_text(
             render_execution_summary_markdown(
@@ -237,6 +245,22 @@ def execute_scheduled_run(
             ),
             encoding="utf-8",
         )
+    elif config.execution.execution_refresh_enabled:
+        manifest["execution"] = {
+            "run_id": run_id,
+            "refresh_checkpoint": None,
+            "overlay_phase": manifest_overlay_phase,
+            "execution_asof": None,
+            "actionable_now": [],
+            "triggered_pending_close": [],
+            "wait": [],
+            "invalidated": [],
+            "degraded": [],
+            "top_priority_order": [],
+            "market_regime": "pre_open_snapshot",
+            "notes": ["No execution checkpoint is due yet; this run is a pre-open snapshot."],
+        }
+        _write_json(run_dir / "execution_summary.json", manifest["execution"])
     if selective_rerun_targets:
         manifest["selective_rerun_targets"] = selective_rerun_targets
     if selective_rerun_results:
@@ -622,6 +646,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "analysts": list(config.run.analysts),
         "trade_date_mode": config.run.trade_date_mode,
         "ticker_universe_mode": config.run.ticker_universe_mode,
+        "market": config.run.market,
         "run_mode": config.run.run_mode,
         "configured_ticker_count": len(config.run.tickers),
         "max_debate_rounds": config.run.max_debate_rounds,
@@ -683,6 +708,7 @@ def _resolve_run_tickers(config: ScheduledAnalysisConfig) -> list[str]:
 def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, Any]:
     successful = [item for item in ticker_summaries if item.get("status") == "success"]
     decision_distribution: dict[str, int] = {}
+    translated_action_distribution: dict[str, int] = {}
     stance_distribution: dict[str, int] = {}
     entry_action_distribution: dict[str, int] = {}
     confidences: list[float] = []
@@ -696,6 +722,12 @@ def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, 
                 decision_distribution[parsed.rating.value] = decision_distribution.get(parsed.rating.value, 0) + 1
                 stance_distribution[parsed.portfolio_stance.value] = stance_distribution.get(parsed.portfolio_stance.value, 0) + 1
                 entry_action_distribution[parsed.entry_action.value] = entry_action_distribution.get(parsed.entry_action.value, 0) + 1
+                translated = _translate_legacy_rating(
+                    rating=parsed.rating.value,
+                    stance=parsed.portfolio_stance.value,
+                    entry_action=parsed.entry_action.value,
+                )
+                translated_action_distribution[translated] = translated_action_distribution.get(translated, 0) + 1
                 confidences.append(parsed.confidence)
                 if parsed.data_coverage.company_news_count == 0:
                     zero_company_news += 1
@@ -709,6 +741,8 @@ def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, 
     avg_confidence = (sum(confidences) / len(confidences)) if confidences else None
     return {
         "decision_distribution": decision_distribution,
+        "legacy_rating_distribution": decision_distribution,
+        "translated_action_distribution": translated_action_distribution,
         "stance_distribution": stance_distribution,
         "entry_action_distribution": entry_action_distribution,
         "avg_confidence": avg_confidence,
@@ -732,6 +766,7 @@ def _compute_batch_warnings(batch_metrics: dict[str, Any]) -> list[str]:
     bullish_ratio = bullish / total if total else 0.0
     wait_ratio = waiting / total if total else 0.0
     if no_trade_ratio >= 0.8:
+        translated_distribution = batch_metrics.get("translated_action_distribution") or {}
         warnings.append(
             f"High NO_TRADE concentration: {no_trade_count}/{total} ({no_trade_ratio:.0%})."
         )
@@ -739,6 +774,11 @@ def _compute_batch_warnings(batch_metrics: dict[str, Any]) -> list[str]:
             warnings.append(
                 "Legacy NO_TRADE concentration coexists with constructive stance/action signals; calibrate stance-action mapping."
             )
+        if translated_distribution:
+            translated_blob = ", ".join(
+                f"{key} {int(value)}/{total}" for key, value in sorted(translated_distribution.items())
+            )
+            warnings.append(f"Translated action distribution: {translated_blob}.")
     if wait_ratio >= 0.8 and bullish_ratio >= 0.5:
         warnings.append(
             f"Wait-heavy constructive batch: WAIT {waiting}/{total} with BULLISH {bullish}/{total}; review entry-action calibration."
@@ -749,6 +789,25 @@ def _compute_batch_warnings(batch_metrics: dict[str, Any]) -> list[str]:
             "Constructive batch produced no BUY/OVERWEIGHT ratings; review rating calibration against stance and entry_action outputs."
         )
     return warnings
+
+
+def _translate_legacy_rating(*, rating: str, stance: str, entry_action: str) -> str:
+    normalized_rating = str(rating or "").strip().upper()
+    normalized_stance = str(stance or "").strip().upper()
+    normalized_entry = str(entry_action or "").strip().upper()
+    if normalized_rating == "NO_TRADE":
+        if normalized_stance == "BEARISH" or normalized_entry == "EXIT":
+            return "AVOID"
+        if normalized_stance == "BULLISH":
+            return "WATCH_TRIGGER"
+        return "WATCH"
+    if normalized_stance == "BEARISH" and normalized_entry == "EXIT":
+        return "AVOID"
+    if normalized_stance == "BULLISH" and normalized_entry in {"ADD", "STARTER"}:
+        return "ACTIONABLE"
+    if normalized_entry == "WAIT":
+        return "WATCH_TRIGGER"
+    return "WATCH"
 
 
 def _build_run_id(started_at: datetime, run_label: str) -> str:
@@ -975,10 +1034,10 @@ def _has_ticker_execution_updates(execution_updates: dict[str, dict[str, Any]]) 
     return any(not str(key).startswith("_") for key in execution_updates)
 
 
-def _select_due_checkpoints(*, now_kst: datetime, checkpoints: list[str]) -> list[str]:
+def _select_due_checkpoints(*, now_kst: datetime, checkpoints: list[str]) -> tuple[list[str], str]:
     normalized = [str(item).strip() for item in checkpoints if str(item).strip()]
     if not normalized:
-        return ["post_research"]
+        return (["post_research"], "POST_RESEARCH")
     due: list[str] = []
     for item in normalized:
         try:
@@ -991,9 +1050,8 @@ def _select_due_checkpoints(*, now_kst: datetime, checkpoints: list[str]) -> lis
             due.append(item)
     if due:
         # Minimize API usage: execute only the most recent due checkpoint in this run.
-        return [due[-1]]
-    # If none are due yet, run the first configured checkpoint once as a pre-open marker.
-    return [normalized[0]]
+        return ([due[-1]], f"CHECKPOINT_{due[-1].replace(':', '_')}")
+    return ([], "PRE_OPEN")
 
 
 def _run_selective_rerun(

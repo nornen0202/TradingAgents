@@ -183,6 +183,11 @@ NVDA = "NVIDIA Override"
 
             self.assertIn("Daily Reports", index_html)
             self.assertIn("partial failure", index_html)
+            self.assertIn("overlay health", index_html)
+            self.assertIn("judge health", index_html)
+            self.assertIn("data coverage", index_html)
+            self.assertIn("freshness", index_html)
+            self.assertIn("identity integrity", index_html)
             self.assertIn("NVDA", run_html)
             self.assertIn("NVIDIA Override (NVDA)", run_html)
             self.assertIn("Report", ticker_html)

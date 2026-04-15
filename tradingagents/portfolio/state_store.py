@@ -48,8 +48,14 @@ def save_portfolio_outputs(
             "account_value_krw": snapshot.account_value_krw,
             "cash_diagnostics": snapshot.cash_diagnostics,
             "decision_distribution": batch_metrics.get("decision_distribution") or {},
+            "legacy_rating_distribution": batch_metrics.get("legacy_rating_distribution")
+            or batch_metrics.get("decision_distribution")
+            or {},
             "stance_distribution": batch_metrics.get("stance_distribution") or {},
             "entry_action_distribution": batch_metrics.get("entry_action_distribution") or {},
+            "translated_action_distribution": batch_metrics.get("translated_action_distribution")
+            or _translated_action_distribution(recommendation),
+            "portfolio_summary_counts": recommendation.data_health_summary,
             "warnings": list(warnings),
             "semantic_verdicts": semantic_verdicts,
             "action_judge": action_judge_payload,
@@ -69,6 +75,14 @@ def save_portfolio_outputs(
         "proposed_orders_json": proposed_orders_path.as_posix(),
         "decision_audit_json": audit_path.as_posix(),
     }
+
+
+def _translated_action_distribution(recommendation: PortfolioRecommendation) -> dict[str, int]:
+    distribution: dict[str, int] = {}
+    for action in recommendation.actions:
+        key = str(action.action_now or "UNKNOWN")
+        distribution[key] = distribution.get(key, 0) + 1
+    return distribution
 
 
 def _build_proposed_orders(snapshot: AccountSnapshot, recommendation: PortfolioRecommendation) -> list[dict[str, Any]]:

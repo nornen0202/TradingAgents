@@ -150,6 +150,20 @@ def build_recommendation(
             "company_news_zero_ratio": batch_metrics.get("company_news_zero_ratio"),
             "snapshot_health": snapshot.snapshot_health,
             "warning_flags": list(warnings),
+            "actionable_now_count": sum(
+                1 for action in prioritized if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}
+            ),
+            "triggerable_candidates_count": sum(
+                1 for action in prioritized if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}
+            ),
+            "watch_candidates_count": sum(1 for action in prioritized if action.action_now == "WATCH"),
+            "held_watch_count": sum(
+                1 for action in prioritized if action.action_now == "HOLD" and action.action_if_triggered == "ADD_IF_TRIGGERED"
+            ),
+            "review_required_count": sum(1 for action in prioritized if action.review_required),
+            "rule_only_fallback_count": sum(
+                1 for action in prioritized if str(action.decision_source).upper() == "RULE_ONLY_FALLBACK"
+            ),
         },
     )
     return recommendation, scored
