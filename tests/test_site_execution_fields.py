@@ -7,7 +7,7 @@ from tradingagents.scheduled.site import (
 
 def test_execution_badge_defaults_to_preopen():
     ticker_summary = {"ticker": "TSM", "status": "success"}
-    assert _execution_badge_label(ticker_summary) == "Pre-open snapshot"
+    assert _execution_badge_label(ticker_summary) == "PRE_OPEN SNAPSHOT"
     assert _execution_display_state(ticker_summary).startswith("WAIT")
 
 

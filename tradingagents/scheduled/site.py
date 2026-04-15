@@ -17,6 +17,7 @@ from tradingagents.presentation import (
     present_primary_condition,
     present_snapshot_mode,
 )
+from tradingagents.schemas import parse_structured_decision
 
 try:
     from markdown_it import MarkdownIt
@@ -136,6 +137,8 @@ def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
 def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) -> str:
     latest = manifests[0] if manifests else None
     latest_portfolio = _load_portfolio_summary(Path(latest["_run_dir"])) if latest else {}
+    latest_health_badges = _health_badges_html(manifest=latest, portfolio_summary=latest_portfolio) if latest else ""
+    latest_health_compact = _render_health_compact_card(manifest=latest, portfolio_summary=latest_portfolio) if latest else ""
     latest_portfolio_label = _portfolio_report_label(latest_portfolio)
     latest_portfolio_link = (
         f"<a class=\"button\" href=\"runs/{_escape(latest['run_id'])}/portfolio.html\">Open {_escape(latest_portfolio_label.lower())}</a>"
@@ -157,6 +160,8 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
             <p><strong>Tickers</strong><span>{latest['summary']['total_tickers']}</span></p>
             <p><strong>Success</strong><span>{latest['summary']['successful_tickers']}</span></p>
             <p><strong>Failed</strong><span>{latest['summary']['failed_tickers']}</span></p>
+            {latest_health_badges}
+            {latest_health_compact}
             <a class="button" href="runs/{_escape(latest['run_id'])}/index.html">Open latest run</a>
             {latest_portfolio_link}
           </div>
@@ -197,6 +202,8 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
               <p>{_escape(manifest['started_at'])}</p>
               <p>{manifest['summary']['successful_tickers']} succeeded, {manifest['summary']['failed_tickers']} failed</p>
               <p>{_escape(manifest['settings'].get('output_language', '-'))} report</p>
+              {_health_badges_html(manifest=manifest, portfolio_summary=portfolio_summary)}
+              {_render_health_compact_inline(manifest=manifest, portfolio_summary=portfolio_summary)}
               {portfolio_link}
             </article>
             """
@@ -268,9 +275,14 @@ def _render_run_page(
               <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
               <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
               <p><strong>Investment view</strong><span>{_escape(present_investment_view(ticker_summary.get('decision') or ticker_summary.get('error'), language=language))}</span></p>
-              <p><strong>Today</strong><span>{_escape(present_action_summary(ticker_summary.get('decision'), language=language))}</span></p>
+              <p><strong>Portfolio stance</strong><span>{_escape(_decision_structured_value(ticker_summary.get('decision'), 'portfolio_stance'))}</span></p>
+              <p><strong>Entry action</strong><span>{_escape(_decision_structured_value(ticker_summary.get('decision'), 'entry_action'))}</span></p>
+              <p><strong>Today</strong><span>{_escape(_today_summary(ticker_summary, language=language))}</span></p>
               <p><strong>Market view</strong><span>{_escape(_decision_market_view(ticker_summary.get('decision'), language=language))}</span></p>
+              <p><strong>Decision source</strong><span>{_escape(_decision_source_label(ticker_summary))}</span></p>
+              <p><strong>Review required</strong><span>{_escape(_review_required_label(ticker_summary))}</span></p>
               <p class="long-field"><strong>Key condition</strong><span>{_escape(_decision_primary_condition(ticker_summary.get('decision'), language=language))}</span></p>
+              <p class="long-field"><strong>Trigger summary</strong><span>{_escape(_trigger_summary(ticker_summary, language=language))}</span></p>
               <p><strong>Execution As-Of</strong><span>{_escape(_execution_value(ticker_summary, 'execution_asof', default='not refreshed'))}</span></p>
               <p><strong>Decision State</strong><span>{_escape(_execution_display_state(ticker_summary))}</span></p>
               <p><strong>Staleness</strong><span>{_escape(_execution_staleness(ticker_summary))}</span></p>
@@ -326,6 +338,7 @@ def _render_run_page(
         <h2>Tickers</h2>
         <p>{manifest['summary']['successful_tickers']} success / {manifest['summary']['failed_tickers']} failed</p>
       </div>
+      {_render_run_health_section(manifest, portfolio_summary)}
       <div class="ticker-grid">
         {''.join(ticker_cards)}
       </div>
@@ -465,9 +478,14 @@ def _render_ticker_page(
         <p><strong>Staleness</strong><span>{_escape(_execution_staleness(ticker_summary))}</span></p>
         <p><strong>Data health</strong><span>{_escape(_execution_value(ticker_summary, 'data_health', default='unknown'))}</span></p>
         <p><strong>Investment view</strong><span>{_escape(present_investment_view(ticker_summary.get('decision'), language=language))}</span></p>
-        <p><strong>Today</strong><span>{_escape(present_action_summary(ticker_summary.get('decision'), language=language))}</span></p>
+        <p><strong>Portfolio stance</strong><span>{_escape(_decision_structured_value(ticker_summary.get('decision'), 'portfolio_stance'))}</span></p>
+        <p><strong>Entry action</strong><span>{_escape(_decision_structured_value(ticker_summary.get('decision'), 'entry_action'))}</span></p>
+        <p><strong>Today</strong><span>{_escape(_today_summary(ticker_summary, language=language))}</span></p>
+        <p><strong>Decision source</strong><span>{_escape(_decision_source_label(ticker_summary))}</span></p>
+        <p><strong>Review required</strong><span>{_escape(_review_required_label(ticker_summary))}</span></p>
         <p><strong>Market view</strong><span>{_escape(_decision_market_view(ticker_summary.get('decision'), language=language))}</span></p>
         <p><strong>Key condition</strong><span>{_escape(_decision_primary_condition(ticker_summary.get('decision'), language=language))}</span></p>
+        <p><strong>Trigger summary</strong><span>{_escape(_trigger_summary(ticker_summary, language=language))}</span></p>
         <p><strong>Source status</strong><span>{_escape(present_data_status(ticker_summary.get('decision'), quality_flags=ticker_summary.get('quality_flags'), language=language))}</span></p>
       </div>
     </section>
@@ -562,7 +580,9 @@ def _execution_staleness(ticker_summary: dict[str, Any]) -> str:
 
 def _execution_badge_label(ticker_summary: dict[str, Any]) -> str:
     payload = _execution_payload(ticker_summary)
-    return "Intraday refreshed" if payload else "Pre-open snapshot"
+    if payload:
+        return "Intraday refreshed"
+    return "PRE_OPEN SNAPSHOT"
 
 
 def _execution_display_state(ticker_summary: dict[str, Any]) -> str:
@@ -582,6 +602,52 @@ def _execution_display_state(ticker_summary: dict[str, Any]) -> str:
     if stale and state == "ACTIONABLE_NOW":
         return "WAIT (stale overlay)"
     return state
+
+
+def _today_summary(ticker_summary: dict[str, Any], *, language: str) -> str:
+    payload = _execution_payload(ticker_summary)
+    decision_state = str(payload.get("decision_state") or "").upper()
+    if decision_state == "ACTIONABLE_NOW":
+        return "오늘 바로 검토" if language.lower().startswith("korean") else "Review now"
+    if decision_state == "TRIGGERED_PENDING_CLOSE":
+        return "종가 확인 필요" if language.lower().startswith("korean") else "Await close confirmation"
+    stance = _decision_structured_value(ticker_summary.get("decision"), "portfolio_stance").upper()
+    entry_action = _decision_structured_value(ticker_summary.get("decision"), "entry_action").upper()
+    if stance == "BULLISH" and entry_action == "WAIT":
+        return "돌파/지지 확인 후 스타터 검토" if language.lower().startswith("korean") else "Starter after trigger"
+    if stance in {"NEUTRAL", "BULLISH"} and entry_action in {"WAIT", "NONE"}:
+        return "보유 유지, 조건 충족 시 추가 검토" if language.lower().startswith("korean") else "Hold and add if triggered"
+    return present_action_summary(ticker_summary.get("decision"), language=language)
+
+
+def _decision_structured_value(raw_decision: Any, field: str) -> str:
+    try:
+        parsed = parse_structured_decision(raw_decision)
+    except Exception:
+        return "-"
+    value = getattr(parsed, field, None)
+    if hasattr(value, "value"):
+        return str(value.value)
+    return str(value or "-")
+
+
+def _decision_source_label(ticker_summary: dict[str, Any]) -> str:
+    payload = _execution_payload(ticker_summary)
+    return str(payload.get("decision_source") or ticker_summary.get("decision_source") or "analysis")
+
+
+def _review_required_label(ticker_summary: dict[str, Any]) -> str:
+    payload = _execution_payload(ticker_summary)
+    value = payload.get("review_required")
+    if value is None:
+        value = ticker_summary.get("review_required")
+    return "yes" if bool(value) else "no"
+
+
+def _trigger_summary(ticker_summary: dict[str, Any], *, language: str) -> str:
+    key = _decision_primary_condition(ticker_summary.get("decision"), language=language)
+    state = _execution_display_state(ticker_summary)
+    return f"{state} · {key}"
 
 
 def _portfolio_status_label(status: str) -> str:
@@ -631,6 +697,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "profile": payload.get("profile"),
         "snapshot_health": payload.get("snapshot_health"),
         "generated_at": payload.get("generated_at"),
+        "semantic_health": payload.get("semantic_health") if isinstance(payload, dict) else {},
         "error": payload.get("error"),
         "portfolio_report_md": report_md if report_md.exists() else None,
         "portfolio_report_json": report_json if report_json.exists() else None,
@@ -663,6 +730,7 @@ def _render_execution_summary_section(summary: dict[str, Any]) -> str:
       </div>
       <article class="run-card">
         <p><strong>Refresh checkpoint</strong><span>{_escape(summary.get('refresh_checkpoint') or '-')}</span></p>
+        <p><strong>Overlay phase</strong><span>{_escape(((summary.get('overlay_phase') or {}).get('name')) or '-')}</span></p>
         <p><strong>Execution As-Of</strong><span>{_escape(summary.get('execution_asof') or '-')}</span></p>
         <p><strong>Actionable now</strong><span>{_escape(_join(summary.get('actionable_now')))}</span></p>
         <p><strong>Triggered pending close</strong><span>{_escape(_join(summary.get('triggered_pending_close')))}</span></p>
@@ -683,6 +751,88 @@ def _status_class(status: str) -> str:
     if normalized in {"failed", "failure"}:
         return "failed"
     return "pending"
+
+
+def _render_run_health_section(manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
+    metrics = _compute_health_metrics(manifest=manifest, portfolio_summary=portfolio_summary)
+    return (
+        "<article class='run-card'>"
+        f"<p><strong>overlay health</strong><span>{_escape(metrics['overlay_health'])}</span></p>"
+        f"<p><strong>judge health</strong><span>{_escape(metrics['judge_health'])}</span></p>"
+        f"<p><strong>data coverage</strong><span>{_escape(metrics['data_coverage'])}</span></p>"
+        f"<p><strong>freshness</strong><span>{_escape(metrics['freshness'])}</span></p>"
+        f"<p><strong>identity integrity</strong><span>{_escape(metrics['identity_integrity'])}</span></p>"
+        "</article>"
+    )
+
+
+def _compute_health_metrics(*, manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> dict[str, str]:
+    execution = manifest.get("execution") or {}
+    phase = str(((execution.get("overlay_phase") or {}).get("name")) or "UNKNOWN")
+    degraded_count = len(execution.get("degraded") or [])
+    total_tickers = max(int((manifest.get("summary") or {}).get("total_tickers") or 0), 1)
+    freshness = "stale-risk" if phase.startswith("CHECKPOINT_") and degraded_count > 0 else ("pre-open" if phase == "PRE_OPEN" else "ok")
+    semantic_health = portfolio_summary.get("semantic_health") or {}
+    fallback_ratio = float(semantic_health.get("rule_only_fallback_ratio") or 0.0)
+    judge_health = "degraded" if fallback_ratio >= 0.3 else "ok"
+    batch_metrics = manifest.get("batch_metrics") or {}
+    coverage_ratio = batch_metrics.get("company_news_zero_ratio")
+    data_coverage = (
+        f"company_news_zero_ratio={coverage_ratio:.0%}" if isinstance(coverage_ratio, (float, int)) else "unknown"
+    )
+    identity_integrity = "ok"
+    if any(not _looks_like_symbol(str(item.get("ticker") or "")) for item in (manifest.get("tickers") or [])):
+        identity_integrity = "warning"
+    return {
+        "overlay_health": phase,
+        "judge_health": judge_health,
+        "data_coverage": data_coverage,
+        "freshness": f"{freshness} ({degraded_count}/{total_tickers} degraded)",
+        "identity_integrity": identity_integrity,
+    }
+
+
+def _render_health_compact_card(*, manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
+    metrics = _compute_health_metrics(manifest=manifest, portfolio_summary=portfolio_summary)
+    rows = "".join(
+        f"<li><strong>{_escape(key.replace('_', ' '))}</strong>: {_escape(value)}</li>"
+        for key, value in metrics.items()
+    )
+    return f"<div class='run-health-compact'><ul>{rows}</ul></div>"
+
+
+def _render_health_compact_inline(*, manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
+    metrics = _compute_health_metrics(manifest=manifest, portfolio_summary=portfolio_summary)
+    compact = " · ".join(f"{key.replace('_', ' ')}={value}" for key, value in metrics.items())
+    return f"<p class='empty'>{_escape(compact)}</p>"
+
+
+def _health_badges_html(*, manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
+    badges: list[str] = []
+    execution = manifest.get("execution") or {}
+    phase = ((execution.get("overlay_phase") or {}).get("name") or "").upper()
+    if phase == "PRE_OPEN":
+        badges.append("overlay: pre-open")
+    semantic_health = portfolio_summary.get("semantic_health") or {}
+    fallback_ratio = float(semantic_health.get("rule_only_fallback_ratio") or 0.0)
+    if fallback_ratio >= 0.3:
+        badges.append(f"judge degraded ({fallback_ratio:.0%})")
+    if not badges:
+        return ""
+    return "<div class='pill-row'>" + "".join(
+        f"<span class='pill'>{_escape(text)}</span>" for text in badges
+    ) + "</div>"
+
+
+def _looks_like_symbol(value: str) -> bool:
+    symbol = str(value or "").strip().upper()
+    if not symbol:
+        return False
+    if " " in symbol:
+        return False
+    if symbol[0] == "." or symbol[-1] == "." or symbol.count(".") > 1:
+        return False
+    return all(ch.isalnum() or ch in {".", "-"} for ch in symbol)
 
 
 def _render_markdown(content: str) -> str:

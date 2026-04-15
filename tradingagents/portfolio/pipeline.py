@@ -109,11 +109,15 @@ def run_portfolio_pipeline(
             warnings=all_warnings,
         )
         status_value = _derive_pipeline_status(snapshot)
+        semantic_health = _build_semantic_health(scored_candidates)
+        if semantic_health["judge_unavailable"]:
+            status_value = "degraded"
         status = {
             "status": status_value,
             "profile": profile.name,
             "snapshot_health": snapshot.snapshot_health,
             "watchlist_reason": _derive_watchlist_reason(snapshot),
+            "semantic_health": semantic_health,
             "report_writer": report_writer_payload,
             "private_output_dir": private_dir.as_posix(),
             "artifacts": artifact_paths,
@@ -213,3 +217,19 @@ def _derive_watchlist_reason(snapshot) -> str | None:
     if "insufficient cash" in warning_blob:
         return "LOW_CAPITAL"
     return "WATCHLIST_POLICY"
+
+
+def _build_semantic_health(candidates: list[Any]) -> dict[str, Any]:
+    total = max(len(candidates), 1)
+    fallback_count = sum(
+        1 for candidate in candidates if str(getattr(candidate, "decision_source", "")).upper() == "RULE_ONLY_FALLBACK"
+    )
+    review_required_count = sum(1 for candidate in candidates if bool(getattr(candidate, "review_required", False)))
+    fallback_ratio = fallback_count / total
+    return {
+        "total_candidates": len(candidates),
+        "rule_only_fallback_count": fallback_count,
+        "review_required_count": review_required_count,
+        "rule_only_fallback_ratio": round(fallback_ratio, 4),
+        "judge_unavailable": fallback_ratio >= 0.3,
+    }

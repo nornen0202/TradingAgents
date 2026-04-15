@@ -21,6 +21,22 @@ def render_portfolio_report_markdown(
     market_label = present_market_regime(recommendation.market_regime, language="Korean")
     immediate_count = sum(1 for action in recommendation.actions if action.delta_krw_now != 0)
     conditional_count = sum(1 for action in recommendation.actions if action.delta_krw_if_triggered != 0)
+    actionable_now_count = sum(
+        1 for action in recommendation.actions if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}
+    )
+    triggerable_candidates_count = sum(
+        1 for action in recommendation.actions if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}
+    )
+    watch_candidates_count = sum(
+        1 for action in recommendation.actions if action.action_now == "WATCH"
+    )
+    held_watch_count = sum(
+        1 for action in recommendation.actions if action.action_now == "HOLD" and action.action_if_triggered == "ADD_IF_TRIGGERED"
+    )
+    review_required_count = sum(1 for action in recommendation.actions if action.review_required)
+    rule_only_fallback_count = sum(
+        1 for action in recommendation.actions if str(action.decision_source).upper() == "RULE_ONLY_FALLBACK"
+    )
     review_names = [action.display_name for action in recommendation.actions if action.review_required]
     title = (
         "# TradingAgents 포트폴리오 워치리스트 리포트"
@@ -60,6 +76,12 @@ def render_portfolio_report_markdown(
             "",
             f"- 지금 실행 후보: {immediate_count}개",
             f"- 조건부 실행 후보: {conditional_count}개",
+            f"- 전략상 즉시 액션 가능: {actionable_now_count}개",
+            f"- 트리거형 후보(현금과 무관): {triggerable_candidates_count}개",
+            f"- 미보유 관찰 후보: {watch_candidates_count}개",
+            f"- 보유 관찰(조건부 추가): {held_watch_count}개",
+            f"- 검토 필요 후보: {review_required_count}개",
+            f"- Rule-only fallback 후보: {rule_only_fallback_count}개",
             f"- 확인 필요 종목: {', '.join(review_names) if review_names else '없음'}",
             "- 세부 진단과 원본 판단 값은 감사용 JSON 파일에 보관됩니다.",
             "",

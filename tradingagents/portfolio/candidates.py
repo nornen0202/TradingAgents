@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from tradingagents.schemas import parse_structured_decision
+from tradingagents.schemas import DecisionRating, parse_structured_decision
 
 from .account_models import AccountSnapshot, PortfolioCandidate
 from .instrument_identity import resolve_identity
@@ -97,8 +97,10 @@ def _build_single_candidate(
         except Exception as exc:
             warnings.append(f"{canonical_ticker}: structured decision parse failed ({exc}).")
 
+    rating_value = "UNKNOWN"
     if structured is None and isinstance(decision_payload, str) and decision_payload.strip():
         normalized = decision_payload.strip().upper()
+        rating_value = normalized
         stance = "BULLISH" if normalized in {"BUY", "OVERWEIGHT"} else "BEARISH" if normalized in {"SELL", "UNDERWEIGHT"} else "NEUTRAL"
         entry_action = "ADD" if normalized in {"BUY", "OVERWEIGHT"} else "EXIT" if normalized in {"SELL", "UNDERWEIGHT"} else "WAIT"
         setup_quality = "COMPELLING" if normalized in {"BUY", "SELL"} else "DEVELOPING"
@@ -123,6 +125,7 @@ def _build_single_candidate(
         trigger_conditions = tuple()
     elif structured is not None:
         structured_dict = structured.to_dict()
+        rating_value = structured.rating.value
         confidence = structured.confidence
         stance = structured.portfolio_stance.value
         entry_action = structured.entry_action.value
@@ -133,6 +136,7 @@ def _build_single_candidate(
         )
     else:
         structured_dict = None
+        rating_value = "UNKNOWN"
         confidence = 0.30
         stance = "NEUTRAL"
         entry_action = "WAIT"
@@ -151,6 +155,7 @@ def _build_single_candidate(
         is_held=is_held,
         stance=stance,
         entry_action=entry_action,
+        rating=rating_value,
     )
     execution_update = (analysis or {}).get("execution_update") if analysis else None
     if isinstance(execution_update, dict):
@@ -196,13 +201,24 @@ def _build_single_candidate(
                 "vendor_calls": vendor_health["vendor_calls"],
                 "fallback_count": vendor_health["fallback_count"],
                 "quality_flags": list(quality_flags),
+                "legacy_rating": rating_value,
             },
         ),
         warnings,
     )
 
 
-def _translate_actions(*, is_held: bool, stance: str, entry_action: str) -> tuple[str, str]:
+def _translate_actions(*, is_held: bool, stance: str, entry_action: str, rating: str) -> tuple[str, str]:
+    normalized_rating = str(rating or "").strip().upper()
+    if normalized_rating == DecisionRating.NO_TRADE.value:
+        if stance == "BEARISH" or entry_action == "EXIT":
+            return ("HOLD" if is_held else "WATCH", "NONE")
+        if is_held:
+            return "HOLD", "ADD_IF_TRIGGERED" if stance == "BULLISH" else "NONE"
+        if stance == "BULLISH":
+            return "WATCH", "STARTER_IF_TRIGGERED"
+        return "WATCH", "WATCH_TRIGGER"
+
     if is_held and stance == "BEARISH" and entry_action == "EXIT":
         return "REDUCE_NOW", "EXIT_IF_TRIGGERED"
     if not is_held and stance == "BEARISH":
