@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import queue
+import shutil
 import subprocess
 import threading
 import uuid
@@ -28,6 +29,15 @@ class CodexAppServerBinaryError(CodexAppServerError):
 
 class CodexStructuredOutputError(CodexAppServerError):
     """Raised when Codex does not honor the requested structured output."""
+
+
+_CODEX_HOME_SEED_FILES = (
+    "auth.json",
+    "config.toml",
+    "models_cache.json",
+    ".codex-global-state.json",
+    "installation_id",
+)
 
 
 @dataclass(slots=True)
@@ -79,6 +89,7 @@ class CodexAppServerSession:
             self.codex_binary = binary
             codex_home = Path(self.workspace_dir) / ".codex-home"
             codex_home.mkdir(parents=True, exist_ok=True)
+            self._seed_codex_home(codex_home)
             proc_env = os.environ.copy()
             proc_env["CODEX_HOME"] = str(codex_home)
 
@@ -101,6 +112,35 @@ class CodexAppServerSession:
 
             self._start_reader_threads()
             self._initialize()
+
+    def _seed_codex_home(self, codex_home: Path) -> None:
+        source_home_value = os.environ.get("CODEX_HOME")
+        if not source_home_value:
+            return
+
+        source_home = Path(source_home_value).expanduser()
+        try:
+            if source_home.resolve() == codex_home.resolve():
+                return
+        except OSError:
+            return
+
+        if not source_home.is_dir():
+            return
+
+        for filename in _CODEX_HOME_SEED_FILES:
+            source = source_home / filename
+            if not source.is_file():
+                continue
+            destination = codex_home / filename
+            try:
+                shutil.copyfile(source, destination)
+            except OSError as exc:
+                if filename == "auth.json":
+                    raise CodexAppServerAuthError(
+                        f"Failed to seed Codex auth from '{source}' to isolated CODEX_HOME "
+                        f"'{codex_home}': {exc}"
+                    ) from exc
 
     def close(self) -> None:
         with self._lock:
