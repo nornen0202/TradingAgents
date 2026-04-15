@@ -88,4 +88,6 @@ def test_triggerable_count_includes_zero_delta_candidates():
         recommendation=recommendation,
         candidates=[candidate],
     )
+    assert "조건부 실행 후보: 1개" in markdown
+    assert "조건부 실행 예산 반영 후보: 0개" in markdown
     assert "트리거형 후보(현금과 무관): 1개" in markdown

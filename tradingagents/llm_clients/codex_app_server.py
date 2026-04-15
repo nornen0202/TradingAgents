@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import queue
 import subprocess
 import threading
@@ -76,6 +77,10 @@ class CodexAppServerSession:
             if not binary:
                 raise CodexAppServerBinaryError(codex_binary_error_message(self.codex_binary))
             self.codex_binary = binary
+            codex_home = Path(self.workspace_dir) / ".codex-home"
+            codex_home.mkdir(parents=True, exist_ok=True)
+            proc_env = os.environ.copy()
+            proc_env["CODEX_HOME"] = str(codex_home)
 
             try:
                 self._proc = subprocess.Popen(
@@ -86,6 +91,7 @@ class CodexAppServerSession:
                     text=True,
                     encoding="utf-8",
                     cwd=self.workspace_dir,
+                    env=proc_env,
                     bufsize=1,
                 )
             except OSError as exc:

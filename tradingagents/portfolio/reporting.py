@@ -20,7 +20,12 @@ def render_portfolio_report_markdown(
     mode_label = present_snapshot_mode(snapshot.snapshot_health, language="Korean")
     market_label = present_market_regime(recommendation.market_regime, language="Korean")
     immediate_count = sum(1 for action in recommendation.actions if action.delta_krw_now != 0)
-    conditional_count = sum(1 for action in recommendation.actions if action.delta_krw_if_triggered != 0)
+    conditional_count = sum(
+        1
+        for action in recommendation.actions
+        if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED", "REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
+    )
+    conditional_budgeted_count = sum(1 for action in recommendation.actions if action.delta_krw_if_triggered != 0)
     actionable_now_count = sum(
         1 for action in recommendation.actions if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}
     )
@@ -76,6 +81,7 @@ def render_portfolio_report_markdown(
             "",
             f"- 지금 실행 후보: {immediate_count}개",
             f"- 조건부 실행 후보: {conditional_count}개",
+            f"- 조건부 실행 예산 반영 후보: {conditional_budgeted_count}개",
             f"- 전략상 즉시 액션 가능: {actionable_now_count}개",
             f"- 트리거형 후보(현금과 무관): {triggerable_candidates_count}개",
             f"- 미보유 관찰 후보: {watch_candidates_count}개",
