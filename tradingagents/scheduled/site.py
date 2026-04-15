@@ -4,7 +4,7 @@ import html
 import json
 import re
 import shutil
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -280,10 +280,14 @@ def _render_run_page(
               <p><strong>Today</strong><span>{_escape(_today_summary(ticker_summary, language=language))}</span></p>
               <p><strong>Market view</strong><span>{_escape(_decision_market_view(ticker_summary.get('decision'), language=language))}</span></p>
               <p><strong>Decision source</strong><span>{_escape(_decision_source_label(ticker_summary))}</span></p>
-              <p><strong>Review required</strong><span>{_escape(_review_required_label(ticker_summary))}</span></p>
+              <p><strong>Analysis review</strong><span>{_escape(_analysis_review_required_label(ticker_summary))}</span></p>
+              <p><strong>Portfolio review</strong><span>{_escape(_portfolio_review_required_label(ticker_summary))}</span></p>
+              <p><strong>Analysis As-Of</strong><span>{_escape(_analysis_asof_label(ticker_summary))}</span></p>
               <p class="long-field"><strong>Key condition</strong><span>{_escape(_decision_primary_condition(ticker_summary.get('decision'), language=language))}</span></p>
               <p class="long-field"><strong>Trigger summary</strong><span>{_escape(_trigger_summary(ticker_summary, language=language))}</span></p>
               <p><strong>Execution As-Of</strong><span>{_escape(_execution_value(ticker_summary, 'execution_asof', default='not refreshed'))}</span></p>
+              <p><strong>Published At</strong><span>{_escape(_published_at_label(manifest))}</span></p>
+              <p><strong>Historical view</strong><span>{_escape(_historical_view_label(manifest))}</span></p>
               <p><strong>Decision State</strong><span>{_escape(_execution_display_state(ticker_summary))}</span></p>
               <p><strong>Staleness</strong><span>{_escape(_execution_staleness(ticker_summary))}</span></p>
               <p><strong>Source status</strong><span>{_escape(present_data_status(ticker_summary.get('decision'), quality_flags=ticker_summary.get('quality_flags'), language=language))}</span></p>
@@ -473,7 +477,10 @@ def _render_ticker_page(
         <p><strong>Snapshot</strong><span>{_escape(_execution_badge_label(ticker_summary))}</span></p>
         <p><strong>Analysis date</strong><span>{_escape(ticker_summary.get('analysis_date') or '-')}</span></p>
         <p><strong>Trade date</strong><span>{_escape(ticker_summary.get('trade_date') or '-')}</span></p>
+        <p><strong>Analysis As-Of</strong><span>{_escape(_analysis_asof_label(ticker_summary))}</span></p>
         <p><strong>Execution As-Of</strong><span>{_escape(_execution_value(ticker_summary, 'execution_asof', default='not refreshed'))}</span></p>
+        <p><strong>Published At</strong><span>{_escape(_published_at_label(manifest))}</span></p>
+        <p><strong>Historical view</strong><span>{_escape(_historical_view_label(manifest))}</span></p>
         <p><strong>Decision State</strong><span>{_escape(_execution_display_state(ticker_summary))}</span></p>
         <p><strong>Staleness</strong><span>{_escape(_execution_staleness(ticker_summary))}</span></p>
         <p><strong>Data health</strong><span>{_escape(_execution_value(ticker_summary, 'data_health', default='unknown'))}</span></p>
@@ -482,7 +489,8 @@ def _render_ticker_page(
         <p><strong>Entry action</strong><span>{_escape(_decision_structured_value(ticker_summary.get('decision'), 'entry_action'))}</span></p>
         <p><strong>Today</strong><span>{_escape(_today_summary(ticker_summary, language=language))}</span></p>
         <p><strong>Decision source</strong><span>{_escape(_decision_source_label(ticker_summary))}</span></p>
-        <p><strong>Review required</strong><span>{_escape(_review_required_label(ticker_summary))}</span></p>
+        <p><strong>Analysis review</strong><span>{_escape(_analysis_review_required_label(ticker_summary))}</span></p>
+        <p><strong>Portfolio review</strong><span>{_escape(_portfolio_review_required_label(ticker_summary))}</span></p>
         <p><strong>Market view</strong><span>{_escape(_decision_market_view(ticker_summary.get('decision'), language=language))}</span></p>
         <p><strong>Key condition</strong><span>{_escape(_decision_primary_condition(ticker_summary.get('decision'), language=language))}</span></p>
         <p><strong>Trigger summary</strong><span>{_escape(_trigger_summary(ticker_summary, language=language))}</span></p>
@@ -636,12 +644,49 @@ def _decision_source_label(ticker_summary: dict[str, Any]) -> str:
     return str(payload.get("decision_source") or ticker_summary.get("decision_source") or "analysis")
 
 
-def _review_required_label(ticker_summary: dict[str, Any]) -> str:
+def _analysis_review_required_label(ticker_summary: dict[str, Any]) -> str:
+    value = ticker_summary.get("review_required")
+    return "yes" if bool(value) else "no"
+
+
+def _portfolio_review_required_label(ticker_summary: dict[str, Any]) -> str:
     payload = _execution_payload(ticker_summary)
     value = payload.get("review_required")
-    if value is None:
-        value = ticker_summary.get("review_required")
     return "yes" if bool(value) else "no"
+
+
+def _analysis_asof_label(ticker_summary: dict[str, Any]) -> str:
+    value = ticker_summary.get("finished_at") or ticker_summary.get("started_at")
+    return str(value or "-")
+
+
+def _published_at_label(manifest: dict[str, Any]) -> str:
+    value = manifest.get("finished_at") or manifest.get("started_at")
+    return str(value or "-")
+
+
+def _historical_view_label(manifest: dict[str, Any]) -> str:
+    published_raw = manifest.get("finished_at") or manifest.get("started_at")
+    if not published_raw:
+        return "unknown"
+    try:
+        published_at = _parse_iso_datetime(str(published_raw))
+    except ValueError:
+        return "unknown"
+    age_seconds = (datetime.now(timezone.utc) - published_at.astimezone(timezone.utc)).total_seconds()
+    return "yes" if age_seconds >= 6 * 3600 else "no"
+
+
+def _parse_iso_datetime(value: str) -> datetime:
+    text = str(value or "").strip()
+    if not text:
+        raise ValueError("missing datetime")
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    parsed = datetime.fromisoformat(text)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
 
 
 def _trigger_summary(ticker_summary: dict[str, Any], *, language: str) -> str:

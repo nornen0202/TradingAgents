@@ -21,3 +21,14 @@ def test_degraded_fail_closed():
     )
     assert now == "WATCH"
     assert trig == "STARTER_IF_TRIGGERED"
+
+
+def test_degraded_without_trigger_does_not_fabricate_watch_trigger():
+    now, trig = _apply_execution_overlay_actions(
+        action_now="STARTER_NOW",
+        action_if_triggered="NONE",
+        execution_update={"decision_state": "DEGRADED", "decision_now": "STARTER_NOW"},
+        is_held=False,
+    )
+    assert now == "WATCH"
+    assert trig == "NONE"

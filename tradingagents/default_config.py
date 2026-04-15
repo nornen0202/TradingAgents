@@ -11,8 +11,8 @@ DEFAULT_CONFIG = {
     # LLM settings
     "llm_provider": "openai",
     "deep_think_llm": "gpt-5.4",
-    "quick_think_llm": "gpt-5.4",
-    "output_think_llm": "gpt-5.4",
+    "quick_think_llm": "gpt-5.4-mini",
+    "output_think_llm": "gpt-5.4-mini",
     "backend_url": "https://api.openai.com/v1",
     # Provider-specific thinking configuration
     "google_thinking_level": None,      # "high", "minimal", etc.
@@ -48,8 +48,8 @@ DEFAULT_CONFIG = {
         "allow_large_model": False,
     },
     # Debate and discussion settings
-    "max_debate_rounds": 1,
-    "max_risk_discuss_rounds": 1,
+    "max_debate_rounds": 2,
+    "max_risk_discuss_rounds": 2,
     "max_recur_limit": 100,
     "market_country": "US",
     "timezone": "US/Eastern",

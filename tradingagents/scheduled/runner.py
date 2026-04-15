@@ -696,13 +696,27 @@ def _resolve_run_tickers(config: ScheduledAnalysisConfig) -> list[str]:
 
     merged: list[str] = []
     seen: set[str] = set()
+    seen_identity: set[str] = set()
     for ticker in [*configured, *account_tickers]:
         normalized = str(ticker or "").strip().upper()
         if not normalized or normalized in seen:
             continue
+        identity_key = _ticker_identity_key(normalized)
+        if identity_key in seen_identity:
+            continue
         seen.add(normalized)
+        seen_identity.add(identity_key)
         merged.append(normalized)
     return merged or configured
+
+
+def _ticker_identity_key(ticker: str) -> str:
+    normalized = str(ticker or "").strip().upper()
+    if normalized.endswith(".KS") or normalized.endswith(".KQ"):
+        base = normalized[:-3]
+        if len(base) == 6 and base.isdigit():
+            return f"KR:{base}"
+    return normalized
 
 
 def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, Any]:

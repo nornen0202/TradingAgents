@@ -35,8 +35,8 @@ class RunSettings:
     trade_date_mode: str = "latest_available"
     explicit_trade_date: str | None = None
     timezone: str = "Asia/Seoul"
-    max_debate_rounds: int = 1
-    max_risk_discuss_rounds: int = 1
+    max_debate_rounds: int = 2
+    max_risk_discuss_rounds: int = 2
     latest_market_data_lookback_days: int = 14
     continue_on_ticker_error: bool = True
     report_polisher_enabled: bool = True
@@ -48,8 +48,8 @@ class RunSettings:
 class LLMSettings:
     provider: str = "codex"
     deep_model: str = "gpt-5.4"
-    quick_model: str = "gpt-5.4"
-    output_model: str = "gpt-5.4"
+    quick_model: str = "gpt-5.4-mini"
+    output_model: str = "gpt-5.4-mini"
     codex_reasoning_effort: str = "medium"
     codex_summary: str = "none"
     codex_personality: str = "none"
@@ -174,8 +174,8 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             trade_date_mode=trade_date_mode,
             explicit_trade_date=explicit_trade_date,
             timezone=timezone_name,
-            max_debate_rounds=int(run_raw.get("max_debate_rounds", 1)),
-            max_risk_discuss_rounds=int(run_raw.get("max_risk_discuss_rounds", 1)),
+            max_debate_rounds=int(run_raw.get("max_debate_rounds", 2)),
+            max_risk_discuss_rounds=int(run_raw.get("max_risk_discuss_rounds", 2)),
             latest_market_data_lookback_days=int(run_raw.get("latest_market_data_lookback_days", 14)),
             continue_on_ticker_error=bool(run_raw.get("continue_on_ticker_error", True)),
             report_polisher_enabled=bool(run_raw.get("report_polisher_enabled", True)),
@@ -185,8 +185,8 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         llm=LLMSettings(
             provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
             deep_model=str(llm_raw.get("deep_model", "gpt-5.4")).strip() or "gpt-5.4",
-            quick_model=str(llm_raw.get("quick_model", "gpt-5.4")).strip() or "gpt-5.4",
-            output_model=str(llm_raw.get("output_model", "gpt-5.4")).strip() or "gpt-5.4",
+            quick_model=str(llm_raw.get("quick_model", "gpt-5.4-mini")).strip() or "gpt-5.4-mini",
+            output_model=str(llm_raw.get("output_model", "gpt-5.4-mini")).strip() or "gpt-5.4-mini",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_summary=str(llm_raw.get("codex_summary", "none")).strip() or "none",
             codex_personality=str(llm_raw.get("codex_personality", "none")).strip() or "none",
@@ -326,12 +326,26 @@ def with_overrides(
 def _normalize_tickers(values: Iterable[str]) -> list[str]:
     normalized: list[str] = []
     seen: set[str] = set()
+    seen_identity: set[str] = set()
     for value in values:
         ticker = normalize_ticker_symbol(str(value))
         if not ticker or ticker in seen:
             continue
+        identity_key = _ticker_identity_key(ticker)
+        if identity_key in seen_identity:
+            continue
         seen.add(ticker)
+        seen_identity.add(identity_key)
         normalized.append(ticker)
+    return normalized
+
+
+def _ticker_identity_key(ticker: str) -> str:
+    normalized = str(ticker or "").strip().upper()
+    if normalized.endswith(".KS") or normalized.endswith(".KQ"):
+        base = normalized[:-3]
+        if len(base) == 6 and base.isdigit():
+            return f"KR:{base}"
     return normalized
 
 
