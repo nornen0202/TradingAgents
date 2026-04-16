@@ -8,6 +8,7 @@ from tradingagents.schemas import (
     DecisionNow,
     DecisionState,
     ExecutionContract,
+    ExecutionTimingState,
     ExecutionUpdate,
     IntradayMarketSnapshot,
     SessionVWAPPreference,
@@ -44,6 +45,7 @@ def evaluate_execution_state(
             trigger_status=trigger_status,
             data_health="STALE",
             refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=ExecutionTimingState.DEGRADED,
         )
 
     if is_event_guard_active(contract.event_guard, now):
@@ -59,6 +61,7 @@ def evaluate_execution_state(
             trigger_status=trigger_status,
             data_health="OK",
             refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=ExecutionTimingState.WAITING,
         )
 
     intraday_low = market.day_low if market.day_low is not None else market.last_price
@@ -78,10 +81,12 @@ def evaluate_execution_state(
             trigger_status=trigger_status,
             data_health="OK",
             refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=ExecutionTimingState.INVALIDATED,
         )
 
     decision_state = DecisionState.WAIT
     decision_now = DecisionNow.NONE
+    execution_timing_state = ExecutionTimingState.WAITING
 
     if contract.breakout_level is not None and intraday_high >= contract.breakout_level:
         trigger_status["breakout_hit_intraday"] = True
@@ -89,18 +94,22 @@ def evaluate_execution_state(
         if rvol_ok:
             if contract.breakout_confirmation == BreakoutConfirmation.CLOSE_ABOVE:
                 decision_state = DecisionState.TRIGGERED_PENDING_CLOSE
+                execution_timing_state = ExecutionTimingState.CLOSE_CONFIRM
                 trigger_status["close_confirmation_pending"] = True
                 reason_codes.append("close_confirmation_required")
             else:
                 if market.last_price >= contract.breakout_level:
                     decision_state = DecisionState.ACTIONABLE_NOW
                     decision_now = _decision_now_from_action(contract.action_if_triggered)
+                    execution_timing_state = ExecutionTimingState.LIVE_BREAKOUT
                     reason_codes.append("breakout_confirmed")
                 else:
                     decision_state = DecisionState.ARMED
+                    execution_timing_state = ExecutionTimingState.LIVE_BREAKOUT
                     reason_codes.append("breakout_hit_but_not_holding_level")
         else:
             decision_state = DecisionState.ARMED
+            execution_timing_state = ExecutionTimingState.LIVE_BREAKOUT
             reason_codes.append("relative_volume_unconfirmed")
 
     if contract.pullback_buy_zone is not None:
@@ -110,9 +119,11 @@ def evaluate_execution_state(
             if _vwap_check(contract.session_vwap_preference, market.last_price, market.session_vwap):
                 decision_state = DecisionState.ACTIONABLE_NOW
                 decision_now = _decision_now_from_action(contract.action_if_triggered)
+                execution_timing_state = ExecutionTimingState.ACTIONABLE_LIVE
                 reason_codes.append("pullback_zone_actionable")
             else:
                 decision_state = DecisionState.ARMED
+                execution_timing_state = ExecutionTimingState.ACTIONABLE_LIVE
                 reason_codes.append("vwap_filter_not_met")
 
     if not reason_codes:
@@ -129,6 +140,7 @@ def evaluate_execution_state(
         trigger_status=trigger_status,
         data_health="OK",
         refresh_checkpoint=refresh_checkpoint,
+        execution_timing_state=execution_timing_state,
     )
 
 
@@ -163,6 +175,7 @@ def _build_update(
     trigger_status: dict[str, bool],
     data_health: str,
     refresh_checkpoint: str | None,
+    execution_timing_state: ExecutionTimingState = ExecutionTimingState.WAITING,
 ) -> ExecutionUpdate:
     return ExecutionUpdate(
         ticker=contract.ticker,
@@ -194,4 +207,5 @@ def _build_update(
         staleness_seconds=staleness_seconds,
         data_health=data_health,
         refresh_checkpoint=refresh_checkpoint,
+        execution_timing_state=execution_timing_state,
     )

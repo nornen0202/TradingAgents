@@ -10,7 +10,7 @@ def test_us_default_checkpoints_are_three_kst_times():
 
 
 def test_kr_default_checkpoints_match_operational_profile():
-    assert _default_execution_checkpoints_kst("KR") == ("09:20", "12:00", "15:40")
+    assert _default_execution_checkpoints_kst("KR") == ("10:05", "11:05", "12:35", "14:35")
 
 
 def test_explicit_market_overrides_timezone_inference(tmp_path: Path):
@@ -31,3 +31,22 @@ site_dir = ".site"
     config = load_scheduled_config(config_path)
     assert config.run.market == "US"
     assert len(config.execution.execution_refresh_checkpoints_kst) == 3
+
+
+def test_intraday_overlay_workflow_uses_kr_operational_crons():
+    workflow = Path(".github/workflows/intraday-overlay-refresh.yml").read_text(encoding="utf-8")
+    assert "KR checkpoints: 10:05, 11:05, 12:35, 14:35 KST." in workflow
+    assert "5 1,2 * * 1-5" in workflow
+    assert "35 3,5 * * 1-5" in workflow
+    assert "5 0,2,4 * * 1-5" not in workflow
+    assert "25 6 * * 1-5" not in workflow
+
+
+def test_daily_workflow_runs_us_and_kr_two_hours_earlier():
+    workflow = Path(".github/workflows/daily-codex-analysis.yml").read_text(encoding="utf-8")
+    assert "7:00 KST weekdays (22:00 UTC previous day) -> KR analysis" in workflow
+    assert "19:00 KST weekdays (10:00 UTC) -> US analysis" in workflow
+    assert "0 22 * * 0-4" in workflow
+    assert "0 10 * * 1-5" in workflow
+    assert "0 0 * * 1-5" not in workflow
+    assert "0 12 * * 1-5" not in workflow

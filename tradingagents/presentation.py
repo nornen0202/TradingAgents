@@ -206,7 +206,37 @@ def sanitize_investor_text(value: Any, *, language: str = "Korean") -> str:
         return "실계좌 스냅샷 없이 관심종목 기준으로 작성했습니다." if is_korean(language) else "Prepared from a watchlist without a live account snapshot."
     if "no_trade" in lower:
         return "즉시 실행보다 관찰 신호가 많은 장입니다." if is_korean(language) else "Signals favor patience over immediate action."
+    if is_korean(language):
+        localized = _localized_english_investor_text(text)
+        if localized is not None:
+            return localized
     return text.replace("_", " ")
+
+
+def _localized_english_investor_text(text: str) -> str | None:
+    compact = " ".join(str(text or "").split())
+    if not compact:
+        return "없음"
+    lower = compact.lower()
+    if "close above" in lower:
+        level = compact.split("above", 1)[1].strip()
+        return f"종가 {level} 이상 확인 시 검토"
+    if "close below" in lower:
+        level = compact.split("below", 1)[1].strip()
+        return f"종가 {level} 이탈 시 축소 검토"
+    if "volume" in lower and any(token in lower for token in ("above", "surge", "breakout")):
+        return "거래량 확인을 동반한 조건 충족 시 검토"
+    if len(compact.split()) <= 4:
+        return None
+    ascii_letters = sum(1 for char in compact if "a" <= char.lower() <= "z")
+    non_space = sum(1 for char in compact if not char.isspace())
+    if non_space and ascii_letters / non_space >= 0.45:
+        if any(token in lower for token in ("trigger", "condition", "confirm", "wait", "pending", "breakout")):
+            return "조건 충족 전까지 대기합니다."
+        if any(token in lower for token in ("risk", "invalid", "below", "reduce", "trim", "exit")):
+            return "리스크 조건 이탈 시 축소를 검토합니다."
+        return "근거 요약 생성 실패: 원문은 투자자 화면에서 숨깁니다."
+    return None
 
 
 def _rating_label(value: str, korean: bool) -> str:

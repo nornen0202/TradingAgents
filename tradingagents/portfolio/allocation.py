@@ -26,6 +26,11 @@ _IMMEDIACY_WEIGHTS = {
     "EXIT": 1.0,
 }
 
+_IMMEDIATE_ACTIONS = {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}
+_TRIGGER_BUY_ACTIONS = {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}
+_TRIGGER_SELL_ACTIONS = {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
+_STRATEGIC_TRIGGER_ACTIONS = _TRIGGER_BUY_ACTIONS | _TRIGGER_SELL_ACTIONS
+
 
 def build_recommendation(
     *,
@@ -38,7 +43,7 @@ def build_recommendation(
 ) -> tuple[PortfolioRecommendation, list[PortfolioCandidate]]:
     scored = [_score_candidate(candidate, snapshot, batch_metrics, warnings) for candidate in candidates]
     investable_cash_now = max(snapshot.available_cash_krw - snapshot.constraints.min_cash_buffer_krw, 0)
-    trigger_budget_krw = min(profile.trigger_budget_krw or investable_cash_now, snapshot.available_cash_krw)
+    trigger_budget_krw = min(profile.trigger_budget_krw or investable_cash_now, investable_cash_now)
 
     wait_ratio = _ratio(batch_metrics.get("entry_action_distribution"), "WAIT")
     bullish_ratio = _ratio(batch_metrics.get("stance_distribution"), "BULLISH")
@@ -104,7 +109,13 @@ def build_recommendation(
                     "coverage_score": round(candidate.data_health.get("coverage_score", 0.0), 4),
                     "score_now": round(candidate.score_now, 4),
                     "score_triggered": round(candidate.score_triggered, 4),
+                    "strict_cash_available_for_new_buys_krw": investable_cash_now,
                 },
+                strategy_state=candidate.strategy_state,
+                execution_feasibility_now=candidate.execution_feasibility_now,
+                stale_but_triggerable=candidate.stale_but_triggerable,
+                funding_source_score=round(candidate.funding_source_score, 4),
+                capital_reallocation_rank=candidate.capital_reallocation_rank,
                 decision_source=candidate.decision_source,
                 timing_readiness=round(candidate.timing_readiness, 4),
                 reason_codes=candidate.reason_codes,
@@ -128,11 +139,21 @@ def build_recommendation(
         PortfolioAction(**{**action.__dict__, "priority": index})
         for index, action in enumerate(actions, start=1)
     )
+    prioritized = _annotate_reallocation_ranks(prioritized, snapshot)
 
     cash_after_now = snapshot.available_cash_krw - sum(max(action.delta_krw_now, 0) for action in prioritized)
     cash_after_triggered = cash_after_now - sum(max(action.delta_krw_if_triggered, 0) for action in prioritized)
 
     risks = _infer_portfolio_risks(prioritized, warnings, batch_metrics)
+    candidate_counts = _build_candidate_counts(prioritized, snapshot)
+    funding_plan = _build_funding_plan(prioritized, snapshot)
+    scenario_plan = _build_scenario_plan(
+        actions=prioritized,
+        snapshot=snapshot,
+        funding_plan=funding_plan,
+        candidate_counts=candidate_counts,
+        profile=profile,
+    )
     recommendation = PortfolioRecommendation(
         snapshot_id=snapshot.snapshot_id,
         report_date=report_date,
@@ -151,11 +172,12 @@ def build_recommendation(
             "snapshot_health": snapshot.snapshot_health,
             "warning_flags": list(warnings),
             "actionable_now_count": sum(
-                1 for action in prioritized if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}
+                1 for action in prioritized if action.action_now in _IMMEDIATE_ACTIONS
             ),
             "triggerable_candidates_count": sum(
-                1 for action in prioritized if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}
+                1 for action in prioritized if action.action_if_triggered in _TRIGGER_BUY_ACTIONS
             ),
+            **candidate_counts,
             "watch_candidates_count": sum(1 for action in prioritized if action.action_now == "WATCH"),
             "held_watch_count": sum(
                 1 for action in prioritized if action.action_now == "HOLD" and action.action_if_triggered == "ADD_IF_TRIGGERED"
@@ -164,7 +186,13 @@ def build_recommendation(
             "rule_only_fallback_count": sum(
                 1 for action in prioritized if str(action.decision_source).upper() == "RULE_ONLY_FALLBACK"
             ),
+            "funding_plan_available": bool(
+                funding_plan.get("top_add_if_funded") and funding_plan.get("top_trim_if_funding_needed")
+            ),
         },
+        candidate_counts=candidate_counts,
+        funding_plan=funding_plan,
+        scenario_plan=scenario_plan,
     )
     return recommendation, scored
 
@@ -204,20 +232,47 @@ def _score_candidate(
     if candidate.review_required and not candidate.is_held:
         score_now = min(score_now, 0.0)
         score_triggered *= 0.75
+    funding_source_score = _candidate_funding_source_score(
+        candidate=candidate,
+        coverage_score=coverage_score,
+        timing_readiness=timing_readiness,
+    )
 
     return PortfolioCandidate(
         **{
             **candidate.__dict__,
             "score_now": score_now,
             "score_triggered": score_triggered,
+            "funding_source_score": funding_source_score,
             "data_health": {
                 **candidate.data_health,
                 "coverage_score": coverage_score,
                 "thesis_multiplier": round(thesis_multiplier, 4),
                 "timing_now": round(timing_now, 4),
                 "timing_triggered": round(timing_triggered, 4),
+                "funding_source_score": round(funding_source_score, 4),
             },
         }
+    )
+
+
+def _candidate_funding_source_score(
+    *,
+    candidate: PortfolioCandidate,
+    coverage_score: float,
+    timing_readiness: float,
+) -> float:
+    if not candidate.is_held or candidate.market_value_krw <= 0:
+        return 0.0
+    stance_penalty = {"BEARISH": 0.35, "NEUTRAL": 0.22, "BULLISH": 0.04}.get(candidate.stance, 0.18)
+    setup_penalty = {"WEAK": 0.22, "DEVELOPING": 0.10, "COMPELLING": 0.0}.get(candidate.setup_quality, 0.08)
+    no_add_penalty = 0.12 if candidate.suggested_action_if_triggered in {"NONE", "WATCH_TRIGGER"} else 0.0
+    quality_penalty = (1.0 - max(min(coverage_score, 1.0), 0.0)) * 0.18
+    timing_penalty = (1.0 - max(min(timing_readiness, 1.0), 0.0)) * 0.14
+    confidence_penalty = (1.0 - max(min(candidate.confidence, 1.0), 0.0)) * 0.12
+    return round(
+        max(0.0, min(1.0, stance_penalty + setup_penalty + no_add_penalty + quality_penalty + timing_penalty + confidence_penalty)),
+        4,
     )
 
 
@@ -312,11 +367,348 @@ def _normalize_now_action(candidate: PortfolioCandidate, delta_now: int) -> str:
 
 
 def _normalize_triggered_action(candidate: PortfolioCandidate, delta_triggered: int) -> str:
-    if candidate.suggested_action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"} and delta_triggered <= 0:
-        return "WATCH_TRIGGER"
-    if candidate.suggested_action_if_triggered in {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"} and delta_triggered == 0:
-        return "NONE"
     return candidate.suggested_action_if_triggered
+
+
+def _build_candidate_counts(
+    actions: tuple[PortfolioAction, ...],
+    snapshot: AccountSnapshot,
+) -> dict[str, int]:
+    strategic_trigger_candidates = [
+        action for action in actions if action.action_if_triggered in _STRATEGIC_TRIGGER_ACTIONS
+    ]
+    budgeted_trigger_candidates = [
+        action for action in strategic_trigger_candidates if int(action.delta_krw_if_triggered) != 0
+    ]
+    top_add_if_funded = [
+        action
+        for action in strategic_trigger_candidates
+        if action.action_if_triggered in _TRIGGER_BUY_ACTIONS and int(action.delta_krw_if_triggered) <= 0
+    ]
+    top_trim_if_needed = [
+        action
+        for action in actions
+        if snapshot.find_position(action.canonical_ticker) is not None and action.funding_source_score > 0
+    ]
+    return {
+        "strategic_trigger_candidates_count": len(strategic_trigger_candidates),
+        "budgeted_trigger_candidates_count": len(budgeted_trigger_candidates),
+        "immediate_candidates_count": sum(1 for action in actions if action.action_now in _IMMEDIATE_ACTIONS and action.delta_krw_now != 0),
+        "funding_candidates_count": len(top_add_if_funded) if top_trim_if_needed else 0,
+        "held_add_if_triggered_count": sum(
+            1
+            for action in actions
+            if snapshot.find_position(action.canonical_ticker) is not None
+            and action.action_if_triggered in _TRIGGER_BUY_ACTIONS
+        ),
+        "watch_if_triggered_count": sum(
+            1
+            for action in actions
+            if snapshot.find_position(action.canonical_ticker) is None
+            and action.action_if_triggered in (_TRIGGER_BUY_ACTIONS | {"WATCH_TRIGGER"})
+        ),
+    }
+
+
+def _annotate_reallocation_ranks(
+    actions: tuple[PortfolioAction, ...],
+    snapshot: AccountSnapshot,
+) -> tuple[PortfolioAction, ...]:
+    trim_rank_by_ticker = {
+        action.canonical_ticker: index
+        for index, action in enumerate(
+            sorted(
+                (
+                    action
+                    for action in actions
+                    if snapshot.find_position(action.canonical_ticker) is not None and action.funding_source_score > 0
+                ),
+                key=lambda action: (action.funding_source_score, action.market_value_krw if hasattr(action, "market_value_krw") else 0),
+                reverse=True,
+            ),
+            start=1,
+        )
+    }
+    add_rank_by_ticker = {
+        action.canonical_ticker: index
+        for index, action in enumerate(
+            sorted(
+                (action for action in actions if action.action_if_triggered in _TRIGGER_BUY_ACTIONS),
+                key=_add_if_funded_score,
+                reverse=True,
+            ),
+            start=1,
+        )
+    }
+    annotated: list[PortfolioAction] = []
+    for action in actions:
+        rank = trim_rank_by_ticker.get(action.canonical_ticker) or add_rank_by_ticker.get(action.canonical_ticker)
+        annotated.append(
+            PortfolioAction(
+                **{
+                    **action.__dict__,
+                    "capital_reallocation_rank": rank,
+                }
+            )
+        )
+    return tuple(annotated)
+
+
+def _build_funding_plan(
+    actions: tuple[PortfolioAction, ...],
+    snapshot: AccountSnapshot,
+) -> dict[str, Any]:
+    add_candidates = sorted(
+        (action for action in actions if action.action_if_triggered in _TRIGGER_BUY_ACTIONS),
+        key=_add_if_funded_score,
+        reverse=True,
+    )
+    trim_candidates = sorted(
+        (
+            action
+            for action in actions
+            if snapshot.find_position(action.canonical_ticker) is not None and action.funding_source_score > 0
+        ),
+        key=lambda action: action.funding_source_score,
+        reverse=True,
+    )
+    cash_gap = max(snapshot.constraints.min_cash_buffer_krw - snapshot.available_cash_krw, 0)
+    return {
+        "cash_gap_to_strict_buffer_krw": cash_gap,
+        "top_add_if_funded": [_funding_add_item(action) for action in add_candidates[:5]],
+        "top_trim_if_funding_needed": [_funding_trim_item(action, snapshot) for action in trim_candidates[:5]],
+    }
+
+
+def _build_scenario_plan(
+    *,
+    actions: tuple[PortfolioAction, ...],
+    snapshot: AccountSnapshot,
+    funding_plan: dict[str, Any],
+    candidate_counts: dict[str, int],
+    profile: PortfolioProfile,
+) -> dict[str, Any]:
+    immediate_orders = [action for action in actions if action.delta_krw_now != 0]
+    budgeted_triggers = [action for action in actions if action.delta_krw_if_triggered != 0]
+    switch_orders = _build_switch_scenario_orders(actions=actions, snapshot=snapshot)
+    aggressive_orders = _build_aggressive_scenario_orders(actions=actions, snapshot=snapshot, profile=profile)
+    add_if_funded = list(funding_plan.get("top_add_if_funded") or [])
+    trim_sources = list(funding_plan.get("top_trim_if_funding_needed") or [])
+    return {
+        "strict": {
+            "label": "Strict",
+            "cash_buffer_respected": snapshot.available_cash_krw >= snapshot.constraints.min_cash_buffer_krw,
+            "immediate_order_count": len(immediate_orders),
+            "budgeted_trigger_count": len(budgeted_triggers),
+            "strategic_trigger_count": candidate_counts.get("strategic_trigger_candidates_count", 0),
+            "orders_now": [_scenario_order_from_action(action, scenario="strict_now", amount=action.delta_krw_now) for action in immediate_orders],
+            "orders_if_triggered": [
+                _scenario_order_from_action(action, scenario="strict_if_triggered", amount=action.delta_krw_if_triggered)
+                for action in budgeted_triggers
+            ],
+        },
+        "switch": {
+            "label": "Switch",
+            "enabled": bool(switch_orders),
+            "would_buy_if_funded": add_if_funded[:3],
+            "would_trim_first": trim_sources[:3],
+            "orders_if_triggered": switch_orders,
+            "gross_buy_krw": sum(max(int(order.get("amount_krw", 0)), 0) for order in switch_orders if order.get("side") == "buy"),
+            "gross_sell_krw": sum(max(int(order.get("amount_krw", 0)), 0) for order in switch_orders if order.get("side") == "sell"),
+        },
+        "aggressive": {
+            "label": "Aggressive",
+            "enabled": bool(aggressive_orders),
+            "requires_buffer_sacrifice": snapshot.available_cash_krw < snapshot.constraints.min_cash_buffer_krw,
+            "would_buy_if_buffer_relaxed": add_if_funded[:3],
+            "orders_if_triggered": aggressive_orders,
+            "gross_buy_krw": sum(max(int(order.get("amount_krw", 0)), 0) for order in aggressive_orders if order.get("side") == "buy"),
+        },
+    }
+
+
+def _build_switch_scenario_orders(
+    *,
+    actions: tuple[PortfolioAction, ...],
+    snapshot: AccountSnapshot,
+) -> list[dict[str, Any]]:
+    min_trade = max(int(snapshot.constraints.min_trade_krw), 1)
+    trim_actions = sorted(
+        (
+            action
+            for action in actions
+            if snapshot.find_position(action.canonical_ticker) is not None and action.funding_source_score > 0
+        ),
+        key=lambda action: action.funding_source_score,
+        reverse=True,
+    )
+    add_actions = sorted(
+        (action for action in actions if action.action_if_triggered in _TRIGGER_BUY_ACTIONS),
+        key=_add_if_funded_score,
+        reverse=True,
+    )
+    if not trim_actions or not add_actions:
+        return []
+
+    sell_orders: list[dict[str, Any]] = []
+    sell_budget = 0
+    turnover_limit = int(max(snapshot.account_value_krw, 1) * snapshot.constraints.max_daily_turnover_ratio)
+    for action in trim_actions:
+        position = snapshot.find_position(action.canonical_ticker)
+        if position is None:
+            continue
+        ratio = min(0.35, max(0.15, float(action.funding_source_score) * 0.55))
+        amount = int(position.market_value_krw * ratio)
+        remaining_turnover = max(turnover_limit - sell_budget, 0) if turnover_limit > 0 else amount
+        amount = min(amount, remaining_turnover)
+        if amount < min_trade:
+            continue
+        sell_budget += amount
+        sell_orders.append(
+            _scenario_order_from_action(
+                action,
+                scenario="switch_trim_source",
+                amount=-amount,
+                note="자금 조달을 위한 조건부 축소",
+            )
+        )
+        if sell_budget >= min_trade * 3:
+            break
+
+    if sell_budget < min_trade:
+        return []
+
+    buy_orders = _allocate_buy_scenario_orders(
+        actions=add_actions,
+        snapshot=snapshot,
+        budget_krw=sell_budget,
+        scenario="switch_buy_if_funded",
+        note="축소 자금 확보 시 조건부 매수",
+    )
+    if not buy_orders:
+        return []
+    return sell_orders + buy_orders
+
+
+def _build_aggressive_scenario_orders(
+    *,
+    actions: tuple[PortfolioAction, ...],
+    snapshot: AccountSnapshot,
+    profile: PortfolioProfile,
+) -> list[dict[str, Any]]:
+    add_actions = sorted(
+        (action for action in actions if action.action_if_triggered in _TRIGGER_BUY_ACTIONS),
+        key=_add_if_funded_score,
+        reverse=True,
+    )
+    if not add_actions:
+        return []
+    investable_cash = max(snapshot.available_cash_krw - snapshot.constraints.min_cash_buffer_krw, 0)
+    if investable_cash <= 0:
+        budget = min(max(int(profile.trigger_budget_krw or 0), snapshot.constraints.min_trade_krw), max(snapshot.available_cash_krw, 0))
+    else:
+        budget = min(int(profile.trigger_budget_krw or investable_cash), investable_cash)
+    if budget < snapshot.constraints.min_trade_krw:
+        return []
+    return _allocate_buy_scenario_orders(
+        actions=add_actions,
+        snapshot=snapshot,
+        budget_krw=budget,
+        scenario="aggressive_buy_if_triggered",
+        note="버퍼 일부 희생을 허용하는 조건부 매수",
+    )
+
+
+def _allocate_buy_scenario_orders(
+    *,
+    actions: list[PortfolioAction],
+    snapshot: AccountSnapshot,
+    budget_krw: int,
+    scenario: str,
+    note: str,
+) -> list[dict[str, Any]]:
+    min_trade = max(int(snapshot.constraints.min_trade_krw), 1)
+    account_value = max(snapshot.account_value_krw, 1)
+    total_score = sum(max(_add_if_funded_score(action), 0.01) for action in actions)
+    remaining_budget = int(budget_krw)
+    orders: list[dict[str, Any]] = []
+    for index, action in enumerate(actions):
+        if remaining_budget < min_trade:
+            break
+        score = max(_add_if_funded_score(action), 0.01)
+        if index == len(actions) - 1:
+            raw_amount = remaining_budget
+        else:
+            raw_amount = int(budget_krw * score / max(total_score, 0.01))
+        current_position = snapshot.find_position(action.canonical_ticker)
+        current_value = int(current_position.market_value_krw if current_position else 0)
+        max_name_value = int(snapshot.constraints.max_single_name_weight * account_value)
+        remaining_name_capacity = max(max_name_value - current_value, 0)
+        amount = min(raw_amount, remaining_budget, remaining_name_capacity)
+        if amount < min_trade:
+            continue
+        remaining_budget -= amount
+        orders.append(_scenario_order_from_action(action, scenario=scenario, amount=amount, note=note))
+    return orders
+
+
+def _scenario_order_from_action(
+    action: PortfolioAction,
+    *,
+    scenario: str,
+    amount: int,
+    note: str | None = None,
+) -> dict[str, Any]:
+    amount_int = int(amount)
+    return {
+        "scenario": scenario,
+        "canonical_ticker": action.canonical_ticker,
+        "display_name": action.display_name,
+        "side": "buy" if amount_int > 0 else "sell",
+        "amount_krw": abs(amount_int),
+        "signed_delta_krw": amount_int,
+        "action_now": action.action_now,
+        "action_if_triggered": action.action_if_triggered,
+        "trigger_conditions": list(action.trigger_conditions),
+        "rank": action.capital_reallocation_rank,
+        "note": note,
+    }
+
+
+def _add_if_funded_score(action: PortfolioAction) -> float:
+    return (
+        max(float(action.data_health.get("score_triggered") or 0.0), 0.0)
+        + max(min(float(action.confidence or 0.0), 1.0), 0.0) * 0.30
+        + max(min(float(action.timing_readiness or 0.0), 1.0), 0.0) * 0.20
+        + max(min(float(action.data_health.get("trigger_quality") or 0.0), 1.0), 0.0) * 0.20
+    )
+
+
+def _funding_add_item(action: PortfolioAction) -> dict[str, Any]:
+    return {
+        "canonical_ticker": action.canonical_ticker,
+        "display_name": action.display_name,
+        "action_if_triggered": action.action_if_triggered,
+        "delta_krw_if_triggered": action.delta_krw_if_triggered,
+        "rank": action.capital_reallocation_rank,
+        "score": round(_add_if_funded_score(action), 4),
+        "trigger_conditions": list(action.trigger_conditions),
+        "rationale": action.rationale,
+    }
+
+
+def _funding_trim_item(action: PortfolioAction, snapshot: AccountSnapshot) -> dict[str, Any]:
+    position = snapshot.find_position(action.canonical_ticker)
+    return {
+        "canonical_ticker": action.canonical_ticker,
+        "display_name": action.display_name,
+        "rank": action.capital_reallocation_rank,
+        "funding_source_score": round(action.funding_source_score, 4),
+        "market_value_krw": int(position.market_value_krw if position else 0),
+        "action_now": action.action_now,
+        "action_if_triggered": action.action_if_triggered,
+        "rationale": action.rationale,
+    }
 
 
 def _apply_execution_constraints(

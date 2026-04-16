@@ -10,6 +10,14 @@ from .account_models import AccountSnapshot, PortfolioCandidate
 from .instrument_identity import resolve_identity
 
 
+_TRIGGER_ACTIONS = {
+    "ADD_IF_TRIGGERED",
+    "STARTER_IF_TRIGGERED",
+    "REDUCE_IF_TRIGGERED",
+    "EXIT_IF_TRIGGERED",
+}
+
+
 def build_portfolio_candidates(
     *,
     snapshot: AccountSnapshot,
@@ -165,6 +173,21 @@ def _build_single_candidate(
             execution_update=execution_update,
             is_held=is_held,
         )
+    execution_feasibility_now = _execution_feasibility_now(
+        action_now=action_now,
+        execution_update=execution_update if isinstance(execution_update, dict) else None,
+        quality_flags=quality_flags,
+    )
+    strategy_state = _strategy_state(
+        action_now=action_now,
+        action_if_triggered=action_if_triggered,
+        is_held=is_held,
+        stance=stance,
+    )
+    stale_but_triggerable = (
+        execution_feasibility_now == "blocked_stale_or_degraded_data"
+        and action_if_triggered in _TRIGGER_ACTIONS
+    )
     rationale = _build_rationale(
         stance=stance,
         entry_action=entry_action,
@@ -196,12 +219,18 @@ def _build_single_candidate(
             entry_action=entry_action,
             setup_quality=setup_quality,
             rationale=rationale,
+            strategy_state=strategy_state,
+            execution_feasibility_now=execution_feasibility_now,
+            stale_but_triggerable=stale_but_triggerable,
             data_health={
                 "coverage_score": 0.0,
                 "vendor_calls": vendor_health["vendor_calls"],
                 "fallback_count": vendor_health["fallback_count"],
                 "quality_flags": list(quality_flags),
                 "legacy_rating": rating_value,
+                "strategy_state": strategy_state,
+                "execution_feasibility_now": execution_feasibility_now,
+                "stale_but_triggerable": stale_but_triggerable,
             },
         ),
         warnings,
@@ -287,3 +316,39 @@ def _apply_execution_overlay_actions(
         if promoted:
             return (promoted, "NONE")
     return action_now, action_if_triggered
+
+
+def _execution_feasibility_now(
+    *,
+    action_now: str,
+    execution_update: dict[str, Any] | None,
+    quality_flags: tuple[str, ...],
+) -> str:
+    quality_flag_set = {str(flag).strip().lower() for flag in quality_flags}
+    if "stale_market_data" in quality_flag_set:
+        return "blocked_stale_or_degraded_data"
+    if execution_update:
+        decision_state = str(execution_update.get("decision_state") or "").upper()
+        data_health = str(execution_update.get("data_health") or "").upper()
+        reason_codes = {str(item).strip().lower() for item in (execution_update.get("reason_codes") or [])}
+        if decision_state == "DEGRADED" or data_health == "STALE" or "stale_market_data" in reason_codes:
+            return "blocked_stale_or_degraded_data"
+        if decision_state == "INVALIDATED":
+            return "risk_exit_review"
+    if action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}:
+        return "executable_now"
+    return "not_actionable_now"
+
+
+def _strategy_state(*, action_now: str, action_if_triggered: str, is_held: bool, stance: str) -> str:
+    if action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"} or action_if_triggered in {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+        return "reduce_or_exit"
+    if action_now in {"ADD_NOW", "STARTER_NOW"}:
+        return "add_now"
+    if action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}:
+        return "add_if_triggered"
+    if action_if_triggered == "WATCH_TRIGGER":
+        return "watch_if_triggered"
+    if is_held and stance == "NEUTRAL":
+        return "hold_or_watch"
+    return "hold_or_watch"

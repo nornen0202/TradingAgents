@@ -234,6 +234,10 @@ def _prioritize_market_specific_vendors(method: str, vendor_chain: list[str], ar
             reordered.remove(vendor_name)
             reordered.insert(0, vendor_name)
 
+    def remove(vendor_name: str) -> None:
+        while vendor_name in reordered:
+            reordered.remove(vendor_name)
+
     try:
         from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 
@@ -246,6 +250,11 @@ def _prioritize_market_specific_vendors(method: str, vendor_chain: list[str], ar
                         promote("naver")
                     if method == "get_disclosures":
                         promote("opendart")
+                else:
+                    if method in {"get_news", "get_company_news", "get_social_sentiment"}:
+                        remove("naver")
+                    if method == "get_disclosures":
+                        remove("opendart")
         if method in {"get_global_news", "get_macro_news"}:
             region = kwargs.get("region") or (args[3] if len(args) > 3 else None)
             if isinstance(region, str) and region.upper() == "KR":
@@ -440,6 +449,9 @@ def _emit_vendor_fallback_log(method: str, note: str) -> None:
 
     message = f"Vendor fallback for {method}: {note}"
     if os.getenv("GITHUB_ACTIONS") == "true":
+        if "empty or unusable result" in note:
+            print(f"::notice::{message}")
+            return
         print(f"::warning::{message}")
         return
     print(f"[vendor-fallback] {message}")

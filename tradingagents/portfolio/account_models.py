@@ -159,6 +159,11 @@ class PortfolioCandidate:
     entry_action: str
     setup_quality: str
     rationale: str
+    strategy_state: str = "hold_or_watch"
+    execution_feasibility_now: str = "not_actionable_now"
+    stale_but_triggerable: bool = False
+    funding_source_score: float = 0.0
+    capital_reallocation_rank: int | None = None
     trigger_profile: dict[str, Any] = field(default_factory=dict)
     decision_source: str = "RULE_ONLY"
     thesis_strength: float = 0.0
@@ -193,6 +198,11 @@ class PortfolioAction:
     trigger_conditions: tuple[str, ...]
     rationale: str
     data_health: dict[str, Any]
+    strategy_state: str = "hold_or_watch"
+    execution_feasibility_now: str = "not_actionable_now"
+    stale_but_triggerable: bool = False
+    funding_source_score: float = 0.0
+    capital_reallocation_rank: int | None = None
     decision_source: str = "RULE_ONLY"
     timing_readiness: float = 0.0
     reason_codes: tuple[str, ...] = tuple()
@@ -216,6 +226,9 @@ class PortfolioRecommendation:
     actions: tuple[PortfolioAction, ...]
     portfolio_risks: tuple[str, ...]
     data_health_summary: dict[str, Any]
+    candidate_counts: dict[str, int] = field(default_factory=dict)
+    funding_plan: dict[str, Any] = field(default_factory=dict)
+    scenario_plan: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)

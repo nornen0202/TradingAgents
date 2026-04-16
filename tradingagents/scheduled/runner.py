@@ -631,7 +631,7 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     graph_config["codex_request_timeout"] = config.llm.codex_request_timeout
     graph_config["codex_max_retries"] = config.llm.codex_max_retries
     graph_config["codex_cleanup_threads"] = config.llm.codex_cleanup_threads
-    if config.run.timezone == "Asia/Seoul":
+    if config.run.market == "KR":
         graph_config["market_country"] = "KR"
         graph_config["timezone"] = "Asia/Seoul"
         graph_config["tool_vendors"] = {
@@ -639,6 +639,12 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
             "get_disclosures": "opendart",
             "get_macro_news": "ecos,alpha_vantage,yfinance",
             "get_social_sentiment": "naver,yfinance",
+        }
+    else:
+        graph_config["market_country"] = "US"
+        graph_config["tool_vendors"] = {
+            "get_company_news": "alpha_vantage,yfinance",
+            "get_social_sentiment": "yfinance",
         }
     if config.llm.codex_workspace_dir:
         graph_config["codex_workspace_dir"] = config.llm.codex_workspace_dir
@@ -816,10 +822,14 @@ def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, 
     translated_action_distribution: dict[str, int] = {}
     stance_distribution: dict[str, int] = {}
     entry_action_distribution: dict[str, int] = {}
+    trade_date_distribution: dict[str, int] = {}
     confidences: list[float] = []
     zero_company_news = 0
 
     for item in successful:
+        trade_date = str(item.get("trade_date") or "").strip()
+        if trade_date:
+            trade_date_distribution[trade_date] = trade_date_distribution.get(trade_date, 0) + 1
         raw = item.get("decision")
         if isinstance(raw, str) and raw.strip().startswith("{"):
             try:
@@ -850,6 +860,7 @@ def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, 
         "translated_action_distribution": translated_action_distribution,
         "stance_distribution": stance_distribution,
         "entry_action_distribution": entry_action_distribution,
+        "trade_date_distribution": trade_date_distribution,
         "avg_confidence": avg_confidence,
         "company_news_zero_ratio": (zero_company_news / total) if total else None,
     }
@@ -860,6 +871,12 @@ def _compute_batch_warnings(batch_metrics: dict[str, Any]) -> list[str]:
     decision_distribution = batch_metrics.get("decision_distribution") or {}
     stance_distribution = batch_metrics.get("stance_distribution") or {}
     entry_action_distribution = batch_metrics.get("entry_action_distribution") or {}
+    trade_date_distribution = batch_metrics.get("trade_date_distribution") or {}
+    if len(trade_date_distribution) > 1:
+        distribution_blob = ", ".join(
+            f"{date_value}={count}" for date_value, count in sorted(trade_date_distribution.items())
+        )
+        warnings.append(f"mixed_daily_cohort: trade_date_distribution includes {distribution_blob}.")
     total = sum(int(v) for v in decision_distribution.values())
     if total < 10:
         return warnings
@@ -1222,10 +1239,25 @@ def _run_execution_overlay_passes(
             contract_path = run_dir / contract_rel
             if not contract_path.exists():
                 continue
+            contract_dict: dict[str, Any] = {}
+            attempt_payload = _build_intraday_attempt_payload(
+                ticker=ticker,
+                checkpoint_label=checkpoint_label,
+                interval="5m",
+                success=False,
+                attempted_at=datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
+            )
             try:
                 contract_dict = json.loads(contract_path.read_text(encoding="utf-8"))
                 contract = _ExecutionContractShim(contract_dict).to_contract()
                 market = fetch_intraday_market_snapshot(ticker, interval="5m")
+                attempt_payload.update(
+                    {
+                        "success": True,
+                        "provider": market.provider,
+                        "market_data_asof": market.asof,
+                    }
+                )
                 update = evaluate_execution_state(
                     contract,
                     market,
@@ -1234,9 +1266,10 @@ def _run_execution_overlay_passes(
                     refresh_checkpoint=checkpoint_label,
                 )
                 update_payload = update.to_dict()
+                update_payload["intraday_snapshot_attempt"] = attempt_payload
                 ticker_dir = run_dir / "tickers" / ticker
                 checkpoint_dir = ticker_dir / "execution" / "checkpoints"
-                _write_json(checkpoint_dir / f"execution_update_{checkpoint_label}.json", update_payload)
+                _write_json(checkpoint_dir / _checkpoint_update_filename(checkpoint_label), update_payload)
                 update_path = ticker_dir / "execution_update.json"
                 _write_json(update_path, update_payload)
                 summary["artifacts"]["execution_update_json"] = _relative_to_run(run_dir, update_path)
@@ -1253,11 +1286,150 @@ def _run_execution_overlay_passes(
                 md_path.write_text(md_text, encoding="utf-8")
                 summary["artifacts"]["execution_update_md"] = _relative_to_run(run_dir, md_path)
                 summary["execution_update"] = update_payload
+                summary["intraday_snapshot_attempt"] = attempt_payload
+                _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 updates_by_ticker[ticker] = update_payload
             except Exception as exc:
+                attempt_payload.update(
+                    {
+                        "success": False,
+                        "error_type": exc.__class__.__name__,
+                        "error": _summarize_exception(exc),
+                    }
+                )
+                ticker_dir = run_dir / "tickers" / ticker
+                checkpoint_dir = ticker_dir / "execution" / "checkpoints"
+                update_payload = _build_failed_execution_update_payload(
+                    ticker=ticker,
+                    checkpoint_label=checkpoint_label,
+                    attempt_payload=attempt_payload,
+                    summary=summary,
+                    contract_payload=contract_dict,
+                    now=datetime.now(ZoneInfo(config.run.timezone)),
+                )
+                _write_json(checkpoint_dir / _checkpoint_update_filename(checkpoint_label), update_payload)
+                update_path = ticker_dir / "execution_update.json"
+                _write_json(update_path, update_payload)
+                summary["artifacts"]["execution_update_json"] = _relative_to_run(run_dir, update_path)
+                md_path = ticker_dir / "execution_update.md"
+                md_path.write_text(
+                    "# Execution overlay unavailable\n\n"
+                    f"- Ticker: {ticker}\n"
+                    f"- Checkpoint: {checkpoint_label}\n"
+                    f"- Reason: {_summarize_exception(exc)}\n",
+                    encoding="utf-8",
+                )
+                summary["artifacts"]["execution_update_md"] = _relative_to_run(run_dir, md_path)
+                summary["execution_update"] = update_payload
+                summary["intraday_snapshot_attempt"] = attempt_payload
+                _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
+                updates_by_ticker[ticker] = update_payload
                 print(f"::warning::Execution overlay checkpoint '{checkpoint_label}' failed for {ticker}: {exc}")
         updates_by_ticker["_latest_checkpoint"] = {"value": checkpoint_label}
     return updates_by_ticker
+
+
+def _build_intraday_attempt_payload(
+    *,
+    ticker: str,
+    checkpoint_label: str,
+    interval: str,
+    success: bool,
+    attempted_at: str,
+) -> dict[str, Any]:
+    return {
+        "ticker": ticker,
+        "attempted": True,
+        "success": bool(success),
+        "checkpoint": checkpoint_label,
+        "interval": interval,
+        "attempted_at": attempted_at,
+    }
+
+
+def _checkpoint_update_filename(checkpoint_label: str) -> str:
+    safe_label = "".join(
+        char if char.isalnum() or char in {"-", "_", "."} else "_"
+        for char in str(checkpoint_label or "post_research")
+    ).strip("_")
+    return f"execution_update_{safe_label or 'post_research'}.json"
+
+
+def _build_failed_execution_update_payload(
+    *,
+    ticker: str,
+    checkpoint_label: str,
+    attempt_payload: dict[str, Any],
+    summary: dict[str, Any],
+    contract_payload: dict[str, Any] | None,
+    now: datetime,
+) -> dict[str, Any]:
+    contract_payload = contract_payload or {}
+    return {
+        "ticker": ticker,
+        "analysis_asof": str(
+            contract_payload.get("analysis_asof")
+            or summary.get("finished_at")
+            or summary.get("started_at")
+            or ""
+        ),
+        "execution_asof": now.isoformat(),
+        "market_data_asof": contract_payload.get("market_data_asof"),
+        "source": {"provider": None, "interval": attempt_payload.get("interval"), "status": "failed"},
+        "last_price": None,
+        "session_vwap": None,
+        "day_high": None,
+        "day_low": None,
+        "intraday_volume": None,
+        "avg20_daily_volume": None,
+        "relative_volume": None,
+        "price_state": "UNAVAILABLE",
+        "volume_state": "UNAVAILABLE",
+        "event_state": "UNKNOWN",
+        "decision_state": "DEGRADED",
+        "decision_now": "NONE",
+        "decision_if_triggered": str(contract_payload.get("action_if_triggered") or "NONE"),
+        "execution_timing_state": "DEGRADED",
+        "trigger_status": {
+            "breakout_hit_intraday": False,
+            "close_confirmation_pending": False,
+            "pullback_zone_active": False,
+            "invalidated": False,
+        },
+        "changed_fields": ["execution_asof", "intraday_snapshot_attempt"],
+        "reason_codes": ["intraday_snapshot_unavailable"],
+        "staleness_seconds": None,
+        "data_health": "UNAVAILABLE",
+        "refresh_checkpoint": checkpoint_label,
+        "intraday_snapshot_attempt": attempt_payload,
+    }
+
+
+def _append_analysis_intraday_attempt(
+    *,
+    run_dir: Path,
+    ticker_summary: dict[str, Any],
+    attempt_payload: dict[str, Any],
+) -> None:
+    artifacts = ticker_summary.get("artifacts") or {}
+    analysis_rel = artifacts.get("analysis_json")
+    if not analysis_rel:
+        return
+    analysis_path = run_dir / analysis_rel
+    if not analysis_path.exists():
+        return
+    try:
+        payload = json.loads(analysis_path.read_text(encoding="utf-8"))
+    except Exception:
+        return
+    attempts = payload.get("intraday_snapshot_attempts")
+    if not isinstance(attempts, list):
+        attempts = []
+    attempts.append(attempt_payload)
+    payload["intraday_snapshot_attempts"] = attempts
+    payload["latest_intraday_snapshot_attempt"] = attempt_payload
+    payload["intraday_snapshot_latest_attempt"] = attempt_payload
+    _write_json(analysis_path, payload)
 
 
 def _load_execution_contracts_for_run(

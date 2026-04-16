@@ -1,5 +1,6 @@
 [run]
 tickers = ["000660.KS", "005380.KS", "005930.KS", "010950.KS", "012450.KS", "034020.KS", "042700.KS", "058470.KQ", "064400.KS", "095340.KQ", "278470.KS"]
+market = "KR"
 ticker_universe_mode = "config_only"
 analysts = ["market", "social", "news", "fundamentals"]
 output_language = "Korean"
@@ -56,7 +57,7 @@ report_polisher_enabled = true
 
 [execution]
 enabled = true
-checkpoints_kst = ["09:05", "11:05", "13:05", "15:25"]
+checkpoints_kst = ["10:05", "11:05", "12:35", "14:35"]
 max_data_age_seconds = 180
 publish_badges = true
 publish_debug = false

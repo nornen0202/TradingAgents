@@ -2,9 +2,9 @@ name: Intraday Overlay Refresh
 
 on:
   schedule:
-    # KR checkpoints: 09:05, 11:05, 13:05, 15:25 KST.
-    - cron: '5 0,2,4 * * 1-5'
-    - cron: '25 6 * * 1-5'
+    # KR checkpoints: 10:05, 11:05, 12:35, 14:35 KST.
+    - cron: '5 1,2 * * 1-5'
+    - cron: '35 3,5 * * 1-5'
     # US checkpoints: 23:35, 01:35, 03:35, 05:05 KST.
     - cron: '35 14,16,18 * * 1-5'
     - cron: '5 20 * * 1-5'
@@ -147,7 +147,7 @@ jobs:
           path: site
 
   overlay_refresh_kr:
-    if: ${{ (github.event_name == 'schedule' && (github.event.schedule == '5 0,2,4 * * 1-5' || github.event.schedule == '25 6 * * 1-5')) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) }}
+    if: ${{ (github.event_name == 'schedule' && (github.event.schedule == '5 1,2 * * 1-5' || github.event.schedule == '35 3,5 * * 1-5')) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 120
     defaults:
@@ -292,7 +292,7 @@ jobs:
           if ("${{ github.event_name }}" -eq "workflow_dispatch" -and $profile -eq "kr") {
             $configPath = "config/scheduled_analysis_korea.toml"
           }
-          if ("${{ github.event_name }}" -eq "schedule" -and ($schedule -eq "5 0,2,4 * * 1-5" -or $schedule -eq "25 6 * * 1-5")) {
+          if ("${{ github.event_name }}" -eq "schedule" -and ($schedule -eq "5 1,2 * * 1-5" -or $schedule -eq "35 3,5 * * 1-5")) {
             $configPath = "config/scheduled_analysis_korea.toml"
           }
 
