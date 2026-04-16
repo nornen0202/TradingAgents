@@ -40,3 +40,13 @@ def test_intraday_overlay_workflow_uses_kr_operational_crons():
     assert "35 3,5 * * 1-5" in workflow
     assert "5 0,2,4 * * 1-5" not in workflow
     assert "25 6 * * 1-5" not in workflow
+
+
+def test_daily_workflow_runs_us_and_kr_two_hours_earlier():
+    workflow = Path(".github/workflows/daily-codex-analysis.yml").read_text(encoding="utf-8")
+    assert "7:00 KST weekdays (22:00 UTC previous day) -> KR analysis" in workflow
+    assert "19:00 KST weekdays (10:00 UTC) -> US analysis" in workflow
+    assert "0 22 * * 0-4" in workflow
+    assert "0 10 * * 1-5" in workflow
+    assert "0 0 * * 1-5" not in workflow
+    assert "0 12 * * 1-5" not in workflow
