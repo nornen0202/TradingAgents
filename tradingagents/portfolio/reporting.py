@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from tradingagents.presentation import (
     present_account_action,
     present_market_regime,
@@ -11,6 +13,9 @@ from tradingagents.presentation import (
 from .account_models import AccountSnapshot, PortfolioCandidate, PortfolioRecommendation
 
 
+_TRIGGER_ACTIONS = {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED", "REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
+
+
 def render_portfolio_report_markdown(
     *,
     snapshot: AccountSnapshot,
@@ -19,25 +24,13 @@ def render_portfolio_report_markdown(
 ) -> str:
     mode_label = present_snapshot_mode(snapshot.snapshot_health, language="Korean")
     market_label = present_market_regime(recommendation.market_regime, language="Korean")
-    immediate_count = sum(1 for action in recommendation.actions if action.delta_krw_now != 0)
-    conditional_count = sum(
-        1
-        for action in recommendation.actions
-        if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED", "REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
-    )
-    conditional_budgeted_count = sum(1 for action in recommendation.actions if action.delta_krw_if_triggered != 0)
-    actionable_now_count = sum(
-        1 for action in recommendation.actions if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}
-    )
-    triggerable_candidates_count = sum(
-        1 for action in recommendation.actions if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}
-    )
-    watch_candidates_count = sum(
-        1 for action in recommendation.actions if action.action_now == "WATCH"
-    )
-    held_watch_count = sum(
-        1 for action in recommendation.actions if action.action_now == "HOLD" and action.action_if_triggered == "ADD_IF_TRIGGERED"
-    )
+    counts = _candidate_counts(recommendation)
+    immediate_count = counts["immediate_candidates_count"]
+    strategic_trigger_count = counts["strategic_trigger_candidates_count"]
+    budgeted_trigger_count = counts["budgeted_trigger_candidates_count"]
+    funding_count = counts["funding_candidates_count"]
+    held_add_count = counts["held_add_if_triggered_count"]
+    watch_if_triggered_count = counts["watch_if_triggered_count"]
     review_required_count = sum(1 for action in recommendation.actions if action.review_required)
     rule_only_fallback_count = sum(
         1 for action in recommendation.actions if str(action.decision_source).upper() == "RULE_ONLY_FALLBACK"
@@ -61,11 +54,14 @@ def render_portfolio_report_markdown(
             f"{_cell(_conditional_action_label(action))} | "
             f"{_cell(_amount_label(action.delta_krw_now))} | "
             f"{_cell(_amount_label(action.delta_krw_if_triggered))} | "
-            f"{action.priority} | {_cell(sanitize_investor_text(action.rationale, language='Korean'))} | "
+            f"{action.priority} | {_cell(_localized_rationale(action))} | "
             f"{present_review_required(action.review_required, language='Korean')} |"
         )
 
     portfolio_risks = _risk_lines(recommendation.portfolio_risks)
+    strategy_line = _strategy_priority_line(recommendation)
+    funding_sections = _funding_sections(recommendation)
+    scenario_table = _scenario_table(recommendation)
     return "\n".join(
         [
             title,
@@ -73,34 +69,149 @@ def render_portfolio_report_markdown(
             f"- 기준 시각: `{snapshot.as_of}`",
             f"- 운용 모드: `{mode_label}`",
             f"- 계좌 평가금액: `{_krw(snapshot.account_value_krw)}`",
+            f"- 가용 현금: `{_krw(snapshot.available_cash_krw)}`",
+            f"- 최소 현금 버퍼: `{_krw(snapshot.constraints.min_cash_buffer_krw)}`",
             f"- 오늘 실행 후 예상 현금: `{_krw(recommendation.recommended_cash_after_now_krw)}`",
             f"- 조건부 실행까지 반영한 예상 현금: `{_krw(recommendation.recommended_cash_after_triggered_krw)}`",
             f"- 시장 분위기: `{market_label}`",
             "",
             "## 핵심 요약",
             "",
-            f"- 지금 실행 후보: {immediate_count}개",
-            f"- 조건부 실행 후보: {conditional_count}개",
-            f"- 조건부 실행 예산 반영 후보: {conditional_budgeted_count}개",
-            f"- 전략상 즉시 액션 가능: {actionable_now_count}개",
-            f"- 트리거형 후보(현금과 무관): {triggerable_candidates_count}개",
-            f"- 미보유 관찰 후보: {watch_candidates_count}개",
-            f"- 보유 관찰(조건부 추가): {held_watch_count}개",
-            f"- 검토 필요 후보: {review_required_count}개",
-            f"- Rule-only fallback 후보: {rule_only_fallback_count}개",
-            f"- 확인 필요 종목: {', '.join(review_names) if review_names else '없음'}",
-            "- 세부 진단과 원본 판단 값은 감사용 JSON 파일에 보관됩니다.",
+            _strict_summary_line(snapshot, immediate_count),
+            strategy_line,
+            f"- 전략상 조건부 후보 {strategic_trigger_count}개 / 자금 반영 조건부 후보 {budgeted_trigger_count}개",
+            f"- 자금 조달형 후보 {funding_count}개 / 보유 조건부 추가 후보 {held_add_count}개 / 미보유 조건부 관찰 후보 {watch_if_triggered_count}개",
             "",
             "## 액션 요약",
             "",
             *action_rows,
             "",
+            "## 운용 시나리오",
+            "",
+            scenario_table,
+            "",
+            funding_sections,
+            "",
             "## 포트폴리오 리스크",
             "",
             portfolio_risks,
             "",
+            "## 집계 진단",
+            "",
+            f"- 지금 실행 후보: {immediate_count}개",
+            f"- 조건부 실행 후보: {strategic_trigger_count}개",
+            f"- 조건부 실행 예산 반영 후보: {budgeted_trigger_count}개",
+            f"- 트리거형 후보(현금과 무관): {strategic_trigger_count}개",
+            f"- 전략상 조건부 후보: {strategic_trigger_count}개",
+            f"- 자금 조달형 후보: {funding_count}개",
+            f"- 확인 필요 후보: {review_required_count}개",
+            f"- Rule-only fallback 후보: {rule_only_fallback_count}개",
+            f"- 확인 필요 종목: {', '.join(review_names) if review_names else '없음'}",
+            "- 내부 진단과 원본 판단 값은 감사용 JSON 파일에 보관합니다.",
+            "",
         ]
     )
+
+
+def _candidate_counts(recommendation: PortfolioRecommendation) -> dict[str, int]:
+    counts = dict(recommendation.candidate_counts or {})
+    actions = recommendation.actions
+    counts.setdefault(
+        "strategic_trigger_candidates_count",
+        sum(1 for action in actions if action.action_if_triggered in _TRIGGER_ACTIONS),
+    )
+    counts.setdefault(
+        "budgeted_trigger_candidates_count",
+        sum(1 for action in actions if action.delta_krw_if_triggered != 0),
+    )
+    counts.setdefault(
+        "immediate_candidates_count",
+        sum(1 for action in actions if action.delta_krw_now != 0),
+    )
+    counts.setdefault("funding_candidates_count", 0)
+    counts.setdefault(
+        "held_add_if_triggered_count",
+        sum(1 for action in actions if action.action_now == "HOLD" and action.action_if_triggered == "ADD_IF_TRIGGERED"),
+    )
+    counts.setdefault(
+        "watch_if_triggered_count",
+        sum(1 for action in actions if action.action_now == "WATCH" and action.action_if_triggered in _TRIGGER_ACTIONS),
+    )
+    return counts
+
+
+def _strict_summary_line(snapshot: AccountSnapshot, immediate_count: int) -> str:
+    if immediate_count <= 0 and snapshot.available_cash_krw < snapshot.constraints.min_cash_buffer_krw:
+        return "- 오늘은 신규매수 없음: 가용 현금이 최소 현금 버퍼보다 작아 strict 모드에서는 주문을 보류합니다."
+    if immediate_count <= 0:
+        return "- 오늘은 신규매수 없음: 즉시 실행 조건을 통과한 주문이 없습니다."
+    return f"- 오늘 즉시 실행 후보 {immediate_count}개를 우선 확인합니다."
+
+
+def _strategy_priority_line(recommendation: PortfolioRecommendation) -> str:
+    names = [str(item.get("display_name") or item.get("canonical_ticker")) for item in _top_add_if_funded(recommendation)]
+    if names:
+        return f"- 하지만 전략상 우선순위는 {' > '.join(names[:4])} 순입니다."
+    return "- 전략상 우선순위는 조건 충족 종목이 생길 때 다시 정렬합니다."
+
+
+def _funding_sections(recommendation: PortfolioRecommendation) -> str:
+    add_items = _top_add_if_funded(recommendation)
+    trim_items = _top_trim_if_needed(recommendation)
+    add_lines = [
+        f"- {item.get('display_name') or item.get('canonical_ticker')}: {_short_conditions(item.get('trigger_conditions'))}"
+        for item in add_items
+    ]
+    trim_lines = [
+        f"- {item.get('display_name') or item.get('canonical_ticker')}: 자금조달 점수 {float(item.get('funding_source_score') or 0):.2f}"
+        for item in trim_items
+    ]
+    return "\n".join(
+        [
+            "## would-buy-if-funded",
+            "",
+            "\n".join(add_lines) if add_lines else "- 자금이 생겨도 바로 늘릴 조건부 후보가 없습니다.",
+            "",
+            "## would-trim-first",
+            "",
+            "\n".join(trim_lines) if trim_lines else "- 자금 조달을 위해 먼저 줄일 후보가 없습니다.",
+        ]
+    )
+
+
+def _scenario_table(recommendation: PortfolioRecommendation) -> str:
+    scenarios = recommendation.scenario_plan or {}
+    strict = scenarios.get("strict") or {}
+    switch = scenarios.get("switch") or {}
+    aggressive = scenarios.get("aggressive") or {}
+    rows = [
+        "| 시나리오 | 의미 | 주문 계획 |",
+        "|---|---|---|",
+        f"| Strict | 현금 버퍼 절대 준수 | 즉시 {int(strict.get('immediate_order_count') or 0)}개 / 조건부 예산 {int(strict.get('budgeted_trigger_count') or 0)}개 |",
+        f"| Switch | 줄여서 늘리기 허용 | {'매도 ' + _krw(int(switch.get('gross_sell_krw') or 0)) + ' / 매수 ' + _krw(int(switch.get('gross_buy_krw') or 0)) if switch.get('enabled') else '후보 부족'} |",
+        f"| Aggressive | 조건 충족 시 버퍼 일부 희생 | {'조건부 매수 ' + _krw(int(aggressive.get('gross_buy_krw') or 0)) if aggressive.get('enabled') else '보류'} |",
+    ]
+    return "\n".join(rows)
+
+
+def _top_add_if_funded(recommendation: PortfolioRecommendation) -> list[dict[str, Any]]:
+    funding_plan = recommendation.funding_plan or {}
+    values = funding_plan.get("top_add_if_funded")
+    return [item for item in values if isinstance(item, dict)] if isinstance(values, list) else []
+
+
+def _top_trim_if_needed(recommendation: PortfolioRecommendation) -> list[dict[str, Any]]:
+    funding_plan = recommendation.funding_plan or {}
+    values = funding_plan.get("top_trim_if_funding_needed")
+    return [item for item in values if isinstance(item, dict)] if isinstance(values, list) else []
+
+
+def _short_conditions(values: Any) -> str:
+    if not isinstance(values, list) or not values:
+        return "조건 충족 시 검토"
+    cleaned = [sanitize_investor_text(value, language="Korean") for value in values]
+    cleaned = [value for value in cleaned if value and value != "없음"]
+    return "; ".join(cleaned[:2]) if cleaned else "조건 충족 시 검토"
 
 
 def _position_label(position) -> str:
@@ -118,10 +229,21 @@ def _conditional_action_label(action) -> str:
     return f"{label}: {'; '.join(conditions[:2])}"
 
 
+def _localized_rationale(action) -> str:
+    text = sanitize_investor_text(action.rationale, language="Korean")
+    if text and text != "없음":
+        return text
+    if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}:
+        return "조건 충족 전까지 대기합니다."
+    if action.action_if_triggered in {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+        return "리스크 조건 이탈 시 축소를 검토합니다."
+    return "추가 행동보다 관찰이 우선입니다."
+
+
 def _amount_label(value: int) -> str:
     amount = int(value)
     if amount == 0:
-        return "변동 없음"
+        return "변화 없음"
     if amount > 0:
         return f"매수 {_krw(amount)}"
     return f"매도 {_krw(abs(amount))}"

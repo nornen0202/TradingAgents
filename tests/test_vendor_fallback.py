@@ -136,6 +136,51 @@ class VendorFallbackTests(unittest.TestCase):
             "::warning::Vendor fallback for get_social_sentiment: naver: missing naver key"
         )
 
+    def test_empty_vendor_results_emit_notice_instead_of_warning(self):
+        with patch("tradingagents.dataflows.interface.get_vendor", return_value="yfinance"), patch.dict(
+            "tradingagents.dataflows.interface.VENDOR_METHODS",
+            {
+                "get_social_sentiment": {
+                    "yfinance": lambda *_args, **_kwargs: "No social sentiment data found for AAPL.",
+                }
+            },
+            clear=False,
+        ), patch.dict(os.environ, {"GITHUB_ACTIONS": "true"}, clear=False), patch("builtins.print") as mocked_print:
+            route_to_vendor("get_social_sentiment", "AAPL", "2026-04-01", "2026-04-02")
+
+        calls = [call.args[0] for call in mocked_print.call_args_list]
+        self.assertTrue(any(str(item).startswith("::notice::Vendor fallback") for item in calls))
+        self.assertFalse(any(str(item).startswith("::warning::Vendor fallback") for item in calls))
+
+    def test_us_symbols_skip_kr_only_vendor_fallbacks(self):
+        with patch("tradingagents.dataflows.interface.get_vendor", return_value="yfinance,naver"), patch.dict(
+            "tradingagents.dataflows.interface.VENDOR_METHODS",
+            {
+                "get_social_sentiment": {
+                    "yfinance": lambda *_args, **_kwargs: "No social sentiment data found for AAPL.",
+                    "naver": lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("naver should be skipped for US symbols")),
+                }
+            },
+            clear=False,
+        ):
+            result = route_to_vendor("get_social_sentiment", "AAPL", "2026-04-01", "2026-04-02")
+
+        self.assertIn("No social sentiment", result)
+
+    def test_us_symbols_skip_opendart_disclosure_fallback(self):
+        with patch("tradingagents.dataflows.interface.get_vendor", return_value="opendart"), patch.dict(
+            "tradingagents.dataflows.interface.VENDOR_METHODS",
+            {
+                "get_disclosures": {
+                    "opendart": lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("opendart should be skipped for US symbols")),
+                }
+            },
+            clear=False,
+        ):
+            result = route_to_vendor("get_disclosures", "AAPL", "2026-04-01", "2026-04-02")
+
+        self.assertIn("No disclosures found", result)
+
 
 if __name__ == "__main__":
     unittest.main()

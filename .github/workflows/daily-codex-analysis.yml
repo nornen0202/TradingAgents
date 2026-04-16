@@ -56,7 +56,6 @@ jobs:
       - deploy_kr
     if: ${{ always() && ((github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '0 12 * * 1-5')) && needs.analyze_kr.result != 'failure' && needs.analyze_kr.result != 'cancelled' && needs.deploy_kr.result != 'failure' && needs.deploy_kr.result != 'cancelled' }}
     runs-on: [self-hosted, Windows]
-    timeout-minutes: 240
     defaults:
       run:
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
@@ -363,7 +362,6 @@ jobs:
   analyze_kr:
     if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) || (github.event_name == 'schedule' && github.event.schedule == '0 0 * * 1-5') }}
     runs-on: [self-hosted, Windows]
-    timeout-minutes: 240
     defaults:
       run:
         shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}

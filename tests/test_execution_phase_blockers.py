@@ -9,6 +9,7 @@ from tradingagents.schemas import (
     DecisionState,
     EventGuard,
     ExecutionContract,
+    ExecutionTimingState,
     IntradayMarketSnapshot,
     LevelBasis,
     PrimarySetup,
@@ -69,6 +70,34 @@ def test_breakout_hit_by_day_high_marks_actionable():
         max_data_age_seconds=180,
     )
     assert update.decision_state in {DecisionState.ACTIONABLE_NOW, DecisionState.ARMED}
+
+
+def test_intraday_breakout_exposes_live_breakout_timing_state():
+    now = datetime.now(timezone.utc)
+    update = evaluate_execution_state(
+        _contract(breakout_confirmation=BreakoutConfirmation.INTRADAY_ABOVE),
+        _market(last_price=101.0, day_high=101.5, day_low=98.0),
+        now=now,
+        max_data_age_seconds=180,
+    )
+
+    assert update.decision_state == DecisionState.ACTIONABLE_NOW
+    assert update.execution_timing_state == ExecutionTimingState.LIVE_BREAKOUT
+    assert update.to_dict()["execution_timing_state"] == "LIVE_BREAKOUT"
+
+
+def test_close_confirmation_exposes_close_confirm_timing_state():
+    now = datetime.now(timezone.utc)
+    update = evaluate_execution_state(
+        _contract(breakout_confirmation=BreakoutConfirmation.CLOSE_ABOVE),
+        _market(last_price=101.0, day_high=101.5, day_low=98.0),
+        now=now,
+        max_data_age_seconds=180,
+    )
+
+    assert update.decision_state == DecisionState.TRIGGERED_PENDING_CLOSE
+    assert update.execution_timing_state == ExecutionTimingState.CLOSE_CONFIRM
+    assert update.to_dict()["execution_timing_state"] == "CLOSE_CONFIRM"
 
 
 def test_build_execution_summary_handles_empty_updates():

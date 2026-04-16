@@ -70,6 +70,15 @@ class DecisionNow(str, Enum):
     EXIT_NOW = "EXIT_NOW"
 
 
+class ExecutionTimingState(str, Enum):
+    WAITING = "WAITING"
+    LIVE_BREAKOUT = "LIVE_BREAKOUT"
+    CLOSE_CONFIRM = "CLOSE_CONFIRM"
+    ACTIONABLE_LIVE = "ACTIONABLE_LIVE"
+    INVALIDATED = "INVALIDATED"
+    DEGRADED = "DEGRADED"
+
+
 @dataclass(frozen=True)
 class PullbackBuyZone:
     low: float
@@ -192,6 +201,7 @@ class ExecutionUpdate:
     staleness_seconds: int | None
     data_health: str
     refresh_checkpoint: str | None = None
+    execution_timing_state: ExecutionTimingState = ExecutionTimingState.WAITING
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -219,6 +229,7 @@ class ExecutionUpdate:
             "staleness_seconds": self.staleness_seconds,
             "data_health": self.data_health,
             "refresh_checkpoint": self.refresh_checkpoint,
+            "execution_timing_state": self.execution_timing_state.value,
         }
 
     def to_json(self, *, indent: int = 2) -> str:

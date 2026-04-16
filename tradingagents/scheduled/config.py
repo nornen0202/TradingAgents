@@ -20,8 +20,8 @@ VALID_TRADE_DATE_MODES = {"latest_available", "today", "previous_business_day", 
 VALID_TICKER_UNIVERSE_MODES = {"config_only", "config_plus_account", "account_only"}
 VALID_RUN_MODES = {"full", "overlay_only", "selective_rerun_only"}
 DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET: dict[str, tuple[str, ...]] = {
-    # KST anchors intentionally map to (pre-open, intraday, post-close) semantics.
-    "KR": ("09:20", "12:00", "15:40"),
+    # KST anchors cover morning, lunch, and afternoon refresh windows.
+    "KR": ("10:05", "11:05", "12:35", "14:35"),
 }
 
 
