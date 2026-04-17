@@ -142,6 +142,16 @@ def _build_single_candidate(
         trigger_conditions = tuple(
             dict.fromkeys([*structured.watchlist_triggers, *structured.catalysts, *structured.invalidators])
         )
+        execution_levels = structured.execution_levels.to_dict()
+        level_conditions = [
+            execution_levels.get("intraday_pilot_rule"),
+            execution_levels.get("close_confirm_rule"),
+            execution_levels.get("next_day_followthrough_rule"),
+            execution_levels.get("failed_breakout_rule"),
+        ]
+        trigger_conditions = tuple(
+            dict.fromkeys([*trigger_conditions, *(str(item).strip() for item in level_conditions if str(item or "").strip())])
+        )
     else:
         structured_dict = None
         rating_value = "UNKNOWN"
@@ -157,6 +167,11 @@ def _build_single_candidate(
         }
         trigger_conditions = tuple()
         warnings.append(f"{canonical_ticker}: missing analysis; defaulting to NEUTRAL/WAIT before portfolio action translation.")
+    execution_levels_dict = (
+        (structured_dict or {}).get("execution_levels")
+        if isinstance((structured_dict or {}).get("execution_levels"), dict)
+        else {}
+    )
 
     is_held = position is not None
     action_now, action_if_triggered = _translate_actions(
@@ -177,6 +192,10 @@ def _build_single_candidate(
         action_now=action_now,
         execution_update=execution_update if isinstance(execution_update, dict) else None,
         quality_flags=quality_flags,
+    )
+    execution_health = _execution_health(
+        execution_update=execution_update if isinstance(execution_update, dict) else None,
+        execution_levels=execution_levels_dict,
     )
     strategy_state = _strategy_state(
         action_now=action_now,
@@ -222,6 +241,17 @@ def _build_single_candidate(
             strategy_state=strategy_state,
             execution_feasibility_now=execution_feasibility_now,
             stale_but_triggerable=stale_but_triggerable,
+            trigger_profile={
+                "intraday_pilot_rule": execution_levels_dict.get("intraday_pilot_rule"),
+                "close_confirm_rule": execution_levels_dict.get("close_confirm_rule"),
+                "next_day_followthrough_rule": execution_levels_dict.get("next_day_followthrough_rule"),
+                "failed_breakout_rule": execution_levels_dict.get("failed_breakout_rule"),
+                "trim_rule": execution_levels_dict.get("trim_rule"),
+                "funding_priority": execution_levels_dict.get("funding_priority"),
+                "entry_window": execution_levels_dict.get("entry_window"),
+                "trigger_quality": execution_levels_dict.get("trigger_quality"),
+                "primary_trigger_type": _primary_trigger_type(execution_update if isinstance(execution_update, dict) else None),
+            },
             data_health={
                 "coverage_score": 0.0,
                 "vendor_calls": vendor_health["vendor_calls"],
@@ -231,6 +261,7 @@ def _build_single_candidate(
                 "strategy_state": strategy_state,
                 "execution_feasibility_now": execution_feasibility_now,
                 "stale_but_triggerable": stale_but_triggerable,
+                **execution_health,
             },
         ),
         warnings,
@@ -290,8 +321,15 @@ def _apply_execution_overlay_actions(
 ) -> tuple[str, str]:
     decision_state = str(execution_update.get("decision_state") or "").upper()
     decision_now = str(execution_update.get("decision_now") or "").upper()
+    timing_state = str(execution_update.get("execution_timing_state") or "").upper()
 
-    if decision_state == "DEGRADED":
+    if timing_state == "FAILED_BREAKOUT":
+        if is_held:
+            return ("HOLD", "REDUCE_IF_TRIGGERED")
+        return ("WATCH", "WATCH_TRIGGER")
+    if timing_state == "SUPPORT_FAIL":
+        return ("REDUCE_NOW" if is_held else "WATCH", "EXIT_IF_TRIGGERED" if is_held else "NONE")
+    if decision_state == "DEGRADED" or timing_state == "STALE_TRIGGERABLE":
         if is_held:
             preserved_trigger = action_if_triggered
             if action_if_triggered == "STARTER_IF_TRIGGERED":
@@ -302,6 +340,10 @@ def _apply_execution_overlay_actions(
     if decision_state == "INVALIDATED":
         return ("REDUCE_NOW" if is_held else "WATCH", "EXIT_IF_TRIGGERED" if is_held else "NONE")
     if decision_state == "TRIGGERED_PENDING_CLOSE":
+        if is_held:
+            return ("HOLD", "ADD_IF_TRIGGERED")
+        return ("WATCH", "STARTER_IF_TRIGGERED")
+    if timing_state == "LATE_SESSION_CONFIRM":
         if is_held:
             return ("HOLD", "ADD_IF_TRIGGERED")
         return ("WATCH", "STARTER_IF_TRIGGERED")
@@ -338,6 +380,54 @@ def _execution_feasibility_now(
     if action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}:
         return "executable_now"
     return "not_actionable_now"
+
+
+def _execution_health(
+    *,
+    execution_update: dict[str, Any] | None,
+    execution_levels: dict[str, Any],
+) -> dict[str, Any]:
+    quality_map = {"weak": 0.33, "medium": 0.66, "strong": 1.0}
+    trigger_quality = str(execution_levels.get("trigger_quality") or "").strip().lower()
+    payload: dict[str, Any] = {
+        "execution_timing_state": "",
+        "session_vwap_ok": None,
+        "relative_volume_ok": None,
+        "trigger_quality": quality_map.get(trigger_quality, 0.0),
+        "entry_window": execution_levels.get("entry_window"),
+    }
+    if not execution_update:
+        return payload
+    timing_state = str(execution_update.get("execution_timing_state") or "").upper()
+    source = execution_update.get("source") if isinstance(execution_update.get("source"), dict) else {}
+    payload["execution_timing_state"] = timing_state
+    payload["market_session"] = source.get("market_session")
+    payload["quote_delay_seconds"] = source.get("quote_delay_seconds")
+    payload["provider_realtime_capable"] = source.get("provider_realtime_capable")
+    last_price = _safe_float(execution_update.get("last_price"))
+    session_vwap = _safe_float(execution_update.get("session_vwap"))
+    relative_volume = _safe_float(execution_update.get("relative_volume"))
+    payload["session_vwap_ok"] = None if last_price is None or session_vwap is None else last_price >= session_vwap
+    payload["relative_volume_ok"] = None if relative_volume is None else relative_volume >= 1.0
+    return payload
+
+
+def _primary_trigger_type(execution_update: dict[str, Any] | None) -> str:
+    if not execution_update:
+        return ""
+    timing_state = str(execution_update.get("execution_timing_state") or "").upper()
+    if timing_state in {"LIVE_BREAKOUT", "FAILED_BREAKOUT", "LATE_SESSION_CONFIRM"}:
+        return "breakout"
+    if timing_state in {"SUPPORT_HOLD", "SUPPORT_FAIL"}:
+        return "support"
+    return timing_state.lower()
+
+
+def _safe_float(value: Any) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def _strategy_state(*, action_now: str, action_if_triggered: str, is_held: bool, stance: str) -> str:

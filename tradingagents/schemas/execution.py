@@ -73,6 +73,11 @@ class DecisionNow(str, Enum):
 class ExecutionTimingState(str, Enum):
     WAITING = "WAITING"
     LIVE_BREAKOUT = "LIVE_BREAKOUT"
+    FAILED_BREAKOUT = "FAILED_BREAKOUT"
+    SUPPORT_HOLD = "SUPPORT_HOLD"
+    SUPPORT_FAIL = "SUPPORT_FAIL"
+    LATE_SESSION_CONFIRM = "LATE_SESSION_CONFIRM"
+    STALE_TRIGGERABLE = "STALE_TRIGGERABLE"
     CLOSE_CONFIRM = "CLOSE_CONFIRM"
     ACTIONABLE_LIVE = "ACTIONABLE_LIVE"
     INVALIDATED = "INVALIDATED"
@@ -128,6 +133,14 @@ class ExecutionContract:
     event_guard: EventGuard | None = None
     reason_codes: tuple[str, ...] = field(default_factory=tuple)
     notes: tuple[str, ...] = field(default_factory=tuple)
+    intraday_pilot_rule: str | None = None
+    close_confirm_rule: str | None = None
+    next_day_followthrough_rule: str | None = None
+    failed_breakout_rule: str | None = None
+    trim_rule: str | None = None
+    funding_priority: str | None = None
+    entry_window: str | None = None
+    trigger_quality: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         payload: dict[str, Any] = {
@@ -153,6 +166,24 @@ class ExecutionContract:
             "event_guard": self.event_guard.to_dict() if self.event_guard else None,
             "reason_codes": list(self.reason_codes),
             "notes": list(self.notes),
+            "execution_levels": {
+                "intraday_pilot_rule": self.intraday_pilot_rule,
+                "close_confirm_rule": self.close_confirm_rule,
+                "next_day_followthrough_rule": self.next_day_followthrough_rule,
+                "failed_breakout_rule": self.failed_breakout_rule,
+                "trim_rule": self.trim_rule,
+                "funding_priority": self.funding_priority,
+                "entry_window": self.entry_window,
+                "trigger_quality": self.trigger_quality,
+            },
+            "intraday_pilot_rule": self.intraday_pilot_rule,
+            "close_confirm_rule": self.close_confirm_rule,
+            "next_day_followthrough_rule": self.next_day_followthrough_rule,
+            "failed_breakout_rule": self.failed_breakout_rule,
+            "trim_rule": self.trim_rule,
+            "funding_priority": self.funding_priority,
+            "entry_window": self.entry_window,
+            "trigger_quality": self.trigger_quality,
         }
         return payload
 
@@ -173,6 +204,31 @@ class IntradayMarketSnapshot:
     volume: int
     avg20_daily_volume: float | None
     relative_volume: float | None
+    bar_timestamp: str | None = None
+    provider_timestamp: str | None = None
+    quote_delay_seconds: int | None = None
+    provider_realtime_capable: bool = False
+    market_session: str = "unknown"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "ticker": self.ticker,
+            "asof": self.asof,
+            "bar_timestamp": self.bar_timestamp or self.asof,
+            "provider": self.provider,
+            "provider_timestamp": self.provider_timestamp or self.asof,
+            "quote_delay_seconds": self.quote_delay_seconds,
+            "provider_realtime_capable": self.provider_realtime_capable,
+            "market_session": self.market_session,
+            "interval": self.interval,
+            "last_price": self.last_price,
+            "session_vwap": self.session_vwap,
+            "day_high": self.day_high,
+            "day_low": self.day_low,
+            "volume": self.volume,
+            "avg20_daily_volume": self.avg20_daily_volume,
+            "relative_volume": self.relative_volume,
+        }
 
 
 @dataclass(frozen=True)

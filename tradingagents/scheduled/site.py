@@ -308,7 +308,9 @@ def _render_run_page(
               <p><strong>종목명</strong><span>{_escape(_ticker_display_label(ticker_summary))}</span></p>
               <p><strong>투자판단</strong><span>{_escape(investor_summary['investment_view'])}</span></p>
               <p><strong>오늘 할 일</strong><span>{_escape(investor_summary['today_action'])}</span></p>
+              <p><strong>장중 pilot 조건</strong><span>{_escape(investor_summary['intraday_pilot_action'])}</span></p>
               <p><strong>종가 확인 시 할 일</strong><span>{_escape(investor_summary['close_action'])}</span></p>
+              <p><strong>내일 follow-through</strong><span>{_escape(investor_summary['next_day_action'])}</span></p>
               <p class="long-field"><strong>핵심 가격대</strong><span>{_escape(investor_summary['key_levels'])}</span></p>
               <p class="long-field"><strong>위험 요약</strong><span>{_escape(investor_summary['risk_summary'])}</span></p>
               <p><strong>리서치 기준</strong><span>{_escape(investor_summary['research_basis'])}</span></p>
@@ -550,8 +552,8 @@ def _render_portfolio_page(
 
     downloads_html = _download_details_html(
         download_links,
-        summary="Source files",
-        empty_text="No downloadable files",
+        summary="자료 다운로드",
+        empty_text="다운로드 가능한 파일 없음",
     )
     status_label = _portfolio_status_label(str(portfolio_summary.get("status") or "unknown"))
     snapshot_mode = (
@@ -618,8 +620,8 @@ def _render_ticker_page(
         )
     downloads_html = _download_details_html(
         download_links,
-        summary="Source files",
-        empty_text="No downloadable files",
+        summary="자료 다운로드",
+        empty_text="다운로드 가능한 파일 없음",
     )
 
     failure_html = ""
@@ -659,11 +661,14 @@ def _render_ticker_page(
         <p><strong>기준 시각</strong><span>{_escape(investor_summary['basis_asof'])}</span></p>
         <p><strong>투자판단</strong><span>{_escape(investor_summary['investment_view'])}</span></p>
         <p><strong>오늘 할 일</strong><span>{_escape(investor_summary['today_action'])}</span></p>
+        <p><strong>장중 pilot 조건</strong><span>{_escape(investor_summary['intraday_pilot_action'])}</span></p>
         <p><strong>종가 확인 시 할 일</strong><span>{_escape(investor_summary['close_action'])}</span></p>
+        <p><strong>내일 follow-through</strong><span>{_escape(investor_summary['next_day_action'])}</span></p>
         <p><strong>리서치 기준</strong><span>{_escape(investor_summary['research_basis'])}</span></p>
         <p><strong>실행 기준</strong><span>{_escape(investor_summary['execution_basis'])}</span></p>
         <p><strong>핵심 가격대</strong><span>{_escape(investor_summary['key_levels'])}</span></p>
         <p><strong>위험 요약</strong><span>{_escape(investor_summary['risk_summary'])}</span></p>
+        <p><strong>왜 이 종목인가</strong><span>{_escape(investor_summary['why_this_ticker'])}</span></p>
         {_advanced_diagnostics_html(ticker_summary, manifest, stale_after_seconds=stale_after_seconds)}
       </div>
     </section>
@@ -794,9 +799,20 @@ def _ticker_investor_summary(
     return {
         "investment_view": present_investment_view(ticker_summary.get("decision") or ticker_summary.get("error"), language=language),
         "today_action": today_action,
+        "intraday_pilot_action": _intraday_pilot_rule_summary(
+            ticker_summary,
+            primary_condition=primary_condition,
+            language=language,
+        ),
         "close_action": close_action,
+        "next_day_action": _next_day_followthrough_summary(
+            ticker_summary,
+            primary_condition=primary_condition,
+            language=language,
+        ),
         "key_levels": _key_levels_summary(ticker_summary, primary_condition=primary_condition, language=language),
         "risk_summary": _risk_summary(ticker_summary, language=language),
+        "why_this_ticker": _why_this_ticker_summary(ticker_summary, language=language),
         "research_basis": _research_basis_label(ticker_summary, language=language),
         "execution_basis": _execution_basis_label(ticker_summary, language=language),
         "basis_asof": _basis_asof_label(ticker_summary, language=language),
@@ -833,6 +849,55 @@ def _basis_asof_label(ticker_summary: dict[str, Any], *, language: str) -> str:
     if language.lower().startswith("korean"):
         return f"{ticker_summary.get('analysis_date') or '-'} 분석 / {ticker_summary.get('trade_date') or '-'} 거래일"
     return f"Analysis {ticker_summary.get('analysis_date') or '-'} / trade date {ticker_summary.get('trade_date') or '-'}"
+
+
+def _intraday_pilot_rule_summary(
+    ticker_summary: dict[str, Any],
+    *,
+    primary_condition: str,
+    language: str,
+) -> str:
+    levels = _execution_levels_payload(ticker_summary)
+    rule = str(levels.get("intraday_pilot_rule") or "").strip()
+    if rule:
+        return sanitize_investor_text(rule, language=language)
+    if language.lower().startswith("korean"):
+        return f"10:30 이후 {primary_condition} + VWAP 위 + 거래량 확인 시 소액 starter만 검토"
+    return f"After 10:30, consider only a small starter if {primary_condition}, VWAP, and volume confirm"
+
+
+def _next_day_followthrough_summary(
+    ticker_summary: dict[str, Any],
+    *,
+    primary_condition: str,
+    language: str,
+) -> str:
+    levels = _execution_levels_payload(ticker_summary)
+    rule = str(levels.get("next_day_followthrough_rule") or "").strip()
+    if rule:
+        return sanitize_investor_text(rule, language=language)
+    if language.lower().startswith("korean"):
+        return f"다음 거래일 첫 30~60분 동안 {primary_condition} 재이탈이 없는지 확인"
+    return f"Next session: require no loss of {primary_condition} during the first 30-60 minutes"
+
+
+def _why_this_ticker_summary(ticker_summary: dict[str, Any], *, language: str) -> str:
+    try:
+        parsed = parse_structured_decision(ticker_summary.get("decision"))
+    except Exception:
+        return "근거 요약 생성 실패: 원문은 투자자 화면에서 숨깁니다." if language.lower().startswith("korean") else "Rationale unavailable"
+    candidates = [*parsed.catalysts, parsed.entry_logic]
+    for item in candidates:
+        text = sanitize_investor_text(item, language=language)
+        if text and text not in {"-", "None", "없음"}:
+            return text
+    return "조건 충족 전까지 관찰합니다." if language.lower().startswith("korean") else "Watch until the setup confirms"
+
+
+def _execution_levels_payload(ticker_summary: dict[str, Any]) -> dict[str, Any]:
+    contract = _execution_contract_payload(ticker_summary)
+    levels = contract.get("execution_levels")
+    return levels if isinstance(levels, dict) else {}
 
 
 def _key_levels_summary(
@@ -1008,6 +1073,11 @@ def _execution_timing_state_label(ticker_summary: dict[str, Any]) -> str:
     mapping = {
         "WAITING": "대기",
         "LIVE_BREAKOUT": "장중 돌파",
+        "FAILED_BREAKOUT": "실패 돌파",
+        "SUPPORT_HOLD": "지지 확인",
+        "SUPPORT_FAIL": "지지 이탈",
+        "LATE_SESSION_CONFIRM": "막판 종가 확인",
+        "STALE_TRIGGERABLE": "전략 후보 유지",
         "CLOSE_CONFIRM": "종가 확인",
         "ACTIONABLE_LIVE": "장중 실행 가능",
         "INVALIDATED": "무효화",
@@ -1035,12 +1105,13 @@ def _today_summary(
     if "RULE_ONLY_FALLBACK" in decision_source:
         return "규칙 기반 대체 판단, 데이터 재확인 필요" if is_korean else "Rule fallback; verify data before action"
     if decision_state == "DEGRADED":
-        return _ticker_investor_summary(
+        summary = _ticker_investor_summary(
             ticker_summary,
             {},
             language=language,
             stale_after_seconds=stale_after_seconds,
         )["today_action"]
+        return f"보수적 관찰: {summary}" if is_korean else f"Conservative watch: {summary}"
     if decision_state == "ACTIONABLE_NOW":
         return "오늘 바로 검토" if language.lower().startswith("korean") else "Review now"
     if decision_state == "TRIGGERED_PENDING_CLOSE":

@@ -41,6 +41,8 @@ def get_intraday_snapshot(
                 "ok": False,
                 "symbol": symbol,
                 "interval": interval,
+                "tool": "get_intraday_snapshot",
+                "error_type": exc.__class__.__name__,
                 "error": str(exc),
             },
             ensure_ascii=False,

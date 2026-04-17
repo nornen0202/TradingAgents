@@ -74,6 +74,12 @@ def load_portfolio_profile(path: str | Path, profile_name: str) -> PortfolioProf
         constraints=constraints,
         continue_on_error=bool(payload.get("continue_on_error", True)),
         market_scope=market_scope,
+        allow_intraday_pilot=bool(payload.get("allow_intraday_pilot", False)),
+        intraday_pilot_max_krw=max(0, _to_int(payload.get("intraday_pilot_max_krw"), default=600_000)),
+        intraday_pilot_min_time_kst=_normalize_text(payload.get("intraday_pilot_min_time_kst")) or "10:30",
+        intraday_pilot_require_vwap=bool(payload.get("intraday_pilot_require_vwap", True)),
+        intraday_pilot_require_adjusted_rvol=bool(payload.get("intraday_pilot_require_adjusted_rvol", True)),
+        intraday_pilot_forbid_failed_breakout=bool(payload.get("intraday_pilot_forbid_failed_breakout", True)),
     )
 
 

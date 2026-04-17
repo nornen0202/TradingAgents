@@ -38,6 +38,7 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
             min_rvol = _extract_relative_volume((*decision.watchlist_triggers, *decision.catalysts))
             reason_codes = tuple(_normalize_reason_codes(decision.watchlist_triggers, prefix="trigger"))
             notes = tuple(_normalize_reason_codes(decision.catalysts, prefix="catalyst"))
+            execution_levels = decision.execution_levels
             return ExecutionContract(
                 ticker=ticker,
                 analysis_asof=analysis_asof,
@@ -65,6 +66,28 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                 event_guard=event_guard,
                 reason_codes=reason_codes,
                 notes=notes,
+                intraday_pilot_rule=execution_levels.intraday_pilot_rule or _default_intraday_pilot_rule(
+                    breakout_level=breakout_level,
+                    min_relative_volume=min_rvol,
+                ),
+                close_confirm_rule=execution_levels.close_confirm_rule or _default_close_confirm_rule(
+                    breakout_level=breakout_level,
+                    min_relative_volume=min_rvol,
+                ),
+                next_day_followthrough_rule=(
+                    execution_levels.next_day_followthrough_rule
+                    or _default_next_day_followthrough_rule(breakout_level=breakout_level)
+                ),
+                failed_breakout_rule=execution_levels.failed_breakout_rule or _default_failed_breakout_rule(
+                    breakout_level=breakout_level,
+                ),
+                trim_rule=execution_levels.trim_rule or _default_trim_rule(
+                    invalid_close=invalid_close,
+                    invalid_intraday=invalid_intraday,
+                ),
+                funding_priority=execution_levels.funding_priority,
+                entry_window=execution_levels.entry_window.value,
+                trigger_quality=execution_levels.trigger_quality.value,
             )
         except Exception:
             pass
@@ -83,6 +106,14 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
         action_if_triggered=ActionIfTriggered.NONE,
         reason_codes=("fallback_contract",),
         notes=("Structured decision unavailable; fail-closed watch mode.",),
+        intraday_pilot_rule="장중 신규 진입은 보류하고, 구조적 thesis가 복구될 때까지 관찰합니다.",
+        close_confirm_rule="종가 기준 구조적 조건을 다시 확인한 뒤 실행 여부를 판단합니다.",
+        next_day_followthrough_rule="다음 거래일 첫 30~60분 동안 핵심 가격대를 회복하는지 확인합니다.",
+        failed_breakout_rule="장중 돌파 실패가 확인되면 신규 매수를 금지합니다.",
+        trim_rule="보유 중이면 무효화 가격 이탈 또는 리스크 확대 시 축소를 검토합니다.",
+        funding_priority="low",
+        entry_window="mid",
+        trigger_quality="weak",
     )
 
 
@@ -201,3 +232,48 @@ def _breakout_confirmation_from_text(lines: tuple[str, ...]) -> BreakoutConfirma
     if "end of day" in joined or "eod only" in joined:
         return BreakoutConfirmation.END_OF_DAY_ONLY
     return BreakoutConfirmation.CLOSE_ABOVE
+
+
+def _default_intraday_pilot_rule(
+    *,
+    breakout_level: float | None,
+    min_relative_volume: float | None,
+) -> str:
+    level = _format_level(breakout_level) if breakout_level is not None else "trigger"
+    rvol = f" + adjusted RVOL {min_relative_volume:g}배 이상" if min_relative_volume else " + adjusted RVOL 확인"
+    return f"10:30 KST 이후 {level} 상회 + VWAP 위{rvol} + 오전 실패 돌파가 아닐 때 30만~60만원 starter만 허용"
+
+
+def _default_close_confirm_rule(
+    *,
+    breakout_level: float | None,
+    min_relative_volume: float | None,
+) -> str:
+    level = _format_level(breakout_level) if breakout_level is not None else "핵심 trigger"
+    rvol = f"와 RVOL {min_relative_volume:g}배 이상" if min_relative_volume else "와 거래량 확인"
+    return f"종가가 {level} 위에서 유지되고 {rvol}가 동반될 때 본격 진입 또는 증액을 검토"
+
+
+def _default_next_day_followthrough_rule(*, breakout_level: float | None) -> str:
+    level = _format_level(breakout_level) if breakout_level is not None else "핵심 trigger"
+    return f"다음 거래일 첫 30~60분 동안 {level} 재이탈이 없고 재돌파가 유지될 때 추가 검토"
+
+
+def _default_failed_breakout_rule(*, breakout_level: float | None) -> str:
+    level = _format_level(breakout_level) if breakout_level is not None else "trigger"
+    return f"장중 {level} 돌파 후 VWAP 또는 {level} 아래로 재이탈하면 당일 신규 매수 금지"
+
+
+def _default_trim_rule(*, invalid_close: float | None, invalid_intraday: float | None) -> str:
+    invalid = invalid_intraday if invalid_intraday is not None else invalid_close
+    if invalid is None:
+        return "핵심 지지 이탈 또는 thesis 훼손 뉴스가 확인되면 먼저 축소 후보로 분류"
+    return f"{_format_level(invalid)} 이탈이 확인되면 보유분 축소 또는 청산 검토"
+
+
+def _format_level(value: float | None) -> str:
+    if value is None:
+        return "trigger"
+    if float(value).is_integer():
+        return f"{int(value):,}"
+    return f"{float(value):,.2f}"

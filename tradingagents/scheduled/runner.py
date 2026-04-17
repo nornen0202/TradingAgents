@@ -5,7 +5,7 @@ from copy import deepcopy
 import json
 import shutil
 import traceback
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from time import perf_counter
 from typing import Any
@@ -331,6 +331,8 @@ def resolve_trade_date(
         return now.date().isoformat()
     if mode == "previous_business_day":
         return _previous_business_day(now.date()).isoformat()
+    if mode == "latest_available" and _is_kr_daily_thesis_run(ticker=ticker, config=config):
+        return _completed_daily_trade_date_for_kr(now).isoformat()
 
     normalized_symbol = (normalized_symbol or "").strip().upper()
     if not _looks_like_yahoo_ticker_format(normalized_symbol):
@@ -401,6 +403,25 @@ def _fetch_recent_trade_date_history(symbol: str, *, lookback_days: int) -> Any:
     if history is None:
         raise RuntimeError(f"Yahoo Finance returned no history payload for {symbol}.")
     return history
+
+
+def _is_kr_daily_thesis_run(*, ticker: str, config: ScheduledAnalysisConfig) -> bool:
+    if str(config.run.market or "").strip().upper() != "KR":
+        return False
+    symbol = str(ticker or "").strip().upper()
+    return symbol.endswith((".KS", ".KQ")) or (len(symbol) == 6 and symbol.isdigit())
+
+
+def _completed_daily_trade_date_for_kr(now: datetime) -> date:
+    local = now.astimezone(ZoneInfo("Asia/Seoul")) if now.tzinfo else now.replace(tzinfo=ZoneInfo("Asia/Seoul"))
+    if local.date().weekday() >= 5:
+        return _previous_business_day(local.date())
+    # Before and during the regular session, the daily thesis must stay on the
+    # last completed daily bar. Only after the close-plan window do we allow
+    # same-day daily thesis generation.
+    if local.time() < time(hour=15, minute=35):
+        return _previous_business_day(local.date())
+    return local.date()
 
 
 def _looks_like_yahoo_ticker_format(symbol: str) -> bool:
@@ -506,20 +527,19 @@ def _run_single_ticker(
             tool_by_vendor[event["vendor"]] = tool_by_vendor.get(event["vendor"], 0) + 1
             if event.get("fallback"):
                 fallback_count += 1
-        quality_flags: list[str] = []
         effective_tool_calls = max(int(metrics.get("tool_calls", 0) or 0), len(tool_events))
         called_tools = _collect_called_tool_names(final_state)
-        if effective_tool_calls == 0:
-            quality_flags.append("no_tool_calls_detected")
+        quality_flags = _build_analysis_quality_flags(
+            config=config,
+            trade_date=trade_date,
+            analysis_date=analysis_date,
+            called_tools=called_tools,
+            effective_tool_calls=effective_tool_calls,
+            tokens_available=bool(metrics.get("tokens_available", False)),
+        )
+        if "no_tool_calls_detected" in quality_flags:
             print(f"::warning::No tool calls were recorded for {ticker}; report quality may be degraded.")
-        if not metrics.get("tokens_available", False):
-            quality_flags.append("token_usage_unavailable")
-        if (
-            "market" in config.run.analysts
-            and trade_date == analysis_date
-            and "get_intraday_snapshot" not in called_tools
-        ):
-            quality_flags.append("intraday_snapshot_missing_same_day")
+        if "intraday_snapshot_missing_same_day" in quality_flags:
             print(
                 f"::warning::{ticker} same-day analysis completed without get_intraday_snapshot tool usage."
             )
@@ -546,6 +566,7 @@ def _run_single_ticker(
                 "events": tool_events,
                 "called_tools": sorted(called_tools),
                 "intraday_snapshot_used": "get_intraday_snapshot" in called_tools,
+                "intraday_tool_used": "get_intraday_snapshot" in called_tools,
             },
             "quality_flags": quality_flags,
             "report_writer": report_writer_payload,
@@ -567,6 +588,35 @@ def _run_single_ticker(
             execution_contract_path = ticker_dir / "execution_contract.json"
             _write_json(execution_contract_path, execution_contract_payload)
             execution_artifacts["execution_contract_json"] = _relative_to_run(run_dir, execution_contract_path)
+            daily_thesis_path = ticker_dir / "daily_thesis.json"
+            _write_json(
+                daily_thesis_path,
+                _build_daily_thesis_artifact(
+                    analysis_payload=analysis_payload,
+                    contract_payload=execution_contract_payload,
+                ),
+            )
+            execution_artifacts["daily_thesis_json"] = _relative_to_run(run_dir, daily_thesis_path)
+            close_plan_path = ticker_dir / "close_plan.json"
+            _write_json(
+                close_plan_path,
+                _build_close_plan_artifact(
+                    analysis_payload=analysis_payload,
+                    contract_payload=execution_contract_payload,
+                    execution_update_payload=None,
+                ),
+            )
+            execution_artifacts["close_plan_json"] = _relative_to_run(run_dir, close_plan_path)
+            intraday_execution_path = ticker_dir / "intraday_execution.json"
+            _write_json(
+                intraday_execution_path,
+                _build_intraday_execution_artifact(
+                    analysis_payload=analysis_payload,
+                    contract_payload=execution_contract_payload,
+                    execution_update_payload=None,
+                ),
+            )
+            execution_artifacts["intraday_execution_json"] = _relative_to_run(run_dir, intraday_execution_path)
         except Exception as exc:
             print(f"::warning::Execution contract build failed for {ticker}: {exc}")
 
@@ -839,6 +889,29 @@ def _collect_called_tool_names(final_state: dict[str, Any]) -> set[str]:
     return names
 
 
+def _build_analysis_quality_flags(
+    *,
+    config: ScheduledAnalysisConfig,
+    trade_date: str,
+    analysis_date: str,
+    called_tools: set[str],
+    effective_tool_calls: int,
+    tokens_available: bool,
+) -> list[str]:
+    quality_flags: list[str] = []
+    if effective_tool_calls == 0:
+        quality_flags.append("no_tool_calls_detected")
+    if not tokens_available:
+        quality_flags.append("token_usage_unavailable")
+    if (
+        "market" in config.run.analysts
+        and trade_date == analysis_date
+        and "get_intraday_snapshot" not in called_tools
+    ):
+        quality_flags.append("intraday_snapshot_missing_same_day")
+    return quality_flags
+
+
 def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, Any]:
     successful = [item for item in ticker_summaries if item.get("status") == "success"]
     decision_distribution: dict[str, int] = {}
@@ -991,6 +1064,93 @@ def _write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _build_daily_thesis_artifact(
+    *,
+    analysis_payload: dict[str, Any],
+    contract_payload: dict[str, Any] | None,
+) -> dict[str, Any]:
+    contract_payload = contract_payload or {}
+    return {
+        "artifact_type": "daily_thesis",
+        "ticker": analysis_payload.get("ticker"),
+        "ticker_name": analysis_payload.get("ticker_name"),
+        "analysis_asof": analysis_payload.get("finished_at") or analysis_payload.get("started_at"),
+        "daily_thesis_trade_date": analysis_payload.get("trade_date"),
+        "analysis_date": analysis_payload.get("analysis_date"),
+        "basis": "last_completed_daily_bar",
+        "same_day_partial_bar_used_as_daily_thesis": False,
+        "decision": analysis_payload.get("decision"),
+        "portfolio_stance": contract_payload.get("portfolio_stance"),
+        "entry_action_base": contract_payload.get("entry_action_base"),
+        "setup_quality": contract_payload.get("setup_quality"),
+        "confidence": contract_payload.get("confidence"),
+        "execution_levels": contract_payload.get("execution_levels") or {},
+        "artifacts": {
+            "analysis_json": "analysis.json",
+            "execution_contract_json": "execution_contract.json",
+        },
+    }
+
+
+def _build_intraday_execution_artifact(
+    *,
+    analysis_payload: dict[str, Any],
+    contract_payload: dict[str, Any] | None,
+    execution_update_payload: dict[str, Any] | None,
+) -> dict[str, Any]:
+    contract_payload = contract_payload or {}
+    execution_update_payload = execution_update_payload or {}
+    return {
+        "artifact_type": "intraday_execution",
+        "ticker": analysis_payload.get("ticker"),
+        "daily_thesis_trade_date": analysis_payload.get("trade_date"),
+        "analysis_date": analysis_payload.get("analysis_date"),
+        "execution_asof": execution_update_payload.get("execution_asof"),
+        "market_data_asof": execution_update_payload.get("market_data_asof"),
+        "basis": "same_day_intraday_overlay",
+        "same_day_partial_bar_used_as_daily_thesis": False,
+        "status": "refreshed" if execution_update_payload else "pending_overlay",
+        "decision_state": execution_update_payload.get("decision_state"),
+        "decision_now": execution_update_payload.get("decision_now"),
+        "decision_if_triggered": execution_update_payload.get("decision_if_triggered")
+        or contract_payload.get("action_if_triggered"),
+        "execution_timing_state": execution_update_payload.get("execution_timing_state"),
+        "trigger_status": execution_update_payload.get("trigger_status") or {},
+        "source": execution_update_payload.get("source") or {},
+        "data_health": execution_update_payload.get("data_health"),
+        "staleness_seconds": execution_update_payload.get("staleness_seconds"),
+        "reason_codes": execution_update_payload.get("reason_codes") or [],
+        "execution_levels": contract_payload.get("execution_levels") or {},
+    }
+
+
+def _build_close_plan_artifact(
+    *,
+    analysis_payload: dict[str, Any],
+    contract_payload: dict[str, Any] | None,
+    execution_update_payload: dict[str, Any] | None,
+) -> dict[str, Any]:
+    contract_payload = contract_payload or {}
+    execution_update_payload = execution_update_payload or {}
+    levels = contract_payload.get("execution_levels") or {}
+    return {
+        "artifact_type": "close_plan",
+        "ticker": analysis_payload.get("ticker"),
+        "daily_thesis_trade_date": analysis_payload.get("trade_date"),
+        "analysis_date": analysis_payload.get("analysis_date"),
+        "execution_asof": execution_update_payload.get("execution_asof"),
+        "close_confirm_rule": levels.get("close_confirm_rule") or contract_payload.get("close_confirm_rule"),
+        "next_day_followthrough_rule": levels.get("next_day_followthrough_rule")
+        or contract_payload.get("next_day_followthrough_rule"),
+        "failed_breakout_rule": levels.get("failed_breakout_rule") or contract_payload.get("failed_breakout_rule"),
+        "trim_rule": levels.get("trim_rule") or contract_payload.get("trim_rule"),
+        "entry_window": levels.get("entry_window") or contract_payload.get("entry_window"),
+        "trigger_quality": levels.get("trigger_quality") or contract_payload.get("trigger_quality"),
+        "latest_execution_timing_state": execution_update_payload.get("execution_timing_state"),
+        "latest_decision_state": execution_update_payload.get("decision_state"),
+    }
+
+
 def _bootstrap_overlay_inputs_from_latest_run(
     *,
     config: ScheduledAnalysisConfig,
@@ -1025,7 +1185,14 @@ def _bootstrap_overlay_inputs_from_latest_run(
         target_analysis = target_ticker_dir / "analysis.json"
         target_analysis.write_text(source_analysis.read_text(encoding="utf-8"), encoding="utf-8")
         copied_source_artifacts: dict[str, str] = {}
-        for artifact_key in ("report_markdown", "final_state_json", "graph_log_json"):
+        for artifact_key in (
+            "report_markdown",
+            "final_state_json",
+            "graph_log_json",
+            "daily_thesis_json",
+            "close_plan_json",
+            "intraday_execution_json",
+        ):
             copied_artifact = _copy_bootstrap_artifact(
                 source_run_dir=source_run_dir,
                 run_dir=run_dir,
@@ -1382,6 +1549,28 @@ def _run_execution_overlay_passes(
                 update_path = ticker_dir / "execution_update.json"
                 _write_json(update_path, update_payload)
                 summary["artifacts"]["execution_update_json"] = _relative_to_run(run_dir, update_path)
+                analysis_payload = _load_ticker_analysis_payload(run_dir=run_dir, ticker_summary=summary)
+                if analysis_payload:
+                    intraday_execution_path = ticker_dir / "intraday_execution.json"
+                    _write_json(
+                        intraday_execution_path,
+                        _build_intraday_execution_artifact(
+                            analysis_payload=analysis_payload,
+                            contract_payload=contract_dict,
+                            execution_update_payload=update_payload,
+                        ),
+                    )
+                    summary["artifacts"]["intraday_execution_json"] = _relative_to_run(run_dir, intraday_execution_path)
+                    close_plan_path = ticker_dir / "close_plan.json"
+                    _write_json(
+                        close_plan_path,
+                        _build_close_plan_artifact(
+                            analysis_payload=analysis_payload,
+                            contract_payload=contract_dict,
+                            execution_update_payload=update_payload,
+                        ),
+                    )
+                    summary["artifacts"]["close_plan_json"] = _relative_to_run(run_dir, close_plan_path)
 
                 md_path = ticker_dir / "execution_update.md"
                 md_text = render_execution_update_markdown(
@@ -1420,6 +1609,28 @@ def _run_execution_overlay_passes(
                 update_path = ticker_dir / "execution_update.json"
                 _write_json(update_path, update_payload)
                 summary["artifacts"]["execution_update_json"] = _relative_to_run(run_dir, update_path)
+                analysis_payload = _load_ticker_analysis_payload(run_dir=run_dir, ticker_summary=summary)
+                if analysis_payload:
+                    intraday_execution_path = ticker_dir / "intraday_execution.json"
+                    _write_json(
+                        intraday_execution_path,
+                        _build_intraday_execution_artifact(
+                            analysis_payload=analysis_payload,
+                            contract_payload=contract_dict,
+                            execution_update_payload=update_payload,
+                        ),
+                    )
+                    summary["artifacts"]["intraday_execution_json"] = _relative_to_run(run_dir, intraday_execution_path)
+                    close_plan_path = ticker_dir / "close_plan.json"
+                    _write_json(
+                        close_plan_path,
+                        _build_close_plan_artifact(
+                            analysis_payload=analysis_payload,
+                            contract_payload=contract_dict,
+                            execution_update_payload=update_payload,
+                        ),
+                    )
+                    summary["artifacts"]["close_plan_json"] = _relative_to_run(run_dir, close_plan_path)
                 md_path = ticker_dir / "execution_update.md"
                 md_path.write_text(
                     "# Execution overlay unavailable\n\n"
@@ -1541,6 +1752,25 @@ def _append_analysis_intraday_attempt(
     _write_json(analysis_path, payload)
 
 
+def _load_ticker_analysis_payload(
+    *,
+    run_dir: Path,
+    ticker_summary: dict[str, Any],
+) -> dict[str, Any] | None:
+    artifacts = ticker_summary.get("artifacts") or {}
+    analysis_rel = artifacts.get("analysis_json")
+    if not analysis_rel:
+        return None
+    analysis_path = run_dir / analysis_rel
+    if not analysis_path.exists():
+        return None
+    try:
+        payload = json.loads(analysis_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
 def _load_execution_contracts_for_run(
     run_dir: Path,
     ticker_summaries: list[dict[str, Any]],
@@ -1591,6 +1821,21 @@ def _build_execution_summary(
     pending_close = sorted(
         [ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "TRIGGERED_PENDING_CLOSE"]
     )
+    live_breakout = sorted(
+        [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "LIVE_BREAKOUT"]
+    )
+    failed_breakout = sorted(
+        [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "FAILED_BREAKOUT"]
+    )
+    support_hold = sorted(
+        [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "SUPPORT_HOLD"]
+    )
+    support_fail = sorted(
+        [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "SUPPORT_FAIL"]
+    )
+    stale_triggerable = sorted(
+        [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "STALE_TRIGGERABLE"]
+    )
     wait = sorted([ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "WAIT"])
     invalidated = sorted(
         [ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "INVALIDATED"]
@@ -1605,10 +1850,15 @@ def _build_execution_summary(
         "execution_asof": first.get("execution_asof"),
         "actionable_now": actionable_now,
         "triggered_pending_close": pending_close,
+        "live_breakout": live_breakout,
+        "failed_breakout": failed_breakout,
+        "support_hold": support_hold,
+        "support_fail": support_fail,
+        "stale_triggerable": stale_triggerable,
         "wait": wait,
         "invalidated": invalidated,
         "degraded": degraded,
-        "top_priority_order": actionable_now + pending_close + wait + invalidated + degraded,
+        "top_priority_order": actionable_now + pending_close + support_hold + live_breakout + wait + failed_breakout + support_fail + invalidated + degraded,
         "market_regime": "constructive_but_selective" if actionable_now else "wait_and_watch",
         "notes": [
             "Do not treat pre-open report as executable without overlay refresh.",
@@ -1630,6 +1880,7 @@ class _ExecutionContractShim:
 
     def to_contract(self) -> ExecutionContract:
         guard_payload = self.payload.get("event_guard") or {}
+        levels = self.payload.get("execution_levels") if isinstance(self.payload.get("execution_levels"), dict) else {}
         guard = EventGuard(
             earnings_date=guard_payload.get("earnings_date"),
             block_new_position_within_days=int(guard_payload.get("block_new_position_within_days", 0) or 0),
@@ -1674,4 +1925,13 @@ class _ExecutionContractShim:
             event_guard=guard,
             reason_codes=tuple(self.payload.get("reason_codes") or []),
             notes=tuple(self.payload.get("notes") or []),
+            intraday_pilot_rule=self.payload.get("intraday_pilot_rule") or levels.get("intraday_pilot_rule"),
+            close_confirm_rule=self.payload.get("close_confirm_rule") or levels.get("close_confirm_rule"),
+            next_day_followthrough_rule=self.payload.get("next_day_followthrough_rule")
+            or levels.get("next_day_followthrough_rule"),
+            failed_breakout_rule=self.payload.get("failed_breakout_rule") or levels.get("failed_breakout_rule"),
+            trim_rule=self.payload.get("trim_rule") or levels.get("trim_rule"),
+            funding_priority=self.payload.get("funding_priority") or levels.get("funding_priority"),
+            entry_window=self.payload.get("entry_window") or levels.get("entry_window"),
+            trigger_quality=self.payload.get("trigger_quality") or levels.get("trigger_quality"),
         )

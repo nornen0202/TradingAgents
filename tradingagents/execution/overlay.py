@@ -30,10 +30,18 @@ def evaluate_execution_state(
         "close_confirmation_pending": False,
         "pullback_zone_active": False,
         "invalidated": False,
+        "failed_breakout": False,
+        "support_hold": False,
+        "support_fail": False,
     }
 
     staleness_seconds = int(max(0, (now - datetime.fromisoformat(market.asof)).total_seconds()))
     if staleness_seconds > max_data_age_seconds:
+        timing_state = (
+            ExecutionTimingState.STALE_TRIGGERABLE
+            if contract.action_if_triggered != ActionIfTriggered.NONE
+            else ExecutionTimingState.DEGRADED
+        )
         return _build_update(
             contract,
             market,
@@ -45,7 +53,7 @@ def evaluate_execution_state(
             trigger_status=trigger_status,
             data_health="STALE",
             refresh_checkpoint=refresh_checkpoint,
-            execution_timing_state=ExecutionTimingState.DEGRADED,
+            execution_timing_state=timing_state,
         )
 
     if is_event_guard_active(contract.event_guard, now):
@@ -94,7 +102,11 @@ def evaluate_execution_state(
         if rvol_ok:
             if contract.breakout_confirmation == BreakoutConfirmation.CLOSE_ABOVE:
                 decision_state = DecisionState.TRIGGERED_PENDING_CLOSE
-                execution_timing_state = ExecutionTimingState.CLOSE_CONFIRM
+                execution_timing_state = (
+                    ExecutionTimingState.LATE_SESSION_CONFIRM
+                    if _is_late_session(now, refresh_checkpoint=refresh_checkpoint)
+                    else ExecutionTimingState.CLOSE_CONFIRM
+                )
                 trigger_status["close_confirmation_pending"] = True
                 reason_codes.append("close_confirmation_required")
             else:
@@ -105,25 +117,34 @@ def evaluate_execution_state(
                     reason_codes.append("breakout_confirmed")
                 else:
                     decision_state = DecisionState.ARMED
-                    execution_timing_state = ExecutionTimingState.LIVE_BREAKOUT
-                    reason_codes.append("breakout_hit_but_not_holding_level")
+                    execution_timing_state = ExecutionTimingState.FAILED_BREAKOUT
+                    trigger_status["failed_breakout"] = True
+                    reason_codes.append("failed_breakout")
         else:
             decision_state = DecisionState.ARMED
             execution_timing_state = ExecutionTimingState.LIVE_BREAKOUT
             reason_codes.append("relative_volume_unconfirmed")
 
     if contract.pullback_buy_zone is not None:
+        if market.last_price < contract.pullback_buy_zone.low and intraday_low < contract.pullback_buy_zone.low:
+            trigger_status["support_fail"] = True
+            if decision_state not in {DecisionState.INVALIDATED, DecisionState.ACTIONABLE_NOW}:
+                decision_state = DecisionState.ARMED
+                decision_now = DecisionNow.NONE
+                execution_timing_state = ExecutionTimingState.SUPPORT_FAIL
+                reason_codes.append("support_zone_failed")
         in_zone = contract.pullback_buy_zone.low <= market.last_price <= contract.pullback_buy_zone.high
         if in_zone:
             trigger_status["pullback_zone_active"] = True
+            trigger_status["support_hold"] = True
             if _vwap_check(contract.session_vwap_preference, market.last_price, market.session_vwap):
                 decision_state = DecisionState.ACTIONABLE_NOW
                 decision_now = _decision_now_from_action(contract.action_if_triggered)
-                execution_timing_state = ExecutionTimingState.ACTIONABLE_LIVE
+                execution_timing_state = ExecutionTimingState.SUPPORT_HOLD
                 reason_codes.append("pullback_zone_actionable")
             else:
                 decision_state = DecisionState.ARMED
-                execution_timing_state = ExecutionTimingState.ACTIONABLE_LIVE
+                execution_timing_state = ExecutionTimingState.SUPPORT_HOLD
                 reason_codes.append("vwap_filter_not_met")
 
     if not reason_codes:
@@ -163,6 +184,25 @@ def _decision_now_from_action(action: ActionIfTriggered) -> DecisionNow:
     return mapping[action]
 
 
+def _is_late_session(now: datetime, *, refresh_checkpoint: str | None) -> bool:
+    if not refresh_checkpoint:
+        return False
+    checkpoint = str(refresh_checkpoint).strip().lower()
+    if "late" in checkpoint or "close" in checkpoint:
+        return True
+    if not checkpoint.startswith(("14:", "15:")):
+        return False
+    local = now
+    if now.tzinfo is not None:
+        try:
+            from zoneinfo import ZoneInfo
+
+            local = now.astimezone(ZoneInfo("Asia/Seoul"))
+        except Exception:
+            local = now
+    return (local.hour, local.minute) >= (14, 30)
+
+
 def _build_update(
     contract: ExecutionContract,
     market: IntradayMarketSnapshot,
@@ -182,7 +222,15 @@ def _build_update(
         analysis_asof=contract.analysis_asof,
         execution_asof=now.isoformat(),
         market_data_asof=market.asof,
-        source={"provider": market.provider, "interval": market.interval},
+        source={
+            "provider": market.provider,
+            "interval": market.interval,
+            "bar_timestamp": market.bar_timestamp or market.asof,
+            "provider_timestamp": market.provider_timestamp or market.asof,
+            "quote_delay_seconds": market.quote_delay_seconds,
+            "provider_realtime_capable": market.provider_realtime_capable,
+            "market_session": market.market_session,
+        },
         last_price=market.last_price,
         session_vwap=market.session_vwap,
         day_high=market.day_high,
