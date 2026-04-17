@@ -89,6 +89,9 @@ class InvestorModeUiTests(unittest.TestCase):
     def test_investor_mode_hides_engineering_fields_by_default(self):
         self.test_default_ticker_page_hides_engineering_labels()
 
+    def test_investor_mode_hides_advanced_diagnostics_by_default(self):
+        self.test_default_ticker_page_hides_engineering_labels()
+
 
 if __name__ == "__main__":
     unittest.main()

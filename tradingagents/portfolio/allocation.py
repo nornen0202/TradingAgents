@@ -78,6 +78,7 @@ def build_recommendation(
             positive_now=positive_now,
             account_value=account_value,
             snapshot=snapshot,
+            profile=profile,
         )
         delta_triggered = _allocate_triggered_delta(
             candidate=candidate,
@@ -312,6 +313,7 @@ def _allocate_now_delta(
     positive_now: float,
     account_value: int,
     snapshot: AccountSnapshot,
+    profile: PortfolioProfile,
 ) -> int:
     action = candidate.suggested_action_now
     if action in {"HOLD", "WATCH"}:
@@ -322,13 +324,55 @@ def _allocate_now_delta(
     if action not in {"ADD_NOW", "STARTER_NOW"} or positive_now <= 0:
         return 0
 
+    if action == "STARTER_NOW" and not _intraday_pilot_allowed(candidate=candidate, snapshot=snapshot, profile=profile):
+        return 0
+
     raw_delta = int(investable_cash_now * max(candidate.score_now, 0.0) / positive_now)
     max_name_value = int(snapshot.constraints.max_single_name_weight * account_value)
     remaining_name_capacity = max(max_name_value - current_value, 0)
     allowed = min(raw_delta, remaining_name_capacity)
+    if action == "STARTER_NOW":
+        starter_floor = max(snapshot.constraints.min_trade_krw, 300_000)
+        allowed = min(allowed, max(int(profile.intraday_pilot_max_krw), 0))
+        if allowed < starter_floor:
+            return 0
     if allowed < snapshot.constraints.min_trade_krw:
         return 0
     return allowed
+
+
+def _intraday_pilot_allowed(
+    *,
+    candidate: PortfolioCandidate,
+    snapshot: AccountSnapshot,
+    profile: PortfolioProfile,
+) -> bool:
+    if not profile.allow_intraday_pilot:
+        return False
+    if profile.intraday_pilot_forbid_failed_breakout and str(
+        candidate.data_health.get("execution_timing_state") or ""
+    ).upper() == "FAILED_BREAKOUT":
+        return False
+    if profile.intraday_pilot_require_vwap and candidate.data_health.get("session_vwap_ok") is False:
+        return False
+    if profile.intraday_pilot_require_adjusted_rvol and candidate.data_health.get("relative_volume_ok") is False:
+        return False
+    return _snapshot_time_at_or_after(snapshot.as_of, profile.intraday_pilot_min_time_kst)
+
+
+def _snapshot_time_at_or_after(snapshot_asof: str, min_time_kst: str) -> bool:
+    try:
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        parsed = datetime.fromisoformat(str(snapshot_asof))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=ZoneInfo("Asia/Seoul"))
+        local = parsed.astimezone(ZoneInfo("Asia/Seoul"))
+        hour_text, minute_text = str(min_time_kst or "10:30").split(":", 1)
+        return (local.hour, local.minute) >= (int(hour_text), int(minute_text))
+    except Exception:
+        return True
 
 
 def _allocate_triggered_delta(

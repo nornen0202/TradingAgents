@@ -46,6 +46,18 @@ class TimeHorizon(str, Enum):
     LONG = "long"
 
 
+class EntryWindow(str, Enum):
+    OPEN = "open"
+    MID = "mid"
+    LATE = "late"
+
+
+class TriggerQuality(str, Enum):
+    WEAK = "weak"
+    MEDIUM = "medium"
+    STRONG = "strong"
+
+
 class SocialSource(str, Enum):
     DEDICATED = "dedicated"
     NEWS_DERIVED = "news_derived"
@@ -69,6 +81,30 @@ class DataCoverage:
 
 
 @dataclass(frozen=True)
+class ExecutionLevels:
+    intraday_pilot_rule: str = ""
+    close_confirm_rule: str = ""
+    next_day_followthrough_rule: str = ""
+    failed_breakout_rule: str = ""
+    trim_rule: str = ""
+    funding_priority: str = "medium"
+    entry_window: EntryWindow = EntryWindow.MID
+    trigger_quality: TriggerQuality = TriggerQuality.MEDIUM
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "intraday_pilot_rule": self.intraday_pilot_rule,
+            "close_confirm_rule": self.close_confirm_rule,
+            "next_day_followthrough_rule": self.next_day_followthrough_rule,
+            "failed_breakout_rule": self.failed_breakout_rule,
+            "trim_rule": self.trim_rule,
+            "funding_priority": self.funding_priority,
+            "entry_window": self.entry_window.value,
+            "trigger_quality": self.trigger_quality.value,
+        }
+
+
+@dataclass(frozen=True)
 class StructuredDecision:
     rating: DecisionRating
     portfolio_stance: PortfolioStance
@@ -84,6 +120,7 @@ class StructuredDecision:
     invalidators: tuple[str, ...]
     watchlist_triggers: tuple[str, ...]
     data_coverage: DataCoverage
+    execution_levels: ExecutionLevels = ExecutionLevels()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -101,6 +138,7 @@ class StructuredDecision:
             "invalidators": list(self.invalidators),
             "watchlist_triggers": list(self.watchlist_triggers),
             "data_coverage": self.data_coverage.to_dict(),
+            "execution_levels": self.execution_levels.to_dict(),
         }
 
     def to_json(self, *, indent: int = 2) -> str:
@@ -125,10 +163,22 @@ def build_decision_output_instructions(context: str) -> str:
         '"catalysts":["..."],'
         '"invalidators":["..."],'
         '"watchlist_triggers":["..."],'
-        '"data_coverage":{"company_news_count":0,"disclosures_count":0,"social_source":"dedicated | news_derived | unavailable","macro_items_count":0}}. '
+        '"data_coverage":{"company_news_count":0,"disclosures_count":0,"social_source":"dedicated | news_derived | unavailable","macro_items_count":0},'
+        '"execution_levels":{'
+        '"intraday_pilot_rule":"10:30 KST 이후 trigger 상회 + VWAP 위 + adjusted RVOL 충족 + 오전 실패 돌파 아님",'
+        '"close_confirm_rule":"종가가 trigger 위에서 마감하고 거래량 기준 충족 시 증액 검토",'
+        '"next_day_followthrough_rule":"다음 거래일 첫 30~60분 동안 trigger 재이탈 없을 때 추가 검토",'
+        '"failed_breakout_rule":"장중 돌파 후 VWAP/trigger 아래로 재이탈하면 신규 매수 금지",'
+        '"trim_rule":"무효화 가격 이탈 또는 실패 돌파 확인 시 축소 검토",'
+        '"funding_priority":"low | medium | high",'
+        '"entry_window":"open | mid | late",'
+        '"trigger_quality":"weak | medium | strong"}}. '
         "Treat rating as the legacy medium-term investment/allocation view, not the same-day execution action. "
         "Use portfolio_stance for directional view, and entry_action for immediate action today. "
         "Do not use NO_TRADE solely because entry_action is WAIT. "
+        "Always include execution_levels as investor-facing execution rules, even when the action is WAIT. "
+        "Use intraday_pilot_rule for a small regular-session starter only, close_confirm_rule for full-size add/entry, "
+        "and next_day_followthrough_rule for the next trading day support/rebreakout check. "
         "For constructive but unconfirmed setups, prefer HOLD or OVERWEIGHT with portfolio_stance=BULLISH and entry_action=WAIT when the evidence supports watchlist or held exposure. "
         "Reserve NO_TRADE for weak, contradictory, or insufficient theses, no favorable setup to monitor, or data quality gaps that make the view non-investable. "
         "Use BUY or OVERWEIGHT when the thesis is strong and the entry setup is actionable today; do not default to NO_TRADE just because it is available. "
@@ -190,6 +240,43 @@ def _require_string_list(data: Mapping[str, Any], field_name: str) -> tuple[str,
             )
         normalized.append(item.strip())
     return tuple(normalized)
+
+
+def _optional_string(value: Any) -> str:
+    return str(value or "").strip()
+
+
+def _parse_execution_levels(data: Mapping[str, Any]) -> ExecutionLevels:
+    raw = data.get("execution_levels")
+    if not isinstance(raw, Mapping):
+        return ExecutionLevels()
+
+    try:
+        entry_window = EntryWindow(str(raw.get("entry_window", EntryWindow.MID.value)).strip().lower())
+    except ValueError as exc:
+        raise StructuredDecisionValidationError(
+            f"Unsupported entry window: {raw.get('entry_window')!r}."
+        ) from exc
+
+    try:
+        trigger_quality = TriggerQuality(
+            str(raw.get("trigger_quality", TriggerQuality.MEDIUM.value)).strip().lower()
+        )
+    except ValueError as exc:
+        raise StructuredDecisionValidationError(
+            f"Unsupported trigger quality: {raw.get('trigger_quality')!r}."
+        ) from exc
+
+    return ExecutionLevels(
+        intraday_pilot_rule=_optional_string(raw.get("intraday_pilot_rule")),
+        close_confirm_rule=_optional_string(raw.get("close_confirm_rule")),
+        next_day_followthrough_rule=_optional_string(raw.get("next_day_followthrough_rule")),
+        failed_breakout_rule=_optional_string(raw.get("failed_breakout_rule")),
+        trim_rule=_optional_string(raw.get("trim_rule")),
+        funding_priority=_optional_string(raw.get("funding_priority")) or "medium",
+        entry_window=entry_window,
+        trigger_quality=trigger_quality,
+    )
 
 
 def _infer_stance_action_from_rating(rating: DecisionRating) -> tuple[PortfolioStance, EntryAction, SetupQuality]:
@@ -289,6 +376,7 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
             social_source=social_source,
             macro_items_count=max(0, int(raw_coverage.get("macro_items_count", 0) or 0)),
         ),
+        execution_levels=_parse_execution_levels(data),
     )
 
 

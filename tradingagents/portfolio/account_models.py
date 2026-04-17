@@ -133,6 +133,12 @@ class PortfolioProfile:
     constraints: AccountConstraints
     continue_on_error: bool = True
     market_scope: str = "kr"
+    allow_intraday_pilot: bool = False
+    intraday_pilot_max_krw: int = 600_000
+    intraday_pilot_min_time_kst: str = "10:30"
+    intraday_pilot_require_vwap: bool = True
+    intraday_pilot_require_adjusted_rvol: bool = True
+    intraday_pilot_forbid_failed_breakout: bool = True
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)

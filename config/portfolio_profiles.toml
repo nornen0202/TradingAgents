@@ -31,6 +31,12 @@ max_daily_turnover_ratio = 0.30
 max_order_count_per_day = 5
 respect_existing_weights_softly = true
 continue_on_error = true
+allow_intraday_pilot = true
+intraday_pilot_max_krw = 600000
+intraday_pilot_min_time_kst = "10:30"
+intraday_pilot_require_vwap = true
+intraday_pilot_require_adjusted_rvol = true
+intraday_pilot_forbid_failed_breakout = true
 
 [profiles.us_kis_default]
 enabled = true
@@ -74,3 +80,9 @@ max_daily_turnover_ratio = 0.30
 max_order_count_per_day = 5
 respect_existing_weights_softly = true
 continue_on_error = true
+allow_intraday_pilot = true
+intraday_pilot_max_krw = 600000
+intraday_pilot_min_time_kst = "10:30"
+intraday_pilot_require_vwap = true
+intraday_pilot_require_adjusted_rvol = true
+intraday_pilot_forbid_failed_breakout = true
