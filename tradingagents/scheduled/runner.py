@@ -28,6 +28,7 @@ from tradingagents.execution.reporting import (
 from tradingagents.execution.selective_rerun import collect_event_signals, find_selective_rerun_targets
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.portfolio import load_snapshot_for_profile, run_portfolio_pipeline
+from tradingagents.portfolio.delta import compute_portfolio_delta, render_portfolio_delta_markdown
 from tradingagents.portfolio.profiles import load_portfolio_profile
 from tradingagents.report_writer import polish_ticker_report
 from tradingagents.schemas import (
@@ -230,6 +231,7 @@ def execute_scheduled_run(
     }
     manifest["batch_metrics"] = _compute_batch_metrics(ticker_summaries)
     manifest["warnings"] = _compute_batch_warnings(manifest["batch_metrics"])
+    manifest["market_session_phase"] = _market_session_phase(manifest_overlay_phase)
     if event_signals:
         manifest["event_signals"] = event_signals
     if source_run_id:
@@ -287,6 +289,27 @@ def execute_scheduled_run(
             )
     else:
         manifest["portfolio"] = {"status": "disabled"}
+
+    manifest["run_quality"] = _compute_run_quality(manifest=manifest)
+    manifest["usefulness_rank"] = manifest["run_quality"]["usefulness_rank"]
+
+    previous_manifest = _find_previous_comparable_manifest(
+        archive_dir=config.storage.archive_dir,
+        current_manifest=manifest,
+    )
+    portfolio_delta = compute_portfolio_delta(previous_manifest=previous_manifest, current_manifest=manifest)
+    delta_json_path = run_dir / "portfolio_delta.json"
+    delta_md_path = run_dir / "portfolio_delta.md"
+    _write_json(delta_json_path, portfolio_delta)
+    delta_md_path.write_text(render_portfolio_delta_markdown(portfolio_delta), encoding="utf-8")
+    manifest["portfolio_delta"] = {
+        "from_run": portfolio_delta.get("from_run"),
+        "summary": portfolio_delta.get("summary"),
+        "artifacts": {
+            "portfolio_delta_json": _relative_to_run(run_dir, delta_json_path),
+            "portfolio_delta_markdown": _relative_to_run(run_dir, delta_md_path),
+        },
+    }
 
     _write_json(run_dir / "run.json", manifest)
     _write_json(config.storage.archive_dir / "latest-run.json", manifest)
@@ -1101,6 +1124,92 @@ def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[
 
     # Preserve prior behavior when no better candidate exists.
     return candidate
+
+
+def _find_previous_comparable_manifest(
+    *,
+    archive_dir: Path,
+    current_manifest: dict[str, Any],
+) -> dict[str, Any] | None:
+    runs_dir = archive_dir / "runs"
+    if not runs_dir.exists():
+        return None
+    current_run_id = str(current_manifest.get("run_id") or "")
+    current_settings = current_manifest.get("settings") or {}
+    current_scope = str(current_settings.get("market_scope") or current_settings.get("market") or "").strip().lower()
+    current_profile = str(((current_manifest.get("portfolio") or {}).get("profile")) or "").strip().lower()
+    for year_dir in sorted((path for path in runs_dir.iterdir() if path.is_dir()), reverse=True):
+        for run_dir in sorted((path for path in year_dir.iterdir() if path.is_dir()), reverse=True):
+            manifest_path = run_dir / "run.json"
+            if not manifest_path.exists():
+                continue
+            candidate = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if str(candidate.get("run_id") or "") == current_run_id:
+                continue
+            candidate_settings = candidate.get("settings") or {}
+            scope = str(candidate_settings.get("market_scope") or candidate_settings.get("market") or "").strip().lower()
+            if current_scope and scope and current_scope != scope:
+                continue
+            profile = str(((candidate.get("portfolio") or {}).get("profile")) or "").strip().lower()
+            if current_profile and profile and current_profile != profile:
+                continue
+            return candidate
+    return None
+
+
+def _market_session_phase(overlay_phase: dict[str, Any]) -> str:
+    phase = str(overlay_phase.get("name") or "").upper()
+    if phase == "PRE_OPEN":
+        return "pre_open"
+    if phase.startswith("CHECKPOINT_"):
+        return "in_session"
+    if phase == "POST_RESEARCH":
+        return "post_research"
+    if phase == "DISABLED":
+        return "disabled"
+    return "unknown"
+
+
+def _compute_run_quality(*, manifest: dict[str, Any]) -> dict[str, Any]:
+    execution = manifest.get("execution") or {}
+    summary = manifest.get("summary") or {}
+    total_tickers = max(int(summary.get("total_tickers") or 0), 1)
+    degraded_ratio = len(execution.get("degraded") or []) / total_tickers
+    batch_metrics = manifest.get("batch_metrics") or {}
+    news_zero_ratio = float(batch_metrics.get("company_news_zero_ratio") or 0.0)
+    semantic_health = ((manifest.get("portfolio") or {}).get("semantic_health") or {})
+    fallback_ratio = float(semantic_health.get("rule_only_fallback_ratio") or 0.0)
+    judge_health = "degraded" if fallback_ratio >= 0.3 else "ok"
+    phase = str(((execution.get("overlay_phase") or {}).get("name")) or "").upper()
+    if phase.startswith("CHECKPOINT_"):
+        phase_score = 1.0
+    elif phase == "PRE_OPEN":
+        phase_score = 0.7
+    else:
+        phase_score = 0.45
+    actionable = len(execution.get("actionable_now") or [])
+    triggerable = len(execution.get("triggered_pending_close") or [])
+    signal_score = min((actionable + triggerable) / max(total_tickers, 1), 1.0)
+    score = (
+        (1.0 - degraded_ratio) * 0.40
+        + (1.0 - min(news_zero_ratio, 1.0)) * 0.15
+        + (1.0 - min(fallback_ratio, 1.0)) * 0.10
+        + phase_score * 0.30
+        + signal_score * 0.05
+    )
+    return {
+        "run_quality_score": round(max(min(score, 1.0), 0.0), 4),
+        "signals": {
+            "stale_ratio": round(degraded_ratio, 4),
+            "company_news_zero_ratio": round(news_zero_ratio, 4),
+            "judge_health": judge_health,
+            "rule_only_fallback_ratio": round(fallback_ratio, 4),
+            "phase": phase or "UNKNOWN",
+            "triggerable_count": triggerable,
+            "actionable_count": actionable,
+        },
+        "usefulness_rank": int(round((1.0 - max(min(score, 1.0), 0.0)) * 100)),
+    }
 
 
 def _manifest_has_bootstrap_ready_ticker(manifest: dict[str, Any], *, tickers: list[str] | None) -> bool:

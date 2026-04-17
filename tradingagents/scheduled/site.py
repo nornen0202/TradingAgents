@@ -49,7 +49,7 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
         _copy_artifacts(site_dir, run_dir, manifest, portfolio_summary)
         _write_text(
             site_dir / "runs" / manifest["run_id"] / "index.html",
-            _render_run_page(manifest, settings, portfolio_summary=portfolio_summary),
+            _render_run_page(manifest, settings, portfolio_summary=portfolio_summary, manifests=manifests),
         )
         if portfolio_summary.get("status_path"):
             _write_text(
@@ -59,7 +59,7 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
         for ticker_summary in manifest.get("tickers", []):
             _write_text(
                 site_dir / "runs" / manifest["run_id"] / f"{ticker_summary['ticker']}.html",
-                _render_ticker_page(manifest, ticker_summary, settings),
+                _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests),
             )
 
     _write_text(site_dir / "index.html", _render_index_page(manifests, settings))
@@ -119,6 +119,14 @@ def _copy_artifacts(
             copied_any = True
 
     if copied_any:
+        delta_artifacts = ((manifest.get("portfolio_delta") or {}).get("artifacts") or {}).values()
+        for artifact_path in delta_artifacts:
+            if not artifact_path:
+                continue
+            source = _resolve_artifact_source(run_dir, artifact_path)
+            if source.is_file():
+                download_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, download_dir / source.name)
         return
 
     for source in portfolio_summary.get("downloadable_files", []):
@@ -126,6 +134,14 @@ def _copy_artifacts(
             continue
         download_dir.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, download_dir / source.name)
+
+    for artifact_path in ((manifest.get("portfolio_delta") or {}).get("artifacts") or {}).values():
+        if not artifact_path:
+            continue
+        source = _resolve_artifact_source(run_dir, artifact_path)
+        if source.is_file():
+            download_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, download_dir / source.name)
 
 
 def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
@@ -137,38 +153,49 @@ def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
 
 def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) -> str:
     latest = manifests[0] if manifests else None
-    latest_portfolio = _load_portfolio_summary(Path(latest["_run_dir"])) if latest else {}
+    representative = _select_representative_run(manifests)
+    latest_portfolio = _load_portfolio_summary(Path(representative["_run_dir"])) if representative else {}
     latest_health_badges = ""
-    latest_health_compact = _render_health_compact_card(manifest=latest, portfolio_summary=latest_portfolio) if latest else ""
+    latest_health_compact = _render_health_compact_card(manifest=representative, portfolio_summary=latest_portfolio) if representative else ""
     latest_portfolio_label = _portfolio_report_label(latest_portfolio)
     latest_portfolio_link = (
-        f"<a class=\"button\" href=\"runs/{_escape(latest['run_id'])}/portfolio.html\">Open {_escape(latest_portfolio_label.lower())}</a>"
-        if latest and latest_portfolio.get("status_path")
+        f"<a class=\"button\" href=\"runs/{_escape(representative['run_id'])}/portfolio.html\">Open {_escape(latest_portfolio_label.lower())}</a>"
+        if representative and latest_portfolio.get("status_path")
         else ""
     )
+    latest_technical_html = ""
+    if latest and representative and latest["run_id"] != representative["run_id"]:
+        latest_technical_html = (
+            "<p class='empty'>"
+            f"가장 최근 기술 run: <a href='runs/{_escape(latest['run_id'])}/index.html'>{_escape(latest['run_id'])}</a>"
+            f" ({_escape(_run_phase_label(latest))})"
+            "</p>"
+        )
     latest_html = (
         f"""
         <section class="hero">
           <div>
-            <p class="eyebrow">Latest automated run</p>
+            <p class="eyebrow">대표 투자 run</p>
             <h1>{_escape(settings.title)}</h1>
             <p class="subtitle">{_escape(settings.subtitle)}</p>
           </div>
           <div class="hero-card">
-            <div class="status {latest['status']}">{_escape(latest['status'].replace('_', ' '))}</div>
-            <p><strong>Run ID</strong><span>{_escape(latest['run_id'])}</span></p>
-            <p><strong>Started</strong><span>{_escape(latest['started_at'])}</span></p>
-            <p><strong>Tickers</strong><span>{latest['summary']['total_tickers']}</span></p>
-            <p><strong>Success</strong><span>{latest['summary']['successful_tickers']}</span></p>
-            <p><strong>Failed</strong><span>{latest['summary']['failed_tickers']}</span></p>
+            <div class="status {representative['status']}">{_escape(representative['status'].replace('_', ' '))}</div>
+            <p><strong>Run ID</strong><span>{_escape(representative['run_id'])}</span></p>
+            <p><strong>Started</strong><span>{_escape(representative['started_at'])}</span></p>
+            <p><strong>세션 단계</strong><span>{_escape(_run_phase_label(representative))}</span></p>
+            <p><strong>Tickers</strong><span>{representative['summary']['total_tickers']}</span></p>
+            <p><strong>Success</strong><span>{representative['summary']['successful_tickers']}</span></p>
+            <p><strong>Failed</strong><span>{representative['summary']['failed_tickers']}</span></p>
             {latest_health_badges}
             {latest_health_compact}
-            <a class="button" href="runs/{_escape(latest['run_id'])}/index.html">Open latest run</a>
+            <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open 대표 투자 run</a>
             {latest_portfolio_link}
+            {latest_technical_html}
           </div>
         </section>
         """
-        if latest
+        if representative
         else f"""
         <section class="hero">
           <div>
@@ -209,9 +236,9 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
         )
 
     warning_html = ""
-    if latest and latest.get("warnings"):
+    if representative and representative.get("warnings"):
         warning_html = "".join(
-            f"<div class='warning-banner'>{_escape(warning)}</div>" for warning in latest.get("warnings", [])
+            f"<div class='warning-banner'>{_escape(warning)}</div>" for warning in representative.get("warnings", [])
         )
 
     body = latest_html + warning_html + f"""
@@ -233,6 +260,7 @@ def _render_run_page(
     settings: SiteSettings,
     *,
     portfolio_summary: dict[str, Any] | None = None,
+    manifests: list[dict[str, Any]] | None = None,
 ) -> str:
     portfolio_summary = portfolio_summary or {}
     portfolio_status = manifest.get("portfolio") or {}
@@ -320,6 +348,8 @@ def _render_run_page(
         f"<div class='warning-banner'>{_escape(warning)}</div>"
         for warning in (manifest.get("warnings") or [])
     )
+    delta_html = _render_portfolio_delta_section(manifest)
+    timeline_html = _render_session_timeline_section(manifest, manifests or [])
     body = f"""
     <nav class="breadcrumbs"><a href="../../index.html">Home</a></nav>
     <section class="hero compact">
@@ -336,6 +366,8 @@ def _render_run_page(
       </div>
     </section>
     {warning_html}
+    {delta_html}
+    {timeline_html}
     {portfolio_html}
     <section class="section">
       <div class="section-head">
@@ -349,6 +381,141 @@ def _render_run_page(
     </section>
     """
     return _page_template(f"{manifest['run_id']} | {settings.title}", body, prefix="../../")
+
+
+def _render_portfolio_delta_section(manifest: dict[str, Any]) -> str:
+    delta = manifest.get("portfolio_delta") or {}
+    if not delta:
+        return ""
+    artifacts = delta.get("artifacts") or {}
+    json_name = Path(str(artifacts.get("portfolio_delta_json") or "portfolio_delta.json")).name
+    md_name = Path(str(artifacts.get("portfolio_delta_markdown") or "portfolio_delta.md")).name
+    summary = str(delta.get("summary") or "직전 run 대비 요약 없음")
+    from_run = str(delta.get("from_run") or "-")
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>직전 overlay 대비 변화</h2>
+      </div>
+      <article class="run-card">
+        <p><strong>비교 run</strong><span>{_escape(from_run)}</span></p>
+        <p class="long-field"><strong>요약</strong><span>{_escape(summary)}</span></p>
+        <div class="pill-row">
+          <a class="pill" href="../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(json_name)}">{_escape(json_name)}</a>
+          <a class="pill" href="../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(md_name)}">{_escape(md_name)}</a>
+        </div>
+      </article>
+    </section>
+    """
+
+
+def _render_session_timeline_section(manifest: dict[str, Any], manifests: list[dict[str, Any]]) -> str:
+    items = _session_timeline_items(manifest, manifests)
+    if not items:
+        return ""
+    rows = "".join(
+        "<li>"
+        f"<a href='index.html'>{_escape(item['run_id'])}</a>" if item["run_id"] == manifest["run_id"] else f"<a href='../{_escape(item['run_id'])}/index.html'>{_escape(item['run_id'])}</a>"
+        + f" · {_escape(item['started_at'])} · {_escape(item['phase'])}"
+        + (" <strong>(current)</strong>" if item["run_id"] == manifest["run_id"] else "")
+        + "</li>"
+        for item in items
+    )
+    return (
+        "<section class='section'>"
+        "<div class='section-head'><h2>동일 세션 timeline</h2></div>"
+        f"<article class='run-card'><ul>{rows}</ul></article>"
+        "</section>"
+    )
+
+
+def _session_timeline_items(manifest: dict[str, Any], manifests: list[dict[str, Any]]) -> list[dict[str, str]]:
+    current_market = str(((manifest.get("settings") or {}).get("market") or "")).strip().lower()
+    current_date = str(manifest.get("run_id") or "")[:8]
+    matched: list[dict[str, str]] = []
+    for item in manifests:
+        run_id = str(item.get("run_id") or "")
+        if not run_id.startswith(current_date):
+            continue
+        market = str(((item.get("settings") or {}).get("market") or "")).strip().lower()
+        if current_market and market and current_market != market:
+            continue
+        matched.append(
+            {
+                "run_id": run_id,
+                "started_at": str(item.get("started_at") or "-"),
+                "phase": _run_phase_label(item),
+            }
+        )
+    matched.sort(key=lambda row: row["started_at"])
+    return matched
+
+
+def _render_ticker_delta_section(
+    *,
+    manifest: dict[str, Any],
+    ticker_summary: dict[str, Any],
+    manifests: list[dict[str, Any]],
+    language: str,
+) -> str:
+    previous = _previous_comparable_run(manifest, manifests)
+    if not previous:
+        return ""
+    ticker = str(ticker_summary.get("ticker") or "").strip().upper()
+    previous_ticker = _find_ticker_summary(previous, ticker)
+    if not previous_ticker:
+        return ""
+    stale_after_seconds = _execution_stale_threshold_seconds(manifest)
+    previous_today = _ticker_investor_summary(
+        previous_ticker,
+        previous,
+        language=language,
+        stale_after_seconds=stale_after_seconds,
+    ).get("today_action", "-")
+    current_today = _ticker_investor_summary(
+        ticker_summary,
+        manifest,
+        language=language,
+        stale_after_seconds=stale_after_seconds,
+    ).get("today_action", "-")
+    previous_state = _execution_display_state(previous_ticker, stale_after_seconds=stale_after_seconds)
+    current_state = _execution_display_state(ticker_summary, stale_after_seconds=stale_after_seconds)
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>직전 run 대비 종목 변화</h2>
+      </div>
+      <article class="run-card">
+        <p><strong>비교 run</strong><span>{_escape(str(previous.get('run_id') or '-'))}</span></p>
+        <p><strong>판단 상태</strong><span>{_escape(previous_state)} → {_escape(current_state)}</span></p>
+        <p class="long-field"><strong>Today 변화</strong><span>{_escape(previous_today)} → {_escape(current_today)}</span></p>
+      </article>
+    </section>
+    """
+
+
+def _previous_comparable_run(manifest: dict[str, Any], manifests: list[dict[str, Any]]) -> dict[str, Any] | None:
+    current_run_id = str(manifest.get("run_id") or "")
+    current_market = str(((manifest.get("settings") or {}).get("market") or "")).strip().lower()
+    for item in manifests:
+        run_id = str(item.get("run_id") or "")
+        if run_id == current_run_id:
+            continue
+        market = str(((item.get("settings") or {}).get("market") or "")).strip().lower()
+        if current_market and market and current_market != market:
+            continue
+        started = str(item.get("started_at") or "")
+        current_started = str(manifest.get("started_at") or "")
+        if started < current_started:
+            return item
+    return None
+
+
+def _find_ticker_summary(manifest: dict[str, Any], ticker: str) -> dict[str, Any] | None:
+    for item in manifest.get("tickers") or []:
+        if str(item.get("ticker") or "").strip().upper() == ticker:
+            return item
+    return None
 
 
 def _render_portfolio_page(
@@ -428,6 +595,8 @@ def _render_ticker_page(
     manifest: dict[str, Any],
     ticker_summary: dict[str, Any],
     settings: SiteSettings,
+    *,
+    manifests: list[dict[str, Any]] | None = None,
 ) -> str:
     run_dir = Path(manifest["_run_dir"])
     language = _manifest_language(manifest)
@@ -468,6 +637,12 @@ def _render_ticker_page(
         language=language,
         stale_after_seconds=stale_after_seconds,
     )
+    ticker_delta_html = _render_ticker_delta_section(
+        manifest=manifest,
+        ticker_summary=ticker_summary,
+        manifests=manifests or [],
+        language=language,
+    )
     body = f"""
     <nav class="breadcrumbs">
       <a href="../../index.html">Home</a>
@@ -492,6 +667,7 @@ def _render_ticker_page(
         {_advanced_diagnostics_html(ticker_summary, manifest, stale_after_seconds=stale_after_seconds)}
       </div>
     </section>
+    {ticker_delta_html}
     {failure_html}
     <section class="section prose">
       <div class="section-head">
@@ -567,14 +743,19 @@ def _ticker_investor_summary(
             today_action = f"오늘 바로 검토: {primary_condition}"
         elif display_state == "TRIGGERED_PENDING_CLOSE":
             today_action = f"장중 조건 진입, 종가 확인 대기: {primary_condition}"
-        elif stale_or_degraded:
-            today_action = f"장중 데이터 신선도 저하로 보수적 관찰: 오늘 신규 추격 금지. {primary_condition} 확인"
         elif stance == "BULLISH" and entry_action in {"WAIT", "STARTER", "ADD"}:
             today_action = f"추격 매수보다 조건 확인 우선: {primary_condition}"
         elif stance == "BEARISH" or entry_action == "EXIT":
             today_action = f"위험 조건 확인 후 축소 검토: {primary_condition}"
         else:
             today_action = f"보유/관찰 유지: {primary_condition}"
+        caveats: list[str] = []
+        if stale_or_degraded:
+            caveats.append("다만 장중 데이터가 stale/degraded라 종가 확인을 우선합니다")
+        if bool(_execution_payload(ticker_summary).get("review_required")) or bool(ticker_summary.get("review_required")):
+            caveats.append("사람 검토 필요")
+        if caveats:
+            today_action = f"{today_action}. {' / '.join(caveats)}."
 
         if timing_state == "LIVE_BREAKOUT":
             close_action = f"종가 확인 후 추가 검토: {primary_condition}"
@@ -595,14 +776,19 @@ def _ticker_investor_summary(
             today_action = f"Review now: {primary_condition}"
         elif display_state == "TRIGGERED_PENDING_CLOSE":
             today_action = f"Intraday trigger seen; confirm close: {primary_condition}"
-        elif stale_or_degraded:
-            today_action = f"Stale intraday data; do not chase today. Check {primary_condition}"
         elif stance == "BULLISH" and entry_action in {"WAIT", "STARTER", "ADD"}:
             today_action = f"Wait for confirmation: {primary_condition}"
         elif stance == "BEARISH" or entry_action == "EXIT":
             today_action = f"Review risk before reducing: {primary_condition}"
         else:
             today_action = f"Hold or watch: {primary_condition}"
+        caveats = []
+        if stale_or_degraded:
+            caveats.append("intraday data is stale/degraded; prioritize close confirmation")
+        if bool(_execution_payload(ticker_summary).get("review_required")) or bool(ticker_summary.get("review_required")):
+            caveats.append("manual review required")
+        if caveats:
+            today_action = f"{today_action}. {' / '.join(caveats)}."
         close_action = f"Recheck at close: {primary_condition}"
 
     return {
@@ -1089,6 +1275,45 @@ def _render_run_health_section(manifest: dict[str, Any], portfolio_summary: dict
         f"<p><strong>종목 식별</strong><span>{_escape(metrics['identity_integrity'])}</span></p>"
         "</details>"
     )
+
+
+def _select_representative_run(manifests: list[dict[str, Any]]) -> dict[str, Any] | None:
+    if not manifests:
+        return None
+    ranked = sorted(manifests, key=_representative_run_sort_key)
+    return ranked[0] if ranked else manifests[0]
+
+
+def _representative_run_sort_key(manifest: dict[str, Any]) -> tuple[int, int, int, str]:
+    phase = _run_phase_label(manifest)
+    in_session_rank = 0 if phase == "in_session" else 1
+    stale_ratio = _run_stale_ratio(manifest)
+    if phase == "post_close_stale_overlay":
+        in_session_rank = 3
+    usefulness_rank = int(((manifest.get("run_quality") or {}).get("usefulness_rank") or manifest.get("usefulness_rank") or 100))
+    started_at = str(manifest.get("started_at") or "")
+    recency_bias = "".join(chr(255 - ord(ch)) if ord(ch) < 255 else ch for ch in started_at)
+    return (in_session_rank, int(stale_ratio * 1000), usefulness_rank, recency_bias)
+
+
+def _run_phase_label(manifest: dict[str, Any]) -> str:
+    phase = str(manifest.get("market_session_phase") or ((manifest.get("execution") or {}).get("overlay_phase") or {}).get("name") or "").upper()
+    if phase.startswith("CHECKPOINT_") and _run_stale_ratio(manifest) >= 0.95:
+        return "post_close_stale_overlay"
+    if phase == "IN_SESSION" or phase.startswith("CHECKPOINT_"):
+        return "in_session"
+    if phase in {"PRE_OPEN", "PRE-OPEN"}:
+        return "pre_open"
+    if phase in {"POST_RESEARCH", "AFTER_CLOSE", "POST_CLOSE"}:
+        return "post_close"
+    return "other"
+
+
+def _run_stale_ratio(manifest: dict[str, Any]) -> float:
+    execution = manifest.get("execution") or {}
+    degraded = len(execution.get("degraded") or [])
+    total = max(int((manifest.get("summary") or {}).get("total_tickers") or 0), 1)
+    return degraded / total
 
 
 def _compute_health_metrics(*, manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> dict[str, str]:

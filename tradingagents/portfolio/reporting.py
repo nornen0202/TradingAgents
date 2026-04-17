@@ -26,6 +26,9 @@ def render_portfolio_report_markdown(
     market_label = present_market_regime(recommendation.market_regime, language="Korean")
     counts = _candidate_counts(recommendation)
     immediate_count = counts["immediate_candidates_count"]
+    immediate_actionable_count = counts["immediate_actionable_count"]
+    immediate_budgeted_count = counts["immediate_budgeted_count"]
+    budget_blocked_actionable_count = counts["budget_blocked_actionable_count"]
     strategic_trigger_count = counts["strategic_trigger_candidates_count"]
     budgeted_trigger_count = counts["budgeted_trigger_candidates_count"]
     funding_count = counts["funding_candidates_count"]
@@ -77,10 +80,16 @@ def render_portfolio_report_markdown(
             "",
             "## 핵심 요약",
             "",
-            _strict_summary_line(snapshot, immediate_count),
+            _strict_summary_line(snapshot, immediate_budgeted_count, budget_blocked_actionable_count),
             strategy_line,
             f"- 전략상 조건부 후보 {strategic_trigger_count}개 / 자금 반영 조건부 후보 {budgeted_trigger_count}개",
             f"- 자금 조달형 후보 {funding_count}개 / 보유 조건부 추가 후보 {held_add_count}개 / 미보유 조건부 관찰 후보 {watch_if_triggered_count}개",
+            (
+                f"- 즉시 실행 신호 {immediate_actionable_count}개 중 "
+                f"{budget_blocked_actionable_count}개는 자금/버퍼 제약으로 미집행 상태입니다."
+                if budget_blocked_actionable_count > 0
+                else f"- 즉시 실행 신호 {immediate_actionable_count}개 중 실제 예산 반영 주문 {immediate_budgeted_count}개입니다."
+            ),
             "",
             "## 액션 요약",
             "",
@@ -98,7 +107,9 @@ def render_portfolio_report_markdown(
             "",
             "## 집계 진단",
             "",
-            f"- 지금 실행 후보: {immediate_count}개",
+            f"- 지금 실행 후보(예산 반영): {immediate_count}개",
+            f"- 즉시 실행 신호: {immediate_actionable_count}개",
+            f"- 자금 제약으로 막힌 즉시 신호: {budget_blocked_actionable_count}개",
             f"- 조건부 실행 후보: {strategic_trigger_count}개",
             f"- 조건부 실행 예산 반영 후보: {budgeted_trigger_count}개",
             f"- 트리거형 후보(현금과 무관): {strategic_trigger_count}개",
@@ -128,6 +139,22 @@ def _candidate_counts(recommendation: PortfolioRecommendation) -> dict[str, int]
         "immediate_candidates_count",
         sum(1 for action in actions if action.delta_krw_now != 0),
     )
+    counts.setdefault(
+        "immediate_actionable_count",
+        sum(1 for action in actions if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}),
+    )
+    counts.setdefault(
+        "immediate_budgeted_count",
+        sum(
+            1
+            for action in actions
+            if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"} and action.delta_krw_now != 0
+        ),
+    )
+    counts.setdefault(
+        "budget_blocked_actionable_count",
+        sum(1 for action in actions if action.action_now in {"ADD_NOW", "STARTER_NOW"} and action.delta_krw_now == 0),
+    )
     counts.setdefault("funding_candidates_count", 0)
     counts.setdefault(
         "held_add_if_triggered_count",
@@ -140,12 +167,18 @@ def _candidate_counts(recommendation: PortfolioRecommendation) -> dict[str, int]
     return counts
 
 
-def _strict_summary_line(snapshot: AccountSnapshot, immediate_count: int) -> str:
-    if immediate_count <= 0 and snapshot.available_cash_krw < snapshot.constraints.min_cash_buffer_krw:
+def _strict_summary_line(
+    snapshot: AccountSnapshot,
+    immediate_budgeted_count: int,
+    budget_blocked_actionable_count: int,
+) -> str:
+    if immediate_budgeted_count <= 0 and budget_blocked_actionable_count > 0:
+        return f"- 즉시 실행 신호는 있으나({budget_blocked_actionable_count}개) 자금/버퍼 제약으로 오늘 주문은 보류합니다."
+    if immediate_budgeted_count <= 0 and snapshot.available_cash_krw < snapshot.constraints.min_cash_buffer_krw:
         return "- 오늘은 신규매수 없음: 가용 현금이 최소 현금 버퍼보다 작아 strict 모드에서는 주문을 보류합니다."
-    if immediate_count <= 0:
+    if immediate_budgeted_count <= 0:
         return "- 오늘은 신규매수 없음: 즉시 실행 조건을 통과한 주문이 없습니다."
-    return f"- 오늘 즉시 실행 후보 {immediate_count}개를 우선 확인합니다."
+    return f"- 오늘 즉시 실행 후보 {immediate_budgeted_count}개를 우선 확인합니다."
 
 
 def _strategy_priority_line(recommendation: PortfolioRecommendation) -> str:
@@ -158,6 +191,8 @@ def _strategy_priority_line(recommendation: PortfolioRecommendation) -> str:
 def _funding_sections(recommendation: PortfolioRecommendation) -> str:
     add_items = _top_add_if_funded(recommendation)
     trim_items = _top_trim_if_needed(recommendation)
+    funding_plan = recommendation.funding_plan or {}
+    switch_items = funding_plan.get("switch_candidates") or []
     add_lines = [
         f"- {item.get('display_name') or item.get('canonical_ticker')}: {_short_conditions(item.get('trigger_conditions'))}"
         for item in add_items
@@ -168,6 +203,27 @@ def _funding_sections(recommendation: PortfolioRecommendation) -> str:
     ]
     return "\n".join(
         [
+            "## 전략상 가장 강한 후보",
+            "",
+            "\n".join(add_lines[:3]) if add_lines else "- 전략상 강한 조건부 후보가 없습니다.",
+            "",
+            "## 리밸런싱 시 먼저 줄일 후보",
+            "",
+            "\n".join(trim_lines[:3]) if trim_lines else "- 우선 축소 후보가 없습니다.",
+            "",
+            "## switch-candidates",
+            "",
+            (
+                "\n".join(
+                    f"- 매수 {((item.get('buy') or {}).get('display_name') or (item.get('buy') or {}).get('canonical_ticker') or '-')}"
+                    f" / 축소 {((item.get('trim') or {}).get('display_name') or (item.get('trim') or {}).get('canonical_ticker') or '-')}"
+                    for item in switch_items
+                    if isinstance(item, dict)
+                )
+                if switch_items
+                else "- 스위칭 조합 후보가 없습니다."
+            ),
+            "",
             "## would-buy-if-funded",
             "",
             "\n".join(add_lines) if add_lines else "- 자금이 생겨도 바로 늘릴 조건부 후보가 없습니다.",

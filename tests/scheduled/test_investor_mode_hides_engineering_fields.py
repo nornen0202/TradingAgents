@@ -86,6 +86,9 @@ class InvestorModeUiTests(unittest.TestCase):
         self.assertIn("종가 확인 시 할 일", html)
         self.assertIn("고급 진단", html)
 
+    def test_investor_mode_hides_engineering_fields_by_default(self):
+        self.test_default_ticker_page_hides_engineering_labels()
+
 
 if __name__ == "__main__":
     unittest.main()

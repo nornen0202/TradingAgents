@@ -53,6 +53,9 @@ class KoreanReportLanguageTests(unittest.TestCase):
         self.assertNotIn("because", joined)
         self.assertIn("조건 충족", joined)
 
+    def test_korean_report_has_no_english_rationale_in_investor_mode(self):
+        self.test_action_table_uses_korean_fallback_for_english_rationale()
+
 
 if __name__ == "__main__":
     unittest.main()
