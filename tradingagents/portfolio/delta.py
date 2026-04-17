@@ -15,6 +15,7 @@ def compute_portfolio_delta(
             "to_run": current_run_id,
             "priority_changes": [],
             "state_changes": [],
+            "relative_action_changes": [],
             "newly_actionable": [],
             "newly_invalidated": [],
             "newly_degraded": [],
@@ -38,6 +39,14 @@ def compute_portfolio_delta(
             continue
         state_changes.append({"ticker": ticker, "from": prev_state[ticker], "to": curr_state[ticker]})
 
+    prev_relative_action = _relative_action_by_ticker(previous_manifest)
+    curr_relative_action = _relative_action_by_ticker(current_manifest)
+    relative_action_changes: list[dict[str, Any]] = []
+    for ticker in sorted(set(prev_relative_action) & set(curr_relative_action)):
+        if prev_relative_action[ticker] == curr_relative_action[ticker]:
+            continue
+        relative_action_changes.append({"ticker": ticker, "from": prev_relative_action[ticker], "to": curr_relative_action[ticker]})
+
     newly_actionable = sorted(ticker for ticker, state in curr_state.items() if state == "ACTIONABLE_NOW" and prev_state.get(ticker) != "ACTIONABLE_NOW")
     newly_invalidated = sorted(ticker for ticker, state in curr_state.items() if state == "INVALIDATED" and prev_state.get(ticker) != "INVALIDATED")
     newly_degraded = sorted(ticker for ticker, state in curr_state.items() if state == "DEGRADED" and prev_state.get(ticker) != "DEGRADED")
@@ -47,10 +56,11 @@ def compute_portfolio_delta(
         "to_run": current_run_id,
         "priority_changes": priority_changes,
         "state_changes": state_changes,
+        "relative_action_changes": relative_action_changes,
         "newly_actionable": newly_actionable,
         "newly_invalidated": newly_invalidated,
         "newly_degraded": newly_degraded,
-        "summary": _summary_line(priority_changes, newly_actionable, newly_invalidated, newly_degraded),
+        "summary": _summary_line(priority_changes, newly_actionable, newly_invalidated, newly_degraded, relative_action_changes),
     }
 
 
@@ -78,6 +88,17 @@ def render_portfolio_delta_markdown(delta: dict[str, Any]) -> str:
     state_changes = delta.get("state_changes") or []
     if state_changes:
         for item in state_changes:
+            lines.append(f"- {item.get('ticker')}: {item.get('from')} -> {item.get('to')}")
+    else:
+        lines.append("- none")
+
+    lines.extend([
+        "",
+        "## relative_action_changes",
+    ])
+    relative_action_changes = delta.get("relative_action_changes") or []
+    if relative_action_changes:
+        for item in relative_action_changes:
             lines.append(f"- {item.get('ticker')}: {item.get('from')} -> {item.get('to')}")
     else:
         lines.append("- none")
@@ -131,11 +152,32 @@ def _state_by_ticker(manifest: dict[str, Any]) -> dict[str, str]:
     return states
 
 
+def _relative_action_by_ticker(manifest: dict[str, Any]) -> dict[str, str]:
+    portfolio = manifest.get("portfolio") if isinstance(manifest.get("portfolio"), dict) else {}
+    action_summary = portfolio.get("action_summary") if isinstance(portfolio.get("action_summary"), dict) else {}
+    relative_actions = action_summary.get("relative_actions") if isinstance(action_summary.get("relative_actions"), dict) else {}
+    normalized = {
+        str(ticker).strip().upper(): str(action).strip().upper()
+        for ticker, action in relative_actions.items()
+        if str(ticker).strip()
+    }
+    if normalized:
+        return normalized
+    values: dict[str, str] = {}
+    for ticker_summary in manifest.get("tickers") or []:
+        ticker = str(ticker_summary.get("ticker") or "").strip().upper()
+        action = str(ticker_summary.get("portfolio_relative_action") or "").strip().upper()
+        if ticker and action:
+            values[ticker] = action
+    return values
+
+
 def _summary_line(
     priority_changes: list[dict[str, Any]],
     newly_actionable: list[str],
     newly_invalidated: list[str],
     newly_degraded: list[str],
+    relative_action_changes: list[dict[str, Any]] | None = None,
 ) -> str:
     parts: list[str] = []
     if priority_changes:
@@ -147,4 +189,7 @@ def _summary_line(
         parts.append(f"무효화 {', '.join(newly_invalidated[:2])}")
     if newly_degraded:
         parts.append(f"자료 저하 {', '.join(newly_degraded[:2])}")
+    if relative_action_changes:
+        top = relative_action_changes[0]
+        parts.append(f"{top.get('ticker')} 계좌 액션 {top.get('from')}->{top.get('to')}")
     return "; ".join(parts) if parts else "직전 run 대비 핵심 변화 없음"

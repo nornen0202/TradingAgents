@@ -30,6 +30,7 @@ _IMMEDIATE_ACTIONS = {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_
 _TRIGGER_BUY_ACTIONS = {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}
 _TRIGGER_SELL_ACTIONS = {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
 _STRATEGIC_TRIGGER_ACTIONS = _TRIGGER_BUY_ACTIONS | _TRIGGER_SELL_ACTIONS
+_RELATIVE_TRIM_ACTIONS = {"TRIM_TO_FUND", "REDUCE_RISK", "EXIT"}
 
 
 def build_recommendation(
@@ -53,6 +54,12 @@ def build_recommendation(
             trigger_budget_krw,
             int(max(snapshot.available_cash_krw - snapshot.constraints.min_cash_buffer_krw, 0) * 0.50),
         )
+    scored = _annotate_relative_candidates(
+        candidates=scored,
+        snapshot=snapshot,
+        batch_metrics=batch_metrics,
+        investable_cash_now=investable_cash_now,
+    )
 
     positive_now = sum(
         max(candidate.score_now, 0.0)
@@ -91,13 +98,20 @@ def build_recommendation(
 
         target_now = _weight_after_delta(current_value, delta_now, account_value)
         target_triggered = _weight_after_delta(current_value, delta_triggered, account_value)
+        budget_blocked_actionable = _is_budget_blocked_actionable(
+            candidate=candidate,
+            delta_now=delta_now,
+            profile=profile,
+        )
+        action_now = _normalize_now_action(candidate, delta_now)
+        action_now = _relative_action_now(candidate, action_now)
         actions.append(
             PortfolioAction(
                 canonical_ticker=candidate.instrument.canonical_ticker,
                 display_name=candidate.instrument.display_name,
                 priority=len(actions) + 1,
                 confidence=round(candidate.confidence, 2),
-                action_now=_normalize_now_action(candidate, delta_now),
+                action_now=action_now,
                 delta_krw_now=delta_now,
                 target_weight_now=round(target_now, 4),
                 action_if_triggered=_normalize_triggered_action(candidate, delta_triggered),
@@ -111,9 +125,16 @@ def build_recommendation(
                     "score_now": round(candidate.score_now, 4),
                     "score_triggered": round(candidate.score_triggered, 4),
                     "strict_cash_available_for_new_buys_krw": investable_cash_now,
+                    "portfolio_relative_action": candidate.portfolio_relative_action,
+                    "relative_action_reason_codes": list(candidate.relative_action_reason_codes),
+                    "budget_blocked_actionable": budget_blocked_actionable,
                 },
                 strategy_state=candidate.strategy_state,
                 execution_feasibility_now=candidate.execution_feasibility_now,
+                portfolio_relative_action=candidate.portfolio_relative_action,
+                relative_action_reason=candidate.relative_action_reason,
+                relative_action_reason_codes=candidate.relative_action_reason_codes,
+                budget_blocked_actionable=budget_blocked_actionable,
                 stale_but_triggerable=candidate.stale_but_triggerable,
                 funding_source_score=round(candidate.funding_source_score, 4),
                 capital_reallocation_rank=candidate.capital_reallocation_rank,
@@ -184,6 +205,7 @@ def build_recommendation(
                 1 for action in prioritized if action.action_now == "HOLD" and action.action_if_triggered == "ADD_IF_TRIGGERED"
             ),
             "review_required_count": sum(1 for action in prioritized if action.review_required),
+            "relative_action_distribution": _relative_action_distribution(prioritized),
             "rule_only_fallback_count": sum(
                 1 for action in prioritized if str(action.decision_source).upper() == "RULE_ONLY_FALLBACK"
             ),
@@ -257,6 +279,195 @@ def _score_candidate(
     )
 
 
+def _annotate_relative_candidates(
+    *,
+    candidates: list[PortfolioCandidate],
+    snapshot: AccountSnapshot,
+    batch_metrics: dict[str, Any],
+    investable_cash_now: int,
+) -> list[PortfolioCandidate]:
+    if not candidates:
+        return []
+    cash_tight = snapshot.available_cash_krw < snapshot.constraints.min_cash_buffer_krw + snapshot.constraints.min_trade_krw
+    constructive_count = sum(1 for candidate in candidates if candidate.stance == "BULLISH")
+    too_many_constructive = constructive_count >= max(4, int(len(candidates) * 0.60))
+    add_candidates = [
+        candidate
+        for candidate in candidates
+        if candidate.suggested_action_now in {"ADD_NOW", "STARTER_NOW"}
+        or candidate.suggested_action_if_triggered in _TRIGGER_BUY_ACTIONS
+    ]
+    strongest_add_score = max((_candidate_add_score(candidate) for candidate in add_candidates), default=0.0)
+    held_sector_weight = _held_sector_weights(candidates, snapshot)
+
+    annotated: list[PortfolioCandidate] = []
+    for candidate in candidates:
+        relative_action = _base_relative_action(candidate)
+        reason_codes = list(candidate.relative_action_reason_codes)
+        quality_flags = {str(flag).strip().lower() for flag in candidate.quality_flags}
+        if candidate.is_held and "missing_analysis_for_held_position" in quality_flags:
+            reason_codes.append("NO_COVERAGE")
+        funding_score = float(candidate.funding_source_score or 0.0)
+        extra_penalties = _relative_penalties(
+            candidate=candidate,
+            snapshot=snapshot,
+            batch_metrics=batch_metrics,
+            held_sector_weight=held_sector_weight,
+        )
+        for code, value in extra_penalties.items():
+            if value > 0:
+                funding_score += value
+                reason_codes.append(code)
+
+        if candidate.is_held:
+            if relative_action in {"REDUCE_RISK", "EXIT"}:
+                reason_codes.append("THESIS_WEAKENING")
+            elif "NO_COVERAGE" in reason_codes:
+                relative_action = "TRIM_TO_FUND"
+            elif (
+                (cash_tight or investable_cash_now <= 0 or too_many_constructive)
+                and strongest_add_score > 0
+                and funding_score >= 0.14
+                and strongest_add_score >= _candidate_add_score(candidate) + 0.08
+            ):
+                relative_action = "TRIM_TO_FUND"
+                reason_codes.append("OPPORTUNITY_COST")
+            elif "REGIME_HEADWIND" in reason_codes and (cash_tight or too_many_constructive):
+                relative_action = "TRIM_TO_FUND"
+            elif "CONCENTRATION" in reason_codes and (cash_tight or too_many_constructive):
+                relative_action = "TRIM_TO_FUND"
+        else:
+            relative_action = "ADD" if candidate in add_candidates else "WATCH"
+
+        reason_codes_tuple = tuple(dict.fromkeys(reason_codes))
+        relative_reason = _relative_reason_text(reason_codes_tuple)
+        funding_score = _cap_no_coverage_trim_score(candidate, funding_score, reason_codes_tuple)
+        annotated.append(
+            PortfolioCandidate(
+                **{
+                    **candidate.__dict__,
+                    "portfolio_relative_action": relative_action,
+                    "relative_action_reason": relative_reason,
+                    "relative_action_reason_codes": reason_codes_tuple,
+                    "funding_source_score": round(max(0.0, min(funding_score, 1.0)), 4),
+                    "data_health": {
+                        **candidate.data_health,
+                        "portfolio_relative_action": relative_action,
+                        "relative_action_reason": relative_reason,
+                        "relative_action_reason_codes": list(reason_codes_tuple),
+                        "opportunity_cost_penalty": round(extra_penalties.get("OPPORTUNITY_COST", 0.0), 4),
+                        "concentration_penalty": round(extra_penalties.get("CONCENTRATION", 0.0), 4),
+                        "regime_penalty": round(extra_penalties.get("REGIME_HEADWIND", 0.0), 4),
+                        "data_quality_penalty": round(extra_penalties.get("DATA_QUALITY", 0.0), 4),
+                    },
+                }
+            )
+        )
+    return annotated
+
+
+def _base_relative_action(candidate: PortfolioCandidate) -> str:
+    current = str(candidate.portfolio_relative_action or "").upper()
+    if current in {"TRIM_TO_FUND", "REDUCE_RISK", "EXIT"}:
+        return current
+    if candidate.is_held and current == "HOLD":
+        return current
+    if not candidate.is_held and current in {"ADD", "WATCH"}:
+        return current
+    if candidate.is_held and candidate.suggested_action_now == "EXIT_NOW":
+        return "EXIT"
+    if candidate.is_held and (
+        candidate.suggested_action_now in {"REDUCE_NOW", "TRIM_NOW"}
+        or candidate.suggested_action_if_triggered in _TRIGGER_SELL_ACTIONS
+    ):
+        return "REDUCE_RISK"
+    if candidate.is_held:
+        return "HOLD"
+    if candidate.suggested_action_now in {"ADD_NOW", "STARTER_NOW"} or candidate.suggested_action_if_triggered in _TRIGGER_BUY_ACTIONS:
+        return "ADD"
+    return "WATCH"
+
+
+def _candidate_add_score(candidate: PortfolioCandidate) -> float:
+    return (
+        max(float(candidate.score_triggered or 0.0), 0.0)
+        + max(float(candidate.score_now or 0.0), 0.0) * 0.35
+        + max(min(float(candidate.confidence or 0.0), 1.0), 0.0) * 0.20
+        + max(min(float(candidate.timing_readiness or 0.0), 1.0), 0.0) * 0.15
+        + max(min(float(candidate.data_health.get("trigger_quality") or 0.0), 1.0), 0.0) * 0.10
+    )
+
+
+def _held_sector_weights(candidates: list[PortfolioCandidate], snapshot: AccountSnapshot) -> dict[str, float]:
+    weights: dict[str, float] = {}
+    account_value = max(snapshot.account_value_krw, 1)
+    for candidate in candidates:
+        if not candidate.is_held or not candidate.sector:
+            continue
+        key = str(candidate.sector).strip().lower()
+        weights[key] = weights.get(key, 0.0) + (candidate.market_value_krw / account_value)
+    return weights
+
+
+def _relative_penalties(
+    *,
+    candidate: PortfolioCandidate,
+    snapshot: AccountSnapshot,
+    batch_metrics: dict[str, Any],
+    held_sector_weight: dict[str, float],
+) -> dict[str, float]:
+    if not candidate.is_held:
+        return {}
+    penalties: dict[str, float] = {}
+    account_value = max(snapshot.account_value_krw, 1)
+    current_weight = candidate.market_value_krw / account_value
+    if current_weight > snapshot.constraints.max_single_name_weight * 0.80:
+        penalties["CONCENTRATION"] = max(penalties.get("CONCENTRATION", 0.0), 0.08)
+    sector_key = str(candidate.sector or "").strip().lower()
+    if sector_key and held_sector_weight.get(sector_key, 0.0) > snapshot.constraints.max_sector_weight * 0.80:
+        penalties["CONCENTRATION"] = max(penalties.get("CONCENTRATION", 0.0), 0.07)
+
+    bullish_ratio = _ratio(batch_metrics.get("stance_distribution"), "BULLISH")
+    sector_blob = sector_key.replace("_", " ")
+    if bullish_ratio >= 0.55 and any(token in sector_blob for token in ("gold", "precious", "commodity", "energy", "oil")):
+        penalties["REGIME_HEADWIND"] = 0.08
+    if str(candidate.data_health.get("execution_feasibility_now") or candidate.execution_feasibility_now) == "blocked_stale_or_degraded_data":
+        penalties["DATA_QUALITY"] = 0.04
+    return penalties
+
+
+def _relative_reason_text(reason_codes: tuple[str, ...]) -> str:
+    if "THESIS_WEAKENING" in reason_codes:
+        return "Reduce risk because the held thesis or execution state weakened."
+    if "REGIME_HEADWIND" in reason_codes:
+        return "Trim candidate because today's regime makes this exposure less useful versus stronger ideas."
+    if "CONCENTRATION" in reason_codes:
+        return "Trim candidate because portfolio concentration is already high."
+    if "OPPORTUNITY_COST" in reason_codes:
+        return "Trim to fund stronger ranked candidates while cash is scarce."
+    if "NO_COVERAGE" in reason_codes:
+        return "No current thesis coverage; classify separately before using it as a funding source."
+    if "DATA_QUALITY" in reason_codes:
+        return "Execution data quality is weak; avoid adding and review size."
+    return ""
+
+
+def _cap_no_coverage_trim_score(
+    candidate: PortfolioCandidate,
+    score: float,
+    reason_codes: tuple[str, ...],
+) -> float:
+    if "NO_COVERAGE" not in reason_codes:
+        return score
+    active_negative = (
+        "THESIS_WEAKENING" in reason_codes
+        or candidate.stance == "BEARISH"
+        or candidate.suggested_action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}
+        or candidate.suggested_action_if_triggered in _TRIGGER_SELL_ACTIONS
+    )
+    return score if active_negative else min(score, 0.48)
+
+
 def _candidate_funding_source_score(
     *,
     candidate: PortfolioCandidate,
@@ -271,8 +482,26 @@ def _candidate_funding_source_score(
     quality_penalty = (1.0 - max(min(coverage_score, 1.0), 0.0)) * 0.18
     timing_penalty = (1.0 - max(min(timing_readiness, 1.0), 0.0)) * 0.14
     confidence_penalty = (1.0 - max(min(candidate.confidence, 1.0), 0.0)) * 0.12
+    no_coverage_penalty = (
+        0.10
+        if "missing_analysis_for_held_position"
+        in {str(flag).strip().lower() for flag in candidate.quality_flags}
+        else 0.0
+    )
     return round(
-        max(0.0, min(1.0, stance_penalty + setup_penalty + no_add_penalty + quality_penalty + timing_penalty + confidence_penalty)),
+        max(
+            0.0,
+            min(
+                1.0,
+                stance_penalty
+                + setup_penalty
+                + no_add_penalty
+                + quality_penalty
+                + timing_penalty
+                + confidence_penalty
+                + no_coverage_penalty,
+            ),
+        ),
         4,
     )
 
@@ -353,9 +582,9 @@ def _intraday_pilot_allowed(
         candidate.data_health.get("execution_timing_state") or ""
     ).upper() == "FAILED_BREAKOUT":
         return False
-    if profile.intraday_pilot_require_vwap and candidate.data_health.get("session_vwap_ok") is False:
+    if profile.intraday_pilot_require_vwap and candidate.data_health.get("session_vwap_ok") is not True:
         return False
-    if profile.intraday_pilot_require_adjusted_rvol and candidate.data_health.get("relative_volume_ok") is False:
+    if profile.intraday_pilot_require_adjusted_rvol and candidate.data_health.get("relative_volume_ok") is not True:
         return False
     return _snapshot_time_at_or_after(snapshot.as_of, profile.intraday_pilot_min_time_kst)
 
@@ -410,6 +639,30 @@ def _normalize_now_action(candidate: PortfolioCandidate, delta_now: int) -> str:
     return candidate.suggested_action_now
 
 
+def _relative_action_now(candidate: PortfolioCandidate, action_now: str) -> str:
+    relative_action = str(candidate.portfolio_relative_action or "").upper()
+    if action_now == "HOLD" and relative_action in {"TRIM_TO_FUND", "REDUCE_RISK", "EXIT"}:
+        return relative_action
+    return action_now
+
+
+def _is_budget_blocked_actionable(*, candidate: PortfolioCandidate, delta_now: int, profile: PortfolioProfile) -> bool:
+    if int(delta_now) != 0:
+        return False
+    if candidate.suggested_action_now not in {"ADD_NOW", "STARTER_NOW"}:
+        return False
+    if profile.allow_intraday_pilot and candidate.suggested_action_now == "STARTER_NOW":
+        if profile.intraday_pilot_require_vwap and candidate.data_health.get("session_vwap_ok") is not True:
+            return False
+        if profile.intraday_pilot_require_adjusted_rvol and candidate.data_health.get("relative_volume_ok") is not True:
+            return False
+    blocked_states = {"executable_now", "actionable_now", "blocked_stale_or_degraded_data"}
+    return str(candidate.execution_feasibility_now or "").lower() in blocked_states or candidate.suggested_action_now in {
+        "ADD_NOW",
+        "STARTER_NOW",
+    }
+
+
 def _normalize_triggered_action(candidate: PortfolioCandidate, delta_triggered: int) -> str:
     return candidate.suggested_action_if_triggered
 
@@ -432,14 +685,26 @@ def _build_candidate_counts(
     top_trim_if_needed = [
         action
         for action in actions
-        if snapshot.find_position(action.canonical_ticker) is not None and action.funding_source_score > 0
+        if snapshot.find_position(action.canonical_ticker) is not None
+        and (action.funding_source_score > 0 or action.portfolio_relative_action in _RELATIVE_TRIM_ACTIONS)
     ]
     immediate_actionable = [action for action in actions if action.action_now in _IMMEDIATE_ACTIONS]
     immediate_budgeted = [action for action in immediate_actionable if int(action.delta_krw_now) != 0]
     budget_blocked = [
         action
         for action in immediate_actionable
-        if int(action.delta_krw_now) == 0 and action.action_now in {"ADD_NOW", "STARTER_NOW"}
+        if int(action.delta_krw_now) == 0 and action.budget_blocked_actionable
+    ]
+    pilot_ready = [
+        action
+        for action in actions
+        if action.action_now == "STARTER_NOW" or action.action_if_triggered == "STARTER_IF_TRIGGERED"
+    ]
+    close_confirm = [
+        action
+        for action in actions
+        if action.action_if_triggered in _STRATEGIC_TRIGGER_ACTIONS
+        or str(action.data_health.get("execution_timing_state") or "").upper() in {"LATE_SESSION_CONFIRM", "CLOSE_CONFIRM"}
     ]
     return {
         "strategic_trigger_candidates_count": len(strategic_trigger_candidates),
@@ -448,6 +713,11 @@ def _build_candidate_counts(
         "immediate_actionable_count": len(immediate_actionable),
         "immediate_budgeted_count": len(immediate_budgeted),
         "budget_blocked_actionable_count": len(budget_blocked),
+        "immediate_budget_blocked_count": len(budget_blocked),
+        "pilot_ready_count": len(pilot_ready),
+        "close_confirm_count": len(close_confirm),
+        "trim_to_fund_count": sum(1 for action in actions if action.portfolio_relative_action == "TRIM_TO_FUND"),
+        "reduce_risk_count": sum(1 for action in actions if action.portfolio_relative_action in {"REDUCE_RISK", "EXIT"}),
         "funding_candidates_count": len(top_add_if_funded) if top_trim_if_needed else 0,
         "held_add_if_triggered_count": sum(
             1
@@ -475,9 +745,10 @@ def _annotate_reallocation_ranks(
                 (
                     action
                     for action in actions
-                    if snapshot.find_position(action.canonical_ticker) is not None and action.funding_source_score > 0
+                    if snapshot.find_position(action.canonical_ticker) is not None
+                    and (action.funding_source_score > 0 or action.portfolio_relative_action in _RELATIVE_TRIM_ACTIONS)
                 ),
-                key=lambda action: (action.funding_source_score, action.market_value_krw if hasattr(action, "market_value_krw") else 0),
+                key=lambda action: (action.funding_source_score, action.portfolio_relative_action in _RELATIVE_TRIM_ACTIONS),
                 reverse=True,
             ),
             start=1,
@@ -521,9 +792,14 @@ def _build_funding_plan(
         (
             action
             for action in actions
-            if snapshot.find_position(action.canonical_ticker) is not None and action.funding_source_score > 0
+            if snapshot.find_position(action.canonical_ticker) is not None
+            and (action.funding_source_score > 0 or action.portfolio_relative_action in _RELATIVE_TRIM_ACTIONS)
         ),
-        key=lambda action: action.funding_source_score,
+        key=lambda action: (
+            action.portfolio_relative_action in {"REDUCE_RISK", "EXIT"},
+            action.portfolio_relative_action == "TRIM_TO_FUND",
+            action.funding_source_score,
+        ),
         reverse=True,
     )
     cash_gap = max(snapshot.constraints.min_cash_buffer_krw - snapshot.available_cash_krw, 0)
@@ -602,9 +878,14 @@ def _build_switch_scenario_orders(
         (
             action
             for action in actions
-            if snapshot.find_position(action.canonical_ticker) is not None and action.funding_source_score > 0
+            if snapshot.find_position(action.canonical_ticker) is not None
+            and (action.funding_source_score > 0 or action.portfolio_relative_action in _RELATIVE_TRIM_ACTIONS)
         ),
-        key=lambda action: action.funding_source_score,
+        key=lambda action: (
+            action.portfolio_relative_action in {"REDUCE_RISK", "EXIT"},
+            action.portfolio_relative_action == "TRIM_TO_FUND",
+            action.funding_source_score,
+        ),
         reverse=True,
     )
     add_actions = sorted(
@@ -734,6 +1015,8 @@ def _scenario_order_from_action(
         "signed_delta_krw": amount_int,
         "action_now": action.action_now,
         "action_if_triggered": action.action_if_triggered,
+        "portfolio_relative_action": action.portfolio_relative_action,
+        "relative_action_reason_codes": list(action.relative_action_reason_codes),
         "trigger_conditions": list(action.trigger_conditions),
         "rank": action.capital_reallocation_rank,
         "note": note,
@@ -757,6 +1040,8 @@ def _funding_add_item(action: PortfolioAction) -> dict[str, Any]:
         "delta_krw_if_triggered": action.delta_krw_if_triggered,
         "rank": action.capital_reallocation_rank,
         "score": round(_add_if_funded_score(action), 4),
+        "portfolio_relative_action": action.portfolio_relative_action,
+        "budget_blocked_actionable": action.budget_blocked_actionable,
         "trigger_conditions": list(action.trigger_conditions),
         "rationale": action.rationale,
     }
@@ -772,8 +1057,22 @@ def _funding_trim_item(action: PortfolioAction, snapshot: AccountSnapshot) -> di
         "market_value_krw": int(position.market_value_krw if position else 0),
         "action_now": action.action_now,
         "action_if_triggered": action.action_if_triggered,
+        "portfolio_relative_action": action.portfolio_relative_action,
+        "relative_action_reason": action.relative_action_reason,
+        "relative_action_reason_codes": list(action.relative_action_reason_codes),
+        "funding_reason_codes": list(action.relative_action_reason_codes) or _fallback_funding_reason_codes(action),
         "rationale": action.rationale,
     }
+
+
+def _fallback_funding_reason_codes(action: PortfolioAction) -> list[str]:
+    if action.portfolio_relative_action == "REDUCE_RISK":
+        return ["THESIS_WEAKENING"]
+    if action.portfolio_relative_action == "TRIM_TO_FUND":
+        return ["OPPORTUNITY_COST"]
+    if action.funding_source_score > 0:
+        return ["OPPORTUNITY_COST"]
+    return []
 
 
 def _apply_execution_constraints(
@@ -860,6 +1159,14 @@ def _infer_portfolio_risks(
     if not risks:
         risks.append("특이 리스크 없음")
     return risks
+
+
+def _relative_action_distribution(actions: tuple[PortfolioAction, ...]) -> dict[str, int]:
+    distribution: dict[str, int] = {}
+    for action in actions:
+        key = str(action.portfolio_relative_action or "WATCH").upper()
+        distribution[key] = distribution.get(key, 0) + 1
+    return distribution
 
 
 def _ratio(distribution: dict[str, Any] | None, key: str) -> float:

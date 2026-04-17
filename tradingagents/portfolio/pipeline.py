@@ -118,6 +118,7 @@ def run_portfolio_pipeline(
             "snapshot_health": snapshot.snapshot_health,
             "watchlist_reason": _derive_watchlist_reason(snapshot),
             "semantic_health": semantic_health,
+            "action_summary": _build_action_summary(recommendation),
             "report_writer": report_writer_payload,
             "private_output_dir": private_dir.as_posix(),
             "artifacts": artifact_paths,
@@ -232,4 +233,17 @@ def _build_semantic_health(candidates: list[Any]) -> dict[str, Any]:
         "review_required_count": review_required_count,
         "rule_only_fallback_ratio": round(fallback_ratio, 4),
         "judge_unavailable": fallback_ratio >= 0.3,
+    }
+
+
+def _build_action_summary(recommendation) -> dict[str, Any]:
+    return {
+        "relative_actions": {
+            action.canonical_ticker: action.portfolio_relative_action
+            for action in recommendation.actions
+        },
+        "actions_now": {
+            action.canonical_ticker: action.action_now
+            for action in recommendation.actions
+        },
     }

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import SiteSettings
+from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY, REALTIME_EXECUTION_READY, STALE_INVALID_FOR_EXECUTION
 from tradingagents.presentation import (
     present_action_summary,
     present_data_status,
@@ -168,7 +169,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
         latest_technical_html = (
             "<p class='empty'>"
             f"가장 최근 기술 run: <a href='runs/{_escape(latest['run_id'])}/index.html'>{_escape(latest['run_id'])}</a>"
-            f" ({_escape(_run_phase_label(latest))})"
+            f" ({_escape(_run_phase_display_label(latest))})"
             "</p>"
         )
     latest_html = (
@@ -183,7 +184,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
             <div class="status {representative['status']}">{_escape(representative['status'].replace('_', ' '))}</div>
             <p><strong>Run ID</strong><span>{_escape(representative['run_id'])}</span></p>
             <p><strong>Started</strong><span>{_escape(representative['started_at'])}</span></p>
-            <p><strong>세션 단계</strong><span>{_escape(_run_phase_label(representative))}</span></p>
+            <p><strong>세션 단계</strong><span>{_escape(_run_phase_display_label(representative))}</span></p>
             <p><strong>Tickers</strong><span>{representative['summary']['total_tickers']}</span></p>
             <p><strong>Success</strong><span>{representative['summary']['successful_tickers']}</span></p>
             <p><strong>Failed</strong><span>{representative['summary']['failed_tickers']}</span></p>
@@ -736,11 +737,15 @@ def _ticker_investor_summary(
     display_state = _execution_display_state(ticker_summary, stale_after_seconds=stale_after_seconds)
     timing_state = str(_execution_payload(ticker_summary).get("execution_timing_state") or "").upper()
     stale_or_degraded = _is_stale_or_degraded(ticker_summary, stale_after_seconds=stale_after_seconds)
+    execution_quality = _ticker_execution_data_quality(ticker_summary)
+    delayed_analysis_only = execution_quality == DELAYED_ANALYSIS_ONLY
     stance = _decision_structured_value(ticker_summary.get("decision"), "portfolio_stance").upper()
     entry_action = _decision_structured_value(ticker_summary.get("decision"), "entry_action").upper()
 
     if korean:
-        if timing_state == "LIVE_BREAKOUT":
+        if delayed_analysis_only:
+            today_action = f"조건부 관찰: {primary_condition}"
+        elif timing_state == "LIVE_BREAKOUT":
             today_action = f"장중 기준 돌파 구간 진입: {primary_condition}"
         elif timing_state == "CLOSE_CONFIRM":
             today_action = f"장중 조건 진입, 종가 확인 대기: {primary_condition}"
@@ -755,6 +760,8 @@ def _ticker_investor_summary(
         else:
             today_action = f"보유/관찰 유지: {primary_condition}"
         caveats: list[str] = []
+        if delayed_analysis_only:
+            caveats.append("실시간 실행용 시세가 아니라 지연 분석용입니다")
         if stale_or_degraded:
             caveats.append("다만 장중 데이터가 stale/degraded라 종가 확인을 우선합니다")
         if bool(_execution_payload(ticker_summary).get("review_required")) or bool(ticker_summary.get("review_required")):
@@ -773,7 +780,9 @@ def _ticker_investor_summary(
         else:
             close_action = f"종가에서 {primary_condition} 재확인"
     else:
-        if timing_state == "LIVE_BREAKOUT":
+        if delayed_analysis_only:
+            today_action = f"Delayed analysis only; monitor condition: {primary_condition}"
+        elif timing_state == "LIVE_BREAKOUT":
             today_action = f"Live breakout zone entered: {primary_condition}"
         elif timing_state == "CLOSE_CONFIRM":
             today_action = f"Intraday trigger seen; confirm close: {primary_condition}"
@@ -788,6 +797,8 @@ def _ticker_investor_summary(
         else:
             today_action = f"Hold or watch: {primary_condition}"
         caveats = []
+        if delayed_analysis_only:
+            caveats.append("quotes are delayed and not execution-ready")
         if stale_or_degraded:
             caveats.append("intraday data is stale/degraded; prioritize close confirmation")
         if bool(_execution_payload(ticker_summary).get("review_required")) or bool(ticker_summary.get("review_required")):
@@ -827,6 +838,17 @@ def _is_stale_or_degraded(ticker_summary: dict[str, Any], *, stale_after_seconds
     return "stale_market_data" in quality_flags
 
 
+def _ticker_execution_data_quality(ticker_summary: dict[str, Any]) -> str:
+    payload = _execution_payload(ticker_summary)
+    source = payload.get("source") if isinstance(payload.get("source"), dict) else {}
+    quality = str(source.get("execution_data_quality") or payload.get("execution_data_quality") or "").strip().upper()
+    if quality in {REALTIME_EXECUTION_READY, DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION}:
+        return quality
+    if source.get("provider_realtime_capable") is False:
+        return DELAYED_ANALYSIS_ONLY
+    return ""
+
+
 def _research_basis_label(ticker_summary: dict[str, Any], *, language: str) -> str:
     trade_date = ticker_summary.get("trade_date") or ticker_summary.get("analysis_date") or "-"
     if language.lower().startswith("korean"):
@@ -837,6 +859,10 @@ def _research_basis_label(ticker_summary: dict[str, Any], *, language: str) -> s
 def _execution_basis_label(ticker_summary: dict[str, Any], *, language: str) -> str:
     execution_asof = _execution_value(ticker_summary, "execution_asof", default="")
     if execution_asof:
+        if _ticker_execution_data_quality(ticker_summary) == DELAYED_ANALYSIS_ONLY:
+            if language.lower().startswith("korean"):
+                return f"지연 분석용 intraday snapshot({execution_asof}) 기준; 실시간 실행 신호 아님"
+            return f"Delayed analysis-only intraday snapshot at {execution_asof}; not execution-ready"
         if language.lower().startswith("korean"):
             return f"실행 오버레이는 {execution_asof} 장중 스냅샷 기준"
         return f"Execution overlay uses intraday snapshot at {execution_asof}"
@@ -1351,33 +1377,172 @@ def _render_run_health_section(manifest: dict[str, Any], portfolio_summary: dict
 def _select_representative_run(manifests: list[dict[str, Any]]) -> dict[str, Any] | None:
     if not manifests:
         return None
-    ranked = sorted(manifests, key=_representative_run_sort_key)
+    target = manifests[0]
+    target_market = _manifest_market(target)
+    target_family = _manifest_run_family(target)
+    ranked_pool = [
+        manifest
+        for manifest in manifests
+        if _manifest_market(manifest) == target_market and _manifest_run_family(manifest) == target_family
+    ]
+    if not ranked_pool:
+        ranked_pool = [manifest for manifest in manifests if _manifest_market(manifest) == target_market]
+    if not ranked_pool:
+        ranked_pool = list(manifests)
+    ranked = sorted(ranked_pool, key=_representative_run_sort_key)
     return ranked[0] if ranked else manifests[0]
 
 
-def _representative_run_sort_key(manifest: dict[str, Any]) -> tuple[int, int, int, str]:
+def _representative_run_sort_key(manifest: dict[str, Any]) -> tuple[int, int, int, int, str]:
     phase = _run_phase_label(manifest)
-    in_session_rank = 0 if phase == "in_session" else 1
+    phase_rank = {
+        "regular_session": 0,
+        "in_session": 0,
+        "delayed_analysis_only": 1,
+        "pre_open": 2,
+        "post_close": 3,
+        "historical_review": 4,
+    }.get(phase, 5)
     stale_ratio = _run_stale_ratio(manifest)
-    if phase == "post_close_stale_overlay":
-        in_session_rank = 3
+    quality_rank = {
+        REALTIME_EXECUTION_READY: 0,
+        DELAYED_ANALYSIS_ONLY: 1,
+        STALE_INVALID_FOR_EXECUTION: 2,
+    }.get(_run_execution_data_quality(manifest), 1)
     usefulness_rank = int(((manifest.get("run_quality") or {}).get("usefulness_rank") or manifest.get("usefulness_rank") or 100))
     started_at = str(manifest.get("started_at") or "")
     recency_bias = "".join(chr(255 - ord(ch)) if ord(ch) < 255 else ch for ch in started_at)
-    return (in_session_rank, int(stale_ratio * 1000), usefulness_rank, recency_bias)
+    return (phase_rank, quality_rank, int(stale_ratio * 1000), usefulness_rank, recency_bias)
 
 
 def _run_phase_label(manifest: dict[str, Any]) -> str:
     phase = str(manifest.get("market_session_phase") or ((manifest.get("execution") or {}).get("overlay_phase") or {}).get("name") or "").upper()
+    quality = _run_execution_data_quality(manifest)
+    calendar_phase = _manifest_calendar_phase(manifest)
+    if phase in {"DELAYED_ANALYSIS_ONLY", "ANALYSIS_ONLY_DELAYED"}:
+        return "delayed_analysis_only"
+    if phase in {"IN_SESSION", "REGULAR_SESSION"} and calendar_phase in {"pre_open", "post_close", "historical_review"}:
+        return calendar_phase
+    if phase in {"REGULAR_SESSION", "IN_SESSION"} and quality in {DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION}:
+        return "delayed_analysis_only"
+    if phase in {"REGULAR_SESSION"}:
+        return "regular_session"
+    if phase in {"HISTORICAL_REVIEW"}:
+        return "historical_review"
+    if phase.startswith("CHECKPOINT_") and calendar_phase in {"pre_open", "post_close", "historical_review"}:
+        return calendar_phase
     if phase.startswith("CHECKPOINT_") and _run_stale_ratio(manifest) >= 0.95:
-        return "post_close_stale_overlay"
-    if phase == "IN_SESSION" or phase.startswith("CHECKPOINT_"):
-        return "in_session"
+        return "delayed_analysis_only" if quality == DELAYED_ANALYSIS_ONLY else "post_close"
+    if phase.startswith("CHECKPOINT_"):
+        return "regular_session" if quality == REALTIME_EXECUTION_READY else "delayed_analysis_only"
     if phase in {"PRE_OPEN", "PRE-OPEN"}:
         return "pre_open"
     if phase in {"POST_RESEARCH", "AFTER_CLOSE", "POST_CLOSE"}:
         return "post_close"
     return "other"
+
+
+def _manifest_calendar_phase(manifest: dict[str, Any]) -> str:
+    started_at = str(manifest.get("started_at") or "").strip()
+    if not started_at:
+        return "unknown"
+    try:
+        parsed = datetime.fromisoformat(started_at.replace("Z", "+00:00"))
+    except ValueError:
+        return "unknown"
+    market = _manifest_market(manifest).upper()
+    timezone_name = "US/Eastern" if market == "US" else "Asia/Seoul"
+    try:
+        from zoneinfo import ZoneInfo
+
+        local = parsed.astimezone(ZoneInfo(timezone_name)) if parsed.tzinfo else parsed.replace(tzinfo=ZoneInfo(timezone_name))
+    except Exception:
+        return "unknown"
+    if local.weekday() == 5:
+        return "post_close"
+    if local.weekday() == 6:
+        return "historical_review"
+    current = local.time()
+    if market == "US":
+        pre_open = datetime.strptime("04:00", "%H:%M").time()
+        open_time = datetime.strptime("09:30", "%H:%M").time()
+        close_time = datetime.strptime("16:00", "%H:%M").time()
+    else:
+        pre_open = datetime.strptime("08:00", "%H:%M").time()
+        open_time = datetime.strptime("09:00", "%H:%M").time()
+        close_time = datetime.strptime("15:30", "%H:%M").time()
+    if current < pre_open:
+        return "historical_review"
+    if current < open_time:
+        return "pre_open"
+    if current <= close_time:
+        return "regular_session"
+    return "post_close"
+
+
+def _run_phase_display_label(manifest: dict[str, Any]) -> str:
+    mapping = {
+        "regular_session": "Regular session",
+        "in_session": "Regular session",
+        "delayed_analysis_only": "Delayed analysis only",
+        "pre_open": "Pre open",
+        "post_close": "Post close",
+        "historical_review": "Historical review",
+        "other": "Other",
+    }
+    return mapping.get(_run_phase_label(manifest), "Other")
+
+
+def _manifest_market(manifest: dict[str, Any]) -> str:
+    settings = manifest.get("settings") or {}
+    market = str(settings.get("market") or settings.get("market_scope") or "").strip().lower()
+    if market:
+        return market
+    run_id = str(manifest.get("run_id") or "").lower()
+    if "-us" in run_id or run_id.endswith("us"):
+        return "us"
+    if "-kr" in run_id or run_id.endswith("kr"):
+        return "kr"
+    return "unknown"
+
+
+def _manifest_run_family(manifest: dict[str, Any]) -> str:
+    portfolio = manifest.get("portfolio") or {}
+    status = str(portfolio.get("status") or "").strip().lower()
+    if portfolio and status not in {"", "disabled"}:
+        return "account-aware"
+    if portfolio.get("profile"):
+        return "account-aware"
+    return "watchlist"
+
+
+def _run_execution_data_quality(manifest: dict[str, Any]) -> str:
+    execution = manifest.get("execution") or {}
+    quality = str(execution.get("execution_data_quality") or "").strip().upper()
+    if quality in {REALTIME_EXECUTION_READY, DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION}:
+        return quality
+    counts = execution.get("market_data_quality_counts") if isinstance(execution.get("market_data_quality_counts"), dict) else {}
+    if int(counts.get(REALTIME_EXECUTION_READY) or 0) and not int(counts.get(DELAYED_ANALYSIS_ONLY) or 0) and not int(counts.get(STALE_INVALID_FOR_EXECUTION) or 0):
+        return REALTIME_EXECUTION_READY
+    if int(counts.get(DELAYED_ANALYSIS_ONLY) or 0):
+        return DELAYED_ANALYSIS_ONLY
+    if int(counts.get(STALE_INVALID_FOR_EXECUTION) or 0):
+        return STALE_INVALID_FOR_EXECUTION
+    for ticker in manifest.get("tickers") or []:
+        update = ticker.get("execution_update") if isinstance(ticker.get("execution_update"), dict) else {}
+        source = update.get("source") if isinstance(update.get("source"), dict) else {}
+        source_quality = str(source.get("execution_data_quality") or update.get("execution_data_quality") or "").strip().upper()
+        if source_quality in {DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION}:
+            return source_quality
+        if source.get("provider_realtime_capable") is False:
+            return DELAYED_ANALYSIS_ONLY
+        try:
+            quote_delay = int(source.get("quote_delay_seconds"))
+        except (TypeError, ValueError):
+            quote_delay = 0
+        if quote_delay > _execution_stale_threshold_seconds(manifest):
+            return DELAYED_ANALYSIS_ONLY
+    return ""
 
 
 def _run_stale_ratio(manifest: dict[str, Any]) -> float:
@@ -1389,10 +1554,16 @@ def _run_stale_ratio(manifest: dict[str, Any]) -> float:
 
 def _compute_health_metrics(*, manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> dict[str, str]:
     execution = manifest.get("execution") or {}
-    phase = str(((execution.get("overlay_phase") or {}).get("name")) or "UNKNOWN")
+    phase = _run_phase_label(manifest)
     degraded_count = len(execution.get("degraded") or [])
     total_tickers = max(int((manifest.get("summary") or {}).get("total_tickers") or 0), 1)
-    freshness = "stale-risk" if phase.startswith("CHECKPOINT_") and degraded_count > 0 else ("pre-open" if phase == "PRE_OPEN" else "ok")
+    quality = _run_execution_data_quality(manifest)
+    if phase == "delayed_analysis_only":
+        freshness = "delayed analysis only"
+    elif quality == STALE_INVALID_FOR_EXECUTION:
+        freshness = "stale invalid for execution"
+    else:
+        freshness = "stale-risk" if phase == "regular_session" and degraded_count > 0 else ("pre-open" if phase == "pre_open" else "ok")
     semantic_health = portfolio_summary.get("semantic_health") or {}
     fallback_ratio = float(semantic_health.get("rule_only_fallback_ratio") or 0.0)
     judge_health = "degraded" if fallback_ratio >= 0.3 else "ok"

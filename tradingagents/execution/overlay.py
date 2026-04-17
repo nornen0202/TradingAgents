@@ -230,6 +230,7 @@ def _build_update(
             "quote_delay_seconds": market.quote_delay_seconds,
             "provider_realtime_capable": market.provider_realtime_capable,
             "market_session": market.market_session,
+            "execution_data_quality": market.execution_data_quality,
         },
         last_price=market.last_price,
         session_vwap=market.session_vwap,
