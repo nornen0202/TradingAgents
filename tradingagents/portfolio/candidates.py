@@ -216,6 +216,22 @@ def _build_single_candidate(
 
     if analysis is None and is_held:
         quality_flags = (*quality_flags, "missing_analysis_for_held_position")
+    portfolio_relative_action = _initial_portfolio_relative_action(
+        is_held=is_held,
+        action_now=action_now,
+        action_if_triggered=action_if_triggered,
+        stance=stance,
+        entry_action=entry_action,
+        analysis_present=analysis is not None,
+    )
+    relative_reason_codes = _initial_relative_reason_codes(
+        is_held=is_held,
+        action_now=action_now,
+        action_if_triggered=action_if_triggered,
+        stance=stance,
+        entry_action=entry_action,
+        analysis_present=analysis is not None,
+    )
 
     return (
         PortfolioCandidate(
@@ -240,6 +256,9 @@ def _build_single_candidate(
             rationale=rationale,
             strategy_state=strategy_state,
             execution_feasibility_now=execution_feasibility_now,
+            portfolio_relative_action=portfolio_relative_action,
+            relative_action_reason=_relative_reason_text(relative_reason_codes),
+            relative_action_reason_codes=relative_reason_codes,
             stale_but_triggerable=stale_but_triggerable,
             trigger_profile={
                 "intraday_pilot_rule": execution_levels_dict.get("intraday_pilot_rule"),
@@ -260,6 +279,8 @@ def _build_single_candidate(
                 "legacy_rating": rating_value,
                 "strategy_state": strategy_state,
                 "execution_feasibility_now": execution_feasibility_now,
+                "portfolio_relative_action": portfolio_relative_action,
+                "relative_action_reason_codes": list(relative_reason_codes),
                 "stale_but_triggerable": stale_but_triggerable,
                 **execution_health,
             },
@@ -404,6 +425,7 @@ def _execution_health(
     payload["market_session"] = source.get("market_session")
     payload["quote_delay_seconds"] = source.get("quote_delay_seconds")
     payload["provider_realtime_capable"] = source.get("provider_realtime_capable")
+    payload["execution_data_quality"] = source.get("execution_data_quality")
     last_price = _safe_float(execution_update.get("last_price"))
     session_vwap = _safe_float(execution_update.get("session_vwap"))
     relative_volume = _safe_float(execution_update.get("relative_volume"))
@@ -428,6 +450,55 @@ def _safe_float(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _initial_portfolio_relative_action(
+    *,
+    is_held: bool,
+    action_now: str,
+    action_if_triggered: str,
+    stance: str,
+    entry_action: str,
+    analysis_present: bool,
+) -> str:
+    if is_held and action_now in {"REDUCE_NOW", "TRIM_NOW"}:
+        return "REDUCE_RISK"
+    if is_held and action_now == "EXIT_NOW":
+        return "EXIT"
+    if is_held and action_if_triggered in {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+        return "REDUCE_RISK"
+    if is_held:
+        return "HOLD" if analysis_present or stance == "BULLISH" else "TRIM_TO_FUND"
+    if action_now in {"ADD_NOW", "STARTER_NOW"} or action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}:
+        return "ADD"
+    return "WATCH"
+
+
+def _initial_relative_reason_codes(
+    *,
+    is_held: bool,
+    action_now: str,
+    action_if_triggered: str,
+    stance: str,
+    entry_action: str,
+    analysis_present: bool,
+) -> tuple[str, ...]:
+    codes: list[str] = []
+    if is_held and not analysis_present:
+        codes.append("NO_COVERAGE")
+    if is_held and (stance == "BEARISH" or entry_action == "EXIT" or action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}):
+        codes.append("THESIS_WEAKENING")
+    if is_held and action_if_triggered in {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+        codes.append("THESIS_WEAKENING")
+    return tuple(dict.fromkeys(codes))
+
+
+def _relative_reason_text(reason_codes: tuple[str, ...]) -> str:
+    if "NO_COVERAGE" in reason_codes:
+        return "No current thesis coverage; size should be reviewed before funding stronger candidates."
+    if "THESIS_WEAKENING" in reason_codes:
+        return "Thesis or execution state weakened; reduce risk before adding exposure."
+    return ""
 
 
 def _strategy_state(*, action_now: str, action_if_triggered: str, is_held: bool, stance: str) -> str:

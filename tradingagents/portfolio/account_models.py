@@ -167,6 +167,10 @@ class PortfolioCandidate:
     rationale: str
     strategy_state: str = "hold_or_watch"
     execution_feasibility_now: str = "not_actionable_now"
+    portfolio_relative_action: str = "WATCH"
+    relative_action_reason: str = ""
+    relative_action_reason_codes: tuple[str, ...] = tuple()
+    budget_blocked_actionable: bool = False
     stale_but_triggerable: bool = False
     funding_source_score: float = 0.0
     capital_reallocation_rank: int | None = None
@@ -206,6 +210,10 @@ class PortfolioAction:
     data_health: dict[str, Any]
     strategy_state: str = "hold_or_watch"
     execution_feasibility_now: str = "not_actionable_now"
+    portfolio_relative_action: str = "WATCH"
+    relative_action_reason: str = ""
+    relative_action_reason_codes: tuple[str, ...] = tuple()
+    budget_blocked_actionable: bool = False
     stale_but_triggerable: bool = False
     funding_source_score: float = 0.0
     capital_reallocation_rank: int | None = None

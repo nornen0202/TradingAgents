@@ -17,7 +17,13 @@ from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry
-from tradingagents.dataflows.intraday_market import fetch_intraday_market_snapshot
+from tradingagents.dataflows.intraday_market import (
+    DELAYED_ANALYSIS_ONLY,
+    REALTIME_EXECUTION_READY,
+    STALE_INVALID_FOR_EXECUTION,
+    classify_execution_market_data,
+    fetch_intraday_market_snapshot,
+)
 from tradingagents.dataflows.stockstats_utils import is_retryable_yfinance_error, yf_retry
 from tradingagents.execution.contract_builder import build_execution_contract
 from tradingagents.execution.overlay import evaluate_execution_state
@@ -231,7 +237,11 @@ def execute_scheduled_run(
     }
     manifest["batch_metrics"] = _compute_batch_metrics(ticker_summaries)
     manifest["warnings"] = _compute_batch_warnings(manifest["batch_metrics"])
-    manifest["market_session_phase"] = _market_session_phase(manifest_overlay_phase)
+    manifest["market_session_phase"] = _market_session_phase(
+        manifest_overlay_phase,
+        now=started_at,
+        market=config.run.market,
+    )
     if event_signals:
         manifest["event_signals"] = event_signals
     if source_run_id:
@@ -242,8 +252,16 @@ def execute_scheduled_run(
             run_id=run_id,
             ticker_updates=execution_updates,
             checkpoint=latest_checkpoint,
+            max_data_age_seconds=config.execution.execution_max_data_age_seconds,
         )
         manifest["execution"]["overlay_phase"] = manifest_overlay_phase
+        manifest["market_session_phase"] = _market_session_phase(
+            manifest_overlay_phase,
+            now=started_at,
+            market=config.run.market,
+            execution_summary=manifest["execution"],
+            max_quote_delay_seconds=config.execution.execution_max_data_age_seconds,
+        )
         _write_json(run_dir / "execution_summary.json", manifest["execution"])
         (run_dir / "execution_summary.md").write_text(
             render_execution_summary_markdown(
@@ -268,6 +286,13 @@ def execute_scheduled_run(
             "market_regime": "pre_open_snapshot",
             "notes": ["No execution checkpoint is due yet; this run is a pre-open snapshot."],
         }
+        manifest["market_session_phase"] = _market_session_phase(
+            manifest_overlay_phase,
+            now=started_at,
+            market=config.run.market,
+            execution_summary=manifest["execution"],
+            max_quote_delay_seconds=config.execution.execution_max_data_age_seconds,
+        )
         _write_json(run_dir / "execution_summary.json", manifest["execution"])
     if selective_rerun_targets:
         manifest["selective_rerun_targets"] = selective_rerun_targets
@@ -331,8 +356,7 @@ def resolve_trade_date(
         return now.date().isoformat()
     if mode == "previous_business_day":
         return _previous_business_day(now.date()).isoformat()
-    if mode == "latest_available" and _is_kr_daily_thesis_run(ticker=ticker, config=config):
-        return _completed_daily_trade_date_for_kr(now).isoformat()
+    kr_daily_thesis_run = mode == "latest_available" and _is_kr_daily_thesis_run(ticker=ticker, config=config)
 
     normalized_symbol = (normalized_symbol or "").strip().upper()
     if not _looks_like_yahoo_ticker_format(normalized_symbol):
@@ -349,11 +373,12 @@ def resolve_trade_date(
     except Exception as exc:
         if not is_retryable_yfinance_error(exc):
             raise
-        fallback_date = _previous_business_day(now.date()).isoformat()
+        fallback = _completed_daily_trade_date_for_kr(now) if kr_daily_thesis_run else _previous_business_day(now.date())
+        fallback_date = fallback.isoformat()
         print(
             "::warning::"
             f"Yahoo Finance latest-trade-date lookup failed for {ticker} ({normalized_symbol}); "
-            f"using previous business day {fallback_date}. reason={_summarize_exception(exc)}"
+            f"using fallback completed trade date {fallback_date}. reason={_summarize_exception(exc)}"
         )
         return fallback_date
     if history.empty:
@@ -368,6 +393,10 @@ def resolve_trade_date(
     last_date = last_value.date() if hasattr(last_value, "date") else last_value
     if not isinstance(last_date, date):
         raise RuntimeError(f"Unexpected trade date index value for {ticker}: {last_index!r}")
+    if kr_daily_thesis_run:
+        completed_cutoff = _completed_daily_trade_date_for_kr(now)
+        if last_date > completed_cutoff:
+            return completed_cutoff.isoformat()
     return last_date.isoformat()
 
 
@@ -1324,17 +1353,67 @@ def _find_previous_comparable_manifest(
     return None
 
 
-def _market_session_phase(overlay_phase: dict[str, Any]) -> str:
+def _market_session_phase(
+    overlay_phase: dict[str, Any],
+    *,
+    now: datetime | None = None,
+    market: str | None = None,
+    execution_summary: dict[str, Any] | None = None,
+    max_quote_delay_seconds: int = 180,
+) -> str:
     phase = str(overlay_phase.get("name") or "").upper()
+    if phase == "DISABLED":
+        return "disabled"
+    calendar_phase = _calendar_session_phase(now=now, market=market)
+    if execution_summary:
+        quality = str(execution_summary.get("execution_data_quality") or "").upper()
+        if not quality:
+            quality = _aggregate_execution_data_quality(
+                {
+                    ticker: _execution_data_quality_for_payload(payload, max_data_age_seconds=max_quote_delay_seconds)
+                    for ticker, payload in (execution_summary.get("ticker_updates") or {}).items()
+                    if isinstance(payload, dict)
+                }
+            )
+        if calendar_phase == "regular_session" and quality in {DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION}:
+            return "delayed_analysis_only"
+    if calendar_phase in {"pre_open", "regular_session", "post_close", "historical_review"}:
+        return calendar_phase
     if phase == "PRE_OPEN":
         return "pre_open"
     if phase.startswith("CHECKPOINT_"):
-        return "in_session"
+        return "regular_session"
     if phase == "POST_RESEARCH":
-        return "post_research"
-    if phase == "DISABLED":
-        return "disabled"
+        return "post_close"
     return "unknown"
+
+
+def _calendar_session_phase(*, now: datetime | None, market: str | None) -> str:
+    if now is None:
+        return "unknown"
+    market_text = str(market or "").strip().upper()
+    timezone_name = "US/Eastern" if market_text == "US" else "Asia/Seoul"
+    local = now.astimezone(ZoneInfo(timezone_name)) if now.tzinfo else now.replace(tzinfo=ZoneInfo(timezone_name))
+    if local.weekday() == 5:
+        return "post_close"
+    if local.weekday() == 6:
+        return "historical_review"
+    current = local.time()
+    if market_text == "US":
+        pre_open = time(hour=4, minute=0)
+        open_time = time(hour=9, minute=30)
+        close_time = time(hour=16, minute=0)
+    else:
+        pre_open = time(hour=8, minute=0)
+        open_time = time(hour=9, minute=0)
+        close_time = time(hour=15, minute=30)
+    if current < pre_open:
+        return "historical_review"
+    if current < open_time:
+        return "pre_open"
+    if current <= close_time:
+        return "regular_session"
+    return "post_close"
 
 
 def _compute_run_quality(*, manifest: dict[str, Any]) -> dict[str, Any]:
@@ -1532,6 +1611,7 @@ def _run_execution_overlay_passes(
                         "success": True,
                         "provider": market.provider,
                         "market_data_asof": market.asof,
+                        "execution_data_quality": market.execution_data_quality,
                     }
                 )
                 update = evaluate_execution_state(
@@ -1695,7 +1775,12 @@ def _build_failed_execution_update_payload(
         ),
         "execution_asof": now.isoformat(),
         "market_data_asof": contract_payload.get("market_data_asof"),
-        "source": {"provider": None, "interval": attempt_payload.get("interval"), "status": "failed"},
+        "source": {
+            "provider": None,
+            "interval": attempt_payload.get("interval"),
+            "status": "failed",
+            "execution_data_quality": STALE_INVALID_FOR_EXECUTION,
+        },
         "last_price": None,
         "session_vwap": None,
         "day_high": None,
@@ -1720,6 +1805,7 @@ def _build_failed_execution_update_payload(
         "reason_codes": ["intraday_snapshot_unavailable"],
         "staleness_seconds": None,
         "data_health": "UNAVAILABLE",
+        "execution_data_quality": STALE_INVALID_FOR_EXECUTION,
         "refresh_checkpoint": checkpoint_label,
         "intraday_snapshot_attempt": attempt_payload,
     }
@@ -1799,6 +1885,7 @@ def _build_execution_summary(
     run_id: str,
     ticker_updates: dict[str, dict[str, Any]],
     checkpoint: str,
+    max_data_age_seconds: int = 180,
 ) -> dict[str, Any]:
     ticker_updates = {k: v for k, v in ticker_updates.items() if not k.startswith("_")}
     if not ticker_updates:
@@ -1836,6 +1923,14 @@ def _build_execution_summary(
     stale_triggerable = sorted(
         [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "STALE_TRIGGERABLE"]
     )
+    market_data_quality_by_ticker = {
+        ticker: _execution_data_quality_for_payload(payload, max_data_age_seconds=max_data_age_seconds)
+        for ticker, payload in ticker_updates.items()
+    }
+    market_data_quality_counts = {
+        quality: sum(1 for value in market_data_quality_by_ticker.values() if value == quality)
+        for quality in (REALTIME_EXECUTION_READY, DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION)
+    }
     wait = sorted([ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "WAIT"])
     invalidated = sorted(
         [ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "INVALIDATED"]
@@ -1855,6 +1950,9 @@ def _build_execution_summary(
         "support_hold": support_hold,
         "support_fail": support_fail,
         "stale_triggerable": stale_triggerable,
+        "market_data_quality_by_ticker": market_data_quality_by_ticker,
+        "market_data_quality_counts": market_data_quality_counts,
+        "execution_data_quality": _aggregate_execution_data_quality(market_data_quality_by_ticker),
         "wait": wait,
         "invalidated": invalidated,
         "degraded": degraded,
@@ -1865,6 +1963,31 @@ def _build_execution_summary(
             "Close-confirmation setups remain pending until end-of-day.",
         ],
     }
+
+
+def _execution_data_quality_for_payload(payload: dict[str, Any], *, max_data_age_seconds: int) -> str:
+    source = payload.get("source") if isinstance(payload.get("source"), dict) else {}
+    explicit = str(source.get("execution_data_quality") or payload.get("execution_data_quality") or "").strip().upper()
+    if explicit in {REALTIME_EXECUTION_READY, DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION}:
+        return explicit
+    return classify_execution_market_data(
+        source,
+        data_health=str(payload.get("data_health") or ""),
+        max_quote_delay_seconds=max_data_age_seconds,
+    )
+
+
+def _aggregate_execution_data_quality(values_by_ticker: dict[str, str]) -> str:
+    values = {str(value).strip().upper() for value in values_by_ticker.values() if str(value).strip()}
+    if not values:
+        return STALE_INVALID_FOR_EXECUTION
+    if values == {REALTIME_EXECUTION_READY}:
+        return REALTIME_EXECUTION_READY
+    if STALE_INVALID_FOR_EXECUTION in values and DELAYED_ANALYSIS_ONLY not in values and REALTIME_EXECUTION_READY not in values:
+        return STALE_INVALID_FOR_EXECUTION
+    if DELAYED_ANALYSIS_ONLY in values or STALE_INVALID_FOR_EXECUTION in values:
+        return DELAYED_ANALYSIS_ONLY
+    return REALTIME_EXECUTION_READY
 
 
 class _ExecutionUpdateShim:

@@ -29,6 +29,11 @@ def render_portfolio_report_markdown(
     immediate_actionable_count = counts["immediate_actionable_count"]
     immediate_budgeted_count = counts["immediate_budgeted_count"]
     budget_blocked_actionable_count = counts["budget_blocked_actionable_count"]
+    immediate_budget_blocked_count = counts["immediate_budget_blocked_count"]
+    pilot_ready_count = counts["pilot_ready_count"]
+    close_confirm_count = counts["close_confirm_count"]
+    trim_to_fund_count = counts["trim_to_fund_count"]
+    reduce_risk_count = counts["reduce_risk_count"]
     strategic_trigger_count = counts["strategic_trigger_candidates_count"]
     budgeted_trigger_count = counts["budgeted_trigger_candidates_count"]
     funding_count = counts["funding_candidates_count"]
@@ -46,13 +51,14 @@ def render_portfolio_report_markdown(
     )
 
     action_rows = [
-        "| 종목 | 현재 상태 | 지금 할 일 | 조건 충족 시 | 금액(지금) | 금액(조건부) | 우선순위 | 핵심 이유 | 확인 필요 |",
-        "|---|---|---|---|---:|---:|---:|---|---|",
+        "| 종목 | 현재 상태 | 포트폴리오 액션 | 지금 할 일 | 조건 충족 시 | 금액(지금) | 금액(조건부) | 우선순위 | 핵심 이유 | 확인 필요 |",
+        "|---|---|---|---|---|---:|---:|---:|---|---|",
     ]
     for action in recommendation.actions:
         current_value = snapshot.find_position(action.canonical_ticker)
         action_rows.append(
             f"| {_cell(action.display_name)} | {_cell(_position_label(current_value))} | "
+            f"{_cell(present_account_action(action.portfolio_relative_action, language='Korean'))} | "
             f"{_cell(present_account_action(action.action_now, language='Korean'))} | "
             f"{_cell(_conditional_action_label(action))} | "
             f"{_cell(_amount_label(action.delta_krw_now))} | "
@@ -88,6 +94,8 @@ def render_portfolio_report_markdown(
             f"- 현재 계좌 여력: 가용 현금 {_krw(snapshot.available_cash_krw)} / 버퍼 {_krw(snapshot.constraints.min_cash_buffer_krw)}",
             _strict_summary_line(snapshot, immediate_budgeted_count, budget_blocked_actionable_count),
             strategy_line,
+            f"- 계좌 상대 액션: 줄여서 재배치 {trim_to_fund_count}개 / 위험 축소 {reduce_risk_count}개",
+            f"- 실행 신호 구분: 예산 차단 {immediate_budget_blocked_count}개 / 장중 pilot 준비 {pilot_ready_count}개 / 종가 확인 {close_confirm_count}개",
             f"- 전략상 조건부 후보 {strategic_trigger_count}개 / 자금 반영 조건부 후보 {budgeted_trigger_count}개",
             f"- 자금 조달형 후보 {funding_count}개 / 보유 조건부 추가 후보 {held_add_count}개 / 미보유 조건부 관찰 후보 {watch_if_triggered_count}개",
             (
@@ -116,6 +124,11 @@ def render_portfolio_report_markdown(
             f"- 지금 실행 후보(예산 반영): {immediate_count}개",
             f"- 즉시 실행 신호: {immediate_actionable_count}개",
             f"- 자금 제약으로 막힌 즉시 신호: {budget_blocked_actionable_count}개",
+            f"- 예산 차단 실행 후보: {immediate_budget_blocked_count}개",
+            f"- 장중 pilot 준비 후보: {pilot_ready_count}개",
+            f"- 종가 확인 후보: {close_confirm_count}개",
+            f"- 줄여서 재배치 후보: {trim_to_fund_count}개",
+            f"- 위험 축소 후보: {reduce_risk_count}개",
             f"- 조건부 실행 후보: {strategic_trigger_count}개",
             f"- 조건부 실행 예산 반영 후보: {budgeted_trigger_count}개",
             f"- 트리거형 후보(현금과 무관): {strategic_trigger_count}개",
@@ -159,7 +172,28 @@ def _candidate_counts(recommendation: PortfolioRecommendation) -> dict[str, int]
     )
     counts.setdefault(
         "budget_blocked_actionable_count",
-        sum(1 for action in actions if action.action_now in {"ADD_NOW", "STARTER_NOW"} and action.delta_krw_now == 0),
+        sum(
+            1
+            for action in actions
+            if action.budget_blocked_actionable and action.delta_krw_now == 0
+        ),
+    )
+    counts.setdefault("immediate_budget_blocked_count", counts["budget_blocked_actionable_count"])
+    counts.setdefault(
+        "pilot_ready_count",
+        sum(1 for action in actions if action.action_now == "STARTER_NOW" or action.action_if_triggered == "STARTER_IF_TRIGGERED"),
+    )
+    counts.setdefault(
+        "close_confirm_count",
+        sum(1 for action in actions if action.action_if_triggered in _TRIGGER_ACTIONS),
+    )
+    counts.setdefault(
+        "trim_to_fund_count",
+        sum(1 for action in actions if action.portfolio_relative_action == "TRIM_TO_FUND"),
+    )
+    counts.setdefault(
+        "reduce_risk_count",
+        sum(1 for action in actions if action.portfolio_relative_action in {"REDUCE_RISK", "EXIT"}),
     )
     counts.setdefault("funding_candidates_count", 0)
     counts.setdefault(
@@ -204,7 +238,7 @@ def _funding_sections(recommendation: PortfolioRecommendation) -> str:
         for item in add_items
     ]
     trim_lines = [
-        f"- {item.get('display_name') or item.get('canonical_ticker')}: 자금조달 점수 {float(item.get('funding_source_score') or 0):.2f}"
+        f"- {item.get('display_name') or item.get('canonical_ticker')}: {_funding_reason_label(item)} / 자금조달 점수 {float(item.get('funding_source_score') or 0):.2f}"
         for item in trim_items
     ]
     return "\n".join(
@@ -266,6 +300,23 @@ def _top_trim_if_needed(recommendation: PortfolioRecommendation) -> list[dict[st
     funding_plan = recommendation.funding_plan or {}
     values = funding_plan.get("top_trim_if_funding_needed")
     return [item for item in values if isinstance(item, dict)] if isinstance(values, list) else []
+
+
+def _funding_reason_label(item: dict[str, Any]) -> str:
+    codes = [str(value).strip().upper() for value in (item.get("funding_reason_codes") or item.get("relative_action_reason_codes") or [])]
+    if "THESIS_WEAKENING" in codes:
+        return "보유 논리 약화"
+    if "REGIME_HEADWIND" in codes:
+        return "장중 환경 역풍"
+    if "CONCENTRATION" in codes:
+        return "계좌 집중도 완화"
+    if "OPPORTUNITY_COST" in codes:
+        return "더 강한 후보로 재배치"
+    if "NO_COVERAGE" in codes:
+        return "이번 run 분석 공백"
+    if "DATA_QUALITY" in codes:
+        return "실행 데이터 품질 확인"
+    return "재배치 후보"
 
 
 def _short_conditions(values: Any) -> str:

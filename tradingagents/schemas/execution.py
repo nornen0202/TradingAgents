@@ -209,6 +209,7 @@ class IntradayMarketSnapshot:
     quote_delay_seconds: int | None = None
     provider_realtime_capable: bool = False
     market_session: str = "unknown"
+    execution_data_quality: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -220,6 +221,7 @@ class IntradayMarketSnapshot:
             "quote_delay_seconds": self.quote_delay_seconds,
             "provider_realtime_capable": self.provider_realtime_capable,
             "market_session": self.market_session,
+            "execution_data_quality": self.execution_data_quality,
             "interval": self.interval,
             "last_price": self.last_price,
             "session_vwap": self.session_vwap,
