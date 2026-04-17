@@ -360,7 +360,7 @@ def _allocate_triggered_delta(
 
 def _normalize_now_action(candidate: PortfolioCandidate, delta_now: int) -> str:
     if candidate.suggested_action_now in {"ADD_NOW", "STARTER_NOW"} and delta_now <= 0:
-        return "HOLD"
+        return candidate.suggested_action_now
     if candidate.suggested_action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"} and delta_now == 0:
         return "HOLD"
     return candidate.suggested_action_now
@@ -390,10 +390,20 @@ def _build_candidate_counts(
         for action in actions
         if snapshot.find_position(action.canonical_ticker) is not None and action.funding_source_score > 0
     ]
+    immediate_actionable = [action for action in actions if action.action_now in _IMMEDIATE_ACTIONS]
+    immediate_budgeted = [action for action in immediate_actionable if int(action.delta_krw_now) != 0]
+    budget_blocked = [
+        action
+        for action in immediate_actionable
+        if int(action.delta_krw_now) == 0 and action.action_now in {"ADD_NOW", "STARTER_NOW"}
+    ]
     return {
         "strategic_trigger_candidates_count": len(strategic_trigger_candidates),
         "budgeted_trigger_candidates_count": len(budgeted_trigger_candidates),
-        "immediate_candidates_count": sum(1 for action in actions if action.action_now in _IMMEDIATE_ACTIONS and action.delta_krw_now != 0),
+        "immediate_candidates_count": len(immediate_budgeted),
+        "immediate_actionable_count": len(immediate_actionable),
+        "immediate_budgeted_count": len(immediate_budgeted),
+        "budget_blocked_actionable_count": len(budget_blocked),
         "funding_candidates_count": len(top_add_if_funded) if top_trim_if_needed else 0,
         "held_add_if_triggered_count": sum(
             1
@@ -473,10 +483,21 @@ def _build_funding_plan(
         reverse=True,
     )
     cash_gap = max(snapshot.constraints.min_cash_buffer_krw - snapshot.available_cash_krw, 0)
+    top_add_items = [_funding_add_item(action) for action in add_candidates[:5]]
+    top_trim_items = [_funding_trim_item(action, snapshot) for action in trim_candidates[:5]]
     return {
         "cash_gap_to_strict_buffer_krw": cash_gap,
-        "top_add_if_funded": [_funding_add_item(action) for action in add_candidates[:5]],
-        "top_trim_if_funding_needed": [_funding_trim_item(action, snapshot) for action in trim_candidates[:5]],
+        "top_add_if_funded": top_add_items,
+        "top_trim_if_funding_needed": top_trim_items,
+        "would_buy_if_funded": top_add_items[:3],
+        "trim_first_candidates": top_trim_items[:3],
+        "switch_candidates": [
+            {
+                "buy": top_add_items[index],
+                "trim": top_trim_items[index],
+            }
+            for index in range(min(len(top_add_items), len(top_trim_items), 3))
+        ],
     }
 
 
@@ -766,7 +787,7 @@ def _apply_execution_constraints(
 
 
 def _normalize_action_value(action_now: str, delta_now: int) -> str:
-    if action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"} and delta_now == 0:
+    if action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"} and delta_now == 0:
         return "HOLD"
     return action_now
 
