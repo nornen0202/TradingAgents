@@ -10,6 +10,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from tradingagents.llm_clients.codex_app_server import (
     CodexAppServerAuthError,
     CodexAppServerBinaryError,
+    CodexAppServerError,
     CodexInvocationResult,
     CodexStructuredOutputError,
 )
@@ -482,6 +483,35 @@ class CodexProviderTests(unittest.TestCase):
 
         with self.assertRaisesRegex(RuntimeError, "transport exploded"):
             llm.invoke("fail fast")
+
+    def test_codex_app_server_errors_recreate_session_and_retry_with_backoff(self):
+        class FailingCodexSession(FakeCodexSession):
+            def invoke(self, **kwargs):
+                self.invocations.append(kwargs)
+                raise CodexAppServerError("unexpected status 403 Forbidden")
+
+        failing_session = FailingCodexSession()
+        recovered_session = FakeCodexSession(responses=['{"answer":"Recovered"}'])
+        sessions = deque([failing_session, recovered_session])
+
+        llm = create_llm_client(
+            "codex",
+            "gpt-5.4",
+            codex_binary="C:/fake/codex",
+            codex_workspace_dir="C:/tmp/codex-workspace",
+            codex_max_retries=1,
+            session_factory=lambda **kwargs: sessions.popleft(),
+            preflight_runner=lambda **kwargs: None,
+        ).get_llm()
+
+        with patch("tradingagents.llm_clients.codex_chat_model.time.sleep") as sleep_mock:
+            result = llm.invoke("recover after transient transport failure")
+
+        self.assertEqual(result.content, "Recovered")
+        self.assertEqual(failing_session.closed, 1)
+        self.assertEqual(len(failing_session.invocations), 1)
+        self.assertEqual(len(recovered_session.invocations), 1)
+        sleep_mock.assert_called_once_with(30.0)
 
     def test_provider_codex_smoke_covers_bind_tools_and_direct_invoke_paths(self):
         session = FakeCodexSession(

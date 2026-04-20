@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import threading
+import time
 import uuid
 from typing import Any, Callable, Sequence
 
@@ -11,7 +12,11 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 
-from .codex_app_server import CodexAppServerSession, CodexStructuredOutputError
+from .codex_app_server import (
+    CodexAppServerError,
+    CodexAppServerSession,
+    CodexStructuredOutputError,
+)
 from .codex_message_codec import (
     format_messages_for_codex,
     normalize_input_messages,
@@ -116,10 +121,11 @@ class CodexChatModel(BaseChatModel):
 
         raw_response: str | None = None
         last_error: Exception | None = None
+        last_schema_error: Exception | None = None
         for attempt in range(self.codex_max_retries + 1):
             retry_message = None
-            if attempt:
-                previous_error = str(last_error) if last_error is not None else "unknown schema mismatch"
+            if attempt and last_schema_error is not None:
+                previous_error = str(last_schema_error)
                 retry_message = (
                     "The previous response did not satisfy TradingAgents validation: "
                     f"{previous_error}. Return only valid JSON that exactly matches the requested "
@@ -134,14 +140,24 @@ class CodexChatModel(BaseChatModel):
                 tool_arguments_as_json_string=tool_arguments_as_json_string,
                 retry_message=retry_message,
             )
-            result = self._session_or_create().invoke(
-                prompt=prompt,
-                model=self.model,
-                output_schema=output_schema,
-                reasoning_effort=self.codex_reasoning_effort,
-                summary=self.codex_summary,
-                personality=self.codex_personality,
-            )
+            try:
+                result = self._session_or_create().invoke(
+                    prompt=prompt,
+                    model=self.model,
+                    output_schema=output_schema,
+                    reasoning_effort=self.codex_reasoning_effort,
+                    summary=self.codex_summary,
+                    personality=self.codex_personality,
+                )
+            except CodexAppServerError as exc:
+                last_error = exc
+                last_schema_error = None
+                if attempt >= self.codex_max_retries:
+                    raise
+                # Transport failures can leave the stdio session unusable.
+                self.close()
+                time.sleep(self._codex_retry_delay(attempt))
+                continue
             raw_response = result.final_text
 
             if run_manager is not None:
@@ -170,6 +186,7 @@ class CodexChatModel(BaseChatModel):
                 return ChatResult(generations=[ChatGeneration(message=ai_message)])
             except (json.JSONDecodeError, CodexStructuredOutputError, ValueError) as exc:
                 last_error = exc
+                last_schema_error = exc
                 continue
 
         raise CodexStructuredOutputError(
@@ -185,6 +202,10 @@ class CodexChatModel(BaseChatModel):
                 f"Expected plain response JSON with string `answer`, got: {payload!r}"
             )
         return AIMessage(content=payload["answer"])
+
+    @staticmethod
+    def _codex_retry_delay(attempt: int) -> float:
+        return min(30.0 * (2 ** max(0, attempt)), 180.0)
 
     def _parse_tool_response(
         self,
