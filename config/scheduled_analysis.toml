@@ -1,5 +1,5 @@
 [run]
-tickers = ["AAPL", "COST", "ETN", "FANG", "GEV", "GOOGL", "LHX", "LLY", "LRCX", "MU", "NET", "NVDA", "ORCL", "TSLA", "TSM", "VRT"]
+tickers = ["AAPL", "AMD", "AVGO", "CDNS", "COST", "ETN", "FANG", "GEV", "GOOGL", "INTC", "LHX", "LLY", "LRCX", "MRVL", "MU", "NET", "NVDA", "ORCL", "SNPS", "SOXX", "TSLA", "TSM", "VRT"]
 market = "US"
 ticker_universe_mode = "config_only"
 analysts = ["market", "social", "news", "fundamentals"]
@@ -67,6 +67,9 @@ llm_summary_model = "gpt-5.4-mini"
 
 [ticker_names]
 AAPL = "Apple"
+AMD = "Advanced Micro Devices"
+AVGO = "Broadcom"
+CDNS = "Cadence Design Systems"
 COST = "Costco Wholesale"
 ETN = "Eaton"
 ETHU = "2x Ether ETF"
@@ -74,14 +77,18 @@ FANG = "Diamondback Energy"
 GEV = "GE Vernova"
 GLDM = "SPDR Gold MiniShares Trust"
 GOOGL = "Alphabet Class A"
+INTC = "Intel"
 LHX = "L3Harris Technologies"
 LLY = "Eli Lilly"
 LRCX = "Lam Research"
+MRVL = "Marvell Technology"
 MU = "Micron Technology"
 NET = "Cloudflare"
 NVDA = "NVIDIA"
 ORCL = "Oracle"
 RSP = "Invesco S&P 500 Equal Weight ETF"
+SNPS = "Synopsys"
+SOXX = "iShares Semiconductor ETF"
 TSLA = "Tesla"
 TSM = "Taiwan Semiconductor Manufacturing"
 VRT = "Vertiv"
