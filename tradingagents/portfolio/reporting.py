@@ -9,6 +9,7 @@ from tradingagents.presentation import (
     present_snapshot_mode,
     sanitize_investor_text,
 )
+from tradingagents.reporting_consistency import render_consistency_section
 
 from .account_models import AccountSnapshot, PortfolioCandidate, PortfolioRecommendation
 
@@ -21,6 +22,7 @@ def render_portfolio_report_markdown(
     snapshot: AccountSnapshot,
     recommendation: PortfolioRecommendation,
     candidates: list[PortfolioCandidate],
+    live_context_delta: dict[str, Any] | None = None,
 ) -> str:
     mode_label = present_snapshot_mode(snapshot.snapshot_health, language="Korean")
     market_label = present_market_regime(recommendation.market_regime, language="Korean")
@@ -69,8 +71,10 @@ def render_portfolio_report_markdown(
 
     portfolio_risks = _risk_lines(recommendation.portfolio_risks)
     strategy_line = _strategy_priority_line(recommendation)
+    scenario_summary_lines = _scenario_summary_lines(recommendation)
     funding_sections = _funding_sections(recommendation)
-    scenario_table = _scenario_table(recommendation)
+    scenario_table = _scenario_table_v2(recommendation)
+    consistency_section = render_consistency_section(live_context_delta)
     return "\n".join(
         [
             title,
@@ -94,6 +98,7 @@ def render_portfolio_report_markdown(
             f"- 현재 계좌 여력: 가용 현금 {_krw(snapshot.available_cash_krw)} / 버퍼 {_krw(snapshot.constraints.min_cash_buffer_krw)}",
             _strict_summary_line(snapshot, immediate_budgeted_count, budget_blocked_actionable_count),
             strategy_line,
+            *scenario_summary_lines,
             f"- 계좌 상대 액션: 줄여서 재배치 {trim_to_fund_count}개 / 위험 축소 {reduce_risk_count}개",
             f"- 실행 신호 구분: 예산 차단 {immediate_budget_blocked_count}개 / 장중 pilot 준비 {pilot_ready_count}개 / 종가 확인 {close_confirm_count}개",
             f"- 전략상 조건부 후보 {strategic_trigger_count}개 / 자금 반영 조건부 후보 {budgeted_trigger_count}개",
@@ -114,6 +119,8 @@ def render_portfolio_report_markdown(
             scenario_table,
             "",
             funding_sections,
+            "",
+            consistency_section,
             "",
             "## 포트폴리오 리스크",
             "",
@@ -273,6 +280,50 @@ def _funding_sections(recommendation: PortfolioRecommendation) -> str:
             "\n".join(trim_lines) if trim_lines else "- 자금 조달을 위해 먼저 줄일 후보가 없습니다.",
         ]
     )
+
+
+def _scenario_summary_lines(recommendation: PortfolioRecommendation) -> list[str]:
+    scenarios = recommendation.scenario_plan or {}
+    strict = scenarios.get("strict") or {}
+    switch = scenarios.get("switch") or {}
+    cash_agnostic = scenarios.get("cash_agnostic") or scenarios.get("aggressive") or {}
+    ranking_names = [
+        str(item.get("display_name") or item.get("canonical_ticker"))
+        for item in (cash_agnostic.get("strategy_ranking") or [])
+        if isinstance(item, dict)
+    ]
+    return [
+        f"- Strict: immediate {int(strict.get('immediate_order_count') or 0)} / budgeted triggers {int(strict.get('budgeted_trigger_count') or 0)}",
+        f"- Switch: trim {len(switch.get('would_trim_first') or [])} -> buy {len(switch.get('would_buy_if_funded') or [])}",
+        (
+            f"- Cash-agnostic: {' > '.join(ranking_names[:4])}"
+            if ranking_names
+            else "- Cash-agnostic: no ranked add candidates"
+        ),
+    ]
+
+
+def _scenario_table_v2(recommendation: PortfolioRecommendation) -> str:
+    scenarios = recommendation.scenario_plan or {}
+    strict = scenarios.get("strict") or {}
+    switch = scenarios.get("switch") or {}
+    cash_agnostic = scenarios.get("cash_agnostic") or scenarios.get("aggressive") or {}
+    rows = [
+        "| Scenario | Intent | Plan |",
+        "|---|---|---|",
+        f"| Strict | Respect cash buffer | Immediate {int(strict.get('immediate_order_count') or 0)} / budgeted triggers {int(strict.get('budgeted_trigger_count') or 0)} |",
+        (
+            f"| Switch | Trim weaker names to fund stronger names | Sell {_krw(int(switch.get('gross_sell_krw') or 0))} / Buy {_krw(int(switch.get('gross_buy_krw') or 0))} |"
+            if switch.get("enabled")
+            else "| Switch | Trim weaker names to fund stronger names | Hold |"
+        ),
+        (
+            f"| Cash-agnostic | Ignore cash buffer for strategy ranking | Conditional buy {_krw(int(cash_agnostic.get('gross_buy_krw') or 0))} |"
+            if cash_agnostic.get("enabled")
+            else "| Cash-agnostic | Ignore cash buffer for strategy ranking | Hold |"
+        ),
+    ]
+    return "\n".join(rows)
 
 
 def _scenario_table(recommendation: PortfolioRecommendation) -> str:

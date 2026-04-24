@@ -6,6 +6,8 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Any
 
+from .decision import PriceLevel
+
 
 class ExecutionValidationError(ValueError):
     """Raised when execution payload validation fails."""
@@ -72,16 +74,24 @@ class DecisionNow(str, Enum):
 
 class ExecutionTimingState(str, Enum):
     WAITING = "WAITING"
-    LIVE_BREAKOUT = "LIVE_BREAKOUT"
+    NO_LIVE_DATA = "NO_LIVE_DATA"
+    PRE_OPEN_THESIS_ONLY = "PRE_OPEN_THESIS_ONLY"
+    PILOT_READY = "PILOT_READY"
+    PILOT_BLOCKED_VOLUME = "PILOT_BLOCKED_VOLUME"
+    PILOT_BLOCKED_FAILED_BREAKOUT = "PILOT_BLOCKED_FAILED_BREAKOUT"
+    CLOSE_CONFIRM_PENDING = "CLOSE_CONFIRM_PENDING"
+    CLOSE_CONFIRMED = "CLOSE_CONFIRMED"
+    NEXT_DAY_FOLLOWTHROUGH_PENDING = "NEXT_DAY_FOLLOWTHROUGH_PENDING"
     FAILED_BREAKOUT = "FAILED_BREAKOUT"
     SUPPORT_HOLD = "SUPPORT_HOLD"
     SUPPORT_FAIL = "SUPPORT_FAIL"
-    LATE_SESSION_CONFIRM = "LATE_SESSION_CONFIRM"
     STALE_TRIGGERABLE = "STALE_TRIGGERABLE"
-    CLOSE_CONFIRM = "CLOSE_CONFIRM"
-    ACTIONABLE_LIVE = "ACTIONABLE_LIVE"
     INVALIDATED = "INVALIDATED"
     DEGRADED = "DEGRADED"
+    LIVE_BREAKOUT = "LIVE_BREAKOUT"
+    LATE_SESSION_CONFIRM = "LATE_SESSION_CONFIRM"
+    CLOSE_CONFIRM = "CLOSE_CONFIRM"
+    ACTIONABLE_LIVE = "ACTIONABLE_LIVE"
 
 
 @dataclass(frozen=True)
@@ -133,6 +143,9 @@ class ExecutionContract:
     event_guard: EventGuard | None = None
     reason_codes: tuple[str, ...] = field(default_factory=tuple)
     notes: tuple[str, ...] = field(default_factory=tuple)
+    structured_levels: tuple[PriceLevel, ...] = field(default_factory=tuple)
+    vwap_required: bool = False
+    earliest_pilot_time_local: str | None = None
     intraday_pilot_rule: str | None = None
     close_confirm_rule: str | None = None
     next_day_followthrough_rule: str | None = None
@@ -172,6 +185,10 @@ class ExecutionContract:
                 "next_day_followthrough_rule": self.next_day_followthrough_rule,
                 "failed_breakout_rule": self.failed_breakout_rule,
                 "trim_rule": self.trim_rule,
+                "levels": [level.to_dict() for level in self.structured_levels],
+                "min_relative_volume": self.min_relative_volume,
+                "vwap_required": self.vwap_required,
+                "earliest_pilot_time_local": self.earliest_pilot_time_local,
                 "funding_priority": self.funding_priority,
                 "entry_window": self.entry_window,
                 "trigger_quality": self.trigger_quality,
@@ -181,6 +198,9 @@ class ExecutionContract:
             "next_day_followthrough_rule": self.next_day_followthrough_rule,
             "failed_breakout_rule": self.failed_breakout_rule,
             "trim_rule": self.trim_rule,
+            "structured_levels": [level.to_dict() for level in self.structured_levels],
+            "vwap_required": self.vwap_required,
+            "earliest_pilot_time_local": self.earliest_pilot_time_local,
             "funding_priority": self.funding_priority,
             "entry_window": self.entry_window,
             "trigger_quality": self.trigger_quality,

@@ -10,6 +10,7 @@ from tradingagents.schemas import (
     EventGuard,
     ExecutionContract,
     LevelBasis,
+    PriceLevel,
     PrimarySetup,
     PullbackBuyZone,
     SessionVWAPPreference,
@@ -26,19 +27,87 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
     if isinstance(decision_payload, str) and decision_payload.strip().startswith("{"):
         try:
             decision = parse_structured_decision(decision_payload)
-            breakout_level = _extract_level((*decision.watchlist_triggers, *decision.catalysts), ("breakout", "above"))
-            pullback_low, pullback_high = _extract_zone(
-                (*decision.watchlist_triggers, *decision.catalysts),
-                keywords=("pullback", "buy zone", "retest"),
-            )
-            invalid_close = _extract_level(decision.invalidators, ("close", "below"))
-            invalid_intraday = _extract_level(decision.invalidators, ("intraday", "below"))
-            event_guard = _extract_event_guard((*decision.watchlist_triggers, *decision.catalysts, *decision.invalidators))
-            vwap_pref = _extract_vwap_preference((*decision.watchlist_triggers, *decision.catalysts))
-            min_rvol = _extract_relative_volume((*decision.watchlist_triggers, *decision.catalysts))
-            reason_codes = tuple(_normalize_reason_codes(decision.watchlist_triggers, prefix="trigger"))
-            notes = tuple(_normalize_reason_codes(decision.catalysts, prefix="catalyst"))
             execution_levels = decision.execution_levels
+            structured_levels = execution_levels.levels
+
+            breakout_structured = _find_level(structured_levels, "breakout", "resistance")
+            pullback_structured = _find_level(structured_levels, "pullback", "support")
+            invalid_close_structured = _find_invalidation_level(structured_levels, confirmation="close")
+            invalid_intraday_structured = _find_invalidation_level(structured_levels, confirmation="intraday")
+
+            used_regex_fallback = False
+            breakout_level = _price_from_level(breakout_structured)
+            if breakout_level is None:
+                breakout_level = _extract_level((*decision.watchlist_triggers, *decision.catalysts), ("breakout", "above"))
+                used_regex_fallback = used_regex_fallback or breakout_level is not None
+
+            pullback_low, pullback_high = _zone_from_level(pullback_structured)
+            if pullback_low is None or pullback_high is None:
+                fallback_low, fallback_high = _extract_zone(
+                    (*decision.watchlist_triggers, *decision.catalysts),
+                    keywords=("pullback", "buy zone", "retest"),
+                )
+                if fallback_low is not None and fallback_high is not None:
+                    pullback_low, pullback_high = fallback_low, fallback_high
+                    used_regex_fallback = True
+
+            invalid_close = _price_from_level(invalid_close_structured)
+            if invalid_close is None:
+                invalid_close = _extract_level(decision.invalidators, ("close", "below"))
+                used_regex_fallback = used_regex_fallback or invalid_close is not None
+
+            invalid_intraday = _price_from_level(invalid_intraday_structured)
+            if invalid_intraday is None:
+                invalid_intraday = _extract_level(decision.invalidators, ("intraday", "below"))
+                used_regex_fallback = used_regex_fallback or invalid_intraday is not None
+
+            event_guard = _extract_event_guard((*decision.watchlist_triggers, *decision.catalysts, *decision.invalidators))
+            vwap_pref = (
+                SessionVWAPPreference.ABOVE
+                if execution_levels.vwap_required
+                else _extract_vwap_preference((*decision.watchlist_triggers, *decision.catalysts))
+            )
+            min_rvol = execution_levels.min_relative_volume
+            if min_rvol is None:
+                min_rvol = _extract_relative_volume(
+                    (
+                        *decision.watchlist_triggers,
+                        *decision.catalysts,
+                        *(level.volume_rule for level in structured_levels if level.volume_rule),
+                    )
+                )
+                used_regex_fallback = used_regex_fallback or min_rvol is not None
+
+            breakout_confirmation = _breakout_confirmation(
+                breakout_structured,
+                (*decision.watchlist_triggers, *decision.catalysts),
+            )
+            reason_codes = list(_normalize_reason_codes(decision.watchlist_triggers, prefix="trigger"))
+            notes = list(_normalize_reason_codes(decision.catalysts, prefix="catalyst"))
+            if used_regex_fallback:
+                reason_codes.append("execution_level_regex_fallback")
+
+            actionable_defined = _has_machine_actionable_level(
+                structured_levels=structured_levels,
+                breakout_level=breakout_level,
+                pullback_low=pullback_low,
+                pullback_high=pullback_high,
+                invalid_close=invalid_close,
+                invalid_intraday=invalid_intraday,
+            )
+            action_if_triggered = _action_if_triggered(decision.entry_action.value)
+            if (
+                (
+                    action_if_triggered != ActionIfTriggered.NONE
+                    or (
+                        str(decision.portfolio_stance.value).upper() == "BULLISH"
+                        and str(decision.entry_action.value).upper() == "WAIT"
+                    )
+                )
+                and not actionable_defined
+            ):
+                reason_codes.append("no_machine_actionable_level")
+
             return ExecutionContract(
                 ticker=ticker,
                 analysis_asof=analysis_asof,
@@ -50,10 +119,10 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                 entry_action_base=decision.entry_action.value,
                 setup_quality=decision.setup_quality.value,
                 confidence=decision.confidence,
-                action_if_triggered=_action_if_triggered(decision.entry_action.value),
+                action_if_triggered=action_if_triggered,
                 starter_fraction_of_target=(0.25 if decision.entry_action.value == "STARTER" else None),
                 breakout_level=breakout_level,
-                breakout_confirmation=_breakout_confirmation_from_text((*decision.watchlist_triggers, *decision.catalysts)),
+                breakout_confirmation=breakout_confirmation,
                 pullback_buy_zone=(
                     None
                     if pullback_low is None or pullback_high is None
@@ -64,11 +133,16 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                 min_relative_volume=min_rvol,
                 session_vwap_preference=vwap_pref,
                 event_guard=event_guard,
-                reason_codes=reason_codes,
-                notes=notes,
+                reason_codes=tuple(dict.fromkeys(reason_codes)),
+                notes=tuple(dict.fromkeys(notes)),
+                structured_levels=structured_levels,
+                vwap_required=execution_levels.vwap_required,
+                earliest_pilot_time_local=execution_levels.earliest_pilot_time_local,
                 intraday_pilot_rule=execution_levels.intraday_pilot_rule or _default_intraday_pilot_rule(
                     breakout_level=breakout_level,
                     min_relative_volume=min_rvol,
+                    earliest_pilot_time_local=execution_levels.earliest_pilot_time_local,
+                    vwap_required=execution_levels.vwap_required,
                 ),
                 close_confirm_rule=execution_levels.close_confirm_rule or _default_close_confirm_rule(
                     breakout_level=breakout_level,
@@ -106,11 +180,13 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
         action_if_triggered=ActionIfTriggered.NONE,
         reason_codes=("fallback_contract",),
         notes=("Structured decision unavailable; fail-closed watch mode.",),
-        intraday_pilot_rule="장중 신규 진입은 보류하고, 구조적 thesis가 복구될 때까지 관찰합니다.",
-        close_confirm_rule="종가 기준 구조적 조건을 다시 확인한 뒤 실행 여부를 판단합니다.",
-        next_day_followthrough_rule="다음 거래일 첫 30~60분 동안 핵심 가격대를 회복하는지 확인합니다.",
-        failed_breakout_rule="장중 돌파 실패가 확인되면 신규 매수를 금지합니다.",
-        trim_rule="보유 중이면 무효화 가격 이탈 또는 리스크 확대 시 축소를 검토합니다.",
+        vwap_required=False,
+        earliest_pilot_time_local="10:30",
+        intraday_pilot_rule="Allow only a small pilot after confirmation; otherwise keep the idea on watch.",
+        close_confirm_rule="Recheck the trigger and volume at the close before upgrading the setup.",
+        next_day_followthrough_rule="Next session, keep the trigger during the first 30-60 minutes before adding.",
+        failed_breakout_rule="If the breakout fails, block new buying and reassess risk.",
+        trim_rule="Trim if the invalidation level or failed breakout confirms.",
         funding_priority="low",
         entry_window="mid",
         trigger_quality="weak",
@@ -157,6 +233,70 @@ def _normalize_reason_codes(values: tuple[str, ...], *, prefix: str) -> list[str
     return normalized
 
 
+def _find_level(levels: tuple[PriceLevel, ...], *level_types: str) -> PriceLevel | None:
+    allowed = {str(level_type).strip().lower() for level_type in level_types}
+    for level in levels:
+        if level.level_type in allowed:
+            return level
+    return None
+
+
+def _find_invalidation_level(levels: tuple[PriceLevel, ...], *, confirmation: str) -> PriceLevel | None:
+    for level in levels:
+        if level.level_type not in {"invalidation", "trim"}:
+            continue
+        if str(level.confirmation).strip().lower() == confirmation:
+            return level
+    return None
+
+
+def _price_from_level(level: PriceLevel | None) -> float | None:
+    if level is None:
+        return None
+    if level.price is not None:
+        return float(level.price)
+    if level.low is not None and level.high is not None:
+        return float(min(level.low, level.high))
+    if level.low is not None:
+        return float(level.low)
+    if level.high is not None:
+        return float(level.high)
+    return None
+
+
+def _zone_from_level(level: PriceLevel | None) -> tuple[float | None, float | None]:
+    if level is None:
+        return (None, None)
+    if level.low is not None and level.high is not None:
+        return (float(min(level.low, level.high)), float(max(level.low, level.high)))
+    if level.price is not None:
+        value = float(level.price)
+        return (value, value)
+    if level.low is not None:
+        value = float(level.low)
+        return (value, value)
+    if level.high is not None:
+        value = float(level.high)
+        return (value, value)
+    return (None, None)
+
+
+def _has_machine_actionable_level(
+    *,
+    structured_levels: tuple[PriceLevel, ...],
+    breakout_level: float | None,
+    pullback_low: float | None,
+    pullback_high: float | None,
+    invalid_close: float | None,
+    invalid_intraday: float | None,
+) -> bool:
+    if structured_levels:
+        for level in structured_levels:
+            if level.price is not None or level.low is not None or level.high is not None:
+                return True
+    return any(value is not None for value in (breakout_level, pullback_low, pullback_high, invalid_close, invalid_intraday))
+
+
 def _extract_level(lines: tuple[str, ...], keywords: tuple[str, ...]) -> float | None:
     for line in lines:
         lowered = line.lower()
@@ -200,7 +340,7 @@ def _extract_event_guard(lines: tuple[str, ...]) -> EventGuard:
 
 def _extract_vwap_preference(lines: tuple[str, ...]) -> SessionVWAPPreference:
     joined = " ".join(lines).lower()
-    if "above vwap" in joined:
+    if "above vwap" in joined or "vwap above" in joined:
         return SessionVWAPPreference.ABOVE
     if "below vwap" in joined:
         return SessionVWAPPreference.BELOW
@@ -210,17 +350,27 @@ def _extract_vwap_preference(lines: tuple[str, ...]) -> SessionVWAPPreference:
 def _extract_relative_volume(lines: tuple[str, ...]) -> float | None:
     for line in lines:
         lowered = line.lower()
-        if "relative volume" not in lowered and "rvol" not in lowered:
+        if "relative volume" not in lowered and "rvol" not in lowered and "volume_rule" not in lowered:
             continue
-        match = re.search(r"(?:rvol|relative volume)\s*[:>=]?\s*(-?\d+(?:\.\d+)?)", lowered)
-        if not match:
-            numbers = re.findall(r"(-?\d+(?:\.\d+)?)", line)
-            if numbers:
-                match_value = numbers[-1]
-                return max(0.1, float(match_value))
+        match = re.search(r"(?:rvol|relative volume)[^0-9-]*(-?\d+(?:\.\d+)?)", lowered)
         if match:
             return max(0.1, float(match.group(1)))
-    return 1.0
+        numbers = re.findall(r"(-?\d+(?:\.\d+)?)", line)
+        if numbers:
+            return max(0.1, float(numbers[-1]))
+    return None
+
+
+def _breakout_confirmation(level: PriceLevel | None, lines: tuple[str, ...]) -> BreakoutConfirmation:
+    if level is not None:
+        mapping = {
+            "intraday": BreakoutConfirmation.INTRADAY_ABOVE,
+            "close": BreakoutConfirmation.CLOSE_ABOVE,
+            "two_bar": BreakoutConfirmation.TWO_BAR_HOLD,
+            "next_day": BreakoutConfirmation.END_OF_DAY_ONLY,
+        }
+        return mapping.get(level.confirmation, BreakoutConfirmation.CLOSE_ABOVE)
+    return _breakout_confirmation_from_text(lines)
 
 
 def _breakout_confirmation_from_text(lines: tuple[str, ...]) -> BreakoutConfirmation:
@@ -238,10 +388,14 @@ def _default_intraday_pilot_rule(
     *,
     breakout_level: float | None,
     min_relative_volume: float | None,
+    earliest_pilot_time_local: str | None,
+    vwap_required: bool,
 ) -> str:
-    level = _format_level(breakout_level) if breakout_level is not None else "trigger"
-    rvol = f" + adjusted RVOL {min_relative_volume:g}배 이상" if min_relative_volume else " + adjusted RVOL 확인"
-    return f"10:30 KST 이후 {level} 상회 + VWAP 위{rvol} + 오전 실패 돌파가 아닐 때 30만~60만원 starter만 허용"
+    level = _format_level(breakout_level) if breakout_level is not None else "the trigger"
+    time_gate = earliest_pilot_time_local or "10:30"
+    vwap_text = " with price above VWAP" if vwap_required else ""
+    rvol_text = f" and RVOL >= {min_relative_volume:g}" if min_relative_volume else " and volume confirmation"
+    return f"After {time_gate} local, allow only a small pilot if price clears {level}{vwap_text}{rvol_text}."
 
 
 def _default_close_confirm_rule(
@@ -249,31 +403,31 @@ def _default_close_confirm_rule(
     breakout_level: float | None,
     min_relative_volume: float | None,
 ) -> str:
-    level = _format_level(breakout_level) if breakout_level is not None else "핵심 trigger"
-    rvol = f"와 RVOL {min_relative_volume:g}배 이상" if min_relative_volume else "와 거래량 확인"
-    return f"종가가 {level} 위에서 유지되고 {rvol}가 동반될 때 본격 진입 또는 증액을 검토"
+    level = _format_level(breakout_level) if breakout_level is not None else "the trigger"
+    rvol_text = f" with RVOL >= {min_relative_volume:g}" if min_relative_volume else " with volume confirmation"
+    return f"Require a close above {level}{rvol_text} before a full add."
 
 
 def _default_next_day_followthrough_rule(*, breakout_level: float | None) -> str:
-    level = _format_level(breakout_level) if breakout_level is not None else "핵심 trigger"
-    return f"다음 거래일 첫 30~60분 동안 {level} 재이탈이 없고 재돌파가 유지될 때 추가 검토"
+    level = _format_level(breakout_level) if breakout_level is not None else "the trigger"
+    return f"Next session, keep {level} during the first 30-60 minutes before adding."
 
 
 def _default_failed_breakout_rule(*, breakout_level: float | None) -> str:
-    level = _format_level(breakout_level) if breakout_level is not None else "trigger"
-    return f"장중 {level} 돌파 후 VWAP 또는 {level} 아래로 재이탈하면 당일 신규 매수 금지"
+    level = _format_level(breakout_level) if breakout_level is not None else "the trigger"
+    return f"If price loses {level} after breakout, block new buying and reassess funding sources."
 
 
 def _default_trim_rule(*, invalid_close: float | None, invalid_intraday: float | None) -> str:
     invalid = invalid_intraday if invalid_intraday is not None else invalid_close
     if invalid is None:
-        return "핵심 지지 이탈 또는 thesis 훼손 뉴스가 확인되면 먼저 축소 후보로 분류"
-    return f"{_format_level(invalid)} 이탈이 확인되면 보유분 축소 또는 청산 검토"
+        return "Trim if the thesis invalidates or a failed breakout confirms."
+    return f"Trim if price loses {_format_level(invalid)} on the relevant confirmation basis."
 
 
 def _format_level(value: float | None) -> str:
     if value is None:
-        return "trigger"
+        return "the trigger"
     if float(value).is_integer():
         return f"{int(value):,}"
     return f"{float(value):,.2f}"

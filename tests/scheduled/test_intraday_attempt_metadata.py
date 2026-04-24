@@ -79,7 +79,7 @@ checkpoints_kst = ["12:35"]
 
     update = updates["NVDA"]
     assert update["decision_state"] == "DEGRADED"
-    assert update["execution_timing_state"] == "DEGRADED"
+    assert update["execution_timing_state"] == "NO_LIVE_DATA"
     assert update["decision_if_triggered"] == "ADD"
     assert update["intraday_snapshot_attempt"]["success"] is False
     assert update["intraday_snapshot_attempt"]["error_type"] == "RuntimeError"

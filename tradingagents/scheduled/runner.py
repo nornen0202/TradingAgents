@@ -33,6 +33,7 @@ from tradingagents.execution.reporting import (
 )
 from tradingagents.execution.selective_rerun import collect_event_signals, find_selective_rerun_targets
 from tradingagents.graph.trading_graph import TradingAgentsGraph
+from tradingagents.live.context_delta import build_live_context_delta, render_report_vs_live_delta_markdown
 from tradingagents.portfolio import load_snapshot_for_profile, run_portfolio_pipeline
 from tradingagents.portfolio.delta import compute_portfolio_delta, render_portfolio_delta_markdown
 from tradingagents.portfolio.profiles import load_portfolio_profile
@@ -43,6 +44,7 @@ from tradingagents.schemas import (
     EventGuard,
     ExecutionContract,
     PullbackBuyZone,
+    PriceLevel,
     LevelBasis,
     PrimarySetup,
     SessionVWAPPreference,
@@ -124,6 +126,7 @@ def execute_scheduled_run(
     ticker_summaries: list[dict[str, Any]] = []
     engine_results_dir = run_dir / "engine-results"
     run_mode = str(config.run.run_mode or "full").strip().lower()
+    run_trade_date = _resolve_run_trade_date(config=config, tickers=run_tickers) if run_mode == "full" else None
     source_run_id: str | None = None
     if run_mode == "selective_rerun_only" and not config.execution.execution_refresh_enabled:
         raise RuntimeError(
@@ -142,6 +145,7 @@ def execute_scheduled_run(
                 ticker=ticker,
                 run_dir=run_dir,
                 engine_results_dir=engine_results_dir,
+                trade_date_override=run_trade_date,
             )
             ticker_summaries.append(ticker_summary)
             if ticker_summary["status"] != "success" and not config.run.continue_on_ticker_error:
@@ -235,6 +239,9 @@ def execute_scheduled_run(
         },
         "tickers": ticker_summaries,
     }
+    if run_trade_date:
+        manifest["daily_thesis_trade_date"] = run_trade_date
+        manifest["settings"]["daily_thesis_trade_date"] = run_trade_date
     manifest["batch_metrics"] = _compute_batch_metrics(ticker_summaries)
     manifest["warnings"] = _compute_batch_warnings(manifest["batch_metrics"])
     manifest["market_session_phase"] = _market_session_phase(
@@ -279,6 +286,10 @@ def execute_scheduled_run(
             "execution_asof": None,
             "actionable_now": [],
             "triggered_pending_close": [],
+            "pilot_ready": [],
+            "pilot_blocked_volume": [],
+            "close_confirm": [],
+            "next_day_followthrough_pending": [],
             "wait": [],
             "invalidated": [],
             "degraded": [],
@@ -298,6 +309,26 @@ def execute_scheduled_run(
         manifest["selective_rerun_targets"] = selective_rerun_targets
     if selective_rerun_results:
         manifest["selective_rerun_results"] = selective_rerun_results
+
+    live_context_delta = build_live_context_delta(run_dir=run_dir, manifest=manifest)
+    if live_context_delta:
+        live_delta_json_path = run_dir / "live_context_delta.json"
+        live_delta_md_path = run_dir / "report_vs_live_delta.md"
+        _write_json(live_delta_json_path, live_context_delta)
+        live_delta_md_path.write_text(
+            render_report_vs_live_delta_markdown(live_context_delta),
+            encoding="utf-8",
+        )
+        manifest["live_context_delta"] = {
+            "as_of": live_context_delta.get("as_of"),
+            "changed_since_base": bool((live_context_delta.get("portfolio_delta") or {}).get("changed_since_base")),
+            "artifacts": {
+                "live_context_delta_json": _relative_to_run(run_dir, live_delta_json_path),
+                "report_vs_live_delta_markdown": _relative_to_run(run_dir, live_delta_md_path),
+            },
+            "ticker_deltas": live_context_delta.get("ticker_deltas") or [],
+            "portfolio_delta": live_context_delta.get("portfolio_delta") or {},
+        }
 
     if config.portfolio.enabled and config.portfolio.profile_path:
         portfolio_status = run_portfolio_pipeline(
@@ -400,6 +431,17 @@ def resolve_trade_date(
     return last_date.isoformat()
 
 
+def _resolve_run_trade_date(
+    *,
+    config: ScheduledAnalysisConfig,
+    tickers: list[str],
+) -> str | None:
+    normalized = [str(item).strip() for item in tickers if str(item).strip()]
+    if not normalized:
+        return None
+    return resolve_trade_date(normalized[0], config)
+
+
 def _fetch_recent_trade_date_history(symbol: str, *, lookback_days: int) -> Any:
     period = f"{max(1, int(lookback_days))}d"
     ticker = yf.Ticker(symbol)
@@ -488,6 +530,7 @@ def _run_single_ticker(
     ticker: str,
     run_dir: Path,
     engine_results_dir: Path,
+    trade_date_override: str | None = None,
 ) -> dict[str, Any]:
     ticker_dir = run_dir / "tickers" / ticker
     ticker_dir.mkdir(parents=True, exist_ok=True)
@@ -504,7 +547,7 @@ def _run_single_ticker(
 
     try:
         reset_tool_telemetry()
-        trade_date = resolve_trade_date(ticker, config)
+        trade_date = trade_date_override or resolve_trade_date(ticker, config)
         stats_handler = StatsCallbackHandler()
         graph = TradingAgentsGraph(
             config.run.analysts,
@@ -1794,7 +1837,7 @@ def _build_failed_execution_update_payload(
         "decision_state": "DEGRADED",
         "decision_now": "NONE",
         "decision_if_triggered": str(contract_payload.get("action_if_triggered") or "NONE"),
-        "execution_timing_state": "DEGRADED",
+        "execution_timing_state": "NO_LIVE_DATA",
         "trigger_status": {
             "breakout_hit_intraday": False,
             "close_confirmation_pending": False,
@@ -1880,6 +1923,16 @@ def _load_execution_contracts_for_run(
     return loaded
 
 
+def _normalize_execution_timing_state(value: Any) -> str:
+    state = str(value or "").strip().upper()
+    return {
+        "LIVE_BREAKOUT": "PILOT_READY",
+        "ACTIONABLE_LIVE": "PILOT_READY",
+        "LATE_SESSION_CONFIRM": "CLOSE_CONFIRM_PENDING",
+        "CLOSE_CONFIRM": "CLOSE_CONFIRM_PENDING",
+    }.get(state, state or "WAITING")
+
+
 def _build_execution_summary(
     *,
     run_id: str,
@@ -1895,6 +1948,10 @@ def _build_execution_summary(
             "execution_asof": None,
             "actionable_now": [],
             "triggered_pending_close": [],
+            "pilot_ready": [],
+            "pilot_blocked_volume": [],
+            "close_confirm": [],
+            "next_day_followthrough_pending": [],
             "wait": [],
             "invalidated": [],
             "degraded": [],
@@ -1902,26 +1959,57 @@ def _build_execution_summary(
             "market_regime": "degraded",
             "notes": ["Execution overlay produced no ticker updates."],
         }
+    state_by_ticker = {
+        ticker: _normalize_execution_timing_state(payload.get("execution_timing_state"))
+        for ticker, payload in ticker_updates.items()
+    }
     actionable_now = sorted(
-        [ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "ACTIONABLE_NOW"]
+        [
+            ticker
+            for ticker, payload in ticker_updates.items()
+            if payload.get("decision_state") == "ACTIONABLE_NOW"
+        ]
     )
     pending_close = sorted(
-        [ticker for ticker, payload in ticker_updates.items() if payload.get("decision_state") == "TRIGGERED_PENDING_CLOSE"]
+        [
+            ticker
+            for ticker, payload in ticker_updates.items()
+            if payload.get("decision_state") == "TRIGGERED_PENDING_CLOSE"
+        ]
     )
-    live_breakout = sorted(
-        [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "LIVE_BREAKOUT"]
+    pilot_ready = sorted([ticker for ticker, state in state_by_ticker.items() if state == "PILOT_READY"])
+    pilot_blocked_volume = sorted(
+        [ticker for ticker, state in state_by_ticker.items() if state == "PILOT_BLOCKED_VOLUME"]
+    )
+    close_confirm = sorted(
+        [
+            ticker
+            for ticker, state in state_by_ticker.items()
+            if state in {"CLOSE_CONFIRM_PENDING", "CLOSE_CONFIRMED"}
+        ]
+    )
+    next_day_followthrough_pending = sorted(
+        [
+            ticker
+            for ticker, state in state_by_ticker.items()
+            if state == "NEXT_DAY_FOLLOWTHROUGH_PENDING"
+        ]
     )
     failed_breakout = sorted(
-        [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "FAILED_BREAKOUT"]
+        [
+            ticker
+            for ticker, state in state_by_ticker.items()
+            if state in {"FAILED_BREAKOUT", "PILOT_BLOCKED_FAILED_BREAKOUT"}
+        ]
     )
-    support_hold = sorted(
-        [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "SUPPORT_HOLD"]
-    )
-    support_fail = sorted(
-        [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "SUPPORT_FAIL"]
-    )
+    support_hold = sorted([ticker for ticker, state in state_by_ticker.items() if state == "SUPPORT_HOLD"])
+    support_fail = sorted([ticker for ticker, state in state_by_ticker.items() if state == "SUPPORT_FAIL"])
     stale_triggerable = sorted(
-        [ticker for ticker, payload in ticker_updates.items() if payload.get("execution_timing_state") == "STALE_TRIGGERABLE"]
+        [
+            ticker
+            for ticker, state in state_by_ticker.items()
+            if state in {"STALE_TRIGGERABLE", "NO_LIVE_DATA", "PRE_OPEN_THESIS_ONLY"}
+        ]
     )
     market_data_quality_by_ticker = {
         ticker: _execution_data_quality_for_payload(payload, max_data_age_seconds=max_data_age_seconds)
@@ -1945,7 +2033,11 @@ def _build_execution_summary(
         "execution_asof": first.get("execution_asof"),
         "actionable_now": actionable_now,
         "triggered_pending_close": pending_close,
-        "live_breakout": live_breakout,
+        "pilot_ready": pilot_ready,
+        "pilot_blocked_volume": pilot_blocked_volume,
+        "close_confirm": close_confirm,
+        "next_day_followthrough_pending": next_day_followthrough_pending,
+        "live_breakout": pilot_ready,
         "failed_breakout": failed_breakout,
         "support_hold": support_hold,
         "support_fail": support_fail,
@@ -1956,8 +2048,20 @@ def _build_execution_summary(
         "wait": wait,
         "invalidated": invalidated,
         "degraded": degraded,
-        "top_priority_order": actionable_now + pending_close + support_hold + live_breakout + wait + failed_breakout + support_fail + invalidated + degraded,
-        "market_regime": "constructive_but_selective" if actionable_now else "wait_and_watch",
+        "top_priority_order": (
+            pilot_ready
+            + close_confirm
+            + next_day_followthrough_pending
+            + support_hold
+            + wait
+            + pilot_blocked_volume
+            + failed_breakout
+            + support_fail
+            + stale_triggerable
+            + invalidated
+            + degraded
+        ),
+        "market_regime": "constructive_but_selective" if (pilot_ready or close_confirm) else "wait_and_watch",
         "notes": [
             "Do not treat pre-open report as executable without overlay refresh.",
             "Close-confirmation setups remain pending until end-of-day.",
@@ -1990,6 +2094,28 @@ def _aggregate_execution_data_quality(values_by_ticker: dict[str, str]) -> str:
     return REALTIME_EXECUTION_READY
 
 
+def _optional_float(value: Any) -> float | None:
+    try:
+        if value in (None, ""):
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _optional_bool(value: Any, *, default: bool = False) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return default
+    normalized = str(value).strip().lower()
+    if normalized in {"true", "1", "yes"}:
+        return True
+    if normalized in {"false", "0", "no"}:
+        return False
+    return default
+
+
 class _ExecutionUpdateShim:
     def __init__(self, payload: dict[str, Any]):
         self.ticker = str(payload.get("ticker") or "")
@@ -2004,6 +2130,24 @@ class _ExecutionContractShim:
     def to_contract(self) -> ExecutionContract:
         guard_payload = self.payload.get("event_guard") or {}
         levels = self.payload.get("execution_levels") if isinstance(self.payload.get("execution_levels"), dict) else {}
+        structured_levels_payload = self.payload.get("structured_levels")
+        if not isinstance(structured_levels_payload, list):
+            structured_levels_payload = levels.get("levels") if isinstance(levels.get("levels"), list) else []
+        structured_levels = tuple(
+            PriceLevel(
+                label=str(item.get("label") or ""),
+                level_type=str(item.get("level_type") or "breakout"),
+                price=_optional_float(item.get("price")),
+                low=_optional_float(item.get("low")),
+                high=_optional_float(item.get("high")),
+                currency=str(item.get("currency") or "") or None,
+                confirmation=str(item.get("confirmation") or "close"),
+                volume_rule=str(item.get("volume_rule") or ""),
+                source_text=str(item.get("source_text") or ""),
+            )
+            for item in structured_levels_payload
+            if isinstance(item, dict)
+        )
         guard = EventGuard(
             earnings_date=guard_payload.get("earnings_date"),
             block_new_position_within_days=int(guard_payload.get("block_new_position_within_days", 0) or 0),
@@ -2041,13 +2185,20 @@ class _ExecutionContractShim:
             ),
             invalid_if_close_below=self.payload.get("invalid_if_close_below"),
             invalid_if_intraday_below=self.payload.get("invalid_if_intraday_below"),
-            min_relative_volume=self.payload.get("min_relative_volume"),
+            min_relative_volume=self.payload.get("min_relative_volume") or levels.get("min_relative_volume"),
             session_vwap_preference=SessionVWAPPreference(
                 str(self.payload.get("session_vwap_preference") or "indifferent")
             ),
             event_guard=guard,
             reason_codes=tuple(self.payload.get("reason_codes") or []),
             notes=tuple(self.payload.get("notes") or []),
+            structured_levels=structured_levels,
+            vwap_required=_optional_bool(
+                self.payload.get("vwap_required", levels.get("vwap_required", False)),
+                default=False,
+            ),
+            earliest_pilot_time_local=self.payload.get("earliest_pilot_time_local")
+            or levels.get("earliest_pilot_time_local"),
             intraday_pilot_rule=self.payload.get("intraday_pilot_rule") or levels.get("intraday_pilot_rule"),
             close_confirm_rule=self.payload.get("close_confirm_rule") or levels.get("close_confirm_rule"),
             next_day_followthrough_rule=self.payload.get("next_day_followthrough_rule")
