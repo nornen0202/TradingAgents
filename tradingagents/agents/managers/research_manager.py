@@ -35,6 +35,7 @@ Your job:
 - when evidence is strong and timing is confirmed today, do not avoid BUY/OVERWEIGHT solely because NO_TRADE is available
 - focus on evidence arbitration rather than rhetorical style
 - make catalysts, invalidators, watchlist_triggers, and data_coverage explicit
+- when a setup mentions a concrete trigger, support, invalidation, trim, or resistance area, also populate execution_levels.levels with numeric prices or ranges instead of relying only on prose
 
 Use these objective reports for grounding:
 Market Report:

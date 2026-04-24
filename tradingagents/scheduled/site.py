@@ -128,6 +128,13 @@ def _copy_artifacts(
             if source.is_file():
                 download_dir.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source, download_dir / source.name)
+        for artifact_path in ((manifest.get("live_context_delta") or {}).get("artifacts") or {}).values():
+            if not artifact_path:
+                continue
+            source = _resolve_artifact_source(run_dir, artifact_path)
+            if source.is_file():
+                download_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, download_dir / source.name)
         return
 
     for source in portfolio_summary.get("downloadable_files", []):
@@ -137,6 +144,13 @@ def _copy_artifacts(
         shutil.copy2(source, download_dir / source.name)
 
     for artifact_path in ((manifest.get("portfolio_delta") or {}).get("artifacts") or {}).values():
+        if not artifact_path:
+            continue
+        source = _resolve_artifact_source(run_dir, artifact_path)
+        if source.is_file():
+            download_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, download_dir / source.name)
+    for artifact_path in ((manifest.get("live_context_delta") or {}).get("artifacts") or {}).values():
         if not artifact_path:
             continue
         source = _resolve_artifact_source(run_dir, artifact_path)
@@ -158,6 +172,9 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
     latest_portfolio = _load_portfolio_summary(Path(representative["_run_dir"])) if representative else {}
     latest_health_badges = ""
     latest_health_compact = _render_health_compact_card(manifest=representative, portfolio_summary=latest_portfolio) if representative else ""
+    representative_badge = ""
+    if representative and _run_phase_label(representative) in {"delayed_analysis_only", "post_close"}:
+        representative_badge = "<div class='warning-banner'>Not for live execution</div>"
     latest_portfolio_label = _portfolio_report_label(latest_portfolio)
     latest_portfolio_link = (
         f"<a class=\"button\" href=\"runs/{_escape(representative['run_id'])}/portfolio.html\">Open {_escape(latest_portfolio_label.lower())}</a>"
@@ -165,11 +182,19 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
         else ""
     )
     latest_technical_html = ""
+    latest_technical_run = latest if latest and representative and latest["run_id"] != representative["run_id"] else None
     if latest and representative and latest["run_id"] != representative["run_id"]:
         latest_technical_html = (
             "<p class='empty'>"
             f"가장 최근 기술 run: <a href='runs/{_escape(latest['run_id'])}/index.html'>{_escape(latest['run_id'])}</a>"
             f" ({_escape(_run_phase_display_label(latest))})"
+            "</p>"
+        )
+    if latest_technical_run:
+        latest_technical_html = (
+            "<p class='empty'>"
+            f"가장 최근 기술 run / Latest technical run: <a href='runs/{_escape(latest_technical_run['run_id'])}/index.html'>{_escape(latest_technical_run['run_id'])}</a>"
+            f" ({_escape(_run_phase_display_label(latest_technical_run))})"
             "</p>"
         )
     latest_html = (
@@ -188,9 +213,11 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
             <p><strong>Tickers</strong><span>{representative['summary']['total_tickers']}</span></p>
             <p><strong>Success</strong><span>{representative['summary']['successful_tickers']}</span></p>
             <p><strong>Failed</strong><span>{representative['summary']['failed_tickers']}</span></p>
+            {representative_badge}
             {latest_health_badges}
             {latest_health_compact}
             <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open 대표 투자 run</a>
+            <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open representative investment run</a>
             {latest_portfolio_link}
             {latest_technical_html}
           </div>
@@ -352,6 +379,7 @@ def _render_run_page(
         for warning in (manifest.get("warnings") or [])
     )
     delta_html = _render_portfolio_delta_section(manifest)
+    live_delta_html = _render_live_context_delta_section(manifest)
     timeline_html = _render_session_timeline_section(manifest, manifests or [])
     body = f"""
     <nav class="breadcrumbs"><a href="../../index.html">Home</a></nav>
@@ -370,6 +398,7 @@ def _render_run_page(
     </section>
     {warning_html}
     {delta_html}
+    {live_delta_html}
     {timeline_html}
     {portfolio_html}
     <section class="section">
@@ -403,6 +432,51 @@ def _render_portfolio_delta_section(manifest: dict[str, Any]) -> str:
       <article class="run-card">
         <p><strong>비교 run</strong><span>{_escape(from_run)}</span></p>
         <p class="long-field"><strong>요약</strong><span>{_escape(summary)}</span></p>
+        <div class="pill-row">
+          <a class="pill" href="../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(json_name)}">{_escape(json_name)}</a>
+          <a class="pill" href="../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(md_name)}">{_escape(md_name)}</a>
+        </div>
+      </article>
+    </section>
+    """
+
+
+def _render_live_context_delta_section(manifest: dict[str, Any]) -> str:
+    delta = manifest.get("live_context_delta") or {}
+    if not delta:
+        return (
+            "<section class='section'>"
+            "<div class='section-head'><h2>Report vs latest intraday reanalysis</h2></div>"
+            "<article class='run-card'>"
+            "<p>Latest intraday reanalysis not run.</p>"
+            "</article>"
+            "</section>"
+        )
+
+    artifacts = delta.get("artifacts") or {}
+    json_name = Path(str(artifacts.get("live_context_delta_json") or "live_context_delta.json")).name
+    md_name = Path(str(artifacts.get("report_vs_live_delta_markdown") or "report_vs_live_delta.md")).name
+    changed = [
+        str(item.get("ticker") or "")
+        for item in (delta.get("ticker_deltas") or [])
+        if str(item.get("base_action") or "").upper() != str(item.get("live_action") or "").upper()
+    ]
+    reasons: list[str] = []
+    for item in (delta.get("ticker_deltas") or []):
+        for code in item.get("reason_codes") or []:
+            normalized = str(code).strip().upper()
+            if normalized and normalized not in reasons:
+                reasons.append(normalized)
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>Report vs latest intraday reanalysis</h2>
+      </div>
+      <article class="run-card">
+        <p><strong>Base thesis</strong><span>{_escape(str(manifest.get('daily_thesis_trade_date') or manifest.get('run_id') or '-'))}</span></p>
+        <p><strong>Live context as of</strong><span>{_escape(str(delta.get('as_of') or '-'))}</span></p>
+        <p class="long-field"><strong>Changed tickers</strong><span>{_escape(', '.join(changed) if changed else 'None')}</span></p>
+        <p class="long-field"><strong>Why it changed</strong><span>{_escape(', '.join(reasons[:6]) if reasons else 'live price and volume did not materially change the thesis')}</span></p>
         <div class="pill-row">
           <a class="pill" href="../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(json_name)}">{_escape(json_name)}</a>
           <a class="pill" href="../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(md_name)}">{_escape(md_name)}</a>
@@ -452,6 +526,44 @@ def _session_timeline_items(manifest: dict[str, Any], manifests: list[dict[str, 
         )
     matched.sort(key=lambda row: row["started_at"])
     return matched
+
+
+def _render_live_ticker_context_delta_section(
+    *,
+    manifest: dict[str, Any],
+    ticker_summary: dict[str, Any],
+) -> str:
+    delta = manifest.get("live_context_delta") or {}
+    ticker = str(ticker_summary.get("ticker") or "").strip().upper()
+    ticker_delta = next(
+        (
+            item
+            for item in (delta.get("ticker_deltas") or [])
+            if str(item.get("ticker") or "").strip().upper() == ticker
+        ),
+        None,
+    )
+    if not ticker_delta:
+        if delta:
+            return ""
+        return (
+            "<section class='section'>"
+            "<div class='section-head'><h2>Latest intraday reanalysis</h2></div>"
+            "<article class='run-card'><p>Latest intraday reanalysis not run.</p></article>"
+            "</section>"
+        )
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>Latest intraday reanalysis</h2>
+      </div>
+      <article class="run-card">
+        <p><strong>Base action</strong><span>{_escape(str(ticker_delta.get('base_action') or '-'))}</span></p>
+        <p><strong>Live action</strong><span>{_escape(str(ticker_delta.get('live_action') or '-'))}</span></p>
+        <p class="long-field"><strong>Reason codes</strong><span>{_escape(', '.join(ticker_delta.get('reason_codes') or []) or '-')}</span></p>
+      </article>
+    </section>
+    """
 
 
 def _render_ticker_delta_section(
@@ -582,6 +694,7 @@ def _render_portfolio_page(
       </div>
     </section>
     {failure_html}
+    {_render_live_context_delta_section(manifest)}
     <section class="section prose">
       <div class="section-head">
         <h2>{_escape(portfolio_label)}</h2>
@@ -640,6 +753,10 @@ def _render_ticker_page(
         language=language,
         stale_after_seconds=stale_after_seconds,
     )
+    live_ticker_delta_html = _render_live_ticker_context_delta_section(
+        manifest=manifest,
+        ticker_summary=ticker_summary,
+    )
     ticker_delta_html = _render_ticker_delta_section(
         manifest=manifest,
         ticker_summary=ticker_summary,
@@ -673,6 +790,7 @@ def _render_ticker_page(
         {_advanced_diagnostics_html(ticker_summary, manifest, stale_after_seconds=stale_after_seconds)}
       </div>
     </section>
+    {live_ticker_delta_html}
     {ticker_delta_html}
     {failure_html}
     <section class="section prose">
@@ -728,6 +846,164 @@ def _ticker_investor_summary(
     language: str | None = None,
     stale_after_seconds: int = 180,
 ) -> dict[str, str]:
+    return _ticker_investor_summary_v2(
+        ticker_summary=ticker_summary,
+        manifest=manifest,
+        language=language,
+        stale_after_seconds=stale_after_seconds,
+    )
+
+
+def _ticker_investor_summary_v2(
+    *,
+    ticker_summary: dict[str, Any],
+    manifest: dict[str, Any] | None = None,
+    language: str | None = None,
+    stale_after_seconds: int = 180,
+) -> dict[str, str]:
+    manifest = manifest or {}
+    language = language or _manifest_language(manifest)
+    korean = language.lower().startswith("korean")
+    primary_condition = _decision_primary_condition(ticker_summary.get("decision"), language=language)
+    if primary_condition in {"", "-", "None", "?놁쓬"}:
+        primary_condition = "조건 확인" if korean else "confirmation"
+
+    display_state = _execution_display_state(ticker_summary, stale_after_seconds=stale_after_seconds)
+    raw_timing_state = str(_execution_payload(ticker_summary).get("execution_timing_state") or "").strip().upper()
+    timing_state = _normalize_execution_timing_state(raw_timing_state)
+    stale_or_degraded = _is_stale_or_degraded(ticker_summary, stale_after_seconds=stale_after_seconds)
+    execution_quality = _ticker_execution_data_quality(ticker_summary)
+    delayed_analysis_only = execution_quality == DELAYED_ANALYSIS_ONLY
+    stance = _decision_structured_value(ticker_summary.get("decision"), "portfolio_stance").upper()
+    entry_action = _decision_structured_value(ticker_summary.get("decision"), "entry_action").upper()
+
+    if korean:
+        if raw_timing_state == "LIVE_BREAKOUT":
+            today_action = f"장중 기준 돌파 구간 진입: {primary_condition}"
+            close_action = f"종가 확인 후 추가 검토: {primary_condition}"
+        elif raw_timing_state == "CLOSE_CONFIRM":
+            today_action = f"장중 조건 진입, 종가 확인 대기: {primary_condition}"
+            close_action = f"종가 기준 {primary_condition} 유지 시 실행 검토"
+        else:
+            today_map = {
+                "PILOT_READY": f"소형 pilot 가능: {primary_condition}",
+                "PILOT_BLOCKED_VOLUME": f"거래량 확인 전 pilot 보류: {primary_condition}",
+                "CLOSE_CONFIRM_PENDING": f"종가 확인 대기: {primary_condition}",
+                "CLOSE_CONFIRMED": f"종가 확인 대기: {primary_condition}",
+                "FAILED_BREAKOUT": f"실패 돌파 주의, 신규 금지 또는 축소 검토: {primary_condition}",
+                "PILOT_BLOCKED_FAILED_BREAKOUT": f"실패 돌파 주의, 신규 금지 또는 축소 검토: {primary_condition}",
+                "PRE_OPEN_THESIS_ONLY": f"장 시작 전 thesis only: {primary_condition}",
+                "NO_LIVE_DATA": f"live data 미확보: {primary_condition}",
+                "STALE_TRIGGERABLE": f"전략 후보 유지, live 실행은 보류: {primary_condition}",
+            }
+            close_map = {
+                "PILOT_READY": f"종가에 유지 확인 후 add 검토: {primary_condition}",
+                "CLOSE_CONFIRM_PENDING": f"종가 기준 {primary_condition} 유지 시 본격 add 검토",
+                "CLOSE_CONFIRMED": f"종가 기준 {primary_condition} 유지 시 본격 add 검토",
+                "FAILED_BREAKOUT": "종가에도 약하면 축소 우선 검토",
+                "PILOT_BLOCKED_FAILED_BREAKOUT": "종가에도 약하면 축소 우선 검토",
+            }
+            today_action = today_map.get(timing_state)
+            close_action = close_map.get(timing_state)
+            if not today_action:
+                if delayed_analysis_only:
+                    today_action = f"조건부 관찰: {primary_condition}"
+                elif display_state == "ACTIONABLE_NOW":
+                    today_action = f"오늘 바로 검토: {primary_condition}"
+                elif display_state == "TRIGGERED_PENDING_CLOSE":
+                    today_action = f"장중 조건 진입, 종가 확인 대기: {primary_condition}"
+                elif stance == "BULLISH" and entry_action in {"WAIT", "STARTER", "ADD"}:
+                    today_action = f"추격 매수보다 조건 확인 우선: {primary_condition}"
+                elif stance == "BEARISH" or entry_action == "EXIT":
+                    today_action = f"위험 조건 확인 후 축소 검토: {primary_condition}"
+                else:
+                    today_action = f"보유/관찰 유지: {primary_condition}"
+            if not close_action:
+                close_action = (
+                    f"종가 기준 {primary_condition} 이탈 시 축소 검토"
+                    if stance == "BEARISH" or entry_action == "EXIT"
+                    else f"종가에서 {primary_condition} 재확인"
+                )
+    else:
+        if raw_timing_state == "LIVE_BREAKOUT":
+            today_action = f"Live breakout zone entered: {primary_condition}"
+            close_action = f"Recheck at close before adding size: {primary_condition}"
+        elif raw_timing_state == "CLOSE_CONFIRM":
+            today_action = f"Intraday trigger seen; confirm close: {primary_condition}"
+            close_action = f"Add only if the close confirms: {primary_condition}"
+        else:
+            today_map = {
+                "PILOT_READY": f"Small pilot allowed intraday: {primary_condition}",
+                "PILOT_BLOCKED_VOLUME": f"Price triggered but volume confirmation is still missing: {primary_condition}",
+                "CLOSE_CONFIRM_PENDING": f"Trigger seen; wait for the close: {primary_condition}",
+                "CLOSE_CONFIRMED": f"Trigger seen; wait for the close: {primary_condition}",
+                "FAILED_BREAKOUT": f"Failed breakout risk; avoid fresh buys and review trims: {primary_condition}",
+                "PILOT_BLOCKED_FAILED_BREAKOUT": f"Failed breakout risk; avoid fresh buys and review trims: {primary_condition}",
+                "PRE_OPEN_THESIS_ONLY": f"Pre-open thesis only: {primary_condition}",
+                "NO_LIVE_DATA": f"No live data yet: {primary_condition}",
+                "STALE_TRIGGERABLE": f"Strategic candidate remains valid, but live execution is blocked: {primary_condition}",
+            }
+            close_map = {
+                "PILOT_READY": f"Recheck at close before adding size: {primary_condition}",
+                "CLOSE_CONFIRM_PENDING": f"Add only if the close confirms: {primary_condition}",
+                "CLOSE_CONFIRMED": f"Add only if the close confirms: {primary_condition}",
+                "FAILED_BREAKOUT": "If weakness persists into the close, prioritize trims",
+                "PILOT_BLOCKED_FAILED_BREAKOUT": "If weakness persists into the close, prioritize trims",
+            }
+            today_action = today_map.get(timing_state)
+            close_action = close_map.get(timing_state)
+            if not today_action:
+                if delayed_analysis_only:
+                    today_action = f"Delayed analysis only; monitor condition: {primary_condition}"
+                elif display_state == "ACTIONABLE_NOW":
+                    today_action = f"Review now: {primary_condition}"
+                elif display_state == "TRIGGERED_PENDING_CLOSE":
+                    today_action = f"Intraday trigger seen; confirm close: {primary_condition}"
+                elif stance == "BULLISH" and entry_action in {"WAIT", "STARTER", "ADD"}:
+                    today_action = f"Wait for confirmation: {primary_condition}"
+                elif stance == "BEARISH" or entry_action == "EXIT":
+                    today_action = f"Review risk before reducing: {primary_condition}"
+                else:
+                    today_action = f"Hold or watch: {primary_condition}"
+            if not close_action:
+                close_action = f"Recheck at close: {primary_condition}"
+
+    caveats: list[str] = []
+    if delayed_analysis_only:
+        caveats.append("지연 데이터이며 실시간 실행용은 아닙니다" if korean else "quotes are delayed and not execution-ready")
+    if stale_or_degraded:
+        caveats.append(
+            "장중 데이터가 stale/degraded라 종가 확인을 우선합니다"
+            if korean
+            else "intraday data is stale/degraded; prioritize close confirmation"
+        )
+    if bool(_execution_payload(ticker_summary).get("review_required")) or bool(ticker_summary.get("review_required")):
+        caveats.append("사람 검토 필요" if korean else "manual review required")
+    if caveats:
+        today_action = f"{today_action}. {' / '.join(caveats)}."
+
+    return {
+        "investment_view": present_investment_view(ticker_summary.get("decision") or ticker_summary.get("error"), language=language),
+        "today_action": today_action,
+        "intraday_pilot_action": _intraday_pilot_rule_summary(
+            ticker_summary,
+            primary_condition=primary_condition,
+            language=language,
+        ),
+        "close_action": close_action,
+        "next_day_action": _next_day_followthrough_summary(
+            ticker_summary,
+            primary_condition=primary_condition,
+            language=language,
+        ),
+        "key_levels": _key_levels_summary(ticker_summary, primary_condition=primary_condition, language=language),
+        "risk_summary": _risk_summary(ticker_summary, language=language),
+        "why_this_ticker": _why_this_ticker_summary(ticker_summary, language=language),
+        "research_basis": _research_basis_label(ticker_summary, language=language),
+        "execution_basis": _execution_basis_label(ticker_summary, language=language),
+        "basis_asof": _basis_asof_label(ticker_summary, language=language),
+    }
+
     manifest = manifest or {}
     language = language or _manifest_language(manifest)
     korean = language.lower().startswith("korean")
@@ -735,7 +1011,7 @@ def _ticker_investor_summary(
     if primary_condition in {"", "-", "None", "없음"}:
         primary_condition = "조건 확인" if korean else "confirmation"
     display_state = _execution_display_state(ticker_summary, stale_after_seconds=stale_after_seconds)
-    timing_state = str(_execution_payload(ticker_summary).get("execution_timing_state") or "").upper()
+    timing_state = _normalize_execution_timing_state(_execution_payload(ticker_summary).get("execution_timing_state"))
     stale_or_degraded = _is_stale_or_degraded(ticker_summary, stale_after_seconds=stale_after_seconds)
     execution_quality = _ticker_execution_data_quality(ticker_summary)
     delayed_analysis_only = execution_quality == DELAYED_ANALYSIS_ONLY
@@ -1035,6 +1311,16 @@ def _execution_payload(ticker_summary: dict[str, Any]) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
+def _normalize_execution_timing_state(value: Any) -> str:
+    state = str(value or "").strip().upper()
+    return {
+        "LIVE_BREAKOUT": "PILOT_READY",
+        "ACTIONABLE_LIVE": "PILOT_READY",
+        "LATE_SESSION_CONFIRM": "CLOSE_CONFIRM_PENDING",
+        "CLOSE_CONFIRM": "CLOSE_CONFIRM_PENDING",
+    }.get(state, state or "WAITING")
+
+
 def _execution_stale_threshold_seconds(manifest: dict[str, Any]) -> int:
     settings = manifest.get("settings") or {}
     raw = settings.get("execution_max_data_age_seconds")
@@ -1095,6 +1381,26 @@ def _execution_display_state(ticker_summary: dict[str, Any], *, stale_after_seco
 
 
 def _execution_timing_state_label(ticker_summary: dict[str, Any]) -> str:
+    state = _normalize_execution_timing_state(_execution_payload(ticker_summary).get("execution_timing_state"))
+    labels = {
+        "WAITING": "Waiting",
+        "NO_LIVE_DATA": "No live data",
+        "PRE_OPEN_THESIS_ONLY": "Pre-open thesis only",
+        "PILOT_READY": "Pilot ready",
+        "PILOT_BLOCKED_VOLUME": "Pilot blocked by volume",
+        "PILOT_BLOCKED_FAILED_BREAKOUT": "Pilot blocked by failed breakout",
+        "CLOSE_CONFIRM_PENDING": "Close confirm pending",
+        "CLOSE_CONFIRMED": "Close confirmed",
+        "NEXT_DAY_FOLLOWTHROUGH_PENDING": "Next day follow-through",
+        "FAILED_BREAKOUT": "Failed breakout",
+        "SUPPORT_HOLD": "Support hold",
+        "SUPPORT_FAIL": "Support fail",
+        "STALE_TRIGGERABLE": "Stale triggerable",
+        "INVALIDATED": "Invalidated",
+        "DEGRADED": "Degraded",
+    }
+    return labels.get(state, state.title().replace("_", " "))
+
     state = str(_execution_payload(ticker_summary).get("execution_timing_state") or "").upper()
     mapping = {
         "WAITING": "대기",
@@ -1119,7 +1425,25 @@ def _today_summary(
     stale_after_seconds: int = 180,
 ) -> str:
     payload = _execution_payload(ticker_summary)
+    timing_state = _normalize_execution_timing_state(payload.get("execution_timing_state")) if payload else "WAITING"
     is_korean = language.lower().startswith("korean")
+    if timing_state in {
+        "PILOT_READY",
+        "PILOT_BLOCKED_VOLUME",
+        "PILOT_BLOCKED_FAILED_BREAKOUT",
+        "FAILED_BREAKOUT",
+        "CLOSE_CONFIRM_PENDING",
+        "CLOSE_CONFIRMED",
+        "PRE_OPEN_THESIS_ONLY",
+        "NO_LIVE_DATA",
+        "STALE_TRIGGERABLE",
+    } and payload:
+        return _ticker_investor_summary(
+            ticker_summary,
+            {},
+            language=language,
+            stale_after_seconds=stale_after_seconds,
+        )["today_action"].split(".")[0]
     if not payload:
         return "장 시작 전 스냅샷, 장중 데이터 대기" if is_korean else "Pre-open snapshot; waiting for intraday refresh"
 
@@ -1325,6 +1649,29 @@ def _load_execution_summary(run_dir: Path) -> dict[str, Any]:
 def _render_execution_summary_section(summary: dict[str, Any]) -> str:
     if not summary:
         return ""
+    pilot_ready = ", ".join(summary.get("pilot_ready") or []) or "-"
+    close_confirm = ", ".join(summary.get("close_confirm") or summary.get("triggered_pending_close") or []) or "-"
+    pilot_blocked_volume = ", ".join(summary.get("pilot_blocked_volume") or []) or "-"
+    next_day = ", ".join(summary.get("next_day_followthrough_pending") or []) or "-"
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>Advanced diagnostics</h2>
+      </div>
+      <details class="run-card advanced-diagnostics">
+        <summary>Execution overlay details</summary>
+        <p><strong>Checkpoint</strong><span>{_escape(summary.get('refresh_checkpoint') or '-')}</span></p>
+        <p><strong>Overlay phase</strong><span>{_escape(((summary.get('overlay_phase') or {}).get('name')) or '-')}</span></p>
+        <p><strong>Execution as of</strong><span>{_escape(summary.get('execution_asof') or '-')}</span></p>
+        <p><strong>Pilot ready</strong><span>{_escape(pilot_ready)}</span></p>
+        <p><strong>Close confirm</strong><span>{_escape(close_confirm)}</span></p>
+        <p><strong>Pilot blocked by volume</strong><span>{_escape(pilot_blocked_volume)}</span></p>
+        <p><strong>Next day follow-through</strong><span>{_escape(next_day)}</span></p>
+        <p><strong>Failed breakout</strong><span>{_escape(', '.join(summary.get('failed_breakout') or []) or '-')}</span></p>
+        <p><strong>Stale triggerable</strong><span>{_escape(', '.join(summary.get('stale_triggerable') or []) or '-')}</span></p>
+      </details>
+    </section>
+    """
     def _join(values: Any) -> str:
         if not isinstance(values, list) or not values:
             return "-"
@@ -1398,9 +1745,9 @@ def _representative_run_sort_key(manifest: dict[str, Any]) -> tuple[int, int, in
     phase_rank = {
         "regular_session": 0,
         "in_session": 0,
-        "delayed_analysis_only": 1,
-        "pre_open": 2,
-        "post_close": 3,
+        "pre_open": 1,
+        "post_close": 2,
+        "delayed_analysis_only": 3,
         "historical_review": 4,
     }.get(phase, 5)
     stale_ratio = _run_stale_ratio(manifest)

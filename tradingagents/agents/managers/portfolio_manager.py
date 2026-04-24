@@ -36,7 +36,8 @@ def create_portfolio_manager(llm, memory):
 Use the common decision schema and be explicit about rating (legacy), portfolio_stance, entry_action, setup_quality, confidence, time horizon, entry logic, exit logic, position sizing, risk limits, catalysts, invalidators, watchlist_triggers, data_coverage, and execution_levels.
 NO_TRADE is allowed as a legacy rating, but do not collapse all outcomes into NO_TRADE.
 Always distinguish: (1) directional stance, (2) immediate entry decision, (3) watchlist maintenance triggers, and (4) whether a starter could be justified when conditions are met.
-For regular-session investors, split execution_levels into intraday_pilot_rule, close_confirm_rule, next_day_followthrough_rule, failed_breakout_rule, trim_rule, funding_priority, entry_window, and trigger_quality.
+For regular-session investors, split execution_levels into intraday_pilot_rule, close_confirm_rule, next_day_followthrough_rule, failed_breakout_rule, trim_rule, numeric levels[], min_relative_volume, vwap_required, earliest_pilot_time_local, funding_priority, entry_window, and trigger_quality.
+Always provide machine-actionable execution_levels.levels with numeric price or range fields whenever the thesis contains a concrete trigger, support, invalidation, trim, or resistance area.
 Intraday pilot means a small starter only; full-size add/entry belongs in close_confirm_rule or next_day_followthrough_rule.
 If the thesis is constructive but timing is incomplete, keep stance constructive, set entry_action=WAIT, and choose HOLD or OVERWEIGHT as the legacy rating when the view remains investable.
 Reserve NO_TRADE for weak, contradictory, or insufficient evidence, no favorable setup to monitor, or data quality gaps that make the view non-investable.

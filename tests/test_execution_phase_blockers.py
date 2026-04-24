@@ -82,8 +82,8 @@ def test_intraday_breakout_exposes_live_breakout_timing_state():
     )
 
     assert update.decision_state == DecisionState.ACTIONABLE_NOW
-    assert update.execution_timing_state == ExecutionTimingState.LIVE_BREAKOUT
-    assert update.to_dict()["execution_timing_state"] == "LIVE_BREAKOUT"
+    assert update.execution_timing_state == ExecutionTimingState.PILOT_READY
+    assert update.to_dict()["execution_timing_state"] == "PILOT_READY"
 
 
 def test_close_confirmation_exposes_close_confirm_timing_state():
@@ -96,8 +96,8 @@ def test_close_confirmation_exposes_close_confirm_timing_state():
     )
 
     assert update.decision_state == DecisionState.TRIGGERED_PENDING_CLOSE
-    assert update.execution_timing_state == ExecutionTimingState.CLOSE_CONFIRM
-    assert update.to_dict()["execution_timing_state"] == "CLOSE_CONFIRM"
+    assert update.execution_timing_state == ExecutionTimingState.CLOSE_CONFIRM_PENDING
+    assert update.to_dict()["execution_timing_state"] == "CLOSE_CONFIRM_PENDING"
 
 
 def test_build_execution_summary_handles_empty_updates():

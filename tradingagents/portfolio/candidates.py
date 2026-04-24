@@ -342,14 +342,28 @@ def _apply_execution_overlay_actions(
 ) -> tuple[str, str]:
     decision_state = str(execution_update.get("decision_state") or "").upper()
     decision_now = str(execution_update.get("decision_now") or "").upper()
-    timing_state = str(execution_update.get("execution_timing_state") or "").upper()
+    timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
 
     if timing_state == "FAILED_BREAKOUT":
         if is_held:
             return ("HOLD", "REDUCE_IF_TRIGGERED")
         return ("WATCH", "WATCH_TRIGGER")
+    if timing_state == "PILOT_BLOCKED_FAILED_BREAKOUT":
+        if is_held:
+            preserved_trigger = "ADD_IF_TRIGGERED" if action_if_triggered == "STARTER_IF_TRIGGERED" else action_if_triggered
+            return ("HOLD", preserved_trigger or "ADD_IF_TRIGGERED")
+        preserved_trigger = action_if_triggered if action_if_triggered in {"STARTER_IF_TRIGGERED", "ADD_IF_TRIGGERED"} else "STARTER_IF_TRIGGERED"
+        return ("WATCH", preserved_trigger)
     if timing_state == "SUPPORT_FAIL":
         return ("REDUCE_NOW" if is_held else "WATCH", "EXIT_IF_TRIGGERED" if is_held else "NONE")
+    if timing_state in {"NO_LIVE_DATA", "PRE_OPEN_THESIS_ONLY"}:
+        if is_held:
+            preserved_trigger = action_if_triggered
+            if preserved_trigger == "STARTER_IF_TRIGGERED":
+                preserved_trigger = "ADD_IF_TRIGGERED"
+            return ("HOLD", preserved_trigger)
+        preserved_trigger = action_if_triggered if action_if_triggered in {"STARTER_IF_TRIGGERED", "ADD_IF_TRIGGERED", "WATCH_TRIGGER"} else "NONE"
+        return ("WATCH", preserved_trigger)
     if decision_state == "DEGRADED" or timing_state == "STALE_TRIGGERABLE":
         if is_held:
             preserved_trigger = action_if_triggered
@@ -360,14 +374,26 @@ def _apply_execution_overlay_actions(
         return ("WATCH", preserved_trigger)
     if decision_state == "INVALIDATED":
         return ("REDUCE_NOW" if is_held else "WATCH", "EXIT_IF_TRIGGERED" if is_held else "NONE")
-    if decision_state == "TRIGGERED_PENDING_CLOSE":
+    if decision_state == "TRIGGERED_PENDING_CLOSE" or timing_state in {
+        "CLOSE_CONFIRM_PENDING",
+        "CLOSE_CONFIRMED",
+        "NEXT_DAY_FOLLOWTHROUGH_PENDING",
+        "LATE_SESSION_CONFIRM",
+        "CLOSE_CONFIRM",
+    }:
         if is_held:
             return ("HOLD", "ADD_IF_TRIGGERED")
         return ("WATCH", "STARTER_IF_TRIGGERED")
-    if timing_state == "LATE_SESSION_CONFIRM":
+    if timing_state == "PILOT_READY":
         if is_held:
-            return ("HOLD", "ADD_IF_TRIGGERED")
-        return ("WATCH", "STARTER_IF_TRIGGERED")
+            return ("ADD_NOW", "NONE")
+        return ("STARTER_NOW", "NONE")
+    if timing_state == "PILOT_BLOCKED_VOLUME":
+        if is_held:
+            preserved_trigger = "ADD_IF_TRIGGERED" if action_if_triggered == "STARTER_IF_TRIGGERED" else action_if_triggered
+            return ("HOLD", preserved_trigger or "ADD_IF_TRIGGERED")
+        preserved_trigger = action_if_triggered if action_if_triggered in {"STARTER_IF_TRIGGERED", "ADD_IF_TRIGGERED"} else "STARTER_IF_TRIGGERED"
+        return ("WATCH", preserved_trigger)
     if decision_state == "ACTIONABLE_NOW":
         mapping = {
             "STARTER_NOW": "STARTER_NOW",
@@ -394,10 +420,18 @@ def _execution_feasibility_now(
         decision_state = str(execution_update.get("decision_state") or "").upper()
         data_health = str(execution_update.get("data_health") or "").upper()
         reason_codes = {str(item).strip().lower() for item in (execution_update.get("reason_codes") or [])}
-        if decision_state == "DEGRADED" or data_health == "STALE" or "stale_market_data" in reason_codes:
+        timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
+        if (
+            decision_state == "DEGRADED"
+            or data_health in {"STALE", "DELAYED", "UNAVAILABLE"}
+            or "stale_market_data" in reason_codes
+            or timing_state in {"STALE_TRIGGERABLE", "NO_LIVE_DATA"}
+        ):
             return "blocked_stale_or_degraded_data"
         if decision_state == "INVALIDATED":
             return "risk_exit_review"
+        if timing_state == "PILOT_READY":
+            return "executable_now"
     if action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}:
         return "executable_now"
     return "not_actionable_now"
@@ -419,7 +453,7 @@ def _execution_health(
     }
     if not execution_update:
         return payload
-    timing_state = str(execution_update.get("execution_timing_state") or "").upper()
+    timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
     source = execution_update.get("source") if isinstance(execution_update.get("source"), dict) else {}
     payload["execution_timing_state"] = timing_state
     payload["market_session"] = source.get("market_session")
@@ -437,12 +471,33 @@ def _execution_health(
 def _primary_trigger_type(execution_update: dict[str, Any] | None) -> str:
     if not execution_update:
         return ""
-    timing_state = str(execution_update.get("execution_timing_state") or "").upper()
-    if timing_state in {"LIVE_BREAKOUT", "FAILED_BREAKOUT", "LATE_SESSION_CONFIRM"}:
+    timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
+    if timing_state in {
+        "LIVE_BREAKOUT",
+        "FAILED_BREAKOUT",
+        "LATE_SESSION_CONFIRM",
+        "PILOT_READY",
+        "PILOT_BLOCKED_VOLUME",
+        "PILOT_BLOCKED_FAILED_BREAKOUT",
+        "CLOSE_CONFIRM_PENDING",
+        "CLOSE_CONFIRMED",
+        "CLOSE_CONFIRM",
+    }:
         return "breakout"
     if timing_state in {"SUPPORT_HOLD", "SUPPORT_FAIL"}:
         return "support"
     return timing_state.lower()
+
+
+def _normalize_timing_state(value: str) -> str:
+    mapping = {
+        "LIVE_BREAKOUT": "PILOT_READY",
+        "LATE_SESSION_CONFIRM": "CLOSE_CONFIRM_PENDING",
+        "CLOSE_CONFIRM": "CLOSE_CONFIRM_PENDING",
+        "ACTIONABLE_LIVE": "PILOT_READY",
+    }
+    normalized = str(value or "").strip().upper()
+    return mapping.get(normalized, normalized)
 
 
 def _safe_float(value: Any) -> float | None:

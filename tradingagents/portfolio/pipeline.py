@@ -87,6 +87,7 @@ def run_portfolio_pipeline(
             snapshot=snapshot,
             recommendation=recommendation,
             candidates=scored_candidates,
+            live_context_delta=manifest.get("live_context_delta"),
         )
         markdown, report_writer_payload = polish_portfolio_report_markdown(
             markdown,

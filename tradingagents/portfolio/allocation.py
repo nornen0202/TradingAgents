@@ -580,7 +580,7 @@ def _intraday_pilot_allowed(
         return False
     if profile.intraday_pilot_forbid_failed_breakout and str(
         candidate.data_health.get("execution_timing_state") or ""
-    ).upper() == "FAILED_BREAKOUT":
+    ).upper() in {"FAILED_BREAKOUT", "PILOT_BLOCKED_FAILED_BREAKOUT"}:
         return False
     if profile.intraday_pilot_require_vwap and candidate.data_health.get("session_vwap_ok") is not True:
         return False
@@ -698,13 +698,18 @@ def _build_candidate_counts(
     pilot_ready = [
         action
         for action in actions
-        if action.action_now == "STARTER_NOW" or action.action_if_triggered == "STARTER_IF_TRIGGERED"
+        if _normalized_timing_state(action) == "PILOT_READY"
+        and str(action.data_health.get("execution_data_quality") or "").upper() == "REALTIME_EXECUTION_READY"
+        and (
+            action.action_now in {"STARTER_NOW", "ADD_NOW"}
+            or action.action_if_triggered in _TRIGGER_BUY_ACTIONS
+        )
     ]
     close_confirm = [
         action
         for action in actions
-        if action.action_if_triggered in _STRATEGIC_TRIGGER_ACTIONS
-        or str(action.data_health.get("execution_timing_state") or "").upper() in {"LATE_SESSION_CONFIRM", "CLOSE_CONFIRM"}
+        if _normalized_timing_state(action) in {"CLOSE_CONFIRM_PENDING", "CLOSE_CONFIRMED"}
+        and action.action_if_triggered in _TRIGGER_BUY_ACTIONS
     ]
     return {
         "strategic_trigger_candidates_count": len(strategic_trigger_candidates),
@@ -832,9 +837,20 @@ def _build_scenario_plan(
     immediate_orders = [action for action in actions if action.delta_krw_now != 0]
     budgeted_triggers = [action for action in actions if action.delta_krw_if_triggered != 0]
     switch_orders = _build_switch_scenario_orders(actions=actions, snapshot=snapshot)
-    aggressive_orders = _build_aggressive_scenario_orders(actions=actions, snapshot=snapshot, profile=profile)
+    cash_agnostic_orders = _build_cash_agnostic_scenario_orders(actions=actions, snapshot=snapshot, profile=profile)
     add_if_funded = list(funding_plan.get("top_add_if_funded") or [])
     trim_sources = list(funding_plan.get("top_trim_if_funding_needed") or [])
+    cash_agnostic = {
+        "label": "Cash-agnostic",
+        "enabled": bool(cash_agnostic_orders),
+        "strategy_ranking": add_if_funded[:5],
+        "orders_if_triggered": cash_agnostic_orders,
+        "gross_buy_krw": sum(
+            max(int(order.get("amount_krw", 0)), 0)
+            for order in cash_agnostic_orders
+            if order.get("side") == "buy"
+        ),
+    }
     return {
         "strict": {
             "label": "Strict",
@@ -857,14 +873,8 @@ def _build_scenario_plan(
             "gross_buy_krw": sum(max(int(order.get("amount_krw", 0)), 0) for order in switch_orders if order.get("side") == "buy"),
             "gross_sell_krw": sum(max(int(order.get("amount_krw", 0)), 0) for order in switch_orders if order.get("side") == "sell"),
         },
-        "aggressive": {
-            "label": "Aggressive",
-            "enabled": bool(aggressive_orders),
-            "requires_buffer_sacrifice": snapshot.available_cash_krw < snapshot.constraints.min_cash_buffer_krw,
-            "would_buy_if_buffer_relaxed": add_if_funded[:3],
-            "orders_if_triggered": aggressive_orders,
-            "gross_buy_krw": sum(max(int(order.get("amount_krw", 0)), 0) for order in aggressive_orders if order.get("side") == "buy"),
-        },
+        "cash_agnostic": cash_agnostic,
+        "aggressive": cash_agnostic,
     }
 
 
@@ -936,7 +946,7 @@ def _build_switch_scenario_orders(
     return sell_orders + buy_orders
 
 
-def _build_aggressive_scenario_orders(
+def _build_cash_agnostic_scenario_orders(
     *,
     actions: tuple[PortfolioAction, ...],
     snapshot: AccountSnapshot,
@@ -949,18 +959,17 @@ def _build_aggressive_scenario_orders(
     )
     if not add_actions:
         return []
-    investable_cash = max(snapshot.available_cash_krw - snapshot.constraints.min_cash_buffer_krw, 0)
-    if investable_cash <= 0:
-        budget = min(max(int(profile.trigger_budget_krw or 0), snapshot.constraints.min_trade_krw), max(snapshot.available_cash_krw, 0))
-    else:
-        budget = min(int(profile.trigger_budget_krw or investable_cash), investable_cash)
+    budget = max(
+        int(profile.trigger_budget_krw or 0),
+        snapshot.constraints.min_trade_krw * min(len(add_actions), 3),
+    )
     if budget < snapshot.constraints.min_trade_krw:
         return []
     return _allocate_buy_scenario_orders(
         actions=add_actions,
         snapshot=snapshot,
         budget_krw=budget,
-        scenario="aggressive_buy_if_triggered",
+        scenario="cash_agnostic_buy_if_triggered",
         note="버퍼 일부 희생을 허용하는 조건부 매수",
     )
 
@@ -1021,6 +1030,17 @@ def _scenario_order_from_action(
         "rank": action.capital_reallocation_rank,
         "note": note,
     }
+
+
+def _normalized_timing_state(action: PortfolioAction) -> str:
+    raw = str(action.data_health.get("execution_timing_state") or "").upper()
+    mapping = {
+        "LIVE_BREAKOUT": "PILOT_READY",
+        "LATE_SESSION_CONFIRM": "CLOSE_CONFIRM_PENDING",
+        "CLOSE_CONFIRM": "CLOSE_CONFIRM_PENDING",
+        "ACTIONABLE_LIVE": "PILOT_READY",
+    }
+    return mapping.get(raw, raw)
 
 
 def _add_if_funded_score(action: PortfolioAction) -> float:

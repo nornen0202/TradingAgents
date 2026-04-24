@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION
 from tradingagents.schemas import (
     ActionIfTriggered,
     BreakoutConfirmation,
@@ -36,6 +37,44 @@ def evaluate_execution_state(
     }
 
     staleness_seconds = int(max(0, (now - datetime.fromisoformat(market.asof)).total_seconds()))
+    data_quality = str(market.execution_data_quality or "").upper()
+    market_session = str(market.market_session or "").strip().lower()
+
+    if market_session == "pre_open":
+        return _build_update(
+            contract,
+            market,
+            now,
+            staleness_seconds=staleness_seconds,
+            decision_state=DecisionState.WAIT,
+            decision_now=DecisionNow.NONE,
+            reason_codes=("pre_open_thesis_only",),
+            trigger_status=trigger_status,
+            data_health="OK",
+            refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=ExecutionTimingState.PRE_OPEN_THESIS_ONLY,
+        )
+
+    if data_quality in {DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION}:
+        timing_state = (
+            ExecutionTimingState.STALE_TRIGGERABLE
+            if contract.action_if_triggered != ActionIfTriggered.NONE
+            else ExecutionTimingState.DEGRADED
+        )
+        return _build_update(
+            contract,
+            market,
+            now,
+            staleness_seconds=staleness_seconds,
+            decision_state=DecisionState.DEGRADED,
+            decision_now=DecisionNow.NONE,
+            reason_codes=("delayed_or_invalid_market_data",),
+            trigger_status=trigger_status,
+            data_health="STALE" if data_quality == STALE_INVALID_FOR_EXECUTION else "DELAYED",
+            refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=timing_state,
+        )
+
     if staleness_seconds > max_data_age_seconds:
         timing_state = (
             ExecutionTimingState.STALE_TRIGGERABLE
@@ -57,7 +96,6 @@ def evaluate_execution_state(
         )
 
     if is_event_guard_active(contract.event_guard, now):
-        reason_codes.append("pre_event_guard_active")
         return _build_update(
             contract,
             market,
@@ -65,7 +103,7 @@ def evaluate_execution_state(
             staleness_seconds=staleness_seconds,
             decision_state=DecisionState.WAIT,
             decision_now=DecisionNow.NONE,
-            reason_codes=tuple(reason_codes),
+            reason_codes=("pre_event_guard_active",),
             trigger_status=trigger_status,
             data_health="OK",
             refresh_checkpoint=refresh_checkpoint,
@@ -74,10 +112,12 @@ def evaluate_execution_state(
 
     intraday_low = market.day_low if market.day_low is not None else market.last_price
     intraday_high = market.day_high if market.day_high is not None else market.last_price
+    decision_state = DecisionState.WAIT
+    decision_now = DecisionNow.NONE
+    execution_timing_state = ExecutionTimingState.WAITING
 
     if contract.invalid_if_intraday_below is not None and intraday_low < contract.invalid_if_intraday_below:
         trigger_status["invalidated"] = True
-        reason_codes.append("intraday_invalidation_breached")
         return _build_update(
             contract,
             market,
@@ -85,45 +125,69 @@ def evaluate_execution_state(
             staleness_seconds=staleness_seconds,
             decision_state=DecisionState.INVALIDATED,
             decision_now=DecisionNow.EXIT_NOW,
-            reason_codes=tuple(reason_codes),
+            reason_codes=("intraday_invalidation_breached",),
             trigger_status=trigger_status,
             data_health="OK",
             refresh_checkpoint=refresh_checkpoint,
             execution_timing_state=ExecutionTimingState.INVALIDATED,
         )
 
-    decision_state = DecisionState.WAIT
-    decision_now = DecisionNow.NONE
-    execution_timing_state = ExecutionTimingState.WAITING
+    breakout_hit = contract.breakout_level is not None and intraday_high >= contract.breakout_level
+    rvol_confirmed = contract.min_relative_volume is None or ((market.relative_volume or 0.0) >= contract.min_relative_volume)
+    vwap_confirmed = _vwap_check(contract.session_vwap_preference, market.last_price, market.session_vwap)
+    pilot_window_open = _pilot_window_open(
+        market_asof=market.asof,
+        earliest_pilot_time_local=contract.earliest_pilot_time_local,
+    )
 
-    if contract.breakout_level is not None and intraday_high >= contract.breakout_level:
+    if breakout_hit:
         trigger_status["breakout_hit_intraday"] = True
-        rvol_ok = contract.min_relative_volume is None or ((market.relative_volume or 0.0) >= contract.min_relative_volume)
-        if rvol_ok:
-            if contract.breakout_confirmation == BreakoutConfirmation.CLOSE_ABOVE:
-                decision_state = DecisionState.TRIGGERED_PENDING_CLOSE
-                execution_timing_state = (
-                    ExecutionTimingState.LATE_SESSION_CONFIRM
-                    if _is_late_session(now, refresh_checkpoint=refresh_checkpoint)
-                    else ExecutionTimingState.CLOSE_CONFIRM
-                )
-                trigger_status["close_confirmation_pending"] = True
-                reason_codes.append("close_confirmation_required")
-            else:
-                if market.last_price >= contract.breakout_level:
-                    decision_state = DecisionState.ACTIONABLE_NOW
-                    decision_now = _decision_now_from_action(contract.action_if_triggered)
-                    execution_timing_state = ExecutionTimingState.LIVE_BREAKOUT
-                    reason_codes.append("breakout_confirmed")
-                else:
-                    decision_state = DecisionState.ARMED
-                    execution_timing_state = ExecutionTimingState.FAILED_BREAKOUT
-                    trigger_status["failed_breakout"] = True
-                    reason_codes.append("failed_breakout")
-        else:
+        last_price_above_breakout = market.last_price >= float(contract.breakout_level or 0.0)
+
+        if not last_price_above_breakout:
+            trigger_status["failed_breakout"] = True
             decision_state = DecisionState.ARMED
-            execution_timing_state = ExecutionTimingState.LIVE_BREAKOUT
-            reason_codes.append("relative_volume_unconfirmed")
+            decision_now = DecisionNow.NONE
+            execution_timing_state = (
+                ExecutionTimingState.PILOT_BLOCKED_FAILED_BREAKOUT
+                if contract.action_if_triggered == ActionIfTriggered.STARTER
+                else ExecutionTimingState.FAILED_BREAKOUT
+            )
+            reason_codes.append("failed_breakout")
+        elif contract.breakout_confirmation in {BreakoutConfirmation.CLOSE_ABOVE, BreakoutConfirmation.END_OF_DAY_ONLY}:
+            trigger_status["close_confirmation_pending"] = True
+            if market_session == "post_close":
+                decision_state = DecisionState.WAIT
+                decision_now = DecisionNow.NONE
+                execution_timing_state = (
+                    ExecutionTimingState.CLOSE_CONFIRMED
+                    if rvol_confirmed and vwap_confirmed
+                    else ExecutionTimingState.CLOSE_CONFIRM_PENDING
+                )
+                reason_codes.append("close_confirmed" if execution_timing_state == ExecutionTimingState.CLOSE_CONFIRMED else "close_confirmation_required")
+            else:
+                decision_state = DecisionState.TRIGGERED_PENDING_CLOSE
+                decision_now = DecisionNow.NONE
+                execution_timing_state = ExecutionTimingState.CLOSE_CONFIRM_PENDING
+                reason_codes.append("close_confirmation_required")
+        elif not pilot_window_open:
+            decision_state = DecisionState.ARMED
+            decision_now = DecisionNow.NONE
+            execution_timing_state = ExecutionTimingState.CLOSE_CONFIRM_PENDING
+            reason_codes.append("pilot_window_not_open")
+        elif not rvol_confirmed or not vwap_confirmed:
+            decision_state = DecisionState.ARMED
+            decision_now = DecisionNow.NONE
+            execution_timing_state = ExecutionTimingState.PILOT_BLOCKED_VOLUME
+            if not rvol_confirmed:
+                reason_codes.append("relative_volume_unconfirmed")
+            if not vwap_confirmed:
+                reason_codes.append("vwap_unconfirmed")
+        else:
+            decision_state = DecisionState.ACTIONABLE_NOW
+            decision_now = _decision_now_from_action(contract.action_if_triggered)
+            execution_timing_state = ExecutionTimingState.PILOT_READY
+            reason_codes.append("pilot_ready")
 
     if contract.pullback_buy_zone is not None:
         if market.last_price < contract.pullback_buy_zone.low and intraday_low < contract.pullback_buy_zone.low:
@@ -133,19 +197,27 @@ def evaluate_execution_state(
                 decision_now = DecisionNow.NONE
                 execution_timing_state = ExecutionTimingState.SUPPORT_FAIL
                 reason_codes.append("support_zone_failed")
+
         in_zone = contract.pullback_buy_zone.low <= market.last_price <= contract.pullback_buy_zone.high
         if in_zone:
             trigger_status["pullback_zone_active"] = True
             trigger_status["support_hold"] = True
-            if _vwap_check(contract.session_vwap_preference, market.last_price, market.session_vwap):
+            if vwap_confirmed:
                 decision_state = DecisionState.ACTIONABLE_NOW
                 decision_now = _decision_now_from_action(contract.action_if_triggered)
                 execution_timing_state = ExecutionTimingState.SUPPORT_HOLD
                 reason_codes.append("pullback_zone_actionable")
             else:
                 decision_state = DecisionState.ARMED
-                execution_timing_state = ExecutionTimingState.SUPPORT_HOLD
-                reason_codes.append("vwap_filter_not_met")
+                decision_now = DecisionNow.NONE
+                execution_timing_state = ExecutionTimingState.PILOT_BLOCKED_VOLUME
+                reason_codes.append("vwap_unconfirmed")
+
+    if market_session == "post_close" and execution_timing_state == ExecutionTimingState.WAITING and contract.breakout_level is not None:
+        decision_state = DecisionState.WAIT
+        decision_now = DecisionNow.NONE
+        execution_timing_state = ExecutionTimingState.NEXT_DAY_FOLLOWTHROUGH_PENDING
+        reason_codes.append("next_day_followthrough_pending")
 
     if not reason_codes:
         reason_codes.append("waiting_for_trigger")
@@ -184,23 +256,15 @@ def _decision_now_from_action(action: ActionIfTriggered) -> DecisionNow:
     return mapping[action]
 
 
-def _is_late_session(now: datetime, *, refresh_checkpoint: str | None) -> bool:
-    if not refresh_checkpoint:
-        return False
-    checkpoint = str(refresh_checkpoint).strip().lower()
-    if "late" in checkpoint or "close" in checkpoint:
+def _pilot_window_open(*, market_asof: str, earliest_pilot_time_local: str | None) -> bool:
+    if not earliest_pilot_time_local:
         return True
-    if not checkpoint.startswith(("14:", "15:")):
-        return False
-    local = now
-    if now.tzinfo is not None:
-        try:
-            from zoneinfo import ZoneInfo
-
-            local = now.astimezone(ZoneInfo("Asia/Seoul"))
-        except Exception:
-            local = now
-    return (local.hour, local.minute) >= (14, 30)
+    try:
+        parsed = datetime.fromisoformat(str(market_asof))
+        hour_text, minute_text = str(earliest_pilot_time_local).split(":", 1)
+        return (parsed.hour, parsed.minute) >= (int(hour_text), int(minute_text))
+    except Exception:
+        return True
 
 
 def _build_update(
@@ -240,7 +304,11 @@ def _build_update(
         avg20_daily_volume=market.avg20_daily_volume,
         relative_volume=market.relative_volume,
         price_state="INTRADAY",
-        volume_state="CONFIRMED" if (market.relative_volume or 0.0) >= (contract.min_relative_volume or 0.0) else "UNCONFIRMED",
+        volume_state=(
+            "CONFIRMED"
+            if (market.relative_volume or 0.0) >= (contract.min_relative_volume or 0.0)
+            else "UNCONFIRMED"
+        ),
         event_state="GUARDED" if "pre_event_guard_active" in reason_codes else "OPEN",
         decision_state=decision_state,
         decision_now=decision_now,

@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass
 from enum import Enum
 from json import JSONDecodeError
-from typing import Any, Mapping
+from typing import Any, Literal, Mapping
 
 
 class StructuredDecisionValidationError(ValueError):
@@ -64,6 +64,15 @@ class SocialSource(str, Enum):
     UNAVAILABLE = "unavailable"
 
 
+PriceLevelType = Literal["breakout", "support", "pullback", "invalidation", "trim", "resistance"]
+PriceLevelConfirmation = Literal["intraday", "close", "two_bar", "next_day"]
+FundingPriority = Literal["low", "medium", "high"]
+
+_SOCIAL_SOURCE_ALIASES = {
+    "available": SocialSource.DEDICATED.value,
+}
+
+
 @dataclass(frozen=True)
 class DataCoverage:
     company_news_count: int
@@ -81,13 +90,43 @@ class DataCoverage:
 
 
 @dataclass(frozen=True)
+class PriceLevel:
+    label: str
+    level_type: PriceLevelType
+    price: float | None = None
+    low: float | None = None
+    high: float | None = None
+    currency: str | None = None
+    confirmation: PriceLevelConfirmation = "close"
+    volume_rule: str = ""
+    source_text: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "label": self.label,
+            "level_type": self.level_type,
+            "price": self.price,
+            "low": self.low,
+            "high": self.high,
+            "currency": self.currency,
+            "confirmation": self.confirmation,
+            "volume_rule": self.volume_rule,
+            "source_text": self.source_text,
+        }
+
+
+@dataclass(frozen=True)
 class ExecutionLevels:
     intraday_pilot_rule: str = ""
     close_confirm_rule: str = ""
     next_day_followthrough_rule: str = ""
     failed_breakout_rule: str = ""
     trim_rule: str = ""
-    funding_priority: str = "medium"
+    levels: tuple[PriceLevel, ...] = tuple()
+    min_relative_volume: float | None = None
+    vwap_required: bool = False
+    earliest_pilot_time_local: str = "10:30"
+    funding_priority: FundingPriority = "medium"
     entry_window: EntryWindow = EntryWindow.MID
     trigger_quality: TriggerQuality = TriggerQuality.MEDIUM
 
@@ -98,6 +137,10 @@ class ExecutionLevels:
             "next_day_followthrough_rule": self.next_day_followthrough_rule,
             "failed_breakout_rule": self.failed_breakout_rule,
             "trim_rule": self.trim_rule,
+            "levels": [level.to_dict() for level in self.levels],
+            "min_relative_volume": self.min_relative_volume,
+            "vwap_required": self.vwap_required,
+            "earliest_pilot_time_local": self.earliest_pilot_time_local,
             "funding_priority": self.funding_priority,
             "entry_window": self.entry_window.value,
             "trigger_quality": self.trigger_quality.value,
@@ -165,11 +208,15 @@ def build_decision_output_instructions(context: str) -> str:
         '"watchlist_triggers":["..."],'
         '"data_coverage":{"company_news_count":0,"disclosures_count":0,"social_source":"dedicated | news_derived | unavailable","macro_items_count":0},'
         '"execution_levels":{'
-        '"intraday_pilot_rule":"10:30 KST 이후 trigger 상회 + VWAP 위 + adjusted RVOL 충족 + 오전 실패 돌파 아님",'
-        '"close_confirm_rule":"종가가 trigger 위에서 마감하고 거래량 기준 충족 시 증액 검토",'
-        '"next_day_followthrough_rule":"다음 거래일 첫 30~60분 동안 trigger 재이탈 없을 때 추가 검토",'
-        '"failed_breakout_rule":"장중 돌파 후 VWAP/trigger 아래로 재이탈하면 신규 매수 금지",'
-        '"trim_rule":"무효화 가격 이탈 또는 실패 돌파 확인 시 축소 검토",'
+        '"intraday_pilot_rule":"After 10:30 local, allow only a small pilot if trigger, VWAP, and volume conditions are met",'
+        '"close_confirm_rule":"Require a close above the trigger before a full add",'
+        '"next_day_followthrough_rule":"Next day, keep the trigger during the first 30-60 minutes before adding",'
+        '"failed_breakout_rule":"If price loses the trigger or VWAP after breakout, block new buying",'
+        '"trim_rule":"Trim if invalidation or failed breakout confirms",'
+        '"levels":[{"label":"breakout above 426000","level_type":"breakout","price":426000,"confirmation":"close","volume_rule":"RVOL >= 1.2","source_text":"close above 426,000 with volume"}],'
+        '"min_relative_volume":1.2,'
+        '"vwap_required":true,'
+        '"earliest_pilot_time_local":"10:30",'
         '"funding_priority":"low | medium | high",'
         '"entry_window":"open | mid | late",'
         '"trigger_quality":"weak | medium | strong"}}. '
@@ -177,8 +224,9 @@ def build_decision_output_instructions(context: str) -> str:
         "Use portfolio_stance for directional view, and entry_action for immediate action today. "
         "Do not use NO_TRADE solely because entry_action is WAIT. "
         "Always include execution_levels as investor-facing execution rules, even when the action is WAIT. "
-        "Use intraday_pilot_rule for a small regular-session starter only, close_confirm_rule for full-size add/entry, "
-        "and next_day_followthrough_rule for the next trading day support/rebreakout check. "
+        "Populate execution_levels.levels with machine-actionable prices or ranges whenever possible. "
+        "Use intraday_pilot_rule for a small regular-session starter only, close_confirm_rule for full-size add or entry, "
+        "and next_day_followthrough_rule for the next trading day support or re-breakout check. "
         "For constructive but unconfirmed setups, prefer HOLD or OVERWEIGHT with portfolio_stance=BULLISH and entry_action=WAIT when the evidence supports watchlist or held exposure. "
         "Reserve NO_TRADE for weak, contradictory, or insufficient theses, no favorable setup to monitor, or data quality gaps that make the view non-investable. "
         "Use BUY or OVERWEIGHT when the thesis is strong and the entry setup is actionable today; do not default to NO_TRADE just because it is available. "
@@ -246,6 +294,53 @@ def _optional_string(value: Any) -> str:
     return str(value or "").strip()
 
 
+def _optional_float(value: Any) -> float | None:
+    if value in (None, ""):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError) as exc:
+        raise StructuredDecisionValidationError(f"Execution level value must be numeric, got {value!r}.") from exc
+
+
+def _optional_bool(value: Any, *, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    text = str(value).strip().lower()
+    if text in {"true", "1", "yes", "y"}:
+        return True
+    if text in {"false", "0", "no", "n"}:
+        return False
+    raise StructuredDecisionValidationError(f"Execution level flag must be boolean-like, got {value!r}.")
+
+
+def _parse_price_level(raw: Mapping[str, Any]) -> PriceLevel:
+    level_type = str(raw.get("level_type") or "").strip().lower()
+    if level_type not in {"breakout", "support", "pullback", "invalidation", "trim", "resistance"}:
+        raise StructuredDecisionValidationError(f"Unsupported execution level_type: {raw.get('level_type')!r}.")
+
+    confirmation = str(raw.get("confirmation") or "close").strip().lower()
+    if confirmation not in {"intraday", "close", "two_bar", "next_day"}:
+        raise StructuredDecisionValidationError(
+            f"Unsupported execution level confirmation: {raw.get('confirmation')!r}."
+        )
+
+    label = _optional_string(raw.get("label")) or _optional_string(raw.get("source_text")) or level_type
+    return PriceLevel(
+        label=label,
+        level_type=level_type,
+        price=_optional_float(raw.get("price")),
+        low=_optional_float(raw.get("low")),
+        high=_optional_float(raw.get("high")),
+        currency=_optional_string(raw.get("currency")) or None,
+        confirmation=confirmation,
+        volume_rule=_optional_string(raw.get("volume_rule")),
+        source_text=_optional_string(raw.get("source_text")),
+    )
+
+
 def _parse_execution_levels(data: Mapping[str, Any]) -> ExecutionLevels:
     raw = data.get("execution_levels")
     if not isinstance(raw, Mapping):
@@ -267,13 +362,33 @@ def _parse_execution_levels(data: Mapping[str, Any]) -> ExecutionLevels:
             f"Unsupported trigger quality: {raw.get('trigger_quality')!r}."
         ) from exc
 
+    funding_priority = str(raw.get("funding_priority", "medium")).strip().lower() or "medium"
+    if funding_priority not in {"low", "medium", "high"}:
+        raise StructuredDecisionValidationError(
+            f"Unsupported funding priority: {raw.get('funding_priority')!r}."
+        )
+
+    level_items: list[PriceLevel] = []
+    raw_levels = raw.get("levels")
+    if raw_levels is not None:
+        if not isinstance(raw_levels, list):
+            raise StructuredDecisionValidationError("Field 'execution_levels.levels' must be a list.")
+        for item in raw_levels:
+            if not isinstance(item, Mapping):
+                raise StructuredDecisionValidationError("Each execution level must be an object.")
+            level_items.append(_parse_price_level(item))
+
     return ExecutionLevels(
         intraday_pilot_rule=_optional_string(raw.get("intraday_pilot_rule")),
         close_confirm_rule=_optional_string(raw.get("close_confirm_rule")),
         next_day_followthrough_rule=_optional_string(raw.get("next_day_followthrough_rule")),
         failed_breakout_rule=_optional_string(raw.get("failed_breakout_rule")),
         trim_rule=_optional_string(raw.get("trim_rule")),
-        funding_priority=_optional_string(raw.get("funding_priority")) or "medium",
+        levels=tuple(level_items),
+        min_relative_volume=_optional_float(raw.get("min_relative_volume")),
+        vwap_required=_optional_bool(raw.get("vwap_required"), default=False),
+        earliest_pilot_time_local=_optional_string(raw.get("earliest_pilot_time_local")) or "10:30",
+        funding_priority=funding_priority,
         entry_window=entry_window,
         trigger_quality=trigger_quality,
     )
@@ -349,8 +464,10 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
         ) from exc
 
     raw_coverage = data.get("data_coverage") if isinstance(data.get("data_coverage"), Mapping) else {}
+    social_source_raw = str(raw_coverage.get("social_source", "unavailable")).strip().lower()
+    social_source_raw = _SOCIAL_SOURCE_ALIASES.get(social_source_raw, social_source_raw)
     try:
-        social_source = SocialSource(str(raw_coverage.get("social_source", "unavailable")).strip().lower())
+        social_source = SocialSource(social_source_raw)
     except ValueError as exc:
         raise StructuredDecisionValidationError(
             f"Unsupported social source: {raw_coverage.get('social_source')!r}."

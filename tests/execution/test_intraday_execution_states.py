@@ -73,7 +73,7 @@ def test_failed_breakout_state_is_distinct_from_live_breakout():
         max_data_age_seconds=180,
     )
 
-    assert update.execution_timing_state == ExecutionTimingState.FAILED_BREAKOUT
+    assert update.execution_timing_state == ExecutionTimingState.PILOT_BLOCKED_FAILED_BREAKOUT
     assert update.trigger_status["failed_breakout"] is True
 
 
@@ -88,4 +88,4 @@ def test_late_session_confirm_state_uses_checkpoint_context():
     )
 
     assert update.decision_state == DecisionState.TRIGGERED_PENDING_CLOSE
-    assert update.execution_timing_state == ExecutionTimingState.LATE_SESSION_CONFIRM
+    assert update.execution_timing_state == ExecutionTimingState.CLOSE_CONFIRM_PENDING
