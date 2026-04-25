@@ -1,6 +1,7 @@
 import json
 
 from tradingagents.execution.contract_builder import build_execution_contract
+from tradingagents.schemas import BreakoutConfirmation
 
 
 def test_contract_builder_prefers_structured_levels():
@@ -101,3 +102,61 @@ def test_contract_builder_marks_regex_fallback_and_missing_machine_level():
     contract_without_level = build_execution_contract(ticker="TSM", analysis_payload=payload)
 
     assert "no_machine_actionable_level" in contract_without_level.reason_codes
+
+
+def test_contract_builder_accepts_normalized_structured_level_variants():
+    decision = {
+        "rating": "HOLD",
+        "portfolio_stance": "BULLISH",
+        "entry_action": "WAIT",
+        "setup_quality": "DEVELOPING",
+        "confidence": 0.7,
+        "time_horizon": "short",
+        "entry_logic": "watch for reclaim",
+        "exit_logic": "respect downside reference",
+        "position_sizing": "starter",
+        "risk_limits": "1R",
+        "catalysts": ["breakout above 999.0 with rvol 3.0"],
+        "invalidators": ["close below 80"],
+        "watchlist_triggers": [],
+        "data_coverage": {
+            "company_news_count": 2,
+            "disclosures_count": 0,
+            "social_source": "dedicated",
+            "macro_items_count": 1,
+        },
+        "execution_levels": {
+            "levels": [
+                {
+                    "label": "ORCL reclaim zone",
+                    "level_type": "breakout trigger",
+                    "price": "176.0-178.0",
+                    "confirmation": "intraday hold or daily close above zone",
+                },
+                {
+                    "label": "downside reference",
+                    "level_type": "downside reference",
+                    "price": "170",
+                    "confirmation": "close below",
+                },
+            ],
+            "min_relative_volume": "RVOL >= 1.4",
+            "vwap_required": "yes",
+        },
+    }
+    payload = {
+        "decision": json.dumps(decision, ensure_ascii=False),
+        "finished_at": "2026-04-24T10:00:00+09:00",
+        "trade_date": "2026-04-23",
+    }
+
+    contract = build_execution_contract(ticker="ORCL", analysis_payload=payload)
+
+    assert contract.breakout_level == 176.0
+    assert contract.breakout_confirmation == BreakoutConfirmation.CLOSE_ABOVE
+    assert contract.structured_levels[0].low == 176.0
+    assert contract.structured_levels[0].high == 178.0
+    assert contract.structured_levels[1].level_type == "invalidation"
+    assert contract.min_relative_volume == 1.4
+    assert "execution_level_regex_fallback" not in contract.reason_codes
+    assert "fallback_contract" not in contract.reason_codes

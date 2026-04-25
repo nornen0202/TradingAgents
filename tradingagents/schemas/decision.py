@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from enum import Enum
 from json import JSONDecodeError
-from typing import Any, Literal, Mapping
+from typing import Any, Literal, Mapping, cast
 
 
 class StructuredDecisionValidationError(ValueError):
@@ -71,6 +72,9 @@ FundingPriority = Literal["low", "medium", "high"]
 _SOCIAL_SOURCE_ALIASES = {
     "available": SocialSource.DEDICATED.value,
 }
+_PRICE_LEVEL_TYPES = {"breakout", "support", "pullback", "invalidation", "trim", "resistance"}
+_PRICE_LEVEL_CONFIRMATIONS = {"intraday", "close", "two_bar", "next_day"}
+_NUMBER_PATTERN = re.compile(r"[-+]?\d*\.?\d+")
 
 
 @dataclass(frozen=True)
@@ -227,6 +231,8 @@ def build_decision_output_instructions(context: str) -> str:
         "Populate execution_levels.levels with machine-actionable prices or ranges whenever possible. "
         "Use intraday_pilot_rule for a small regular-session starter only, close_confirm_rule for full-size add or entry, "
         "and next_day_followthrough_rule for the next trading day support or re-breakout check. "
+        "For execution_levels.levels, level_type must be one of breakout, support, pullback, invalidation, trim, resistance, "
+        "and confirmation must be one of intraday, close, two_bar, next_day; put extra nuance in label or source_text. "
         "For constructive but unconfirmed setups, prefer HOLD or OVERWEIGHT with portfolio_stance=BULLISH and entry_action=WAIT when the evidence supports watchlist or held exposure. "
         "Reserve NO_TRADE for weak, contradictory, or insufficient theses, no favorable setup to monitor, or data quality gaps that make the view non-investable. "
         "Use BUY or OVERWEIGHT when the thesis is strong and the entry setup is actionable today; do not default to NO_TRADE just because it is available. "
@@ -297,10 +303,12 @@ def _optional_string(value: Any) -> str:
 def _optional_float(value: Any) -> float | None:
     if value in (None, ""):
         return None
-    try:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int | float):
         return float(value)
-    except (TypeError, ValueError) as exc:
-        raise StructuredDecisionValidationError(f"Execution level value must be numeric, got {value!r}.") from exc
+    numbers = _numbers_from_text(value)
+    return numbers[0] if numbers else None
 
 
 def _optional_bool(value: Any, *, default: bool = False) -> bool:
@@ -313,27 +321,49 @@ def _optional_bool(value: Any, *, default: bool = False) -> bool:
         return True
     if text in {"false", "0", "no", "n"}:
         return False
-    raise StructuredDecisionValidationError(f"Execution level flag must be boolean-like, got {value!r}.")
+    if any(token in text for token in ("required", "require", "above vwap", "vwap ok", "must")):
+        return True
+    if any(token in text for token in ("not required", "optional", "ignore", "indifferent")):
+        return False
+    return default
 
 
 def _parse_price_level(raw: Mapping[str, Any]) -> PriceLevel:
-    level_type = str(raw.get("level_type") or "").strip().lower()
-    if level_type not in {"breakout", "support", "pullback", "invalidation", "trim", "resistance"}:
+    level_type = _normalize_price_level_type(raw.get("level_type"), raw)
+    if level_type is None:
         raise StructuredDecisionValidationError(f"Unsupported execution level_type: {raw.get('level_type')!r}.")
 
-    confirmation = str(raw.get("confirmation") or "close").strip().lower()
-    if confirmation not in {"intraday", "close", "two_bar", "next_day"}:
-        raise StructuredDecisionValidationError(
-            f"Unsupported execution level confirmation: {raw.get('confirmation')!r}."
-        )
+    confirmation = _normalize_price_level_confirmation(raw.get("confirmation"))
 
     label = _optional_string(raw.get("label")) or _optional_string(raw.get("source_text")) or level_type
+    low = _optional_float(raw.get("low"))
+    high = _optional_float(raw.get("high"))
+    price = _optional_float(raw.get("price"))
+    if low is None or high is None:
+        range_low, range_high = _range_from_values(
+            raw.get("price"),
+            raw.get("low"),
+            raw.get("high"),
+        )
+        if range_low is None or range_high is None:
+            range_low, range_high = _range_from_context(
+                raw.get("label"),
+                raw.get("source_text"),
+            )
+        if range_low is not None and range_high is not None:
+            low = range_low if low is None else low
+            high = range_high if high is None else high
+            if _has_multiple_numbers(raw.get("price")):
+                price = None
+    if low is not None and high is not None and low > high:
+        low, high = high, low
+
     return PriceLevel(
         label=label,
         level_type=level_type,
-        price=_optional_float(raw.get("price")),
-        low=_optional_float(raw.get("low")),
-        high=_optional_float(raw.get("high")),
+        price=price,
+        low=low,
+        high=high,
         currency=_optional_string(raw.get("currency")) or None,
         confirmation=confirmation,
         volume_rule=_optional_string(raw.get("volume_rule")),
@@ -346,37 +376,21 @@ def _parse_execution_levels(data: Mapping[str, Any]) -> ExecutionLevels:
     if not isinstance(raw, Mapping):
         return ExecutionLevels()
 
-    try:
-        entry_window = EntryWindow(str(raw.get("entry_window", EntryWindow.MID.value)).strip().lower())
-    except ValueError as exc:
-        raise StructuredDecisionValidationError(
-            f"Unsupported entry window: {raw.get('entry_window')!r}."
-        ) from exc
+    entry_window = _normalize_entry_window(raw.get("entry_window"))
+    trigger_quality = _normalize_trigger_quality(raw.get("trigger_quality"))
 
-    try:
-        trigger_quality = TriggerQuality(
-            str(raw.get("trigger_quality", TriggerQuality.MEDIUM.value)).strip().lower()
-        )
-    except ValueError as exc:
-        raise StructuredDecisionValidationError(
-            f"Unsupported trigger quality: {raw.get('trigger_quality')!r}."
-        ) from exc
-
-    funding_priority = str(raw.get("funding_priority", "medium")).strip().lower() or "medium"
-    if funding_priority not in {"low", "medium", "high"}:
-        raise StructuredDecisionValidationError(
-            f"Unsupported funding priority: {raw.get('funding_priority')!r}."
-        )
+    funding_priority = _normalize_funding_priority(raw.get("funding_priority"))
 
     level_items: list[PriceLevel] = []
     raw_levels = raw.get("levels")
-    if raw_levels is not None:
-        if not isinstance(raw_levels, list):
-            raise StructuredDecisionValidationError("Field 'execution_levels.levels' must be a list.")
+    if isinstance(raw_levels, list):
         for item in raw_levels:
             if not isinstance(item, Mapping):
-                raise StructuredDecisionValidationError("Each execution level must be an object.")
-            level_items.append(_parse_price_level(item))
+                continue
+            try:
+                level_items.append(_parse_price_level(item))
+            except StructuredDecisionValidationError:
+                continue
 
     return ExecutionLevels(
         intraday_pilot_rule=_optional_string(raw.get("intraday_pilot_rule")),
@@ -392,6 +406,130 @@ def _parse_execution_levels(data: Mapping[str, Any]) -> ExecutionLevels:
         entry_window=entry_window,
         trigger_quality=trigger_quality,
     )
+
+
+def _numbers_from_text(value: Any) -> list[float]:
+    if value in (None, "") or isinstance(value, bool):
+        return []
+    if isinstance(value, int | float):
+        return [float(value)]
+    text = str(value).replace(",", "")
+    text = re.sub(r"(?<=\d)\s*[-\u2013\u2014~]\s*(?=\d)", " ", text)
+    numbers: list[float] = []
+    for match in _NUMBER_PATTERN.finditer(text):
+        token = match.group(0)
+        if token in {"+", "-", ".", "+.", "-."}:
+            continue
+        try:
+            numbers.append(float(token))
+        except ValueError:
+            continue
+    return numbers
+
+
+def _range_from_values(*values: Any) -> tuple[float | None, float | None]:
+    for value in values:
+        numbers = _numbers_from_text(value)
+        if len(numbers) >= 2:
+            first, second = numbers[0], numbers[1]
+            return (min(first, second), max(first, second))
+    return (None, None)
+
+
+def _range_from_context(*values: Any) -> tuple[float | None, float | None]:
+    for value in values:
+        text = str(value or "")
+        lowered = text.lower()
+        has_explicit_range = bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*[-\u2013\u2014~]\s*\d", text))
+        has_range_words = any(token in lowered for token in ("zone", "range", "between", "from "))
+        if not has_explicit_range and not has_range_words:
+            continue
+        numbers = _numbers_from_text(text)
+        if len(numbers) >= 2:
+            first, second = numbers[0], numbers[1]
+            return (min(first, second), max(first, second))
+    return (None, None)
+
+
+def _has_multiple_numbers(value: Any) -> bool:
+    return len(_numbers_from_text(value)) >= 2
+
+
+def _normalize_text(value: Any) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", str(value or "").strip().lower()).strip()
+
+
+def _normalize_price_level_type(value: Any, raw: Mapping[str, Any]) -> PriceLevelType | None:
+    text = _normalize_text(value)
+    if text.replace(" ", "_") in _PRICE_LEVEL_TYPES:
+        return cast(PriceLevelType, text.replace(" ", "_"))
+    context = _normalize_text(
+        " ".join(
+            str(raw.get(field) or "")
+            for field in ("label", "source_text", "level_type", "confirmation")
+        )
+    )
+    haystack = f"{text} {context}".strip()
+    if not haystack:
+        return None
+    if any(token in haystack for token in ("trim", "reduce", "funding source", "take profit")):
+        return "trim"
+    if any(token in haystack for token in ("invalid", "invalidation", "stop", "fail", "loss", "below")):
+        return "invalidation"
+    if any(token in haystack for token in ("pullback", "retest", "buy zone", "dip")):
+        return "pullback"
+    if any(token in haystack for token in ("support", "downside", "floor", "reference")):
+        return "support"
+    if any(token in haystack for token in ("resistance", "target", "upside", "ceiling")):
+        return "resistance"
+    if any(token in haystack for token in ("breakout", "trigger", "reclaim", "break above")):
+        return "breakout"
+    return None
+
+
+def _normalize_price_level_confirmation(value: Any) -> PriceLevelConfirmation:
+    text = _normalize_text(value)
+    compact = text.replace(" ", "_")
+    if compact in _PRICE_LEVEL_CONFIRMATIONS:
+        return cast(PriceLevelConfirmation, compact)
+    if not text:
+        return "close"
+    if ("two" in text and "bar" in text) or "2 bar" in text or "two_bar" in compact:
+        return "two_bar"
+    if any(token in text for token in ("next day", "follow through", "followthrough", "next session")):
+        return "next_day"
+    if any(token in text for token in ("close", "daily", "eod", "end of day", "strong close")):
+        return "close"
+    if any(token in text for token in ("intraday", "touch", "hold", "reclaim", "stall", "test", "vwap")):
+        return "intraday"
+    return "close"
+
+
+def _normalize_funding_priority(value: Any) -> FundingPriority:
+    text = _normalize_text(value)
+    if "high" in text:
+        return "high"
+    if "low" in text:
+        return "low"
+    return "medium"
+
+
+def _normalize_entry_window(value: Any) -> EntryWindow:
+    text = _normalize_text(value)
+    if "open" in text:
+        return EntryWindow.OPEN
+    if "late" in text or "close" in text:
+        return EntryWindow.LATE
+    return EntryWindow.MID
+
+
+def _normalize_trigger_quality(value: Any) -> TriggerQuality:
+    text = _normalize_text(value)
+    if "strong" in text or "high" in text:
+        return TriggerQuality.STRONG
+    if "weak" in text or "low" in text:
+        return TriggerQuality.WEAK
+    return TriggerQuality.MEDIUM
 
 
 def _infer_stance_action_from_rating(rating: DecisionRating) -> tuple[PortfolioStance, EntryAction, SetupQuality]:
