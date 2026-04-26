@@ -33,9 +33,16 @@ def create_portfolio_manager(llm, memory):
 
 {instrument_context}
 
-Use the common decision schema and be explicit about rating (legacy), portfolio_stance, entry_action, setup_quality, confidence, time horizon, entry logic, exit logic, position sizing, risk limits, catalysts, invalidators, watchlist_triggers, data_coverage, and execution_levels.
+Use the common decision schema and be explicit about rating (legacy), portfolio_stance, entry_action, risk_action, risk_action_reason, risk_action_reason_codes, risk_action_level, setup_quality, confidence, time horizon, entry logic, exit logic, position sizing, risk limits, catalysts, invalidators, watchlist_triggers, data_coverage, and execution_levels.
 NO_TRADE is allowed as a legacy rating, but do not collapse all outcomes into NO_TRADE.
-Always distinguish: (1) directional stance, (2) immediate entry decision, (3) watchlist maintenance triggers, and (4) whether a starter could be justified when conditions are met.
+Always distinguish: (1) directional stance, (2) immediate entry decision, (3) sell-side/downside-risk action, (4) watchlist maintenance triggers, and (5) whether a starter could be justified when conditions are met.
+You must evaluate both buy-side and sell-side risk. Do not default every constructive thesis to BULLISH + WAIT.
+For held positions, explicitly decide whether the position should be held, trimmed for funding, reduced for risk, partially profit-taken, stopped out, or exited.
+Set risk_action=REDUCE_RISK when price has broken named support/invalidation, failed breakout is confirmed and downside risk increased, sector/regime turns against the position, thesis catalysts are delayed/disproven, earnings/guidance/news materially weakens the thesis, or reward/risk deteriorates after an extended move.
+Set risk_action=TAKE_PROFIT when the position is extended far beyond support, an upside trigger already played out, momentum is fading, or the thesis remains valid but risk/reward no longer favors full size.
+Set risk_action=STOP_LOSS when an explicit stop/invalidation level is broken, follow-through fails after a defined holding rule, or loss-control is more important than funding rotation.
+Set risk_action=TRIM_TO_FUND only when thesis is not invalidated, the position is lower priority than stronger candidates, and the trim is primarily a funding/rotation decision.
+Every non-NONE risk_action must include specific reason codes and a numeric risk_action_level whenever a trim/support/stop/invalidation/profit level exists.
 For regular-session investors, split execution_levels into intraday_pilot_rule, close_confirm_rule, next_day_followthrough_rule, failed_breakout_rule, trim_rule, numeric levels[], min_relative_volume, vwap_required, earliest_pilot_time_local, funding_priority, entry_window, and trigger_quality.
 Always provide machine-actionable execution_levels.levels with numeric price or range fields whenever the thesis contains a concrete trigger, support, invalidation, trim, or resistance area.
 Intraday pilot means a small starter only; full-size add/entry belongs in close_confirm_rule or next_day_followthrough_rule.

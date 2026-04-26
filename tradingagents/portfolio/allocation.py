@@ -26,11 +26,19 @@ _IMMEDIACY_WEIGHTS = {
     "EXIT": 1.0,
 }
 
-_IMMEDIATE_ACTIONS = {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}
+_IMMEDIATE_ACTIONS = {
+    "ADD_NOW",
+    "STARTER_NOW",
+    "REDUCE_NOW",
+    "TRIM_NOW",
+    "TAKE_PROFIT_NOW",
+    "STOP_LOSS_NOW",
+    "EXIT_NOW",
+}
 _TRIGGER_BUY_ACTIONS = {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}
-_TRIGGER_SELL_ACTIONS = {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
+_TRIGGER_SELL_ACTIONS = {"REDUCE_IF_TRIGGERED", "TAKE_PROFIT_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
 _STRATEGIC_TRIGGER_ACTIONS = _TRIGGER_BUY_ACTIONS | _TRIGGER_SELL_ACTIONS
-_RELATIVE_TRIM_ACTIONS = {"TRIM_TO_FUND", "REDUCE_RISK", "EXIT"}
+_RELATIVE_TRIM_ACTIONS = {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}
 
 
 def build_recommendation(
@@ -134,6 +142,10 @@ def build_recommendation(
                 portfolio_relative_action=candidate.portfolio_relative_action,
                 relative_action_reason=candidate.relative_action_reason,
                 relative_action_reason_codes=candidate.relative_action_reason_codes,
+                risk_action=candidate.risk_action,
+                risk_action_reason_codes=candidate.risk_action_reason_codes,
+                risk_action_level=candidate.risk_action_level,
+                sell_side_category=candidate.sell_side_category,
                 budget_blocked_actionable=budget_blocked_actionable,
                 stale_but_triggerable=candidate.stale_but_triggerable,
                 funding_source_score=round(candidate.funding_source_score, 4),
@@ -206,6 +218,8 @@ def build_recommendation(
             ),
             "review_required_count": sum(1 for action in prioritized if action.review_required),
             "relative_action_distribution": _relative_action_distribution(prioritized),
+            "risk_action_distribution": _risk_action_distribution(prioritized),
+            "sell_side_distribution": _sell_side_distribution(prioritized),
             "rule_only_fallback_count": sum(
                 1 for action in prioritized if str(action.decision_source).upper() == "RULE_ONLY_FALLBACK"
             ),
@@ -320,8 +334,10 @@ def _annotate_relative_candidates(
                 reason_codes.append(code)
 
         if candidate.is_held:
-            if relative_action in {"REDUCE_RISK", "EXIT"}:
+            if relative_action in {"REDUCE_RISK", "STOP_LOSS", "EXIT"}:
                 reason_codes.append("THESIS_WEAKENING")
+            elif relative_action == "TAKE_PROFIT":
+                reason_codes.append("PROFIT_TAKING")
             elif "NO_COVERAGE" in reason_codes:
                 relative_action = "TRIM_TO_FUND"
             elif (
@@ -368,18 +384,28 @@ def _annotate_relative_candidates(
 
 def _base_relative_action(candidate: PortfolioCandidate) -> str:
     current = str(candidate.portfolio_relative_action or "").upper()
-    if current in {"TRIM_TO_FUND", "REDUCE_RISK", "EXIT"}:
+    if current in {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT", "AVOID", "WATCH_RISK"}:
         return current
     if candidate.is_held and current == "HOLD":
         return current
     if not candidate.is_held and current in {"ADD", "WATCH"}:
         return current
-    if candidate.is_held and candidate.suggested_action_now == "EXIT_NOW":
+    if candidate.is_held and candidate.suggested_action_now in {"EXIT_NOW"}:
         return "EXIT"
+    if candidate.is_held and candidate.suggested_action_now == "STOP_LOSS_NOW":
+        return "STOP_LOSS"
+    if candidate.is_held and candidate.suggested_action_now == "TAKE_PROFIT_NOW":
+        return "TAKE_PROFIT"
     if candidate.is_held and (
         candidate.suggested_action_now in {"REDUCE_NOW", "TRIM_NOW"}
         or candidate.suggested_action_if_triggered in _TRIGGER_SELL_ACTIONS
     ):
+        if candidate.suggested_action_if_triggered == "STOP_LOSS_IF_TRIGGERED":
+            return "STOP_LOSS"
+        if candidate.suggested_action_if_triggered == "TAKE_PROFIT_IF_TRIGGERED":
+            return "TAKE_PROFIT"
+        if candidate.suggested_action_if_triggered == "EXIT_IF_TRIGGERED":
+            return "EXIT"
         return "REDUCE_RISK"
     if candidate.is_held:
         return "HOLD"
@@ -437,6 +463,14 @@ def _relative_penalties(
 
 
 def _relative_reason_text(reason_codes: tuple[str, ...]) -> str:
+    if "INVALIDATION_BROKEN" in reason_codes:
+        return "Reduce or exit because an invalidation or stop-loss level was breached."
+    if "SUPPORT_BROKEN" in reason_codes:
+        return "Reduce risk because named support broke."
+    if "FAILED_BREAKOUT" in reason_codes:
+        return "Reduce risk because the breakout failed."
+    if "PROFIT_TAKING" in reason_codes:
+        return "Take partial profit because reward/risk no longer favors full size."
     if "THESIS_WEAKENING" in reason_codes:
         return "Reduce risk because the held thesis or execution state weakened."
     if "REGIME_HEADWIND" in reason_codes:
@@ -462,7 +496,7 @@ def _cap_no_coverage_trim_score(
     active_negative = (
         "THESIS_WEAKENING" in reason_codes
         or candidate.stance == "BEARISH"
-        or candidate.suggested_action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}
+        or candidate.suggested_action_now in {"REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW", "STOP_LOSS_NOW", "EXIT_NOW"}
         or candidate.suggested_action_if_triggered in _TRIGGER_SELL_ACTIONS
     )
     return score if active_negative else min(score, 0.48)
@@ -547,8 +581,13 @@ def _allocate_now_delta(
     action = candidate.suggested_action_now
     if action in {"HOLD", "WATCH"}:
         return 0
-    if action in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}:
-        base_ratio = 1.0 if action == "EXIT_NOW" else min(max(abs(candidate.score_now), 0.15), 0.5)
+    if action in {"REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW", "STOP_LOSS_NOW", "EXIT_NOW"}:
+        if action in {"EXIT_NOW", "STOP_LOSS_NOW"}:
+            base_ratio = 1.0
+        elif action == "TAKE_PROFIT_NOW":
+            base_ratio = min(max(abs(candidate.score_now), 0.20), 0.35)
+        else:
+            base_ratio = min(max(abs(candidate.score_now), 0.15), 0.5)
         return -int(current_value * base_ratio)
     if action not in {"ADD_NOW", "STARTER_NOW"} or positive_now <= 0:
         return 0
@@ -616,8 +655,13 @@ def _allocate_triggered_delta(
     action = candidate.suggested_action_if_triggered
     if action in {"NONE", "WATCH_TRIGGER"}:
         return 0
-    if action in {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
-        base_ratio = 1.0 if action == "EXIT_IF_TRIGGERED" else min(max(abs(candidate.score_triggered), 0.15), 0.5)
+    if action in _TRIGGER_SELL_ACTIONS:
+        if action in {"EXIT_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED"}:
+            base_ratio = 1.0
+        elif action == "TAKE_PROFIT_IF_TRIGGERED":
+            base_ratio = min(max(abs(candidate.score_triggered), 0.20), 0.35)
+        else:
+            base_ratio = min(max(abs(candidate.score_triggered), 0.15), 0.5)
         return -int(current_value * base_ratio)
     if action not in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"} or positive_triggered <= 0:
         return 0
@@ -634,14 +678,14 @@ def _allocate_triggered_delta(
 def _normalize_now_action(candidate: PortfolioCandidate, delta_now: int) -> str:
     if candidate.suggested_action_now in {"ADD_NOW", "STARTER_NOW"} and delta_now <= 0:
         return candidate.suggested_action_now
-    if candidate.suggested_action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"} and delta_now == 0:
+    if candidate.suggested_action_now in {"REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW", "STOP_LOSS_NOW", "EXIT_NOW"} and delta_now == 0:
         return "HOLD"
     return candidate.suggested_action_now
 
 
 def _relative_action_now(candidate: PortfolioCandidate, action_now: str) -> str:
     relative_action = str(candidate.portfolio_relative_action or "").upper()
-    if action_now == "HOLD" and relative_action in {"TRIM_TO_FUND", "REDUCE_RISK", "EXIT"}:
+    if action_now == "HOLD" and relative_action in {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}:
         return relative_action
     return action_now
 
@@ -722,7 +766,10 @@ def _build_candidate_counts(
         "pilot_ready_count": len(pilot_ready),
         "close_confirm_count": len(close_confirm),
         "trim_to_fund_count": sum(1 for action in actions if action.portfolio_relative_action == "TRIM_TO_FUND"),
-        "reduce_risk_count": sum(1 for action in actions if action.portfolio_relative_action in {"REDUCE_RISK", "EXIT"}),
+        "reduce_risk_count": sum(1 for action in actions if action.portfolio_relative_action == "REDUCE_RISK"),
+        "take_profit_count": sum(1 for action in actions if action.portfolio_relative_action == "TAKE_PROFIT"),
+        "stop_loss_count": sum(1 for action in actions if action.portfolio_relative_action == "STOP_LOSS"),
+        "exit_count": sum(1 for action in actions if action.portfolio_relative_action == "EXIT"),
         "funding_candidates_count": len(top_add_if_funded) if top_trim_if_needed else 0,
         "held_add_if_triggered_count": sum(
             1
@@ -801,7 +848,7 @@ def _build_funding_plan(
             and (action.funding_source_score > 0 or action.portfolio_relative_action in _RELATIVE_TRIM_ACTIONS)
         ),
         key=lambda action: (
-            action.portfolio_relative_action in {"REDUCE_RISK", "EXIT"},
+            action.portfolio_relative_action in {"REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"},
             action.portfolio_relative_action == "TRIM_TO_FUND",
             action.funding_source_score,
         ),
@@ -892,7 +939,7 @@ def _build_switch_scenario_orders(
             and (action.funding_source_score > 0 or action.portfolio_relative_action in _RELATIVE_TRIM_ACTIONS)
         ),
         key=lambda action: (
-            action.portfolio_relative_action in {"REDUCE_RISK", "EXIT"},
+            action.portfolio_relative_action in {"REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"},
             action.portfolio_relative_action == "TRIM_TO_FUND",
             action.funding_source_score,
         ),
@@ -1026,6 +1073,10 @@ def _scenario_order_from_action(
         "action_if_triggered": action.action_if_triggered,
         "portfolio_relative_action": action.portfolio_relative_action,
         "relative_action_reason_codes": list(action.relative_action_reason_codes),
+        "risk_action": action.risk_action,
+        "risk_action_reason_codes": list(action.risk_action_reason_codes),
+        "risk_action_level": action.risk_action_level,
+        "sell_side_category": action.sell_side_category,
         "trigger_conditions": list(action.trigger_conditions),
         "rank": action.capital_reallocation_rank,
         "note": note,
@@ -1080,6 +1131,10 @@ def _funding_trim_item(action: PortfolioAction, snapshot: AccountSnapshot) -> di
         "portfolio_relative_action": action.portfolio_relative_action,
         "relative_action_reason": action.relative_action_reason,
         "relative_action_reason_codes": list(action.relative_action_reason_codes),
+        "risk_action": action.risk_action,
+        "risk_action_reason_codes": list(action.risk_action_reason_codes),
+        "risk_action_level": action.risk_action_level,
+        "sell_side_category": action.sell_side_category,
         "funding_reason_codes": list(action.relative_action_reason_codes) or _fallback_funding_reason_codes(action),
         "rationale": action.rationale,
     }
@@ -1087,6 +1142,12 @@ def _funding_trim_item(action: PortfolioAction, snapshot: AccountSnapshot) -> di
 
 def _fallback_funding_reason_codes(action: PortfolioAction) -> list[str]:
     if action.portfolio_relative_action == "REDUCE_RISK":
+        return ["THESIS_WEAKENING"]
+    if action.portfolio_relative_action == "TAKE_PROFIT":
+        return ["PROFIT_TAKING"]
+    if action.portfolio_relative_action == "STOP_LOSS":
+        return ["INVALIDATION_BROKEN"]
+    if action.portfolio_relative_action == "EXIT":
         return ["THESIS_WEAKENING"]
     if action.portfolio_relative_action == "TRIM_TO_FUND":
         return ["OPPORTUNITY_COST"]
@@ -1150,7 +1211,7 @@ def _apply_execution_constraints(
 
 
 def _normalize_action_value(action_now: str, delta_now: int) -> str:
-    if action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"} and delta_now == 0:
+    if action_now in {"REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW", "STOP_LOSS_NOW", "EXIT_NOW"} and delta_now == 0:
         return "HOLD"
     return action_now
 
@@ -1187,6 +1248,22 @@ def _relative_action_distribution(actions: tuple[PortfolioAction, ...]) -> dict[
         key = str(action.portfolio_relative_action or "WATCH").upper()
         distribution[key] = distribution.get(key, 0) + 1
     return distribution
+
+
+def _risk_action_distribution(actions: tuple[PortfolioAction, ...]) -> dict[str, int]:
+    distribution: dict[str, int] = {}
+    for action in actions:
+        key = str(action.risk_action or "NONE").upper()
+        distribution[key] = distribution.get(key, 0) + 1
+    return distribution
+
+
+def _sell_side_distribution(actions: tuple[PortfolioAction, ...]) -> dict[str, int]:
+    keys = ("TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT")
+    return {
+        key: sum(1 for action in actions if str(action.portfolio_relative_action or "").upper() == key)
+        for key in keys
+    }
 
 
 def _ratio(distribution: dict[str, Any] | None, key: str) -> float:

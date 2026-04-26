@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from copy import deepcopy
 import json
+import re
 import shutil
 import traceback
 from datetime import date, datetime, time, timedelta
@@ -338,6 +339,9 @@ def execute_scheduled_run(
             llm_settings=config.llm,
         )
         manifest["portfolio"] = portfolio_status
+        for warning in portfolio_status.get("sell_side_calibration_warnings") or []:
+            if warning not in manifest["warnings"]:
+                manifest["warnings"].append(warning)
         if portfolio_status.get("status") == "failed":
             print(
                 "::warning::Portfolio pipeline failed: "
@@ -990,14 +994,21 @@ def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, 
     translated_action_distribution: dict[str, int] = {}
     stance_distribution: dict[str, int] = {}
     entry_action_distribution: dict[str, int] = {}
+    risk_action_distribution: dict[str, int] = {}
     trade_date_distribution: dict[str, int] = {}
     confidences: list[float] = []
     zero_company_news = 0
+    support_fail_count = 0
+    numeric_trigger_text_count = 0
+    empty_numeric_levels_count = 0
 
     for item in successful:
         trade_date = str(item.get("trade_date") or "").strip()
         if trade_date:
             trade_date_distribution[trade_date] = trade_date_distribution.get(trade_date, 0) + 1
+        execution_update = item.get("execution_update") if isinstance(item.get("execution_update"), dict) else {}
+        if str(execution_update.get("execution_timing_state") or "").upper() == "SUPPORT_FAIL":
+            support_fail_count += 1
         raw = item.get("decision")
         if isinstance(raw, str) and raw.strip().startswith("{"):
             try:
@@ -1005,6 +1016,11 @@ def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, 
                 decision_distribution[parsed.rating.value] = decision_distribution.get(parsed.rating.value, 0) + 1
                 stance_distribution[parsed.portfolio_stance.value] = stance_distribution.get(parsed.portfolio_stance.value, 0) + 1
                 entry_action_distribution[parsed.entry_action.value] = entry_action_distribution.get(parsed.entry_action.value, 0) + 1
+                risk_action_distribution[parsed.risk_action.value] = risk_action_distribution.get(parsed.risk_action.value, 0) + 1
+                if _decision_has_numeric_trigger_text(parsed):
+                    numeric_trigger_text_count += 1
+                    if not parsed.execution_levels.levels:
+                        empty_numeric_levels_count += 1
                 translated = _translate_legacy_rating(
                     rating=parsed.rating.value,
                     stance=parsed.portfolio_stance.value,
@@ -1026,11 +1042,27 @@ def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, 
         "decision_distribution": decision_distribution,
         "legacy_rating_distribution": decision_distribution,
         "translated_action_distribution": translated_action_distribution,
+        "risk_action_distribution": risk_action_distribution,
+        "sell_side_distribution": {
+            "TRIM_TO_FUND": int(risk_action_distribution.get("TRIM_TO_FUND", 0) or 0),
+            "REDUCE_RISK": int(risk_action_distribution.get("REDUCE_RISK", 0) or 0),
+            "TAKE_PROFIT": int(risk_action_distribution.get("TAKE_PROFIT", 0) or 0),
+            "STOP_LOSS": int(risk_action_distribution.get("STOP_LOSS", 0) or 0),
+            "EXIT": int(risk_action_distribution.get("EXIT", 0) or 0),
+        },
         "stance_distribution": stance_distribution,
         "entry_action_distribution": entry_action_distribution,
         "trade_date_distribution": trade_date_distribution,
         "avg_confidence": avg_confidence,
         "company_news_zero_ratio": (zero_company_news / total) if total else None,
+        "support_fail_count": support_fail_count,
+        "numeric_trigger_text_count": numeric_trigger_text_count,
+        "empty_numeric_levels_count": empty_numeric_levels_count,
+        "numeric_trigger_text_empty_levels_ratio": (
+            empty_numeric_levels_count / numeric_trigger_text_count
+            if numeric_trigger_text_count
+            else 0.0
+        ),
     }
 
 
@@ -1039,6 +1071,7 @@ def _compute_batch_warnings(batch_metrics: dict[str, Any]) -> list[str]:
     decision_distribution = batch_metrics.get("decision_distribution") or {}
     stance_distribution = batch_metrics.get("stance_distribution") or {}
     entry_action_distribution = batch_metrics.get("entry_action_distribution") or {}
+    sell_side_distribution = batch_metrics.get("sell_side_distribution") or {}
     trade_date_distribution = batch_metrics.get("trade_date_distribution") or {}
     if len(trade_date_distribution) > 1:
         distribution_blob = ", ".join(
@@ -1073,12 +1106,55 @@ def _compute_batch_warnings(batch_metrics: dict[str, Any]) -> list[str]:
         warnings.append(
             f"Wait-heavy constructive batch: WAIT {waiting}/{total} with BULLISH {bullish}/{total}; review entry-action calibration."
         )
+    if wait_ratio >= 0.9 and bullish_ratio >= 0.9:
+        warnings.append("bullish_wait_concentration")
+    reduce_risk_count = int(sell_side_distribution.get("REDUCE_RISK", 0) or 0)
+    support_fail_count = int(batch_metrics.get("support_fail_count", 0) or 0)
+    if reduce_risk_count == 0 and support_fail_count > 0:
+        warnings.append("sell_side_missed_support_fail")
+    if float(batch_metrics.get("numeric_trigger_text_empty_levels_ratio") or 0.0) > 0.30:
+        warnings.append("execution_level_extraction_warning")
     buy_like_count = int(decision_distribution.get("BUY", 0)) + int(decision_distribution.get("OVERWEIGHT", 0))
     if wait_ratio >= 0.6 and bullish_ratio >= 0.5 and buy_like_count == 0:
         warnings.append(
             "Constructive batch produced no BUY/OVERWEIGHT ratings; review rating calibration against stance and entry_action outputs."
         )
     return warnings
+
+
+def _decision_has_numeric_trigger_text(parsed: Any) -> bool:
+    texts = [
+        parsed.execution_levels.intraday_pilot_rule,
+        parsed.execution_levels.close_confirm_rule,
+        parsed.execution_levels.next_day_followthrough_rule,
+        parsed.execution_levels.failed_breakout_rule,
+        parsed.execution_levels.trim_rule,
+        parsed.risk_limits,
+        parsed.exit_logic,
+        *parsed.watchlist_triggers,
+        *parsed.invalidators,
+    ]
+    keywords = (
+        "trigger",
+        "breakout",
+        "support",
+        "pullback",
+        "invalidation",
+        "invalid",
+        "trim",
+        "stop",
+        "below",
+        "above",
+        "resistance",
+        "지지",
+        "손절",
+        "축소",
+    )
+    for value in texts:
+        text = str(value or "").lower()
+        if any(keyword in text for keyword in keywords) and re.search(r"\d", text):
+            return True
+    return False
 
 
 def _translate_legacy_rating(*, rating: str, stance: str, entry_action: str) -> str:
@@ -2144,6 +2220,7 @@ class _ExecutionContractShim:
                 confirmation=str(item.get("confirmation") or "close"),
                 volume_rule=str(item.get("volume_rule") or ""),
                 source_text=str(item.get("source_text") or ""),
+                reason_code=str(item.get("reason_code") or ""),
             )
             for item in structured_levels_payload
             if isinstance(item, dict)
@@ -2208,4 +2285,21 @@ class _ExecutionContractShim:
             funding_priority=self.payload.get("funding_priority") or levels.get("funding_priority"),
             entry_window=self.payload.get("entry_window") or levels.get("entry_window"),
             trigger_quality=self.payload.get("trigger_quality") or levels.get("trigger_quality"),
+            risk_action=str(self.payload.get("risk_action") or "NONE"),
+            risk_action_reason=str(self.payload.get("risk_action_reason") or ""),
+            risk_action_reason_codes=tuple(self.payload.get("risk_action_reason_codes") or []),
+            risk_action_level=(
+                PriceLevel(
+                    label=str((self.payload.get("risk_action_level") or {}).get("label") or ""),
+                    level_type=str((self.payload.get("risk_action_level") or {}).get("level_type") or "SUPPORT"),
+                    price=_optional_float((self.payload.get("risk_action_level") or {}).get("price")),
+                    low=_optional_float((self.payload.get("risk_action_level") or {}).get("low")),
+                    high=_optional_float((self.payload.get("risk_action_level") or {}).get("high")),
+                    confirmation=str((self.payload.get("risk_action_level") or {}).get("confirmation") or "close"),
+                    source_text=str((self.payload.get("risk_action_level") or {}).get("source_text") or ""),
+                    reason_code=str((self.payload.get("risk_action_level") or {}).get("reason_code") or ""),
+                )
+                if isinstance(self.payload.get("risk_action_level"), dict)
+                else None
+            ),
         )

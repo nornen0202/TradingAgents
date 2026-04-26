@@ -154,6 +154,10 @@ class ExecutionContract:
     funding_priority: str | None = None
     entry_window: str | None = None
     trigger_quality: str | None = None
+    risk_action: str = "NONE"
+    risk_action_reason: str = ""
+    risk_action_reason_codes: tuple[str, ...] = field(default_factory=tuple)
+    risk_action_level: PriceLevel | None = None
 
     def to_dict(self) -> dict[str, Any]:
         payload: dict[str, Any] = {
@@ -204,6 +208,10 @@ class ExecutionContract:
             "funding_priority": self.funding_priority,
             "entry_window": self.entry_window,
             "trigger_quality": self.trigger_quality,
+            "risk_action": self.risk_action,
+            "risk_action_reason": self.risk_action_reason,
+            "risk_action_reason_codes": list(self.risk_action_reason_codes),
+            "risk_action_level": self.risk_action_level.to_dict() if self.risk_action_level else None,
         }
         return payload
 

@@ -43,6 +43,30 @@ class StructuredDecisionTests(unittest.TestCase):
         decision = parse_structured_decision(payload)
         self.assertEqual(decision.entry_action.value, "NONE")
         self.assertEqual(decision.data_coverage.social_source.value, "unavailable")
+        self.assertEqual(decision.risk_action.value, "NONE")
+        self.assertIn("risk_action", decision.to_dict())
+
+    def test_legacy_underweight_with_risk_text_infers_reduce_risk(self):
+        payload = """
+        {
+          "rating": "UNDERWEIGHT",
+          "portfolio_stance": "BEARISH",
+          "entry_action": "WAIT",
+          "setup_quality": "WEAK",
+          "confidence": 0.58,
+          "time_horizon": "short",
+          "entry_logic": "No fresh entry.",
+          "exit_logic": "Reduce if support breaks.",
+          "position_sizing": "Lower exposure.",
+          "risk_limits": "Close below 95 invalidates the setup.",
+          "catalysts": [],
+          "invalidators": ["Support broken below 95"],
+          "watchlist_triggers": [],
+          "data_coverage": {"company_news_count":1,"disclosures_count":0,"social_source":"dedicated","macro_items_count":1}
+        }
+        """
+        decision = parse_structured_decision(payload)
+        self.assertEqual(decision.risk_action.value, "REDUCE_RISK")
 
     def test_invalid_schema_raises_validation_error(self):
         payload = '{"confidence": 0.5, "time_horizon": "short"}'

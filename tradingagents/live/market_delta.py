@@ -52,6 +52,7 @@ def build_market_delta(
         "vwap": execution_update.get("session_vwap"),
         "relative_volume": execution_update.get("relative_volume"),
         "execution_data_quality": _execution_quality(execution_update),
+        "contract_evidence": _contract_evidence(contract_payload),
     }
 
 
@@ -80,7 +81,7 @@ def top_add_candidates(deltas: list[dict[str, Any]]) -> list[str]:
 
 
 def top_trim_candidates(deltas: list[dict[str, Any]]) -> list[str]:
-    preferred_states = {"FAILED_BREAKOUT", "SUPPORT_FAIL"}
+    preferred_states = {"FAILED_BREAKOUT", "SUPPORT_FAIL", "INVALIDATED"}
     ordered = [
         item["ticker"]
         for item in deltas
@@ -176,6 +177,19 @@ def _price_and_volume_reason_codes(
         codes.append("VOLUME_PENDING")
 
     return codes
+
+
+def _contract_evidence(contract_payload: dict[str, Any]) -> dict[str, Any]:
+    pullback = contract_payload.get("pullback_buy_zone") if isinstance(contract_payload.get("pullback_buy_zone"), dict) else {}
+    support_level = pullback.get("low") or pullback.get("high")
+    return {
+        "breakout_level": _optional_float(contract_payload.get("breakout_level")),
+        "support_level": _optional_float(support_level),
+        "invalidation_level": _optional_float(
+            contract_payload.get("invalid_if_intraday_below")
+            or contract_payload.get("invalid_if_close_below")
+        ),
+    }
 
 
 def _execution_quality(execution_update: dict[str, Any]) -> str:

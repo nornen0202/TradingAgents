@@ -1,4 +1,5 @@
 import json
+import unittest
 from pathlib import Path
 from unittest.mock import patch
 
@@ -12,6 +13,7 @@ from tradingagents.schemas import (
     SessionVWAPPreference,
     ThesisState,
 )
+from tradingagents.live.sell_side_delta import build_sell_side_delta_candidates
 
 
 def test_report_vs_live_delta_artifact(tmp_path: Path):
@@ -96,3 +98,23 @@ def test_report_vs_live_delta_artifact(tmp_path: Path):
     markdown = render_report_vs_live_delta_markdown(artifact)
     assert "리포트 원판 vs 최신 장중 재분석" in markdown
     assert "278470.KS" in json.dumps(artifact, ensure_ascii=False)
+
+
+class ReportVsLiveDeltaSellSideTests(unittest.TestCase):
+    def test_sell_side_delta_is_embedded_when_support_fails(self):
+        artifact = {
+            "ticker_deltas": [
+                {
+                    "ticker": "278470.KS",
+                    "base_action": "HOLD",
+                    "live_action": "SUPPORT_FAIL",
+                    "execution_timing_state": "SUPPORT_FAIL",
+                    "live_price": 210000,
+                    "contract_evidence": {"support_level": 215500},
+                }
+            ]
+        }
+
+        candidates = build_sell_side_delta_candidates(live_context_delta=artifact, held_tickers={"278470.KS"})
+
+        self.assertEqual(candidates[0]["new_risk_action"], "REDUCE_RISK")

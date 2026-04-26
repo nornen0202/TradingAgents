@@ -14,7 +14,14 @@ from tradingagents.reporting_consistency import render_consistency_section
 from .account_models import AccountSnapshot, PortfolioCandidate, PortfolioRecommendation
 
 
-_TRIGGER_ACTIONS = {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED", "REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
+_TRIGGER_ACTIONS = {
+    "ADD_IF_TRIGGERED",
+    "STARTER_IF_TRIGGERED",
+    "REDUCE_IF_TRIGGERED",
+    "TAKE_PROFIT_IF_TRIGGERED",
+    "STOP_LOSS_IF_TRIGGERED",
+    "EXIT_IF_TRIGGERED",
+}
 
 
 def render_portfolio_report_markdown(
@@ -23,6 +30,7 @@ def render_portfolio_report_markdown(
     recommendation: PortfolioRecommendation,
     candidates: list[PortfolioCandidate],
     live_context_delta: dict[str, Any] | None = None,
+    live_sell_side_delta: list[dict[str, Any]] | None = None,
 ) -> str:
     mode_label = present_snapshot_mode(snapshot.snapshot_health, language="Korean")
     market_label = present_market_regime(recommendation.market_regime, language="Korean")
@@ -36,6 +44,9 @@ def render_portfolio_report_markdown(
     close_confirm_count = counts["close_confirm_count"]
     trim_to_fund_count = counts["trim_to_fund_count"]
     reduce_risk_count = counts["reduce_risk_count"]
+    take_profit_count = counts["take_profit_count"]
+    stop_loss_count = counts["stop_loss_count"]
+    exit_count = counts["exit_count"]
     strategic_trigger_count = counts["strategic_trigger_candidates_count"]
     budgeted_trigger_count = counts["budgeted_trigger_candidates_count"]
     funding_count = counts["funding_candidates_count"]
@@ -73,6 +84,7 @@ def render_portfolio_report_markdown(
     strategy_line = _strategy_priority_line(recommendation)
     scenario_summary_lines = _scenario_summary_lines(recommendation)
     funding_sections = _funding_sections(recommendation)
+    sell_side_sections = _sell_side_sections(recommendation, live_sell_side_delta=live_sell_side_delta)
     scenario_table = _scenario_table_v2(recommendation)
     consistency_section = render_consistency_section(live_context_delta)
     return "\n".join(
@@ -100,6 +112,7 @@ def render_portfolio_report_markdown(
             strategy_line,
             *scenario_summary_lines,
             f"- 계좌 상대 액션: 줄여서 재배치 {trim_to_fund_count}개 / 위험 축소 {reduce_risk_count}개",
+            f"- Sell-side 구분: 자금 조달 {trim_to_fund_count}개 / 리스크 축소 {reduce_risk_count}개 / 이익실현 {take_profit_count}개 / 손절 {stop_loss_count}개 / 청산 {exit_count}개",
             f"- 실행 신호 구분: 예산 차단 {immediate_budget_blocked_count}개 / 장중 pilot 준비 {pilot_ready_count}개 / 종가 확인 {close_confirm_count}개",
             f"- 전략상 조건부 후보 {strategic_trigger_count}개 / 자금 반영 조건부 후보 {budgeted_trigger_count}개",
             f"- 자금 조달형 후보 {funding_count}개 / 보유 조건부 추가 후보 {held_add_count}개 / 미보유 조건부 관찰 후보 {watch_if_triggered_count}개",
@@ -117,6 +130,8 @@ def render_portfolio_report_markdown(
             "## 운용 시나리오",
             "",
             scenario_table,
+            "",
+            sell_side_sections,
             "",
             funding_sections,
             "",
@@ -136,6 +151,9 @@ def render_portfolio_report_markdown(
             f"- 종가 확인 후보: {close_confirm_count}개",
             f"- 줄여서 재배치 후보: {trim_to_fund_count}개",
             f"- 위험 축소 후보: {reduce_risk_count}개",
+            f"- 이익실현 후보: {take_profit_count}개",
+            f"- 손절 조건 후보: {stop_loss_count}개",
+            f"- 청산 후보: {exit_count}개",
             f"- 조건부 실행 후보: {strategic_trigger_count}개",
             f"- 조건부 실행 예산 반영 후보: {budgeted_trigger_count}개",
             f"- 트리거형 후보(현금과 무관): {strategic_trigger_count}개",
@@ -167,14 +185,19 @@ def _candidate_counts(recommendation: PortfolioRecommendation) -> dict[str, int]
     )
     counts.setdefault(
         "immediate_actionable_count",
-        sum(1 for action in actions if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}),
+        sum(
+            1
+            for action in actions
+            if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW", "STOP_LOSS_NOW", "EXIT_NOW"}
+        ),
     )
     counts.setdefault(
         "immediate_budgeted_count",
         sum(
             1
             for action in actions
-            if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"} and action.delta_krw_now != 0
+            if action.action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW", "STOP_LOSS_NOW", "EXIT_NOW"}
+            and action.delta_krw_now != 0
         ),
     )
     counts.setdefault(
@@ -200,7 +223,19 @@ def _candidate_counts(recommendation: PortfolioRecommendation) -> dict[str, int]
     )
     counts.setdefault(
         "reduce_risk_count",
-        sum(1 for action in actions if action.portfolio_relative_action in {"REDUCE_RISK", "EXIT"}),
+        sum(1 for action in actions if action.portfolio_relative_action == "REDUCE_RISK"),
+    )
+    counts.setdefault(
+        "take_profit_count",
+        sum(1 for action in actions if action.portfolio_relative_action == "TAKE_PROFIT"),
+    )
+    counts.setdefault(
+        "stop_loss_count",
+        sum(1 for action in actions if action.portfolio_relative_action == "STOP_LOSS"),
+    )
+    counts.setdefault(
+        "exit_count",
+        sum(1 for action in actions if action.portfolio_relative_action == "EXIT"),
     )
     counts.setdefault("funding_candidates_count", 0)
     counts.setdefault(
@@ -233,6 +268,61 @@ def _strategy_priority_line(recommendation: PortfolioRecommendation) -> str:
     if names:
         return f"- 하지만 전략상 우선순위는 {' > '.join(names[:4])} 순입니다."
     return "- 전략상 우선순위는 조건 충족 종목이 생길 때 다시 정렬합니다."
+
+
+def _sell_side_sections(
+    recommendation: PortfolioRecommendation,
+    *,
+    live_sell_side_delta: list[dict[str, Any]] | None = None,
+) -> str:
+    actions = list(recommendation.actions)
+    live_risk_lines = _live_sell_side_lines(live_sell_side_delta)
+    sections = [
+        ("오늘 살 후보", [action for action in actions if action.action_now in {"ADD_NOW", "STARTER_NOW"}]),
+        ("조건부 살 후보", [action for action in actions if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}]),
+        ("줄여서 살 후보", [action for action in actions if action.portfolio_relative_action == "TRIM_TO_FUND"]),
+        ("위험 때문에 줄일 후보", [action for action in actions if action.portfolio_relative_action == "REDUCE_RISK"]),
+        ("이익실현 후보", [action for action in actions if action.portfolio_relative_action == "TAKE_PROFIT"]),
+        ("손절/청산 후보", [action for action in actions if action.portfolio_relative_action in {"STOP_LOSS", "EXIT"}]),
+        ("그냥 보유", [action for action in actions if action.action_now == "HOLD" and action.action_if_triggered == "NONE" and action.portfolio_relative_action == "HOLD"]),
+        ("관찰만", [action for action in actions if action.action_now == "WATCH"]),
+    ]
+    chunks: list[str] = ["## 투자자용 액션 구분"]
+    for title, items in sections:
+        chunks.extend(["", f"### {title}"])
+        if title == "위험 때문에 줄일 후보" and live_risk_lines:
+            chunks.extend(live_risk_lines)
+        if not items:
+            if title != "위험 때문에 줄일 후보" or not live_risk_lines:
+                chunks.append("- 없음")
+            continue
+        chunks.extend(_action_brief_line(action) for action in items[:5])
+    return "\n".join(chunks)
+
+
+def _live_sell_side_lines(values: list[dict[str, Any]] | None) -> list[str]:
+    lines: list[str] = []
+    for item in values or []:
+        if not isinstance(item, dict):
+            continue
+        ticker = str(item.get("ticker") or "").strip()
+        action = str(item.get("new_risk_action") or "").strip()
+        delta_type = str(item.get("delta_type") or "").strip()
+        if ticker and action:
+            lines.append(f"- {ticker}: live delta 기준 {present_account_action(action, language='Korean')} ({delta_type})")
+    return lines
+
+
+def _action_brief_line(action) -> str:
+    label = present_account_action(action.portfolio_relative_action, language="Korean")
+    reason = _localized_rationale(action)
+    level = ""
+    if action.risk_action_level:
+        raw_level = action.risk_action_level
+        price = raw_level.get("price") or raw_level.get("low") or raw_level.get("high")
+        if price:
+            level = f" / 기준 {price}"
+    return f"- {action.display_name}: {label}{level} - {reason}"
 
 
 def _funding_sections(recommendation: PortfolioRecommendation) -> str:
@@ -355,6 +445,17 @@ def _top_trim_if_needed(recommendation: PortfolioRecommendation) -> list[dict[st
 
 def _funding_reason_label(item: dict[str, Any]) -> str:
     codes = [str(value).strip().upper() for value in (item.get("funding_reason_codes") or item.get("relative_action_reason_codes") or [])]
+    action = str(item.get("portfolio_relative_action") or item.get("risk_action") or "").strip().upper()
+    if action == "STOP_LOSS" or "INVALIDATION_BROKEN" in codes:
+        return "손절 조건"
+    if action == "TAKE_PROFIT" or "PROFIT_TAKING" in codes:
+        return "이익실현성 축소"
+    if action == "EXIT":
+        return "청산 후보"
+    if "SUPPORT_BROKEN" in codes:
+        return "지지선 이탈"
+    if "FAILED_BREAKOUT" in codes:
+        return "실패 돌파"
     if "THESIS_WEAKENING" in codes:
         return "보유 논리 약화"
     if "REGIME_HEADWIND" in codes:
@@ -399,7 +500,7 @@ def _localized_rationale(action) -> str:
         return text
     if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}:
         return "조건 충족 전까지 대기합니다."
-    if action.action_if_triggered in {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+    if action.action_if_triggered in {"REDUCE_IF_TRIGGERED", "TAKE_PROFIT_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
         return "리스크 조건 이탈 시 축소를 검토합니다."
     return "추가 행동보다 관찰이 우선입니다."
 

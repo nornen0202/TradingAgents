@@ -133,8 +133,14 @@ def evaluate_execution_state(
         )
 
     breakout_hit = contract.breakout_level is not None and intraday_high >= contract.breakout_level
-    rvol_confirmed = contract.min_relative_volume is None or ((market.relative_volume or 0.0) >= contract.min_relative_volume)
+    rvol_confirmed = contract.min_relative_volume is None or (
+        market.relative_volume is not None and market.relative_volume >= contract.min_relative_volume
+    )
     vwap_confirmed = _vwap_check(contract.session_vwap_preference, market.last_price, market.session_vwap)
+    missing_required_confirmation = (
+        (contract.min_relative_volume is not None and market.relative_volume is None)
+        or (contract.session_vwap_preference != SessionVWAPPreference.INDIFFERENT and market.session_vwap is None)
+    )
     pilot_window_open = _pilot_window_open(
         market_asof=market.asof,
         earliest_pilot_time_local=contract.earliest_pilot_time_local,
@@ -179,6 +185,8 @@ def evaluate_execution_state(
             decision_state = DecisionState.ARMED
             decision_now = DecisionNow.NONE
             execution_timing_state = ExecutionTimingState.PILOT_BLOCKED_VOLUME
+            if missing_required_confirmation:
+                reason_codes.append("data_missing_blocked_pilot")
             if not rvol_confirmed:
                 reason_codes.append("relative_volume_unconfirmed")
             if not vwap_confirmed:
@@ -211,6 +219,8 @@ def evaluate_execution_state(
                 decision_state = DecisionState.ARMED
                 decision_now = DecisionNow.NONE
                 execution_timing_state = ExecutionTimingState.PILOT_BLOCKED_VOLUME
+                if contract.session_vwap_preference != SessionVWAPPreference.INDIFFERENT and market.session_vwap is None:
+                    reason_codes.append("data_missing_blocked_pilot")
                 reason_codes.append("vwap_unconfirmed")
 
     if market_session == "post_close" and execution_timing_state == ExecutionTimingState.WAITING and contract.breakout_level is not None:
@@ -238,8 +248,10 @@ def evaluate_execution_state(
 
 
 def _vwap_check(pref: SessionVWAPPreference, price: float, vwap: float | None) -> bool:
-    if pref == SessionVWAPPreference.INDIFFERENT or vwap is None:
+    if pref == SessionVWAPPreference.INDIFFERENT:
         return True
+    if vwap is None:
+        return False
     if pref == SessionVWAPPreference.ABOVE:
         return price >= vwap
     return price <= vwap
@@ -305,9 +317,13 @@ def _build_update(
         relative_volume=market.relative_volume,
         price_state="INTRADAY",
         volume_state=(
-            "CONFIRMED"
-            if (market.relative_volume or 0.0) >= (contract.min_relative_volume or 0.0)
-            else "UNCONFIRMED"
+            "MISSING"
+            if contract.min_relative_volume is not None and market.relative_volume is None
+            else (
+                "CONFIRMED"
+                if (market.relative_volume or 0.0) >= (contract.min_relative_volume or 0.0)
+                else "UNCONFIRMED"
+            )
         ),
         event_state="GUARDED" if "pre_event_guard_active" in reason_codes else "OPEN",
         decision_state=decision_state,

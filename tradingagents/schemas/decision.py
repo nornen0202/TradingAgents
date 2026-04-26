@@ -35,6 +35,16 @@ class EntryAction(str, Enum):
     EXIT = "EXIT"
 
 
+class RiskAction(str, Enum):
+    NONE = "NONE"
+    HOLD = "HOLD"
+    TRIM_TO_FUND = "TRIM_TO_FUND"
+    REDUCE_RISK = "REDUCE_RISK"
+    TAKE_PROFIT = "TAKE_PROFIT"
+    STOP_LOSS = "STOP_LOSS"
+    EXIT = "EXIT"
+
+
 class SetupQuality(str, Enum):
     WEAK = "WEAK"
     DEVELOPING = "DEVELOPING"
@@ -65,15 +75,44 @@ class SocialSource(str, Enum):
     UNAVAILABLE = "unavailable"
 
 
-PriceLevelType = Literal["breakout", "support", "pullback", "invalidation", "trim", "resistance"]
-PriceLevelConfirmation = Literal["intraday", "close", "two_bar", "next_day"]
+class PriceLevelType(str, Enum):
+    BREAKOUT = "BREAKOUT"
+    SUPPORT = "SUPPORT"
+    PULLBACK = "PULLBACK"
+    INVALIDATION = "INVALIDATION"
+    TRIM = "TRIM"
+    STOP_LOSS = "STOP_LOSS"
+    TAKE_PROFIT = "TAKE_PROFIT"
+    RESISTANCE = "RESISTANCE"
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, str):
+            return self.value == other.upper().replace(" ", "_")
+        return super().__eq__(other)
+
+    __hash__ = str.__hash__
+
+
+PriceLevelConfirmation = Literal["intraday", "close", "two_bar", "next_day", "volume_confirmed"]
 FundingPriority = Literal["low", "medium", "high"]
 
 _SOCIAL_SOURCE_ALIASES = {
     "available": SocialSource.DEDICATED.value,
 }
-_PRICE_LEVEL_TYPES = {"breakout", "support", "pullback", "invalidation", "trim", "resistance"}
-_PRICE_LEVEL_CONFIRMATIONS = {"intraday", "close", "two_bar", "next_day"}
+_PRICE_LEVEL_TYPES = {level.value for level in PriceLevelType}
+_PRICE_LEVEL_TYPE_ALIASES = {
+    "breakout": PriceLevelType.BREAKOUT,
+    "support": PriceLevelType.SUPPORT,
+    "pullback": PriceLevelType.PULLBACK,
+    "invalidation": PriceLevelType.INVALIDATION,
+    "trim": PriceLevelType.TRIM,
+    "stop_loss": PriceLevelType.STOP_LOSS,
+    "stop": PriceLevelType.STOP_LOSS,
+    "take_profit": PriceLevelType.TAKE_PROFIT,
+    "profit": PriceLevelType.TAKE_PROFIT,
+    "resistance": PriceLevelType.RESISTANCE,
+}
+_PRICE_LEVEL_CONFIRMATIONS = {"intraday", "close", "two_bar", "next_day", "volume_confirmed"}
 _NUMBER_PATTERN = re.compile(r"[-+]?\d*\.?\d+")
 
 
@@ -104,11 +143,13 @@ class PriceLevel:
     confirmation: PriceLevelConfirmation = "close"
     volume_rule: str = ""
     source_text: str = ""
+    reason_code: str = ""
+    level_type_source: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "label": self.label,
-            "level_type": self.level_type,
+            "level_type": self.level_type_source or _price_level_type_value(self.level_type),
             "price": self.price,
             "low": self.low,
             "high": self.high,
@@ -116,6 +157,7 @@ class PriceLevel:
             "confirmation": self.confirmation,
             "volume_rule": self.volume_rule,
             "source_text": self.source_text,
+            "reason_code": self.reason_code,
         }
 
 
@@ -168,6 +210,11 @@ class StructuredDecision:
     watchlist_triggers: tuple[str, ...]
     data_coverage: DataCoverage
     execution_levels: ExecutionLevels = ExecutionLevels()
+    risk_action: RiskAction = RiskAction.NONE
+    risk_action_reason: str = ""
+    risk_action_reason_codes: tuple[str, ...] = tuple()
+    risk_action_confidence: float | None = None
+    risk_action_level: PriceLevel | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -186,6 +233,11 @@ class StructuredDecision:
             "watchlist_triggers": list(self.watchlist_triggers),
             "data_coverage": self.data_coverage.to_dict(),
             "execution_levels": self.execution_levels.to_dict(),
+            "risk_action": self.risk_action.value,
+            "risk_action_reason": self.risk_action_reason,
+            "risk_action_reason_codes": list(self.risk_action_reason_codes),
+            "risk_action_confidence": self.risk_action_confidence,
+            "risk_action_level": self.risk_action_level.to_dict() if self.risk_action_level else None,
         }
 
     def to_json(self, *, indent: int = 2) -> str:
@@ -200,6 +252,11 @@ def build_decision_output_instructions(context: str) -> str:
         '{"rating":"NO_TRADE | UNDERWEIGHT | HOLD | OVERWEIGHT | BUY | SELL",'
         '"portfolio_stance":"BEARISH | NEUTRAL | BULLISH",'
         '"entry_action":"NONE | WAIT | STARTER | ADD | EXIT",'
+        '"risk_action":"NONE | HOLD | TRIM_TO_FUND | REDUCE_RISK | TAKE_PROFIT | STOP_LOSS | EXIT",'
+        '"risk_action_reason":"...",'
+        '"risk_action_reason_codes":["..."],'
+        '"risk_action_confidence":0.0,'
+        '"risk_action_level":{"label":"support fail","level_type":"SUPPORT","price":420000,"confirmation":"close","source_text":"close below support","reason_code":"SUPPORT_BROKEN"},'
         '"setup_quality":"WEAK | DEVELOPING | COMPELLING",'
         '"confidence":0.0,'
         '"time_horizon":"short | medium | long",'
@@ -217,7 +274,7 @@ def build_decision_output_instructions(context: str) -> str:
         '"next_day_followthrough_rule":"Next day, keep the trigger during the first 30-60 minutes before adding",'
         '"failed_breakout_rule":"If price loses the trigger or VWAP after breakout, block new buying",'
         '"trim_rule":"Trim if invalidation or failed breakout confirms",'
-        '"levels":[{"label":"breakout above 426000","level_type":"breakout","price":426000,"confirmation":"close","volume_rule":"RVOL >= 1.2","source_text":"close above 426,000 with volume"}],'
+        '"levels":[{"label":"breakout above 426000","level_type":"BREAKOUT","price":426000,"confirmation":"close","volume_rule":"RVOL >= 1.2","source_text":"close above 426,000 with volume","reason_code":"BREAKOUT_TRIGGER"}],'
         '"min_relative_volume":1.2,'
         '"vwap_required":true,'
         '"earliest_pilot_time_local":"10:30",'
@@ -226,13 +283,18 @@ def build_decision_output_instructions(context: str) -> str:
         '"trigger_quality":"weak | medium | strong"}}. '
         "Treat rating as the legacy medium-term investment/allocation view, not the same-day execution action. "
         "Use portfolio_stance for directional view, and entry_action for immediate action today. "
+        "Evaluate both buy-side entry and sell-side/downside risk. "
+        "For held positions, explicitly decide whether risk_action should be HOLD, TRIM_TO_FUND, REDUCE_RISK, TAKE_PROFIT, STOP_LOSS, or EXIT. "
+        "Use TRIM_TO_FUND only for funding or rotation when the thesis is not invalidated; use REDUCE_RISK, STOP_LOSS, or EXIT for support breaks, invalidation, failed breakout, thesis damage, weak earnings/guidance, regime headwinds, or deteriorated reward/risk. "
+        "Use TAKE_PROFIT when the thesis remains valid but an extended move or fading momentum argues for partial de-risking. "
+        "Always include risk_action_reason_codes and risk_action_level when a numeric sell-side level exists. "
         "Do not use NO_TRADE solely because entry_action is WAIT. "
         "Always include execution_levels as investor-facing execution rules, even when the action is WAIT. "
         "Populate execution_levels.levels with machine-actionable prices or ranges whenever possible. "
         "Use intraday_pilot_rule for a small regular-session starter only, close_confirm_rule for full-size add or entry, "
         "and next_day_followthrough_rule for the next trading day support or re-breakout check. "
-        "For execution_levels.levels, level_type must be one of breakout, support, pullback, invalidation, trim, resistance, "
-        "and confirmation must be one of intraday, close, two_bar, next_day; put extra nuance in label or source_text. "
+        "For execution_levels.levels, level_type must be one of BREAKOUT, SUPPORT, PULLBACK, INVALIDATION, TRIM, STOP_LOSS, TAKE_PROFIT, RESISTANCE, "
+        "and confirmation must be one of intraday, close, two_bar, next_day, volume_confirmed; put extra nuance in label or source_text. "
         "For constructive but unconfirmed setups, prefer HOLD or OVERWEIGHT with portfolio_stance=BULLISH and entry_action=WAIT when the evidence supports watchlist or held exposure. "
         "Reserve NO_TRADE for weak, contradictory, or insufficient theses, no favorable setup to monitor, or data quality gaps that make the view non-investable. "
         "Use BUY or OVERWEIGHT when the thesis is strong and the entry setup is actionable today; do not default to NO_TRADE just because it is available. "
@@ -293,6 +355,17 @@ def _require_string_list(data: Mapping[str, Any], field_name: str) -> tuple[str,
                 f"Field '{field_name}' must contain only non-empty strings."
             )
         normalized.append(item.strip())
+    return tuple(normalized)
+
+
+def _optional_string_list(value: Any) -> tuple[str, ...]:
+    if not isinstance(value, list):
+        return tuple()
+    normalized: list[str] = []
+    for item in value:
+        text = str(item or "").strip()
+        if text:
+            normalized.append(text)
     return tuple(normalized)
 
 
@@ -368,6 +441,8 @@ def _parse_price_level(raw: Mapping[str, Any]) -> PriceLevel:
         confirmation=confirmation,
         volume_rule=_optional_string(raw.get("volume_rule")),
         source_text=_optional_string(raw.get("source_text")),
+        reason_code=_optional_string(raw.get("reason_code")),
+        level_type_source=_optional_string(raw.get("level_type")),
     )
 
 
@@ -413,9 +488,24 @@ def _numbers_from_text(value: Any) -> list[float]:
         return []
     if isinstance(value, int | float):
         return [float(value)]
-    text = str(value).replace(",", "")
+    text = str(value)
+    korean_values: list[float] = []
+    consumed_spans: list[tuple[int, int]] = []
+    for match in re.finditer(r"(\d+(?:\.\d+)?)\s*만\s*([\d,]+)(?=원|\s|~|-|$)", text):
+        major = float(match.group(1)) * 10000
+        minor = float(str(match.group(2) or 0).replace(",", ""))
+        korean_values.append(major + minor)
+        consumed_spans.append(match.span())
+    text_for_manse = text
+    for start, end in reversed(consumed_spans):
+        text_for_manse = text_for_manse[:start] + " " * (end - start) + text_for_manse[end:]
+    for match in re.finditer(r"(\d+(?:\.\d+)?)\s*만", text_for_manse):
+        korean_values.append(float(match.group(1)) * 10000)
+    text = re.sub(r"\d+(?:\.\d+)?\s*만\s*[\d,]*", " ", text)
+    text = re.sub(r"\b\d{1,2}:\d{2}\b", " ", text)
+    text = text.replace(",", "")
     text = re.sub(r"(?<=\d)\s*[-\u2013\u2014~]\s*(?=\d)", " ", text)
-    numbers: list[float] = []
+    numbers: list[float] = list(korean_values)
     for match in _NUMBER_PATTERN.finditer(text):
         token = match.group(0)
         if token in {"+", "-", ".", "+.", "-."}:
@@ -441,7 +531,7 @@ def _range_from_context(*values: Any) -> tuple[float | None, float | None]:
         text = str(value or "")
         lowered = text.lower()
         has_explicit_range = bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*[-\u2013\u2014~]\s*\d", text))
-        has_range_words = any(token in lowered for token in ("zone", "range", "between", "from "))
+        has_range_words = any(token in lowered for token in ("zone", "range", "between", "from ", "구간", "~"))
         if not has_explicit_range and not has_range_words:
             continue
         numbers = _numbers_from_text(text)
@@ -459,10 +549,26 @@ def _normalize_text(value: Any) -> str:
     return re.sub(r"[^a-z0-9]+", " ", str(value or "").strip().lower()).strip()
 
 
+def _price_level_type_value(value: Any) -> str:
+    if isinstance(value, PriceLevelType):
+        return value.value
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    normalized = text.upper().replace(" ", "_")
+    alias = _PRICE_LEVEL_TYPE_ALIASES.get(normalized.lower())
+    return text if alias else normalized
+
+
 def _normalize_price_level_type(value: Any, raw: Mapping[str, Any]) -> PriceLevelType | None:
     text = _normalize_text(value)
-    if text.replace(" ", "_") in _PRICE_LEVEL_TYPES:
-        return cast(PriceLevelType, text.replace(" ", "_"))
+    compact = text.replace(" ", "_")
+    alias = _PRICE_LEVEL_TYPE_ALIASES.get(compact)
+    if alias is not None:
+        return alias
+    upper = compact.upper()
+    if upper in _PRICE_LEVEL_TYPES:
+        return PriceLevelType(upper)
     context = _normalize_text(
         " ".join(
             str(raw.get(field) or "")
@@ -472,18 +578,22 @@ def _normalize_price_level_type(value: Any, raw: Mapping[str, Any]) -> PriceLeve
     haystack = f"{text} {context}".strip()
     if not haystack:
         return None
-    if any(token in haystack for token in ("trim", "reduce", "funding source", "take profit")):
-        return "trim"
-    if any(token in haystack for token in ("invalid", "invalidation", "stop", "fail", "loss", "below")):
-        return "invalidation"
+    if any(token in haystack for token in ("take profit", "profit target", "take-profit")):
+        return PriceLevelType.TAKE_PROFIT
+    if any(token in haystack for token in ("stop loss", "stop-loss", "stop out", "loss control")):
+        return PriceLevelType.STOP_LOSS
+    if any(token in haystack for token in ("trim", "reduce", "funding source")):
+        return PriceLevelType.TRIM
+    if any(token in haystack for token in ("invalid", "invalidation", "fail", "loss", "below")):
+        return PriceLevelType.INVALIDATION
     if any(token in haystack for token in ("pullback", "retest", "buy zone", "dip")):
-        return "pullback"
+        return PriceLevelType.PULLBACK
     if any(token in haystack for token in ("support", "downside", "floor", "reference")):
-        return "support"
+        return PriceLevelType.SUPPORT
     if any(token in haystack for token in ("resistance", "target", "upside", "ceiling")):
-        return "resistance"
+        return PriceLevelType.RESISTANCE
     if any(token in haystack for token in ("breakout", "trigger", "reclaim", "break above")):
-        return "breakout"
+        return PriceLevelType.BREAKOUT
     return None
 
 
@@ -494,6 +604,8 @@ def _normalize_price_level_confirmation(value: Any) -> PriceLevelConfirmation:
         return cast(PriceLevelConfirmation, compact)
     if not text:
         return "close"
+    if any(token in text for token in ("volume confirmed", "volume confirmation", "rvol confirmed", "volume_confirmed")):
+        return "volume_confirmed"
     if ("two" in text and "bar" in text) or "2 bar" in text or "two_bar" in compact:
         return "two_bar"
     if any(token in text for token in ("next day", "follow through", "followthrough", "next session")):
@@ -540,6 +652,108 @@ def _infer_stance_action_from_rating(rating: DecisionRating) -> tuple[PortfolioS
     if rating in {DecisionRating.UNDERWEIGHT, DecisionRating.SELL}:
         return PortfolioStance.BEARISH, EntryAction.EXIT, SetupQuality.WEAK
     return PortfolioStance.NEUTRAL, EntryAction.NONE, SetupQuality.DEVELOPING
+
+
+def _infer_risk_action_from_legacy(
+    *,
+    rating: DecisionRating,
+    portfolio_stance: PortfolioStance,
+    entry_action: EntryAction,
+    setup_quality: SetupQuality,
+    data: Mapping[str, Any],
+) -> tuple[RiskAction, tuple[str, ...], str]:
+    text_blob = " ".join(
+        str(data.get(field) or "")
+        for field in (
+            "risk_action_reason",
+            "exit_logic",
+            "risk_limits",
+            "invalidators",
+            "watchlist_triggers",
+            "catalysts",
+        )
+    ).lower()
+    has_true_risk_condition = any(
+        token in text_blob
+        for token in (
+            "support",
+            "invalidation",
+            "invalidat",
+            "stop",
+            "loss",
+            "failed breakout",
+            "breakout fail",
+            "guidance",
+            "earnings miss",
+            "thesis",
+            "below",
+            "breach",
+            "broken",
+        )
+    )
+    portfolio_relative = str(data.get("portfolio_relative_action") or "").strip().upper()
+    if portfolio_relative == RiskAction.TRIM_TO_FUND.value and not has_true_risk_condition:
+        return RiskAction.NONE, tuple(), ""
+    if rating == DecisionRating.SELL and entry_action == EntryAction.EXIT:
+        return RiskAction.EXIT, ("LEGACY_SELL_EXIT",), "Legacy SELL rating with EXIT entry action."
+    if (
+        rating == DecisionRating.UNDERWEIGHT
+        or portfolio_stance == PortfolioStance.BEARISH
+        or setup_quality == SetupQuality.WEAK
+    ) and has_true_risk_condition:
+        return RiskAction.REDUCE_RISK, ("LEGACY_WEAK_RISK_SETUP",), "Legacy weak/bearish setup with downside-risk evidence."
+    return RiskAction.NONE, tuple(), ""
+
+
+def _parse_risk_action(
+    *,
+    data: Mapping[str, Any],
+    rating: DecisionRating,
+    portfolio_stance: PortfolioStance,
+    entry_action: EntryAction,
+    setup_quality: SetupQuality,
+) -> tuple[RiskAction, str, tuple[str, ...], float | None, PriceLevel | None]:
+    fallback_action, fallback_codes, fallback_reason = _infer_risk_action_from_legacy(
+        rating=rating,
+        portfolio_stance=portfolio_stance,
+        entry_action=entry_action,
+        setup_quality=setup_quality,
+        data=data,
+    )
+    raw_action = str(data.get("risk_action") or "").strip().upper()
+    if not raw_action:
+        risk_action = fallback_action
+    else:
+        try:
+            risk_action = RiskAction(raw_action)
+        except ValueError as exc:
+            raise StructuredDecisionValidationError(f"Unsupported risk action: {data.get('risk_action')!r}.") from exc
+
+    reason = _optional_string(data.get("risk_action_reason")) or fallback_reason
+    reason_codes = _optional_string_list(data.get("risk_action_reason_codes")) or fallback_codes
+    confidence = _optional_float(data.get("risk_action_confidence"))
+    if confidence is not None and not 0.0 <= confidence <= 1.0:
+        raise StructuredDecisionValidationError("Field 'risk_action_confidence' must be between 0 and 1 inclusive.")
+
+    risk_level = None
+    raw_level = data.get("risk_action_level")
+    if isinstance(raw_level, Mapping):
+        try:
+            risk_level = _parse_price_level(raw_level)
+        except StructuredDecisionValidationError:
+            risk_level = None
+    if risk_level is None and risk_action in {RiskAction.REDUCE_RISK, RiskAction.STOP_LOSS, RiskAction.EXIT}:
+        for level in _parse_execution_levels(data).levels:
+            normalized = _price_level_type_value(level.level_type)
+            if normalized in {
+                PriceLevelType.SUPPORT.value,
+                PriceLevelType.INVALIDATION.value,
+                PriceLevelType.STOP_LOSS.value,
+                PriceLevelType.TRIM.value,
+            }:
+                risk_level = level
+                break
+    return risk_action, reason, tuple(dict.fromkeys(reason_codes)), confidence, risk_level
 
 
 def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDecision:
@@ -601,6 +815,14 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
             f"Unsupported setup quality: {data.get('setup_quality')!r}."
         ) from exc
 
+    risk_action, risk_action_reason, risk_action_reason_codes, risk_action_confidence, risk_action_level = _parse_risk_action(
+        data=data,
+        rating=rating,
+        portfolio_stance=portfolio_stance,
+        entry_action=entry_action,
+        setup_quality=setup_quality,
+    )
+
     raw_coverage = data.get("data_coverage") if isinstance(data.get("data_coverage"), Mapping) else {}
     social_source_raw = str(raw_coverage.get("social_source", "unavailable")).strip().lower()
     social_source_raw = _SOCIAL_SOURCE_ALIASES.get(social_source_raw, social_source_raw)
@@ -632,6 +854,11 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
             macro_items_count=max(0, int(raw_coverage.get("macro_items_count", 0) or 0)),
         ),
         execution_levels=_parse_execution_levels(data),
+        risk_action=risk_action,
+        risk_action_reason=risk_action_reason,
+        risk_action_reason_codes=risk_action_reason_codes,
+        risk_action_confidence=risk_action_confidence,
+        risk_action_level=risk_action_level,
     )
 
 

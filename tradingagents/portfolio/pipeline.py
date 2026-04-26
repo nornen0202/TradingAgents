@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from tradingagents.report_writer import polish_portfolio_report_markdown
+from tradingagents.live.sell_side_delta import build_sell_side_delta_candidates, render_risk_action_delta_markdown
 
 from .action_judge import arbitrate_portfolio_actions
 from .account_models import AccountSnapshot
@@ -73,6 +74,10 @@ def run_portfolio_pipeline(
             profile=profile,
             report_date=str(manifest.get("started_at") or "")[:10],
         )
+        live_sell_side_delta = build_sell_side_delta_candidates(
+            live_context_delta=manifest.get("live_context_delta"),
+            held_tickers={position.canonical_ticker for position in snapshot.positions},
+        )
         recommendation, action_judge_payload, action_judge_warnings = arbitrate_portfolio_actions(
             recommendation=recommendation,
             candidates=scored_candidates,
@@ -88,6 +93,7 @@ def run_portfolio_pipeline(
             recommendation=recommendation,
             candidates=scored_candidates,
             live_context_delta=manifest.get("live_context_delta"),
+            live_sell_side_delta=live_sell_side_delta,
         )
         markdown, report_writer_payload = polish_portfolio_report_markdown(
             markdown,
@@ -108,6 +114,8 @@ def run_portfolio_pipeline(
             report_writer_payload=report_writer_payload,
             batch_metrics=manifest.get("batch_metrics") or {},
             warnings=all_warnings,
+            live_sell_side_delta=live_sell_side_delta,
+            risk_action_delta_markdown=render_risk_action_delta_markdown(live_sell_side_delta),
         )
         status_value = _derive_pipeline_status(snapshot)
         semantic_health = _build_semantic_health(scored_candidates)
@@ -120,6 +128,8 @@ def run_portfolio_pipeline(
             "watchlist_reason": _derive_watchlist_reason(snapshot),
             "semantic_health": semantic_health,
             "action_summary": _build_action_summary(recommendation),
+            "sell_side_summary": recommendation.data_health_summary.get("sell_side_distribution") or {},
+            "sell_side_calibration_warnings": _sell_side_calibration_warnings(recommendation),
             "report_writer": report_writer_payload,
             "private_output_dir": private_dir.as_posix(),
             "artifacts": artifact_paths,
@@ -248,3 +258,16 @@ def _build_action_summary(recommendation) -> dict[str, Any]:
             for action in recommendation.actions
         },
     }
+
+
+def _sell_side_calibration_warnings(recommendation) -> list[str]:
+    warnings: list[str] = []
+    distribution = recommendation.data_health_summary.get("sell_side_distribution") or {}
+    if int(distribution.get("REDUCE_RISK") or 0) == 0 and any(
+        str(action.data_health.get("execution_timing_state") or "").upper() == "SUPPORT_FAIL"
+        for action in recommendation.actions
+    ):
+        warnings.append("sell_side_missed_support_fail")
+    if int(distribution.get("REDUCE_RISK") or 0) == 0 and recommendation.actions:
+        warnings.append("reduce_risk_count_zero_in_account_aware_run")
+    return warnings

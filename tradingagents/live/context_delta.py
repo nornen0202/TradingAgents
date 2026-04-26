@@ -5,6 +5,7 @@ from typing import Any
 
 from .market_delta import build_market_delta, is_live_action_change, top_add_candidates, top_trim_candidates
 from .news_delta import build_news_delta
+from .sell_side_delta import build_sell_side_delta_candidates
 
 
 def build_live_context_delta(
@@ -41,7 +42,7 @@ def build_live_context_delta(
     ]
     execution_asof_values = [value for value in execution_asof_values if value]
 
-    return {
+    payload = {
         "as_of": execution_asof_values[0] if execution_asof_values else str(manifest.get("started_at") or ""),
         "base_run_id": str(manifest.get("run_id") or ""),
         "market": str(((manifest.get("settings") or {}).get("market")) or "").upper(),
@@ -55,6 +56,8 @@ def build_live_context_delta(
             ),
         },
     }
+    payload["sell_side_delta_candidates"] = build_sell_side_delta_candidates(live_context_delta=payload)
+    return payload
 
 
 def render_report_vs_live_delta_markdown(live_context_delta: dict[str, Any] | None) -> str:

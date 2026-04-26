@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from tradingagents.schemas import DecisionRating, parse_structured_decision
+from tradingagents.schemas import DecisionRating, RiskAction, parse_structured_decision
 
 from .account_models import AccountSnapshot, PortfolioCandidate
 from .instrument_identity import resolve_identity
@@ -14,6 +14,8 @@ _TRIGGER_ACTIONS = {
     "ADD_IF_TRIGGERED",
     "STARTER_IF_TRIGGERED",
     "REDUCE_IF_TRIGGERED",
+    "TAKE_PROFIT_IF_TRIGGERED",
+    "STOP_LOSS_IF_TRIGGERED",
     "EXIT_IF_TRIGGERED",
 }
 
@@ -123,6 +125,7 @@ def _build_single_candidate(
             "rating": normalized,
             "portfolio_stance": stance,
             "entry_action": entry_action,
+            "risk_action": "EXIT" if normalized == "SELL" else "REDUCE_RISK" if normalized == "UNDERWEIGHT" else "NONE",
             "setup_quality": setup_quality,
             "confidence": confidence,
             "watchlist_triggers": [],
@@ -130,6 +133,9 @@ def _build_single_candidate(
             "invalidators": [],
             "data_coverage": data_coverage,
         }
+        risk_action = str(structured_dict["risk_action"])
+        risk_action_reason_codes = ("LEGACY_SELL_EXIT",) if risk_action == "EXIT" else ("LEGACY_UNDERWEIGHT",) if risk_action == "REDUCE_RISK" else tuple()
+        risk_action_level = None
         trigger_conditions = tuple()
     elif structured is not None:
         structured_dict = structured.to_dict()
@@ -137,6 +143,9 @@ def _build_single_candidate(
         confidence = structured.confidence
         stance = structured.portfolio_stance.value
         entry_action = structured.entry_action.value
+        risk_action = structured.risk_action.value
+        risk_action_reason_codes = structured.risk_action_reason_codes
+        risk_action_level = structured.risk_action_level.to_dict() if structured.risk_action_level else None
         setup_quality = structured.setup_quality.value
         data_coverage = structured.data_coverage.to_dict()
         trigger_conditions = tuple(
@@ -159,6 +168,9 @@ def _build_single_candidate(
         stance = "NEUTRAL"
         entry_action = "WAIT"
         setup_quality = "WEAK"
+        risk_action = "NONE"
+        risk_action_reason_codes = tuple()
+        risk_action_level = None
         data_coverage = {
             "company_news_count": 0,
             "disclosures_count": 0,
@@ -181,10 +193,34 @@ def _build_single_candidate(
         rating=rating_value,
     )
     execution_update = (analysis or {}).get("execution_update") if analysis else None
+    risk_action, risk_action_reason_codes = _apply_execution_overlay_risk_action(
+        risk_action=risk_action,
+        risk_action_reason_codes=risk_action_reason_codes,
+        execution_update=execution_update if isinstance(execution_update, dict) else None,
+        is_held=is_held,
+    )
+    action_now, action_if_triggered = _apply_risk_action_mapping(
+        action_now=action_now,
+        action_if_triggered=action_if_triggered,
+        risk_action=risk_action,
+        risk_action_reason_codes=risk_action_reason_codes,
+        risk_action_level=risk_action_level,
+        execution_update=execution_update if isinstance(execution_update, dict) else None,
+        is_held=is_held,
+    )
     if isinstance(execution_update, dict):
         action_now, action_if_triggered = _apply_execution_overlay_actions(
             action_now=action_now,
             action_if_triggered=action_if_triggered,
+            execution_update=execution_update,
+            is_held=is_held,
+        )
+        action_now, action_if_triggered = _apply_risk_action_mapping(
+            action_now=action_now,
+            action_if_triggered=action_if_triggered,
+            risk_action=risk_action,
+            risk_action_reason_codes=risk_action_reason_codes,
+            risk_action_level=risk_action_level,
             execution_update=execution_update,
             is_held=is_held,
         )
@@ -223,6 +259,7 @@ def _build_single_candidate(
         stance=stance,
         entry_action=entry_action,
         analysis_present=analysis is not None,
+        risk_action=risk_action,
     )
     relative_reason_codes = _initial_relative_reason_codes(
         is_held=is_held,
@@ -231,7 +268,10 @@ def _build_single_candidate(
         stance=stance,
         entry_action=entry_action,
         analysis_present=analysis is not None,
+        risk_action=risk_action,
+        risk_action_reason_codes=risk_action_reason_codes,
     )
+    sell_side_category = _sell_side_category(risk_action, portfolio_relative_action)
 
     return (
         PortfolioCandidate(
@@ -259,6 +299,10 @@ def _build_single_candidate(
             portfolio_relative_action=portfolio_relative_action,
             relative_action_reason=_relative_reason_text(relative_reason_codes),
             relative_action_reason_codes=relative_reason_codes,
+            risk_action=risk_action,
+            risk_action_reason_codes=risk_action_reason_codes,
+            risk_action_level=risk_action_level,
+            sell_side_category=sell_side_category,
             stale_but_triggerable=stale_but_triggerable,
             trigger_profile={
                 "intraday_pilot_rule": execution_levels_dict.get("intraday_pilot_rule"),
@@ -281,6 +325,10 @@ def _build_single_candidate(
                 "execution_feasibility_now": execution_feasibility_now,
                 "portfolio_relative_action": portfolio_relative_action,
                 "relative_action_reason_codes": list(relative_reason_codes),
+                "risk_action": risk_action,
+                "risk_action_reason_codes": list(risk_action_reason_codes),
+                "risk_action_level": risk_action_level,
+                "sell_side_category": sell_side_category,
                 "stale_but_triggerable": stale_but_triggerable,
                 **execution_health,
             },
@@ -319,6 +367,107 @@ def _translate_actions(*, is_held: bool, stance: str, entry_action: str, rating:
     if is_held:
         return "HOLD", "NONE"
     return "WATCH", "NONE"
+
+
+def _apply_execution_overlay_risk_action(
+    *,
+    risk_action: str,
+    risk_action_reason_codes: tuple[str, ...],
+    execution_update: dict[str, Any] | None,
+    is_held: bool,
+) -> tuple[str, tuple[str, ...]]:
+    if not execution_update or not is_held:
+        return risk_action, risk_action_reason_codes
+    current = str(risk_action or "NONE").upper()
+    codes = list(risk_action_reason_codes)
+    decision_state = str(execution_update.get("decision_state") or "").upper()
+    timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
+    trigger_status = execution_update.get("trigger_status") if isinstance(execution_update.get("trigger_status"), dict) else {}
+    if decision_state == "INVALIDATED" or timing_state == "INVALIDATED" or trigger_status.get("invalidated"):
+        codes.append("INVALIDATION_BROKEN")
+        return _stronger_risk_action(current, RiskAction.STOP_LOSS.value), tuple(dict.fromkeys(codes))
+    if timing_state == "SUPPORT_FAIL" or trigger_status.get("support_fail"):
+        codes.append("SUPPORT_BROKEN")
+        return _stronger_risk_action(current, RiskAction.REDUCE_RISK.value), tuple(dict.fromkeys(codes))
+    if timing_state in {"FAILED_BREAKOUT", "PILOT_BLOCKED_FAILED_BREAKOUT"} or trigger_status.get("failed_breakout"):
+        codes.append("FAILED_BREAKOUT")
+        return _stronger_risk_action(current, RiskAction.REDUCE_RISK.value), tuple(dict.fromkeys(codes))
+    return current or RiskAction.NONE.value, tuple(dict.fromkeys(codes))
+
+
+def _stronger_risk_action(current: str, candidate: str) -> str:
+    order = {
+        RiskAction.NONE.value: 0,
+        RiskAction.HOLD.value: 0,
+        RiskAction.TRIM_TO_FUND.value: 1,
+        RiskAction.TAKE_PROFIT.value: 2,
+        RiskAction.REDUCE_RISK.value: 3,
+        RiskAction.STOP_LOSS.value: 4,
+        RiskAction.EXIT.value: 5,
+    }
+    current_key = str(current or RiskAction.NONE.value).upper()
+    candidate_key = str(candidate or RiskAction.NONE.value).upper()
+    return candidate_key if order.get(candidate_key, 0) > order.get(current_key, 0) else current_key
+
+
+def _apply_risk_action_mapping(
+    *,
+    action_now: str,
+    action_if_triggered: str,
+    risk_action: str,
+    risk_action_reason_codes: tuple[str, ...],
+    risk_action_level: dict[str, Any] | None,
+    execution_update: dict[str, Any] | None,
+    is_held: bool,
+) -> tuple[str, str]:
+    normalized = str(risk_action or RiskAction.NONE.value).upper()
+    if normalized in {RiskAction.NONE.value, RiskAction.HOLD.value}:
+        return action_now, action_if_triggered
+    if not is_held:
+        if normalized in {RiskAction.REDUCE_RISK.value, RiskAction.STOP_LOSS.value, RiskAction.EXIT.value}:
+            return "WATCH", "NONE"
+        return action_now, action_if_triggered
+    if normalized == RiskAction.TRIM_TO_FUND.value:
+        return action_now, action_if_triggered
+
+    triggered_now = _risk_action_triggered_now(
+        risk_action=normalized,
+        reason_codes=risk_action_reason_codes,
+        risk_action_level=risk_action_level,
+        execution_update=execution_update,
+    )
+    if normalized == RiskAction.EXIT.value:
+        return ("EXIT_NOW", "NONE") if triggered_now else ("HOLD", "EXIT_IF_TRIGGERED")
+    if normalized == RiskAction.STOP_LOSS.value:
+        return ("STOP_LOSS_NOW", "NONE") if triggered_now else ("HOLD", "STOP_LOSS_IF_TRIGGERED")
+    if normalized == RiskAction.REDUCE_RISK.value:
+        return ("REDUCE_NOW", "NONE") if triggered_now else ("HOLD", "REDUCE_IF_TRIGGERED")
+    if normalized == RiskAction.TAKE_PROFIT.value:
+        return ("TAKE_PROFIT_NOW", "NONE") if triggered_now else ("HOLD", "TAKE_PROFIT_IF_TRIGGERED")
+    return action_now, action_if_triggered
+
+
+def _risk_action_triggered_now(
+    *,
+    risk_action: str,
+    reason_codes: tuple[str, ...],
+    risk_action_level: dict[str, Any] | None,
+    execution_update: dict[str, Any] | None,
+) -> bool:
+    if execution_update:
+        decision_state = str(execution_update.get("decision_state") or "").upper()
+        timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
+        trigger_status = execution_update.get("trigger_status") if isinstance(execution_update.get("trigger_status"), dict) else {}
+        if decision_state == "INVALIDATED" or timing_state in {"INVALIDATED", "SUPPORT_FAIL", "FAILED_BREAKOUT"}:
+            return True
+        if trigger_status.get("invalidated") or trigger_status.get("support_fail") or trigger_status.get("failed_breakout"):
+            return True
+    code_blob = " ".join(str(code).upper() for code in reason_codes)
+    if any(token in code_blob for token in ("BROKEN", "BREACHED", "HIT", "FAILED", "TRIGGERED", "CONFIRMED")):
+        return True
+    if str(risk_action or "").upper() in {RiskAction.EXIT.value, RiskAction.STOP_LOSS.value} and risk_action_level is None:
+        return True
+    return False
 
 
 def _build_rationale(*, stance: str, entry_action: str, is_held: bool, analysis_present: bool) -> str:
@@ -432,7 +581,7 @@ def _execution_feasibility_now(
             return "risk_exit_review"
         if timing_state == "PILOT_READY":
             return "executable_now"
-    if action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}:
+    if action_now in {"ADD_NOW", "STARTER_NOW", "REDUCE_NOW", "TRIM_NOW", "EXIT_NOW", "STOP_LOSS_NOW", "TAKE_PROFIT_NOW"}:
         return "executable_now"
     return "not_actionable_now"
 
@@ -515,7 +664,21 @@ def _initial_portfolio_relative_action(
     stance: str,
     entry_action: str,
     analysis_present: bool,
+    risk_action: str,
 ) -> str:
+    normalized_risk = str(risk_action or RiskAction.NONE.value).upper()
+    if is_held and normalized_risk in {
+        RiskAction.TRIM_TO_FUND.value,
+        RiskAction.REDUCE_RISK.value,
+        RiskAction.TAKE_PROFIT.value,
+        RiskAction.STOP_LOSS.value,
+        RiskAction.EXIT.value,
+    }:
+        return normalized_risk
+    if not is_held and normalized_risk in {RiskAction.REDUCE_RISK.value, RiskAction.STOP_LOSS.value, RiskAction.EXIT.value}:
+        return "AVOID"
+    if not is_held and normalized_risk == RiskAction.TAKE_PROFIT.value:
+        return "WATCH_RISK"
     if is_held and action_now in {"REDUCE_NOW", "TRIM_NOW"}:
         return "REDUCE_RISK"
     if is_held and action_now == "EXIT_NOW":
@@ -537,18 +700,44 @@ def _initial_relative_reason_codes(
     stance: str,
     entry_action: str,
     analysis_present: bool,
+    risk_action: str,
+    risk_action_reason_codes: tuple[str, ...],
 ) -> tuple[str, ...]:
-    codes: list[str] = []
+    codes: list[str] = list(risk_action_reason_codes)
+    normalized_risk = str(risk_action or RiskAction.NONE.value).upper()
     if is_held and not analysis_present:
         codes.append("NO_COVERAGE")
-    if is_held and (stance == "BEARISH" or entry_action == "EXIT" or action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"}):
+    if is_held and normalized_risk in {RiskAction.REDUCE_RISK.value, RiskAction.STOP_LOSS.value, RiskAction.EXIT.value}:
         codes.append("THESIS_WEAKENING")
-    if is_held and action_if_triggered in {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+    if is_held and normalized_risk == RiskAction.TAKE_PROFIT.value:
+        codes.append("PROFIT_TAKING")
+    if is_held and normalized_risk == RiskAction.TRIM_TO_FUND.value:
+        codes.append("OPPORTUNITY_COST")
+    if is_held and (
+        stance == "BEARISH"
+        or entry_action == "EXIT"
+        or action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW", "STOP_LOSS_NOW", "TAKE_PROFIT_NOW"}
+    ):
+        codes.append("THESIS_WEAKENING")
+    if is_held and action_if_triggered in {
+        "REDUCE_IF_TRIGGERED",
+        "EXIT_IF_TRIGGERED",
+        "STOP_LOSS_IF_TRIGGERED",
+        "TAKE_PROFIT_IF_TRIGGERED",
+    }:
         codes.append("THESIS_WEAKENING")
     return tuple(dict.fromkeys(codes))
 
 
 def _relative_reason_text(reason_codes: tuple[str, ...]) -> str:
+    if "INVALIDATION_BROKEN" in reason_codes:
+        return "Invalidation or stop-loss level was breached; prioritize loss control."
+    if "SUPPORT_BROKEN" in reason_codes:
+        return "Named support broke; reduce downside risk before adding exposure."
+    if "FAILED_BREAKOUT" in reason_codes:
+        return "Breakout failed; avoid fresh buying and reduce risk if weakness persists."
+    if "PROFIT_TAKING" in reason_codes:
+        return "Take partial profit because reward/risk no longer favors full size."
     if "NO_COVERAGE" in reason_codes:
         return "No current thesis coverage; size should be reviewed before funding stronger candidates."
     if "THESIS_WEAKENING" in reason_codes:
@@ -556,8 +745,28 @@ def _relative_reason_text(reason_codes: tuple[str, ...]) -> str:
     return ""
 
 
+def _sell_side_category(risk_action: str, portfolio_relative_action: str) -> str:
+    normalized = str(risk_action or portfolio_relative_action or "").upper()
+    if normalized == RiskAction.TRIM_TO_FUND.value:
+        return "funding"
+    if normalized == RiskAction.REDUCE_RISK.value:
+        return "risk"
+    if normalized == RiskAction.TAKE_PROFIT.value:
+        return "profit"
+    if normalized == RiskAction.STOP_LOSS.value:
+        return "stop"
+    if normalized == RiskAction.EXIT.value:
+        return "exit"
+    return "none"
+
+
 def _strategy_state(*, action_now: str, action_if_triggered: str, is_held: bool, stance: str) -> str:
-    if action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW"} or action_if_triggered in {"REDUCE_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+    if action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW", "STOP_LOSS_NOW", "TAKE_PROFIT_NOW"} or action_if_triggered in {
+        "REDUCE_IF_TRIGGERED",
+        "EXIT_IF_TRIGGERED",
+        "STOP_LOSS_IF_TRIGGERED",
+        "TAKE_PROFIT_IF_TRIGGERED",
+    }:
         return "reduce_or_exit"
     if action_now in {"ADD_NOW", "STARTER_NOW"}:
         return "add_now"
