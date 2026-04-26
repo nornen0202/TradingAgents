@@ -1,4 +1,4 @@
-import tempfile
+﻿import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -57,8 +57,8 @@ class CliUnicodeLoggingTests(unittest.TestCase):
                 "research_depth": 1,
                 "llm_provider": "codex",
                 "backend_url": None,
-                "shallow_thinker": "gpt-5.4",
-                "deep_thinker": "gpt-5.4",
+                "shallow_thinker": "gpt-5.5",
+                "deep_thinker": "gpt-5.5",
                 "codex_reasoning_effort": "medium",
             }
 

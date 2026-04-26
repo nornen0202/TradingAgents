@@ -1,4 +1,4 @@
-import unittest
+﻿import unittest
 import warnings
 
 from tradingagents.llm_clients.base_client import BaseLLMClient
@@ -52,4 +52,4 @@ class ModelValidationTests(unittest.TestCase):
                 self.assertEqual(caught, [])
 
     def test_validator_accepts_known_model_with_surrounding_whitespace(self):
-        self.assertTrue(validate_model(" openai ", " gpt-5.4 "))
+        self.assertTrue(validate_model(" openai ", " gpt-5.5 "))

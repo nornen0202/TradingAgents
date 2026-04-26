@@ -1,4 +1,4 @@
-import os
+﻿import os
 from pathlib import Path
 from unittest.mock import patch
 
@@ -43,7 +43,7 @@ def test_codex_app_server_seeds_auth_into_isolated_codex_home(tmp_path: Path):
     source_home = tmp_path / "source-home"
     source_home.mkdir()
     (source_home / "auth.json").write_text('{"account":"present"}', encoding="utf-8")
-    (source_home / "config.toml").write_text("model = 'gpt-5.4'\n", encoding="utf-8")
+    (source_home / "config.toml").write_text("model = 'gpt-5.5'\n", encoding="utf-8")
     workspace = tmp_path / "workspace"
 
     class _FakeProc:
@@ -68,4 +68,4 @@ def test_codex_app_server_seeds_auth_into_isolated_codex_home(tmp_path: Path):
 
     isolated_home = workspace / ".codex-home"
     assert (isolated_home / "auth.json").read_text(encoding="utf-8") == '{"account":"present"}'
-    assert (isolated_home / "config.toml").read_text(encoding="utf-8") == "model = 'gpt-5.4'\n"
+    assert (isolated_home / "config.toml").read_text(encoding="utf-8") == "model = 'gpt-5.5'\n"

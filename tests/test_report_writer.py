@@ -1,4 +1,4 @@
-import json
+﻿import json
 import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -23,9 +23,9 @@ class _FakeLLM:
 def _llm_settings():
     return SimpleNamespace(
         provider="codex",
-        output_model="gpt-5.4",
-        deep_model="gpt-5.4",
-        quick_model="gpt-5.4",
+        output_model="gpt-5.5",
+        deep_model="gpt-5.5",
+        quick_model="gpt-5.5",
         codex_reasoning_effort="medium",
         codex_summary="none",
         codex_personality="none",

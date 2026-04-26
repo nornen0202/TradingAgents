@@ -217,7 +217,7 @@ def _create_action_llm(llm_settings: Any | None) -> Any | None:
     provider = str(getattr(llm_settings, "provider", "") or "").strip().lower()
     model = str(getattr(llm_settings, "output_model", "") or getattr(llm_settings, "deep_model", "") or "").strip()
     if provider == "codex" and not model:
-        model = "gpt-5.4"
+        model = "gpt-5.5"
     if not provider or not model:
         return None
 

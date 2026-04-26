@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 
 from tradingagents.scheduled.config import load_scheduled_config
 
@@ -20,9 +20,9 @@ site_dir = "./site"
     config = load_scheduled_config(config_path)
     assert config.run.max_debate_rounds == 2
     assert config.run.max_risk_discuss_rounds == 2
-    assert config.llm.deep_model == "gpt-5.4"
-    assert config.llm.quick_model == "gpt-5.4-mini"
-    assert config.llm.output_model == "gpt-5.4-mini"
+    assert config.llm.deep_model == "gpt-5.5"
+    assert config.llm.quick_model == "gpt-5.5"
+    assert config.llm.output_model == "gpt-5.5"
 
 
 def test_empty_execution_checkpoints_fall_back_to_market_defaults(tmp_path: Path):

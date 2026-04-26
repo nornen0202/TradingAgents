@@ -11,30 +11,27 @@ ProviderModeOptions = Dict[str, Dict[str, List[ModelOption]]]
 MODEL_OPTIONS: ProviderModeOptions = {
     "openai": {
         "quick": [
-            ("GPT-5.4 Mini - Fast, strong coding and tool use", "gpt-5.4-mini"),
-            ("GPT-5.4 Nano - Cheapest, high-volume tasks", "gpt-5.4-nano"),
-            ("GPT-5.4 - Latest frontier, 1M context", "gpt-5.4"),
+            ("GPT-5.5 - Latest frontier model", "gpt-5.5"),
+            ("GPT-5.2 - Strong reasoning, cost-effective", "gpt-5.2"),
             ("GPT-4.1 - Smartest non-reasoning model", "gpt-4.1"),
         ],
         "deep": [
-            ("GPT-5.4 - Latest frontier, 1M context", "gpt-5.4"),
+            ("GPT-5.5 - Latest frontier model", "gpt-5.5"),
             ("GPT-5.2 - Strong reasoning, cost-effective", "gpt-5.2"),
-            ("GPT-5.4 Mini - Fast, strong coding and tool use", "gpt-5.4-mini"),
-            ("GPT-5.4 Pro - Most capable, expensive ($30/$180 per 1M tokens)", "gpt-5.4-pro"),
+            ("GPT-4.1 - Smartest non-reasoning model", "gpt-4.1"),
         ],
     },
     "codex": {
         "quick": [
-            ("GPT-5.4 Mini - Local Codex session, fast tool use", "gpt-5.4-mini"),
-            ("GPT-5.4 Nano - Lowest-cost Codex model", "gpt-5.4-nano"),
-            ("GPT-5.4 - Frontier Codex model", "gpt-5.4"),
+            ("GPT-5.5 - Frontier Codex model", "gpt-5.5"),
+            ("GPT-5.3 Codex - Coding-optimized fallback", "gpt-5.3-codex"),
+            ("GPT-5.2 - Strong Codex reasoning", "gpt-5.2"),
             ("GPT-4.1 - Strong non-reasoning fallback", "gpt-4.1"),
         ],
         "deep": [
-            ("GPT-5.4 - Frontier Codex model", "gpt-5.4"),
+            ("GPT-5.5 - Frontier Codex model", "gpt-5.5"),
+            ("GPT-5.3 Codex - Coding-optimized fallback", "gpt-5.3-codex"),
             ("GPT-5.2 - Strong Codex reasoning", "gpt-5.2"),
-            ("GPT-5.4 Mini - Faster Codex alternative", "gpt-5.4-mini"),
-            ("GPT-5.4 Pro - Highest capability Codex model", "gpt-5.4-pro"),
         ],
     },
     "anthropic": {

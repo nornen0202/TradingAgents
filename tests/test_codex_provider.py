@@ -1,4 +1,4 @@
-import re
+﻿import re
 import unittest
 from collections import deque
 from pathlib import Path
@@ -55,7 +55,7 @@ class FakeCodexSession:
             "requiresOpenaiAuth": False,
         }
         self.models_payload = models_payload or {
-            "data": [{"id": "gpt-5.4", "model": "gpt-5.4"}]
+            "data": [{"id": "gpt-5.5", "model": "gpt-5.5"}]
         }
         self.started = 0
         self.closed = 0
@@ -231,7 +231,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             session_factory=lambda **kwargs: session,
@@ -269,7 +269,7 @@ class CodexProviderTests(unittest.TestCase):
         session.invoke = invoke_with_usage
         llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             session_factory=lambda **kwargs: session,
@@ -286,7 +286,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             session_factory=lambda **kwargs: session,
@@ -310,7 +310,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             session_factory=lambda **kwargs: session,
@@ -336,7 +336,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             session_factory=lambda **kwargs: session,
@@ -361,7 +361,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             session_factory=lambda **kwargs: session,
@@ -381,7 +381,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         required_llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             session_factory=lambda **kwargs: required_session,
@@ -408,7 +408,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         named_llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             session_factory=lambda **kwargs: named_session,
@@ -433,7 +433,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             codex_max_retries=1,
@@ -454,7 +454,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         failing_llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             codex_max_retries=1,
@@ -473,7 +473,7 @@ class CodexProviderTests(unittest.TestCase):
         session = FailingSession()
         llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             codex_max_retries=2,
@@ -496,7 +496,7 @@ class CodexProviderTests(unittest.TestCase):
 
         llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             codex_max_retries=1,
@@ -522,7 +522,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         llm = create_llm_client(
             "codex",
-            "gpt-5.4",
+            "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
             session_factory=lambda **kwargs: session,
@@ -549,7 +549,7 @@ class CodexProviderTests(unittest.TestCase):
         )
         result = run_codex_preflight(
             codex_binary="C:\\fake\\codex.exe",
-            model="gpt-5.4",
+            model="gpt-5.5",
             request_timeout=10.0,
             workspace_dir="C:/tmp/codex-workspace",
             cleanup_threads=True,
@@ -563,7 +563,7 @@ class CodexProviderTests(unittest.TestCase):
         with self.assertRaises(CodexAppServerAuthError):
             run_codex_preflight(
                 codex_binary="C:\\fake\\codex.exe",
-                model="gpt-5.4",
+                model="gpt-5.5",
                 request_timeout=10.0,
                 workspace_dir="C:/tmp/codex-workspace",
                 cleanup_threads=True,
@@ -577,7 +577,7 @@ class CodexProviderTests(unittest.TestCase):
             with self.assertRaises(CodexAppServerBinaryError):
                 run_codex_preflight(
                     codex_binary="definitely-missing-codex-binary",
-                    model="gpt-5.4",
+                    model="gpt-5.5",
                     request_timeout=10.0,
                     workspace_dir="C:/tmp/codex-workspace",
                     cleanup_threads=True,
@@ -596,7 +596,7 @@ class CodexProviderTests(unittest.TestCase):
         ):
             run_codex_preflight(
                 codex_binary=None,
-                model="gpt-5.4",
+                model="gpt-5.5",
                 request_timeout=10.0,
                 workspace_dir="C:/tmp/codex-workspace",
                 cleanup_threads=True,
@@ -613,7 +613,7 @@ class CodexProviderTests(unittest.TestCase):
 
         llm = create_llm_client(
             provider="codex",
-            model="gpt-5.4",
+            model="gpt-5.5",
             codex_workspace_dir=None,
             preflight_runner=preflight_runner,
             session_factory=FakeCodexSession,
