@@ -21,6 +21,7 @@ def save_portfolio_outputs(
     warnings: list[str],
     live_sell_side_delta: list[dict[str, Any]] | None = None,
     risk_action_delta_markdown: str | None = None,
+    summary_image_artifacts: dict[str, str] | None = None,
 ) -> dict[str, str]:
     private_dir.mkdir(parents=True, exist_ok=True)
 
@@ -82,7 +83,7 @@ def save_portfolio_outputs(
             "actions": [action.to_dict() for action in recommendation.actions],
         },
     )
-    return {
+    artifacts = {
         "account_snapshot_json": account_snapshot_path.as_posix(),
         "portfolio_candidates_json": candidates_path.as_posix(),
         "portfolio_semantic_verdicts_json": semantic_verdicts_path.as_posix(),
@@ -98,6 +99,8 @@ def save_portfolio_outputs(
         "risk_action_delta_md": risk_action_delta_path.as_posix(),
         "decision_audit_json": audit_path.as_posix(),
     }
+    artifacts.update(summary_image_artifacts or {})
+    return artifacts
 
 
 def _translated_action_distribution(recommendation: PortfolioRecommendation) -> dict[str, int]:

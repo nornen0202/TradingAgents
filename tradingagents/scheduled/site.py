@@ -114,6 +114,8 @@ def _copy_artifacts(
         if not artifact_path:
             continue
         source = _resolve_artifact_source(run_dir, artifact_path)
+        if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
+            continue
         if source.is_file():
             download_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, download_dir / source.name)
@@ -139,6 +141,8 @@ def _copy_artifacts(
 
     for source in portfolio_summary.get("downloadable_files", []):
         if not isinstance(source, Path) or not source.is_file():
+            continue
+        if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
             continue
         download_dir.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, download_dir / source.name)
@@ -316,12 +320,16 @@ def _render_run_page(
         if not artifact_path:
             continue
         artifact_name = Path(str(artifact_path)).name
+        if _is_summary_image_artifact(Path(artifact_name)) and not _summary_image_publish_enabled(manifest):
+            continue
         portfolio_links.append(
             f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(artifact_name)}'>{_escape(artifact_name)}</a>"
         )
     if not portfolio_links:
         for source in portfolio_summary.get("downloadable_files", []):
             if not isinstance(source, Path):
+                continue
+            if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
                 continue
             portfolio_links.append(
                 f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
@@ -659,6 +667,8 @@ def _render_portfolio_page(
     for source in portfolio_summary.get("downloadable_files", []):
         if not isinstance(source, Path):
             continue
+        if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
+            continue
         download_links.append(
             f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
         )
@@ -684,6 +694,7 @@ def _render_portfolio_page(
         else _portfolio_report_label(portfolio_summary)
     )
     portfolio_label = _portfolio_report_label(portfolio_summary)
+    summary_image_html = _portfolio_summary_image_html(manifest, portfolio_summary)
 
     body = f"""
     <nav class="breadcrumbs">
@@ -703,6 +714,7 @@ def _render_portfolio_page(
       </div>
     </section>
     {failure_html}
+    {summary_image_html}
     {_render_live_context_delta_section(manifest)}
     <section class="section prose">
       <div class="section-head">
@@ -714,6 +726,37 @@ def _render_portfolio_page(
     {downloads_html}
     """
     return _page_template(f"{manifest['run_id']} {portfolio_label.lower()} | {settings.title}", body, prefix="../../")
+
+
+def _portfolio_summary_image_html(manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
+    if not _summary_image_publish_enabled(manifest):
+        return ""
+    image_path = portfolio_summary.get("summary_image_png") or portfolio_summary.get("summary_image_svg")
+    if not isinstance(image_path, Path) or not image_path.exists():
+        return ""
+    image_name = image_path.name
+    href = f"../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(image_name)}"
+    return f"""
+    <section class="section summary-image-section">
+      <div class="section-head">
+        <h2>요약 이미지</h2>
+        <a class="pill" href="{href}">Download image</a>
+      </div>
+      <figure class="summary-image-frame">
+        <img src="{href}" alt="TradingAgents portfolio summary image for {_escape(manifest['run_id'])}" loading="lazy" />
+      </figure>
+    </section>
+    """
+
+
+def _summary_image_publish_enabled(manifest: dict[str, Any]) -> bool:
+    settings = manifest.get("settings") or {}
+    return bool(settings.get("summary_image_publish_to_site", True))
+
+
+def _is_summary_image_artifact(path: Path) -> bool:
+    name = path.name.lower()
+    return name.startswith("summary_image_") or name.startswith("summary_card")
 
 
 def _render_ticker_page(
@@ -1604,6 +1647,10 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
     report_md = private_dir / "portfolio_report.md"
     report_json = private_dir / "portfolio_report.json"
     candidates_json = private_dir / "portfolio_candidates.json"
+    summary_svg = private_dir / "summary_card.svg"
+    summary_png = private_dir / "summary_card_ai.png"
+    summary_spec = private_dir / "summary_image_spec.json"
+    summary_metadata = private_dir / "summary_image_metadata.json"
     files = sorted(path for path in private_dir.iterdir() if path.is_file())
     candidate_symbols: list[str] = []
     candidate_pairs: list[dict[str, str]] = []
@@ -1649,6 +1696,10 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "error": payload.get("error"),
         "portfolio_report_md": report_md if report_md.exists() else None,
         "portfolio_report_json": report_json if report_json.exists() else None,
+        "summary_image_svg": summary_svg if summary_svg.exists() else None,
+        "summary_image_png": summary_png if summary_png.exists() else None,
+        "summary_image_spec_json": summary_spec if summary_spec.exists() else None,
+        "summary_image_metadata_json": summary_metadata if summary_metadata.exists() else None,
         "candidate_canonical_symbols": candidate_symbols,
         "candidate_identity_pairs": candidate_pairs,
         "sell_side_counts": sell_side_counts,
@@ -2273,6 +2324,21 @@ a { color: inherit; }
   border: 1px solid var(--line);
   padding: 10px;
   text-align: left;
+}
+
+.summary-image-frame {
+  margin: 16px 0 0;
+  display: flex;
+  justify-content: center;
+}
+
+.summary-image-frame img {
+  width: min(100%, 760px);
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 12px 32px rgba(17, 34, 51, 0.12);
 }
 
 @media (max-width: 840px) {

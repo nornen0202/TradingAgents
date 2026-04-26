@@ -337,6 +337,7 @@ def execute_scheduled_run(
             manifest=manifest,
             portfolio_settings=config.portfolio,
             llm_settings=config.llm,
+            summary_image_settings=config.summary_image,
         )
         manifest["portfolio"] = portfolio_status
         for warning in portfolio_status.get("sell_side_calibration_warnings") or []:
@@ -881,6 +882,10 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "execution_refresh_checkpoints_kst": list(config.execution.execution_refresh_checkpoints_kst),
         "execution_max_data_age_seconds": config.execution.execution_max_data_age_seconds,
         "execution_publish_debug": config.execution.execution_publish_debug,
+        "summary_image_enabled": config.summary_image.enabled,
+        "summary_image_mode": config.summary_image.mode,
+        "summary_image_publish_to_site": config.summary_image.publish_to_site,
+        "summary_image_redact_account_values": config.summary_image.redact_account_values,
     }
 
 

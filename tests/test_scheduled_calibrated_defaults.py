@@ -23,6 +23,9 @@ site_dir = "./site"
     assert config.llm.deep_model == "gpt-5.5"
     assert config.llm.quick_model == "gpt-5.5"
     assert config.llm.output_model == "gpt-5.5"
+    assert config.summary_image.enabled is True
+    assert config.summary_image.mode == "deterministic_svg"
+    assert config.summary_image.publish_to_site is True
 
 
 def test_empty_execution_checkpoints_fall_back_to_market_defaults(tmp_path: Path):
@@ -45,3 +48,29 @@ site_dir = "./site"
     )
     config = load_scheduled_config(config_path)
     assert len(config.execution.execution_refresh_checkpoints_kst) == 3
+
+
+def test_summary_image_config_accepts_openai_mode_alias(tmp_path: Path):
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        """
+[run]
+tickers = ["AAPL"]
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+
+[summary_image]
+enabled = true
+mode = "openai"
+publish_to_site = false
+redact_account_values = true
+image_model = "gpt-image-2"
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    assert config.summary_image.mode == "openai_image"
+    assert config.summary_image.publish_to_site is False
+    assert config.summary_image.redact_account_values is True
