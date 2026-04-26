@@ -1,4 +1,4 @@
-import json
+﻿import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -170,9 +170,9 @@ report_polisher_enabled = false
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4"
-deep_model = "gpt-5.4"
-output_model = "gpt-5.4"
+quick_model = "gpt-5.5"
+deep_model = "gpt-5.5"
+output_model = "gpt-5.5"
 
 [storage]
 archive_dir = "{archive_dir.as_posix()}"
@@ -311,9 +311,9 @@ report_polisher_enabled = false
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4"
-deep_model = "gpt-5.4"
-output_model = "gpt-5.4"
+quick_model = "gpt-5.5"
+deep_model = "gpt-5.5"
+output_model = "gpt-5.5"
 
 [storage]
 archive_dir = "{archive_dir.as_posix()}"
@@ -472,9 +472,9 @@ report_polisher_enabled = false
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4"
-deep_model = "gpt-5.4"
-output_model = "gpt-5.4"
+quick_model = "gpt-5.5"
+deep_model = "gpt-5.5"
+output_model = "gpt-5.5"
 
 [storage]
 archive_dir = "{archive_dir.as_posix()}"
@@ -539,9 +539,9 @@ report_polisher_enabled = false
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4"
-deep_model = "gpt-5.4"
-output_model = "gpt-5.4"
+quick_model = "gpt-5.5"
+deep_model = "gpt-5.5"
+output_model = "gpt-5.5"
 
 [storage]
 archive_dir = "{archive_dir.as_posix()}"

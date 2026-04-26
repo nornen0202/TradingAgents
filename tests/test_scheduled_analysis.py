@@ -1,4 +1,4 @@
-import json
+﻿import json
 import tempfile
 import unittest
 from datetime import date
@@ -163,8 +163,8 @@ report_polisher_enabled = false
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4"
-deep_model = "gpt-5.4"
+quick_model = "gpt-5.5"
+deep_model = "gpt-5.5"
 codex_reasoning_effort = "medium"
 
 [translation]
@@ -198,8 +198,8 @@ NVDA = "NVIDIA Override"
             self.assertEqual(manifest["summary"]["successful_tickers"], 1)
             self.assertEqual(manifest["summary"]["failed_tickers"], 1)
             self.assertEqual(manifest["settings"]["provider"], "codex")
-            self.assertEqual(manifest["settings"]["deep_model"], "gpt-5.4")
-            self.assertEqual(manifest["settings"]["quick_model"], "gpt-5.4")
+            self.assertEqual(manifest["settings"]["deep_model"], "gpt-5.5")
+            self.assertEqual(manifest["settings"]["quick_model"], "gpt-5.5")
             self.assertEqual(manifest["settings"]["translation_backend"], "nllb_ct2")
             self.assertEqual(manifest["settings"]["translation_model"], "nllb-200-distilled-600m")
             self.assertEqual(manifest["tickers"][0]["analysis_date"], manifest["started_at"][:10])
@@ -274,8 +274,8 @@ NVDA = "NVIDIA Override"
                         "timezone": "Asia/Seoul",
                         "settings": {
                             "provider": "codex",
-                            "quick_model": "gpt-5.4",
-                            "deep_model": "gpt-5.4",
+                            "quick_model": "gpt-5.5",
+                            "deep_model": "gpt-5.5",
                             "codex_reasoning_effort": "medium",
                             "output_language": "Korean",
                             "translation_backend": "nllb_ct2",
@@ -359,8 +359,8 @@ report_polisher_enabled = false
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4"
-deep_model = "gpt-5.4"
+quick_model = "gpt-5.5"
+deep_model = "gpt-5.5"
 
 [storage]
 archive_dir = "{archive_dir.as_posix()}"
@@ -409,8 +409,8 @@ report_polisher_enabled = false
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.4"
-deep_model = "gpt-5.4"
+quick_model = "gpt-5.5"
+deep_model = "gpt-5.5"
 
 [storage]
 archive_dir = "{archive_dir.as_posix()}"

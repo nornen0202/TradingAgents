@@ -386,7 +386,7 @@ def _create_writer_llm(llm_settings: Any | None) -> Any | None:
         or ""
     ).strip()
     if provider == "codex" and not model:
-        model = "gpt-5.4"
+        model = "gpt-5.5"
     if not provider or not model:
         return None
 
