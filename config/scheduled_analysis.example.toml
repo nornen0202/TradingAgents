@@ -16,11 +16,9 @@ report_polisher_enabled = true
 
 [llm]
 provider = "codex"
-# TradingAgents' current Codex provider path uses the frontier model id `gpt-5.4`
-# for Codex 5.4 sessions.
-quick_model = "gpt-5.4-mini"
-deep_model = "gpt-5.4"
-output_model = "gpt-5.4-mini"
+quick_model = "gpt-5.5"
+deep_model = "gpt-5.5"
+output_model = "gpt-5.5"
 codex_reasoning_effort = "medium"
 codex_summary = "none"
 codex_personality = "none"
@@ -65,4 +63,14 @@ max_data_age_seconds = 180
 publish_badges = true
 publish_debug = false
 selective_rerun_enabled = true
-llm_summary_model = "gpt-5.4-mini"
+llm_summary_model = "gpt-5.5"
+
+[summary_image]
+enabled = true
+mode = "deterministic_svg" # deterministic_svg / openai_image / both
+publish_to_site = true
+redact_account_values = false
+image_model = "gpt-image-2"
+image_size = "1024x1536"
+image_quality = "medium"
+request_timeout = 180.0

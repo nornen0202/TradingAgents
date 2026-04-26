@@ -98,6 +98,18 @@ class ExecutionSettings:
 
 
 @dataclass(frozen=True)
+class SummaryImageSettings:
+    enabled: bool = True
+    mode: str = "deterministic_svg"
+    publish_to_site: bool = True
+    redact_account_values: bool = False
+    image_model: str = "gpt-image-2"
+    image_size: str = "1024x1536"
+    image_quality: str = "medium"
+    request_timeout: float = 180.0
+
+
+@dataclass(frozen=True)
 class PortfolioSettings:
     enabled: bool = False
     profile_path: Path | None = None
@@ -118,6 +130,7 @@ class ScheduledAnalysisConfig:
     site: SiteSettings
     portfolio: PortfolioSettings
     execution: ExecutionSettings
+    summary_image: SummaryImageSettings
     config_path: Path
 
 
@@ -133,6 +146,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     site_raw = raw.get("site") or {}
     portfolio_raw = raw.get("portfolio") or {}
     execution_raw = raw.get("execution") or {}
+    summary_image_raw = raw.get("summary_image") or {}
 
     tickers = _normalize_tickers(run_raw.get("tickers") or [])
     if not tickers:
@@ -248,6 +262,16 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             execution_selective_rerun_enabled=bool(execution_raw.get("selective_rerun_enabled", True)),
             execution_llm_summary_model=_optional_string(execution_raw.get("llm_summary_model")) or "gpt-5.5",
             execution_publish_debug=bool(execution_raw.get("publish_debug", False)),
+        ),
+        summary_image=SummaryImageSettings(
+            enabled=bool(summary_image_raw.get("enabled", True)),
+            mode=_normalize_summary_image_mode(summary_image_raw.get("mode", "deterministic_svg")),
+            publish_to_site=bool(summary_image_raw.get("publish_to_site", True)),
+            redact_account_values=bool(summary_image_raw.get("redact_account_values", False)),
+            image_model=str(summary_image_raw.get("image_model", "gpt-image-2")).strip() or "gpt-image-2",
+            image_size=str(summary_image_raw.get("image_size", "1024x1536")).strip() or "1024x1536",
+            image_quality=str(summary_image_raw.get("image_quality", "medium")).strip() or "medium",
+            request_timeout=float(summary_image_raw.get("request_timeout", 180.0)),
         ),
         config_path=config_path,
     )
@@ -381,6 +405,24 @@ def _normalize_run_mode(value: object) -> str:
         raise ValueError(
             f"Unsupported run_mode '{mode}'. "
             f"Expected one of: {', '.join(sorted(VALID_RUN_MODES))}."
+        )
+    return mode
+
+
+def _normalize_summary_image_mode(value: object) -> str:
+    mode = str(value or "deterministic_svg").strip().lower()
+    aliases = {
+        "svg": "deterministic_svg",
+        "deterministic": "deterministic_svg",
+        "openai": "openai_image",
+        "ai": "openai_image",
+    }
+    mode = aliases.get(mode, mode)
+    valid_modes = {"deterministic_svg", "openai_image", "both"}
+    if mode not in valid_modes:
+        raise ValueError(
+            f"Unsupported summary_image.mode '{mode}'. "
+            f"Expected one of: {', '.join(sorted(valid_modes))}."
         )
     return mode
 

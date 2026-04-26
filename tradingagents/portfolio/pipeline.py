@@ -7,6 +7,7 @@ from typing import Any
 
 from tradingagents.report_writer import polish_portfolio_report_markdown
 from tradingagents.live.sell_side_delta import build_sell_side_delta_candidates, render_risk_action_delta_markdown
+from tradingagents.summary_image.generator import generate_summary_image_artifacts
 
 from .action_judge import arbitrate_portfolio_actions
 from .account_models import AccountSnapshot
@@ -28,6 +29,7 @@ def run_portfolio_pipeline(
     manifest: dict[str, Any],
     portfolio_settings: Any,
     llm_settings: Any | None = None,
+    summary_image_settings: Any | None = None,
 ) -> dict[str, Any]:
     if not getattr(portfolio_settings, "enabled", False):
         return {"status": "disabled"}
@@ -103,6 +105,16 @@ def run_portfolio_pipeline(
             llm_settings=llm_settings,
             enabled=bool(getattr(portfolio_settings, "report_polisher_enabled", True)),
         )
+        summary_image_artifacts = generate_summary_image_artifacts(
+            private_dir=private_dir,
+            snapshot=snapshot,
+            recommendation=recommendation,
+            candidates=scored_candidates,
+            manifest=manifest,
+            live_sell_side_delta=live_sell_side_delta,
+            report_writer_payload=report_writer_payload,
+            settings=summary_image_settings,
+        )
         artifact_paths = save_portfolio_outputs(
             private_dir=private_dir,
             snapshot=snapshot,
@@ -116,6 +128,7 @@ def run_portfolio_pipeline(
             warnings=all_warnings,
             live_sell_side_delta=live_sell_side_delta,
             risk_action_delta_markdown=render_risk_action_delta_markdown(live_sell_side_delta),
+            summary_image_artifacts=summary_image_artifacts,
         )
         status_value = _derive_pipeline_status(snapshot)
         semantic_health = _build_semantic_health(scored_candidates)
