@@ -29,6 +29,10 @@ def create_research_manager(llm, memory):
 Your job:
 - weigh the strongest bullish and bearish evidence
 - separate directional stance (portfolio_stance) from immediate action (entry_action)
+- evaluate sell-side/downside-risk explicitly with risk_action separate from entry_action
+- use REDUCE_RISK, TAKE_PROFIT, STOP_LOSS, or EXIT when support, invalidation, failed breakout, thesis damage, weak earnings/guidance, regime headwind, or deteriorated reward/risk justifies reducing held exposure
+- use TRIM_TO_FUND only for funding/rotation when the thesis remains valid and the trim is not a risk event
+- include risk_action_reason_codes and risk_action_level whenever a numeric sell-side level exists
 - do not use NO_TRADE solely because immediate action is not justified today
 - when evidence is positive but setup is incomplete, prefer portfolio_stance=BULLISH with entry_action=WAIT and a legacy rating of HOLD or OVERWEIGHT when the thesis remains investable
 - reserve NO_TRADE for weak, contradictory, or insufficient evidence, no favorable setup to monitor, or data quality gaps

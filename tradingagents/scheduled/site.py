@@ -248,6 +248,13 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
             if portfolio_summary.get("status_path")
             else ""
         )
+        sell_side_counts = portfolio_summary.get("sell_side_counts") if isinstance(portfolio_summary.get("sell_side_counts"), dict) else {}
+        sell_side_line = (
+            f"<p>리스크 축소 {int(sell_side_counts.get('REDUCE_RISK') or 0)} / "
+            f"손절·청산 {int(sell_side_counts.get('STOP_LOSS') or 0) + int(sell_side_counts.get('EXIT') or 0)}</p>"
+            if sell_side_counts
+            else ""
+        )
         cards.append(
             f"""
             <article class="run-card">
@@ -258,6 +265,8 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
               <p>{_escape(manifest['started_at'])}</p>
               <p>{manifest['summary']['successful_tickers']} succeeded, {manifest['summary']['failed_tickers']} failed</p>
               <p>{_escape(manifest['settings'].get('output_language', '-'))} report</p>
+              <p>{_escape(_run_category(manifest))}</p>
+              {sell_side_line}
               {portfolio_link}
             </article>
             """
@@ -1598,6 +1607,17 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
     files = sorted(path for path in private_dir.iterdir() if path.is_file())
     candidate_symbols: list[str] = []
     candidate_pairs: list[dict[str, str]] = []
+    sell_side_counts: dict[str, Any] = {}
+    if report_json.exists():
+        try:
+            report_payload = json.loads(report_json.read_text(encoding="utf-8"))
+            sell_side_counts = (
+                (report_payload.get("data_health_summary") or {}).get("sell_side_distribution")
+                or report_payload.get("candidate_counts")
+                or {}
+            )
+        except Exception:
+            sell_side_counts = {}
     if candidates_json.exists():
         try:
             payload_candidates = json.loads(candidates_json.read_text(encoding="utf-8"))
@@ -1631,6 +1651,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "portfolio_report_json": report_json if report_json.exists() else None,
         "candidate_canonical_symbols": candidate_symbols,
         "candidate_identity_pairs": candidate_pairs,
+        "sell_side_counts": sell_side_counts,
         "downloadable_files": files,
         "artifact_count": len(files),
     }
@@ -1828,6 +1849,17 @@ def _manifest_calendar_phase(manifest: dict[str, Any]) -> str:
 
 
 def _run_phase_display_label(manifest: dict[str, Any]) -> str:
+    category = _run_category(manifest)
+    display = {
+        "LIVE_EXECUTION_READY": "Live execution ready",
+        "REGULAR_SESSION_ANALYSIS": "Regular session analysis",
+        "POST_CLOSE_REVIEW": "Post-close review",
+        "DELAYED_ANALYSIS_ONLY": "Delayed analysis only",
+        "NEXT_DAY_PLAN": "Next-day plan",
+        "TECHNICAL_ARCHIVE": "Technical archive",
+    }.get(category)
+    if display:
+        return display
     mapping = {
         "regular_session": "Regular session",
         "in_session": "Regular session",
@@ -1838,6 +1870,22 @@ def _run_phase_display_label(manifest: dict[str, Any]) -> str:
         "other": "Other",
     }
     return mapping.get(_run_phase_label(manifest), "Other")
+
+
+def _run_category(manifest: dict[str, Any]) -> str:
+    phase = _run_phase_label(manifest)
+    quality = _run_execution_data_quality(manifest)
+    if phase in {"regular_session", "in_session"} and quality == REALTIME_EXECUTION_READY:
+        return "LIVE_EXECUTION_READY"
+    if phase in {"regular_session", "in_session"}:
+        return "REGULAR_SESSION_ANALYSIS"
+    if phase == "post_close":
+        return "POST_CLOSE_REVIEW"
+    if phase == "delayed_analysis_only":
+        return "DELAYED_ANALYSIS_ONLY"
+    if phase == "pre_open":
+        return "NEXT_DAY_PLAN"
+    return "TECHNICAL_ARCHIVE"
 
 
 def _manifest_market(manifest: dict[str, Any]) -> str:

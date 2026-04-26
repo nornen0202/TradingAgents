@@ -19,6 +19,8 @@ def save_portfolio_outputs(
     report_writer_payload: dict[str, Any],
     batch_metrics: dict[str, Any],
     warnings: list[str],
+    live_sell_side_delta: list[dict[str, Any]] | None = None,
+    risk_action_delta_markdown: str | None = None,
 ) -> dict[str, str]:
     private_dir.mkdir(parents=True, exist_ok=True)
 
@@ -34,6 +36,8 @@ def save_portfolio_outputs(
     funding_plan_path = private_dir / "funding_plan.json"
     would_buy_path = private_dir / "would_buy_if_funded.json"
     would_trim_path = private_dir / "would_trim_first.json"
+    live_downgrade_path = private_dir / "live_downgrade_candidates.json"
+    risk_action_delta_path = private_dir / "risk_action_delta.md"
 
     _write_json(account_snapshot_path, snapshot.to_dict())
     _write_json(candidates_path, {"candidates": [candidate.to_dict() for candidate in candidates]})
@@ -46,6 +50,8 @@ def save_portfolio_outputs(
     _write_json(funding_plan_path, recommendation.funding_plan or {})
     _write_json(would_buy_path, {"candidates": (recommendation.funding_plan or {}).get("would_buy_if_funded") or []})
     _write_json(would_trim_path, {"candidates": (recommendation.funding_plan or {}).get("trim_first_candidates") or []})
+    _write_json(live_downgrade_path, {"candidates": live_sell_side_delta or []})
+    risk_action_delta_path.write_text(risk_action_delta_markdown or "# Risk Action Delta\n\n- Not available.", encoding="utf-8")
     _write_json(
         audit_path,
         {
@@ -61,6 +67,12 @@ def save_portfolio_outputs(
             "entry_action_distribution": batch_metrics.get("entry_action_distribution") or {},
             "translated_action_distribution": batch_metrics.get("translated_action_distribution")
             or _translated_action_distribution(recommendation),
+            "sell_side_distribution": _sell_side_distribution(recommendation),
+            "sell_side_calibration_warnings": _sell_side_calibration_warnings(
+                recommendation=recommendation,
+                batch_metrics=batch_metrics,
+                warnings=warnings,
+            ),
             "portfolio_summary_counts": recommendation.data_health_summary,
             "warnings": list(warnings),
             "semantic_verdicts": semantic_verdicts,
@@ -82,6 +94,8 @@ def save_portfolio_outputs(
         "funding_plan_json": funding_plan_path.as_posix(),
         "would_buy_if_funded_json": would_buy_path.as_posix(),
         "would_trim_first_json": would_trim_path.as_posix(),
+        "live_downgrade_candidates_json": live_downgrade_path.as_posix(),
+        "risk_action_delta_md": risk_action_delta_path.as_posix(),
         "decision_audit_json": audit_path.as_posix(),
     }
 
@@ -92,6 +106,48 @@ def _translated_action_distribution(recommendation: PortfolioRecommendation) -> 
         key = str(action.action_now or "UNKNOWN")
         distribution[key] = distribution.get(key, 0) + 1
     return distribution
+
+
+def _sell_side_distribution(recommendation: PortfolioRecommendation) -> dict[str, int]:
+    keys = ("TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT")
+    return {
+        key: sum(1 for action in recommendation.actions if str(action.portfolio_relative_action or "").upper() == key)
+        for key in keys
+    }
+
+
+def _sell_side_calibration_warnings(
+    *,
+    recommendation: PortfolioRecommendation,
+    batch_metrics: dict[str, Any],
+    warnings: list[str],
+) -> list[str]:
+    result: list[str] = []
+    distribution = _sell_side_distribution(recommendation)
+    reduce_risk_count = int(distribution.get("REDUCE_RISK") or 0)
+    support_fail_count = sum(
+        1
+        for action in recommendation.actions
+        if "SUPPORT_BROKEN" in {str(code).upper() for code in action.relative_action_reason_codes}
+        or str(action.data_health.get("execution_timing_state") or "").upper() == "SUPPORT_FAIL"
+    )
+    if reduce_risk_count == 0 and support_fail_count > 0:
+        result.append("sell_side_missed_support_fail")
+    if reduce_risk_count == 0 and _looks_account_aware(recommendation):
+        result.append("reduce_risk_count_zero_in_account_aware_run")
+    if _numeric_level_warning(batch_metrics, warnings):
+        result.append("execution_level_extraction_warning")
+    return result
+
+
+def _looks_account_aware(recommendation: PortfolioRecommendation) -> bool:
+    return recommendation.account_value_krw > 0 or any(action.portfolio_relative_action != "WATCH" for action in recommendation.actions)
+
+
+def _numeric_level_warning(batch_metrics: dict[str, Any], warnings: list[str]) -> bool:
+    if bool(batch_metrics.get("execution_level_extraction_warning")):
+        return True
+    return any("execution_level_extraction" in str(warning).lower() for warning in warnings)
 
 
 def _build_proposed_orders(snapshot: AccountSnapshot, recommendation: PortfolioRecommendation) -> list[dict[str, Any]]:

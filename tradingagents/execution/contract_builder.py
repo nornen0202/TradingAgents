@@ -11,6 +11,7 @@ from tradingagents.schemas import (
     ExecutionContract,
     LevelBasis,
     PriceLevel,
+    PriceLevelType,
     PrimarySetup,
     PullbackBuyZone,
     SessionVWAPPreference,
@@ -28,7 +29,7 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
         try:
             decision = parse_structured_decision(decision_payload)
             execution_levels = decision.execution_levels
-            structured_levels = execution_levels.levels
+            structured_levels, synthesized_level_fallback = _structured_levels_for_contract(decision)
 
             breakout_structured = _find_level(structured_levels, "breakout", "resistance")
             pullback_structured = _find_level(structured_levels, "pullback", "support")
@@ -84,7 +85,7 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
             )
             reason_codes = list(_normalize_reason_codes(decision.watchlist_triggers, prefix="trigger"))
             notes = list(_normalize_reason_codes(decision.catalysts, prefix="catalyst"))
-            if used_regex_fallback:
+            if used_regex_fallback or synthesized_level_fallback:
                 reason_codes.append("execution_level_regex_fallback")
 
             actionable_defined = _has_machine_actionable_level(
@@ -107,6 +108,8 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                 and not actionable_defined
             ):
                 reason_codes.append("no_machine_actionable_level")
+            if _numeric_rule_text_exists(decision) and not structured_levels:
+                reason_codes.append("execution_level_extraction_failed")
 
             return ExecutionContract(
                 ticker=ticker,
@@ -162,6 +165,10 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                 funding_priority=execution_levels.funding_priority,
                 entry_window=execution_levels.entry_window.value,
                 trigger_quality=execution_levels.trigger_quality.value,
+                risk_action=decision.risk_action.value,
+                risk_action_reason=decision.risk_action_reason,
+                risk_action_reason_codes=decision.risk_action_reason_codes,
+                risk_action_level=decision.risk_action_level,
             )
         except Exception:
             pass
@@ -223,6 +230,217 @@ def _action_if_triggered(entry_action: str) -> ActionIfTriggered:
     return mapping.get(normalized, ActionIfTriggered.NONE)
 
 
+def _structured_levels_for_contract(decision: Any) -> tuple[tuple[PriceLevel, ...], bool]:
+    existing = tuple(getattr(decision.execution_levels, "levels", tuple()) or tuple())
+    if existing:
+        return existing, False
+
+    levels: list[PriceLevel] = []
+    execution_levels = decision.execution_levels
+    rule_specs = (
+        (execution_levels.intraday_pilot_rule, PriceLevelType.BREAKOUT, "intraday", "INTRADAY_PILOT_LEVEL"),
+        (execution_levels.close_confirm_rule, PriceLevelType.BREAKOUT, "close", "CLOSE_CONFIRM_LEVEL"),
+        (execution_levels.next_day_followthrough_rule, PriceLevelType.SUPPORT, "next_day", "NEXT_DAY_FOLLOWTHROUGH_LEVEL"),
+        (execution_levels.failed_breakout_rule, PriceLevelType.BREAKOUT, "intraday", "FAILED_BREAKOUT_REFERENCE"),
+        (execution_levels.trim_rule, PriceLevelType.TRIM, "close", "TRIM_LEVEL"),
+    )
+    for text, default_type, confirmation, reason_code in rule_specs:
+        levels.extend(
+            _levels_from_text(
+                text,
+                default_type=default_type,
+                confirmation=confirmation,
+                reason_code=reason_code,
+            )
+        )
+        if reason_code == "FAILED_BREAKOUT_REFERENCE" and _numbers_from_text(text):
+            levels.extend(
+                _levels_from_text(
+                    text,
+                    default_type=PriceLevelType.INVALIDATION,
+                    confirmation="intraday",
+                    reason_code="FAILED_BREAKOUT_INVALIDATION",
+                    force_when_numeric=True,
+                )
+            )
+
+    fallback_lines = (
+        *decision.watchlist_triggers,
+        *decision.invalidators,
+        decision.risk_limits,
+        decision.exit_logic,
+        *decision.catalysts,
+    )
+    for line in fallback_lines:
+        levels.extend(_levels_from_text(line, default_type=None, confirmation=None, reason_code="TEXT_LEVEL_FALLBACK"))
+
+    return tuple(_dedupe_levels(levels)), bool(levels)
+
+
+def _levels_from_text(
+    text: Any,
+    *,
+    default_type: PriceLevelType | None,
+    confirmation: str | None,
+    reason_code: str,
+    force_when_numeric: bool = False,
+) -> list[PriceLevel]:
+    source_text = str(text or "").strip()
+    if not source_text:
+        return []
+    lowered = source_text.lower()
+    numbers = _numbers_from_text(source_text)
+    if not numbers:
+        return []
+    if _numbers_look_like_non_price_condition(source_text, numbers):
+        return []
+    level_type = (
+        default_type
+        if default_type is not None and (force_when_numeric or reason_code != "TEXT_LEVEL_FALLBACK")
+        else _infer_level_type_from_text(lowered, default_type=default_type)
+    )
+    if level_type is None:
+        if not force_when_numeric:
+            return []
+        level_type = default_type or PriceLevelType.SUPPORT
+    resolved_confirmation = confirmation or _confirmation_from_text(lowered)
+    low = high = price = None
+    if _looks_like_range(source_text) and len(numbers) >= 2:
+        low, high = min(numbers[0], numbers[1]), max(numbers[0], numbers[1])
+    else:
+        price = numbers[0]
+    label = f"{level_type.value.lower()} {price if price is not None else f'{low}-{high}'}"
+    return [
+        PriceLevel(
+            label=label,
+            level_type=level_type,
+            price=price,
+            low=low,
+            high=high,
+            confirmation=resolved_confirmation,
+            source_text=source_text,
+            reason_code=reason_code,
+        )
+    ]
+
+
+def _numbers_look_like_non_price_condition(text: str, numbers: list[float]) -> bool:
+    lowered = str(text or "").lower()
+    price_context = any(
+        token in lowered
+        for token in (
+            "price",
+            "above",
+            "below",
+            "support",
+            "resistance",
+            "breakout",
+            "trigger",
+            "reclaim",
+            "pullback",
+            "trim",
+            "stop",
+            "invalid",
+            "level",
+            "원",
+            "$",
+        )
+    )
+    if price_context:
+        return False
+    return max(numbers) < 10 and any(token in lowered for token in ("rvol", "relative volume", "volume", "vwap"))
+
+
+def _infer_level_type_from_text(text: str, *, default_type: PriceLevelType | None) -> PriceLevelType | None:
+    if any(token in text for token in ("take profit", "profit target", "take-profit")):
+        return PriceLevelType.TAKE_PROFIT
+    if any(token in text for token in ("stop loss", "stop-loss", "stop out")):
+        return PriceLevelType.STOP_LOSS
+    if any(token in text for token in ("invalid", "invalidation", "close below", "intraday below", "below support")):
+        return PriceLevelType.INVALIDATION
+    if any(token in text for token in ("support", "floor", "hold", "keep", "loses", "lose ", "지지", "이탈")):
+        return PriceLevelType.SUPPORT
+    if any(token in text for token in ("trim", "reduce", "de-risk", "derisk", "축소")):
+        return PriceLevelType.TRIM
+    if any(token in text for token in ("pullback", "retest", "buy zone", "dip")):
+        return PriceLevelType.PULLBACK
+    if any(token in text for token in ("resistance", "target", "ceiling")):
+        return PriceLevelType.RESISTANCE
+    if any(token in text for token in ("breakout", "trigger", "above", "reclaim", "clears", "clear ")):
+        return PriceLevelType.BREAKOUT
+    return default_type
+
+
+def _confirmation_from_text(text: str) -> str:
+    if any(token in text for token in ("next day", "next session", "follow-through", "followthrough")):
+        return "next_day"
+    if any(token in text for token in ("volume", "rvol")):
+        return "volume_confirmed"
+    if any(token in text for token in ("intraday", "touch", "day low", "session")):
+        return "intraday"
+    return "close"
+
+
+def _dedupe_levels(levels: list[PriceLevel]) -> list[PriceLevel]:
+    deduped: list[PriceLevel] = []
+    seen: set[tuple[str, float | None, float | None, float | None, str]] = set()
+    for level in levels:
+        key = (
+            _level_type_value(level.level_type),
+            level.price,
+            level.low,
+            level.high,
+            str(level.confirmation),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(level)
+    return deduped
+
+
+def _numeric_rule_text_exists(decision: Any) -> bool:
+    execution_levels = decision.execution_levels
+    lines = (
+        execution_levels.intraday_pilot_rule,
+        execution_levels.close_confirm_rule,
+        execution_levels.next_day_followthrough_rule,
+        execution_levels.failed_breakout_rule,
+        execution_levels.trim_rule,
+        *decision.watchlist_triggers,
+        *decision.invalidators,
+        decision.risk_limits,
+        decision.exit_logic,
+    )
+    trigger_words = (
+        "breakout",
+        "trigger",
+        "support",
+        "pullback",
+        "invalid",
+        "stop",
+        "trim",
+        "reduce",
+        "below",
+        "above",
+        "resistance",
+    )
+    for line in lines:
+        text = str(line or "").lower()
+        if any(word in text for word in trigger_words) and bool(_numbers_from_text(text)):
+            return True
+    return False
+
+
+def _level_type_value(value: Any) -> str:
+    if isinstance(value, PriceLevelType):
+        return value.value
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    return text.upper().replace(" ", "_")
+
+
 def _normalize_reason_codes(values: tuple[str, ...], *, prefix: str) -> list[str]:
     normalized: list[str] = []
     for value in values:
@@ -234,16 +452,16 @@ def _normalize_reason_codes(values: tuple[str, ...], *, prefix: str) -> list[str
 
 
 def _find_level(levels: tuple[PriceLevel, ...], *level_types: str) -> PriceLevel | None:
-    allowed = {str(level_type).strip().lower() for level_type in level_types}
+    allowed = {str(level_type).strip().upper().replace(" ", "_") for level_type in level_types}
     for level in levels:
-        if level.level_type in allowed:
+        if _level_type_value(level.level_type) in allowed:
             return level
     return None
 
 
 def _find_invalidation_level(levels: tuple[PriceLevel, ...], *, confirmation: str) -> PriceLevel | None:
     for level in levels:
-        if level.level_type not in {"invalidation", "trim"}:
+        if _level_type_value(level.level_type) not in {"INVALIDATION", "TRIM", "STOP_LOSS"}:
             continue
         if str(level.confirmation).strip().lower() == confirmation:
             return level
@@ -297,14 +515,54 @@ def _has_machine_actionable_level(
     return any(value is not None for value in (breakout_level, pullback_low, pullback_high, invalid_close, invalid_intraday))
 
 
+def _numbers_from_text(value: Any) -> list[float]:
+    if value in (None, ""):
+        return []
+    text = str(value)
+    text = re.sub(r"\b\d{1,2}:\d{2}\b", " ", text)
+    korean_values: list[float] = []
+    consumed_spans: list[tuple[int, int]] = []
+    for match in re.finditer(r"(\d+(?:\.\d+)?)\s*만\s*([\d,]+)(?=원|\s|~|-|$)", text):
+        major = float(match.group(1)) * 10000
+        minor = float(str(match.group(2) or 0).replace(",", ""))
+        korean_values.append(major + minor)
+        consumed_spans.append(match.span())
+    text_for_manse = text
+    for start, end in reversed(consumed_spans):
+        text_for_manse = text_for_manse[:start] + " " * (end - start) + text_for_manse[end:]
+    for match in re.finditer(r"(\d+(?:\.\d+)?)\s*만", text_for_manse):
+        korean_values.append(float(match.group(1)) * 10000)
+        consumed_spans.append(match.span())
+    text = re.sub(r"\d+(?:\.\d+)?\s*만\s*[\d,]*", " ", text)
+    text = text.replace(",", "")
+    text = re.sub(r"(?<=\d)\s*[-\u2013\u2014~]\s*(?=\d)", " ", text)
+    values = list(korean_values)
+    for match in re.finditer(r"[-+]?\d*\.?\d+", text):
+        token = match.group(0)
+        if token in {"+", "-", ".", "+.", "-."}:
+            continue
+        try:
+            values.append(float(token))
+        except ValueError:
+            continue
+    return values
+
+
+def _looks_like_range(text: str) -> bool:
+    return bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*[-\u2013\u2014~]\s*\d", text)) or any(
+        token in str(text or "").lower()
+        for token in ("range", "zone", "between", "from ", "구간", "~")
+    )
+
+
 def _extract_level(lines: tuple[str, ...], keywords: tuple[str, ...]) -> float | None:
     for line in lines:
         lowered = line.lower()
         if not all(keyword in lowered for keyword in keywords):
             continue
-        match = re.search(r"(-?\d+(?:\.\d+)?)", line)
-        if match:
-            return float(match.group(1))
+        numbers = _numbers_from_text(line)
+        if numbers:
+            return numbers[0]
     return None
 
 
@@ -313,7 +571,7 @@ def _extract_zone(lines: tuple[str, ...], *, keywords: tuple[str, ...]) -> tuple
         lowered = line.lower()
         if not any(keyword in lowered for keyword in keywords):
             continue
-        numbers = re.findall(r"(-?\d+(?:\.\d+)?)", line)
+        numbers = _numbers_from_text(line)
         if len(numbers) >= 2:
             first = float(numbers[0])
             second = float(numbers[1])

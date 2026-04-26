@@ -170,6 +170,10 @@ class PortfolioCandidate:
     portfolio_relative_action: str = "WATCH"
     relative_action_reason: str = ""
     relative_action_reason_codes: tuple[str, ...] = tuple()
+    risk_action: str = "NONE"
+    risk_action_reason_codes: tuple[str, ...] = tuple()
+    risk_action_level: dict[str, Any] | None = None
+    sell_side_category: str = "none"
     budget_blocked_actionable: bool = False
     stale_but_triggerable: bool = False
     funding_source_score: float = 0.0
@@ -213,6 +217,10 @@ class PortfolioAction:
     portfolio_relative_action: str = "WATCH"
     relative_action_reason: str = ""
     relative_action_reason_codes: tuple[str, ...] = tuple()
+    risk_action: str = "NONE"
+    risk_action_reason_codes: tuple[str, ...] = tuple()
+    risk_action_level: dict[str, Any] | None = None
+    sell_side_category: str = "none"
     budget_blocked_actionable: bool = False
     stale_but_triggerable: bool = False
     funding_source_score: float = 0.0
