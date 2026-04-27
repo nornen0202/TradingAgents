@@ -74,3 +74,34 @@ image_model = "gpt-image-2"
     assert config.summary_image.mode == "openai_image"
     assert config.summary_image.publish_to_site is False
     assert config.summary_image.redact_account_values is True
+
+
+def test_codex_model_env_override_replaces_configured_models(tmp_path: Path, monkeypatch):
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        """
+[run]
+tickers = ["AAPL"]
+
+[llm]
+quick_model = "gpt-5.5"
+deep_model = "gpt-5.5"
+output_model = "gpt-5.5"
+
+[execution]
+llm_summary_model = "gpt-5.5"
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("TRADINGAGENTS_CODEX_MODEL", "gpt-5.4")
+
+    config = load_scheduled_config(config_path)
+
+    assert config.llm.quick_model == "gpt-5.4"
+    assert config.llm.deep_model == "gpt-5.4"
+    assert config.llm.output_model == "gpt-5.4"
+    assert config.execution.execution_llm_summary_model == "gpt-5.4"

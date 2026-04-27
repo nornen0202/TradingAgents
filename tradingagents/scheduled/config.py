@@ -178,6 +178,12 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     archive_dir = _resolve_path(storage_raw.get("archive_dir", ".tradingagents-scheduled/archive"), base_dir)
     site_dir = _resolve_path(storage_raw.get("site_dir", "site"), base_dir)
 
+    codex_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_MODEL"))
+    quick_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_QUICK_MODEL")) or codex_model_override
+    deep_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_DEEP_MODEL")) or codex_model_override
+    output_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_OUTPUT_MODEL")) or codex_model_override
+    execution_model_override = _optional_string(os.getenv("TRADINGAGENTS_EXECUTION_LLM_SUMMARY_MODEL")) or codex_model_override
+
     return ScheduledAnalysisConfig(
         run=RunSettings(
             tickers=tickers,
@@ -198,9 +204,9 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         ),
         llm=LLMSettings(
             provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
-            deep_model=str(llm_raw.get("deep_model", "gpt-5.5")).strip() or "gpt-5.5",
-            quick_model=str(llm_raw.get("quick_model", "gpt-5.5")).strip() or "gpt-5.5",
-            output_model=str(llm_raw.get("output_model", "gpt-5.5")).strip() or "gpt-5.5",
+            deep_model=deep_model_override or str(llm_raw.get("deep_model", "gpt-5.5")).strip() or "gpt-5.5",
+            quick_model=quick_model_override or str(llm_raw.get("quick_model", "gpt-5.5")).strip() or "gpt-5.5",
+            output_model=output_model_override or str(llm_raw.get("output_model", "gpt-5.5")).strip() or "gpt-5.5",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_summary=str(llm_raw.get("codex_summary", "none")).strip() or "none",
             codex_personality=str(llm_raw.get("codex_personality", "none")).strip() or "none",
@@ -260,7 +266,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             execution_max_data_age_seconds=max(30, int(execution_raw.get("max_data_age_seconds", 180))),
             execution_publish_badges=bool(execution_raw.get("publish_badges", True)),
             execution_selective_rerun_enabled=bool(execution_raw.get("selective_rerun_enabled", True)),
-            execution_llm_summary_model=_optional_string(execution_raw.get("llm_summary_model")) or "gpt-5.5",
+            execution_llm_summary_model=execution_model_override or _optional_string(execution_raw.get("llm_summary_model")) or "gpt-5.5",
             execution_publish_debug=bool(execution_raw.get("publish_debug", False)),
         ),
         summary_image=SummaryImageSettings(

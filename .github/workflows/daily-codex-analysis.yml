@@ -216,11 +216,21 @@ jobs:
           $workspaceDir = Join-Path $env:GITHUB_WORKSPACE ".codex-preflight"
           $script = @"
           import os
-          from tradingagents.llm_clients.codex_app_server import CodexAppServerAuthError, CodexAppServerBinaryError
+          from tradingagents.llm_clients.codex_app_server import CodexAppServerAuthError, CodexAppServerBinaryError, CodexModelUnavailableError
           from tradingagents.llm_clients.codex_preflight import run_codex_preflight
 
           workspace_dir = r"$workspaceDir"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
+          github_env = os.getenv("GITHUB_ENV")
+          preferred_model = "gpt-5.5"
+          fallback_models = [
+              "gpt-5.4",
+              "gpt-5.3-codex",
+              "gpt-5.3-codex-spark",
+              "gpt-5.2-codex",
+              "gpt-5.2",
+              "gpt-5.4-mini",
+          ]
 
           def write_summary(lines):
               if not summary_path:
@@ -231,10 +241,11 @@ jobs:
           try:
               result = run_codex_preflight(
                   codex_binary=None,
-                  model="gpt-5.5",
+                  model=preferred_model,
                   request_timeout=30.0,
                   workspace_dir=workspace_dir,
                   cleanup_threads=True,
+                  fallback_models=fallback_models,
               )
           except CodexAppServerAuthError as exc:
               message = (
@@ -269,6 +280,33 @@ jobs:
                   ]
               )
               raise SystemExit(1)
+          except CodexModelUnavailableError as exc:
+              message = (
+                  "No configured Codex model or fallback model is available for the runner. "
+                  "Update the Codex installation/account or adjust the fallback list."
+              )
+              print(f"::error::{message}")
+              print(exc)
+              write_summary(
+                  [
+                      "## Codex model unavailable",
+                      "",
+                      message,
+                      "",
+                      str(exc),
+                  ]
+              )
+              raise SystemExit(1)
+
+          if result.fallback_used:
+              warning = (
+                  f"Preferred Codex model {result.requested_model} is not available on this runner; "
+                  f"using {result.resolved_model} from model/list."
+              )
+              print(f"::warning::{warning}")
+              if github_env:
+                  with open(github_env, "a", encoding="utf-8") as handle:
+                      handle.write(f"TRADINGAGENTS_CODEX_MODEL={result.resolved_model}\n")
 
           print("Codex account:", result.account)
           print("First available models:", ", ".join(result.models[:8]))
@@ -277,6 +315,8 @@ jobs:
                   "## Codex preflight passed",
                   "",
                   f"- Account: {result.account}",
+                  f"- Requested model: {result.requested_model}",
+                  f"- Resolved model: {result.resolved_model}",
                   f"- Models: {', '.join(result.models[:8])}",
                   f"- Binary: {os.getenv('CODEX_BINARY', '(auto)')}",
               ]
@@ -568,11 +608,21 @@ jobs:
           $workspaceDir = Join-Path $env:GITHUB_WORKSPACE ".codex-preflight"
           $script = @"
           import os
-          from tradingagents.llm_clients.codex_app_server import CodexAppServerAuthError, CodexAppServerBinaryError
+          from tradingagents.llm_clients.codex_app_server import CodexAppServerAuthError, CodexAppServerBinaryError, CodexModelUnavailableError
           from tradingagents.llm_clients.codex_preflight import run_codex_preflight
 
           workspace_dir = r"$workspaceDir"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
+          github_env = os.getenv("GITHUB_ENV")
+          preferred_model = "gpt-5.5"
+          fallback_models = [
+              "gpt-5.4",
+              "gpt-5.3-codex",
+              "gpt-5.3-codex-spark",
+              "gpt-5.2-codex",
+              "gpt-5.2",
+              "gpt-5.4-mini",
+          ]
 
           def write_summary(lines):
               if not summary_path:
@@ -583,10 +633,11 @@ jobs:
           try:
               result = run_codex_preflight(
                   codex_binary=None,
-                  model="gpt-5.5",
+                  model=preferred_model,
                   request_timeout=30.0,
                   workspace_dir=workspace_dir,
                   cleanup_threads=True,
+                  fallback_models=fallback_models,
               )
           except CodexAppServerAuthError as exc:
               message = (
@@ -621,6 +672,33 @@ jobs:
                   ]
               )
               raise SystemExit(1)
+          except CodexModelUnavailableError as exc:
+              message = (
+                  "No configured Codex model or fallback model is available for the runner. "
+                  "Update the Codex installation/account or adjust the fallback list."
+              )
+              print(f"::error::{message}")
+              print(exc)
+              write_summary(
+                  [
+                      "## Codex model unavailable",
+                      "",
+                      message,
+                      "",
+                      str(exc),
+                  ]
+              )
+              raise SystemExit(1)
+
+          if result.fallback_used:
+              warning = (
+                  f"Preferred Codex model {result.requested_model} is not available on this runner; "
+                  f"using {result.resolved_model} from model/list."
+              )
+              print(f"::warning::{warning}")
+              if github_env:
+                  with open(github_env, "a", encoding="utf-8") as handle:
+                      handle.write(f"TRADINGAGENTS_CODEX_MODEL={result.resolved_model}\n")
 
           print("Codex account:", result.account)
           print("First available models:", ", ".join(result.models[:8]))
@@ -629,6 +707,8 @@ jobs:
                   "## Codex preflight passed",
                   "",
                   f"- Account: {result.account}",
+                  f"- Requested model: {result.requested_model}",
+                  f"- Resolved model: {result.resolved_model}",
                   f"- Models: {', '.join(result.models[:8])}",
                   f"- Binary: {os.getenv('CODEX_BINARY', '(auto)')}",
               ]
