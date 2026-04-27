@@ -22,7 +22,10 @@ DEFAULT_CONFIG = {
     "codex_reasoning_effort": "medium",
     "codex_summary": "none",
     "codex_personality": "none",
-    "codex_workspace_dir": str(Path.home() / ".codex" / "tradingagents-workspace"),
+    "codex_workspace_dir": os.getenv(
+        "TRADINGAGENTS_CODEX_WORKSPACE_DIR",
+        str(Path.home() / ".codex" / "tradingagents-workspace"),
+    ),
     "codex_request_timeout": 120.0,
     "codex_max_retries": 2,
     "codex_cleanup_threads": True,

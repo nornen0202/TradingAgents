@@ -183,6 +183,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     deep_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_DEEP_MODEL")) or codex_model_override
     output_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_OUTPUT_MODEL")) or codex_model_override
     execution_model_override = _optional_string(os.getenv("TRADINGAGENTS_EXECUTION_LLM_SUMMARY_MODEL")) or codex_model_override
+    codex_workspace_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_WORKSPACE_DIR"))
 
     return ScheduledAnalysisConfig(
         run=RunSettings(
@@ -213,7 +214,9 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             codex_request_timeout=float(llm_raw.get("codex_request_timeout", 180.0)),
             codex_max_retries=int(llm_raw.get("codex_max_retries", 2)),
             codex_cleanup_threads=bool(llm_raw.get("codex_cleanup_threads", True)),
-            codex_workspace_dir=_optional_string(llm_raw.get("codex_workspace_dir")) or str(Path.home() / ".codex" / "tradingagents-workspace"),
+            codex_workspace_dir=codex_workspace_override
+            or _optional_string(llm_raw.get("codex_workspace_dir"))
+            or str(Path.home() / ".codex" / "tradingagents-workspace"),
             codex_binary=_optional_string(llm_raw.get("codex_binary")),
         ),
         translation=TranslationSettings(

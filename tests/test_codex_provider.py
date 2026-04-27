@@ -1,4 +1,5 @@
 ﻿import re
+import os
 import unittest
 from collections import deque
 from pathlib import Path
@@ -666,6 +667,23 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(response.content, "Fallback ok")
         self.assertEqual(llm.model, "gpt-5.4")
         self.assertEqual(session.invocations[0]["model"], "gpt-5.4")
+
+    def test_codex_chat_model_can_disable_model_fallback(self):
+        session = FakeCodexSession(
+            responses=['{"answer":"Should not run"}'],
+            models_payload={"data": [{"id": "gpt-5.4", "model": "gpt-5.4"}]},
+        )
+        with patch.dict(os.environ, {"TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK": "0"}, clear=False):
+            with self.assertRaises(CodexModelUnavailableError):
+                create_llm_client(
+                    provider="codex",
+                    model="gpt-5.5",
+                    codex_binary="C:/fake/codex",
+                    codex_workspace_dir="C:/tmp/codex-workspace",
+                    session_factory=lambda **kwargs: session,
+                ).get_llm()
+
+        self.assertEqual(session.invocations, [])
 
     def test_codex_client_defaults_workspace_when_none_is_passed(self):
         captured = {}
