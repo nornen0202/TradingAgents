@@ -12,6 +12,7 @@ from tradingagents.llm_clients.codex_app_server import (
     CodexAppServerBinaryError,
     CodexAppServerError,
     CodexInvocationResult,
+    CodexModelUnavailableError,
     CodexStructuredOutputError,
 )
 from tradingagents.llm_clients.codex_message_codec import normalize_input_messages
@@ -556,6 +557,8 @@ class CodexProviderTests(unittest.TestCase):
             session_factory=valid_factory,
         )
         self.assertEqual(result.account["type"], "chatgpt")
+        self.assertEqual(result.resolved_model, "gpt-5.5")
+        self.assertFalse(result.fallback_used)
 
         authless_factory = lambda **kwargs: FakeCodexSession(
             account_payload={"account": None, "requiresOpenaiAuth": True}
@@ -583,6 +586,46 @@ class CodexProviderTests(unittest.TestCase):
                     cleanup_threads=True,
                 )
 
+    def test_preflight_resolves_to_first_available_fallback_model(self):
+        factory = lambda **kwargs: FakeCodexSession(
+            models_payload={
+                "data": [
+                    {"id": "gpt-5.4", "model": "gpt-5.4"},
+                    {"id": "gpt-5.3-codex", "model": "gpt-5.3-codex"},
+                ]
+            }
+        )
+
+        result = run_codex_preflight(
+            codex_binary="C:\\fake\\codex.exe",
+            model="gpt-5.5",
+            fallback_models=("gpt-5.4", "gpt-5.3-codex"),
+            request_timeout=10.0,
+            workspace_dir="C:/tmp/codex-workspace",
+            cleanup_threads=True,
+            session_factory=factory,
+        )
+
+        self.assertEqual(result.requested_model, "gpt-5.5")
+        self.assertEqual(result.resolved_model, "gpt-5.4")
+        self.assertTrue(result.fallback_used)
+
+    def test_preflight_raises_model_unavailable_when_no_fallback_matches(self):
+        factory = lambda **kwargs: FakeCodexSession(
+            models_payload={"data": [{"id": "gpt-5.3-codex", "model": "gpt-5.3-codex"}]}
+        )
+
+        with self.assertRaises(CodexModelUnavailableError):
+            run_codex_preflight(
+                codex_binary="C:\\fake\\codex.exe",
+                model="gpt-5.5",
+                fallback_models=("gpt-5.4",),
+                request_timeout=10.0,
+                workspace_dir="C:/tmp/codex-workspace",
+                cleanup_threads=True,
+                session_factory=factory,
+            )
+
     def test_preflight_uses_resolved_binary_path(self):
         captured = {}
 
@@ -604,6 +647,25 @@ class CodexProviderTests(unittest.TestCase):
             )
 
         self.assertEqual(captured["codex_binary"], "C:/resolved/codex.exe")
+
+    def test_codex_chat_model_uses_resolved_fallback_for_invocation(self):
+        session = FakeCodexSession(
+            responses=['{"answer":"Fallback ok"}'],
+            models_payload={"data": [{"id": "gpt-5.4", "model": "gpt-5.4"}]},
+        )
+        llm = create_llm_client(
+            provider="codex",
+            model="gpt-5.5",
+            codex_binary="C:/fake/codex",
+            codex_workspace_dir="C:/tmp/codex-workspace",
+            session_factory=lambda **kwargs: session,
+        ).get_llm()
+
+        response = llm.invoke("Use the best available model.")
+
+        self.assertEqual(response.content, "Fallback ok")
+        self.assertEqual(llm.model, "gpt-5.4")
+        self.assertEqual(session.invocations[0]["model"], "gpt-5.4")
 
     def test_codex_client_defaults_workspace_when_none_is_passed(self):
         captured = {}

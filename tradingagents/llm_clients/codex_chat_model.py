@@ -30,6 +30,17 @@ from .codex_schema import (
 )
 
 
+CODEX_MODEL_FALLBACKS = (
+    "gpt-5.5",
+    "gpt-5.4",
+    "gpt-5.3-codex",
+    "gpt-5.3-codex-spark",
+    "gpt-5.2-codex",
+    "gpt-5.2",
+    "gpt-5.4-mini",
+)
+
+
 class CodexChatModel(BaseChatModel):
     """LangChain chat model that talks to `codex app-server` over stdio."""
 
@@ -75,14 +86,18 @@ class CodexChatModel(BaseChatModel):
             if self._preflight_done:
                 return
             runner = self.preflight_runner or run_codex_preflight
-            runner(
+            result = runner(
                 codex_binary=self.codex_binary,
                 model=self.model,
+                fallback_models=CODEX_MODEL_FALLBACKS,
                 request_timeout=self.codex_request_timeout,
                 workspace_dir=self.codex_workspace_dir,
                 cleanup_threads=self.codex_cleanup_threads,
                 session_factory=self.session_factory or CodexAppServerSession,
             )
+            resolved_model = getattr(result, "resolved_model", None)
+            if resolved_model and resolved_model != self.model:
+                self.model = str(resolved_model)
             self._preflight_done = True
 
     def bind_tools(

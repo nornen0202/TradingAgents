@@ -27,6 +27,10 @@ class CodexAppServerBinaryError(CodexAppServerError):
     """Raised when the Codex binary cannot be started."""
 
 
+class CodexModelUnavailableError(CodexAppServerError):
+    """Raised when the requested Codex model is absent from model/list."""
+
+
 class CodexStructuredOutputError(CodexAppServerError):
     """Raised when Codex does not honor the requested structured output."""
 

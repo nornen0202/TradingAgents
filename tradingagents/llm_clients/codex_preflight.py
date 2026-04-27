@@ -7,6 +7,7 @@ from .codex_app_server import (
     CodexAppServerAuthError,
     CodexAppServerBinaryError,
     CodexAppServerSession,
+    CodexModelUnavailableError,
 )
 from .codex_binary import codex_binary_error_message, resolve_codex_binary
 
@@ -15,6 +16,9 @@ from .codex_binary import codex_binary_error_message, resolve_codex_binary
 class CodexPreflightResult:
     account: dict
     models: list[str]
+    requested_model: str
+    resolved_model: str
+    fallback_used: bool = False
 
 
 def run_codex_preflight(
@@ -24,6 +28,7 @@ def run_codex_preflight(
     request_timeout: float,
     workspace_dir: str,
     cleanup_threads: bool,
+    fallback_models: list[str] | tuple[str, ...] | None = None,
     session_factory: Callable[..., CodexAppServerSession] = CodexAppServerSession,
 ) -> CodexPreflightResult:
     binary = resolve_codex_binary(codex_binary)
@@ -51,13 +56,23 @@ def run_codex_preflight(
 
         models_payload = session.model_list(include_hidden=True)
         models = _collect_model_names(models_payload)
-        if model not in models:
+        resolved_model = _resolve_model(model, models=models, fallback_models=fallback_models)
+        if not resolved_model:
             preview = ", ".join(models[:8]) if models else "no models reported"
-            raise CodexAppServerBinaryError(
-                f"Codex model '{model}' is not available from `model/list`. Available models: {preview}"
+            fallback_text = ""
+            if fallback_models:
+                fallback_text = f" Fallback candidates were: {', '.join(str(item) for item in fallback_models)}."
+            raise CodexModelUnavailableError(
+                f"Codex model '{model}' is not available from `model/list`. Available models: {preview}.{fallback_text}"
             )
 
-        return CodexPreflightResult(account=account, models=models)
+        return CodexPreflightResult(
+            account=account,
+            models=models,
+            requested_model=model,
+            resolved_model=resolved_model,
+            fallback_used=resolved_model != model,
+        )
     finally:
         session.close()
 
@@ -72,3 +87,20 @@ def _collect_model_names(payload: dict) -> list[str]:
             if isinstance(value, str) and value not in names:
                 names.append(value)
     return names
+
+
+def _resolve_model(
+    model: str,
+    *,
+    models: list[str],
+    fallback_models: list[str] | tuple[str, ...] | None,
+) -> str | None:
+    requested = str(model or "").strip()
+    if requested in models:
+        return requested
+
+    for candidate in fallback_models or ():
+        normalized = str(candidate or "").strip()
+        if normalized and normalized in models:
+            return normalized
+    return None
