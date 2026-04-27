@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import threading
 import time
 import uuid
@@ -39,6 +40,7 @@ CODEX_MODEL_FALLBACKS = (
     "gpt-5.2",
     "gpt-5.4-mini",
 )
+_FALSE_MODEL_FALLBACK_VALUES = {"0", "false", "no", "off"}
 
 
 class CodexChatModel(BaseChatModel):
@@ -86,10 +88,16 @@ class CodexChatModel(BaseChatModel):
             if self._preflight_done:
                 return
             runner = self.preflight_runner or run_codex_preflight
+            fallback_flag = os.environ.get("TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK", "1")
+            fallback_models = (
+                ()
+                if fallback_flag.strip().lower() in _FALSE_MODEL_FALLBACK_VALUES
+                else CODEX_MODEL_FALLBACKS
+            )
             result = runner(
                 codex_binary=self.codex_binary,
                 model=self.model,
-                fallback_models=CODEX_MODEL_FALLBACKS,
+                fallback_models=fallback_models,
                 request_timeout=self.codex_request_timeout,
                 workspace_dir=self.codex_workspace_dir,
                 cleanup_threads=self.codex_cleanup_threads,

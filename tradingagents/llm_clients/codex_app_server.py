@@ -42,6 +42,7 @@ _CODEX_HOME_SEED_FILES = (
     ".codex-global-state.json",
     "installation_id",
 )
+_FALSE_VALUES = {"0", "false", "no", "off"}
 
 
 @dataclass(slots=True)
@@ -79,6 +80,7 @@ class CodexAppServerSession:
         self._request_lock = threading.RLock()
         self._reader_thread: threading.Thread | None = None
         self._stderr_thread: threading.Thread | None = None
+        self._codex_home: Path | None = None
 
     def start(self) -> None:
         with self._lock:
@@ -93,6 +95,7 @@ class CodexAppServerSession:
             self.codex_binary = binary
             codex_home = Path(self.workspace_dir) / ".codex-home"
             codex_home.mkdir(parents=True, exist_ok=True)
+            self._codex_home = codex_home
             self._seed_codex_home(codex_home)
             proc_env = os.environ.copy()
             proc_env["CODEX_HOME"] = str(codex_home)
@@ -151,6 +154,7 @@ class CodexAppServerSession:
             proc = self._proc
             self._proc = None
             if proc is None:
+                self._prune_isolated_codex_logs()
                 return
 
             try:
@@ -164,6 +168,28 @@ class CodexAppServerSession:
                 proc.wait(timeout=2)
             except Exception:
                 proc.kill()
+                try:
+                    proc.wait(timeout=2)
+                except Exception:
+                    pass
+            finally:
+                self._prune_isolated_codex_logs()
+
+    def _prune_isolated_codex_logs(self) -> None:
+        flag = os.environ.get("TRADINGAGENTS_CODEX_PRUNE_HOME_LOGS", "1").strip().lower()
+        if flag in _FALSE_VALUES:
+            return
+
+        codex_home = self._codex_home
+        if codex_home is None or codex_home.name != ".codex-home":
+            return
+
+        try:
+            for path in codex_home.glob("logs_*.sqlite*"):
+                if path.is_file():
+                    path.unlink()
+        except OSError:
+            return
 
     def account_read(self) -> dict[str, Any]:
         return self.request("account/read", {"refreshToken": False})

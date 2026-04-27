@@ -64,6 +64,7 @@ jobs:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
+      TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       CODEX_BINARY: ${{ vars.CODEX_BINARY }}
@@ -86,6 +87,59 @@ jobs:
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
+      - name: Prepare runner disk and Codex workspace
+        run: |
+          $ErrorActionPreference = "Continue"
+
+          function Remove-CodexLogFiles {
+            param([string]$Root)
+            if ([string]::IsNullOrWhiteSpace($Root) -or -not (Test-Path -LiteralPath $Root)) {
+              return
+            }
+            Get-ChildItem -LiteralPath $Root -Filter "logs_*.sqlite*" -Force -File -ErrorAction SilentlyContinue |
+              Remove-Item -Force -ErrorAction SilentlyContinue
+          }
+
+          $legacyCodexHome = Join-Path $env:USERPROFILE ".codex\tradingagents-workspace\.codex-home"
+          Remove-CodexLogFiles $legacyCodexHome
+
+          $sandboxBinary = Join-Path $env:USERPROFILE ".codex\.sandbox-bin\codex.exe"
+          $installedBinary = Get-ChildItem -Path "C:\Program Files\WindowsApps\OpenAI.Codex_*\app\resources\codex.exe" -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+          if ($installedBinary) {
+            $sandboxDir = Split-Path $sandboxBinary -Parent
+            New-Item -ItemType Directory -Force -Path $sandboxDir | Out-Null
+            $shouldCopy = -not (Test-Path -LiteralPath $sandboxBinary)
+            if (-not $shouldCopy) {
+              $current = Get-Item -LiteralPath $sandboxBinary
+              $shouldCopy = ($installedBinary.LastWriteTime -gt $current.LastWriteTime) -or ($installedBinary.Length -ne $current.Length)
+            }
+            if ($shouldCopy) {
+              Copy-Item -LiteralPath $installedBinary.FullName -Destination $sandboxBinary -Force
+              Write-Host "Updated Codex sandbox binary from installed app: $($installedBinary.FullName)"
+            }
+          }
+
+          $workspace = Join-Path $env:RUNNER_TEMP "tradingagents-codex-workspace"
+          $workspaceFull = [System.IO.Path]::GetFullPath($workspace)
+          $runnerTempFull = [System.IO.Path]::GetFullPath($env:RUNNER_TEMP)
+          if (-not $workspaceFull.StartsWith($runnerTempFull, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to clean Codex workspace outside RUNNER_TEMP: $workspaceFull"
+          }
+          if (Test-Path -LiteralPath $workspaceFull) {
+            Remove-Item -LiteralPath $workspaceFull -Recurse -Force -ErrorAction SilentlyContinue
+          }
+          New-Item -ItemType Directory -Force -Path $workspaceFull | Out-Null
+          Add-Content -Path $env:GITHUB_ENV -Value "TRADINGAGENTS_CODEX_WORKSPACE_DIR=$workspaceFull"
+          Write-Host "Using per-run Codex workspace: $workspaceFull"
+
+          $freeBytes = (Get-PSDrive C).Free
+          Write-Host ("C: free space after cleanup: {0:N2} GB" -f ($freeBytes / 1GB))
+          if ($freeBytes -lt 5GB) {
+            throw "C: free space is below 5GB after cleanup; refusing to start analysis."
+          }
+
       - name: Check out repository
         uses: actions/checkout@v6
 
@@ -223,7 +277,8 @@ jobs:
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
           preferred_model = "gpt-5.5"
-          fallback_models = [
+          allow_fallback = os.getenv("TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK", "1").strip().lower()
+          fallback_models = [] if allow_fallback in {"0", "false", "no", "off"} else [
               "gpt-5.4",
               "gpt-5.3-codex",
               "gpt-5.3-codex-spark",
@@ -400,6 +455,30 @@ jobs:
           name: github-pages-us
           path: site
 
+      - name: Clean Codex runtime workspace
+        if: ${{ always() }}
+        run: |
+          function Remove-CodexLogFiles {
+            param([string]$Root)
+            if ([string]::IsNullOrWhiteSpace($Root) -or -not (Test-Path -LiteralPath $Root)) {
+              return
+            }
+            Get-ChildItem -LiteralPath $Root -Filter "logs_*.sqlite*" -Force -File -ErrorAction SilentlyContinue |
+              Remove-Item -Force -ErrorAction SilentlyContinue
+          }
+
+          $workspace = $env:TRADINGAGENTS_CODEX_WORKSPACE_DIR
+          if (-not [string]::IsNullOrWhiteSpace($workspace)) {
+            $workspaceFull = [System.IO.Path]::GetFullPath($workspace)
+            $runnerTempFull = [System.IO.Path]::GetFullPath($env:RUNNER_TEMP)
+            if ($workspaceFull.StartsWith($runnerTempFull, [System.StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $workspaceFull)) {
+              Remove-Item -LiteralPath $workspaceFull -Recurse -Force -ErrorAction SilentlyContinue
+            }
+          }
+
+          $legacyCodexHome = Join-Path $env:USERPROFILE ".codex\tradingagents-workspace\.codex-home"
+          Remove-CodexLogFiles $legacyCodexHome
+
   analyze_kr:
     if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) || (github.event_name == 'schedule' && github.event.schedule == '0 22 * * 0-4') }}
     runs-on: [self-hosted, Windows]
@@ -411,6 +490,7 @@ jobs:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
+      TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       CODEX_BINARY: ${{ vars.CODEX_BINARY }}
@@ -429,6 +509,59 @@ jobs:
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
+      - name: Prepare runner disk and Codex workspace
+        run: |
+          $ErrorActionPreference = "Continue"
+
+          function Remove-CodexLogFiles {
+            param([string]$Root)
+            if ([string]::IsNullOrWhiteSpace($Root) -or -not (Test-Path -LiteralPath $Root)) {
+              return
+            }
+            Get-ChildItem -LiteralPath $Root -Filter "logs_*.sqlite*" -Force -File -ErrorAction SilentlyContinue |
+              Remove-Item -Force -ErrorAction SilentlyContinue
+          }
+
+          $legacyCodexHome = Join-Path $env:USERPROFILE ".codex\tradingagents-workspace\.codex-home"
+          Remove-CodexLogFiles $legacyCodexHome
+
+          $sandboxBinary = Join-Path $env:USERPROFILE ".codex\.sandbox-bin\codex.exe"
+          $installedBinary = Get-ChildItem -Path "C:\Program Files\WindowsApps\OpenAI.Codex_*\app\resources\codex.exe" -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+          if ($installedBinary) {
+            $sandboxDir = Split-Path $sandboxBinary -Parent
+            New-Item -ItemType Directory -Force -Path $sandboxDir | Out-Null
+            $shouldCopy = -not (Test-Path -LiteralPath $sandboxBinary)
+            if (-not $shouldCopy) {
+              $current = Get-Item -LiteralPath $sandboxBinary
+              $shouldCopy = ($installedBinary.LastWriteTime -gt $current.LastWriteTime) -or ($installedBinary.Length -ne $current.Length)
+            }
+            if ($shouldCopy) {
+              Copy-Item -LiteralPath $installedBinary.FullName -Destination $sandboxBinary -Force
+              Write-Host "Updated Codex sandbox binary from installed app: $($installedBinary.FullName)"
+            }
+          }
+
+          $workspace = Join-Path $env:RUNNER_TEMP "tradingagents-codex-workspace"
+          $workspaceFull = [System.IO.Path]::GetFullPath($workspace)
+          $runnerTempFull = [System.IO.Path]::GetFullPath($env:RUNNER_TEMP)
+          if (-not $workspaceFull.StartsWith($runnerTempFull, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to clean Codex workspace outside RUNNER_TEMP: $workspaceFull"
+          }
+          if (Test-Path -LiteralPath $workspaceFull) {
+            Remove-Item -LiteralPath $workspaceFull -Recurse -Force -ErrorAction SilentlyContinue
+          }
+          New-Item -ItemType Directory -Force -Path $workspaceFull | Out-Null
+          Add-Content -Path $env:GITHUB_ENV -Value "TRADINGAGENTS_CODEX_WORKSPACE_DIR=$workspaceFull"
+          Write-Host "Using per-run Codex workspace: $workspaceFull"
+
+          $freeBytes = (Get-PSDrive C).Free
+          Write-Host ("C: free space after cleanup: {0:N2} GB" -f ($freeBytes / 1GB))
+          if ($freeBytes -lt 5GB) {
+            throw "C: free space is below 5GB after cleanup; refusing to start analysis."
+          }
+
       - name: Check out repository
         uses: actions/checkout@v6
 
@@ -615,7 +748,8 @@ jobs:
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
           preferred_model = "gpt-5.5"
-          fallback_models = [
+          allow_fallback = os.getenv("TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK", "1").strip().lower()
+          fallback_models = [] if allow_fallback in {"0", "false", "no", "off"} else [
               "gpt-5.4",
               "gpt-5.3-codex",
               "gpt-5.3-codex-spark",
@@ -868,6 +1002,30 @@ jobs:
           name: kr-portfolio-private-${{ github.run_id }}
           path: portfolio-artifacts
           if-no-files-found: warn
+
+      - name: Clean Codex runtime workspace
+        if: ${{ always() }}
+        run: |
+          function Remove-CodexLogFiles {
+            param([string]$Root)
+            if ([string]::IsNullOrWhiteSpace($Root) -or -not (Test-Path -LiteralPath $Root)) {
+              return
+            }
+            Get-ChildItem -LiteralPath $Root -Filter "logs_*.sqlite*" -Force -File -ErrorAction SilentlyContinue |
+              Remove-Item -Force -ErrorAction SilentlyContinue
+          }
+
+          $workspace = $env:TRADINGAGENTS_CODEX_WORKSPACE_DIR
+          if (-not [string]::IsNullOrWhiteSpace($workspace)) {
+            $workspaceFull = [System.IO.Path]::GetFullPath($workspace)
+            $runnerTempFull = [System.IO.Path]::GetFullPath($env:RUNNER_TEMP)
+            if ($workspaceFull.StartsWith($runnerTempFull, [System.StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $workspaceFull)) {
+              Remove-Item -LiteralPath $workspaceFull -Recurse -Force -ErrorAction SilentlyContinue
+            }
+          }
+
+          $legacyCodexHome = Join-Path $env:USERPROFILE ".codex\tradingagents-workspace\.codex-home"
+          Remove-CodexLogFiles $legacyCodexHome
 
   deploy_kr:
     needs:

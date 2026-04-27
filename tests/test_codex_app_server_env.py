@@ -69,3 +69,25 @@ def test_codex_app_server_seeds_auth_into_isolated_codex_home(tmp_path: Path):
     isolated_home = workspace / ".codex-home"
     assert (isolated_home / "auth.json").read_text(encoding="utf-8") == '{"account":"present"}'
     assert (isolated_home / "config.toml").read_text(encoding="utf-8") == "model = 'gpt-5.5'\n"
+
+
+def test_codex_app_server_prunes_isolated_home_logs_on_close(tmp_path: Path):
+    workspace = tmp_path / "workspace"
+    isolated_home = workspace / ".codex-home"
+    isolated_home.mkdir(parents=True)
+    (isolated_home / "logs_2.sqlite").write_text("log", encoding="utf-8")
+    (isolated_home / "logs_2.sqlite-wal").write_text("wal", encoding="utf-8")
+    (isolated_home / "auth.json").write_text("{}", encoding="utf-8")
+
+    session = CodexAppServerSession(
+        codex_binary="codex",
+        request_timeout=30,
+        workspace_dir=str(workspace),
+        cleanup_threads=True,
+    )
+    session._codex_home = isolated_home
+    session.close()
+
+    assert not (isolated_home / "logs_2.sqlite").exists()
+    assert not (isolated_home / "logs_2.sqlite-wal").exists()
+    assert (isolated_home / "auth.json").exists()
