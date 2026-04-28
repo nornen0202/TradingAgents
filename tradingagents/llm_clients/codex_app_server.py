@@ -6,6 +6,7 @@ import queue
 import shutil
 import subprocess
 import threading
+import time
 import uuid
 from collections import deque
 from dataclasses import dataclass
@@ -66,7 +67,7 @@ class CodexAppServerSession:
         client_version: str = "0.2.3",
     ) -> None:
         self.codex_binary = codex_binary
-        self.request_timeout = request_timeout
+        self.request_timeout = float(request_timeout or 0)
         self.workspace_dir = str(Path(workspace_dir).expanduser())
         self.cleanup_threads = cleanup_threads
         self.client_name = client_name
@@ -210,6 +211,7 @@ class CodexAppServerSession:
         with self._request_lock:
             self.start()
             thread_id = None
+            turn_completed = False
             try:
                 thread = self.request(
                     "thread/start",
@@ -237,21 +239,25 @@ class CodexAppServerSession:
                 )
                 turn_id = started["turn"]["id"]
                 final_text, notifications = self._collect_turn(turn_id)
+                turn_completed = True
                 return CodexInvocationResult(final_text=final_text, notifications=notifications)
             finally:
-                if thread_id and self.cleanup_threads:
+                if thread_id and self.cleanup_threads and turn_completed:
                     try:
                         self.request("thread/unsubscribe", {"threadId": thread_id})
                     except CodexAppServerError:
                         pass
+                elif thread_id and self.cleanup_threads:
+                    self.close()
 
     def request(self, method: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         request_id = str(uuid.uuid4())
         self._write({"id": request_id, "method": method, "params": params or {}})
         deferred: list[dict[str, Any]] = []
+        deadline = self._operation_deadline()
 
         while True:
-            message = self._next_message(self.request_timeout)
+            message = self._next_message_before(deadline, method)
             if message.get("id") == request_id:
                 self._restore_deferred(deferred)
                 if "error" in message:
@@ -291,9 +297,10 @@ class CodexAppServerSession:
         notifications: list[dict[str, Any]] = []
         final_messages: list[str] = []
         fallback_messages: list[str] = []
+        deadline = self._operation_deadline()
 
         while True:
-            message = self._next_message(self.request_timeout)
+            message = self._next_message_before(deadline, f"Codex turn {turn_id}")
 
             if "method" in message and "id" in message:
                 self._handle_server_request(message)
@@ -339,6 +346,26 @@ class CodexAppServerSession:
             return fallback_messages[-1], notifications
         raise CodexStructuredOutputError("Codex turn completed without an assistant message.")
 
+    def _operation_deadline(self) -> float | None:
+        if self.request_timeout <= 0:
+            return None
+        return time.monotonic() + self.request_timeout
+
+    def _next_message_before(self, deadline: float | None, operation: str) -> dict[str, Any]:
+        timeout = self._remaining_timeout(deadline, operation)
+        return self._next_message(timeout)
+
+    def _remaining_timeout(self, deadline: float | None, operation: str) -> float | None:
+        if deadline is None:
+            return None
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise CodexAppServerError(
+                f"Timed out waiting for {operation} after {self.request_timeout:g}s. "
+                f"stderr_tail={self._stderr_tail()}"
+            )
+        return remaining
+
     def _handle_server_request(self, message: dict[str, Any]) -> None:
         try:
             self._write({"id": message["id"], "result": {}})
@@ -356,7 +383,7 @@ class CodexAppServerSession:
                 f"Failed to write to Codex app-server: {exc}. stderr_tail={self._stderr_tail()}"
             ) from exc
 
-    def _next_message(self, timeout: float) -> dict[str, Any]:
+    def _next_message(self, timeout: float | None) -> dict[str, Any]:
         if self._pending:
             return self._pending.popleft()
 

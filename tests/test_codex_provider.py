@@ -12,6 +12,7 @@ from tradingagents.llm_clients.codex_app_server import (
     CodexAppServerAuthError,
     CodexAppServerBinaryError,
     CodexAppServerError,
+    CodexAppServerSession,
     CodexInvocationResult,
     CodexModelUnavailableError,
     CodexStructuredOutputError,
@@ -514,6 +515,34 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(len(failing_session.invocations), 1)
         self.assertEqual(len(recovered_session.invocations), 1)
         sleep_mock.assert_called_once_with(30.0)
+
+    def test_codex_app_server_turn_timeout_is_total_wall_clock(self):
+        session = CodexAppServerSession(
+            codex_binary="C:/fake/codex",
+            request_timeout=5.0,
+            workspace_dir="C:/tmp/codex-workspace",
+            cleanup_threads=True,
+        )
+
+        def fake_next_message(timeout):
+            self.assertAlmostEqual(timeout, 4.0)
+            return {
+                "method": "item/completed",
+                "params": {
+                    "turnId": "turn-1",
+                    "item": {"type": "toolCall", "name": "noop"},
+                },
+            }
+
+        with (
+            patch.object(session, "_next_message", side_effect=fake_next_message),
+            patch(
+                "tradingagents.llm_clients.codex_app_server.time.monotonic",
+                side_effect=[100.0, 101.0, 106.1],
+            ),
+        ):
+            with self.assertRaisesRegex(CodexAppServerError, "Timed out waiting for Codex turn"):
+                session._collect_turn("turn-1")
 
     def test_provider_codex_smoke_covers_bind_tools_and_direct_invoke_paths(self):
         session = FakeCodexSession(
