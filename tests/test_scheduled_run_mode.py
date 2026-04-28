@@ -233,6 +233,58 @@ enabled = false
         assert "run_mode=overlay_only requires [execution].enabled=true" in str(exc)
 
 
+def test_full_mode_records_selective_targets_without_running_second_research_pass(tmp_path: Path):
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["NVDA"]
+run_mode = "full"
+
+[storage]
+archive_dir = "{(tmp_path / 'archive').as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+checkpoints_kst = ["00:00"]
+selective_rerun_enabled = true
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+
+    ticker_summary = {
+        "ticker": "NVDA",
+        "ticker_name": "NVIDIA",
+        "status": "success",
+        "trade_date": "2026-04-14",
+        "analysis_date": "2026-04-14",
+        "decision": "HOLD",
+        "started_at": "2026-04-14T22:00:00+09:00",
+        "finished_at": "2026-04-14T22:01:00+09:00",
+        "duration_seconds": 60.0,
+        "metrics": {"llm_calls": 1, "tool_calls": 1, "tokens_in": 0, "tokens_out": 0},
+        "tool_telemetry": {"called_tools": []},
+        "quality_flags": [],
+        "artifacts": {},
+    }
+
+    with (
+        patch("tradingagents.scheduled.runner._run_single_ticker", return_value=ticker_summary) as run_single,
+        patch("tradingagents.scheduled.runner._run_execution_overlay_passes", side_effect=_fake_overlay_updates),
+        patch("tradingagents.scheduled.runner.collect_event_signals", return_value={}),
+        patch("tradingagents.scheduled.runner.find_selective_rerun_targets", return_value={"NVDA": ["overlay_invalidated"]}),
+        patch("tradingagents.scheduled.runner._run_selective_rerun", side_effect=AssertionError("full mode must not rerun research")),
+        patch("tradingagents.scheduled.runner.build_site", return_value=[]),
+    ):
+        manifest = execute_scheduled_run(config, run_label="full-selective-target-test")
+
+    assert run_single.call_count == 1
+    assert manifest["selective_rerun_targets"] == {"NVDA": ["overlay_invalidated"]}
+    assert "selective_rerun_results" not in manifest
+
+
 def test_selective_rerun_only_requires_execution_refresh_enabled(tmp_path: Path):
     archive_dir = tmp_path / "archive"
     config_path = tmp_path / "scheduled_analysis.toml"

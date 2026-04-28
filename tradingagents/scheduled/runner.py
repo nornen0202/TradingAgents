@@ -195,7 +195,9 @@ def execute_scheduled_run(
             updates={key: _ExecutionUpdateShim(val) for key, val in execution_updates.items() if not key.startswith("_")},
             event_signals=event_signals,
         )
-        should_execute_selective_rerun = run_mode in {"full", "selective_rerun_only"}
+        # Full daily runs already refreshed every ticker; executing another full
+        # graph pass here can push the workflow past the Actions job timeout.
+        should_execute_selective_rerun = run_mode == "selective_rerun_only"
         if selective_rerun_targets and should_execute_selective_rerun:
             selective_rerun_results = _run_selective_rerun(
                 config=config,

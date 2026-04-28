@@ -47,7 +47,7 @@ permissions:
 
 concurrency:
   group: daily-codex-analysis
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   analyze_us:
@@ -937,7 +937,7 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
       - name: Collect private account artifacts
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: |
           $archiveRoot = $env:TRADINGAGENTS_ARCHIVE_DIR
           if ([string]::IsNullOrWhiteSpace($archiveRoot)) {
@@ -996,7 +996,7 @@ jobs:
           path: site
 
       - name: Upload private account artifact
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
           name: kr-portfolio-private-${{ github.run_id }}
