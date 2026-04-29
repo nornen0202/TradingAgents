@@ -122,6 +122,75 @@ class PortfolioSettings:
 
 
 @dataclass(frozen=True)
+class PrismDashboardSettings:
+    enabled: bool = False
+    mode: str = "advisory"
+    local_dashboard_json_path: Path | None = None
+    local_sqlite_db_path: Path | None = None
+    dashboard_json_url: str | None = None
+    dashboard_base_url: str = "https://analysis.stocksimulation.kr"
+    timeout_seconds: float = 5.0
+    max_payload_bytes: int = 5_000_000
+    use_live_http: bool = False
+    use_html_scraping: bool = False
+    confidence_cap: float = 0.25
+    market: str | None = None
+    use_for_candidate_generation: bool = False
+    use_for_performance_benchmark: bool = False
+    use_for_ui_comparison: bool = True
+
+    @property
+    def dashboard_url(self) -> str | None:
+        return self.dashboard_json_url
+
+    @property
+    def local_json_path(self) -> Path | None:
+        return self.local_dashboard_json_path
+
+    @property
+    def sqlite_path(self) -> Path | None:
+        return self.local_sqlite_db_path
+
+
+@dataclass(frozen=True)
+class ExternalDataSettings:
+    prism: PrismDashboardSettings = field(default_factory=PrismDashboardSettings)
+
+    @property
+    def prism_dashboard(self) -> PrismDashboardSettings:
+        return self.prism
+
+
+@dataclass(frozen=True)
+class ScannerSettings:
+    enabled: bool = False
+    market: str = "KR"
+    max_candidates: int = 10
+    max_new_tickers_per_run: int = 5
+    include_prism_candidates: bool = True
+    local_ohlcv_path: Path | None = None
+    min_traded_value_krw: int = 10_000_000_000
+    min_market_cap_krw: int = 500_000_000_000
+    max_daily_change_pct: float = 20.0
+    min_volume_ratio_to_market_avg: float = 0.2
+    exclude_halted_or_low_liquidity: bool = True
+
+
+@dataclass(frozen=True)
+class PerformanceSettings:
+    enabled: bool = False
+    store_path: Path | None = None
+    update_outcomes_on_run: bool = False
+
+
+@dataclass(frozen=True)
+class AlertSettings:
+    enabled: bool = False
+    markdown_output_path: Path | None = None
+    telegram_enabled: bool = False
+
+
+@dataclass(frozen=True)
 class ScheduledAnalysisConfig:
     run: RunSettings
     llm: LLMSettings
@@ -131,6 +200,10 @@ class ScheduledAnalysisConfig:
     portfolio: PortfolioSettings
     execution: ExecutionSettings
     summary_image: SummaryImageSettings
+    external_data: ExternalDataSettings
+    scanner: ScannerSettings
+    performance: PerformanceSettings
+    alerts: AlertSettings
     config_path: Path
 
 
@@ -147,6 +220,11 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     portfolio_raw = raw.get("portfolio") or {}
     execution_raw = raw.get("execution") or {}
     summary_image_raw = raw.get("summary_image") or {}
+    external_raw = raw.get("external") or {}
+    external_data_raw = raw.get("external_data") or {}
+    scanner_raw = raw.get("scanner") or {}
+    performance_raw = raw.get("performance") or {}
+    alerts_raw = raw.get("alerts") or {}
 
     tickers = _normalize_tickers(run_raw.get("tickers") or [])
     if not tickers:
@@ -282,6 +360,15 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             image_quality=str(summary_image_raw.get("image_quality", "medium")).strip() or "medium",
             request_timeout=float(summary_image_raw.get("request_timeout", 180.0)),
         ),
+        external_data=_load_external_data_settings(
+            external_raw=external_raw,
+            external_data_raw=external_data_raw,
+            base_dir=base_dir,
+            default_market=market_code,
+        ),
+        scanner=_load_scanner_settings(scanner_raw, base_dir=base_dir, default_market=market_code),
+        performance=_load_performance_settings(performance_raw, base_dir=base_dir),
+        alerts=_load_alert_settings(alerts_raw, base_dir=base_dir),
         config_path=config_path,
     )
 
@@ -436,6 +523,84 @@ def _normalize_summary_image_mode(value: object) -> str:
     return mode
 
 
+def _load_external_data_settings(
+    *,
+    external_raw: dict[str, object],
+    external_data_raw: dict[str, object],
+    base_dir: Path,
+    default_market: str,
+) -> ExternalDataSettings:
+    prism_raw = {}
+    if isinstance(external_raw, dict):
+        prism_raw = external_raw.get("prism") or {}
+    if not prism_raw and isinstance(external_data_raw, dict):
+        prism_raw = external_data_raw.get("prism") or external_data_raw.get("prism_dashboard") or {}
+    if not isinstance(prism_raw, dict):
+        prism_raw = {}
+    enabled = _env_bool("PRISM_EXTERNAL_ENABLED", bool(prism_raw.get("enabled", False)))
+    local_json = _env_optional_path("PRISM_DASHBOARD_JSON_PATH", _first_config_value(prism_raw, "local_dashboard_json_path", "local_json_path"), base_dir)
+    sqlite_path = _env_optional_path("PRISM_SQLITE_DB_PATH", _first_config_value(prism_raw, "local_sqlite_db_path", "sqlite_path"), base_dir)
+    dashboard_json_url = _env_string("PRISM_DASHBOARD_JSON_URL", _optional_string(_first_config_value(prism_raw, "dashboard_json_url", "dashboard_url")))
+    dashboard_base_url = _env_string(
+        "PRISM_DASHBOARD_BASE_URL",
+        _optional_string(prism_raw.get("dashboard_base_url")) or "https://analysis.stocksimulation.kr",
+    )
+    return ExternalDataSettings(
+        prism=PrismDashboardSettings(
+            enabled=enabled,
+            mode=str(prism_raw.get("mode", "advisory")).strip().lower() or "advisory",
+            local_dashboard_json_path=local_json,
+            local_sqlite_db_path=sqlite_path,
+            dashboard_json_url=dashboard_json_url,
+            dashboard_base_url=dashboard_base_url or "https://analysis.stocksimulation.kr",
+            timeout_seconds=_env_float("PRISM_TIMEOUT_SECONDS", float(prism_raw.get("timeout_seconds", 5.0) or 5.0)),
+            max_payload_bytes=_env_int("PRISM_MAX_PAYLOAD_BYTES", int(prism_raw.get("max_payload_bytes", 5_000_000) or 5_000_000)),
+            use_live_http=_env_bool("PRISM_USE_LIVE_HTTP", bool(prism_raw.get("use_live_http", False))),
+            use_html_scraping=bool(prism_raw.get("use_html_scraping", False)),
+            confidence_cap=float(prism_raw.get("confidence_cap", 0.25) or 0.25),
+            market=_optional_string(prism_raw.get("market")) or default_market,
+            use_for_candidate_generation=bool(prism_raw.get("use_for_candidate_generation", False)),
+            use_for_performance_benchmark=bool(prism_raw.get("use_for_performance_benchmark", False)),
+            use_for_ui_comparison=bool(prism_raw.get("use_for_ui_comparison", True)),
+        )
+    )
+
+
+def _load_scanner_settings(raw: dict[str, object], *, base_dir: Path, default_market: str) -> ScannerSettings:
+    raw = raw if isinstance(raw, dict) else {}
+    return ScannerSettings(
+        enabled=bool(raw.get("enabled", False)),
+        market=str(raw.get("market", default_market)).strip().upper() or default_market,
+        max_candidates=max(1, int(raw.get("max_candidates", 10) or 10)),
+        max_new_tickers_per_run=max(0, int(raw.get("max_new_tickers_per_run", 5) or 5)),
+        include_prism_candidates=bool(raw.get("include_prism_candidates", True)),
+        local_ohlcv_path=_resolve_optional_path(raw.get("local_ohlcv_path"), base_dir),
+        min_traded_value_krw=int(raw.get("min_traded_value_krw", 10_000_000_000) or 10_000_000_000),
+        min_market_cap_krw=int(raw.get("min_market_cap_krw", 500_000_000_000) or 500_000_000_000),
+        max_daily_change_pct=float(raw.get("max_daily_change_pct", 20.0) or 20.0),
+        min_volume_ratio_to_market_avg=float(raw.get("min_volume_ratio_to_market_avg", 0.2) or 0.2),
+        exclude_halted_or_low_liquidity=bool(raw.get("exclude_halted_or_low_liquidity", True)),
+    )
+
+
+def _load_performance_settings(raw: dict[str, object], *, base_dir: Path) -> PerformanceSettings:
+    raw = raw if isinstance(raw, dict) else {}
+    return PerformanceSettings(
+        enabled=bool(raw.get("enabled", False)),
+        store_path=_resolve_optional_path(raw.get("store_path"), base_dir),
+        update_outcomes_on_run=bool(raw.get("update_outcomes_on_run", False)),
+    )
+
+
+def _load_alert_settings(raw: dict[str, object], *, base_dir: Path) -> AlertSettings:
+    raw = raw if isinstance(raw, dict) else {}
+    return AlertSettings(
+        enabled=bool(raw.get("enabled", False)),
+        markdown_output_path=_resolve_optional_path(raw.get("markdown_output_path"), base_dir),
+        telegram_enabled=bool(raw.get("telegram_enabled", False)),
+    )
+
+
 def _normalize_analysts(values: Iterable[str]) -> list[str]:
     normalized: list[str] = []
     seen: set[str] = set()
@@ -468,6 +633,62 @@ def _resolve_path(value: str | os.PathLike[str], base_dir: Path) -> Path:
     if not path.is_absolute():
         path = (base_dir / path).resolve()
     return path
+
+
+def _first_config_value(raw: dict[str, object], *keys: str) -> object | None:
+    for key in keys:
+        if key in raw and raw[key] not in (None, ""):
+            return raw[key]
+    return None
+
+
+def _env_string(name: str, default: str | None) -> str | None:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    text = value.strip()
+    return text or None
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _env_float(name: str, default: float) -> float:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
+
+def _env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        return default
+
+
+def _env_optional_path(name: str, default: object, base_dir: Path) -> Path | None:
+    value = os.getenv(name)
+    if value is not None:
+        default = value
+    return _resolve_optional_path(default, base_dir)
+
+
+def _resolve_optional_path(value: object, base_dir: Path) -> Path | None:
+    text = _optional_string(value)
+    if text is None:
+        return None
+    return _resolve_path(text, base_dir)
 
 
 def _optional_string(value: object) -> str | None:

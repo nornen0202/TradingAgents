@@ -33,8 +33,12 @@ from tradingagents.execution.reporting import (
     render_execution_update_markdown,
 )
 from tradingagents.execution.selective_rerun import collect_event_signals, find_selective_rerun_targets
+from tradingagents.external.prism_conflicts import best_prism_signal_by_ticker
+from tradingagents.external.prism_loader import load_prism_signals
+from tradingagents.external.prism_models import PrismSignalAction
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.live.context_delta import build_live_context_delta, render_report_vs_live_delta_markdown
+from tradingagents.performance.action_outcomes import record_run_recommendations, summarize_action_performance, update_action_outcomes
 from tradingagents.portfolio import load_snapshot_for_profile, run_portfolio_pipeline
 from tradingagents.portfolio.delta import compute_portfolio_delta, render_portfolio_delta_markdown
 from tradingagents.portfolio.profiles import load_portfolio_profile
@@ -53,6 +57,7 @@ from tradingagents.schemas import (
     parse_structured_decision,
 )
 from tradingagents.reporting import save_report_bundle
+from tradingagents.scanner.prism_like_scanner import augment_universe_with_scanner, run_prism_like_scanner
 
 from .config import (
     ScheduledAnalysisConfig,
@@ -123,7 +128,14 @@ def execute_scheduled_run(
     run_dir = config.storage.archive_dir / "runs" / started_at.strftime("%Y") / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    run_tickers = _resolve_run_tickers(config)
+    base_run_tickers = _resolve_run_tickers(config)
+    run_tickers, scanner_status = _augment_run_tickers_with_scanner(
+        config=config,
+        base_tickers=base_run_tickers,
+        run_dir=run_dir,
+        run_id=run_id,
+        asof=started_at.isoformat(),
+    )
     ticker_summaries: list[dict[str, Any]] = []
     engine_results_dir = run_dir / "engine-results"
     run_mode = str(config.run.run_mode or "full").strip().lower()
@@ -242,6 +254,8 @@ def execute_scheduled_run(
         },
         "tickers": ticker_summaries,
     }
+    if scanner_status:
+        manifest["scanner"] = scanner_status
     if run_trade_date:
         manifest["daily_thesis_trade_date"] = run_trade_date
         manifest["settings"]["daily_thesis_trade_date"] = run_trade_date
@@ -340,6 +354,7 @@ def execute_scheduled_run(
             portfolio_settings=config.portfolio,
             llm_settings=config.llm,
             summary_image_settings=config.summary_image,
+            external_data_settings=config.external_data,
         )
         manifest["portfolio"] = portfolio_status
         for warning in portfolio_status.get("sell_side_calibration_warnings") or []:
@@ -352,6 +367,9 @@ def execute_scheduled_run(
             )
     else:
         manifest["portfolio"] = {"status": "disabled"}
+
+    if config.performance.enabled:
+        manifest["performance"] = _run_performance_tracking(config=config, run_dir=run_dir, started_at=started_at)
 
     manifest["run_quality"] = _compute_run_quality(manifest=manifest)
     manifest["usefulness_rank"] = manifest["run_quality"]["usefulness_rank"]
@@ -888,7 +906,134 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "summary_image_mode": config.summary_image.mode,
         "summary_image_publish_to_site": config.summary_image.publish_to_site,
         "summary_image_redact_account_values": config.summary_image.redact_account_values,
+        "external_prism_enabled": config.external_data.prism.enabled,
+        "external_prism_use_live_http": config.external_data.prism.use_live_http,
+        "external_prism_ui_comparison": config.external_data.prism.use_for_ui_comparison,
+        "scanner_enabled": config.scanner.enabled,
+        "scanner_market": config.scanner.market,
+        "scanner_max_candidates": config.scanner.max_candidates,
+        "performance_enabled": config.performance.enabled,
     }
+
+
+def _augment_run_tickers_with_scanner(
+    *,
+    config: ScheduledAnalysisConfig,
+    base_tickers: list[str],
+    run_dir: Path,
+    run_id: str,
+    asof: str,
+) -> tuple[list[str], dict[str, Any] | None]:
+    if not config.scanner.enabled and not (
+        config.external_data.prism.enabled and config.external_data.prism.use_for_candidate_generation
+    ):
+        return base_tickers, None
+
+    scanner_result = None
+    warnings: list[str] = []
+    artifacts: dict[str, str] = {}
+    prism_ingestion = None
+    external_signals = []
+    if config.scanner.include_prism_candidates or config.external_data.prism.use_for_candidate_generation:
+        prism_ingestion = load_prism_signals(config.external_data)
+        external_signals = list(prism_ingestion.signals)
+        warnings.extend(prism_ingestion.warnings)
+
+    if config.scanner.enabled:
+        output_path = run_dir / "scanner" / "scanner_candidates.json"
+        scanner_result = run_prism_like_scanner(
+            ohlcv_path=config.scanner.local_ohlcv_path,
+            market=config.scanner.market,
+            regime="unknown",
+            run_id=run_id,
+            asof=asof,
+            max_candidates=config.scanner.max_candidates,
+            min_traded_value_krw=config.scanner.min_traded_value_krw,
+            min_market_cap_krw=config.scanner.min_market_cap_krw,
+            max_daily_change_pct=config.scanner.max_daily_change_pct,
+            min_volume_ratio_to_market_avg=config.scanner.min_volume_ratio_to_market_avg,
+            exclude_halted_or_low_liquidity=config.scanner.exclude_halted_or_low_liquidity,
+            external_signals=external_signals,
+            output_path=output_path,
+        )
+        warnings.extend(scanner_result.warnings)
+        artifacts["scanner_candidates_json"] = _relative_to_run(run_dir, output_path)
+
+    tickers = augment_universe_with_scanner(
+        base_tickers,
+        scanner_result,
+        max_new_tickers=config.scanner.max_new_tickers_per_run,
+    )
+    tickers = _augment_with_prism_candidates(
+        tickers,
+        external_signals,
+        max_new=max(0, config.scanner.max_new_tickers_per_run - max(0, len(tickers) - len(base_tickers))),
+    )
+    return tickers, {
+        "enabled": config.scanner.enabled,
+        "market": config.scanner.market,
+        "candidate_count": len(scanner_result.candidates) if scanner_result else 0,
+        "added_tickers": [ticker for ticker in tickers if ticker not in set(base_tickers)],
+        "warnings": list(dict.fromkeys(warnings)),
+        "artifacts": artifacts,
+        "prism_candidate_source": prism_ingestion.status_dict() if prism_ingestion is not None else None,
+    }
+
+
+def _augment_with_prism_candidates(
+    tickers: list[str],
+    external_signals: list[Any],
+    *,
+    max_new: int,
+) -> list[str]:
+    if max_new <= 0:
+        return tickers
+    result = list(tickers)
+    seen = {str(ticker).strip().upper() for ticker in result}
+    ranked = sorted(
+        best_prism_signal_by_ticker(external_signals).values(),
+        key=lambda signal: (float(signal.confidence or 0.0), float(signal.composite_score or signal.trigger_score or 0.0)),
+        reverse=True,
+    )
+    added = 0
+    for signal in ranked:
+        if signal.signal_action not in {PrismSignalAction.BUY, PrismSignalAction.ADD, PrismSignalAction.WATCH}:
+            continue
+        ticker = str(signal.canonical_ticker or "").strip().upper()
+        if not ticker or ticker in seen:
+            continue
+        result.append(ticker)
+        seen.add(ticker)
+        added += 1
+        if added >= max_new:
+            break
+    return result
+
+
+def _run_performance_tracking(
+    *,
+    config: ScheduledAnalysisConfig,
+    run_dir: Path,
+    started_at: datetime,
+) -> dict[str, Any]:
+    db_path = config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")
+    try:
+        record_run_recommendations(run_dir, db_path)
+        if config.performance.update_outcomes_on_run:
+            update_action_outcomes(db_path, asof_date=started_at.date().isoformat(), horizons=(1, 3, 5, 10, 20, 60))
+        summary = summarize_action_performance(db_path)
+        return {
+            "enabled": True,
+            "store_path": db_path.as_posix(),
+            "summary": summary.to_dict() if hasattr(summary, "to_dict") else summary,
+        }
+    except Exception as exc:
+        return {
+            "enabled": True,
+            "store_path": db_path.as_posix(),
+            "status": "failed",
+            "warning": f"performance_tracking_failed:{exc}",
+        }
 
 
 def _resolve_run_tickers(config: ScheduledAnalysisConfig) -> list[str]:

@@ -1,0 +1,30 @@
+{
+  "account_summary": {"cash": 1000000, "asof": "2026-04-29T15:00:00+09:00"},
+  "stock_holdings": [
+    {
+      "code": "005930",
+      "종목명": "삼성전자",
+      "decision": "HOLD",
+      "current_price": 75000,
+      "quantity": 10,
+      "avg_cost": 72000,
+      "pnl_pct": 4.1
+    }
+  ],
+  "watchlist_history": [
+    {
+      "symbol": "000660.KS",
+      "display_name": "SK하이닉스",
+      "recommendation": "ADD",
+      "trigger": "CLOSING_STRENGTH",
+      "composite_score": 91,
+      "risk_reward_ratio": 1.8
+    }
+  ],
+  "trigger_performance": {
+    "VOLUME_SURGE": {"win_rate_30d": 0.61, "avg_return_30d": 0.074}
+  },
+  "trading_principles": [
+    {"condition": "volume_surge", "action": "pilot_only", "reason": "추격 금지"}
+  ]
+}

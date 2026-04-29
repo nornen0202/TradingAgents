@@ -14,8 +14,34 @@ TradingAgents는 실제 트레이딩 조직의 협업 구조를 반영한 멀티
 - 비대화형 스케줄 실행과 정적 리포트 사이트 생성
 - 한국어 출력용 로컬 번역 백엔드 기본값: `NLLB-200-distilled-600M + CTranslate2`
 - 한국/미국 티커 스케줄 설정, `ticker_names` 오버라이드, `quality_flags`, `batch_metrics`, `warnings`
+- 선택형 PRISM 외부 신호 수집, PRISM-style 후보 스캐너, 추천 액션 성과 추적
 
 이 프로젝트는 연구 목적입니다. 실제 투자 판단이나 자문 용도로 사용하면 안 되며, 결과는 모델, 데이터, 프롬프트, 시장 상황에 따라 크게 달라질 수 있습니다.
+
+## PRISM 외부 신호와 운영 보강
+
+TradingAgents는 PRISM 데이터를 외부 참고 신호로만 사용합니다. PRISM `BUY`가 있더라도 TradingAgents의 리스크 액션, 계좌 제약, 포트폴리오 배분, 실행 승인 레이어를 우회하지 않습니다.
+
+```toml
+[external.prism]
+enabled = true
+mode = "advisory"
+local_dashboard_json_path = "C:/Projects/prism-insight/examples/dashboard/public/dashboard_data.json"
+use_live_http = false
+confidence_cap = 0.25
+
+[scanner]
+enabled = true
+market = "KR"
+max_candidates = 10
+include_prism_candidates = true
+
+[performance]
+enabled = true
+store_path = "archive/performance.sqlite"
+```
+
+자세한 설정과 충돌 정책은 [Docs/prism_external_signals.md](Docs/prism_external_signals.md), 스캐너는 [Docs/scanner_prism_style.md](Docs/scanner_prism_style.md), 추천 성과 추적은 [Docs/action_performance_tracker.md](Docs/action_performance_tracker.md)를 참고하세요. 모든 기능은 기본 비활성화이며, 기존 scheduled report는 PRISM 없이 그대로 동작합니다.
 
 ## 빠른 시작
 

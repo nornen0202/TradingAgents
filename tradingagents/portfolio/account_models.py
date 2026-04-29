@@ -187,6 +187,11 @@ class PortfolioCandidate:
     score_now: float = 0.0
     score_triggered: float = 0.0
     gate_reasons: tuple[str, ...] = tuple()
+    external_signals: tuple[Any, ...] = tuple()
+    prism_agreement: str = "no_prism_signal"
+    external_signal_score_delta: float = 0.0
+    external_signal_notes: tuple[str, ...] = tuple()
+    buy_matrix: dict[str, Any] | None = None
     data_health: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -232,6 +237,11 @@ class PortfolioAction:
     trigger_type: str | None = None
     gate_reasons: tuple[str, ...] = tuple()
     sector: str | None = None
+    external_signals: tuple[Any, ...] = tuple()
+    prism_agreement: str = "no_prism_signal"
+    external_signal_score_delta: float = 0.0
+    external_signal_notes: tuple[str, ...] = tuple()
+    buy_matrix: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)

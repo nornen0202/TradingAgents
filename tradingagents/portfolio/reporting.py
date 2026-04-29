@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from tradingagents.external.prism_conflicts import render_external_signal_section
 from tradingagents.presentation import (
     present_account_action,
     present_market_regime,
@@ -34,6 +35,7 @@ def render_portfolio_report_markdown(
     candidates: list[PortfolioCandidate],
     live_context_delta: dict[str, Any] | None = None,
     live_sell_side_delta: list[dict[str, Any]] | None = None,
+    external_reconciliation: dict[str, Any] | None = None,
 ) -> str:
     mode_label = present_snapshot_mode(snapshot.snapshot_health, language="Korean")
     market_label = present_market_regime(recommendation.market_regime, language="Korean")
@@ -67,8 +69,8 @@ def render_portfolio_report_markdown(
     )
 
     action_rows = [
-        "| 종목 | 현재 상태 | 포트폴리오 액션 | 지금 할 일 | 조건 충족 시 | 금액(지금) | 금액(조건부) | 우선순위 | 핵심 이유 | 확인 필요 |",
-        "|---|---|---|---|---|---:|---:|---:|---|---|",
+        "| 종목 | 현재 상태 | 포트폴리오 액션 | 지금 할 일 | 조건 충족 시 | PRISM | 금액(지금) | 금액(조건부) | 우선순위 | 핵심 이유 | 확인 필요 |",
+        "|---|---|---|---|---|---|---:|---:|---:|---|---|",
     ]
     for action in recommendation.actions:
         current_value = snapshot.find_position(action.canonical_ticker)
@@ -77,6 +79,7 @@ def render_portfolio_report_markdown(
             f"{_cell(present_account_action(action.portfolio_relative_action, language='Korean'))} | "
             f"{_cell(present_account_action(action.action_now, language='Korean'))} | "
             f"{_cell(_conditional_action_label(action))} | "
+            f"{_cell(_prism_badge(action))} | "
             f"{_cell(_amount_label(action.delta_krw_now))} | "
             f"{_cell(_amount_label(action.delta_krw_if_triggered))} | "
             f"{action.priority} | {_cell(_localized_rationale(action))} | "
@@ -92,6 +95,7 @@ def render_portfolio_report_markdown(
     sell_side_sections = _sell_side_sections(recommendation, live_sell_side_delta=live_sell_side_delta)
     scenario_table = _scenario_table_v2(recommendation)
     consistency_section = render_consistency_section(live_context_delta)
+    external_section = render_external_signal_section(external_reconciliation) if external_reconciliation else ""
     return "\n".join(
         [
             title,
@@ -116,7 +120,7 @@ def render_portfolio_report_markdown(
             f"- 계좌 상대 액션: 줄여서 재배치 {trim_to_fund_count}개 / 위험 축소 {reduce_risk_count}개",
             f"- Sell-side 구분: 자금 조달 {trim_to_fund_count}개 / 리스크 축소 {reduce_risk_count}개 / 이익실현 {take_profit_count}개 / 손절 {stop_loss_count}개 / 청산 {exit_count}개",
             f"- 실행 신호 구분: 예산 차단 {immediate_budget_blocked_count}개 / 장중 pilot 준비 {pilot_ready_count}개 / 종가 확인 {close_confirm_count}개",
-            f"- 전략상 조건부 후보 {strategic_trigger_count}개 / 자금 반영 조건부 후보 {budgeted_trigger_count}개",
+            f"- 현금 제약 무시 조건부 후보 {strategic_trigger_count}개 / 자금 반영 조건부 후보 {budgeted_trigger_count}개",
             f"- 자금 조달형 후보 {funding_count}개 / 보유 조건부 추가 후보 {held_add_count}개 / 미보유 조건부 관찰 후보 {watch_if_triggered_count}개",
             (
                 f"- 즉시 실행 신호 {immediate_actionable_count}개 중 "
@@ -139,6 +143,8 @@ def render_portfolio_report_markdown(
             "",
             funding_sections,
             "",
+            external_section,
+            "" if external_section else "",
             consistency_section,
             "",
             "## 포트폴리오 리스크",
@@ -161,7 +167,7 @@ def render_portfolio_report_markdown(
             f"- 조건부 실행 후보: {strategic_trigger_count}개",
             f"- 조건부 실행 예산 반영 후보: {budgeted_trigger_count}개",
             f"- 트리거형 후보(현금과 무관): {strategic_trigger_count}개",
-            f"- 전략상 조건부 후보: {strategic_trigger_count}개",
+            f"- 현금 제약 무시 조건부 후보: {strategic_trigger_count}개",
             f"- 자금 조달형 후보: {funding_count}개",
             f"- 확인 필요 후보: {review_required_count}개",
             f"- Rule-only fallback 후보: {rule_only_fallback_count}개",
@@ -322,10 +328,10 @@ def _directional_priority_sections(recommendation: PortfolioRecommendation) -> s
         )
     ]
     sections = [
-        ("오늘 즉시 매도/축소 후보", [action for action in actions if action.action_now in _NOW_SELL_ACTIONS]),
-        ("오늘 즉시 매수 후보", [action for action in actions if action.action_now in _NOW_BUY_ACTIONS]),
+        ("오늘 즉시 매도/축소 후보 / 오늘 바로 매도/축소 후보", [action for action in actions if action.action_now in _NOW_SELL_ACTIONS]),
+        ("오늘 바로 매수 후보", [action for action in actions if action.action_now in _NOW_BUY_ACTIONS]),
         ("조건부 매수 후보", [action for action in actions if action.action_if_triggered in _TRIGGER_BUY_ACTIONS]),
-        ("조건부 매도/이익실현 후보", conditional_sell),
+        ("조건부 매도/손절/이익실현 후보", conditional_sell + [action for action in stop_or_exit if action not in conditional_sell]),
         ("손절/청산 후보", stop_or_exit),
     ]
     chunks: list[str] = ["## 오늘 할 일: 방향별 후보"]
@@ -359,7 +365,9 @@ def _directional_action_line(index: int, action) -> str:
     amount_label = _amount_label(amount) if amount else "금액 변화 없음"
     level = _risk_level_label(action.risk_action_level)
     reason = _localized_rationale(action)
-    return f"- {index}. {action.display_name} - {action_label} / {relative_label}{level} / {amount_label} - {reason}"
+    prism = _prism_badge(action)
+    prism_text = f" / {prism}" if prism else ""
+    return f"- {index}. {action.display_name} - {action_label} / {relative_label}{level} / {amount_label}{prism_text} - {reason}"
 
 
 def _risk_level_label(raw_level: dict[str, Any] | None) -> str:
@@ -385,8 +393,18 @@ def _sell_side_sections(
     actions = list(recommendation.actions)
     live_risk_lines = _live_sell_side_lines(live_sell_side_delta)
     sections = [
-        ("오늘 살 후보", [action for action in actions if action.action_now in {"ADD_NOW", "STARTER_NOW"}]),
-        ("조건부 살 후보", [action for action in actions if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}]),
+        ("오늘 바로 매수 후보 (오늘 살 후보)", [action for action in actions if action.action_now in {"ADD_NOW", "STARTER_NOW"}]),
+        ("오늘 바로 매도/축소 후보", [action for action in actions if action.action_now in _NOW_SELL_ACTIONS]),
+        ("조건부 매수 후보 (조건부 살 후보)", [action for action in actions if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}]),
+        (
+            "조건부 매도/이익실현/손절 후보",
+            [
+                action
+                for action in actions
+                if action.action_if_triggered in {"REDUCE_IF_TRIGGERED", "TAKE_PROFIT_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
+                or action.portfolio_relative_action in {"REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}
+            ],
+        ),
         ("줄여서 살 후보", [action for action in actions if action.portfolio_relative_action == "TRIM_TO_FUND"]),
         ("위험 때문에 줄일 후보", [action for action in actions if action.portfolio_relative_action == "REDUCE_RISK"]),
         ("이익실현 후보", [action for action in actions if action.portfolio_relative_action == "TAKE_PROFIT"]),
@@ -429,7 +447,25 @@ def _action_brief_line(action) -> str:
         price = raw_level.get("price") or raw_level.get("low") or raw_level.get("high")
         if price:
             level = f" / 기준 {price}"
-    return f"- {action.display_name}: {label}{level} - {reason}"
+    prism = _prism_badge(action)
+    prism_text = f" / {prism}" if prism else ""
+    return f"- {action.display_name}: {label}{level}{prism_text} - {reason}"
+
+
+def _prism_badge(action) -> str:
+    agreement = str(getattr(action, "prism_agreement", "") or (getattr(action, "data_health", {}) or {}).get("prism_agreement") or "").strip()
+    if not agreement or agreement == "no_prism_signal":
+        return "PRISM 신호 없음"
+    mapping = {
+        "confirmed_buy": "PRISM 동의: BUY confirmed",
+        "confirmed_sell": "PRISM 동의: SELL confirmed",
+        "conflict_prism_buy_ta_reduce": "PRISM 충돌: PRISM BUY but TA REDUCE_RISK",
+        "conflict_prism_sell_ta_buy": "PRISM 충돌: PRISM SELL but TA BUY",
+        "prism_watch_only": "PRISM 관찰 신호",
+        "prism_sell_warning": "PRISM SELL 경고",
+        "external_only": "PRISM 외부 관찰",
+    }
+    return mapping.get(agreement, agreement.replace("_", " "))
 
 
 def _funding_sections(recommendation: PortfolioRecommendation) -> str:
