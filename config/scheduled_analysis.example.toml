@@ -74,3 +74,28 @@ image_model = "gpt-image-2"
 image_size = "1024x1536"
 image_quality = "medium"
 request_timeout = 180.0
+
+[external.prism]
+enabled = false
+mode = "advisory"
+local_dashboard_json_path = ""
+local_sqlite_db_path = ""
+dashboard_json_url = ""
+dashboard_base_url = "https://analysis.stocksimulation.kr"
+timeout_seconds = 5
+max_payload_bytes = 5000000
+use_live_http = false
+use_html_scraping = false
+confidence_cap = 0.25
+
+[scanner]
+enabled = false
+market = "KR"
+local_ohlcv_path = ""
+max_candidates = 10
+max_new_tickers_per_run = 5
+include_prism_candidates = true
+
+[performance]
+enabled = false
+store_path = "archive/performance.sqlite"

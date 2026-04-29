@@ -22,6 +22,8 @@ def save_portfolio_outputs(
     live_sell_side_delta: list[dict[str, Any]] | None = None,
     risk_action_delta_markdown: str | None = None,
     summary_image_artifacts: dict[str, str] | None = None,
+    external_signal_artifacts: dict[str, str] | None = None,
+    external_reconciliation: dict[str, Any] | None = None,
 ) -> dict[str, str]:
     private_dir.mkdir(parents=True, exist_ok=True)
 
@@ -79,6 +81,7 @@ def save_portfolio_outputs(
             "semantic_verdicts": semantic_verdicts,
             "action_judge": action_judge_payload,
             "report_writer": report_writer_payload,
+            "external_reconciliation": external_reconciliation,
             "candidates": [candidate.to_dict() for candidate in candidates],
             "actions": [action.to_dict() for action in recommendation.actions],
         },
@@ -100,6 +103,7 @@ def save_portfolio_outputs(
         "decision_audit_json": audit_path.as_posix(),
     }
     artifacts.update(summary_image_artifacts or {})
+    artifacts.update(external_signal_artifacts or {})
     return artifacts
 
 

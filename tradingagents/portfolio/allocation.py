@@ -136,6 +136,11 @@ def build_recommendation(
                     "portfolio_relative_action": candidate.portfolio_relative_action,
                     "relative_action_reason_codes": list(candidate.relative_action_reason_codes),
                     "budget_blocked_actionable": budget_blocked_actionable,
+                    "external_signals": list(candidate.external_signals),
+                    "prism_agreement": candidate.prism_agreement,
+                    "external_signal_score_delta": round(candidate.external_signal_score_delta, 4),
+                    "external_signal_notes": list(candidate.external_signal_notes),
+                    "buy_matrix": candidate.buy_matrix,
                 },
                 strategy_state=candidate.strategy_state,
                 execution_feasibility_now=candidate.execution_feasibility_now,
@@ -157,6 +162,11 @@ def build_recommendation(
                 trigger_type=str(candidate.trigger_profile.get("primary_trigger_type") or "") or None,
                 gate_reasons=candidate.gate_reasons,
                 sector=candidate.sector,
+                external_signals=candidate.external_signals,
+                prism_agreement=candidate.prism_agreement,
+                external_signal_score_delta=round(candidate.external_signal_score_delta, 4),
+                external_signal_notes=candidate.external_signal_notes,
+                buy_matrix=candidate.buy_matrix,
             )
         )
 
@@ -297,6 +307,10 @@ def _score_candidate(
         conviction * timing_triggered * coverage_score * thesis_multiplier
         - concentration_penalty
     )
+    external_delta = max(min(float(candidate.external_signal_score_delta or 0.0), 0.25), -0.25)
+    if external_delta:
+        score_now += external_delta
+        score_triggered += external_delta
     if candidate.review_required and not candidate.is_held:
         score_now = min(score_now, 0.0)
         score_triggered *= 0.75
@@ -319,6 +333,9 @@ def _score_candidate(
                 "timing_now": round(timing_now, 4),
                 "timing_triggered": round(timing_triggered, 4),
                 "funding_source_score": round(funding_source_score, 4),
+                "external_signal_score_delta": round(external_delta, 4),
+                "prism_agreement": candidate.prism_agreement,
+                "buy_matrix": candidate.buy_matrix,
             },
         }
     )
