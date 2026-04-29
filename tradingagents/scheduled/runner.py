@@ -39,6 +39,7 @@ from tradingagents.external.prism_models import PrismSignalAction
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.live.context_delta import build_live_context_delta, render_report_vs_live_delta_markdown
 from tradingagents.performance.action_outcomes import record_run_recommendations, summarize_action_performance, update_action_outcomes
+from tradingagents.performance.price_history import load_price_history_for_recommendations
 from tradingagents.portfolio import load_snapshot_for_profile, run_portfolio_pipeline
 from tradingagents.portfolio.delta import compute_portfolio_delta, render_portfolio_delta_markdown
 from tradingagents.portfolio.profiles import load_portfolio_profile
@@ -908,11 +909,15 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "summary_image_redact_account_values": config.summary_image.redact_account_values,
         "external_prism_enabled": config.external_data.prism.enabled,
         "external_prism_use_live_http": config.external_data.prism.use_live_http,
+        "external_prism_use_html_scraping": config.external_data.prism.use_html_scraping,
         "external_prism_ui_comparison": config.external_data.prism.use_for_ui_comparison,
         "scanner_enabled": config.scanner.enabled,
         "scanner_market": config.scanner.market,
         "scanner_max_candidates": config.scanner.max_candidates,
         "performance_enabled": config.performance.enabled,
+        "performance_update_outcomes_on_run": config.performance.update_outcomes_on_run,
+        "performance_price_provider": config.performance.price_provider,
+        "performance_benchmark_ticker": config.performance.benchmark_ticker,
     }
 
 
@@ -1019,14 +1024,48 @@ def _run_performance_tracking(
     db_path = config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")
     try:
         record_run_recommendations(run_dir, db_path)
+        outcome_update: dict[str, Any] = {
+            "enabled": bool(config.performance.update_outcomes_on_run),
+            "provider": config.performance.price_provider,
+            "warnings": [],
+            "updated": False,
+        }
         if config.performance.update_outcomes_on_run:
-            update_action_outcomes(db_path, asof_date=started_at.date().isoformat(), horizons=(1, 3, 5, 10, 20, 60))
+            price_result = load_price_history_for_recommendations(
+                db_path,
+                provider=config.performance.price_provider,
+                price_history_path=config.performance.price_history_path,
+                benchmark_ticker=config.performance.benchmark_ticker,
+                lookback_days=config.performance.price_lookback_days,
+                asof_date=started_at.date().isoformat(),
+            )
+            outcome_update.update(
+                {
+                    "provider": price_result.provider,
+                    "has_prices": price_result.has_prices,
+                    "warnings": price_result.warnings,
+                }
+            )
+            if price_result.has_prices:
+                update_action_outcomes(
+                    db_path,
+                    asof_date=started_at.date().isoformat(),
+                    horizons=config.performance.outcome_horizons,
+                    price_history=price_result.price_history,
+                )
+                outcome_update["updated"] = True
         summary = summarize_action_performance(db_path)
-        return {
+        payload = {
             "enabled": True,
+            "status": "ok",
             "store_path": db_path.as_posix(),
+            "outcome_update": outcome_update,
             "summary": summary.to_dict() if hasattr(summary, "to_dict") else summary,
         }
+        summary_path = run_dir / "performance" / "performance_summary.json"
+        payload["artifacts"] = {"performance_summary_json": _relative_to_run(run_dir, summary_path)}
+        _write_json(summary_path, payload)
+        return payload
     except Exception as exc:
         return {
             "enabled": True,

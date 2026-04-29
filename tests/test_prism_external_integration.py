@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from tradingagents.external.prism_conflicts import enrich_candidates_with_prism, reconcile_prism_with_actions
-from tradingagents.external.prism_dashboard import load_dashboard_json_file
+from tradingagents.external.prism_dashboard import load_dashboard_json_file, parse_dashboard_html
 from tradingagents.external.prism_loader import PrismLoaderConfig, load_prism_signals
 from tradingagents.external.prism_models import PrismIngestionResult
 from tradingagents.external.prism_sqlite import load_prism_sqlite
@@ -14,6 +14,7 @@ from tradingagents.performance.action_outcomes import (
     update_action_outcomes,
 )
 from tradingagents.performance.journal import generate_closed_trade_review
+from tradingagents.performance.price_history import BENCHMARK_KEY, load_price_history_for_recommendations
 from tradingagents.portfolio.account_models import (
     AccountConstraints,
     AccountSnapshot,
@@ -23,6 +24,7 @@ from tradingagents.portfolio.account_models import (
     PortfolioRecommendation,
 )
 from tradingagents.portfolio.reporting import render_portfolio_report_markdown
+from tradingagents.scheduled.site import _render_performance_tracking_section
 from tradingagents.scanner.prism_like_scanner import run_prism_like_scanner
 from tradingagents.scanner.sector_regime import apply_buy_matrix_overlay, evaluate_buy_matrix
 
@@ -89,6 +91,62 @@ def test_prism_invalid_json_returns_warning(tmp_path):
 
     assert result.ok is False
     assert result.warnings
+
+
+def test_prism_dashboard_html_parses_embedded_payload_when_enabled():
+    html_text = (FIXTURES / "prism" / "dashboard_page_embedded.html").read_text(encoding="utf-8")
+
+    result = parse_dashboard_html(html_text, source="https://example.test", market="KR")
+
+    assert result.ok is True
+    assert result.signals[0].canonical_ticker == "000660.KS"
+    assert result.signals[0].signal_action.value == "BUY"
+    assert result.performance_summary
+    assert "dashboard_html_scraping_opt_in" in result.warnings
+
+
+def test_prism_loader_only_uses_html_scraping_when_explicitly_enabled():
+    html_text = (FIXTURES / "prism" / "dashboard_page_embedded.html").read_text(encoding="utf-8")
+    html_result = parse_dashboard_html(html_text, source="https://example.test", market="KR")
+
+    with (
+        patch(
+            "tradingagents.external.prism_loader.fetch_dashboard_json_url",
+            return_value=PrismIngestionResult(enabled=True, ok=False, warnings=["json_unavailable"]),
+        ),
+        patch("tradingagents.external.prism_loader.fetch_dashboard_html_url", return_value=html_result) as html_fetch,
+    ):
+        result = load_prism_signals(
+            PrismLoaderConfig(
+                enabled=True,
+                use_live_http=True,
+                use_html_scraping=False,
+                dashboard_base_url="https://example.test",
+            )
+        )
+
+    assert result.ok is False
+    html_fetch.assert_not_called()
+
+    with (
+        patch(
+            "tradingagents.external.prism_loader.fetch_dashboard_json_url",
+            return_value=PrismIngestionResult(enabled=True, ok=False, warnings=["json_unavailable"]),
+        ),
+        patch("tradingagents.external.prism_loader.fetch_dashboard_html_url", return_value=html_result) as html_fetch,
+    ):
+        result = load_prism_signals(
+            PrismLoaderConfig(
+                enabled=True,
+                use_live_http=True,
+                use_html_scraping=True,
+                dashboard_base_url="https://example.test",
+            )
+        )
+
+    assert result.ok is True
+    assert result.signals
+    html_fetch.assert_called_once()
 
 
 def test_prism_sqlite_parser_tolerates_missing_tables(tmp_path):
@@ -250,6 +308,51 @@ def test_action_tracker_records_and_updates_fixture_outcomes(tmp_path):
     assert summary.by_action["STARTER_NOW"]["count"] == 1
 
 
+def test_price_history_loader_adds_benchmark_and_updates_outcomes(tmp_path):
+    run_dir = tmp_path / "run"
+    private = run_dir / "portfolio-private"
+    private.mkdir(parents=True)
+    (run_dir / "run.json").write_text(
+        json.dumps({"run_id": "run1", "started_at": "2026-04-01T09:00:00+09:00"}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (private / "portfolio_report.json").write_text(
+        json.dumps(
+            {
+                "actions": [
+                    {
+                        "canonical_ticker": "000660.KS",
+                        "action_now": "STARTER_NOW",
+                        "action_if_triggered": "NONE",
+                        "delta_krw_now": 100000,
+                        "confidence": 0.7,
+                        "risk_action": "NONE",
+                        "data_health": {"last_price": 100, "prism_agreement": "confirmed_buy"},
+                    }
+                ]
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    db_path = tmp_path / "perf.sqlite"
+
+    record_run_recommendations(run_dir, db_path)
+    price_result = load_price_history_for_recommendations(
+        db_path,
+        provider="local_json",
+        price_history_path=FIXTURES / "performance" / "price_history_with_benchmark.json",
+        benchmark_ticker="SPY",
+    )
+    update_action_outcomes(db_path, "2026-04-30", price_history=price_result.price_history)
+
+    assert price_result.has_prices is True
+    assert BENCHMARK_KEY in price_result.price_history
+    with sqlite3.connect(db_path) as conn:
+        benchmark_return = conn.execute("SELECT benchmark_return_5d FROM action_outcomes").fetchone()[0]
+    assert benchmark_return is not None
+
+
 def test_trading_journal_generates_rule_based_review(tmp_path):
     path = tmp_path / "closed_trade_review.json"
     review = generate_closed_trade_review(
@@ -322,3 +425,27 @@ def test_investor_report_separates_actions_and_prism_sections():
     assert "외부 PRISM 신호 요약" in markdown
     assert "PRISM 동의: BUY confirmed" in markdown
     assert "전략상 우선순위" not in markdown
+
+
+def test_site_renders_performance_tracking_section():
+    html = _render_performance_tracking_section(
+        {
+            "run_id": "run1",
+            "performance": {
+                "enabled": True,
+                "status": "ok",
+                "outcome_update": {"enabled": True, "updated": True, "provider": "local_json", "warnings": []},
+                "summary": {
+                    "recommendations": 3,
+                    "outcomes": 2,
+                    "by_action": {"STARTER_NOW": {"count": 1, "avg_return_5d": 0.04, "avg_return_20d": 0.08}},
+                    "prism_agreement": {"confirmed_buy": {"count": 1, "avg_return_5d": 0.03, "avg_return_20d": 0.07}},
+                },
+                "artifacts": {"performance_summary_json": "performance/performance_summary.json"},
+            },
+        }
+    )
+
+    assert "추천 성과 추적" in html
+    assert "STARTER_NOW" in html
+    assert "confirmed_buy" in html

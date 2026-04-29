@@ -28,6 +28,7 @@ enabled = true
 mode = "advisory"
 local_dashboard_json_path = "C:/Projects/prism-insight/examples/dashboard/public/dashboard_data.json"
 use_live_http = false
+use_html_scraping = false
 confidence_cap = 0.25
 
 [scanner]
@@ -39,9 +40,13 @@ include_prism_candidates = true
 [performance]
 enabled = true
 store_path = "archive/performance.sqlite"
+update_outcomes_on_run = true
+price_provider = "local_json"
+price_history_path = "C:/TradingAgentsData/price_history.json"
+benchmark_ticker = "SPY"
 ```
 
-자세한 설정과 충돌 정책은 [Docs/prism_external_signals.md](Docs/prism_external_signals.md), 스캐너는 [Docs/scanner_prism_style.md](Docs/scanner_prism_style.md), 추천 성과 추적은 [Docs/action_performance_tracker.md](Docs/action_performance_tracker.md)를 참고하세요. 모든 기능은 기본 비활성화이며, 기존 scheduled report는 PRISM 없이 그대로 동작합니다.
+자세한 설정과 충돌 정책은 [Docs/prism_external_signals.md](Docs/prism_external_signals.md), 스캐너는 [Docs/scanner_prism_style.md](Docs/scanner_prism_style.md), 추천 성과 추적은 [Docs/action_performance_tracker.md](Docs/action_performance_tracker.md)를 참고하세요. 모든 기능은 기본 비활성화이며, 기존 scheduled report는 PRISM 없이 그대로 동작합니다. Live HTTP와 dashboard HTML embedded JSON 파싱은 각각 명시적으로 켜야 하며, outcome 업데이트도 가격 히스토리 파일 또는 opt-in provider가 있어야 계산됩니다.
 
 ## 빠른 시작
 

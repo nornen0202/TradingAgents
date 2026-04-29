@@ -138,6 +138,13 @@ def _copy_artifacts(
             if source.is_file():
                 download_dir.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source, download_dir / source.name)
+        for artifact_path in ((manifest.get("performance") or {}).get("artifacts") or {}).values():
+            if not artifact_path:
+                continue
+            source = _resolve_artifact_source(run_dir, artifact_path)
+            if source.is_file():
+                download_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, download_dir / source.name)
         return
 
     for source in portfolio_summary.get("downloadable_files", []):
@@ -156,6 +163,13 @@ def _copy_artifacts(
             download_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, download_dir / source.name)
     for artifact_path in ((manifest.get("live_context_delta") or {}).get("artifacts") or {}).values():
+        if not artifact_path:
+            continue
+        source = _resolve_artifact_source(run_dir, artifact_path)
+        if source.is_file():
+            download_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, download_dir / source.name)
+    for artifact_path in ((manifest.get("performance") or {}).get("artifacts") or {}).values():
         if not artifact_path:
             continue
         source = _resolve_artifact_source(run_dir, artifact_path)
@@ -719,6 +733,7 @@ def _render_portfolio_page(
     {failure_html}
     {summary_image_html}
     {_render_live_context_delta_section(manifest)}
+    {_render_performance_tracking_section(manifest)}
     <section class="section prose">
       <div class="section-head">
         <h2>{_escape(portfolio_label)}</h2>
@@ -729,6 +744,95 @@ def _render_portfolio_page(
     {downloads_html}
     """
     return _page_template(f"{manifest['run_id']} {portfolio_label.lower()} | {settings.title}", body, prefix="../../")
+
+
+def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
+    performance = manifest.get("performance") or {}
+    if not performance.get("enabled"):
+        return ""
+    status = str(performance.get("status") or "ok")
+    summary = performance.get("summary") if isinstance(performance.get("summary"), dict) else {}
+    outcome_update = performance.get("outcome_update") if isinstance(performance.get("outcome_update"), dict) else {}
+    artifacts = performance.get("artifacts") if isinstance(performance.get("artifacts"), dict) else {}
+    artifact_link = ""
+    artifact_name = Path(str(artifacts.get("performance_summary_json") or "")).name
+    if artifact_name:
+        artifact_link = (
+            f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(artifact_name)}'>"
+            f"{_escape(artifact_name)}</a>"
+        )
+    action_rows = _performance_bucket_rows(summary.get("by_action") if isinstance(summary.get("by_action"), dict) else {})
+    prism_rows = _performance_bucket_rows(summary.get("prism_agreement") if isinstance(summary.get("prism_agreement"), dict) else {})
+    warnings = outcome_update.get("warnings") if isinstance(outcome_update.get("warnings"), list) else []
+    warning_html = "".join(f"<li>{_escape(item)}</li>" for item in warnings[:6])
+    update_label = "갱신됨" if outcome_update.get("updated") else ("대기 중" if outcome_update.get("enabled") else "비활성")
+    provider = str(outcome_update.get("provider") or performance.get("provider") or "-")
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>추천 성과 추적</h2>
+        <p>{_escape(status)}</p>
+      </div>
+      <article class="run-card">
+        <p><strong>기록된 추천</strong><span>{int(summary.get('recommendations') or 0)}</span></p>
+        <p><strong>업데이트된 outcome</strong><span>{int(summary.get('outcomes') or 0)}</span></p>
+        <p><strong>가격 데이터 provider</strong><span>{_escape(provider)}</span></p>
+        <p><strong>Outcome 업데이트</strong><span>{_escape(update_label)}</span></p>
+        <div class="pill-row">{artifact_link}</div>
+      </article>
+      <div class="run-grid">
+        {_performance_table('액션별 5일/20일 성과', action_rows)}
+        {_performance_table('PRISM 일치/충돌별 성과', prism_rows)}
+      </div>
+      {"<details class='advanced-diagnostics'><summary>성과 추적 경고</summary><ul>" + warning_html + "</ul></details>" if warning_html else ""}
+    </section>
+    """
+
+
+def _performance_bucket_rows(buckets: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for bucket, metrics in buckets.items():
+        if not isinstance(metrics, dict):
+            continue
+        rows.append(
+            {
+                "bucket": str(bucket or "UNKNOWN"),
+                "count": int(metrics.get("count") or 0),
+                "avg_return_5d": metrics.get("avg_return_5d"),
+                "avg_return_20d": metrics.get("avg_return_20d"),
+            }
+        )
+    rows.sort(key=lambda row: (-row["count"], row["bucket"]))
+    return rows[:8]
+
+
+def _performance_table(title: str, rows: list[dict[str, Any]]) -> str:
+    if not rows:
+        body = "<p class='empty'>아직 outcome 데이터가 없습니다.</p>"
+    else:
+        table_rows = "".join(
+            "<tr>"
+            f"<td>{_escape(row['bucket'])}</td>"
+            f"<td>{row['count']}</td>"
+            f"<td>{_escape(_format_pct_value(row.get('avg_return_5d')))}</td>"
+            f"<td>{_escape(_format_pct_value(row.get('avg_return_20d')))}</td>"
+            "</tr>"
+            for row in rows
+        )
+        body = (
+            "<table><thead><tr><th>구분</th><th>건수</th><th>평균 5일</th><th>평균 20일</th></tr></thead>"
+            f"<tbody>{table_rows}</tbody></table>"
+        )
+    return f"<article class='run-card'><h3>{_escape(title)}</h3>{body}</article>"
+
+
+def _format_pct_value(value: Any) -> str:
+    try:
+        if value is None:
+            return "-"
+        return f"{float(value) * 100:.2f}%"
+    except (TypeError, ValueError):
+        return "-"
 
 
 def _portfolio_summary_image_html(manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:

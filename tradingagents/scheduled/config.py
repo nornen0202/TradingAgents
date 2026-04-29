@@ -181,6 +181,11 @@ class PerformanceSettings:
     enabled: bool = False
     store_path: Path | None = None
     update_outcomes_on_run: bool = False
+    price_provider: str = "none"
+    price_history_path: Path | None = None
+    benchmark_ticker: str | None = None
+    outcome_horizons: tuple[int, ...] = (1, 3, 5, 10, 20, 60)
+    price_lookback_days: int = 120
 
 
 @dataclass(frozen=True)
@@ -556,7 +561,7 @@ def _load_external_data_settings(
             timeout_seconds=_env_float("PRISM_TIMEOUT_SECONDS", float(prism_raw.get("timeout_seconds", 5.0) or 5.0)),
             max_payload_bytes=_env_int("PRISM_MAX_PAYLOAD_BYTES", int(prism_raw.get("max_payload_bytes", 5_000_000) or 5_000_000)),
             use_live_http=_env_bool("PRISM_USE_LIVE_HTTP", bool(prism_raw.get("use_live_http", False))),
-            use_html_scraping=bool(prism_raw.get("use_html_scraping", False)),
+            use_html_scraping=_env_bool("PRISM_USE_HTML_SCRAPING", bool(prism_raw.get("use_html_scraping", False))),
             confidence_cap=float(prism_raw.get("confidence_cap", 0.25) or 0.25),
             market=_optional_string(prism_raw.get("market")) or default_market,
             use_for_candidate_generation=bool(prism_raw.get("use_for_candidate_generation", False)),
@@ -589,6 +594,21 @@ def _load_performance_settings(raw: dict[str, object], *, base_dir: Path) -> Per
         enabled=bool(raw.get("enabled", False)),
         store_path=_resolve_optional_path(raw.get("store_path"), base_dir),
         update_outcomes_on_run=bool(raw.get("update_outcomes_on_run", False)),
+        price_provider=(
+            _env_string("TRADINGAGENTS_PERFORMANCE_PRICE_PROVIDER", _optional_string(raw.get("price_provider")))
+            or "none"
+        ).strip().lower(),
+        price_history_path=_env_optional_path(
+            "TRADINGAGENTS_PERFORMANCE_PRICE_HISTORY_PATH",
+            raw.get("price_history_path"),
+            base_dir,
+        ),
+        benchmark_ticker=_env_string(
+            "TRADINGAGENTS_PERFORMANCE_BENCHMARK_TICKER",
+            _optional_string(raw.get("benchmark_ticker")),
+        ),
+        outcome_horizons=_normalize_int_sequence(raw.get("outcome_horizons"), default=(1, 3, 5, 10, 20, 60)),
+        price_lookback_days=max(1, int(raw.get("price_lookback_days", 120) or 120)),
     )
 
 
@@ -696,6 +716,29 @@ def _optional_string(value: object) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _normalize_int_sequence(value: object, *, default: tuple[int, ...]) -> tuple[int, ...]:
+    if value is None:
+        return default
+    if isinstance(value, str):
+        raw_values = [item.strip() for item in value.split(",")]
+    else:
+        try:
+            raw_values = [str(item).strip() for item in value]  # type: ignore[operator]
+        except TypeError:
+            raw_values = [str(value).strip()]
+    result: list[int] = []
+    for item in raw_values:
+        if not item:
+            continue
+        try:
+            horizon = int(item)
+        except ValueError:
+            continue
+        if horizon > 0 and horizon not in result:
+            result.append(horizon)
+    return tuple(result) or default
 
 
 def _validate_trade_date(value: str) -> str:

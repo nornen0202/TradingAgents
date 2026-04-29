@@ -87,6 +87,10 @@ max_payload_bytes = 5000000
 use_live_http = false
 use_html_scraping = false
 confidence_cap = 0.25
+# Optional live activation:
+# - keep both false for default offline-safe behavior
+# - set use_live_http=true only when you accept live dashboard reads
+# - set use_html_scraping=true only when JSON endpoints are unavailable and embedded dashboard JSON is acceptable
 
 [scanner]
 enabled = false
@@ -99,3 +103,9 @@ include_prism_candidates = true
 [performance]
 enabled = false
 store_path = "archive/performance.sqlite"
+update_outcomes_on_run = false
+price_provider = "none" # none / local_json / yfinance
+price_history_path = ""
+benchmark_ticker = ""
+outcome_horizons = [1, 3, 5, 10, 20, 60]
+price_lookback_days = 120

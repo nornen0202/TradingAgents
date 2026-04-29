@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 from .models import ACTION_TRACKER_SCHEMA, ActionPerformanceSummary
+from .price_history import BENCHMARK_KEY
 
 
 def initialize_action_tracker(db_path: Path) -> None:
@@ -73,6 +74,7 @@ def update_action_outcomes(
 ) -> None:
     initialize_action_tracker(db_path)
     prices = _normalize_price_history(price_history or (_load_json(Path(price_history_path)) if price_history_path else {}))
+    benchmark_series = prices.get(BENCHMARK_KEY)
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
         recommendations = list(conn.execute("SELECT * FROM action_recommendations"))
@@ -81,7 +83,7 @@ def update_action_outcomes(
             series = prices.get(ticker)
             if not series:
                 continue
-            returns = _compute_returns(row, series, horizons=horizons)
+            returns = _compute_returns(row, series, horizons=horizons, benchmark_series=benchmark_series)
             if not returns:
                 continue
             conn.execute("DELETE FROM action_outcomes WHERE recommendation_id = ?", (row["id"],))
@@ -223,13 +225,15 @@ def _prism_skipped_rows(run_dir: Path, *, run_id: str, created_at: str, existing
     return rows
 
 
-def _compute_returns(row: sqlite3.Row, series: list[tuple[str, float]], *, horizons: Sequence[int]) -> dict[str, Any]:
+def _compute_returns(
+    row: sqlite3.Row,
+    series: list[tuple[str, float]],
+    *,
+    horizons: Sequence[int],
+    benchmark_series: list[tuple[str, float]] | None = None,
+) -> dict[str, Any]:
     created_date = str(row["created_at"] or "")[:10]
-    start_index = 0
-    for index, (date_text, _price) in enumerate(series):
-        if date_text >= created_date:
-            start_index = index
-            break
+    start_index = _start_index_for_date(series, created_date)
     base_price = _float_or_none(row["recommended_price"]) or series[start_index][1]
     if base_price <= 0:
         return {}
@@ -243,9 +247,27 @@ def _compute_returns(row: sqlite3.Row, series: list[tuple[str, float]], *, horiz
         values["max_drawdown_20d"] = round((min(window) - base_price) / base_price, 6)
         values["max_favorable_excursion_20d"] = round((max(window) - base_price) / base_price, 6)
     return_5d = values.get("return_5d")
-    values["benchmark_return_5d"] = None
+    values["benchmark_return_5d"] = _benchmark_return_5d(benchmark_series, created_date=created_date)
     values["outcome_label"] = _outcome_label(str(row["action"]), return_5d)
     return values
+
+
+def _start_index_for_date(series: list[tuple[str, float]], created_date: str) -> int:
+    for index, (date_text, _price) in enumerate(series):
+        if date_text >= created_date:
+            return index
+    return max(len(series) - 1, 0)
+
+
+def _benchmark_return_5d(series: list[tuple[str, float]] | None, *, created_date: str) -> float | None:
+    if not series:
+        return None
+    start_index = _start_index_for_date(series, created_date)
+    base = series[start_index][1]
+    if base <= 0:
+        return None
+    target_index = min(start_index + 5, len(series) - 1)
+    return round((series[target_index][1] - base) / base, 6)
 
 
 def _normalize_price_history(payload: Mapping[str, Any]) -> dict[str, list[tuple[str, float]]]:
