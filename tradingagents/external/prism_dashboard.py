@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime
+from html import unescape
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -180,11 +183,130 @@ def fetch_dashboard_json_url(
     )
 
 
+def fetch_dashboard_html_url(
+    url: str,
+    *,
+    timeout_seconds: float = 5.0,
+    max_payload_bytes: int = 5_000_000,
+    market: str | None = None,
+) -> PrismIngestionResult:
+    """Opt-in fallback for dashboards that embed JSON in HTML script tags."""
+
+    ingested_at = datetime.now().astimezone()
+    try:
+        response = requests.get(url, timeout=timeout_seconds, stream=True)
+        response.raise_for_status()
+        content_type = str(response.headers.get("content-type") or "").lower()
+        if content_type and "html" not in content_type and "text/" not in content_type:
+            return PrismIngestionResult(
+                enabled=True,
+                ok=False,
+                source_kind=PrismSourceKind.DASHBOARD_LIVE,
+                source=url,
+                ingested_at=ingested_at,
+                warnings=[f"dashboard_html_unsupported_content_type:{content_type}"],
+            )
+        chunks: list[bytes] = []
+        total = 0
+        for chunk in response.iter_content(chunk_size=65536):
+            total += len(chunk)
+            if total > max_payload_bytes:
+                return PrismIngestionResult(
+                    enabled=True,
+                    ok=False,
+                    source_kind=PrismSourceKind.DASHBOARD_LIVE,
+                    source=url,
+                    ingested_at=ingested_at,
+                    warnings=[f"dashboard_html_payload_too_large:{total}>{max_payload_bytes}"],
+                )
+            chunks.append(chunk)
+        html_text = b"".join(chunks).decode(response.encoding or "utf-8", errors="replace")
+    except Exception as exc:
+        return PrismIngestionResult(
+            enabled=True,
+            ok=False,
+            source_kind=PrismSourceKind.DASHBOARD_LIVE,
+            source=url,
+            ingested_at=ingested_at,
+            warnings=[f"dashboard_html_unavailable:{url}:{exc}"],
+        )
+    return parse_dashboard_html(
+        html_text,
+        source=url,
+        market=market,
+        ingested_at=ingested_at,
+    )
+
+
 def candidate_dashboard_urls(base_url: str) -> tuple[str, ...]:
     base = str(base_url or "").strip().rstrip("/")
     if not base:
         return tuple()
     return tuple(f"{base}{path}" for path in DASHBOARD_CANDIDATE_PATHS)
+
+
+def parse_dashboard_html(
+    html_text: str,
+    *,
+    source: str | None = None,
+    market: str | None = None,
+    ingested_at: datetime | None = None,
+) -> PrismIngestionResult:
+    ingested_at = ingested_at or datetime.now().astimezone()
+    payloads = _extract_embedded_dashboard_payloads(html_text)
+    if not payloads:
+        return PrismIngestionResult(
+            enabled=True,
+            ok=False,
+            source_kind=PrismSourceKind.DASHBOARD_LIVE,
+            source=source,
+            ingested_at=ingested_at,
+            warnings=["dashboard_html_no_embedded_json_payload_found"],
+        )
+
+    warnings: list[str] = ["dashboard_html_scraping_opt_in"]
+    signals: list[PrismExternalSignal] = []
+    seen: set[tuple[str, str, str | None]] = set()
+    portfolio_snapshot: dict[str, Any] = {}
+    performance_summary: dict[str, Any] = {}
+    journal_lessons: list[dict[str, Any]] = []
+
+    for payload in payloads:
+        parsed = parse_dashboard_payload(
+            payload,
+            source_kind=PrismSourceKind.DASHBOARD_LIVE,
+            source=source,
+            market=market,
+            ingested_at=ingested_at,
+        )
+        warnings.extend(parsed.warnings)
+        for signal in parsed.signals:
+            key = (signal.canonical_ticker, signal.signal_action.value, signal.trigger_type)
+            if key in seen:
+                continue
+            seen.add(key)
+            signals.append(signal)
+        if parsed.portfolio_snapshot:
+            portfolio_snapshot.update(parsed.portfolio_snapshot)
+        if parsed.performance_summary:
+            performance_summary.update(parsed.performance_summary)
+        journal_lessons.extend(parsed.journal_lessons)
+
+    if not signals:
+        warnings.append("dashboard_html_no_ticker_level_prism_signals_found")
+    return PrismIngestionResult(
+        enabled=True,
+        ok=True,
+        source_kind=PrismSourceKind.DASHBOARD_LIVE,
+        source=source,
+        ingested_at=ingested_at,
+        signals=signals,
+        portfolio_snapshot=portfolio_snapshot or None,
+        performance_summary=performance_summary or None,
+        journal_lessons=journal_lessons,
+        warnings=list(dict.fromkeys(warnings)),
+        raw_payload_hash=payload_hash({"embedded_payloads": payloads}),
+    )
 
 
 def parse_dashboard_payload(
@@ -254,7 +376,7 @@ def _iter_signal_records(payload: Any, *, section: str = "root", depth: int = 0)
     for key, value in payload.items():
         key_text = str(key)
         key_lower = key_text.lower()
-        should_descend = key_lower in _SECTION_KEYS or depth < 2
+        should_descend = key_lower in _SECTION_KEYS or depth < 4
         if should_descend and isinstance(value, (dict, list)):
             yield from _iter_signal_records(value, section=key_text, depth=depth + 1)
 
@@ -366,3 +488,134 @@ def _collect_journal_lessons(payload: Any) -> list[dict[str, Any]]:
         elif isinstance(value, dict):
             lessons.append({"section": section, **value})
     return lessons
+
+
+class _DashboardScriptParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=False)
+        self.scripts: list[tuple[dict[str, str], str]] = []
+        self._attrs: dict[str, str] | None = None
+        self._chunks: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag.lower() != "script":
+            return
+        self._attrs = {str(key).lower(): str(value or "") for key, value in attrs}
+        self._chunks = []
+
+    def handle_data(self, data: str) -> None:
+        if self._attrs is not None:
+            self._chunks.append(data)
+
+    def handle_entityref(self, name: str) -> None:
+        if self._attrs is not None:
+            self._chunks.append(f"&{name};")
+
+    def handle_charref(self, name: str) -> None:
+        if self._attrs is not None:
+            self._chunks.append(f"&#{name};")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() != "script" or self._attrs is None:
+            return
+        self.scripts.append((self._attrs, "".join(self._chunks)))
+        self._attrs = None
+        self._chunks = []
+
+
+_SCRIPT_DATA_NAMES = (
+    "__NEXT_DATA__",
+    "__PRISM_DATA__",
+    "PRISM_DASHBOARD_DATA",
+    "DASHBOARD_DATA",
+    "dashboardData",
+    "prismDashboardData",
+)
+
+
+def _extract_embedded_dashboard_payloads(html_text: str) -> list[Any]:
+    parser = _DashboardScriptParser()
+    try:
+        parser.feed(html_text or "")
+    except Exception:
+        return []
+    payloads: list[Any] = []
+    seen_hashes: set[str] = set()
+    for attrs, script_text in parser.scripts:
+        script_id = attrs.get("id", "")
+        script_type = attrs.get("type", "")
+        candidate_text = unescape(script_text or "").strip()
+        if not candidate_text or "{" not in candidate_text:
+            continue
+        should_try = (
+            "json" in script_type.lower()
+            or script_id in _SCRIPT_DATA_NAMES
+            or any(name in candidate_text for name in _SCRIPT_DATA_NAMES)
+            or any(key in candidate_text for key in ("portfolio", "watchlist", "holding_decisions", "trigger_performance"))
+        )
+        if not should_try:
+            continue
+        for payload in _json_payloads_from_script(candidate_text):
+            if not _payload_has_dashboard_keywords(payload):
+                continue
+            signature = payload_hash(payload)
+            if signature in seen_hashes:
+                continue
+            seen_hashes.add(signature)
+            payloads.append(payload)
+    return payloads
+
+
+def _json_payloads_from_script(script_text: str) -> list[Any]:
+    text = script_text.strip().rstrip(";")
+    payloads: list[Any] = []
+    if text.startswith(("{", "[")):
+        try:
+            payloads.append(json.loads(text))
+            return payloads
+        except Exception:
+            pass
+    decoder = json.JSONDecoder()
+    for name in _SCRIPT_DATA_NAMES:
+        for match in re.finditer(rf"(?:window\.)?{re.escape(name)}\s*=", text):
+            start = _first_json_start(text, match.end())
+            if start is None:
+                continue
+            decoded = _decode_json_at(text, start, decoder)
+            if decoded is not None:
+                payloads.append(decoded)
+    if payloads:
+        return payloads
+    for match in re.finditer(r"[\{\[]", text):
+        decoded = _decode_json_at(text, match.start(), decoder)
+        if decoded is not None:
+            payloads.append(decoded)
+    return payloads
+
+
+def _first_json_start(text: str, start: int) -> int | None:
+    candidates = [index for index in (text.find("{", start), text.find("[", start)) if index >= 0]
+    return min(candidates) if candidates else None
+
+
+def _decode_json_at(text: str, start: int, decoder: json.JSONDecoder) -> Any | None:
+    try:
+        payload, _end = decoder.raw_decode(text[start:])
+        return payload
+    except Exception:
+        return None
+
+
+def _payload_has_dashboard_keywords(payload: Any, *, depth: int = 0) -> bool:
+    if depth > 5:
+        return False
+    if isinstance(payload, list):
+        return any(_payload_has_dashboard_keywords(item, depth=depth + 1) for item in payload[:20])
+    if not isinstance(payload, dict):
+        return False
+    keys = {str(key).lower() for key in payload}
+    ticker_keys = {str(key).lower() for key in _TICKER_KEYS}
+    action_keys = {str(key).lower() for key in _ACTION_KEYS}
+    if keys & _SECTION_KEYS or keys & ticker_keys or keys & action_keys:
+        return True
+    return any(_payload_has_dashboard_keywords(value, depth=depth + 1) for value in payload.values())

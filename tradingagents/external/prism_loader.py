@@ -5,7 +5,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from .prism_dashboard import candidate_dashboard_urls, fetch_dashboard_json_url, load_dashboard_json_file
+from .prism_dashboard import (
+    candidate_dashboard_urls,
+    fetch_dashboard_html_url,
+    fetch_dashboard_json_url,
+    load_dashboard_json_file,
+)
 from .prism_models import PrismIngestionResult
 from .prism_sqlite import load_prism_sqlite
 
@@ -47,6 +52,16 @@ def load_prism_signals(config: PrismLoaderConfig | Any | None = None) -> PrismIn
         for url in candidate_dashboard_urls(cfg.dashboard_base_url):
             result = fetch_dashboard_json_url(
                 url,
+                timeout_seconds=cfg.timeout_seconds,
+                max_payload_bytes=cfg.max_payload_bytes,
+                market=cfg.market,
+            )
+            if result.ok and result.signals:
+                return result
+            warnings.extend(result.warnings)
+        if cfg.use_html_scraping:
+            result = fetch_dashboard_html_url(
+                cfg.dashboard_base_url,
                 timeout_seconds=cfg.timeout_seconds,
                 max_payload_bytes=cfg.max_payload_bytes,
                 market=cfg.market,
@@ -104,6 +119,7 @@ def _apply_env_overrides(config: PrismLoaderConfig) -> PrismLoaderConfig:
     json_url = _env_text("PRISM_DASHBOARD_JSON_URL", config.dashboard_json_url)
     base_url = _env_text("PRISM_DASHBOARD_BASE_URL", config.dashboard_base_url)
     use_live = _env_bool("PRISM_USE_LIVE_HTTP", config.use_live_http)
+    use_html = _env_bool("PRISM_USE_HTML_SCRAPING", config.use_html_scraping)
     timeout = _env_float("PRISM_TIMEOUT_SECONDS", config.timeout_seconds)
     max_bytes = _env_int("PRISM_MAX_PAYLOAD_BYTES", config.max_payload_bytes)
     return PrismLoaderConfig(
@@ -116,7 +132,7 @@ def _apply_env_overrides(config: PrismLoaderConfig) -> PrismLoaderConfig:
         timeout_seconds=timeout,
         max_payload_bytes=max_bytes,
         use_live_http=use_live,
-        use_html_scraping=config.use_html_scraping,
+        use_html_scraping=use_html,
         confidence_cap=config.confidence_cap,
         market=config.market,
     )
