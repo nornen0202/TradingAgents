@@ -66,6 +66,35 @@ class NumericExecutionLevelTests(unittest.TestCase):
 
         self.assertTrue(any(level["level_type"] == "SUPPORT" and level["low"] == 215500.0 for level in levels))
 
+    def test_date_and_52_week_text_does_not_create_date_range(self):
+        contract = build_execution_contract(
+            ticker="034020.KS",
+            analysis_payload=self._payload(
+                {"trim_rule": "2026-04-27 고점 및 52주 고점 130300 접근 시 일부 이익실현 검토"}
+            ),
+        )
+
+        levels = contract.to_dict()["execution_levels"]["levels"]
+        self.assertTrue(any(level["level_type"] == "TRIM" and level["price"] == 130300.0 for level in levels))
+        self.assertFalse(any(level.get("low") == 4.0 and level.get("high") == 2026.0 for level in levels))
+
+    def test_market_metrics_are_not_extracted_as_price_levels(self):
+        decision = self._payload({})
+        raw = json.loads(decision["decision"])
+        raw["watchlist_triggers"] = ["RVOL 1.2", "RSI 73.08", "거래량 1,153,302주"]
+        decision["decision"] = json.dumps(raw, ensure_ascii=False)
+
+        contract = build_execution_contract(ticker="005930.KS", analysis_payload=decision)
+        levels = contract.to_dict()["execution_levels"]["levels"]
+        numeric_values = {
+            value
+            for level in levels
+            for value in (level.get("price"), level.get("low"), level.get("high"))
+            if value is not None
+        }
+
+        self.assertFalse({1.2, 73.08, 1153302.0} & numeric_values)
+
 
 if __name__ == "__main__":
     unittest.main()

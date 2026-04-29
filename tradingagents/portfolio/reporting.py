@@ -22,6 +22,9 @@ _TRIGGER_ACTIONS = {
     "STOP_LOSS_IF_TRIGGERED",
     "EXIT_IF_TRIGGERED",
 }
+_NOW_BUY_ACTIONS = {"ADD_NOW", "STARTER_NOW"}
+_NOW_SELL_ACTIONS = {"REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW", "STOP_LOSS_NOW", "EXIT_NOW"}
+_TRIGGER_BUY_ACTIONS = {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}
 
 
 def render_portfolio_report_markdown(
@@ -81,8 +84,10 @@ def render_portfolio_report_markdown(
         )
 
     portfolio_risks = _risk_lines(recommendation.portfolio_risks)
-    strategy_line = _strategy_priority_line(recommendation)
     scenario_summary_lines = _scenario_summary_lines(recommendation)
+    cash_projection_lines = _cash_projection_lines(snapshot, recommendation)
+    manual_review_line = _manual_review_summary_line(recommendation, review_required_count)
+    directional_sections = _directional_priority_sections(recommendation)
     funding_sections = _funding_sections(recommendation)
     sell_side_sections = _sell_side_sections(recommendation, live_sell_side_delta=live_sell_side_delta)
     scenario_table = _scenario_table_v2(recommendation)
@@ -94,22 +99,19 @@ def render_portfolio_report_markdown(
             f"- 기준 시각: `{snapshot.as_of}`",
             f"- 운용 모드: `{mode_label}`",
             f"- 계좌 평가금액: `{_krw(snapshot.account_value_krw)}`",
-            f"- 가용 현금: `{_krw(snapshot.available_cash_krw)}`",
-            f"- 최소 현금 버퍼: `{_krw(snapshot.constraints.min_cash_buffer_krw)}`",
-            f"- 오늘 실행 후 예상 현금: `{_krw(recommendation.recommended_cash_after_now_krw)}`",
-            f"- 조건부 실행까지 반영한 예상 현금: `{_krw(recommendation.recommended_cash_after_triggered_krw)}`",
+            *cash_projection_lines,
             f"- 시장 분위기: `{market_label}`",
             "",
             "## 핵심 요약",
             "",
-            f"- 오늘 바로 실행 가능: {immediate_budgeted_count}개",
+            manual_review_line,
+            f"- 오늘 바로 실행 가능 주문: {immediate_budgeted_count}개",
             f"- 오늘 장중 pilot 가능: {sum(1 for action in recommendation.actions if action.action_now == 'STARTER_NOW' and action.delta_krw_now > 0)}개",
             f"- 종가 확인 후 실행 후보: {budgeted_trigger_count}개",
             f"- 줄여서 살 후보: {len(_top_add_if_funded(recommendation)[:3])}개",
             f"- 먼저 줄일 후보: {len(_top_trim_if_needed(recommendation)[:3])}개",
             f"- 현재 계좌 여력: 가용 현금 {_krw(snapshot.available_cash_krw)} / 버퍼 {_krw(snapshot.constraints.min_cash_buffer_krw)}",
             _strict_summary_line(snapshot, immediate_budgeted_count, budget_blocked_actionable_count),
-            strategy_line,
             *scenario_summary_lines,
             f"- 계좌 상대 액션: 줄여서 재배치 {trim_to_fund_count}개 / 위험 축소 {reduce_risk_count}개",
             f"- Sell-side 구분: 자금 조달 {trim_to_fund_count}개 / 리스크 축소 {reduce_risk_count}개 / 이익실현 {take_profit_count}개 / 손절 {stop_loss_count}개 / 청산 {exit_count}개",
@@ -122,6 +124,8 @@ def render_portfolio_report_markdown(
                 if budget_blocked_actionable_count > 0
                 else f"- 즉시 실행 신호 {immediate_actionable_count}개 중 실제 예산 반영 주문 {immediate_budgeted_count}개입니다."
             ),
+            "",
+            directional_sections,
             "",
             "## 액션 요약",
             "",
@@ -263,11 +267,114 @@ def _strict_summary_line(
     return f"- 오늘 즉시 실행 후보 {immediate_budgeted_count}개를 우선 확인합니다."
 
 
-def _strategy_priority_line(recommendation: PortfolioRecommendation) -> str:
-    names = [str(item.get("display_name") or item.get("canonical_ticker")) for item in _top_add_if_funded(recommendation)]
-    if names:
-        return f"- 하지만 전략상 우선순위는 {' > '.join(names[:4])} 순입니다."
-    return "- 전략상 우선순위는 조건 충족 종목이 생길 때 다시 정렬합니다."
+def _cash_projection_lines(snapshot: AccountSnapshot, recommendation: PortfolioRecommendation) -> list[str]:
+    buying_power_after_now = recommendation.recommended_buying_power_after_now_krw
+    if buying_power_after_now is None:
+        buying_power_after_now = snapshot.buying_power_krw
+    settled_after_now = recommendation.recommended_settled_cash_after_now_krw
+    if settled_after_now is None:
+        settled_after_now = snapshot.settled_cash_krw
+    buying_power_after_triggered = recommendation.recommended_buying_power_after_triggered_krw
+    if buying_power_after_triggered is None:
+        buying_power_after_triggered = buying_power_after_now
+    settled_after_triggered = recommendation.recommended_settled_cash_after_triggered_krw
+    if settled_after_triggered is None:
+        settled_after_triggered = settled_after_now
+    buffer_ok = recommendation.recommended_cash_after_now_krw >= snapshot.constraints.min_cash_buffer_krw
+    return [
+        f"- 현재 가용 현금: `{_krw(snapshot.available_cash_krw)}`",
+        f"- 현재 매수가능금액: `{_krw(snapshot.buying_power_krw)}`",
+        f"- 현재 결제 현금: `{_krw(snapshot.settled_cash_krw)}`",
+        f"- 최소 현금 버퍼: `{_krw(snapshot.constraints.min_cash_buffer_krw)}`",
+        f"- 오늘 매수 주문 반영 후 가용 현금: `{_krw(recommendation.recommended_cash_after_now_krw)}`",
+        f"- 오늘 주문 체결 가정 시 매수가능금액: `{_krw(int(buying_power_after_now))}`",
+        f"- 매도 정산 후 예상 현금(D+2 기준): `{_krw(int(settled_after_now))}`",
+        f"- 조건부 실행까지 반영한 매수가능금액: `{_krw(int(buying_power_after_triggered))}`",
+        f"- 조건부 실행까지 반영한 정산 현금(D+2 기준): `{_krw(int(settled_after_triggered))}`",
+        f"- 현금 버퍼 충족 여부: `{'충족' if buffer_ok else '미달'}`",
+        "- 매도 주문은 현금 버퍼 회복 후보지만, 실제 출금 가능 현금은 국내 주식 결제 주기와 broker 기준에 따라 달라질 수 있습니다.",
+    ]
+
+
+def _manual_review_summary_line(recommendation: PortfolioRecommendation, review_required_count: int) -> str:
+    total = max(len(recommendation.actions), 1)
+    if review_required_count / total >= 0.8:
+        return f"- 수동 확인 필요: 확인 필요 후보가 {review_required_count}/{len(recommendation.actions)}개입니다."
+    return f"- 확인 필요 후보: {review_required_count}개"
+
+
+def _directional_priority_sections(recommendation: PortfolioRecommendation) -> str:
+    actions = list(recommendation.actions)
+    stop_or_exit = [
+        action
+        for action in actions
+        if action.action_now in {"STOP_LOSS_NOW", "EXIT_NOW"}
+        or action.action_if_triggered in {"STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
+        or action.portfolio_relative_action in {"STOP_LOSS", "EXIT"}
+    ]
+    conditional_sell = [
+        action
+        for action in actions
+        if action not in stop_or_exit
+        and (
+            action.action_if_triggered in {"REDUCE_IF_TRIGGERED", "TAKE_PROFIT_IF_TRIGGERED"}
+            or action.portfolio_relative_action in {"REDUCE_RISK", "TAKE_PROFIT"}
+        )
+    ]
+    sections = [
+        ("오늘 즉시 매도/축소 후보", [action for action in actions if action.action_now in _NOW_SELL_ACTIONS]),
+        ("오늘 즉시 매수 후보", [action for action in actions if action.action_now in _NOW_BUY_ACTIONS]),
+        ("조건부 매수 후보", [action for action in actions if action.action_if_triggered in _TRIGGER_BUY_ACTIONS]),
+        ("조건부 매도/이익실현 후보", conditional_sell),
+        ("손절/청산 후보", stop_or_exit),
+    ]
+    chunks: list[str] = ["## 오늘 할 일: 방향별 후보"]
+    for title, items in sections:
+        chunks.extend(["", f"### {title}"])
+        if not items:
+            chunks.append("- 없음")
+            continue
+        chunks.extend(_directional_action_line(index, action) for index, action in enumerate(items[:5], start=1))
+
+    switch_items = (recommendation.funding_plan or {}).get("switch_candidates") or []
+    chunks.extend(["", "### 스위칭 후보"])
+    if not switch_items:
+        chunks.append("- 없음")
+    else:
+        for index, item in enumerate([item for item in switch_items if isinstance(item, dict)][:3], start=1):
+            buy = item.get("buy") or {}
+            trim = item.get("trim") or {}
+            buy_name = buy.get("display_name") or buy.get("canonical_ticker") or "-"
+            trim_name = trim.get("display_name") or trim.get("canonical_ticker") or "-"
+            chunks.append(f"- {index}. 축소 {trim_name} -> 매수 {buy_name}")
+    return "\n".join(chunks)
+
+
+def _directional_action_line(index: int, action) -> str:
+    action_label = present_account_action(action.action_now, language="Korean")
+    if action.action_now in {"HOLD", "WATCH"}:
+        action_label = present_account_action(action.action_if_triggered, conditional=True, language="Korean")
+    relative_label = present_account_action(action.portfolio_relative_action, language="Korean")
+    amount = action.delta_krw_now if action.delta_krw_now else action.delta_krw_if_triggered
+    amount_label = _amount_label(amount) if amount else "금액 변화 없음"
+    level = _risk_level_label(action.risk_action_level)
+    reason = _localized_rationale(action)
+    return f"- {index}. {action.display_name} - {action_label} / {relative_label}{level} / {amount_label} - {reason}"
+
+
+def _risk_level_label(raw_level: dict[str, Any] | None) -> str:
+    if not raw_level:
+        return ""
+    price = raw_level.get("price")
+    if price in (None, ""):
+        low = raw_level.get("low")
+        high = raw_level.get("high")
+        if low not in (None, "") and high not in (None, ""):
+            return f" / 기준 {low}~{high}"
+        price = low if low not in (None, "") else high
+    if price in (None, ""):
+        return ""
+    return f" / 기준 {price}"
 
 
 def _sell_side_sections(
@@ -340,15 +447,15 @@ def _funding_sections(recommendation: PortfolioRecommendation) -> str:
     ]
     return "\n".join(
         [
-            "## 전략상 가장 강한 후보",
+            "## 자금 제약 무시 매수 후보",
             "",
-            "\n".join(add_lines[:3]) if add_lines else "- 전략상 강한 조건부 후보가 없습니다.",
+            "\n".join(add_lines[:3]) if add_lines else "- 자금이 생겨도 바로 늘릴 조건부 후보가 없습니다.",
             "",
             "## 리밸런싱 시 먼저 줄일 후보",
             "",
             "\n".join(trim_lines[:3]) if trim_lines else "- 우선 축소 후보가 없습니다.",
             "",
-            "## switch-candidates",
+            "## 줄여서 살 조합",
             "",
             (
                 "\n".join(
@@ -361,11 +468,11 @@ def _funding_sections(recommendation: PortfolioRecommendation) -> str:
                 else "- 스위칭 조합 후보가 없습니다."
             ),
             "",
-            "## would-buy-if-funded",
+            "## 자금이 생기면 살 후보",
             "",
             "\n".join(add_lines) if add_lines else "- 자금이 생겨도 바로 늘릴 조건부 후보가 없습니다.",
             "",
-            "## would-trim-first",
+            "## 자금 조달 시 먼저 줄일 후보",
             "",
             "\n".join(trim_lines) if trim_lines else "- 자금 조달을 위해 먼저 줄일 후보가 없습니다.",
         ]
@@ -383,12 +490,12 @@ def _scenario_summary_lines(recommendation: PortfolioRecommendation) -> list[str
         if isinstance(item, dict)
     ]
     return [
-        f"- Strict: immediate {int(strict.get('immediate_order_count') or 0)} / budgeted triggers {int(strict.get('budgeted_trigger_count') or 0)}",
-        f"- Switch: trim {len(switch.get('would_trim_first') or [])} -> buy {len(switch.get('would_buy_if_funded') or [])}",
+        f"- 보수 모드: 즉시 주문 {int(strict.get('immediate_order_count') or 0)}개 / 조건부 예산 후보 {int(strict.get('budgeted_trigger_count') or 0)}개",
+        f"- 갈아타기 모드: 먼저 줄일 후보 {len(switch.get('would_trim_first') or [])}개 -> 자금이 생기면 살 후보 {len(switch.get('would_buy_if_funded') or [])}개",
         (
-            f"- Cash-agnostic: {' > '.join(ranking_names[:4])}"
+            f"- 현금 제약 무시 매수 후보: {' > '.join(ranking_names[:4])}"
             if ranking_names
-            else "- Cash-agnostic: no ranked add candidates"
+            else "- 현금 제약 무시 매수 후보: 없음"
         ),
     ]
 
@@ -399,18 +506,18 @@ def _scenario_table_v2(recommendation: PortfolioRecommendation) -> str:
     switch = scenarios.get("switch") or {}
     cash_agnostic = scenarios.get("cash_agnostic") or scenarios.get("aggressive") or {}
     rows = [
-        "| Scenario | Intent | Plan |",
+        "| 모드 | 의미 | 주문 계획 |",
         "|---|---|---|",
-        f"| Strict | Respect cash buffer | Immediate {int(strict.get('immediate_order_count') or 0)} / budgeted triggers {int(strict.get('budgeted_trigger_count') or 0)} |",
+        f"| 보수 모드 | 현금 버퍼 준수 | 즉시 {int(strict.get('immediate_order_count') or 0)}개 / 조건부 예산 {int(strict.get('budgeted_trigger_count') or 0)}개 |",
         (
-            f"| Switch | Trim weaker names to fund stronger names | Sell {_krw(int(switch.get('gross_sell_krw') or 0))} / Buy {_krw(int(switch.get('gross_buy_krw') or 0))} |"
+            f"| 갈아타기 모드 | 약한 후보를 줄여 강한 후보 재원 마련 | 매도 {_krw(int(switch.get('gross_sell_krw') or 0))} / 매수 {_krw(int(switch.get('gross_buy_krw') or 0))} |"
             if switch.get("enabled")
-            else "| Switch | Trim weaker names to fund stronger names | Hold |"
+            else "| 갈아타기 모드 | 약한 후보를 줄여 강한 후보 재원 마련 | 보류 |"
         ),
         (
-            f"| Cash-agnostic | Ignore cash buffer for strategy ranking | Conditional buy {_krw(int(cash_agnostic.get('gross_buy_krw') or 0))} |"
+            f"| 현금 제약 무시 모드 | 현금 버퍼를 제외하고 매수 후보만 순위화 | 조건부 매수 {_krw(int(cash_agnostic.get('gross_buy_krw') or 0))} |"
             if cash_agnostic.get("enabled")
-            else "| Cash-agnostic | Ignore cash buffer for strategy ranking | Hold |"
+            else "| 현금 제약 무시 모드 | 현금 버퍼를 제외하고 매수 후보만 순위화 | 보류 |"
         ),
     ]
     return "\n".join(rows)

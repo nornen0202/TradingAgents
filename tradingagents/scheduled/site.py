@@ -11,6 +11,7 @@ from typing import Any
 from .config import SiteSettings
 from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY, REALTIME_EXECUTION_READY, STALE_INVALID_FOR_EXECUTION
 from tradingagents.presentation import (
+    present_account_action,
     present_action_summary,
     present_data_status,
     present_decision_payload,
@@ -60,7 +61,7 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
         for ticker_summary in manifest.get("tickers", []):
             _write_text(
                 site_dir / "runs" / manifest["run_id"] / f"{ticker_summary['ticker']}.html",
-                _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests),
+                _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests, portfolio_summary=portfolio_summary),
             )
 
     _write_text(site_dir / "index.html", _render_index_page(manifests, settings))
@@ -337,8 +338,9 @@ def _render_run_page(
 
     ticker_cards = []
     for ticker_summary in manifest.get("tickers", []):
+        display_summary = _with_portfolio_action(ticker_summary, portfolio_summary)
         investor_summary = _ticker_investor_summary(
-            ticker_summary,
+            display_summary,
             manifest,
             language=language,
             stale_after_seconds=stale_after_seconds,
@@ -351,7 +353,8 @@ def _render_run_page(
                 <span class="status {ticker_summary['status']}">{_escape(ticker_summary['status'])}</span>
               </div>
               <p><strong>종목명</strong><span>{_escape(_ticker_display_label(ticker_summary))}</span></p>
-              <p><strong>투자판단</strong><span>{_escape(investor_summary['investment_view'])}</span></p>
+              <p><strong>{_escape(investor_summary['investment_view_label'])}</strong><span>{_escape(investor_summary['investment_view'])}</span></p>
+              <p><strong>중기 리서치 관점</strong><span>{_escape(investor_summary['research_view'])}</span></p>
               <p><strong>오늘 할 일</strong><span>{_escape(investor_summary['today_action'])}</span></p>
               <p><strong>장중 pilot 조건</strong><span>{_escape(investor_summary['intraday_pilot_action'])}</span></p>
               <p><strong>종가 확인 시 할 일</strong><span>{_escape(investor_summary['close_action'])}</span></p>
@@ -765,6 +768,7 @@ def _render_ticker_page(
     settings: SiteSettings,
     *,
     manifests: list[dict[str, Any]] | None = None,
+    portfolio_summary: dict[str, Any] | None = None,
 ) -> str:
     run_dir = Path(manifest["_run_dir"])
     language = _manifest_language(manifest)
@@ -799,8 +803,9 @@ def _render_ticker_page(
             "</section>"
         )
 
+    display_summary = _with_portfolio_action(ticker_summary, portfolio_summary or {})
     investor_summary = _ticker_investor_summary(
-        ticker_summary,
+        display_summary,
         manifest,
         language=language,
         stale_after_seconds=stale_after_seconds,
@@ -829,7 +834,8 @@ def _render_ticker_page(
       <div class="hero-card">
         <div class="status {ticker_summary['status']}">{_escape(ticker_summary['status'])}</div>
         <p><strong>기준 시각</strong><span>{_escape(investor_summary['basis_asof'])}</span></p>
-        <p><strong>투자판단</strong><span>{_escape(investor_summary['investment_view'])}</span></p>
+        <p><strong>{_escape(investor_summary['investment_view_label'])}</strong><span>{_escape(investor_summary['investment_view'])}</span></p>
+        <p><strong>중기 리서치 관점</strong><span>{_escape(investor_summary['research_view'])}</span></p>
         <p><strong>오늘 할 일</strong><span>{_escape(investor_summary['today_action'])}</span></p>
         <p><strong>장중 pilot 조건</strong><span>{_escape(investor_summary['intraday_pilot_action'])}</span></p>
         <p><strong>종가 확인 시 할 일</strong><span>{_escape(investor_summary['close_action'])}</span></p>
@@ -891,6 +897,85 @@ def _decision_primary_condition(raw_decision: Any, *, language: str) -> str:
     return present_primary_condition(raw_decision, language=language)
 
 
+def _with_portfolio_action(ticker_summary: dict[str, Any], portfolio_summary: dict[str, Any]) -> dict[str, Any]:
+    actions_by_ticker = portfolio_summary.get("actions_by_ticker") if isinstance(portfolio_summary, dict) else {}
+    if not isinstance(actions_by_ticker, dict):
+        return ticker_summary
+    ticker = str(ticker_summary.get("ticker") or "").strip()
+    action = actions_by_ticker.get(ticker)
+    if not isinstance(action, dict):
+        return ticker_summary
+    return {**ticker_summary, "portfolio_action": action}
+
+
+def _portfolio_execution_view(portfolio_action: dict[str, Any], *, language: str) -> str:
+    if not isinstance(portfolio_action, dict) or not portfolio_action:
+        return ""
+    korean = language.lower().startswith("korean")
+    action_now = str(portfolio_action.get("action_now") or "").upper()
+    relative_action = str(portfolio_action.get("portfolio_relative_action") or "").upper()
+    risk_action = str(portfolio_action.get("risk_action") or "").upper()
+    if action_now in {"STOP_LOSS_NOW", "EXIT_NOW"} or relative_action in {"STOP_LOSS", "EXIT"} or risk_action in {"STOP_LOSS", "EXIT"}:
+        return "손절/청산 검토" if korean else "Review stop-loss / exit"
+    if action_now in {"REDUCE_NOW", "TRIM_NOW"} or relative_action == "REDUCE_RISK":
+        return "일부 축소 검토" if korean else "Review partial reduction"
+    if action_now == "TAKE_PROFIT_NOW" or relative_action == "TAKE_PROFIT":
+        return "이익실현 검토" if korean else "Review take-profit"
+    if action_now in {"ADD_NOW", "STARTER_NOW"}:
+        return "매수 검토" if korean else "Review buy"
+    if relative_action == "TRIM_TO_FUND":
+        return "재배치용 축소 후보" if korean else "Trim candidate for funding"
+    return ""
+
+
+def _portfolio_today_action(portfolio_action: dict[str, Any], *, language: str) -> str:
+    if not isinstance(portfolio_action, dict) or not portfolio_action:
+        return ""
+    korean = language.lower().startswith("korean")
+    action_now = str(portfolio_action.get("action_now") or "").upper()
+    if action_now not in {"STOP_LOSS_NOW", "EXIT_NOW", "REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW", "ADD_NOW", "STARTER_NOW"}:
+        return ""
+    label = present_account_action(action_now, language=language)
+    reason = sanitize_investor_text(portfolio_action.get("rationale") or "", language=language)
+    level = _portfolio_level_text(portfolio_action, language=language)
+    if korean:
+        detail = f": {level}" if level else ""
+        suffix = f" - {reason}" if reason and reason != "없음" else ""
+        return f"{label}{detail}{suffix}"
+    detail = f": {level}" if level else ""
+    suffix = f" - {reason}" if reason and reason != "None" else ""
+    return f"{label}{detail}{suffix}"
+
+
+def _portfolio_close_action(portfolio_action: dict[str, Any], *, language: str) -> str:
+    if not isinstance(portfolio_action, dict) or not portfolio_action:
+        return ""
+    action_if_triggered = str(portfolio_action.get("action_if_triggered") or "").upper()
+    if action_if_triggered not in {"REDUCE_IF_TRIGGERED", "TAKE_PROFIT_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+        return ""
+    level = _portfolio_level_text(portfolio_action, language=language)
+    label = present_account_action(action_if_triggered, conditional=True, language=language)
+    if language.lower().startswith("korean"):
+        return f"종가 기준 {level} 확인 시 {label}" if level else f"종가 확인 시 {label}"
+    return f"At close, {label.lower()} if {level}" if level else f"At close, {label.lower()}"
+
+
+def _portfolio_level_text(portfolio_action: dict[str, Any], *, language: str) -> str:
+    level = portfolio_action.get("risk_action_level") if isinstance(portfolio_action.get("risk_action_level"), dict) else {}
+    if not level:
+        return ""
+    price = level.get("price")
+    if price in (None, ""):
+        low = level.get("low")
+        high = level.get("high")
+        if low not in (None, "") and high not in (None, ""):
+            return f"{low}~{high}"
+        price = low if low not in (None, "") else high
+    if price in (None, ""):
+        return ""
+    return f"{price}"
+
+
 def _ticker_investor_summary(
     ticker_summary: dict[str, Any],
     manifest: dict[str, Any] | None = None,
@@ -928,6 +1013,9 @@ def _ticker_investor_summary_v2(
     delayed_analysis_only = execution_quality == DELAYED_ANALYSIS_ONLY
     stance = _decision_structured_value(ticker_summary.get("decision"), "portfolio_stance").upper()
     entry_action = _decision_structured_value(ticker_summary.get("decision"), "entry_action").upper()
+    research_view = present_investment_view(ticker_summary.get("decision") or ticker_summary.get("error"), language=language)
+    portfolio_action = ticker_summary.get("portfolio_action") if isinstance(ticker_summary.get("portfolio_action"), dict) else {}
+    account_execution_view = _portfolio_execution_view(portfolio_action, language=language)
 
     if korean:
         if raw_timing_state == "LIVE_BREAKOUT":
@@ -1034,8 +1122,23 @@ def _ticker_investor_summary_v2(
     if caveats:
         today_action = f"{today_action}. {' / '.join(caveats)}."
 
+    portfolio_today_action = _portfolio_today_action(portfolio_action, language=language)
+    if portfolio_today_action:
+        if caveats:
+            portfolio_today_action = f"{portfolio_today_action}. {' / '.join(caveats)}."
+        today_action = portfolio_today_action
+    portfolio_close_action = _portfolio_close_action(portfolio_action, language=language)
+    if portfolio_close_action:
+        close_action = portfolio_close_action
+
     return {
-        "investment_view": present_investment_view(ticker_summary.get("decision") or ticker_summary.get("error"), language=language),
+        "investment_view": account_execution_view or research_view,
+        "investment_view_label": (
+            ("계좌 실행 판단" if account_execution_view else "투자판단")
+            if korean
+            else ("Account action" if account_execution_view else "Investment view")
+        ),
+        "research_view": research_view,
         "today_action": today_action,
         "intraday_pilot_action": _intraday_pilot_rule_summary(
             ticker_summary,
@@ -1655,6 +1758,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
     candidate_symbols: list[str] = []
     candidate_pairs: list[dict[str, str]] = []
     sell_side_counts: dict[str, Any] = {}
+    actions_by_ticker: dict[str, dict[str, Any]] = {}
     if report_json.exists():
         try:
             report_payload = json.loads(report_json.read_text(encoding="utf-8"))
@@ -1663,8 +1767,15 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
                 or report_payload.get("candidate_counts")
                 or {}
             )
+            for action in report_payload.get("actions") or []:
+                if not isinstance(action, dict):
+                    continue
+                ticker = str(action.get("canonical_ticker") or "").strip()
+                if ticker:
+                    actions_by_ticker[ticker] = action
         except Exception:
             sell_side_counts = {}
+            actions_by_ticker = {}
     if candidates_json.exists():
         try:
             payload_candidates = json.loads(candidates_json.read_text(encoding="utf-8"))
@@ -1703,6 +1814,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "candidate_canonical_symbols": candidate_symbols,
         "candidate_identity_pairs": candidate_pairs,
         "sell_side_counts": sell_side_counts,
+        "actions_by_ticker": actions_by_ticker,
         "downloadable_files": files,
         "artifact_count": len(files),
     }
@@ -1728,19 +1840,19 @@ def _render_execution_summary_section(summary: dict[str, Any]) -> str:
     return f"""
     <section class="section">
       <div class="section-head">
-        <h2>Advanced diagnostics</h2>
+        <h2>고급 진단</h2>
       </div>
       <details class="run-card advanced-diagnostics">
-        <summary>Execution overlay details</summary>
-        <p><strong>Checkpoint</strong><span>{_escape(summary.get('refresh_checkpoint') or '-')}</span></p>
-        <p><strong>Overlay phase</strong><span>{_escape(((summary.get('overlay_phase') or {}).get('name')) or '-')}</span></p>
-        <p><strong>Execution as of</strong><span>{_escape(summary.get('execution_asof') or '-')}</span></p>
-        <p><strong>Pilot ready</strong><span>{_escape(pilot_ready)}</span></p>
-        <p><strong>Close confirm</strong><span>{_escape(close_confirm)}</span></p>
-        <p><strong>Pilot blocked by volume</strong><span>{_escape(pilot_blocked_volume)}</span></p>
-        <p><strong>Next day follow-through</strong><span>{_escape(next_day)}</span></p>
-        <p><strong>Failed breakout</strong><span>{_escape(', '.join(summary.get('failed_breakout') or []) or '-')}</span></p>
-        <p><strong>Stale triggerable</strong><span>{_escape(', '.join(summary.get('stale_triggerable') or []) or '-')}</span></p>
+        <summary>실행 오버레이 원자료</summary>
+        <p><strong>체크포인트</strong><span>{_escape(summary.get('refresh_checkpoint') or '-')}</span></p>
+        <p><strong>오버레이 단계</strong><span>{_escape(((summary.get('overlay_phase') or {}).get('name')) or '-')}</span></p>
+        <p><strong>실행 기준시각</strong><span>{_escape(summary.get('execution_asof') or '-')}</span></p>
+        <p><strong>장중 pilot 준비</strong><span>{_escape(pilot_ready)}</span></p>
+        <p><strong>종가 확인</strong><span>{_escape(close_confirm)}</span></p>
+        <p><strong>거래량 확인 전 보류</strong><span>{_escape(pilot_blocked_volume)}</span></p>
+        <p><strong>다음 거래일 확인</strong><span>{_escape(next_day)}</span></p>
+        <p><strong>실패 돌파</strong><span>{_escape(', '.join(summary.get('failed_breakout') or []) or '-')}</span></p>
+        <p><strong>전략 후보 유지</strong><span>{_escape(', '.join(summary.get('stale_triggerable') or []) or '-')}</span></p>
       </details>
     </section>
     """
@@ -2073,11 +2185,15 @@ def _health_badges_html(*, manifest: dict[str, Any], portfolio_summary: dict[str
     execution = manifest.get("execution") or {}
     phase = ((execution.get("overlay_phase") or {}).get("name") or "").upper()
     if phase == "PRE_OPEN":
-        badges.append("overlay: pre-open")
+        badges.append("오버레이: 장전")
     semantic_health = portfolio_summary.get("semantic_health") or {}
     fallback_ratio = float(semantic_health.get("rule_only_fallback_ratio") or 0.0)
     if fallback_ratio >= 0.3:
-        badges.append(f"judge degraded ({fallback_ratio:.0%})")
+        badges.append(f"판단 보강 저하 ({fallback_ratio:.0%})")
+    total_candidates = int(semantic_health.get("total_candidates") or 0)
+    review_required = int(semantic_health.get("review_required_count") or 0)
+    if total_candidates > 0 and review_required / total_candidates >= 0.8:
+        badges.append(f"수동 확인 필요 ({review_required}/{total_candidates})")
     if not badges:
         return ""
     return "<div class='pill-row'>" + "".join(

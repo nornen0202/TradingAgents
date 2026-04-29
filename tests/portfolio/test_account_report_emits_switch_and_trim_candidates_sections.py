@@ -93,5 +93,7 @@ def test_account_report_emits_switch_and_trim_candidates_sections():
     )
     markdown = render_portfolio_report_markdown(snapshot=snapshot, recommendation=recommendation, candidates=scored)
 
-    assert "## would-buy-if-funded" in markdown
-    assert "## would-trim-first" in markdown
+    assert "## 자금이 생기면 살 후보" in markdown
+    assert "## 자금 조달 시 먼저 줄일 후보" in markdown
+    assert "## 줄여서 살 조합" in markdown
+    assert "would-buy-if-funded" not in markdown

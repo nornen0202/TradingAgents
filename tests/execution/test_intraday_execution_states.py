@@ -9,6 +9,8 @@ from tradingagents.schemas import (
     ExecutionTimingState,
     IntradayMarketSnapshot,
     LevelBasis,
+    PriceLevel,
+    PriceLevelType,
     PrimarySetup,
     ThesisState,
 )
@@ -35,7 +37,7 @@ def _contract(**kwargs):
     return ExecutionContract(**base)
 
 
-def _market(*, last_price: float, day_high: float, day_low: float, age_seconds: int = 0, asof=None):
+def _market(*, last_price: float, day_high: float, day_low: float, age_seconds: int = 0, asof=None, market_session="regular"):
     asof = asof or (datetime.now(timezone.utc) - timedelta(seconds=age_seconds))
     return IntradayMarketSnapshot(
         ticker="005930.KS",
@@ -49,6 +51,7 @@ def _market(*, last_price: float, day_high: float, day_low: float, age_seconds: 
         volume=1000,
         avg20_daily_volume=1000.0,
         relative_volume=1.2,
+        market_session=market_session,
     )
 
 
@@ -88,4 +91,49 @@ def test_late_session_confirm_state_uses_checkpoint_context():
     )
 
     assert update.decision_state == DecisionState.TRIGGERED_PENDING_CLOSE
+    assert update.execution_timing_state == ExecutionTimingState.CLOSE_CONFIRM_PENDING
+
+
+def test_risk_action_level_uses_current_price_not_day_low_for_stop_now():
+    update = evaluate_execution_state(
+        _contract(
+            action_if_triggered=ActionIfTriggered.NONE,
+            breakout_level=None,
+            risk_action="STOP_LOSS",
+            risk_action_level=PriceLevel(
+                label="intraday stop",
+                level_type=PriceLevelType.STOP_LOSS,
+                price=95.0,
+                confirmation="intraday",
+            ),
+        ),
+        _market(last_price=100.0, day_high=101.0, day_low=90.0),
+        now=datetime.now(timezone.utc),
+        max_data_age_seconds=180,
+    )
+
+    assert update.decision_state == DecisionState.WAIT
+    assert update.decision_now.value == "NONE"
+
+
+def test_close_confirmation_risk_action_waits_for_close_intraday():
+    update = evaluate_execution_state(
+        _contract(
+            action_if_triggered=ActionIfTriggered.NONE,
+            breakout_level=None,
+            risk_action="STOP_LOSS",
+            risk_action_level=PriceLevel(
+                label="close stop",
+                level_type=PriceLevelType.STOP_LOSS,
+                price=95.0,
+                confirmation="close",
+            ),
+        ),
+        _market(last_price=94.0, day_high=101.0, day_low=93.0, market_session="regular"),
+        now=datetime.now(timezone.utc),
+        max_data_age_seconds=180,
+    )
+
+    assert update.decision_state == DecisionState.TRIGGERED_PENDING_CLOSE
+    assert update.decision_now.value == "NONE"
     assert update.execution_timing_state == ExecutionTimingState.CLOSE_CONFIRM_PENDING

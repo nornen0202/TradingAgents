@@ -68,6 +68,40 @@ class StructuredDecisionTests(unittest.TestCase):
         decision = parse_structured_decision(payload)
         self.assertEqual(decision.risk_action.value, "REDUCE_RISK")
 
+    def test_risk_action_level_does_not_parse_date_as_range(self):
+        payload = """
+        {
+          "rating": "HOLD",
+          "portfolio_stance": "BULLISH",
+          "entry_action": "WAIT",
+          "risk_action": "TAKE_PROFIT",
+          "risk_action_reason_codes": ["PROFIT_TAKING"],
+          "risk_action_level": {
+            "label": "52-week high trim",
+            "level_type": "TAKE_PROFIT",
+            "price": 130300,
+            "confirmation": "intraday",
+            "source_text": "2026-04-27 고점 및 52주 고점 130300 접근 시 일부 이익실현"
+          },
+          "setup_quality": "DEVELOPING",
+          "confidence": 0.70,
+          "time_horizon": "short",
+          "entry_logic": "Wait.",
+          "exit_logic": "Take profit near resistance.",
+          "position_sizing": "Hold.",
+          "risk_limits": "Use levels.",
+          "catalysts": [],
+          "invalidators": [],
+          "watchlist_triggers": [],
+          "data_coverage": {"company_news_count":1,"disclosures_count":0,"social_source":"dedicated","macro_items_count":1}
+        }
+        """
+        decision = parse_structured_decision(payload)
+
+        self.assertEqual(decision.risk_action_level.price, 130300.0)
+        self.assertIsNone(decision.risk_action_level.low)
+        self.assertIsNone(decision.risk_action_level.high)
+
     def test_invalid_schema_raises_validation_error(self):
         payload = '{"confidence": 0.5, "time_horizon": "short"}'
         with self.assertRaises(StructuredDecisionValidationError):

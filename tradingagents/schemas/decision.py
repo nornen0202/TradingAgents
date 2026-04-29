@@ -384,6 +384,25 @@ def _optional_float(value: Any) -> float | None:
     return numbers[0] if numbers else None
 
 
+def _optional_metric_float(value: Any) -> float | None:
+    if value in (None, "") or isinstance(value, bool):
+        return None
+    if isinstance(value, int | float):
+        return float(value)
+    text = str(value)
+    text = re.sub(r"\b20\d{2}[-./]\d{1,2}[-./]\d{1,2}\b", " ", text)
+    text = re.sub(r"\b\d{1,2}:\d{2}\b", " ", text)
+    for match in _NUMBER_PATTERN.finditer(text):
+        token = match.group(0)
+        if token in {"+", "-", ".", "+.", "-."}:
+            continue
+        try:
+            return float(token)
+        except ValueError:
+            continue
+    return None
+
+
 def _optional_bool(value: Any, *, default: bool = False) -> bool:
     if value is None:
         return default
@@ -430,6 +449,9 @@ def _parse_price_level(raw: Mapping[str, Any]) -> PriceLevel:
                 price = None
     if low is not None and high is not None and low > high:
         low, high = high, low
+    if _range_is_incompatible_with_price(price=price, low=low, high=high):
+        low = None
+        high = None
 
     return PriceLevel(
         label=label,
@@ -474,7 +496,7 @@ def _parse_execution_levels(data: Mapping[str, Any]) -> ExecutionLevels:
         failed_breakout_rule=_optional_string(raw.get("failed_breakout_rule")),
         trim_rule=_optional_string(raw.get("trim_rule")),
         levels=tuple(level_items),
-        min_relative_volume=_optional_float(raw.get("min_relative_volume")),
+        min_relative_volume=_optional_metric_float(raw.get("min_relative_volume")),
         vwap_required=_optional_bool(raw.get("vwap_required"), default=False),
         earliest_pilot_time_local=_optional_string(raw.get("earliest_pilot_time_local")) or "10:30",
         funding_priority=funding_priority,
@@ -488,7 +510,7 @@ def _numbers_from_text(value: Any) -> list[float]:
         return []
     if isinstance(value, int | float):
         return [float(value)]
-    text = str(value)
+    text = _strip_non_price_numeric_context(str(value))
     korean_values: list[float] = []
     consumed_spans: list[tuple[int, int]] = []
     for match in re.finditer(r"(\d+(?:\.\d+)?)\s*만\s*([\d,]+)(?=원|\s|~|-|$)", text):
@@ -529,8 +551,9 @@ def _range_from_values(*values: Any) -> tuple[float | None, float | None]:
 def _range_from_context(*values: Any) -> tuple[float | None, float | None]:
     for value in values:
         text = str(value or "")
+        sanitized = _strip_non_price_numeric_context(text)
         lowered = text.lower()
-        has_explicit_range = bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*[-\u2013\u2014~]\s*\d", text))
+        has_explicit_range = bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*[-\u2013\u2014~]\s*\d", sanitized))
         has_range_words = any(token in lowered for token in ("zone", "range", "between", "from ", "구간", "~"))
         if not has_explicit_range and not has_range_words:
             continue
@@ -543,6 +566,53 @@ def _range_from_context(*values: Any) -> tuple[float | None, float | None]:
 
 def _has_multiple_numbers(value: Any) -> bool:
     return len(_numbers_from_text(value)) >= 2
+
+
+def _strip_non_price_numeric_context(text: str) -> str:
+    cleaned = str(text or "")
+    cleaned = re.sub(r"\b20\d{2}[-./]\d{1,2}[-./]\d{1,2}\b", " ", cleaned)
+    cleaned = re.sub(r"\b\d{1,2}\s*월\s*\d{1,2}\s*일\b", " ", cleaned)
+    cleaned = re.sub(r"\b\d{1,2}:\d{2}\b", " ", cleaned)
+    cleaned = re.sub(r"[-+]?\d+(?:\.\d+)?\s*%", " ", cleaned)
+    cleaned = re.sub(
+        r"\b(?:rvol|rsi)\s*(?:>=|<=|>|<|=|:)?\s*[-+]?\d+(?:\.\d+)?\b",
+        " ",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(
+        r"\b\d+(?:\.\d+)?\s*(?:ema|sma|ma)(?=\s|[,.);:]|$)",
+        " ",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(
+        r"\b\d+(?:\.\d+)?\s*(?:일|day|days|week|weeks|주)(?=\s|[,.);:]|$)",
+        " ",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(
+        r"\d[\d,]*(?:\.\d+)?\s*(?:주|shares?|shares)(?=\s|[,.);:]|$)",
+        " ",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    return cleaned
+
+
+def _range_is_incompatible_with_price(
+    *,
+    price: float | None,
+    low: float | None,
+    high: float | None,
+) -> bool:
+    if price is None or low is None or high is None:
+        return False
+    largest_range_value = max(abs(float(low)), abs(float(high)))
+    if largest_range_value == 0:
+        return True
+    return float(price) >= 10_000 and largest_range_value < float(price) * 0.2
 
 
 def _normalize_text(value: Any) -> str:
