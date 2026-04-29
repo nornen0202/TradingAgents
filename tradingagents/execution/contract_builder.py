@@ -342,6 +342,18 @@ def _numbers_look_like_non_price_condition(text: str, numbers: list[float]) -> b
             "stop",
             "invalid",
             "level",
+            "close",
+            "loses",
+            "lose ",
+            "target",
+            "krw",
+            "가격",
+            "종가",
+            "지지",
+            "저항",
+            "돌파",
+            "이탈",
+            "회복",
             "원",
             "$",
         )
@@ -518,8 +530,7 @@ def _has_machine_actionable_level(
 def _numbers_from_text(value: Any) -> list[float]:
     if value in (None, ""):
         return []
-    text = str(value)
-    text = re.sub(r"\b\d{1,2}:\d{2}\b", " ", text)
+    text = _strip_non_price_numeric_context(str(value))
     korean_values: list[float] = []
     consumed_spans: list[tuple[int, int]] = []
     for match in re.finditer(r"(\d+(?:\.\d+)?)\s*만\s*([\d,]+)(?=원|\s|~|-|$)", text):
@@ -549,10 +560,44 @@ def _numbers_from_text(value: Any) -> list[float]:
 
 
 def _looks_like_range(text: str) -> bool:
-    return bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*[-\u2013\u2014~]\s*\d", text)) or any(
+    sanitized = _strip_non_price_numeric_context(str(text or ""))
+    return bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*[-\u2013\u2014~]\s*\d", sanitized)) or any(
         token in str(text or "").lower()
         for token in ("range", "zone", "between", "from ", "구간", "~")
     )
+
+
+def _strip_non_price_numeric_context(text: str) -> str:
+    cleaned = str(text or "")
+    cleaned = re.sub(r"\b20\d{2}[-./]\d{1,2}[-./]\d{1,2}\b", " ", cleaned)
+    cleaned = re.sub(r"\b\d{1,2}\s*월\s*\d{1,2}\s*일\b", " ", cleaned)
+    cleaned = re.sub(r"\b\d{1,2}:\d{2}\b", " ", cleaned)
+    cleaned = re.sub(r"[-+]?\d+(?:\.\d+)?\s*%", " ", cleaned)
+    cleaned = re.sub(
+        r"\b(?:rvol|rsi)\s*(?:>=|<=|>|<|=|:)?\s*[-+]?\d+(?:\.\d+)?\b",
+        " ",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(
+        r"\b\d+(?:\.\d+)?\s*(?:ema|sma|ma)(?=\s|[,.);:]|$)",
+        " ",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(
+        r"\b\d+(?:\.\d+)?\s*(?:일|day|days|week|weeks|주)(?=\s|[,.);:]|$)",
+        " ",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(
+        r"\d[\d,]*(?:\.\d+)?\s*(?:주|shares?)(?=\s|[,.);:]|$)",
+        " ",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    return cleaned
 
 
 def _extract_level(lines: tuple[str, ...], keywords: tuple[str, ...]) -> float | None:

@@ -193,10 +193,12 @@ def _build_single_candidate(
         rating=rating_value,
     )
     execution_update = (analysis or {}).get("execution_update") if analysis else None
+    execution_update_payload = execution_update if isinstance(execution_update, dict) else None
+    current_price_for_risk = _current_price_for_risk_mapping(execution_update_payload, position)
     risk_action, risk_action_reason_codes = _apply_execution_overlay_risk_action(
         risk_action=risk_action,
         risk_action_reason_codes=risk_action_reason_codes,
-        execution_update=execution_update if isinstance(execution_update, dict) else None,
+        execution_update=execution_update_payload,
         is_held=is_held,
     )
     action_now, action_if_triggered = _apply_risk_action_mapping(
@@ -205,7 +207,8 @@ def _build_single_candidate(
         risk_action=risk_action,
         risk_action_reason_codes=risk_action_reason_codes,
         risk_action_level=risk_action_level,
-        execution_update=execution_update if isinstance(execution_update, dict) else None,
+        execution_update=execution_update_payload,
+        current_price=current_price_for_risk,
         is_held=is_held,
     )
     if isinstance(execution_update, dict):
@@ -221,7 +224,8 @@ def _build_single_candidate(
             risk_action=risk_action,
             risk_action_reason_codes=risk_action_reason_codes,
             risk_action_level=risk_action_level,
-            execution_update=execution_update,
+            execution_update=execution_update_payload,
+            current_price=current_price_for_risk,
             is_held=is_held,
         )
     execution_feasibility_now = _execution_feasibility_now(
@@ -418,6 +422,7 @@ def _apply_risk_action_mapping(
     risk_action_reason_codes: tuple[str, ...],
     risk_action_level: dict[str, Any] | None,
     execution_update: dict[str, Any] | None,
+    current_price: float | None,
     is_held: bool,
 ) -> tuple[str, str]:
     normalized = str(risk_action or RiskAction.NONE.value).upper()
@@ -435,6 +440,7 @@ def _apply_risk_action_mapping(
         reason_codes=risk_action_reason_codes,
         risk_action_level=risk_action_level,
         execution_update=execution_update,
+        current_price=current_price,
     )
     if normalized == RiskAction.EXIT.value:
         return ("EXIT_NOW", "NONE") if triggered_now else ("HOLD", "EXIT_IF_TRIGGERED")
@@ -453,21 +459,124 @@ def _risk_action_triggered_now(
     reason_codes: tuple[str, ...],
     risk_action_level: dict[str, Any] | None,
     execution_update: dict[str, Any] | None,
+    current_price: float | None,
 ) -> bool:
-    if execution_update:
-        decision_state = str(execution_update.get("decision_state") or "").upper()
-        timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
-        trigger_status = execution_update.get("trigger_status") if isinstance(execution_update.get("trigger_status"), dict) else {}
-        if decision_state == "INVALIDATED" or timing_state in {"INVALIDATED", "SUPPORT_FAIL", "FAILED_BREAKOUT"}:
-            return True
-        if trigger_status.get("invalidated") or trigger_status.get("support_fail") or trigger_status.get("failed_breakout"):
-            return True
-    code_blob = " ".join(str(code).upper() for code in reason_codes)
-    if any(token in code_blob for token in ("BROKEN", "BREACHED", "HIT", "FAILED", "TRIGGERED", "CONFIRMED")):
+    if risk_action_level is not None:
+        return _risk_action_level_triggered_now(
+            risk_action=risk_action,
+            risk_action_level=risk_action_level,
+            execution_update=execution_update,
+            current_price=current_price,
+        )
+    if _execution_update_has_risk_trigger(execution_update):
         return True
-    if str(risk_action or "").upper() in {RiskAction.EXIT.value, RiskAction.STOP_LOSS.value} and risk_action_level is None:
+    code_blob = " ".join(str(code).upper() for code in reason_codes)
+    if str(risk_action or "").upper() == RiskAction.EXIT.value and any(
+        token in code_blob for token in ("LEGACY_SELL_EXIT", "MANUAL_EXIT_NOW", "EXPLICIT_EXIT_NOW")
+    ):
         return True
     return False
+
+
+def _current_price_for_risk_mapping(execution_update: dict[str, Any] | None, position: Any) -> float | None:
+    for value in (
+        (execution_update or {}).get("last_price"),
+        (execution_update or {}).get("current_price"),
+        (execution_update or {}).get("estimated_market_price_krw"),
+        getattr(position, "market_price_krw", None),
+    ):
+        try:
+            if value is not None and float(value) > 0:
+                return float(value)
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def _execution_update_has_risk_trigger(execution_update: dict[str, Any] | None) -> bool:
+    if not execution_update:
+        return False
+    decision_state = str(execution_update.get("decision_state") or "").upper()
+    timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
+    trigger_status = execution_update.get("trigger_status") if isinstance(execution_update.get("trigger_status"), dict) else {}
+    if decision_state == "INVALIDATED" or timing_state in {"INVALIDATED", "SUPPORT_FAIL", "FAILED_BREAKOUT"}:
+        return True
+    return bool(trigger_status.get("invalidated") or trigger_status.get("support_fail") or trigger_status.get("failed_breakout"))
+
+
+def _risk_action_level_triggered_now(
+    *,
+    risk_action: str,
+    risk_action_level: dict[str, Any],
+    execution_update: dict[str, Any] | None,
+    current_price: float | None,
+) -> bool:
+    if current_price is None or current_price <= 0:
+        return False
+    confirmation = str(risk_action_level.get("confirmation") or "").strip().lower()
+    if confirmation in {"two_bar", "next_day"}:
+        return False
+    if confirmation == "close" and not _is_close_confirmed_execution(execution_update):
+        return False
+
+    direction = _risk_action_level_direction(risk_action=risk_action, risk_action_level=risk_action_level)
+    trigger_level = _risk_action_trigger_price(risk_action_level, direction=direction)
+    if trigger_level is None or trigger_level <= 0:
+        return False
+    if direction == "upside":
+        return float(current_price) >= float(trigger_level)
+    return float(current_price) <= float(trigger_level)
+
+
+def _is_close_confirmed_execution(execution_update: dict[str, Any] | None) -> bool:
+    if not execution_update:
+        return False
+    source = execution_update.get("source") if isinstance(execution_update.get("source"), dict) else {}
+    market_session = str(source.get("market_session") or "").strip().lower()
+    timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
+    return market_session in {"post_close", "closed", "after_hours"} or timing_state in {"CLOSE_CONFIRMED", "CLOSE_CONFIRM"}
+
+
+def _risk_action_trigger_price(risk_action_level: dict[str, Any], *, direction: str) -> float | None:
+    values = {
+        "price": risk_action_level.get("price"),
+        "low": risk_action_level.get("low"),
+        "high": risk_action_level.get("high"),
+    }
+    if values["price"] not in (None, ""):
+        try:
+            return float(values["price"])
+        except (TypeError, ValueError):
+            return None
+    ordered_keys = ("high", "low") if direction == "upside" else ("low", "high")
+    for key in ordered_keys:
+        try:
+            value = values[key]
+            if value not in (None, ""):
+                return float(value)
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def _risk_action_level_direction(*, risk_action: str, risk_action_level: dict[str, Any]) -> str:
+    normalized_action = str(risk_action or "").upper()
+    level_type = str(risk_action_level.get("level_type") or "").upper().replace(" ", "_")
+    text = " ".join(
+        str(risk_action_level.get(key) or "")
+        for key in ("label", "source_text", "reason_code", "level_type")
+    ).lower()
+    if normalized_action == RiskAction.TAKE_PROFIT.value:
+        return "upside"
+    if normalized_action in {RiskAction.STOP_LOSS.value, RiskAction.EXIT.value}:
+        return "downside"
+    if level_type in {"TAKE_PROFIT", "RESISTANCE"}:
+        return "upside"
+    if level_type in {"SUPPORT", "INVALIDATION", "STOP_LOSS"}:
+        return "downside"
+    if any(token in text for token in ("profit", "target", "resistance", "ceiling", "이익", "익절", "저항", "고점")):
+        return "upside"
+    return "downside"
 
 
 def _build_rationale(*, stance: str, entry_action: str, is_held: bool, analysis_present: bool) -> str:
@@ -533,6 +642,8 @@ def _apply_execution_overlay_actions(
         if is_held:
             return ("HOLD", "ADD_IF_TRIGGERED")
         return ("WATCH", "STARTER_IF_TRIGGERED")
+    if decision_state == "ACTIONABLE_NOW" and decision_now in {"REDUCE_NOW", "EXIT_NOW"}:
+        return (decision_now, "NONE") if is_held else ("WATCH", "NONE")
     if timing_state == "PILOT_READY":
         if is_held:
             return ("ADD_NOW", "NONE")

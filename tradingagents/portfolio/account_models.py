@@ -251,6 +251,10 @@ class PortfolioRecommendation:
     candidate_counts: dict[str, int] = field(default_factory=dict)
     funding_plan: dict[str, Any] = field(default_factory=dict)
     scenario_plan: dict[str, Any] = field(default_factory=dict)
+    recommended_buying_power_after_now_krw: int | None = None
+    recommended_buying_power_after_triggered_krw: int | None = None
+    recommended_settled_cash_after_now_krw: int | None = None
+    recommended_settled_cash_after_triggered_krw: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)

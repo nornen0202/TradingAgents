@@ -102,6 +102,81 @@ class SellSideCandidateMappingTests(unittest.TestCase):
         self.assertEqual(candidate.portfolio_relative_action, "AVOID")
         self.assertEqual(candidate.risk_action, "STOP_LOSS")
 
+    def test_stop_loss_level_above_current_price_required_for_now(self):
+        candidate, _ = _build_single_candidate(
+            snapshot=self._snapshot(),
+            canonical_ticker="005930.KS",
+            position=self._position(),
+            analysis={
+                "decision": self._decision(
+                    risk_action="STOP_LOSS",
+                    risk_action_reason_codes=["INVALIDATION_BROKEN"],
+                    risk_action_level={
+                        "label": "stop",
+                        "level_type": "STOP_LOSS",
+                        "price": 65000,
+                        "confirmation": "intraday",
+                    },
+                ),
+                "tool_telemetry": {},
+                "execution_update": {
+                    "decision_state": "WAIT",
+                    "last_price": 70000,
+                    "trigger_status": {},
+                    "source": {"market_session": "regular"},
+                },
+            },
+        )
+
+        self.assertEqual(candidate.suggested_action_now, "HOLD")
+        self.assertEqual(candidate.suggested_action_if_triggered, "STOP_LOSS_IF_TRIGGERED")
+
+    def test_close_confirmation_stop_loss_does_not_fire_intraday(self):
+        candidate, _ = _build_single_candidate(
+            snapshot=self._snapshot(),
+            canonical_ticker="005930.KS",
+            position=self._position(),
+            analysis={
+                "decision": self._decision(
+                    risk_action="STOP_LOSS",
+                    risk_action_reason_codes=["INVALIDATION_BROKEN"],
+                    risk_action_level={
+                        "label": "close below stop",
+                        "level_type": "STOP_LOSS",
+                        "price": 65000,
+                        "confirmation": "close",
+                    },
+                ),
+                "tool_telemetry": {},
+                "execution_update": {
+                    "decision_state": "WAIT",
+                    "last_price": 64000,
+                    "trigger_status": {},
+                    "source": {"market_session": "regular"},
+                },
+            },
+        )
+
+        self.assertEqual(candidate.suggested_action_now, "HOLD")
+        self.assertEqual(candidate.suggested_action_if_triggered, "STOP_LOSS_IF_TRIGGERED")
+
+    def test_reason_code_alone_does_not_create_stop_loss_now(self):
+        candidate, _ = _build_single_candidate(
+            snapshot=self._snapshot(),
+            canonical_ticker="005930.KS",
+            position=self._position(),
+            analysis={
+                "decision": self._decision(
+                    risk_action="STOP_LOSS",
+                    risk_action_reason_codes=["INVALIDATION_BROKEN"],
+                ),
+                "tool_telemetry": {},
+            },
+        )
+
+        self.assertEqual(candidate.suggested_action_now, "HOLD")
+        self.assertEqual(candidate.suggested_action_if_triggered, "STOP_LOSS_IF_TRIGGERED")
+
 
 if __name__ == "__main__":
     unittest.main()

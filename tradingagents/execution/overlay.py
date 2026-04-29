@@ -116,6 +116,24 @@ def evaluate_execution_state(
     decision_now = DecisionNow.NONE
     execution_timing_state = ExecutionTimingState.WAITING
 
+    risk_action_update = _evaluate_risk_action_level(contract, market)
+    if risk_action_update is not None:
+        risk_decision_state, risk_decision_now, risk_timing_state, risk_reasons, risk_flags = risk_action_update
+        trigger_status.update(risk_flags)
+        return _build_update(
+            contract,
+            market,
+            now,
+            staleness_seconds=staleness_seconds,
+            decision_state=risk_decision_state,
+            decision_now=risk_decision_now,
+            reason_codes=risk_reasons,
+            trigger_status=trigger_status,
+            data_health="OK",
+            refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=risk_timing_state,
+        )
+
     if contract.invalid_if_intraday_below is not None and intraday_low < contract.invalid_if_intraday_below:
         trigger_status["invalidated"] = True
         return _build_update(
@@ -266,6 +284,109 @@ def _decision_now_from_action(action: ActionIfTriggered) -> DecisionNow:
         ActionIfTriggered.EXIT: DecisionNow.EXIT_NOW,
     }
     return mapping[action]
+
+
+def _evaluate_risk_action_level(
+    contract: ExecutionContract,
+    market: IntradayMarketSnapshot,
+) -> tuple[DecisionState, DecisionNow, ExecutionTimingState, tuple[str, ...], dict[str, bool]] | None:
+    risk_action = str(contract.risk_action or "NONE").upper()
+    if risk_action in {"", "NONE", "HOLD", "TRIM_TO_FUND"} or contract.risk_action_level is None:
+        return None
+    trigger_level = _risk_action_trigger_price(contract)
+    if trigger_level is None or trigger_level <= 0:
+        return None
+    direction = _risk_action_direction(contract)
+    triggered = market.last_price >= trigger_level if direction == "upside" else market.last_price <= trigger_level
+    if not triggered:
+        return None
+
+    confirmation = str(contract.risk_action_level.confirmation or "").strip().lower()
+    flags = {
+        "risk_action_triggered": False,
+        "risk_action_close_pending": False,
+    }
+    if confirmation in {"two_bar", "next_day"}:
+        flags["risk_action_close_pending"] = True
+        return (
+            DecisionState.TRIGGERED_PENDING_CLOSE,
+            DecisionNow.NONE,
+            ExecutionTimingState.CLOSE_CONFIRM_PENDING,
+            ("risk_action_confirmation_required",),
+            flags,
+        )
+    if confirmation == "close" and not _market_session_is_post_close(market):
+        flags["risk_action_close_pending"] = True
+        return (
+            DecisionState.TRIGGERED_PENDING_CLOSE,
+            DecisionNow.NONE,
+            ExecutionTimingState.CLOSE_CONFIRM_PENDING,
+            ("risk_action_close_confirmation_required",),
+            flags,
+        )
+
+    flags["risk_action_triggered"] = True
+    if risk_action in {"STOP_LOSS", "EXIT"}:
+        return (
+            DecisionState.INVALIDATED,
+            DecisionNow.EXIT_NOW,
+            ExecutionTimingState.INVALIDATED,
+            ("risk_action_level_triggered",),
+            {**flags, "invalidated": True},
+        )
+    return (
+        DecisionState.ACTIONABLE_NOW,
+        DecisionNow.REDUCE_NOW,
+        ExecutionTimingState.ACTIONABLE_LIVE,
+        ("risk_action_level_triggered",),
+        flags,
+    )
+
+
+def _market_session_is_post_close(market: IntradayMarketSnapshot) -> bool:
+    return str(market.market_session or "").strip().lower() in {"post_close", "closed", "after_hours"}
+
+
+def _risk_action_trigger_price(contract: ExecutionContract) -> float | None:
+    level = contract.risk_action_level
+    if level is None:
+        return None
+    if level.price is not None:
+        return float(level.price)
+    direction = _risk_action_direction(contract)
+    if direction == "upside":
+        if level.high is not None:
+            return float(level.high)
+        if level.low is not None:
+            return float(level.low)
+    else:
+        if level.low is not None:
+            return float(level.low)
+        if level.high is not None:
+            return float(level.high)
+    return None
+
+
+def _risk_action_direction(contract: ExecutionContract) -> str:
+    risk_action = str(contract.risk_action or "").upper()
+    level = contract.risk_action_level
+    if risk_action == "TAKE_PROFIT":
+        return "upside"
+    if risk_action in {"STOP_LOSS", "EXIT"}:
+        return "downside"
+    raw_level_type = getattr(level, "level_type", "") if level is not None else ""
+    level_type = str(getattr(raw_level_type, "value", raw_level_type) or "").upper().replace(" ", "_")
+    if level_type in {"TAKE_PROFIT", "RESISTANCE"}:
+        return "upside"
+    if level_type in {"SUPPORT", "INVALIDATION", "STOP_LOSS"}:
+        return "downside"
+    text = " ".join(
+        str(getattr(level, attr, "") or "")
+        for attr in ("label", "source_text", "reason_code", "level_type")
+    ).lower()
+    if any(token in text for token in ("profit", "target", "resistance", "ceiling", "이익", "익절", "저항", "고점")):
+        return "upside"
+    return "downside"
 
 
 def _pilot_window_open(*, market_asof: str, earliest_pilot_time_local: str | None) -> bool:

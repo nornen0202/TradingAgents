@@ -109,7 +109,7 @@ def build_image_prompt(spec: dict[str, Any]) -> str:
         f"Account: value {account.get('account_value')}, cash {account.get('available_cash')}, buffer {account.get('min_cash_buffer')}, mode {account.get('mode')}\n"
         f"Counts: buy now {counts.get('add_now')}, pilot {counts.get('pilot_ready')}, close confirm {counts.get('close_confirm')}, "
         f"trim to fund {counts.get('trim_to_fund')}, reduce risk {counts.get('reduce_risk')}, stop/exit {int(counts.get('stop_loss') or 0) + int(counts.get('exit') or 0)}\n"
-        f"Top priority: {top or '-'}\n"
+        f"Top account actions: {top or '-'}\n"
         f"Next checkpoints: {checkpoints or '-'}\n"
         f"Risks: {risks or '-'}\n"
         f"Footer text: {spec.get('footer')}\n"

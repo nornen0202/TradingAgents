@@ -175,8 +175,34 @@ def build_recommendation(
     )
     prioritized = _annotate_reallocation_ranks(prioritized, snapshot)
 
-    cash_after_now = snapshot.available_cash_krw - sum(max(action.delta_krw_now, 0) for action in prioritized)
-    cash_after_triggered = cash_after_now - sum(max(action.delta_krw_if_triggered, 0) for action in prioritized)
+    now_buy_krw = sum(max(action.delta_krw_now, 0) for action in prioritized)
+    now_sell_krw = sum(max(-action.delta_krw_now, 0) for action in prioritized)
+    triggered_buy_krw = sum(max(action.delta_krw_if_triggered, 0) for action in prioritized)
+    triggered_sell_krw = sum(max(-action.delta_krw_if_triggered, 0) for action in prioritized)
+    cash_after_now = snapshot.available_cash_krw - now_buy_krw
+    cash_after_triggered = cash_after_now - triggered_buy_krw
+    buying_power_after_now = snapshot.buying_power_krw - now_buy_krw + now_sell_krw
+    buying_power_after_triggered = buying_power_after_now - triggered_buy_krw + triggered_sell_krw
+    settled_cash_after_now = snapshot.settled_cash_krw - now_buy_krw + now_sell_krw
+    settled_cash_after_triggered = settled_cash_after_now - triggered_buy_krw + triggered_sell_krw
+    cash_projection = {
+        "current_available_cash_krw": int(snapshot.available_cash_krw),
+        "current_buying_power_krw": int(snapshot.buying_power_krw),
+        "current_settled_cash_krw": int(snapshot.settled_cash_krw),
+        "min_cash_buffer_krw": int(snapshot.constraints.min_cash_buffer_krw),
+        "gross_buy_now_krw": int(now_buy_krw),
+        "gross_sell_now_krw": int(now_sell_krw),
+        "gross_buy_if_triggered_krw": int(triggered_buy_krw),
+        "gross_sell_if_triggered_krw": int(triggered_sell_krw),
+        "available_cash_after_now_krw": int(max(cash_after_now, 0)),
+        "available_cash_after_triggered_krw": int(max(cash_after_triggered, 0)),
+        "buying_power_after_now_krw": int(max(buying_power_after_now, 0)),
+        "buying_power_after_triggered_krw": int(max(buying_power_after_triggered, 0)),
+        "settled_cash_after_now_krw": int(max(settled_cash_after_now, 0)),
+        "settled_cash_after_triggered_krw": int(max(settled_cash_after_triggered, 0)),
+        "cash_buffer_respected_now": cash_after_now >= snapshot.constraints.min_cash_buffer_krw,
+        "cash_buffer_respected_if_triggered": cash_after_triggered >= snapshot.constraints.min_cash_buffer_krw,
+    }
 
     risks = _infer_portfolio_risks(prioritized, warnings, batch_metrics)
     candidate_counts = _build_candidate_counts(prioritized, snapshot)
@@ -188,6 +214,7 @@ def build_recommendation(
         candidate_counts=candidate_counts,
         profile=profile,
     )
+    scenario_plan["cash_projection"] = cash_projection
     recommendation = PortfolioRecommendation(
         snapshot_id=snapshot.snapshot_id,
         report_date=report_date,
@@ -230,6 +257,10 @@ def build_recommendation(
         candidate_counts=candidate_counts,
         funding_plan=funding_plan,
         scenario_plan=scenario_plan,
+        recommended_buying_power_after_now_krw=max(buying_power_after_now, 0),
+        recommended_buying_power_after_triggered_krw=max(buying_power_after_triggered, 0),
+        recommended_settled_cash_after_now_krw=max(settled_cash_after_now, 0),
+        recommended_settled_cash_after_triggered_krw=max(settled_cash_after_triggered, 0),
     )
     return recommendation, scored
 

@@ -153,10 +153,10 @@ def _count_cards(counts: dict[str, Any]) -> str:
 
 def _priority_bar(items: list[dict[str, Any]]) -> str:
     labels = [str(item.get("ticker") or "") for item in items if str(item.get("ticker") or "").strip()]
-    text = " > ".join(labels[:4]) if labels else "조건 확인 후 우선순위 산정"
+    text = " > ".join(labels[:4]) if labels else "조건 확인 후 후보 산정"
     return (
         "<rect x='32' y='836' width='1056' height='48' rx='8' class='soft'/>"
-        f"<text x='560' y='868' text-anchor='middle' class='h'>전략상 우선순위: {_escape(text)}</text>"
+        f"<text x='560' y='868' text-anchor='middle' class='h'>상위 계좌 액션: {_escape(text)}</text>"
     )
 
 
