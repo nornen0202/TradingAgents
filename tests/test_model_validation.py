@@ -53,3 +53,12 @@ class ModelValidationTests(unittest.TestCase):
 
     def test_validator_accepts_known_model_with_surrounding_whitespace(self):
         self.assertTrue(validate_model(" openai ", " gpt-5.5 "))
+
+    def test_codex_accepts_lightweight_mini_model(self):
+        client = DummyLLMClient("codex", "gpt-5.4-mini")
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            client.get_llm()
+
+        self.assertEqual(caught, [])

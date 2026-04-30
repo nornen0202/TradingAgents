@@ -1,6 +1,8 @@
 from typing import Annotated
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import contextlib
+import io
 import pandas as pd
 import yfinance as yf
 import os
@@ -38,7 +40,7 @@ def _resolve_info_with_symbol_fallback(raw_ticker: str) -> tuple[str | None, dic
     for candidate in _build_yfinance_symbol_candidates(raw_ticker):
         ticker_obj = yf.Ticker(candidate)
         try:
-            info = yf_retry(lambda: ticker_obj.info)
+            info = _fetch_ticker_info_quietly(ticker_obj)
         except Exception as exc:
             attempts.append(f"{candidate}: {exc}")
             continue
@@ -46,6 +48,12 @@ def _resolve_info_with_symbol_fallback(raw_ticker: str) -> tuple[str | None, dic
             return candidate, info, attempts
         attempts.append(f"{candidate}: empty info")
     return None, None, attempts
+
+
+def _fetch_ticker_info_quietly(ticker_obj) -> dict:
+    """Fetch yfinance info without leaking vendor HTTP dumps into workflow logs."""
+    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+        return yf_retry(lambda: ticker_obj.info)
 
 def get_YFin_data_online(
     symbol: Annotated[str, "ticker symbol of the company"],

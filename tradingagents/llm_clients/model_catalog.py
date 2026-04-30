@@ -24,6 +24,7 @@ MODEL_OPTIONS: ProviderModeOptions = {
     "codex": {
         "quick": [
             ("GPT-5.5 - Frontier Codex model", "gpt-5.5"),
+            ("GPT-5.4 Mini - Lightweight Codex model", "gpt-5.4-mini"),
             ("GPT-5.3 Codex - Coding-optimized fallback", "gpt-5.3-codex"),
             ("GPT-5.2 - Strong Codex reasoning", "gpt-5.2"),
             ("GPT-4.1 - Strong non-reasoning fallback", "gpt-4.1"),
