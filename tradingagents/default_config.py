@@ -11,7 +11,7 @@ DEFAULT_CONFIG = {
     # LLM settings
     "llm_provider": "openai",
     "deep_think_llm": "gpt-5.5",
-    "quick_think_llm": "gpt-5.5",
+    "quick_think_llm": "gpt-5.4-mini",
     "output_think_llm": "gpt-5.5",
     "backend_url": "https://api.openai.com/v1",
     # Provider-specific thinking configuration
@@ -35,7 +35,7 @@ DEFAULT_CONFIG = {
     "execution_max_data_age_seconds": 180,
     "execution_publish_badges": True,
     "execution_publish_debug": False,
-    "execution_llm_summary_model": "gpt-5.5",
+    "execution_llm_summary_model": "gpt-5.4-mini",
     "execution_selective_rerun_enabled": True,
     # Output language for analyst reports and final decision
     # Internal agent debate stays in English for reasoning quality

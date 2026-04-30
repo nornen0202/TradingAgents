@@ -48,7 +48,7 @@ class RunSettings:
 class LLMSettings:
     provider: str = "codex"
     deep_model: str = "gpt-5.5"
-    quick_model: str = "gpt-5.5"
+    quick_model: str = "gpt-5.4-mini"
     output_model: str = "gpt-5.5"
     codex_reasoning_effort: str = "medium"
     codex_summary: str = "none"
@@ -93,7 +93,7 @@ class ExecutionSettings:
     execution_max_data_age_seconds: int = 180
     execution_publish_badges: bool = True
     execution_selective_rerun_enabled: bool = True
-    execution_llm_summary_model: str | None = "gpt-5.5"
+    execution_llm_summary_model: str | None = "gpt-5.4-mini"
     execution_publish_debug: bool = False
 
 
@@ -289,7 +289,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         llm=LLMSettings(
             provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
             deep_model=deep_model_override or str(llm_raw.get("deep_model", "gpt-5.5")).strip() or "gpt-5.5",
-            quick_model=quick_model_override or str(llm_raw.get("quick_model", "gpt-5.5")).strip() or "gpt-5.5",
+            quick_model=quick_model_override or str(llm_raw.get("quick_model", "gpt-5.4-mini")).strip() or "gpt-5.4-mini",
             output_model=output_model_override or str(llm_raw.get("output_model", "gpt-5.5")).strip() or "gpt-5.5",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_summary=str(llm_raw.get("codex_summary", "none")).strip() or "none",
@@ -352,7 +352,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             execution_max_data_age_seconds=max(30, int(execution_raw.get("max_data_age_seconds", 180))),
             execution_publish_badges=bool(execution_raw.get("publish_badges", True)),
             execution_selective_rerun_enabled=bool(execution_raw.get("selective_rerun_enabled", True)),
-            execution_llm_summary_model=execution_model_override or _optional_string(execution_raw.get("llm_summary_model")) or "gpt-5.5",
+            execution_llm_summary_model=execution_model_override or _optional_string(execution_raw.get("llm_summary_model")) or "gpt-5.4-mini",
             execution_publish_debug=bool(execution_raw.get("publish_debug", False)),
         ),
         summary_image=SummaryImageSettings(

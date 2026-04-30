@@ -94,9 +94,9 @@ docker compose --profile ollama run --rm tradingagents-ollama
 
 최신 `main` 기준 기본 모델 역할은 아래와 같습니다.
 
-- `quick_think_llm`: `gpt-5.4`
-- `deep_think_llm`: `gpt-5.4`
-- `output_think_llm`: `gpt-5.4`
+- `quick_think_llm`: `gpt-5.4-mini`
+- `deep_think_llm`: `gpt-5.5`
+- `output_think_llm`: `gpt-5.5`
 
 예시:
 
@@ -106,9 +106,9 @@ from tradingagents.default_config import DEFAULT_CONFIG
 
 config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
-config["quick_think_llm"] = "gpt-5.4"
-config["deep_think_llm"] = "gpt-5.4"
-config["output_think_llm"] = "gpt-5.4"
+config["quick_think_llm"] = "gpt-5.4-mini"
+config["deep_think_llm"] = "gpt-5.5"
+config["output_think_llm"] = "gpt-5.5"
 
 graph = TradingAgentsGraph(debug=True, config=config)
 final_state, decision = graph.propagate("NVDA", "2026-01-15")
