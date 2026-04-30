@@ -44,7 +44,7 @@ jobs:
     timeout-minutes: 120
     defaults:
       run:
-        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: python {0}
     env:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
@@ -76,59 +76,71 @@ jobs:
 
       - name: Install TradingAgents
         run: |
-          python -m pip install --upgrade pip
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          python -m pip install -e ".[translation]"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
 
       - name: Run overlay refresh mode
         run: |
-          $configPath = "config/scheduled_analysis.toml"
-          if (-not (Test-Path $configPath)) {
-            throw "Missing config/scheduled_analysis.toml."
-          }
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
 
-          $runMode = "${{ github.event.inputs.run_mode }}"
-          if ([string]::IsNullOrWhiteSpace($runMode)) {
-            $runMode = "overlay_only"
-          }
+          config_path = "config/scheduled_analysis.toml"
+          if not Path(config_path).exists():
+              raise SystemExit("Missing config/scheduled_analysis.toml.")
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--site-dir", "site", "--label", "github-actions-overlay-us")
+          run_mode = "${{ github.event.inputs.run_mode }}".strip() or "overlay_only"
+          args = [
+              sys.executable,
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              config_path,
+              "--run-mode",
+              run_mode,
+              "--site-dir",
+              "site",
+              "--label",
+              "github-actions-overlay-us",
+          ]
 
-          if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
-            $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
-          }
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
 
-          $manualTickers = "${{ github.event.inputs.tickers }}"
-          if (-not [string]::IsNullOrWhiteSpace($manualTickers)) {
-            $args += @("--tickers", $manualTickers)
-          }
+          manual_tickers = "${{ github.event.inputs.tickers }}".strip()
+          if manual_tickers:
+              args += ["--tickers", manual_tickers]
 
-          python @args
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          subprocess.check_call(args)
 
       - name: Add Git Bash to PATH for Pages packaging
         run: |
-          $gitBinCandidates = @(
-            "C:\Program Files\Git\bin",
-            "C:\Program Files\Git\usr\bin"
-          )
+          import os
+          from pathlib import Path
 
-          foreach ($candidate in $gitBinCandidates) {
-            if (Test-Path (Join-Path $candidate "bash.exe")) {
-              Add-Content -Path $env:GITHUB_PATH -Value $candidate
-              Write-Host "Added Git Bash path: $candidate"
-              exit 0
-            }
-          }
-
-          throw "bash.exe was not found under the expected Git for Windows directories."
+          for candidate in (r"C:\Program Files\Git\bin", r"C:\Program Files\Git\usr\bin"):
+              if (Path(candidate) / "bash.exe").exists():
+                  github_path = os.environ.get("GITHUB_PATH")
+                  if not github_path:
+                      raise SystemExit("GITHUB_PATH is unavailable.")
+                  with open(github_path, "a", encoding="utf-8") as handle:
+                      handle.write(candidate + os.linesep)
+                  print(f"Added Git Bash path: {candidate}")
+                  break
+          else:
+              raise SystemExit("bash.exe was not found under the expected Git for Windows directories.")
 
       - name: Verify site output directory exists (US)
         run: |
-          if (-not (Test-Path "site")) {
-            throw "Expected site output directory 'site' was not created."
-          }
+          from pathlib import Path
+
+          if not Path("site").exists():
+              raise SystemExit("Expected site output directory 'site' was not created.")
 
       - name: Upload GitHub Pages artifact (US)
         id: upload_pages_us
@@ -152,7 +164,7 @@ jobs:
     timeout-minutes: 120
     defaults:
       run:
-        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: python {0}
     env:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
@@ -184,59 +196,71 @@ jobs:
 
       - name: Install TradingAgents
         run: |
-          python -m pip install --upgrade pip
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          python -m pip install -e ".[translation]"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
 
       - name: Run overlay refresh mode
         run: |
-          $configPath = "config/scheduled_analysis_korea.toml"
-          if (-not (Test-Path $configPath)) {
-            throw "Missing config/scheduled_analysis_korea.toml."
-          }
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
 
-          $runMode = "${{ github.event.inputs.run_mode }}"
-          if ([string]::IsNullOrWhiteSpace($runMode)) {
-            $runMode = "overlay_only"
-          }
+          config_path = "config/scheduled_analysis_korea.toml"
+          if not Path(config_path).exists():
+              raise SystemExit("Missing config/scheduled_analysis_korea.toml.")
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", $runMode, "--site-dir", "site", "--label", "github-actions-overlay-kr")
+          run_mode = "${{ github.event.inputs.run_mode }}".strip() or "overlay_only"
+          args = [
+              sys.executable,
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              config_path,
+              "--run-mode",
+              run_mode,
+              "--site-dir",
+              "site",
+              "--label",
+              "github-actions-overlay-kr",
+          ]
 
-          if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
-            $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
-          }
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
 
-          $manualTickers = "${{ github.event.inputs.tickers }}"
-          if (-not [string]::IsNullOrWhiteSpace($manualTickers)) {
-            $args += @("--tickers", $manualTickers)
-          }
+          manual_tickers = "${{ github.event.inputs.tickers }}".strip()
+          if manual_tickers:
+              args += ["--tickers", manual_tickers]
 
-          python @args
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          subprocess.check_call(args)
 
       - name: Add Git Bash to PATH for Pages packaging
         run: |
-          $gitBinCandidates = @(
-            "C:\Program Files\Git\bin",
-            "C:\Program Files\Git\usr\bin"
-          )
+          import os
+          from pathlib import Path
 
-          foreach ($candidate in $gitBinCandidates) {
-            if (Test-Path (Join-Path $candidate "bash.exe")) {
-              Add-Content -Path $env:GITHUB_PATH -Value $candidate
-              Write-Host "Added Git Bash path: $candidate"
-              exit 0
-            }
-          }
-
-          throw "bash.exe was not found under the expected Git for Windows directories."
+          for candidate in (r"C:\Program Files\Git\bin", r"C:\Program Files\Git\usr\bin"):
+              if (Path(candidate) / "bash.exe").exists():
+                  github_path = os.environ.get("GITHUB_PATH")
+                  if not github_path:
+                      raise SystemExit("GITHUB_PATH is unavailable.")
+                  with open(github_path, "a", encoding="utf-8") as handle:
+                      handle.write(candidate + os.linesep)
+                  print(f"Added Git Bash path: {candidate}")
+                  break
+          else:
+              raise SystemExit("bash.exe was not found under the expected Git for Windows directories.")
 
       - name: Verify site output directory exists (KR)
         run: |
-          if (-not (Test-Path "site")) {
-            throw "Expected site output directory 'site' was not created."
-          }
+          from pathlib import Path
+
+          if not Path("site").exists():
+              raise SystemExit("Expected site output directory 'site' was not created.")
 
       - name: Upload GitHub Pages artifact (KR)
         id: upload_pages_kr
@@ -263,7 +287,7 @@ jobs:
     timeout-minutes: 60
     defaults:
       run:
-        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: python {0}
     env:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
@@ -279,53 +303,66 @@ jobs:
 
       - name: Install TradingAgents
         run: |
-          python -m pip install --upgrade pip
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          python -m pip install -e ".[translation]"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
 
       - name: Rebuild final merged overlay site
         run: |
-          $profile = "${{ github.event.inputs.profile }}"
-          $schedule = "${{ github.event.schedule }}"
-          $configPath = "config/scheduled_analysis.toml"
-          if ("${{ github.event_name }}" -eq "workflow_dispatch" -and $profile -eq "kr") {
-            $configPath = "config/scheduled_analysis_korea.toml"
-          }
-          if ("${{ github.event_name }}" -eq "schedule" -and ($schedule -eq "5 1,2 * * 1-5" -or $schedule -eq "35 3,5 * * 1-5")) {
-            $configPath = "config/scheduled_analysis_korea.toml"
-          }
+          import os
+          import subprocess
+          import sys
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--site-only", "--site-dir", "site")
-          if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
-            $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
-          }
+          profile = "${{ github.event.inputs.profile }}".strip()
+          schedule = "${{ github.event.schedule }}".strip()
+          event_name = "${{ github.event_name }}".strip()
+          config_path = "config/scheduled_analysis.toml"
+          if event_name == "workflow_dispatch" and profile == "kr":
+              config_path = "config/scheduled_analysis_korea.toml"
+          if event_name == "schedule" and schedule in {"5 1,2 * * 1-5", "35 3,5 * * 1-5"}:
+              config_path = "config/scheduled_analysis_korea.toml"
 
-          python @args
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          args = [
+              sys.executable,
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              config_path,
+              "--site-only",
+              "--site-dir",
+              "site",
+          ]
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+
+          subprocess.check_call(args)
 
       - name: Add Git Bash to PATH for Pages packaging
         run: |
-          $gitBinCandidates = @(
-            "C:\Program Files\Git\bin",
-            "C:\Program Files\Git\usr\bin"
-          )
+          import os
+          from pathlib import Path
 
-          foreach ($candidate in $gitBinCandidates) {
-            if (Test-Path (Join-Path $candidate "bash.exe")) {
-              Add-Content -Path $env:GITHUB_PATH -Value $candidate
-              Write-Host "Added Git Bash path: $candidate"
-              exit 0
-            }
-          }
-
-          throw "bash.exe was not found under the expected Git for Windows directories."
+          for candidate in (r"C:\Program Files\Git\bin", r"C:\Program Files\Git\usr\bin"):
+              if (Path(candidate) / "bash.exe").exists():
+                  github_path = os.environ.get("GITHUB_PATH")
+                  if not github_path:
+                      raise SystemExit("GITHUB_PATH is unavailable.")
+                  with open(github_path, "a", encoding="utf-8") as handle:
+                      handle.write(candidate + os.linesep)
+                  print(f"Added Git Bash path: {candidate}")
+                  break
+          else:
+              raise SystemExit("bash.exe was not found under the expected Git for Windows directories.")
 
       - name: Verify final site output directory exists
         run: |
-          if (-not (Test-Path "site")) {
-            throw "Expected site output directory 'site' was not created."
-          }
+          from pathlib import Path
+
+          if not Path("site").exists():
+              raise SystemExit("Expected site output directory 'site' was not created.")
 
       - name: Upload final GitHub Pages artifact
         id: upload_pages_final
