@@ -21,7 +21,7 @@ site_dir = "./site"
     assert config.run.max_debate_rounds == 2
     assert config.run.max_risk_discuss_rounds == 2
     assert config.llm.deep_model == "gpt-5.5"
-    assert config.llm.quick_model == "gpt-5.5"
+    assert config.llm.quick_model == "gpt-5.4-mini"
     assert config.llm.output_model == "gpt-5.5"
     assert config.summary_image.enabled is True
     assert config.summary_image.mode == "deterministic_svg"
