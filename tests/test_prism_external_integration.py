@@ -1,6 +1,7 @@
 import json
 import sqlite3
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from tradingagents.external.prism_conflicts import enrich_candidates_with_prism, reconcile_prism_with_actions
@@ -24,6 +25,7 @@ from tradingagents.portfolio.account_models import (
     PortfolioRecommendation,
 )
 from tradingagents.portfolio.reporting import render_portfolio_report_markdown
+from tradingagents.scheduled.runner import _augment_run_tickers_with_scanner
 from tradingagents.scheduled.site import _render_performance_tracking_section
 from tradingagents.scanner.prism_like_scanner import run_prism_like_scanner
 from tradingagents.scanner.sector_regime import apply_buy_matrix_overlay, evaluate_buy_matrix
@@ -216,6 +218,47 @@ def test_scanner_filters_low_liquidity_and_overheated_movers():
     assert "123456.KS" not in tickers
     assert "999999.KS" not in tickers
     assert result.candidates[0].trigger_type in {"VOLUME_SURGE", "NEAR_52W_HIGH", "SECTOR_LEADER", "CLOSING_STRENGTH"}
+
+
+def test_scanner_prism_failures_fall_back_to_base_universe(tmp_path):
+    config = SimpleNamespace(
+        scanner=SimpleNamespace(
+            enabled=True,
+            market="KR",
+            local_ohlcv_path=None,
+            max_candidates=10,
+            max_new_tickers_per_run=5,
+            include_prism_candidates=True,
+            min_traded_value_krw=10_000_000_000,
+            min_market_cap_krw=500_000_000_000,
+            max_daily_change_pct=20.0,
+            min_volume_ratio_to_market_avg=0.2,
+            exclude_halted_or_low_liquidity=True,
+        ),
+        external_data=SimpleNamespace(
+            prism=SimpleNamespace(
+                enabled=True,
+                use_for_candidate_generation=True,
+            )
+        ),
+    )
+
+    with (
+        patch("tradingagents.scheduled.runner.load_prism_signals", side_effect=RuntimeError("prism down")),
+        patch("tradingagents.scheduled.runner.run_prism_like_scanner", side_effect=RuntimeError("scanner down")),
+    ):
+        tickers, status = _augment_run_tickers_with_scanner(
+            config=config,
+            base_tickers=["000660.KS"],
+            run_dir=tmp_path,
+            run_id="run1",
+            asof="2026-04-30T09:00:00+09:00",
+        )
+
+    assert tickers == ["000660.KS"]
+    assert status is not None
+    assert any("scanner_prism_ingestion_failed" in warning for warning in status["warnings"])
+    assert any("scanner_failed" in warning for warning in status["warnings"])
 
 
 def test_buy_matrix_blocks_low_risk_reward_candidate():

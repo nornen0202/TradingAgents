@@ -73,6 +73,46 @@ image_size = "1024x1536"
 image_quality = "medium"
 request_timeout = 180.0
 
+[external.prism]
+enabled = true
+mode = "advisory"
+local_dashboard_json_path = ""
+local_sqlite_db_path = ""
+dashboard_json_url = ""
+dashboard_base_url = "https://analysis.stocksimulation.kr"
+timeout_seconds = 5
+max_payload_bytes = 5000000
+use_live_http = true
+use_html_scraping = true
+confidence_cap = 0.25
+market = "US"
+use_for_candidate_generation = true
+use_for_performance_benchmark = true
+use_for_ui_comparison = true
+
+[scanner]
+enabled = true
+market = "US"
+local_ohlcv_path = "C:/TradingAgentsData/scanner/us_ohlcv_snapshot.json"
+max_candidates = 10
+max_new_tickers_per_run = 5
+include_prism_candidates = true
+min_traded_value_krw = 10000000000
+min_market_cap_krw = 500000000000
+max_daily_change_pct = 20.0
+min_volume_ratio_to_market_avg = 0.2
+exclude_halted_or_low_liquidity = true
+
+[performance]
+enabled = true
+store_path = ""
+update_outcomes_on_run = true
+price_provider = "yfinance"
+price_history_path = ""
+benchmark_ticker = "SPY"
+outcome_horizons = [1, 3, 5, 10, 20, 60]
+price_lookback_days = 120
+
 [ticker_names]
 AAPL = "Apple"
 AMD = "Advanced Micro Devices"

@@ -940,29 +940,37 @@ def _augment_run_tickers_with_scanner(
     prism_ingestion = None
     external_signals = []
     if config.scanner.include_prism_candidates or config.external_data.prism.use_for_candidate_generation:
-        prism_ingestion = load_prism_signals(config.external_data)
-        external_signals = list(prism_ingestion.signals)
-        warnings.extend(prism_ingestion.warnings)
+        try:
+            prism_ingestion = load_prism_signals(config.external_data)
+            external_signals = list(prism_ingestion.signals)
+            warnings.extend(prism_ingestion.warnings)
+        except Exception as exc:
+            warnings.append(f"scanner_prism_ingestion_failed:{exc}")
+            external_signals = []
 
     if config.scanner.enabled:
         output_path = run_dir / "scanner" / "scanner_candidates.json"
-        scanner_result = run_prism_like_scanner(
-            ohlcv_path=config.scanner.local_ohlcv_path,
-            market=config.scanner.market,
-            regime="unknown",
-            run_id=run_id,
-            asof=asof,
-            max_candidates=config.scanner.max_candidates,
-            min_traded_value_krw=config.scanner.min_traded_value_krw,
-            min_market_cap_krw=config.scanner.min_market_cap_krw,
-            max_daily_change_pct=config.scanner.max_daily_change_pct,
-            min_volume_ratio_to_market_avg=config.scanner.min_volume_ratio_to_market_avg,
-            exclude_halted_or_low_liquidity=config.scanner.exclude_halted_or_low_liquidity,
-            external_signals=external_signals,
-            output_path=output_path,
-        )
-        warnings.extend(scanner_result.warnings)
-        artifacts["scanner_candidates_json"] = _relative_to_run(run_dir, output_path)
+        try:
+            scanner_result = run_prism_like_scanner(
+                ohlcv_path=config.scanner.local_ohlcv_path,
+                market=config.scanner.market,
+                regime="unknown",
+                run_id=run_id,
+                asof=asof,
+                max_candidates=config.scanner.max_candidates,
+                min_traded_value_krw=config.scanner.min_traded_value_krw,
+                min_market_cap_krw=config.scanner.min_market_cap_krw,
+                max_daily_change_pct=config.scanner.max_daily_change_pct,
+                min_volume_ratio_to_market_avg=config.scanner.min_volume_ratio_to_market_avg,
+                exclude_halted_or_low_liquidity=config.scanner.exclude_halted_or_low_liquidity,
+                external_signals=external_signals,
+                output_path=output_path,
+            )
+            warnings.extend(scanner_result.warnings)
+            artifacts["scanner_candidates_json"] = _relative_to_run(run_dir, output_path)
+        except Exception as exc:
+            warnings.append(f"scanner_failed:{exc}")
+            scanner_result = None
 
     tickers = augment_universe_with_scanner(
         base_tickers,
