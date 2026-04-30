@@ -1,4 +1,7 @@
 import unittest
+import contextlib
+import io
+import sys
 from unittest.mock import patch
 
 from tradingagents.dataflows.stockstats_utils import yf_retry
@@ -28,6 +31,24 @@ class YFinanceSymbolFallbackTests(unittest.TestCase):
 
         self.assertIn("# Company Fundamentals for 058470.KQ", result)
         self.assertIn("Name: Sample KR Co", result)
+
+    def test_get_fundamentals_suppresses_yfinance_http_noise(self):
+        class _TickerStub:
+            @property
+            def info(self):
+                print(
+                    'HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found"}}}',
+                    file=sys.stderr,
+                )
+                raise RuntimeError("No fundamentals data found for symbol")
+
+        stderr = io.StringIO()
+        with patch("tradingagents.dataflows.y_finance.yf.Ticker", return_value=_TickerStub()):
+            with contextlib.redirect_stderr(stderr):
+                result = get_fundamentals("GRID")
+
+        self.assertIn("No fundamentals data found for symbol 'GRID'", result)
+        self.assertNotIn("HTTP Error 404", stderr.getvalue())
 
     def test_yf_retry_retries_none_chart_payload_type_error(self):
         attempts = []
