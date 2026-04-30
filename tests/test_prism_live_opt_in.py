@@ -1,11 +1,10 @@
 import os
-
-import pytest
+import unittest
 
 from tradingagents.external.prism_loader import PrismLoaderConfig, load_prism_signals
 
 
-@pytest.mark.skipif(os.getenv("RUN_LIVE_PRISM_TESTS") != "1", reason="live PRISM dashboard tests are opt-in")
+@unittest.skipUnless(os.getenv("RUN_LIVE_PRISM_TESTS") == "1", "live PRISM dashboard tests are opt-in")
 def test_live_prism_dashboard_opt_in_smoke():
     result = load_prism_signals(
         PrismLoaderConfig(
