@@ -381,42 +381,60 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
       - name: Run scheduled analysis and build site
+        shell: python {0}
         run: |
-          $configPath = "config/scheduled_analysis.toml"
-          if (-not (Test-Path $configPath)) {
-            throw "Missing config/scheduled_analysis.toml. Copy config/scheduled_analysis.example.toml, set your real tickers, and commit the file before enabling the schedule."
-          }
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", "full", "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-us")
+          config_path = "config/scheduled_analysis.toml"
+          if not Path(config_path).is_file():
+              raise SystemExit(
+                  "Missing config/scheduled_analysis.toml. Copy config/scheduled_analysis.example.toml, set your real tickers, and commit the file before enabling the schedule."
+              )
 
-          if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
-            $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
-          } else {
-            Write-Warning "TRADINGAGENTS_ARCHIVE_DIR is not set. Run history will live under the repository checkout unless the config overrides it."
-          }
+          site_dir = os.environ.get("TRADINGAGENTS_SITE_DIR")
+          if not site_dir:
+              raise SystemExit("TRADINGAGENTS_SITE_DIR is not set.")
 
-          $manualTickers = "${{ github.event.inputs.tickers }}"
-          if (-not [string]::IsNullOrWhiteSpace($manualTickers)) {
-            $args += @("--tickers", $manualTickers)
-          }
+          args = [
+              sys.executable,
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              config_path,
+              "--run-mode",
+              "full",
+              "--site-dir",
+              site_dir,
+              "--label",
+              "github-actions-us",
+          ]
 
-          $tickerUniverseMode = "${{ github.event.inputs.ticker_universe_mode }}"
-          if (-not [string]::IsNullOrWhiteSpace($tickerUniverseMode)) {
-            $args += @("--ticker-universe-mode", $tickerUniverseMode)
-          }
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+          else:
+              print("TRADINGAGENTS_ARCHIVE_DIR is not set. Run history will live under the repository checkout unless the config overrides it.")
 
-          $manualTradeDate = "${{ github.event.inputs.trade_date }}"
-          if (-not [string]::IsNullOrWhiteSpace($manualTradeDate)) {
-            $args += @("--trade-date", $manualTradeDate)
-          }
+          manual_tickers = "${{ github.event.inputs.tickers }}".strip()
+          if manual_tickers:
+              args += ["--tickers", manual_tickers]
 
-          $siteOnly = "${{ github.event.inputs.site_only }}"
-          if ($siteOnly -eq "true") {
-            $args += "--site-only"
-          }
+          ticker_universe_mode = "${{ github.event.inputs.ticker_universe_mode }}".strip()
+          if ticker_universe_mode:
+              args += ["--ticker-universe-mode", ticker_universe_mode]
 
-          python @args
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          manual_trade_date = "${{ github.event.inputs.trade_date }}".strip()
+          if manual_trade_date:
+              args += ["--trade-date", manual_trade_date]
+
+          site_only = "${{ github.event.inputs.site_only }}".strip().lower()
+          if site_only == "true":
+              args += ["--site-only"]
+
+          subprocess.check_call(args)
 
       - name: Add Git Bash to PATH for Pages packaging
         run: |
@@ -899,42 +917,58 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
       - name: Run scheduled analysis and build site
+        shell: python {0}
         run: |
-          $configPath = "config/scheduled_analysis_korea.toml"
-          if (-not (Test-Path $configPath)) {
-            throw "Missing config/scheduled_analysis_korea.toml. Add the file before enabling the KR schedule."
-          }
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
 
-          $args = @("-m", "tradingagents.scheduled", "--config", $configPath, "--run-mode", "full", "--site-dir", $env:TRADINGAGENTS_SITE_DIR, "--label", "github-actions-kr")
+          config_path = "config/scheduled_analysis_korea.toml"
+          if not Path(config_path).is_file():
+              raise SystemExit("Missing config/scheduled_analysis_korea.toml. Add the file before enabling the KR schedule.")
 
-          if (-not [string]::IsNullOrWhiteSpace($env:TRADINGAGENTS_ARCHIVE_DIR)) {
-            $args += @("--archive-dir", $env:TRADINGAGENTS_ARCHIVE_DIR)
-          } else {
-            Write-Warning "TRADINGAGENTS_ARCHIVE_DIR is not set. Run history will live under the repository checkout unless the config overrides it."
-          }
+          site_dir = os.environ.get("TRADINGAGENTS_SITE_DIR")
+          if not site_dir:
+              raise SystemExit("TRADINGAGENTS_SITE_DIR is not set.")
 
-          $manualTickers = "${{ github.event.inputs.tickers }}"
-          if (-not [string]::IsNullOrWhiteSpace($manualTickers)) {
-            $args += @("--tickers", $manualTickers)
-          }
+          args = [
+              sys.executable,
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              config_path,
+              "--run-mode",
+              "full",
+              "--site-dir",
+              site_dir,
+              "--label",
+              "github-actions-kr",
+          ]
 
-          $tickerUniverseMode = "${{ github.event.inputs.ticker_universe_mode }}"
-          if (-not [string]::IsNullOrWhiteSpace($tickerUniverseMode)) {
-            $args += @("--ticker-universe-mode", $tickerUniverseMode)
-          }
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+          else:
+              print("TRADINGAGENTS_ARCHIVE_DIR is not set. Run history will live under the repository checkout unless the config overrides it.")
 
-          $manualTradeDate = "${{ github.event.inputs.trade_date }}"
-          if (-not [string]::IsNullOrWhiteSpace($manualTradeDate)) {
-            $args += @("--trade-date", $manualTradeDate)
-          }
+          manual_tickers = "${{ github.event.inputs.tickers }}".strip()
+          if manual_tickers:
+              args += ["--tickers", manual_tickers]
 
-          $siteOnly = "${{ github.event.inputs.site_only }}"
-          if ($siteOnly -eq "true") {
-            $args += "--site-only"
-          }
+          ticker_universe_mode = "${{ github.event.inputs.ticker_universe_mode }}".strip()
+          if ticker_universe_mode:
+              args += ["--ticker-universe-mode", ticker_universe_mode]
 
-          python @args
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          manual_trade_date = "${{ github.event.inputs.trade_date }}".strip()
+          if manual_trade_date:
+              args += ["--trade-date", manual_trade_date]
+
+          site_only = "${{ github.event.inputs.site_only }}".strip().lower()
+          if site_only == "true":
+              args += ["--site-only"]
+
+          subprocess.check_call(args)
 
       - name: Collect private account artifacts
         if: ${{ !cancelled() }}
