@@ -511,6 +511,8 @@ def _relative_penalties(
 
 
 def _relative_reason_text(reason_codes: tuple[str, ...]) -> str:
+    if "REANALYSIS_REQUIRED" in reason_codes:
+        return "Reanalysis required before using this ticker as an actionable candidate."
     if "INVALIDATION_BROKEN" in reason_codes:
         return "Reduce or exit because an invalidation or stop-loss level was breached."
     if "SUPPORT_BROKEN" in reason_codes:

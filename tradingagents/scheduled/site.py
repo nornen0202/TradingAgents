@@ -763,10 +763,17 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
         )
     action_rows = _performance_bucket_rows(summary.get("by_action") if isinstance(summary.get("by_action"), dict) else {})
     prism_rows = _performance_bucket_rows(summary.get("prism_agreement") if isinstance(summary.get("prism_agreement"), dict) else {})
+    action_bucket_rows = _performance_bucket_rows(summary.get("action_buckets") if isinstance(summary.get("action_buckets"), dict) else {})
     warnings = outcome_update.get("warnings") if isinstance(outcome_update.get("warnings"), list) else []
     warning_html = "".join(f"<li>{_escape(item)}</li>" for item in warnings[:6])
     update_label = "갱신됨" if outcome_update.get("updated") else ("대기 중" if outcome_update.get("enabled") else "비활성")
     provider = str(outcome_update.get("provider") or performance.get("provider") or "-")
+    unavailable_reason = str(outcome_update.get("unavailable_reason") or "").strip()
+    unavailable_note = ""
+    if not outcome_update.get("updated"):
+        unavailable_note = "<p class='empty'>성과 추적: 기록은 저장됐지만 아직 성과 계산은 수행되지 않았습니다.</p>"
+        if unavailable_reason:
+            unavailable_note += f"<p class='empty'>{_escape(unavailable_reason)}</p>"
     return f"""
     <section class="section">
       <div class="section-head">
@@ -780,9 +787,11 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
         <p><strong>Outcome 업데이트</strong><span>{_escape(update_label)}</span></p>
         <div class="pill-row">{artifact_link}</div>
       </article>
+      {unavailable_note}
       <div class="run-grid">
         {_performance_table('액션별 5일/20일 성과', action_rows)}
         {_performance_table('PRISM 일치/충돌별 성과', prism_rows)}
+        {_performance_table('추천 출처/PRISM 커버리지별 성과', action_bucket_rows)}
       </div>
       {"<details class='advanced-diagnostics'><summary>성과 추적 경고</summary><ul>" + warning_html + "</ul></details>" if warning_html else ""}
     </section>
@@ -1908,6 +1917,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "snapshot_health": payload.get("snapshot_health"),
         "generated_at": payload.get("generated_at"),
         "semantic_health": payload.get("semantic_health") if isinstance(payload, dict) else {},
+        "external_signals": payload.get("external_signals") if isinstance(payload, dict) else {},
         "error": payload.get("error"),
         "portfolio_report_md": report_md if report_md.exists() else None,
         "portfolio_report_json": report_json if report_json.exists() else None,
@@ -2003,6 +2013,7 @@ def _render_run_health_section(manifest: dict[str, Any], portfolio_summary: dict
         f"<p><strong>오버레이 상태</strong><span>{_escape(metrics['overlay_health'])}</span></p>"
         f"<p><strong>판단 보강 상태</strong><span>{_escape(metrics['judge_health'])}</span></p>"
         f"<p><strong>자료 커버리지</strong><span>{_escape(metrics['data_coverage'])}</span></p>"
+        f"<p><strong>PRISM 커버리지</strong><span>{_escape(metrics['prism_coverage'])}</span></p>"
         f"<p><strong>신선도</strong><span>{_escape(metrics['freshness'])}</span></p>"
         f"<p><strong>종목 식별</strong><span>{_escape(metrics['identity_integrity'])}</span></p>"
         "</details>"
@@ -2264,9 +2275,27 @@ def _compute_health_metrics(*, manifest: dict[str, Any], portfolio_summary: dict
         "overlay_health": phase,
         "judge_health": judge_health,
         "data_coverage": data_coverage,
+        "prism_coverage": _prism_health_label(portfolio_summary),
         "freshness": f"{freshness} ({degraded_count}/{total_tickers} degraded)",
         "identity_integrity": identity_integrity,
     }
+
+
+def _prism_health_label(portfolio_summary: dict[str, Any]) -> str:
+    external = portfolio_summary.get("external_signals") if isinstance(portfolio_summary, dict) else {}
+    if not isinstance(external, dict) or not external:
+        return "not configured"
+    coverage = external.get("coverage_summary") if isinstance(external.get("coverage_summary"), dict) else {}
+    if not coverage:
+        summary = external.get("reconciliation_summary") if isinstance(external.get("reconciliation_summary"), dict) else {}
+        coverage = summary.get("coverage_summary") if isinstance(summary.get("coverage_summary"), dict) else {}
+    if not coverage:
+        return "unknown"
+    run_market = str(coverage.get("run_market") or "UNKNOWN")
+    matching = int(coverage.get("matching_market_signals") or 0)
+    total = int(coverage.get("total_signals") or 0)
+    cross = int(coverage.get("cross_market_signals") or 0)
+    return f"{run_market}: same-market {matching}/{total}, cross-market excluded {cross}"
 
 
 def _render_health_compact_card(*, manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:

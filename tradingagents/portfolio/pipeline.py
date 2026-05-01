@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -62,6 +63,7 @@ def run_portfolio_pipeline(
             candidates,
             prism_ingestion,
             confidence_cap=_prism_confidence_cap(external_data_settings),
+            run_market=_run_market_from_manifest(manifest),
         )
         semantic_candidates, semantic_verdicts, semantic_warnings = build_semantic_verdicts(
             candidates=candidates,
@@ -95,6 +97,11 @@ def run_portfolio_pipeline(
             profile=profile,
             report_date=str(manifest.get("started_at") or "")[:10],
         )
+        recommendation = _attach_run_quality_summary(
+            recommendation,
+            manifest=manifest,
+            candidates=scored_candidates,
+        )
         live_sell_side_delta = build_sell_side_delta_candidates(
             live_context_delta=manifest.get("live_context_delta"),
             held_tickers={position.canonical_ticker for position in snapshot.positions},
@@ -108,9 +115,15 @@ def run_portfolio_pipeline(
             llm_settings=llm_settings,
             portfolio_settings=portfolio_settings,
         )
+        recommendation = _attach_run_quality_summary(
+            recommendation,
+            manifest=manifest,
+            candidates=scored_candidates,
+        )
         all_warnings.extend(action_judge_warnings)
         external_signal_context = _build_external_signal_context(
             run_dir=run_dir,
+            manifest=manifest,
             recommendation=recommendation,
             ingestion=prism_ingestion,
             external_data_settings=external_data_settings,
@@ -259,6 +272,7 @@ def _load_prism_ingestion(external_data_settings: Any | None) -> PrismIngestionR
 def _build_external_signal_context(
     *,
     run_dir: Path,
+    manifest: dict[str, Any],
     recommendation: Any,
     ingestion: PrismIngestionResult,
     external_data_settings: Any | None,
@@ -271,16 +285,19 @@ def _build_external_signal_context(
         tradingagents_actions=recommendation.actions,
         ingestion=ingestion,
         confidence_cap=_prism_confidence_cap(external_data_settings),
+        run_market=_run_market_from_manifest(manifest),
     )
     artifacts = write_prism_signal_artifacts(
         run_dir=run_dir,
         ingestion=ingestion,
         reconciliation=reconciliation,
+        allow_cross_market_candidates=bool(getattr(settings, "allow_cross_market_candidates", False)),
     )
     return {
         "status": {
             "enabled": True,
             "prism": ingestion.status_dict(),
+            "coverage_summary": reconciliation.get("coverage_summary"),
             "reconciliation_summary": reconciliation.get("summary") or {},
             "artifacts": artifacts,
         },
@@ -295,6 +312,64 @@ def _prism_confidence_cap(external_data_settings: Any | None) -> float:
         return float(getattr(settings, "confidence_cap", 0.25))
     except (TypeError, ValueError):
         return 0.25
+
+
+def _run_market_from_manifest(manifest: dict[str, Any]) -> str | None:
+    settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
+    return _run_market_from_settings(settings)
+
+
+def _run_market_from_settings(settings: Any) -> str | None:
+    if isinstance(settings, dict):
+        return str(settings.get("market") or settings.get("scanner_market") or "").strip().upper() or None
+    return str(getattr(settings, "market", "") or "").strip().upper() or None
+
+
+def _attach_run_quality_summary(
+    recommendation: Any,
+    *,
+    manifest: dict[str, Any],
+    candidates: list[Any],
+) -> Any:
+    summary = manifest.get("summary") if isinstance(manifest.get("summary"), dict) else {}
+    quality_gate = manifest.get("quality_gate") if isinstance(manifest.get("quality_gate"), dict) else {}
+    partial_failure_rate = float(
+        quality_gate.get("partial_failure_rate")
+        if quality_gate.get("partial_failure_rate") is not None
+        else summary.get("partial_failure_rate") or 0.0
+    )
+    failed = list(quality_gate.get("failed_tickers") or [])
+    for candidate in candidates:
+        health = getattr(candidate, "data_health", {}) or {}
+        if not isinstance(health, dict) or not health.get("reanalysis_required"):
+            continue
+        ticker = getattr(getattr(candidate, "instrument", None), "canonical_ticker", None) or health.get("canonical_ticker")
+        if not ticker:
+            continue
+        failed.append(
+            {
+                "ticker": str(ticker),
+                "ticker_name": getattr(getattr(candidate, "instrument", None), "display_name", None),
+                "reason": str(health.get("reanalysis_reason") or "decision payload missing required fields"),
+            }
+        )
+    deduped: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for item in failed:
+        if not isinstance(item, dict):
+            continue
+        ticker = str(item.get("ticker") or "").strip().upper()
+        if not ticker or ticker in seen:
+            continue
+        seen.add(ticker)
+        deduped.append(item)
+    data_health_summary = {
+        **(getattr(recommendation, "data_health_summary", {}) or {}),
+        "partial_failure_rate": round(partial_failure_rate, 4),
+        "partial_failure_warning": partial_failure_rate >= 0.2,
+        "reanalysis_required_tickers": deduped,
+    }
+    return replace(recommendation, data_health_summary=data_health_summary)
 
 
 def _derive_pipeline_status(snapshot) -> str:

@@ -61,6 +61,7 @@ class ScannerResult:
     regime: str
     candidates: tuple[ScannerCandidate, ...]
     warnings: tuple[str, ...] = tuple()
+    source_counts: dict[str, int] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)

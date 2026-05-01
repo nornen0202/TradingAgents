@@ -30,12 +30,14 @@ local_dashboard_json_path = "C:/Projects/prism-insight/examples/dashboard/public
 use_live_http = false
 use_html_scraping = false
 confidence_cap = 0.25
+allow_cross_market_candidates = false
 
 [scanner]
 enabled = true
 market = "KR"
 max_candidates = 10
 include_prism_candidates = true
+prism_candidate_market_filter = "same_market"
 
 [performance]
 enabled = true
@@ -45,6 +47,10 @@ price_provider = "local_json"
 price_history_path = "C:/TradingAgentsData/price_history.json"
 benchmark_ticker = "SPY"
 ```
+
+PRISM live dashboard가 KR 전용 데이터인 상태에서 US run을 실행할 수 있습니다. 이 경우 PRISM은 수집/요약에는 남지만, 교차시장 신호는 기본적으로 후보 생성과 충돌 판단에서 제외됩니다. `PRISM 신호 없음`은 같은 시장 안에서 해당 티커 매칭이 없다는 뜻이고, `PRISM 현재 시장 커버리지 없음`은 로드된 PRISM 데이터가 현재 run 시장을 커버하지 않는다는 뜻입니다.
+
+교차시장 후보 생성을 의도적으로 켜려면 `[external.prism].allow_cross_market_candidates = true`와 `allowed_markets = ["KR"]`처럼 허용 시장을 명시하세요. 별도 US PRISM 데이터가 있다면 US scheduled config의 `local_dashboard_json_path`, `local_sqlite_db_path`, 또는 live JSON URL로 분리해서 제공하는 편이 안전합니다.
 
 자세한 설정과 충돌 정책은 [Docs/prism_external_signals.md](Docs/prism_external_signals.md), 스캐너는 [Docs/scanner_prism_style.md](Docs/scanner_prism_style.md), 추천 성과 추적은 [Docs/action_performance_tracker.md](Docs/action_performance_tracker.md)를 참고하세요. 모든 기능은 기본 비활성화이며, 기존 scheduled report는 PRISM 없이 그대로 동작합니다. Live HTTP와 dashboard HTML embedded JSON 파싱은 각각 명시적으로 켜야 하며, outcome 업데이트도 가격 히스토리 파일 또는 opt-in provider가 있어야 계산됩니다.
 

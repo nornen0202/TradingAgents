@@ -95,11 +95,13 @@ def render_portfolio_report_markdown(
     sell_side_sections = _sell_side_sections(recommendation, live_sell_side_delta=live_sell_side_delta)
     scenario_table = _scenario_table_v2(recommendation)
     consistency_section = render_consistency_section(live_context_delta)
-    external_section = render_external_signal_section(external_reconciliation) if external_reconciliation else ""
+    external_section = render_external_signal_section(external_reconciliation) if external_reconciliation is not None else ""
+    quality_gate_sections = _quality_gate_sections(recommendation)
     return "\n".join(
         [
             title,
             "",
+            *quality_gate_sections,
             f"- 기준 시각: `{snapshot.as_of}`",
             f"- 운용 모드: `{mode_label}`",
             f"- 계좌 평가금액: `{_krw(snapshot.account_value_krw)}`",
@@ -259,6 +261,27 @@ def _candidate_counts(recommendation: PortfolioRecommendation) -> dict[str, int]
     return counts
 
 
+def _quality_gate_sections(recommendation: PortfolioRecommendation) -> list[str]:
+    summary = recommendation.data_health_summary or {}
+    failed = [item for item in (summary.get("reanalysis_required_tickers") or []) if isinstance(item, dict)]
+    lines: list[str] = []
+    if bool(summary.get("partial_failure_warning")):
+        lines.extend(
+            [
+                "> 이 리포트는 부분 실패가 큽니다. 실패 종목은 투자 후보가 아니라 재분석 필요로 분류됩니다.",
+                "",
+            ]
+        )
+    if failed:
+        lines.extend(["## 재분석 필요 종목", ""])
+        for item in failed:
+            ticker = str(item.get("ticker") or "").strip() or "-"
+            reason = sanitize_investor_text(item.get("reason") or "analysis failed", language="Korean")
+            lines.append(f"- {ticker}: {reason}")
+        lines.append("")
+    return lines
+
+
 def _strict_summary_line(
     snapshot: AccountSnapshot,
     immediate_budgeted_count: int,
@@ -328,7 +351,7 @@ def _directional_priority_sections(recommendation: PortfolioRecommendation) -> s
         )
     ]
     sections = [
-        ("오늘 즉시 매도/축소 후보 / 오늘 바로 매도/축소 후보", [action for action in actions if action.action_now in _NOW_SELL_ACTIONS]),
+        ("오늘 바로 매도/축소 후보", [action for action in actions if action.action_now in _NOW_SELL_ACTIONS]),
         ("오늘 바로 매수 후보", [action for action in actions if action.action_now in _NOW_BUY_ACTIONS]),
         ("조건부 매수 후보", [action for action in actions if action.action_if_triggered in _TRIGGER_BUY_ACTIONS]),
         ("조건부 매도/손절/이익실현 후보", conditional_sell + [action for action in stop_or_exit if action not in conditional_sell]),
@@ -340,6 +363,9 @@ def _directional_priority_sections(recommendation: PortfolioRecommendation) -> s
         if not items:
             chunks.append("- 없음")
             continue
+        note = _section_prism_note(items)
+        if note:
+            chunks.append(note)
         chunks.extend(_directional_action_line(index, action) for index, action in enumerate(items[:5], start=1))
 
     switch_items = (recommendation.funding_plan or {}).get("switch_candidates") or []
@@ -421,6 +447,9 @@ def _sell_side_sections(
             if title != "위험 때문에 줄일 후보" or not live_risk_lines:
                 chunks.append("- 없음")
             continue
+        note = _section_prism_note(items)
+        if note:
+            chunks.append(note)
         chunks.extend(_action_brief_line(action) for action in items[:5])
     return "\n".join(chunks)
 
@@ -454,18 +483,32 @@ def _action_brief_line(action) -> str:
 
 def _prism_badge(action) -> str:
     agreement = str(getattr(action, "prism_agreement", "") or (getattr(action, "data_health", {}) or {}).get("prism_agreement") or "").strip()
-    if not agreement or agreement == "no_prism_signal":
-        return "PRISM 신호 없음"
+    if not agreement or agreement in {"no_prism_signal", "no_same_market_prism_coverage", "prism_disabled", "prism_ingestion_failed"}:
+        return ""
     mapping = {
-        "confirmed_buy": "PRISM 동의: BUY confirmed",
-        "confirmed_sell": "PRISM 동의: SELL confirmed",
-        "conflict_prism_buy_ta_reduce": "PRISM 충돌: PRISM BUY but TA REDUCE_RISK",
-        "conflict_prism_sell_ta_buy": "PRISM 충돌: PRISM SELL but TA BUY",
+        "confirmed_buy": "PRISM 일치",
+        "confirmed_sell": "PRISM 일치",
+        "conflict_prism_buy_ta_reduce": "PRISM 충돌",
+        "conflict_prism_sell_ta_buy": "PRISM 충돌",
         "prism_watch_only": "PRISM 관찰 신호",
-        "prism_sell_warning": "PRISM SELL 경고",
+        "prism_sell_warning": "PRISM 위험 경고",
         "external_only": "PRISM 외부 관찰",
     }
     return mapping.get(agreement, agreement.replace("_", " "))
+
+
+def _section_prism_note(actions: list[Any]) -> str:
+    if not actions:
+        return ""
+    statuses = [_prism_status(action) for action in actions]
+    if statuses and all(status == "no_prism_signal" for status in statuses):
+        return "- 이 섹션 후보들은 현재 같은 시장의 PRISM 매칭 신호가 없습니다."
+    return ""
+
+
+def _prism_status(action: Any) -> str:
+    health = getattr(action, "data_health", {}) or {}
+    return str(getattr(action, "prism_agreement", "") or health.get("prism_agreement") or "").strip()
 
 
 def _funding_sections(recommendation: PortfolioRecommendation) -> str:

@@ -86,6 +86,7 @@ class ActionPerformanceSummary:
     learned_intuitions: int = 0
     by_action: dict[str, dict[str, Any]] = field(default_factory=dict)
     prism_agreement: dict[str, dict[str, Any]] = field(default_factory=dict)
+    action_buckets: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -95,6 +96,7 @@ class ActionPerformanceSummary:
             "learned_intuitions": self.learned_intuitions,
             "by_action": self.by_action,
             "prism_agreement": self.prism_agreement,
+            "action_buckets": self.action_buckets,
         }
 
 
