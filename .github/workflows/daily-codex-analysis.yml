@@ -58,7 +58,7 @@ jobs:
     runs-on: [self-hosted, Windows]
     defaults:
       run:
-        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: python {0}
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       PYTHONUTF8: "1"
@@ -87,58 +87,82 @@ jobs:
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
       - name: Prepare runner disk and Codex workspace
         run: |
-          $ErrorActionPreference = "Continue"
+          import os
+          import shutil
+          from pathlib import Path
 
-          function Remove-CodexLogFiles {
-            param([string]$Root)
-            if ([string]::IsNullOrWhiteSpace($Root) -or -not (Test-Path -LiteralPath $Root)) {
-              return
-            }
-            Get-ChildItem -LiteralPath $Root -Filter "logs_*.sqlite*" -Force -File -ErrorAction SilentlyContinue |
-              Remove-Item -Force -ErrorAction SilentlyContinue
-          }
+          def append_env(name, value):
+              with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+                  handle.write(f"{name}={value}\n")
 
-          $legacyCodexHome = Join-Path $env:USERPROFILE ".codex\tradingagents-workspace\.codex-home"
-          Remove-CodexLogFiles $legacyCodexHome
+          def is_within(child, parent):
+              child_path = os.path.normcase(os.path.abspath(child))
+              parent_path = os.path.normcase(os.path.abspath(parent))
+              return os.path.commonpath([child_path, parent_path]) == parent_path
 
-          $sandboxBinary = Join-Path $env:USERPROFILE ".codex\.sandbox-bin\codex.exe"
-          $installedBinary = Get-ChildItem -Path "C:\Program Files\WindowsApps\OpenAI.Codex_*\app\resources\codex.exe" -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
-          if ($installedBinary) {
-            $sandboxDir = Split-Path $sandboxBinary -Parent
-            New-Item -ItemType Directory -Force -Path $sandboxDir | Out-Null
-            $shouldCopy = -not (Test-Path -LiteralPath $sandboxBinary)
-            if (-not $shouldCopy) {
-              $current = Get-Item -LiteralPath $sandboxBinary
-              $shouldCopy = ($installedBinary.LastWriteTime -gt $current.LastWriteTime) -or ($installedBinary.Length -ne $current.Length)
-            }
-            if ($shouldCopy) {
-              Copy-Item -LiteralPath $installedBinary.FullName -Destination $sandboxBinary -Force
-              Write-Host "Updated Codex sandbox binary from installed app: $($installedBinary.FullName)"
-            }
-          }
+          def remove_codex_log_files(root):
+              if not root:
+                  return
+              root_path = Path(root)
+              if not root_path.exists():
+                  return
+              for candidate in root_path.glob("logs_*.sqlite*"):
+                  if not candidate.is_file():
+                      continue
+                  try:
+                      candidate.unlink()
+                  except OSError as exc:
+                      print(f"::warning::Could not remove {candidate}: {exc}")
 
-          $workspace = Join-Path $env:RUNNER_TEMP "tradingagents-codex-workspace"
-          $workspaceFull = [System.IO.Path]::GetFullPath($workspace)
-          $runnerTempFull = [System.IO.Path]::GetFullPath($env:RUNNER_TEMP)
-          if (-not $workspaceFull.StartsWith($runnerTempFull, [System.StringComparison]::OrdinalIgnoreCase)) {
-            throw "Refusing to clean Codex workspace outside RUNNER_TEMP: $workspaceFull"
-          }
-          if (Test-Path -LiteralPath $workspaceFull) {
-            Remove-Item -LiteralPath $workspaceFull -Recurse -Force -ErrorAction SilentlyContinue
-          }
-          New-Item -ItemType Directory -Force -Path $workspaceFull | Out-Null
-          Add-Content -Path $env:GITHUB_ENV -Value "TRADINGAGENTS_CODEX_WORKSPACE_DIR=$workspaceFull"
-          Write-Host "Using per-run Codex workspace: $workspaceFull"
+          user_profile = Path(os.environ.get("USERPROFILE", ""))
+          legacy_codex_home = user_profile / ".codex" / "tradingagents-workspace" / ".codex-home"
+          remove_codex_log_files(legacy_codex_home)
 
-          $freeBytes = (Get-PSDrive C).Free
-          Write-Host ("C: free space after cleanup: {0:N2} GB" -f ($freeBytes / 1GB))
-          if ($freeBytes -lt 5GB) {
-            throw "C: free space is below 5GB after cleanup; refusing to start analysis."
-          }
+          sandbox_binary = user_profile / ".codex" / ".sandbox-bin" / "codex.exe"
+          installed_root = Path("C:/Program Files/WindowsApps")
+          installed_candidates = []
+          if installed_root.exists():
+              try:
+                  installed_candidates = sorted(
+                      installed_root.glob("OpenAI.Codex_*/app/resources/codex.exe"),
+                      key=lambda path: path.stat().st_mtime,
+                      reverse=True,
+                  )
+              except OSError as exc:
+                  print(f"::warning::Could not scan installed Codex app binaries: {exc}")
+          if installed_candidates:
+              installed_binary = installed_candidates[0]
+              sandbox_binary.parent.mkdir(parents=True, exist_ok=True)
+              should_copy = not sandbox_binary.exists()
+              if not should_copy:
+                  current = sandbox_binary.stat()
+                  installed = installed_binary.stat()
+                  should_copy = installed.st_mtime > current.st_mtime or installed.st_size != current.st_size
+              if should_copy:
+                  shutil.copy2(installed_binary, sandbox_binary)
+                  print(f"Updated Codex sandbox binary from installed app: {installed_binary}")
+
+          runner_temp = Path(os.environ["RUNNER_TEMP"]).resolve()
+          workspace = (runner_temp / "tradingagents-codex-workspace").resolve()
+          if not is_within(workspace, runner_temp):
+              raise SystemExit(f"Refusing to clean Codex workspace outside RUNNER_TEMP: {workspace}")
+          if workspace.exists():
+              shutil.rmtree(workspace, ignore_errors=True)
+          workspace.mkdir(parents=True, exist_ok=True)
+          append_env("TRADINGAGENTS_CODEX_WORKSPACE_DIR", str(workspace))
+          print(f"Using per-run Codex workspace: {workspace}")
+
+          free_bytes = shutil.disk_usage("C:/").free
+          print(f"C: free space after cleanup: {free_bytes / (1024 ** 3):.2f} GB")
+          if free_bytes < 5 * 1024 ** 3:
+              raise SystemExit("C: free space is below 5GB after cleanup; refusing to start analysis.")
 
       - name: Check out repository
         uses: actions/checkout@v6
@@ -146,134 +170,144 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-
       - name: Install TradingAgents
         run: |
-          python -m pip install --upgrade pip
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          python -m pip install -e ".[translation]"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
 
       - name: Materialize runtime API keys
         if: ${{ github.event.inputs.site_only != 'true' }}
         run: |
-          $runtimePath = Join-Path $env:RUNNER_TEMP "tradingagents-api-keys.json"
-          $payload = [ordered]@{}
-          $aliasGroups = [ordered]@{
-            "ALPHA_VANTAGE_API_KEY" = @("ALPHA_VANTAGE_API_KEY")
-            "NAVER_CLIENT_ID" = @("NAVER_CLIENT_ID")
-            "NAVER_CLIENT_SECRET" = @("NAVER_CLIENT_SECRET")
-            "OPENDART_API_KEY" = @("OPENDART_API_KEY")
-            "KIS_APP_KEY" = @("KIS_APP_KEY", "KIS_Developers_APP_KEY")
-            "KIS_APP_SECRET" = @("KIS_APP_SECRET", "KIS_Developers_APP_SECRET")
-            "KIS_ACCOUNT_NO" = @("KIS_ACCOUNT_NO", "KIS_Developers_ACCOUNT_NO")
-            "KIS_PRODUCT_CODE" = @("KIS_PRODUCT_CODE", "KIS_Developers_PRODUCT_CODE")
+          import json
+          import os
+          from pathlib import Path
+
+          runtime_path = Path(os.environ["RUNNER_TEMP"]) / "tradingagents-api-keys.json"
+          payload = {}
+          alias_groups = {
+              "ALPHA_VANTAGE_API_KEY": ("ALPHA_VANTAGE_API_KEY",),
+              "NAVER_CLIENT_ID": ("NAVER_CLIENT_ID",),
+              "NAVER_CLIENT_SECRET": ("NAVER_CLIENT_SECRET",),
+              "OPENDART_API_KEY": ("OPENDART_API_KEY",),
+              "KIS_APP_KEY": ("KIS_APP_KEY", "KIS_Developers_APP_KEY"),
+              "KIS_APP_SECRET": ("KIS_APP_SECRET", "KIS_Developers_APP_SECRET"),
+              "KIS_ACCOUNT_NO": ("KIS_ACCOUNT_NO", "KIS_Developers_ACCOUNT_NO"),
+              "KIS_PRODUCT_CODE": ("KIS_PRODUCT_CODE", "KIS_Developers_PRODUCT_CODE"),
           }
 
-          foreach ($canonicalName in $aliasGroups.Keys) {
-            foreach ($candidate in $aliasGroups[$canonicalName]) {
-              $value = [Environment]::GetEnvironmentVariable($candidate)
-              if (-not [string]::IsNullOrWhiteSpace($value)) {
-                $payload[$canonicalName] = $value
-                $payload[$candidate] = $value
-                break
-              }
-            }
-          }
+          for canonical_name, candidates in alias_groups.items():
+              for candidate in candidates:
+                  value = os.environ.get(candidate)
+                  if value and value.strip():
+                      payload[canonical_name] = value
+                      payload[candidate] = value
+                      break
 
-          if ($payload.Count -eq 0) {
-            Write-Warning "No GitHub Actions secrets were available for TradingAgents API keys. Runtime will rely on fallback discovery only."
-            exit 0
-          }
+          if not payload:
+              print("::warning::No GitHub Actions secrets were available for TradingAgents API keys. Runtime will rely on fallback discovery only.")
+              raise SystemExit(0)
 
-          $payload | ConvertTo-Json | Set-Content -Path $runtimePath -Encoding UTF8
-          Add-Content -Path $env:GITHUB_ENV -Value "TRADINGAGENTS_API_KEYS_PATH=$runtimePath"
-          Write-Host "Materialized TradingAgents API keys for runtime use."
+          runtime_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write(f"TRADINGAGENTS_API_KEYS_PATH={runtime_path}\n")
+          print("Materialized TradingAgents API keys for runtime use.")
 
       - name: Resolve Codex runtime
         run: |
-          $siteOnly = "${{ github.event.inputs.site_only }}"
-          if ($siteOnly -eq "true") {
-            Write-Host "Skipping Codex runtime resolution because site_only=true."
-            exit 0
-          }
-          function Test-CodexCandidate {
-            param([string]$Candidate)
+          import os
+          import subprocess
+          from pathlib import Path
 
-            if ([string]::IsNullOrWhiteSpace($Candidate) -or -not (Test-Path $Candidate)) {
-              return $false
-            }
+          site_only = "${{ github.event.inputs.site_only }}".strip().lower()
+          if site_only == "true":
+              print("Skipping Codex runtime resolution because site_only=true.")
+              raise SystemExit(0)
 
-            try {
-              & $Candidate --version | Out-Null
-              return ($LASTEXITCODE -eq 0)
-            } catch {
-              Write-Warning "Codex candidate failed: $Candidate :: $($_.Exception.Message)"
-              return $false
-            }
-          }
+          def add_env(name, value):
+              with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+                  handle.write(f"{name}={value}\n")
 
-          $candidates = [System.Collections.Generic.List[string]]::new()
+          def test_codex_candidate(candidate):
+              if not candidate:
+                  return False
+              candidate_path = Path(candidate)
+              if not candidate_path.exists():
+                  return False
+              try:
+                  result = subprocess.run(
+                      [str(candidate_path), "--version"],
+                      stdout=subprocess.DEVNULL,
+                      stderr=subprocess.STDOUT,
+                      check=False,
+                  )
+              except OSError as exc:
+                  print(f"::warning::Codex candidate failed: {candidate_path} :: {exc}")
+                  return False
+              return result.returncode == 0
 
-          if (-not [string]::IsNullOrWhiteSpace($env:CODEX_BINARY)) {
-            $candidates.Add($env:CODEX_BINARY)
-          }
+          candidates = []
+          codex_binary = os.environ.get("CODEX_BINARY", "").strip()
+          if codex_binary:
+              candidates.append(Path(codex_binary))
 
-          $candidates.Add((Join-Path $env:USERPROFILE ".codex\.sandbox-bin\codex.exe"))
+          user_profile = Path(os.environ.get("USERPROFILE", ""))
+          candidates.append(user_profile / ".codex" / ".sandbox-bin" / "codex.exe")
 
-          Get-ChildItem -Path "C:\Users\*\.codex\.sandbox-bin\codex.exe" -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            ForEach-Object { $candidates.Add($_.FullName) }
+          def sorted_matches(pattern):
+              try:
+                  return sorted(Path("C:/").glob(pattern.removeprefix("C:/")), key=lambda path: path.stat().st_mtime, reverse=True)
+              except OSError as exc:
+                  print(f"::warning::Could not scan Codex candidates for {pattern}: {exc}")
+                  return []
 
-          Get-ChildItem -Path "C:\Users\*\.vscode\extensions\openai.chatgpt-*\bin\windows-x86_64\codex.exe" -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            ForEach-Object { $candidates.Add($_.FullName) }
+          for pattern in (
+              "C:/Users/*/.codex/.sandbox-bin/codex.exe",
+              "C:/Users/*/.vscode/extensions/openai.chatgpt-*/bin/windows-x86_64/codex.exe",
+          ):
+              candidates.extend(sorted_matches(pattern))
 
-          $resolvedBinary = $null
-          foreach ($candidate in $candidates) {
-            if (Test-CodexCandidate $candidate) {
-              $resolvedBinary = $candidate
-              break
-            }
-          }
+          seen = set()
+          resolved_binary = None
+          for candidate in candidates:
+              key = os.path.normcase(os.path.abspath(candidate))
+              if key in seen:
+                  continue
+              seen.add(key)
+              if test_codex_candidate(candidate):
+                  resolved_binary = Path(candidate)
+                  break
 
-          if (-not $resolvedBinary) {
-            throw "Could not find a usable Codex binary. Set the CODEX_BINARY repository variable or install Codex for the runner service account."
-          }
+          if not resolved_binary:
+              raise SystemExit("Could not find a usable Codex binary. Set the CODEX_BINARY repository variable or install Codex for the runner service account.")
 
-          Add-Content -Path $env:GITHUB_ENV -Value "CODEX_BINARY=$resolvedBinary"
-          Write-Host "Resolved Codex binary: $resolvedBinary"
+          add_env("CODEX_BINARY", str(resolved_binary))
+          print(f"Resolved Codex binary: {resolved_binary}")
 
-          $resolvedHome = $env:CODEX_HOME
-          if ([string]::IsNullOrWhiteSpace($resolvedHome) -and $resolvedBinary -like "*.codex\.sandbox-bin\codex.exe") {
-            $resolvedHome = Split-Path (Split-Path $resolvedBinary -Parent) -Parent
-          }
+          resolved_home = os.environ.get("CODEX_HOME", "").strip()
+          if not resolved_home and resolved_binary.parent.name.lower() == ".sandbox-bin":
+              resolved_home = str(resolved_binary.parent.parent)
 
-          if (-not [string]::IsNullOrWhiteSpace($resolvedHome)) {
-            Add-Content -Path $env:GITHUB_ENV -Value "CODEX_HOME=$resolvedHome"
-            Write-Host "Using CODEX_HOME: $resolvedHome"
-          }
+          if resolved_home:
+              add_env("CODEX_HOME", resolved_home)
+              print(f"Using CODEX_HOME: {resolved_home}")
 
       - name: Verify Codex login and model availability
         if: ${{ github.event.inputs.site_only != 'true' }}
         run: |
-          $siteOnly = "${{ github.event.inputs.site_only }}"
-          if ($siteOnly -eq "true") {
-            Write-Host "Skipping Codex preflight because site_only=true."
-            exit 0
-          }
-
-          $workspaceDir = Join-Path $env:GITHUB_WORKSPACE ".codex-preflight"
-          $script = @"
           import os
+          from pathlib import Path
           from tradingagents.llm_clients.codex_app_server import CodexAppServerAuthError, CodexAppServerBinaryError, CodexModelUnavailableError
           from tradingagents.llm_clients.codex_preflight import run_codex_preflight
 
-          workspace_dir = r"$workspaceDir"
+          site_only = "${{ github.event.inputs.site_only }}".strip().lower()
+          if site_only == "true":
+              print("Skipping Codex preflight because site_only=true.")
+              raise SystemExit(0)
+
+          workspace_dir = Path(os.environ["GITHUB_WORKSPACE"]) / ".codex-preflight"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
           preferred_model = "gpt-5.5"
@@ -376,12 +410,8 @@ jobs:
                   f"- Binary: {os.getenv('CODEX_BINARY', '(auto)')}",
               ]
           )
-          "@
-          $script | python -
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
       - name: Run scheduled analysis and build site
-        shell: python {0}
         run: |
           import os
           import subprocess
@@ -438,20 +468,17 @@ jobs:
 
       - name: Add Git Bash to PATH for Pages packaging
         run: |
-          $gitBinCandidates = @(
-            "C:\Program Files\Git\bin",
-            "C:\Program Files\Git\usr\bin"
-          )
+          import os
+          from pathlib import Path
 
-          foreach ($candidate in $gitBinCandidates) {
-            if (Test-Path (Join-Path $candidate "bash.exe")) {
-              Add-Content -Path $env:GITHUB_PATH -Value $candidate
-              Write-Host "Added Git Bash path: $candidate"
-              exit 0
-            }
-          }
+          for candidate in (Path("C:/Program Files/Git/bin"), Path("C:/Program Files/Git/usr/bin")):
+              if (candidate / "bash.exe").exists():
+                  with open(os.environ["GITHUB_PATH"], "a", encoding="utf-8") as handle:
+                      handle.write(f"{candidate}\n")
+                  print(f"Added Git Bash path: {candidate}")
+                  raise SystemExit(0)
 
-          throw "bash.exe was not found under the expected Git for Windows directories."
+          raise SystemExit("bash.exe was not found under the expected Git for Windows directories.")
 
       - name: Upload GitHub Pages artifact
         if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) || (github.event_name == 'schedule' && github.event.schedule == '30 9 * * 1-5') }}
@@ -476,33 +503,42 @@ jobs:
       - name: Clean Codex runtime workspace
         if: ${{ always() }}
         run: |
-          function Remove-CodexLogFiles {
-            param([string]$Root)
-            if ([string]::IsNullOrWhiteSpace($Root) -or -not (Test-Path -LiteralPath $Root)) {
-              return
-            }
-            Get-ChildItem -LiteralPath $Root -Filter "logs_*.sqlite*" -Force -File -ErrorAction SilentlyContinue |
-              Remove-Item -Force -ErrorAction SilentlyContinue
-          }
+          import os
+          import shutil
+          from pathlib import Path
 
-          $workspace = $env:TRADINGAGENTS_CODEX_WORKSPACE_DIR
-          if (-not [string]::IsNullOrWhiteSpace($workspace)) {
-            $workspaceFull = [System.IO.Path]::GetFullPath($workspace)
-            $runnerTempFull = [System.IO.Path]::GetFullPath($env:RUNNER_TEMP)
-            if ($workspaceFull.StartsWith($runnerTempFull, [System.StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $workspaceFull)) {
-              Remove-Item -LiteralPath $workspaceFull -Recurse -Force -ErrorAction SilentlyContinue
-            }
-          }
+          def is_within(child, parent):
+              child_path = os.path.normcase(os.path.abspath(child))
+              parent_path = os.path.normcase(os.path.abspath(parent))
+              return os.path.commonpath([child_path, parent_path]) == parent_path
 
-          $legacyCodexHome = Join-Path $env:USERPROFILE ".codex\tradingagents-workspace\.codex-home"
-          Remove-CodexLogFiles $legacyCodexHome
+          def remove_codex_log_files(root):
+              if not root:
+                  return
+              root_path = Path(root)
+              if not root_path.exists():
+                  return
+              for candidate in root_path.glob("logs_*.sqlite*"):
+                  if candidate.is_file():
+                      try:
+                          candidate.unlink()
+                      except OSError as exc:
+                          print(f"::warning::Could not remove {candidate}: {exc}")
+
+          workspace = os.environ.get("TRADINGAGENTS_CODEX_WORKSPACE_DIR", "").strip()
+          runner_temp = os.environ.get("RUNNER_TEMP", "").strip()
+          if workspace and runner_temp and is_within(workspace, runner_temp) and Path(workspace).exists():
+              shutil.rmtree(workspace, ignore_errors=True)
+
+          legacy_codex_home = Path(os.environ.get("USERPROFILE", "")) / ".codex" / "tradingagents-workspace" / ".codex-home"
+          remove_codex_log_files(legacy_codex_home)
 
   analyze_kr:
     if: ${{ (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) || (github.event_name == 'schedule' && github.event.schedule == '30 21 * * 0-4') }}
     runs-on: [self-hosted, Windows]
     defaults:
       run:
-        shell: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File {0}
+        shell: python {0}
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       PYTHONUTF8: "1"
@@ -527,58 +563,82 @@ jobs:
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
       - name: Prepare runner disk and Codex workspace
         run: |
-          $ErrorActionPreference = "Continue"
+          import os
+          import shutil
+          from pathlib import Path
 
-          function Remove-CodexLogFiles {
-            param([string]$Root)
-            if ([string]::IsNullOrWhiteSpace($Root) -or -not (Test-Path -LiteralPath $Root)) {
-              return
-            }
-            Get-ChildItem -LiteralPath $Root -Filter "logs_*.sqlite*" -Force -File -ErrorAction SilentlyContinue |
-              Remove-Item -Force -ErrorAction SilentlyContinue
-          }
+          def append_env(name, value):
+              with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+                  handle.write(f"{name}={value}\n")
 
-          $legacyCodexHome = Join-Path $env:USERPROFILE ".codex\tradingagents-workspace\.codex-home"
-          Remove-CodexLogFiles $legacyCodexHome
+          def is_within(child, parent):
+              child_path = os.path.normcase(os.path.abspath(child))
+              parent_path = os.path.normcase(os.path.abspath(parent))
+              return os.path.commonpath([child_path, parent_path]) == parent_path
 
-          $sandboxBinary = Join-Path $env:USERPROFILE ".codex\.sandbox-bin\codex.exe"
-          $installedBinary = Get-ChildItem -Path "C:\Program Files\WindowsApps\OpenAI.Codex_*\app\resources\codex.exe" -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
-          if ($installedBinary) {
-            $sandboxDir = Split-Path $sandboxBinary -Parent
-            New-Item -ItemType Directory -Force -Path $sandboxDir | Out-Null
-            $shouldCopy = -not (Test-Path -LiteralPath $sandboxBinary)
-            if (-not $shouldCopy) {
-              $current = Get-Item -LiteralPath $sandboxBinary
-              $shouldCopy = ($installedBinary.LastWriteTime -gt $current.LastWriteTime) -or ($installedBinary.Length -ne $current.Length)
-            }
-            if ($shouldCopy) {
-              Copy-Item -LiteralPath $installedBinary.FullName -Destination $sandboxBinary -Force
-              Write-Host "Updated Codex sandbox binary from installed app: $($installedBinary.FullName)"
-            }
-          }
+          def remove_codex_log_files(root):
+              if not root:
+                  return
+              root_path = Path(root)
+              if not root_path.exists():
+                  return
+              for candidate in root_path.glob("logs_*.sqlite*"):
+                  if not candidate.is_file():
+                      continue
+                  try:
+                      candidate.unlink()
+                  except OSError as exc:
+                      print(f"::warning::Could not remove {candidate}: {exc}")
 
-          $workspace = Join-Path $env:RUNNER_TEMP "tradingagents-codex-workspace"
-          $workspaceFull = [System.IO.Path]::GetFullPath($workspace)
-          $runnerTempFull = [System.IO.Path]::GetFullPath($env:RUNNER_TEMP)
-          if (-not $workspaceFull.StartsWith($runnerTempFull, [System.StringComparison]::OrdinalIgnoreCase)) {
-            throw "Refusing to clean Codex workspace outside RUNNER_TEMP: $workspaceFull"
-          }
-          if (Test-Path -LiteralPath $workspaceFull) {
-            Remove-Item -LiteralPath $workspaceFull -Recurse -Force -ErrorAction SilentlyContinue
-          }
-          New-Item -ItemType Directory -Force -Path $workspaceFull | Out-Null
-          Add-Content -Path $env:GITHUB_ENV -Value "TRADINGAGENTS_CODEX_WORKSPACE_DIR=$workspaceFull"
-          Write-Host "Using per-run Codex workspace: $workspaceFull"
+          user_profile = Path(os.environ.get("USERPROFILE", ""))
+          legacy_codex_home = user_profile / ".codex" / "tradingagents-workspace" / ".codex-home"
+          remove_codex_log_files(legacy_codex_home)
 
-          $freeBytes = (Get-PSDrive C).Free
-          Write-Host ("C: free space after cleanup: {0:N2} GB" -f ($freeBytes / 1GB))
-          if ($freeBytes -lt 5GB) {
-            throw "C: free space is below 5GB after cleanup; refusing to start analysis."
-          }
+          sandbox_binary = user_profile / ".codex" / ".sandbox-bin" / "codex.exe"
+          installed_root = Path("C:/Program Files/WindowsApps")
+          installed_candidates = []
+          if installed_root.exists():
+              try:
+                  installed_candidates = sorted(
+                      installed_root.glob("OpenAI.Codex_*/app/resources/codex.exe"),
+                      key=lambda path: path.stat().st_mtime,
+                      reverse=True,
+                  )
+              except OSError as exc:
+                  print(f"::warning::Could not scan installed Codex app binaries: {exc}")
+          if installed_candidates:
+              installed_binary = installed_candidates[0]
+              sandbox_binary.parent.mkdir(parents=True, exist_ok=True)
+              should_copy = not sandbox_binary.exists()
+              if not should_copy:
+                  current = sandbox_binary.stat()
+                  installed = installed_binary.stat()
+                  should_copy = installed.st_mtime > current.st_mtime or installed.st_size != current.st_size
+              if should_copy:
+                  shutil.copy2(installed_binary, sandbox_binary)
+                  print(f"Updated Codex sandbox binary from installed app: {installed_binary}")
+
+          runner_temp = Path(os.environ["RUNNER_TEMP"]).resolve()
+          workspace = (runner_temp / "tradingagents-codex-workspace").resolve()
+          if not is_within(workspace, runner_temp):
+              raise SystemExit(f"Refusing to clean Codex workspace outside RUNNER_TEMP: {workspace}")
+          if workspace.exists():
+              shutil.rmtree(workspace, ignore_errors=True)
+          workspace.mkdir(parents=True, exist_ok=True)
+          append_env("TRADINGAGENTS_CODEX_WORKSPACE_DIR", str(workspace))
+          print(f"Using per-run Codex workspace: {workspace}")
+
+          free_bytes = shutil.disk_usage("C:/").free
+          print(f"C: free space after cleanup: {free_bytes / (1024 ** 3):.2f} GB")
+          if free_bytes < 5 * 1024 ** 3:
+              raise SystemExit("C: free space is below 5GB after cleanup; refusing to start analysis.")
 
       - name: Check out repository
         uses: actions/checkout@v6
@@ -586,58 +646,54 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-
       - name: Install TradingAgents
         run: |
-          python -m pip install --upgrade pip
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          python -m pip install -e ".[translation]"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
 
       - name: Materialize runtime API keys
         if: ${{ github.event.inputs.site_only != 'true' }}
         run: |
-          $runtimePath = Join-Path $env:RUNNER_TEMP "tradingagents-api-keys.json"
-          $payload = [ordered]@{}
-          $aliasGroups = [ordered]@{
-            "ALPHA_VANTAGE_API_KEY" = @("ALPHA_VANTAGE_API_KEY")
-            "NAVER_CLIENT_ID" = @("NAVER_CLIENT_ID")
-            "NAVER_CLIENT_SECRET" = @("NAVER_CLIENT_SECRET")
-            "OPENDART_API_KEY" = @("OPENDART_API_KEY")
-            "KIS_APP_KEY" = @("KIS_APP_KEY", "KIS_Developers_APP_KEY")
-            "KIS_APP_SECRET" = @("KIS_APP_SECRET", "KIS_Developers_APP_SECRET")
-            "KIS_ACCOUNT_NO" = @("KIS_ACCOUNT_NO", "KIS_Developers_ACCOUNT_NO")
-            "KIS_PRODUCT_CODE" = @("KIS_PRODUCT_CODE", "KIS_Developers_PRODUCT_CODE")
+          import json
+          import os
+          from pathlib import Path
+
+          runtime_path = Path(os.environ["RUNNER_TEMP"]) / "tradingagents-api-keys.json"
+          payload = {}
+          alias_groups = {
+              "ALPHA_VANTAGE_API_KEY": ("ALPHA_VANTAGE_API_KEY",),
+              "NAVER_CLIENT_ID": ("NAVER_CLIENT_ID",),
+              "NAVER_CLIENT_SECRET": ("NAVER_CLIENT_SECRET",),
+              "OPENDART_API_KEY": ("OPENDART_API_KEY",),
+              "KIS_APP_KEY": ("KIS_APP_KEY", "KIS_Developers_APP_KEY"),
+              "KIS_APP_SECRET": ("KIS_APP_SECRET", "KIS_Developers_APP_SECRET"),
+              "KIS_ACCOUNT_NO": ("KIS_ACCOUNT_NO", "KIS_Developers_ACCOUNT_NO"),
+              "KIS_PRODUCT_CODE": ("KIS_PRODUCT_CODE", "KIS_Developers_PRODUCT_CODE"),
           }
 
-          foreach ($canonicalName in $aliasGroups.Keys) {
-            foreach ($candidate in $aliasGroups[$canonicalName]) {
-              $value = [Environment]::GetEnvironmentVariable($candidate)
-              if (-not [string]::IsNullOrWhiteSpace($value)) {
-                $payload[$canonicalName] = $value
-                $payload[$candidate] = $value
-                break
-              }
-            }
-          }
+          for canonical_name, candidates in alias_groups.items():
+              for candidate in candidates:
+                  value = os.environ.get(candidate)
+                  if value and value.strip():
+                      payload[canonical_name] = value
+                      payload[candidate] = value
+                      break
 
-          if ($payload.Count -eq 0) {
-            Write-Warning "No GitHub Actions secrets were available for TradingAgents API keys. Runtime will rely on fallback discovery only."
-            exit 0
-          }
+          if not payload:
+              print("::warning::No GitHub Actions secrets were available for TradingAgents API keys. Runtime will rely on fallback discovery only.")
+              raise SystemExit(0)
 
-          $payload | ConvertTo-Json | Set-Content -Path $runtimePath -Encoding UTF8
-          Add-Content -Path $env:GITHUB_ENV -Value "TRADINGAGENTS_API_KEYS_PATH=$runtimePath"
-          Write-Host "Materialized TradingAgents API keys for runtime use."
+          runtime_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write(f"TRADINGAGENTS_API_KEYS_PATH={runtime_path}\n")
+          print("Materialized TradingAgents API keys for runtime use.")
 
       - name: Report KR vendor credential status
         if: ${{ github.event.inputs.site_only != 'true' }}
         run: |
-          $script = @"
           import os
           from tradingagents.dataflows.naver_news import validate_naver_credentials
           from tradingagents.dataflows.opendart import validate_opendart_credentials
@@ -679,90 +735,100 @@ jobs:
           if summary_path:
               with open(summary_path, "a", encoding="utf-8") as handle:
                   handle.write("\\n".join(summary_lines) + "\\n")
-          "@
-          $script | python -
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
       - name: Resolve Codex runtime
         run: |
-          $siteOnly = "${{ github.event.inputs.site_only }}"
-          if ($siteOnly -eq "true") {
-            Write-Host "Skipping Codex runtime resolution because site_only=true."
-            exit 0
-          }
-          function Test-CodexCandidate {
-            param([string]$Candidate)
+          import os
+          import subprocess
+          from pathlib import Path
 
-            if ([string]::IsNullOrWhiteSpace($Candidate) -or -not (Test-Path $Candidate)) {
-              return $false
-            }
+          site_only = "${{ github.event.inputs.site_only }}".strip().lower()
+          if site_only == "true":
+              print("Skipping Codex runtime resolution because site_only=true.")
+              raise SystemExit(0)
 
-            try {
-              & $Candidate --version | Out-Null
-              return ($LASTEXITCODE -eq 0)
-            } catch {
-              Write-Warning "Codex candidate failed: $Candidate :: $($_.Exception.Message)"
-              return $false
-            }
-          }
+          def add_env(name, value):
+              with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+                  handle.write(f"{name}={value}\n")
 
-          $candidates = [System.Collections.Generic.List[string]]::new()
+          def test_codex_candidate(candidate):
+              if not candidate:
+                  return False
+              candidate_path = Path(candidate)
+              if not candidate_path.exists():
+                  return False
+              try:
+                  result = subprocess.run(
+                      [str(candidate_path), "--version"],
+                      stdout=subprocess.DEVNULL,
+                      stderr=subprocess.STDOUT,
+                      check=False,
+                  )
+              except OSError as exc:
+                  print(f"::warning::Codex candidate failed: {candidate_path} :: {exc}")
+                  return False
+              return result.returncode == 0
 
-          if (-not [string]::IsNullOrWhiteSpace($env:CODEX_BINARY)) {
-            $candidates.Add($env:CODEX_BINARY)
-          }
+          candidates = []
+          codex_binary = os.environ.get("CODEX_BINARY", "").strip()
+          if codex_binary:
+              candidates.append(Path(codex_binary))
 
-          $candidates.Add((Join-Path $env:USERPROFILE ".codex\\.sandbox-bin\\codex.exe"))
+          user_profile = Path(os.environ.get("USERPROFILE", ""))
+          candidates.append(user_profile / ".codex" / ".sandbox-bin" / "codex.exe")
 
-          Get-ChildItem -Path "C:\Users\*\\.codex\\.sandbox-bin\\codex.exe" -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            ForEach-Object { $candidates.Add($_.FullName) }
+          def sorted_matches(pattern):
+              try:
+                  return sorted(Path("C:/").glob(pattern.removeprefix("C:/")), key=lambda path: path.stat().st_mtime, reverse=True)
+              except OSError as exc:
+                  print(f"::warning::Could not scan Codex candidates for {pattern}: {exc}")
+                  return []
 
-          Get-ChildItem -Path "C:\Users\*\\.vscode\\extensions\\openai.chatgpt-*\\bin\\windows-x86_64\\codex.exe" -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            ForEach-Object { $candidates.Add($_.FullName) }
+          for pattern in (
+              "C:/Users/*/.codex/.sandbox-bin/codex.exe",
+              "C:/Users/*/.vscode/extensions/openai.chatgpt-*/bin/windows-x86_64/codex.exe",
+          ):
+              candidates.extend(sorted_matches(pattern))
 
-          $resolvedBinary = $null
-          foreach ($candidate in $candidates) {
-            if (Test-CodexCandidate $candidate) {
-              $resolvedBinary = $candidate
-              break
-            }
-          }
+          seen = set()
+          resolved_binary = None
+          for candidate in candidates:
+              key = os.path.normcase(os.path.abspath(candidate))
+              if key in seen:
+                  continue
+              seen.add(key)
+              if test_codex_candidate(candidate):
+                  resolved_binary = Path(candidate)
+                  break
 
-          if (-not $resolvedBinary) {
-            throw "Could not find a usable Codex binary. Set the CODEX_BINARY repository variable or install Codex for the runner service account."
-          }
+          if not resolved_binary:
+              raise SystemExit("Could not find a usable Codex binary. Set the CODEX_BINARY repository variable or install Codex for the runner service account.")
 
-          Add-Content -Path $env:GITHUB_ENV -Value "CODEX_BINARY=$resolvedBinary"
-          Write-Host "Resolved Codex binary: $resolvedBinary"
+          add_env("CODEX_BINARY", str(resolved_binary))
+          print(f"Resolved Codex binary: {resolved_binary}")
 
-          $resolvedHome = $env:CODEX_HOME
-          if ([string]::IsNullOrWhiteSpace($resolvedHome) -and $resolvedBinary -like "*.codex\\.sandbox-bin\\codex.exe") {
-            $resolvedHome = Split-Path (Split-Path $resolvedBinary -Parent) -Parent
-          }
+          resolved_home = os.environ.get("CODEX_HOME", "").strip()
+          if not resolved_home and resolved_binary.parent.name.lower() == ".sandbox-bin":
+              resolved_home = str(resolved_binary.parent.parent)
 
-          if (-not [string]::IsNullOrWhiteSpace($resolvedHome)) {
-            Add-Content -Path $env:GITHUB_ENV -Value "CODEX_HOME=$resolvedHome"
-            Write-Host "Using CODEX_HOME: $resolvedHome"
-          }
+          if resolved_home:
+              add_env("CODEX_HOME", resolved_home)
+              print(f"Using CODEX_HOME: {resolved_home}")
 
       - name: Verify Codex login and model availability
         if: ${{ github.event.inputs.site_only != 'true' }}
         run: |
-          $siteOnly = "${{ github.event.inputs.site_only }}"
-          if ($siteOnly -eq "true") {
-            Write-Host "Skipping Codex preflight because site_only=true."
-            exit 0
-          }
-
-          $workspaceDir = Join-Path $env:GITHUB_WORKSPACE ".codex-preflight"
-          $script = @"
           import os
+          from pathlib import Path
           from tradingagents.llm_clients.codex_app_server import CodexAppServerAuthError, CodexAppServerBinaryError, CodexModelUnavailableError
           from tradingagents.llm_clients.codex_preflight import run_codex_preflight
 
-          workspace_dir = r"$workspaceDir"
+          site_only = "${{ github.event.inputs.site_only }}".strip().lower()
+          if site_only == "true":
+              print("Skipping Codex preflight because site_only=true.")
+              raise SystemExit(0)
+
+          workspace_dir = Path(os.environ["GITHUB_WORKSPACE"]) / ".codex-preflight"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
           preferred_model = "gpt-5.5"
@@ -865,14 +931,10 @@ jobs:
                   f"- Binary: {os.getenv('CODEX_BINARY', '(auto)')}",
               ]
           )
-          "@
-          $script | python -
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
       - name: Validate KIS credentials for account report
         if: ${{ github.event.inputs.site_only != 'true' }}
         run: |
-          $script = @"
           from tradingagents.dataflows.api_keys import get_api_key
           from tradingagents.portfolio.kis import KisClient
 
@@ -912,12 +974,8 @@ jobs:
               "summary_fields": sorted((summary or {}).keys()),
           }
           print("KIS account snapshot preflight:", account_result)
-          "@
-          $script | python -
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
       - name: Run scheduled analysis and build site
-        shell: python {0}
         run: |
           import os
           import subprocess
@@ -973,38 +1031,47 @@ jobs:
       - name: Collect private account artifacts
         if: ${{ !cancelled() }}
         run: |
-          $archiveRoot = $env:TRADINGAGENTS_ARCHIVE_DIR
-          if ([string]::IsNullOrWhiteSpace($archiveRoot)) {
-            $archiveRoot = Join-Path $env:GITHUB_WORKSPACE ".runtime\tradingagents-archive"
-          }
+          import os
+          import shutil
+          from pathlib import Path
 
-          $destination = Join-Path $env:GITHUB_WORKSPACE "portfolio-artifacts"
-          New-Item -ItemType Directory -Force -Path $destination | Out-Null
+          archive_root = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if not archive_root:
+              archive_root = str(Path(os.environ["GITHUB_WORKSPACE"]) / ".runtime" / "tradingagents-archive")
 
-          Get-ChildItem -Path $archiveRoot -Recurse -Directory -Filter "portfolio-private" -ErrorAction SilentlyContinue |
-            ForEach-Object {
-              $runId = Split-Path $_.Parent -Leaf
-              $target = Join-Path $destination $runId
-              New-Item -ItemType Directory -Force -Path $target | Out-Null
-              Copy-Item -Path (Join-Path $_.FullName "*") -Destination $target -Recurse -Force -ErrorAction SilentlyContinue
-            }
+          destination = Path(os.environ["GITHUB_WORKSPACE"]) / "portfolio-artifacts"
+          destination.mkdir(parents=True, exist_ok=True)
+
+          archive_path = Path(archive_root)
+          if not archive_path.exists():
+              raise SystemExit(0)
+
+          for private_dir in archive_path.rglob("portfolio-private"):
+              if not private_dir.is_dir():
+                  continue
+              run_id = private_dir.parent.name
+              target = destination / run_id
+              target.mkdir(parents=True, exist_ok=True)
+              for item in private_dir.iterdir():
+                  item_target = target / item.name
+                  if item.is_dir():
+                      shutil.copytree(item, item_target, dirs_exist_ok=True)
+                  elif item.is_file():
+                      shutil.copy2(item, item_target)
 
       - name: Add Git Bash to PATH for Pages packaging
         run: |
-          $gitBinCandidates = @(
-            "C:\Program Files\Git\bin",
-            "C:\Program Files\Git\usr\bin"
-          )
+          import os
+          from pathlib import Path
 
-          foreach ($candidate in $gitBinCandidates) {
-            if (Test-Path (Join-Path $candidate "bash.exe")) {
-              Add-Content -Path $env:GITHUB_PATH -Value $candidate
-              Write-Host "Added Git Bash path: $candidate"
-              exit 0
-            }
-          }
+          for candidate in (Path("C:/Program Files/Git/bin"), Path("C:/Program Files/Git/usr/bin")):
+              if (candidate / "bash.exe").exists():
+                  with open(os.environ["GITHUB_PATH"], "a", encoding="utf-8") as handle:
+                      handle.write(f"{candidate}\n")
+                  print(f"Added Git Bash path: {candidate}")
+                  raise SystemExit(0)
 
-          throw "bash.exe was not found under the expected Git for Windows directories."
+          raise SystemExit("bash.exe was not found under the expected Git for Windows directories.")
 
       - name: Upload GitHub Pages artifact
         # NOTE:
@@ -1040,26 +1107,35 @@ jobs:
       - name: Clean Codex runtime workspace
         if: ${{ always() }}
         run: |
-          function Remove-CodexLogFiles {
-            param([string]$Root)
-            if ([string]::IsNullOrWhiteSpace($Root) -or -not (Test-Path -LiteralPath $Root)) {
-              return
-            }
-            Get-ChildItem -LiteralPath $Root -Filter "logs_*.sqlite*" -Force -File -ErrorAction SilentlyContinue |
-              Remove-Item -Force -ErrorAction SilentlyContinue
-          }
+          import os
+          import shutil
+          from pathlib import Path
 
-          $workspace = $env:TRADINGAGENTS_CODEX_WORKSPACE_DIR
-          if (-not [string]::IsNullOrWhiteSpace($workspace)) {
-            $workspaceFull = [System.IO.Path]::GetFullPath($workspace)
-            $runnerTempFull = [System.IO.Path]::GetFullPath($env:RUNNER_TEMP)
-            if ($workspaceFull.StartsWith($runnerTempFull, [System.StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $workspaceFull)) {
-              Remove-Item -LiteralPath $workspaceFull -Recurse -Force -ErrorAction SilentlyContinue
-            }
-          }
+          def is_within(child, parent):
+              child_path = os.path.normcase(os.path.abspath(child))
+              parent_path = os.path.normcase(os.path.abspath(parent))
+              return os.path.commonpath([child_path, parent_path]) == parent_path
 
-          $legacyCodexHome = Join-Path $env:USERPROFILE ".codex\tradingagents-workspace\.codex-home"
-          Remove-CodexLogFiles $legacyCodexHome
+          def remove_codex_log_files(root):
+              if not root:
+                  return
+              root_path = Path(root)
+              if not root_path.exists():
+                  return
+              for candidate in root_path.glob("logs_*.sqlite*"):
+                  if candidate.is_file():
+                      try:
+                          candidate.unlink()
+                      except OSError as exc:
+                          print(f"::warning::Could not remove {candidate}: {exc}")
+
+          workspace = os.environ.get("TRADINGAGENTS_CODEX_WORKSPACE_DIR", "").strip()
+          runner_temp = os.environ.get("RUNNER_TEMP", "").strip()
+          if workspace and runner_temp and is_within(workspace, runner_temp) and Path(workspace).exists():
+              shutil.rmtree(workspace, ignore_errors=True)
+
+          legacy_codex_home = Path(os.environ.get("USERPROFILE", "")) / ".codex" / "tradingagents-workspace" / ".codex-home"
+          remove_codex_log_files(legacy_codex_home)
 
   deploy_kr:
     needs:
