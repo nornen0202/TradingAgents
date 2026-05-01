@@ -114,6 +114,8 @@ def present_account_action(action: str, *, conditional: bool = False, language: 
         mapping = {
             "ADD_NOW": "지금 추가 매수",
             "STARTER_NOW": "소액 신규 진입",
+            "ADD": "조건부 소액 진입",
+            "WATCH_TRIGGER": "조건부 관찰",
             "REDUCE_NOW": "일부 축소",
             "TAKE_PROFIT_NOW": "이익실현성 일부 축소",
             "STOP_LOSS_NOW": "손절 조건 충족",
@@ -135,13 +137,14 @@ def present_account_action(action: str, *, conditional: bool = False, language: 
             "TAKE_PROFIT_IF_TRIGGERED": "조건 충족 시 이익실현",
             "STOP_LOSS_IF_TRIGGERED": "조건 충족 시 손절",
             "EXIT_IF_TRIGGERED": "조건 이탈 시 청산 검토",
-            "WATCH_TRIGGER": "조건 확인 후 검토",
         }
         return mapping.get(normalized, _humanize_code(normalized, korean=True))
 
     mapping = {
         "ADD_NOW": "Add now",
         "STARTER_NOW": "Open starter position",
+        "ADD": "Conditional starter add",
+        "WATCH_TRIGGER": "Conditional watch",
         "REDUCE_NOW": "Reduce now",
         "TAKE_PROFIT_NOW": "Take profit now",
         "STOP_LOSS_NOW": "Stop-loss now",
@@ -163,7 +166,6 @@ def present_account_action(action: str, *, conditional: bool = False, language: 
         "TAKE_PROFIT_IF_TRIGGERED": "Take profit if triggered",
         "STOP_LOSS_IF_TRIGGERED": "Stop-loss if triggered",
         "EXIT_IF_TRIGGERED": "Exit if triggered",
-        "WATCH_TRIGGER": "Review if triggered",
     }
     return mapping.get(normalized, _humanize_code(normalized, korean=False))
 
@@ -228,6 +230,8 @@ def sanitize_investor_text(value: Any, *, language: str = "Korean") -> str:
         return "실계좌 스냅샷 없이 관심종목 기준으로 작성했습니다." if is_korean(language) else "Prepared from a watchlist without a live account snapshot."
     if "no_trade" in lower:
         return "즉시 실행보다 관찰 신호가 많은 장입니다." if is_korean(language) else "Signals favor patience over immediate action."
+    if "decision payload" in lower and "missing required fields" in lower:
+        return "decision payload missing required fields"
     if is_korean(language):
         localized = _localized_english_investor_text(text)
         if localized is not None:

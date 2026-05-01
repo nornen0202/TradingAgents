@@ -123,6 +123,7 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         learned = int(_count_optional_table(conn, "learned_intuitions"))
         by_action = _aggregate(conn, "action")
         by_prism = _aggregate(conn, "prism_agreement")
+        action_buckets = _aggregate_action_buckets(conn)
     return ActionPerformanceSummary(
         recommendations=recommendations,
         outcomes=outcomes,
@@ -130,6 +131,7 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         learned_intuitions=learned,
         by_action=by_action,
         prism_agreement=by_prism,
+        action_buckets=action_buckets,
     )
 
 
@@ -314,6 +316,56 @@ def _aggregate(conn: sqlite3.Connection, column: str) -> dict[str, dict[str, Any
             "avg_return_20d": row["avg_return_20d"],
         }
     return result
+
+
+def _aggregate_action_buckets(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
+    rows = conn.execute(
+        """
+        SELECT r.source AS source, r.prism_agreement AS prism_agreement,
+               COUNT(*) AS n, AVG(o.return_5d) AS avg_return_5d,
+               AVG(o.return_20d) AS avg_return_20d
+        FROM action_recommendations r
+        LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
+        GROUP BY r.source, r.prism_agreement
+        """
+    )
+    result: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        bucket = _action_bucket(str(row["source"] or ""), str(row["prism_agreement"] or ""))
+        current = result.setdefault(
+            bucket,
+            {"count": 0, "avg_return_5d": None, "avg_return_20d": None, "_sum_5d": 0.0, "_n_5d": 0, "_sum_20d": 0.0, "_n_20d": 0},
+        )
+        count = int(row["n"] or 0)
+        current["count"] += count
+        if row["avg_return_5d"] is not None:
+            current["_sum_5d"] += float(row["avg_return_5d"]) * count
+            current["_n_5d"] += count
+        if row["avg_return_20d"] is not None:
+            current["_sum_20d"] += float(row["avg_return_20d"]) * count
+            current["_n_20d"] += count
+    for metrics in result.values():
+        if metrics["_n_5d"]:
+            metrics["avg_return_5d"] = metrics["_sum_5d"] / metrics["_n_5d"]
+        if metrics["_n_20d"]:
+            metrics["avg_return_20d"] = metrics["_sum_20d"] / metrics["_n_20d"]
+        for key in ("_sum_5d", "_n_5d", "_sum_20d", "_n_20d"):
+            metrics.pop(key, None)
+    return result
+
+
+def _action_bucket(source: str, prism_agreement: str) -> str:
+    source_text = source.strip().lower()
+    agreement = prism_agreement.strip().lower()
+    if source_text == "scanner":
+        return "Scanner-discovered"
+    if agreement in {"confirmed_buy", "confirmed_sell"}:
+        return "PRISM-confirmed"
+    if agreement.startswith("conflict_"):
+        return "PRISM-conflicted"
+    if agreement == "no_same_market_prism_coverage":
+        return "PRISM-uncovered-current-market"
+    return "TradingAgents-only"
 
 
 def _ensure_columns(conn: sqlite3.Connection, table: str, columns: dict[str, str]) -> None:

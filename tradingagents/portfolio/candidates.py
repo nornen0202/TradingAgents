@@ -28,9 +28,11 @@ def build_portfolio_candidates(
     watch_tickers: tuple[str, ...],
 ) -> tuple[list[PortfolioCandidate], list[str]]:
     analysis_by_ticker = _load_analysis_by_ticker(run_dir, manifest)
+    failed_by_ticker = _failed_tickers_by_canonical(manifest)
     target_tickers = set(watch_tickers)
     target_tickers.update(position.canonical_ticker for position in snapshot.positions)
     target_tickers.update(analysis_by_ticker.keys())
+    target_tickers.update(failed_by_ticker.keys())
 
     candidates: list[PortfolioCandidate] = []
     warnings: list[str] = []
@@ -44,6 +46,7 @@ def build_portfolio_candidates(
             canonical_ticker=canonical_ticker,
             analysis=analysis,
             position=position,
+            failed_reason=failed_by_ticker.get(canonical_ticker),
         )
         candidates.append(candidate)
         warnings.extend(candidate_warnings)
@@ -79,12 +82,38 @@ def _load_analysis_by_ticker(run_dir: Path, manifest: dict[str, Any]) -> dict[st
     return loaded
 
 
+def _failed_tickers_by_canonical(manifest: dict[str, Any]) -> dict[str, str]:
+    failed: dict[str, str] = {}
+    quality_gate = manifest.get("quality_gate") if isinstance(manifest.get("quality_gate"), dict) else {}
+    sources = list(quality_gate.get("failed_tickers") or [])
+    if not sources:
+        sources = [
+            item
+            for item in (manifest.get("tickers") or [])
+            if isinstance(item, dict) and item.get("status") != "success"
+        ]
+    for item in sources:
+        if not isinstance(item, dict):
+            continue
+        raw_ticker = str(item.get("ticker") or "").strip()
+        if not raw_ticker:
+            continue
+        try:
+            identity = resolve_identity(raw_ticker, str(item.get("ticker_name") or "") or None)
+        except Exception:
+            continue
+        reason = str(item.get("reason") or item.get("error") or "analysis failed").strip()
+        failed[identity.canonical_ticker] = _short_failure_reason(reason)
+    return failed
+
+
 def _build_single_candidate(
     *,
     snapshot: AccountSnapshot,
     canonical_ticker: str,
     analysis: dict[str, Any] | None,
     position,
+    failed_reason: str | None = None,
 ) -> tuple[PortfolioCandidate, list[str]]:
     warnings: list[str] = []
     if position is not None:
@@ -100,15 +129,22 @@ def _build_single_candidate(
     }
 
     structured = None
+    structured_parse_error: str | None = None
     decision_payload = (analysis or {}).get("decision")
     if isinstance(decision_payload, str) and decision_payload.strip().startswith("{"):
         try:
             structured = parse_structured_decision(decision_payload)
         except Exception as exc:
+            structured_parse_error = str(exc)
             warnings.append(f"{canonical_ticker}: structured decision parse failed ({exc}).")
 
     rating_value = "UNKNOWN"
-    if structured is None and isinstance(decision_payload, str) and decision_payload.strip():
+    if (
+        structured is None
+        and structured_parse_error is None
+        and isinstance(decision_payload, str)
+        and decision_payload.strip()
+    ):
         normalized = decision_payload.strip().upper()
         rating_value = normalized
         stance = "BULLISH" if normalized in {"BUY", "OVERWEIGHT"} else "BEARISH" if normalized in {"SELL", "UNDERWEIGHT"} else "NEUTRAL"
@@ -178,7 +214,14 @@ def _build_single_candidate(
             "macro_items_count": 0,
         }
         trigger_conditions = tuple()
-        warnings.append(f"{canonical_ticker}: missing analysis; defaulting to NEUTRAL/WAIT before portfolio action translation.")
+        if structured_parse_error:
+            quality_flags = (*quality_flags, "invalid_structured_decision", "run_failed_reanalysis_required")
+            warnings.append(f"{canonical_ticker}: invalid structured decision; reanalysis required.")
+        elif failed_reason:
+            quality_flags = (*quality_flags, "run_failed_reanalysis_required")
+            warnings.append(f"{canonical_ticker}: run failed; reanalysis required ({failed_reason}).")
+        else:
+            warnings.append(f"{canonical_ticker}: missing analysis; defaulting to NEUTRAL/WAIT before portfolio action translation.")
     execution_levels_dict = (
         (structured_dict or {}).get("execution_levels")
         if isinstance((structured_dict or {}).get("execution_levels"), dict)
@@ -192,6 +235,13 @@ def _build_single_candidate(
         entry_action=entry_action,
         rating=rating_value,
     )
+    reanalysis_reason = _reanalysis_reason(failed_reason, structured_parse_error)
+    if reanalysis_reason:
+        action_now = "HOLD" if is_held else "WATCH"
+        action_if_triggered = "NONE"
+        risk_action = "NONE"
+        risk_action_reason_codes = tuple()
+        risk_action_level = None
     execution_update = (analysis or {}).get("execution_update") if analysis else None
     execution_update_payload = execution_update if isinstance(execution_update, dict) else None
     current_price_for_risk = _current_price_for_risk_mapping(execution_update_payload, position)
@@ -228,6 +278,12 @@ def _build_single_candidate(
             current_price=current_price_for_risk,
             is_held=is_held,
         )
+    if reanalysis_reason:
+        action_now = "HOLD" if is_held else "WATCH"
+        action_if_triggered = "NONE"
+        risk_action = "NONE"
+        risk_action_reason_codes = tuple()
+        risk_action_level = None
     execution_feasibility_now = _execution_feasibility_now(
         action_now=action_now,
         execution_update=execution_update if isinstance(execution_update, dict) else None,
@@ -275,6 +331,9 @@ def _build_single_candidate(
         risk_action=risk_action,
         risk_action_reason_codes=risk_action_reason_codes,
     )
+    if reanalysis_reason:
+        portfolio_relative_action = "HOLD" if is_held else "WATCH"
+        relative_reason_codes = ("REANALYSIS_REQUIRED",)
     sell_side_category = _sell_side_category(risk_action, portfolio_relative_action)
 
     return (
@@ -308,6 +367,7 @@ def _build_single_candidate(
             risk_action_level=risk_action_level,
             sell_side_category=sell_side_category,
             stale_but_triggerable=stale_but_triggerable,
+            review_required=bool(reanalysis_reason),
             trigger_profile={
                 "intraday_pilot_rule": execution_levels_dict.get("intraday_pilot_rule"),
                 "close_confirm_rule": execution_levels_dict.get("close_confirm_rule"),
@@ -334,6 +394,8 @@ def _build_single_candidate(
                 "risk_action_level": risk_action_level,
                 "sell_side_category": sell_side_category,
                 "stale_but_triggerable": stale_but_triggerable,
+                "reanalysis_required": bool(reanalysis_reason),
+                "reanalysis_reason": reanalysis_reason,
                 **execution_health,
             },
         ),
@@ -371,6 +433,24 @@ def _translate_actions(*, is_held: bool, stance: str, entry_action: str, rating:
     if is_held:
         return "HOLD", "NONE"
     return "WATCH", "NONE"
+
+
+def _reanalysis_reason(failed_reason: str | None, parse_error: str | None) -> str | None:
+    if parse_error:
+        return _short_failure_reason(parse_error)
+    if failed_reason:
+        return _short_failure_reason(failed_reason)
+    return None
+
+
+def _short_failure_reason(reason: str) -> str:
+    text = " ".join(str(reason or "").split())
+    lower = text.lower()
+    if "missing required fields" in lower:
+        return "decision payload missing required fields"
+    if not text:
+        return "analysis failed"
+    return text[:180]
 
 
 def _apply_execution_overlay_risk_action(
@@ -841,6 +921,8 @@ def _initial_relative_reason_codes(
 
 
 def _relative_reason_text(reason_codes: tuple[str, ...]) -> str:
+    if "REANALYSIS_REQUIRED" in reason_codes:
+        return "Reanalysis required before using this ticker as an actionable candidate."
     if "INVALIDATION_BROKEN" in reason_codes:
         return "Invalidation or stop-loss level was breached; prioritize loss control."
     if "SUPPORT_BROKEN" in reason_codes:

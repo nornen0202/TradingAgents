@@ -33,7 +33,12 @@ from tradingagents.execution.reporting import (
     render_execution_update_markdown,
 )
 from tradingagents.execution.selective_rerun import collect_event_signals, find_selective_rerun_targets
-from tradingagents.external.prism_conflicts import best_prism_signal_by_ticker
+from tradingagents.external.prism_conflicts import (
+    best_prism_signal_by_ticker,
+    build_prism_coverage_summary,
+    filter_prism_signals_for_market,
+    prism_market_coverage_dict,
+)
 from tradingagents.external.prism_loader import load_prism_signals
 from tradingagents.external.prism_models import PrismSignalAction
 from tradingagents.graph.trading_graph import TradingAgentsGraph
@@ -233,6 +238,8 @@ def execute_scheduled_run(
     finished_at = datetime.now(tz)
     failures = sum(1 for item in ticker_summaries if item["status"] != "success")
     successes = len(ticker_summaries) - failures
+    total_tickers = len(ticker_summaries)
+    partial_failure_rate = (failures / total_tickers) if total_tickers else 0.0
     status = "success"
     if failures and successes:
         status = "partial_failure"
@@ -249,9 +256,15 @@ def execute_scheduled_run(
         "timezone": config.run.timezone,
         "settings": _settings_snapshot(config),
         "summary": {
-            "total_tickers": len(ticker_summaries),
+            "total_tickers": total_tickers,
             "successful_tickers": successes,
             "failed_tickers": failures,
+            "partial_failure_rate": round(partial_failure_rate, 4),
+        },
+        "quality_gate": {
+            "partial_failure_rate": round(partial_failure_rate, 4),
+            "partial_failure_warning": partial_failure_rate >= 0.2,
+            "failed_tickers": _failed_ticker_summaries(ticker_summaries),
         },
         "tickers": ticker_summaries,
     }
@@ -911,9 +924,12 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "external_prism_use_live_http": config.external_data.prism.use_live_http,
         "external_prism_use_html_scraping": config.external_data.prism.use_html_scraping,
         "external_prism_ui_comparison": config.external_data.prism.use_for_ui_comparison,
+        "external_prism_allow_cross_market_candidates": config.external_data.prism.allow_cross_market_candidates,
+        "external_prism_allowed_markets": list(config.external_data.prism.allowed_markets),
         "scanner_enabled": config.scanner.enabled,
         "scanner_market": config.scanner.market,
         "scanner_max_candidates": config.scanner.max_candidates,
+        "scanner_prism_candidate_market_filter": config.scanner.prism_candidate_market_filter,
         "performance_enabled": config.performance.enabled,
         "performance_update_outcomes_on_run": config.performance.update_outcomes_on_run,
         "performance_price_provider": config.performance.price_provider,
@@ -934,19 +950,45 @@ def _augment_run_tickers_with_scanner(
     ):
         return base_tickers, None
 
+    run_market = _config_run_market(config)
+    prism_settings = config.external_data.prism
+    allow_cross_market = bool(getattr(prism_settings, "allow_cross_market_candidates", False))
+    allowed_markets = getattr(prism_settings, "allowed_markets", tuple())
+    scanner_filter = str(getattr(config.scanner, "prism_candidate_market_filter", "same_market") or "same_market")
     scanner_result = None
     warnings: list[str] = []
     artifacts: dict[str, str] = {}
     prism_ingestion = None
     external_signals = []
+    external_signals_for_scanner = []
+    external_signals_for_candidates = []
+    prism_market_coverage: dict[str, Any] | None = None
     if config.scanner.include_prism_candidates or config.external_data.prism.use_for_candidate_generation:
         try:
             prism_ingestion = load_prism_signals(config.external_data)
             external_signals = list(prism_ingestion.signals)
+            prism_market_coverage = prism_market_coverage_dict(
+                prism_ingestion,
+                run_market=run_market,
+                allow_cross_market_candidates=allow_cross_market,
+            )
+            external_signals_for_scanner = _scanner_prism_signals_for_market(
+                external_signals,
+                run_market=config.scanner.market or run_market,
+                filter_mode=scanner_filter,
+            )
+            external_signals_for_candidates = filter_prism_signals_for_market(
+                external_signals,
+                run_market=run_market,
+                allow_cross_market_candidates=allow_cross_market,
+                allowed_markets=allowed_markets,
+            )
             warnings.extend(prism_ingestion.warnings)
         except Exception as exc:
             warnings.append(f"scanner_prism_ingestion_failed:{exc}")
             external_signals = []
+            external_signals_for_scanner = []
+            external_signals_for_candidates = []
 
     if config.scanner.enabled:
         output_path = run_dir / "scanner" / "scanner_candidates.json"
@@ -963,7 +1005,8 @@ def _augment_run_tickers_with_scanner(
                 max_daily_change_pct=config.scanner.max_daily_change_pct,
                 min_volume_ratio_to_market_avg=config.scanner.min_volume_ratio_to_market_avg,
                 exclude_halted_or_low_liquidity=config.scanner.exclude_halted_or_low_liquidity,
-                external_signals=external_signals,
+                external_signals=external_signals_for_scanner,
+                prism_candidate_market_filter=scanner_filter,
                 output_path=output_path,
             )
             warnings.extend(scanner_result.warnings)
@@ -979,9 +1022,17 @@ def _augment_run_tickers_with_scanner(
     )
     tickers = _augment_with_prism_candidates(
         tickers,
-        external_signals,
+        external_signals_for_candidates,
         max_new=max(0, config.scanner.max_new_tickers_per_run - max(0, len(tickers) - len(base_tickers))),
+        run_market=run_market,
+        allow_cross_market_candidates=allow_cross_market,
+        allowed_markets=allowed_markets,
     )
+    coverage_summary = build_prism_coverage_summary(
+        prism_ingestion,
+        run_market=run_market,
+        run_tickers=base_tickers,
+    ).to_dict() if prism_ingestion is not None else None
     return tickers, {
         "enabled": config.scanner.enabled,
         "market": config.scanner.market,
@@ -990,6 +1041,13 @@ def _augment_run_tickers_with_scanner(
         "warnings": list(dict.fromkeys(warnings)),
         "artifacts": artifacts,
         "prism_candidate_source": prism_ingestion.status_dict() if prism_ingestion is not None else None,
+        "prism_market_coverage": prism_market_coverage,
+        "prism_coverage_summary": coverage_summary,
+        "source_counts": {
+            "scanner_discovered": len(scanner_result.candidates) if scanner_result else 0,
+            "prism_imported_same_market": len(external_signals_for_candidates),
+            "prism_excluded_cross_market": max(len(external_signals) - len(external_signals_for_candidates), 0),
+        },
     }
 
 
@@ -998,9 +1056,18 @@ def _augment_with_prism_candidates(
     external_signals: list[Any],
     *,
     max_new: int,
+    run_market: str | None = None,
+    allow_cross_market_candidates: bool = False,
+    allowed_markets: Any = None,
 ) -> list[str]:
     if max_new <= 0:
         return tickers
+    external_signals = filter_prism_signals_for_market(
+        external_signals,
+        run_market=run_market,
+        allow_cross_market_candidates=allow_cross_market_candidates,
+        allowed_markets=allowed_markets,
+    )
     result = list(tickers)
     seen = {str(ticker).strip().upper() for ticker in result}
     ranked = sorted(
@@ -1021,6 +1088,30 @@ def _augment_with_prism_candidates(
         if added >= max_new:
             break
     return result
+
+
+def _config_run_market(config: Any) -> str:
+    run = getattr(config, "run", None)
+    market = str(getattr(run, "market", "") or getattr(getattr(config, "scanner", None), "market", "") or "KR").strip().upper()
+    return market or "KR"
+
+
+def _scanner_prism_signals_for_market(
+    external_signals: list[Any],
+    *,
+    run_market: str,
+    filter_mode: str,
+) -> list[Any]:
+    mode = str(filter_mode or "same_market").strip().lower()
+    if mode == "disabled":
+        return []
+    if mode == "all":
+        return list(external_signals)
+    return filter_prism_signals_for_market(
+        external_signals,
+        run_market=run_market,
+        allow_cross_market_candidates=False,
+    )
 
 
 def _run_performance_tracking(
@@ -1062,6 +1153,10 @@ def _run_performance_tracking(
                     price_history=price_result.price_history,
                 )
                 outcome_update["updated"] = True
+            else:
+                outcome_update["unavailable_reason"] = "price_provider_unavailable_or_no_price_history"
+        else:
+            outcome_update["unavailable_reason"] = "outcome_update_disabled"
         summary = summarize_action_performance(db_path)
         payload = {
             "enabled": True,
@@ -1738,6 +1833,8 @@ def _compute_run_quality(*, manifest: dict[str, Any]) -> dict[str, Any]:
     execution = manifest.get("execution") or {}
     summary = manifest.get("summary") or {}
     total_tickers = max(int(summary.get("total_tickers") or 0), 1)
+    failed_tickers = int(summary.get("failed_tickers") or 0)
+    partial_failure_rate = failed_tickers / total_tickers
     degraded_ratio = len(execution.get("degraded") or []) / total_tickers
     batch_metrics = manifest.get("batch_metrics") or {}
     news_zero_ratio = float(batch_metrics.get("company_news_zero_ratio") or 0.0)
@@ -1764,6 +1861,7 @@ def _compute_run_quality(*, manifest: dict[str, Any]) -> dict[str, Any]:
     return {
         "run_quality_score": round(max(min(score, 1.0), 0.0), 4),
         "signals": {
+            "partial_failure_rate": round(partial_failure_rate, 4),
             "stale_ratio": round(degraded_ratio, 4),
             "company_news_zero_ratio": round(news_zero_ratio, 4),
             "judge_health": judge_health,
@@ -1774,6 +1872,35 @@ def _compute_run_quality(*, manifest: dict[str, Any]) -> dict[str, Any]:
         },
         "usefulness_rank": int(round((1.0 - max(min(score, 1.0), 0.0)) * 100)),
     }
+
+
+def _failed_ticker_summaries(ticker_summaries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    failed: list[dict[str, Any]] = []
+    for item in ticker_summaries:
+        if item.get("status") == "success":
+            continue
+        ticker = str(item.get("ticker") or "").strip()
+        if not ticker:
+            continue
+        reason = str(item.get("error") or item.get("reason") or "analysis failed").strip()
+        failed.append(
+            {
+                "ticker": ticker,
+                "ticker_name": item.get("ticker_name"),
+                "reason": _investor_failure_reason(reason),
+            }
+        )
+    return failed
+
+
+def _investor_failure_reason(reason: str) -> str:
+    text = " ".join(str(reason or "").split())
+    lower = text.lower()
+    if "missing required fields" in lower:
+        return "decision payload missing required fields"
+    if not text:
+        return "analysis failed"
+    return text[:180]
 
 
 def _manifest_has_bootstrap_ready_ticker(manifest: dict[str, Any], *, tickers: list[str] | None) -> bool:

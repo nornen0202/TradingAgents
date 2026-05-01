@@ -21,6 +21,19 @@ _EXIT_WORDS = {"EXIT", "SELL", "CLOSE", "LIQUIDATE", "매도", "청산"}
 _NO_ENTRY_WORDS = {"NO_ENTRY", "NO_TRADE", "AVOID", "SKIP", "보류", "회피", "진입없음", "진입 없음"}
 
 
+def infer_market_from_ticker(value: Any) -> str | None:
+    symbol = str(value or "").strip().upper()
+    if not symbol:
+        return None
+    if symbol.endswith((".KS", ".KQ")):
+        return "KR"
+    if re.fullmatch(r"\d{6}", symbol):
+        return "KR"
+    if re.fullmatch(r"[A-Z][A-Z0-9.-]{0,9}", symbol):
+        return "US"
+    return None
+
+
 def canonicalize_ticker(value: Any, *, display_name: str | None = None, market: str | None = None) -> str | None:
     text = str(value or "").strip()
     name = str(display_name or "").strip() or None
@@ -45,17 +58,47 @@ def canonicalize_ticker(value: Any, *, display_name: str | None = None, market: 
 
 
 def normalize_market(value: Any, *, ticker: str | None = None) -> str:
+    inferred = infer_market_from_ticker(ticker)
+    if inferred:
+        return inferred
     text = str(value or "").strip().upper()
     if text in {"KR", "KOREA", "KRX", "KQ", "KS"}:
         return "KR"
     if text in {"US", "USA", "NASDAQ", "NYSE", "AMEX"}:
         return "US"
-    symbol = str(ticker or "").upper()
-    if symbol.endswith((".KS", ".KQ")) or (len(symbol) == 6 and symbol.isdigit()):
-        return "KR"
-    if symbol:
-        return "US" if re.fullmatch(r"[A-Z][A-Z0-9.-]{0,9}", symbol) else "UNKNOWN"
     return "UNKNOWN"
+
+
+def normalize_market_with_warnings(
+    value: Any,
+    *,
+    ticker: str | None = None,
+    default_market: str | None = None,
+) -> tuple[str, list[str]]:
+    warnings: list[str] = []
+    inferred = infer_market_from_ticker(ticker)
+    explicit = _market_from_text(value)
+    default = _market_from_text(default_market)
+    if inferred:
+        if explicit and explicit != inferred:
+            warnings.append("market_conflict_overridden")
+        elif default and default != inferred:
+            warnings.append("market_inferred_from_ticker")
+        return inferred, warnings
+    if explicit:
+        return explicit, warnings
+    if default:
+        return default, warnings
+    return "UNKNOWN", warnings
+
+
+def _market_from_text(value: Any) -> str | None:
+    text = str(value or "").strip().upper()
+    if text in {"KR", "KOREA", "KRX", "KQ", "KS"}:
+        return "KR"
+    if text in {"US", "USA", "NASDAQ", "NYSE", "AMEX"}:
+        return "US"
+    return None
 
 
 def normalize_action(value: Any, *, section: str | None = None) -> PrismSignalAction:

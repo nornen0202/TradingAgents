@@ -138,6 +138,8 @@ class PrismDashboardSettings:
     use_for_candidate_generation: bool = False
     use_for_performance_benchmark: bool = False
     use_for_ui_comparison: bool = True
+    allow_cross_market_candidates: bool = False
+    allowed_markets: tuple[str, ...] = tuple()
 
     @property
     def dashboard_url(self) -> str | None:
@@ -168,6 +170,7 @@ class ScannerSettings:
     max_candidates: int = 10
     max_new_tickers_per_run: int = 5
     include_prism_candidates: bool = True
+    prism_candidate_market_filter: str = "same_market"
     local_ohlcv_path: Path | None = None
     min_traded_value_krw: int = 10_000_000_000
     min_market_cap_krw: int = 500_000_000_000
@@ -567,6 +570,8 @@ def _load_external_data_settings(
             use_for_candidate_generation=bool(prism_raw.get("use_for_candidate_generation", False)),
             use_for_performance_benchmark=bool(prism_raw.get("use_for_performance_benchmark", False)),
             use_for_ui_comparison=bool(prism_raw.get("use_for_ui_comparison", True)),
+            allow_cross_market_candidates=bool(prism_raw.get("allow_cross_market_candidates", False)),
+            allowed_markets=_normalize_market_sequence(prism_raw.get("allowed_markets")),
         )
     )
 
@@ -579,6 +584,9 @@ def _load_scanner_settings(raw: dict[str, object], *, base_dir: Path, default_ma
         max_candidates=max(1, int(raw.get("max_candidates", 10) or 10)),
         max_new_tickers_per_run=max(0, int(raw.get("max_new_tickers_per_run", 5) or 5)),
         include_prism_candidates=bool(raw.get("include_prism_candidates", True)),
+        prism_candidate_market_filter=_normalize_prism_candidate_market_filter(
+            raw.get("prism_candidate_market_filter", "same_market")
+        ),
         local_ohlcv_path=_resolve_optional_path(raw.get("local_ohlcv_path"), base_dir),
         min_traded_value_krw=int(raw.get("min_traded_value_krw", 10_000_000_000) or 10_000_000_000),
         min_market_cap_krw=int(raw.get("min_market_cap_krw", 500_000_000_000) or 500_000_000_000),
@@ -739,6 +747,34 @@ def _normalize_int_sequence(value: object, *, default: tuple[int, ...]) -> tuple
         if horizon > 0 and horizon not in result:
             result.append(horizon)
     return tuple(result) or default
+
+
+def _normalize_market_sequence(value: object) -> tuple[str, ...]:
+    if value is None:
+        return tuple()
+    if isinstance(value, str):
+        raw_values = [item.strip() for item in value.split(",")]
+    else:
+        try:
+            raw_values = [str(item).strip() for item in value]  # type: ignore[operator]
+        except TypeError:
+            raw_values = [str(value).strip()]
+    result: list[str] = []
+    for item in raw_values:
+        market = item.upper()
+        if market in {"KR", "US"} and market not in result:
+            result.append(market)
+    return tuple(result)
+
+
+def _normalize_prism_candidate_market_filter(value: object) -> str:
+    mode = str(value or "same_market").strip().lower()
+    if mode not in {"same_market", "all", "disabled"}:
+        raise ValueError(
+            "Unsupported scanner.prism_candidate_market_filter "
+            f"'{mode}'. Expected one of: same_market, all, disabled."
+        )
+    return mode
 
 
 def _validate_trade_date(value: str) -> str:

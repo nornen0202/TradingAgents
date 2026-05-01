@@ -25,7 +25,11 @@ local_dashboard_json_path = "C:/Projects/prism-insight/examples/dashboard/public
 use_live_http = false
 use_html_scraping = false
 confidence_cap = 0.25
+allow_cross_market_candidates = false
+allowed_markets = []
 ```
+
+PRISM live dashboard data can be KR-only while a TradingAgents scheduled run is US. Ticker suffixes are authoritative during normalization: `.KS`, `.KQ`, and six-digit Korean codes are treated as KR even when the run default market is US; plain symbols such as `AAPL`, `NVDA`, and `TSLA` are treated as US. If a raw dashboard market contradicts the ticker suffix, the ticker-inferred market wins and the signal carries a `market_conflict_overridden` warning.
 
 Live dashboard JSON can be enabled explicitly:
 
@@ -64,6 +68,30 @@ PRISM_MAX_PAYLOAD_BYTES
 
 The live adapter enforces request timeout, content-type checks, max payload bytes, JSON validation, warnings, and graceful fallback. HTML parsing only extracts JSON payloads from script tags and does not place orders or interact with browser controls.
 
+## Market Coverage
+
+Cross-market PRISM signals are excluded from candidate generation and conflict/reconciliation by default. A US run can still load KR PRISM data for the external summary, but those KR tickers will not be appended to the US analysis universe and will not create ticker-level agreement/conflict rows.
+
+The investor report distinguishes these states:
+
+- `PRISM 미사용`: PRISM integration is disabled.
+- `PRISM 수집 실패`: PRISM was enabled but ingestion failed.
+- `PRISM 현재 시장 커버리지 없음`: PRISM data loaded, but it does not cover the current run market.
+- `PRISM 신호 없음`: PRISM covers the current market, but there is no same-market ticker match.
+- `PRISM 일치` / `PRISM 충돌`: same-market overlap agrees or conflicts.
+
+`PRISM 신호 없음` means same-market no match. It does not mean the dashboard was unavailable. `PRISM 현재 시장 커버리지 없음` means the loaded source is for another market.
+
+To explicitly allow cross-market PRISM candidate import, set both the guard and a whitelist:
+
+```toml
+[external.prism]
+allow_cross_market_candidates = true
+allowed_markets = ["KR"]  # example: allow KR PRISM candidates in a US run
+```
+
+If you have separate US PRISM data, provide it as a separate dashboard JSON/SQLite source for the US scheduled config, or set `[external.prism].market = "US"` only when the payload itself contains US tickers. The parser still lets strong ticker suffixes override an incorrect default market.
+
 ## Conflict Rules
 
 - PRISM `BUY` plus TradingAgents `REDUCE_RISK`, `STOP_LOSS`, or `EXIT` creates a hard conflict and review requirement.
@@ -78,5 +106,7 @@ external_signals/prism_signals.json
 external_signals/prism_ingestion_status.json
 external_signals/prism_reconciliation.json
 ```
+
+`prism_ingestion_status.json`, `decision_audit.json`, and the report summary include `coverage_summary`/`prism_market_coverage` counts: source markets, current run market, same-market signal count, overlapping ticker count, excluded cross-market count, confidence availability, and performance availability.
 
 The investor report shows agreement and conflict sections without exposing raw PRISM payload internals.

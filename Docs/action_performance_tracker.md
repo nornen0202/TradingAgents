@@ -1,6 +1,6 @@
 # Action Performance Tracker
 
-The performance tracker records recommendations, not only executed trades. This avoids selection bias and lets later reviews compare TradingAgents-only, PRISM-confirmed, PRISM-conflicted, scanner-discovered, and skipped candidates.
+The performance tracker records recommendations, not only executed trades. This avoids selection bias and lets later reviews compare TradingAgents-only, PRISM-confirmed, PRISM-conflicted, PRISM-uncovered-current-market, scanner-discovered, and skipped candidates.
 
 ## Config
 
@@ -65,4 +65,18 @@ If `benchmark_ticker` is present in the file, it is stored as the benchmark retu
 
 `price_provider = "yfinance"` can fetch missing recommendation tickers, but it is opt-in and provider/network failures are reported as warnings. Tests use deterministic local fixture prices and do not require network access.
 
-The generated static portfolio page now includes a `추천 성과 추적` section when performance tracking is enabled. It shows recorded recommendations, updated outcomes, provider status, action-level average returns, and PRISM agreement/conflict buckets.
+If performance tracking records recommendations but cannot update outcomes because no price provider/history is available, the report says:
+
+```text
+성과 추적: 기록은 저장됐지만 아직 성과 계산은 수행되지 않았습니다.
+```
+
+The generated static portfolio page now includes a `추천 성과 추적` section when performance tracking is enabled. It shows recorded recommendations, updated outcomes, provider status, action-level average returns, PRISM agreement/conflict buckets, and action-level source buckets:
+
+```text
+TradingAgents-only
+PRISM-confirmed
+PRISM-conflicted
+PRISM-uncovered-current-market
+Scanner-discovered
+```

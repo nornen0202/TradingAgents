@@ -79,7 +79,7 @@ class InvestorUiSellSideSectionsTests(unittest.TestCase):
         self.assertIn("강한 후보 매수를 위한 일부 축소", markdown)
         self.assertIn("리스크 축소", markdown)
         self.assertIn("## 오늘 할 일: 방향별 후보", markdown)
-        self.assertIn("### 오늘 즉시 매도/축소 후보", markdown)
+        self.assertIn("### 오늘 바로 매도/축소 후보", markdown)
         self.assertIn("### 조건부 매수 후보", markdown)
         self.assertIn("현재 매수가능금액", markdown)
         self.assertIn("매도 정산 후 예상 현금", markdown)

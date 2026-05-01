@@ -50,6 +50,28 @@ class PrismSourceKind(str, Enum):
 
 
 @dataclass(frozen=True)
+class PrismCoverageSummary:
+    source_kind: str
+    source: str | None
+    source_markets: dict[str, int]
+    run_market: str
+    total_signals: int
+    matching_market_signals: int
+    overlapping_tickers: int
+    cross_market_signals: int
+    buy_count: int
+    sell_count: int
+    hold_count: int
+    unknown_count: int
+    confidence_available_count: int
+    performance_available: bool
+    warnings: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return serialize_prism_value(self)
+
+
+@dataclass(frozen=True)
 class PrismExternalSignal:
     canonical_ticker: str
     display_name: str | None = None

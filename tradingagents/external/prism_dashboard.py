@@ -20,6 +20,7 @@ from .prism_normalize import (
     json_safe,
     normalize_action,
     normalize_market,
+    normalize_market_with_warnings,
     optional_text,
     parse_datetime,
     payload_hash,
@@ -411,7 +412,15 @@ def _build_signal(
         warnings.append(f"{section}:missing_ticker")
         return None
     row_warnings: list[str] = []
-    market = normalize_market(merged.get("market") or default_market, ticker=ticker)
+    raw_market = merged.get("market")
+    market, market_warnings = normalize_market_with_warnings(
+        raw_market,
+        ticker=ticker,
+        default_market=default_market,
+    )
+    row_warnings.extend(market_warnings)
+    for warning in market_warnings:
+        warnings.append(f"{ticker}:{warning}")
     action = normalize_action(first_non_empty(merged, _ACTION_KEYS), section=section)
     source_asof = parse_datetime(first_non_empty(merged, _ASOF_KEYS))
     trigger_type = optional_text(first_non_empty(merged, _TRIGGER_KEYS))

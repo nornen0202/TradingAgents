@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
 
-from tradingagents.external.prism_conflicts import best_prism_signal_by_ticker
+from tradingagents.external.prism_conflicts import best_prism_signal_by_ticker, filter_prism_signals_for_market
 from tradingagents.external.prism_models import PrismExternalSignal, PrismSignalAction
 from tradingagents.external.prism_normalize import canonicalize_ticker, coerce_float, normalize_market
 
@@ -27,6 +27,7 @@ def run_prism_like_scanner(
     min_volume_ratio_to_market_avg: float = 0.2,
     exclude_halted_or_low_liquidity: bool = True,
     external_signals: Iterable[PrismExternalSignal] | None = None,
+    prism_candidate_market_filter: str = "same_market",
     output_path: str | Path | None = None,
 ) -> ScannerResult:
     warnings: list[str] = []
@@ -35,7 +36,18 @@ def run_prism_like_scanner(
         loaded, load_warnings = _load_ohlcv_fixture(ohlcv_path)
         rows = loaded
         warnings.extend(load_warnings)
-    signal_by_ticker = best_prism_signal_by_ticker(external_signals or [])
+    all_external_signals = list(external_signals or [])
+    filtered_external_signals = _filter_scanner_prism_signals(
+        all_external_signals,
+        market=market,
+        mode=prism_candidate_market_filter,
+    )
+    excluded_cross_market = max(len(all_external_signals) - len(filtered_external_signals), 0)
+    if excluded_cross_market:
+        warnings.append(
+            f"PRISM 후보 {len(all_external_signals)}개 중 현재 시장 {market}와 일치하지 않아 {excluded_cross_market}개 제외"
+        )
+    signal_by_ticker = best_prism_signal_by_ticker(filtered_external_signals)
     candidates: list[ScannerCandidate] = []
     for row in rows:
         candidate = _scan_row(
@@ -58,12 +70,35 @@ def run_prism_like_scanner(
         regime=regime,
         candidates=tuple(candidates[: max(0, int(max_candidates))]),
         warnings=tuple(warnings),
+        source_counts={
+            "scanner_discovered": len(candidates[: max(0, int(max_candidates))]),
+            "prism_imported_same_market": len(filtered_external_signals),
+            "prism_excluded_cross_market": excluded_cross_market,
+        },
     )
     if output_path:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(result.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
     return result
+
+
+def _filter_scanner_prism_signals(
+    signals: list[PrismExternalSignal],
+    *,
+    market: str,
+    mode: str,
+) -> list[PrismExternalSignal]:
+    normalized = str(mode or "same_market").strip().lower()
+    if normalized == "disabled":
+        return []
+    if normalized == "all":
+        return signals
+    return filter_prism_signals_for_market(
+        signals,
+        run_market=market,
+        allow_cross_market_candidates=False,
+    )
 
 
 def augment_universe_with_scanner(

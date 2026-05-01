@@ -466,7 +466,7 @@ def test_investor_report_separates_actions_and_prism_sections():
     assert "오늘 바로 매수 후보" in markdown
     assert "오늘 바로 매도/축소 후보" in markdown
     assert "외부 PRISM 신호 요약" in markdown
-    assert "PRISM 동의: BUY confirmed" in markdown
+    assert "PRISM 일치" in markdown
     assert "전략상 우선순위" not in markdown
 
 
