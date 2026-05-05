@@ -93,10 +93,10 @@ def _candidate_counts(recommendation: PortfolioRecommendation) -> dict[str, int]
     counts.setdefault("pilot_ready_count", sum(1 for action in actions if action.action_now == "STARTER_NOW" or action.action_if_triggered == "STARTER_IF_TRIGGERED"))
     counts.setdefault("close_confirm_count", sum(1 for action in actions if str(action.action_if_triggered or "").endswith("_IF_TRIGGERED")))
     counts.setdefault("trim_to_fund_count", sum(1 for action in actions if action.portfolio_relative_action == "TRIM_TO_FUND"))
-    counts.setdefault("reduce_risk_count", sum(1 for action in actions if action.portfolio_relative_action == "REDUCE_RISK"))
-    counts.setdefault("take_profit_count", sum(1 for action in actions if action.portfolio_relative_action == "TAKE_PROFIT"))
-    counts.setdefault("stop_loss_count", sum(1 for action in actions if action.portfolio_relative_action == "STOP_LOSS"))
-    counts.setdefault("exit_count", sum(1 for action in actions if action.portfolio_relative_action == "EXIT"))
+    counts.setdefault("reduce_risk_count", sum(1 for action in actions if _sell_intent(action) == "REDUCE_RISK"))
+    counts.setdefault("take_profit_count", sum(1 for action in actions if _sell_intent(action) == "TAKE_PROFIT"))
+    counts.setdefault("stop_loss_count", sum(1 for action in actions if _sell_intent(action) == "STOP_LOSS"))
+    counts.setdefault("exit_count", sum(1 for action in actions if _sell_intent(action) == "EXIT"))
     return {key: int(value or 0) for key, value in counts.items()}
 
 
@@ -142,13 +142,21 @@ def _position_guide(recommendation: PortfolioRecommendation) -> dict[str, list[s
     risk: list[str] = []
     for action in sorted(recommendation.actions, key=lambda item: item.priority):
         relative = str(action.portfolio_relative_action or "").upper()
+        sell_intent = _sell_intent(action)
         if relative in {"HOLD", "ADD", "WATCH"} and len(keep) < 6:
             keep.append(action.display_name)
         elif relative == "TRIM_TO_FUND" and len(trim) < 6:
             trim.append(action.display_name)
-        elif relative in {"REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"} and len(risk) < 6:
+        elif sell_intent in {"REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"} and len(risk) < 6:
             risk.append(action.display_name)
     return {"hold_or_add": keep, "trim_to_fund": trim, "risk_reduce": risk}
+
+
+def _sell_intent(action: Any) -> str:
+    intent = str(getattr(action, "sell_intent", "") or "").upper()
+    if intent in {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}:
+        return intent
+    return str(getattr(action, "portfolio_relative_action", "") or "").upper()
 
 
 def _risk_lines(

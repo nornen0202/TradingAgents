@@ -45,6 +45,52 @@ class StructuredDecisionTests(unittest.TestCase):
         self.assertEqual(decision.data_coverage.social_source.value, "unavailable")
         self.assertEqual(decision.risk_action.value, "NONE")
         self.assertIn("risk_action", decision.to_dict())
+        self.assertFalse(decision.profit_taking_plan.enabled)
+
+    def test_profit_taking_plan_parses_and_falls_back_from_level(self):
+        payload = """
+        {
+          "rating": "HOLD",
+          "portfolio_stance": "BULLISH",
+          "entry_action": "WAIT",
+          "risk_action": "TAKE_PROFIT",
+          "risk_action_reason_codes": ["EXTENDED_MOVE"],
+          "risk_action_level": {
+            "label": "extension zone",
+            "level_type": "TAKE_PROFIT",
+            "price": 131100,
+            "confirmation": "intraday",
+            "reason_code": "PROFIT_TAKING"
+          },
+          "profit_taking_plan": {
+            "enabled": true,
+            "stage_1_fraction": 20,
+            "stage_2_price": 135000,
+            "stage_2_fraction": 0.30,
+            "trailing_stop_price": 121700,
+            "keep_core_fraction": 0.45,
+            "reentry_condition": "VWAP retest holds",
+            "reason_codes": ["RSI_OVERBOUGHT"]
+          },
+          "setup_quality": "DEVELOPING",
+          "confidence": 0.70,
+          "time_horizon": "short",
+          "entry_logic": "Wait.",
+          "exit_logic": "Take staged profit near extension.",
+          "position_sizing": "Hold core.",
+          "risk_limits": "Use trailing stop.",
+          "catalysts": [],
+          "invalidators": [],
+          "watchlist_triggers": [],
+          "data_coverage": {"company_news_count":1,"disclosures_count":0,"social_source":"dedicated","macro_items_count":1}
+        }
+        """
+        decision = parse_structured_decision(payload)
+
+        self.assertTrue(decision.profit_taking_plan.enabled)
+        self.assertEqual(decision.profit_taking_plan.stage_1_price, 131100.0)
+        self.assertEqual(decision.profit_taking_plan.stage_1_fraction, 0.20)
+        self.assertIn("RSI_OVERBOUGHT", decision.profit_taking_plan.reason_codes)
 
     def test_legacy_underweight_with_risk_text_infers_reduce_risk(self):
         payload = """

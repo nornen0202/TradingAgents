@@ -194,6 +194,34 @@ class ExecutionLevels:
 
 
 @dataclass(frozen=True)
+class ProfitTakingPlan:
+    enabled: bool = False
+    stage_1_price: float | None = None
+    stage_1_fraction: float | None = None
+    stage_2_price: float | None = None
+    stage_2_fraction: float | None = None
+    trailing_stop_price: float | None = None
+    trailing_stop_fraction: float | None = None
+    keep_core_fraction: float | None = None
+    reentry_condition: str = ""
+    reason_codes: tuple[str, ...] = tuple()
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "enabled": self.enabled,
+            "stage_1_price": self.stage_1_price,
+            "stage_1_fraction": self.stage_1_fraction,
+            "stage_2_price": self.stage_2_price,
+            "stage_2_fraction": self.stage_2_fraction,
+            "trailing_stop_price": self.trailing_stop_price,
+            "trailing_stop_fraction": self.trailing_stop_fraction,
+            "keep_core_fraction": self.keep_core_fraction,
+            "reentry_condition": self.reentry_condition,
+            "reason_codes": list(self.reason_codes),
+        }
+
+
+@dataclass(frozen=True)
 class StructuredDecision:
     rating: DecisionRating
     portfolio_stance: PortfolioStance
@@ -215,6 +243,7 @@ class StructuredDecision:
     risk_action_reason_codes: tuple[str, ...] = tuple()
     risk_action_confidence: float | None = None
     risk_action_level: PriceLevel | None = None
+    profit_taking_plan: ProfitTakingPlan = ProfitTakingPlan()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -238,6 +267,7 @@ class StructuredDecision:
             "risk_action_reason_codes": list(self.risk_action_reason_codes),
             "risk_action_confidence": self.risk_action_confidence,
             "risk_action_level": self.risk_action_level.to_dict() if self.risk_action_level else None,
+            "profit_taking_plan": self.profit_taking_plan.to_dict(),
         }
 
     def to_json(self, *, indent: int = 2) -> str:
@@ -257,6 +287,7 @@ def build_decision_output_instructions(context: str) -> str:
         '"risk_action_reason_codes":["..."],'
         '"risk_action_confidence":0.0,'
         '"risk_action_level":{"label":"support fail","level_type":"SUPPORT","price":420000,"confirmation":"close","source_text":"close below support","reason_code":"SUPPORT_BROKEN"},'
+        '"profit_taking_plan":{"enabled":false,"stage_1_price":131100,"stage_1_fraction":0.20,"stage_2_price":135000,"stage_2_fraction":0.30,"trailing_stop_price":121700,"trailing_stop_fraction":0.25,"keep_core_fraction":0.45,"reentry_condition":"10EMA/VWAP retest holds after cooldown","reason_codes":["EXTENDED_MOVE","PROFIT_TAKING"]},'
         '"setup_quality":"WEAK | DEVELOPING | COMPELLING",'
         '"confidence":0.0,'
         '"time_horizon":"short | medium | long",'
@@ -287,6 +318,7 @@ def build_decision_output_instructions(context: str) -> str:
         "For held positions, explicitly decide whether risk_action should be HOLD, TRIM_TO_FUND, REDUCE_RISK, TAKE_PROFIT, STOP_LOSS, or EXIT. "
         "Use TRIM_TO_FUND only for funding or rotation when the thesis is not invalidated; use REDUCE_RISK, STOP_LOSS, or EXIT for support breaks, invalidation, failed breakout, thesis damage, weak earnings/guidance, regime headwinds, or deteriorated reward/risk. "
         "Use TAKE_PROFIT when the thesis remains valid but an extended move or fading momentum argues for partial de-risking. "
+        "When risk_action=TAKE_PROFIT, populate profit_taking_plan with staged partial-profit prices/fractions, trailing stop, keep-core fraction, reentry condition, and reason codes; set enabled=false when no profit-taking plan applies. "
         "Always include risk_action_reason_codes and risk_action_level when a numeric sell-side level exists. "
         "Do not use NO_TRADE solely because entry_action is WAIT. "
         "Always include execution_levels as investor-facing execution rules, even when the action is WAIT. "
@@ -403,6 +435,17 @@ def _optional_metric_float(value: Any) -> float | None:
     return None
 
 
+def _optional_fraction(value: Any) -> float | None:
+    number = _optional_metric_float(value)
+    if number is None:
+        return None
+    if number > 1.0 and number <= 100.0:
+        number = number / 100.0
+    if not 0.0 <= number <= 1.0:
+        return None
+    return float(number)
+
+
 def _optional_bool(value: Any, *, default: bool = False) -> bool:
     if value is None:
         return default
@@ -502,6 +545,82 @@ def _parse_execution_levels(data: Mapping[str, Any]) -> ExecutionLevels:
         funding_priority=funding_priority,
         entry_window=entry_window,
         trigger_quality=trigger_quality,
+    )
+
+
+def _price_from_level(level: PriceLevel | None, *, prefer_high: bool = True) -> float | None:
+    if level is None:
+        return None
+    if level.price is not None:
+        return level.price
+    if prefer_high and level.high is not None:
+        return level.high
+    if not prefer_high and level.low is not None:
+        return level.low
+    return level.low if level.low is not None else level.high
+
+
+def _parse_profit_taking_plan(
+    data: Mapping[str, Any],
+    *,
+    risk_action: RiskAction,
+    risk_action_reason_codes: tuple[str, ...],
+    risk_action_level: PriceLevel | None,
+) -> ProfitTakingPlan:
+    raw = data.get("profit_taking_plan")
+    raw_plan = raw if isinstance(raw, Mapping) else {}
+    has_raw_plan = isinstance(raw, Mapping)
+    risk_level_type = _price_level_type_value(risk_action_level.level_type) if risk_action_level else ""
+    has_profit_level = risk_level_type in {PriceLevelType.TAKE_PROFIT.value, PriceLevelType.RESISTANCE.value}
+    enabled_default = risk_action == RiskAction.TAKE_PROFIT or has_profit_level
+    enabled = _optional_bool(raw_plan.get("enabled"), default=enabled_default if has_raw_plan else enabled_default)
+    if has_raw_plan and raw_plan.get("enabled") is None:
+        enabled = enabled or any(
+            raw_plan.get(key) not in (None, "")
+            for key in (
+                "stage_1_price",
+                "stage_2_price",
+                "trailing_stop_price",
+                "stage_1_fraction",
+                "stage_2_fraction",
+                "trailing_stop_fraction",
+            )
+        )
+
+    fallback_price = _price_from_level(risk_action_level, prefer_high=True) if has_profit_level else None
+    stage_1_price = _optional_float(raw_plan.get("stage_1_price"))
+    stage_2_price = _optional_float(raw_plan.get("stage_2_price"))
+    trailing_stop_price = _optional_float(raw_plan.get("trailing_stop_price"))
+    stage_1_fraction = _optional_fraction(raw_plan.get("stage_1_fraction"))
+    stage_2_fraction = _optional_fraction(raw_plan.get("stage_2_fraction"))
+    trailing_stop_fraction = _optional_fraction(raw_plan.get("trailing_stop_fraction"))
+    keep_core_fraction = _optional_fraction(raw_plan.get("keep_core_fraction"))
+
+    if enabled and stage_1_price is None:
+        stage_1_price = fallback_price
+    if enabled and stage_1_fraction is None and (stage_1_price is not None or risk_action == RiskAction.TAKE_PROFIT):
+        stage_1_fraction = 0.20
+
+    reason_codes = [
+        *risk_action_reason_codes,
+        *_optional_string_list(raw_plan.get("reason_codes")),
+    ]
+    if risk_action_level and risk_action_level.reason_code:
+        reason_codes.append(risk_action_level.reason_code)
+    if enabled and not reason_codes:
+        reason_codes.append("PROFIT_TAKING")
+
+    return ProfitTakingPlan(
+        enabled=bool(enabled),
+        stage_1_price=stage_1_price,
+        stage_1_fraction=stage_1_fraction,
+        stage_2_price=stage_2_price,
+        stage_2_fraction=stage_2_fraction,
+        trailing_stop_price=trailing_stop_price,
+        trailing_stop_fraction=trailing_stop_fraction,
+        keep_core_fraction=keep_core_fraction,
+        reentry_condition=_optional_string(raw_plan.get("reentry_condition")),
+        reason_codes=tuple(dict.fromkeys(str(code).strip().upper() for code in reason_codes if str(code).strip())),
     )
 
 
@@ -812,10 +931,16 @@ def _parse_risk_action(
             risk_level = _parse_price_level(raw_level)
         except StructuredDecisionValidationError:
             risk_level = None
-    if risk_level is None and risk_action in {RiskAction.REDUCE_RISK, RiskAction.STOP_LOSS, RiskAction.EXIT}:
+    if risk_level is None and risk_action in {RiskAction.TAKE_PROFIT, RiskAction.REDUCE_RISK, RiskAction.STOP_LOSS, RiskAction.EXIT}:
         for level in _parse_execution_levels(data).levels:
             normalized = _price_level_type_value(level.level_type)
-            if normalized in {
+            if risk_action == RiskAction.TAKE_PROFIT and normalized in {
+                PriceLevelType.TAKE_PROFIT.value,
+                PriceLevelType.RESISTANCE.value,
+            }:
+                risk_level = level
+                break
+            if risk_action != RiskAction.TAKE_PROFIT and normalized in {
                 PriceLevelType.SUPPORT.value,
                 PriceLevelType.INVALIDATION.value,
                 PriceLevelType.STOP_LOSS.value,
@@ -892,6 +1017,12 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
         entry_action=entry_action,
         setup_quality=setup_quality,
     )
+    profit_taking_plan = _parse_profit_taking_plan(
+        data,
+        risk_action=risk_action,
+        risk_action_reason_codes=risk_action_reason_codes,
+        risk_action_level=risk_action_level,
+    )
 
     raw_coverage = data.get("data_coverage") if isinstance(data.get("data_coverage"), Mapping) else {}
     social_source_raw = str(raw_coverage.get("social_source", "unavailable")).strip().lower()
@@ -929,6 +1060,7 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
         risk_action_reason_codes=risk_action_reason_codes,
         risk_action_confidence=risk_action_confidence,
         risk_action_level=risk_action_level,
+        profit_taking_plan=profit_taking_plan,
     )
 
 

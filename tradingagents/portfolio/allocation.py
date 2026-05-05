@@ -41,6 +41,37 @@ _STRATEGIC_TRIGGER_ACTIONS = _TRIGGER_BUY_ACTIONS | _TRIGGER_SELL_ACTIONS
 _RELATIVE_TRIM_ACTIONS = {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}
 
 
+def _float_or_none(value: Any) -> float | None:
+    try:
+        if value in (None, ""):
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _fraction_or_none(value: Any) -> float | None:
+    number = _float_or_none(value)
+    if number is None:
+        return None
+    if number > 1.0 and number <= 100.0:
+        number = number / 100.0
+    if not 0.0 <= number <= 1.0:
+        return None
+    return number
+
+
+def _take_profit_ratio(candidate: PortfolioCandidate, *, fallback_score: float) -> float:
+    plan = candidate.profit_taking_plan if isinstance(candidate.profit_taking_plan, dict) else {}
+    ratio = _fraction_or_none(plan.get("stage_1_fraction"))
+    if ratio is None:
+        ratio = min(max(abs(fallback_score), 0.20), 0.35)
+    keep_core = _fraction_or_none(plan.get("keep_core_fraction"))
+    if keep_core is not None:
+        ratio = min(ratio, max(0.0, 1.0 - keep_core))
+    return max(0.0, min(ratio, 1.0))
+
+
 def build_recommendation(
     *,
     candidates: list[PortfolioCandidate],
@@ -141,6 +172,12 @@ def build_recommendation(
                     "external_signal_score_delta": round(candidate.external_signal_score_delta, 4),
                     "external_signal_notes": list(candidate.external_signal_notes),
                     "buy_matrix": candidate.buy_matrix,
+                    "sell_intent": candidate.sell_intent,
+                    "sell_trigger_status": candidate.sell_trigger_status,
+                    "sell_size_plan": candidate.sell_size_plan,
+                    "thesis_after_sell": candidate.thesis_after_sell,
+                    "position_metrics": candidate.position_metrics,
+                    "profit_taking_plan": candidate.profit_taking_plan,
                 },
                 strategy_state=candidate.strategy_state,
                 execution_feasibility_now=candidate.execution_feasibility_now,
@@ -151,6 +188,12 @@ def build_recommendation(
                 risk_action_reason_codes=candidate.risk_action_reason_codes,
                 risk_action_level=candidate.risk_action_level,
                 sell_side_category=candidate.sell_side_category,
+                sell_intent=candidate.sell_intent,
+                sell_trigger_status=candidate.sell_trigger_status,
+                sell_size_plan=candidate.sell_size_plan,
+                thesis_after_sell=candidate.thesis_after_sell,
+                position_metrics=candidate.position_metrics,
+                profit_taking_plan=candidate.profit_taking_plan,
                 budget_blocked_actionable=budget_blocked_actionable,
                 stale_but_triggerable=candidate.stale_but_triggerable,
                 funding_source_score=round(candidate.funding_source_score, 4),
@@ -635,7 +678,7 @@ def _allocate_now_delta(
         if action in {"EXIT_NOW", "STOP_LOSS_NOW"}:
             base_ratio = 1.0
         elif action == "TAKE_PROFIT_NOW":
-            base_ratio = min(max(abs(candidate.score_now), 0.20), 0.35)
+            base_ratio = _take_profit_ratio(candidate, fallback_score=candidate.score_now)
         else:
             base_ratio = min(max(abs(candidate.score_now), 0.15), 0.5)
         return -int(current_value * base_ratio)
@@ -709,7 +752,7 @@ def _allocate_triggered_delta(
         if action in {"EXIT_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED"}:
             base_ratio = 1.0
         elif action == "TAKE_PROFIT_IF_TRIGGERED":
-            base_ratio = min(max(abs(candidate.score_triggered), 0.20), 0.35)
+            base_ratio = _take_profit_ratio(candidate, fallback_score=candidate.score_triggered)
         else:
             base_ratio = min(max(abs(candidate.score_triggered), 0.15), 0.5)
         return -int(current_value * base_ratio)
@@ -815,11 +858,11 @@ def _build_candidate_counts(
         "immediate_budget_blocked_count": len(budget_blocked),
         "pilot_ready_count": len(pilot_ready),
         "close_confirm_count": len(close_confirm),
-        "trim_to_fund_count": sum(1 for action in actions if action.portfolio_relative_action == "TRIM_TO_FUND"),
-        "reduce_risk_count": sum(1 for action in actions if action.portfolio_relative_action == "REDUCE_RISK"),
-        "take_profit_count": sum(1 for action in actions if action.portfolio_relative_action == "TAKE_PROFIT"),
-        "stop_loss_count": sum(1 for action in actions if action.portfolio_relative_action == "STOP_LOSS"),
-        "exit_count": sum(1 for action in actions if action.portfolio_relative_action == "EXIT"),
+        "trim_to_fund_count": sum(1 for action in actions if _action_sell_intent(action) == "TRIM_TO_FUND"),
+        "reduce_risk_count": sum(1 for action in actions if _action_sell_intent(action) == "REDUCE_RISK"),
+        "take_profit_count": sum(1 for action in actions if _action_sell_intent(action) == "TAKE_PROFIT"),
+        "stop_loss_count": sum(1 for action in actions if _action_sell_intent(action) == "STOP_LOSS"),
+        "exit_count": sum(1 for action in actions if _action_sell_intent(action) == "EXIT"),
         "funding_candidates_count": len(top_add_if_funded) if top_trim_if_needed else 0,
         "held_add_if_triggered_count": sum(
             1
@@ -1127,6 +1170,12 @@ def _scenario_order_from_action(
         "risk_action_reason_codes": list(action.risk_action_reason_codes),
         "risk_action_level": action.risk_action_level,
         "sell_side_category": action.sell_side_category,
+        "sell_intent": action.sell_intent,
+        "sell_trigger_status": action.sell_trigger_status,
+        "sell_size_plan": action.sell_size_plan,
+        "thesis_after_sell": action.thesis_after_sell,
+        "position_metrics": action.position_metrics,
+        "profit_taking_plan": action.profit_taking_plan,
         "trigger_conditions": list(action.trigger_conditions),
         "rank": action.capital_reallocation_rank,
         "note": note,
@@ -1185,21 +1234,28 @@ def _funding_trim_item(action: PortfolioAction, snapshot: AccountSnapshot) -> di
         "risk_action_reason_codes": list(action.risk_action_reason_codes),
         "risk_action_level": action.risk_action_level,
         "sell_side_category": action.sell_side_category,
+        "sell_intent": action.sell_intent,
+        "sell_trigger_status": action.sell_trigger_status,
+        "sell_size_plan": action.sell_size_plan,
+        "thesis_after_sell": action.thesis_after_sell,
+        "position_metrics": action.position_metrics,
+        "profit_taking_plan": action.profit_taking_plan,
         "funding_reason_codes": list(action.relative_action_reason_codes) or _fallback_funding_reason_codes(action),
         "rationale": action.rationale,
     }
 
 
 def _fallback_funding_reason_codes(action: PortfolioAction) -> list[str]:
-    if action.portfolio_relative_action == "REDUCE_RISK":
+    sell_intent = _action_sell_intent(action)
+    if sell_intent == "REDUCE_RISK":
         return ["THESIS_WEAKENING"]
-    if action.portfolio_relative_action == "TAKE_PROFIT":
+    if sell_intent == "TAKE_PROFIT":
         return ["PROFIT_TAKING"]
-    if action.portfolio_relative_action == "STOP_LOSS":
+    if sell_intent == "STOP_LOSS":
         return ["INVALIDATION_BROKEN"]
-    if action.portfolio_relative_action == "EXIT":
+    if sell_intent == "EXIT":
         return ["THESIS_WEAKENING"]
-    if action.portfolio_relative_action == "TRIM_TO_FUND":
+    if sell_intent == "TRIM_TO_FUND":
         return ["OPPORTUNITY_COST"]
     if action.funding_source_score > 0:
         return ["OPPORTUNITY_COST"]
@@ -1308,10 +1364,20 @@ def _risk_action_distribution(actions: tuple[PortfolioAction, ...]) -> dict[str,
     return distribution
 
 
+def _action_sell_intent(action: PortfolioAction) -> str:
+    intent = str(action.sell_intent or "").upper()
+    if intent in {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}:
+        return intent
+    relative = str(action.portfolio_relative_action or "").upper()
+    if relative in {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}:
+        return relative
+    return "NONE"
+
+
 def _sell_side_distribution(actions: tuple[PortfolioAction, ...]) -> dict[str, int]:
     keys = ("TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT")
     return {
-        key: sum(1 for action in actions if str(action.portfolio_relative_action or "").upper() == key)
+        key: sum(1 for action in actions if _action_sell_intent(action) == key)
         for key in keys
     }
 

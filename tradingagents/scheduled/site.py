@@ -269,7 +269,8 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
         )
         sell_side_counts = portfolio_summary.get("sell_side_counts") if isinstance(portfolio_summary.get("sell_side_counts"), dict) else {}
         sell_side_line = (
-            f"<p>리스크 축소 {int(sell_side_counts.get('REDUCE_RISK') or 0)} / "
+            f"<p>이익실현 {int(sell_side_counts.get('TAKE_PROFIT') or 0)} / "
+            f"리스크 축소 {int(sell_side_counts.get('REDUCE_RISK') or 0)} / "
             f"손절·청산 {int(sell_side_counts.get('STOP_LOSS') or 0) + int(sell_side_counts.get('EXIT') or 0)}</p>"
             if sell_side_counts
             else ""
@@ -764,6 +765,7 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
     action_rows = _performance_bucket_rows(summary.get("by_action") if isinstance(summary.get("by_action"), dict) else {})
     prism_rows = _performance_bucket_rows(summary.get("prism_agreement") if isinstance(summary.get("prism_agreement"), dict) else {})
     action_bucket_rows = _performance_bucket_rows(summary.get("action_buckets") if isinstance(summary.get("action_buckets"), dict) else {})
+    profit_rows = _performance_bucket_rows(summary.get("profit_taking") if isinstance(summary.get("profit_taking"), dict) else {})
     warnings = outcome_update.get("warnings") if isinstance(outcome_update.get("warnings"), list) else []
     warning_html = "".join(f"<li>{_escape(item)}</li>" for item in warnings[:6])
     update_label = "갱신됨" if outcome_update.get("updated") else ("대기 중" if outcome_update.get("enabled") else "비활성")
@@ -790,6 +792,7 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
       {unavailable_note}
       <div class="run-grid">
         {_performance_table('액션별 5일/20일 성과', action_rows)}
+        {_performance_table('익절 성과', profit_rows)}
         {_performance_table('PRISM 일치/충돌별 성과', prism_rows)}
         {_performance_table('추천 출처/PRISM 커버리지별 성과', action_bucket_rows)}
       </div>
@@ -1028,12 +1031,13 @@ def _portfolio_execution_view(portfolio_action: dict[str, Any], *, language: str
     action_now = str(portfolio_action.get("action_now") or "").upper()
     relative_action = str(portfolio_action.get("portfolio_relative_action") or "").upper()
     risk_action = str(portfolio_action.get("risk_action") or "").upper()
+    sell_intent = str(portfolio_action.get("sell_intent") or "").upper()
     if action_now in {"STOP_LOSS_NOW", "EXIT_NOW"} or relative_action in {"STOP_LOSS", "EXIT"} or risk_action in {"STOP_LOSS", "EXIT"}:
         return "손절/청산 검토" if korean else "Review stop-loss / exit"
+    if action_now == "TAKE_PROFIT_NOW" or sell_intent == "TAKE_PROFIT" or relative_action == "TAKE_PROFIT":
+        return "이익실현 검토" if korean else "Review take-profit"
     if action_now in {"REDUCE_NOW", "TRIM_NOW"} or relative_action == "REDUCE_RISK":
         return "일부 축소 검토" if korean else "Review partial reduction"
-    if action_now == "TAKE_PROFIT_NOW" or relative_action == "TAKE_PROFIT":
-        return "이익실현 검토" if korean else "Review take-profit"
     if action_now in {"ADD_NOW", "STARTER_NOW"}:
         return "매수 검토" if korean else "Review buy"
     if relative_action == "TRIM_TO_FUND":

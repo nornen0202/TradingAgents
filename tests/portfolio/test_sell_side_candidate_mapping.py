@@ -6,7 +6,7 @@ from tradingagents.portfolio.candidates import _build_single_candidate
 
 
 class SellSideCandidateMappingTests(unittest.TestCase):
-    def _position(self):
+    def _position(self, *, avg_cost=70000, market_price=70000, unrealized_pnl=0):
         return Position(
             broker_symbol="005930",
             canonical_ticker="005930.KS",
@@ -14,10 +14,10 @@ class SellSideCandidateMappingTests(unittest.TestCase):
             sector="Technology",
             quantity=10,
             available_qty=10,
-            avg_cost_krw=70000,
-            market_price_krw=70000,
-            market_value_krw=700000,
-            unrealized_pnl_krw=0,
+            avg_cost_krw=avg_cost,
+            market_price_krw=market_price,
+            market_value_krw=int(market_price * 10),
+            unrealized_pnl_krw=unrealized_pnl,
         )
 
     def _snapshot(self):
@@ -176,6 +176,74 @@ class SellSideCandidateMappingTests(unittest.TestCase):
 
         self.assertEqual(candidate.suggested_action_now, "HOLD")
         self.assertEqual(candidate.suggested_action_if_triggered, "STOP_LOSS_IF_TRIGGERED")
+
+    def test_profit_level_reduce_risk_is_labeled_take_profit_without_damage(self):
+        position = self._position(avg_cost=70000, market_price=84000, unrealized_pnl=140000)
+        candidate, _ = _build_single_candidate(
+            snapshot=AccountSnapshot(
+                **{
+                    **self._snapshot().__dict__,
+                    "positions": (position,),
+                }
+            ),
+            canonical_ticker="005930.KS",
+            position=position,
+            analysis={
+                "decision": self._decision(
+                    risk_action="REDUCE_RISK",
+                    risk_action_reason_codes=["EXTENDED_MOVE"],
+                    risk_action_level={
+                        "label": "extension resistance",
+                        "level_type": "TAKE_PROFIT",
+                        "price": 85000,
+                        "confirmation": "intraday",
+                    },
+                ),
+                "tool_telemetry": {},
+                "execution_update": {
+                    "decision_state": "WAIT",
+                    "last_price": 84000,
+                    "trigger_status": {},
+                    "source": {"market_session": "regular"},
+                },
+            },
+        )
+
+        self.assertEqual(candidate.risk_action, "REDUCE_RISK")
+        self.assertEqual(candidate.portfolio_relative_action, "REDUCE_RISK")
+        self.assertEqual(candidate.sell_intent, "TAKE_PROFIT")
+        self.assertEqual(candidate.sell_side_category, "profit")
+        self.assertEqual(candidate.thesis_after_sell, "MAINTAIN")
+        self.assertAlmostEqual(candidate.position_metrics["unrealized_return_pct"], 20.0)
+
+    def test_damage_code_keeps_profit_level_reduce_risk_as_reduce_risk(self):
+        position = self._position(avg_cost=70000, market_price=84000, unrealized_pnl=140000)
+        candidate, _ = _build_single_candidate(
+            snapshot=AccountSnapshot(
+                **{
+                    **self._snapshot().__dict__,
+                    "positions": (position,),
+                }
+            ),
+            canonical_ticker="005930.KS",
+            position=position,
+            analysis={
+                "decision": self._decision(
+                    risk_action="REDUCE_RISK",
+                    risk_action_reason_codes=["SUPPORT_BROKEN"],
+                    risk_action_level={
+                        "label": "failed extension",
+                        "level_type": "TAKE_PROFIT",
+                        "price": 85000,
+                        "confirmation": "intraday",
+                    },
+                ),
+                "tool_telemetry": {},
+            },
+        )
+
+        self.assertEqual(candidate.sell_intent, "REDUCE_RISK")
+        self.assertEqual(candidate.thesis_after_sell, "WEAKENED")
 
 
 if __name__ == "__main__":

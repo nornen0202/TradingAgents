@@ -231,23 +231,23 @@ def _candidate_counts(recommendation: PortfolioRecommendation) -> dict[str, int]
     )
     counts.setdefault(
         "trim_to_fund_count",
-        sum(1 for action in actions if action.portfolio_relative_action == "TRIM_TO_FUND"),
+        sum(1 for action in actions if _action_sell_intent(action) == "TRIM_TO_FUND"),
     )
     counts.setdefault(
         "reduce_risk_count",
-        sum(1 for action in actions if action.portfolio_relative_action == "REDUCE_RISK"),
+        sum(1 for action in actions if _action_sell_intent(action) == "REDUCE_RISK"),
     )
     counts.setdefault(
         "take_profit_count",
-        sum(1 for action in actions if action.portfolio_relative_action == "TAKE_PROFIT"),
+        sum(1 for action in actions if _action_sell_intent(action) == "TAKE_PROFIT"),
     )
     counts.setdefault(
         "stop_loss_count",
-        sum(1 for action in actions if action.portfolio_relative_action == "STOP_LOSS"),
+        sum(1 for action in actions if _action_sell_intent(action) == "STOP_LOSS"),
     )
     counts.setdefault(
         "exit_count",
-        sum(1 for action in actions if action.portfolio_relative_action == "EXIT"),
+        sum(1 for action in actions if _action_sell_intent(action) == "EXIT"),
     )
     counts.setdefault("funding_candidates_count", 0)
     counts.setdefault(
@@ -337,25 +337,21 @@ def _directional_priority_sections(recommendation: PortfolioRecommendation) -> s
     stop_or_exit = [
         action
         for action in actions
-        if action.action_now in {"STOP_LOSS_NOW", "EXIT_NOW"}
+        if _action_sell_intent(action) in {"STOP_LOSS", "EXIT"}
+        or action.action_now in {"STOP_LOSS_NOW", "EXIT_NOW"}
         or action.action_if_triggered in {"STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
-        or action.portfolio_relative_action in {"STOP_LOSS", "EXIT"}
     ]
-    conditional_sell = [
-        action
-        for action in actions
-        if action not in stop_or_exit
-        and (
-            action.action_if_triggered in {"REDUCE_IF_TRIGGERED", "TAKE_PROFIT_IF_TRIGGERED"}
-            or action.portfolio_relative_action in {"REDUCE_RISK", "TAKE_PROFIT"}
-        )
-    ]
+    take_profit = [action for action in actions if action not in stop_or_exit and _action_sell_intent(action) == "TAKE_PROFIT"]
+    reduce_risk = [action for action in actions if action not in stop_or_exit and _action_sell_intent(action) == "REDUCE_RISK"]
     sections = [
-        ("오늘 바로 매도/축소 후보", [action for action in actions if action.action_now in _NOW_SELL_ACTIONS]),
+        ("오늘 바로 이익실현 후보", [action for action in take_profit if action.action_now == "TAKE_PROFIT_NOW"]),
+        ("조건부 이익실현 후보", [action for action in take_profit if action.action_now != "TAKE_PROFIT_NOW"]),
+        ("오늘 바로 위험 축소 후보", [action for action in reduce_risk if action.action_now in {"REDUCE_NOW", "TRIM_NOW"}]),
+        ("조건부 위험 축소 후보", [action for action in reduce_risk if action.action_now not in {"REDUCE_NOW", "TRIM_NOW"}]),
+        ("손절/청산 후보", stop_or_exit),
+        ("자금 마련용 축소 후보", [action for action in actions if _action_sell_intent(action) == "TRIM_TO_FUND"]),
         ("오늘 바로 매수 후보", [action for action in actions if action.action_now in _NOW_BUY_ACTIONS]),
         ("조건부 매수 후보", [action for action in actions if action.action_if_triggered in _TRIGGER_BUY_ACTIONS]),
-        ("조건부 매도/손절/이익실현 후보", conditional_sell + [action for action in stop_or_exit if action not in conditional_sell]),
-        ("손절/청산 후보", stop_or_exit),
     ]
     chunks: list[str] = ["## 오늘 할 일: 방향별 후보"]
     for title, items in sections:
@@ -386,7 +382,7 @@ def _directional_action_line(index: int, action) -> str:
     action_label = present_account_action(action.action_now, language="Korean")
     if action.action_now in {"HOLD", "WATCH"}:
         action_label = present_account_action(action.action_if_triggered, conditional=True, language="Korean")
-    relative_label = present_account_action(action.portfolio_relative_action, language="Korean")
+    relative_label = present_account_action(_action_sell_intent(action) or action.portfolio_relative_action, language="Korean")
     amount = action.delta_krw_now if action.delta_krw_now else action.delta_krw_if_triggered
     amount_label = _amount_label(amount) if amount else "금액 변화 없음"
     level = _risk_level_label(action.risk_action_level)
@@ -394,6 +390,13 @@ def _directional_action_line(index: int, action) -> str:
     prism = _prism_badge(action)
     prism_text = f" / {prism}" if prism else ""
     return f"- {index}. {action.display_name} - {action_label} / {relative_label}{level} / {amount_label}{prism_text} - {reason}"
+
+
+def _action_sell_intent(action) -> str:
+    intent = str(getattr(action, "sell_intent", "") or "").strip().upper()
+    if intent in {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}:
+        return intent
+    return str(getattr(action, "portfolio_relative_action", "") or "").strip().upper()
 
 
 def _risk_level_label(raw_level: dict[str, Any] | None) -> str:
@@ -420,31 +423,23 @@ def _sell_side_sections(
     live_risk_lines = _live_sell_side_lines(live_sell_side_delta)
     sections = [
         ("오늘 바로 매수 후보 (오늘 살 후보)", [action for action in actions if action.action_now in {"ADD_NOW", "STARTER_NOW"}]),
-        ("오늘 바로 매도/축소 후보", [action for action in actions if action.action_now in _NOW_SELL_ACTIONS]),
+        ("오늘 바로 이익실현 후보", [action for action in actions if _action_sell_intent(action) == "TAKE_PROFIT" and action.action_now == "TAKE_PROFIT_NOW"]),
+        ("조건부 이익실현 후보", [action for action in actions if _action_sell_intent(action) == "TAKE_PROFIT" and action.action_now != "TAKE_PROFIT_NOW"]),
+        ("오늘 바로 위험 축소 후보", [action for action in actions if _action_sell_intent(action) == "REDUCE_RISK" and action.action_now in {"REDUCE_NOW", "TRIM_NOW"}]),
+        ("조건부 위험 축소 후보", [action for action in actions if _action_sell_intent(action) == "REDUCE_RISK" and action.action_now not in {"REDUCE_NOW", "TRIM_NOW"}]),
+        ("손절/청산 후보", [action for action in actions if _action_sell_intent(action) in {"STOP_LOSS", "EXIT"}]),
+        ("자금 마련용 축소 후보", [action for action in actions if _action_sell_intent(action) == "TRIM_TO_FUND"]),
         ("조건부 매수 후보 (조건부 살 후보)", [action for action in actions if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}]),
-        (
-            "조건부 매도/이익실현/손절 후보",
-            [
-                action
-                for action in actions
-                if action.action_if_triggered in {"REDUCE_IF_TRIGGERED", "TAKE_PROFIT_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}
-                or action.portfolio_relative_action in {"REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}
-            ],
-        ),
-        ("줄여서 살 후보", [action for action in actions if action.portfolio_relative_action == "TRIM_TO_FUND"]),
-        ("위험 때문에 줄일 후보", [action for action in actions if action.portfolio_relative_action == "REDUCE_RISK"]),
-        ("이익실현 후보", [action for action in actions if action.portfolio_relative_action == "TAKE_PROFIT"]),
-        ("손절/청산 후보", [action for action in actions if action.portfolio_relative_action in {"STOP_LOSS", "EXIT"}]),
         ("그냥 보유", [action for action in actions if action.action_now == "HOLD" and action.action_if_triggered == "NONE" and action.portfolio_relative_action == "HOLD"]),
         ("관찰만", [action for action in actions if action.action_now == "WATCH"]),
     ]
     chunks: list[str] = ["## 투자자용 액션 구분"]
     for title, items in sections:
         chunks.extend(["", f"### {title}"])
-        if title == "위험 때문에 줄일 후보" and live_risk_lines:
+        if title in {"오늘 바로 위험 축소 후보", "조건부 위험 축소 후보"} and live_risk_lines:
             chunks.extend(live_risk_lines)
         if not items:
-            if title != "위험 때문에 줄일 후보" or not live_risk_lines:
+            if title not in {"오늘 바로 위험 축소 후보", "조건부 위험 축소 후보"} or not live_risk_lines:
                 chunks.append("- 없음")
             continue
         note = _section_prism_note(items)
@@ -468,7 +463,7 @@ def _live_sell_side_lines(values: list[dict[str, Any]] | None) -> list[str]:
 
 
 def _action_brief_line(action) -> str:
-    label = present_account_action(action.portfolio_relative_action, language="Korean")
+    label = present_account_action(_action_sell_intent(action) or action.portfolio_relative_action, language="Korean")
     reason = _localized_rationale(action)
     level = ""
     if action.risk_action_level:
@@ -478,7 +473,21 @@ def _action_brief_line(action) -> str:
             level = f" / 기준 {price}"
     prism = _prism_badge(action)
     prism_text = f" / {prism}" if prism else ""
-    return f"- {action.display_name}: {label}{level}{prism_text} - {reason}"
+    profit_text = _profit_metric_label(action)
+    return f"- {action.display_name}: {label}{level}{profit_text}{prism_text} - {reason}"
+
+
+def _profit_metric_label(action) -> str:
+    metrics = getattr(action, "position_metrics", {}) or {}
+    if not isinstance(metrics, dict):
+        return ""
+    value = metrics.get("unrealized_return_pct")
+    if value in (None, ""):
+        return ""
+    try:
+        return f" / 미실현 {float(value):.1f}%"
+    except (TypeError, ValueError):
+        return ""
 
 
 def _prism_badge(action) -> str:
@@ -631,7 +640,7 @@ def _top_trim_if_needed(recommendation: PortfolioRecommendation) -> list[dict[st
 
 def _funding_reason_label(item: dict[str, Any]) -> str:
     codes = [str(value).strip().upper() for value in (item.get("funding_reason_codes") or item.get("relative_action_reason_codes") or [])]
-    action = str(item.get("portfolio_relative_action") or item.get("risk_action") or "").strip().upper()
+    action = str(item.get("sell_intent") or item.get("portfolio_relative_action") or item.get("risk_action") or "").strip().upper()
     if action == "STOP_LOSS" or "INVALIDATION_BROKEN" in codes:
         return "손절 조건"
     if action == "TAKE_PROFIT" or "PROFIT_TAKING" in codes:
@@ -686,7 +695,9 @@ def _localized_rationale(action) -> str:
         return text
     if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}:
         return "조건 충족 전까지 대기합니다."
-    if action.action_if_triggered in {"REDUCE_IF_TRIGGERED", "TAKE_PROFIT_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+    if action.action_if_triggered == "TAKE_PROFIT_IF_TRIGGERED":
+        return "목표가 또는 과열 조건 충족 시 일부 이익을 보호합니다."
+    if action.action_if_triggered in {"REDUCE_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
         return "리스크 조건 이탈 시 축소를 검토합니다."
     return "추가 행동보다 관찰이 우선입니다."
 

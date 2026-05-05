@@ -6,7 +6,7 @@ from typing import Any
 
 from tradingagents.schemas import DecisionRating, RiskAction, parse_structured_decision
 
-from .account_models import AccountSnapshot, PortfolioCandidate
+from .account_models import AccountSnapshot, PortfolioCandidate, PortfolioProfile
 from .instrument_identity import resolve_identity
 
 
@@ -26,6 +26,7 @@ def build_portfolio_candidates(
     run_dir: Path,
     manifest: dict[str, Any],
     watch_tickers: tuple[str, ...],
+    profile: PortfolioProfile | None = None,
 ) -> tuple[list[PortfolioCandidate], list[str]]:
     analysis_by_ticker = _load_analysis_by_ticker(run_dir, manifest)
     failed_by_ticker = _failed_tickers_by_canonical(manifest)
@@ -47,6 +48,7 @@ def build_portfolio_candidates(
             analysis=analysis,
             position=position,
             failed_reason=failed_by_ticker.get(canonical_ticker),
+            profile=profile,
         )
         candidates.append(candidate)
         warnings.extend(candidate_warnings)
@@ -114,6 +116,7 @@ def _build_single_candidate(
     analysis: dict[str, Any] | None,
     position,
     failed_reason: str | None = None,
+    profile: PortfolioProfile | None = None,
 ) -> tuple[PortfolioCandidate, list[str]]:
     warnings: list[str] = []
     if position is not None:
@@ -251,6 +254,34 @@ def _build_single_candidate(
         execution_update=execution_update_payload,
         is_held=is_held,
     )
+    profit_taking_plan = _normalize_profit_taking_plan(
+        raw_plan=(structured_dict or {}).get("profit_taking_plan") if isinstance(structured_dict, dict) else None,
+        risk_action=risk_action,
+        risk_action_reason_codes=risk_action_reason_codes,
+        risk_action_level=risk_action_level,
+        position=position,
+        profile=profile,
+    )
+    position_metrics = _position_metrics(
+        position=position,
+        current_price=current_price_for_risk,
+        risk_action_level=risk_action_level,
+        profit_taking_plan=profit_taking_plan,
+        risk_action_reason_codes=risk_action_reason_codes,
+        profile=profile,
+    )
+    if _take_profit_lacks_evidence(
+        risk_action=risk_action,
+        risk_action_level=risk_action_level,
+        risk_action_reason_codes=risk_action_reason_codes,
+        profit_taking_plan=profit_taking_plan,
+        position_metrics=position_metrics,
+        profile=profile,
+    ):
+        risk_action = RiskAction.HOLD.value
+        risk_action_reason_codes = tuple()
+        profit_taking_plan = {"enabled": False, "reason_codes": ["PROFIT_TAKING_NOT_EVIDENCED"]}
+        position_metrics = {**position_metrics, "profit_protection_score": 0.0}
     action_now, action_if_triggered = _apply_risk_action_mapping(
         action_now=action_now,
         action_if_triggered=action_if_triggered,
@@ -330,11 +361,32 @@ def _build_single_candidate(
         analysis_present=analysis is not None,
         risk_action=risk_action,
         risk_action_reason_codes=risk_action_reason_codes,
+        risk_action_level=risk_action_level,
     )
     if reanalysis_reason:
         portfolio_relative_action = "HOLD" if is_held else "WATCH"
         relative_reason_codes = ("REANALYSIS_REQUIRED",)
-    sell_side_category = _sell_side_category(risk_action, portfolio_relative_action)
+    sell_intent = _sell_intent(
+        risk_action=risk_action,
+        portfolio_relative_action=portfolio_relative_action,
+        action_now=action_now,
+        action_if_triggered=action_if_triggered,
+        risk_action_level=risk_action_level,
+        reason_codes=relative_reason_codes,
+    )
+    sell_trigger_status = _sell_trigger_status(
+        action_now=action_now,
+        action_if_triggered=action_if_triggered,
+        risk_action_level=risk_action_level,
+    )
+    sell_size_plan = _sell_size_plan(
+        sell_intent=sell_intent,
+        action_now=action_now,
+        action_if_triggered=action_if_triggered,
+        profit_taking_plan=profit_taking_plan,
+    )
+    thesis_after_sell = _thesis_after_sell(sell_intent=sell_intent, reason_codes=relative_reason_codes)
+    sell_side_category = _sell_side_category(sell_intent if sell_intent != "NONE" else risk_action, portfolio_relative_action)
 
     return (
         PortfolioCandidate(
@@ -366,6 +418,12 @@ def _build_single_candidate(
             risk_action_reason_codes=risk_action_reason_codes,
             risk_action_level=risk_action_level,
             sell_side_category=sell_side_category,
+            sell_intent=sell_intent,
+            sell_trigger_status=sell_trigger_status,
+            sell_size_plan=sell_size_plan,
+            thesis_after_sell=thesis_after_sell,
+            position_metrics=position_metrics,
+            profit_taking_plan=profit_taking_plan,
             stale_but_triggerable=stale_but_triggerable,
             review_required=bool(reanalysis_reason),
             trigger_profile={
@@ -393,6 +451,12 @@ def _build_single_candidate(
                 "risk_action_reason_codes": list(risk_action_reason_codes),
                 "risk_action_level": risk_action_level,
                 "sell_side_category": sell_side_category,
+                "sell_intent": sell_intent,
+                "sell_trigger_status": sell_trigger_status,
+                "sell_size_plan": sell_size_plan,
+                "thesis_after_sell": thesis_after_sell,
+                "position_metrics": position_metrics,
+                "profit_taking_plan": profit_taking_plan,
                 "stale_but_triggerable": stale_but_triggerable,
                 "reanalysis_required": bool(reanalysis_reason),
                 "reanalysis_reason": reanalysis_reason,
@@ -847,6 +911,298 @@ def _safe_float(value: Any) -> float | None:
         return None
 
 
+_THESIS_DAMAGE_CODES = {
+    "SUPPORT_BROKEN",
+    "SUPPORT_FAIL",
+    "FAILED_BREAKOUT",
+    "INVALIDATION_BROKEN",
+    "THESIS_WEAKENING",
+    "NEGATIVE_EARNINGS_GUIDANCE",
+    "NEGATIVE_DISCLOSURE_SHOCK",
+    "REGULATORY_OVERHANG",
+    "SECTOR_HEADWIND",
+    "REGIME_HEADWIND",
+}
+_PROFIT_EVIDENCE_CODES = {
+    "PROFIT_TAKING",
+    "TAKE_PROFIT",
+    "EXTENDED_MOVE",
+    "RSI_OVERBOUGHT",
+    "MOMENTUM_DECELERATION",
+    "VOLUME_COOLING",
+    "RESISTANCE_TEST",
+    "TARGET_REACHED",
+    "PRISM_TAKE_PROFIT",
+}
+
+
+def _profile_float(profile: PortfolioProfile | None, name: str, default: float) -> float:
+    try:
+        value = float(getattr(profile, name, default) if profile is not None else default)
+    except (TypeError, ValueError):
+        value = default
+    return value
+
+
+def _normalize_fraction(value: Any, *, default: float | None = None) -> float | None:
+    number = _safe_float(value)
+    if number is None:
+        return default
+    if number > 1.0 and number <= 100.0:
+        number = number / 100.0
+    if not 0.0 <= number <= 1.0:
+        return default
+    return float(number)
+
+
+def _risk_level_type(risk_action_level: dict[str, Any] | None) -> str:
+    if not isinstance(risk_action_level, dict):
+        return ""
+    return str(risk_action_level.get("level_type") or "").strip().upper().replace(" ", "_")
+
+
+def _is_profit_level(risk_action_level: dict[str, Any] | None) -> bool:
+    return _risk_level_type(risk_action_level) in {"TAKE_PROFIT", "RESISTANCE"}
+
+
+def _level_price(risk_action_level: dict[str, Any] | None, *, prefer_high: bool = True) -> float | None:
+    if not isinstance(risk_action_level, dict):
+        return None
+    price = _safe_float(risk_action_level.get("price"))
+    if price is not None and price > 0:
+        return price
+    first_key, second_key = ("high", "low") if prefer_high else ("low", "high")
+    for key in (first_key, second_key):
+        value = _safe_float(risk_action_level.get(key))
+        if value is not None and value > 0:
+            return value
+    return None
+
+
+def _reason_code_set(values: tuple[str, ...] | list[str] | None) -> set[str]:
+    return {str(value).strip().upper() for value in (values or []) if str(value).strip()}
+
+
+def _has_thesis_damage(values: tuple[str, ...] | list[str] | None) -> bool:
+    codes = _reason_code_set(values)
+    return bool(codes & _THESIS_DAMAGE_CODES)
+
+
+def _has_profit_evidence(values: tuple[str, ...] | list[str] | None) -> bool:
+    codes = _reason_code_set(values)
+    return bool(codes & _PROFIT_EVIDENCE_CODES or any("PROFIT" in code or "EXTENDED" in code for code in codes))
+
+
+def _normalize_profit_taking_plan(
+    *,
+    raw_plan: Any,
+    risk_action: str,
+    risk_action_reason_codes: tuple[str, ...],
+    risk_action_level: dict[str, Any] | None,
+    position: Any,
+    profile: PortfolioProfile | None,
+) -> dict[str, Any]:
+    raw = dict(raw_plan) if isinstance(raw_plan, dict) else {}
+    normalized_risk = str(risk_action or RiskAction.NONE.value).upper()
+    enabled = bool(raw.get("enabled")) if "enabled" in raw else normalized_risk == RiskAction.TAKE_PROFIT.value or _is_profit_level(risk_action_level)
+    stage_1_price = _safe_float(raw.get("stage_1_price")) or (_level_price(risk_action_level) if _is_profit_level(risk_action_level) else None)
+    stage_2_price = _safe_float(raw.get("stage_2_price"))
+    trailing_stop_price = _safe_float(raw.get("trailing_stop_price"))
+    reason_codes = list(_reason_code_set(raw.get("reason_codes") if isinstance(raw.get("reason_codes"), list) else []))
+    reason_codes.extend(_reason_code_set(risk_action_reason_codes))
+    if _is_profit_level(risk_action_level) and not reason_codes:
+        reason_codes.append("PROFIT_TAKING")
+    if normalized_risk == RiskAction.TAKE_PROFIT.value:
+        reason_codes.append("PROFIT_TAKING")
+
+    stage_1_fraction = _normalize_fraction(
+        raw.get("stage_1_fraction"),
+        default=_profile_float(profile, "profit_take_stage1_fraction", 0.20) if enabled else None,
+    )
+    stage_2_fraction = _normalize_fraction(
+        raw.get("stage_2_fraction"),
+        default=_profile_float(profile, "profit_take_stage2_fraction", 0.30) if enabled and stage_2_price is not None else None,
+    )
+    trailing_stop_fraction = _normalize_fraction(
+        raw.get("trailing_stop_fraction"),
+        default=_profile_float(profile, "profit_take_trailing_fraction", 0.25) if enabled and trailing_stop_price is not None else None,
+    )
+    keep_core_fraction = _normalize_fraction(
+        raw.get("keep_core_fraction"),
+        default=_profile_float(profile, "profit_take_keep_core_fraction", 0.45) if enabled else None,
+    )
+    if not position:
+        enabled = False
+
+    return {
+        "enabled": bool(enabled),
+        "stage_1_price": stage_1_price,
+        "stage_1_fraction": stage_1_fraction,
+        "stage_2_price": stage_2_price,
+        "stage_2_fraction": stage_2_fraction,
+        "trailing_stop_price": trailing_stop_price,
+        "trailing_stop_fraction": trailing_stop_fraction,
+        "keep_core_fraction": keep_core_fraction,
+        "reentry_condition": str(raw.get("reentry_condition") or "").strip(),
+        "reason_codes": list(dict.fromkeys(code for code in reason_codes if code)),
+    }
+
+
+def _position_metrics(
+    *,
+    position: Any,
+    current_price: float | None,
+    risk_action_level: dict[str, Any] | None,
+    profit_taking_plan: dict[str, Any],
+    risk_action_reason_codes: tuple[str, ...],
+    profile: PortfolioProfile | None,
+) -> dict[str, Any]:
+    if position is None:
+        return {}
+    entry_price = _safe_float(getattr(position, "avg_cost_krw", None))
+    market_price = current_price or _safe_float(getattr(position, "market_price_krw", None))
+    market_value = _safe_float(getattr(position, "market_value_krw", None))
+    unrealized_pnl = _safe_float(getattr(position, "unrealized_pnl_krw", None))
+    unrealized_return_pct: float | None = None
+    if entry_price and entry_price > 0 and market_price and market_price > 0:
+        unrealized_return_pct = (market_price - entry_price) / entry_price * 100.0
+    elif market_value and unrealized_pnl is not None and market_value - unrealized_pnl > 0:
+        unrealized_return_pct = unrealized_pnl / (market_value - unrealized_pnl) * 100.0
+
+    stage_1_price = _safe_float(profit_taking_plan.get("stage_1_price")) or (_level_price(risk_action_level) if _is_profit_level(risk_action_level) else None)
+    trailing_stop_price = _safe_float(profit_taking_plan.get("trailing_stop_price"))
+    distance_to_target_pct = None
+    if market_price and market_price > 0 and stage_1_price:
+        distance_to_target_pct = (stage_1_price - market_price) / market_price * 100.0
+    distance_to_trailing_stop_pct = None
+    if market_price and market_price > 0 and trailing_stop_price:
+        distance_to_trailing_stop_pct = (market_price - trailing_stop_price) / market_price * 100.0
+
+    threshold = max(_profile_float(profile, "min_profit_take_return_pct", 8.0), 0.01)
+    return_component = 0.0
+    if unrealized_return_pct is not None:
+        return_component = max(0.0, min(unrealized_return_pct / max(threshold * 2.5, 1.0), 1.0)) * 0.45
+    level_component = 0.25 if stage_1_price is not None or _is_profit_level(risk_action_level) else 0.0
+    reason_component = 0.20 if _has_profit_evidence(risk_action_reason_codes) else 0.0
+    near_target_component = 0.10 if distance_to_target_pct is not None and distance_to_target_pct <= 2.0 else 0.0
+    profit_protection_score = max(0.0, min(return_component + level_component + reason_component + near_target_component, 1.0))
+
+    rounded_return = round(unrealized_return_pct, 4) if unrealized_return_pct is not None else None
+    return {
+        "entry_price": entry_price,
+        "avg_cost_krw": entry_price,
+        "current_price": market_price,
+        "market_price_krw": market_price,
+        "market_value_krw": int(market_value or 0),
+        "unrealized_pnl_krw": int(unrealized_pnl or 0),
+        "unrealized_return_pct": rounded_return,
+        "holding_days": None,
+        "last_partial_sell_date": None,
+        "realized_profit_locked_pct": 0.0,
+        "position_extension_pct_from_entry": rounded_return,
+        "distance_to_target_pct": round(distance_to_target_pct, 4) if distance_to_target_pct is not None else None,
+        "distance_to_trailing_stop_pct": round(distance_to_trailing_stop_pct, 4) if distance_to_trailing_stop_pct is not None else None,
+        "profit_protection_score": round(profit_protection_score, 4),
+    }
+
+
+def _take_profit_lacks_evidence(
+    *,
+    risk_action: str,
+    risk_action_level: dict[str, Any] | None,
+    risk_action_reason_codes: tuple[str, ...],
+    profit_taking_plan: dict[str, Any],
+    position_metrics: dict[str, Any],
+    profile: PortfolioProfile | None,
+) -> bool:
+    if str(risk_action or "").upper() != RiskAction.TAKE_PROFIT.value:
+        return False
+    threshold = _profile_float(profile, "min_profit_take_return_pct", 8.0)
+    ready_score = _profile_float(profile, "profit_take_ready_score", 0.65)
+    unrealized = _safe_float(position_metrics.get("unrealized_return_pct"))
+    score = _safe_float(position_metrics.get("profit_protection_score")) or 0.0
+    has_return = unrealized is not None and unrealized >= threshold
+    has_plan = bool(profit_taking_plan.get("enabled") and profit_taking_plan.get("stage_1_price"))
+    has_level = _is_profit_level(risk_action_level)
+    has_reason = _has_profit_evidence(risk_action_reason_codes)
+    return not (has_return or has_plan or has_level or has_reason or score >= ready_score)
+
+
+def _sell_intent(
+    *,
+    risk_action: str,
+    portfolio_relative_action: str,
+    action_now: str,
+    action_if_triggered: str,
+    risk_action_level: dict[str, Any] | None,
+    reason_codes: tuple[str, ...],
+) -> str:
+    normalized = str(risk_action or portfolio_relative_action or "").upper()
+    relative = str(portfolio_relative_action or "").upper()
+    if relative in {"STOP_LOSS", "EXIT", "TRIM_TO_FUND"}:
+        return relative
+    if normalized in {RiskAction.STOP_LOSS.value, RiskAction.EXIT.value, RiskAction.TRIM_TO_FUND.value}:
+        return normalized
+    if normalized == RiskAction.REDUCE_RISK.value and _is_profit_level(risk_action_level) and not _has_thesis_damage(reason_codes):
+        return RiskAction.TAKE_PROFIT.value
+    if action_now == "TAKE_PROFIT_NOW" or action_if_triggered == "TAKE_PROFIT_IF_TRIGGERED" or relative == "TAKE_PROFIT":
+        return RiskAction.TAKE_PROFIT.value
+    if normalized == RiskAction.TAKE_PROFIT.value:
+        return RiskAction.TAKE_PROFIT.value
+    if normalized == RiskAction.REDUCE_RISK.value or relative == "REDUCE_RISK":
+        return RiskAction.REDUCE_RISK.value
+    return "NONE"
+
+
+def _sell_trigger_status(
+    *,
+    action_now: str,
+    action_if_triggered: str,
+    risk_action_level: dict[str, Any] | None,
+) -> str:
+    if action_now in {"REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW", "STOP_LOSS_NOW", "EXIT_NOW"}:
+        return "NOW"
+    if action_if_triggered in {"REDUCE_IF_TRIGGERED", "TAKE_PROFIT_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+        confirmation = str((risk_action_level or {}).get("confirmation") or "").lower()
+        if confirmation == "next_day":
+            return "NEXT_DAY_CONFIRM"
+        if confirmation in {"close", "two_bar", "volume_confirmed"}:
+            return "CLOSE_CONFIRM"
+        return "IF_TRIGGERED"
+    return "NONE"
+
+
+def _sell_size_plan(
+    *,
+    sell_intent: str,
+    action_now: str,
+    action_if_triggered: str,
+    profit_taking_plan: dict[str, Any],
+) -> str:
+    if sell_intent in {"STOP_LOSS", "EXIT"} or action_now in {"STOP_LOSS_NOW", "EXIT_NOW"} or action_if_triggered in {"STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
+        return "FULL_EXIT"
+    if sell_intent == "TAKE_PROFIT":
+        fraction = _normalize_fraction(profit_taking_plan.get("stage_1_fraction"), default=0.20) or 0.20
+        if fraction <= 0.22:
+            return "PARTIAL_20"
+        if fraction <= 0.37:
+            return "PARTIAL_35"
+        return "CUSTOM"
+    if sell_intent in {"REDUCE_RISK", "TRIM_TO_FUND"}:
+        return "CUSTOM"
+    return "NONE"
+
+
+def _thesis_after_sell(*, sell_intent: str, reason_codes: tuple[str, ...]) -> str:
+    if sell_intent == "TAKE_PROFIT":
+        return "MAINTAIN"
+    if sell_intent in {"STOP_LOSS", "EXIT"} or "INVALIDATION_BROKEN" in _reason_code_set(reason_codes):
+        return "INVALIDATED"
+    if sell_intent == "REDUCE_RISK" or _has_thesis_damage(reason_codes):
+        return "WEAKENED"
+    return "UNKNOWN"
+
+
 def _initial_portfolio_relative_action(
     *,
     is_held: bool,
@@ -893,12 +1249,20 @@ def _initial_relative_reason_codes(
     analysis_present: bool,
     risk_action: str,
     risk_action_reason_codes: tuple[str, ...],
+    risk_action_level: dict[str, Any] | None,
 ) -> tuple[str, ...]:
     codes: list[str] = list(risk_action_reason_codes)
     normalized_risk = str(risk_action or RiskAction.NONE.value).upper()
+    profit_style_reduce = (
+        normalized_risk == RiskAction.REDUCE_RISK.value
+        and _is_profit_level(risk_action_level)
+        and not _has_thesis_damage(codes)
+    )
     if is_held and not analysis_present:
         codes.append("NO_COVERAGE")
-    if is_held and normalized_risk in {RiskAction.REDUCE_RISK.value, RiskAction.STOP_LOSS.value, RiskAction.EXIT.value}:
+    if is_held and normalized_risk in {RiskAction.STOP_LOSS.value, RiskAction.EXIT.value}:
+        codes.append("THESIS_WEAKENING")
+    if is_held and normalized_risk == RiskAction.REDUCE_RISK.value and not profit_style_reduce:
         codes.append("THESIS_WEAKENING")
     if is_held and normalized_risk == RiskAction.TAKE_PROFIT.value:
         codes.append("PROFIT_TAKING")
@@ -907,15 +1271,13 @@ def _initial_relative_reason_codes(
     if is_held and (
         stance == "BEARISH"
         or entry_action == "EXIT"
-        or action_now in {"REDUCE_NOW", "TRIM_NOW", "EXIT_NOW", "STOP_LOSS_NOW", "TAKE_PROFIT_NOW"}
+        or action_now in {"EXIT_NOW", "STOP_LOSS_NOW"}
+        or (action_now in {"REDUCE_NOW", "TRIM_NOW"} and not profit_style_reduce)
     ):
         codes.append("THESIS_WEAKENING")
-    if is_held and action_if_triggered in {
-        "REDUCE_IF_TRIGGERED",
-        "EXIT_IF_TRIGGERED",
-        "STOP_LOSS_IF_TRIGGERED",
-        "TAKE_PROFIT_IF_TRIGGERED",
-    }:
+    if is_held and action_if_triggered in {"EXIT_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED"}:
+        codes.append("THESIS_WEAKENING")
+    if is_held and action_if_triggered == "REDUCE_IF_TRIGGERED" and not profit_style_reduce:
         codes.append("THESIS_WEAKENING")
     return tuple(dict.fromkeys(codes))
 

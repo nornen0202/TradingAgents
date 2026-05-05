@@ -18,10 +18,19 @@ def initialize_action_tracker(db_path: Path) -> None:
         _ensure_columns(conn, "action_recommendations", {
             "prism_agreement": "TEXT",
             "skip_reason": "TEXT",
+            "sell_intent": "TEXT",
+            "sell_trigger_status": "TEXT",
+            "sell_size_plan": "TEXT",
+            "unrealized_return_pct": "REAL",
+            "profit_protection_score": "REAL",
+            "profit_plan_json": "TEXT",
         })
         _ensure_columns(conn, "action_outcomes", {
             "return_60d": "REAL",
             "benchmark_return_5d": "REAL",
+            "benchmark_excess_5d": "REAL",
+            "avoided_drawdown_20d": "REAL",
+            "missed_upside_20d": "REAL",
         })
         conn.commit()
 
@@ -43,8 +52,10 @@ def record_run_recommendations(run_dir: Path, db_path: Path) -> None:
                 """
                 INSERT INTO action_recommendations (
                   run_id, ticker, action, risk_action, recommended_price, confidence,
-                  trigger_type, source, prism_agreement, was_executed, skip_reason, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  trigger_type, source, prism_agreement, sell_intent, sell_trigger_status,
+                  sell_size_plan, unrealized_return_pct, profit_protection_score,
+                  profit_plan_json, was_executed, skip_reason, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["run_id"],
@@ -56,6 +67,12 @@ def record_run_recommendations(run_dir: Path, db_path: Path) -> None:
                     row.get("trigger_type"),
                     row.get("source"),
                     row.get("prism_agreement"),
+                    row.get("sell_intent"),
+                    row.get("sell_trigger_status"),
+                    row.get("sell_size_plan"),
+                    row.get("unrealized_return_pct"),
+                    row.get("profit_protection_score"),
+                    row.get("profit_plan_json"),
                     int(bool(row.get("was_executed"))),
                     row.get("skip_reason"),
                     row["created_at"],
@@ -91,9 +108,10 @@ def update_action_outcomes(
                 """
                 INSERT INTO action_outcomes (
                   recommendation_id, return_1d, return_3d, return_5d, return_10d,
-                  return_20d, return_60d, benchmark_return_5d, max_drawdown_20d,
-                  max_favorable_excursion_20d, outcome_label, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  return_20d, return_60d, benchmark_return_5d, benchmark_excess_5d,
+                  max_drawdown_20d, max_favorable_excursion_20d, avoided_drawdown_20d,
+                  missed_upside_20d, outcome_label, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["id"],
@@ -104,8 +122,11 @@ def update_action_outcomes(
                     returns.get("return_20d"),
                     returns.get("return_60d"),
                     returns.get("benchmark_return_5d"),
+                    returns.get("benchmark_excess_5d"),
                     returns.get("max_drawdown_20d"),
                     returns.get("max_favorable_excursion_20d"),
+                    returns.get("avoided_drawdown_20d"),
+                    returns.get("missed_upside_20d"),
                     returns.get("outcome_label"),
                     asof_date,
                 ),
@@ -124,6 +145,7 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         by_action = _aggregate(conn, "action")
         by_prism = _aggregate(conn, "prism_agreement")
         action_buckets = _aggregate_action_buckets(conn)
+        profit_taking = _aggregate_profit_taking(conn)
     return ActionPerformanceSummary(
         recommendations=recommendations,
         outcomes=outcomes,
@@ -132,6 +154,7 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         by_action=by_action,
         prism_agreement=by_prism,
         action_buckets=action_buckets,
+        profit_taking=profit_taking,
     )
 
 
@@ -151,6 +174,8 @@ def _portfolio_action_rows(run_dir: Path, manifest: dict[str, Any], *, run_id: s
         if not ticker:
             continue
         preferred_action = _preferred_action(action)
+        position_metrics = action.get("position_metrics") if isinstance(action.get("position_metrics"), Mapping) else {}
+        profit_plan = action.get("profit_taking_plan") if isinstance(action.get("profit_taking_plan"), Mapping) else {}
         rows.append(
             {
                 "run_id": run_id,
@@ -162,6 +187,12 @@ def _portfolio_action_rows(run_dir: Path, manifest: dict[str, Any], *, run_id: s
                 "trigger_type": action.get("trigger_type"),
                 "source": "TradingAgents",
                 "prism_agreement": action.get("prism_agreement") or (action.get("data_health") or {}).get("prism_agreement"),
+                "sell_intent": action.get("sell_intent"),
+                "sell_trigger_status": action.get("sell_trigger_status"),
+                "sell_size_plan": action.get("sell_size_plan"),
+                "unrealized_return_pct": _float_or_none(position_metrics.get("unrealized_return_pct")),
+                "profit_protection_score": _float_or_none(position_metrics.get("profit_protection_score")),
+                "profit_plan_json": json.dumps(profit_plan, ensure_ascii=False) if profit_plan else None,
                 "was_executed": bool(int(action.get("delta_krw_now") or 0)),
                 "skip_reason": None if int(action.get("delta_krw_now") or 0) else _skip_reason(action),
                 "created_at": created_at,
@@ -248,8 +279,12 @@ def _compute_returns(
     if window:
         values["max_drawdown_20d"] = round((min(window) - base_price) / base_price, 6)
         values["max_favorable_excursion_20d"] = round((max(window) - base_price) / base_price, 6)
+        values["avoided_drawdown_20d"] = round(max(0.0, -float(values["max_drawdown_20d"])), 6)
+        values["missed_upside_20d"] = round(max(0.0, float(values["max_favorable_excursion_20d"])), 6)
     return_5d = values.get("return_5d")
     values["benchmark_return_5d"] = _benchmark_return_5d(benchmark_series, created_date=created_date)
+    if return_5d is not None and values["benchmark_return_5d"] is not None:
+        values["benchmark_excess_5d"] = round(float(return_5d) - float(values["benchmark_return_5d"]), 6)
     values["outcome_label"] = _outcome_label(str(row["action"]), return_5d)
     return values
 
@@ -354,6 +389,36 @@ def _aggregate_action_buckets(conn: sqlite3.Connection) -> dict[str, dict[str, A
     return result
 
 
+def _aggregate_profit_taking(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
+    rows = conn.execute(
+        """
+        SELECT COALESCE(NULLIF(r.action, ''), 'TAKE_PROFIT') AS bucket,
+               COUNT(*) AS n,
+               AVG(o.return_5d) AS avg_return_5d,
+               AVG(o.return_20d) AS avg_return_20d,
+               AVG(o.avoided_drawdown_20d) AS avg_avoided_drawdown_20d,
+               AVG(o.missed_upside_20d) AS avg_missed_upside_20d
+        FROM action_recommendations r
+        LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
+        WHERE UPPER(COALESCE(r.sell_intent, '')) = 'TAKE_PROFIT'
+           OR UPPER(COALESCE(r.action, '')) IN ('TAKE_PROFIT', 'TAKE_PROFIT_NOW', 'TAKE_PROFIT_IF_TRIGGERED')
+           OR UPPER(COALESCE(r.risk_action, '')) = 'TAKE_PROFIT'
+        GROUP BY COALESCE(NULLIF(r.action, ''), 'TAKE_PROFIT')
+        """
+    )
+    result: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        bucket = str(row["bucket"] or "TAKE_PROFIT")
+        result[bucket] = {
+            "count": int(row["n"] or 0),
+            "avg_return_5d": row["avg_return_5d"],
+            "avg_return_20d": row["avg_return_20d"],
+            "avg_avoided_drawdown_20d": row["avg_avoided_drawdown_20d"],
+            "avg_missed_upside_20d": row["avg_missed_upside_20d"],
+        }
+    return result
+
+
 def _action_bucket(source: str, prism_agreement: str) -> str:
     source_text = source.strip().lower()
     agreement = prism_agreement.strip().lower()
@@ -400,6 +465,11 @@ def _preferred_action(action: Mapping[str, Any]) -> str:
 
 def _recommended_price(action: Mapping[str, Any]) -> float | None:
     data = action.get("data_health") if isinstance(action.get("data_health"), Mapping) else {}
+    metrics = action.get("position_metrics") if isinstance(action.get("position_metrics"), Mapping) else {}
+    for key in ("current_price", "market_price_krw"):
+        number = _float_or_none(metrics.get(key))
+        if number is not None and number > 0:
+            return number
     for key in ("current_price", "last_price", "estimated_market_price_krw"):
         value = data.get(key)
         number = _float_or_none(value)
@@ -421,9 +491,16 @@ def _outcome_label(action: str, return_5d: float | None) -> str:
     if return_5d is None:
         return "pending"
     buy_like = action in {"ADD_NOW", "ADD_IF_TRIGGERED", "STARTER_NOW", "STARTER_IF_TRIGGERED"}
+    profit_like = action in {"TAKE_PROFIT", "TAKE_PROFIT_NOW", "TAKE_PROFIT_IF_TRIGGERED"}
     risk_like = action in {"STOP_LOSS", "STOP_LOSS_NOW", "REDUCE_RISK", "REDUCE_NOW", "EXIT", "EXIT_NOW"}
     if buy_like:
         return "positive_followthrough" if return_5d > 0 else "failed_followthrough"
+    if profit_like:
+        if return_5d < 0:
+            return "avoided_loss"
+        if return_5d > 0:
+            return "missed_upside"
+        return "profit_protected_flat"
     if risk_like:
         return "avoided_loss" if return_5d < 0 else "missed_upside"
     return "neutral_positive" if return_5d >= 0 else "neutral_negative"

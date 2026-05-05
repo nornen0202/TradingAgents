@@ -118,9 +118,16 @@ def _translated_action_distribution(recommendation: PortfolioRecommendation) -> 
 def _sell_side_distribution(recommendation: PortfolioRecommendation) -> dict[str, int]:
     keys = ("TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT")
     return {
-        key: sum(1 for action in recommendation.actions if str(action.portfolio_relative_action or "").upper() == key)
+        key: sum(1 for action in recommendation.actions if _action_sell_intent(action) == key)
         for key in keys
     }
+
+
+def _action_sell_intent(action: Any) -> str:
+    intent = str(getattr(action, "sell_intent", "") or "").upper()
+    if intent in {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}:
+        return intent
+    return str(getattr(action, "portfolio_relative_action", "") or "").upper()
 
 
 def _sell_side_calibration_warnings(
