@@ -162,6 +162,7 @@ jobs:
 
       - name: Upload KR generated site
         if: ${{ !cancelled() }}
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: account-performance-kr-site-${{ github.run_id }}
@@ -314,6 +315,7 @@ jobs:
 
       - name: Upload US generated site
         if: ${{ !cancelled() }}
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: account-performance-us-site-${{ github.run_id }}
