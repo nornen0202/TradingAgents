@@ -571,6 +571,45 @@ class CodexProviderTests(unittest.TestCase):
         self.assertIn("Rating: Buy", decision.content)
         self.assertEqual(len(session.invocations), 2)
 
+    def test_codex_workflow_once_preflight_skips_client_preflight_when_env_says_ready(self):
+        calls = {"count": 0}
+
+        def preflight_runner(**kwargs):
+            calls["count"] += 1
+
+        with patch.dict(os.environ, {"TRADINGAGENTS_CODEX_PREFLIGHT_OK": "1"}):
+            llm = create_llm_client(
+                "codex",
+                "gpt-5.5",
+                codex_binary="C:/fake/codex",
+                codex_workspace_dir="C:/tmp/codex-workspace",
+                codex_preflight_mode="workflow_once",
+                session_factory=lambda **kwargs: FakeCodexSession(**kwargs),
+                preflight_runner=preflight_runner,
+            ).get_llm()
+
+        self.assertEqual(calls["count"], 0)
+        self.assertTrue(llm._preflight_done)
+
+    def test_codex_workflow_once_preflight_falls_back_to_client_preflight_without_env(self):
+        calls = {"count": 0}
+
+        def preflight_runner(**kwargs):
+            calls["count"] += 1
+
+        with patch.dict(os.environ, {"TRADINGAGENTS_CODEX_PREFLIGHT_OK": ""}):
+            create_llm_client(
+                "codex",
+                "gpt-5.5",
+                codex_binary="C:/fake/codex",
+                codex_workspace_dir="C:/tmp/codex-workspace",
+                codex_preflight_mode="workflow_once",
+                session_factory=lambda **kwargs: FakeCodexSession(**kwargs),
+                preflight_runner=preflight_runner,
+            ).get_llm()
+
+        self.assertEqual(calls["count"], 1)
+
     def test_preflight_detects_missing_auth_and_missing_binary(self):
         valid_factory = lambda **kwargs: FakeCodexSession(
             account_payload={

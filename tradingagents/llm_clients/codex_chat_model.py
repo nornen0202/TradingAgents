@@ -55,6 +55,7 @@ class CodexChatModel(BaseChatModel):
     codex_request_timeout: float = 120.0
     codex_max_retries: int = 2
     codex_cleanup_threads: bool = True
+    codex_preflight_mode: str = "per_client"
     session_factory: Callable[..., CodexAppServerSession] | None = Field(
         default=None, exclude=True, repr=False
     )
@@ -86,6 +87,12 @@ class CodexChatModel(BaseChatModel):
     def preflight(self) -> None:
         with self._preflight_lock:
             if self._preflight_done:
+                return
+            if (
+                str(self.codex_preflight_mode or "").strip().lower() == "workflow_once"
+                and os.environ.get("TRADINGAGENTS_CODEX_PREFLIGHT_OK", "").strip() == "1"
+            ):
+                self._preflight_done = True
                 return
             runner = self.preflight_runner or run_codex_preflight
             fallback_flag = os.environ.get("TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK", "1")

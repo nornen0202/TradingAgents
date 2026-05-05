@@ -3,12 +3,15 @@ from __future__ import annotations
 import argparse
 from copy import deepcopy
 import json
+import os
 import re
 import shutil
+import subprocess
+import sys
 import traceback
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
-from time import perf_counter
+from time import perf_counter, sleep
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -93,6 +96,10 @@ def main(argv: list[str] | None = None) -> int:
         choices=("full", "overlay_only", "selective_rerun_only", "portfolio_only"),
         help="Execution mode: full / overlay_only / selective_rerun_only / portfolio_only.",
     )
+    parser.add_argument("--analysis-mode", choices=("full", "smoke"), help="Analysis mode: full / smoke.")
+    parser.add_argument("--max-parallel-tickers", type=int, help="Maximum ticker workers to run concurrently.")
+    parser.add_argument("--per-ticker-timeout-minutes", type=float, help="Timeout for each ticker worker.")
+    parser.add_argument("--daily-active-ticker-limit", type=int, help="Limit full analysis to the first N resolved tickers.")
     parser.add_argument("--site-only", action="store_true", help="Only rebuild the static site from archived runs.")
     parser.add_argument("--strict", action="store_true", help="Return a non-zero exit code if any ticker fails.")
     parser.add_argument("--label", default="github-actions", help="Run label for archived metadata.")
@@ -106,6 +113,10 @@ def main(argv: list[str] | None = None) -> int:
         ticker_universe_mode=args.ticker_universe_mode,
         trade_date=args.trade_date,
         run_mode=args.run_mode,
+        analysis_mode=args.analysis_mode,
+        max_parallel_tickers=args.max_parallel_tickers,
+        per_ticker_timeout_minutes=args.per_ticker_timeout_minutes,
+        daily_active_ticker_limit=args.daily_active_ticker_limit,
     )
 
     if args.site_only:
@@ -149,12 +160,24 @@ def execute_scheduled_run(
             run_id=run_id,
             asof=started_at.isoformat(),
         )
-    ticker_summaries: list[dict[str, Any]] = []
-    engine_results_dir = run_dir / "engine-results"
-    run_trade_date = _resolve_run_trade_date(config=config, tickers=run_tickers) if run_mode == "full" else None
     source_run_id: str | None = None
     run_warnings: list[str] = []
     configured_ticker_count = len(run_tickers)
+    active_ticker_limit = _active_ticker_limit(config)
+    if run_mode == "full" and active_ticker_limit and len(run_tickers) > active_ticker_limit:
+        omitted = run_tickers[active_ticker_limit:]
+        warning = (
+            "daily_active_ticker_limit_applied:"
+            f"limit={active_ticker_limit}:omitted_tickers={','.join(omitted)}"
+        )
+        print(f"::warning::{warning}", flush=True)
+        run_warnings.append(warning)
+        run_tickers = run_tickers[:active_ticker_limit]
+    ticker_summaries: list[dict[str, Any]] = []
+    engine_results_dir = run_dir / "engine-results"
+    run_trade_date = _resolve_run_trade_date(config=config, tickers=run_tickers) if run_mode == "full" else None
+    parallel_execution_summary = _parallel_ticker_execution_summary(config, enabled=False)
+    circuit_breaker_summary = _initial_circuit_breaker_summary(config)
     max_runtime_seconds = _max_runtime_seconds(config)
     min_remaining_seconds = _min_remaining_seconds_for_next_ticker(config)
     if run_mode == "selective_rerun_only" and not config.execution.execution_refresh_enabled:
@@ -172,54 +195,32 @@ def execute_scheduled_run(
         )
 
     if run_mode == "full":
-        for index, ticker in enumerate(run_tickers):
-            remaining_seconds = _remaining_runtime_seconds(
-                max_runtime_seconds=max_runtime_seconds,
-                timer_start=run_timer_start,
-            )
-            if remaining_seconds is not None and remaining_seconds < min_remaining_seconds:
-                skipped = run_tickers[index:]
-                warning = (
-                    "run_time_budget_exhausted:"
-                    f"remaining_seconds={int(max(remaining_seconds, 0))}:"
-                    f"min_required_seconds={int(min_remaining_seconds)}:"
-                    f"skipped_tickers={','.join(skipped)}"
+        if _should_run_tickers_in_parallel(config=config, ticker_count=len(run_tickers)):
+            ticker_summaries, parallel_execution_summary, circuit_breaker_summary, parallel_warnings = (
+                _run_parallel_tickers(
+                    config=config,
+                    run_tickers=run_tickers,
+                    run_dir=run_dir,
+                    engine_results_dir=engine_results_dir,
+                    trade_date_override=run_trade_date,
+                    timer_start=run_timer_start,
+                    max_runtime_seconds=max_runtime_seconds,
+                    min_remaining_seconds=min_remaining_seconds,
                 )
-                print(f"::warning::{warning}", flush=True)
-                run_warnings.append(warning)
-                ticker_summaries.extend(
-                    _skipped_ticker_summary(
-                        config=config,
-                        ticker=item,
-                        reason="run_time_budget_exhausted",
-                    )
-                    for item in skipped
-                )
-                break
-            print(
-                f"Starting ticker {index + 1}/{len(run_tickers)}: {ticker}"
-                + (
-                    f" (remaining budget {int(remaining_seconds)}s)"
-                    if remaining_seconds is not None
-                    else ""
-                ),
-                flush=True,
             )
-            ticker_summary = _run_single_ticker(
+            run_warnings.extend(parallel_warnings)
+        else:
+            ticker_summaries = _run_sequential_tickers(
                 config=config,
-                ticker=ticker,
+                run_tickers=run_tickers,
                 run_dir=run_dir,
                 engine_results_dir=engine_results_dir,
                 trade_date_override=run_trade_date,
+                timer_start=run_timer_start,
+                max_runtime_seconds=max_runtime_seconds,
+                min_remaining_seconds=min_remaining_seconds,
+                run_warnings=run_warnings,
             )
-            ticker_summaries.append(ticker_summary)
-            print(
-                f"Finished ticker {index + 1}/{len(run_tickers)}: {ticker} "
-                f"status={ticker_summary.get('status')} duration={ticker_summary.get('duration_seconds')}s",
-                flush=True,
-            )
-            if ticker_summary["status"] != "success" and not config.run.continue_on_ticker_error:
-                break
     elif portfolio_only:
         # KIS account/report verification path: leave ticker research empty and
         # run the account portfolio pipeline below.
@@ -326,6 +327,8 @@ def execute_scheduled_run(
             "partial_failure_warning": partial_failure_rate >= 0.2,
             "failed_tickers": _failed_ticker_summaries(ticker_summaries),
         },
+        "parallel_ticker_execution": parallel_execution_summary,
+        "circuit_breaker": circuit_breaker_summary,
         "tickers": ticker_summaries,
     }
     if scanner_status:
@@ -625,6 +628,574 @@ def _ticker_hint(symbol: str) -> str:
 def _summarize_exception(exc: Exception) -> str:
     text = str(exc).strip() or exc.__class__.__name__
     return text.replace("\n", " ")[:240]
+
+
+def _active_ticker_limit(config: ScheduledAnalysisConfig) -> int:
+    limit = int(getattr(config.run, "daily_active_ticker_limit", 0) or 0)
+    if limit <= 0 and str(getattr(config.run, "analysis_mode", "full") or "full").lower() == "smoke":
+        return 3
+    return max(0, limit)
+
+
+def _should_run_tickers_in_parallel(*, config: ScheduledAnalysisConfig, ticker_count: int) -> bool:
+    return (
+        ticker_count > 1
+        and bool(getattr(config.run, "parallel_ticker_execution", False))
+        and int(getattr(config.run, "max_parallel_tickers", 1) or 1) > 1
+        and bool(config.run.continue_on_ticker_error)
+        and config.config_path is not None
+    )
+
+
+def _parallel_ticker_execution_summary(config: ScheduledAnalysisConfig, *, enabled: bool) -> dict[str, Any]:
+    return {
+        "enabled": bool(enabled),
+        "requested": bool(getattr(config.run, "parallel_ticker_execution", False)),
+        "mode": "subprocess" if enabled else "sequential",
+        "max_parallel_tickers": max(1, int(getattr(config.run, "max_parallel_tickers", 1) or 1)),
+        "per_ticker_timeout_minutes": max(
+            0.0,
+            float(getattr(config.run, "per_ticker_timeout_minutes", 0.0) or 0.0),
+        ),
+    }
+
+
+def _initial_circuit_breaker_summary(config: ScheduledAnalysisConfig) -> dict[str, Any]:
+    return {
+        "enabled": bool(getattr(config.run, "codex_circuit_breaker_enabled", False)),
+        "triggered": False,
+        "reason": None,
+        "triggered_at": None,
+        "skipped_tickers": [],
+        "fatal_error_patterns": list(getattr(config.run, "fatal_error_patterns", ()) or ()),
+        "max_consecutive_codex_failures": max(
+            1,
+            int(getattr(config.run, "max_consecutive_codex_failures", 3) or 3),
+        ),
+    }
+
+
+def _run_sequential_tickers(
+    *,
+    config: ScheduledAnalysisConfig,
+    run_tickers: list[str],
+    run_dir: Path,
+    engine_results_dir: Path,
+    trade_date_override: str | None,
+    timer_start: float,
+    max_runtime_seconds: float | None,
+    min_remaining_seconds: float,
+    run_warnings: list[str],
+) -> list[dict[str, Any]]:
+    ticker_summaries: list[dict[str, Any]] = []
+    for index, ticker in enumerate(run_tickers):
+        remaining_seconds = _remaining_runtime_seconds(
+            max_runtime_seconds=max_runtime_seconds,
+            timer_start=timer_start,
+        )
+        if remaining_seconds is not None and remaining_seconds < min_remaining_seconds:
+            skipped = run_tickers[index:]
+            warning = _run_time_budget_warning(
+                remaining_seconds=remaining_seconds,
+                min_remaining_seconds=min_remaining_seconds,
+                skipped=skipped,
+            )
+            print(f"::warning::{warning}", flush=True)
+            run_warnings.append(warning)
+            ticker_summaries.extend(
+                _skipped_ticker_summary(config=config, ticker=item, reason="run_time_budget_exhausted")
+                for item in skipped
+            )
+            break
+        print(
+            f"Starting ticker {index + 1}/{len(run_tickers)}: {ticker}"
+            + (
+                f" (remaining budget {int(remaining_seconds)}s)"
+                if remaining_seconds is not None
+                else ""
+            ),
+            flush=True,
+        )
+        ticker_summary = _run_single_ticker(
+            config=config,
+            ticker=ticker,
+            run_dir=run_dir,
+            engine_results_dir=engine_results_dir,
+            trade_date_override=trade_date_override,
+        )
+        ticker_summaries.append(ticker_summary)
+        print(
+            f"Finished ticker {index + 1}/{len(run_tickers)}: {ticker} "
+            f"status={ticker_summary.get('status')} duration={ticker_summary.get('duration_seconds')}s",
+            flush=True,
+        )
+        if ticker_summary["status"] != "success" and not config.run.continue_on_ticker_error:
+            break
+    return ticker_summaries
+
+
+def _run_parallel_tickers(
+    *,
+    config: ScheduledAnalysisConfig,
+    run_tickers: list[str],
+    run_dir: Path,
+    engine_results_dir: Path,
+    trade_date_override: str | None,
+    timer_start: float,
+    max_runtime_seconds: float | None,
+    min_remaining_seconds: float,
+) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any], list[str]]:
+    max_workers = min(max(1, int(config.run.max_parallel_tickers or 1)), len(run_tickers))
+    timeout_seconds = _per_ticker_timeout_seconds(config)
+    pending: list[tuple[int, str]] = list(enumerate(run_tickers))
+    running: dict[int, dict[str, Any]] = {}
+    results: dict[int, dict[str, Any]] = {}
+    warnings: list[str] = []
+    consecutive_codex_failures = 0
+    circuit = _initial_circuit_breaker_summary(config)
+    parallel_summary = _parallel_ticker_execution_summary(config, enabled=True)
+
+    print(
+        f"Starting parallel ticker execution: max_parallel_tickers={max_workers}, "
+        f"per_ticker_timeout_seconds={int(timeout_seconds or 0)}",
+        flush=True,
+    )
+
+    while pending or running:
+        while pending and len(running) < max_workers and not circuit["triggered"]:
+            remaining_seconds = _remaining_runtime_seconds(
+                max_runtime_seconds=max_runtime_seconds,
+                timer_start=timer_start,
+            )
+            if remaining_seconds is not None and remaining_seconds < min_remaining_seconds:
+                skipped = [ticker for _, ticker in pending]
+                warning = _run_time_budget_warning(
+                    remaining_seconds=remaining_seconds,
+                    min_remaining_seconds=min_remaining_seconds,
+                    skipped=skipped,
+                )
+                print(f"::warning::{warning}", flush=True)
+                warnings.append(warning)
+                for skipped_index, skipped_ticker in pending:
+                    results[skipped_index] = _skipped_ticker_summary(
+                        config=config,
+                        ticker=skipped_ticker,
+                        reason="run_time_budget_exhausted",
+                    )
+                pending.clear()
+                break
+            next_index, next_ticker = pending.pop(0)
+            try:
+                running[next_index] = _start_ticker_worker(
+                    config=config,
+                    ticker=next_ticker,
+                    index=next_index,
+                    total=len(run_tickers),
+                    run_dir=run_dir,
+                    engine_results_dir=engine_results_dir,
+                    trade_date_override=trade_date_override,
+                )
+            except Exception as exc:
+                results[next_index] = _worker_start_failed_summary(
+                    config=config,
+                    ticker=next_ticker,
+                    error=str(exc),
+                )
+                break
+
+        finished_indices: list[int] = []
+        for index, state in list(running.items()):
+            process: subprocess.Popen[Any] = state["process"]
+            elapsed = perf_counter() - float(state["started_perf"])
+            if timeout_seconds and process.poll() is None and elapsed > timeout_seconds:
+                _terminate_worker_process(process)
+                summary = _worker_timeout_summary(config=config, state=state, elapsed_seconds=elapsed)
+                results[index] = summary
+                _close_worker_log_handles(state)
+                finished_indices.append(index)
+            elif process.poll() is not None:
+                summary = _collect_worker_summary(config=config, state=state, elapsed_seconds=elapsed)
+                results[index] = summary
+                finished_indices.append(index)
+
+        for index in finished_indices:
+            state = running.pop(index, None)
+            if state is None:
+                continue
+            summary = results[index]
+            print(
+                f"Finished ticker worker {index + 1}/{len(run_tickers)}: {summary.get('ticker')} "
+                f"status={summary.get('status')} duration={summary.get('duration_seconds')}s",
+                flush=True,
+            )
+            if _is_codex_failure_summary(summary):
+                consecutive_codex_failures += 1
+            else:
+                consecutive_codex_failures = 0
+            breaker_reason = _circuit_breaker_reason(
+                config=config,
+                summary=summary,
+                consecutive_codex_failures=consecutive_codex_failures,
+            )
+            if breaker_reason:
+                _open_circuit_breaker(
+                    config=config,
+                    circuit=circuit,
+                    reason=breaker_reason,
+                    pending=pending,
+                    running=running,
+                    results=results,
+                    warnings=warnings,
+                )
+                pending.clear()
+                running.clear()
+                break
+
+        if pending or running:
+            sleep(0.25)
+
+    return [results[index] for index in range(len(run_tickers)) if index in results], parallel_summary, circuit, warnings
+
+
+def _run_time_budget_warning(
+    *,
+    remaining_seconds: float,
+    min_remaining_seconds: float,
+    skipped: list[str],
+) -> str:
+    return (
+        "run_time_budget_exhausted:"
+        f"remaining_seconds={int(max(remaining_seconds, 0))}:"
+        f"min_required_seconds={int(min_remaining_seconds)}:"
+        f"skipped_tickers={','.join(skipped)}"
+    )
+
+
+def _per_ticker_timeout_seconds(config: ScheduledAnalysisConfig) -> float:
+    minutes = float(getattr(config.run, "per_ticker_timeout_minutes", 0.0) or 0.0)
+    return max(0.0, minutes * 60.0)
+
+
+def _start_ticker_worker(
+    *,
+    config: ScheduledAnalysisConfig,
+    ticker: str,
+    index: int,
+    total: int,
+    run_dir: Path,
+    engine_results_dir: Path,
+    trade_date_override: str | None,
+) -> dict[str, Any]:
+    safe_name = _safe_worker_name(ticker)
+    summary_dir = run_dir / "worker-summaries"
+    log_dir = run_dir / "worker-logs"
+    summary_dir.mkdir(parents=True, exist_ok=True)
+    log_dir.mkdir(parents=True, exist_ok=True)
+    summary_path = summary_dir / f"{index:03d}_{safe_name}.json"
+    stdout_path = log_dir / f"{index:03d}_{safe_name}.stdout.log"
+    stderr_path = log_dir / f"{index:03d}_{safe_name}.stderr.log"
+    stdout_handle = stdout_path.open("w", encoding="utf-8")
+    stderr_handle = stderr_path.open("w", encoding="utf-8")
+    env = os.environ.copy()
+    worker_workspace = _worker_codex_workspace(config=config, run_dir=run_dir, ticker=ticker, index=index)
+    if worker_workspace:
+        env["TRADINGAGENTS_CODEX_WORKSPACE_DIR"] = str(worker_workspace)
+    args = [
+        sys.executable,
+        "-u",
+        "-m",
+        "tradingagents.scheduled.ticker_worker",
+        "--config",
+        str(config.config_path),
+        "--ticker",
+        ticker,
+        "--run-dir",
+        str(run_dir),
+        "--engine-results-dir",
+        str(engine_results_dir),
+        "--summary-json",
+        str(summary_path),
+    ]
+    if trade_date_override:
+        args.extend(["--trade-date", trade_date_override])
+    print(f"Starting ticker worker {index + 1}/{total}: {ticker}", flush=True)
+    process = subprocess.Popen(
+        args,
+        stdout=stdout_handle,
+        stderr=stderr_handle,
+        text=True,
+        cwd=Path.cwd(),
+        env=env,
+    )
+    return {
+        "ticker": ticker,
+        "index": index,
+        "process": process,
+        "summary_path": summary_path,
+        "stdout_path": stdout_path,
+        "stderr_path": stderr_path,
+        "stdout_handle": stdout_handle,
+        "stderr_handle": stderr_handle,
+        "started_perf": perf_counter(),
+        "started_at": datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
+    }
+
+
+def _worker_codex_workspace(
+    *,
+    config: ScheduledAnalysisConfig,
+    run_dir: Path,
+    ticker: str,
+    index: int,
+) -> Path | None:
+    base = str(getattr(config.llm, "codex_workspace_dir", "") or "").strip()
+    if not base:
+        return None
+    return Path(base).expanduser() / "workers" / run_dir.name / f"{index:03d}_{_safe_worker_name(ticker)}"
+
+
+def _collect_worker_summary(
+    *,
+    config: ScheduledAnalysisConfig,
+    state: dict[str, Any],
+    elapsed_seconds: float,
+) -> dict[str, Any]:
+    process: subprocess.Popen[Any] = state["process"]
+    _close_worker_log_handles(state)
+    summary_path = Path(state["summary_path"])
+    summary: dict[str, Any] | None = None
+    if summary_path.exists():
+        try:
+            loaded = json.loads(summary_path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                summary = loaded
+        except Exception:
+            summary = None
+    if summary is None:
+        summary = _worker_failed_summary(
+            config=config,
+            state=state,
+            reason="worker_summary_missing_or_invalid",
+            elapsed_seconds=elapsed_seconds,
+        )
+    elif "duration_seconds" not in summary or "metrics" not in summary:
+        fallback = _worker_failed_summary(
+            config=config,
+            state=state,
+            reason=str(summary.get("error") or "worker_failed"),
+            elapsed_seconds=elapsed_seconds,
+        )
+        fallback.update({key: value for key, value in summary.items() if value is not None})
+        summary = fallback
+    summary["worker"] = {
+        "mode": "subprocess",
+        "exit_code": process.returncode,
+        "elapsed_seconds": round(elapsed_seconds, 2),
+    }
+    if process.returncode and summary.get("status") == "success":
+        summary["status"] = "failed"
+        summary["error"] = f"worker_exit_code_{process.returncode}"
+    return summary
+
+
+def _worker_timeout_summary(
+    *,
+    config: ScheduledAnalysisConfig,
+    state: dict[str, Any],
+    elapsed_seconds: float,
+) -> dict[str, Any]:
+    summary = _worker_failed_summary(
+        config=config,
+        state=state,
+        reason="per_ticker_timeout",
+        elapsed_seconds=elapsed_seconds,
+    )
+    summary["worker"] = {
+        "mode": "subprocess",
+        "exit_code": None,
+        "elapsed_seconds": round(elapsed_seconds, 2),
+        "timeout": True,
+    }
+    return summary
+
+
+def _worker_failed_summary(
+    *,
+    config: ScheduledAnalysisConfig,
+    state: dict[str, Any],
+    reason: str,
+    elapsed_seconds: float,
+) -> dict[str, Any]:
+    ticker = str(state.get("ticker") or "")
+    try:
+        resolved_name = resolve_instrument(ticker).display_name
+    except Exception:
+        resolved_name = ticker
+    resolved_name = config.run.ticker_name_overrides.get(ticker, resolved_name)
+    started_at = str(state.get("started_at") or datetime.now(ZoneInfo(config.run.timezone)).isoformat())
+    finished_at = datetime.now(ZoneInfo(config.run.timezone)).isoformat()
+    stderr_tail = _mask_sensitive_text(_read_text_tail(Path(state["stderr_path"])))
+    error = reason if not stderr_tail else f"{reason}: {stderr_tail}"
+    return {
+        "ticker": ticker,
+        "ticker_name": resolved_name,
+        "status": "failed",
+        "analysis_date": finished_at[:10],
+        "trade_date": None,
+        "decision": None,
+        "error": error[:500],
+        "started_at": started_at,
+        "finished_at": finished_at,
+        "duration_seconds": round(elapsed_seconds, 2),
+        "metrics": {"llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0},
+        "quality_flags": (reason,),
+        "artifacts": {},
+    }
+
+
+def _worker_start_failed_summary(
+    *,
+    config: ScheduledAnalysisConfig,
+    ticker: str,
+    error: str,
+) -> dict[str, Any]:
+    now = datetime.now(ZoneInfo(config.run.timezone))
+    try:
+        resolved_name = resolve_instrument(ticker).display_name
+    except Exception:
+        resolved_name = ticker
+    resolved_name = config.run.ticker_name_overrides.get(ticker, resolved_name)
+    return {
+        "ticker": ticker,
+        "ticker_name": resolved_name,
+        "status": "failed",
+        "analysis_date": now.date().isoformat(),
+        "trade_date": None,
+        "decision": None,
+        "error": f"worker_start_failed:{error}"[:500],
+        "started_at": now.isoformat(),
+        "finished_at": now.isoformat(),
+        "duration_seconds": 0.0,
+        "metrics": {"llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0},
+        "quality_flags": ("worker_start_failed",),
+        "artifacts": {},
+        "worker": {"mode": "subprocess", "start_failed": True},
+    }
+
+
+def _terminate_worker_process(process: subprocess.Popen[Any]) -> None:
+    if process.poll() is not None:
+        return
+    if os.name == "nt":
+        try:
+            subprocess.run(
+                ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            )
+        except Exception:
+            process.kill()
+    else:
+        process.kill()
+    try:
+        process.wait(timeout=5)
+    except Exception:
+        pass
+
+
+def _close_worker_log_handles(state: dict[str, Any]) -> None:
+    for key in ("stdout_handle", "stderr_handle"):
+        handle = state.get(key)
+        if handle is not None and not handle.closed:
+            handle.close()
+
+
+def _open_circuit_breaker(
+    *,
+    config: ScheduledAnalysisConfig,
+    circuit: dict[str, Any],
+    reason: str,
+    pending: list[tuple[int, str]],
+    running: dict[int, dict[str, Any]],
+    results: dict[int, dict[str, Any]],
+    warnings: list[str],
+) -> None:
+    circuit["triggered"] = True
+    circuit["reason"] = reason
+    circuit["triggered_at"] = datetime.now(ZoneInfo(config.run.timezone)).isoformat()
+    skipped: list[str] = []
+    for index, state in list(running.items()):
+        _terminate_worker_process(state["process"])
+        _close_worker_log_handles(state)
+        ticker = str(state.get("ticker") or "")
+        skipped.append(ticker)
+        results[index] = _skipped_ticker_summary(config=config, ticker=ticker, reason="codex_unavailable_skipped")
+    for index, ticker in pending:
+        skipped.append(ticker)
+        results[index] = _skipped_ticker_summary(config=config, ticker=ticker, reason="codex_unavailable_skipped")
+    circuit["skipped_tickers"] = skipped
+    warning = f"codex_circuit_breaker_opened:reason={reason}:skipped_tickers={','.join(skipped)}"
+    print(f"::warning::{warning}", flush=True)
+    warnings.append(warning)
+
+
+def _circuit_breaker_reason(
+    *,
+    config: ScheduledAnalysisConfig,
+    summary: dict[str, Any],
+    consecutive_codex_failures: int,
+) -> str | None:
+    if not bool(getattr(config.run, "codex_circuit_breaker_enabled", False)):
+        return None
+    error_text = _summary_error_text(summary)
+    for pattern in getattr(config.run, "fatal_error_patterns", ()) or ():
+        if pattern and pattern.lower() in error_text:
+            return f"fatal_pattern:{pattern}"
+    threshold = max(1, int(getattr(config.run, "max_consecutive_codex_failures", 3) or 3))
+    if consecutive_codex_failures >= threshold:
+        return f"consecutive_codex_failures:{consecutive_codex_failures}"
+    return None
+
+
+def _is_codex_failure_summary(summary: dict[str, Any]) -> bool:
+    text = _summary_error_text(summary)
+    if not text:
+        return False
+    patterns = (
+        "timed out waiting for codex app-server",
+        "codex app-server",
+        "codexappserver",
+        "model unavailable",
+        "usage limit",
+        "per_ticker_timeout",
+    )
+    return any(pattern in text for pattern in patterns)
+
+
+def _summary_error_text(summary: dict[str, Any]) -> str:
+    return str(summary.get("error") or summary.get("reason") or "").strip().lower()
+
+
+def _safe_worker_name(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", str(value or "").strip()) or "ticker"
+
+
+def _read_text_tail(path: Path, *, max_chars: int = 2000) -> str:
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+    return text[-max_chars:].replace("\r", " ").replace("\n", " ").strip()
+
+
+def _mask_sensitive_text(value: str) -> str:
+    text = value
+    text = re.sub(r"\b\d{8}-\d{2}\b", "***MASKED***", text)
+    text = re.sub(r"\bkis_\d{8}-\d{2}\b", "kis_***MASKED***", text)
+    text = re.sub(r"(CANO=)[^&\s]+", r"\1***MASKED***", text)
+    text = re.sub(r"(ACNT_PRDT_CD=)[^&\s]+", r"\1***MASKED***", text)
+    return text
 
 
 def _run_single_ticker(
@@ -928,6 +1499,7 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     graph_config["codex_request_timeout"] = config.llm.codex_request_timeout
     graph_config["codex_max_retries"] = config.llm.codex_max_retries
     graph_config["codex_cleanup_threads"] = config.llm.codex_cleanup_threads
+    graph_config["codex_preflight_mode"] = config.llm.codex_preflight_mode
     if config.run.market == "KR":
         graph_config["market_country"] = "KR"
         graph_config["timezone"] = "Asia/Seoul"
@@ -1010,6 +1582,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "deep_model": config.llm.deep_model,
         "output_model": config.llm.output_model,
         "codex_reasoning_effort": config.llm.codex_reasoning_effort,
+        "codex_preflight_mode": config.llm.codex_preflight_mode,
         "output_language": config.run.output_language,
         "translation_backend": config.translation.backend,
         "translation_model": config.translation.model,
@@ -1021,6 +1594,14 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "configured_ticker_count": len(config.run.tickers),
         "max_runtime_minutes": config.run.max_runtime_minutes,
         "min_remaining_minutes_for_next_ticker": config.run.min_remaining_minutes_for_next_ticker,
+        "parallel_ticker_execution": config.run.parallel_ticker_execution,
+        "max_parallel_tickers": config.run.max_parallel_tickers,
+        "per_ticker_timeout_minutes": config.run.per_ticker_timeout_minutes,
+        "codex_circuit_breaker_enabled": config.run.codex_circuit_breaker_enabled,
+        "max_consecutive_codex_failures": config.run.max_consecutive_codex_failures,
+        "fatal_error_patterns": list(config.run.fatal_error_patterns),
+        "daily_active_ticker_limit": config.run.daily_active_ticker_limit,
+        "analysis_mode": config.run.analysis_mode,
         "max_debate_rounds": config.run.max_debate_rounds,
         "max_risk_discuss_rounds": config.run.max_risk_discuss_rounds,
         "report_polisher_enabled": config.run.report_polisher_enabled,

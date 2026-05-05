@@ -90,6 +90,7 @@ def _generate_llm_summary(
                 "codex_request_timeout": getattr(llm_settings, "codex_request_timeout", 120.0),
                 "codex_max_retries": getattr(llm_settings, "codex_max_retries", 2),
                 "codex_cleanup_threads": getattr(llm_settings, "codex_cleanup_threads", True),
+                "codex_preflight_mode": getattr(llm_settings, "codex_preflight_mode", "per_client"),
             }
         llm = create_llm_client(provider=provider, model=model, **kwargs).get_llm()
         payload = {
