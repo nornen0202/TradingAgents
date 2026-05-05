@@ -80,6 +80,12 @@ def load_portfolio_profile(path: str | Path, profile_name: str) -> PortfolioProf
         intraday_pilot_require_vwap=bool(payload.get("intraday_pilot_require_vwap", True)),
         intraday_pilot_require_adjusted_rvol=bool(payload.get("intraday_pilot_require_adjusted_rvol", True)),
         intraday_pilot_forbid_failed_breakout=bool(payload.get("intraday_pilot_forbid_failed_breakout", True)),
+        min_profit_take_return_pct=_to_float(payload.get("min_profit_take_return_pct"), default=8.0),
+        profit_take_ready_score=_to_float(payload.get("profit_take_ready_score"), default=0.65),
+        profit_take_stage1_fraction=_to_float(payload.get("profit_take_stage1_fraction"), default=0.20),
+        profit_take_stage2_fraction=_to_float(payload.get("profit_take_stage2_fraction"), default=0.30),
+        profit_take_trailing_fraction=_to_float(payload.get("profit_take_trailing_fraction"), default=0.25),
+        profit_take_keep_core_fraction=_to_float(payload.get("profit_take_keep_core_fraction"), default=0.45),
     )
 
 

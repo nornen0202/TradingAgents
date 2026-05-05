@@ -3,7 +3,7 @@ import tempfile
 from pathlib import Path
 
 from tradingagents.scheduled.config import SiteSettings
-from tradingagents.scheduled.site import _run_phase_label, build_site
+from tradingagents.scheduled.site import _render_index_page, _run_phase_label, build_site
 
 
 def _write_run(run_dir: Path, payload: dict) -> None:
@@ -102,3 +102,29 @@ def test_post_close_overlay_not_labeled_in_session():
 
     assert _run_phase_label(manifest) == "post_close"
     assert _run_phase_label(manifest) != "in_session"
+
+
+def test_homepage_run_card_exposes_take_profit_count():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        root = Path(tmpdir)
+        run = _manifest(
+            "20260418T030000_github-actions-overlay-kr",
+            started_at="2026-04-18T03:00:00+09:00",
+            market_session_phase="post_close",
+            portfolio_status="success",
+            total_tickers=4,
+        )
+        run_dir = root / run["run_id"]
+        private = run_dir / "portfolio-private"
+        private.mkdir(parents=True)
+        (private / "status.json").write_text('{"status":"success","profile":"kr"}', encoding="utf-8")
+        (private / "portfolio_report.md").write_text("# report", encoding="utf-8")
+        (private / "portfolio_report.json").write_text(
+            '{"data_health_summary":{"sell_side_distribution":{"TAKE_PROFIT":2,"REDUCE_RISK":1,"STOP_LOSS":1,"EXIT":0}},"actions":[]}',
+            encoding="utf-8",
+        )
+        run["_run_dir"] = str(run_dir)
+
+        html = _render_index_page([run], SiteSettings(title="TA", subtitle="Daily"))
+
+    assert "이익실현 2 / 리스크 축소 1 / 손절·청산 1" in html

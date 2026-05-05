@@ -152,7 +152,7 @@ def present_account_action(action: str, *, conditional: bool = False, language: 
         "EXIT_NOW": "Consider exit",
         "TRIM_TO_FUND": "Trim to fund stronger candidates",
         "REDUCE_RISK": "Reduce risk",
-        "TAKE_PROFIT": "Take profit / de-risk",
+        "TAKE_PROFIT": "Take profit",
         "STOP_LOSS": "Stop-loss condition",
         "EXIT": "Exit candidate",
         "HOLD": "Hold",

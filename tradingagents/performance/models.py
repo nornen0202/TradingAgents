@@ -17,6 +17,12 @@ ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
       trigger_type TEXT,
       source TEXT,
       prism_agreement TEXT,
+      sell_intent TEXT,
+      sell_trigger_status TEXT,
+      sell_size_plan TEXT,
+      unrealized_return_pct REAL,
+      profit_protection_score REAL,
+      profit_plan_json TEXT,
       was_executed INTEGER DEFAULT 0,
       skip_reason TEXT,
       created_at TEXT NOT NULL
@@ -32,8 +38,11 @@ ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
       return_20d REAL,
       return_60d REAL,
       benchmark_return_5d REAL,
+      benchmark_excess_5d REAL,
       max_drawdown_20d REAL,
       max_favorable_excursion_20d REAL,
+      avoided_drawdown_20d REAL,
+      missed_upside_20d REAL,
       outcome_label TEXT,
       updated_at TEXT,
       FOREIGN KEY(recommendation_id) REFERENCES action_recommendations(id)
@@ -87,6 +96,7 @@ class ActionPerformanceSummary:
     by_action: dict[str, dict[str, Any]] = field(default_factory=dict)
     prism_agreement: dict[str, dict[str, Any]] = field(default_factory=dict)
     action_buckets: dict[str, dict[str, Any]] = field(default_factory=dict)
+    profit_taking: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -97,6 +107,7 @@ class ActionPerformanceSummary:
             "by_action": self.by_action,
             "prism_agreement": self.prism_agreement,
             "action_buckets": self.action_buckets,
+            "profit_taking": self.profit_taking,
         }
 
 

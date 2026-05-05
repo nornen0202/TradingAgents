@@ -28,6 +28,8 @@ WAIT
 TRIM_TO_FUND
 REDUCE_RISK
 TAKE_PROFIT
+TAKE_PROFIT_NOW
+TAKE_PROFIT_IF_TRIGGERED
 STOP_LOSS
 EXIT
 scanner_candidate_skipped
@@ -71,7 +73,7 @@ If performance tracking records recommendations but cannot update outcomes becau
 성과 추적: 기록은 저장됐지만 아직 성과 계산은 수행되지 않았습니다.
 ```
 
-The generated static portfolio page now includes a `추천 성과 추적` section when performance tracking is enabled. It shows recorded recommendations, updated outcomes, provider status, action-level average returns, PRISM agreement/conflict buckets, and action-level source buckets:
+The generated static portfolio page now includes a `추천 성과 추적` section when performance tracking is enabled. It shows recorded recommendations, updated outcomes, provider status, action-level average returns, profit-taking performance, PRISM agreement/conflict buckets, and action-level source buckets:
 
 ```text
 TradingAgents-only
@@ -80,3 +82,16 @@ PRISM-conflicted
 PRISM-uncovered-current-market
 Scanner-discovered
 ```
+
+Profit-taking recommendations also store additive calibration fields when present:
+
+```text
+sell_intent
+sell_trigger_status
+sell_size_plan
+unrealized_return_pct
+profit_protection_score
+profit_plan_json
+```
+
+Outcome updates compute `avoided_drawdown_20d`, `missed_upside_20d`, and `benchmark_excess_5d` so `TAKE_PROFIT` can be reviewed separately from generic risk reduction.

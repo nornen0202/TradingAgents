@@ -31,6 +31,7 @@ class InvestorUiSellSideSectionsTests(unittest.TestCase):
             portfolio_relative_action=relative_action,
             risk_action=relative_action if relative_action in {"REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"} else "NONE",
             sell_side_category="risk" if relative_action == "REDUCE_RISK" else "none",
+            sell_intent=relative_action if relative_action in {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"} else "NONE",
         )
 
     def test_report_contains_investor_sell_side_sections_and_korean_labels(self):
@@ -73,14 +74,16 @@ class InvestorUiSellSideSectionsTests(unittest.TestCase):
         markdown = render_portfolio_report_markdown(snapshot=snapshot, recommendation=recommendation, candidates=[])
 
         self.assertIn("오늘 살 후보", markdown)
-        self.assertIn("위험 때문에 줄일 후보", markdown)
-        self.assertIn("이익실현 후보", markdown)
+        self.assertIn("조건부 이익실현 후보", markdown)
+        self.assertIn("조건부 위험 축소 후보", markdown)
         self.assertIn("손절/청산 후보", markdown)
+        self.assertIn("자금 마련용 축소 후보", markdown)
         self.assertIn("강한 후보 매수를 위한 일부 축소", markdown)
         self.assertIn("리스크 축소", markdown)
         self.assertIn("## 오늘 할 일: 방향별 후보", markdown)
-        self.assertIn("### 오늘 바로 매도/축소 후보", markdown)
+        self.assertIn("### 오늘 바로 이익실현 후보", markdown)
         self.assertIn("### 조건부 매수 후보", markdown)
+        self.assertNotIn("조건부 매도/손절/이익실현 후보", markdown)
         self.assertIn("현재 매수가능금액", markdown)
         self.assertIn("매도 정산 후 예상 현금", markdown)
         self.assertNotIn("전략상 우선순위", markdown)

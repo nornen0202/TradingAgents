@@ -57,6 +57,7 @@ def run_portfolio_pipeline(
             run_dir=run_dir,
             manifest=manifest,
             watch_tickers=profile.watch_tickers,
+            profile=profile,
         )
         prism_ingestion = _load_prism_ingestion(external_data_settings)
         candidates = enrich_candidates_with_prism(

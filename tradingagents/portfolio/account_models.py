@@ -139,6 +139,12 @@ class PortfolioProfile:
     intraday_pilot_require_vwap: bool = True
     intraday_pilot_require_adjusted_rvol: bool = True
     intraday_pilot_forbid_failed_breakout: bool = True
+    min_profit_take_return_pct: float = 8.0
+    profit_take_ready_score: float = 0.65
+    profit_take_stage1_fraction: float = 0.20
+    profit_take_stage2_fraction: float = 0.30
+    profit_take_trailing_fraction: float = 0.25
+    profit_take_keep_core_fraction: float = 0.45
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)
@@ -174,6 +180,12 @@ class PortfolioCandidate:
     risk_action_reason_codes: tuple[str, ...] = tuple()
     risk_action_level: dict[str, Any] | None = None
     sell_side_category: str = "none"
+    sell_intent: str = "NONE"
+    sell_trigger_status: str = "NONE"
+    sell_size_plan: str = "NONE"
+    thesis_after_sell: str = "UNKNOWN"
+    position_metrics: dict[str, Any] = field(default_factory=dict)
+    profit_taking_plan: dict[str, Any] = field(default_factory=dict)
     budget_blocked_actionable: bool = False
     stale_but_triggerable: bool = False
     funding_source_score: float = 0.0
@@ -226,6 +238,12 @@ class PortfolioAction:
     risk_action_reason_codes: tuple[str, ...] = tuple()
     risk_action_level: dict[str, Any] | None = None
     sell_side_category: str = "none"
+    sell_intent: str = "NONE"
+    sell_trigger_status: str = "NONE"
+    sell_size_plan: str = "NONE"
+    thesis_after_sell: str = "UNKNOWN"
+    position_metrics: dict[str, Any] = field(default_factory=dict)
+    profit_taking_plan: dict[str, Any] = field(default_factory=dict)
     budget_blocked_actionable: bool = False
     stale_but_triggerable: bool = False
     funding_source_score: float = 0.0

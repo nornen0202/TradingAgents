@@ -321,6 +321,8 @@ def _candidate_prism_patch(
         if action_if_triggered in TA_BUY_TRIGGER:
             action_if_triggered = "NONE" if bool(_get(candidate, "is_held")) else "WATCH_TRIGGER"
 
+    position_metrics = _augment_position_metrics(_get(candidate, "position_metrics") or {}, signal)
+    profit_taking_plan = _augment_profit_taking_plan(_get(candidate, "profit_taking_plan") or {}, signal)
     confidence = float(_get(candidate, "confidence") or 0.0)
     adjusted_confidence = max(0.0, min(1.0, confidence + delta))
     return {
@@ -334,6 +336,8 @@ def _candidate_prism_patch(
         "review_required": review_required,
         "risk_action_reason_codes": tuple(dict.fromkeys(risk_codes)),
         "gate_reasons": tuple(dict.fromkeys(gate_reasons)),
+        "position_metrics": position_metrics,
+        "profit_taking_plan": profit_taking_plan,
         "data_health": {
             **data_health,
             "external_signals": signal_payload,
@@ -341,8 +345,72 @@ def _candidate_prism_patch(
             "prism_coverage_status": "MATCHED",
             "external_signal_score_delta": round(delta, 4),
             "external_signal_notes": list(dict.fromkeys(notes)),
+            "position_metrics": position_metrics,
+            "profit_taking_plan": profit_taking_plan,
         },
     }
+
+
+def _augment_position_metrics(metrics: Any, signal: PrismExternalSignal) -> dict[str, Any]:
+    result = dict(metrics) if isinstance(metrics, dict) else {}
+    if signal.current_price is not None:
+        result.setdefault("current_price", signal.current_price)
+    if signal.avg_cost is not None:
+        result.setdefault("entry_price", signal.avg_cost)
+    if signal.pnl_pct is not None:
+        result["prism_pnl_pct"] = signal.pnl_pct
+        result.setdefault("unrealized_return_pct", signal.pnl_pct)
+    if signal.holding_days is not None:
+        result["holding_days"] = signal.holding_days
+    if signal.target_price is not None and result.get("current_price"):
+        try:
+            current = float(result["current_price"])
+            if current > 0:
+                result["distance_to_target_pct"] = round((float(signal.target_price) - current) / current * 100.0, 4)
+        except (TypeError, ValueError):
+            pass
+    if signal.stop_loss_price is not None and result.get("current_price"):
+        try:
+            current = float(result["current_price"])
+            if current > 0:
+                result["distance_to_trailing_stop_pct"] = round((current - float(signal.stop_loss_price)) / current * 100.0, 4)
+        except (TypeError, ValueError):
+            pass
+    score = _float_or_default(result.get("profit_protection_score"), 0.0)
+    if signal.signal_action == PrismSignalAction.TAKE_PROFIT:
+        score += 0.10
+    elif signal.signal_action in PRISM_SELL_OR_RISK and (signal.pnl_pct or 0.0) > 0:
+        score += 0.05
+    result["profit_protection_score"] = round(max(0.0, min(score, 1.0)), 4)
+    return result
+
+
+def _augment_profit_taking_plan(plan: Any, signal: PrismExternalSignal) -> dict[str, Any]:
+    result = dict(plan) if isinstance(plan, dict) else {}
+    if signal.signal_action == PrismSignalAction.TAKE_PROFIT:
+        result["enabled"] = True
+        result.setdefault("stage_1_fraction", 0.20)
+    if signal.target_price is not None:
+        result.setdefault("enabled", True)
+        result.setdefault("stage_1_price", signal.target_price)
+    if signal.stop_loss_price is not None:
+        result.setdefault("trailing_stop_price", signal.stop_loss_price)
+        result.setdefault("trailing_stop_fraction", 0.25)
+    if signal.rationale and not result.get("reentry_condition"):
+        result["prism_rationale"] = signal.rationale
+    codes = [str(code).strip().upper() for code in (result.get("reason_codes") or []) if str(code).strip()]
+    if signal.signal_action == PrismSignalAction.TAKE_PROFIT:
+        codes.append("PRISM_TAKE_PROFIT")
+    if codes:
+        result["reason_codes"] = list(dict.fromkeys(codes))
+    return result
+
+
+def _float_or_default(value: Any, default: float) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def _classify_candidate(candidate: Any, signal: PrismExternalSignal, *, cap: float) -> tuple[str, float, str, bool]:
