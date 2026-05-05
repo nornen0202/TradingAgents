@@ -412,6 +412,7 @@ jobs:
           )
 
       - name: Run scheduled analysis and build site
+        timeout-minutes: 230
         run: |
           import os
           import subprocess
@@ -430,6 +431,7 @@ jobs:
 
           args = [
               sys.executable,
+              "-u",
               "-m",
               "tradingagents.scheduled",
               "--config",
@@ -976,6 +978,7 @@ jobs:
           print("KIS account snapshot preflight:", account_result)
 
       - name: Run scheduled analysis and build site
+        timeout-minutes: 230
         run: |
           import os
           import subprocess
@@ -992,6 +995,7 @@ jobs:
 
           args = [
               sys.executable,
+              "-u",
               "-m",
               "tradingagents.scheduled",
               "--config",

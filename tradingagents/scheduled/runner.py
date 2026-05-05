@@ -130,6 +130,7 @@ def execute_scheduled_run(
 ) -> dict[str, Any]:
     tz = ZoneInfo(config.run.timezone)
     started_at = datetime.now(tz)
+    run_timer_start = perf_counter()
     run_id = _build_run_id(started_at, run_label)
     run_dir = config.storage.archive_dir / "runs" / started_at.strftime("%Y") / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -152,6 +153,10 @@ def execute_scheduled_run(
     engine_results_dir = run_dir / "engine-results"
     run_trade_date = _resolve_run_trade_date(config=config, tickers=run_tickers) if run_mode == "full" else None
     source_run_id: str | None = None
+    run_warnings: list[str] = []
+    configured_ticker_count = len(run_tickers)
+    max_runtime_seconds = _max_runtime_seconds(config)
+    min_remaining_seconds = _min_remaining_seconds_for_next_ticker(config)
     if run_mode == "selective_rerun_only" and not config.execution.execution_refresh_enabled:
         raise RuntimeError(
             "run_mode=selective_rerun_only requires [execution].enabled=true to compute rerun targets."
@@ -167,7 +172,39 @@ def execute_scheduled_run(
         )
 
     if run_mode == "full":
-        for ticker in run_tickers:
+        for index, ticker in enumerate(run_tickers):
+            remaining_seconds = _remaining_runtime_seconds(
+                max_runtime_seconds=max_runtime_seconds,
+                timer_start=run_timer_start,
+            )
+            if remaining_seconds is not None and remaining_seconds < min_remaining_seconds:
+                skipped = run_tickers[index:]
+                warning = (
+                    "run_time_budget_exhausted:"
+                    f"remaining_seconds={int(max(remaining_seconds, 0))}:"
+                    f"min_required_seconds={int(min_remaining_seconds)}:"
+                    f"skipped_tickers={','.join(skipped)}"
+                )
+                print(f"::warning::{warning}", flush=True)
+                run_warnings.append(warning)
+                ticker_summaries.extend(
+                    _skipped_ticker_summary(
+                        config=config,
+                        ticker=item,
+                        reason="run_time_budget_exhausted",
+                    )
+                    for item in skipped
+                )
+                break
+            print(
+                f"Starting ticker {index + 1}/{len(run_tickers)}: {ticker}"
+                + (
+                    f" (remaining budget {int(remaining_seconds)}s)"
+                    if remaining_seconds is not None
+                    else ""
+                ),
+                flush=True,
+            )
             ticker_summary = _run_single_ticker(
                 config=config,
                 ticker=ticker,
@@ -176,6 +213,11 @@ def execute_scheduled_run(
                 trade_date_override=run_trade_date,
             )
             ticker_summaries.append(ticker_summary)
+            print(
+                f"Finished ticker {index + 1}/{len(run_tickers)}: {ticker} "
+                f"status={ticker_summary.get('status')} duration={ticker_summary.get('duration_seconds')}s",
+                flush=True,
+            )
             if ticker_summary["status"] != "success" and not config.run.continue_on_ticker_error:
                 break
     elif portfolio_only:
@@ -276,6 +318,8 @@ def execute_scheduled_run(
             "successful_tickers": successes,
             "failed_tickers": failures,
             "partial_failure_rate": round(partial_failure_rate, 4),
+            "configured_ticker_count": configured_ticker_count,
+            "skipped_tickers": sum(1 for item in ticker_summaries if item.get("status") == "skipped"),
         },
         "quality_gate": {
             "partial_failure_rate": round(partial_failure_rate, 4),
@@ -291,6 +335,9 @@ def execute_scheduled_run(
         manifest["settings"]["daily_thesis_trade_date"] = run_trade_date
     manifest["batch_metrics"] = _compute_batch_metrics(ticker_summaries)
     manifest["warnings"] = _compute_batch_warnings(manifest["batch_metrics"])
+    for warning in run_warnings:
+        if warning not in manifest["warnings"]:
+            manifest["warnings"].append(warning)
     manifest["market_session_phase"] = _market_session_phase(
         manifest_overlay_phase,
         now=started_at,
@@ -805,6 +852,55 @@ def _run_single_ticker(
         }
 
 
+def _max_runtime_seconds(config: ScheduledAnalysisConfig) -> float | None:
+    minutes = float(getattr(config.run, "max_runtime_minutes", 0.0) or 0.0)
+    if minutes <= 0:
+        return None
+    return minutes * 60.0
+
+
+def _min_remaining_seconds_for_next_ticker(config: ScheduledAnalysisConfig) -> float:
+    minutes = float(getattr(config.run, "min_remaining_minutes_for_next_ticker", 0.0) or 0.0)
+    if minutes <= 0:
+        return 0.0
+    return minutes * 60.0
+
+
+def _remaining_runtime_seconds(*, max_runtime_seconds: float | None, timer_start: float) -> float | None:
+    if max_runtime_seconds is None:
+        return None
+    return max_runtime_seconds - (perf_counter() - timer_start)
+
+
+def _skipped_ticker_summary(
+    *,
+    config: ScheduledAnalysisConfig,
+    ticker: str,
+    reason: str,
+) -> dict[str, Any]:
+    try:
+        resolved_name = resolve_instrument(ticker).display_name
+    except Exception:
+        resolved_name = ticker
+    resolved_name = config.run.ticker_name_overrides.get(ticker, resolved_name)
+    now = datetime.now(ZoneInfo(config.run.timezone))
+    return {
+        "ticker": ticker,
+        "ticker_name": resolved_name,
+        "status": "skipped",
+        "analysis_date": now.date().isoformat(),
+        "trade_date": None,
+        "decision": None,
+        "error": reason,
+        "started_at": now.isoformat(),
+        "finished_at": now.isoformat(),
+        "duration_seconds": 0.0,
+        "metrics": {"llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0},
+        "quality_flags": (reason,),
+        "artifacts": {},
+    }
+
+
 def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> dict[str, Any]:
     graph_config = deepcopy(DEFAULT_CONFIG)
     graph_config["results_dir"] = str(engine_results_dir)
@@ -923,6 +1019,8 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "market": config.run.market,
         "run_mode": config.run.run_mode,
         "configured_ticker_count": len(config.run.tickers),
+        "max_runtime_minutes": config.run.max_runtime_minutes,
+        "min_remaining_minutes_for_next_ticker": config.run.min_remaining_minutes_for_next_ticker,
         "max_debate_rounds": config.run.max_debate_rounds,
         "max_risk_discuss_rounds": config.run.max_risk_discuss_rounds,
         "report_polisher_enabled": config.run.report_polisher_enabled,

@@ -235,6 +235,61 @@ NVDA = "NVIDIA Override"
             self.assertNotIn("Quality flags", ticker_html)
             self.assertTrue((site_dir / "downloads" / manifest["run_id"] / "NVDA" / "complete_report.md").exists())
 
+    def test_execute_scheduled_run_stops_before_time_budget_exhaustion(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["NVDA", "AAPL", "MSFT"]
+timezone = "Asia/Seoul"
+continue_on_ticker_error = true
+max_runtime_minutes = 20
+min_remaining_minutes_for_next_ticker = 10
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+            success_summary = {
+                "ticker": "NVDA",
+                "ticker_name": "NVIDIA Corporation",
+                "status": "success",
+                "analysis_date": "2026-04-05",
+                "trade_date": "2026-04-04",
+                "decision": "BUY",
+                "started_at": "2026-04-05T09:13:00+09:00",
+                "finished_at": "2026-04-05T09:20:00+09:00",
+                "duration_seconds": 420.0,
+                "metrics": {"llm_calls": 1, "tool_calls": 1, "tokens_in": 1, "tokens_out": 1},
+                "artifacts": {},
+            }
+            with (
+                patch("tradingagents.scheduled.runner.perf_counter", side_effect=[0.0, 0.0, 900.0]),
+                patch("tradingagents.scheduled.runner.resolve_trade_date", return_value="2026-04-04"),
+                patch("tradingagents.scheduled.runner._run_single_ticker", return_value=success_summary) as run_single,
+            ):
+                manifest = execute_scheduled_run(config, run_label="budget")
+
+            self.assertEqual(run_single.call_count, 1)
+            self.assertEqual(manifest["status"], "partial_failure")
+            self.assertEqual(manifest["summary"]["total_tickers"], 3)
+            self.assertEqual(manifest["summary"]["successful_tickers"], 1)
+            self.assertEqual(manifest["summary"]["failed_tickers"], 2)
+            self.assertEqual(manifest["summary"]["skipped_tickers"], 2)
+            self.assertEqual([item["ticker"] for item in manifest["tickers"][1:]], ["AAPL", "MSFT"])
+            self.assertTrue(all(item["status"] == "skipped" for item in manifest["tickers"][1:]))
+            self.assertTrue(any("run_time_budget_exhausted" in item for item in manifest["warnings"]))
+            run_dir = archive_dir / "runs" / manifest["started_at"][:4] / manifest["run_id"]
+            self.assertTrue((run_dir / "run.json").exists())
+            self.assertTrue((site_dir / "index.html").exists())
+
     def test_main_site_only_rebuilds_from_existing_archive(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

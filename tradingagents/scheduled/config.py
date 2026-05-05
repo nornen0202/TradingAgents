@@ -42,6 +42,8 @@ class RunSettings:
     report_polisher_enabled: bool = True
     ticker_name_overrides: dict[str, str] = field(default_factory=dict)
     run_mode: str = "full"
+    max_runtime_minutes: float = 0.0
+    min_remaining_minutes_for_next_ticker: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -304,6 +306,11 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             report_polisher_enabled=bool(run_raw.get("report_polisher_enabled", True)),
             ticker_name_overrides=_normalize_ticker_name_overrides(raw.get("ticker_names") or {}),
             run_mode=_normalize_run_mode(run_raw.get("run_mode", "full")),
+            max_runtime_minutes=max(0.0, float(run_raw.get("max_runtime_minutes", 0.0) or 0.0)),
+            min_remaining_minutes_for_next_ticker=max(
+                0.0,
+                float(run_raw.get("min_remaining_minutes_for_next_ticker", 0.0) or 0.0),
+            ),
         ),
         llm=LLMSettings(
             provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
