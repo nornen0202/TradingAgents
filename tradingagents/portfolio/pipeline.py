@@ -49,6 +49,14 @@ def run_portfolio_pipeline(
     profile = load_portfolio_profile(portfolio_settings.profile_path, portfolio_settings.profile_name)
     if not profile.enabled:
         return {"status": "disabled", "reason": f"profile {profile.name} is disabled"}
+    run_mode = str(((manifest.get("settings") or {}).get("run_mode")) or "").strip().lower()
+    if run_mode == "portfolio_only":
+        portfolio_settings = replace(
+            portfolio_settings,
+            semantic_judge_enabled=False,
+            action_judge_enabled=False,
+            report_polisher_enabled=False,
+        )
 
     private_dir = run_dir / profile.private_output_dirname
     status_path = private_dir / "status.json"

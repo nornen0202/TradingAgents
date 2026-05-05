@@ -1,0 +1,303 @@
+name: Account Portfolio Report Verify
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "KIS account report profile to verify: all / kr / us"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - kr
+          - us
+
+permissions:
+  contents: read
+
+concurrency:
+  group: account-portfolio-report-verify
+  cancel-in-progress: true
+
+jobs:
+  verify_kr:
+    if: ${{ github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr' }}
+    runs-on: [self-hosted, Windows]
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: python {0}
+    env:
+      PYTHONUTF8: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
+      TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+      KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+      KIS_ACCOUNT_NO: ${{ secrets.KIS_ACCOUNT_NO }}
+      KIS_PRODUCT_CODE: ${{ secrets.KIS_PRODUCT_CODE }}
+      KIS_Developers_APP_KEY: ${{ secrets.KIS_Developers_APP_KEY }}
+      KIS_Developers_APP_SECRET: ${{ secrets.KIS_Developers_APP_SECRET }}
+      KIS_Developers_ACCOUNT_NO: ${{ secrets.KIS_Developers_ACCOUNT_NO }}
+      KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install TradingAgents
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", "."])
+
+      - name: Materialize KIS API keys
+        run: |
+          import json
+          import os
+          from pathlib import Path
+
+          alias_groups = {
+              "KIS_APP_KEY": ("KIS_APP_KEY", "KIS_Developers_APP_KEY"),
+              "KIS_APP_SECRET": ("KIS_APP_SECRET", "KIS_Developers_APP_SECRET"),
+              "KIS_ACCOUNT_NO": ("KIS_ACCOUNT_NO", "KIS_Developers_ACCOUNT_NO"),
+              "KIS_PRODUCT_CODE": ("KIS_PRODUCT_CODE", "KIS_Developers_PRODUCT_CODE"),
+          }
+          payload = {}
+          missing = []
+          for canonical_name, candidates in alias_groups.items():
+              for candidate in candidates:
+                  value = os.environ.get(candidate)
+                  if value and value.strip():
+                      payload[canonical_name] = value
+                      payload[candidate] = value
+                      break
+              if canonical_name in {"KIS_APP_KEY", "KIS_APP_SECRET"} and canonical_name not in payload:
+                  missing.append(canonical_name)
+          if missing:
+              raise SystemExit(f"Missing required KIS credentials: {', '.join(missing)}")
+          runtime_path = Path(os.environ["RUNNER_TEMP"]) / "tradingagents-kis-api-keys.json"
+          runtime_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write(f"TRADINGAGENTS_API_KEYS_PATH={runtime_path}\n")
+          print("Materialized KIS credentials for portfolio-only account verification.")
+
+      - name: KIS KR account preflight
+        run: |
+          from tradingagents.portfolio.kis import KisClient
+          from tradingagents.portfolio.profiles import load_portfolio_profile
+
+          profile = load_portfolio_profile("config/portfolio_profiles.toml", "kr_kis_default")
+          if not profile.account_no:
+              raise SystemExit("KIS account number is not configured for kr_kis_default.")
+          client = KisClient.from_api_keys()
+          token = client.issue_access_token()
+          positions, summary = client.fetch_balance(account_no=profile.account_no, product_code=profile.product_code or "01")
+          print(
+              "KIS KR account preflight:",
+              {
+                  "environment": client.environment,
+                  "token_issued": bool(token),
+                  "positions_count": len(positions),
+                  "summary_field_count": len(summary or {}),
+              },
+          )
+
+      - name: Run KR portfolio-only account report
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          args = [
+              sys.executable,
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              "config/scheduled_analysis_korea.toml",
+              "--run-mode",
+              "portfolio_only",
+              "--site-dir",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
+              "--label",
+              "github-actions-portfolio-kr",
+          ]
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+          subprocess.check_call(args)
+
+      - name: Verify KR public account performance report
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/verify_account_performance_site.py",
+                  "--site-dir",
+                  "site",
+                  "--market",
+                  "kr",
+                  "--run-label",
+                  "github-actions-portfolio-kr",
+              ]
+          )
+
+      - name: Upload KR generated site
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-performance-kr-site-${{ github.run_id }}
+          path: site
+
+  verify_us:
+    needs:
+      - verify_kr
+    if: ${{ always() && (github.event.inputs.profile == 'us' || (github.event.inputs.profile == 'all' && needs.verify_kr.result == 'success')) }}
+    runs-on: [self-hosted, Windows]
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: python {0}
+    env:
+      PYTHONUTF8: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
+      TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+      KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+      KIS_ACCOUNT_NO: ${{ secrets.KIS_ACCOUNT_NO }}
+      KIS_PRODUCT_CODE: ${{ secrets.KIS_PRODUCT_CODE }}
+      KIS_Developers_APP_KEY: ${{ secrets.KIS_Developers_APP_KEY }}
+      KIS_Developers_APP_SECRET: ${{ secrets.KIS_Developers_APP_SECRET }}
+      KIS_Developers_ACCOUNT_NO: ${{ secrets.KIS_Developers_ACCOUNT_NO }}
+      KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install TradingAgents
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", "."])
+
+      - name: Materialize KIS API keys
+        run: |
+          import json
+          import os
+          from pathlib import Path
+
+          alias_groups = {
+              "KIS_APP_KEY": ("KIS_APP_KEY", "KIS_Developers_APP_KEY"),
+              "KIS_APP_SECRET": ("KIS_APP_SECRET", "KIS_Developers_APP_SECRET"),
+              "KIS_ACCOUNT_NO": ("KIS_ACCOUNT_NO", "KIS_Developers_ACCOUNT_NO"),
+              "KIS_PRODUCT_CODE": ("KIS_PRODUCT_CODE", "KIS_Developers_PRODUCT_CODE"),
+          }
+          payload = {}
+          missing = []
+          for canonical_name, candidates in alias_groups.items():
+              for candidate in candidates:
+                  value = os.environ.get(candidate)
+                  if value and value.strip():
+                      payload[canonical_name] = value
+                      payload[candidate] = value
+                      break
+              if canonical_name in {"KIS_APP_KEY", "KIS_APP_SECRET"} and canonical_name not in payload:
+                  missing.append(canonical_name)
+          if missing:
+              raise SystemExit(f"Missing required KIS credentials: {', '.join(missing)}")
+          runtime_path = Path(os.environ["RUNNER_TEMP"]) / "tradingagents-kis-api-keys.json"
+          runtime_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write(f"TRADINGAGENTS_API_KEYS_PATH={runtime_path}\n")
+          print("Materialized KIS credentials for portfolio-only account verification.")
+
+      - name: KIS US account preflight
+        run: |
+          from tradingagents.portfolio.kis import KisClient
+          from tradingagents.portfolio.profiles import load_portfolio_profile
+
+          profile = load_portfolio_profile("config/portfolio_profiles.toml", "us_kis_default")
+          if not profile.account_no:
+              raise SystemExit("KIS account number is not configured for us_kis_default.")
+          client = KisClient.from_api_keys()
+          token = client.issue_access_token()
+          positions, summary = client.fetch_overseas_present_balance(
+              account_no=profile.account_no,
+              product_code=profile.product_code or "01",
+          )
+          print(
+              "KIS US account preflight:",
+              {
+                  "environment": client.environment,
+                  "token_issued": bool(token),
+                  "positions_count": len(positions),
+                  "summary_field_count": len(summary or {}),
+              },
+          )
+
+      - name: Run US portfolio-only account report
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          args = [
+              sys.executable,
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              "config/scheduled_analysis.toml",
+              "--run-mode",
+              "portfolio_only",
+              "--site-dir",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
+              "--label",
+              "github-actions-portfolio-us",
+          ]
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+          subprocess.check_call(args)
+
+      - name: Verify US public account performance report
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/verify_account_performance_site.py",
+                  "--site-dir",
+                  "site",
+                  "--market",
+                  "us",
+                  "--run-label",
+                  "github-actions-portfolio-us",
+              ]
+          )
+
+      - name: Upload US generated site
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: account-performance-us-site-${{ github.run_id }}
+          path: site

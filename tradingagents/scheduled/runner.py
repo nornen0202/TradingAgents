@@ -90,8 +90,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--trade-date", help="Optional YYYY-MM-DD override for all tickers.")
     parser.add_argument(
         "--run-mode",
-        choices=("full", "overlay_only", "selective_rerun_only"),
-        help="Execution mode: full / overlay_only / selective_rerun_only.",
+        choices=("full", "overlay_only", "selective_rerun_only", "portfolio_only"),
+        help="Execution mode: full / overlay_only / selective_rerun_only / portfolio_only.",
     )
     parser.add_argument("--site-only", action="store_true", help="Only rebuild the static site from archived runs.")
     parser.add_argument("--strict", action="store_true", help="Return a non-zero exit code if any ticker fails.")
@@ -134,17 +134,22 @@ def execute_scheduled_run(
     run_dir = config.storage.archive_dir / "runs" / started_at.strftime("%Y") / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    base_run_tickers = _resolve_run_tickers(config)
-    run_tickers, scanner_status = _augment_run_tickers_with_scanner(
-        config=config,
-        base_tickers=base_run_tickers,
-        run_dir=run_dir,
-        run_id=run_id,
-        asof=started_at.isoformat(),
-    )
+    run_mode = str(config.run.run_mode or "full").strip().lower()
+    portfolio_only = run_mode == "portfolio_only"
+    if portfolio_only:
+        run_tickers: list[str] = []
+        scanner_status = None
+    else:
+        base_run_tickers = _resolve_run_tickers(config)
+        run_tickers, scanner_status = _augment_run_tickers_with_scanner(
+            config=config,
+            base_tickers=base_run_tickers,
+            run_dir=run_dir,
+            run_id=run_id,
+            asof=started_at.isoformat(),
+        )
     ticker_summaries: list[dict[str, Any]] = []
     engine_results_dir = run_dir / "engine-results"
-    run_mode = str(config.run.run_mode or "full").strip().lower()
     run_trade_date = _resolve_run_trade_date(config=config, tickers=run_tickers) if run_mode == "full" else None
     source_run_id: str | None = None
     if run_mode == "selective_rerun_only" and not config.execution.execution_refresh_enabled:
@@ -155,6 +160,10 @@ def execute_scheduled_run(
         raise RuntimeError(
             "run_mode=overlay_only requires [execution].enabled=true to refresh execution overlays. "
             "Use run_mode=full for research-only runs or enable [execution] in the scheduled config."
+        )
+    if portfolio_only and (not config.portfolio.enabled or not config.portfolio.profile_path):
+        raise RuntimeError(
+            "run_mode=portfolio_only requires [portfolio].enabled=true and a configured portfolio profile."
         )
 
     if run_mode == "full":
@@ -169,6 +178,10 @@ def execute_scheduled_run(
             ticker_summaries.append(ticker_summary)
             if ticker_summary["status"] != "success" and not config.run.continue_on_ticker_error:
                 break
+    elif portfolio_only:
+        # KIS account/report verification path: leave ticker research empty and
+        # run the account portfolio pipeline below.
+        pass
     else:
         ticker_summaries, source_run_id = _bootstrap_overlay_inputs_from_latest_run(
             config=config,
@@ -177,7 +190,7 @@ def execute_scheduled_run(
         )
 
     execution_updates: dict[str, dict[str, Any]] = {}
-    if config.execution.execution_refresh_enabled:
+    if config.execution.execution_refresh_enabled and not portfolio_only:
         now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
         selected_checkpoints, overlay_phase = _select_due_checkpoints(
             now_kst=now_kst,
@@ -202,12 +215,15 @@ def execute_scheduled_run(
                 "Check execution_contract artifacts and intraday market data availability."
             )
     else:
-        manifest_overlay_phase = {"name": "DISABLED", "selected_checkpoints": []}
+        manifest_overlay_phase = {
+            "name": "PORTFOLIO_ONLY" if portfolio_only else "DISABLED",
+            "selected_checkpoints": [],
+        }
 
-    event_signals = collect_event_signals(run_dir=run_dir, ticker_summaries=ticker_summaries)
+    event_signals = {} if portfolio_only else collect_event_signals(run_dir=run_dir, ticker_summaries=ticker_summaries)
     selective_rerun_targets: dict[str, list[str]] = {}
     selective_rerun_results: list[dict[str, Any]] = []
-    if config.execution.execution_selective_rerun_enabled and execution_updates:
+    if config.execution.execution_selective_rerun_enabled and execution_updates and not portfolio_only:
         selective_rerun_targets = find_selective_rerun_targets(
             contracts=_load_execution_contracts_for_run(run_dir, ticker_summaries),
             updates={key: _ExecutionUpdateShim(val) for key, val in execution_updates.items() if not key.startswith("_")},
@@ -309,7 +325,7 @@ def execute_scheduled_run(
             ),
             encoding="utf-8",
         )
-    elif config.execution.execution_refresh_enabled:
+    elif config.execution.execution_refresh_enabled and not portfolio_only:
         manifest["execution"] = {
             "run_id": run_id,
             "refresh_checkpoint": None,
@@ -369,7 +385,7 @@ def execute_scheduled_run(
             portfolio_performance_settings=config.portfolio_performance,
             llm_settings=config.llm,
             summary_image_settings=config.summary_image,
-            external_data_settings=config.external_data,
+            external_data_settings=None if portfolio_only else config.external_data,
         )
         manifest["portfolio"] = portfolio_status
         for warning in portfolio_status.get("sell_side_calibration_warnings") or []:
@@ -383,7 +399,7 @@ def execute_scheduled_run(
     else:
         manifest["portfolio"] = {"status": "disabled"}
 
-    if config.performance.enabled:
+    if config.performance.enabled and not portfolio_only:
         manifest["performance"] = _run_performance_tracking(config=config, run_dir=run_dir, started_at=started_at)
 
     manifest["run_quality"] = _compute_run_quality(manifest=manifest)
@@ -1784,6 +1800,8 @@ def _market_session_phase(
     phase = str(overlay_phase.get("name") or "").upper()
     if phase == "DISABLED":
         return "disabled"
+    if phase == "PORTFOLIO_ONLY":
+        return "portfolio_only"
     calendar_phase = _calendar_session_phase(now=now, market=market)
     if execution_summary:
         quality = str(execution_summary.get("execution_data_quality") or "").upper()
