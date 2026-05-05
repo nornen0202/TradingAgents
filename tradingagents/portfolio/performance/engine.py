@@ -41,6 +41,16 @@ class LedgerEvent:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class SnapshotSelection:
+    rows: list[dict[str, Any]]
+    raw_count: int
+    excluded_count: int
+    excluded_reasons: dict[str, int]
+    min_snapshot_value_krw: int | None
+    current_excluded_reason: str | None
+
+
 def build_account_performance_outputs(
     *,
     private_dir: Path,
@@ -57,12 +67,20 @@ def build_account_performance_outputs(
     market_scope = _market_scope(profile)
     benchmark_names = _benchmark_names(settings, market_scope)
     current_snapshot = _snapshot_row(snapshot, profile_name=profile.name)
-    snapshot_rows = _load_snapshot_history(run_dir=run_dir, profile_name=profile.name)
-    snapshot_rows.append(current_snapshot)
-    snapshot_rows = _dedupe_snapshot_rows(snapshot_rows)
+    raw_snapshot_rows = _load_snapshot_history(run_dir=run_dir, profile_name=profile.name)
+    raw_snapshot_rows.append(current_snapshot)
+    snapshot_selection = _select_performance_snapshots(
+        raw_snapshot_rows,
+        profile=profile,
+        current_snapshot=current_snapshot,
+        warnings=warnings,
+    )
+    snapshot_rows = snapshot_selection.rows
 
-    start_date = _default_start_date(snapshot_rows, lookback_days=int(getattr(settings, "lookback_days", 800)))
     end_date = _parse_date(current_snapshot["date"]) or date.today()
+    start_date = _default_start_date(snapshot_rows, lookback_days=int(getattr(settings, "lookback_days", 800)))
+    if not snapshot_rows:
+        start_date = end_date
     ledger_events = _load_ledger_events(
         profile=profile,
         market_scope=market_scope,
@@ -108,7 +126,11 @@ def build_account_performance_outputs(
         "costs": costs,
         "contribution_by_ticker": contribution,
         "data_quality": {
+            "raw_snapshot_count": snapshot_selection.raw_count,
             "snapshot_count": len(snapshot_rows),
+            "excluded_snapshot_count": snapshot_selection.excluded_count,
+            "excluded_snapshot_reasons": snapshot_selection.excluded_reasons,
+            "min_snapshot_value_krw": snapshot_selection.min_snapshot_value_krw,
             "ledger_event_count": len(ledger_events),
             "benchmark_provider": _provider_label(settings),
             "warnings": list(dict.fromkeys(warnings)),
@@ -149,9 +171,12 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
     for period in periods:
         if not isinstance(period, Mapping):
             continue
+        period_label = str(period.get("period") or "-")
+        if period.get("partial"):
+            period_label = f"{period_label} (부분)"
         rows.append(
             "| "
-            f"{period.get('period', '-')} | "
+            f"{period_label} | "
             f"{_pct(period.get('actual_return'))} | "
             f"{_pct((period.get('best_excess') or {}).get('excess_return'))} | "
             f"{_pct((period.get('worst_excess') or {}).get('excess_return'))} | "
@@ -212,6 +237,7 @@ def _load_snapshot_history(*, run_dir: Path, profile_name: str) -> list[dict[str
     for snapshot_path in runs_root.rglob("portfolio-private/account_snapshot.json"):
         private_dir = snapshot_path.parent
         status_path = private_dir / "status.json"
+        status: dict[str, Any] = {}
         if status_path.exists():
             try:
                 status = json.loads(status_path.read_text(encoding="utf-8"))
@@ -221,6 +247,8 @@ def _load_snapshot_history(*, run_dir: Path, profile_name: str) -> list[dict[str
                 continue
         try:
             payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+            if isinstance(payload, dict) and not payload.get("snapshot_health") and status.get("snapshot_health"):
+                payload = {**payload, "snapshot_health": status.get("snapshot_health")}
             rows.append(_snapshot_payload_row(payload, profile_name=profile_name))
         except Exception:
             continue
@@ -234,6 +262,9 @@ def _snapshot_row(snapshot: AccountSnapshot, *, profile_name: str) -> dict[str, 
         "date": str(snapshot.as_of)[:10],
         "as_of": snapshot.as_of,
         "account_value_krw": float(snapshot.account_value_krw),
+        "snapshot_health": str(getattr(snapshot, "snapshot_health", "") or ""),
+        "positions_count": len(getattr(snapshot, "positions", ()) or ()),
+        "broker": str(getattr(snapshot, "broker", "") or ""),
     }
 
 
@@ -241,13 +272,81 @@ def _snapshot_payload_row(payload: Mapping[str, Any], *, profile_name: str) -> d
     value = _float_or_none(payload.get("account_value_krw"))
     if value is None:
         value = _float_or_none(payload.get("total_equity_krw")) or 0.0
+    positions = payload.get("positions")
+    positions_count = len(positions) if isinstance(positions, list) else _int_or_none(payload.get("positions_count"))
+    as_of = str(payload.get("as_of") or payload.get("generated_at") or payload.get("date") or "")
     return {
         "snapshot_id": str(payload.get("snapshot_id") or ""),
         "profile": profile_name,
-        "date": str(payload.get("as_of") or "")[:10],
-        "as_of": str(payload.get("as_of") or ""),
+        "date": as_of[:10],
+        "as_of": as_of,
         "account_value_krw": float(value),
+        "snapshot_health": str(payload.get("snapshot_health") or ""),
+        "positions_count": positions_count,
+        "broker": str(payload.get("broker") or ""),
     }
+
+
+def _select_performance_snapshots(
+    rows: list[dict[str, Any]],
+    *,
+    profile: PortfolioProfile,
+    current_snapshot: dict[str, Any],
+    warnings: list[str],
+) -> SnapshotSelection:
+    valid_rows: list[dict[str, Any]] = []
+    reasons: dict[str, int] = {}
+    min_value: float | None = None
+    current_excluded_reason = _snapshot_exclusion_reason(current_snapshot, profile=profile)
+    for row in rows:
+        reason = _snapshot_exclusion_reason(row, profile=profile)
+        if reason:
+            reasons[reason] = reasons.get(reason, 0) + 1
+            continue
+        value = _float_or_none(row.get("account_value_krw"))
+        if value is not None:
+            min_value = value if min_value is None else min(min_value, value)
+        valid_rows.append(row)
+
+    if current_excluded_reason:
+        warnings.append(f"account_performance_current_snapshot_excluded:{current_excluded_reason}")
+        valid_rows = []
+        min_value = None
+
+    for reason, count in sorted(reasons.items()):
+        warnings.append(f"account_performance_snapshot_excluded:{reason}:{count}")
+
+    selected = _dedupe_snapshot_rows(valid_rows)
+    return SnapshotSelection(
+        rows=selected,
+        raw_count=len(rows),
+        excluded_count=sum(reasons.values()),
+        excluded_reasons=dict(sorted(reasons.items())),
+        min_snapshot_value_krw=int(round(min_value)) if min_value is not None else None,
+        current_excluded_reason=current_excluded_reason,
+    )
+
+
+def _snapshot_exclusion_reason(row: Mapping[str, Any], *, profile: PortfolioProfile) -> str | None:
+    if _parse_date(str(row.get("date") or "")) is None:
+        return "invalid_date"
+    value = _float_or_none(row.get("account_value_krw"))
+    if value is None:
+        return "missing_account_value"
+    if not math.isfinite(value):
+        return "non_finite_account_value"
+    if value <= 0:
+        return "non_positive_account_value"
+    health = str(row.get("snapshot_health") or "").strip().upper()
+    if health == "WATCHLIST_ONLY":
+        return "watchlist_only"
+    if health == "INVALID_SNAPSHOT":
+        return "invalid_snapshot"
+    positions_count = _int_or_none(row.get("positions_count"))
+    min_trade_krw = max(0, int(getattr(getattr(profile, "constraints", None), "min_trade_krw", 0) or 0))
+    if min_trade_krw > 0 and value < min_trade_krw and (positions_count is None or positions_count <= 0):
+        return "under_min_trade_no_positions"
+    return None
 
 
 def _dedupe_snapshot_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -288,60 +387,78 @@ def _load_ledger_events(
         from tradingagents.portfolio.kis import KisClient
 
         client = KisClient.from_api_keys(environment=profile.broker_environment)
+        query_ranges = _kis_ledger_query_ranges(start_date=start_date, end_date=end_date)
+        if len(query_ranges) > 1:
+            warnings.append(f"account_performance_kis_ledger_chunked:{len(query_ranges)}")
         if market_scope == "us":
             raw_rows = []
-            raw_rows.extend(
-                client.fetch_overseas_order_fills(
+            for query_start, query_end in query_ranges:
+                raw_rows.extend(
+                    client.fetch_overseas_order_fills(
+                        account_no=profile.account_no,
+                        product_code=profile.product_code,
+                        start_date=query_start,
+                        end_date=query_end,
+                    )
+                )
+                raw_rows.extend(
+                    client.fetch_overseas_period_transactions(
+                        account_no=profile.account_no,
+                        product_code=profile.product_code,
+                        start_date=query_start,
+                        end_date=query_end,
+                    )
+                )
+                profits, _summary = client.fetch_overseas_period_profit(
                     account_no=profile.account_no,
                     product_code=profile.product_code,
-                    start_date=start_date,
-                    end_date=end_date,
+                    start_date=query_start,
+                    end_date=query_end,
                 )
-            )
-            raw_rows.extend(
-                client.fetch_overseas_period_transactions(
-                    account_no=profile.account_no,
-                    product_code=profile.product_code,
-                    start_date=start_date,
-                    end_date=end_date,
-                )
-            )
-            profits, _summary = client.fetch_overseas_period_profit(
-                account_no=profile.account_no,
-                product_code=profile.product_code,
-                start_date=start_date,
-                end_date=end_date,
-            )
-            raw_rows.extend(profits)
+                raw_rows.extend(profits)
             return [_normalize_ledger_event(row, market="US", source="kis_overseas") for row in raw_rows]
 
         raw_rows = []
-        raw_rows.extend(
-            client.fetch_domestic_order_fills(
+        for query_start, query_end in query_ranges:
+            raw_rows.extend(
+                client.fetch_domestic_order_fills(
+                    account_no=profile.account_no,
+                    product_code=profile.product_code,
+                    start_date=query_start,
+                    end_date=query_end,
+                )
+            )
+            daily_profit, _daily_summary = client.fetch_domestic_period_profit(
                 account_no=profile.account_no,
                 product_code=profile.product_code,
-                start_date=start_date,
-                end_date=end_date,
+                start_date=query_start,
+                end_date=query_end,
             )
-        )
-        daily_profit, _daily_summary = client.fetch_domestic_period_profit(
-            account_no=profile.account_no,
-            product_code=profile.product_code,
-            start_date=start_date,
-            end_date=end_date,
-        )
-        trade_profit, _trade_summary = client.fetch_domestic_period_trade_profit(
-            account_no=profile.account_no,
-            product_code=profile.product_code,
-            start_date=start_date,
-            end_date=end_date,
-        )
-        raw_rows.extend(daily_profit)
-        raw_rows.extend(trade_profit)
+            trade_profit, _trade_summary = client.fetch_domestic_period_trade_profit(
+                account_no=profile.account_no,
+                product_code=profile.product_code,
+                start_date=query_start,
+                end_date=query_end,
+            )
+            raw_rows.extend(daily_profit)
+            raw_rows.extend(trade_profit)
         return [_normalize_ledger_event(row, market="KR", source="kis_domestic") for row in raw_rows]
     except Exception as exc:
         warnings.append(f"account_performance_kis_ledger_failed:{_short_error(exc)}")
         return []
+
+
+def _kis_ledger_query_ranges(*, start_date: date, end_date: date) -> list[tuple[date, date]]:
+    if start_date > end_date:
+        return []
+    ranges: list[tuple[date, date]] = []
+    current = start_date
+    max_span = timedelta(days=360)
+    while current <= end_date:
+        chunk_end = min(end_date, current + max_span)
+        ranges.append((current, chunk_end))
+        current = chunk_end + timedelta(days=1)
+    return ranges
 
 
 def _normalize_ledger_event(row: Mapping[str, Any], *, market: str, source: str) -> LedgerEvent:
@@ -627,6 +744,13 @@ def _compute_periods(
         actual_return = (end_value - start_value) / start_value
         start = _parse_date(str(start_snapshot["date"])) or start_boundary
         end = _parse_date(str(end_snapshot["date"])) or end_date
+        partial_reasons = []
+        if start > start_boundary:
+            partial_reasons.append(f"requested_start={start_boundary.isoformat()}:actual_start={start.isoformat()}")
+        if end < end_date:
+            partial_reasons.append(f"requested_end={end_date.isoformat()}:actual_end={end.isoformat()}")
+        if partial_reasons:
+            warnings.append(f"account_performance_period_partial:{period_name}:{';'.join(partial_reasons)}")
         simple_rows: list[dict[str, Any]] = []
         cashflow_rows: list[dict[str, Any]] = []
         for benchmark, series in benchmark_prices.items():
@@ -667,8 +791,11 @@ def _compute_periods(
         periods.append(
             {
                 "period": period_name,
+                "requested_start_date": start_boundary.isoformat(),
                 "start_date": start.isoformat(),
                 "end_date": end.isoformat(),
+                "partial": bool(partial_reasons),
+                "partial_reasons": partial_reasons,
                 "actual_start_value_krw": int(round(start_value)),
                 "actual_end_value_krw": int(round(end_value)),
                 "actual_return": round(actual_return, 6),
@@ -754,6 +881,10 @@ def _summary(periods: list[dict[str, Any]]) -> dict[str, Any]:
         return {}
     return {
         "default_period": default.get("period"),
+        "requested_start_date": default.get("requested_start_date"),
+        "start_date": default.get("start_date"),
+        "end_date": default.get("end_date"),
+        "partial": bool(default.get("partial")),
         "actual_return": default.get("actual_return"),
         "best_excess": default.get("best_excess") or {},
         "worst_excess": default.get("worst_excess") or {},
@@ -850,7 +981,7 @@ def _first_snapshot_on_or_after(rows: list[dict[str, Any]], target: date) -> dic
         row_date = _parse_date(str(row.get("date")))
         if row_date and row_date >= target:
             return row
-    return rows[0] if rows else None
+    return None
 
 
 def _last_snapshot_on_or_before(rows: list[dict[str, Any]], target: date) -> dict[str, Any] | None:
@@ -881,7 +1012,7 @@ def _period_start(period_name: str, *, end_date: date, snapshot_rows: list[dict[
 def _default_start_date(snapshot_rows: list[dict[str, Any]], *, lookback_days: int) -> date:
     first = _parse_date(str(snapshot_rows[0].get("date"))) if snapshot_rows else None
     fallback = date.today() - timedelta(days=max(30, int(lookback_days)))
-    return min(first, fallback) if first else fallback
+    return max(first, fallback) if first else fallback
 
 
 def _normalize_price_rows(raw: Any) -> list[dict[str, Any]]:
@@ -1031,6 +1162,13 @@ def _float_or_none(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _int_or_none(value: Any) -> int | None:
+    number = _float_or_none(value)
+    if number is None:
+        return None
+    return int(round(number))
 
 
 def _parse_date(value: str) -> date | None:

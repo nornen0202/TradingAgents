@@ -52,6 +52,9 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
         "periods": [
             {
                 "period": "ALL",
+                "requested_start_date": "2026-01-01",
+                "start_date": "2026-02-01",
+                "partial": True,
                 "actual_return": 0.2,
                 "mdd": -0.05,
                 "volatility": 0.01,
@@ -113,6 +116,8 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
         encoding="utf-8"
     )
     assert "계좌 성과 vs 지수/ETF" in public_html
+    assert "ALL (부분)" in public_html
+    assert "부분 산출" in public_html
     assert "KOSPI" in public_html
     assert "KOSDAQ" in public_html
     assert "account_performance_public.json" in public_html

@@ -823,6 +823,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     contribution = payload.get("contribution_by_ticker") if isinstance(payload.get("contribution_by_ticker"), list) else []
     benchmarks = [str(item) for item in payload.get("benchmarks", []) if str(item)]
     default_period = str(summary.get("default_period") or (periods[-1].get("period") if periods and isinstance(periods[-1], dict) else "-"))
+    default_period_label = f"{default_period} (부분)" if summary.get("partial") and default_period != "-" else default_period
     best = summary.get("best_excess") if isinstance(summary.get("best_excess"), dict) else {}
     worst = summary.get("worst_excess") if isinstance(summary.get("worst_excess"), dict) else {}
     public_json = portfolio_summary.get("account_performance_public_json")
@@ -835,7 +836,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
                 f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
             )
     period_tabs = "".join(
-        f"<a class='pill' href='#account-perf-{_escape(str(period.get('period') or 'period'))}'>{_escape(str(period.get('period') or '-'))}</a>"
+        f"<a class='pill' href='#account-perf-{_escape(str(period.get('period') or 'period'))}'>{_escape(_account_period_label(period))}</a>"
         for period in periods
         if isinstance(period, dict)
     )
@@ -854,7 +855,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
       <div class="run-grid account-kpi-grid">
         <article class="run-card">
           <h3>실제 계좌 수익률</h3>
-          <p><strong>{_escape(default_period)}</strong><span>{_escape(_format_pct_value(summary.get('actual_return')))}</span></p>
+          <p><strong>{_escape(default_period_label)}</strong><span>{_escape(_format_pct_value(summary.get('actual_return')))}</span></p>
         </article>
         <article class="run-card">
           <h3>최고 초과 벤치마크</h3>
@@ -916,10 +917,16 @@ def _account_performance_period_rows(periods: list[Any]) -> str:
         if not isinstance(period, dict):
             continue
         period_name = str(period.get("period") or "-")
+        period_label = _account_period_label(period)
+        partial_note = ""
+        if period.get("partial"):
+            start = str(period.get("start_date") or "-")
+            requested = str(period.get("requested_start_date") or "-")
+            partial_note = f"<br><span class='account-period-note'>부분 산출: 요청 {_escape(requested)} / 실제 {_escape(start)}</span>"
         rows.append(
             "<tr "
             f"id='account-perf-{_escape(period_name)}'>"
-            f"<td>{_escape(period_name)}</td>"
+            f"<td>{_escape(period_label)}{partial_note}</td>"
             f"<td>{_escape(_format_pct_value(period.get('actual_return')))}</td>"
             f"<td>{_benchmark_comparison_cells(period.get('simple_benchmarks'))}</td>"
             f"<td>{_benchmark_comparison_cells(period.get('cashflow_benchmarks'))}</td>"
@@ -930,6 +937,11 @@ def _account_performance_period_rows(periods: list[Any]) -> str:
     if not rows:
         return "<tr><td colspan='6'>성과를 계산할 수 있는 기간 데이터가 아직 부족합니다.</td></tr>"
     return "".join(rows)
+
+
+def _account_period_label(period: dict[str, Any]) -> str:
+    name = str(period.get("period") or "-")
+    return f"{name} (부분)" if period.get("partial") else name
 
 
 def _benchmark_comparison_cells(values: Any) -> str:
@@ -2988,6 +3000,11 @@ a { color: inherit; }
   padding: 10px;
   text-align: left;
   vertical-align: top;
+}
+
+.account-period-note {
+  color: var(--muted);
+  font-size: 0.86rem;
 }
 
 .prose { line-height: 1.65; }
