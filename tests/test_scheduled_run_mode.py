@@ -118,6 +118,56 @@ checkpoints_kst = ["22:35"]
     assert manifest["tickers"][0]["quality_flags"] == ("overlay_only_mode",)
 
 
+def test_portfolio_only_mode_skips_ticker_analysis_and_runs_portfolio_pipeline(tmp_path: Path):
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["NVDA"]
+run_mode = "portfolio_only"
+
+[storage]
+archive_dir = "{(tmp_path / 'archive').as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+checkpoints_kst = ["22:35"]
+
+[portfolio]
+enabled = true
+profile_path = "portfolio_profiles.toml"
+profile_name = "kr_kis_default"
+
+[performance]
+enabled = true
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+
+    with (
+        patch("tradingagents.scheduled.runner._resolve_run_tickers", side_effect=AssertionError("ticker universe must be skipped")),
+        patch("tradingagents.scheduled.runner._run_single_ticker", side_effect=AssertionError("ticker research must be skipped")),
+        patch("tradingagents.scheduled.runner._run_execution_overlay_passes", side_effect=AssertionError("execution overlay must be skipped")),
+        patch("tradingagents.scheduled.runner._run_performance_tracking", side_effect=AssertionError("recommendation tracking must be skipped")),
+        patch("tradingagents.scheduled.runner.build_live_context_delta", return_value={}),
+        patch("tradingagents.scheduled.runner.run_portfolio_pipeline", return_value={"status": "success"}) as portfolio_pipeline,
+        patch("tradingagents.scheduled.runner.build_site", return_value=[]),
+    ):
+        manifest = execute_scheduled_run(config, run_label="portfolio-only-test")
+
+    assert manifest["settings"]["run_mode"] == "portfolio_only"
+    assert manifest["summary"]["total_tickers"] == 0
+    assert manifest["tickers"] == []
+    assert "execution" not in manifest
+    assert "performance" not in manifest
+    assert manifest["market_session_phase"] == "portfolio_only"
+    assert manifest["portfolio"]["status"] == "success"
+    assert portfolio_pipeline.call_count == 1
+    assert portfolio_pipeline.call_args.kwargs["external_data_settings"] is None
+
+
 def test_overlay_only_mode_prefers_full_source_when_latest_is_overlay(tmp_path: Path):
     archive_dir = tmp_path / "archive"
     full_run_dir = archive_dir / "runs" / "2026" / "20260414T220000_full"

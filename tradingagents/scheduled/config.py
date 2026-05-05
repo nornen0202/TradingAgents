@@ -18,7 +18,7 @@ except ModuleNotFoundError:  # pragma: no cover - Python < 3.11 fallback
 ALL_ANALYSTS = ("market", "social", "news", "fundamentals")
 VALID_TRADE_DATE_MODES = {"latest_available", "today", "previous_business_day", "explicit"}
 VALID_TICKER_UNIVERSE_MODES = {"config_only", "config_plus_account", "account_only"}
-VALID_RUN_MODES = {"full", "overlay_only", "selective_rerun_only"}
+VALID_RUN_MODES = {"full", "overlay_only", "selective_rerun_only", "portfolio_only"}
 DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET: dict[str, tuple[str, ...]] = {
     # KST anchors cover morning, lunch, and afternoon refresh windows.
     "KR": ("10:05", "11:05", "12:35", "14:35"),

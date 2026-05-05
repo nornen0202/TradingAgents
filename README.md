@@ -263,7 +263,7 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 
 - `[run]`
   - `tickers`
-  - `run_mode`: `full | overlay_only | selective_rerun_only`
+  - `run_mode`: `full | overlay_only | selective_rerun_only | portfolio_only`
   - `analysts`
   - `output_language`
   - `trade_date_mode`
@@ -327,11 +327,16 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 - `selective_rerun_only`:
   - 운영자가 판단해 수동 트리거할 때 사용
   - 후보 종목만 selective rerun 실제 실행 후 overlay 재평가
+- `portfolio_only`:
+  - 종목 full research, scanner, execution overlay를 건너뜀
+  - KIS 계좌 스냅샷/체결·손익 원장 조회와 계좌 성과 vs 지수/ETF 리포트 검증용
+  - 포트폴리오 LLM judge/report polish도 비활성화해 빠른 GitHub Actions 확인에 사용
 
 권장 패턴:
-1) 하루 1회 `full`  
-2) 2시간 단위 `overlay_only`  
+1) 하루 1회 `full`
+2) 2시간 단위 `overlay_only`
 3) 필요 시 수동 `selective_rerun_only`
+4) 리포트/계좌 연동 검증은 `portfolio_only`
 
 참고: 저장소에는 2시간 단위 overlay 전용 워크플로우(.github/workflows/intraday-overlay-refresh.yml)가 포함되어 있으며, `profile` 입력으로 `us/kr/all`을 선택해 미국장·한국장을 분리/동시 운영할 수 있습니다.
 
