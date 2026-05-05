@@ -89,6 +89,52 @@ def test_account_performance_cashflow_simulation_uses_trade_ledger(tmp_path: Pat
     assert client.fetch_domestic_order_fills.call_args.kwargs["start_date"].isoformat() == "2026-01-01"
 
 
+def test_account_performance_keeps_successful_kis_ledger_rows_when_endpoint_fails(tmp_path: Path):
+    client = Mock()
+    client.fetch_domestic_order_fills.return_value = [
+        {
+            "ord_dt": "20260201",
+            "pdno": "005930",
+            "sll_buy_dvsn_cd": "02",
+            "tot_ccld_qty": "10",
+            "avg_prvs": "10000",
+            "tot_ccld_amt": "100000",
+        }
+    ]
+    client.fetch_domestic_period_profit.side_effect = RuntimeError(
+        "KIS API error: CANO=12345678&ACNT_PRDT_CD=01 service unavailable"
+    )
+    client.fetch_domestic_period_trade_profit.return_value = ([], {})
+
+    with patch("tradingagents.portfolio.kis.KisClient.from_api_keys", return_value=client):
+        payload = _build_report(
+            tmp_path,
+            market_scope="kr",
+            broker="kis",
+            benchmarks={
+                "KOSPI": [
+                    {"date": "2026-01-01", "close": 100},
+                    {"date": "2026-02-01", "close": 125},
+                    {"date": "2026-04-01", "close": 200},
+                ],
+                "KOSDAQ": [
+                    {"date": "2026-01-01", "close": 100},
+                    {"date": "2026-02-01", "close": 100},
+                    {"date": "2026-04-01", "close": 100},
+                ],
+            },
+        )
+
+    quality = payload["data_quality"]
+    assert quality["ledger_event_count"] == 1
+    assert any("domestic_period_profit" in warning for warning in quality["warnings"])
+    assert all("12345678" not in warning for warning in quality["warnings"])
+
+    period = payload["periods"][0]
+    cashflow = {item["benchmark"]: item for item in period["cashflow_benchmarks"]}
+    assert cashflow["KOSPI"]["benchmark_return"] == 1.06
+
+
 def test_account_performance_excludes_watchlist_only_seed_snapshots(tmp_path: Path):
     payload = _build_report(
         tmp_path,
