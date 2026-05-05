@@ -86,6 +86,65 @@ def test_account_performance_cashflow_simulation_uses_trade_ledger(tmp_path: Pat
     cashflow = {item["benchmark"]: item for item in period["cashflow_benchmarks"]}
     assert cashflow["KOSPI"]["benchmark_return"] == 1.06
     assert cashflow["KOSPI"]["excess_return"] == -0.86
+    assert client.fetch_domestic_order_fills.call_args.kwargs["start_date"].isoformat() == "2026-01-01"
+
+
+def test_account_performance_excludes_watchlist_only_seed_snapshots(tmp_path: Path):
+    payload = _build_report(
+        tmp_path,
+        market_scope="kr",
+        periods=("1M", "YTD", "ALL"),
+        current_as_of="2026-05-05T09:00:00+09:00",
+        history_snapshots=[
+            {
+                "snapshot_id": "watchlist-seed",
+                "as_of": "2026-04-10T09:00:00+09:00",
+                "account_value_krw": 2,
+                "snapshot_health": "WATCHLIST_ONLY",
+                "positions": [],
+            },
+            {
+                "snapshot_id": "first-real",
+                "as_of": "2026-04-16T09:00:00+09:00",
+                "account_value_krw": 1_000_000,
+                "snapshot_health": "VALID",
+                "positions": [{"canonical_ticker": "TEST", "market_value_krw": 900_000}],
+            },
+        ],
+        benchmarks={
+            "KOSPI": [
+                {"date": "2026-04-10", "close": 100},
+                {"date": "2026-04-16", "close": 100},
+                {"date": "2026-05-05", "close": 110},
+            ],
+            "KOSDAQ": [
+                {"date": "2026-04-10", "close": 100},
+                {"date": "2026-04-16", "close": 100},
+                {"date": "2026-05-05", "close": 90},
+            ],
+        },
+    )
+
+    quality = payload["data_quality"]
+    assert quality["raw_snapshot_count"] == 3
+    assert quality["snapshot_count"] == 2
+    assert quality["excluded_snapshot_count"] == 1
+    assert quality["excluded_snapshot_reasons"] == {"watchlist_only": 1}
+    assert quality["min_snapshot_value_krw"] == 1_000_000
+    assert "account_performance_snapshot_excluded:watchlist_only:1" in quality["warnings"]
+
+    all_period = next(item for item in payload["periods"] if item["period"] == "ALL")
+    assert all_period["start_date"] == "2026-04-16"
+    assert all_period["actual_start_value_krw"] == 1_000_000
+    assert all_period["actual_end_value_krw"] == 1_200_000
+    assert all_period["actual_return"] == 0.2
+    assert all_period["partial"] is False
+
+    ytd_period = next(item for item in payload["periods"] if item["period"] == "YTD")
+    assert ytd_period["requested_start_date"] == "2026-01-01"
+    assert ytd_period["start_date"] == "2026-04-16"
+    assert ytd_period["partial"] is True
+    assert ytd_period["actual_return"] == 0.2
 
 
 def _build_report(
@@ -94,27 +153,33 @@ def _build_report(
     market_scope: str,
     benchmarks: dict[str, list[dict[str, object]]],
     broker: str = "manual",
+    periods: tuple[str, ...] = ("ALL",),
+    history_snapshots: list[dict[str, object]] | None = None,
+    current_as_of: str = "2026-04-01T09:00:00+09:00",
+    current_total_equity_krw: int = 1_200_000,
+    current_snapshot_health: str = "VALID",
 ) -> dict[str, object]:
     archive = tmp_path / "archive"
-    previous_run = archive / "runs" / "2026" / f"{market_scope}-previous"
     current_run = archive / "runs" / "2026" / f"{market_scope}-current"
-    previous_private = previous_run / "portfolio-private"
     current_private = current_run / "portfolio-private"
-    previous_private.mkdir(parents=True)
     current_private.mkdir(parents=True)
 
     profile_name = f"{market_scope}_profile"
-    (previous_private / "status.json").write_text(json.dumps({"profile": profile_name}), encoding="utf-8")
-    (previous_private / "account_snapshot.json").write_text(
-        json.dumps(
+    if history_snapshots is None:
+        history_snapshots = [
             {
                 "snapshot_id": "previous",
                 "as_of": "2026-01-01T09:00:00+09:00",
                 "account_value_krw": 1_000_000,
+                "snapshot_health": "VALID",
+                "positions": [{"canonical_ticker": "TEST", "market_value_krw": 900_000}],
             }
-        ),
-        encoding="utf-8",
-    )
+        ]
+    for index, history_payload in enumerate(history_snapshots):
+        previous_private = archive / "runs" / "2026" / f"{market_scope}-previous-{index}" / "portfolio-private"
+        previous_private.mkdir(parents=True)
+        (previous_private / "status.json").write_text(json.dumps({"profile": profile_name}), encoding="utf-8")
+        (previous_private / "account_snapshot.json").write_text(json.dumps(history_payload), encoding="utf-8")
     price_path = tmp_path / f"{market_scope}_prices.json"
     price_path.write_text(json.dumps(benchmarks), encoding="utf-8")
 
@@ -136,14 +201,15 @@ def _build_report(
     )
     snapshot = AccountSnapshot(
         snapshot_id="current",
-        as_of="2026-04-01T09:00:00+09:00",
+        as_of=current_as_of,
         broker="manual",
         account_id="manual",
         currency="KRW",
         settled_cash_krw=100_000,
         available_cash_krw=100_000,
         buying_power_krw=100_000,
-        total_equity_krw=1_200_000,
+        total_equity_krw=current_total_equity_krw,
+        snapshot_health=current_snapshot_health,
         positions=(
             Position(
                 broker_symbol="TEST",
@@ -164,7 +230,7 @@ def _build_report(
         enabled=True,
         publish_to_site=True,
         public_sanitization="mask_identifiers",
-        periods=("ALL",),
+        periods=periods,
         kr_benchmarks=("KOSPI", "KOSDAQ"),
         us_benchmarks=("SPY", "QQQ"),
         price_provider="local_json",
