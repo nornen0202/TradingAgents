@@ -15,6 +15,8 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -52,6 +54,9 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
 
       - name: Install TradingAgents
         run: |
@@ -162,6 +167,12 @@ jobs:
           name: account-performance-kr-site-${{ github.run_id }}
           path: site
 
+      - name: Upload KR GitHub Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          name: account-performance-pages-kr
+          path: site
+
   verify_us:
     needs:
       - verify_kr
@@ -192,6 +203,9 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
 
       - name: Install TradingAgents
         run: |
@@ -304,3 +318,25 @@ jobs:
         with:
           name: account-performance-us-site-${{ github.run_id }}
           path: site
+
+      - name: Upload US GitHub Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          name: account-performance-pages-us
+          path: site
+
+  deploy:
+    needs:
+      - verify_kr
+      - verify_us
+    if: ${{ always() && github.ref == 'refs/heads/main' && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && ((github.event.inputs.profile == 'all' && needs.verify_us.result == 'success') || (github.event.inputs.profile == 'us' && needs.verify_us.result == 'success') || (github.event.inputs.profile == 'kr' && needs.verify_kr.result == 'success')) }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy account performance site to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: ${{ (needs.verify_us.result == 'success' && 'account-performance-pages-us') || 'account-performance-pages-kr' }}
