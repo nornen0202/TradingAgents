@@ -19,6 +19,7 @@ ALL_ANALYSTS = ("market", "social", "news", "fundamentals")
 VALID_TRADE_DATE_MODES = {"latest_available", "today", "previous_business_day", "explicit"}
 VALID_TICKER_UNIVERSE_MODES = {"config_only", "config_plus_account", "account_only"}
 VALID_RUN_MODES = {"full", "overlay_only", "selective_rerun_only", "portfolio_only"}
+VALID_ANALYSIS_MODES = {"full", "smoke"}
 DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET: dict[str, tuple[str, ...]] = {
     # KST anchors cover morning, lunch, and afternoon refresh windows.
     "KR": ("10:05", "11:05", "12:35", "14:35"),
@@ -44,6 +45,14 @@ class RunSettings:
     run_mode: str = "full"
     max_runtime_minutes: float = 0.0
     min_remaining_minutes_for_next_ticker: float = 0.0
+    parallel_ticker_execution: bool = False
+    max_parallel_tickers: int = 1
+    per_ticker_timeout_minutes: float = 0.0
+    codex_circuit_breaker_enabled: bool = False
+    max_consecutive_codex_failures: int = 3
+    fatal_error_patterns: tuple[str, ...] = tuple()
+    daily_active_ticker_limit: int = 0
+    analysis_mode: str = "full"
 
 
 @dataclass(frozen=True)
@@ -58,6 +67,7 @@ class LLMSettings:
     codex_request_timeout: float = 180.0
     codex_max_retries: int = 2
     codex_cleanup_threads: bool = True
+    codex_preflight_mode: str = "per_client"
     codex_workspace_dir: str | None = str(Path.home() / ".codex" / "tradingagents-workspace")
     codex_binary: str | None = None
 
@@ -311,6 +321,17 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
                 0.0,
                 float(run_raw.get("min_remaining_minutes_for_next_ticker", 0.0) or 0.0),
             ),
+            parallel_ticker_execution=bool(run_raw.get("parallel_ticker_execution", False)),
+            max_parallel_tickers=max(1, int(run_raw.get("max_parallel_tickers", 1) or 1)),
+            per_ticker_timeout_minutes=max(0.0, float(run_raw.get("per_ticker_timeout_minutes", 0.0) or 0.0)),
+            codex_circuit_breaker_enabled=bool(run_raw.get("codex_circuit_breaker_enabled", False)),
+            max_consecutive_codex_failures=max(
+                1,
+                int(run_raw.get("max_consecutive_codex_failures", 3) or 3),
+            ),
+            fatal_error_patterns=_normalize_string_tuple(run_raw.get("fatal_error_patterns") or ()),
+            daily_active_ticker_limit=max(0, int(run_raw.get("daily_active_ticker_limit", 0) or 0)),
+            analysis_mode=_normalize_analysis_mode(run_raw.get("analysis_mode", "full")),
         ),
         llm=LLMSettings(
             provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
@@ -323,6 +344,8 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             codex_request_timeout=float(llm_raw.get("codex_request_timeout", 180.0)),
             codex_max_retries=int(llm_raw.get("codex_max_retries", 2)),
             codex_cleanup_threads=bool(llm_raw.get("codex_cleanup_threads", True)),
+            codex_preflight_mode=str(llm_raw.get("codex_preflight_mode", "per_client")).strip().lower()
+            or "per_client",
             codex_workspace_dir=codex_workspace_override
             or _optional_string(llm_raw.get("codex_workspace_dir"))
             or str(Path.home() / ".codex" / "tradingagents-workspace"),
@@ -461,6 +484,10 @@ def with_overrides(
     ticker_universe_mode: str | None = None,
     trade_date: str | None = None,
     run_mode: str | None = None,
+    analysis_mode: str | None = None,
+    max_parallel_tickers: int | None = None,
+    per_ticker_timeout_minutes: float | None = None,
+    daily_active_ticker_limit: int | None = None,
 ) -> ScheduledAnalysisConfig:
     run = config.run
     storage = config.storage
@@ -473,6 +500,14 @@ def with_overrides(
         run = replace(run, trade_date_mode="explicit", explicit_trade_date=_validate_trade_date(trade_date))
     if run_mode:
         run = replace(run, run_mode=_normalize_run_mode(run_mode))
+    if analysis_mode:
+        run = replace(run, analysis_mode=_normalize_analysis_mode(analysis_mode))
+    if max_parallel_tickers is not None:
+        run = replace(run, max_parallel_tickers=max(1, int(max_parallel_tickers or 1)))
+    if per_ticker_timeout_minutes is not None:
+        run = replace(run, per_ticker_timeout_minutes=max(0.0, float(per_ticker_timeout_minutes or 0.0)))
+    if daily_active_ticker_limit is not None:
+        run = replace(run, daily_active_ticker_limit=max(0, int(daily_active_ticker_limit or 0)))
     if archive_dir:
         storage = replace(storage, archive_dir=Path(archive_dir).expanduser().resolve())
     if site_dir:
@@ -538,6 +573,24 @@ def _normalize_run_mode(value: object) -> str:
             f"Expected one of: {', '.join(sorted(VALID_RUN_MODES))}."
         )
     return mode
+
+
+def _normalize_analysis_mode(value: object) -> str:
+    mode = str(value or "full").strip().lower()
+    if mode not in VALID_ANALYSIS_MODES:
+        raise ValueError(
+            f"Unsupported analysis_mode '{mode}'. "
+            f"Expected one of: {', '.join(sorted(VALID_ANALYSIS_MODES))}."
+        )
+    return mode
+
+
+def _normalize_string_tuple(value: object) -> tuple[str, ...]:
+    if isinstance(value, str):
+        candidates = value.split(",")
+    else:
+        candidates = value or ()
+    return tuple(str(item).strip() for item in candidates if str(item).strip())
 
 
 def _normalize_summary_image_mode(value: object) -> str:

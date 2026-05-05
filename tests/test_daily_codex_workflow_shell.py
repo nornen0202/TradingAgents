@@ -27,7 +27,7 @@ def test_daily_analysis_sets_up_python_before_first_script_step():
         assert setup_python < first_python_run
 
 
-def test_daily_analysis_uses_python_shell_for_both_windows_jobs():
+def test_daily_analysis_uses_python_shell_for_all_windows_jobs():
     workflow = _workflow_text()
 
-    assert workflow.count("        shell: python {0}") == 2
+    assert workflow.count("        shell: python {0}") == 3

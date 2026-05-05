@@ -6,6 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import tradingagents.scheduled.runner as scheduled_runner
 from tradingagents.scheduled.runner import execute_scheduled_run, load_scheduled_config, main, resolve_trade_date
 
 
@@ -70,6 +71,26 @@ class _FakeTradingAgentsGraph:
         return final_state, "BUY"
 
 
+class _FakeWorkerProcess:
+    def __init__(self, returncode=0, *, running=False):
+        self.returncode = None if running else returncode
+        self._returncode = returncode
+        self.pid = 12345
+        self.terminated = False
+
+    def poll(self):
+        return self.returncode
+
+    def kill(self):
+        self.terminated = True
+        self.returncode = -9
+
+    def wait(self, timeout=None):
+        if self.returncode is None:
+            self.returncode = self._returncode
+        return self.returncode
+
+
 class ScheduledAnalysisTests(unittest.TestCase):
     def test_load_scheduled_config_enables_report_polisher_by_default(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -92,6 +113,10 @@ site_dir = "./site"
             self.assertTrue(config.run.report_polisher_enabled)
             self.assertTrue(config.portfolio.report_polisher_enabled)
             self.assertEqual(config.run.ticker_universe_mode, "config_only")
+            self.assertFalse(config.run.parallel_ticker_execution)
+            self.assertEqual(config.run.max_parallel_tickers, 1)
+            self.assertEqual(config.run.per_ticker_timeout_minutes, 0.0)
+            self.assertFalse(config.run.codex_circuit_breaker_enabled)
 
     def test_load_scheduled_config_rejects_invalid_ticker_universe_mode(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -290,6 +315,378 @@ site_dir = "{site_dir.as_posix()}"
             self.assertTrue((run_dir / "run.json").exists())
             self.assertTrue((site_dir / "index.html").exists())
 
+    def test_load_scheduled_config_parses_parallel_and_circuit_breaker_settings(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            config_path.write_text(
+                """
+[run]
+tickers = ["NVDA"]
+parallel_ticker_execution = true
+max_parallel_tickers = 2
+per_ticker_timeout_minutes = 30
+codex_circuit_breaker_enabled = true
+max_consecutive_codex_failures = 3
+fatal_error_patterns = ["usage limit", "model unavailable"]
+daily_active_ticker_limit = 4
+analysis_mode = "smoke"
+
+[llm]
+codex_preflight_mode = "workflow_once"
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+""",
+                encoding="utf-8",
+            )
+
+            config = load_scheduled_config(config_path)
+
+            self.assertTrue(config.run.parallel_ticker_execution)
+            self.assertEqual(config.run.max_parallel_tickers, 2)
+            self.assertEqual(config.run.per_ticker_timeout_minutes, 30)
+            self.assertTrue(config.run.codex_circuit_breaker_enabled)
+            self.assertEqual(config.run.max_consecutive_codex_failures, 3)
+            self.assertEqual(config.run.fatal_error_patterns, ("usage limit", "model unavailable"))
+            self.assertEqual(config.run.daily_active_ticker_limit, 4)
+            self.assertEqual(config.run.analysis_mode, "smoke")
+            self.assertEqual(config.llm.codex_preflight_mode, "workflow_once")
+
+    def test_execute_scheduled_run_records_parallel_manifest_state(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["NVDA", "AAPL"]
+parallel_ticker_execution = true
+max_parallel_tickers = 2
+continue_on_ticker_error = true
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+            summary = {
+                "ticker": "NVDA",
+                "ticker_name": "NVIDIA",
+                "status": "success",
+                "analysis_date": "2026-04-05",
+                "trade_date": "2026-04-04",
+                "decision": "BUY",
+                "started_at": "2026-04-05T09:13:00+09:00",
+                "finished_at": "2026-04-05T09:14:00+09:00",
+                "duration_seconds": 60.0,
+                "metrics": {"llm_calls": 1, "tool_calls": 1, "tokens_in": 1, "tokens_out": 1},
+                "artifacts": {},
+                "worker": {"mode": "subprocess", "elapsed_seconds": 60.0},
+            }
+            parallel_summary = {
+                "enabled": True,
+                "requested": True,
+                "mode": "subprocess",
+                "max_parallel_tickers": 2,
+                "per_ticker_timeout_minutes": 0.0,
+            }
+            circuit = {"enabled": False, "triggered": False, "reason": None, "skipped_tickers": []}
+            with (
+                patch("tradingagents.scheduled.runner.resolve_trade_date", return_value="2026-04-04"),
+                patch(
+                    "tradingagents.scheduled.runner._run_parallel_tickers",
+                    return_value=([summary, {**summary, "ticker": "AAPL", "ticker_name": "Apple"}], parallel_summary, circuit, []),
+                ) as run_parallel,
+            ):
+                manifest = execute_scheduled_run(config, run_label="parallel")
+
+            self.assertEqual(run_parallel.call_count, 1)
+            self.assertTrue(manifest["parallel_ticker_execution"]["enabled"])
+            self.assertEqual(manifest["parallel_ticker_execution"]["max_parallel_tickers"], 2)
+            self.assertFalse(manifest["circuit_breaker"]["triggered"])
+            self.assertEqual([item["ticker"] for item in manifest["tickers"]], ["NVDA", "AAPL"])
+
+    def test_parallel_ticker_scheduler_starts_two_workers_and_preserves_manifest_order(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            run_dir = archive_dir / "runs" / "2026" / "test"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["A", "B", "C"]
+parallel_ticker_execution = true
+max_parallel_tickers = 2
+continue_on_ticker_error = true
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+            started: list[str] = []
+
+            def fake_start(**kwargs):
+                ticker = kwargs["ticker"]
+                index = kwargs["index"]
+                started.append(ticker)
+                summary_path = run_dir / "summaries" / f"{index}.json"
+                stdout_path = run_dir / "logs" / f"{index}.out"
+                stderr_path = run_dir / "logs" / f"{index}.err"
+                summary_path.parent.mkdir(parents=True, exist_ok=True)
+                stdout_path.parent.mkdir(parents=True, exist_ok=True)
+                summary_path.write_text(
+                    json.dumps(
+                        {
+                            "ticker": ticker,
+                            "ticker_name": ticker,
+                            "status": "success",
+                            "analysis_date": "2026-04-05",
+                            "trade_date": "2026-04-04",
+                            "decision": "BUY",
+                            "started_at": "2026-04-05T09:13:00+09:00",
+                            "finished_at": "2026-04-05T09:14:00+09:00",
+                            "duration_seconds": 60.0,
+                            "metrics": {"llm_calls": 1, "tool_calls": 1, "tokens_in": 1, "tokens_out": 1},
+                            "artifacts": {},
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                return {
+                    "ticker": ticker,
+                    "index": index,
+                    "process": _FakeWorkerProcess(),
+                    "summary_path": summary_path,
+                    "stdout_path": stdout_path,
+                    "stderr_path": stderr_path,
+                    "stdout_handle": stdout_path.open("w", encoding="utf-8"),
+                    "stderr_handle": stderr_path.open("w", encoding="utf-8"),
+                    "started_perf": 0.0,
+                    "started_at": "2026-04-05T09:13:00+09:00",
+                }
+
+            with patch("tradingagents.scheduled.runner._start_ticker_worker", side_effect=fake_start):
+                summaries, parallel, circuit, warnings = scheduled_runner._run_parallel_tickers(
+                    config=config,
+                    run_tickers=["A", "B", "C"],
+                    run_dir=run_dir,
+                    engine_results_dir=run_dir / "engine-results",
+                    trade_date_override="2026-04-04",
+                    timer_start=0.0,
+                    max_runtime_seconds=None,
+                    min_remaining_seconds=0.0,
+                )
+
+            self.assertEqual(started[:2], ["A", "B"])
+            self.assertEqual([item["ticker"] for item in summaries], ["A", "B", "C"])
+            self.assertTrue(parallel["enabled"])
+            self.assertFalse(circuit["triggered"])
+            self.assertEqual(warnings, [])
+
+    def test_parallel_ticker_scheduler_opens_circuit_breaker_on_fatal_codex_error(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            run_dir = archive_dir / "runs" / "2026" / "test"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["A", "B", "C"]
+parallel_ticker_execution = true
+max_parallel_tickers = 2
+continue_on_ticker_error = true
+codex_circuit_breaker_enabled = true
+fatal_error_patterns = ["usage limit", "model unavailable"]
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+
+            def fake_start(**kwargs):
+                ticker = kwargs["ticker"]
+                index = kwargs["index"]
+                summary_path = run_dir / "summaries" / f"{index}.json"
+                stdout_path = run_dir / "logs" / f"{index}.out"
+                stderr_path = run_dir / "logs" / f"{index}.err"
+                summary_path.parent.mkdir(parents=True, exist_ok=True)
+                stdout_path.parent.mkdir(parents=True, exist_ok=True)
+                status = "failed" if ticker == "A" else "success"
+                error = "You've hit your usage limit." if ticker == "A" else ""
+                summary_path.write_text(
+                    json.dumps(
+                        {
+                            "ticker": ticker,
+                            "ticker_name": ticker,
+                            "status": status,
+                            "analysis_date": "2026-04-05",
+                            "trade_date": "2026-04-04",
+                            "decision": None if status == "failed" else "BUY",
+                            "error": error,
+                            "started_at": "2026-04-05T09:13:00+09:00",
+                            "finished_at": "2026-04-05T09:14:00+09:00",
+                            "duration_seconds": 60.0,
+                            "metrics": {"llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0},
+                            "artifacts": {},
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                return {
+                    "ticker": ticker,
+                    "index": index,
+                    "process": _FakeWorkerProcess(),
+                    "summary_path": summary_path,
+                    "stdout_path": stdout_path,
+                    "stderr_path": stderr_path,
+                    "stdout_handle": stdout_path.open("w", encoding="utf-8"),
+                    "stderr_handle": stderr_path.open("w", encoding="utf-8"),
+                    "started_perf": 0.0,
+                    "started_at": "2026-04-05T09:13:00+09:00",
+                }
+
+            with patch("tradingagents.scheduled.runner._start_ticker_worker", side_effect=fake_start):
+                summaries, _parallel, circuit, warnings = scheduled_runner._run_parallel_tickers(
+                    config=config,
+                    run_tickers=["A", "B", "C"],
+                    run_dir=run_dir,
+                    engine_results_dir=run_dir / "engine-results",
+                    trade_date_override="2026-04-04",
+                    timer_start=0.0,
+                    max_runtime_seconds=None,
+                    min_remaining_seconds=0.0,
+                )
+
+            self.assertTrue(circuit["triggered"])
+            self.assertIn("fatal_pattern:usage limit", circuit["reason"])
+            self.assertEqual(summaries[0]["status"], "failed")
+            self.assertTrue(all(item["status"] == "skipped" for item in summaries[1:]))
+            self.assertTrue(any("codex_circuit_breaker_opened" in item for item in warnings))
+
+    def test_parallel_ticker_scheduler_marks_worker_timeout(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            run_dir = archive_dir / "runs" / "2026" / "test"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["A"]
+parallel_ticker_execution = true
+max_parallel_tickers = 2
+per_ticker_timeout_minutes = 1
+continue_on_ticker_error = true
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+
+            def fake_start(**kwargs):
+                index = kwargs["index"]
+                stdout_path = run_dir / "logs" / f"{index}.out"
+                stderr_path = run_dir / "logs" / f"{index}.err"
+                stdout_path.parent.mkdir(parents=True, exist_ok=True)
+                return {
+                    "ticker": kwargs["ticker"],
+                    "index": index,
+                    "process": _FakeWorkerProcess(running=True),
+                    "summary_path": run_dir / "summaries" / f"{index}.json",
+                    "stdout_path": stdout_path,
+                    "stderr_path": stderr_path,
+                    "stdout_handle": stdout_path.open("w", encoding="utf-8"),
+                    "stderr_handle": stderr_path.open("w", encoding="utf-8"),
+                    "started_perf": 0.0,
+                    "started_at": "2026-04-05T09:13:00+09:00",
+                }
+
+            with (
+                patch("tradingagents.scheduled.runner._start_ticker_worker", side_effect=fake_start),
+                patch("tradingagents.scheduled.runner.perf_counter", return_value=120.0),
+            ):
+                summaries, _parallel, _circuit, _warnings = scheduled_runner._run_parallel_tickers(
+                    config=config,
+                    run_tickers=["A"],
+                    run_dir=run_dir,
+                    engine_results_dir=run_dir / "engine-results",
+                    trade_date_override="2026-04-04",
+                    timer_start=0.0,
+                    max_runtime_seconds=None,
+                    min_remaining_seconds=0.0,
+                )
+
+            self.assertEqual(summaries[0]["status"], "failed")
+            self.assertIn("per_ticker_timeout", summaries[0]["error"])
+
+    def test_parallel_ticker_execution_is_disabled_when_continue_on_error_is_false(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["A", "B"]
+parallel_ticker_execution = true
+max_parallel_tickers = 2
+continue_on_ticker_error = false
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+
+            self.assertFalse(scheduled_runner._should_run_tickers_in_parallel(config=config, ticker_count=2))
+
+    def test_circuit_breaker_opens_after_consecutive_codex_timeouts(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            config_path.write_text(
+                """
+[run]
+tickers = ["A"]
+codex_circuit_breaker_enabled = true
+max_consecutive_codex_failures = 3
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+            summary = {"status": "failed", "error": "Timed out waiting for Codex app-server after 170s"}
+
+            reason = scheduled_runner._circuit_breaker_reason(
+                config=config,
+                summary=summary,
+                consecutive_codex_failures=3,
+            )
+
+            self.assertEqual(reason, "consecutive_codex_failures:3")
+
     def test_main_site_only_rebuilds_from_existing_archive(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -393,6 +790,56 @@ site_dir = "{site_dir.as_posix()}"
 
             self.assertEqual(exit_code, 0)
             self.assertTrue((site_dir / "index.html").exists())
+
+    def test_main_applies_parallel_cli_overrides(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["NVDA", "AAPL", "MSFT"]
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            captured = {}
+
+            def fake_execute(config, *, run_label):
+                captured["config"] = config
+                return {
+                    "run_id": "test",
+                    "status": "success",
+                    "summary": {"successful_tickers": 0, "failed_tickers": 0},
+                }
+
+            with patch("tradingagents.scheduled.runner.execute_scheduled_run", side_effect=fake_execute):
+                exit_code = main(
+                    [
+                        "--config",
+                        str(config_path),
+                        "--analysis-mode",
+                        "smoke",
+                        "--max-parallel-tickers",
+                        "2",
+                        "--per-ticker-timeout-minutes",
+                        "15",
+                        "--daily-active-ticker-limit",
+                        "3",
+                    ]
+                )
+
+            self.assertEqual(exit_code, 0)
+            config = captured["config"]
+            self.assertEqual(config.run.analysis_mode, "smoke")
+            self.assertEqual(config.run.max_parallel_tickers, 2)
+            self.assertEqual(config.run.per_ticker_timeout_minutes, 15)
+            self.assertEqual(config.run.daily_active_ticker_limit, 3)
 
     def test_execute_scheduled_run_supports_account_only_ticker_universe_mode(self):
         with tempfile.TemporaryDirectory() as tmpdir:
