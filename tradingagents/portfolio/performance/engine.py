@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -393,59 +394,98 @@ def _load_ledger_events(
         if market_scope == "us":
             raw_rows = []
             for query_start, query_end in query_ranges:
-                raw_rows.extend(
-                    client.fetch_overseas_order_fills(
+                _extend_kis_ledger_rows(
+                    raw_rows,
+                    warnings=warnings,
+                    endpoint="overseas_order_fills",
+                    fetch=lambda query_start=query_start, query_end=query_end: client.fetch_overseas_order_fills(
                         account_no=profile.account_no,
                         product_code=profile.product_code,
                         start_date=query_start,
                         end_date=query_end,
-                    )
+                    ),
                 )
-                raw_rows.extend(
-                    client.fetch_overseas_period_transactions(
+                _extend_kis_ledger_rows(
+                    raw_rows,
+                    warnings=warnings,
+                    endpoint="overseas_period_transactions",
+                    fetch=lambda query_start=query_start, query_end=query_end: client.fetch_overseas_period_transactions(
                         account_no=profile.account_no,
                         product_code=profile.product_code,
                         start_date=query_start,
                         end_date=query_end,
-                    )
+                    ),
                 )
-                profits, _summary = client.fetch_overseas_period_profit(
-                    account_no=profile.account_no,
-                    product_code=profile.product_code,
-                    start_date=query_start,
-                    end_date=query_end,
+                _extend_kis_ledger_rows(
+                    raw_rows,
+                    warnings=warnings,
+                    endpoint="overseas_period_profit",
+                    fetch=lambda query_start=query_start, query_end=query_end: client.fetch_overseas_period_profit(
+                        account_no=profile.account_no,
+                        product_code=profile.product_code,
+                        start_date=query_start,
+                        end_date=query_end,
+                    ),
                 )
-                raw_rows.extend(profits)
             return [_normalize_ledger_event(row, market="US", source="kis_overseas") for row in raw_rows]
 
         raw_rows = []
         for query_start, query_end in query_ranges:
-            raw_rows.extend(
-                client.fetch_domestic_order_fills(
+            _extend_kis_ledger_rows(
+                raw_rows,
+                warnings=warnings,
+                endpoint="domestic_order_fills",
+                fetch=lambda query_start=query_start, query_end=query_end: client.fetch_domestic_order_fills(
                     account_no=profile.account_no,
                     product_code=profile.product_code,
                     start_date=query_start,
                     end_date=query_end,
-                )
+                ),
             )
-            daily_profit, _daily_summary = client.fetch_domestic_period_profit(
-                account_no=profile.account_no,
-                product_code=profile.product_code,
-                start_date=query_start,
-                end_date=query_end,
+            _extend_kis_ledger_rows(
+                raw_rows,
+                warnings=warnings,
+                endpoint="domestic_period_profit",
+                fetch=lambda query_start=query_start, query_end=query_end: client.fetch_domestic_period_profit(
+                    account_no=profile.account_no,
+                    product_code=profile.product_code,
+                    start_date=query_start,
+                    end_date=query_end,
+                ),
             )
-            trade_profit, _trade_summary = client.fetch_domestic_period_trade_profit(
-                account_no=profile.account_no,
-                product_code=profile.product_code,
-                start_date=query_start,
-                end_date=query_end,
+            _extend_kis_ledger_rows(
+                raw_rows,
+                warnings=warnings,
+                endpoint="domestic_period_trade_profit",
+                fetch=lambda query_start=query_start, query_end=query_end: client.fetch_domestic_period_trade_profit(
+                    account_no=profile.account_no,
+                    product_code=profile.product_code,
+                    start_date=query_start,
+                    end_date=query_end,
+                ),
             )
-            raw_rows.extend(daily_profit)
-            raw_rows.extend(trade_profit)
         return [_normalize_ledger_event(row, market="KR", source="kis_domestic") for row in raw_rows]
     except Exception as exc:
         warnings.append(f"account_performance_kis_ledger_failed:{_short_error(exc)}")
         return []
+
+
+def _extend_kis_ledger_rows(
+    rows: list[dict[str, Any]],
+    *,
+    warnings: list[str],
+    endpoint: str,
+    fetch: Any,
+) -> None:
+    try:
+        result = fetch()
+    except Exception as exc:
+        warnings.append(f"account_performance_kis_ledger_endpoint_failed:{endpoint}:{_short_error(exc)}")
+        return
+    if isinstance(result, tuple):
+        result = result[0]
+    if isinstance(result, list):
+        rows.extend(item for item in result if isinstance(item, dict))
 
 
 def _kis_ledger_query_ranges(*, start_date: date, end_date: date) -> list[tuple[date, date]]:
@@ -1186,7 +1226,11 @@ def _date_text(value: date) -> str:
 
 
 def _short_error(exc: Exception) -> str:
-    return str(exc).strip().replace("\n", " ")[:180] or exc.__class__.__name__
+    text = str(exc).strip().replace("\n", " ") or exc.__class__.__name__
+    text = re.sub(r"(CANO=)[^&\s]+", r"\1***MASKED***", text)
+    text = re.sub(r"(ACNT_PRDT_CD=)[^&\s]+", r"\1***MASKED***", text)
+    text = re.sub(r"\b\d{8}-\d{2}\b", "***MASKED***", text)
+    return text[:180]
 
 
 def _pct(value: Any) -> str:
