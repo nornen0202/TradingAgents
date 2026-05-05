@@ -122,6 +122,20 @@ class PortfolioSettings:
 
 
 @dataclass(frozen=True)
+class PortfolioPerformanceSettings:
+    enabled: bool = True
+    publish_to_site: bool = True
+    public_sanitization: str = "mask_identifiers"
+    periods: tuple[str, ...] = ("1M", "3M", "6M", "YTD", "1Y", "ALL")
+    kr_benchmarks: tuple[str, ...] = ("KOSPI", "KOSDAQ")
+    us_benchmarks: tuple[str, ...] = ("SPY", "QQQ")
+    price_provider: str = "yfinance"
+    price_history_path: Path | None = None
+    lookback_days: int = 800
+    fetch_kis_ledger: bool = True
+
+
+@dataclass(frozen=True)
 class PrismDashboardSettings:
     enabled: bool = False
     mode: str = "advisory"
@@ -206,6 +220,7 @@ class ScheduledAnalysisConfig:
     storage: StorageSettings
     site: SiteSettings
     portfolio: PortfolioSettings
+    portfolio_performance: PortfolioPerformanceSettings
     execution: ExecutionSettings
     summary_image: SummaryImageSettings
     external_data: ExternalDataSettings
@@ -226,6 +241,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     storage_raw = raw.get("storage") or {}
     site_raw = raw.get("site") or {}
     portfolio_raw = raw.get("portfolio") or {}
+    portfolio_performance_raw = raw.get("portfolio_performance") or {}
     execution_raw = raw.get("execution") or {}
     summary_image_raw = raw.get("summary_image") or {}
     external_raw = raw.get("external") or {}
@@ -345,6 +361,10 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             action_judge_enabled=bool(portfolio_raw.get("action_judge_enabled", False)),
             action_judge_top_n=max(1, int(portfolio_raw.get("action_judge_top_n", 5))),
             report_polisher_enabled=bool(portfolio_raw.get("report_polisher_enabled", True)),
+        ),
+        portfolio_performance=_load_portfolio_performance_settings(
+            portfolio_performance_raw,
+            base_dir=base_dir,
         ),
         execution=ExecutionSettings(
             execution_refresh_enabled=bool(execution_raw.get("enabled", False)),
@@ -596,6 +616,39 @@ def _load_scanner_settings(raw: dict[str, object], *, base_dir: Path, default_ma
     )
 
 
+def _load_portfolio_performance_settings(
+    raw: dict[str, object],
+    *,
+    base_dir: Path,
+) -> PortfolioPerformanceSettings:
+    raw = raw if isinstance(raw, dict) else {}
+    return PortfolioPerformanceSettings(
+        enabled=bool(raw.get("enabled", True)),
+        publish_to_site=bool(raw.get("publish_to_site", True)),
+        public_sanitization=str(raw.get("public_sanitization", "mask_identifiers")).strip().lower()
+        or "mask_identifiers",
+        periods=_normalize_string_sequence(
+            raw.get("periods"),
+            default=("1M", "3M", "6M", "YTD", "1Y", "ALL"),
+            uppercase=True,
+        ),
+        kr_benchmarks=_normalize_string_sequence(
+            raw.get("kr_benchmarks"),
+            default=("KOSPI", "KOSDAQ"),
+            uppercase=True,
+        ),
+        us_benchmarks=_normalize_string_sequence(
+            raw.get("us_benchmarks"),
+            default=("SPY", "QQQ"),
+            uppercase=True,
+        ),
+        price_provider=str(raw.get("price_provider", "yfinance")).strip().lower() or "yfinance",
+        price_history_path=_resolve_optional_path(raw.get("price_history_path"), base_dir),
+        lookback_days=max(30, int(raw.get("lookback_days", 800) or 800)),
+        fetch_kis_ledger=bool(raw.get("fetch_kis_ledger", True)),
+    )
+
+
 def _load_performance_settings(raw: dict[str, object], *, base_dir: Path) -> PerformanceSettings:
     raw = raw if isinstance(raw, dict) else {}
     return PerformanceSettings(
@@ -618,6 +671,23 @@ def _load_performance_settings(raw: dict[str, object], *, base_dir: Path) -> Per
         outcome_horizons=_normalize_int_sequence(raw.get("outcome_horizons"), default=(1, 3, 5, 10, 20, 60)),
         price_lookback_days=max(1, int(raw.get("price_lookback_days", 120) or 120)),
     )
+
+
+def _normalize_string_sequence(
+    raw_value: object,
+    *,
+    default: tuple[str, ...],
+    uppercase: bool = False,
+) -> tuple[str, ...]:
+    if raw_value is None:
+        return default
+    result: list[str] = []
+    for item in raw_value or []:
+        text = str(item).strip()
+        if not text:
+            continue
+        result.append(text.upper() if uppercase else text)
+    return tuple(dict.fromkeys(result)) or default
 
 
 def _load_alert_settings(raw: dict[str, object], *, base_dir: Path) -> AlertSettings:

@@ -26,6 +26,7 @@ from .csv_import import load_snapshot_from_positions_csv
 from .gates import apply_gates
 from .kis import PortfolioConfigurationError, load_account_snapshot_from_kis
 from .manual_snapshot import load_manual_snapshot
+from .performance import build_account_performance_outputs
 from .profiles import load_portfolio_profile
 from .reporting import render_portfolio_report_markdown
 from .semantic_judge import build_semantic_verdicts
@@ -40,6 +41,7 @@ def run_portfolio_pipeline(
     llm_settings: Any | None = None,
     summary_image_settings: Any | None = None,
     external_data_settings: Any | None = None,
+    portfolio_performance_settings: Any | None = None,
 ) -> dict[str, Any]:
     if not getattr(portfolio_settings, "enabled", False):
         return {"status": "disabled"}
@@ -172,9 +174,20 @@ def run_portfolio_pipeline(
             external_signal_artifacts=external_signal_context.get("artifacts") or {},
             external_reconciliation=external_signal_context.get("reconciliation"),
         )
+        account_performance_status = _build_account_performance_status(
+            private_dir=private_dir,
+            run_dir=run_dir,
+            snapshot=snapshot,
+            profile=profile,
+            settings=portfolio_performance_settings,
+            artifact_paths=artifact_paths,
+            warnings=all_warnings,
+        )
         status_value = _derive_pipeline_status(snapshot)
         semantic_health = _build_semantic_health(scored_candidates)
         if semantic_health["judge_unavailable"]:
+            status_value = "degraded"
+        if account_performance_status.get("status") == "failed":
             status_value = "degraded"
         status = {
             "status": status_value,
@@ -187,6 +200,7 @@ def run_portfolio_pipeline(
             "sell_side_calibration_warnings": _sell_side_calibration_warnings(recommendation),
             "report_writer": report_writer_payload,
             "external_signals": external_signal_context.get("status"),
+            "account_performance": account_performance_status,
             "private_output_dir": private_dir.as_posix(),
             "artifacts": artifact_paths,
             "generated_at": datetime.now().astimezone().isoformat(),
@@ -205,6 +219,56 @@ def run_portfolio_pipeline(
         if getattr(portfolio_settings, "continue_on_error", True):
             return status
         raise
+
+
+def _build_account_performance_status(
+    *,
+    private_dir: Path,
+    run_dir: Path,
+    snapshot: AccountSnapshot,
+    profile: Any,
+    settings: Any | None,
+    artifact_paths: dict[str, str],
+    warnings: list[str],
+) -> dict[str, Any]:
+    if settings is None or not bool(getattr(settings, "enabled", False)):
+        return {"enabled": False, "status": "disabled"}
+    try:
+        artifacts = build_account_performance_outputs(
+            private_dir=private_dir,
+            run_dir=run_dir,
+            snapshot=snapshot,
+            profile=profile,
+            settings=settings,
+        )
+        artifact_paths.update(artifacts)
+        public_json = private_dir / "account_performance_public.json"
+        payload: dict[str, Any] = {}
+        if public_json.exists():
+            try:
+                payload = json.loads(public_json.read_text(encoding="utf-8"))
+            except Exception:
+                payload = {}
+        quality = payload.get("data_quality") if isinstance(payload.get("data_quality"), dict) else {}
+        return {
+            "enabled": True,
+            "status": str(payload.get("status") or ("ok" if artifacts else "partial")),
+            "publish_to_site": bool(getattr(settings, "publish_to_site", True)),
+            "benchmarks": payload.get("benchmarks") or [],
+            "periods": [item.get("period") for item in payload.get("periods", []) if isinstance(item, dict)],
+            "data_quality": quality,
+            "artifacts": artifacts,
+        }
+    except Exception as exc:
+        message = f"account_performance_failed:{_short_error(exc)}"
+        warnings.append(message)
+        return {
+            "enabled": True,
+            "status": "failed",
+            "publish_to_site": bool(getattr(settings, "publish_to_site", True)),
+            "error": _short_error(exc),
+            "artifacts": {},
+        }
 
 
 def load_snapshot_for_profile(profile) -> Any:
@@ -257,6 +321,10 @@ def _load_watchlist_only_snapshot(profile) -> AccountSnapshot:
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def _short_error(exc: Exception) -> str:
+    return str(exc).strip().replace("\n", " ")[:240] or exc.__class__.__name__
 
 
 def _load_prism_ingestion(external_data_settings: Any | None) -> PrismIngestionResult:
