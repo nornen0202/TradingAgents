@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -392,6 +392,369 @@ class KisClient:
 
         return orders
 
+    def fetch_domestic_order_fills(
+        self,
+        *,
+        account_no: str,
+        product_code: str,
+        start_date: date | datetime | str,
+        end_date: date | datetime | str,
+        symbol: str = "",
+        side_code: str = "00",
+    ) -> list[dict[str, Any]]:
+        start_text = _date_param(start_date)
+        end_text = _date_param(end_date)
+        cutoff = datetime.now().date() - timedelta(days=90)
+        pd_dv = "before" if _date_from_param(start_text) < cutoff else "inner"
+        if self.environment == "demo":
+            tr_id = "VTSC9215R" if pd_dv == "before" else "VTTC0081R"
+        else:
+            tr_id = "CTSC9215R" if pd_dv == "before" else "TTTC0081R"
+        params = {
+            "CANO": account_no,
+            "ACNT_PRDT_CD": product_code,
+            "INQR_STRT_DT": start_text,
+            "INQR_END_DT": end_text,
+            "SLL_BUY_DVSN_CD": side_code,
+            "PDNO": symbol,
+            "CCLD_DVSN": "01",
+            "INQR_DVSN": "01",
+            "INQR_DVSN_3": "00",
+            "ORD_GNO_BRNO": "",
+            "ODNO": "",
+            "INQR_DVSN_1": "",
+            "CTX_AREA_FK100": "",
+            "CTX_AREA_NK100": "",
+            "EXCG_ID_DVSN_CD": "KRX",
+        }
+        rows: list[dict[str, Any]] = []
+        tr_cont = ""
+
+        while True:
+            payload, headers = self.request_json(
+                method="GET",
+                path="/uapi/domestic-stock/v1/trading/inquire-daily-ccld",
+                tr_id=tr_id,
+                params=params,
+                tr_cont=tr_cont,
+            )
+            rows.extend(_coerce_records(payload.get("output1")))
+            tr_cont_header = str(headers.get("tr_cont") or "")
+            if tr_cont_header not in {"M", "F"}:
+                break
+            params["CTX_AREA_FK100"] = str(payload.get("ctx_area_fk100") or "")
+            params["CTX_AREA_NK100"] = str(payload.get("ctx_area_nk100") or "")
+            tr_cont = "N"
+
+        return rows
+
+    def fetch_domestic_period_profit(
+        self,
+        *,
+        account_no: str,
+        product_code: str,
+        start_date: date | datetime | str,
+        end_date: date | datetime | str,
+        symbol: str = "",
+        sort_code: str = "02",
+        inquiry_code: str = "00",
+        balance_code: str = "00",
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        params = {
+            "CANO": account_no,
+            "ACNT_PRDT_CD": product_code,
+            "INQR_STRT_DT": _date_param(start_date),
+            "INQR_END_DT": _date_param(end_date),
+            "SORT_DVSN": sort_code,
+            "INQR_DVSN": inquiry_code,
+            "CBLC_DVSN": balance_code,
+            "PDNO": symbol,
+            "CTX_AREA_FK100": "",
+            "CTX_AREA_NK100": "",
+        }
+        return self._fetch_domestic_period_profit_page(
+            path="/uapi/domestic-stock/v1/trading/inquire-period-profit",
+            tr_id="TTTC8708R",
+            params=params,
+        )
+
+    def fetch_domestic_period_trade_profit(
+        self,
+        *,
+        account_no: str,
+        product_code: str,
+        start_date: date | datetime | str,
+        end_date: date | datetime | str,
+        symbol: str = "",
+        sort_code: str = "02",
+        balance_code: str = "00",
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        params = {
+            "CANO": account_no,
+            "ACNT_PRDT_CD": product_code,
+            "SORT_DVSN": sort_code,
+            "INQR_STRT_DT": _date_param(start_date),
+            "INQR_END_DT": _date_param(end_date),
+            "CBLC_DVSN": balance_code,
+            "PDNO": symbol,
+            "CTX_AREA_FK100": "",
+            "CTX_AREA_NK100": "",
+        }
+        return self._fetch_domestic_period_profit_page(
+            path="/uapi/domestic-stock/v1/trading/inquire-period-trade-profit",
+            tr_id="TTTC8715R",
+            params=params,
+        )
+
+    def _fetch_domestic_period_profit_page(
+        self,
+        *,
+        path: str,
+        tr_id: str,
+        params: dict[str, Any],
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        summary: dict[str, Any] = {}
+        tr_cont = ""
+
+        while True:
+            payload, headers = self.request_json(
+                method="GET",
+                path=path,
+                tr_id=tr_id,
+                params=params,
+                tr_cont=tr_cont,
+            )
+            rows.extend(_coerce_records(payload.get("output1")))
+            summary_records = _coerce_records(payload.get("output2"))
+            if summary_records:
+                summary = summary_records[0]
+            tr_cont_header = str(headers.get("tr_cont") or "")
+            if tr_cont_header not in {"M", "F"}:
+                break
+            params["CTX_AREA_FK100"] = str(payload.get("ctx_area_fk100") or "")
+            params["CTX_AREA_NK100"] = str(payload.get("ctx_area_nk100") or "")
+            tr_cont = "N"
+
+        return rows, summary
+
+    def fetch_overseas_order_fills(
+        self,
+        *,
+        account_no: str,
+        product_code: str,
+        start_date: date | datetime | str,
+        end_date: date | datetime | str,
+        symbol: str = "%",
+        exchange_code: str = "%",
+        side_code: str = "00",
+        fill_code: str = "01",
+        sort_sequence: str = "DS",
+    ) -> list[dict[str, Any]]:
+        tr_id = "VTTS3035R" if self.environment == "demo" else "TTTS3035R"
+        params = {
+            "CANO": account_no,
+            "ACNT_PRDT_CD": product_code,
+            "PDNO": "" if self.environment == "demo" else symbol,
+            "ORD_STRT_DT": _date_param(start_date),
+            "ORD_END_DT": _date_param(end_date),
+            "SLL_BUY_DVSN": "00" if self.environment == "demo" else side_code,
+            "CCLD_NCCS_DVSN": "00" if self.environment == "demo" else fill_code,
+            "OVRS_EXCG_CD": "" if self.environment == "demo" else exchange_code,
+            "SORT_SQN": sort_sequence,
+            "ORD_DT": "",
+            "ORD_GNO_BRNO": "",
+            "ODNO": "",
+            "CTX_AREA_NK200": "",
+            "CTX_AREA_FK200": "",
+        }
+        rows: list[dict[str, Any]] = []
+        tr_cont = ""
+
+        while True:
+            payload, headers = self.request_json(
+                method="GET",
+                path="/uapi/overseas-stock/v1/trading/inquire-ccnl",
+                tr_id=tr_id,
+                params=params,
+                tr_cont=tr_cont,
+            )
+            rows.extend(_coerce_records(payload.get("output")))
+            tr_cont_header = str(headers.get("tr_cont") or "")
+            if tr_cont_header not in {"M", "F"}:
+                break
+            params["CTX_AREA_NK200"] = str(payload.get("ctx_area_nk200") or "")
+            params["CTX_AREA_FK200"] = str(payload.get("ctx_area_fk200") or "")
+            tr_cont = "N"
+
+        return rows
+
+    def fetch_overseas_period_transactions(
+        self,
+        *,
+        account_no: str,
+        product_code: str,
+        start_date: date | datetime | str,
+        end_date: date | datetime | str,
+        exchange_code: str = "NAS",
+        symbol: str = "",
+        side_code: str = "00",
+        loan_code: str = "",
+    ) -> list[dict[str, Any]]:
+        params = {
+            "CANO": account_no,
+            "ACNT_PRDT_CD": product_code,
+            "ERLM_STRT_DT": _date_param(start_date),
+            "ERLM_END_DT": _date_param(end_date),
+            "OVRS_EXCG_CD": exchange_code,
+            "PDNO": symbol,
+            "SLL_BUY_DVSN_CD": side_code,
+            "LOAN_DVSN_CD": loan_code,
+            "CTX_AREA_FK100": "",
+            "CTX_AREA_NK100": "",
+        }
+        rows: list[dict[str, Any]] = []
+        tr_cont = ""
+
+        while True:
+            payload, headers = self.request_json(
+                method="GET",
+                path="/uapi/overseas-stock/v1/trading/inquire-period-trans",
+                tr_id="CTOS4001R",
+                params=params,
+                tr_cont=tr_cont,
+            )
+            rows.extend(_coerce_records(payload.get("output1")))
+            rows.extend(_coerce_records(payload.get("output2")))
+            tr_cont_header = str(headers.get("tr_cont") or "")
+            if tr_cont_header not in {"M", "F"}:
+                break
+            params["CTX_AREA_FK100"] = str(payload.get("ctx_area_fk100") or "")
+            params["CTX_AREA_NK100"] = str(payload.get("ctx_area_nk100") or "")
+            tr_cont = "N"
+
+        return rows
+
+    def fetch_overseas_period_profit(
+        self,
+        *,
+        account_no: str,
+        product_code: str,
+        start_date: date | datetime | str,
+        end_date: date | datetime | str,
+        exchange_code: str = "NASD",
+        country_code: str = "",
+        currency_code: str = "USD",
+        symbol: str = "",
+        won_currency_code: str = "02",
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        params = {
+            "CANO": account_no,
+            "ACNT_PRDT_CD": product_code,
+            "OVRS_EXCG_CD": exchange_code,
+            "NATN_CD": country_code,
+            "CRCY_CD": currency_code,
+            "PDNO": symbol,
+            "INQR_STRT_DT": _date_param(start_date),
+            "INQR_END_DT": _date_param(end_date),
+            "WCRC_FRCR_DVSN_CD": won_currency_code,
+            "CTX_AREA_FK200": "",
+            "CTX_AREA_NK200": "",
+        }
+        rows: list[dict[str, Any]] = []
+        summary: dict[str, Any] = {}
+        tr_cont = ""
+
+        while True:
+            payload, headers = self.request_json(
+                method="GET",
+                path="/uapi/overseas-stock/v1/trading/inquire-period-profit",
+                tr_id="TTTS3039R",
+                params=params,
+                tr_cont=tr_cont,
+            )
+            rows.extend(_coerce_records(payload.get("output1")))
+            summary_records = _coerce_records(payload.get("output2"))
+            if summary_records:
+                summary = summary_records[0]
+            tr_cont_header = str(headers.get("tr_cont") or "")
+            if tr_cont_header not in {"M", "F"}:
+                break
+            params["CTX_AREA_FK200"] = str(payload.get("ctx_area_fk200") or "")
+            params["CTX_AREA_NK200"] = str(payload.get("ctx_area_nk200") or "")
+            tr_cont = "N"
+
+        return rows, summary
+
+    def fetch_domestic_index_price_history(
+        self,
+        *,
+        index_code: str,
+        start_date: date | datetime | str,
+        end_date: date | datetime | str,
+    ) -> list[dict[str, Any]]:
+        params = {
+            "FID_PERIOD_DIV_CODE": "D",
+            "FID_COND_MRKT_DIV_CODE": "U",
+            "FID_INPUT_ISCD": index_code,
+            "FID_INPUT_DATE_1": _date_param(end_date),
+        }
+        rows: list[dict[str, Any]] = []
+        tr_cont = ""
+
+        while True:
+            payload, headers = self.request_json(
+                method="GET",
+                path="/uapi/domestic-stock/v1/quotations/inquire-index-daily-price",
+                tr_id="FHPUP02120000",
+                params=params,
+                tr_cont=tr_cont,
+            )
+            rows.extend(_coerce_records(payload.get("output1")))
+            rows.extend(_coerce_records(payload.get("output2")))
+            tr_cont_header = str(headers.get("tr_cont") or "")
+            if tr_cont_header not in {"M", "F"}:
+                break
+            tr_cont = "N"
+
+        return _filter_rows_by_date(rows, start_date=start_date, end_date=end_date)
+
+    def fetch_overseas_daily_price_history(
+        self,
+        *,
+        symbol: str,
+        exchange_code: str,
+        start_date: date | datetime | str,
+        end_date: date | datetime | str,
+    ) -> list[dict[str, Any]]:
+        params = {
+            "AUTH": "",
+            "EXCD": exchange_code,
+            "SYMB": symbol,
+            "GUBN": "0",
+            "BYMD": _date_param(end_date),
+            "MODP": "1",
+        }
+        rows: list[dict[str, Any]] = []
+        tr_cont = ""
+
+        while True:
+            payload, headers = self.request_json(
+                method="GET",
+                path="/uapi/overseas-price/v1/quotations/dailyprice",
+                tr_id="HHDFS76240000",
+                params=params,
+                tr_cont=tr_cont,
+            )
+            rows.extend(_coerce_records(payload.get("output1")))
+            rows.extend(_coerce_records(payload.get("output2")))
+            tr_cont_header = str(headers.get("tr_cont") or "")
+            if tr_cont_header not in {"M", "F"}:
+                break
+            tr_cont = "N"
+
+        return _filter_rows_by_date(rows, start_date=start_date, end_date=end_date)
+
 
 def validate_kis_credentials(
     *,
@@ -611,12 +974,56 @@ def _coerce_records(value: Any) -> list[dict[str, Any]]:
     return []
 
 
+def _date_param(value: date | datetime | str) -> str:
+    if isinstance(value, datetime):
+        return value.strftime("%Y%m%d")
+    if isinstance(value, date):
+        return value.strftime("%Y%m%d")
+    text = str(value or "").strip()
+    if len(text) >= 10 and text[4] == "-" and text[7] == "-":
+        return text[:10].replace("-", "")
+    return re.sub(r"\D", "", text)[:8]
+
+
+def _date_from_param(value: str) -> date:
+    text = _date_param(value)
+    if len(text) != 8:
+        return datetime.now().date()
+    return date(int(text[:4]), int(text[4:6]), int(text[6:8]))
+
+
+def _filter_rows_by_date(
+    rows: list[dict[str, Any]],
+    *,
+    start_date: date | datetime | str,
+    end_date: date | datetime | str,
+) -> list[dict[str, Any]]:
+    start = _date_from_param(_date_param(start_date))
+    end = _date_from_param(_date_param(end_date))
+    filtered: list[dict[str, Any]] = []
+    for row in rows:
+        row_date = _row_date_candidate(row)
+        if row_date is None or start <= row_date <= end:
+            filtered.append(row)
+    return filtered
+
+
+def _row_date_candidate(row: dict[str, Any]) -> date | None:
+    for key in ("stck_bsop_date", "xymd", "bsop_date", "trd_dd", "date", "ord_dt", "trad_dt", "erlm_dt"):
+        text = _date_param(row.get(key, ""))
+        if len(text) == 8:
+            return date(int(text[:4]), int(text[4:6]), int(text[6:8]))
+    return None
+
+
 def _first_float(payload: dict[str, Any], keys: tuple[str, ...]) -> float | None:
     for key in keys:
         value = payload.get(key)
         if value in (None, ""):
             continue
         try:
+            if isinstance(value, str):
+                value = value.replace(",", "")
             return float(value)
         except (TypeError, ValueError):
             continue

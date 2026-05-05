@@ -53,6 +53,18 @@ action_judge_enabled = true
 action_judge_top_n = 5
 report_polisher_enabled = true
 
+[portfolio_performance]
+enabled = true
+publish_to_site = true
+public_sanitization = "mask_identifiers"
+periods = ["1M", "3M", "6M", "YTD", "1Y", "ALL"]
+kr_benchmarks = ["KOSPI", "KOSDAQ"]
+us_benchmarks = ["SPY", "QQQ"]
+price_provider = "yfinance"
+price_history_path = ""
+lookback_days = 800
+fetch_kis_ledger = true
+
 [execution]
 enabled = true
 checkpoints_kst = ["10:05", "11:05", "12:35", "14:35"]

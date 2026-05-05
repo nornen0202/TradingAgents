@@ -184,6 +184,9 @@ profile_path = "{profile_path.as_posix()}"
 profile_name = "manual_test"
 continue_on_error = false
 report_polisher_enabled = false
+
+[portfolio_performance]
+enabled = false
 """,
                 encoding="utf-8",
             )
@@ -328,6 +331,9 @@ semantic_judge_enabled = true
 action_judge_enabled = true
 action_judge_top_n = 2
 report_polisher_enabled = false
+
+[portfolio_performance]
+enabled = false
 """,
                 encoding="utf-8",
             )
@@ -486,6 +492,9 @@ profile_path = "{profile_path.as_posix()}"
 profile_name = "manual_watchlist"
 continue_on_error = false
 report_polisher_enabled = false
+
+[portfolio_performance]
+enabled = false
 """,
                 encoding="utf-8",
             )
@@ -553,6 +562,9 @@ profile_path = "{profile_path.as_posix()}"
 profile_name = "us_watchlist"
 continue_on_error = false
 report_polisher_enabled = false
+
+[portfolio_performance]
+enabled = false
 """,
                 encoding="utf-8",
             )

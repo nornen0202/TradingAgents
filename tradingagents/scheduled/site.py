@@ -119,7 +119,7 @@ def _copy_artifacts(
             continue
         if source.is_file():
             download_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, download_dir / source.name)
+            _copy_public_portfolio_artifact(source, download_dir / source.name)
             copied_any = True
 
     if copied_any:
@@ -153,7 +153,7 @@ def _copy_artifacts(
         if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
             continue
         download_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, download_dir / source.name)
+        _copy_public_portfolio_artifact(source, download_dir / source.name)
 
     for artifact_path in ((manifest.get("portfolio_delta") or {}).get("artifacts") or {}).values():
         if not artifact_path:
@@ -183,6 +183,65 @@ def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
     if candidate.is_absolute():
         return candidate
     return run_dir / candidate
+
+
+def _copy_public_portfolio_artifact(source: Path, destination: Path) -> None:
+    if source.suffix.lower() == ".json":
+        try:
+            payload = json.loads(source.read_text(encoding="utf-8"))
+            sanitized = _sanitize_public_json(payload)
+            destination.write_text(json.dumps(sanitized, indent=2, ensure_ascii=False), encoding="utf-8")
+            return
+        except Exception:
+            pass
+    shutil.copy2(source, destination)
+
+
+def _sanitize_public_json(value: Any) -> Any:
+    sensitive_keys = {
+        "account_id",
+        "account_no",
+        "broker_account_id",
+        "broker_order_id",
+        "order_id",
+        "odno",
+        "cano",
+        "acnt_prdt_cd",
+        "snapshot_id",
+        "kis_order_id",
+        "ord_gno_brno",
+        "ord_no",
+    }
+    if isinstance(value, dict):
+        sanitized: dict[str, Any] = {}
+        for key, item in value.items():
+            key_text = str(key)
+            if key_text.lower() in sensitive_keys:
+                sanitized[key_text] = _mask_identifier(item)
+            else:
+                sanitized[key_text] = _sanitize_public_json(item)
+        return sanitized
+    if isinstance(value, list):
+        return [_sanitize_public_json(item) for item in value]
+    if isinstance(value, str):
+        return _mask_sensitive_text(value)
+    return value
+
+
+def _mask_identifier(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    return "***MASKED***"
+
+
+def _mask_sensitive_text(value: str) -> str:
+    text = str(value)
+    text = re.sub(r"\b\d{8}-\d{2}\b", "***MASKED***", text)
+    text = re.sub(r"\bkis_\d{8}-\d{2}\b", "kis_***MASKED***", text)
+    text = re.sub(r"(CANO=)[^&\s]+", r"\1***MASKED***", text)
+    text = re.sub(r"(ACNT_PRDT_CD=)[^&\s]+", r"\1***MASKED***", text)
+    return text
 
 
 def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) -> str:
@@ -687,6 +746,8 @@ def _render_portfolio_page(
             continue
         if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
             continue
+        if not _is_public_portfolio_download(source):
+            continue
         download_links.append(
             f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
         )
@@ -734,6 +795,7 @@ def _render_portfolio_page(
     {failure_html}
     {summary_image_html}
     {_render_live_context_delta_section(manifest)}
+    {_render_account_performance_section(manifest, portfolio_summary)}
     {_render_performance_tracking_section(manifest)}
     <section class="section prose">
       <div class="section-head">
@@ -745,6 +807,249 @@ def _render_portfolio_page(
     {downloads_html}
     """
     return _page_template(f"{manifest['run_id']} {portfolio_label.lower()} | {settings.title}", body, prefix="../../")
+
+
+def _render_account_performance_section(manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
+    account_performance_status = (manifest.get("portfolio") or {}).get("account_performance") or {}
+    if account_performance_status and not account_performance_status.get("publish_to_site", True):
+        return ""
+    payload = portfolio_summary.get("account_performance")
+    if not isinstance(payload, dict) or not payload:
+        return ""
+    periods = payload.get("periods") if isinstance(payload.get("periods"), list) else []
+    summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
+    quality = payload.get("data_quality") if isinstance(payload.get("data_quality"), dict) else {}
+    costs = payload.get("costs") if isinstance(payload.get("costs"), dict) else {}
+    contribution = payload.get("contribution_by_ticker") if isinstance(payload.get("contribution_by_ticker"), list) else []
+    benchmarks = [str(item) for item in payload.get("benchmarks", []) if str(item)]
+    default_period = str(summary.get("default_period") or (periods[-1].get("period") if periods and isinstance(periods[-1], dict) else "-"))
+    best = summary.get("best_excess") if isinstance(summary.get("best_excess"), dict) else {}
+    worst = summary.get("worst_excess") if isinstance(summary.get("worst_excess"), dict) else {}
+    public_json = portfolio_summary.get("account_performance_public_json")
+    chart_json = portfolio_summary.get("account_performance_chart_data_json")
+    report_md = portfolio_summary.get("account_performance_report_md")
+    download_links = []
+    for source in (public_json, chart_json, report_md):
+        if isinstance(source, Path) and source.exists():
+            download_links.append(
+                f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
+            )
+    period_tabs = "".join(
+        f"<a class='pill' href='#account-perf-{_escape(str(period.get('period') or 'period'))}'>{_escape(str(period.get('period') or '-'))}</a>"
+        for period in periods
+        if isinstance(period, dict)
+    )
+    table_rows = _account_performance_period_rows(periods)
+    contribution_rows = _account_contribution_rows(contribution)
+    warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
+    warning_html = "".join(f"<li>{_escape(str(item))}</li>" for item in warnings[:8]) or "<li>특이사항 없음</li>"
+    chart_html = _account_performance_svg(payload.get("chart_data") if isinstance(payload.get("chart_data"), dict) else {})
+    benchmark_label = ", ".join(benchmarks) or "-"
+    return f"""
+    <section class="section account-performance">
+      <div class="section-head">
+        <h2>계좌 성과 vs 지수/ETF</h2>
+        <p>{_escape(benchmark_label)}</p>
+      </div>
+      <div class="run-grid account-kpi-grid">
+        <article class="run-card">
+          <h3>실제 계좌 수익률</h3>
+          <p><strong>{_escape(default_period)}</strong><span>{_escape(_format_pct_value(summary.get('actual_return')))}</span></p>
+        </article>
+        <article class="run-card">
+          <h3>최고 초과 벤치마크</h3>
+          <p><strong>{_escape(str(best.get('benchmark') or '-'))}</strong><span>{_escape(_format_pct_value(best.get('excess_return')))}</span></p>
+        </article>
+        <article class="run-card">
+          <h3>최저 초과 벤치마크</h3>
+          <p><strong>{_escape(str(worst.get('benchmark') or '-'))}</strong><span>{_escape(_format_pct_value(worst.get('excess_return')))}</span></p>
+        </article>
+        <article class="run-card">
+          <h3>복잡하게 운용한 프리미엄</h3>
+          <p><strong>초과손익</strong><span>{_escape(_format_signed_krw_value(best.get('excess_krw')))}</span></p>
+        </article>
+      </div>
+      <div class="pill-row account-period-tabs">{period_tabs}</div>
+      {chart_html}
+      <div class="account-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>기간</th>
+              <th>실제</th>
+              <th>단순 기간 수익률 비교</th>
+              <th>동일 현금흐름 시뮬레이션</th>
+              <th>MDD</th>
+              <th>변동성</th>
+            </tr>
+          </thead>
+          <tbody>{table_rows}</tbody>
+        </table>
+      </div>
+      <div class="run-grid">
+        <article class="run-card">
+          <h3>종목별 기여도</h3>
+          {contribution_rows}
+        </article>
+        <article class="run-card">
+          <h3>매매 비용</h3>
+          <p><strong>수수료</strong><span>{_escape(_format_krw_value(costs.get('fees_krw')))}</span></p>
+          <p><strong>세금</strong><span>{_escape(_format_krw_value(costs.get('taxes_krw')))}</span></p>
+          <p><strong>총 비용</strong><span>{_escape(_format_krw_value(costs.get('total_cost_krw')))}</span></p>
+        </article>
+        <article class="run-card">
+          <h3>데이터 품질</h3>
+          <p><strong>스냅샷</strong><span>{int(quality.get('snapshot_count') or 0)}</span></p>
+          <p><strong>원장 이벤트</strong><span>{int(quality.get('ledger_event_count') or 0)}</span></p>
+          <p><strong>가격 provider</strong><span>{_escape(str(quality.get('benchmark_provider') or '-'))}</span></p>
+        </article>
+      </div>
+      <details class="advanced-diagnostics"><summary>데이터 품질 경고</summary><ul>{warning_html}</ul></details>
+      <div class="pill-row">{''.join(download_links)}</div>
+    </section>
+    """
+
+
+def _account_performance_period_rows(periods: list[Any]) -> str:
+    rows: list[str] = []
+    for period in periods:
+        if not isinstance(period, dict):
+            continue
+        period_name = str(period.get("period") or "-")
+        rows.append(
+            "<tr "
+            f"id='account-perf-{_escape(period_name)}'>"
+            f"<td>{_escape(period_name)}</td>"
+            f"<td>{_escape(_format_pct_value(period.get('actual_return')))}</td>"
+            f"<td>{_benchmark_comparison_cells(period.get('simple_benchmarks'))}</td>"
+            f"<td>{_benchmark_comparison_cells(period.get('cashflow_benchmarks'))}</td>"
+            f"<td>{_escape(_format_pct_value(period.get('mdd')))}</td>"
+            f"<td>{_escape(_format_pct_value(period.get('volatility')))}</td>"
+            "</tr>"
+        )
+    if not rows:
+        return "<tr><td colspan='6'>성과를 계산할 수 있는 기간 데이터가 아직 부족합니다.</td></tr>"
+    return "".join(rows)
+
+
+def _benchmark_comparison_cells(values: Any) -> str:
+    if not isinstance(values, list) or not values:
+        return "-"
+    parts = []
+    for item in values:
+        if not isinstance(item, dict):
+            continue
+        parts.append(
+            f"<span>{_escape(str(item.get('benchmark') or '-'))}: "
+            f"{_escape(_format_pct_value(item.get('benchmark_return')))} / "
+            f"초과 {_escape(_format_pct_value(item.get('excess_return')))} "
+            f"({_escape(_format_signed_krw_value(item.get('excess_krw')))}"
+            ")</span>"
+        )
+    return "<br>".join(parts) if parts else "-"
+
+
+def _account_contribution_rows(contribution: list[Any]) -> str:
+    if not contribution:
+        return "<p class='empty'>산출 가능한 기여도 데이터가 없습니다.</p>"
+    rows = []
+    for item in contribution[:8]:
+        if not isinstance(item, dict):
+            continue
+        rows.append(
+            "<p>"
+            f"<strong>{_escape(str(item.get('ticker') or '-'))}</strong>"
+            f"<span>{_escape(_format_signed_krw_value(item.get('total_contribution_krw')))}</span>"
+            "</p>"
+        )
+    return "".join(rows) or "<p class='empty'>산출 가능한 기여도 데이터가 없습니다.</p>"
+
+
+def _account_performance_svg(chart_data: dict[str, Any]) -> str:
+    series = chart_data.get("series") if isinstance(chart_data.get("series"), list) else []
+    benchmarks = [str(item) for item in chart_data.get("benchmarks", []) if str(item)]
+    if len(series) < 2:
+        return "<p class='empty'>차트를 그릴 만큼의 일별 계좌 스냅샷이 아직 충분하지 않습니다.</p>"
+    keys = ["account_return", *benchmarks]
+    values: list[float] = []
+    for row in series:
+        if not isinstance(row, dict):
+            continue
+        for key in keys:
+            try:
+                if row.get(key) is not None:
+                    values.append(float(row[key]))
+            except (TypeError, ValueError):
+                continue
+    if not values:
+        return "<p class='empty'>차트 기준 수익률 데이터가 없습니다.</p>"
+    min_value = min(values)
+    max_value = max(values)
+    if min_value == max_value:
+        min_value -= 0.01
+        max_value += 0.01
+    width = 980
+    height = 320
+    left = 56
+    right = 24
+    top = 24
+    bottom = 44
+    plot_w = width - left - right
+    plot_h = height - top - bottom
+    colors = {
+        "account_return": "#0f7c82",
+        "KOSPI": "#7a4d9f",
+        "KOSDAQ": "#c46a1c",
+        "SPY": "#2f6f45",
+        "QQQ": "#8b3f52",
+    }
+
+    def point(index: int, value: float) -> tuple[float, float]:
+        x = left + (plot_w * index / max(1, len(series) - 1))
+        y = top + plot_h - ((value - min_value) / (max_value - min_value) * plot_h)
+        return x, y
+
+    polylines = []
+    labels = []
+    for key in keys:
+        points = []
+        for index, row in enumerate(series):
+            if not isinstance(row, dict) or row.get(key) is None:
+                continue
+            try:
+                points.append(point(index, float(row[key])))
+            except (TypeError, ValueError):
+                continue
+        if len(points) < 2:
+            continue
+        color = colors.get(key, "#374151")
+        point_text = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+        label = "계좌" if key == "account_return" else key
+        polylines.append(f"<polyline points='{point_text}' fill='none' stroke='{color}' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' />")
+        labels.append(f"<span><i style='background:{color}'></i>{_escape(label)}</span>")
+    zero_y = point(0, 0.0)[1] if min_value <= 0 <= max_value else None
+    zero_line = (
+        f"<line x1='{left}' y1='{zero_y:.1f}' x2='{width - right}' y2='{zero_y:.1f}' stroke='#d9e2e1' stroke-dasharray='4 5' />"
+        if zero_y is not None
+        else ""
+    )
+    start_label = _escape(str((series[0] or {}).get("date") or ""))
+    end_label = _escape(str((series[-1] or {}).get("date") or ""))
+    return (
+        "<div class='account-chart'>"
+        f"<svg viewBox='0 0 {width} {height}' role='img' aria-label='계좌 누적 수익률과 벤치마크 비교 차트'>"
+        f"<rect x='0' y='0' width='{width}' height='{height}' rx='12' fill='#fbfdfd' />"
+        f"<line x1='{left}' y1='{height - bottom}' x2='{width - right}' y2='{height - bottom}' stroke='#cfd8d6' />"
+        f"<line x1='{left}' y1='{top}' x2='{left}' y2='{height - bottom}' stroke='#cfd8d6' />"
+        f"{zero_line}{''.join(polylines)}"
+        f"<text x='{left}' y='{height - 15}'>{start_label}</text>"
+        f"<text x='{width - right}' y='{height - 15}' text-anchor='end'>{end_label}</text>"
+        f"<text x='{left}' y='18'>{_escape(_format_pct_value(max_value))}</text>"
+        f"<text x='{left}' y='{height - bottom - 6}'>{_escape(_format_pct_value(min_value))}</text>"
+        "</svg>"
+        f"<div class='account-chart-legend'>{''.join(labels)}</div>"
+        "</div>"
+    )
 
 
 def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
@@ -838,6 +1143,24 @@ def _performance_table(title: str, rows: list[dict[str, Any]]) -> str:
     return f"<article class='run-card'><h3>{_escape(title)}</h3>{body}</article>"
 
 
+def _is_public_portfolio_download(source: Path) -> bool:
+    if source.suffix.lower() not in {".json", ".md"}:
+        return False
+    private_names = {
+        "account_snapshot.json",
+        "status.json",
+        "portfolio_action_judge.json",
+        "portfolio_semantic_verdicts.json",
+        "decision_audit.json",
+        "report_writer.json",
+        "portfolio_report_writer.json",
+        "account_performance_report.json",
+        "summary_image_spec.json",
+        "summary_image_metadata.json",
+    }
+    return source.name not in private_names
+
+
 def _format_pct_value(value: Any) -> str:
     try:
         if value is None:
@@ -845,6 +1168,26 @@ def _format_pct_value(value: Any) -> str:
         return f"{float(value) * 100:.2f}%"
     except (TypeError, ValueError):
         return "-"
+
+
+def _format_krw_value(value: Any) -> str:
+    try:
+        if value is None:
+            return "-"
+        return f"{int(round(float(value))):,} KRW"
+    except (TypeError, ValueError):
+        return "-"
+
+
+def _format_signed_krw_value(value: Any) -> str:
+    try:
+        if value is None:
+            return "-"
+        number = int(round(float(value)))
+    except (TypeError, ValueError):
+        return "-"
+    sign = "+" if number > 0 else ""
+    return f"{sign}{number:,} KRW"
 
 
 def _portfolio_summary_image_html(manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
@@ -1871,11 +2214,15 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
     summary_png = private_dir / "summary_card_ai.png"
     summary_spec = private_dir / "summary_image_spec.json"
     summary_metadata = private_dir / "summary_image_metadata.json"
+    account_performance_public = private_dir / "account_performance_public.json"
+    account_performance_chart_data = private_dir / "account_performance_chart_data.json"
+    account_performance_report_md = private_dir / "account_performance_report.md"
     files = sorted(path for path in private_dir.iterdir() if path.is_file())
     candidate_symbols: list[str] = []
     candidate_pairs: list[dict[str, str]] = []
     sell_side_counts: dict[str, Any] = {}
     actions_by_ticker: dict[str, dict[str, Any]] = {}
+    account_performance: dict[str, Any] = {}
     if report_json.exists():
         try:
             report_payload = json.loads(report_json.read_text(encoding="utf-8"))
@@ -1913,6 +2260,13 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
                     )
         except Exception:
             candidate_symbols = []
+    if account_performance_public.exists():
+        try:
+            parsed = json.loads(account_performance_public.read_text(encoding="utf-8"))
+            if isinstance(parsed, dict):
+                account_performance = parsed
+        except Exception:
+            account_performance = {}
     return {
         "status_path": status_path,
         "status": str(payload.get("status") or "unknown"),
@@ -1929,6 +2283,10 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "summary_image_png": summary_png if summary_png.exists() else None,
         "summary_image_spec_json": summary_spec if summary_spec.exists() else None,
         "summary_image_metadata_json": summary_metadata if summary_metadata.exists() else None,
+        "account_performance": account_performance,
+        "account_performance_public_json": account_performance_public if account_performance_public.exists() else None,
+        "account_performance_chart_data_json": account_performance_chart_data if account_performance_chart_data.exists() else None,
+        "account_performance_report_md": account_performance_report_md if account_performance_report_md.exists() else None,
         "candidate_canonical_symbols": candidate_symbols,
         "candidate_identity_pairs": candidate_pairs,
         "sell_side_counts": sell_side_counts,
@@ -2557,6 +2915,79 @@ a { color: inherit; }
   display: flex;
   justify-content: space-between;
   gap: 12px;
+}
+
+.account-performance .run-card p {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+.account-performance .run-card p span {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.account-period-tabs {
+  margin: 16px 0;
+}
+
+.account-chart {
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.account-chart svg {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.account-chart text {
+  fill: var(--muted);
+  font-size: 13px;
+}
+
+.account-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.account-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.account-chart-legend i {
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.account-table-wrap {
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.account-table-wrap table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+}
+
+.account-table-wrap th,
+.account-table-wrap td {
+  border: 1px solid var(--line);
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
 }
 
 .prose { line-height: 1.65; }

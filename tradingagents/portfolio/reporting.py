@@ -351,6 +351,7 @@ def _directional_priority_sections(recommendation: PortfolioRecommendation) -> s
         ("손절/청산 후보", stop_or_exit),
         ("자금 마련용 축소 후보", [action for action in actions if _action_sell_intent(action) == "TRIM_TO_FUND"]),
         ("오늘 바로 매수 후보", [action for action in actions if action.action_now in _NOW_BUY_ACTIONS]),
+        ("오늘 바로 매도/축소 후보", [action for action in actions if action.action_now in _NOW_SELL_ACTIONS]),
         ("조건부 매수 후보", [action for action in actions if action.action_if_triggered in _TRIGGER_BUY_ACTIONS]),
     ]
     chunks: list[str] = ["## 오늘 할 일: 방향별 후보"]
