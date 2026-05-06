@@ -31,3 +31,14 @@ def test_daily_analysis_uses_python_shell_for_all_windows_jobs():
     workflow = _workflow_text()
 
     assert workflow.count("        shell: python {0}") == 3
+
+
+def test_daily_analysis_deploy_runs_after_final_pages_build():
+    workflow = _workflow_text()
+
+    deploy_start = workflow.index("  deploy:")
+    deploy_block = workflow[deploy_start:]
+
+    assert "      - build_pages" in deploy_block
+    assert "if: ${{ always() && needs.build_pages.result == 'success' }}" in deploy_block
+    assert "artifact_name: github-pages-final" in deploy_block
