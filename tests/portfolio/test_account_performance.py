@@ -190,7 +190,11 @@ def test_account_performance_excludes_watchlist_only_seed_snapshots(tmp_path: Pa
     assert ytd_period["requested_start_date"] == "2026-01-01"
     assert ytd_period["start_date"] == "2026-04-16"
     assert ytd_period["partial"] is True
-    assert ytd_period["actual_return"] == 0.2
+    assert ytd_period["status"] == "insufficient_history"
+    assert ytd_period["actual_return"] is None
+    assert payload["summary"]["default_period"] == "ALL"
+    assert payload["summary"]["actual_return"] == 0.2
+    assert any("account_performance_period_insufficient_history:YTD" in item for item in quality["warnings"])
 
 
 def _build_report(
