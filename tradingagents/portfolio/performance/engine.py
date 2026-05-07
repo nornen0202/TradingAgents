@@ -175,6 +175,16 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
         period_label = str(period.get("period") or "-")
         if period.get("partial"):
             period_label = f"{period_label} (부분)"
+        if period.get("status") == "insufficient_history":
+            available_start = str(period.get("start_date") or "-")
+            requested_start = str(period.get("requested_start_date") or "-")
+            rows.append(
+                "| "
+                f"{period_label} | "
+                f"데이터 부족 (요청 {requested_start} / 기록 시작 {available_start}) | "
+                "- | - | - | - |"
+            )
+            continue
         rows.append(
             "| "
             f"{period_label} | "
@@ -769,8 +779,33 @@ def _compute_periods(
     periods: list[dict[str, Any]] = []
     if len(snapshot_rows) < 2:
         return periods
+    first_available_start = _parse_date(str(snapshot_rows[0].get("date") or ""))
     for period_name in period_names:
         start_boundary = _period_start(period_name, end_date=end_date, snapshot_rows=snapshot_rows)
+        if (
+            str(period_name or "").strip().upper() != "ALL"
+            and first_available_start is not None
+            and start_boundary < first_available_start
+        ):
+            end_snapshot = _last_snapshot_on_or_before(snapshot_rows, end_date)
+            if not end_snapshot or first_available_start >= (_parse_date(str(end_snapshot.get("date"))) or end_date):
+                warnings.append(f"account_performance_period_partial:{period_name}")
+                continue
+            reason = (
+                f"requested_start={start_boundary.isoformat()}:"
+                f"available_start={first_available_start.isoformat()}"
+            )
+            warnings.append(f"account_performance_period_insufficient_history:{period_name}:{reason}")
+            periods.append(
+                _insufficient_history_period(
+                    period_name=period_name,
+                    requested_start=start_boundary,
+                    available_start=first_available_start,
+                    end_date=_parse_date(str(end_snapshot.get("date"))) or end_date,
+                    reason=reason,
+                )
+            )
+            continue
         start_snapshot = _first_snapshot_on_or_after(snapshot_rows, start_boundary)
         end_snapshot = _last_snapshot_on_or_before(snapshot_rows, end_date)
         if not start_snapshot or not end_snapshot or start_snapshot["date"] >= end_snapshot["date"]:
@@ -848,6 +883,34 @@ def _compute_periods(
             }
         )
     return periods
+
+
+def _insufficient_history_period(
+    *,
+    period_name: str,
+    requested_start: date,
+    available_start: date,
+    end_date: date,
+    reason: str,
+) -> dict[str, Any]:
+    return {
+        "period": period_name,
+        "requested_start_date": requested_start.isoformat(),
+        "start_date": available_start.isoformat(),
+        "end_date": end_date.isoformat(),
+        "partial": True,
+        "partial_reasons": [reason],
+        "status": "insufficient_history",
+        "actual_start_value_krw": None,
+        "actual_end_value_krw": None,
+        "actual_return": None,
+        "mdd": None,
+        "volatility": None,
+        "simple_benchmarks": [],
+        "cashflow_benchmarks": [],
+        "best_excess": {},
+        "worst_excess": {},
+    }
 
 
 def _build_chart_data(
@@ -934,8 +997,11 @@ def _summary(periods: list[dict[str, Any]]) -> dict[str, Any]:
 def _default_period(periods: list[dict[str, Any]]) -> dict[str, Any] | None:
     for preferred in ("YTD", "1Y", "6M", "3M", "1M", "ALL"):
         for period in periods:
-            if period.get("period") == preferred:
+            if period.get("period") == preferred and _float_or_none(period.get("actual_return")) is not None:
                 return period
+    for period in periods:
+        if _float_or_none(period.get("actual_return")) is not None:
+            return period
     return periods[-1] if periods else None
 
 

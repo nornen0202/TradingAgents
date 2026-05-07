@@ -923,6 +923,19 @@ def _account_performance_period_rows(periods: list[Any]) -> str:
             start = str(period.get("start_date") or "-")
             requested = str(period.get("requested_start_date") or "-")
             partial_note = f"<br><span class='account-period-note'>부분 산출: 요청 {_escape(requested)} / 실제 {_escape(start)}</span>"
+        if period.get("status") == "insufficient_history":
+            rows.append(
+                "<tr "
+                f"id='account-perf-{_escape(period_name)}'>"
+                f"<td>{_escape(period_label)}{partial_note}</td>"
+                "<td>데이터 부족</td>"
+                "<td>요청 기간 시작일의 계좌 스냅샷 없음</td>"
+                "<td>-</td>"
+                "<td>-</td>"
+                "<td>-</td>"
+                "</tr>"
+            )
+            continue
         rows.append(
             "<tr "
             f"id='account-perf-{_escape(period_name)}'>"

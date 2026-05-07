@@ -51,6 +51,22 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
         },
         "periods": [
             {
+                "period": "YTD",
+                "requested_start_date": "2026-01-01",
+                "start_date": "2026-02-01",
+                "end_date": "2026-04-01",
+                "partial": True,
+                "partial_reasons": ["requested_start=2026-01-01:available_start=2026-02-01"],
+                "status": "insufficient_history",
+                "actual_return": None,
+                "mdd": None,
+                "volatility": None,
+                "simple_benchmarks": [],
+                "cashflow_benchmarks": [],
+                "best_excess": {},
+                "worst_excess": {},
+            },
+            {
                 "period": "ALL",
                 "requested_start_date": "2026-01-01",
                 "start_date": "2026-02-01",
@@ -116,6 +132,9 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
         encoding="utf-8"
     )
     assert "계좌 성과 vs 지수/ETF" in public_html
+    assert "YTD (부분)" in public_html
+    assert "데이터 부족" in public_html
+    assert "요청 기간 시작일의 계좌 스냅샷 없음" in public_html
     assert "ALL (부분)" in public_html
     assert "부분 산출" in public_html
     assert "KOSPI" in public_html
