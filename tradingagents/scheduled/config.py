@@ -145,6 +145,7 @@ class PortfolioPerformanceSettings:
     price_history_path: Path | None = None
     lookback_days: int = 800
     fetch_kis_ledger: bool = True
+    min_coverage_ratio: float = 0.8
 
 
 @dataclass(frozen=True)
@@ -706,6 +707,7 @@ def _load_portfolio_performance_settings(
         price_history_path=_resolve_optional_path(raw.get("price_history_path"), base_dir),
         lookback_days=max(30, int(raw.get("lookback_days", 800) or 800)),
         fetch_kis_ledger=bool(raw.get("fetch_kis_ledger", True)),
+        min_coverage_ratio=max(0.0, min(1.0, float(raw.get("min_coverage_ratio", 0.8) or 0.8))),
     )
 
 

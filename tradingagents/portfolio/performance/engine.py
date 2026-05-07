@@ -5,6 +5,7 @@ import math
 import re
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timedelta
+from enum import Enum
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -19,6 +20,18 @@ _US_BENCHMARK_SYMBOLS = {
     "SPY": {"exchange": "AMS", "yfinance": "SPY", "label": "SPY"},
     "QQQ": {"exchange": "NAS", "yfinance": "QQQ", "label": "QQQ"},
 }
+
+
+class LedgerEventType(str, Enum):
+    TRADE = "trade"
+    DEPOSIT = "deposit"
+    WITHDRAWAL = "withdrawal"
+    DIVIDEND = "dividend"
+    FEE = "fee"
+    TAX = "tax"
+    INTEREST = "interest"
+    FX_CONVERSION = "fx_conversion"
+    UNKNOWN = "unknown"
 
 
 @dataclass(frozen=True)
@@ -40,6 +53,44 @@ class LedgerEvent:
 
     def to_public_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class CashflowEvent:
+    date: str
+    event_type: str
+    amount_krw: float
+    capital_flow: bool
+    performance_flow: bool
+    source: str
+
+    def to_public_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class PeriodCoverage:
+    period: str
+    requested_start_date: date
+    actual_start_date: date | None
+    end_date: date | None
+    requested_days: int | None
+    actual_days: int | None
+    coverage_ratio: float | None
+    is_partial: bool
+    same_actual_window_as: str | None
+    is_summary_eligible: bool
+    insufficient_reason: str | None
+
+    def to_public_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        for key in ("requested_start_date", "actual_start_date", "end_date"):
+            value = payload.get(key)
+            if isinstance(value, date):
+                payload[key] = value.isoformat()
+        if isinstance(payload.get("coverage_ratio"), float):
+            payload["coverage_ratio"] = round(float(payload["coverage_ratio"]), 6)
+        return payload
 
 
 @dataclass(frozen=True)
@@ -94,6 +145,11 @@ def build_account_performance_outputs(
     if len(snapshot_rows) < 2:
         warnings.append("account_performance_snapshot_history_insufficient")
 
+    benchmark_provider_status = _initial_benchmark_provider_status(
+        profile=profile,
+        settings=settings,
+        benchmarks=benchmark_names,
+    )
     benchmark_prices = _load_benchmark_prices(
         profile=profile,
         settings=settings,
@@ -102,19 +158,34 @@ def build_account_performance_outputs(
         start_date=start_date,
         end_date=end_date,
         warnings=warnings,
+        provider_status=benchmark_provider_status,
     )
+    cashflow_events = _cashflow_events_from_ledger(ledger_events)
     periods = _compute_periods(
         snapshot_rows=snapshot_rows,
         ledger_events=ledger_events,
+        cashflow_events=cashflow_events,
         benchmark_prices=benchmark_prices,
         period_names=tuple(getattr(settings, "periods", ("1M", "3M", "6M", "YTD", "1Y", "ALL"))),
         end_date=end_date,
+        min_coverage_ratio=float(getattr(settings, "min_coverage_ratio", 0.8) or 0.8),
         warnings=warnings,
     )
-    chart_data = _build_chart_data(snapshot_rows=snapshot_rows, benchmark_prices=benchmark_prices)
     contribution = _contribution_by_ticker(snapshot=snapshot, ledger_events=ledger_events)
+    reconciliation = reconcile_account_performance(
+        snapshot_rows=snapshot_rows,
+        ledger_events=ledger_events,
+        contribution_rows=contribution,
+        warnings=warnings,
+    )
     costs = _cost_summary(ledger_events)
     summary = _summary(periods)
+    chart_data = _build_chart_data(
+        snapshot_rows=snapshot_rows,
+        benchmark_prices=benchmark_prices,
+        cashflow_events=cashflow_events,
+        summary=summary,
+    )
 
     payload = {
         "status": "ok" if periods else "partial",
@@ -126,6 +197,7 @@ def build_account_performance_outputs(
         "chart_data": chart_data,
         "costs": costs,
         "contribution_by_ticker": contribution,
+        "reconciliation": reconciliation,
         "data_quality": {
             "raw_snapshot_count": snapshot_selection.raw_count,
             "snapshot_count": len(snapshot_rows),
@@ -133,7 +205,10 @@ def build_account_performance_outputs(
             "excluded_snapshot_reasons": snapshot_selection.excluded_reasons,
             "min_snapshot_value_krw": snapshot_selection.min_snapshot_value_krw,
             "ledger_event_count": len(ledger_events),
+            "cashflow_event_count": len(cashflow_events),
+            "external_capital_flow_count": len([event for event in cashflow_events if event.capital_flow]),
             "benchmark_provider": _provider_label(settings),
+            "benchmark_provider_status": benchmark_provider_status,
             "warnings": list(dict.fromkeys(warnings)),
         },
         "public_sanitization": str(getattr(settings, "public_sanitization", "mask_identifiers") or "mask_identifiers"),
@@ -164,33 +239,36 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
     periods = payload.get("periods") if isinstance(payload.get("periods"), list) else []
     costs = payload.get("costs") if isinstance(payload.get("costs"), Mapping) else {}
     contribution = payload.get("contribution_by_ticker") if isinstance(payload.get("contribution_by_ticker"), list) else []
+    reconciliation = payload.get("reconciliation") if isinstance(payload.get("reconciliation"), Mapping) else {}
     quality = payload.get("data_quality") if isinstance(payload.get("data_quality"), Mapping) else {}
-    rows = [
-        "| 기간 | 실제 수익률 | 최고 초과 | 최저 초과 | 초과손익 | 비교 기준 |",
-        "|---|---:|---:|---:|---:|---|",
+    display_periods = [
+        period
+        for period in periods
+        if isinstance(period, Mapping)
+        and _float_or_none(period.get("actual_return")) is not None
+        and period.get("status") not in {"insufficient_history", "duplicate_actual_window"}
+        and not period.get("same_actual_window_as")
+    ] or [
+        period
+        for period in periods
+        if isinstance(period, Mapping) and _float_or_none(period.get("actual_return")) is not None
     ]
-    for period in periods:
+    rows = [
+        "| 기간 | 계좌 수익률 | 산출 기준 | 최고 초과 | 초과손익 | 비교 기준 |",
+        "|---|---:|---|---:|---:|---|",
+    ]
+    for period in display_periods:
         if not isinstance(period, Mapping):
             continue
-        period_label = str(period.get("period") or "-")
+        period_label = "사용 가능 전체 기간" if str(period.get("period") or "").upper() == "ALL" else str(period.get("period") or "-")
         if period.get("partial"):
             period_label = f"{period_label} (부분)"
-        if period.get("status") == "insufficient_history":
-            available_start = str(period.get("start_date") or "-")
-            requested_start = str(period.get("requested_start_date") or "-")
-            rows.append(
-                "| "
-                f"{period_label} | "
-                f"데이터 부족 (요청 {requested_start} / 기록 시작 {available_start}) | "
-                "- | - | - | - |"
-            )
-            continue
         rows.append(
             "| "
             f"{period_label} | "
             f"{_pct(period.get('actual_return'))} | "
+            f"{_return_method_label(period.get('primary_return_method'), period.get('return_method_warning'))} | "
             f"{_pct((period.get('best_excess') or {}).get('excess_return'))} | "
-            f"{_pct((period.get('worst_excess') or {}).get('excess_return'))} | "
             f"{_krw((period.get('best_excess') or {}).get('excess_krw'))} | "
             f"{', '.join(str(item.get('benchmark')) for item in period.get('simple_benchmarks', []) if isinstance(item, Mapping)) or '-'} |"
         )
@@ -206,17 +284,36 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
 
     warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
     warning_lines = [f"- {item}" for item in warnings[:8]] or ["- 특이사항 없음"]
+    hidden_periods = [
+        str(period.get("period") or "-")
+        for period in periods
+        if isinstance(period, Mapping)
+        and (
+            period.get("status") in {"insufficient_history", "duplicate_actual_window"}
+            or period.get("same_actual_window_as")
+        )
+    ]
+    hidden_note = (
+        f"- 별도 표시하지 않은 요청 기간: `{'/'.join(dict.fromkeys(hidden_periods))}` "
+        "(기록 부족 또는 동일 실제 기간)"
+        if hidden_periods
+        else "- 별도 숨긴 요청 기간 없음"
+    )
+    contribution_status = str(reconciliation.get("reconciliation_status") or "UNAVAILABLE")
     return "\n".join(
         [
             "## 계좌 성과 vs 지수/ETF",
             "",
-            f"- 기본 기간: `{summary.get('default_period') or '-'}`",
-            f"- 실제 계좌 수익률: `{_pct(summary.get('actual_return'))}`",
+            f"- 성과 기준 기간: `{summary.get('start_date') or '-'} ~ {summary.get('end_date') or '-'}` "
+            f"(`{summary.get('default_period_label') or summary.get('default_period') or '-'}`)",
+            f"- 계좌 수익률: `{_pct(summary.get('actual_return'))}` "
+            f"({_return_method_label(summary.get('primary_return_method'), summary.get('return_method_warning'))})",
             f"- 최고 초과 기준: `{((summary.get('best_excess') or {}).get('benchmark')) or '-'}` "
             f"({_pct((summary.get('best_excess') or {}).get('excess_return'))})",
             f"- 최저 초과 기준: `{((summary.get('worst_excess') or {}).get('benchmark')) or '-'}` "
             f"({_pct((summary.get('worst_excess') or {}).get('excess_return'))})",
-            f"- 복잡한 운용 프리미엄: `{_krw((summary.get('best_excess') or {}).get('excess_krw'))}`",
+            f"- 참고용 초과손익: `{_krw((summary.get('best_excess') or {}).get('excess_krw'))}`",
+            hidden_note,
             "",
             "### 기간별 비교",
             "",
@@ -228,7 +325,9 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
             f"- 세금: `{_krw(costs.get('taxes_krw'))}`",
             f"- 총 비용: `{_krw(costs.get('total_cost_krw'))}`",
             "",
-            "### 종목별 기여도",
+            "### 보유/실현 손익 기여도",
+            "",
+            f"- 정합성 상태: `{contribution_status}`",
             "",
             *(contribution_rows or ["- 산출 가능한 기여도 데이터가 없습니다."]),
             "",
@@ -543,6 +642,13 @@ def _normalize_ledger_event(row: Mapping[str, Any], *, market: str, source: str)
             "frcr_ccld_amt",
             "ovrs_stck_sll_amt",
             "ovrs_stck_buy_amt",
+            "dpst_amt",
+            "wthdr_amt",
+            "tr_amt",
+            "trns_amt",
+            "cashflow_amount",
+            "dividend_krw",
+            "interest_krw",
             "gross_amount",
         ),
     )
@@ -571,6 +677,7 @@ def _normalize_ledger_event(row: Mapping[str, Any], *, market: str, source: str)
     if realized is not None:
         realized = _to_krw(realized, fx_rate=fx_rate)
     currency = _first_text(row, ("crcy_cd", "tr_crcy_cd", "currency")) or ("USD" if market == "US" else "KRW")
+    event_type = _classify_ledger_event_type(row, side=side)
     return LedgerEvent(
         date=date_text,
         market=market,
@@ -584,7 +691,7 @@ def _normalize_ledger_event(row: Mapping[str, Any], *, market: str, source: str)
         currency=currency,
         fx_rate=fx_rate,
         realized_pnl_krw=realized,
-        event_type="trade" if side in {"BUY", "SELL"} else "cash_or_profit",
+        event_type=event_type.value,
         source=source,
     )
 
@@ -598,9 +705,17 @@ def _load_benchmark_prices(
     start_date: date,
     end_date: date,
     warnings: list[str],
+    provider_status: dict[str, dict[str, Any]],
 ) -> dict[str, list[dict[str, Any]]]:
     prices: dict[str, list[dict[str, Any]]] = {}
     prices.update(_load_local_benchmark_prices(getattr(settings, "price_history_path", None), benchmarks=benchmarks, warnings=warnings))
+    for benchmark in prices:
+        _mark_benchmark_provider_status(
+            provider_status,
+            benchmark,
+            used_provider="local_json",
+            status="ok",
+        )
     missing = [name for name in benchmarks if name not in prices]
 
     if profile.broker == "kis" and missing:
@@ -612,19 +727,31 @@ def _load_benchmark_prices(
                 start_date=start_date,
                 end_date=end_date,
                 warnings=warnings,
+                provider_status=provider_status,
             )
         )
         missing = [name for name in benchmarks if name not in prices]
 
     provider = str(getattr(settings, "price_provider", "yfinance") or "yfinance").strip().lower()
     if provider == "local_json":
+        for benchmark in missing:
+            _mark_benchmark_provider_status(provider_status, benchmark, status="missing")
         return prices
     if provider in {"", "none", "disabled"}:
         if missing:
             warnings.append(f"account_performance_benchmark_missing:{','.join(missing)}")
+        for benchmark in missing:
+            _mark_benchmark_provider_status(provider_status, benchmark, status="missing")
         return prices
     if provider != "yfinance":
         warnings.append(f"account_performance_price_provider_unsupported:{provider}")
+        for benchmark in missing:
+            _mark_benchmark_provider_status(
+                provider_status,
+                benchmark,
+                status="missing",
+                warning=f"unsupported_provider:{provider}",
+            )
         return prices
 
     if missing:
@@ -635,9 +762,62 @@ def _load_benchmark_prices(
                 start_date=start_date,
                 end_date=end_date,
                 warnings=warnings,
+                provider_status=provider_status,
             )
         )
+    for benchmark in benchmarks:
+        if benchmark not in prices:
+            _mark_benchmark_provider_status(provider_status, benchmark, status="missing")
     return prices
+
+
+def _initial_benchmark_provider_status(
+    *,
+    profile: PortfolioProfile,
+    settings: Any,
+    benchmarks: tuple[str, ...],
+) -> dict[str, dict[str, Any]]:
+    configured = str(getattr(settings, "price_provider", "yfinance") or "yfinance").strip().lower()
+    if getattr(settings, "price_history_path", None):
+        preferred = "local_json"
+    elif profile.broker == "kis":
+        preferred = "kis"
+    else:
+        preferred = configured
+    return {
+        benchmark: {
+            "preferred_provider": preferred,
+            "used_provider": None,
+            "status": "pending",
+            "warnings": [],
+        }
+        for benchmark in benchmarks
+    }
+
+
+def _mark_benchmark_provider_status(
+    provider_status: dict[str, dict[str, Any]],
+    benchmark: str,
+    *,
+    used_provider: str | None = None,
+    status: str | None = None,
+    warning: str | None = None,
+) -> None:
+    item = provider_status.setdefault(
+        benchmark,
+        {"preferred_provider": None, "used_provider": None, "status": "pending", "warnings": []},
+    )
+    if used_provider:
+        item["used_provider"] = used_provider
+    if status:
+        if status == "ok" and item.get("warnings") and item.get("preferred_provider") != used_provider:
+            item["status"] = "fallback"
+        else:
+            item["status"] = status
+    if warning:
+        warnings = list(item.get("warnings")) if isinstance(item.get("warnings"), list) else []
+        warnings.append(_short_error(warning))
+        item["warnings"] = list(dict.fromkeys(warnings))
 
 
 def _load_local_benchmark_prices(
@@ -680,6 +860,7 @@ def _fetch_kis_benchmark_prices(
     start_date: date,
     end_date: date,
     warnings: list[str],
+    provider_status: dict[str, dict[str, Any]],
 ) -> dict[str, list[dict[str, Any]]]:
     try:
         from tradingagents.portfolio.kis import KisClient
@@ -687,6 +868,13 @@ def _fetch_kis_benchmark_prices(
         client = KisClient.from_api_keys(environment=profile.broker_environment)
     except Exception as exc:
         warnings.append(f"account_performance_kis_benchmark_unavailable:{_short_error(exc)}")
+        for benchmark in benchmarks:
+            _mark_benchmark_provider_status(
+                provider_status,
+                benchmark,
+                status="unavailable",
+                warning=f"kis_unavailable:{_short_error(exc)}",
+            )
         return {}
 
     result: dict[str, list[dict[str, Any]]] = {}
@@ -712,8 +900,20 @@ def _fetch_kis_benchmark_prices(
             normalized = _normalize_price_rows(rows)
             if normalized:
                 result[benchmark] = normalized
+                _mark_benchmark_provider_status(
+                    provider_status,
+                    benchmark,
+                    used_provider="kis",
+                    status="ok",
+                )
         except Exception as exc:
             warnings.append(f"account_performance_kis_benchmark_failed:{benchmark}:{_short_error(exc)}")
+            _mark_benchmark_provider_status(
+                provider_status,
+                benchmark,
+                status="failed",
+                warning=f"kis_failed:{_short_error(exc)}",
+            )
     return result
 
 
@@ -724,11 +924,19 @@ def _fetch_yfinance_benchmark_prices(
     start_date: date,
     end_date: date,
     warnings: list[str],
+    provider_status: dict[str, dict[str, Any]],
 ) -> dict[str, list[dict[str, Any]]]:
     try:
         import yfinance as yf
     except Exception as exc:
         warnings.append(f"account_performance_yfinance_unavailable:{_short_error(exc)}")
+        for benchmark in benchmarks:
+            _mark_benchmark_provider_status(
+                provider_status,
+                benchmark,
+                status="unavailable",
+                warning=f"yfinance_unavailable:{_short_error(exc)}",
+            )
         return {}
     result: dict[str, list[dict[str, Any]]] = {}
     for benchmark in benchmarks:
@@ -746,13 +954,31 @@ def _fetch_yfinance_benchmark_prices(
             )
         except Exception as exc:
             warnings.append(f"account_performance_yfinance_failed:{benchmark}:{_short_error(exc)}")
+            _mark_benchmark_provider_status(
+                provider_status,
+                benchmark,
+                status="failed",
+                warning=f"yfinance_failed:{_short_error(exc)}",
+            )
             continue
         if data is None or getattr(data, "empty", True):
             warnings.append(f"account_performance_yfinance_empty:{benchmark}")
+            _mark_benchmark_provider_status(
+                provider_status,
+                benchmark,
+                status="empty",
+                warning="yfinance_empty",
+            )
             continue
         close = data.get("Close")
         if close is None:
             warnings.append(f"account_performance_yfinance_no_close:{benchmark}")
+            _mark_benchmark_provider_status(
+                provider_status,
+                benchmark,
+                status="failed",
+                warning="yfinance_no_close",
+            )
             continue
         if hasattr(close, "columns"):
             close = close.iloc[:, 0]
@@ -764,6 +990,14 @@ def _fetch_yfinance_benchmark_prices(
             rows.append({"date": str(getattr(index, "date", lambda: index)())[:10], "close": numeric})
         if rows:
             result[benchmark] = rows
+            previous = provider_status.get(benchmark) or {}
+            status = "fallback" if previous.get("warnings") else "ok"
+            _mark_benchmark_provider_status(
+                provider_status,
+                benchmark,
+                used_provider="yfinance",
+                status=status,
+            )
     return result
 
 
@@ -771,44 +1005,25 @@ def _compute_periods(
     *,
     snapshot_rows: list[dict[str, Any]],
     ledger_events: list[LedgerEvent],
+    cashflow_events: list[CashflowEvent],
     benchmark_prices: dict[str, list[dict[str, Any]]],
     period_names: tuple[str, ...],
     end_date: date,
+    min_coverage_ratio: float,
     warnings: list[str],
 ) -> list[dict[str, Any]]:
     periods: list[dict[str, Any]] = []
     if len(snapshot_rows) < 2:
         return periods
     first_available_start = _parse_date(str(snapshot_rows[0].get("date") or ""))
+    end_snapshot = _last_snapshot_on_or_before(snapshot_rows, end_date)
+    actual_end_date = _parse_date(str(end_snapshot.get("date"))) if end_snapshot else None
+    if end_snapshot is None or actual_end_date is None:
+        return periods
     for period_name in period_names:
         start_boundary = _period_start(period_name, end_date=end_date, snapshot_rows=snapshot_rows)
-        if (
-            str(period_name or "").strip().upper() != "ALL"
-            and first_available_start is not None
-            and start_boundary < first_available_start
-        ):
-            end_snapshot = _last_snapshot_on_or_before(snapshot_rows, end_date)
-            if not end_snapshot or first_available_start >= (_parse_date(str(end_snapshot.get("date"))) or end_date):
-                warnings.append(f"account_performance_period_partial:{period_name}")
-                continue
-            reason = (
-                f"requested_start={start_boundary.isoformat()}:"
-                f"available_start={first_available_start.isoformat()}"
-            )
-            warnings.append(f"account_performance_period_insufficient_history:{period_name}:{reason}")
-            periods.append(
-                _insufficient_history_period(
-                    period_name=period_name,
-                    requested_start=start_boundary,
-                    available_start=first_available_start,
-                    end_date=_parse_date(str(end_snapshot.get("date"))) or end_date,
-                    reason=reason,
-                )
-            )
-            continue
         start_snapshot = _first_snapshot_on_or_after(snapshot_rows, start_boundary)
-        end_snapshot = _last_snapshot_on_or_before(snapshot_rows, end_date)
-        if not start_snapshot or not end_snapshot or start_snapshot["date"] >= end_snapshot["date"]:
+        if not start_snapshot or start_snapshot["date"] >= end_snapshot["date"]:
             warnings.append(f"account_performance_period_partial:{period_name}")
             continue
         start_value = float(start_snapshot["account_value_krw"])
@@ -816,9 +1031,16 @@ def _compute_periods(
         if start_value <= 0:
             warnings.append(f"account_performance_period_invalid_start_value:{period_name}")
             continue
-        actual_return = (end_value - start_value) / start_value
         start = _parse_date(str(start_snapshot["date"])) or start_boundary
-        end = _parse_date(str(end_snapshot["date"])) or end_date
+        end = actual_end_date
+        coverage = _build_period_coverage(
+            period_name=period_name,
+            requested_start=start_boundary,
+            actual_start=start,
+            end=end,
+            requested_end=end_date,
+            min_coverage_ratio=min_coverage_ratio,
+        )
         partial_reasons = []
         if start > start_boundary:
             partial_reasons.append(f"requested_start={start_boundary.isoformat()}:actual_start={start.isoformat()}")
@@ -826,43 +1048,115 @@ def _compute_periods(
             partial_reasons.append(f"requested_end={end_date.isoformat()}:actual_end={end.isoformat()}")
         if partial_reasons:
             warnings.append(f"account_performance_period_partial:{period_name}:{';'.join(partial_reasons)}")
+        insufficient_reason = _period_insufficient_reason(
+            period_name=period_name,
+            requested_start=start_boundary,
+            actual_start=start,
+            coverage=coverage,
+            min_coverage_ratio=min_coverage_ratio,
+            first_available_start=first_available_start,
+        )
+        if insufficient_reason:
+            reason = (
+                f"requested_start={start_boundary.isoformat()}:"
+                f"available_start={start.isoformat()}:"
+                f"coverage_ratio={_coverage_ratio_text(coverage.coverage_ratio)}:"
+                f"reason={insufficient_reason}"
+            )
+            warnings.append(f"account_performance_period_insufficient_history:{period_name}:{reason}")
+            periods.append(
+                _insufficient_history_period(
+                    period_name=period_name,
+                    requested_start=start_boundary,
+                    available_start=start,
+                    end_date=end,
+                    reason=reason,
+                    coverage=coverage,
+                )
+            )
+            continue
+        return_profile = _period_return_profile(
+            period_name=period_name,
+            snapshot_rows=snapshot_rows,
+            ledger_events=ledger_events,
+            cashflow_events=cashflow_events,
+            start_date=start,
+            end_date=end,
+            start_value=start_value,
+            end_value=end_value,
+        )
+        primary_return = _float_or_none(return_profile.get("primary_return"))
+        if primary_return is None:
+            warnings.append(f"account_performance_period_return_unavailable:{period_name}")
+            continue
+        if return_profile.get("return_method_warning"):
+            warnings.append(f"account_performance_{return_profile['return_method_warning']}:{period_name}")
         simple_rows: list[dict[str, Any]] = []
         cashflow_rows: list[dict[str, Any]] = []
+        benchmark_cashflow_available = not _has_unknown_material_ledger_events(
+            ledger_events,
+            start_date=start,
+            end_date=end,
+        )
+        if not benchmark_cashflow_available:
+            warnings.append(f"account_performance_benchmark_cashflow_unavailable:{period_name}:unknown_ledger_events")
         for benchmark, series in benchmark_prices.items():
             simple = _benchmark_simple_return(series, start_date=start, end_date=end)
             if simple is None:
                 warnings.append(f"account_performance_benchmark_period_missing:{period_name}:{benchmark}")
                 continue
-            excess = actual_return - simple
+            excess = primary_return - simple
             simple_rows.append(
                 {
                     "benchmark": benchmark,
                     "benchmark_return": round(simple, 6),
                     "excess_return": round(excess, 6),
                     "excess_krw": int(round(excess * start_value)),
+                    "comparison_basis": "simple_period_return",
                 }
             )
-            simulated = _benchmark_cashflow_return(
-                series,
-                ledger_events=ledger_events,
-                start_date=start,
-                end_date=end,
-                start_value=start_value,
-            )
-            if simulated is not None:
-                cf_excess = actual_return - simulated
-                cashflow_rows.append(
-                    {
-                        "benchmark": benchmark,
-                        "benchmark_return": round(simulated, 6),
-                        "excess_return": round(cf_excess, 6),
-                        "excess_krw": int(round(cf_excess * start_value)),
-                    }
+            if benchmark_cashflow_available:
+                simulated = benchmark_same_cashflow_return(
+                    series,
+                    external_cashflows=cashflow_events,
+                    start_date=start,
+                    end_date=end,
+                    start_value=start_value,
                 )
+                if simulated is not None:
+                    cf_excess = primary_return - simulated
+                    capital_flow_count = len(
+                        [
+                            event
+                            for event in cashflow_events
+                            if event.capital_flow
+                            and (event_date := _parse_date(event.date)) is not None
+                            and start <= event_date <= end
+                        ]
+                    )
+                    basis = "external_cashflows" if capital_flow_count else "no_external_cashflows"
+                    reliability = "reference" if return_profile.get("return_method_warning") else "reliable"
+                    cashflow_rows.append(
+                        {
+                            "benchmark": benchmark,
+                            "benchmark_return": round(simulated, 6),
+                            "excess_return": round(cf_excess, 6),
+                            "excess_krw": int(round(cf_excess * start_value)),
+                            "cashflow_event_count": capital_flow_count,
+                            "comparison_basis": basis,
+                            "reliability": reliability,
+                        }
+                    )
         all_rows = simple_rows or cashflow_rows
         best = max(all_rows, key=lambda item: float(item["excess_return"])) if all_rows else None
         worst = min(all_rows, key=lambda item: float(item["excess_return"])) if all_rows else None
         period_values = _snapshot_values_between(snapshot_rows, start, end)
+        coverage_payload = _replace_period_coverage(
+            coverage,
+            is_partial=bool(partial_reasons),
+            is_summary_eligible=coverage.is_summary_eligible and not partial_reasons,
+            insufficient_reason=None,
+        ).to_public_dict()
         periods.append(
             {
                 "period": period_name,
@@ -873,16 +1167,244 @@ def _compute_periods(
                 "partial_reasons": partial_reasons,
                 "actual_start_value_krw": int(round(start_value)),
                 "actual_end_value_krw": int(round(end_value)),
-                "actual_return": round(actual_return, 6),
+                "simple_nav_return": _round_or_none(return_profile.get("simple_nav_return")),
+                "twr_return": _round_or_none(return_profile.get("twr_return")),
+                "mwr_return": None,
+                "primary_return": _round_or_none(return_profile.get("primary_return")),
+                "primary_return_method": return_profile.get("primary_return_method"),
+                "return_method_warning": return_profile.get("return_method_warning"),
+                "actual_return": _round_or_none(return_profile.get("primary_return")),
                 "mdd": _max_drawdown(period_values),
                 "volatility": _volatility(period_values),
+                "period_coverage": coverage_payload,
                 "simple_benchmarks": simple_rows,
                 "cashflow_benchmarks": cashflow_rows,
                 "best_excess": best or {},
                 "worst_excess": worst or {},
             }
         )
+    _mark_duplicate_actual_windows(periods, warnings=warnings)
     return periods
+
+
+def _build_period_coverage(
+    *,
+    period_name: str,
+    requested_start: date,
+    actual_start: date | None,
+    end: date | None,
+    requested_end: date,
+    min_coverage_ratio: float,
+) -> PeriodCoverage:
+    requested_days = max(0, (requested_end - requested_start).days) if requested_end >= requested_start else None
+    actual_days = (
+        max(0, (end - actual_start).days)
+        if actual_start is not None and end is not None and end >= actual_start
+        else None
+    )
+    if str(period_name or "").strip().upper() == "ALL":
+        requested_days = actual_days
+    coverage_ratio = (
+        float(actual_days) / float(requested_days)
+        if actual_days is not None and requested_days not in (None, 0)
+        else None
+    )
+    is_partial = bool(
+        actual_start is None
+        or end is None
+        or actual_start > requested_start
+        or end < requested_end
+        or (coverage_ratio is not None and coverage_ratio < 1.0)
+    )
+    insufficient_reason = None
+    is_summary_eligible = True
+    if coverage_ratio is not None and coverage_ratio < min_coverage_ratio:
+        insufficient_reason = "coverage below minimum threshold"
+        is_summary_eligible = False
+    if str(period_name or "").strip().upper() == "ALL":
+        is_partial = False
+        insufficient_reason = None
+        is_summary_eligible = actual_days is not None and actual_days > 0
+    return PeriodCoverage(
+        period=str(period_name),
+        requested_start_date=requested_start,
+        actual_start_date=actual_start,
+        end_date=end,
+        requested_days=requested_days,
+        actual_days=actual_days,
+        coverage_ratio=coverage_ratio,
+        is_partial=is_partial,
+        same_actual_window_as=None,
+        is_summary_eligible=is_summary_eligible,
+        insufficient_reason=insufficient_reason,
+    )
+
+
+def _replace_period_coverage(
+    coverage: PeriodCoverage,
+    *,
+    is_partial: bool | None = None,
+    same_actual_window_as: str | None = None,
+    is_summary_eligible: bool | None = None,
+    insufficient_reason: str | None = None,
+) -> PeriodCoverage:
+    return PeriodCoverage(
+        period=coverage.period,
+        requested_start_date=coverage.requested_start_date,
+        actual_start_date=coverage.actual_start_date,
+        end_date=coverage.end_date,
+        requested_days=coverage.requested_days,
+        actual_days=coverage.actual_days,
+        coverage_ratio=coverage.coverage_ratio,
+        is_partial=coverage.is_partial if is_partial is None else is_partial,
+        same_actual_window_as=same_actual_window_as,
+        is_summary_eligible=coverage.is_summary_eligible if is_summary_eligible is None else is_summary_eligible,
+        insufficient_reason=insufficient_reason,
+    )
+
+
+def _period_insufficient_reason(
+    *,
+    period_name: str,
+    requested_start: date,
+    actual_start: date,
+    coverage: PeriodCoverage,
+    min_coverage_ratio: float,
+    first_available_start: date | None,
+) -> str | None:
+    if str(period_name or "").strip().upper() == "ALL":
+        return None
+    if first_available_start is not None and requested_start < first_available_start:
+        return "account history starts after requested period start"
+    if actual_start > requested_start and coverage.coverage_ratio is not None and coverage.coverage_ratio < min_coverage_ratio:
+        return "nearest usable snapshot is after requested period start"
+    if coverage.coverage_ratio is not None and coverage.coverage_ratio < min_coverage_ratio:
+        return "coverage below minimum threshold"
+    return None
+
+
+def _coverage_ratio_text(value: float | None) -> str:
+    return "-" if value is None else f"{value:.6f}"
+
+
+def _round_or_none(value: Any, digits: int = 6) -> float | None:
+    number = _float_or_none(value)
+    return round(number, digits) if number is not None else None
+
+
+def _mark_duplicate_actual_windows(periods: list[dict[str, Any]], *, warnings: list[str]) -> None:
+    by_window: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for period in periods:
+        start = str(period.get("start_date") or "")
+        end = str(period.get("end_date") or "")
+        if start and end:
+            by_window.setdefault((start, end), []).append(period)
+
+    for grouped in by_window.values():
+        if len(grouped) < 2:
+            continue
+        canonical = _duplicate_window_canonical_period(grouped)
+        canonical_label = _period_summary_label(canonical)
+        duplicates: list[str] = []
+        for period in grouped:
+            if period is canonical:
+                coverage = _period_coverage_from_payload(period.get("period_coverage"))
+                if coverage:
+                    period["period_coverage"] = _replace_period_coverage(
+                        coverage,
+                        same_actual_window_as=None,
+                        is_summary_eligible=bool(period.get("actual_return") is not None),
+                    ).to_public_dict()
+                continue
+            duplicates.append(str(period.get("period") or "-"))
+            coverage = _period_coverage_from_payload(period.get("period_coverage"))
+            if coverage:
+                period["period_coverage"] = _replace_period_coverage(
+                    coverage,
+                    same_actual_window_as=canonical_label,
+                    is_summary_eligible=False,
+                    insufficient_reason=f"same actual window as {canonical_label}",
+                    is_partial=True,
+                ).to_public_dict()
+            period["same_actual_window_as"] = canonical_label
+            had_return = _float_or_none(period.get("actual_return")) is not None
+            if had_return:
+                period["raw_duplicate_result"] = {
+                    "actual_return": period.get("actual_return"),
+                    "simple_nav_return": period.get("simple_nav_return"),
+                    "twr_return": period.get("twr_return"),
+                    "primary_return": period.get("primary_return"),
+                    "primary_return_method": period.get("primary_return_method"),
+                    "mdd": period.get("mdd"),
+                    "volatility": period.get("volatility"),
+                    "simple_benchmarks": period.get("simple_benchmarks") or [],
+                    "cashflow_benchmarks": period.get("cashflow_benchmarks") or [],
+                    "best_excess": period.get("best_excess") or {},
+                    "worst_excess": period.get("worst_excess") or {},
+                }
+            period.update(
+                {
+                    "status": "duplicate_actual_window" if had_return else period.get("status", "duplicate_actual_window"),
+                    "partial": True,
+                    "actual_return": None,
+                    "primary_return": None,
+                    "mdd": None,
+                    "volatility": None,
+                    "simple_benchmarks": [],
+                    "cashflow_benchmarks": [],
+                    "best_excess": {},
+                    "worst_excess": {},
+                }
+            )
+            reason = f"same_actual_window_as={canonical_label}"
+            partial_reasons = list(period.get("partial_reasons")) if isinstance(period.get("partial_reasons"), list) else []
+            if reason not in {str(item) for item in partial_reasons}:
+                partial_reasons.append(reason)
+            period["partial_reasons"] = partial_reasons
+        if duplicates:
+            warnings.append(
+                "account_performance_duplicate_actual_windows:"
+                f"{canonical_label}:{','.join(sorted(dict.fromkeys(duplicates)))}"
+            )
+
+
+def _duplicate_window_canonical_period(periods: list[dict[str, Any]]) -> dict[str, Any]:
+    for period in periods:
+        if str(period.get("period") or "").strip().upper() == "ALL":
+            return period
+    eligible = [
+        period
+        for period in periods
+        if _float_or_none(period.get("actual_return")) is not None
+        and ((period.get("period_coverage") or {}).get("is_summary_eligible") if isinstance(period.get("period_coverage"), dict) else True)
+    ]
+    candidates = eligible or periods
+    return max(candidates, key=lambda item: int(((item.get("period_coverage") or {}).get("actual_days") or 0) if isinstance(item.get("period_coverage"), dict) else 0))
+
+
+def _period_summary_label(period: Mapping[str, Any]) -> str:
+    return "ALL_AVAILABLE" if str(period.get("period") or "").strip().upper() == "ALL" else str(period.get("period") or "-")
+
+
+def _period_coverage_from_payload(value: Any) -> PeriodCoverage | None:
+    if not isinstance(value, Mapping):
+        return None
+    requested = _parse_date(str(value.get("requested_start_date") or ""))
+    if requested is None:
+        return None
+    return PeriodCoverage(
+        period=str(value.get("period") or ""),
+        requested_start_date=requested,
+        actual_start_date=_parse_date(str(value.get("actual_start_date") or "")),
+        end_date=_parse_date(str(value.get("end_date") or "")),
+        requested_days=_int_or_none(value.get("requested_days")),
+        actual_days=_int_or_none(value.get("actual_days")),
+        coverage_ratio=_float_or_none(value.get("coverage_ratio")),
+        is_partial=bool(value.get("is_partial")),
+        same_actual_window_as=str(value.get("same_actual_window_as") or "") or None,
+        is_summary_eligible=bool(value.get("is_summary_eligible")),
+        insufficient_reason=str(value.get("insufficient_reason") or "") or None,
+    )
 
 
 def _insufficient_history_period(
@@ -892,7 +1414,30 @@ def _insufficient_history_period(
     available_start: date,
     end_date: date,
     reason: str,
+    coverage: PeriodCoverage | None = None,
 ) -> dict[str, Any]:
+    coverage_payload = (
+        _replace_period_coverage(
+            coverage,
+            is_partial=True,
+            is_summary_eligible=False,
+            insufficient_reason=coverage.insufficient_reason or "account history starts after requested period start",
+        ).to_public_dict()
+        if coverage
+        else PeriodCoverage(
+            period=period_name,
+            requested_start_date=requested_start,
+            actual_start_date=available_start,
+            end_date=end_date,
+            requested_days=max(0, (end_date - requested_start).days),
+            actual_days=max(0, (end_date - available_start).days),
+            coverage_ratio=None,
+            is_partial=True,
+            same_actual_window_as=None,
+            is_summary_eligible=False,
+            insufficient_reason="account history starts after requested period start",
+        ).to_public_dict()
+    )
     return {
         "period": period_name,
         "requested_start_date": requested_start.isoformat(),
@@ -903,9 +1448,16 @@ def _insufficient_history_period(
         "status": "insufficient_history",
         "actual_start_value_krw": None,
         "actual_end_value_krw": None,
+        "simple_nav_return": None,
+        "twr_return": None,
+        "mwr_return": None,
+        "primary_return": None,
+        "primary_return_method": "insufficient_history",
+        "return_method_warning": "insufficient_history",
         "actual_return": None,
         "mdd": None,
         "volatility": None,
+        "period_coverage": coverage_payload,
         "simple_benchmarks": [],
         "cashflow_benchmarks": [],
         "best_excess": {},
@@ -917,20 +1469,41 @@ def _build_chart_data(
     *,
     snapshot_rows: list[dict[str, Any]],
     benchmark_prices: dict[str, list[dict[str, Any]]],
+    cashflow_events: list[CashflowEvent],
+    summary: Mapping[str, Any],
 ) -> dict[str, Any]:
     if not snapshot_rows:
         return {"series": []}
     start_value = float(snapshot_rows[0].get("account_value_krw") or 0.0)
+    return_method = str(summary.get("primary_return_method") or "simple_nav")
+    use_twr = return_method == "twr"
     benchmark_start = {
         name: _price_on_or_after(rows, _parse_date(str(snapshot_rows[0].get("date"))) or date.today())
         for name, rows in benchmark_prices.items()
     }
     series = []
+    cumulative_twr = 0.0
+    previous_row: dict[str, Any] | None = None
     for row in snapshot_rows:
         row_date = _parse_date(str(row.get("date"))) or date.today()
         item: dict[str, Any] = {"date": row_date.isoformat()}
         value = float(row.get("account_value_krw") or 0.0)
-        item["account_return"] = round((value - start_value) / start_value, 6) if start_value > 0 else None
+        if use_twr and previous_row is not None:
+            previous_date = _parse_date(str(previous_row.get("date") or ""))
+            previous_value = _float_or_none(previous_row.get("account_value_krw"))
+            if previous_date is not None and previous_value and previous_value > 0:
+                flow_sum = sum(
+                    event.amount_krw
+                    for event in cashflow_events
+                    if event.capital_flow
+                    and (event_date := _parse_date(event.date)) is not None
+                    and previous_date < event_date <= row_date
+                )
+                interval_return = (value - flow_sum - previous_value) / previous_value
+                cumulative_twr = (1.0 + cumulative_twr) * (1.0 + interval_return) - 1.0
+            item["account_return"] = round(cumulative_twr, 6)
+        else:
+            item["account_return"] = round((value - start_value) / start_value, 6) if start_value > 0 else None
         for name, rows in benchmark_prices.items():
             start_price = benchmark_start.get(name)
             current_price = _price_on_or_before(rows, row_date)
@@ -940,7 +1513,37 @@ def _build_chart_data(
                 else None
             )
         series.append(item)
-    return {"series": series, "benchmarks": list(benchmark_prices)}
+        previous_row = row
+    return {
+        "series": series,
+        "benchmarks": list(benchmark_prices),
+        "return_method": return_method,
+        "coverage": summary.get("period_coverage") or {},
+        "title": _chart_title(summary),
+    }
+
+
+def _chart_title(summary: Mapping[str, Any]) -> str:
+    method_label = _return_method_label(summary.get("primary_return_method"), summary.get("return_method_warning"))
+    is_available_history = str(summary.get("default_period") or "") == "ALL_AVAILABLE"
+    period_label = "사용 가능 기간" if is_available_history else str(summary.get("default_period_label") or summary.get("default_period") or "기간")
+    return f"{period_label} 수익률 ({method_label})"
+
+
+def _return_method_label(method: Any, warning: Any = None) -> str:
+    method_text = str(method or "").strip().lower()
+    warning_text = str(warning or "").strip().lower()
+    if method_text == "twr":
+        return "현금흐름 보정 TWR"
+    if method_text == "mwr":
+        return "현금흐름 보정 MWR"
+    if warning_text == "cashflow_adjustment_unavailable" or method_text == "simple_nav_unadjusted":
+        return "현금흐름 미보정 단순 NAV 기준"
+    if method_text == "available_history_simple_nav":
+        return "사용 가능 기간 단순 NAV 기준"
+    if method_text == "insufficient_history":
+        return "기간 데이터 부족"
+    return "단순 NAV 기준"
 
 
 def _contribution_by_ticker(*, snapshot: AccountSnapshot, ledger_events: list[LedgerEvent]) -> list[dict[str, Any]]:
@@ -978,23 +1581,326 @@ def _cost_summary(ledger_events: list[LedgerEvent]) -> dict[str, int]:
     }
 
 
+def _cashflow_events_from_ledger(ledger_events: list[LedgerEvent]) -> list[CashflowEvent]:
+    events: list[CashflowEvent] = []
+    for event in ledger_events:
+        try:
+            event_type = LedgerEventType(str(event.event_type or LedgerEventType.UNKNOWN.value))
+        except ValueError:
+            event_type = LedgerEventType.UNKNOWN
+        amount = _cashflow_amount_krw(event, event_type)
+        if amount is None:
+            continue
+        events.append(
+            CashflowEvent(
+                date=event.date,
+                event_type=event_type.value,
+                amount_krw=float(amount),
+                capital_flow=event_type in {LedgerEventType.DEPOSIT, LedgerEventType.WITHDRAWAL},
+                performance_flow=event_type
+                in {
+                    LedgerEventType.DEPOSIT,
+                    LedgerEventType.WITHDRAWAL,
+                    LedgerEventType.DIVIDEND,
+                    LedgerEventType.INTEREST,
+                    LedgerEventType.FEE,
+                    LedgerEventType.TAX,
+                },
+                source=event.source,
+            )
+        )
+    return sorted(events, key=lambda item: item.date)
+
+
+def _cashflow_amount_krw(event: LedgerEvent, event_type: LedgerEventType) -> float | None:
+    if event_type == LedgerEventType.DEPOSIT:
+        return abs(float(event.gross_amount_krw))
+    if event_type == LedgerEventType.WITHDRAWAL:
+        return -abs(float(event.gross_amount_krw))
+    if event_type in {LedgerEventType.DIVIDEND, LedgerEventType.INTEREST}:
+        amount = event.gross_amount_krw if event.gross_amount_krw else event.realized_pnl_krw
+        return abs(float(amount or 0.0))
+    if event_type == LedgerEventType.FEE:
+        amount = event.fee_krw if event.fee_krw else event.gross_amount_krw
+        return -abs(float(amount or 0.0))
+    if event_type == LedgerEventType.TAX:
+        amount = event.tax_krw if event.tax_krw else event.gross_amount_krw
+        return -abs(float(amount or 0.0))
+    if event_type == LedgerEventType.UNKNOWN and abs(float(event.gross_amount_krw or 0.0)) > 0:
+        return float(event.gross_amount_krw)
+    return None
+
+
+def _period_return_profile(
+    *,
+    period_name: str,
+    snapshot_rows: list[dict[str, Any]],
+    ledger_events: list[LedgerEvent],
+    cashflow_events: list[CashflowEvent],
+    start_date: date,
+    end_date: date,
+    start_value: float,
+    end_value: float,
+) -> dict[str, Any]:
+    simple_nav_return = (end_value - start_value) / start_value if start_value > 0 else None
+    if simple_nav_return is None:
+        return {
+            "simple_nav_return": None,
+            "twr_return": None,
+            "primary_return": None,
+            "primary_return_method": "unavailable",
+            "return_method_warning": "invalid_start_nav",
+        }
+
+    unknown_material = _has_unknown_material_ledger_events(ledger_events, start_date=start_date, end_date=end_date)
+    capital_flows = _cashflows_between(cashflow_events, start_date=start_date, end_date=end_date, capital_only=True)
+    if unknown_material:
+        return {
+            "simple_nav_return": simple_nav_return,
+            "twr_return": None,
+            "primary_return": simple_nav_return,
+            "primary_return_method": "simple_nav_unadjusted",
+            "return_method_warning": "cashflow_adjustment_unavailable",
+        }
+    if capital_flows:
+        twr_return = _cashflow_adjusted_twr_return(
+            snapshot_rows=snapshot_rows,
+            cashflow_events=capital_flows,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        if twr_return is not None:
+            return {
+                "simple_nav_return": simple_nav_return,
+                "twr_return": twr_return,
+                "primary_return": twr_return,
+                "primary_return_method": "twr",
+                "return_method_warning": None,
+            }
+        return {
+            "simple_nav_return": simple_nav_return,
+            "twr_return": None,
+            "primary_return": simple_nav_return,
+            "primary_return_method": "simple_nav_unadjusted",
+            "return_method_warning": "cashflow_adjustment_unavailable",
+        }
+
+    method = "available_history_simple_nav" if str(period_name or "").strip().upper() == "ALL" else "simple_nav"
+    return {
+        "simple_nav_return": simple_nav_return,
+        "twr_return": None,
+        "primary_return": simple_nav_return,
+        "primary_return_method": method,
+        "return_method_warning": None,
+    }
+
+
+def _cashflow_adjusted_twr_return(
+    *,
+    snapshot_rows: list[dict[str, Any]],
+    cashflow_events: list[CashflowEvent],
+    start_date: date,
+    end_date: date,
+) -> float | None:
+    rows = [
+        row
+        for row in snapshot_rows
+        if (row_date := _parse_date(str(row.get("date") or ""))) is not None and start_date <= row_date <= end_date
+    ]
+    if len(rows) < 2:
+        return None
+    cumulative = 1.0
+    for previous, current in zip(rows, rows[1:]):
+        previous_date = _parse_date(str(previous.get("date") or ""))
+        current_date = _parse_date(str(current.get("date") or ""))
+        previous_value = _float_or_none(previous.get("account_value_krw"))
+        current_value = _float_or_none(current.get("account_value_krw"))
+        if previous_date is None or current_date is None or previous_value is None or current_value is None or previous_value <= 0:
+            return None
+        flow_sum = sum(
+            event.amount_krw
+            for event in cashflow_events
+            if (event_date := _parse_date(event.date)) is not None and previous_date < event_date <= current_date
+        )
+        interval_return = (current_value - flow_sum - previous_value) / previous_value
+        cumulative *= 1.0 + interval_return
+    return cumulative - 1.0
+
+
+def _cashflows_between(
+    cashflow_events: list[CashflowEvent],
+    *,
+    start_date: date,
+    end_date: date,
+    capital_only: bool = False,
+) -> list[CashflowEvent]:
+    rows = []
+    for event in cashflow_events:
+        event_date = _parse_date(event.date)
+        if event_date is None or event_date < start_date or event_date > end_date:
+            continue
+        if capital_only and not event.capital_flow:
+            continue
+        rows.append(event)
+    return rows
+
+
+def _has_unknown_material_ledger_events(
+    ledger_events: list[LedgerEvent],
+    *,
+    start_date: date,
+    end_date: date,
+) -> bool:
+    for event in ledger_events:
+        event_date = _parse_date(event.date)
+        if event_date is None or event_date < start_date or event_date > end_date:
+            continue
+        if str(event.event_type or "").lower() != LedgerEventType.UNKNOWN.value:
+            continue
+        if abs(float(event.gross_amount_krw or 0.0)) > 0:
+            return True
+    return False
+
+
+def reconcile_account_performance(
+    *,
+    snapshot_rows: list[dict[str, Any]],
+    ledger_events: list[LedgerEvent],
+    contribution_rows: list[dict[str, Any]],
+    warnings: list[str] | None = None,
+) -> dict[str, Any]:
+    if len(snapshot_rows) < 2:
+        return {
+            "start_nav_krw": None,
+            "end_nav_krw": None,
+            "simple_nav_pnl_krw": None,
+            "sum_position_contribution_krw": None,
+            "external_cashflow_net_krw": None,
+            "fees_taxes_krw": None,
+            "unexplained_difference_krw": None,
+            "unexplained_difference_pct_of_nav": None,
+            "reconciliation_status": "UNAVAILABLE",
+        }
+    start_nav = _float_or_none(snapshot_rows[0].get("account_value_krw"))
+    end_nav = _float_or_none(snapshot_rows[-1].get("account_value_krw"))
+    if start_nav is None or end_nav is None:
+        return {
+            "start_nav_krw": None,
+            "end_nav_krw": None,
+            "simple_nav_pnl_krw": None,
+            "sum_position_contribution_krw": None,
+            "external_cashflow_net_krw": None,
+            "fees_taxes_krw": None,
+            "unexplained_difference_krw": None,
+            "unexplained_difference_pct_of_nav": None,
+            "reconciliation_status": "UNAVAILABLE",
+        }
+
+    cashflow_events = _cashflow_events_from_ledger(ledger_events)
+    unknown_material = any(
+        str(event.event_type or "").lower() == LedgerEventType.UNKNOWN.value
+        and abs(float(event.gross_amount_krw or 0.0)) > 0
+        for event in ledger_events
+    )
+    external_cashflow_net = (
+        None
+        if unknown_material
+        else sum(
+            event.amount_krw
+            for event in cashflow_events
+            if event.event_type
+            in {
+                LedgerEventType.DEPOSIT.value,
+                LedgerEventType.WITHDRAWAL.value,
+                LedgerEventType.DIVIDEND.value,
+                LedgerEventType.INTEREST.value,
+            }
+        )
+    )
+    simple_nav_pnl = end_nav - start_nav
+    contribution_sum = sum(
+        float(item.get("total_contribution_krw") or 0.0)
+        for item in contribution_rows
+        if isinstance(item, Mapping)
+    )
+    fees_taxes = sum(float(event.fee_krw or 0.0) + float(event.tax_krw or 0.0) for event in ledger_events)
+    unexplained = None if external_cashflow_net is None else simple_nav_pnl - contribution_sum - external_cashflow_net
+    unexplained_pct = unexplained / end_nav if unexplained is not None and end_nav else None
+    threshold = max(50_000.0, abs(end_nav) * 0.02)
+    if unexplained is None:
+        status = "UNAVAILABLE"
+        if warnings is not None and unknown_material:
+            warnings.append("account_performance_cashflow_unadjusted")
+    elif abs(unexplained) <= threshold:
+        status = "OK"
+    elif abs(unexplained) <= max(200_000.0, abs(end_nav) * 0.10):
+        status = "WARNING"
+    else:
+        status = "FAILED"
+    if warnings is not None and status in {"WARNING", "FAILED"}:
+        warnings.append("account_performance_unreconciled_pnl")
+        warnings.append("account_performance_contribution_not_total_return")
+
+    return {
+        "start_nav_krw": int(round(start_nav)),
+        "end_nav_krw": int(round(end_nav)),
+        "simple_nav_pnl_krw": int(round(simple_nav_pnl)),
+        "sum_position_contribution_krw": int(round(contribution_sum)),
+        "external_cashflow_net_krw": int(round(external_cashflow_net)) if external_cashflow_net is not None else None,
+        "fees_taxes_krw": int(round(fees_taxes)),
+        "unexplained_difference_krw": int(round(unexplained)) if unexplained is not None else None,
+        "unexplained_difference_pct_of_nav": round(unexplained_pct, 6) if unexplained_pct is not None else None,
+        "reconciliation_status": status,
+    }
+
+
 def _summary(periods: list[dict[str, Any]]) -> dict[str, Any]:
     default = _default_period(periods)
     if not default:
         return {}
+    default_label = _period_summary_label(default)
     return {
-        "default_period": default.get("period"),
+        "default_period": default_label,
+        "source_period": default.get("period"),
+        "default_period_label": _period_display_label(default),
         "requested_start_date": default.get("requested_start_date"),
         "start_date": default.get("start_date"),
         "end_date": default.get("end_date"),
         "partial": bool(default.get("partial")),
+        "simple_nav_return": default.get("simple_nav_return"),
+        "twr_return": default.get("twr_return"),
+        "mwr_return": default.get("mwr_return"),
+        "primary_return": default.get("primary_return"),
+        "primary_return_method": default.get("primary_return_method"),
+        "return_method_warning": default.get("return_method_warning"),
         "actual_return": default.get("actual_return"),
+        "period_coverage": default.get("period_coverage") or {},
         "best_excess": default.get("best_excess") or {},
         "worst_excess": default.get("worst_excess") or {},
     }
 
 
 def _default_period(periods: list[dict[str, Any]]) -> dict[str, Any] | None:
+    eligible = [
+        period
+        for period in periods
+        if _float_or_none(period.get("actual_return")) is not None
+        and _period_summary_eligible(period)
+        and not bool(period.get("same_actual_window_as"))
+    ]
+    non_all_eligible = [period for period in eligible if str(period.get("period") or "").upper() != "ALL"]
+    if non_all_eligible:
+        return max(
+            non_all_eligible,
+            key=lambda item: int(
+                ((item.get("period_coverage") or {}).get("requested_days") or 0)
+                if isinstance(item.get("period_coverage"), Mapping)
+                else 0
+            ),
+        )
+    all_period = next((period for period in periods if str(period.get("period") or "").upper() == "ALL"), None)
+    if all_period and _float_or_none(all_period.get("actual_return")) is not None:
+        return all_period
     for preferred in ("YTD", "1Y", "6M", "3M", "1M", "ALL"):
         for period in periods:
             if period.get("period") == preferred and _float_or_none(period.get("actual_return")) is not None:
@@ -1005,12 +1911,55 @@ def _default_period(periods: list[dict[str, Any]]) -> dict[str, Any] | None:
     return periods[-1] if periods else None
 
 
+def _period_summary_eligible(period: Mapping[str, Any]) -> bool:
+    coverage = period.get("period_coverage")
+    if isinstance(coverage, Mapping):
+        return bool(coverage.get("is_summary_eligible"))
+    return _float_or_none(period.get("actual_return")) is not None and period.get("status") not in {
+        "insufficient_history",
+        "duplicate_actual_window",
+    }
+
+
+def _period_display_label(period: Mapping[str, Any]) -> str:
+    if str(period.get("period") or "").strip().upper() == "ALL":
+        return "사용 가능 전체 기간"
+    return str(period.get("period") or "-")
+
+
 def _benchmark_simple_return(rows: list[dict[str, Any]], *, start_date: date, end_date: date) -> float | None:
     start = _price_on_or_after(rows, start_date)
     end = _price_on_or_before(rows, end_date)
     if start is None or end is None or start <= 0:
         return None
     return (end - start) / start
+
+
+def benchmark_same_cashflow_return(
+    rows: list[dict[str, Any]],
+    *,
+    external_cashflows: list[CashflowEvent],
+    start_date: date,
+    end_date: date,
+    start_value: float,
+) -> float | None:
+    start = _price_on_or_after(rows, start_date)
+    end = _price_on_or_before(rows, end_date)
+    if start is None or end is None or start <= 0 or start_value <= 0:
+        return None
+    shares = start_value / start
+    for event in external_cashflows:
+        if not event.capital_flow:
+            continue
+        event_date = _parse_date(event.date)
+        if event_date is None or event_date < start_date or event_date > end_date:
+            continue
+        price = _price_on_or_before(rows, event_date) or start
+        if price <= 0:
+            continue
+        shares += float(event.amount_krw) / price
+    final_value = shares * end
+    return (final_value - start_value) / start_value
 
 
 def _benchmark_cashflow_return(
@@ -1021,27 +1970,13 @@ def _benchmark_cashflow_return(
     end_date: date,
     start_value: float,
 ) -> float | None:
-    start = _price_on_or_after(rows, start_date)
-    end = _price_on_or_before(rows, end_date)
-    if start is None or end is None or start <= 0 or start_value <= 0:
-        return None
-    shares = start_value / start
-    cash = 0.0
-    for event in ledger_events:
-        event_date = _parse_date(event.date)
-        if event_date is None or event_date < start_date or event_date > end_date:
-            continue
-        price = _price_on_or_before(rows, event_date) or start
-        if price <= 0 or event.gross_amount_krw <= 0:
-            continue
-        if event.side == "BUY":
-            shares += event.gross_amount_krw / price
-            cash -= event.gross_amount_krw
-        elif event.side == "SELL":
-            shares -= event.gross_amount_krw / price
-            cash += event.gross_amount_krw
-    final_value = shares * end + cash
-    return (final_value - start_value) / start_value
+    return benchmark_same_cashflow_return(
+        rows,
+        external_cashflows=_cashflow_events_from_ledger(ledger_events),
+        start_date=start_date,
+        end_date=end_date,
+        start_value=start_value,
+    )
 
 
 def _snapshot_values_between(rows: list[dict[str, Any]], start_date: date, end_date: date) -> list[float]:
@@ -1203,6 +2138,7 @@ def _public_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         "chart_data",
         "costs",
         "contribution_by_ticker",
+        "reconciliation",
         "data_quality",
         "public_sanitization",
     }
@@ -1234,6 +2170,63 @@ def _side_from_row(row: Mapping[str, Any]) -> str:
     if code in {"01", "1", "SELL"} or "sell" in name or "매도" in name:
         return "SELL"
     return "UNKNOWN"
+
+
+def _classify_ledger_event_type(row: Mapping[str, Any], *, side: str) -> LedgerEventType:
+    if side in {"BUY", "SELL"}:
+        return LedgerEventType.TRADE
+    explicit = _first_text(
+        row,
+        (
+            "event_type",
+            "ledger_event_type",
+            "transaction_type",
+            "transaction_kind",
+            "cashflow_type",
+            "tr_dvsn",
+            "tr_dvsn_name",
+            "rmks",
+            "rmks_name",
+            "memo",
+            "description",
+        ),
+    ).strip()
+    normalized = re.sub(r"[\s_\-]+", "", explicit).lower()
+    if normalized:
+        if normalized in {"deposit", "cashdeposit", "dpst", "입금"} or "deposit" in normalized or "입금" in normalized:
+            return LedgerEventType.DEPOSIT
+        if (
+            normalized in {"withdrawal", "withdraw", "cashwithdrawal", "wthdr", "출금"}
+            or "withdraw" in normalized
+            or "출금" in normalized
+        ):
+            return LedgerEventType.WITHDRAWAL
+        if normalized in {"dividend", "div"} or "dividend" in normalized or "배당" in normalized:
+            return LedgerEventType.DIVIDEND
+        if normalized in {"interest", "int"} or "interest" in normalized or "이자" in normalized:
+            return LedgerEventType.INTEREST
+        if normalized in {"fee", "commission", "cmsn"} or "fee" in normalized or "commission" in normalized or "수수료" in normalized:
+            return LedgerEventType.FEE
+        if normalized == "tax" or "tax" in normalized or "세금" in normalized or "제세" in normalized:
+            return LedgerEventType.TAX
+        if "fx" in normalized or "exchange" in normalized or "환전" in normalized:
+            return LedgerEventType.FX_CONVERSION
+        if normalized in {"trade", "fill", "execution", "체결"}:
+            return LedgerEventType.TRADE
+
+    if _first_float(row, ("dpst_amt", "deposit_amount", "cash_deposit_krw")) is not None:
+        return LedgerEventType.DEPOSIT
+    if _first_float(row, ("wthdr_amt", "withdrawal_amount", "cash_withdrawal_krw")) is not None:
+        return LedgerEventType.WITHDRAWAL
+    if _first_float(row, ("dividend_krw", "dvdn_amt", "dividend_amount")) is not None:
+        return LedgerEventType.DIVIDEND
+    if _first_float(row, ("interest_krw", "int_amt", "interest_amount")) is not None:
+        return LedgerEventType.INTEREST
+    if _first_float(row, ("tax_amt", "tax", "transaction_tax")) not in (None, 0):
+        return LedgerEventType.TAX
+    if _first_float(row, ("fee_amt", "fee", "cmsn_amt", "commission")) not in (None, 0):
+        return LedgerEventType.FEE
+    return LedgerEventType.UNKNOWN
 
 
 def _to_krw(value: float, *, fx_rate: float | None) -> float:

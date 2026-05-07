@@ -236,7 +236,10 @@ def _normalize_account_performance_payload(value: Any) -> Any:
     summary = normalized.get("summary") if isinstance(normalized.get("summary"), dict) else {}
     default_period = _account_performance_default_period(normalized_periods)
     if default_period and (
-        converted_warnings or not _account_performance_summary_is_usable(summary, normalized_periods)
+        converted_warnings
+        or not _account_performance_summary_is_usable(summary, normalized_periods)
+        or "default_period_label" not in summary
+        or "primary_return_method" not in summary
     ):
         normalized["summary"] = _account_performance_summary_from_period(default_period, previous=summary)
     return normalized
@@ -288,6 +291,19 @@ def _mark_account_performance_history_gap(period: dict[str, Any]) -> tuple[dict[
     )
     if reason not in {str(item) for item in partial_reasons}:
         partial_reasons.append(reason)
+    coverage = dict(normalized.get("period_coverage")) if isinstance(normalized.get("period_coverage"), dict) else {}
+    coverage.update(
+        {
+            "period": period_name,
+            "requested_start_date": requested,
+            "actual_start_date": available,
+            "end_date": _account_performance_date_text(normalized.get("end_date")) or normalized.get("end_date"),
+            "is_partial": True,
+            "same_actual_window_as": "ALL_AVAILABLE",
+            "is_summary_eligible": False,
+            "insufficient_reason": "account history starts after requested period start",
+        }
+    )
     normalized.update(
         {
             "status": "insufficient_history",
@@ -295,9 +311,16 @@ def _mark_account_performance_history_gap(period: dict[str, Any]) -> tuple[dict[
             "partial_reasons": partial_reasons,
             "actual_start_value_krw": None,
             "actual_end_value_krw": None,
+            "simple_nav_return": None,
+            "twr_return": None,
+            "mwr_return": None,
+            "primary_return": None,
+            "primary_return_method": "insufficient_history",
+            "return_method_warning": "insufficient_history",
             "actual_return": None,
             "mdd": None,
             "volatility": None,
+            "period_coverage": coverage,
             "simple_benchmarks": [],
             "cashflow_benchmarks": [],
             "best_excess": {},
@@ -310,12 +333,15 @@ def _mark_account_performance_history_gap(period: dict[str, Any]) -> tuple[dict[
 
 def _account_performance_summary_is_usable(summary: dict[str, Any], periods: list[Any]) -> bool:
     summary_period = str(summary.get("default_period") or "")
+    source_period = str(summary.get("source_period") or "")
     if not summary_period:
         return False
     for period in periods:
         if not isinstance(period, dict):
             continue
-        if str(period.get("period") or "") != summary_period:
+        period_name = str(period.get("period") or "")
+        period_label = _account_performance_period_summary_label(period)
+        if period_name not in {summary_period, source_period} and period_label != summary_period:
             continue
         if period.get("status") == "insufficient_history":
             return False
@@ -325,13 +351,19 @@ def _account_performance_summary_is_usable(summary: dict[str, Any], periods: lis
 
 def _account_performance_default_period(periods: list[Any]) -> dict[str, Any] | None:
     dict_periods = [period for period in periods if isinstance(period, dict)]
-    for preferred in ("YTD", "1Y", "6M", "3M", "1M", "ALL"):
-        for period in dict_periods:
-            if (
-                str(period.get("period") or "") == preferred
-                and _account_performance_number(period.get("actual_return")) is not None
-            ):
-                return period
+    eligible = [
+        period
+        for period in dict_periods
+        if _account_performance_number(period.get("actual_return")) is not None
+        and _account_period_summary_eligible(period)
+        and not period.get("same_actual_window_as")
+    ]
+    non_all = [period for period in eligible if str(period.get("period") or "").upper() != "ALL"]
+    if non_all:
+        return max(non_all, key=lambda item: _account_period_requested_days(item))
+    for period in dict_periods:
+        if str(period.get("period") or "").upper() == "ALL" and _account_performance_number(period.get("actual_return")) is not None:
+            return period
     for period in dict_periods:
         if _account_performance_number(period.get("actual_return")) is not None:
             return period
@@ -344,17 +376,53 @@ def _account_performance_summary_from_period(period: dict[str, Any], *, previous
     worst = period.get("worst_excess") if isinstance(period.get("worst_excess"), dict) else {}
     summary.update(
         {
-            "default_period": period.get("period"),
+            "default_period": _account_performance_period_summary_label(period),
+            "source_period": period.get("period"),
+            "default_period_label": _account_period_display_label(period),
             "requested_start_date": period.get("requested_start_date"),
             "start_date": period.get("start_date"),
             "end_date": period.get("end_date"),
             "partial": bool(period.get("partial")),
+            "simple_nav_return": period.get("simple_nav_return", period.get("actual_return")),
+            "twr_return": period.get("twr_return"),
+            "mwr_return": period.get("mwr_return"),
+            "primary_return": period.get("primary_return", period.get("actual_return")),
+            "primary_return_method": period.get("primary_return_method") or (
+                "available_history_simple_nav" if str(period.get("period") or "").upper() == "ALL" else "simple_nav"
+            ),
+            "return_method_warning": period.get("return_method_warning"),
             "actual_return": period.get("actual_return"),
+            "period_coverage": period.get("period_coverage") if isinstance(period.get("period_coverage"), dict) else {},
             "best_excess": best,
             "worst_excess": worst,
         }
     )
     return summary
+
+
+def _account_period_summary_eligible(period: dict[str, Any]) -> bool:
+    coverage = period.get("period_coverage")
+    if isinstance(coverage, dict) and "is_summary_eligible" in coverage:
+        return bool(coverage.get("is_summary_eligible"))
+    return period.get("status") not in {"insufficient_history", "duplicate_actual_window"}
+
+
+def _account_period_requested_days(period: dict[str, Any]) -> int:
+    coverage = period.get("period_coverage")
+    if isinstance(coverage, dict):
+        try:
+            return int(float(coverage.get("requested_days") or 0))
+        except (TypeError, ValueError):
+            return 0
+    return 0
+
+
+def _account_performance_period_summary_label(period: dict[str, Any]) -> str:
+    return "ALL_AVAILABLE" if str(period.get("period") or "").upper() == "ALL" else str(period.get("period") or "-")
+
+
+def _account_period_display_label(period: dict[str, Any]) -> str:
+    return "사용 가능 전체 기간" if str(period.get("period") or "").upper() == "ALL" else str(period.get("period") or "-")
 
 
 def _account_performance_number(value: Any) -> float | None:
@@ -1002,9 +1070,14 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     quality = payload.get("data_quality") if isinstance(payload.get("data_quality"), dict) else {}
     costs = payload.get("costs") if isinstance(payload.get("costs"), dict) else {}
     contribution = payload.get("contribution_by_ticker") if isinstance(payload.get("contribution_by_ticker"), list) else []
+    reconciliation = payload.get("reconciliation") if isinstance(payload.get("reconciliation"), dict) else {}
     benchmarks = [str(item) for item in payload.get("benchmarks", []) if str(item)]
     default_period = str(summary.get("default_period") or (periods[-1].get("period") if periods and isinstance(periods[-1], dict) else "-"))
-    default_period_label = f"{default_period} (부분)" if summary.get("partial") and default_period != "-" else default_period
+    default_period_label = str(summary.get("default_period_label") or default_period)
+    if summary.get("partial") and default_period_label != "-":
+        default_period_label = f"{default_period_label} (부분)"
+    method_label = _account_return_method_label(summary.get("primary_return_method"), summary.get("return_method_warning"))
+    coverage_label = _account_summary_coverage_label(summary)
     best = summary.get("best_excess") if isinstance(summary.get("best_excess"), dict) else {}
     worst = summary.get("worst_excess") if isinstance(summary.get("worst_excess"), dict) else {}
     public_json = portfolio_summary.get("account_performance_public_json")
@@ -1016,17 +1089,28 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
             download_links.append(
                 f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
             )
+    display_periods = _account_performance_display_periods(periods)
+    hidden_period_note = _account_hidden_period_note(periods, display_periods)
     period_tabs = "".join(
         f"<a class='pill' href='#account-perf-{_escape(str(period.get('period') or 'period'))}'>{_escape(_account_period_label(period))}</a>"
-        for period in periods
+        for period in display_periods
         if isinstance(period, dict)
     )
-    table_rows = _account_performance_period_rows(periods)
-    contribution_rows = _account_contribution_rows(contribution)
+    table_rows = _account_performance_period_rows(display_periods)
+    raw_table_rows = _account_performance_period_rows(periods, diagnostics=True)
+    contribution_rows = _account_contribution_rows(contribution, reconciliation=reconciliation)
     warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
     warning_html = "".join(f"<li>{_escape(str(item))}</li>" for item in warnings[:8]) or "<li>특이사항 없음</li>"
     chart_html = _account_performance_svg(payload.get("chart_data") if isinstance(payload.get("chart_data"), dict) else {})
     benchmark_label = ", ".join(benchmarks) or "-"
+    provider_messages = _account_benchmark_provider_messages(quality)
+    investor_notes = _account_performance_investor_notes(
+        periods=periods,
+        summary=summary,
+        reconciliation=reconciliation,
+        quality=quality,
+    )
+    benchmark_reliability = _account_benchmark_reliability_label(summary, reconciliation)
     return f"""
     <section class="section account-performance">
       <div class="section-head">
@@ -1035,23 +1119,26 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
       </div>
       <div class="run-grid account-kpi-grid">
         <article class="run-card">
-          <h3>실제 계좌 수익률</h3>
-          <p><strong>{_escape(default_period_label)}</strong><span>{_escape(_format_pct_value(summary.get('actual_return')))}</span></p>
+          <h3>성과 기준 기간</h3>
+          <p><strong>{_escape(default_period_label)}</strong><span>{_escape(coverage_label)}</span></p>
         </article>
         <article class="run-card">
-          <h3>최고 초과 벤치마크</h3>
-          <p><strong>{_escape(str(best.get('benchmark') or '-'))}</strong><span>{_escape(_format_pct_value(best.get('excess_return')))}</span></p>
+          <h3>계좌 수익률</h3>
+          <p><strong>{_escape(method_label)}</strong><span>{_escape(_format_pct_value(summary.get('actual_return')))}</span></p>
         </article>
         <article class="run-card">
-          <h3>최저 초과 벤치마크</h3>
-          <p><strong>{_escape(str(worst.get('benchmark') or '-'))}</strong><span>{_escape(_format_pct_value(worst.get('excess_return')))}</span></p>
+          <h3>벤치마크 비교</h3>
+          <p><strong>{_escape(benchmark_reliability)}</strong><span>{_escape(str(best.get('benchmark') or '-'))} {_escape(_format_pct_value(best.get('excess_return')))}</span></p>
         </article>
         <article class="run-card">
-          <h3>복잡하게 운용한 프리미엄</h3>
-          <p><strong>초과손익</strong><span>{_escape(_format_signed_krw_value(best.get('excess_krw')))}</span></p>
+          <h3>참고용 초과손익</h3>
+          <p><strong>{_escape(str(best.get('benchmark') or '-'))}</strong><span>{_escape(_format_signed_krw_value(best.get('excess_krw')))}</span></p>
         </article>
       </div>
+      {investor_notes}
+      {provider_messages}
       <div class="pill-row account-period-tabs">{period_tabs}</div>
+      {hidden_period_note}
       {chart_html}
       <div class="account-table-wrap">
         <table>
@@ -1070,7 +1157,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
       </div>
       <div class="run-grid">
         <article class="run-card">
-          <h3>종목별 기여도</h3>
+          <h3>보유/실현 손익 기여도</h3>
           {contribution_rows}
         </article>
         <article class="run-card">
@@ -1086,13 +1173,54 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
           <p><strong>가격 provider</strong><span>{_escape(str(quality.get('benchmark_provider') or '-'))}</span></p>
         </article>
       </div>
+      <details class="advanced-diagnostics"><summary>기간별 원시 산출</summary><table><tbody>{raw_table_rows}</tbody></table></details>
       <details class="advanced-diagnostics"><summary>데이터 품질 경고</summary><ul>{warning_html}</ul></details>
       <div class="pill-row">{''.join(download_links)}</div>
     </section>
     """
 
 
-def _account_performance_period_rows(periods: list[Any]) -> str:
+def _account_performance_display_periods(periods: list[Any]) -> list[dict[str, Any]]:
+    display = [
+        period
+        for period in periods
+        if isinstance(period, dict)
+        and _account_performance_number(period.get("actual_return")) is not None
+        and period.get("status") not in {"insufficient_history", "duplicate_actual_window"}
+        and not period.get("same_actual_window_as")
+    ]
+    if display:
+        return display
+    return [
+        period
+        for period in periods
+        if isinstance(period, dict) and _account_performance_number(period.get("actual_return")) is not None
+    ]
+
+
+def _account_hidden_period_note(periods: list[Any], display_periods: list[dict[str, Any]]) -> str:
+    display_names = {str(period.get("period") or "") for period in display_periods}
+    hidden = []
+    for period in periods:
+        if not isinstance(period, dict):
+            continue
+        name = str(period.get("period") or "-")
+        if name in display_names:
+            continue
+        if period.get("status") in {"insufficient_history", "duplicate_actual_window"} or period.get("same_actual_window_as"):
+            hidden.append(name)
+    if not hidden:
+        return ""
+    labels = "/".join(dict.fromkeys(hidden))
+    return (
+        "<p class='empty'>"
+        f"{_escape(labels)}는 계좌 기록이 해당 기간 전체를 커버하지 않아 별도 성과로 표시하지 않습니다. "
+        "아래 사용 가능 전체 기간 기준만 기본 비교에 사용합니다."
+        "</p>"
+    )
+
+
+def _account_performance_period_rows(periods: list[Any], *, diagnostics: bool = False) -> str:
     rows: list[str] = []
     for period in periods:
         if not isinstance(period, dict):
@@ -1103,7 +1231,27 @@ def _account_performance_period_rows(periods: list[Any]) -> str:
         if period.get("partial"):
             start = str(period.get("start_date") or "-")
             requested = str(period.get("requested_start_date") or "-")
-            partial_note = f"<br><span class='account-period-note'>부분 산출: 요청 {_escape(requested)} / 실제 {_escape(start)}</span>"
+            coverage = period.get("period_coverage") if isinstance(period.get("period_coverage"), dict) else {}
+            ratio = _format_coverage_ratio(coverage.get("coverage_ratio"))
+            duplicate = str(coverage.get("same_actual_window_as") or period.get("same_actual_window_as") or "")
+            duplicate_text = f" / {duplicate}와 동일 창" if duplicate else ""
+            partial_note = (
+                f"<br><span class='account-period-note'>부분 산출: 요청 {_escape(requested)} / 실제 {_escape(start)}"
+                f" / 커버리지 {_escape(ratio)}{_escape(duplicate_text)}</span>"
+            )
+        if period.get("status") in {"insufficient_history", "duplicate_actual_window"} and not diagnostics:
+            rows.append(
+                "<tr "
+                f"id='account-perf-{_escape(period_name)}'>"
+                f"<td>{_escape(period_label)}{partial_note}</td>"
+                "<td>데이터 부족</td>"
+                "<td>요청 기간 시작일의 계좌 스냅샷 없음</td>"
+                "<td>-</td>"
+                "<td>-</td>"
+                "<td>-</td>"
+                "</tr>"
+            )
+            continue
         if period.get("status") == "insufficient_history":
             rows.append(
                 "<tr "
@@ -1117,11 +1265,25 @@ def _account_performance_period_rows(periods: list[Any]) -> str:
                 "</tr>"
             )
             continue
+        if period.get("status") == "duplicate_actual_window":
+            rows.append(
+                "<tr "
+                f"id='account-perf-{_escape(period_name)}'>"
+                f"<td>{_escape(period_label)}{partial_note}</td>"
+                "<td>중복 기간</td>"
+                f"<td>{_escape(str(period.get('same_actual_window_as') or '-'))}와 동일 실제 기간</td>"
+                "<td>-</td>"
+                "<td>-</td>"
+                "<td>-</td>"
+                "</tr>"
+            )
+            continue
+        method_note = _account_return_method_label(period.get("primary_return_method"), period.get("return_method_warning"))
         rows.append(
             "<tr "
             f"id='account-perf-{_escape(period_name)}'>"
             f"<td>{_escape(period_label)}{partial_note}</td>"
-            f"<td>{_escape(_format_pct_value(period.get('actual_return')))}</td>"
+            f"<td>{_escape(_format_pct_value(period.get('actual_return')))}<br><span class='account-period-note'>{_escape(method_note)}</span></td>"
             f"<td>{_benchmark_comparison_cells(period.get('simple_benchmarks'))}</td>"
             f"<td>{_benchmark_comparison_cells(period.get('cashflow_benchmarks'))}</td>"
             f"<td>{_escape(_format_pct_value(period.get('mdd')))}</td>"
@@ -1135,6 +1297,8 @@ def _account_performance_period_rows(periods: list[Any]) -> str:
 
 def _account_period_label(period: dict[str, Any]) -> str:
     name = str(period.get("period") or "-")
+    if name.upper() == "ALL":
+        name = "사용 가능 전체 기간"
     return f"{name} (부분)" if period.get("partial") else name
 
 
@@ -1145,19 +1309,130 @@ def _benchmark_comparison_cells(values: Any) -> str:
     for item in values:
         if not isinstance(item, dict):
             continue
+        reliability = str(item.get("reliability") or "")
+        suffix = " 참고용" if reliability == "reference" else ""
         parts.append(
             f"<span>{_escape(str(item.get('benchmark') or '-'))}: "
             f"{_escape(_format_pct_value(item.get('benchmark_return')))} / "
             f"초과 {_escape(_format_pct_value(item.get('excess_return')))} "
             f"({_escape(_format_signed_krw_value(item.get('excess_krw')))}"
-            ")</span>"
+            f"){_escape(suffix)}</span>"
         )
     return "<br>".join(parts) if parts else "-"
 
 
-def _account_contribution_rows(contribution: list[Any]) -> str:
+def _account_return_method_label(method: Any, warning: Any = None) -> str:
+    method_text = str(method or "").strip().lower()
+    warning_text = str(warning or "").strip().lower()
+    if method_text == "twr":
+        return "현금흐름 보정 TWR"
+    if method_text == "mwr":
+        return "현금흐름 보정 MWR"
+    if warning_text == "cashflow_adjustment_unavailable" or method_text == "simple_nav_unadjusted":
+        return "현금흐름 미보정 단순 NAV 기준"
+    if method_text == "available_history_simple_nav":
+        return "사용 가능 기간 단순 NAV 기준"
+    if method_text == "insufficient_history":
+        return "기간 데이터 부족"
+    return "단순 NAV 기준"
+
+
+def _format_coverage_ratio(value: Any) -> str:
+    try:
+        if value is None:
+            return "-"
+        return f"{float(value) * 100:.0f}%"
+    except (TypeError, ValueError):
+        return "-"
+
+
+def _account_summary_coverage_label(summary: dict[str, Any]) -> str:
+    start = str(summary.get("start_date") or "-")
+    end = str(summary.get("end_date") or "-")
+    coverage = summary.get("period_coverage") if isinstance(summary.get("period_coverage"), dict) else {}
+    ratio = _format_coverage_ratio(coverage.get("coverage_ratio"))
+    if start != "-" and end != "-":
+        return f"{start} ~ {end} ({ratio})"
+    return ratio
+
+
+def _account_benchmark_reliability_label(summary: dict[str, Any], reconciliation: dict[str, Any]) -> str:
+    warning = str(summary.get("return_method_warning") or "")
+    status = str(reconciliation.get("reconciliation_status") or "").upper()
+    if warning == "cashflow_adjustment_unavailable" or status in {"WARNING", "FAILED", "UNAVAILABLE"}:
+        return "참고용 - 검증 필요"
+    return "비교 가능"
+
+
+def _account_performance_investor_notes(
+    *,
+    periods: list[Any],
+    summary: dict[str, Any],
+    reconciliation: dict[str, Any],
+    quality: dict[str, Any],
+) -> str:
+    notes: list[str] = []
+    if str(summary.get("default_period") or "") == "ALL_AVAILABLE":
+        start = str(summary.get("start_date") or "-")
+        end = str(summary.get("end_date") or "-")
+        notes.append(f"성과 기준 기간: {start} ~ {end} (사용 가능 전체 기간)")
+    method_label = _account_return_method_label(summary.get("primary_return_method"), summary.get("return_method_warning"))
+    notes.append(f"계좌 수익률: {method_label}")
+    if summary.get("return_method_warning") == "cashflow_adjustment_unavailable":
+        notes.append("벤치마크 비교: 참고용 - 외부 현금흐름 보정이 불완전합니다.")
+    status = str(reconciliation.get("reconciliation_status") or "").upper()
+    if status in {"WARNING", "FAILED"}:
+        notes.append("보유/실현 손익 합계와 NAV 변화가 크게 달라 초과수익 해석은 검증이 필요합니다.")
+    warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
+    if any("account_performance_duplicate_actual_windows" in str(item) for item in warnings):
+        notes.append("일부 요청 기간은 실제 사용 가능 기간이 같아 기본 표에서는 합쳐서 보여줍니다.")
+    if not notes:
+        return ""
+    return "<div class='warning-banner account-performance-note'>" + "<br>".join(_escape(item) for item in notes) + "</div>"
+
+
+def _account_benchmark_provider_messages(quality: dict[str, Any]) -> str:
+    statuses = quality.get("benchmark_provider_status")
+    if not isinstance(statuses, dict):
+        return ""
+    fallback_by_used: dict[str, list[str]] = {}
+    provider_lines = []
+    for benchmark, status in statuses.items():
+        if not isinstance(status, dict):
+            continue
+        preferred = str(status.get("preferred_provider") or "-")
+        used = str(status.get("used_provider") or "-")
+        state = str(status.get("status") or "-")
+        if state == "fallback":
+            fallback_by_used.setdefault(used, []).append(str(benchmark))
+        elif used not in {"", "-", "None"}:
+            provider_lines.append(f"{benchmark}: {used}")
+        elif state not in {"ok", "pending"}:
+            provider_lines.append(f"{benchmark}: {state}")
+        elif preferred:
+            provider_lines.append(f"{benchmark}: {preferred}")
+    messages = []
+    for used, names in fallback_by_used.items():
+        provider = used if used not in {"", "-", "None"} else "대체 provider"
+        messages.append(f"{'/'.join(names)} 가격은 선호 provider 조회 실패 후 {provider}로 대체했습니다.")
+    if provider_lines:
+        messages.append("가격 provider: " + ", ".join(provider_lines))
+    if not messages:
+        return ""
+    return "<p class='empty'>" + "<br>".join(_escape(item) for item in messages) + "</p>"
+
+
+def _account_contribution_rows(contribution: list[Any], *, reconciliation: dict[str, Any]) -> str:
+    status = str(reconciliation.get("reconciliation_status") or "").upper()
+    if status == "OK":
+        status_html = "<p class='empty'>NAV 변화와 기여도 합계가 허용 범위 안에서 대체로 일치합니다.</p>"
+    else:
+        status_html = (
+            "<p class='empty'>이 표는 보유/실현 손익만 요약하며, 입출금·환전·배당·수수료·데이터 차이로 "
+            "총 NAV 변화와 일치하지 않을 수 있습니다.</p>"
+        )
     if not contribution:
-        return "<p class='empty'>산출 가능한 기여도 데이터가 없습니다.</p>"
+        return status_html + "<p class='empty'>산출 가능한 기여도 데이터가 없습니다.</p>"
     rows = []
     for item in contribution[:8]:
         if not isinstance(item, dict):
@@ -1168,12 +1443,13 @@ def _account_contribution_rows(contribution: list[Any]) -> str:
             f"<span>{_escape(_format_signed_krw_value(item.get('total_contribution_krw')))}</span>"
             "</p>"
         )
-    return "".join(rows) or "<p class='empty'>산출 가능한 기여도 데이터가 없습니다.</p>"
+    return status_html + ("".join(rows) or "<p class='empty'>산출 가능한 기여도 데이터가 없습니다.</p>")
 
 
 def _account_performance_svg(chart_data: dict[str, Any]) -> str:
     series = chart_data.get("series") if isinstance(chart_data.get("series"), list) else []
     benchmarks = [str(item) for item in chart_data.get("benchmarks", []) if str(item)]
+    title = str(chart_data.get("title") or "사용 가능 기간 수익률")
     if len(series) < 2:
         return "<p class='empty'>차트를 그릴 만큼의 일별 계좌 스냅샷이 아직 충분하지 않습니다.</p>"
     keys = ["account_return", *benchmarks]
@@ -1243,6 +1519,7 @@ def _account_performance_svg(chart_data: dict[str, Any]) -> str:
     end_label = _escape(str((series[-1] or {}).get("date") or ""))
     return (
         "<div class='account-chart'>"
+        f"<h3 class='account-chart-title'>{_escape(title)}</h3>"
         f"<svg viewBox='0 0 {width} {height}' role='img' aria-label='계좌 누적 수익률과 벤치마크 비교 차트'>"
         f"<rect x='0' y='0' width='{width}' height='{height}' rx='12' fill='#fbfdfd' />"
         f"<line x1='{left}' y1='{height - bottom}' x2='{width - right}' y2='{height - bottom}' stroke='#cfd8d6' />"
@@ -3142,6 +3419,12 @@ a { color: inherit; }
 .account-chart {
   margin: 16px 0;
   overflow: hidden;
+}
+
+.account-chart-title {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  letter-spacing: 0;
 }
 
 .account-chart svg {

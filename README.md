@@ -15,6 +15,7 @@ TradingAgents는 실제 트레이딩 조직의 협업 구조를 반영한 멀티
 - 한국어 출력용 로컬 번역 백엔드 기본값: `NLLB-200-distilled-600M + CTranslate2`
 - 한국/미국 티커 스케줄 설정, `ticker_names` 오버라이드, `quality_flags`, `batch_metrics`, `warnings`
 - 선택형 PRISM 외부 신호 수집, PRISM-style 후보 스캐너, 추천 액션 성과 추적
+- 계좌 NAV 성과와 지수/ETF 비교: 기간 커버리지, 현금흐름 보정 가능 여부, 벤치마크 provider fallback, 기여도 정합성 경고를 함께 표시
 
 이 프로젝트는 연구 목적입니다. 실제 투자 판단이나 자문 용도로 사용하면 안 되며, 결과는 모델, 데이터, 프롬프트, 시장 상황에 따라 크게 달라질 수 있습니다.
 
@@ -53,6 +54,8 @@ PRISM live dashboard가 KR 전용 데이터인 상태에서 US run을 실행할 
 교차시장 후보 생성을 의도적으로 켜려면 `[external.prism].allow_cross_market_candidates = true`와 `allowed_markets = ["KR"]`처럼 허용 시장을 명시하세요. 별도 US PRISM 데이터가 있다면 US scheduled config의 `local_dashboard_json_path`, `local_sqlite_db_path`, 또는 live JSON URL로 분리해서 제공하는 편이 안전합니다.
 
 자세한 설정과 충돌 정책은 [Docs/prism_external_signals.md](Docs/prism_external_signals.md), 스캐너는 [Docs/scanner_prism_style.md](Docs/scanner_prism_style.md), 추천 성과 추적은 [Docs/action_performance_tracker.md](Docs/action_performance_tracker.md)를 참고하세요. 모든 기능은 기본 비활성화이며, 기존 scheduled report는 PRISM 없이 그대로 동작합니다. Live HTTP와 dashboard HTML embedded JSON 파싱은 각각 명시적으로 켜야 하며, outcome 업데이트도 가격 히스토리 파일 또는 opt-in provider가 있어야 계산됩니다.
+
+계좌 성과 vs 지수/ETF 섹션은 단순 NAV 수익률, 현금흐름 보정 TWR, 사용 가능 기간(`ALL_AVAILABLE`), 동일 현금흐름 벤치마크, 기여도 정합성 경고를 구분해 표시합니다. 짧은 계좌 기록 때문에 1M/3M/YTD 등이 같은 실제 기간으로 접히면 기본 투자자 화면에서는 중복 행을 숨기고, 원시 산출은 진단 영역과 JSON artifact에 보존합니다. 계산 기준은 [Docs/account_performance.md](Docs/account_performance.md)를 참고하세요.
 
 ## 빠른 시작
 

@@ -24,6 +24,11 @@ def test_account_performance_reports_kospi_and_kosdaq(tmp_path: Path):
     simple = {item["benchmark"]: item for item in period["simple_benchmarks"]}
     assert period["period"] == "ALL"
     assert period["actual_return"] == 0.2
+    assert period["simple_nav_return"] == 0.2
+    assert period["primary_return_method"] == "available_history_simple_nav"
+    assert payload["summary"]["default_period"] == "ALL_AVAILABLE"
+    assert payload["chart_data"]["return_method"] == "available_history_simple_nav"
+    assert "coverage" in payload["chart_data"]
     assert simple["KOSPI"]["benchmark_return"] == 0.1
     assert simple["KOSPI"]["excess_return"] == 0.1
     assert simple["KOSDAQ"]["benchmark_return"] == -0.1
@@ -48,7 +53,7 @@ def test_account_performance_reports_spy_and_qqq(tmp_path: Path):
     assert simple["QQQ"]["excess_return"] == -0.05
 
 
-def test_account_performance_cashflow_simulation_uses_trade_ledger(tmp_path: Path):
+def test_account_performance_cashflow_simulation_ignores_internal_trade_ledger(tmp_path: Path):
     client = Mock()
     client.fetch_domestic_order_fills.return_value = [
         {
@@ -84,8 +89,10 @@ def test_account_performance_cashflow_simulation_uses_trade_ledger(tmp_path: Pat
 
     period = payload["periods"][0]
     cashflow = {item["benchmark"]: item for item in period["cashflow_benchmarks"]}
-    assert cashflow["KOSPI"]["benchmark_return"] == 1.06
-    assert cashflow["KOSPI"]["excess_return"] == -0.86
+    assert payload["data_quality"]["external_capital_flow_count"] == 0
+    assert cashflow["KOSPI"]["benchmark_return"] == 1.0
+    assert cashflow["KOSPI"]["cashflow_event_count"] == 0
+    assert cashflow["KOSPI"]["comparison_basis"] == "no_external_cashflows"
     assert client.fetch_domestic_order_fills.call_args.kwargs["start_date"].isoformat() == "2026-01-01"
 
 
@@ -132,7 +139,7 @@ def test_account_performance_keeps_successful_kis_ledger_rows_when_endpoint_fail
 
     period = payload["periods"][0]
     cashflow = {item["benchmark"]: item for item in period["cashflow_benchmarks"]}
-    assert cashflow["KOSPI"]["benchmark_return"] == 1.06
+    assert cashflow["KOSPI"]["benchmark_return"] == 1.0
 
 
 def test_account_performance_excludes_watchlist_only_seed_snapshots(tmp_path: Path):
@@ -192,9 +199,126 @@ def test_account_performance_excludes_watchlist_only_seed_snapshots(tmp_path: Pa
     assert ytd_period["partial"] is True
     assert ytd_period["status"] == "insufficient_history"
     assert ytd_period["actual_return"] is None
-    assert payload["summary"]["default_period"] == "ALL"
+    assert ytd_period["period_coverage"]["same_actual_window_as"] == "ALL_AVAILABLE"
+    assert ytd_period["period_coverage"]["is_summary_eligible"] is False
+    assert payload["summary"]["default_period"] == "ALL_AVAILABLE"
+    assert payload["summary"]["source_period"] == "ALL"
     assert payload["summary"]["actual_return"] == 0.2
     assert any("account_performance_period_insufficient_history:YTD" in item for item in quality["warnings"])
+
+
+def test_account_performance_short_history_marks_duplicate_windows_and_available_headline(tmp_path: Path):
+    payload = _build_report(
+        tmp_path,
+        market_scope="kr",
+        periods=("1M", "3M", "6M", "YTD", "1Y", "ALL"),
+        current_as_of="2026-05-07T09:00:00+09:00",
+        history_snapshots=[
+            {
+                "snapshot_id": "first-real",
+                "as_of": "2026-04-13T09:00:00+09:00",
+                "account_value_krw": 1_000_000,
+                "snapshot_health": "VALID",
+                "positions": [{"canonical_ticker": "TEST", "market_value_krw": 900_000}],
+            }
+        ],
+        benchmarks={
+            "KOSPI": [{"date": "2026-04-13", "close": 100}, {"date": "2026-05-07", "close": 110}],
+            "KOSDAQ": [{"date": "2026-04-13", "close": 100}, {"date": "2026-05-07", "close": 90}],
+        },
+    )
+
+    assert payload["summary"]["default_period"] == "ALL_AVAILABLE"
+    assert payload["summary"]["source_period"] == "ALL"
+    for period_name in ("1M", "3M", "6M", "YTD", "1Y"):
+        period = next(item for item in payload["periods"] if item["period"] == period_name)
+        assert period["actual_return"] is None
+        assert period["period_coverage"]["is_summary_eligible"] is False
+        assert period["period_coverage"]["same_actual_window_as"] == "ALL_AVAILABLE"
+    assert any("account_performance_duplicate_actual_windows:ALL_AVAILABLE" in item for item in payload["data_quality"]["warnings"])
+
+
+def test_account_performance_external_deposit_and_withdrawal_drive_same_cashflow_benchmark(tmp_path: Path):
+    client = Mock()
+    client.fetch_domestic_order_fills.return_value = []
+    client.fetch_domestic_period_trade_profit.return_value = ([], {})
+    client.fetch_domestic_period_profit.return_value = (
+        [
+            {"date": "2026-02-01", "event_type": "deposit", "cashflow_amount": "500000"},
+            {"date": "2026-03-01", "event_type": "withdrawal", "cashflow_amount": "200000"},
+        ],
+        {},
+    )
+
+    with patch("tradingagents.portfolio.kis.KisClient.from_api_keys", return_value=client):
+        payload = _build_report(
+            tmp_path,
+            market_scope="kr",
+            broker="kis",
+            current_total_equity_krw=1_600_000,
+            benchmarks={
+                "KOSPI": [
+                    {"date": "2026-01-01", "close": 100},
+                    {"date": "2026-02-01", "close": 125},
+                    {"date": "2026-03-01", "close": 160},
+                    {"date": "2026-04-01", "close": 200},
+                ],
+                "KOSDAQ": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 100}],
+            },
+        )
+
+    period = payload["periods"][0]
+    assert payload["data_quality"]["external_capital_flow_count"] == 2
+    assert period["simple_nav_return"] == 0.6
+    assert period["twr_return"] == 0.3
+    assert period["actual_return"] == 0.3
+    assert period["primary_return_method"] == "twr"
+    assert payload["chart_data"]["return_method"] == "twr"
+    cashflow = {item["benchmark"]: item for item in period["cashflow_benchmarks"]}
+    assert cashflow["KOSPI"]["cashflow_event_count"] == 2
+    assert cashflow["KOSPI"]["benchmark_return"] == 1.55
+
+
+def test_account_performance_unknown_cashflow_classification_flags_simple_nav(tmp_path: Path):
+    client = Mock()
+    client.fetch_domestic_order_fills.return_value = []
+    client.fetch_domestic_period_trade_profit.return_value = ([], {})
+    client.fetch_domestic_period_profit.return_value = ([{"date": "2026-02-01", "cashflow_amount": "500000"}], {})
+
+    with patch("tradingagents.portfolio.kis.KisClient.from_api_keys", return_value=client):
+        payload = _build_report(
+            tmp_path,
+            market_scope="kr",
+            broker="kis",
+            benchmarks={
+                "KOSPI": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 110}],
+                "KOSDAQ": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 100}],
+            },
+        )
+
+    period = payload["periods"][0]
+    assert period["primary_return_method"] == "simple_nav_unadjusted"
+    assert period["return_method_warning"] == "cashflow_adjustment_unavailable"
+    assert period["cashflow_benchmarks"] == []
+    assert any("account_performance_cashflow_adjustment_unavailable:ALL" in item for item in payload["data_quality"]["warnings"])
+
+
+def test_account_performance_contribution_mismatch_triggers_reconciliation_warning(tmp_path: Path):
+    payload = _build_report(
+        tmp_path,
+        market_scope="us",
+        current_total_equity_krw=1_500_000,
+        benchmarks={
+            "SPY": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 112}],
+            "QQQ": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 125}],
+        },
+    )
+
+    reconciliation = payload["reconciliation"]
+    assert reconciliation["simple_nav_pnl_krw"] == 500_000
+    assert reconciliation["sum_position_contribution_krw"] == 100_000
+    assert reconciliation["reconciliation_status"] == "FAILED"
+    assert "account_performance_unreconciled_pnl" in payload["data_quality"]["warnings"]
 
 
 def _build_report(
