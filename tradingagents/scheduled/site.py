@@ -189,12 +189,193 @@ def _copy_public_portfolio_artifact(source: Path, destination: Path) -> None:
     if source.suffix.lower() == ".json":
         try:
             payload = json.loads(source.read_text(encoding="utf-8"))
+            if source.name == "account_performance_public.json":
+                payload = _normalize_account_performance_payload(payload)
             sanitized = _sanitize_public_json(payload)
             destination.write_text(json.dumps(sanitized, indent=2, ensure_ascii=False), encoding="utf-8")
             return
         except Exception:
             pass
     shutil.copy2(source, destination)
+
+
+def _normalize_account_performance_payload(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    periods = value.get("periods")
+    if not isinstance(periods, list):
+        return value
+
+    normalized = dict(value)
+    normalized_periods: list[Any] = [dict(period) if isinstance(period, dict) else period for period in periods]
+    converted_warnings: list[str] = []
+    all_period = _account_performance_all_period(normalized_periods)
+    if all_period:
+        all_start = _account_performance_date_text(all_period.get("start_date"))
+        all_end = _account_performance_date_text(all_period.get("end_date"))
+        for index, period in enumerate(normalized_periods):
+            if not isinstance(period, dict):
+                continue
+            if not _is_legacy_account_performance_history_gap(period, all_start=all_start, all_end=all_end):
+                continue
+            normalized_periods[index], warning = _mark_account_performance_history_gap(period)
+            converted_warnings.append(warning)
+
+    normalized["periods"] = normalized_periods
+    if converted_warnings:
+        quality = dict(normalized.get("data_quality")) if isinstance(normalized.get("data_quality"), dict) else {}
+        warnings = list(quality.get("warnings")) if isinstance(quality.get("warnings"), list) else []
+        existing_warnings = {str(item) for item in warnings}
+        for warning in converted_warnings:
+            if warning not in existing_warnings:
+                warnings.append(warning)
+                existing_warnings.add(warning)
+        quality["warnings"] = warnings
+        normalized["data_quality"] = quality
+
+    summary = normalized.get("summary") if isinstance(normalized.get("summary"), dict) else {}
+    default_period = _account_performance_default_period(normalized_periods)
+    if default_period and (
+        converted_warnings or not _account_performance_summary_is_usable(summary, normalized_periods)
+    ):
+        normalized["summary"] = _account_performance_summary_from_period(default_period, previous=summary)
+    return normalized
+
+
+def _account_performance_all_period(periods: list[Any]) -> dict[str, Any] | None:
+    for period in periods:
+        if not isinstance(period, dict):
+            continue
+        if str(period.get("period") or "").upper() != "ALL":
+            continue
+        if _account_performance_number(period.get("actual_return")) is not None:
+            return period
+    return None
+
+
+def _is_legacy_account_performance_history_gap(period: dict[str, Any], *, all_start: str, all_end: str) -> bool:
+    if str(period.get("period") or "").upper() == "ALL":
+        return False
+    if period.get("status") == "insufficient_history":
+        return False
+    if not period.get("partial"):
+        return False
+    if _account_performance_number(period.get("actual_return")) is None:
+        return False
+
+    requested = _account_performance_date_text(period.get("requested_start_date"))
+    start = _account_performance_date_text(period.get("start_date"))
+    end = _account_performance_date_text(period.get("end_date"))
+    if not requested or not start or not _account_performance_date_before(requested, start):
+        return False
+    if start != all_start:
+        return False
+    if all_end and end and end != all_end:
+        return False
+    return True
+
+
+def _mark_account_performance_history_gap(period: dict[str, Any]) -> tuple[dict[str, Any], str]:
+    normalized = dict(period)
+    period_name = str(normalized.get("period") or "-")
+    requested = _account_performance_date_text(normalized.get("requested_start_date")) or str(
+        normalized.get("requested_start_date") or "-"
+    )
+    available = _account_performance_date_text(normalized.get("start_date")) or str(normalized.get("start_date") or "-")
+    reason = f"requested_start={requested}:available_start={available}"
+    partial_reasons = (
+        list(normalized.get("partial_reasons")) if isinstance(normalized.get("partial_reasons"), list) else []
+    )
+    if reason not in {str(item) for item in partial_reasons}:
+        partial_reasons.append(reason)
+    normalized.update(
+        {
+            "status": "insufficient_history",
+            "partial": True,
+            "partial_reasons": partial_reasons,
+            "actual_start_value_krw": None,
+            "actual_end_value_krw": None,
+            "actual_return": None,
+            "mdd": None,
+            "volatility": None,
+            "simple_benchmarks": [],
+            "cashflow_benchmarks": [],
+            "best_excess": {},
+            "worst_excess": {},
+        }
+    )
+    warning = f"account_performance_period_insufficient_history:{period_name}:{reason}"
+    return normalized, warning
+
+
+def _account_performance_summary_is_usable(summary: dict[str, Any], periods: list[Any]) -> bool:
+    summary_period = str(summary.get("default_period") or "")
+    if not summary_period:
+        return False
+    for period in periods:
+        if not isinstance(period, dict):
+            continue
+        if str(period.get("period") or "") != summary_period:
+            continue
+        if period.get("status") == "insufficient_history":
+            return False
+        return _account_performance_number(period.get("actual_return")) is not None
+    return False
+
+
+def _account_performance_default_period(periods: list[Any]) -> dict[str, Any] | None:
+    dict_periods = [period for period in periods if isinstance(period, dict)]
+    for preferred in ("YTD", "1Y", "6M", "3M", "1M", "ALL"):
+        for period in dict_periods:
+            if (
+                str(period.get("period") or "") == preferred
+                and _account_performance_number(period.get("actual_return")) is not None
+            ):
+                return period
+    for period in dict_periods:
+        if _account_performance_number(period.get("actual_return")) is not None:
+            return period
+    return dict_periods[-1] if dict_periods else None
+
+
+def _account_performance_summary_from_period(period: dict[str, Any], *, previous: dict[str, Any]) -> dict[str, Any]:
+    summary = dict(previous)
+    best = period.get("best_excess") if isinstance(period.get("best_excess"), dict) else {}
+    worst = period.get("worst_excess") if isinstance(period.get("worst_excess"), dict) else {}
+    summary.update(
+        {
+            "default_period": period.get("period"),
+            "requested_start_date": period.get("requested_start_date"),
+            "start_date": period.get("start_date"),
+            "end_date": period.get("end_date"),
+            "partial": bool(period.get("partial")),
+            "actual_return": period.get("actual_return"),
+            "best_excess": best,
+            "worst_excess": worst,
+        }
+    )
+    return summary
+
+
+def _account_performance_number(value: Any) -> float | None:
+    try:
+        if value is None:
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _account_performance_date_text(value: Any) -> str:
+    text = str(value or "").strip()[:10]
+    return text if re.fullmatch(r"\d{4}-\d{2}-\d{2}", text) else ""
+
+
+def _account_performance_date_before(left: str, right: str) -> bool:
+    try:
+        return datetime.strptime(left, "%Y-%m-%d").date() < datetime.strptime(right, "%Y-%m-%d").date()
+    except ValueError:
+        return False
 
 
 def _sanitize_public_json(value: Any) -> Any:
@@ -2289,7 +2470,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         try:
             parsed = json.loads(account_performance_public.read_text(encoding="utf-8"))
             if isinstance(parsed, dict):
-                account_performance = parsed
+                account_performance = _normalize_account_performance_payload(parsed)
         except Exception:
             account_performance = {}
     return {

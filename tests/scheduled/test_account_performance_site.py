@@ -146,3 +146,127 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     assert "12345678" not in published_snapshot
     assert "ODNO-SECRET" not in published_snapshot
     assert (site / "downloads" / manifest["run_id"] / "portfolio" / "account_performance_public.json").exists()
+
+
+def test_portfolio_page_normalizes_legacy_duplicate_account_performance_periods(tmp_path: Path):
+    archive = tmp_path / "archive"
+    site = tmp_path / "site"
+    run_dir = archive / "runs" / "2026" / "20260402T090000_test"
+    private_dir = run_dir / "portfolio-private"
+    private_dir.mkdir(parents=True)
+
+    (private_dir / "status.json").write_text(
+        json.dumps(
+            {
+                "status": "success",
+                "profile": "kr_kis_default",
+                "snapshot_health": "VALID",
+                "generated_at": "2026-04-02T09:00:00+09:00",
+            }
+        ),
+        encoding="utf-8",
+    )
+    performance_payload = {
+        "status": "ok",
+        "generated_at": "2026-04-02T09:00:00+09:00",
+        "market_scope": "KR",
+        "benchmarks": ["KOSPI"],
+        "summary": {
+            "default_period": "YTD",
+            "requested_start_date": "2026-01-01",
+            "start_date": "2026-02-01",
+            "end_date": "2026-04-02",
+            "partial": True,
+            "actual_return": 0.2,
+            "best_excess": {"benchmark": "KOSPI", "excess_return": 0.1, "excess_krw": 100000},
+            "worst_excess": {"benchmark": "KOSPI", "excess_return": 0.1, "excess_krw": 100000},
+        },
+        "periods": [
+            {
+                "period": "YTD",
+                "requested_start_date": "2026-01-01",
+                "start_date": "2026-02-01",
+                "end_date": "2026-04-02",
+                "partial": True,
+                "partial_reasons": ["requested_start=2026-01-01:actual_start=2026-02-01"],
+                "actual_return": 0.2,
+                "mdd": -0.05,
+                "volatility": 0.01,
+                "simple_benchmarks": [
+                    {"benchmark": "KOSPI", "benchmark_return": 0.1, "excess_return": 0.1, "excess_krw": 100000}
+                ],
+                "cashflow_benchmarks": [],
+                "best_excess": {"benchmark": "KOSPI", "excess_return": 0.1, "excess_krw": 100000},
+                "worst_excess": {"benchmark": "KOSPI", "excess_return": 0.1, "excess_krw": 100000},
+            },
+            {
+                "period": "ALL",
+                "requested_start_date": "2026-02-01",
+                "start_date": "2026-02-01",
+                "end_date": "2026-04-02",
+                "partial": True,
+                "actual_return": 0.2,
+                "mdd": -0.05,
+                "volatility": 0.01,
+                "simple_benchmarks": [
+                    {"benchmark": "KOSPI", "benchmark_return": 0.1, "excess_return": 0.1, "excess_krw": 100000}
+                ],
+                "cashflow_benchmarks": [],
+                "best_excess": {"benchmark": "KOSPI", "excess_return": 0.1, "excess_krw": 100000},
+                "worst_excess": {"benchmark": "KOSPI", "excess_return": 0.1, "excess_krw": 100000},
+            },
+        ],
+        "chart_data": {
+            "benchmarks": ["KOSPI"],
+            "series": [
+                {"date": "2026-02-01", "account_return": 0, "KOSPI": 0},
+                {"date": "2026-04-02", "account_return": 0.2, "KOSPI": 0.1},
+            ],
+        },
+        "costs": {},
+        "contribution_by_ticker": [],
+        "data_quality": {"snapshot_count": 2, "ledger_event_count": 0, "benchmark_provider": "local_json", "warnings": []},
+    }
+    performance_path = private_dir / "account_performance_public.json"
+    performance_path.write_text(json.dumps(performance_payload), encoding="utf-8")
+
+    manifest = {
+        "run_id": "20260402T090000_test",
+        "label": "test",
+        "status": "success",
+        "started_at": "2026-04-02T09:00:00+09:00",
+        "finished_at": "2026-04-02T09:05:00+09:00",
+        "timezone": "Asia/Seoul",
+        "settings": {"output_language": "Korean"},
+        "summary": {"total_tickers": 0, "successful_tickers": 0, "failed_tickers": 0},
+        "warnings": [],
+        "tickers": [],
+        "portfolio": {
+            "status": "success",
+            "account_performance": {"enabled": True, "publish_to_site": True, "status": "ok"},
+            "artifacts": {"account_performance_public_json": performance_path.as_posix()},
+        },
+    }
+    (run_dir / "run.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+    build_site(archive, site, SiteSettings())
+
+    public_html = (site / "runs" / manifest["run_id"] / "portfolio.html").read_text(encoding="utf-8")
+    published_payload = json.loads(
+        (site / "downloads" / manifest["run_id"] / "portfolio" / "account_performance_public.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    ytd_period = next(period for period in published_payload["periods"] if period["period"] == "YTD")
+
+    assert "<strong>ALL (부분)</strong><span>20.00%</span>" in public_html
+    assert "YTD (부분)" in public_html
+    assert "데이터 부족" in public_html
+    assert "요청 기간 시작일의 계좌 스냅샷 없음" in public_html
+    assert ytd_period["status"] == "insufficient_history"
+    assert ytd_period["actual_return"] is None
+    assert published_payload["summary"]["default_period"] == "ALL"
+    assert any(
+        "account_performance_period_insufficient_history:YTD" in item
+        for item in published_payload["data_quality"]["warnings"]
+    )
