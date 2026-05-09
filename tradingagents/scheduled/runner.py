@@ -1860,12 +1860,22 @@ def _run_performance_tracking(
         else:
             outcome_update["unavailable_reason"] = "outcome_update_disabled"
         summary = summarize_action_performance(db_path)
+        summary_payload = summary.to_dict() if hasattr(summary, "to_dict") else summary
+        recommendations = (
+            int(summary_payload.get("recommendations") or 0)
+            if isinstance(summary_payload, dict)
+            else 0
+        )
+        status = "ok" if outcome_update.get("updated") else "recorded_pending_outcomes"
+        if recommendations <= 0 and not outcome_update.get("updated"):
+            status = "recorded_pending_outcomes"
         payload = {
             "enabled": True,
-            "status": "ok",
+            "status": status,
             "store_path": db_path.as_posix(),
             "outcome_update": outcome_update,
-            "summary": summary.to_dict() if hasattr(summary, "to_dict") else summary,
+            "summary": summary_payload,
+            "recorded_recommendations": recommendations,
         }
         summary_path = run_dir / "performance" / "performance_summary.json"
         payload["artifacts"] = {"performance_summary_json": _relative_to_run(run_dir, summary_path)}
@@ -1877,6 +1887,7 @@ def _run_performance_tracking(
             "store_path": db_path.as_posix(),
             "status": "failed",
             "warning": f"performance_tracking_failed:{exc}",
+            "failure_reason": str(exc),
         }
 
 

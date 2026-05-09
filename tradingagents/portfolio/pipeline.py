@@ -258,12 +258,20 @@ def _build_account_performance_status(
             except Exception:
                 payload = {}
         quality = payload.get("data_quality") if isinstance(payload.get("data_quality"), dict) else {}
+        summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
+        reconciliation = payload.get("reconciliation") if isinstance(payload.get("reconciliation"), dict) else {}
         return {
             "enabled": True,
             "status": str(payload.get("status") or ("ok" if artifacts else "partial")),
             "publish_to_site": bool(getattr(settings, "publish_to_site", True)),
             "benchmarks": payload.get("benchmarks") or [],
             "periods": [item.get("period") for item in payload.get("periods", []) if isinstance(item, dict)],
+            "summary_period": summary.get("default_period"),
+            "performance_confidence": summary.get("performance_confidence"),
+            "hide_excess_headline": bool(summary.get("hide_excess_headline")),
+            "requires_manual_reconciliation": bool(summary.get("requires_manual_reconciliation")),
+            "reconciliation_status": reconciliation.get("reconciliation_status"),
+            "reconciliation_severity": reconciliation.get("reconciliation_severity"),
             "data_quality": quality,
             "artifacts": artifacts,
         }

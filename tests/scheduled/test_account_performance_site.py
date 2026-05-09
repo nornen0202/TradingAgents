@@ -4,7 +4,12 @@ import json
 from pathlib import Path
 
 from tradingagents.scheduled.config import SiteSettings
-from tradingagents.scheduled.site import build_site
+from tradingagents.scheduled.site import (
+    _account_benchmark_provider_label,
+    _account_performance_svg,
+    _render_account_performance_section,
+    build_site,
+)
 
 
 def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_path: Path):
@@ -471,6 +476,102 @@ def test_portfolio_page_shows_friendly_provider_fallback_and_keeps_raw_error_in_
     build_site(archive, site, SiteSettings())
     public_html = (site / "runs" / "20260506T090000_test" / "portfolio.html").read_text(encoding="utf-8")
     investor_section = public_html.split("데이터 품질 경고", 1)[0]
-    assert "SPY/QQQ 가격은 선호 provider 조회 실패 후 yfinance로 대체했습니다." in investor_section
+    assert "벤치마크 가격: SPY/QQQ = KIS 실패 후 yfinance fallback" in investor_section
     assert "https://openapi" not in investor_section
     assert raw_error in public_html
+
+
+def test_reconciliation_failed_demotes_excess_headline():
+    payload = {
+        "status": "ok",
+        "benchmarks": ["KOSDAQ"],
+        "summary": {
+            "default_period": "ALL_AVAILABLE",
+            "default_period_label": "사용 가능 전체 기간",
+            "start_date": "2026-04-13",
+            "end_date": "2026-05-07",
+            "actual_return": 0.2869,
+            "primary_return_method": "available_history_twr_equivalent",
+            "performance_confidence": "low",
+            "hide_excess_headline": True,
+            "mwr_unavailable_reason": "no_external_capital_flows_for_irr",
+            "best_excess": {"benchmark": "KOSDAQ", "excess_return": 1.6107, "excess_krw": 12_345_678},
+            "worst_excess": {"benchmark": "KOSDAQ", "excess_return": 1.6107, "excess_krw": 12_345_678},
+            "period_coverage": {"coverage_ratio": 1.0},
+        },
+        "periods": [
+            {
+                "period": "ALL",
+                "start_date": "2026-04-13",
+                "end_date": "2026-05-07",
+                "actual_return": 0.2869,
+                "primary_return_method": "available_history_twr_equivalent",
+                "simple_benchmarks": [
+                    {"benchmark": "KOSDAQ", "benchmark_return": -1.3238, "excess_return": 1.6107, "excess_krw": 12_345_678}
+                ],
+                "cashflow_benchmarks": [],
+            }
+        ],
+        "chart_data": {"benchmarks": [], "series": []},
+        "costs": {},
+        "contribution_by_ticker": [],
+        "reconciliation": {
+            "reconciliation_status": "FAILED",
+            "reconciliation_severity": "critical",
+            "unexplained_difference_pct_of_nav": 0.22,
+        },
+        "data_quality": {"snapshot_count": 2, "ledger_event_count": 0, "warnings": []},
+    }
+
+    html = _render_account_performance_section(
+        {"run_id": "run1", "portfolio": {"account_performance": {"publish_to_site": True}}},
+        {"account_performance": payload},
+    )
+    kpi_section = html.split("<div class=\"account-table-wrap\">", 1)[0]
+
+    assert "성과 신뢰도" in kpi_section
+    assert "낮음" in kpi_section
+    assert "정합성 FAILED / 중대" in kpi_section
+    assert "정합성 검증 후 해석" in kpi_section
+    assert "수동 검증 필요" in kpi_section
+    assert "KOSDAQ 161.07%" not in kpi_section
+
+
+def test_chart_peak_return_labeled_as_peak_not_headline():
+    html = _account_performance_svg(
+        {
+            "title": "사용 가능 기간 수익률",
+            "benchmarks": [],
+            "final_return": 1.7048,
+            "peak_return": 1.8922,
+            "max_drawdown": -0.1145,
+            "consistency_status": "ok",
+            "series": [
+                {"date": "2026-04-13", "account_return": 0.0},
+                {"date": "2026-04-25", "account_return": 1.8922},
+                {"date": "2026-05-07", "account_return": 1.7048},
+            ],
+        }
+    )
+
+    assert "최종 수익률: 170.48%" in html
+    assert "기간 중 최고 수익률: 189.22%" in html
+    assert "최대 낙폭: -11.45%" in html
+    assert "189.22%0.00%" not in html
+    assert "<text" not in html
+    assert "aria-hidden='true'" in html
+
+
+def test_benchmark_provider_label_uses_actual_provider_status():
+    label = _account_benchmark_provider_label(
+        {
+            "benchmark_provider": "yfinance",
+            "benchmark_provider_status": {
+                "KOSPI": {"preferred_provider": "kis", "used_provider": "kis", "status": "ok"},
+                "KOSDAQ": {"preferred_provider": "kis", "used_provider": "kis", "status": "ok"},
+            },
+        }
+    )
+
+    assert label == "KOSPI/KOSDAQ=kis"
+    assert "yfinance" not in label

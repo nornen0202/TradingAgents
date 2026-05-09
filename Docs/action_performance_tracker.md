@@ -48,6 +48,8 @@ python -m tradingagents.performance.query_archive --db archive/performance.sqlit
 
 Outcome updates are disabled unless `update_outcomes_on_run = true`. Even then, the runner needs either a local price history file or an explicit provider.
 
+Scheduled runs now separate recommendation recording from outcome updates. When tracking is enabled, recommendations are written first. If outcome updates are disabled or price history is unavailable, the run status is `recorded_pending_outcomes` instead of `failed`, and `failure_reason` / `unavailable_reason` explain any remaining issue.
+
 Local JSON accepts this shape:
 
 ```json
