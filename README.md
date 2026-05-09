@@ -55,7 +55,7 @@ PRISM live dashboard가 KR 전용 데이터인 상태에서 US run을 실행할 
 
 자세한 설정과 충돌 정책은 [Docs/prism_external_signals.md](Docs/prism_external_signals.md), 스캐너는 [Docs/scanner_prism_style.md](Docs/scanner_prism_style.md), 추천 성과 추적은 [Docs/action_performance_tracker.md](Docs/action_performance_tracker.md)를 참고하세요. 모든 기능은 기본 비활성화이며, 기존 scheduled report는 PRISM 없이 그대로 동작합니다. Live HTTP와 dashboard HTML embedded JSON 파싱은 각각 명시적으로 켜야 하며, outcome 업데이트도 가격 히스토리 파일 또는 opt-in provider가 있어야 계산됩니다.
 
-계좌 성과 vs 지수/ETF 섹션은 단순 NAV 수익률, 현금흐름 보정 TWR, 사용 가능 기간(`ALL_AVAILABLE`), 동일 현금흐름 벤치마크, 기여도 정합성 경고를 구분해 표시합니다. 짧은 계좌 기록 때문에 1M/3M/YTD 등이 같은 실제 기간으로 접히면 기본 투자자 화면에서는 중복 행을 숨기고, 원시 산출은 진단 영역과 JSON artifact에 보존합니다. 계산 기준은 [Docs/account_performance.md](Docs/account_performance.md)를 참고하세요.
+계좌 성과 vs 지수/ETF 섹션은 단순 NAV 참고값, 현금흐름 보정 TWR, 외부 현금흐름이 없는 경우의 TWR-equivalent, 사용 가능 기간(`ALL_AVAILABLE`), 동일 현금흐름 벤치마크, 기여도 정합성 경고를 구분해 표시합니다. 짧은 계좌 기록 때문에 1M/3M/YTD 등이 같은 실제 기간으로 접히면 기본 투자자 화면에서는 중복 행을 숨기고, 원시 산출은 진단 영역과 JSON artifact에 보존합니다. NAV와 종목별 손익 기여도가 reconcile되지 않으면 성과 신뢰도를 낮추고 초과수익 headline을 수동 검증 대상으로 강등합니다. 계산 기준은 [Docs/account_performance.md](Docs/account_performance.md)를 참고하세요.
 
 ## 빠른 시작
 

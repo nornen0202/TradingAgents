@@ -25,10 +25,13 @@ def test_account_performance_reports_kospi_and_kosdaq(tmp_path: Path):
     assert period["period"] == "ALL"
     assert period["actual_return"] == 0.2
     assert period["simple_nav_return"] == 0.2
-    assert period["primary_return_method"] == "available_history_simple_nav"
+    assert period["primary_return_method"] == "available_history_twr_equivalent"
+    assert period["twr_return"] == 0.2
     assert payload["summary"]["default_period"] == "ALL_AVAILABLE"
-    assert payload["chart_data"]["return_method"] == "available_history_simple_nav"
+    assert payload["chart_data"]["return_method"] == "available_history_twr_equivalent"
     assert "coverage" in payload["chart_data"]
+    assert payload["chart_data"]["final_return"] == payload["summary"]["actual_return"]
+    assert payload["chart_data"]["consistency_status"] == "ok"
     assert simple["KOSPI"]["benchmark_return"] == 0.1
     assert simple["KOSPI"]["excess_return"] == 0.1
     assert simple["KOSDAQ"]["benchmark_return"] == -0.1
@@ -51,6 +54,25 @@ def test_account_performance_reports_spy_and_qqq(tmp_path: Path):
     assert simple["SPY"]["benchmark_return"] == 0.12
     assert simple["QQQ"]["benchmark_return"] == 0.25
     assert simple["QQQ"]["excess_return"] == -0.05
+
+
+def test_twr_no_external_cashflows_equals_simple_nav_when_reconciled(tmp_path: Path):
+    payload = _build_report(
+        tmp_path,
+        market_scope="kr",
+        current_total_equity_krw=1_100_000,
+        benchmarks={
+            "KOSPI": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 110}],
+            "KOSDAQ": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 100}],
+        },
+    )
+
+    period = payload["periods"][0]
+    assert payload["reconciliation"]["reconciliation_status"] == "OK"
+    assert period["simple_nav_return"] == 0.1
+    assert period["twr_return"] == 0.1
+    assert period["primary_return_method"] == "available_history_twr_equivalent"
+    assert payload["summary"]["performance_confidence"] == "high"
 
 
 def test_account_performance_cashflow_simulation_ignores_internal_trade_ledger(tmp_path: Path):
@@ -238,6 +260,121 @@ def test_account_performance_short_history_marks_duplicate_windows_and_available
     assert any("account_performance_duplicate_actual_windows:ALL_AVAILABLE" in item for item in payload["data_quality"]["warnings"])
 
 
+def test_min_coverage_ratio_zero_is_honored_by_engine(tmp_path: Path):
+    payload = _build_report(
+        tmp_path,
+        market_scope="kr",
+        periods=("1M",),
+        current_as_of="2026-05-07T09:00:00+09:00",
+        history_snapshots=[
+            {
+                "snapshot_id": "first-real",
+                "as_of": "2026-04-13T09:00:00+09:00",
+                "account_value_krw": 1_000_000,
+                "snapshot_health": "VALID",
+                "positions": [{"canonical_ticker": "TEST", "market_value_krw": 900_000}],
+            }
+        ],
+        benchmarks={
+            "KOSPI": [{"date": "2026-04-13", "close": 100}, {"date": "2026-05-07", "close": 110}],
+            "KOSDAQ": [{"date": "2026-04-13", "close": 100}, {"date": "2026-05-07", "close": 90}],
+        },
+        min_coverage_ratio=0.0,
+    )
+
+    period = payload["periods"][0]
+    assert payload["data_quality"]["min_coverage_ratio"] == 0.0
+    assert period["period"] == "1M"
+    assert period["actual_return"] == 0.2
+    assert period["period_coverage"]["is_summary_eligible"] is True
+    assert not any("account_performance_period_insufficient_history:1M" in item for item in payload["data_quality"]["warnings"])
+
+
+def test_contribution_aggregates_bare_kr_code_with_canonical_position(tmp_path: Path):
+    client = Mock()
+    client.fetch_domestic_order_fills.return_value = []
+    client.fetch_domestic_period_profit.return_value = ([], {})
+    client.fetch_domestic_period_trade_profit.return_value = (
+        [
+            {"trad_dt": "20260201", "pdno": "000660", "realized_pnl": "574163"},
+            {"trad_dt": "20260215", "pdno": "034020", "realized_pnl": "87926"},
+        ],
+        {},
+    )
+    positions = (
+        Position(
+            broker_symbol="000660",
+            canonical_ticker="000660.KS",
+            display_name="SK hynix",
+            sector=None,
+            quantity=1,
+            available_qty=1,
+            avg_cost_krw=1_000_000,
+            market_price_krw=1_635_500,
+            market_value_krw=1_635_500,
+            unrealized_pnl_krw=635_500,
+        ),
+        Position(
+            broker_symbol="034020",
+            canonical_ticker="034020.KS",
+            display_name="Doosan Energy",
+            sector=None,
+            quantity=1,
+            available_qty=1,
+            avg_cost_krw=1_000_000,
+            market_price_krw=1_285_074,
+            market_value_krw=1_285_074,
+            unrealized_pnl_krw=285_074,
+        ),
+    )
+
+    with patch("tradingagents.portfolio.kis.KisClient.from_api_keys", return_value=client):
+        payload = _build_report(
+            tmp_path,
+            market_scope="kr",
+            broker="kis",
+            positions=positions,
+            current_total_equity_krw=3_100_000,
+            benchmarks={
+                "KOSPI": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 110}],
+                "KOSDAQ": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 100}],
+            },
+        )
+
+    rows = {row["ticker"]: row for row in payload["contribution_by_ticker"]}
+    assert "000660" not in rows
+    assert "034020" not in rows
+    assert rows["000660.KS"]["realized_pnl_krw"] == 574_163
+    assert rows["000660.KS"]["unrealized_pnl_krw"] == 635_500
+    assert rows["000660.KS"]["total_contribution_krw"] == 1_209_663
+    assert rows["034020.KS"]["total_contribution_krw"] == 373_000
+
+
+def test_contribution_keeps_unresolved_bare_code_with_warning(tmp_path: Path):
+    client = Mock()
+    client.fetch_domestic_order_fills.return_value = []
+    client.fetch_domestic_period_profit.return_value = ([], {})
+    client.fetch_domestic_period_trade_profit.return_value = (
+        [{"trad_dt": "20260201", "pdno": "123456", "realized_pnl": "50000"}],
+        {},
+    )
+
+    with patch("tradingagents.portfolio.kis.KisClient.from_api_keys", return_value=client):
+        payload = _build_report(
+            tmp_path,
+            market_scope="kr",
+            broker="kis",
+            benchmarks={
+                "KOSPI": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 110}],
+                "KOSDAQ": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 100}],
+            },
+        )
+
+    rows = {row["ticker"]: row for row in payload["contribution_by_ticker"]}
+    assert rows["123456"]["realized_pnl_krw"] == 50_000
+    assert "account_performance_contribution_unresolved_ticker:123456" in payload["data_quality"]["warnings"]
+
+
 def test_account_performance_external_deposit_and_withdrawal_drive_same_cashflow_benchmark(tmp_path: Path):
     client = Mock()
     client.fetch_domestic_order_fills.return_value = []
@@ -318,6 +455,9 @@ def test_account_performance_contribution_mismatch_triggers_reconciliation_warni
     assert reconciliation["simple_nav_pnl_krw"] == 500_000
     assert reconciliation["sum_position_contribution_krw"] == 100_000
     assert reconciliation["reconciliation_status"] == "FAILED"
+    assert payload["summary"]["performance_confidence"] == "low"
+    assert payload["summary"]["hide_excess_headline"] is True
+    assert payload["summary"]["requires_manual_reconciliation"] is True
     assert "account_performance_unreconciled_pnl" in payload["data_quality"]["warnings"]
 
 
@@ -332,6 +472,8 @@ def _build_report(
     current_as_of: str = "2026-04-01T09:00:00+09:00",
     current_total_equity_krw: int = 1_200_000,
     current_snapshot_health: str = "VALID",
+    positions: tuple[Position, ...] | None = None,
+    min_coverage_ratio: float | None = None,
 ) -> dict[str, object]:
     archive = tmp_path / "archive"
     current_run = archive / "runs" / "2026" / f"{market_scope}-current"
@@ -373,18 +515,8 @@ def _build_report(
         constraints=AccountConstraints(),
         market_scope=market_scope,
     )
-    snapshot = AccountSnapshot(
-        snapshot_id="current",
-        as_of=current_as_of,
-        broker="manual",
-        account_id="manual",
-        currency="KRW",
-        settled_cash_krw=100_000,
-        available_cash_krw=100_000,
-        buying_power_krw=100_000,
-        total_equity_krw=current_total_equity_krw,
-        snapshot_health=current_snapshot_health,
-        positions=(
+    if positions is None:
+        positions = (
             Position(
                 broker_symbol="TEST",
                 canonical_ticker="TEST",
@@ -397,7 +529,20 @@ def _build_report(
                 market_value_krw=1_100_000,
                 unrealized_pnl_krw=100_000,
             ),
-        ),
+        )
+
+    snapshot = AccountSnapshot(
+        snapshot_id="current",
+        as_of=current_as_of,
+        broker="manual",
+        account_id="manual",
+        currency="KRW",
+        settled_cash_krw=100_000,
+        available_cash_krw=100_000,
+        buying_power_krw=100_000,
+        total_equity_krw=current_total_equity_krw,
+        snapshot_health=current_snapshot_health,
+        positions=positions,
         constraints=AccountConstraints(),
     )
     settings = SimpleNamespace(
@@ -412,6 +557,8 @@ def _build_report(
         lookback_days=365,
         fetch_kis_ledger=broker == "kis",
     )
+    if min_coverage_ratio is not None:
+        settings.min_coverage_ratio = min_coverage_ratio
 
     artifacts = build_account_performance_outputs(
         private_dir=current_private,

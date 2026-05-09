@@ -683,6 +683,7 @@ def _load_portfolio_performance_settings(
     base_dir: Path,
 ) -> PortfolioPerformanceSettings:
     raw = raw if isinstance(raw, dict) else {}
+    min_coverage_raw = raw.get("min_coverage_ratio") if "min_coverage_ratio" in raw else 0.8
     return PortfolioPerformanceSettings(
         enabled=bool(raw.get("enabled", True)),
         publish_to_site=bool(raw.get("publish_to_site", True)),
@@ -707,8 +708,18 @@ def _load_portfolio_performance_settings(
         price_history_path=_resolve_optional_path(raw.get("price_history_path"), base_dir),
         lookback_days=max(30, int(raw.get("lookback_days", 800) or 800)),
         fetch_kis_ledger=bool(raw.get("fetch_kis_ledger", True)),
-        min_coverage_ratio=max(0.0, min(1.0, float(raw.get("min_coverage_ratio", 0.8) or 0.8))),
+        min_coverage_ratio=_clamp_ratio(min_coverage_raw, default=0.8),
     )
+
+
+def _clamp_ratio(value: object, *, default: float) -> float:
+    if value is None:
+        return float(default)
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return float(default)
+    return max(0.0, min(1.0, number))
 
 
 def _load_performance_settings(raw: dict[str, object], *, base_dir: Path) -> PerformanceSettings:

@@ -1,6 +1,9 @@
 import sqlite3
+from datetime import datetime, timezone
 
 from tradingagents.performance.action_outcomes import record_run_recommendations, summarize_action_performance, update_action_outcomes
+from tradingagents.scheduled.config import load_scheduled_config
+from tradingagents.scheduled.runner import _run_performance_tracking
 from tradingagents.scheduled.site import _render_performance_tracking_section
 
 
@@ -24,6 +27,64 @@ def test_performance_unavailable_reason_rendered():
 
     assert "성과 추적: 기록은 저장됐지만 아직 성과 계산은 수행되지 않았습니다." in html
     assert "price_provider_unavailable_or_no_price_history" in html
+
+
+def test_action_recommendations_recorded_even_when_outcome_update_disabled(tmp_path):
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        """
+[run]
+tickers = ["AAPL"]
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+
+[performance]
+enabled = true
+store_path = "./performance.sqlite"
+update_outcomes_on_run = false
+price_provider = "none"
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    run_dir = tmp_path / "run"
+    private = run_dir / "portfolio-private"
+    private.mkdir(parents=True)
+    (run_dir / "run.json").write_text(
+        '{"run_id":"run1","started_at":"2026-04-01T09:00:00+09:00"}',
+        encoding="utf-8",
+    )
+    (private / "portfolio_report.json").write_text(
+        """
+        {
+          "actions": [
+            {
+              "canonical_ticker": "AAPL",
+              "action_now": "WATCH",
+              "action_if_triggered": "STARTER_IF_TRIGGERED",
+              "portfolio_relative_action": "ADD",
+              "delta_krw_now": 0,
+              "confidence": 0.5
+            }
+          ]
+        }
+        """,
+        encoding="utf-8",
+    )
+
+    payload = _run_performance_tracking(
+        config=config,
+        run_dir=run_dir,
+        started_at=datetime(2026, 4, 1, tzinfo=timezone.utc),
+    )
+
+    assert payload["status"] == "recorded_pending_outcomes"
+    assert payload["recorded_recommendations"] == 1
+    assert payload["summary"]["recommendations"] == 1
+    assert payload["summary"]["outcomes"] == 0
+    assert payload["outcome_update"]["unavailable_reason"] == "outcome_update_disabled"
 
 
 def test_action_outcome_buckets_include_prism_uncovered(tmp_path):

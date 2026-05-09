@@ -1023,6 +1023,7 @@ def _render_portfolio_page(
     )
     portfolio_label = _portfolio_report_label(portfolio_summary)
     summary_image_html = _portfolio_summary_image_html(manifest, portfolio_summary)
+    account_performance_badges = _account_performance_status_badges(portfolio_summary)
 
     body = f"""
     <nav class="breadcrumbs">
@@ -1039,6 +1040,7 @@ def _render_portfolio_page(
         <div class="status {portfolio_summary.get('status_class', 'pending')}">{_escape(status_label)}</div>
         <p><strong>Account mode</strong><span>{_escape(snapshot_mode)}</span></p>
         <p><strong>Generated</strong><span>{_escape(portfolio_summary.get('generated_at') or '-')}</span></p>
+        {account_performance_badges}
       </div>
     </section>
     {failure_html}
@@ -1080,6 +1082,9 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     coverage_label = _account_summary_coverage_label(summary)
     best = summary.get("best_excess") if isinstance(summary.get("best_excess"), dict) else {}
     worst = summary.get("worst_excess") if isinstance(summary.get("worst_excess"), dict) else {}
+    hide_excess_headline = bool(summary.get("hide_excess_headline"))
+    confidence_label = _account_confidence_label(summary)
+    reconciliation_label = _account_reconciliation_label(reconciliation)
     public_json = portfolio_summary.get("account_performance_public_json")
     chart_json = portfolio_summary.get("account_performance_chart_data_json")
     report_md = portfolio_summary.get("account_performance_report_md")
@@ -1111,6 +1116,14 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
         quality=quality,
     )
     benchmark_reliability = _account_benchmark_reliability_label(summary, reconciliation)
+    benchmark_headline_value = (
+        "정합성 검증 후 해석"
+        if hide_excess_headline
+        else f"{str(best.get('benchmark') or '-')} {_format_pct_value(best.get('excess_return'))}"
+    )
+    excess_headline_label = "수동 검증 필요" if hide_excess_headline else str(best.get("benchmark") or "-")
+    excess_headline_value = "참고용" if hide_excess_headline else _format_signed_krw_value(best.get("excess_krw"))
+    provider_label = _account_benchmark_provider_label(quality)
     return f"""
     <section class="section account-performance">
       <div class="section-head">
@@ -1118,6 +1131,10 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
         <p>{_escape(benchmark_label)}</p>
       </div>
       <div class="run-grid account-kpi-grid">
+        <article class="run-card">
+          <h3>성과 신뢰도</h3>
+          <p><strong>{_escape(confidence_label)}</strong><span>{_escape(reconciliation_label)}</span></p>
+        </article>
         <article class="run-card">
           <h3>성과 기준 기간</h3>
           <p><strong>{_escape(default_period_label)}</strong><span>{_escape(coverage_label)}</span></p>
@@ -1128,11 +1145,11 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
         </article>
         <article class="run-card">
           <h3>벤치마크 비교</h3>
-          <p><strong>{_escape(benchmark_reliability)}</strong><span>{_escape(str(best.get('benchmark') or '-'))} {_escape(_format_pct_value(best.get('excess_return')))}</span></p>
+          <p><strong>{_escape(benchmark_reliability)}</strong><span>{_escape(benchmark_headline_value)}</span></p>
         </article>
         <article class="run-card">
-          <h3>참고용 초과손익</h3>
-          <p><strong>{_escape(str(best.get('benchmark') or '-'))}</strong><span>{_escape(_format_signed_krw_value(best.get('excess_krw')))}</span></p>
+          <h3>초과손익 해석</h3>
+          <p><strong>{_escape(excess_headline_label)}</strong><span>{_escape(excess_headline_value)}</span></p>
         </article>
       </div>
       {investor_notes}
@@ -1169,8 +1186,10 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
         <article class="run-card">
           <h3>데이터 품질</h3>
           <p><strong>스냅샷</strong><span>{int(quality.get('snapshot_count') or 0)}</span></p>
-          <p><strong>원장 이벤트</strong><span>{int(quality.get('ledger_event_count') or 0)}</span></p>
-          <p><strong>가격 provider</strong><span>{_escape(str(quality.get('benchmark_provider') or '-'))}</span></p>
+          <p><strong>입출금/외부자금흐름</strong><span>{int(quality.get('external_capital_flow_count') or 0)}건</span></p>
+          <p><strong>성과 보정 이벤트</strong><span>{int(quality.get('cashflow_event_count') or 0)}건</span></p>
+          <p><strong>거래 원장</strong><span>{int(quality.get('ledger_event_count') or 0)}건</span></p>
+          <p><strong>벤치마크 가격</strong><span>{_escape(provider_label)}</span></p>
         </article>
       </div>
       <details class="advanced-diagnostics"><summary>기간별 원시 산출</summary><table><tbody>{raw_table_rows}</tbody></table></details>
@@ -1326,6 +1345,8 @@ def _account_return_method_label(method: Any, warning: Any = None) -> str:
     warning_text = str(warning or "").strip().lower()
     if method_text == "twr":
         return "현금흐름 보정 TWR"
+    if method_text in {"twr_equivalent", "available_history_twr_equivalent"}:
+        return "외부 현금흐름 없음 - TWR 상당 단순 NAV"
     if method_text == "mwr":
         return "현금흐름 보정 MWR"
     if warning_text == "cashflow_adjustment_unavailable" or method_text == "simple_nav_unadjusted":
@@ -1356,7 +1377,48 @@ def _account_summary_coverage_label(summary: dict[str, Any]) -> str:
     return ratio
 
 
+def _account_confidence_label(summary: dict[str, Any]) -> str:
+    confidence = str(summary.get("performance_confidence") or "").strip().lower()
+    return {
+        "high": "높음",
+        "medium": "보통",
+        "low": "낮음",
+    }.get(confidence, "미확인")
+
+
+def _account_reconciliation_label(reconciliation: dict[str, Any]) -> str:
+    status = str(reconciliation.get("reconciliation_status") or "UNAVAILABLE").strip().upper()
+    severity = str(reconciliation.get("reconciliation_severity") or "").strip().lower()
+    suffix = {
+        "critical": " / 중대",
+        "failed": " / 실패",
+        "warning": " / 경고",
+        "unavailable": " / 불완전",
+    }.get(severity, "")
+    return f"정합성 {status}{suffix}"
+
+
+def _account_performance_status_badges(portfolio_summary: dict[str, Any]) -> str:
+    payload = portfolio_summary.get("account_performance") if isinstance(portfolio_summary, dict) else None
+    if not isinstance(payload, dict):
+        return ""
+    summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
+    reconciliation = payload.get("reconciliation") if isinstance(payload.get("reconciliation"), dict) else {}
+    if not summary and not reconciliation:
+        return ""
+    confidence = _account_confidence_label(summary)
+    reconciliation_label = _account_reconciliation_label(reconciliation)
+    status = str(reconciliation.get("reconciliation_status") or "").strip().upper()
+    badge_class = "failed" if status == "FAILED" else ("partial_failure" if status in {"WARNING", "UNAVAILABLE"} else "success")
+    return (
+        f"<div class='status {badge_class}'>계좌 성과: {_escape(reconciliation_label)}</div>"
+        f"<p><strong>성과 신뢰도</strong><span>{_escape(confidence)}</span></p>"
+    )
+
+
 def _account_benchmark_reliability_label(summary: dict[str, Any], reconciliation: dict[str, Any]) -> str:
+    if bool(summary.get("hide_excess_headline")):
+        return "참고용 - 정합성 실패"
     warning = str(summary.get("return_method_warning") or "")
     status = str(reconciliation.get("reconciliation_status") or "").upper()
     if warning == "cashflow_adjustment_unavailable" or status in {"WARNING", "FAILED", "UNAVAILABLE"}:
@@ -1378,10 +1440,15 @@ def _account_performance_investor_notes(
         notes.append(f"성과 기준 기간: {start} ~ {end} (사용 가능 전체 기간)")
     method_label = _account_return_method_label(summary.get("primary_return_method"), summary.get("return_method_warning"))
     notes.append(f"계좌 수익률: {method_label}")
+    if summary.get("mwr_return") is None:
+        reason = str(summary.get("mwr_unavailable_reason") or "dated_external_cashflows_incomplete")
+        notes.append(f"MWR: 산출 불가 ({reason})")
     if summary.get("return_method_warning") == "cashflow_adjustment_unavailable":
         notes.append("벤치마크 비교: 참고용 - 외부 현금흐름 보정이 불완전합니다.")
     status = str(reconciliation.get("reconciliation_status") or "").upper()
-    if status in {"WARNING", "FAILED"}:
+    if status == "FAILED":
+        notes.append("성과 정합성: 실패 - 초과수익은 수동 검증 전까지 headline으로 해석하지 않습니다.")
+    elif status == "WARNING":
         notes.append("보유/실현 손익 합계와 NAV 변화가 크게 달라 초과수익 해석은 검증이 필요합니다.")
     warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
     if any("account_performance_duplicate_actual_windows" in str(item) for item in warnings):
@@ -1395,7 +1462,7 @@ def _account_benchmark_provider_messages(quality: dict[str, Any]) -> str:
     statuses = quality.get("benchmark_provider_status")
     if not isinstance(statuses, dict):
         return ""
-    fallback_by_used: dict[str, list[str]] = {}
+    fallback_by_used: dict[tuple[str, str], list[str]] = {}
     provider_lines = []
     for benchmark, status in statuses.items():
         if not isinstance(status, dict):
@@ -1404,7 +1471,7 @@ def _account_benchmark_provider_messages(quality: dict[str, Any]) -> str:
         used = str(status.get("used_provider") or "-")
         state = str(status.get("status") or "-")
         if state == "fallback":
-            fallback_by_used.setdefault(used, []).append(str(benchmark))
+            fallback_by_used.setdefault((preferred, used), []).append(str(benchmark))
         elif used not in {"", "-", "None"}:
             provider_lines.append(f"{benchmark}: {used}")
         elif state not in {"ok", "pending"}:
@@ -1412,14 +1479,45 @@ def _account_benchmark_provider_messages(quality: dict[str, Any]) -> str:
         elif preferred:
             provider_lines.append(f"{benchmark}: {preferred}")
     messages = []
-    for used, names in fallback_by_used.items():
+    for (preferred, used), names in fallback_by_used.items():
         provider = used if used not in {"", "-", "None"} else "대체 provider"
-        messages.append(f"{'/'.join(names)} 가격은 선호 provider 조회 실패 후 {provider}로 대체했습니다.")
+        preferred_label = preferred.upper() if preferred not in {"", "-", "None"} else "선호 provider"
+        messages.append(f"벤치마크 가격: {'/'.join(names)} = {preferred_label} 실패 후 {provider} fallback")
     if provider_lines:
-        messages.append("가격 provider: " + ", ".join(provider_lines))
+        messages.append("벤치마크 가격: " + ", ".join(provider_lines))
     if not messages:
         return ""
     return "<p class='empty'>" + "<br>".join(_escape(item) for item in messages) + "</p>"
+
+
+def _account_benchmark_provider_label(quality: dict[str, Any]) -> str:
+    statuses = quality.get("benchmark_provider_status")
+    if not isinstance(statuses, dict) or not statuses:
+        provider = str(quality.get("benchmark_provider") or "-")
+        return f"기본 설정 {provider}" if provider not in {"", "-", "None"} else "-"
+    ok_by_provider: dict[str, list[str]] = {}
+    fallback: list[str] = []
+    unavailable: list[str] = []
+    for benchmark, status in statuses.items():
+        if not isinstance(status, dict):
+            continue
+        used = str(status.get("used_provider") or "").strip()
+        preferred = str(status.get("preferred_provider") or "").strip()
+        state = str(status.get("status") or "").strip().lower()
+        name = str(benchmark)
+        if state == "fallback":
+            provider = used or "fallback"
+            fallback.append(f"{name}={provider} fallback")
+        elif used:
+            ok_by_provider.setdefault(used, []).append(name)
+        elif preferred:
+            ok_by_provider.setdefault(preferred, []).append(name)
+        else:
+            unavailable.append(f"{name}=unavailable")
+    parts = [f"{'/'.join(names)}={provider}" for provider, names in sorted(ok_by_provider.items())]
+    parts.extend(fallback)
+    parts.extend(unavailable)
+    return ", ".join(parts) if parts else "-"
 
 
 def _account_contribution_rows(contribution: list[Any], *, reconciliation: dict[str, Any]) -> str:
@@ -1515,20 +1613,44 @@ def _account_performance_svg(chart_data: dict[str, Any]) -> str:
         if zero_y is not None
         else ""
     )
-    start_label = _escape(str((series[0] or {}).get("date") or ""))
-    end_label = _escape(str((series[-1] or {}).get("date") or ""))
+    start_label = str((series[0] or {}).get("date") or "")
+    end_label = str((series[-1] or {}).get("date") or "")
+    final_return = chart_data.get("final_return")
+    peak_return = chart_data.get("peak_return")
+    max_drawdown = chart_data.get("max_drawdown")
+    if final_return is None:
+        final_return = (series[-1] or {}).get("account_return")
+    if peak_return is None:
+        account_values = [
+            float(row.get("account_return"))
+            for row in series
+            if isinstance(row, dict) and row.get("account_return") is not None
+        ]
+        peak_return = max(account_values) if account_values else None
+    chart_warning = ""
+    if str(chart_data.get("consistency_status") or "") == "warning":
+        chart_warning = "<p class='empty'>차트 최종 수익률과 요약 수익률이 달라 원시 산출 검토가 필요합니다.</p>"
+    screen_reader_text = (
+        f"{title}. 기간 {start_label}부터 {end_label}까지. "
+        f"최종 수익률 {_format_pct_value(final_return)}, "
+        f"기간 중 최고 수익률 {_format_pct_value(peak_return)}, "
+        f"최대 낙폭 {_format_pct_value(max_drawdown)}."
+    )
     return (
         "<div class='account-chart'>"
         f"<h3 class='account-chart-title'>{_escape(title)}</h3>"
-        f"<svg viewBox='0 0 {width} {height}' role='img' aria-label='계좌 누적 수익률과 벤치마크 비교 차트'>"
+        "<div class='account-chart-stats'>"
+        f"<span>최종 수익률: {_escape(_format_pct_value(final_return))}</span>"
+        f"<span>기간 중 최고 수익률: {_escape(_format_pct_value(peak_return))}</span>"
+        f"<span>최대 낙폭: {_escape(_format_pct_value(max_drawdown))}</span>"
+        "</div>"
+        f"{chart_warning}"
+        f"<p class='sr-only'>{_escape(screen_reader_text)}</p>"
+        f"<svg viewBox='0 0 {width} {height}' aria-hidden='true' focusable='false'>"
         f"<rect x='0' y='0' width='{width}' height='{height}' rx='12' fill='#fbfdfd' />"
         f"<line x1='{left}' y1='{height - bottom}' x2='{width - right}' y2='{height - bottom}' stroke='#cfd8d6' />"
         f"<line x1='{left}' y1='{top}' x2='{left}' y2='{height - bottom}' stroke='#cfd8d6' />"
         f"{zero_line}{''.join(polylines)}"
-        f"<text x='{left}' y='{height - 15}'>{start_label}</text>"
-        f"<text x='{width - right}' y='{height - 15}' text-anchor='end'>{end_label}</text>"
-        f"<text x='{left}' y='18'>{_escape(_format_pct_value(max_value))}</text>"
-        f"<text x='{left}' y='{height - bottom - 6}'>{_escape(_format_pct_value(min_value))}</text>"
         "</svg>"
         f"<div class='account-chart-legend'>{''.join(labels)}</div>"
         "</div>"
@@ -1559,11 +1681,14 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
     update_label = "갱신됨" if outcome_update.get("updated") else ("대기 중" if outcome_update.get("enabled") else "비활성")
     provider = str(outcome_update.get("provider") or performance.get("provider") or "-")
     unavailable_reason = str(outcome_update.get("unavailable_reason") or "").strip()
+    failure_reason = str(performance.get("failure_reason") or performance.get("warning") or "").strip()
     unavailable_note = ""
     if not outcome_update.get("updated"):
         unavailable_note = "<p class='empty'>성과 추적: 기록은 저장됐지만 아직 성과 계산은 수행되지 않았습니다.</p>"
         if unavailable_reason:
             unavailable_note += f"<p class='empty'>{_escape(unavailable_reason)}</p>"
+        if failure_reason:
+            unavailable_note += f"<p class='empty'>failure_reason: {_escape(failure_reason)}</p>"
     return f"""
     <section class="section">
       <div class="section-head">
@@ -2880,11 +3005,14 @@ def _select_representative_run(manifests: list[dict[str, Any]]) -> dict[str, Any
         ranked_pool = [manifest for manifest in manifests if _manifest_market(manifest) == target_market]
     if not ranked_pool:
         ranked_pool = list(manifests)
+    qualified = [manifest for manifest in ranked_pool if _representative_run_quality_gate(manifest)]
+    if qualified:
+        ranked_pool = qualified
     ranked = sorted(ranked_pool, key=_representative_run_sort_key)
     return ranked[0] if ranked else manifests[0]
 
 
-def _representative_run_sort_key(manifest: dict[str, Any]) -> tuple[int, int, int, int, str]:
+def _representative_run_sort_key(manifest: dict[str, Any]) -> tuple[int, int, int, int, int, int, str]:
     phase = _run_phase_label(manifest)
     phase_rank = {
         "regular_session": 0,
@@ -2900,10 +3028,68 @@ def _representative_run_sort_key(manifest: dict[str, Any]) -> tuple[int, int, in
         DELAYED_ANALYSIS_ONLY: 1,
         STALE_INVALID_FOR_EXECUTION: 2,
     }.get(_run_execution_data_quality(manifest), 1)
+    representative_rank = _representative_run_quality_rank(manifest)
+    failure_rank = int(_run_failure_ratio(manifest) * 1000)
     usefulness_rank = int(((manifest.get("run_quality") or {}).get("usefulness_rank") or manifest.get("usefulness_rank") or 100))
     started_at = str(manifest.get("started_at") or "")
     recency_bias = "".join(chr(255 - ord(ch)) if ord(ch) < 255 else ch for ch in started_at)
-    return (phase_rank, quality_rank, int(stale_ratio * 1000), usefulness_rank, recency_bias)
+    return (representative_rank, phase_rank, quality_rank, failure_rank, int(stale_ratio * 1000), usefulness_rank, recency_bias)
+
+
+def _representative_run_quality_gate(manifest: dict[str, Any]) -> bool:
+    if not _has_portfolio_or_account_report(manifest):
+        return False
+    total, successful, failed = _run_success_counts(manifest)
+    if total <= 0:
+        return False
+    success_rate = successful / total if total else 0.0
+    failure_ratio = failed / total if total else 1.0
+    return success_rate >= 0.90 and (failed == 0 or failure_ratio <= 0.05)
+
+
+def _representative_run_quality_rank(manifest: dict[str, Any]) -> int:
+    if _representative_run_quality_gate(manifest):
+        return 0
+    failure_ratio = _run_failure_ratio(manifest)
+    if failure_ratio > 0.05:
+        return 3
+    if _has_portfolio_or_account_report(manifest):
+        return 1
+    return 2
+
+
+def _run_success_counts(manifest: dict[str, Any]) -> tuple[int, int, int]:
+    summary = manifest.get("summary") if isinstance(manifest.get("summary"), dict) else {}
+    total = int(summary.get("total_tickers") or len(manifest.get("tickers") or []) or 0)
+    failed = int(summary.get("failed_tickers") or 0)
+    successful = int(summary.get("successful_tickers") or max(total - failed, 0))
+    if total <= 0 and successful + failed > 0:
+        total = successful + failed
+    return total, successful, failed
+
+
+def _run_failure_ratio(manifest: dict[str, Any]) -> float:
+    total, _successful, failed = _run_success_counts(manifest)
+    if total <= 0:
+        return 0.0
+    return failed / total
+
+
+def _has_portfolio_or_account_report(manifest: dict[str, Any]) -> bool:
+    portfolio = manifest.get("portfolio") if isinstance(manifest.get("portfolio"), dict) else {}
+    status = str(portfolio.get("status") or "").strip().lower()
+    artifacts = portfolio.get("artifacts") if isinstance(portfolio.get("artifacts"), dict) else {}
+    if artifacts and any(
+        key in artifacts
+        for key in {
+            "portfolio_report_md",
+            "portfolio_report_json",
+            "account_performance_public_json",
+            "account_performance_chart_data_json",
+        }
+    ):
+        return True
+    return bool(portfolio) and status not in {"", "disabled", "failed"}
 
 
 def _run_phase_label(manifest: dict[str, Any]) -> str:
@@ -2996,6 +3182,8 @@ def _run_phase_display_label(manifest: dict[str, Any]) -> str:
 
 
 def _run_category(manifest: dict[str, Any]) -> str:
+    if _run_failure_ratio(manifest) > 0.05:
+        return "TECHNICAL_ARCHIVE"
     phase = _run_phase_label(manifest)
     quality = _run_execution_data_quality(manifest)
     if phase in {"regular_session", "in_session"} and quality == REALTIME_EXECUTION_READY:
@@ -3427,16 +3615,20 @@ a { color: inherit; }
   letter-spacing: 0;
 }
 
+.account-chart-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .account-chart svg {
   width: 100%;
   height: auto;
   border: 1px solid var(--line);
   border-radius: 14px;
-}
-
-.account-chart text {
-  fill: var(--muted);
-  font-size: 13px;
 }
 
 .account-chart-legend {
@@ -3482,6 +3674,18 @@ a { color: inherit; }
 .account-period-note {
   color: var(--muted);
   font-size: 0.86rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .prose { line-height: 1.65; }

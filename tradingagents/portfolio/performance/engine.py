@@ -161,6 +161,7 @@ def build_account_performance_outputs(
         provider_status=benchmark_provider_status,
     )
     cashflow_events = _cashflow_events_from_ledger(ledger_events)
+    min_coverage_ratio = _settings_ratio(getattr(settings, "min_coverage_ratio", None), default=0.8)
     periods = _compute_periods(
         snapshot_rows=snapshot_rows,
         ledger_events=ledger_events,
@@ -168,10 +169,10 @@ def build_account_performance_outputs(
         benchmark_prices=benchmark_prices,
         period_names=tuple(getattr(settings, "periods", ("1M", "3M", "6M", "YTD", "1Y", "ALL"))),
         end_date=end_date,
-        min_coverage_ratio=float(getattr(settings, "min_coverage_ratio", 0.8) or 0.8),
+        min_coverage_ratio=min_coverage_ratio,
         warnings=warnings,
     )
-    contribution = _contribution_by_ticker(snapshot=snapshot, ledger_events=ledger_events)
+    contribution = _contribution_by_ticker(snapshot=snapshot, ledger_events=ledger_events, warnings=warnings)
     reconciliation = reconcile_account_performance(
         snapshot_rows=snapshot_rows,
         ledger_events=ledger_events,
@@ -180,11 +181,13 @@ def build_account_performance_outputs(
     )
     costs = _cost_summary(ledger_events)
     summary = _summary(periods)
+    summary = _summary_with_performance_confidence(summary, reconciliation)
     chart_data = _build_chart_data(
         snapshot_rows=snapshot_rows,
         benchmark_prices=benchmark_prices,
         cashflow_events=cashflow_events,
         summary=summary,
+        warnings=warnings,
     )
 
     payload = {
@@ -209,6 +212,7 @@ def build_account_performance_outputs(
             "external_capital_flow_count": len([event for event in cashflow_events if event.capital_flow]),
             "benchmark_provider": _provider_label(settings),
             "benchmark_provider_status": benchmark_provider_status,
+            "min_coverage_ratio": min_coverage_ratio,
             "warnings": list(dict.fromkeys(warnings)),
         },
         "public_sanitization": str(getattr(settings, "public_sanitization", "mask_identifiers") or "mask_identifiers"),
@@ -1151,10 +1155,11 @@ def _compute_periods(
         best = max(all_rows, key=lambda item: float(item["excess_return"])) if all_rows else None
         worst = min(all_rows, key=lambda item: float(item["excess_return"])) if all_rows else None
         period_values = _snapshot_values_between(snapshot_rows, start, end)
+        summary_eligible = coverage.is_summary_eligible and (not partial_reasons or min_coverage_ratio <= 0.0)
         coverage_payload = _replace_period_coverage(
             coverage,
             is_partial=bool(partial_reasons),
-            is_summary_eligible=coverage.is_summary_eligible and not partial_reasons,
+            is_summary_eligible=summary_eligible,
             insufficient_reason=None,
         ).to_public_dict()
         periods.append(
@@ -1169,7 +1174,9 @@ def _compute_periods(
                 "actual_end_value_krw": int(round(end_value)),
                 "simple_nav_return": _round_or_none(return_profile.get("simple_nav_return")),
                 "twr_return": _round_or_none(return_profile.get("twr_return")),
-                "mwr_return": None,
+                "twr_unavailable_reason": return_profile.get("twr_unavailable_reason"),
+                "mwr_return": _round_or_none(return_profile.get("mwr_return")),
+                "mwr_unavailable_reason": return_profile.get("mwr_unavailable_reason") or "mwr_not_implemented",
                 "primary_return": _round_or_none(return_profile.get("primary_return")),
                 "primary_return_method": return_profile.get("primary_return_method"),
                 "return_method_warning": return_profile.get("return_method_warning"),
@@ -1273,6 +1280,8 @@ def _period_insufficient_reason(
     first_available_start: date | None,
 ) -> str | None:
     if str(period_name or "").strip().upper() == "ALL":
+        return None
+    if min_coverage_ratio <= 0.0:
         return None
     if first_available_start is not None and requested_start < first_available_start:
         return "account history starts after requested period start"
@@ -1450,7 +1459,9 @@ def _insufficient_history_period(
         "actual_end_value_krw": None,
         "simple_nav_return": None,
         "twr_return": None,
+        "twr_unavailable_reason": "insufficient_history",
         "mwr_return": None,
+        "mwr_unavailable_reason": "insufficient_history",
         "primary_return": None,
         "primary_return_method": "insufficient_history",
         "return_method_warning": "insufficient_history",
@@ -1471,20 +1482,39 @@ def _build_chart_data(
     benchmark_prices: dict[str, list[dict[str, Any]]],
     cashflow_events: list[CashflowEvent],
     summary: Mapping[str, Any],
+    warnings: list[str] | None = None,
 ) -> dict[str, Any]:
     if not snapshot_rows:
         return {"series": []}
-    start_value = float(snapshot_rows[0].get("account_value_krw") or 0.0)
+    summary_start = _parse_date(str(summary.get("start_date") or "")) or _parse_date(str(snapshot_rows[0].get("date") or ""))
+    summary_end = _parse_date(str(summary.get("end_date") or "")) or _parse_date(str(snapshot_rows[-1].get("date") or ""))
+    rows = [
+        row
+        for row in snapshot_rows
+        if (row_date := _parse_date(str(row.get("date") or ""))) is not None
+        and (summary_start is None or row_date >= summary_start)
+        and (summary_end is None or row_date <= summary_end)
+    ]
+    if len(rows) < 2:
+        return {
+            "series": [],
+            "benchmarks": list(benchmark_prices),
+            "return_method": str(summary.get("primary_return_method") or "simple_nav"),
+            "coverage": summary.get("period_coverage") or {},
+            "title": _chart_title(summary),
+        }
+    start_value = float(rows[0].get("account_value_krw") or 0.0)
     return_method = str(summary.get("primary_return_method") or "simple_nav")
     use_twr = return_method == "twr"
+    start_date = _parse_date(str(rows[0].get("date"))) or date.today()
     benchmark_start = {
-        name: _price_on_or_after(rows, _parse_date(str(snapshot_rows[0].get("date"))) or date.today())
-        for name, rows in benchmark_prices.items()
+        name: _price_on_or_after(price_rows, start_date)
+        for name, price_rows in benchmark_prices.items()
     }
     series = []
     cumulative_twr = 0.0
     previous_row: dict[str, Any] | None = None
-    for row in snapshot_rows:
+    for row in rows:
         row_date = _parse_date(str(row.get("date"))) or date.today()
         item: dict[str, Any] = {"date": row_date.isoformat()}
         value = float(row.get("account_value_krw") or 0.0)
@@ -1514,11 +1544,35 @@ def _build_chart_data(
             )
         series.append(item)
         previous_row = row
+    account_returns = [
+        float(row["account_return"])
+        for row in series
+        if isinstance(row, dict) and row.get("account_return") is not None
+    ]
+    final_return = account_returns[-1] if account_returns else None
+    summary_return = _float_or_none(summary.get("actual_return"))
+    consistency_status = "unchecked"
+    consistency_warning = None
+    if final_return is not None and summary_return is not None:
+        if abs(final_return - summary_return) <= 0.0001:
+            consistency_status = "ok"
+        else:
+            consistency_status = "warning"
+            consistency_warning = "chart_final_return_differs_from_summary"
+            if warnings is not None:
+                warnings.append("account_performance_chart_summary_mismatch")
     return {
         "series": series,
         "benchmarks": list(benchmark_prices),
         "return_method": return_method,
         "coverage": summary.get("period_coverage") or {},
+        "summary_return": _round_or_none(summary_return),
+        "final_return": _round_or_none(final_return),
+        "peak_return": _round_or_none(max(account_returns) if account_returns else None),
+        "trough_return": _round_or_none(min(account_returns) if account_returns else None),
+        "max_drawdown": _round_or_none(_max_drawdown([1.0 + value for value in account_returns])) if account_returns else None,
+        "consistency_status": consistency_status,
+        "consistency_warning": consistency_warning,
         "title": _chart_title(summary),
     }
 
@@ -1535,6 +1589,8 @@ def _return_method_label(method: Any, warning: Any = None) -> str:
     warning_text = str(warning or "").strip().lower()
     if method_text == "twr":
         return "현금흐름 보정 TWR"
+    if method_text in {"twr_equivalent", "available_history_twr_equivalent"}:
+        return "외부 현금흐름 없음 - TWR 상당 단순 NAV"
     if method_text == "mwr":
         return "현금흐름 보정 MWR"
     if warning_text == "cashflow_adjustment_unavailable" or method_text == "simple_nav_unadjusted":
@@ -1546,16 +1602,39 @@ def _return_method_label(method: Any, warning: Any = None) -> str:
     return "단순 NAV 기준"
 
 
-def _contribution_by_ticker(*, snapshot: AccountSnapshot, ledger_events: list[LedgerEvent]) -> list[dict[str, Any]]:
+def _contribution_by_ticker(
+    *,
+    snapshot: AccountSnapshot,
+    ledger_events: list[LedgerEvent],
+    warnings: list[str] | None = None,
+) -> list[dict[str, Any]]:
+    positions_by_canonical: dict[str, Any] = {}
+    positions_by_base_code: dict[str, str] = {}
+    for position in snapshot.positions:
+        canonical = str(position.canonical_ticker or "").strip().upper()
+        if not canonical:
+            continue
+        positions_by_canonical[canonical] = position
+        for candidate in (position.canonical_ticker, position.broker_symbol):
+            base_code = _kr_base_code(candidate)
+            if base_code:
+                positions_by_base_code.setdefault(base_code, canonical)
+
     realized: dict[str, float] = {}
     for event in ledger_events:
         if event.realized_pnl_krw is None or not event.ticker:
             continue
-        realized[event.ticker] = realized.get(event.ticker, 0.0) + float(event.realized_pnl_krw)
-    tickers = {position.canonical_ticker for position in snapshot.positions} | set(realized)
+        ticker = _canonical_contribution_ticker(
+            event.ticker,
+            positions_by_canonical=positions_by_canonical,
+            positions_by_base_code=positions_by_base_code,
+            warnings=warnings,
+        )
+        realized[ticker] = realized.get(ticker, 0.0) + float(event.realized_pnl_krw)
+    tickers = set(positions_by_canonical) | set(realized)
     rows = []
     for ticker in sorted(tickers):
-        position = snapshot.find_position(ticker)
+        position = positions_by_canonical.get(ticker)
         unrealized = float(position.unrealized_pnl_krw if position else 0.0)
         realized_value = float(realized.get(ticker, 0.0))
         rows.append(
@@ -1569,6 +1648,35 @@ def _contribution_by_ticker(*, snapshot: AccountSnapshot, ledger_events: list[Le
         )
     rows.sort(key=lambda item: abs(int(item["total_contribution_krw"])), reverse=True)
     return rows
+
+
+def _canonical_contribution_ticker(
+    ticker: Any,
+    *,
+    positions_by_canonical: Mapping[str, Any],
+    positions_by_base_code: Mapping[str, str],
+    warnings: list[str] | None = None,
+) -> str:
+    normalized = str(ticker or "").strip().upper()
+    if not normalized:
+        return "-"
+    if normalized in positions_by_canonical:
+        return normalized
+    base_code = _kr_base_code(normalized)
+    if base_code and base_code in positions_by_base_code:
+        return positions_by_base_code[base_code]
+    if base_code and normalized == base_code and warnings is not None:
+        warnings.append(f"account_performance_contribution_unresolved_ticker:{normalized}")
+    return normalized
+
+
+def _kr_base_code(ticker: Any) -> str | None:
+    normalized = str(ticker or "").strip().upper()
+    if normalized.endswith(".KS") or normalized.endswith(".KQ"):
+        normalized = normalized[:-3]
+    if len(normalized) == 6 and normalized.isdigit():
+        return normalized
+    return None
 
 
 def _cost_summary(ledger_events: list[LedgerEvent]) -> dict[str, int]:
@@ -1658,6 +1766,9 @@ def _period_return_profile(
         return {
             "simple_nav_return": simple_nav_return,
             "twr_return": None,
+            "twr_unavailable_reason": "cashflow_adjustment_unavailable",
+            "mwr_return": None,
+            "mwr_unavailable_reason": "dated_external_cashflows_incomplete",
             "primary_return": simple_nav_return,
             "primary_return_method": "simple_nav_unadjusted",
             "return_method_warning": "cashflow_adjustment_unavailable",
@@ -1673,6 +1784,9 @@ def _period_return_profile(
             return {
                 "simple_nav_return": simple_nav_return,
                 "twr_return": twr_return,
+                "twr_unavailable_reason": None,
+                "mwr_return": None,
+                "mwr_unavailable_reason": "mwr_not_implemented",
                 "primary_return": twr_return,
                 "primary_return_method": "twr",
                 "return_method_warning": None,
@@ -1680,15 +1794,21 @@ def _period_return_profile(
         return {
             "simple_nav_return": simple_nav_return,
             "twr_return": None,
+            "twr_unavailable_reason": "cashflow_dates_or_nav_snapshots_incomplete",
+            "mwr_return": None,
+            "mwr_unavailable_reason": "dated_external_cashflows_incomplete",
             "primary_return": simple_nav_return,
             "primary_return_method": "simple_nav_unadjusted",
             "return_method_warning": "cashflow_adjustment_unavailable",
         }
 
-    method = "available_history_simple_nav" if str(period_name or "").strip().upper() == "ALL" else "simple_nav"
+    method = "available_history_twr_equivalent" if str(period_name or "").strip().upper() == "ALL" else "twr_equivalent"
     return {
         "simple_nav_return": simple_nav_return,
-        "twr_return": None,
+        "twr_return": simple_nav_return,
+        "twr_unavailable_reason": None,
+        "mwr_return": None,
+        "mwr_unavailable_reason": "no_external_capital_flows_for_irr",
         "primary_return": simple_nav_return,
         "primary_return_method": method,
         "return_method_warning": None,
@@ -1780,6 +1900,7 @@ def reconcile_account_performance(
             "unexplained_difference_krw": None,
             "unexplained_difference_pct_of_nav": None,
             "reconciliation_status": "UNAVAILABLE",
+            "reconciliation_severity": "unavailable",
         }
     start_nav = _float_or_none(snapshot_rows[0].get("account_value_krw"))
     end_nav = _float_or_none(snapshot_rows[-1].get("account_value_krw"))
@@ -1794,6 +1915,7 @@ def reconcile_account_performance(
             "unexplained_difference_krw": None,
             "unexplained_difference_pct_of_nav": None,
             "reconciliation_status": "UNAVAILABLE",
+            "reconciliation_severity": "unavailable",
         }
 
     cashflow_events = _cashflow_events_from_ledger(ledger_events)
@@ -1826,17 +1948,21 @@ def reconcile_account_performance(
     fees_taxes = sum(float(event.fee_krw or 0.0) + float(event.tax_krw or 0.0) for event in ledger_events)
     unexplained = None if external_cashflow_net is None else simple_nav_pnl - contribution_sum - external_cashflow_net
     unexplained_pct = unexplained / end_nav if unexplained is not None and end_nav else None
-    threshold = max(50_000.0, abs(end_nav) * 0.02)
+    materiality_pct = abs(unexplained_pct) if unexplained_pct is not None else None
     if unexplained is None:
         status = "UNAVAILABLE"
+        severity = "unavailable"
         if warnings is not None and unknown_material:
             warnings.append("account_performance_cashflow_unadjusted")
-    elif abs(unexplained) <= threshold:
+    elif materiality_pct is not None and materiality_pct <= 0.02:
         status = "OK"
-    elif abs(unexplained) <= max(200_000.0, abs(end_nav) * 0.10):
+        severity = "ok"
+    elif materiality_pct is not None and materiality_pct <= 0.05:
         status = "WARNING"
+        severity = "warning"
     else:
         status = "FAILED"
+        severity = "critical" if materiality_pct is not None and materiality_pct > 0.20 else "failed"
     if warnings is not None and status in {"WARNING", "FAILED"}:
         warnings.append("account_performance_unreconciled_pnl")
         warnings.append("account_performance_contribution_not_total_return")
@@ -1851,6 +1977,7 @@ def reconcile_account_performance(
         "unexplained_difference_krw": int(round(unexplained)) if unexplained is not None else None,
         "unexplained_difference_pct_of_nav": round(unexplained_pct, 6) if unexplained_pct is not None else None,
         "reconciliation_status": status,
+        "reconciliation_severity": severity,
     }
 
 
@@ -1869,7 +1996,9 @@ def _summary(periods: list[dict[str, Any]]) -> dict[str, Any]:
         "partial": bool(default.get("partial")),
         "simple_nav_return": default.get("simple_nav_return"),
         "twr_return": default.get("twr_return"),
+        "twr_unavailable_reason": default.get("twr_unavailable_reason"),
         "mwr_return": default.get("mwr_return"),
+        "mwr_unavailable_reason": default.get("mwr_unavailable_reason"),
         "primary_return": default.get("primary_return"),
         "primary_return_method": default.get("primary_return_method"),
         "return_method_warning": default.get("return_method_warning"),
@@ -1878,6 +2007,52 @@ def _summary(periods: list[dict[str, Any]]) -> dict[str, Any]:
         "best_excess": default.get("best_excess") or {},
         "worst_excess": default.get("worst_excess") or {},
     }
+
+
+def _summary_with_performance_confidence(
+    summary: dict[str, Any],
+    reconciliation: Mapping[str, Any],
+) -> dict[str, Any]:
+    if not summary:
+        return summary
+    result = dict(summary)
+    status = str(reconciliation.get("reconciliation_status") or "").upper()
+    severity = str(reconciliation.get("reconciliation_severity") or "").lower()
+    if status == "FAILED":
+        result.update(
+            {
+                "performance_confidence": "low",
+                "performance_confidence_reason": "unreconciled_nav_vs_position_pnl",
+                "hide_excess_headline": True,
+                "requires_manual_reconciliation": True,
+                "reconciliation_severity": severity or "failed",
+            }
+        )
+    elif status in {"WARNING", "UNAVAILABLE"}:
+        result.update(
+            {
+                "performance_confidence": "medium",
+                "performance_confidence_reason": (
+                    "cashflow_or_reconciliation_incomplete"
+                    if status == "UNAVAILABLE"
+                    else "reconciliation_warning"
+                ),
+                "hide_excess_headline": False,
+                "requires_manual_reconciliation": status == "UNAVAILABLE",
+                "reconciliation_severity": severity or status.lower(),
+            }
+        )
+    else:
+        result.update(
+            {
+                "performance_confidence": "high",
+                "performance_confidence_reason": "reconciled_or_no_material_difference",
+                "hide_excess_headline": False,
+                "requires_manual_reconciliation": False,
+                "reconciliation_severity": severity or "ok",
+            }
+        )
+    return result
 
 
 def _default_period(periods: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -2160,6 +2335,16 @@ def _provider_label(settings: Any) -> str:
     if getattr(settings, "price_history_path", None):
         return f"local_json+{provider}" if provider not in {"local_json", "none"} else "local_json"
     return provider
+
+
+def _settings_ratio(value: Any, *, default: float) -> float:
+    if value is None:
+        return float(default)
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return float(default)
+    return max(0.0, min(1.0, number))
 
 
 def _side_from_row(row: Mapping[str, Any]) -> str:
