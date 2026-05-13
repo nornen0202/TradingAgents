@@ -21,3 +21,22 @@ def test_min_coverage_ratio_is_clamped(tmp_path: Path):
 
     assert high.min_coverage_ratio == 1.0
     assert low.min_coverage_ratio == 0.0
+
+
+def test_broker_performance_settings_are_loaded(tmp_path: Path):
+    settings = _load_portfolio_performance_settings(
+        {
+            "broker_return_baseline_path": "broker.json",
+            "broker_period_start": "2026-04-13",
+            "broker_period_end": "2026-05-12",
+            "prefer_broker_reported_performance": False,
+            "show_snapshot_performance_when_unreconciled": True,
+        },
+        base_dir=tmp_path,
+    )
+
+    assert settings.broker_return_baseline_path == tmp_path / "broker.json"
+    assert settings.broker_period_start == "2026-04-13"
+    assert settings.broker_period_end == "2026-05-12"
+    assert settings.prefer_broker_reported_performance is False
+    assert settings.show_snapshot_performance_when_unreconciled is True

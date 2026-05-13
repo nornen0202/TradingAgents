@@ -4,12 +4,42 @@ The scheduled portfolio report can publish an account performance section that c
 
 ## Return Methods
 
+- `broker_performance`: when Korea Investment broker-reported period performance is available, the investor report treats it as the primary account-performance source. The internal TradingAgents snapshot return remains a secondary diagnostic calculation.
 - `simple_nav_return`: `(end_nav - start_nav) / start_nav`. This is easy to audit, but it is only a clean performance return when there were no material external cashflows during the window.
 - `twr_return`: time-weighted return adjusted for classified external capital flows. TradingAgents uses dated account snapshots and classified deposit/withdrawal events to remove the effect of capital moving into or out of the account.
 - `mwr_return`: reserved for money-weighted IRR when dated external cashflows are complete enough. When it cannot be computed, `mwr_unavailable_reason` explains why.
 - `primary_return`: the return shown in the investor headline. It is TWR when classified external capital flows are present and computable. If there are no external capital flows and reconciliation is clean, the report labels the result as `TWR-equivalent` simple NAV. If cashflow classification is incomplete, simple NAV is shown only as a cashflow-unadjusted reference value.
 
 If ledger rows suggest cash movement but cannot be classified, the report sets `return_method_warning = "cashflow_adjustment_unavailable"` and labels the headline as cashflow-unadjusted simple NAV. TWR and MWR unavailable states are explicit in JSON and in the investor notes.
+
+If broker performance reports deposits or withdrawals while the internal ledger does not classify external capital flows, TradingAgents no longer labels the snapshot return as TWR-equivalent. It marks the snapshot return as cashflow-unadjusted and emits `account_performance_broker_external_flows_not_in_snapshot_ledger`.
+
+## Broker-Reported Performance
+
+For KIS domestic profiles, the engine can read the broker period-profit summary through the existing KIS period profit APIs or through a private JSON/CSV baseline configured with:
+
+```toml
+[portfolio_performance]
+broker_return_baseline_path = ""
+broker_period_start = ""
+broker_period_end = ""
+prefer_broker_reported_performance = true
+show_snapshot_performance_when_unreconciled = false
+```
+
+Normalized artifacts are written alongside the account performance artifacts:
+
+- `broker_performance_raw.json`
+- `broker_performance_normalized.json`
+- `broker_performance_comparison.json`
+
+The comparison artifact checks broker ending assets against the TradingAgents account value, compares broker return with the internal simple NAV return, records period/scope alignment, and reports `OK`, `WARNING`, or `FAILED`.
+
+The broker app-style formulas are:
+
+- `investment_pnl_krw = end_asset_krw - start_asset_krw - deposit_amount_krw + withdrawal_amount_krw`
+- `balance_return_pct = investment_pnl_krw / (start_asset_krw + deposit_amount_krw - withdrawal_amount_krw) * 100`
+- `total_deposit_return_pct = investment_pnl_krw / (start_asset_krw + deposit_amount_krw) * 100`
 
 ## Period Coverage
 

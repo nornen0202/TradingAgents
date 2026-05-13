@@ -267,6 +267,42 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(snapshot["total_equity_krw"], 5200000)
         self.assertEqual(snapshot["cash_diagnostics"]["selected_fields"]["total_equity"], "tot_evlu_amt")
 
+    def test_extract_cash_snapshot_prefers_domestic_net_asset_over_stock_eval_total(self):
+        profile = PortfolioProfile(
+            name="kis-test",
+            enabled=True,
+            broker="kis",
+            broker_environment="real",
+            read_only=True,
+            account_no="12345678",
+            product_code="01",
+            manual_snapshot_path=None,
+            csv_positions_path=None,
+            private_output_dirname="portfolio-private",
+            watch_tickers=tuple(),
+            trigger_budget_krw=500000,
+            constraints=AccountConstraints(min_cash_buffer_krw=0, min_trade_krw=100000),
+        )
+
+        snapshot = _extract_cash_snapshot(
+            summary_payload={
+                "dnca_tot_amt": "300000",
+                "tot_evlu_amt": "15813494",
+                "nass_amt": "42218247",
+                "ord_psbl_amt": "300000",
+            },
+            positions_market_value=15_500_000,
+            profile=profile,
+        )
+
+        self.assertEqual(snapshot["snapshot_health"], "VALID")
+        self.assertEqual(snapshot["total_equity_krw"], 42_218_247)
+        self.assertEqual(snapshot["cash_diagnostics"]["selected_fields"]["total_equity"], "nass_amt")
+        self.assertEqual(
+            snapshot["cash_diagnostics"]["selected_fields"]["total_equity_candidates"]["tot_evlu_amt"],
+            15_813_494,
+        )
+
     def test_extract_cash_snapshot_accepts_overseas_summary_fields(self):
         profile = PortfolioProfile(
             name="kis-us-test",

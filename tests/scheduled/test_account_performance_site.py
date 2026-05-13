@@ -159,6 +159,104 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     assert (site / "downloads" / manifest["run_id"] / "portfolio" / "account_performance_public.json").exists()
 
 
+def test_portfolio_page_prioritizes_broker_performance_and_hides_failed_snapshot_headline():
+    payload = {
+        "status": "ok",
+        "market_scope": "KR",
+        "benchmarks": ["KOSPI", "KOSDAQ"],
+        "summary": {
+            "default_period": "ALL_AVAILABLE",
+            "default_period_label": "사용 가능 전체 기간",
+            "start_date": "2026-04-13",
+            "end_date": "2026-05-13",
+            "actual_return": 1.6128,
+            "simple_nav_return": 1.6128,
+            "primary_return_method": "simple_nav_unadjusted",
+            "return_method_warning": "broker_external_cashflow_unmodeled",
+            "best_excess": {"benchmark": "KOSPI", "excess_return": 1.2, "excess_krw": 7_000_000},
+            "hide_excess_headline": True,
+            "show_snapshot_performance_when_unreconciled": False,
+        },
+        "broker_performance": {
+            "broker": "kis",
+            "account_scope": "KR domestic",
+            "period_start": "2026-04-13",
+            "period_end": "2026-05-12",
+            "investment_pnl_krw": 4_552_630,
+            "balance_return_pct": 12.08,
+            "start_asset_krw": 2,
+            "end_asset_krw": 42_218_247,
+            "deposit_amount_krw": 37_665_615,
+            "withdrawal_amount_krw": 0,
+            "benchmark_returns": [
+                {"benchmark": "KOSPI", "benchmark_return_pct": 30.45, "excess_return_pct": -18.37},
+                {"benchmark": "KOSDAQ", "benchmark_return_pct": 7.83, "excess_return_pct": 4.25},
+            ],
+        },
+        "broker_performance_comparison": {
+            "comparison_status": "FAILED",
+            "broker_end_asset_krw": 42_218_247,
+            "tradingagents_account_value_krw": 15_813_494,
+            "end_asset_delta_krw": -26_404_753,
+            "end_asset_delta_pct": -62.546,
+            "broker_balance_return_pct": 12.08,
+            "tradingagents_simple_nav_return_pct": 161.28,
+            "return_delta_pct": 149.20,
+            "period_match_status": "MISMATCH",
+            "scope_match_status": "MATCH",
+        },
+        "periods": [
+            {
+                "period": "ALL",
+                "requested_start_date": "2026-04-13",
+                "start_date": "2026-04-13",
+                "end_date": "2026-05-13",
+                "actual_return": 1.6128,
+                "primary_return_method": "simple_nav_unadjusted",
+                "return_method_warning": "broker_external_cashflow_unmodeled",
+                "simple_benchmarks": [],
+                "cashflow_benchmarks": [],
+            }
+        ],
+        "chart_data": {"series": [{"date": "2026-04-13", "account_return": 0}, {"date": "2026-05-13", "account_return": 1.6128}]},
+        "costs": {"fees_krw": 583, "taxes_krw": 14160, "total_cost_krw": 14743},
+        "contribution_by_ticker": [],
+        "reconciliation": {
+            "reconciliation_status": "FAILED",
+            "simple_nav_pnl_krw": 9_761_292,
+            "sum_position_contribution_krw": 2_578_672,
+            "external_cashflow_net_krw": 0,
+            "fees_taxes_krw": 14_743,
+            "unexplained_difference_krw": 7_182_620,
+        },
+        "data_quality": {
+            "snapshot_count": 2,
+            "ledger_event_count": 56,
+            "cashflow_event_count": 56,
+            "external_capital_flow_count": 1,
+            "warnings": [
+                "account_performance_period_insufficient_history:YTD",
+                "broker_performance_comparison:broker_end_asset_differs_from_tradingagents_account_value",
+            ],
+        },
+    }
+
+    html = _render_account_performance_section(
+        {"run_id": "run1", "portfolio": {"account_performance": {"publish_to_site": True}}},
+        {"account_performance": payload},
+    )
+
+    assert "한국투자증권 앱 기준 성과" in html
+    assert html.index("한국투자증권 앱 기준 성과") < html.index("내부 스냅샷 수익률")
+    assert "12.08%" in html
+    assert "검증 전 참고 불가" in html
+    assert "브로커 앱 기말자산과 TradingAgents 내부 계좌 평가액이 크게 다릅니다." in html
+    assert "정합성 상세" in html
+    assert html.index("broker_performance_comparison:broker_end_asset") < html.index(
+        "account_performance_period_insufficient_history:YTD"
+    )
+
+
 def test_portfolio_page_normalizes_legacy_duplicate_account_performance_periods(tmp_path: Path):
     archive = tmp_path / "archive"
     site = tmp_path / "site"
@@ -532,7 +630,7 @@ def test_reconciliation_failed_demotes_excess_headline():
 
     assert "성과 신뢰도" in kpi_section
     assert "낮음" in kpi_section
-    assert "정합성 FAILED / 중대" in kpi_section
+    assert "검증 필요 / 정합성 실패" in kpi_section
     assert "정합성 검증 후 해석" in kpi_section
     assert "수동 검증 필요" in kpi_section
     assert "KOSDAQ 161.07%" not in kpi_section
