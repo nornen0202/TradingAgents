@@ -10,6 +10,14 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from tradingagents.portfolio.account_models import AccountSnapshot, PortfolioProfile
+from tradingagents.portfolio.performance.broker_kis import (
+    fetch_kis_domestic_broker_performance,
+    load_broker_performance_baseline,
+)
+from tradingagents.portfolio.performance.broker_models import (
+    BrokerPerformanceComparison,
+    BrokerPerformanceSummary,
+)
 
 
 _KR_BENCHMARK_SYMBOLS = {
@@ -160,12 +168,31 @@ def build_account_performance_outputs(
         warnings=warnings,
         provider_status=benchmark_provider_status,
     )
+    broker_period_start, broker_period_end = _broker_period_window(
+        settings=settings,
+        snapshot_rows=snapshot_rows,
+        end_date=end_date,
+    )
+    broker_performance = _load_broker_performance(
+        profile=profile,
+        settings=settings,
+        market_scope=market_scope,
+        period_start=broker_period_start,
+        period_end=broker_period_end,
+        benchmark_prices=benchmark_prices,
+        warnings=warnings,
+    )
     cashflow_events = _cashflow_events_from_ledger(ledger_events)
+    broker_external_capital_flow_count = broker_performance.external_capital_flow_count if broker_performance else 0
+    snapshot_external_capital_flow_count = len([event for event in cashflow_events if event.capital_flow])
+    if broker_external_capital_flow_count and not snapshot_external_capital_flow_count:
+        warnings.append("account_performance_broker_external_flows_not_in_snapshot_ledger")
     min_coverage_ratio = _settings_ratio(getattr(settings, "min_coverage_ratio", None), default=0.8)
     periods = _compute_periods(
         snapshot_rows=snapshot_rows,
         ledger_events=ledger_events,
         cashflow_events=cashflow_events,
+        broker_performance=broker_performance,
         benchmark_prices=benchmark_prices,
         period_names=tuple(getattr(settings, "periods", ("1M", "3M", "6M", "YTD", "1Y", "ALL"))),
         end_date=end_date,
@@ -187,6 +214,15 @@ def build_account_performance_outputs(
     costs = _cost_summary(ledger_events)
     summary = _summary(periods)
     summary = _summary_with_performance_confidence(summary, reconciliation)
+    summary = _summary_with_snapshot_display_policy(summary, settings=settings)
+    broker_comparison = _broker_performance_comparison(
+        broker_performance=broker_performance,
+        snapshot=snapshot,
+        summary=summary,
+        market_scope=market_scope,
+        warnings=warnings,
+    )
+    summary = _summary_with_broker_comparison(summary, broker_comparison)
     chart_data = _build_chart_data(
         snapshot_rows=snapshot_rows,
         benchmark_prices=benchmark_prices,
@@ -203,6 +239,8 @@ def build_account_performance_outputs(
         "summary": summary,
         "periods": periods,
         "chart_data": chart_data,
+        "broker_performance": broker_performance.to_dict() if broker_performance else {},
+        "broker_performance_comparison": broker_comparison.to_dict() if broker_comparison else {},
         "costs": costs,
         "contribution_by_ticker": contribution,
         "reconciliation": reconciliation,
@@ -214,7 +252,13 @@ def build_account_performance_outputs(
             "min_snapshot_value_krw": snapshot_selection.min_snapshot_value_krw,
             "ledger_event_count": len(ledger_events),
             "cashflow_event_count": len(cashflow_events),
-            "external_capital_flow_count": len([event for event in cashflow_events if event.capital_flow]),
+            "external_capital_flow_count": max(
+                snapshot_external_capital_flow_count,
+                broker_external_capital_flow_count,
+            ),
+            "snapshot_external_capital_flow_count": snapshot_external_capital_flow_count,
+            "broker_external_capital_flow_count": broker_external_capital_flow_count,
+            "broker_performance_available": bool(broker_performance),
             "benchmark_provider": _provider_label(settings),
             "benchmark_provider_status": benchmark_provider_status,
             "min_coverage_ratio": min_coverage_ratio,
@@ -229,18 +273,36 @@ def build_account_performance_outputs(
     public_json = private_dir / "account_performance_public.json"
     chart_json = private_dir / "account_performance_chart_data.json"
     report_md = private_dir / "account_performance_report.md"
+    broker_raw_json = private_dir / "broker_performance_raw.json"
+    broker_normalized_json = private_dir / "broker_performance_normalized.json"
+    broker_comparison_json = private_dir / "broker_performance_comparison.json"
 
     _write_json(report_json, payload)
     _write_json(public_json, public_payload)
     _write_json(chart_json, public_payload.get("chart_data") or {})
+    if broker_performance:
+        _write_json(broker_raw_json, broker_performance.raw_summary)
+        _write_json(broker_normalized_json, broker_performance.to_dict())
+    if broker_comparison:
+        _write_json(broker_comparison_json, broker_comparison.to_dict())
     report_md.write_text(markdown, encoding="utf-8")
 
-    return {
+    artifacts = {
         "account_performance_report_json": report_json.as_posix(),
         "account_performance_public_json": public_json.as_posix(),
         "account_performance_chart_data_json": chart_json.as_posix(),
         "account_performance_report_md": report_md.as_posix(),
     }
+    if broker_performance:
+        artifacts.update(
+            {
+                "broker_performance_raw_json": broker_raw_json.as_posix(),
+                "broker_performance_normalized_json": broker_normalized_json.as_posix(),
+            }
+        )
+    if broker_comparison:
+        artifacts["broker_performance_comparison_json"] = broker_comparison_json.as_posix()
+    return artifacts
 
 
 def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
@@ -250,6 +312,12 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
     contribution = payload.get("contribution_by_ticker") if isinstance(payload.get("contribution_by_ticker"), list) else []
     reconciliation = payload.get("reconciliation") if isinstance(payload.get("reconciliation"), Mapping) else {}
     quality = payload.get("data_quality") if isinstance(payload.get("data_quality"), Mapping) else {}
+    broker = payload.get("broker_performance") if isinstance(payload.get("broker_performance"), Mapping) else {}
+    broker_comparison = (
+        payload.get("broker_performance_comparison")
+        if isinstance(payload.get("broker_performance_comparison"), Mapping)
+        else {}
+    )
     display_periods = [
         period
         for period in periods
@@ -309,13 +377,32 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
         else "- 별도 숨긴 요청 기간 없음"
     )
     contribution_status = str(reconciliation.get("reconciliation_status") or "UNAVAILABLE")
+    broker_lines = []
+    if broker:
+        broker_lines = [
+            "",
+            "### 한국투자증권 앱 기준 성과",
+            "",
+            f"- 기간: `{broker.get('period_start') or '-'} ~ {broker.get('period_end') or '-'}`",
+            f"- 브로커 수익률: `{_pct_points(broker.get('balance_return_pct'))}`",
+            f"- 투자손익: `{_krw(broker.get('investment_pnl_krw'))}`",
+            f"- 기초/기말자산: `{_krw(broker.get('start_asset_krw'))} -> {_krw(broker.get('end_asset_krw'))}`",
+            f"- 입금/출금: `{_krw(broker.get('deposit_amount_krw'))} / {_krw(broker.get('withdrawal_amount_krw'))}`",
+            f"- 브로커-내부 비교: `{broker_comparison.get('comparison_status') or '-'}`",
+        ]
+    hide_snapshot = (
+        str(reconciliation.get("reconciliation_status") or "").upper() == "FAILED"
+        and not bool(summary.get("show_snapshot_performance_when_unreconciled"))
+    )
+    snapshot_summary_return = "검증 전 참고 불가" if hide_snapshot else _pct(summary.get("actual_return"))
     return "\n".join(
         [
             "## 계좌 성과 vs 지수/ETF",
+            *broker_lines,
             "",
             f"- 성과 기준 기간: `{summary.get('start_date') or '-'} ~ {summary.get('end_date') or '-'}` "
             f"(`{summary.get('default_period_label') or summary.get('default_period') or '-'}`)",
-            f"- 계좌 수익률: `{_pct(summary.get('actual_return'))}` "
+            f"- 내부 스냅샷 수익률: `{snapshot_summary_return}` "
             f"({_return_method_label(summary.get('primary_return_method'), summary.get('return_method_warning'))})",
             f"- 최고 초과 기준: `{((summary.get('best_excess') or {}).get('benchmark')) or '-'}` "
             f"({_pct((summary.get('best_excess') or {}).get('excess_return'))})",
@@ -1042,6 +1129,7 @@ def _compute_periods(
     snapshot_rows: list[dict[str, Any]],
     ledger_events: list[LedgerEvent],
     cashflow_events: list[CashflowEvent],
+    broker_performance: BrokerPerformanceSummary | None,
     benchmark_prices: dict[str, list[dict[str, Any]]],
     period_names: tuple[str, ...],
     end_date: date,
@@ -1116,6 +1204,7 @@ def _compute_periods(
             snapshot_rows=snapshot_rows,
             ledger_events=ledger_events,
             cashflow_events=cashflow_events,
+            broker_performance=broker_performance,
             start_date=start,
             end_date=end,
             start_value=start_value,
@@ -1625,7 +1714,7 @@ def _return_method_label(method: Any, warning: Any = None) -> str:
         return "외부 현금흐름 없음 - TWR 상당 단순 NAV"
     if method_text == "mwr":
         return "현금흐름 보정 MWR"
-    if warning_text == "cashflow_adjustment_unavailable" or method_text == "simple_nav_unadjusted":
+    if warning_text in {"cashflow_adjustment_unavailable", "broker_external_cashflow_unmodeled"} or method_text == "simple_nav_unadjusted":
         return "현금흐름 미보정 단순 NAV 기준"
     if method_text == "available_history_simple_nav":
         return "사용 가능 기간 단순 NAV 기준"
@@ -1820,6 +1909,7 @@ def _period_return_profile(
     snapshot_rows: list[dict[str, Any]],
     ledger_events: list[LedgerEvent],
     cashflow_events: list[CashflowEvent],
+    broker_performance: BrokerPerformanceSummary | None,
     start_date: date,
     end_date: date,
     start_value: float,
@@ -1837,6 +1927,11 @@ def _period_return_profile(
 
     unknown_material = _has_unknown_material_ledger_events(ledger_events, start_date=start_date, end_date=end_date)
     capital_flows = _cashflows_between(cashflow_events, start_date=start_date, end_date=end_date, capital_only=True)
+    broker_external_flows = _broker_external_flows_overlap(
+        broker_performance,
+        start_date=start_date,
+        end_date=end_date,
+    )
     if unknown_material:
         return {
             "simple_nav_return": simple_nav_return,
@@ -1847,6 +1942,17 @@ def _period_return_profile(
             "primary_return": simple_nav_return,
             "primary_return_method": "simple_nav_unadjusted",
             "return_method_warning": "cashflow_adjustment_unavailable",
+        }
+    if broker_external_flows and not capital_flows:
+        return {
+            "simple_nav_return": simple_nav_return,
+            "twr_return": None,
+            "twr_unavailable_reason": "broker_external_cashflow_unmodeled",
+            "mwr_return": None,
+            "mwr_unavailable_reason": "dated_external_cashflows_incomplete",
+            "primary_return": simple_nav_return,
+            "primary_return_method": "simple_nav_unadjusted",
+            "return_method_warning": "broker_external_cashflow_unmodeled",
         }
     if capital_flows:
         twr_return = _cashflow_adjusted_twr_return(
@@ -2130,6 +2236,37 @@ def _summary_with_performance_confidence(
     return result
 
 
+def _summary_with_snapshot_display_policy(summary: dict[str, Any], *, settings: Any) -> dict[str, Any]:
+    if not summary:
+        return summary
+    result = dict(summary)
+    result["show_snapshot_performance_when_unreconciled"] = bool(
+        getattr(settings, "show_snapshot_performance_when_unreconciled", False)
+    )
+    return result
+
+
+def _summary_with_broker_comparison(
+    summary: dict[str, Any],
+    comparison: BrokerPerformanceComparison | None,
+) -> dict[str, Any]:
+    if not summary or comparison is None:
+        return summary
+    if comparison.comparison_status != "FAILED":
+        return summary
+    result = dict(summary)
+    result.update(
+        {
+            "performance_confidence": "low",
+            "performance_confidence_reason": "broker_reported_performance_mismatch",
+            "hide_excess_headline": True,
+            "requires_manual_reconciliation": True,
+            "broker_comparison_status": comparison.comparison_status,
+        }
+    )
+    return result
+
+
 def _default_period(periods: list[dict[str, Any]]) -> dict[str, Any] | None:
     eligible = [
         period
@@ -2370,6 +2507,142 @@ def _benchmark_yfinance_symbol(market_scope: str, benchmark: str) -> str | None:
     return str(_KR_BENCHMARK_SYMBOLS.get(benchmark, {}).get("yfinance") or benchmark)
 
 
+def _broker_period_window(
+    *,
+    settings: Any,
+    snapshot_rows: list[dict[str, Any]],
+    end_date: date,
+) -> tuple[date, date]:
+    configured_end = _parse_date(str(getattr(settings, "broker_period_end", "") or "")) or end_date
+    configured_start = _parse_date(str(getattr(settings, "broker_period_start", "") or ""))
+    if configured_start is None:
+        configured_start = _period_start("1M", end_date=configured_end, snapshot_rows=snapshot_rows)
+    if configured_start > configured_end:
+        configured_start = configured_end
+    return configured_start, configured_end
+
+
+def _load_broker_performance(
+    *,
+    profile: PortfolioProfile,
+    settings: Any,
+    market_scope: str,
+    period_start: date,
+    period_end: date,
+    benchmark_prices: Mapping[str, list[dict[str, Any]]],
+    warnings: list[str],
+) -> BrokerPerformanceSummary | None:
+    baseline = load_broker_performance_baseline(
+        getattr(settings, "broker_return_baseline_path", None),
+        period_start=period_start,
+        period_end=period_end,
+        benchmark_prices=benchmark_prices,
+        warnings=warnings,
+    )
+    if baseline is not None:
+        warnings.extend(f"broker_performance:{item}" for item in baseline.warnings)
+        return baseline
+    if not bool(getattr(settings, "prefer_broker_reported_performance", True)):
+        return None
+    if profile.broker != "kis" or market_scope != "kr":
+        return None
+    broker = fetch_kis_domestic_broker_performance(
+        profile=profile,
+        period_start=period_start,
+        period_end=period_end,
+        benchmark_prices=benchmark_prices,
+        warnings=warnings,
+    )
+    if broker is not None:
+        warnings.extend(f"broker_performance:{item}" for item in broker.warnings)
+    return broker
+
+
+def _broker_performance_comparison(
+    *,
+    broker_performance: BrokerPerformanceSummary | None,
+    snapshot: AccountSnapshot,
+    summary: Mapping[str, Any],
+    market_scope: str,
+    warnings: list[str],
+) -> BrokerPerformanceComparison | None:
+    if broker_performance is None:
+        return None
+    broker_end = broker_performance.end_asset_krw
+    ta_value = int(snapshot.account_value_krw)
+    end_delta = ta_value - broker_end if broker_end is not None else None
+    end_delta_pct = (end_delta / broker_end * 100.0) if end_delta is not None and broker_end else None
+    ta_return_pct = (
+        float(summary.get("simple_nav_return")) * 100.0
+        if _float_or_none(summary.get("simple_nav_return")) is not None
+        else (
+            float(summary.get("actual_return")) * 100.0
+            if _float_or_none(summary.get("actual_return")) is not None
+            else None
+        )
+    )
+    broker_return_pct = broker_performance.balance_return_pct
+    return_delta = ta_return_pct - broker_return_pct if ta_return_pct is not None and broker_return_pct is not None else None
+
+    summary_start = str(summary.get("start_date") or "")
+    summary_end = str(summary.get("end_date") or "")
+    period_match = (
+        "MATCH"
+        if summary_start == broker_performance.period_start and summary_end == broker_performance.period_end
+        else "MISMATCH"
+    )
+    scope_text = broker_performance.account_scope.upper()
+    scope_match = "MATCH" if market_scope.upper() in scope_text or ("KR" in scope_text and market_scope == "kr") else "UNKNOWN"
+
+    comparison_warnings: list[str] = []
+    status = "OK"
+    if end_delta_pct is not None and abs(end_delta_pct) > 5.0:
+        comparison_warnings.append("broker_end_asset_differs_from_tradingagents_account_value")
+        status = "FAILED"
+    elif end_delta_pct is not None and abs(end_delta_pct) > 2.0:
+        comparison_warnings.append("broker_end_asset_warning")
+        status = "WARNING"
+    if return_delta is not None and abs(return_delta) > 5.0:
+        comparison_warnings.append("broker_return_differs_from_snapshot_return")
+        status = "FAILED"
+    elif status == "OK" and return_delta is not None and abs(return_delta) > 1.0:
+        comparison_warnings.append("broker_return_warning")
+        status = "WARNING"
+    if period_match != "MATCH":
+        comparison_warnings.append("broker_period_mismatch")
+        if status == "OK":
+            status = "WARNING"
+    warnings.extend(f"broker_performance_comparison:{item}" for item in comparison_warnings)
+    return BrokerPerformanceComparison(
+        broker_end_asset_krw=broker_end,
+        tradingagents_account_value_krw=ta_value,
+        end_asset_delta_krw=int(round(end_delta)) if end_delta is not None else None,
+        end_asset_delta_pct=_round_or_none(end_delta_pct),
+        broker_balance_return_pct=_round_or_none(broker_return_pct),
+        tradingagents_simple_nav_return_pct=_round_or_none(ta_return_pct),
+        return_delta_pct=_round_or_none(return_delta),
+        period_match_status=period_match,
+        scope_match_status=scope_match,
+        comparison_status=status,
+        warnings=comparison_warnings,
+    )
+
+
+def _broker_external_flows_overlap(
+    broker_performance: BrokerPerformanceSummary | None,
+    *,
+    start_date: date,
+    end_date: date,
+) -> bool:
+    if broker_performance is None or broker_performance.external_capital_flow_count <= 0:
+        return False
+    broker_start = _parse_date(broker_performance.period_start)
+    broker_end = _parse_date(broker_performance.period_end)
+    if broker_start is None or broker_end is None:
+        return True
+    return broker_start <= end_date and broker_end >= start_date
+
+
 def _benchmark_aliases() -> dict[str, str]:
     aliases: dict[str, str] = {}
     for name, meta in {**_KR_BENCHMARK_SYMBOLS, **_US_BENCHMARK_SYMBOLS}.items():
@@ -2386,13 +2659,23 @@ def _public_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         "summary",
         "periods",
         "chart_data",
+        "broker_performance",
+        "broker_performance_comparison",
         "costs",
         "contribution_by_ticker",
         "reconciliation",
         "data_quality",
         "public_sanitization",
     }
-    return {key: value for key, value in payload.items() if key in allowed}
+    public = {key: value for key, value in payload.items() if key in allowed}
+    broker = public.get("broker_performance")
+    if isinstance(broker, Mapping):
+        public["broker_performance"] = {
+            key: value
+            for key, value in broker.items()
+            if key != "raw_summary"
+        }
+    return public
 
 
 def _write_json(path: Path, payload: Any) -> None:
@@ -2589,6 +2872,13 @@ def _pct(value: Any) -> str:
     if number is None:
         return "-"
     return f"{number * 100:.2f}%"
+
+
+def _pct_points(value: Any) -> str:
+    number = _float_or_none(value)
+    if number is None:
+        return "-"
+    return f"{number:.2f}%"
 
 
 def _krw(value: Any) -> str:

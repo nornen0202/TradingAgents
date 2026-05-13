@@ -260,6 +260,11 @@ def _build_account_performance_status(
         quality = payload.get("data_quality") if isinstance(payload.get("data_quality"), dict) else {}
         summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
         reconciliation = payload.get("reconciliation") if isinstance(payload.get("reconciliation"), dict) else {}
+        broker_comparison = (
+            payload.get("broker_performance_comparison")
+            if isinstance(payload.get("broker_performance_comparison"), dict)
+            else {}
+        )
         return {
             "enabled": True,
             "status": str(payload.get("status") or ("ok" if artifacts else "partial")),
@@ -272,6 +277,8 @@ def _build_account_performance_status(
             "requires_manual_reconciliation": bool(summary.get("requires_manual_reconciliation")),
             "reconciliation_status": reconciliation.get("reconciliation_status"),
             "reconciliation_severity": reconciliation.get("reconciliation_severity"),
+            "broker_performance_available": bool(payload.get("broker_performance")),
+            "broker_comparison_status": broker_comparison.get("comparison_status"),
             "data_quality": quality,
             "artifacts": artifacts,
         }

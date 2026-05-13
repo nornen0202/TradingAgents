@@ -146,6 +146,11 @@ class PortfolioPerformanceSettings:
     lookback_days: int = 800
     fetch_kis_ledger: bool = True
     min_coverage_ratio: float = 0.8
+    broker_return_baseline_path: Path | None = None
+    broker_period_start: str = ""
+    broker_period_end: str = ""
+    prefer_broker_reported_performance: bool = True
+    show_snapshot_performance_when_unreconciled: bool = False
 
 
 @dataclass(frozen=True)
@@ -709,6 +714,11 @@ def _load_portfolio_performance_settings(
         lookback_days=max(30, int(raw.get("lookback_days", 800) or 800)),
         fetch_kis_ledger=bool(raw.get("fetch_kis_ledger", True)),
         min_coverage_ratio=_clamp_ratio(min_coverage_raw, default=0.8),
+        broker_return_baseline_path=_resolve_optional_path(raw.get("broker_return_baseline_path"), base_dir),
+        broker_period_start=str(raw.get("broker_period_start", "") or "").strip(),
+        broker_period_end=str(raw.get("broker_period_end", "") or "").strip(),
+        prefer_broker_reported_performance=bool(raw.get("prefer_broker_reported_performance", True)),
+        show_snapshot_performance_when_unreconciled=bool(raw.get("show_snapshot_performance_when_unreconciled", False)),
     )
 
 

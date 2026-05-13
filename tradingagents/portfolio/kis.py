@@ -1148,10 +1148,9 @@ def _extract_cash_snapshot(
             "dnca_tot_amt",
         ),
     ) or available_cash
-    reported_equity = _first_numeric(
-        summary_payload,
-        ("tot_evlu_amt", "nass_amt", "tot_asst_amt", "evlu_amt_smtl_amt", "frcr_evlu_tota"),
-    )
+    equity_selection = _select_total_equity_candidate(summary_payload, profile=profile)
+    reported_equity = equity_selection.get("value")
+    selected_equity_field = str(equity_selection.get("field") or "") or None
     total_equity = max(
         int(reported_equity or 0),
         int(positions_market_value + max(settled_cash, available_cash, buying_power, 0)),
@@ -1222,8 +1221,9 @@ def _extract_cash_snapshot(
                 ),
                 "total_equity": _selected_field(
                     summary_payload,
-                    ("tot_evlu_amt", "nass_amt", "tot_asst_amt", "evlu_amt_smtl_amt", "frcr_evlu_tota"),
+                    (selected_equity_field,) if selected_equity_field else tuple(),
                 ),
+                "total_equity_candidates": equity_selection.get("candidates") or {},
             },
         },
     }
@@ -1239,6 +1239,23 @@ def _parse_numeric_fields(payload: dict[str, Any], allowed_keys: set[str]) -> di
             continue
         parsed[key] = numeric
     return parsed
+
+
+def _select_total_equity_candidate(payload: dict[str, Any], *, profile: PortfolioProfile) -> dict[str, Any]:
+    market_scope = str(getattr(profile, "market_scope", "kr") or "kr").strip().lower()
+    if market_scope in {"us", "overseas"}:
+        priority = ("tot_asst_amt", "frcr_evlu_tota", "nass_amt", "tot_evlu_amt", "evlu_amt_smtl_amt")
+    else:
+        priority = ("nass_amt", "tot_asst_amt", "evlu_amt_smtl_amt", "tot_evlu_amt", "frcr_evlu_tota")
+    candidates = {
+        key: numeric
+        for key in priority
+        if (numeric := _maybe_int(payload.get(key))) is not None
+    }
+    for key in priority:
+        if key in candidates:
+            return {"field": key, "value": candidates[key], "candidates": candidates}
+    return {"field": None, "value": None, "candidates": candidates}
 
 
 def _selected_field(payload: dict[str, Any], keys: tuple[str, ...]) -> str | None:

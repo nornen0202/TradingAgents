@@ -552,6 +552,94 @@ def test_account_performance_contribution_mismatch_triggers_reconciliation_warni
     assert "account_performance_unreconciled_pnl" in payload["data_quality"]["warnings"]
 
 
+def test_broker_baseline_screenshot_period_return_and_mismatch_are_reported(tmp_path: Path):
+    broker_baseline = {
+        "period_start": "2026-04-13",
+        "period_end": "2026-05-12",
+        "start_asset_krw": 2,
+        "end_asset_krw": 42_218_247,
+        "deposit_amount_krw": 37_665_615,
+        "withdrawal_amount_krw": 0,
+    }
+    payload = _build_report(
+        tmp_path,
+        market_scope="kr",
+        periods=("1M", "ALL"),
+        current_as_of="2026-05-13T09:00:00+09:00",
+        current_total_equity_krw=15_813_494,
+        history_snapshots=[
+            {
+                "snapshot_id": "previous",
+                "as_of": "2026-04-13T09:00:00+09:00",
+                "account_value_krw": 6_052_202,
+                "snapshot_health": "VALID",
+                "positions": [{"canonical_ticker": "TEST", "market_value_krw": 5_900_000}],
+            }
+        ],
+        benchmarks={
+            "KOSPI": [{"date": "2026-04-13", "close": 100}, {"date": "2026-05-12", "close": 130.45}],
+            "KOSDAQ": [{"date": "2026-04-13", "close": 100}, {"date": "2026-05-12", "close": 107.83}],
+        },
+        broker_baseline=broker_baseline,
+    )
+
+    broker = payload["broker_performance"]
+    assert broker["investment_pnl_krw"] == 4_552_630
+    assert broker["investment_principal_krw"] == 37_665_617
+    assert broker["balance_return_pct"] == round(4_552_630 / 37_665_617 * 100, 6)
+    assert broker["end_asset_krw"] == 42_218_247
+    assert payload["data_quality"]["external_capital_flow_count"] == 1
+    assert payload["data_quality"]["snapshot_external_capital_flow_count"] == 0
+    assert payload["data_quality"]["broker_external_capital_flow_count"] == 1
+    assert "account_performance_broker_external_flows_not_in_snapshot_ledger" in payload["data_quality"]["warnings"]
+
+    period_1m = next(item for item in payload["periods"] if item["period"] == "1M")
+    assert period_1m["primary_return_method"] == "simple_nav_unadjusted"
+    assert period_1m["return_method_warning"] == "broker_external_cashflow_unmodeled"
+
+    comparison = payload["broker_performance_comparison"]
+    assert comparison["comparison_status"] == "FAILED"
+    assert comparison["broker_end_asset_krw"] == 42_218_247
+    assert comparison["tradingagents_account_value_krw"] == 15_813_494
+    assert comparison["period_match_status"] == "MISMATCH"
+    assert payload["summary"]["hide_excess_headline"] is True
+
+
+def test_broker_baseline_one_year_total_deposit_return_matches_screenshot(tmp_path: Path):
+    payload = _build_report(
+        tmp_path,
+        market_scope="kr",
+        current_as_of="2026-05-13T09:00:00+09:00",
+        current_total_equity_krw=15_813_494,
+        history_snapshots=[
+            {
+                "snapshot_id": "previous",
+                "as_of": "2025-05-13T09:00:00+09:00",
+                "account_value_krw": 6_052_202,
+                "snapshot_health": "VALID",
+                "positions": [{"canonical_ticker": "TEST", "market_value_krw": 5_900_000}],
+            }
+        ],
+        benchmarks={
+            "KOSPI": [{"date": "2025-05-13", "close": 100}, {"date": "2026-05-12", "close": 293.16}],
+            "KOSDAQ": [{"date": "2025-05-13", "close": 100}, {"date": "2026-05-12", "close": 162.60}],
+        },
+        broker_baseline={
+            "period_start": "2025-05-13",
+            "period_end": "2026-05-12",
+            "start_asset_krw": 2,
+            "end_asset_krw": 42_218_247,
+            "deposit_amount_krw": 37_865_615,
+            "withdrawal_amount_krw": 200_000,
+        },
+    )
+
+    broker = payload["broker_performance"]
+    assert broker["investment_pnl_krw"] == 4_552_630
+    assert broker["balance_return_pct"] == round(4_552_630 / 37_665_617 * 100, 6)
+    assert broker["total_deposit_return_pct"] == round(4_552_630 / 37_865_617 * 100, 6)
+
+
 def _build_report(
     tmp_path: Path,
     *,
@@ -565,6 +653,7 @@ def _build_report(
     current_snapshot_health: str = "VALID",
     positions: tuple[Position, ...] | None = None,
     min_coverage_ratio: float | None = None,
+    broker_baseline: dict[str, object] | None = None,
 ) -> dict[str, object]:
     archive = tmp_path / "archive"
     current_run = archive / "runs" / "2026" / f"{market_scope}-current"
@@ -589,6 +678,10 @@ def _build_report(
         (previous_private / "account_snapshot.json").write_text(json.dumps(history_payload), encoding="utf-8")
     price_path = tmp_path / f"{market_scope}_prices.json"
     price_path.write_text(json.dumps(benchmarks), encoding="utf-8")
+    broker_baseline_path = None
+    if broker_baseline is not None:
+        broker_baseline_path = tmp_path / f"{market_scope}_broker_baseline.json"
+        broker_baseline_path.write_text(json.dumps(broker_baseline), encoding="utf-8")
 
     profile = PortfolioProfile(
         name=profile_name,
@@ -647,6 +740,11 @@ def _build_report(
         price_history_path=price_path,
         lookback_days=365,
         fetch_kis_ledger=broker == "kis",
+        broker_return_baseline_path=broker_baseline_path,
+        broker_period_start=str((broker_baseline or {}).get("period_start") or ""),
+        broker_period_end=str((broker_baseline or {}).get("period_end") or ""),
+        prefer_broker_reported_performance=True,
+        show_snapshot_performance_when_unreconciled=False,
     )
     if min_coverage_ratio is not None:
         settings.min_coverage_ratio = min_coverage_ratio
