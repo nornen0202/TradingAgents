@@ -224,6 +224,26 @@ def sanitize_investor_text(value: Any, *, language: str = "Korean") -> str:
         return "없음" if is_korean(language) else "None"
 
     lower = text.lower()
+    if "run_time_budget_exhausted" in lower or (
+        "remaining_seconds" in lower and "min_required_seconds" in lower
+    ):
+        return (
+            "일부 종목은 분석 시간이 부족해 재분석 전까지 투자 후보에서 제외합니다."
+            if is_korean(language)
+            else "Some tickers need reanalysis before they should be treated as investable candidates."
+        )
+    if "wait-heavy constructive" in lower or "bullish_wait_concentration" in lower:
+        return (
+            "우호적 관점은 많지만 즉시 실행 조건을 통과한 종목은 적어 조건 확인이 우선입니다."
+            if is_korean(language)
+            else "Constructive views are broad, but few names meet immediate execution conditions."
+        )
+    if "delayed_or_invalid_market_data" in lower or "stale/degraded" in lower:
+        return (
+            "장중 데이터가 지연되거나 불완전해 종가와 거래량 확인을 우선합니다."
+            if is_korean(language)
+            else "Intraday data is delayed or incomplete, so close and volume confirmation come first."
+        )
     if any(token in lower for token in ("semantic_judge", "rule_only", "fallback", "vendor", "tool", "token")):
         return "일부 분석 자료 또는 자동 판단 결과는 확인이 필요합니다." if is_korean(language) else "Some source or automation checks need review."
     if "no broker account snapshot" in lower or "watchlist-only" in lower:

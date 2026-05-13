@@ -1,7 +1,11 @@
 import sqlite3
+import sys
 from datetime import datetime, timezone
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from tradingagents.performance.action_outcomes import record_run_recommendations, summarize_action_performance, update_action_outcomes
+from tradingagents.performance.price_history import _fetch_yfinance_price_history
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.runner import _run_performance_tracking
 from tradingagents.scheduled.site import _render_performance_tracking_section
@@ -85,6 +89,87 @@ price_provider = "none"
     assert payload["summary"]["recommendations"] == 1
     assert payload["summary"]["outcomes"] == 0
     assert payload["outcome_update"]["unavailable_reason"] == "outcome_update_disabled"
+
+
+def test_outcome_update_failure_does_not_discard_recorded_recommendations(tmp_path):
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        """
+[run]
+tickers = ["AAPL"]
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+
+[performance]
+enabled = true
+store_path = "./performance.sqlite"
+update_outcomes_on_run = true
+price_provider = "yfinance"
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    run_dir = tmp_path / "run"
+    private = run_dir / "portfolio-private"
+    private.mkdir(parents=True)
+    (run_dir / "run.json").write_text(
+        '{"run_id":"run1","started_at":"2026-04-01T09:00:00+09:00"}',
+        encoding="utf-8",
+    )
+    (private / "portfolio_report.json").write_text(
+        """
+        {
+          "actions": [
+            {
+              "canonical_ticker": "AAPL",
+              "action_now": "WATCH",
+              "action_if_triggered": "STARTER_IF_TRIGGERED",
+              "portfolio_relative_action": "ADD",
+              "delta_krw_now": 0,
+              "confidence": 0.5
+            }
+          ]
+        }
+        """,
+        encoding="utf-8",
+    )
+
+    with patch(
+        "tradingagents.scheduled.runner.load_price_history_for_recommendations",
+        side_effect=TypeError("float() argument must be a string or a real number, not 'Series'"),
+    ):
+        payload = _run_performance_tracking(
+            config=config,
+            run_dir=run_dir,
+            started_at=datetime(2026, 4, 1, tzinfo=timezone.utc),
+        )
+
+    assert payload["status"] == "recorded_pending_outcomes"
+    assert payload["summary"]["recommendations"] == 1
+    assert payload["outcome_update"]["unavailable_reason"] == "outcome_update_failed"
+    assert "Series" in payload["outcome_update"]["failure_reason"]
+
+
+def test_yfinance_close_dataframe_is_converted_to_scalar_rows(monkeypatch):
+    import pandas as pd
+
+    dates = pd.to_datetime(["2026-04-01", "2026-04-02"])
+    frame = pd.DataFrame({("Close", "AAPL"): [100.0, 103.0]}, index=dates)
+    fake_yfinance = SimpleNamespace(download=lambda *args, **kwargs: frame)
+    monkeypatch.setitem(sys.modules, "yfinance", fake_yfinance)
+
+    history, warnings = _fetch_yfinance_price_history(
+        ["AAPL"],
+        benchmark_ticker=None,
+        lookback_days=5,
+        asof_date="2026-04-02",
+    )
+
+    assert history["AAPL"][0]["close"] == 100.0
+    assert history["AAPL"][1]["close"] == 103.0
+    assert not any("Series" in warning for warning in warnings)
 
 
 def test_action_outcome_buckets_include_prism_uncovered(tmp_path):

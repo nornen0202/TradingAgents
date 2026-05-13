@@ -350,6 +350,97 @@ def test_contribution_aggregates_bare_kr_code_with_canonical_position(tmp_path: 
     assert rows["034020.KS"]["total_contribution_krw"] == 373_000
 
 
+def test_contribution_uses_period_unrealized_pnl_change_for_reconciliation(tmp_path: Path):
+    positions = (
+        Position(
+            broker_symbol="TEST",
+            canonical_ticker="TEST",
+            display_name="Test",
+            sector=None,
+            quantity=1,
+            available_qty=1,
+            avg_cost_krw=1_000_000,
+            market_price_krw=1_600_000,
+            market_value_krw=1_600_000,
+            unrealized_pnl_krw=600_000,
+        ),
+    )
+    payload = _build_report(
+        tmp_path,
+        market_scope="kr",
+        current_total_equity_krw=1_100_000,
+        positions=positions,
+        history_snapshots=[
+            {
+                "snapshot_id": "previous",
+                "as_of": "2026-01-01T09:00:00+09:00",
+                "account_value_krw": 1_000_000,
+                "snapshot_health": "VALID",
+                "positions": [
+                    {
+                        "broker_symbol": "TEST",
+                        "canonical_ticker": "TEST",
+                        "display_name": "Test",
+                        "unrealized_pnl_krw": 500_000,
+                    }
+                ],
+            }
+        ],
+        benchmarks={
+            "KOSPI": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 110}],
+            "KOSDAQ": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 100}],
+        },
+    )
+
+    row = next(item for item in payload["contribution_by_ticker"] if item["ticker"] == "TEST")
+    assert row["starting_unrealized_pnl_krw"] == 500_000
+    assert row["ending_unrealized_pnl_krw"] == 600_000
+    assert row["unrealized_pnl_change_krw"] == 100_000
+    assert row["total_contribution_krw"] == 100_000
+    assert payload["reconciliation"]["simple_nav_pnl_krw"] == 100_000
+    assert payload["reconciliation"]["sum_position_contribution_krw"] == 100_000
+    assert payload["reconciliation"]["reconciliation_status"] == "OK"
+
+
+def test_overseas_period_profit_realized_pnl_is_not_fx_converted_twice(tmp_path: Path):
+    client = Mock()
+    client.fetch_overseas_order_fills.return_value = []
+    client.fetch_overseas_period_transactions.return_value = []
+    client.fetch_overseas_period_profit.return_value = (
+        [{"trad_dt": "20260201", "pdno": "AAPL", "ovrs_rlzt_pfls_amt": "100000", "bass_exrt": "1400"}],
+        {},
+    )
+
+    with patch("tradingagents.portfolio.kis.KisClient.from_api_keys", return_value=client):
+        payload = _build_report(
+            tmp_path,
+            market_scope="us",
+            broker="kis",
+            current_total_equity_krw=1_100_000,
+            positions=(),
+            history_snapshots=[
+                {
+                    "snapshot_id": "previous",
+                    "as_of": "2026-01-01T09:00:00+09:00",
+                    "account_value_krw": 1_000_000,
+                    "snapshot_health": "VALID",
+                    "positions": [],
+                }
+            ],
+            benchmarks={
+                "SPY": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 112}],
+                "QQQ": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 125}],
+            },
+        )
+
+    rows = {row["ticker"]: row for row in payload["contribution_by_ticker"]}
+    assert rows["AAPL"]["realized_pnl_krw"] == 100_000
+    assert rows["AAPL"]["total_contribution_krw"] == 100_000
+    assert payload["reconciliation"]["simple_nav_pnl_krw"] == 100_000
+    assert payload["reconciliation"]["sum_position_contribution_krw"] == 100_000
+    assert payload["reconciliation"]["reconciliation_status"] == "OK"
+
+
 def test_contribution_keeps_unresolved_bare_code_with_warning(tmp_path: Path):
     client = Mock()
     client.fetch_domestic_order_fills.return_value = []

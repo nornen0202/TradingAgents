@@ -69,4 +69,26 @@ def test_portfolio_external_summary_shows_market_coverage():
 
     assert "현재 리포트 시장: US" in section
     assert "현재 시장에 매칭된 PRISM 신호: 0개" in section
+    assert "TradingAgents 액션과 겹친 PRISM 신호: 0개" in section
     assert "교차시장 신호는 후보 생성/충돌 판단에서 제외됨" in section
+
+
+def test_portfolio_external_summary_lists_external_only_same_market_signal():
+    ingestion = PrismIngestionResult(
+        enabled=True,
+        ok=True,
+        signals=[
+            PrismExternalSignal(canonical_ticker="MSFT", market="US", signal_action=PrismSignalAction.REDUCE_RISK),
+        ],
+    )
+    reconciliation = reconcile_prism_with_actions(
+        tradingagents_actions=[_action("AAPL")],
+        ingestion=ingestion,
+        run_market="US",
+    )
+
+    section = render_external_signal_section(reconciliation)
+
+    assert "### PRISM 단독 관찰 후보" in section
+    assert "MSFT" in section
+    assert "PRISM `REDUCE_RISK`" in section

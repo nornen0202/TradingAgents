@@ -1832,31 +1832,39 @@ def _run_performance_tracking(
             "updated": False,
         }
         if config.performance.update_outcomes_on_run:
-            price_result = load_price_history_for_recommendations(
-                db_path,
-                provider=config.performance.price_provider,
-                price_history_path=config.performance.price_history_path,
-                benchmark_ticker=config.performance.benchmark_ticker,
-                lookback_days=config.performance.price_lookback_days,
-                asof_date=started_at.date().isoformat(),
-            )
-            outcome_update.update(
-                {
-                    "provider": price_result.provider,
-                    "has_prices": price_result.has_prices,
-                    "warnings": price_result.warnings,
-                }
-            )
-            if price_result.has_prices:
-                update_action_outcomes(
+            try:
+                price_result = load_price_history_for_recommendations(
                     db_path,
+                    provider=config.performance.price_provider,
+                    price_history_path=config.performance.price_history_path,
+                    benchmark_ticker=config.performance.benchmark_ticker,
+                    lookback_days=config.performance.price_lookback_days,
                     asof_date=started_at.date().isoformat(),
-                    horizons=config.performance.outcome_horizons,
-                    price_history=price_result.price_history,
                 )
-                outcome_update["updated"] = True
-            else:
-                outcome_update["unavailable_reason"] = "price_provider_unavailable_or_no_price_history"
+                outcome_update.update(
+                    {
+                        "provider": price_result.provider,
+                        "has_prices": price_result.has_prices,
+                        "warnings": price_result.warnings,
+                    }
+                )
+                if price_result.has_prices:
+                    update_action_outcomes(
+                        db_path,
+                        asof_date=started_at.date().isoformat(),
+                        horizons=config.performance.outcome_horizons,
+                        price_history=price_result.price_history,
+                    )
+                    outcome_update["updated"] = True
+                else:
+                    outcome_update["unavailable_reason"] = "price_provider_unavailable_or_no_price_history"
+            except Exception as exc:
+                outcome_update["updated"] = False
+                outcome_update["unavailable_reason"] = "outcome_update_failed"
+                outcome_update["failure_reason"] = str(exc)
+                warnings = list(outcome_update.get("warnings") or [])
+                warnings.append(f"performance_outcome_update_failed:{exc}")
+                outcome_update["warnings"] = warnings
         else:
             outcome_update["unavailable_reason"] = "outcome_update_disabled"
         summary = summarize_action_performance(db_path)

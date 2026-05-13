@@ -79,7 +79,7 @@ def render_portfolio_report_markdown(
             f"{_cell(present_account_action(action.portfolio_relative_action, language='Korean'))} | "
             f"{_cell(present_account_action(action.action_now, language='Korean'))} | "
             f"{_cell(_conditional_action_label(action))} | "
-            f"{_cell(_prism_badge(action))} | "
+            f"{_cell(_prism_badge(action, include_empty=True))} | "
             f"{_cell(_amount_label(action.delta_krw_now))} | "
             f"{_cell(_amount_label(action.delta_krw_if_triggered))} | "
             f"{action.priority} | {_cell(_localized_rationale(action))} | "
@@ -147,8 +147,6 @@ def render_portfolio_report_markdown(
             "",
             external_section,
             "" if external_section else "",
-            consistency_section,
-            "",
             "## 포트폴리오 리스크",
             "",
             portfolio_risks,
@@ -176,6 +174,8 @@ def render_portfolio_report_markdown(
             f"- 확인 필요 종목: {', '.join(review_names) if review_names else '없음'}",
             "- 내부 진단과 원본 판단 값은 감사용 JSON 파일에 보관합니다.",
             "",
+            consistency_section,
+            "" if consistency_section else "",
         ]
     )
 
@@ -491,10 +491,17 @@ def _profit_metric_label(action) -> str:
         return ""
 
 
-def _prism_badge(action) -> str:
+def _prism_badge(action, *, include_empty: bool = False) -> str:
     agreement = str(getattr(action, "prism_agreement", "") or (getattr(action, "data_health", {}) or {}).get("prism_agreement") or "").strip()
-    if not agreement or agreement in {"no_prism_signal", "no_same_market_prism_coverage", "prism_disabled", "prism_ingestion_failed"}:
-        return ""
+    empty_mapping = {
+        "": "미확인",
+        "no_prism_signal": "매칭 없음",
+        "no_same_market_prism_coverage": "현재 시장 없음",
+        "prism_disabled": "미사용",
+        "prism_ingestion_failed": "수집 실패",
+    }
+    if agreement in empty_mapping:
+        return empty_mapping[agreement] if include_empty else ""
     mapping = {
         "confirmed_buy": "PRISM 일치",
         "confirmed_sell": "PRISM 일치",
@@ -513,6 +520,8 @@ def _section_prism_note(actions: list[Any]) -> str:
     statuses = [_prism_status(action) for action in actions]
     if statuses and all(status == "no_prism_signal" for status in statuses):
         return "- 이 섹션 후보들은 현재 같은 시장의 PRISM 매칭 신호가 없습니다."
+    if statuses and all(status == "no_same_market_prism_coverage" for status in statuses):
+        return "- 이 섹션 후보들은 현재 리포트 시장의 PRISM 커버리지가 없습니다."
     return ""
 
 
@@ -716,6 +725,8 @@ def _risk_lines(values: tuple[str, ...]) -> str:
     cleaned = []
     for value in values:
         text = sanitize_investor_text(value, language="Korean")
+        if "근거 요약 생성 실패" in text:
+            continue
         if text and text not in cleaned:
             cleaned.append(text)
     return "\n".join(f"- {item}" for item in cleaned) if cleaned else "- 특이 리스크 없음"

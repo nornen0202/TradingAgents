@@ -172,7 +172,12 @@ def build_account_performance_outputs(
         min_coverage_ratio=min_coverage_ratio,
         warnings=warnings,
     )
-    contribution = _contribution_by_ticker(snapshot=snapshot, ledger_events=ledger_events, warnings=warnings)
+    contribution = _contribution_by_ticker(
+        snapshot=snapshot,
+        snapshot_rows=snapshot_rows,
+        ledger_events=ledger_events,
+        warnings=warnings,
+    )
     reconciliation = reconcile_account_performance(
         snapshot_rows=snapshot_rows,
         ledger_events=ledger_events,
@@ -283,7 +288,7 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
             continue
         contribution_rows.append(
             f"- {item.get('ticker')}: 기여도 {_krw(item.get('total_contribution_krw'))} "
-            f"(실현 {_krw(item.get('realized_pnl_krw'))}, 미실현 {_krw(item.get('unrealized_pnl_krw'))})"
+            f"(실현 {_krw(item.get('realized_pnl_krw'))}, 미실현 변화 {_krw(item.get('unrealized_pnl_krw'))})"
         )
 
     warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
@@ -378,6 +383,7 @@ def _snapshot_row(snapshot: AccountSnapshot, *, profile_name: str) -> dict[str, 
         "account_value_krw": float(snapshot.account_value_krw),
         "snapshot_health": str(getattr(snapshot, "snapshot_health", "") or ""),
         "positions_count": len(getattr(snapshot, "positions", ()) or ()),
+        "positions": _snapshot_position_rows(getattr(snapshot, "positions", ()) or ()),
         "broker": str(getattr(snapshot, "broker", "") or ""),
     }
 
@@ -397,8 +403,46 @@ def _snapshot_payload_row(payload: Mapping[str, Any], *, profile_name: str) -> d
         "account_value_krw": float(value),
         "snapshot_health": str(payload.get("snapshot_health") or ""),
         "positions_count": positions_count,
+        "positions": _payload_position_rows(positions if isinstance(positions, list) else []),
         "broker": str(payload.get("broker") or ""),
     }
+
+
+def _snapshot_position_rows(positions: Any) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for position in positions or ():
+        canonical = str(getattr(position, "canonical_ticker", "") or "").strip().upper()
+        if not canonical:
+            continue
+        rows.append(
+            {
+                "broker_symbol": str(getattr(position, "broker_symbol", "") or "").strip().upper(),
+                "canonical_ticker": canonical,
+                "display_name": str(getattr(position, "display_name", "") or canonical),
+                "unrealized_pnl_krw": _float_or_none(getattr(position, "unrealized_pnl_krw", None)) or 0.0,
+            }
+        )
+    return rows
+
+
+def _payload_position_rows(positions: list[Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for position in positions:
+        if not isinstance(position, Mapping):
+            continue
+        canonical = str(position.get("canonical_ticker") or position.get("ticker") or "").strip().upper()
+        if not canonical:
+            continue
+        broker_symbol = str(position.get("broker_symbol") or position.get("pdno") or canonical).strip().upper()
+        rows.append(
+            {
+                "broker_symbol": broker_symbol,
+                "canonical_ticker": canonical,
+                "display_name": str(position.get("display_name") or position.get("name") or canonical),
+                "unrealized_pnl_krw": _float_or_none(position.get("unrealized_pnl_krw")) or 0.0,
+            }
+        )
+    return rows
 
 
 def _select_performance_snapshots(
@@ -667,19 +711,7 @@ def _normalize_ledger_event(row: Mapping[str, Any], *, market: str, source: str)
         _first_float(row, ("tax", "tax_amt", "tr_tax", "sll_tax", "sttx", "transaction_tax")) or 0.0,
         fx_rate=fx_rate,
     )
-    realized = _first_float(
-        row,
-        (
-            "rlzt_pfls",
-            "rlzt_pfls_amt",
-            "trad_pfls_amt",
-            "evlu_pfls_smtl_amt",
-            "ovrs_rlzt_pfls_amt",
-            "realized_pnl",
-        ),
-    )
-    if realized is not None:
-        realized = _to_krw(realized, fx_rate=fx_rate)
+    realized = _realized_pnl_krw(row, fx_rate=fx_rate)
     currency = _first_text(row, ("crcy_cd", "tr_crcy_cd", "currency")) or ("USD" if market == "US" else "KRW")
     event_type = _classify_ledger_event_type(row, side=side)
     return LedgerEvent(
@@ -1605,6 +1637,7 @@ def _return_method_label(method: Any, warning: Any = None) -> str:
 def _contribution_by_ticker(
     *,
     snapshot: AccountSnapshot,
+    snapshot_rows: list[dict[str, Any]],
     ledger_events: list[LedgerEvent],
     warnings: list[str] | None = None,
 ) -> list[dict[str, Any]]:
@@ -1616,6 +1649,13 @@ def _contribution_by_ticker(
             continue
         positions_by_canonical[canonical] = position
         for candidate in (position.canonical_ticker, position.broker_symbol):
+            base_code = _kr_base_code(candidate)
+            if base_code:
+                positions_by_base_code.setdefault(base_code, canonical)
+    start_positions_by_canonical = _positions_by_canonical_from_snapshot_row(snapshot_rows[0] if snapshot_rows else {})
+    for canonical, row in start_positions_by_canonical.items():
+        positions_by_canonical.setdefault(canonical, row)
+        for candidate in (row.get("canonical_ticker"), row.get("broker_symbol")):
             base_code = _kr_base_code(candidate)
             if base_code:
                 positions_by_base_code.setdefault(base_code, canonical)
@@ -1631,23 +1671,58 @@ def _contribution_by_ticker(
             warnings=warnings,
         )
         realized[ticker] = realized.get(ticker, 0.0) + float(event.realized_pnl_krw)
-    tickers = set(positions_by_canonical) | set(realized)
+    current_positions = {str(position.canonical_ticker or "").strip().upper(): position for position in snapshot.positions if str(position.canonical_ticker or "").strip()}
+    tickers = set(current_positions) | set(start_positions_by_canonical) | set(realized)
     rows = []
     for ticker in sorted(tickers):
-        position = positions_by_canonical.get(ticker)
-        unrealized = float(position.unrealized_pnl_krw if position else 0.0)
+        position = current_positions.get(ticker)
+        start_position = start_positions_by_canonical.get(ticker)
+        ending_unrealized = _position_unrealized_pnl(position)
+        starting_unrealized = _position_unrealized_pnl(start_position)
+        unrealized_change = ending_unrealized - starting_unrealized
         realized_value = float(realized.get(ticker, 0.0))
+        display_name = (
+            str(getattr(position, "display_name", "") or "").strip()
+            or str((start_position or {}).get("display_name") or "").strip()
+            or ticker
+        )
         rows.append(
             {
                 "ticker": ticker,
-                "display_name": position.display_name if position else ticker,
+                "display_name": display_name,
                 "realized_pnl_krw": int(round(realized_value)),
-                "unrealized_pnl_krw": int(round(unrealized)),
-                "total_contribution_krw": int(round(realized_value + unrealized)),
+                "starting_unrealized_pnl_krw": int(round(starting_unrealized)),
+                "ending_unrealized_pnl_krw": int(round(ending_unrealized)),
+                "unrealized_pnl_change_krw": int(round(unrealized_change)),
+                "unrealized_pnl_krw": int(round(unrealized_change)),
+                "total_contribution_krw": int(round(realized_value + unrealized_change)),
             }
         )
     rows.sort(key=lambda item: abs(int(item["total_contribution_krw"])), reverse=True)
     return rows
+
+
+def _positions_by_canonical_from_snapshot_row(row: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
+    positions = row.get("positions") if isinstance(row, Mapping) else []
+    result: dict[str, dict[str, Any]] = {}
+    if not isinstance(positions, list):
+        return result
+    for position in positions:
+        if not isinstance(position, Mapping):
+            continue
+        canonical = str(position.get("canonical_ticker") or position.get("ticker") or "").strip().upper()
+        if not canonical:
+            continue
+        result[canonical] = dict(position)
+    return result
+
+
+def _position_unrealized_pnl(position: Any) -> float:
+    if position is None:
+        return 0.0
+    if isinstance(position, Mapping):
+        return float(_float_or_none(position.get("unrealized_pnl_krw")) or 0.0)
+    return float(_float_or_none(getattr(position, "unrealized_pnl_krw", None)) or 0.0)
 
 
 def _canonical_contribution_ticker(
@@ -2414,6 +2489,30 @@ def _classify_ledger_event_type(row: Mapping[str, Any], *, side: str) -> LedgerE
     return LedgerEventType.UNKNOWN
 
 
+def _realized_pnl_krw(row: Mapping[str, Any], *, fx_rate: float | None) -> float | None:
+    key, value = _first_float_with_key(
+        row,
+        (
+            "rlzt_pfls",
+            "rlzt_pfls_amt",
+            "trad_pfls_amt",
+            "evlu_pfls_smtl_amt",
+            "ovrs_rlzt_pfls_amt",
+            "realized_pnl",
+            "realized_pnl_krw",
+            "frcr_rlzt_pfls_amt",
+            "frcr_realized_pnl",
+            "realized_pnl_usd",
+        ),
+    )
+    if value is None:
+        return None
+    normalized_key = str(key or "").lower()
+    if "frcr" in normalized_key or normalized_key.endswith("_usd"):
+        return _to_krw(value, fx_rate=fx_rate)
+    return float(value)
+
+
 def _to_krw(value: float, *, fx_rate: float | None) -> float:
     if fx_rate and fx_rate > 0:
         return float(value) * float(fx_rate)
@@ -2435,6 +2534,14 @@ def _first_float(payload: Mapping[str, Any], keys: tuple[str, ...]) -> float | N
         if value is not None:
             return value
     return None
+
+
+def _first_float_with_key(payload: Mapping[str, Any], keys: tuple[str, ...]) -> tuple[str | None, float | None]:
+    for key in keys:
+        value = _float_or_none(payload.get(key))
+        if value is not None:
+            return key, value
+    return None, None
 
 
 def _float_or_none(value: Any) -> float | None:
