@@ -1416,6 +1416,10 @@ def _render_etf_alternative_comparison(value: Any) -> str:
       </div>
         """
     rows = _etf_alternative_rows(alternatives)
+    curve_html = _etf_equity_curve_svg(
+        alternatives=ok_alternatives,
+        markers=[item for item in value.get("cashflow_markers", []) if isinstance(item, dict)],
+    )
     return f"""
       <div class="account-etf-alternatives">
         <h3>동일 입금일 ETF 대체 포트폴리오 비교</h3>
@@ -1453,6 +1457,7 @@ def _render_etf_alternative_comparison(value: Any) -> str:
             <tbody>{rows}</tbody>
           </table>
         </div>
+        {curve_html}
         {_render_etf_policy_box(policy)}
         {warning_html}
       </div>
@@ -1504,11 +1509,93 @@ def _render_etf_policy_box(policy: dict[str, Any]) -> str:
     for key, label in labels.items():
         item = checks.get(key) if isinstance(checks.get(key), dict) else {}
         rows.append(f"<p><strong>{_escape(label)}</strong><span>{_escape(str(item.get('status') or 'INSUFFICIENT_DATA'))}</span></p>")
+    core = policy.get("core_satellite_recommendation") if isinstance(policy.get("core_satellite_recommendation"), dict) else {}
+    if core:
+        core_weight = (_account_performance_number(core.get("recommended_core_etf_weight")) or 0.0) * 100.0
+        individual_weight = (_account_performance_number(core.get("recommended_individual_stock_weight")) or 0.0) * 100.0
+        rows.append(
+            "<p><strong>현재 권고</strong><span>"
+            f"ETF core {_escape(_format_pct_points_value(core_weight))} / "
+            f"개별 종목 {_escape(_format_pct_points_value(individual_weight))}"
+            "</span></p>"
+        )
     return (
         "<article class='run-card account-performance-note'>"
         "<h3>개별 종목 비중 판단</h3>"
         + "".join(rows)
         + "</article>"
+    )
+
+
+def _etf_equity_curve_svg(*, alternatives: list[dict[str, Any]], markers: list[dict[str, Any]]) -> str:
+    series = []
+    for item in alternatives[:6]:
+        curve = [point for point in item.get("equity_curve", []) if isinstance(point, dict)]
+        points = []
+        for point in curve:
+            value = _account_performance_number(point.get("value_krw"))
+            date_text = str(point.get("date") or "")
+            if value is not None and date_text:
+                points.append((date_text, value))
+        if points:
+            series.append({"label": str(item.get("label") or item.get("key") or "-"), "points": points})
+    if not series:
+        return ""
+    width = 760
+    height = 260
+    pad_x = 56
+    pad_y = 28
+    all_dates = sorted({date_text for item in series for date_text, _value in item["points"]})
+    all_values = [value for item in series for _date_text, value in item["points"]]
+    if not all_dates or not all_values:
+        return ""
+    min_value = min(all_values)
+    max_value = max(all_values)
+    if max_value <= min_value:
+        max_value = min_value + 1
+    date_index = {date_text: index for index, date_text in enumerate(all_dates)}
+
+    def x_for(date_text: str) -> float:
+        if len(all_dates) == 1:
+            return width / 2
+        return pad_x + (width - pad_x * 2) * date_index[date_text] / (len(all_dates) - 1)
+
+    def y_for(value: float) -> float:
+        return height - pad_y - (height - pad_y * 2) * (value - min_value) / (max_value - min_value)
+
+    colors = ["#1f77b4", "#d62728", "#2ca02c", "#9467bd", "#ff7f0e", "#17becf"]
+    lines = []
+    legends = []
+    for index, item in enumerate(series):
+        path = " ".join(f"{x_for(date_text):.1f},{y_for(value):.1f}" for date_text, value in item["points"])
+        color = colors[index % len(colors)]
+        lines.append(f"<polyline fill='none' stroke='{color}' stroke-width='2.2' points='{path}' />")
+        legends.append(
+            f"<span><i style='background:{color}'></i>{_escape(item['label'])}</span>"
+        )
+    marker_lines = []
+    marker_dates = sorted({str(item.get("date") or "") for item in markers if str(item.get("date") or "") in date_index})
+    for date_text in marker_dates:
+        x = x_for(date_text)
+        marker_lines.append(
+            f"<line x1='{x:.1f}' y1='{pad_y}' x2='{x:.1f}' y2='{height - pad_y}' stroke='#8b95a1' stroke-dasharray='4 4' stroke-width='1' />"
+        )
+    return (
+        "<div class='account-performance-chart account-etf-curve'>"
+        "<h3>ETF 대체 포트폴리오 equity curve</h3>"
+        "<p class='account-period-note'>점선은 날짜별 입출금 이벤트가 있었던 날입니다. 금액은 공개 화면에 표시하지 않습니다.</p>"
+        f"<svg viewBox='0 0 {width} {height}' role='img' aria-label='ETF DCA equity curves'>"
+        f"<rect x='0' y='0' width='{width}' height='{height}' fill='white' />"
+        + "".join(marker_lines)
+        + f"<line x1='{pad_x}' y1='{height - pad_y}' x2='{width - pad_x}' y2='{height - pad_y}' stroke='#d0d7de' />"
+        + f"<line x1='{pad_x}' y1='{pad_y}' x2='{pad_x}' y2='{height - pad_y}' stroke='#d0d7de' />"
+        + "".join(lines)
+        + f"<text x='{pad_x}' y='{height - 6}' font-size='11' fill='#57606a'>{_escape(all_dates[0])}</text>"
+        + f"<text x='{width - pad_x - 70}' y='{height - 6}' font-size='11' fill='#57606a'>{_escape(all_dates[-1])}</text>"
+        + "</svg>"
+        + "<div class='etf-curve-legend'>"
+        + "".join(legends)
+        + "</div></div>"
     )
 
 
@@ -1547,6 +1634,8 @@ def _friendly_etf_warning(value: str) -> str:
         return "날짜별 출금 합계와 브로커 총출금액이 일치하지 않습니다."
     if "seed_ignored_below_minimum" in text:
         return "기초자산이 최소 seed 기준보다 작아 ETF seed 매수에서 제외했습니다."
+    if "period_start_mismatch" in text or "period_end_mismatch" in text:
+        return "실제 계좌 성과 기간과 ETF 대체 비교 기간이 달라 직접 비교할 수 없습니다."
     return text
 
 
@@ -4060,6 +4149,38 @@ a { color: inherit; }
   height: auto;
   border: 1px solid var(--line);
   border-radius: 14px;
+}
+
+.account-etf-curve {
+  margin: 18px 0;
+}
+
+.account-etf-curve svg {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.etf-curve-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.etf-curve-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.etf-curve-legend i {
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  display: inline-block;
 }
 
 .account-chart-legend {

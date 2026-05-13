@@ -47,10 +47,18 @@ def test_etf_dca_benchmark_settings_are_loaded(tmp_path: Path):
         {},
         etf_dca_raw={
             "enabled": True,
+            "require_dated_cashflows": True,
+            "cashflow_source": "manual_csv",
             "manual_cashflow_csv_path": "cashflows.csv",
             "price_history_path": "etf_prices.json",
             "fx_history_path": "fx.json",
+            "period_start": "2026-04-13",
+            "period_end": "2026-05-12",
+            "price_basis": "close",
+            "cashflow_trade_timing": "same_day_close",
+            "withdrawal_policy": "pro_rata_current_weights",
             "min_initial_seed_krw": 10_000,
+            "core_satellite_policy_enabled": True,
             "instruments": {
                 "kospi200": {
                     "display_name": "KOSPI200 ETF",
@@ -79,4 +87,12 @@ def test_etf_dca_benchmark_settings_are_loaded(tmp_path: Path):
     assert settings.etf_alternative_symbols["KOSPI200"] == "069500.KS"
     assert settings.etf_alternative_symbols["SP500_KRW"] == "360750.KS"
     assert settings.etf_alternative_blended_weights == {"KOSPI200": 0.7, "SP500_KRW": 0.3}
+    assert settings.etf_dca_require_dated_cashflows is True
+    assert settings.etf_dca_cashflow_source == "manual_csv"
+    assert settings.etf_dca_period_start == "2026-04-13"
+    assert settings.etf_dca_period_end == "2026-05-12"
+    assert settings.etf_dca_price_basis == "close"
+    assert settings.etf_dca_cashflow_trade_timing == "same_day_close"
+    assert settings.etf_dca_withdrawal_policy == "pro_rata_current_weights"
     assert settings.etf_dca_min_initial_seed_krw == 10_000
+    assert settings.etf_dca_core_satellite_policy_enabled is True
