@@ -1,0 +1,6 @@
+from __future__ import annotations
+
+from tradingagents.portfolio.performance.etf_alternatives import EtfAlternativePortfolioResult
+
+
+VirtualBenchmarkPortfolioResult = EtfAlternativePortfolioResult

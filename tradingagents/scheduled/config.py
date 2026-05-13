@@ -151,6 +151,24 @@ class PortfolioPerformanceSettings:
     broker_period_end: str = ""
     prefer_broker_reported_performance: bool = True
     show_snapshot_performance_when_unreconciled: bool = False
+    etf_alternative_enabled: bool = True
+    cashflow_baseline_path: Path | None = None
+    etf_price_history_path: Path | None = None
+    etf_fx_history_path: Path | None = None
+    etf_alternative_include_start_asset: bool = True
+    etf_alternative_transaction_cost_bps: float = 0.0
+    etf_alternative_symbols: dict[str, str] = field(default_factory=dict)
+    etf_alternative_currencies: dict[str, str] = field(default_factory=dict)
+    etf_alternative_labels: dict[str, str] = field(default_factory=dict)
+    etf_alternative_portfolios: dict[str, dict[str, float]] = field(default_factory=dict)
+    etf_alternative_blended_weights: dict[str, float] = field(default_factory=dict)
+    etf_dca_min_initial_seed_krw: int = 10_000
+    etf_dca_reinvest_dividends: bool = True
+    etf_dca_generate_standalone_report: bool = True
+    etf_dca_show_in_portfolio_report: bool = True
+    alpha_policy_mode: str = "report_only"
+    alpha_policy_reduce_target_pct: float = 15.0
+    alpha_policy_min_action_samples: int = 5
 
 
 @dataclass(frozen=True)
@@ -260,6 +278,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     site_raw = raw.get("site") or {}
     portfolio_raw = raw.get("portfolio") or {}
     portfolio_performance_raw = raw.get("portfolio_performance") or {}
+    etf_dca_benchmarks_raw = raw.get("etf_dca_benchmarks") or {}
     execution_raw = raw.get("execution") or {}
     summary_image_raw = raw.get("summary_image") or {}
     external_raw = raw.get("external") or {}
@@ -400,6 +419,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         ),
         portfolio_performance=_load_portfolio_performance_settings(
             portfolio_performance_raw,
+            etf_dca_raw=etf_dca_benchmarks_raw,
             base_dir=base_dir,
         ),
         execution=ExecutionSettings(
@@ -686,9 +706,18 @@ def _load_portfolio_performance_settings(
     raw: dict[str, object],
     *,
     base_dir: Path,
+    etf_dca_raw: dict[str, object] | None = None,
 ) -> PortfolioPerformanceSettings:
     raw = raw if isinstance(raw, dict) else {}
+    etf_dca_raw = etf_dca_raw if isinstance(etf_dca_raw, dict) else {}
     min_coverage_raw = raw.get("min_coverage_ratio") if "min_coverage_ratio" in raw else 0.8
+    etf_symbols, etf_currencies, etf_labels = _load_etf_instrument_settings(raw, etf_dca_raw)
+    etf_portfolios, etf_blended = _load_etf_portfolio_settings(raw, etf_dca_raw)
+    manual_cashflow_path = (
+        etf_dca_raw.get("manual_cashflow_csv_path")
+        or etf_dca_raw.get("manual_cashflow_json_path")
+        or raw.get("cashflow_baseline_path")
+    )
     return PortfolioPerformanceSettings(
         enabled=bool(raw.get("enabled", True)),
         publish_to_site=bool(raw.get("publish_to_site", True)),
@@ -719,7 +748,158 @@ def _load_portfolio_performance_settings(
         broker_period_end=str(raw.get("broker_period_end", "") or "").strip(),
         prefer_broker_reported_performance=bool(raw.get("prefer_broker_reported_performance", True)),
         show_snapshot_performance_when_unreconciled=bool(raw.get("show_snapshot_performance_when_unreconciled", False)),
+        etf_alternative_enabled=bool(
+            raw.get("etf_alternative_enabled", etf_dca_raw.get("enabled", True))
+        ),
+        cashflow_baseline_path=_resolve_optional_path(manual_cashflow_path, base_dir),
+        etf_price_history_path=_resolve_optional_path(
+            raw.get("etf_price_history_path") or etf_dca_raw.get("price_history_path"),
+            base_dir,
+        ),
+        etf_fx_history_path=_resolve_optional_path(
+            raw.get("etf_fx_history_path") or etf_dca_raw.get("fx_history_path"),
+            base_dir,
+        ),
+        etf_alternative_include_start_asset=bool(
+            raw.get("etf_alternative_include_start_asset", etf_dca_raw.get("include_start_asset", True))
+        ),
+        etf_alternative_transaction_cost_bps=max(
+            0.0,
+            float(
+                raw.get(
+                    "etf_alternative_transaction_cost_bps",
+                    etf_dca_raw.get("transaction_cost_bps", 0.0),
+                )
+                or 0.0
+            ),
+        ),
+        etf_alternative_symbols=etf_symbols,
+        etf_alternative_currencies=etf_currencies,
+        etf_alternative_labels=etf_labels,
+        etf_alternative_portfolios=etf_portfolios,
+        etf_alternative_blended_weights=etf_blended,
+        etf_dca_min_initial_seed_krw=max(
+            0,
+            int(etf_dca_raw.get("min_initial_seed_krw", raw.get("etf_dca_min_initial_seed_krw", 10_000)) or 0),
+        ),
+        etf_dca_reinvest_dividends=bool(etf_dca_raw.get("reinvest_dividends", True)),
+        etf_dca_generate_standalone_report=bool(etf_dca_raw.get("generate_standalone_report", True)),
+        etf_dca_show_in_portfolio_report=bool(etf_dca_raw.get("show_in_portfolio_report", True)),
+        alpha_policy_mode=str(raw.get("alpha_policy_mode", etf_dca_raw.get("alpha_policy_mode", "report_only")) or "report_only").strip().lower(),
+        alpha_policy_reduce_target_pct=max(
+            0.0,
+            float(raw.get("alpha_policy_reduce_target_pct", etf_dca_raw.get("alpha_policy_reduce_target_pct", 15.0)) or 15.0),
+        ),
+        alpha_policy_min_action_samples=max(
+            1,
+            int(raw.get("alpha_policy_min_action_samples", etf_dca_raw.get("alpha_policy_min_action_samples", 5)) or 5),
+        ),
     )
+
+
+def _load_etf_instrument_settings(
+    raw: dict[str, object],
+    etf_dca_raw: dict[str, object],
+) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
+    symbols = _normalize_string_mapping(raw.get("etf_alternative_symbols"))
+    currencies = _normalize_string_mapping(raw.get("etf_alternative_currencies"))
+    labels = _normalize_string_mapping(raw.get("etf_alternative_labels"))
+    instruments = etf_dca_raw.get("instruments") if isinstance(etf_dca_raw, dict) else {}
+    if isinstance(instruments, dict):
+        for raw_key, value in instruments.items():
+            if not isinstance(value, dict):
+                continue
+            key = _normalize_etf_key(raw_key)
+            ticker = _optional_string(value.get("ticker"))
+            currency = _optional_string(value.get("currency"))
+            label = _optional_string(value.get("display_name"))
+            if ticker:
+                symbols[key] = ticker
+            if currency:
+                currencies[key] = currency.upper()
+            if label:
+                labels[key] = label
+    return symbols, currencies, labels
+
+
+def _load_etf_portfolio_settings(
+    raw: dict[str, object],
+    etf_dca_raw: dict[str, object],
+) -> tuple[dict[str, dict[str, float]], dict[str, float]]:
+    portfolios = _normalize_nested_float_mapping(raw.get("etf_alternative_portfolios"))
+    blended = _normalize_float_mapping(raw.get("etf_alternative_blended_weights"))
+    raw_portfolios = etf_dca_raw.get("portfolios") if isinstance(etf_dca_raw, dict) else {}
+    if isinstance(raw_portfolios, dict):
+        for raw_key, value in raw_portfolios.items():
+            if not isinstance(value, dict):
+                continue
+            portfolio_key = _normalize_etf_portfolio_key(raw_key)
+            weights = value.get("weights") if isinstance(value.get("weights"), dict) else value
+            parsed = {
+                _normalize_etf_key(key): float(number)
+                for key, raw_number in (weights or {}).items()
+                if (number := _float_or_none(raw_number)) is not None
+            }
+            if parsed:
+                if portfolio_key == "BLENDED":
+                    blended = parsed
+                else:
+                    portfolios[portfolio_key] = parsed
+    return portfolios, blended
+
+
+def _normalize_string_mapping(value: object) -> dict[str, str]:
+    if not isinstance(value, dict):
+        return {}
+    return {_normalize_etf_key(key): str(item).strip() for key, item in value.items() if str(key).strip()}
+
+
+def _normalize_float_mapping(value: object) -> dict[str, float]:
+    if not isinstance(value, dict):
+        return {}
+    result: dict[str, float] = {}
+    for key, item in value.items():
+        number = _float_or_none(item)
+        if number is not None:
+            result[_normalize_etf_key(key)] = number
+    return result
+
+
+def _normalize_nested_float_mapping(value: object) -> dict[str, dict[str, float]]:
+    if not isinstance(value, dict):
+        return {}
+    result: dict[str, dict[str, float]] = {}
+    for key, item in value.items():
+        parsed = _normalize_float_mapping(item)
+        if parsed:
+            result[_normalize_etf_portfolio_key(key)] = parsed
+    return result
+
+
+def _normalize_etf_key(value: object) -> str:
+    key = str(value or "").strip().upper().replace("-", "_")
+    aliases = {
+        "KOSPI200": "KOSPI200",
+        "KOSPI_200": "KOSPI200",
+        "KOSDAQ150": "KOSDAQ150",
+        "KOSDAQ_150": "KOSDAQ150",
+        "SP500": "SP500",
+        "S&P500": "SP500",
+        "SP500_KRW": "SP500_KRW",
+        "SP500_KR": "SP500_KRW",
+        "NASDAQ100": "NASDAQ100",
+        "NASDAQ_100": "NASDAQ100",
+        "NASDAQ100_KRW": "NASDAQ100_KRW",
+        "NASDAQ100_KR": "NASDAQ100_KRW",
+    }
+    return aliases.get(key, key)
+
+
+def _normalize_etf_portfolio_key(value: object) -> str:
+    key = str(value or "").strip().upper().replace("-", "_")
+    if "BLENDED" in key:
+        return "BLENDED"
+    return _normalize_etf_key(key)
 
 
 def _clamp_ratio(value: object, *, default: float) -> float:
@@ -877,6 +1057,19 @@ def _optional_string(value: object) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _float_or_none(value: object) -> float | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        value = value.replace(",", "").replace("%", "").strip()
+        if not value:
+            return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def _normalize_int_sequence(value: object, *, default: tuple[int, ...]) -> tuple[int, ...]:

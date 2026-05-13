@@ -66,6 +66,27 @@ The same-cashflow benchmark simulates buying or selling benchmark shares only fo
 
 This keeps internal rebalancing from being mistaken for investor contributions or withdrawals.
 
+## Same-Deposit-Date ETF DCA Benchmark
+
+When dated deposit/withdrawal cashflows and ETF price data are available, TradingAgents also builds virtual ETF portfolios for the same account period. The primary comparison is broker-reported account performance versus a virtual account that buys benchmark ETFs on the same cashflow dates.
+
+Artifacts:
+
+- `etf_dca_comparison.json`
+- `etf_dca_benchmark_results.json`
+- `etf_dca_policy_recommendation.json`
+- `etf_alternative_portfolios_public.json`
+- `cashflows_audit.json`
+
+If KIS only provides aggregate deposits and withdrawals, exact DCA comparison is marked unavailable with `etf_alternative_cashflow_dates_required`. TradingAgents does not turn aggregate deposits into fake single-date cashflows.
+
+The DCA benchmark formulas mirror the broker app-style return:
+
+- `benchmark_pnl_krw = benchmark_end_value_krw - seed_asset_krw - deposit_amount_krw + withdrawal_amount_krw`
+- `benchmark_balance_return_pct = benchmark_pnl_krw / (seed_asset_krw + deposit_amount_krw - withdrawal_amount_krw) * 100`
+
+The default ETF universe and manual cashflow CSV format are documented in [etf_dca_benchmark.md](etf_dca_benchmark.md).
+
 ## Reconciliation
 
 The report emits a reconciliation block:
