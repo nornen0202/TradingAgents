@@ -32,13 +32,21 @@ date,type,amount_krw,currency,description
 ```toml
 [etf_dca_benchmarks]
 enabled = true
+require_dated_cashflows = true
+cashflow_source = "auto"
 manual_cashflow_csv_path = "config/account_cashflows.csv"
 price_history_path = "config/etf_prices.json"
 fx_history_path = ""
+period_start = ""
+period_end = ""
+price_basis = "close"
+cashflow_trade_timing = "same_day_close"
+withdrawal_policy = "pro_rata_current_weights"
 min_initial_seed_krw = 10000
 reinvest_dividends = true
 show_in_portfolio_report = true
 generate_standalone_report = true
+core_satellite_policy_enabled = true
 
 [etf_dca_benchmarks.instruments.kospi200]
 display_name = "KOSPI200 ETF"
@@ -61,8 +69,10 @@ weights = { kospi200 = 0.35, kosdaq150 = 0.15, sp500_krw = 0.30, nasdaq100_krw =
 - `etf_alternative_portfolios_public.json`: 투자자 화면용 public payload
 - `etf_alternative_portfolios_raw.json`: private 진단 payload
 - `cashflows_audit.json`: 날짜별 현금흐름 사용 가능 여부와 경고
+- `etf_dca_benchmark_transactions.json`: 가상 ETF 매수/매도 체결 내역
+- `etf_dca_equity_curves.json`: 벤치마크별 equity curve
 
-날짜별 현금흐름 원장은 민감할 수 있으므로 기본 portfolio page에는 집계값만 표시합니다.
+날짜별 현금흐름 원장은 민감할 수 있으므로 기본 portfolio page에는 집계값과 이벤트 marker만 표시합니다. raw cashflow와 가상 거래 내역은 private artifact로 남기며, public 비교 JSON에는 금액 없는 marker와 equity curve만 포함합니다.
 
 ## 정책 판정
 

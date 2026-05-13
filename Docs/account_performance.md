@@ -74,6 +74,8 @@ Artifacts:
 
 - `etf_dca_comparison.json`
 - `etf_dca_benchmark_results.json`
+- `etf_dca_benchmark_transactions.json`
+- `etf_dca_equity_curves.json`
 - `etf_dca_policy_recommendation.json`
 - `etf_alternative_portfolios_public.json`
 - `cashflows_audit.json`
@@ -86,6 +88,7 @@ The DCA benchmark formulas mirror the broker app-style return:
 - `benchmark_balance_return_pct = benchmark_pnl_krw / (seed_asset_krw + deposit_amount_krw - withdrawal_amount_krw) * 100`
 
 The default ETF universe and manual cashflow CSV format are documented in [etf_dca_benchmark.md](etf_dca_benchmark.md).
+The public comparison payload includes `exact_dated_cashflows_available`, `actual_vs_benchmark`, `best_benchmark_id`, `blended_benchmark_id`, and redacted cashflow markers. Exact dated cashflow amounts remain private.
 
 ## Reconciliation
 

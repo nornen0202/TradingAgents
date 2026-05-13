@@ -162,10 +162,18 @@ class PortfolioPerformanceSettings:
     etf_alternative_labels: dict[str, str] = field(default_factory=dict)
     etf_alternative_portfolios: dict[str, dict[str, float]] = field(default_factory=dict)
     etf_alternative_blended_weights: dict[str, float] = field(default_factory=dict)
+    etf_dca_require_dated_cashflows: bool = True
+    etf_dca_cashflow_source: str = "auto"
+    etf_dca_period_start: str = ""
+    etf_dca_period_end: str = ""
+    etf_dca_price_basis: str = "close"
+    etf_dca_cashflow_trade_timing: str = "same_day_close"
+    etf_dca_withdrawal_policy: str = "pro_rata_current_weights"
     etf_dca_min_initial_seed_krw: int = 10_000
     etf_dca_reinvest_dividends: bool = True
     etf_dca_generate_standalone_report: bool = True
     etf_dca_show_in_portfolio_report: bool = True
+    etf_dca_core_satellite_policy_enabled: bool = True
     alpha_policy_mode: str = "report_only"
     alpha_policy_reduce_target_pct: float = 15.0
     alpha_policy_min_action_samples: int = 5
@@ -778,6 +786,17 @@ def _load_portfolio_performance_settings(
         etf_alternative_labels=etf_labels,
         etf_alternative_portfolios=etf_portfolios,
         etf_alternative_blended_weights=etf_blended,
+        etf_dca_require_dated_cashflows=bool(etf_dca_raw.get("require_dated_cashflows", True)),
+        etf_dca_cashflow_source=str(etf_dca_raw.get("cashflow_source", "auto") or "auto").strip().lower(),
+        etf_dca_period_start=str(etf_dca_raw.get("period_start", "") or "").strip(),
+        etf_dca_period_end=str(etf_dca_raw.get("period_end", "") or "").strip(),
+        etf_dca_price_basis=str(etf_dca_raw.get("price_basis", "close") or "close").strip().lower(),
+        etf_dca_cashflow_trade_timing=str(
+            etf_dca_raw.get("cashflow_trade_timing", "same_day_close") or "same_day_close"
+        ).strip().lower(),
+        etf_dca_withdrawal_policy=str(
+            etf_dca_raw.get("withdrawal_policy", "pro_rata_current_weights") or "pro_rata_current_weights"
+        ).strip().lower(),
         etf_dca_min_initial_seed_krw=max(
             0,
             int(etf_dca_raw.get("min_initial_seed_krw", raw.get("etf_dca_min_initial_seed_krw", 10_000)) or 0),
@@ -785,6 +804,7 @@ def _load_portfolio_performance_settings(
         etf_dca_reinvest_dividends=bool(etf_dca_raw.get("reinvest_dividends", True)),
         etf_dca_generate_standalone_report=bool(etf_dca_raw.get("generate_standalone_report", True)),
         etf_dca_show_in_portfolio_report=bool(etf_dca_raw.get("show_in_portfolio_report", True)),
+        etf_dca_core_satellite_policy_enabled=bool(etf_dca_raw.get("core_satellite_policy_enabled", True)),
         alpha_policy_mode=str(raw.get("alpha_policy_mode", etf_dca_raw.get("alpha_policy_mode", "report_only")) or "report_only").strip().lower(),
         alpha_policy_reduce_target_pct=max(
             0.0,

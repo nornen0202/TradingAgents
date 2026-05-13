@@ -88,7 +88,6 @@ class EtfAlternativePortfolioResult:
     def to_public_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         payload.pop("transactions", None)
-        payload.pop("equity_curve", None)
         return payload
 
 
@@ -108,15 +107,39 @@ class EtfAlternativeComparisonSummary:
     price_diagnostics: dict[str, Any] = field(default_factory=dict)
 
     def to_public_dict(self) -> dict[str, Any]:
+        alternatives = [item.to_public_dict() for item in self.alternatives]
+        actual_return_pct = _float_or_none(self.actual.get("balance_return_pct"))
+        actual_pnl_krw = _int_or_none(self.actual.get("investment_pnl_krw"))
+        actual_final_value_krw = _int_or_none(self.actual.get("end_asset_krw"))
+        actual_vs_benchmark = _actual_vs_benchmark_payload(self.alternatives)
+        best = _best_result(self.alternatives)
+        blended = _result_by_key(self.alternatives, "BLENDED")
+        exact_available = self.status == "OK" and str(self.cashflows.get("status") or "").upper() == "OK"
+        reason = _comparison_reason(self.status)
         return {
             "status": self.status,
+            "reason": reason,
+            "message": _comparison_message(self.status),
+            "exact_dated_cashflows_available": exact_available,
             "period_start": self.period_start,
             "period_end": self.period_end,
             "actual_source": self.actual_source,
+            "period_match_status": self.actual.get("period_match_status"),
+            "actual_final_value_krw": actual_final_value_krw,
+            "actual_return_pct": actual_return_pct,
+            "actual_pnl_krw": actual_pnl_krw,
             "actual": self.actual,
             "cashflows": self.cashflows,
+            "cashflow_markers": [
+                {"date": item.date, "flow_type": item.flow_type, "source": item.source}
+                for item in self.raw_cashflows
+            ],
             "instruments": [item.to_dict() for item in self.instruments],
-            "alternatives": [item.to_public_dict() for item in self.alternatives],
+            "alternatives": alternatives,
+            "benchmarks": alternatives,
+            "best_benchmark_id": best.key if best else None,
+            "blended_benchmark_id": blended.key if blended else None,
+            "actual_vs_benchmark": actual_vs_benchmark,
             "policy": self.policy,
             "warnings": list(self.warnings),
         }
@@ -164,8 +187,25 @@ def build_etf_alternative_comparison(
         _extend_warnings(warnings, local_warnings)
         return result
 
-    period_start = _parse_date(str(actual.get("period_start") or ""))
-    period_end = _parse_date(str(actual.get("period_end") or ""))
+    actual_period_start = _parse_date(str(actual.get("period_start") or ""))
+    actual_period_end = _parse_date(str(actual.get("period_end") or ""))
+    period_start = actual_period_start
+    period_end = actual_period_end
+    configured_start = _parse_date(str(getattr(settings, "etf_dca_period_start", "") or ""))
+    configured_end = _parse_date(str(getattr(settings, "etf_dca_period_end", "") or ""))
+    period_match_status = "MATCHED"
+    if configured_start and configured_start != actual_period_start:
+        local_warnings.append("etf_alternative_period_start_mismatch")
+        period_match_status = "MISMATCH"
+    if configured_end and configured_end != actual_period_end:
+        local_warnings.append("etf_alternative_period_end_mismatch")
+        period_match_status = "MISMATCH"
+    if configured_start and configured_end and configured_start <= configured_end:
+        period_start = configured_start
+        period_end = configured_end
+    actual["benchmark_period_start"] = period_start.isoformat() if period_start else None
+    actual["benchmark_period_end"] = period_end.isoformat() if period_end else None
+    actual["period_match_status"] = period_match_status
     if period_start is None or period_end is None or period_start > period_end:
         local_warnings.append("etf_alternative_invalid_period")
         result = EtfAlternativeComparisonSummary(
@@ -245,8 +285,8 @@ def build_etf_alternative_comparison(
     ]
 
     portfolios = _portfolio_configs(settings, snapshot=snapshot)
-    actual_pnl = _int_or_none(actual.get("investment_pnl_krw"))
-    actual_return_pct = _float_or_none(actual.get("balance_return_pct"))
+    actual_pnl = _int_or_none(actual.get("investment_pnl_krw")) if period_match_status == "MATCHED" else None
+    actual_return_pct = _float_or_none(actual.get("balance_return_pct")) if period_match_status == "MATCHED" else None
     start_asset = float(_int_or_none(actual.get("start_asset_krw")) or 0)
     alternatives = [
         _simulate_portfolio(
@@ -401,11 +441,17 @@ def evaluate_alpha_policy(
     status = "ACTION_REQUIRED" if decisions else (
         "INSUFFICIENT_DATA" if any(item.get("status") == "INSUFFICIENT_DATA" for item in checks.values()) else "OK"
     )
+    core_satellite = _core_satellite_recommendation_payload(
+        decisions=list(dict.fromkeys(decisions)),
+        status=status,
+        reduce_target=reduce_target,
+    )
     return {
         "mode": str(getattr(settings, "alpha_policy_mode", "report_only") or "report_only"),
         "status": status,
         "decisions": list(dict.fromkeys(decisions)),
         "checks": checks,
+        "core_satellite_recommendation": core_satellite,
     }
 
 
@@ -455,14 +501,59 @@ def _actual_performance(
     }
 
 
+def _core_satellite_recommendation_payload(
+    *,
+    decisions: list[str],
+    status: str,
+    reduce_target: float,
+) -> dict[str, Any]:
+    confidence = "low" if status == "INSUFFICIENT_DATA" else "medium"
+    core_weight = 0.50
+    individual_weight = 0.50
+    reasons: list[str] = []
+    if "ETF_CORE_REQUIRED" in decisions:
+        core_weight = 0.90
+        individual_weight = 0.10
+        confidence = "high"
+        reasons.append("12개월 수익률, MDD, 회전율 기준이 모두 혼합 ETF 벤치마크보다 불리합니다.")
+    elif any(item.startswith("REDUCE_INDIVIDUAL_STOCK_TARGET_TO_") for item in decisions):
+        individual_weight = max(0.0, min(1.0, reduce_target / 100.0))
+        core_weight = 1.0 - individual_weight
+        reasons.append("6개월 누적 초과수익이 음수입니다.")
+    elif "FREEZE_NEW_INDIVIDUAL_BUYS" in decisions:
+        core_weight = 0.70
+        individual_weight = 0.30
+        reasons.append("최근 3개월 연속 혼합 벤치마크를 언더퍼폼했습니다.")
+    else:
+        reasons.append("정책 전환 판단을 위한 충분한 ETF 우위 신호가 아직 없습니다.")
+    if "ACTION_SIGNALS_OBSERVATION_ONLY" in decisions:
+        reasons.append("ADD/STARTER 액션 성과가 ETF 대체 계좌 대비 낮습니다.")
+    return {
+        "recommended_core_etf_weight": round(core_weight, 4),
+        "recommended_individual_stock_weight": round(individual_weight, 4),
+        "confidence": confidence,
+        "reasons": reasons,
+        "rules_triggered": decisions,
+        "next_review_date": None,
+    }
+
+
 def _external_flow_from_row(row: Mapping[str, Any]) -> ExternalCapitalFlow | None:
     parsed = _parse_date(
-        str(row.get("date") or row.get("trade_date") or row.get("as_of") or row.get("asof") or row.get("timestamp") or "")
+        str(
+            row.get("date")
+            or row.get("event_date")
+            or row.get("trade_date")
+            or row.get("as_of")
+            or row.get("asof")
+            or row.get("timestamp")
+            or ""
+        )
     )
     if parsed is None:
         return None
-    flow_type = str(row.get("type") or row.get("flow_type") or row.get("event_type") or "").strip().lower()
-    amount = _first_number(row, ("amount_krw", "amount", "cashflow_amount", "amt"))
+    flow_type = str(row.get("type") or row.get("cashflow_type") or row.get("flow_type") or row.get("event_type") or "").strip().lower()
+    amount = _first_number(row, ("amount_krw", "amount", "amount_local", "cashflow_amount", "amt"))
     if flow_type in {"buy", "sell", "매수", "매도", "trade"}:
         return None
     if not flow_type:
@@ -646,6 +737,60 @@ def _cashflow_id(flow: ExternalCapitalFlow) -> str:
     if raw_id:
         return raw_id
     return f"{flow.date}:{flow.flow_type}:{flow.amount_krw}:{flow.source}"
+
+
+def _actual_vs_benchmark_payload(alternatives: list[EtfAlternativePortfolioResult]) -> dict[str, dict[str, Any]]:
+    payload: dict[str, dict[str, Any]] = {}
+    for item in alternatives:
+        if item.status != "OK":
+            payload[item.key] = {"status": item.status, "warnings": list(item.warnings)}
+            continue
+        excess = _float_or_none(item.excess_return_pct)
+        payload[item.key] = {
+            "status": item.status,
+            "benchmark_final_value_krw": item.end_value_krw,
+            "benchmark_return_pct": item.balance_return_pct,
+            "actual_excess_return_pct": item.excess_return_pct,
+            "actual_excess_pnl_krw": item.excess_pnl_krw,
+            "winner": "actual" if excess is not None and excess >= 0 else "benchmark",
+        }
+    return payload
+
+
+def _best_result(alternatives: list[EtfAlternativePortfolioResult]) -> EtfAlternativePortfolioResult | None:
+    ok_items = [item for item in alternatives if item.status == "OK" and item.balance_return_pct is not None]
+    if not ok_items:
+        return None
+    return max(ok_items, key=lambda item: float(item.balance_return_pct or -10**9))
+
+
+def _comparison_reason(status: str) -> str | None:
+    normalized = str(status or "").strip()
+    if normalized == "cashflow_dates_required":
+        return "dated_cashflows_missing"
+    if normalized == "actual_performance_unavailable":
+        return "actual_performance_unavailable"
+    if normalized == "price_or_fx_unavailable":
+        return "price_or_fx_unavailable"
+    if normalized == "portfolio_config_unavailable":
+        return "portfolio_config_unavailable"
+    return None
+
+
+def _comparison_message(status: str) -> str | None:
+    normalized = str(status or "").strip()
+    if normalized == "cashflow_dates_required":
+        return (
+            "KIS period summary only provides aggregate deposits. Exact same-deposit-date ETF benchmark "
+            "requires dated cashflows. Provide manual cashflow CSV/JSON or enable broker cashflow ledger."
+        )
+    if normalized == "actual_performance_unavailable":
+        return "Actual account performance is unavailable because broker performance is missing and snapshot reconciliation is not trusted."
+    if normalized == "price_or_fx_unavailable":
+        return "One or more ETF alternatives could not be calculated because price or FX data is missing."
+    if normalized == "portfolio_config_unavailable":
+        return "No ETF benchmark portfolio definition is available."
+    return None
 
 
 def _simulate_portfolio(

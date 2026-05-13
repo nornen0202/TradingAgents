@@ -85,14 +85,22 @@ show_snapshot_performance_when_unreconciled = false
 
 [etf_dca_benchmarks]
 enabled = true
+require_dated_cashflows = true
+cashflow_source = "auto"
 manual_cashflow_csv_path = ""
 manual_cashflow_json_path = ""
+period_start = ""
+period_end = ""
 price_history_path = ""
 fx_history_path = ""
+price_basis = "close"
+cashflow_trade_timing = "same_day_close"
+withdrawal_policy = "pro_rata_current_weights"
 min_initial_seed_krw = 10000
 reinvest_dividends = true
 show_in_portfolio_report = true
 generate_standalone_report = true
+core_satellite_policy_enabled = true
 
 [etf_dca_benchmarks.instruments.kospi200]
 display_name = "KOSPI200 ETF"
