@@ -1,3 +1,4 @@
+import re
 import unittest
 
 from tradingagents.portfolio.account_models import (
@@ -167,6 +168,51 @@ class SummaryImageSpecAndSvgTests(unittest.TestCase):
         self.assertIn("비공개", svg)
         self.assertIn("리포트 기준", svg)
         self.assertNotIn("25,502,998 KRW", svg)
+
+    def test_svg_renderer_clamps_long_text_inside_canvas(self):
+        spec = build_portfolio_summary_image_spec(
+            snapshot=_snapshot(),
+            recommendation=PortfolioRecommendation(
+                snapshot_id="snap",
+                report_date="2026-04-26",
+                account_value_krw=25_502_998,
+                recommended_cash_after_now_krw=676_302,
+                recommended_cash_after_triggered_krw=376_302,
+                market_regime="bullish",
+                actions=(
+                    _action(
+                        "AAPL",
+                        priority=1,
+                        action_if_triggered="TAKE_PROFIT_IF_TRIGGERED",
+                        conditions=(
+                            "close above 294.49 with RVOL >= 1.2 and next-session follow-through after reclaiming VWAP",
+                        ),
+                    ),
+                ),
+                portfolio_risks=(
+                    "Wait-heavy constructive batch: WAIT 20/20 with BULLISH 20/20; review entry-action calibration.",
+                    "run_time_budget_exhausted:remaining_seconds=632:min_required_seconds=1500:skipped_tickers=SNPS,SOXX",
+                ),
+                data_health_summary={},
+            ),
+            candidates=[],
+            manifest={
+                "run_id": "20260426T013659_github-actions-us",
+                "status": "partial_failure",
+                "started_at": "2026-04-26T01:36:59+00:00",
+                "summary": {"total_tickers": 23, "successful_tickers": 21, "failed_tickers": 2},
+                "settings": {"market": "US"},
+            },
+            live_sell_side_delta=[],
+            report_writer_payload={},
+        )
+        svg = render_summary_svg(spec)
+        y_values = [int(value) for value in re.findall(r" y='(\d+)'", svg)]
+
+        self.assertTrue(y_values)
+        self.assertLessEqual(max(y_values), 1375)
+        self.assertNotIn("run_time_budget_exhausted", svg)
+        self.assertNotIn("Wait-heavy", svg)
 
 
 if __name__ == "__main__":

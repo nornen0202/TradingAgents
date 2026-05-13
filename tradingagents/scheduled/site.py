@@ -741,7 +741,6 @@ def _render_run_page(
     </section>
     {warning_html}
     {delta_html}
-    {live_delta_html}
     {timeline_html}
     {portfolio_html}
     <section class="section">
@@ -754,6 +753,7 @@ def _render_run_page(
         {''.join(ticker_cards)}
       </div>
     </section>
+    {live_delta_html}
     """
     return _page_template(f"{manifest['run_id']} | {settings.title}", body, prefix="../../")
 
@@ -1045,7 +1045,6 @@ def _render_portfolio_page(
     </section>
     {failure_html}
     {summary_image_html}
-    {_render_live_context_delta_section(manifest)}
     {_render_account_performance_section(manifest, portfolio_summary)}
     {_render_performance_tracking_section(manifest)}
     <section class="section prose">
@@ -1056,6 +1055,7 @@ def _render_portfolio_page(
     </section>
     {_render_execution_summary_section(execution_summary)}
     {downloads_html}
+    {_render_live_context_delta_section(manifest)}
     """
     return _page_template(f"{manifest['run_id']} {portfolio_label.lower()} | {settings.title}", body, prefix="../../")
 
@@ -1523,10 +1523,10 @@ def _account_benchmark_provider_label(quality: dict[str, Any]) -> str:
 def _account_contribution_rows(contribution: list[Any], *, reconciliation: dict[str, Any]) -> str:
     status = str(reconciliation.get("reconciliation_status") or "").upper()
     if status == "OK":
-        status_html = "<p class='empty'>NAV 변화와 기여도 합계가 허용 범위 안에서 대체로 일치합니다.</p>"
+        status_html = "<p class='empty'>기간 중 실현손익과 미실현손익 변화가 NAV 변화와 허용 범위 안에서 일치합니다.</p>"
     else:
         status_html = (
-            "<p class='empty'>이 표는 보유/실현 손익만 요약하며, 입출금·환전·배당·수수료·데이터 차이로 "
+            "<p class='empty'>이 표는 기간 중 실현손익과 미실현손익 변화를 요약하며, 입출금·환전·배당·수수료·데이터 차이로 "
             "총 NAV 변화와 일치하지 않을 수 있습니다.</p>"
         )
     if not contribution:
@@ -1681,7 +1681,12 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
     update_label = "갱신됨" if outcome_update.get("updated") else ("대기 중" if outcome_update.get("enabled") else "비활성")
     provider = str(outcome_update.get("provider") or performance.get("provider") or "-")
     unavailable_reason = str(outcome_update.get("unavailable_reason") or "").strip()
-    failure_reason = str(performance.get("failure_reason") or performance.get("warning") or "").strip()
+    failure_reason = str(
+        performance.get("failure_reason")
+        or outcome_update.get("failure_reason")
+        or performance.get("warning")
+        or ""
+    ).strip()
     unavailable_note = ""
     if not outcome_update.get("updated"):
         unavailable_note = "<p class='empty'>성과 추적: 기록은 저장됐지만 아직 성과 계산은 수행되지 않았습니다.</p>"

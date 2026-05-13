@@ -81,3 +81,14 @@ def test_prism_no_signal_not_repeated_for_every_candidate():
 
     assert markdown.count("PRISM 신호 없음") == 0
     assert "이 섹션 후보들은 현재 같은 시장의 PRISM 매칭 신호가 없습니다." in markdown
+
+
+def test_action_summary_prism_column_shows_no_match_label():
+    markdown = render_portfolio_report_markdown(
+        snapshot=_snapshot(),
+        recommendation=_recommendation([_action("AAPL")]),
+        candidates=[],
+    )
+
+    action_table = markdown.split("## 액션 요약", 1)[1].split("## 운용 시나리오", 1)[0]
+    assert "매칭 없음" in action_table

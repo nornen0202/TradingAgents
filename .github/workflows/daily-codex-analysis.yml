@@ -50,7 +50,7 @@ on:
       max_parallel_tickers:
         description: "Maximum ticker workers to run concurrently"
         required: false
-        default: "2"
+        default: "3"
         type: string
       daily_active_ticker_limit:
         description: "Limit full analysis to the first N resolved tickers; smoke defaults to 3"

@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any
 
 from tradingagents.portfolio.account_models import AccountSnapshot, PortfolioCandidate, PortfolioRecommendation
-from tradingagents.presentation import present_account_action, present_market_regime, present_snapshot_mode
+from tradingagents.presentation import present_account_action, present_market_regime, present_snapshot_mode, sanitize_investor_text
 
 
 def build_portfolio_summary_image_spec(
@@ -163,15 +163,42 @@ def _risk_lines(
     recommendation: PortfolioRecommendation,
     live_sell_side_delta: list[dict[str, Any]] | None,
 ) -> list[str]:
-    lines = [_shorten(str(item), 72) for item in (recommendation.portfolio_risks or ()) if str(item).strip()]
+    counts = _candidate_counts(recommendation)
+    lines: list[str] = []
+    for item in recommendation.portfolio_risks or ():
+        _append_risk_line(lines, item)
+    if counts.get("immediate_budgeted_count", 0) <= 0 and counts.get("close_confirm_count", 0) > 0:
+        _append_risk_line(lines, "즉시 실행보다 종가·거래량 확인이 우선입니다.")
+    if counts.get("reduce_risk_count", 0) or counts.get("take_profit_count", 0):
+        _append_risk_line(lines, "보유 종목은 목표가 도달과 지지선 이탈 여부를 먼저 확인합니다.")
+    failed = [
+        item
+        for item in (recommendation.data_health_summary or {}).get("reanalysis_required_tickers", [])
+        if isinstance(item, dict)
+    ]
+    if failed:
+        tickers = ", ".join(str(item.get("ticker") or "").strip() for item in failed[:4] if str(item.get("ticker") or "").strip())
+        _append_risk_line(lines, f"{tickers or '일부 종목'}은 재분석 전까지 투자 후보에서 제외합니다.")
     for delta in live_sell_side_delta or []:
         if len(lines) >= 4:
             break
         ticker = str(delta.get("ticker") or "").strip()
         delta_type = str(delta.get("delta_type") or "").strip()
         if ticker or delta_type:
-            lines.append(_shorten(f"{ticker} {delta_type} 확인 필요".strip(), 72))
+            _append_risk_line(lines, f"{ticker} 장중 변화 확인 필요".strip())
     return lines[:4] or ["조건 미충족 상태의 추격 매수는 피하고, 지지선·거래량 확인 우선"]
+
+
+def _append_risk_line(lines: list[str], value: Any) -> None:
+    text = sanitize_investor_text(value, language="Korean")
+    if not text or text == "없음":
+        return
+    if "근거 요약 생성 실패" in text:
+        return
+    normalized = " ".join(text.split())
+    if normalized in lines:
+        return
+    lines.append(_shorten(normalized, 68))
 
 
 def _writer_summary(payload: dict[str, Any] | None) -> dict[str, Any]:

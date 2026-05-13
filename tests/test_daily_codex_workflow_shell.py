@@ -33,6 +33,14 @@ def test_daily_analysis_uses_python_shell_for_all_windows_jobs():
     assert workflow.count("        shell: python {0}") == 3
 
 
+def test_daily_analysis_default_parallel_ticker_workers_is_three():
+    workflow = _workflow_text()
+
+    input_start = workflow.index("      max_parallel_tickers:")
+    input_block = workflow[input_start : workflow.index("      daily_active_ticker_limit:", input_start)]
+    assert 'default: "3"' in input_block
+
+
 def test_daily_analysis_deploy_runs_after_final_pages_build():
     workflow = _workflow_text()
 

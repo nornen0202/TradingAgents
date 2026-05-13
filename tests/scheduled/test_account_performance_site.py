@@ -150,6 +150,7 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     assert "KOSPI" in public_html
     assert "KOSDAQ" in public_html
     assert "account_performance_public.json" in public_html
+    assert public_html.rfind("자료 다운로드") < public_html.rfind("Report vs latest intraday reanalysis")
     assert "account_snapshot.json" not in public_html
     assert "12345678" not in public_html
     assert "ODNO-SECRET" not in public_html

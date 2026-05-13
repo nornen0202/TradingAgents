@@ -110,7 +110,7 @@ def _summary_box(summary: dict[str, Any]) -> str:
         str(summary.get("one_sentence") or ""),
         *[str(item) for item in (summary.get("why") or [])[:3]],
     ]
-    text = _text_lines(lines, 88, 318, width=390, line_height=31, css="body")
+    text = _text_lines(lines, 88, 318, width=390, line_height=31, css="body", max_lines=7)
     return f"<rect x='32' y='276' width='480' height='260' rx='8' class='soft'/>{text}"
 
 
@@ -169,8 +169,18 @@ def _checkpoint_cards(items: list[dict[str, Any]]) -> str:
         x = 36 + index * 360
         parts.append(f"<rect x='{x}' y='948' width='330' height='132' rx='8' class='info'/>")
         parts.append(f"<text x='{x + 22}' y='992' class='h'>{_escape(item.get('ticker'))}</text>")
-        parts.extend(_text_lines([str(item.get("condition") or "")], x + 22, 1024, width=280, line_height=24, css="small").splitlines())
-        parts.append(f"<text x='{x + 22}' y='1062' class='small'>액션: {_escape(item.get('action'))}</text>")
+        parts.extend(
+            _text_lines(
+                [str(item.get("condition") or "")],
+                x + 22,
+                1024,
+                width=280,
+                line_height=24,
+                css="small",
+                max_lines=2,
+            ).splitlines()
+        )
+        parts.append(f"<text x='{x + 22}' y='1072' class='small'>액션: {_escape(item.get('action'))}</text>")
     return "\n".join(parts)
 
 
@@ -181,8 +191,28 @@ def _position_guide(guide: dict[str, Any]) -> str:
     parts = ["<rect x='36' y='1168' width='550' height='156' rx='8' class='panel'/>"]
     parts.append("<text x='64' y='1205' class='body green'>보유 유지 / 조건부 추가</text>")
     parts.append("<text x='330' y='1205' class='body orange'>축소 / 리스크 관리</text>")
-    parts.extend(_text_lines(_bullets(hold[:5] or ["해당 없음"]), 72, 1238, width=210, line_height=22, css="small").splitlines())
-    parts.extend(_text_lines(_bullets((trim + risk)[:5] or ["해당 없음"]), 338, 1238, width=210, line_height=22, css="small").splitlines())
+    parts.extend(
+        _text_lines(
+            _bullets(hold[:5] or ["해당 없음"]),
+            72,
+            1238,
+            width=210,
+            line_height=22,
+            css="small",
+            max_lines=4,
+        ).splitlines()
+    )
+    parts.extend(
+        _text_lines(
+            _bullets((trim + risk)[:5] or ["해당 없음"]),
+            338,
+            1238,
+            width=210,
+            line_height=22,
+            css="small",
+            max_lines=4,
+        ).splitlines()
+    )
     return "\n".join(parts)
 
 
@@ -190,18 +220,31 @@ def _risk_box(risks: list[str]) -> str:
     lines = _bullets([str(item) for item in risks[:4]] or ["주요 리스크 없음"])
     return (
         "<rect x='622' y='1168' width='466' height='156' rx='8' class='risk'/>"
-        + _text_lines(lines, 660, 1210, width=370, line_height=26, css="body")
+        + _text_lines(lines, 660, 1210, width=370, line_height=24, css="body", max_lines=5)
     )
 
 
-def _text_lines(lines: list[str], x: int, y: int, *, width: int, line_height: int, css: str) -> str:
-    output: list[str] = []
-    line_no = 0
+def _text_lines(
+    lines: list[str],
+    x: int,
+    y: int,
+    *,
+    width: int,
+    line_height: int,
+    css: str,
+    max_lines: int | None = None,
+) -> str:
+    chunks: list[str] = []
     max_chars = max(8, width // 14)
     for line in lines:
         for chunk in _wrap(str(line), max_chars=max_chars):
-            output.append(f"<text x='{x}' y='{y + line_no * line_height}' class='{css}'>{_escape(chunk)}</text>")
-            line_no += 1
+            chunks.append(chunk)
+    if max_lines is not None and len(chunks) > max_lines:
+        chunks = chunks[:max_lines]
+        chunks[-1] = _with_ellipsis(chunks[-1], max_chars=max_chars)
+    output: list[str] = []
+    for line_no, chunk in enumerate(chunks):
+        output.append(f"<text x='{x}' y='{y + line_no * line_height}' class='{css}'>{_escape(chunk)}</text>")
     return "\n".join(output)
 
 
@@ -237,6 +280,14 @@ def _wrap(value: str, *, max_chars: int) -> list[str]:
     if current:
         lines.append(current)
     return lines
+
+
+def _with_ellipsis(value: str, *, max_chars: int) -> str:
+    text = str(value or "").rstrip()
+    suffix = "..."
+    if len(text) <= max_chars - len(suffix):
+        return f"{text}{suffix}"
+    return f"{text[: max(1, max_chars - len(suffix))].rstrip()}{suffix}"
 
 
 def _escape(value: Any) -> str:

@@ -233,10 +233,12 @@ def render_external_signal_section(reconciliation: dict[str, Any] | None) -> str
     action_counts = summary.get("prism_action_distribution") or {}
     consensus = [entry for entry in entries if str(entry.get("prism_agreement")) in {"confirmed_buy", "confirmed_sell"}]
     conflicts = [entry for entry in entries if str(entry.get("prism_agreement")).startswith("conflict_")]
+    external_only = [entry for entry in entries if str(entry.get("prism_agreement")) == "external_only"]
     source_markets = coverage.get("source_markets") if isinstance(coverage, dict) else {}
     market_summary = _format_source_market_summary(source_markets)
     run_market = str((coverage or {}).get("run_market") or reconciliation.get("run_market") or "UNKNOWN")
     matching_market = int((coverage or {}).get("matching_market_signals") or 0)
+    overlapping = int((coverage or {}).get("overlapping_tickers") or 0)
     cross_market = int((coverage or {}).get("cross_market_signals") or 0)
     status = str(reconciliation.get("status") or "").lower()
     if status == "disabled" or ingestion.get("enabled") is False:
@@ -264,6 +266,7 @@ def render_external_signal_section(reconciliation: dict[str, Any] | None) -> str
         f"- 현재 리포트 시장: {run_market}",
         f"- 커버리지 상태: {coverage_label or 'UNKNOWN'}",
         f"- 현재 시장에 매칭된 PRISM 신호: {matching_market}개",
+        f"- TradingAgents 액션과 겹친 PRISM 신호: {overlapping}개",
         f"- 교차시장 신호는 후보 생성/충돌 판단에서 {'제외됨' if cross_market else '해당 없음'}",
         f"- BUY / SELL / HOLD 분포: BUY {int(action_counts.get('BUY') or 0) + int(action_counts.get('ADD') or 0)} / SELL {int(action_counts.get('SELL') or 0) + int(action_counts.get('REDUCE_RISK') or 0) + int(action_counts.get('STOP_LOSS') or 0) + int(action_counts.get('EXIT') or 0)} / HOLD {int(action_counts.get('HOLD') or 0) + int(action_counts.get('WATCH') or 0)}",
         f"- TradingAgents와 일치한 수: {len(consensus)}",
@@ -275,6 +278,9 @@ def render_external_signal_section(reconciliation: dict[str, Any] | None) -> str
         "",
         "### PRISM과 TradingAgents가 충돌한 후보",
         *_entry_lines(conflicts, empty="- 없음"),
+        "",
+        "### PRISM 단독 관찰 후보",
+        *_entry_lines(external_only, empty="- 없음"),
     ]
     return "\n".join(lines)
 

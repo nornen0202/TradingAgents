@@ -138,14 +138,18 @@ def _fetch_yfinance_price_history(
         if data is None or getattr(data, "empty", True):
             warnings.append(f"performance_yfinance_no_data:{ticker}")
             continue
-        close = data.get("Close")
+        close = _extract_close_series(data, ticker)
         if close is None:
             warnings.append(f"performance_yfinance_no_close:{ticker}")
             continue
         rows: list[dict[str, Any]] = []
         for index, value in close.dropna().items():
+            close_value = _scalar_float(value)
+            if close_value is None:
+                warnings.append(f"performance_yfinance_non_scalar_close:{ticker}")
+                continue
             date_text = getattr(index, "date", lambda: index)()
-            rows.append({"date": str(date_text)[:10], "close": float(value)})
+            rows.append({"date": str(date_text)[:10], "close": close_value})
         if rows:
             history[ticker.upper()] = rows
             if ticker == benchmark:
@@ -155,3 +159,52 @@ def _fetch_yfinance_price_history(
     if asof_date and history:
         warnings.append(f"performance_price_history_loaded_asof:{asof_date}")
     return history, warnings
+
+
+def _extract_close_series(data: Any, ticker: str) -> Any | None:
+    close = data.get("Close") if hasattr(data, "get") else None
+    if close is None and hasattr(data, "xs"):
+        try:
+            close = data.xs("Close", level=0, axis=1, drop_level=True)
+        except Exception:
+            close = None
+    if close is None:
+        return None
+    if hasattr(close, "columns"):
+        columns = list(getattr(close, "columns", []))
+        if not columns:
+            return None
+        ticker_text = str(ticker or "").strip().upper()
+        for column in columns:
+            if _column_matches_ticker(column, ticker_text):
+                return close[column]
+        non_empty = close.dropna(axis=1, how="all") if hasattr(close, "dropna") else close
+        non_empty_columns = list(getattr(non_empty, "columns", []))
+        if len(non_empty_columns) == 1:
+            return non_empty[non_empty_columns[0]]
+        if len(columns) == 1:
+            return close[columns[0]]
+        return None
+    return close
+
+
+def _column_matches_ticker(column: Any, ticker: str) -> bool:
+    if not ticker:
+        return False
+    if isinstance(column, tuple):
+        return any(str(part).strip().upper() == ticker for part in column)
+    return str(column).strip().upper() == ticker
+
+
+def _scalar_float(value: Any) -> float | None:
+    if value in (None, ""):
+        return None
+    if hasattr(value, "item"):
+        try:
+            value = value.item()
+        except Exception:
+            return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
