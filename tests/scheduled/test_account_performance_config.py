@@ -40,3 +40,43 @@ def test_broker_performance_settings_are_loaded(tmp_path: Path):
     assert settings.broker_period_end == "2026-05-12"
     assert settings.prefer_broker_reported_performance is False
     assert settings.show_snapshot_performance_when_unreconciled is True
+
+
+def test_etf_dca_benchmark_settings_are_loaded(tmp_path: Path):
+    settings = _load_portfolio_performance_settings(
+        {},
+        etf_dca_raw={
+            "enabled": True,
+            "manual_cashflow_csv_path": "cashflows.csv",
+            "price_history_path": "etf_prices.json",
+            "fx_history_path": "fx.json",
+            "min_initial_seed_krw": 10_000,
+            "instruments": {
+                "kospi200": {
+                    "display_name": "KOSPI200 ETF",
+                    "ticker": "069500.KS",
+                    "currency": "KRW",
+                },
+                "sp500_krw": {
+                    "display_name": "S&P500 KRW ETF",
+                    "ticker": "360750.KS",
+                    "currency": "KRW",
+                },
+            },
+            "portfolios": {
+                "blended_default": {
+                    "weights": {"kospi200": 0.7, "sp500_krw": 0.3},
+                }
+            },
+        },
+        base_dir=tmp_path,
+    )
+
+    assert settings.etf_alternative_enabled is True
+    assert settings.cashflow_baseline_path == tmp_path / "cashflows.csv"
+    assert settings.etf_price_history_path == tmp_path / "etf_prices.json"
+    assert settings.etf_fx_history_path == tmp_path / "fx.json"
+    assert settings.etf_alternative_symbols["KOSPI200"] == "069500.KS"
+    assert settings.etf_alternative_symbols["SP500_KRW"] == "360750.KS"
+    assert settings.etf_alternative_blended_weights == {"KOSPI200": 0.7, "SP500_KRW": 0.3}
+    assert settings.etf_dca_min_initial_seed_krw == 10_000

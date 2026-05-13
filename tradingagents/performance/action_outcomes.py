@@ -29,6 +29,11 @@ def initialize_action_tracker(db_path: Path) -> None:
             "return_60d": "REAL",
             "benchmark_return_5d": "REAL",
             "benchmark_excess_5d": "REAL",
+            "benchmark_return_20d": "REAL",
+            "benchmark_excess_20d": "REAL",
+            "benchmark_return_60d": "REAL",
+            "benchmark_excess_60d": "REAL",
+            "benchmark_key": "TEXT",
             "avoided_drawdown_20d": "REAL",
             "missed_upside_20d": "REAL",
         })
@@ -109,9 +114,11 @@ def update_action_outcomes(
                 INSERT INTO action_outcomes (
                   recommendation_id, return_1d, return_3d, return_5d, return_10d,
                   return_20d, return_60d, benchmark_return_5d, benchmark_excess_5d,
+                  benchmark_return_20d, benchmark_excess_20d, benchmark_return_60d,
+                  benchmark_excess_60d, benchmark_key,
                   max_drawdown_20d, max_favorable_excursion_20d, avoided_drawdown_20d,
                   missed_upside_20d, outcome_label, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["id"],
@@ -123,6 +130,11 @@ def update_action_outcomes(
                     returns.get("return_60d"),
                     returns.get("benchmark_return_5d"),
                     returns.get("benchmark_excess_5d"),
+                    returns.get("benchmark_return_20d"),
+                    returns.get("benchmark_excess_20d"),
+                    returns.get("benchmark_return_60d"),
+                    returns.get("benchmark_excess_60d"),
+                    returns.get("benchmark_key"),
                     returns.get("max_drawdown_20d"),
                     returns.get("max_favorable_excursion_20d"),
                     returns.get("avoided_drawdown_20d"),
@@ -282,9 +294,13 @@ def _compute_returns(
         values["avoided_drawdown_20d"] = round(max(0.0, -float(values["max_drawdown_20d"])), 6)
         values["missed_upside_20d"] = round(max(0.0, float(values["max_favorable_excursion_20d"])), 6)
     return_5d = values.get("return_5d")
-    values["benchmark_return_5d"] = _benchmark_return_5d(benchmark_series, created_date=created_date)
-    if return_5d is not None and values["benchmark_return_5d"] is not None:
-        values["benchmark_excess_5d"] = round(float(return_5d) - float(values["benchmark_return_5d"]), 6)
+    values["benchmark_key"] = BENCHMARK_KEY if benchmark_series else None
+    for horizon in (5, 20, 60):
+        benchmark_return = _benchmark_return(benchmark_series, created_date=created_date, horizon=horizon)
+        values[f"benchmark_return_{horizon}d"] = benchmark_return
+        action_return = values.get(f"return_{horizon}d")
+        if action_return is not None and benchmark_return is not None:
+            values[f"benchmark_excess_{horizon}d"] = round(float(action_return) - float(benchmark_return), 6)
     values["outcome_label"] = _outcome_label(str(row["action"]), return_5d)
     return values
 
@@ -296,14 +312,14 @@ def _start_index_for_date(series: list[tuple[str, float]], created_date: str) ->
     return max(len(series) - 1, 0)
 
 
-def _benchmark_return_5d(series: list[tuple[str, float]] | None, *, created_date: str) -> float | None:
+def _benchmark_return(series: list[tuple[str, float]] | None, *, created_date: str, horizon: int) -> float | None:
     if not series:
         return None
     start_index = _start_index_for_date(series, created_date)
     base = series[start_index][1]
     if base <= 0:
         return None
-    target_index = min(start_index + 5, len(series) - 1)
+    target_index = min(start_index + int(horizon), len(series) - 1)
     return round((series[target_index][1] - base) / base, 6)
 
 
@@ -336,7 +352,8 @@ def _aggregate(conn: sqlite3.Connection, column: str) -> dict[str, dict[str, Any
     rows = conn.execute(
         f"""
         SELECT r.{column} AS bucket, COUNT(*) AS n, AVG(o.return_5d) AS avg_return_5d,
-               AVG(o.return_20d) AS avg_return_20d
+               AVG(o.return_20d) AS avg_return_20d,
+               AVG(o.benchmark_excess_20d) AS avg_benchmark_excess_20d
         FROM action_recommendations r
         LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
         GROUP BY r.{column}
@@ -349,6 +366,7 @@ def _aggregate(conn: sqlite3.Connection, column: str) -> dict[str, dict[str, Any
             "count": int(row["n"] or 0),
             "avg_return_5d": row["avg_return_5d"],
             "avg_return_20d": row["avg_return_20d"],
+            "avg_benchmark_excess_20d": row["avg_benchmark_excess_20d"],
         }
     return result
 
@@ -358,7 +376,8 @@ def _aggregate_action_buckets(conn: sqlite3.Connection) -> dict[str, dict[str, A
         """
         SELECT r.source AS source, r.prism_agreement AS prism_agreement,
                COUNT(*) AS n, AVG(o.return_5d) AS avg_return_5d,
-               AVG(o.return_20d) AS avg_return_20d
+               AVG(o.return_20d) AS avg_return_20d,
+               AVG(o.benchmark_excess_20d) AS avg_benchmark_excess_20d
         FROM action_recommendations r
         LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
         GROUP BY r.source, r.prism_agreement
@@ -369,7 +388,18 @@ def _aggregate_action_buckets(conn: sqlite3.Connection) -> dict[str, dict[str, A
         bucket = _action_bucket(str(row["source"] or ""), str(row["prism_agreement"] or ""))
         current = result.setdefault(
             bucket,
-            {"count": 0, "avg_return_5d": None, "avg_return_20d": None, "_sum_5d": 0.0, "_n_5d": 0, "_sum_20d": 0.0, "_n_20d": 0},
+            {
+                "count": 0,
+                "avg_return_5d": None,
+                "avg_return_20d": None,
+                "avg_benchmark_excess_20d": None,
+                "_sum_5d": 0.0,
+                "_n_5d": 0,
+                "_sum_20d": 0.0,
+                "_n_20d": 0,
+                "_sum_excess_20d": 0.0,
+                "_n_excess_20d": 0,
+            },
         )
         count = int(row["n"] or 0)
         current["count"] += count
@@ -379,12 +409,17 @@ def _aggregate_action_buckets(conn: sqlite3.Connection) -> dict[str, dict[str, A
         if row["avg_return_20d"] is not None:
             current["_sum_20d"] += float(row["avg_return_20d"]) * count
             current["_n_20d"] += count
+        if row["avg_benchmark_excess_20d"] is not None:
+            current["_sum_excess_20d"] += float(row["avg_benchmark_excess_20d"]) * count
+            current["_n_excess_20d"] += count
     for metrics in result.values():
         if metrics["_n_5d"]:
             metrics["avg_return_5d"] = metrics["_sum_5d"] / metrics["_n_5d"]
         if metrics["_n_20d"]:
             metrics["avg_return_20d"] = metrics["_sum_20d"] / metrics["_n_20d"]
-        for key in ("_sum_5d", "_n_5d", "_sum_20d", "_n_20d"):
+        if metrics["_n_excess_20d"]:
+            metrics["avg_benchmark_excess_20d"] = metrics["_sum_excess_20d"] / metrics["_n_excess_20d"]
+        for key in ("_sum_5d", "_n_5d", "_sum_20d", "_n_20d", "_sum_excess_20d", "_n_excess_20d"):
             metrics.pop(key, None)
     return result
 

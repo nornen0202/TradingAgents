@@ -257,6 +257,209 @@ def test_portfolio_page_prioritizes_broker_performance_and_hides_failed_snapshot
     )
 
 
+def test_portfolio_page_renders_etf_dca_comparison_when_available():
+    payload = {
+        "status": "ok",
+        "market_scope": "KR",
+        "benchmarks": ["KOSPI", "KOSDAQ"],
+        "summary": {
+            "default_period": "ALL_AVAILABLE",
+            "default_period_label": "사용 가능 전체 기간",
+            "start_date": "2026-01-01",
+            "end_date": "2026-04-01",
+            "actual_return": 0.2,
+            "primary_return_method": "simple_nav_unadjusted",
+            "best_excess": {},
+        },
+        "broker_performance": {
+            "broker": "kis",
+            "account_scope": "KR domestic",
+            "period_start": "2026-01-01",
+            "period_end": "2026-04-01",
+            "investment_pnl_krw": 6_000,
+            "balance_return_pct": 20.0,
+            "start_asset_krw": 20_000,
+            "end_asset_krw": 36_000,
+            "deposit_amount_krw": 10_000,
+            "withdrawal_amount_krw": 0,
+        },
+        "etf_alternative_comparison": {
+            "status": "OK",
+            "period_start": "2026-01-01",
+            "period_end": "2026-04-01",
+            "actual_source": "broker_reported",
+            "actual": {"balance_return_pct": 20.0, "investment_pnl_krw": 6_000},
+            "cashflows": {"dated_flow_count": 1, "deposit_amount_krw": 10_000, "withdrawal_amount_krw": 0},
+            "alternatives": [
+                {
+                    "key": "KOSPI200_100",
+                    "label": "KOSPI200 ETF 100%",
+                    "weights": {"KOSPI200": 1.0},
+                    "status": "OK",
+                    "end_value_krw": 42_500,
+                    "investment_pnl_krw": 12_500,
+                    "balance_return_pct": 41.666667,
+                    "excess_return_pct": -21.666667,
+                    "excess_pnl_krw": -6_500,
+                    "mdd_pct": 0.0,
+                },
+                {
+                    "key": "BLENDED",
+                    "label": "혼합 벤치마크",
+                    "weights": {"KOSPI200": 0.5, "SP500_KRW": 0.5},
+                    "status": "OK",
+                    "end_value_krw": 39_000,
+                    "investment_pnl_krw": 9_000,
+                    "balance_return_pct": 30.0,
+                    "excess_return_pct": -10.0,
+                    "excess_pnl_krw": -3_000,
+                    "mdd_pct": 0.0,
+                },
+            ],
+            "policy": {
+                "mode": "report_only",
+                "status": "ACTION_REQUIRED",
+                "decisions": ["FREEZE_NEW_INDIVIDUAL_BUYS"],
+                "checks": {
+                    "three_month_consecutive_underperformance": {"status": "FAILED"},
+                    "six_month_cumulative_excess": {"status": "INSUFFICIENT_DATA"},
+                    "twelve_month_return_mdd_turnover": {"status": "INSUFFICIENT_DATA"},
+                    "action_add_starter_vs_etf": {"status": "INSUFFICIENT_DATA"},
+                },
+            },
+            "warnings": [],
+        },
+        "periods": [],
+        "chart_data": {"series": []},
+        "costs": {},
+        "contribution_by_ticker": [],
+        "reconciliation": {"reconciliation_status": "FAILED"},
+        "data_quality": {"snapshot_count": 2, "warnings": []},
+    }
+
+    html = _render_account_performance_section(
+        {"run_id": "run1", "portfolio": {"account_performance": {"publish_to_site": True}}},
+        {"account_performance": payload},
+    )
+
+    assert "동일 입금일 ETF 대체 포트폴리오 비교" in html
+    assert "KOSPI200 ETF 100%" in html
+    assert "41.67%" in html
+    assert "실제 대비 -10.00%" in html
+    assert "FREEZE_NEW_INDIVIDUAL_BUYS" in html
+
+
+def test_portfolio_page_renders_etf_dca_unavailable_without_dated_cashflows():
+    payload = {
+        "status": "ok",
+        "summary": {"default_period": "ALL_AVAILABLE", "best_excess": {}, "hide_excess_headline": True},
+        "periods": [],
+        "chart_data": {"series": []},
+        "costs": {},
+        "contribution_by_ticker": [],
+        "reconciliation": {"reconciliation_status": "FAILED"},
+        "data_quality": {"warnings": []},
+        "etf_alternative_comparison": {
+            "status": "cashflow_dates_required",
+            "period_start": "2026-04-13",
+            "period_end": "2026-05-12",
+            "actual_source": "broker_reported",
+            "actual": {"balance_return_pct": 12.08},
+            "cashflows": {
+                "dated_flow_count": 0,
+                "broker_deposit_amount_krw": 37_665_615,
+                "missing_reason": "dated_external_capital_flows_required",
+            },
+            "alternatives": [],
+            "policy": {"status": "INSUFFICIENT_DATA", "decisions": [], "checks": {}},
+            "warnings": ["etf_alternative_cashflow_dates_required"],
+        },
+    }
+
+    html = _render_account_performance_section(
+        {"run_id": "run1", "portfolio": {"account_performance": {"publish_to_site": True}}},
+        {"account_performance": payload},
+    )
+
+    assert "입금일 원장 필요" in html
+    assert "정확한 적립식 ETF 비교를 제공하지 않습니다" in html
+    assert "37,665,615 KRW" in html
+    assert "ETF 대체 최고 수익률" not in html
+
+
+def test_build_site_generates_standalone_etf_benchmark_page(tmp_path: Path):
+    archive = tmp_path / "archive"
+    site = tmp_path / "site"
+    run_dir = archive / "runs" / "2026" / "20260401T090000_test"
+    private_dir = run_dir / "portfolio-private"
+    private_dir.mkdir(parents=True)
+    comparison = {
+        "status": "OK",
+        "period_start": "2026-01-01",
+        "period_end": "2026-04-01",
+        "actual_source": "broker_reported",
+        "actual": {"balance_return_pct": 20.0, "investment_pnl_krw": 6_000},
+        "cashflows": {"dated_flow_count": 1, "deposit_amount_krw": 10_000, "withdrawal_amount_krw": 0},
+        "alternatives": [
+            {
+                "key": "KOSPI200_100",
+                "label": "KOSPI200 ETF 100%",
+                "weights": {"KOSPI200": 1.0},
+                "status": "OK",
+                "end_value_krw": 42_500,
+                "investment_pnl_krw": 12_500,
+                "balance_return_pct": 41.666667,
+                "excess_return_pct": -21.666667,
+                "excess_pnl_krw": -6_500,
+                "mdd_pct": 0.0,
+            }
+        ],
+        "policy": {"mode": "report_only", "status": "INSUFFICIENT_DATA", "decisions": [], "checks": {}},
+        "warnings": [],
+    }
+    performance_payload = {
+        "status": "ok",
+        "summary": {"default_period": "ALL_AVAILABLE", "best_excess": {}},
+        "periods": [],
+        "chart_data": {"series": []},
+        "costs": {},
+        "contribution_by_ticker": [],
+        "reconciliation": {"reconciliation_status": "OK"},
+        "data_quality": {"warnings": []},
+        "etf_alternative_comparison": comparison,
+    }
+    (private_dir / "status.json").write_text(json.dumps({"status": "success", "profile": "kr"}), encoding="utf-8")
+    (private_dir / "account_performance_public.json").write_text(json.dumps(performance_payload), encoding="utf-8")
+    (private_dir / "etf_dca_comparison.json").write_text(json.dumps(comparison), encoding="utf-8")
+    (private_dir / "etf_dca_policy_recommendation.json").write_text(json.dumps(comparison["policy"]), encoding="utf-8")
+    (run_dir / "run.json").write_text(
+        json.dumps(
+            {
+                "run_id": "20260401T090000_test",
+                "label": "test",
+                "status": "success",
+                "started_at": "2026-04-01T09:00:00+09:00",
+                "finished_at": "2026-04-01T09:05:00+09:00",
+                "timezone": "Asia/Seoul",
+                "settings": {"output_language": "Korean"},
+                "summary": {"total_tickers": 0, "successful_tickers": 0, "failed_tickers": 0},
+                "warnings": [],
+                "tickers": [],
+                "portfolio": {"status": "success", "account_performance": {"enabled": True, "publish_to_site": True}},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    build_site(archive, site, SiteSettings())
+
+    run_html = (site / "runs" / "20260401T090000_test" / "index.html").read_text(encoding="utf-8")
+    etf_html = (site / "runs" / "20260401T090000_test" / "etf_benchmark.html").read_text(encoding="utf-8")
+    assert "etf_benchmark.html" in run_html
+    assert "동일 입금일 ETF 대체 비교" in etf_html
+    assert (site / "downloads" / "20260401T090000_test" / "portfolio" / "etf_dca_comparison.json").exists()
+
+
 def test_portfolio_page_normalizes_legacy_duplicate_account_performance_periods(tmp_path: Path):
     archive = tmp_path / "archive"
     site = tmp_path / "site"

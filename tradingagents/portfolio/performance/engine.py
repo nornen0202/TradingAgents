@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from tradingagents.portfolio.account_models import AccountSnapshot, PortfolioProfile
+from tradingagents.portfolio.benchmarks.dca_engine import build_etf_dca_comparison
 from tradingagents.portfolio.performance.broker_kis import (
     fetch_kis_domestic_broker_performance,
     load_broker_performance_baseline,
@@ -230,6 +231,15 @@ def build_account_performance_outputs(
         summary=summary,
         warnings=warnings,
     )
+    etf_dca_comparison = build_etf_dca_comparison(
+        snapshot=snapshot,
+        settings=settings,
+        summary=summary,
+        periods=periods,
+        broker_performance=broker_performance,
+        reconciliation=reconciliation,
+        warnings=warnings,
+    )
 
     payload = {
         "status": "ok" if periods else "partial",
@@ -241,6 +251,7 @@ def build_account_performance_outputs(
         "chart_data": chart_data,
         "broker_performance": broker_performance.to_dict() if broker_performance else {},
         "broker_performance_comparison": broker_comparison.to_dict() if broker_comparison else {},
+        "etf_alternative_comparison": etf_dca_comparison.to_public_dict() if etf_dca_comparison else {},
         "costs": costs,
         "contribution_by_ticker": contribution,
         "reconciliation": reconciliation,
@@ -276,6 +287,17 @@ def build_account_performance_outputs(
     broker_raw_json = private_dir / "broker_performance_raw.json"
     broker_normalized_json = private_dir / "broker_performance_normalized.json"
     broker_comparison_json = private_dir / "broker_performance_comparison.json"
+    etf_alt_raw_json = private_dir / "etf_alternative_portfolios_raw.json"
+    etf_alt_public_json = private_dir / "etf_alternative_portfolios_public.json"
+    etf_alt_policy_json = private_dir / "etf_alternative_policy.json"
+    etf_dca_cashflows_json = private_dir / "etf_dca_cashflows.json"
+    cashflows_json = private_dir / "cashflows.json"
+    cashflows_audit_json = private_dir / "cashflows_audit.json"
+    etf_dca_transactions_json = private_dir / "etf_dca_benchmark_transactions.json"
+    etf_dca_results_json = private_dir / "etf_dca_benchmark_results.json"
+    etf_dca_equity_curves_json = private_dir / "etf_dca_equity_curves.json"
+    etf_dca_comparison_json = private_dir / "etf_dca_comparison.json"
+    etf_dca_policy_json = private_dir / "etf_dca_policy_recommendation.json"
 
     _write_json(report_json, payload)
     _write_json(public_json, public_payload)
@@ -285,6 +307,49 @@ def build_account_performance_outputs(
         _write_json(broker_normalized_json, broker_performance.to_dict())
     if broker_comparison:
         _write_json(broker_comparison_json, broker_comparison.to_dict())
+    if etf_dca_comparison:
+        etf_public = etf_dca_comparison.to_public_dict()
+        etf_raw = etf_dca_comparison.to_raw_dict()
+        _write_json(etf_alt_raw_json, etf_raw)
+        _write_json(etf_alt_public_json, etf_public)
+        _write_json(etf_alt_policy_json, etf_public.get("policy") or {})
+        _write_json(etf_dca_cashflows_json, [item.to_dict(include_raw=True) for item in etf_dca_comparison.raw_cashflows])
+        _write_json(cashflows_json, [item.to_dict(include_raw=False) for item in etf_dca_comparison.raw_cashflows])
+        _write_json(
+            cashflows_audit_json,
+            {
+                "exact_dated_cashflows_available": etf_public.get("status") == "OK",
+                "cashflow_count": (etf_public.get("cashflows") or {}).get("dated_flow_count", 0),
+                "deposit_count": len([item for item in etf_dca_comparison.raw_cashflows if item.flow_type == "deposit"]),
+                "withdrawal_count": len([item for item in etf_dca_comparison.raw_cashflows if item.flow_type == "withdrawal"]),
+                "sources": sorted({item.source for item in etf_dca_comparison.raw_cashflows}),
+                "warnings": etf_public.get("warnings") or [],
+            },
+        )
+        raw_alternatives = etf_raw.get("alternatives") if isinstance(etf_raw, Mapping) else []
+        transactions = []
+        equity_curves = []
+        if isinstance(raw_alternatives, list):
+            for alternative in raw_alternatives:
+                if not isinstance(alternative, Mapping):
+                    continue
+                for transaction in alternative.get("transactions") or []:
+                    if isinstance(transaction, Mapping):
+                        transactions.append(dict(transaction))
+                curve = alternative.get("equity_curve") or []
+                if isinstance(curve, list):
+                    equity_curves.append(
+                        {
+                            "benchmark_id": alternative.get("key"),
+                            "display_name": alternative.get("label"),
+                            "points": [dict(point) for point in curve if isinstance(point, Mapping)],
+                        }
+                    )
+        _write_json(etf_dca_transactions_json, {"transactions": transactions})
+        _write_json(etf_dca_results_json, {"benchmarks": etf_public.get("alternatives") or []})
+        _write_json(etf_dca_equity_curves_json, {"equity_curves": equity_curves})
+        _write_json(etf_dca_comparison_json, etf_public)
+        _write_json(etf_dca_policy_json, etf_public.get("policy") or {})
     report_md.write_text(markdown, encoding="utf-8")
 
     artifacts = {
@@ -302,6 +367,16 @@ def build_account_performance_outputs(
         )
     if broker_comparison:
         artifacts["broker_performance_comparison_json"] = broker_comparison_json.as_posix()
+    if etf_dca_comparison:
+        artifacts.update(
+            {
+                "etf_alternative_portfolios_public_json": etf_alt_public_json.as_posix(),
+                "etf_alternative_policy_json": etf_alt_policy_json.as_posix(),
+                "etf_dca_benchmark_results_json": etf_dca_results_json.as_posix(),
+                "etf_dca_comparison_json": etf_dca_comparison_json.as_posix(),
+                "etf_dca_policy_recommendation_json": etf_dca_policy_json.as_posix(),
+            }
+        )
     return artifacts
 
 
@@ -316,6 +391,11 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
     broker_comparison = (
         payload.get("broker_performance_comparison")
         if isinstance(payload.get("broker_performance_comparison"), Mapping)
+        else {}
+    )
+    etf_comparison = (
+        payload.get("etf_alternative_comparison")
+        if isinstance(payload.get("etf_alternative_comparison"), Mapping)
         else {}
     )
     display_periods = [
@@ -390,6 +470,34 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
             f"- 입금/출금: `{_krw(broker.get('deposit_amount_krw'))} / {_krw(broker.get('withdrawal_amount_krw'))}`",
             f"- 브로커-내부 비교: `{broker_comparison.get('comparison_status') or '-'}`",
         ]
+    etf_lines = []
+    if etf_comparison:
+        etf_status = str(etf_comparison.get("status") or "-")
+        etf_cashflows = etf_comparison.get("cashflows") if isinstance(etf_comparison.get("cashflows"), Mapping) else {}
+        alternatives = [
+            item
+            for item in etf_comparison.get("alternatives", [])
+            if isinstance(item, Mapping) and item.get("status") == "OK"
+        ]
+        best_etf = max(
+            alternatives,
+            key=lambda item: _float_or_none(item.get("balance_return_pct")) if _float_or_none(item.get("balance_return_pct")) is not None else -10**9,
+        ) if alternatives else {}
+        blended = next((item for item in alternatives if str(item.get("key") or "").upper() == "BLENDED"), {})
+        etf_lines = [
+            "",
+            "### 동일 입금일 ETF 대체 포트폴리오 비교",
+            "",
+            f"- 상태: `{etf_status}`",
+            f"- 실제 성과 기준: `{etf_comparison.get('actual_source') or '-'}` "
+            f"({_pct_points((etf_comparison.get('actual') or {}).get('balance_return_pct'))})",
+            f"- 날짜별 현금흐름: `{etf_cashflows.get('dated_flow_count') or 0}건` "
+            f"(입금 {_krw(etf_cashflows.get('deposit_amount_krw'))}, 출금 {_krw(etf_cashflows.get('withdrawal_amount_krw'))})",
+            f"- ETF 최고 수익률: `{best_etf.get('label') or '-'}` "
+            f"({_pct_points(best_etf.get('balance_return_pct'))})",
+            f"- 혼합 벤치마크: `{_pct_points(blended.get('balance_return_pct'))}` / "
+            f"실제 대비 `{_pct_points(blended.get('excess_return_pct'))}`",
+        ]
     hide_snapshot = (
         str(reconciliation.get("reconciliation_status") or "").upper() == "FAILED"
         and not bool(summary.get("show_snapshot_performance_when_unreconciled"))
@@ -399,6 +507,7 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
         [
             "## 계좌 성과 vs 지수/ETF",
             *broker_lines,
+            *etf_lines,
             "",
             f"- 성과 기준 기간: `{summary.get('start_date') or '-'} ~ {summary.get('end_date') or '-'}` "
             f"(`{summary.get('default_period_label') or summary.get('default_period') or '-'}`)",
@@ -2661,6 +2770,7 @@ def _public_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         "chart_data",
         "broker_performance",
         "broker_performance_comparison",
+        "etf_alternative_comparison",
         "costs",
         "contribution_by_ticker",
         "reconciliation",

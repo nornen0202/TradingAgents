@@ -58,6 +58,11 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
                 site_dir / "runs" / manifest["run_id"] / "portfolio.html",
                 _render_portfolio_page(manifest, settings, portfolio_summary=portfolio_summary),
             )
+            if _portfolio_has_etf_benchmark_page(portfolio_summary):
+                _write_text(
+                    site_dir / "runs" / manifest["run_id"] / "etf_benchmark.html",
+                    _render_etf_benchmark_page(manifest, settings, portfolio_summary=portfolio_summary),
+                )
         for ticker_summary in manifest.get("tickers", []):
             _write_text(
                 site_dir / "runs" / manifest["run_id"] / f"{ticker_summary['ticker']}.html",
@@ -693,9 +698,14 @@ def _render_run_page(
 
     portfolio_html = ""
     if portfolio_status or portfolio_summary:
+        rendered_links = []
+        if portfolio_summary.get("status_path"):
+            rendered_links.append("<a class='pill' href='portfolio.html'>portfolio.html</a>")
+        if _portfolio_has_etf_benchmark_page(portfolio_summary):
+            rendered_links.append("<a class='pill' href='etf_benchmark.html'>etf_benchmark.html</a>")
         rendered_page = (
-            "<a class='pill' href='portfolio.html'>portfolio.html</a>"
-            if portfolio_summary.get("status_path")
+            "".join(rendered_links)
+            if rendered_links
             else f"<span class='empty'>No published {_escape(portfolio_label.lower())}</span>"
         )
         portfolio_html = f"""
@@ -1060,6 +1070,59 @@ def _render_portfolio_page(
     return _page_template(f"{manifest['run_id']} {portfolio_label.lower()} | {settings.title}", body, prefix="../../")
 
 
+def _portfolio_has_etf_benchmark_page(portfolio_summary: dict[str, Any]) -> bool:
+    payload = portfolio_summary.get("account_performance")
+    if not isinstance(payload, dict):
+        return False
+    comparison = payload.get("etf_alternative_comparison")
+    return isinstance(comparison, dict) and bool(comparison)
+
+
+def _render_etf_benchmark_page(
+    manifest: dict[str, Any],
+    settings: SiteSettings,
+    *,
+    portfolio_summary: dict[str, Any],
+) -> str:
+    payload = portfolio_summary.get("account_performance") if isinstance(portfolio_summary, dict) else {}
+    comparison = payload.get("etf_alternative_comparison") if isinstance(payload, dict) else {}
+    etf_html = _render_etf_alternative_comparison(comparison)
+    downloads = []
+    for source in (
+        portfolio_summary.get("etf_dca_comparison_json"),
+        portfolio_summary.get("etf_dca_policy_recommendation_json"),
+        portfolio_summary.get("etf_alternative_portfolios_public_json"),
+    ):
+        if isinstance(source, Path) and source.exists():
+            downloads.append(
+                f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
+            )
+    body = f"""
+    <nav class="breadcrumbs">
+      <a href="../../index.html">Home</a>
+      <a href="index.html">{_escape(manifest['run_id'])}</a>
+      <a href="portfolio.html">Portfolio</a>
+    </nav>
+    <section class="hero compact">
+      <div>
+        <p class="eyebrow">ETF DCA benchmark</p>
+        <h1>동일 입금일 ETF 대체 비교</h1>
+        <p class="subtitle">{_escape(str((comparison or {}).get('period_start') or '-'))} ~ {_escape(str((comparison or {}).get('period_end') or '-'))}</p>
+      </div>
+      <div class="hero-card">
+        <div class="status {portfolio_summary.get('status_class', 'pending')}">{_escape(str((comparison or {}).get('status') or 'unknown'))}</div>
+        <p><strong>Actual source</strong><span>{_escape(str((comparison or {}).get('actual_source') or '-'))}</span></p>
+        <p><strong>Purpose</strong><span>same cashflow ETF alternative</span></p>
+      </div>
+    </section>
+    <section class="section">
+      {etf_html or "<p class='empty'>ETF 대체 비교 데이터가 없습니다.</p>"}
+    </section>
+    {_download_details_html(downloads, summary="자료 다운로드", empty_text="다운로드 가능한 ETF 비교 파일 없음")}
+    """
+    return _page_template(f"{manifest['run_id']} ETF benchmark | {settings.title}", body, prefix="../../")
+
+
 def _render_account_performance_section(manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
     account_performance_status = (manifest.get("portfolio") or {}).get("account_performance") or {}
     if account_performance_status and not account_performance_status.get("publish_to_site", True):
@@ -1108,8 +1171,10 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     public_json = portfolio_summary.get("account_performance_public_json")
     chart_json = portfolio_summary.get("account_performance_chart_data_json")
     report_md = portfolio_summary.get("account_performance_report_md")
+    etf_dca_json = portfolio_summary.get("etf_dca_comparison_json")
+    etf_policy_json = portfolio_summary.get("etf_dca_policy_recommendation_json")
     download_links = []
-    for source in (public_json, chart_json, report_md):
+    for source in (public_json, chart_json, report_md, etf_dca_json, etf_policy_json):
         if isinstance(source, Path) and source.exists():
             download_links.append(
                 f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
@@ -1134,6 +1199,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
             "</div>"
         )
     broker_html = _render_broker_performance_summary(broker_performance, broker_comparison)
+    etf_html = _render_etf_alternative_comparison(payload.get("etf_alternative_comparison"))
     benchmark_label = ", ".join(benchmarks) or "-"
     provider_messages = _account_benchmark_provider_messages(quality)
     investor_notes = _account_performance_investor_notes(
@@ -1158,6 +1224,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
         <p>{_escape(benchmark_label)}</p>
       </div>
       {broker_html}
+      {etf_html}
       <div class="run-grid account-kpi-grid">
         <article class="run-card">
           <h3>성과 신뢰도</h3>
@@ -1291,6 +1358,196 @@ def _broker_benchmark_cells(values: Any) -> str:
             f"{_escape(_format_pct_points_value(item.get('benchmark_return_pct')))}"
         )
     return " / ".join(parts) if parts else "-"
+
+
+def _render_etf_alternative_comparison(value: Any) -> str:
+    if not isinstance(value, dict) or not value:
+        return ""
+    status = str(value.get("status") or "").strip()
+    if not status:
+        return ""
+    actual = value.get("actual") if isinstance(value.get("actual"), dict) else {}
+    cashflows = value.get("cashflows") if isinstance(value.get("cashflows"), dict) else {}
+    alternatives = [item for item in value.get("alternatives", []) if isinstance(item, dict)]
+    ok_alternatives = [item for item in alternatives if str(item.get("status") or "").upper() == "OK"]
+    best = (
+        max(
+            ok_alternatives,
+            key=lambda item: _account_performance_number(item.get("balance_return_pct")) or -10**9,
+        )
+        if ok_alternatives
+        else {}
+    )
+    blended = next((item for item in ok_alternatives if str(item.get("key") or "").upper() == "BLENDED"), {})
+    policy = value.get("policy") if isinstance(value.get("policy"), dict) else {}
+    decisions = policy.get("decisions") if isinstance(policy.get("decisions"), list) else []
+    policy_text = ", ".join(str(item) for item in decisions) if decisions else str(policy.get("status") or "INSUFFICIENT_DATA")
+    warning_items = [str(item) for item in value.get("warnings", []) if str(item)]
+    warning_html = (
+        "<div class='warning-banner account-performance-note'>"
+        + "<br>".join(_escape(_friendly_etf_warning(item)) for item in warning_items[:4])
+        + "</div>"
+        if warning_items
+        else ""
+    )
+    if status == "cashflow_dates_required":
+        return f"""
+      <div class="account-etf-alternatives">
+        <h3>동일 입금일 ETF 대체 포트폴리오 비교</h3>
+        <div class="warning-banner account-performance-note">
+          정확한 ETF 대체 비교를 계산하려면 날짜별 입금/출금 내역이 필요합니다.
+          현재는 총입금액만 확인되어 정확한 적립식 ETF 비교를 제공하지 않습니다.
+        </div>
+        <div class="run-grid account-kpi-grid">
+          <article class="run-card">
+            <h3>현금흐름 상태</h3>
+            <p><strong>입금일 원장 필요</strong><span>총입금 {_escape(_format_krw_value(cashflows.get('broker_deposit_amount_krw')))}</span></p>
+          </article>
+          <article class="run-card">
+            <h3>실제 계좌 기준</h3>
+            <p><strong>{_escape(str(value.get('actual_source') or '-'))}</strong><span>{_escape(_format_pct_points_value(actual.get('balance_return_pct')))}</span></p>
+          </article>
+          <article class="run-card">
+            <h3>해결 방법</h3>
+            <p><strong>cashflow CSV/JSON</strong><span>date, type, amount_krw</span></p>
+          </article>
+        </div>
+        {warning_html}
+      </div>
+        """
+    rows = _etf_alternative_rows(alternatives)
+    return f"""
+      <div class="account-etf-alternatives">
+        <h3>동일 입금일 ETF 대체 포트폴리오 비교</h3>
+        <p class="empty">같은 입금일에 같은 금액으로 ETF를 샀다면 어땠는지 계산합니다. 단순 기간 지수 수익률보다 실제 계좌 운용과 더 공정하게 비교합니다.</p>
+        <div class="run-grid account-kpi-grid">
+          <article class="run-card">
+            <h3>실제 계좌 수익률</h3>
+            <p><strong>{_escape(_actual_source_label(value.get('actual_source')))}</strong><span>{_escape(_format_pct_points_value(actual.get('balance_return_pct')))}</span></p>
+          </article>
+          <article class="run-card">
+            <h3>ETF 대체 최고 수익률</h3>
+            <p><strong>{_escape(str(best.get('label') or '-'))}</strong><span>{_escape(_format_pct_points_value(best.get('balance_return_pct')))}</span></p>
+          </article>
+          <article class="run-card">
+            <h3>혼합 벤치마크</h3>
+            <p><strong>{_escape(_format_pct_points_value(blended.get('balance_return_pct')))}</strong><span>실제 대비 {_escape(_format_pct_points_value(blended.get('excess_return_pct')))}</span></p>
+          </article>
+          <article class="run-card">
+            <h3>정책 제안</h3>
+            <p><strong>{_escape(str(policy.get('mode') or 'report_only'))}</strong><span>{_escape(policy_text)}</span></p>
+          </article>
+        </div>
+        <div class="account-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>대체 포트폴리오</th>
+                <th>최종 평가액</th>
+                <th>수익률</th>
+                <th>실제 계좌 대비</th>
+                <th>MDD</th>
+                <th>판단</th>
+              </tr>
+            </thead>
+            <tbody>{rows}</tbody>
+          </table>
+        </div>
+        {_render_etf_policy_box(policy)}
+        {warning_html}
+      </div>
+    """
+
+
+def _etf_alternative_rows(alternatives: list[dict[str, Any]]) -> str:
+    rows: list[str] = []
+    for item in alternatives:
+        status = str(item.get("status") or "")
+        if status.upper() != "OK":
+            judgment = _friendly_etf_warning(",".join(str(warning) for warning in item.get("warnings", []) if warning)) or status
+            rows.append(
+                "<tr>"
+                f"<td>{_escape(str(item.get('label') or item.get('key') or '-'))}</td>"
+                "<td>-</td><td>-</td><td>-</td><td>-</td>"
+                f"<td>{_escape(judgment)}</td>"
+                "</tr>"
+            )
+            continue
+        excess = _account_performance_number(item.get("excess_return_pct"))
+        judgment = "실제 우위" if excess is not None and excess >= 0 else "ETF 우위"
+        rows.append(
+            "<tr>"
+            f"<td>{_escape(str(item.get('label') or item.get('key') or '-'))}<br><span class='account-period-note'>{_escape(_etf_weights_label(item.get('weights')))}</span></td>"
+            f"<td>{_escape(_format_krw_value(item.get('end_value_krw')))}</td>"
+            f"<td>{_escape(_format_pct_points_value(item.get('balance_return_pct')))}</td>"
+            f"<td>{_escape(_format_pct_points_value(item.get('excess_return_pct')))}<br><span class='account-period-note'>{_escape(_format_signed_krw_value(item.get('excess_pnl_krw')))}</span></td>"
+            f"<td>{_escape(_format_pct_points_value(item.get('mdd_pct')))}</td>"
+            f"<td>{_escape(judgment)}</td>"
+            "</tr>"
+        )
+    if not rows:
+        return "<tr><td colspan='6'>ETF 대체 포트폴리오를 계산할 수 없습니다.</td></tr>"
+    return "".join(rows)
+
+
+def _render_etf_policy_box(policy: dict[str, Any]) -> str:
+    if not isinstance(policy, dict) or not policy:
+        return ""
+    checks = policy.get("checks") if isinstance(policy.get("checks"), dict) else {}
+    labels = {
+        "three_month_consecutive_underperformance": "3개월 기준",
+        "six_month_cumulative_excess": "6개월 기준",
+        "twelve_month_return_mdd_turnover": "12개월 기준",
+        "action_add_starter_vs_etf": "액션 성과",
+    }
+    rows = []
+    for key, label in labels.items():
+        item = checks.get(key) if isinstance(checks.get(key), dict) else {}
+        rows.append(f"<p><strong>{_escape(label)}</strong><span>{_escape(str(item.get('status') or 'INSUFFICIENT_DATA'))}</span></p>")
+    return (
+        "<article class='run-card account-performance-note'>"
+        "<h3>개별 종목 비중 판단</h3>"
+        + "".join(rows)
+        + "</article>"
+    )
+
+
+def _etf_weights_label(value: Any) -> str:
+    if not isinstance(value, dict):
+        return "-"
+    parts = []
+    for key, weight in value.items():
+        try:
+            parts.append(f"{key} {float(weight) * 100:.0f}%")
+        except (TypeError, ValueError):
+            continue
+    return " / ".join(parts) if parts else "-"
+
+
+def _actual_source_label(value: Any) -> str:
+    source = str(value or "")
+    if source == "broker_reported":
+        return "한국투자증권 앱 기준"
+    if source == "internal_reconciled_snapshot":
+        return "내부 스냅샷 정합 기준"
+    return source or "-"
+
+
+def _friendly_etf_warning(value: str) -> str:
+    text = str(value or "")
+    if "cashflow_dates_required" in text:
+        return "날짜별 입금/출금 원장이 필요합니다."
+    if "price_missing" in text:
+        return "ETF 가격 데이터가 없어 해당 벤치마크를 계산하지 않았습니다."
+    if "fx_missing" in text:
+        return "해외 ETF의 KRW 환산 FX 데이터가 필요합니다."
+    if "deposit_total_mismatch" in text:
+        return "날짜별 입금 합계와 브로커 총입금액이 일치하지 않습니다."
+    if "withdrawal_total_mismatch" in text:
+        return "날짜별 출금 합계와 브로커 총출금액이 일치하지 않습니다."
+    if "seed_ignored_below_minimum" in text:
+        return "기초자산이 최소 seed 기준보다 작아 ETF seed 매수에서 제외했습니다."
+    return text
 
 
 def _account_reconciliation_detail_html(
@@ -1908,6 +2165,12 @@ def _is_public_portfolio_download(source: Path) -> bool:
         "report_writer.json",
         "portfolio_report_writer.json",
         "account_performance_report.json",
+        "etf_alternative_portfolios_raw.json",
+        "etf_dca_cashflows.json",
+        "cashflows.json",
+        "cashflows_audit.json",
+        "etf_dca_benchmark_transactions.json",
+        "etf_dca_equity_curves.json",
         "summary_image_spec.json",
         "summary_image_metadata.json",
     }
@@ -2979,7 +3242,18 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
     account_performance_public = private_dir / "account_performance_public.json"
     account_performance_chart_data = private_dir / "account_performance_chart_data.json"
     account_performance_report_md = private_dir / "account_performance_report.md"
-    files = sorted(path for path in private_dir.iterdir() if path.is_file())
+    etf_dca_comparison = private_dir / "etf_dca_comparison.json"
+    etf_dca_policy = private_dir / "etf_dca_policy_recommendation.json"
+    etf_alt_public = private_dir / "etf_alternative_portfolios_public.json"
+    private_download_names = {
+        "etf_alternative_portfolios_raw.json",
+        "etf_dca_cashflows.json",
+        "cashflows.json",
+        "cashflows_audit.json",
+        "etf_dca_benchmark_transactions.json",
+        "etf_dca_equity_curves.json",
+    }
+    files = sorted(path for path in private_dir.iterdir() if path.is_file() and path.name not in private_download_names)
     candidate_symbols: list[str] = []
     candidate_pairs: list[dict[str, str]] = []
     sell_side_counts: dict[str, Any] = {}
@@ -3049,6 +3323,9 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "account_performance_public_json": account_performance_public if account_performance_public.exists() else None,
         "account_performance_chart_data_json": account_performance_chart_data if account_performance_chart_data.exists() else None,
         "account_performance_report_md": account_performance_report_md if account_performance_report_md.exists() else None,
+        "etf_dca_comparison_json": etf_dca_comparison if etf_dca_comparison.exists() else None,
+        "etf_dca_policy_recommendation_json": etf_dca_policy if etf_dca_policy.exists() else None,
+        "etf_alternative_portfolios_public_json": etf_alt_public if etf_alt_public.exists() else None,
         "candidate_canonical_symbols": candidate_symbols,
         "candidate_identity_pairs": candidate_pairs,
         "sell_side_counts": sell_side_counts,

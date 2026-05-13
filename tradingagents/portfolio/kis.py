@@ -506,6 +506,25 @@ class KisClient:
             params=params,
         )
 
+    def fetch_domestic_cashflow_ledger(
+        self,
+        *,
+        account_no: str,
+        product_code: str,
+        start_date: date | datetime | str,
+        end_date: date | datetime | str,
+    ) -> list[dict[str, Any]]:
+        """Return dated cashflow ledger rows when a supported KIS endpoint is wired.
+
+        The public KIS period-profit APIs used by this project expose aggregate
+        deposit/withdrawal fields, but they are not a dated deposit ledger. Until
+        a stable endpoint is configured and tested, callers must treat this as
+        unavailable and must not synthesize dated deposits from aggregate totals.
+        """
+
+        _ = (account_no, product_code, start_date, end_date)
+        return []
+
     def _fetch_domestic_period_profit_page(
         self,
         *,

@@ -85,6 +85,45 @@ broker_period_end = ""
 prefer_broker_reported_performance = true
 show_snapshot_performance_when_unreconciled = false
 
+[etf_dca_benchmarks]
+enabled = true
+manual_cashflow_csv_path = ""
+manual_cashflow_json_path = ""
+price_history_path = ""
+fx_history_path = ""
+min_initial_seed_krw = 10000
+reinvest_dividends = true
+show_in_portfolio_report = true
+generate_standalone_report = true
+
+[etf_dca_benchmarks.instruments.kospi200]
+display_name = "KOSPI200 ETF"
+ticker = "069500.KS"
+market = "KR"
+currency = "KRW"
+
+[etf_dca_benchmarks.instruments.kosdaq150]
+display_name = "KOSDAQ150 ETF"
+ticker = "229200.KS"
+market = "KR"
+currency = "KRW"
+
+[etf_dca_benchmarks.instruments.sp500_krw]
+display_name = "S&P500 KRW ETF"
+ticker = "360750.KS"
+market = "KR"
+currency = "KRW"
+
+[etf_dca_benchmarks.instruments.nasdaq100_krw]
+display_name = "Nasdaq100 KRW ETF"
+ticker = "133690.KS"
+market = "KR"
+currency = "KRW"
+
+[etf_dca_benchmarks.portfolios.blended_default]
+display_name = "혼합 벤치마크"
+weights = { kospi200 = 0.35, kosdaq150 = 0.15, sp500_krw = 0.30, nasdaq100_krw = 0.20 }
+
 [execution]
 enabled = true
 checkpoints_kst = ["23:35"]
