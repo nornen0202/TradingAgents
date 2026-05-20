@@ -32,6 +32,11 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     )
     (private_dir / "portfolio_report.md").write_text("# TradingAgents 계좌 운용 리포트\n", encoding="utf-8")
     (private_dir / "portfolio_report.json").write_text(json.dumps({"actions": []}), encoding="utf-8")
+    (private_dir / "decision_audit.json").write_text(json.dumps({"account_id": "12345678-01"}), encoding="utf-8")
+    (private_dir / "portfolio_semantic_verdicts.json").write_text(
+        json.dumps({"verdicts": [{"broker_order_id": "ODNO-SECRET"}]}),
+        encoding="utf-8",
+    )
     (private_dir / "account_snapshot.json").write_text(
         json.dumps(
             {
@@ -120,6 +125,8 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
             "account_performance": {"enabled": True, "publish_to_site": True, "status": "ok"},
             "artifacts": {
                 "account_snapshot_json": (private_dir / "account_snapshot.json").as_posix(),
+                "decision_audit_json": (private_dir / "decision_audit.json").as_posix(),
+                "portfolio_semantic_verdicts_json": (private_dir / "portfolio_semantic_verdicts.json").as_posix(),
                 "portfolio_report_md": (private_dir / "portfolio_report.md").as_posix(),
                 "portfolio_report_json": (private_dir / "portfolio_report.json").as_posix(),
                 "account_performance_public_json": (private_dir / "account_performance_public.json").as_posix(),
@@ -133,9 +140,9 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     build_site(archive, site, SiteSettings())
 
     public_html = (site / "runs" / manifest["run_id"] / "portfolio.html").read_text(encoding="utf-8")
-    published_snapshot = (site / "downloads" / manifest["run_id"] / "portfolio" / "account_snapshot.json").read_text(
-        encoding="utf-8"
-    )
+    snapshot_download = site / "downloads" / manifest["run_id"] / "portfolio" / "account_snapshot.json"
+    audit_download = site / "downloads" / manifest["run_id"] / "portfolio" / "decision_audit.json"
+    semantic_download = site / "downloads" / manifest["run_id"] / "portfolio" / "portfolio_semantic_verdicts.json"
     assert "계좌 성과 vs 지수/ETF" in public_html
     assert "성과 기준 기간" in public_html
     assert "계좌 수익률" in public_html
@@ -154,8 +161,9 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     assert "account_snapshot.json" not in public_html
     assert "12345678" not in public_html
     assert "ODNO-SECRET" not in public_html
-    assert "12345678" not in published_snapshot
-    assert "ODNO-SECRET" not in published_snapshot
+    assert not snapshot_download.exists()
+    assert not audit_download.exists()
+    assert not semantic_download.exists()
     assert (site / "downloads" / manifest["run_id"] / "portfolio" / "account_performance_public.json").exists()
 
 
@@ -837,6 +845,15 @@ def test_reconciliation_failed_demotes_excess_headline():
     assert "정합성 검증 후 해석" in kpi_section
     assert "수동 검증 필요" in kpi_section
     assert "KOSDAQ 161.07%" not in kpi_section
+    default_table = html.split("기간별 원시 산출", 1)[0]
+    assert "검증 전 참고 불가" in default_table
+    assert "28.69%" not in default_table
+    assert "161.07%" not in default_table
+    raw_table = html.split("기간별 원시 산출", 1)[1]
+    assert "28.69%" in raw_table
+    assert "161.07%" in raw_table
+    assert html.count("id='account-perf-ALL'") == 1
+    assert "id='account-perf-raw-ALL'" in html
 
 
 def test_chart_peak_return_labeled_as_peak_not_headline():

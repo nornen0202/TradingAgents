@@ -51,6 +51,7 @@ class KoreanReportLanguageTests(unittest.TestCase):
         joined = "\n".join(action_lines)
         self.assertNotIn("English rationale", joined)
         self.assertNotIn("because", joined)
+        self.assertNotIn("근거 요약 생성 실패", joined)
         self.assertIn("조건 충족", joined)
 
     def test_korean_report_has_no_english_rationale_in_investor_mode(self):

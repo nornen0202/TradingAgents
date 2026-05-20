@@ -21,3 +21,23 @@ def test_etf_benchmark_site_renders_dated_cashflow_unavailable_state():
 
     assert "입금일 원장 필요" in html
     assert "정확한 적립식 ETF 비교를 제공하지 않습니다" in html
+
+
+def test_etf_benchmark_site_explains_actual_performance_unavailable_state():
+    html = _render_etf_alternative_comparison(
+        {
+            "status": "actual_performance_unavailable",
+            "reason": "actual_performance_unavailable",
+            "actual_source": "unavailable",
+            "actual": {},
+            "cashflows": {"dated_flow_count": 0, "deposit_amount_krw": 0, "withdrawal_amount_krw": 0},
+            "alternatives": [],
+            "policy": {"mode": "report_only", "status": "INSUFFICIENT_DATA"},
+            "warnings": ["etf_alternative_actual_performance_unavailable"],
+        }
+    )
+
+    assert "실제 계좌 성과가 검증되지 않아" in html
+    assert "config/account_cashflows.csv" in html
+    assert "manual_cashflow_csv_path" in html
+    assert "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다." in html
