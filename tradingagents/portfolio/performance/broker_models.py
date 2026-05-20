@@ -31,6 +31,10 @@ class BrokerPerformanceSummary:
     end_asset_krw: int | None = None
     deposit_amount_krw: int | None = None
     withdrawal_amount_krw: int | None = None
+    realized_trade_pnl_krw: int | None = None
+    realized_trade_return_pct: float | None = None
+    trade_fees_krw: int | None = None
+    trade_taxes_krw: int | None = None
     dividend_krw: int | None = None
     interest_krw: int | None = None
     fees_krw: int | None = None

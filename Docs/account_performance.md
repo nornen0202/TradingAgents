@@ -33,6 +33,15 @@ Normalized artifacts are written alongside the account performance artifacts:
 - `broker_performance_normalized.json`
 - `broker_performance_comparison.json`
 
+KIS `inquire-period-trade-profit` fields such as `tot_rlzt_pfls` and `tot_pftrt` are normalized as realized trade diagnostics:
+
+- `realized_trade_pnl_krw`
+- `realized_trade_return_pct`
+- `trade_fees_krw`
+- `trade_taxes_krw`
+
+They are not promoted into `balance_return_pct`, because the endpoint is a period trade-profit view rather than whole-account NAV performance.
+
 The comparison artifact checks broker ending assets against the TradingAgents account value, compares broker return with the internal simple NAV return, records period/scope alignment, and reports `OK`, `WARNING`, or `FAILED`.
 
 The broker app-style formulas are:
@@ -115,6 +124,8 @@ Reconciliation uses NAV movement, summed realized/unrealized contribution rows, 
 - `FAILED`: above 5%; above 20% is marked critical.
 
 If reconciliation fails, `summary.performance_confidence` becomes `low`, `hide_excess_headline` is true, and the investor view demotes benchmark excess values to "manual reconciliation required" instead of presenting them as a headline.
+
+Period rows keep raw calculated returns in JSON for audit, but public display uses `display_eligible=false` and `trust_state=unreconciled_reference` so the default investor page can hide untrusted snapshot returns and leave them only in diagnostics.
 
 KR contribution rows are aggregated by canonical ticker. For example, realized PnL from a KIS ledger row such as `000660` is merged into a held Yahoo-style position such as `000660.KS` when the account positions identify the same six-digit code. Unresolved bare codes remain separate and add a diagnostic warning.
 

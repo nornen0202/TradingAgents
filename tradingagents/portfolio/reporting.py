@@ -680,7 +680,7 @@ def _short_conditions(values: Any) -> str:
     if not isinstance(values, list) or not values:
         return "조건 충족 시 검토"
     cleaned = [sanitize_investor_text(value, language="Korean") for value in values]
-    cleaned = [value for value in cleaned if value and value != "없음"]
+    cleaned = [value for value in cleaned if value and value != "없음" and not _is_failed_investor_summary(value)]
     return "; ".join(cleaned[:2]) if cleaned else "조건 충족 시 검토"
 
 
@@ -693,7 +693,7 @@ def _position_label(position) -> str:
 def _conditional_action_label(action) -> str:
     label = present_account_action(action.action_if_triggered, conditional=True, language="Korean")
     conditions = [sanitize_investor_text(item, language="Korean") for item in action.trigger_conditions]
-    conditions = [item for item in conditions if item and item != "없음"]
+    conditions = [item for item in conditions if item and item != "없음" and not _is_failed_investor_summary(item)]
     if not conditions:
         return label
     return f"{label}: {'; '.join(conditions[:2])}"
@@ -701,7 +701,7 @@ def _conditional_action_label(action) -> str:
 
 def _localized_rationale(action) -> str:
     text = sanitize_investor_text(action.rationale, language="Korean")
-    if text and text != "없음":
+    if text and text != "없음" and not _is_failed_investor_summary(text):
         return text
     if action.action_if_triggered in {"ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}:
         return "조건 충족 전까지 대기합니다."
@@ -710,6 +710,10 @@ def _localized_rationale(action) -> str:
     if action.action_if_triggered in {"REDUCE_IF_TRIGGERED", "STOP_LOSS_IF_TRIGGERED", "EXIT_IF_TRIGGERED"}:
         return "리스크 조건 이탈 시 축소를 검토합니다."
     return "추가 행동보다 관찰이 우선입니다."
+
+
+def _is_failed_investor_summary(value: str) -> bool:
+    return "근거 요약 생성 실패" in str(value or "")
 
 
 def _amount_label(value: int) -> str:

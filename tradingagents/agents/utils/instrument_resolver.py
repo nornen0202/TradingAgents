@@ -83,12 +83,33 @@ _KRX_COMPANIES = {
         "symbol": "005380.KS",
         "aliases": ("현대차", "Hyundai Motor", "005380", "005380.KS"),
     },
+    "009150": {
+        "display_name": "삼성전기",
+        "display_name_kr": "삼성전기",
+        "display_name_en": "Samsung Electro-Mechanics",
+        "symbol": "009150.KS",
+        "aliases": ("삼성전기", "Samsung Electro-Mechanics", "009150", "009150.KS"),
+    },
+    "010140": {
+        "display_name": "삼성중공업",
+        "display_name_kr": "삼성중공업",
+        "display_name_en": "Samsung Heavy Industries",
+        "symbol": "010140.KS",
+        "aliases": ("삼성중공업", "Samsung Heavy Industries", "010140", "010140.KS"),
+    },
     "010950": {
         "display_name": "S-Oil",
         "display_name_kr": "에쓰오일",
         "display_name_en": "S-Oil",
         "symbol": "010950.KS",
         "aliases": ("S-Oil", "에쓰오일", "010950", "010950.KS"),
+    },
+    "011070": {
+        "display_name": "LG이노텍",
+        "display_name_kr": "LG이노텍",
+        "display_name_en": "LG Innotek",
+        "symbol": "011070.KS",
+        "aliases": ("LG이노텍", "LG Innotek", "011070", "011070.KS"),
     },
     "034020": {
         "display_name": "두산에너빌리티",
@@ -97,12 +118,26 @@ _KRX_COMPANIES = {
         "symbol": "034020.KS",
         "aliases": ("두산에너빌리티", "Doosan Enerbility", "034020", "034020.KS"),
     },
+    "034220": {
+        "display_name": "LG디스플레이",
+        "display_name_kr": "LG디스플레이",
+        "display_name_en": "LG Display",
+        "symbol": "034220.KS",
+        "aliases": ("LG디스플레이", "LG Display", "034220", "034220.KS"),
+    },
     "042700": {
         "display_name": "한미반도체",
         "display_name_kr": "한미반도체",
         "display_name_en": "Hanmi Semiconductor",
         "symbol": "042700.KS",
         "aliases": ("한미반도체", "Hanmi Semiconductor", "042700", "042700.KS"),
+    },
+    "066570": {
+        "display_name": "LG전자",
+        "display_name_kr": "LG전자",
+        "display_name_en": "LG Electronics",
+        "symbol": "066570.KS",
+        "aliases": ("LG전자", "LG Electronics", "066570", "066570.KS"),
     },
     "058470": {
         "display_name": "리노공업",
@@ -138,6 +173,20 @@ _KRX_COMPANIES = {
         "display_name_en": "APR",
         "symbol": "278470.KS",
         "aliases": ("에이피알", "APR", "278470", "278470.KS"),
+    },
+    "353200": {
+        "display_name": "대덕전자",
+        "display_name_kr": "대덕전자",
+        "display_name_en": "Daeduck Electronics",
+        "symbol": "353200.KS",
+        "aliases": ("대덕전자", "Daeduck Electronics", "353200", "353200.KS"),
+    },
+    "403870": {
+        "display_name": "HPSP",
+        "display_name_kr": "HPSP",
+        "display_name_en": "HPSP",
+        "symbol": "403870.KQ",
+        "aliases": ("HPSP", "403870", "403870.KQ"),
     },
 }
 

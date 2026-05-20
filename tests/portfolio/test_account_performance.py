@@ -1,13 +1,37 @@
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from tradingagents.portfolio.account_models import AccountConstraints, AccountSnapshot, PortfolioProfile, Position
 from tradingagents.portfolio.performance import build_account_performance_outputs
+from tradingagents.portfolio.performance.broker_kis import normalize_kis_broker_summary
 from tradingagents.portfolio.performance.etf_alternatives import load_external_capital_flows
+
+
+def test_kis_trade_profit_summary_is_normalized_separately_from_account_return():
+    summary = normalize_kis_broker_summary(
+        {
+            "tot_rlzt_pfls": "2561940",
+            "tot_pftrt": "18.94745390",
+            "tot_fee": "880",
+            "tot_tltx": "32216",
+        },
+        period_start=date(2026, 4, 19),
+        period_end=date(2026, 5, 19),
+    )
+
+    payload = summary.to_dict()
+    assert payload["investment_pnl_krw"] is None
+    assert payload["balance_return_pct"] is None
+    assert payload["realized_trade_pnl_krw"] == 2_561_940
+    assert payload["realized_trade_return_pct"] == 18.947454
+    assert payload["trade_fees_krw"] == 880
+    assert payload["trade_taxes_krw"] == 32_216
+    assert "broker_performance_missing_balance_return" in payload["warnings"]
 
 
 def test_account_performance_reports_kospi_and_kosdaq(tmp_path: Path):
@@ -550,6 +574,9 @@ def test_account_performance_contribution_mismatch_triggers_reconciliation_warni
     assert payload["summary"]["performance_confidence"] == "low"
     assert payload["summary"]["hide_excess_headline"] is True
     assert payload["summary"]["requires_manual_reconciliation"] is True
+    assert payload["periods"][0]["actual_return"] == 0.5
+    assert payload["periods"][0]["display_eligible"] is False
+    assert payload["periods"][0]["trust_state"] == "unreconciled_reference"
     assert "account_performance_unreconciled_pnl" in payload["data_quality"]["warnings"]
 
 

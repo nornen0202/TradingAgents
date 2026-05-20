@@ -152,6 +152,30 @@ def normalize_kis_broker_summary(
     withdrawal = (
         _first_int(raw, ("withdrawal_amount_krw", "tot_wthdr_amt", "wthdr_amt", "out_amt", "출금고", "출금액")) or 0
     )
+    realized_trade_pnl = _first_int(
+        raw,
+        (
+            "realized_trade_pnl_krw",
+            "trade_tot_rlzt_pfls",
+            "tot_rlzt_pfls",
+            "rlzt_pfls",
+            "총실현손익",
+            "매매손익",
+        ),
+    )
+    realized_trade_return = _first_float(
+        raw,
+        (
+            "realized_trade_return_pct",
+            "trade_tot_pftrt",
+            "tot_pftrt",
+            "pftrt",
+            "총수익률",
+            "매매수익률",
+        ),
+    )
+    trade_fees = _first_int(raw, ("trade_tot_fee", "tot_fee", "trade_smtl_fee", "매매수수료"))
+    trade_taxes = _first_int(raw, ("trade_tot_tltx", "tot_tltx", "trade_tot_tax", "매매세금"))
     investment_pnl = _first_int(
         raw,
         (
@@ -230,6 +254,10 @@ def normalize_kis_broker_summary(
         end_asset_krw=end_asset,
         deposit_amount_krw=deposit,
         withdrawal_amount_krw=withdrawal,
+        realized_trade_pnl_krw=realized_trade_pnl,
+        realized_trade_return_pct=_round_or_none(realized_trade_return),
+        trade_fees_krw=trade_fees,
+        trade_taxes_krw=trade_taxes,
         dividend_krw=_first_int(raw, ("dividend_krw", "dvdn_amt", "배당금")) or 0,
         interest_krw=_first_int(raw, ("interest_krw", "int_amt", "예탁금이자", "상환이자")) or 0,
         fees_krw=_first_int(raw, ("fees_krw", "fee_amt", "smtl_fee", "수수료")) or 0,

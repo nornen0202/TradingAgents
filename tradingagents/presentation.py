@@ -276,6 +276,23 @@ def _localized_english_investor_text(text: str) -> str | None:
         return None
     ascii_letters = sum(1 for char in compact if "a" <= char.lower() <= "z")
     non_space = sum(1 for char in compact if not char.isspace())
+    if ascii_letters >= 12 and any(
+        token in lower
+        for token in (
+            "current setup",
+            "existing-position",
+            "dominant near-term",
+            "support",
+            "breakout",
+            "follow-through",
+            "wait",
+            "confirm",
+            "requires",
+        )
+    ):
+        if any(token in lower for token in ("risk", "invalid", "below", "reduce", "trim", "exit")):
+            return "리스크 조건 이탈 시 축소를 검토합니다."
+        return "조건 충족 전까지 대기합니다."
     if non_space and ascii_letters / non_space >= 0.45:
         if any(token in lower for token in ("trigger", "condition", "confirm", "wait", "pending", "breakout")):
             return "조건 충족 전까지 대기합니다."

@@ -122,6 +122,8 @@ def _copy_artifacts(
         source = _resolve_artifact_source(run_dir, artifact_path)
         if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
             continue
+        if not _should_publish_portfolio_artifact(source):
+            continue
         if source.is_file():
             download_dir.mkdir(parents=True, exist_ok=True)
             _copy_public_portfolio_artifact(source, download_dir / source.name)
@@ -156,6 +158,8 @@ def _copy_artifacts(
         if not isinstance(source, Path) or not source.is_file():
             continue
         if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
+            continue
+        if not _should_publish_portfolio_artifact(source):
             continue
         download_dir.mkdir(parents=True, exist_ok=True)
         _copy_public_portfolio_artifact(source, download_dir / source.name)
@@ -202,6 +206,12 @@ def _copy_public_portfolio_artifact(source: Path, destination: Path) -> None:
         except Exception:
             pass
     shutil.copy2(source, destination)
+
+
+def _should_publish_portfolio_artifact(source: Path) -> bool:
+    if _is_summary_image_artifact(source):
+        return True
+    return _is_public_portfolio_download(source)
 
 
 def _normalize_account_performance_payload(value: Any) -> Any:
@@ -1186,7 +1196,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
         for period in display_periods
         if isinstance(period, dict)
     )
-    table_rows = _account_performance_period_rows(display_periods)
+    table_rows = _account_performance_period_rows(display_periods, hide_untrusted=not show_snapshot_headline)
     raw_table_rows = _account_performance_period_rows(periods, diagnostics=True)
     contribution_rows = _account_contribution_rows(contribution, reconciliation=reconciliation)
     warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
@@ -1316,6 +1326,20 @@ def _render_broker_performance_summary(broker: dict[str, Any], comparison: dict[
             "</div>"
         )
     benchmark_rows = _broker_benchmark_cells(broker.get("benchmark_returns"))
+    trade_cost = None
+    trade_fees = _account_performance_number(broker.get("trade_fees_krw"))
+    trade_taxes = _account_performance_number(broker.get("trade_taxes_krw"))
+    if trade_fees is not None or trade_taxes is not None:
+        trade_cost = float(trade_fees or 0.0) + float(trade_taxes or 0.0)
+    trade_html = ""
+    if broker.get("realized_trade_pnl_krw") is not None or broker.get("realized_trade_return_pct") is not None:
+        trade_html = f"""
+          <article class="run-card">
+            <h3>매매손익</h3>
+            <p><strong>{_escape(_format_signed_krw_value(broker.get('realized_trade_pnl_krw')))}</strong><span>매매손익률 {_escape(_format_pct_points_value(broker.get('realized_trade_return_pct')))}</span></p>
+            <p><strong>매매 비용</strong><span>{_escape(_format_krw_value(trade_cost))}</span></p>
+          </article>
+        """
     return f"""
       <div class="account-broker-performance">
         <h3>{_escape(broker_name)} 앱 기준 성과</h3>
@@ -1336,6 +1360,7 @@ def _render_broker_performance_summary(broker: dict[str, Any], comparison: dict[
             <h3>입출금</h3>
             <p><strong>입금 {_escape(_format_krw_value(broker.get('deposit_amount_krw')))}</strong><span>출금 {_escape(_format_krw_value(broker.get('withdrawal_amount_krw')))}</span></p>
           </article>
+          {trade_html}
           <article class="run-card">
             <h3>브로커 기준 벤치마크</h3>
             <p><strong>앱 수익률 기준</strong><span>{benchmark_rows}</span></p>
@@ -1412,6 +1437,32 @@ def _render_etf_alternative_comparison(value: Any) -> str:
             <p><strong>cashflow CSV/JSON</strong><span>date, type, amount_krw</span></p>
           </article>
         </div>
+        {warning_html}
+      </div>
+        """
+    if status == "actual_performance_unavailable":
+        return f"""
+      <div class="account-etf-alternatives">
+        <h3>동일 입금일 ETF 대체 포트폴리오 비교</h3>
+        <div class="warning-banner account-performance-note">
+          실제 계좌 성과가 검증되지 않아 ETF 대체 포트폴리오와 직접 비교하지 않습니다.
+          브로커 계좌 수익률 또는 정합성 OK/WARNING 내부 스냅샷이 필요합니다.
+        </div>
+        <div class="run-grid account-kpi-grid">
+          <article class="run-card">
+            <h3>실제 계좌 성과</h3>
+            <p><strong>검증 전 참고 불가</strong><span>{_escape(str(value.get('reason') or status))}</span></p>
+          </article>
+          <article class="run-card">
+            <h3>날짜별 현금흐름</h3>
+            <p><strong>{int(cashflows.get('dated_flow_count') or 0)}건</strong><span>입금일/출금일 원장 필요</span></p>
+          </article>
+          <article class="run-card">
+            <h3>필요 입력</h3>
+            <p><strong>config/account_cashflows.csv</strong><span>date, type, amount_krw</span></p>
+          </article>
+        </div>
+        <p class="empty">또는 etf_dca_benchmarks.manual_cashflow_csv_path / manual_cashflow_json_path 설정에 날짜별 입출금 원장을 연결합니다.</p>
         {warning_html}
       </div>
         """
@@ -1622,6 +1673,8 @@ def _actual_source_label(value: Any) -> str:
 
 def _friendly_etf_warning(value: str) -> str:
     text = str(value or "")
+    if "actual_performance_unavailable" in text:
+        return "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다."
     if "cashflow_dates_required" in text:
         return "날짜별 입금/출금 원장이 필요합니다."
     if "price_missing" in text:
@@ -1721,12 +1774,18 @@ def _account_hidden_period_note(periods: list[Any], display_periods: list[dict[s
     )
 
 
-def _account_performance_period_rows(periods: list[Any], *, diagnostics: bool = False) -> str:
+def _account_performance_period_rows(
+    periods: list[Any],
+    *,
+    diagnostics: bool = False,
+    hide_untrusted: bool = False,
+) -> str:
     rows: list[str] = []
     for period in periods:
         if not isinstance(period, dict):
             continue
         period_name = str(period.get("period") or "-")
+        row_id = f"account-perf-raw-{period_name}" if diagnostics else f"account-perf-{period_name}"
         period_label = _account_period_label(period)
         partial_note = ""
         if period.get("partial"):
@@ -1743,7 +1802,7 @@ def _account_performance_period_rows(periods: list[Any], *, diagnostics: bool = 
         if period.get("status") in {"insufficient_history", "duplicate_actual_window"} and not diagnostics:
             rows.append(
                 "<tr "
-                f"id='account-perf-{_escape(period_name)}'>"
+                f"id='{_escape(row_id)}'>"
                 f"<td>{_escape(period_label)}{partial_note}</td>"
                 "<td>데이터 부족</td>"
                 "<td>요청 기간 시작일의 계좌 스냅샷 없음</td>"
@@ -1756,7 +1815,7 @@ def _account_performance_period_rows(periods: list[Any], *, diagnostics: bool = 
         if period.get("status") == "insufficient_history":
             rows.append(
                 "<tr "
-                f"id='account-perf-{_escape(period_name)}'>"
+                f"id='{_escape(row_id)}'>"
                 f"<td>{_escape(period_label)}{partial_note}</td>"
                 "<td>데이터 부족</td>"
                 "<td>요청 기간 시작일의 계좌 스냅샷 없음</td>"
@@ -1769,7 +1828,7 @@ def _account_performance_period_rows(periods: list[Any], *, diagnostics: bool = 
         if period.get("status") == "duplicate_actual_window":
             rows.append(
                 "<tr "
-                f"id='account-perf-{_escape(period_name)}'>"
+                f"id='{_escape(row_id)}'>"
                 f"<td>{_escape(period_label)}{partial_note}</td>"
                 "<td>중복 기간</td>"
                 f"<td>{_escape(str(period.get('same_actual_window_as') or '-'))}와 동일 실제 기간</td>"
@@ -1780,9 +1839,26 @@ def _account_performance_period_rows(periods: list[Any], *, diagnostics: bool = 
             )
             continue
         method_note = _account_return_method_label(period.get("primary_return_method"), period.get("return_method_warning"))
+        if not diagnostics and (
+            hide_untrusted
+            or period.get("display_eligible") is False
+            or str(period.get("trust_state") or "") == "unreconciled_reference"
+        ):
+            rows.append(
+                "<tr "
+                f"id='{_escape(row_id)}'>"
+                f"<td>{_escape(period_label)}{partial_note}</td>"
+                f"<td>검증 전 참고 불가<br><span class='account-period-note'>{_escape(method_note)}</span></td>"
+                "<td>정합성 검증 후 해석</td>"
+                "<td>-</td>"
+                "<td>-</td>"
+                "<td>-</td>"
+                "</tr>"
+            )
+            continue
         rows.append(
             "<tr "
-            f"id='account-perf-{_escape(period_name)}'>"
+            f"id='{_escape(row_id)}'>"
             f"<td>{_escape(period_label)}{partial_note}</td>"
             f"<td>{_escape(_format_pct_value(period.get('actual_return')))}<br><span class='account-period-note'>{_escape(method_note)}</span></td>"
             f"<td>{_benchmark_comparison_cells(period.get('simple_benchmarks'))}</td>"

@@ -224,6 +224,7 @@ def build_account_performance_outputs(
         warnings=warnings,
     )
     summary = _summary_with_broker_comparison(summary, broker_comparison)
+    periods = _periods_with_display_policy(periods, summary=summary)
     chart_data = _build_chart_data(
         snapshot_rows=snapshot_rows,
         benchmark_prices=benchmark_prices,
@@ -420,6 +421,17 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
         period_label = "사용 가능 전체 기간" if str(period.get("period") or "").upper() == "ALL" else str(period.get("period") or "-")
         if period.get("partial"):
             period_label = f"{period_label} (부분)"
+        if period.get("display_eligible") is False or period.get("trust_state") == "unreconciled_reference":
+            rows.append(
+                "| "
+                f"{period_label} | "
+                "검증 전 참고 불가 | "
+                "정합성 실패 | "
+                "정합성 검증 후 해석 | "
+                "- | "
+                f"{', '.join(str(item.get('benchmark')) for item in period.get('simple_benchmarks', []) if isinstance(item, Mapping)) or '-'} |"
+            )
+            continue
         rows.append(
             "| "
             f"{period_label} | "
@@ -466,6 +478,8 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
             f"- 기간: `{broker.get('period_start') or '-'} ~ {broker.get('period_end') or '-'}`",
             f"- 브로커 수익률: `{_pct_points(broker.get('balance_return_pct'))}`",
             f"- 투자손익: `{_krw(broker.get('investment_pnl_krw'))}`",
+            f"- 매매손익: `{_krw(broker.get('realized_trade_pnl_krw'))}` "
+            f"(`{_pct_points(broker.get('realized_trade_return_pct'))}`)",
             f"- 기초/기말자산: `{_krw(broker.get('start_asset_krw'))} -> {_krw(broker.get('end_asset_krw'))}`",
             f"- 입금/출금: `{_krw(broker.get('deposit_amount_krw'))} / {_krw(broker.get('withdrawal_amount_krw'))}`",
             f"- 브로커-내부 비교: `{broker_comparison.get('comparison_status') or '-'}`",
@@ -514,10 +528,10 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
             f"- 내부 스냅샷 수익률: `{snapshot_summary_return}` "
             f"({_return_method_label(summary.get('primary_return_method'), summary.get('return_method_warning'))})",
             f"- 최고 초과 기준: `{((summary.get('best_excess') or {}).get('benchmark')) or '-'}` "
-            f"({_pct((summary.get('best_excess') or {}).get('excess_return'))})",
+            f"({'정합성 검증 후 해석' if hide_snapshot else _pct((summary.get('best_excess') or {}).get('excess_return'))})",
             f"- 최저 초과 기준: `{((summary.get('worst_excess') or {}).get('benchmark')) or '-'}` "
-            f"({_pct((summary.get('worst_excess') or {}).get('excess_return'))})",
-            f"- 참고용 초과손익: `{_krw((summary.get('best_excess') or {}).get('excess_krw'))}`",
+            f"({'정합성 검증 후 해석' if hide_snapshot else _pct((summary.get('worst_excess') or {}).get('excess_return'))})",
+            f"- 참고용 초과손익: `{'정합성 검증 후 해석' if hide_snapshot else _krw((summary.get('best_excess') or {}).get('excess_krw'))}`",
             hidden_note,
             "",
             "### 기간별 비교",
@@ -2373,6 +2387,30 @@ def _summary_with_broker_comparison(
             "broker_comparison_status": comparison.comparison_status,
         }
     )
+    return result
+
+
+def _periods_with_display_policy(periods: list[dict[str, Any]], *, summary: Mapping[str, Any]) -> list[dict[str, Any]]:
+    hide_unreconciled_snapshot = bool(summary.get("hide_excess_headline")) and not bool(
+        summary.get("show_snapshot_performance_when_unreconciled")
+    )
+    result: list[dict[str, Any]] = []
+    for period in periods:
+        if not isinstance(period, dict):
+            result.append(period)
+            continue
+        row = dict(period)
+        if _float_or_none(row.get("actual_return")) is None:
+            row.setdefault("display_eligible", False)
+            row.setdefault("trust_state", str(row.get("status") or row.get("primary_return_method") or "unavailable"))
+        elif hide_unreconciled_snapshot:
+            row["display_eligible"] = False
+            row["trust_state"] = "unreconciled_reference"
+            row["display_reason"] = "snapshot_reconciliation_failed"
+        else:
+            row.setdefault("display_eligible", True)
+            row.setdefault("trust_state", "trusted")
+        result.append(row)
     return result
 
 
