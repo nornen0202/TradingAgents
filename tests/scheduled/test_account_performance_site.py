@@ -37,6 +37,15 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
         json.dumps({"verdicts": [{"broker_order_id": "ODNO-SECRET"}]}),
         encoding="utf-8",
     )
+    (private_dir / "summary_image_spec.json").write_text(
+        json.dumps({"account_value_krw": 42_000_000}),
+        encoding="utf-8",
+    )
+    (private_dir / "broker_performance_raw.json").write_text(json.dumps({"tot_rlzt_pfls": "1234"}), encoding="utf-8")
+    (private_dir / "broker_performance_normalized.json").write_text(
+        json.dumps({"raw_summary": {"tot_rlzt_pfls": "1234"}}),
+        encoding="utf-8",
+    )
     (private_dir / "account_snapshot.json").write_text(
         json.dumps(
             {
@@ -127,6 +136,9 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
                 "account_snapshot_json": (private_dir / "account_snapshot.json").as_posix(),
                 "decision_audit_json": (private_dir / "decision_audit.json").as_posix(),
                 "portfolio_semantic_verdicts_json": (private_dir / "portfolio_semantic_verdicts.json").as_posix(),
+                "summary_image_spec_json": (private_dir / "summary_image_spec.json").as_posix(),
+                "broker_performance_raw_json": (private_dir / "broker_performance_raw.json").as_posix(),
+                "broker_performance_normalized_json": (private_dir / "broker_performance_normalized.json").as_posix(),
                 "portfolio_report_md": (private_dir / "portfolio_report.md").as_posix(),
                 "portfolio_report_json": (private_dir / "portfolio_report.json").as_posix(),
                 "account_performance_public_json": (private_dir / "account_performance_public.json").as_posix(),
@@ -140,9 +152,15 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     build_site(archive, site, SiteSettings())
 
     public_html = (site / "runs" / manifest["run_id"] / "portfolio.html").read_text(encoding="utf-8")
+    index_html = (site / "runs" / manifest["run_id"] / "index.html").read_text(encoding="utf-8")
     snapshot_download = site / "downloads" / manifest["run_id"] / "portfolio" / "account_snapshot.json"
     audit_download = site / "downloads" / manifest["run_id"] / "portfolio" / "decision_audit.json"
     semantic_download = site / "downloads" / manifest["run_id"] / "portfolio" / "portfolio_semantic_verdicts.json"
+    summary_spec_download = site / "downloads" / manifest["run_id"] / "portfolio" / "summary_image_spec.json"
+    broker_raw_download = site / "downloads" / manifest["run_id"] / "portfolio" / "broker_performance_raw.json"
+    broker_normalized_download = (
+        site / "downloads" / manifest["run_id"] / "portfolio" / "broker_performance_normalized.json"
+    )
     assert "계좌 성과 vs 지수/ETF" in public_html
     assert "성과 기준 기간" in public_html
     assert "계좌 수익률" in public_html
@@ -159,11 +177,20 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     assert "account_performance_public.json" in public_html
     assert public_html.rfind("자료 다운로드") < public_html.rfind("Report vs latest intraday reanalysis")
     assert "account_snapshot.json" not in public_html
+    assert "account_snapshot.json" not in index_html
+    assert "decision_audit.json" not in index_html
+    assert "portfolio_semantic_verdicts.json" not in index_html
+    assert "summary_image_spec.json" not in index_html
+    assert "broker_performance_raw.json" not in index_html
+    assert "broker_performance_normalized.json" not in index_html
     assert "12345678" not in public_html
     assert "ODNO-SECRET" not in public_html
     assert not snapshot_download.exists()
     assert not audit_download.exists()
     assert not semantic_download.exists()
+    assert not summary_spec_download.exists()
+    assert not broker_raw_download.exists()
+    assert not broker_normalized_download.exists()
     assert (site / "downloads" / manifest["run_id"] / "portfolio" / "account_performance_public.json").exists()
 
 
@@ -228,7 +255,9 @@ def test_portfolio_page_prioritizes_broker_performance_and_hides_failed_snapshot
         ],
         "chart_data": {"series": [{"date": "2026-04-13", "account_return": 0}, {"date": "2026-05-13", "account_return": 1.6128}]},
         "costs": {"fees_krw": 583, "taxes_krw": 14160, "total_cost_krw": 14743},
-        "contribution_by_ticker": [],
+        "contribution_by_ticker": [
+            {"ticker": "005930.KS", "display_name": "삼성전자", "total_contribution_krw": 1234}
+        ],
         "reconciliation": {
             "reconciliation_status": "FAILED",
             "simple_nav_pnl_krw": 9_761_292,
@@ -260,6 +289,8 @@ def test_portfolio_page_prioritizes_broker_performance_and_hides_failed_snapshot
     assert "검증 전 참고 불가" in html
     assert "브로커 앱 기말자산과 TradingAgents 내부 계좌 평가액이 크게 다릅니다." in html
     assert "정합성 상세" in html
+    assert "<strong>삼성전자</strong>" in html
+    assert "<strong>005930.KS</strong>" not in html
     assert html.index("broker_performance_comparison:broker_end_asset") < html.index(
         "account_performance_period_insufficient_history:YTD"
     )

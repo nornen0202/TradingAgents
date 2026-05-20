@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from tests.portfolio.benchmarks.helpers import build_fixture_comparison, default_settings
-from tradingagents.scheduled.site import _render_etf_alternative_comparison
+from tradingagents.scheduled.config import SiteSettings
+from tradingagents.scheduled.site import _render_etf_alternative_comparison, _render_etf_benchmark_page
 
 
 def test_etf_benchmark_site_renders_equity_curve_and_policy():
@@ -41,3 +42,27 @@ def test_etf_benchmark_site_explains_actual_performance_unavailable_state():
     assert "config/account_cashflows.csv" in html
     assert "manual_cashflow_csv_path" in html
     assert "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다." in html
+    assert "actual_performance_unavailable</span>" not in html
+
+
+def test_standalone_etf_benchmark_page_uses_friendly_status_labels():
+    comparison = {
+        "status": "actual_performance_unavailable",
+        "reason": "actual_performance_unavailable",
+        "actual_source": "unavailable",
+        "actual": {},
+        "cashflows": {"dated_flow_count": 0},
+        "alternatives": [],
+        "warnings": ["etf_alternative_actual_performance_unavailable"],
+    }
+    html = _render_etf_benchmark_page(
+        {"run_id": "run1"},
+        SiteSettings(),
+        portfolio_summary={"status_class": "partial_failure", "account_performance": {"etf_alternative_comparison": comparison}},
+    )
+
+    assert "실제 성과 검증 전" in html
+    assert "실제 성과 출처" in html
+    assert "검증 전 참고 불가" in html
+    assert "actual_performance_unavailable</div>" not in html
+    assert "Actual source" not in html
