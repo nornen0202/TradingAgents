@@ -446,13 +446,17 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
     for item in contribution[:8]:
         if not isinstance(item, Mapping):
             continue
+        ticker = str(item.get("ticker") or "-")
+        display_name = str(item.get("display_name") or "").strip()
+        label = display_name if display_name and display_name != ticker else ticker
+        display_label = f"{label} ({ticker})" if label != ticker else label
         contribution_rows.append(
-            f"- {item.get('ticker')}: 기여도 {_krw(item.get('total_contribution_krw'))} "
+            f"- {display_label}: 기여도 {_krw(item.get('total_contribution_krw'))} "
             f"(실현 {_krw(item.get('realized_pnl_krw'))}, 미실현 변화 {_krw(item.get('unrealized_pnl_krw'))})"
         )
 
     warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
-    warning_lines = [f"- {item}" for item in warnings[:8]] or ["- 특이사항 없음"]
+    warning_lines = [f"- {_friendly_data_quality_warning(item)}" for item in warnings[:8]] or ["- 특이사항 없음"]
     hidden_periods = [
         str(period.get("period") or "-")
         for period in periods
@@ -468,7 +472,7 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
         if hidden_periods
         else "- 별도 숨긴 요청 기간 없음"
     )
-    contribution_status = str(reconciliation.get("reconciliation_status") or "UNAVAILABLE")
+    contribution_status = _reconciliation_status_label(reconciliation.get("reconciliation_status"))
     broker_lines = []
     if broker:
         broker_lines = [
@@ -487,6 +491,8 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
     etf_lines = []
     if etf_comparison:
         etf_status = str(etf_comparison.get("status") or "-")
+        etf_status_label = _etf_status_label(etf_status)
+        etf_actual_source = _actual_source_label(etf_comparison.get("actual_source"))
         etf_cashflows = etf_comparison.get("cashflows") if isinstance(etf_comparison.get("cashflows"), Mapping) else {}
         alternatives = [
             item
@@ -502,8 +508,8 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
             "",
             "### 동일 입금일 ETF 대체 포트폴리오 비교",
             "",
-            f"- 상태: `{etf_status}`",
-            f"- 실제 성과 기준: `{etf_comparison.get('actual_source') or '-'}` "
+            f"- 상태: `{etf_status_label}`",
+            f"- 실제 성과 기준: `{etf_actual_source}` "
             f"({_pct_points((etf_comparison.get('actual') or {}).get('balance_return_pct'))})",
             f"- 날짜별 현금흐름: `{etf_cashflows.get('dated_flow_count') or 0}건` "
             f"(입금 {_krw(etf_cashflows.get('deposit_amount_krw'))}, 출금 {_krw(etf_cashflows.get('withdrawal_amount_krw'))})",
@@ -512,6 +518,15 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
             f"- 혼합 벤치마크: `{_pct_points(blended.get('balance_return_pct'))}` / "
             f"실제 대비 `{_pct_points(blended.get('excess_return_pct'))}`",
         ]
+        if etf_status == "actual_performance_unavailable":
+            etf_lines.extend(
+                [
+                    "- 사유: `실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다.`",
+                    "- 필요한 실제 성과: `브로커 계좌 수익률` 또는 `정합성 OK/WARNING 내부 스냅샷`",
+                    "- 필요한 현금흐름 입력: `config/account_cashflows.csv` 또는 "
+                    "`etf_dca_benchmarks.manual_cashflow_csv_path/manual_cashflow_json_path`",
+                ]
+            )
     hide_snapshot = (
         str(reconciliation.get("reconciliation_status") or "").upper() == "FAILED"
         and not bool(summary.get("show_snapshot_performance_when_unreconciled"))
@@ -1844,6 +1859,61 @@ def _return_method_label(method: Any, warning: Any = None) -> str:
     if method_text == "insufficient_history":
         return "기간 데이터 부족"
     return "단순 NAV 기준"
+
+
+def _reconciliation_status_label(value: Any) -> str:
+    status = str(value or "UNAVAILABLE").strip().upper()
+    return {
+        "OK": "정합성 확인",
+        "WARNING": "정합성 경고",
+        "FAILED": "정합성 실패",
+        "UNAVAILABLE": "정합성 미확인",
+    }.get(status, "정합성 미확인")
+
+
+def _etf_status_label(value: Any) -> str:
+    status = str(value or "").strip().lower()
+    if status == "ok":
+        return "계산 완료"
+    if status == "actual_performance_unavailable":
+        return "실제 성과 검증 전"
+    if status == "cashflow_dates_required":
+        return "입금일 원장 필요"
+    if status == "no_alternatives":
+        return "대체 포트폴리오 없음"
+    return str(value or "-")
+
+
+def _actual_source_label(value: Any) -> str:
+    source = str(value or "").strip()
+    if source == "broker_reported":
+        return "한국투자증권 앱 기준"
+    if source == "internal_reconciled_snapshot":
+        return "내부 스냅샷 정합 기준"
+    if source == "unavailable":
+        return "검증 전 참고 불가"
+    return source or "-"
+
+
+def _friendly_data_quality_warning(value: Any) -> str:
+    text = str(value or "")
+    if "etf_alternative_actual_performance_unavailable" in text:
+        return "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다."
+    if "account_performance_snapshot_history_insufficient" in text:
+        return "계좌 스냅샷 이력이 부족해 기간별 성과를 계산하지 못했습니다."
+    if "broker_performance_missing_balance_return" in text:
+        return "브로커 계좌 전체 수익률 데이터가 없어 앱 기준 NAV 성과는 표시하지 않았습니다."
+    if "broker_performance_missing_end_asset" in text:
+        return "브로커 기말자산 데이터가 없어 내부 계좌 평가액과 직접 비교하지 못했습니다."
+    if "broker_performance_missing_investment_pnl" in text:
+        return "브로커 투자손익 데이터가 없어 계좌 전체 손익으로 표시하지 않았습니다."
+    if "broker_performance_comparison:broker_period_mismatch" in text:
+        return "브로커 성과 기간과 내부 계좌 스냅샷 기간이 달라 비교 해석에 주의가 필요합니다."
+    if "account_performance_unreconciled_pnl" in text:
+        return "NAV 변화와 보유/실현 손익 기여도 합계가 맞지 않아 수동 정합성 확인이 필요합니다."
+    if "account_performance_cashflow" in text:
+        return "입출금 원장이 부족해 현금흐름 보정 성과가 제한됩니다."
+    return text
 
 
 def _contribution_by_ticker(

@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 from tradingagents.portfolio.account_models import AccountConstraints, AccountSnapshot, PortfolioProfile, Position
 from tradingagents.portfolio.performance import build_account_performance_outputs
 from tradingagents.portfolio.performance.broker_kis import normalize_kis_broker_summary
+from tradingagents.portfolio.performance.engine import render_account_performance_markdown
 from tradingagents.portfolio.performance.etf_alternatives import load_external_capital_flows
 
 
@@ -32,6 +33,36 @@ def test_kis_trade_profit_summary_is_normalized_separately_from_account_return()
     assert payload["trade_fees_krw"] == 880
     assert payload["trade_taxes_krw"] == 32_216
     assert "broker_performance_missing_balance_return" in payload["warnings"]
+
+
+def test_account_performance_markdown_uses_friendly_etf_unavailable_copy():
+    markdown = render_account_performance_markdown(
+        {
+            "summary": {},
+            "periods": [],
+            "costs": {},
+            "contribution_by_ticker": [
+                {"ticker": "005930.KS", "display_name": "삼성전자", "total_contribution_krw": 0}
+            ],
+            "reconciliation": {"reconciliation_status": "UNAVAILABLE"},
+            "data_quality": {"warnings": ["etf_alternative_actual_performance_unavailable"]},
+            "etf_alternative_comparison": {
+                "status": "actual_performance_unavailable",
+                "actual_source": "unavailable",
+                "actual": {},
+                "cashflows": {"dated_flow_count": 0, "deposit_amount_krw": 0, "withdrawal_amount_krw": 0},
+                "alternatives": [],
+            },
+        }
+    )
+
+    assert "상태: `실제 성과 검증 전`" in markdown
+    assert "실제 성과 기준: `검증 전 참고 불가`" in markdown
+    assert "필요한 현금흐름 입력: `config/account_cashflows.csv`" in markdown
+    assert "삼성전자 (005930.KS)" in markdown
+    assert "정합성 상태: `정합성 미확인`" in markdown
+    assert "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다." in markdown
+    assert "actual_performance_unavailable" not in markdown
 
 
 def test_account_performance_reports_kospi_and_kosdaq(tmp_path: Path):

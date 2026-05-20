@@ -659,7 +659,10 @@ def _render_run_page(
         if not artifact_path:
             continue
         artifact_name = Path(str(artifact_path)).name
-        if _is_summary_image_artifact(Path(artifact_name)) and not _summary_image_publish_enabled(manifest):
+        artifact = Path(artifact_name)
+        if _is_summary_image_artifact(artifact) and not _summary_image_publish_enabled(manifest):
+            continue
+        if not _should_publish_portfolio_artifact(artifact):
             continue
         portfolio_links.append(
             f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(artifact_name)}'>{_escape(artifact_name)}</a>"
@@ -669,6 +672,8 @@ def _render_run_page(
             if not isinstance(source, Path):
                 continue
             if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
+                continue
+            if not _should_publish_portfolio_artifact(source):
                 continue
             portfolio_links.append(
                 f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
@@ -1097,6 +1102,7 @@ def _render_etf_benchmark_page(
     payload = portfolio_summary.get("account_performance") if isinstance(portfolio_summary, dict) else {}
     comparison = payload.get("etf_alternative_comparison") if isinstance(payload, dict) else {}
     etf_html = _render_etf_alternative_comparison(comparison)
+    etf_status = _etf_status_label((comparison or {}).get("status"))
     downloads = []
     for source in (
         portfolio_summary.get("etf_dca_comparison_json"),
@@ -1120,9 +1126,9 @@ def _render_etf_benchmark_page(
         <p class="subtitle">{_escape(str((comparison or {}).get('period_start') or '-'))} ~ {_escape(str((comparison or {}).get('period_end') or '-'))}</p>
       </div>
       <div class="hero-card">
-        <div class="status {portfolio_summary.get('status_class', 'pending')}">{_escape(str((comparison or {}).get('status') or 'unknown'))}</div>
-        <p><strong>Actual source</strong><span>{_escape(str((comparison or {}).get('actual_source') or '-'))}</span></p>
-        <p><strong>Purpose</strong><span>same cashflow ETF alternative</span></p>
+        <div class="status {portfolio_summary.get('status_class', 'pending')}">{_escape(etf_status)}</div>
+        <p><strong>실제 성과 출처</strong><span>{_escape(_actual_source_label((comparison or {}).get('actual_source')))}</span></p>
+        <p><strong>목적</strong><span>동일 현금흐름 ETF 대체 비교</span></p>
       </div>
     </section>
     <section class="section">
@@ -1441,6 +1447,7 @@ def _render_etf_alternative_comparison(value: Any) -> str:
       </div>
         """
     if status == "actual_performance_unavailable":
+        reason_text = _friendly_etf_warning(str(value.get("reason") or status))
         return f"""
       <div class="account-etf-alternatives">
         <h3>동일 입금일 ETF 대체 포트폴리오 비교</h3>
@@ -1451,7 +1458,7 @@ def _render_etf_alternative_comparison(value: Any) -> str:
         <div class="run-grid account-kpi-grid">
           <article class="run-card">
             <h3>실제 계좌 성과</h3>
-            <p><strong>검증 전 참고 불가</strong><span>{_escape(str(value.get('reason') or status))}</span></p>
+            <p><strong>검증 전 참고 불가</strong><span>{_escape(reason_text)}</span></p>
           </article>
           <article class="run-card">
             <h3>날짜별 현금흐름</h3>
@@ -1668,6 +1675,8 @@ def _actual_source_label(value: Any) -> str:
         return "한국투자증권 앱 기준"
     if source == "internal_reconciled_snapshot":
         return "내부 스냅샷 정합 기준"
+    if source == "unavailable":
+        return "검증 전 참고 불가"
     return source or "-"
 
 
@@ -1690,6 +1699,20 @@ def _friendly_etf_warning(value: str) -> str:
     if "period_start_mismatch" in text or "period_end_mismatch" in text:
         return "실제 계좌 성과 기간과 ETF 대체 비교 기간이 달라 직접 비교할 수 없습니다."
     return text
+
+
+def _etf_status_label(value: Any) -> str:
+    status = str(value or "").strip()
+    normalized = status.lower()
+    if normalized == "ok":
+        return "계산 완료"
+    if normalized == "actual_performance_unavailable":
+        return "실제 성과 검증 전"
+    if normalized == "cashflow_dates_required":
+        return "입금일 원장 필요"
+    if normalized == "no_alternatives":
+        return "대체 포트폴리오 없음"
+    return _friendly_etf_warning(status) if status else "-"
 
 
 def _account_reconciliation_detail_html(
@@ -1947,6 +1970,12 @@ def _account_confidence_label(summary: dict[str, Any]) -> str:
 def _account_reconciliation_label(reconciliation: dict[str, Any]) -> str:
     status = str(reconciliation.get("reconciliation_status") or "UNAVAILABLE").strip().upper()
     severity = str(reconciliation.get("reconciliation_severity") or "").strip().lower()
+    labels = {
+        "OK": "정합성 확인",
+        "WARNING": "정합성 경고",
+        "FAILED": "정합성 실패",
+        "UNAVAILABLE": "정합성 미확인",
+    }
     if status == "FAILED":
         return "검증 필요 / 정합성 실패"
     suffix = {
@@ -1955,7 +1984,7 @@ def _account_reconciliation_label(reconciliation: dict[str, Any]) -> str:
         "warning": " / 경고",
         "unavailable": " / 불완전",
     }.get(severity, "")
-    return f"정합성 {status}{suffix}"
+    return f"{labels.get(status, '정합성 미확인')}{suffix}"
 
 
 def _account_performance_status_badges(portfolio_summary: dict[str, Any]) -> str:
@@ -2097,10 +2126,15 @@ def _account_contribution_rows(contribution: list[Any], *, reconciliation: dict[
     for item in contribution[:8]:
         if not isinstance(item, dict):
             continue
+        ticker = str(item.get("ticker") or "-")
+        display_name = str(item.get("display_name") or "").strip()
+        label = display_name if display_name and display_name != ticker else ticker
+        value = _format_signed_krw_value(item.get("total_contribution_krw"))
+        detail = f"{value} · {ticker}" if label != ticker else value
         rows.append(
             "<p>"
-            f"<strong>{_escape(str(item.get('ticker') or '-'))}</strong>"
-            f"<span>{_escape(_format_signed_krw_value(item.get('total_contribution_krw')))}</span>"
+            f"<strong>{_escape(label)}</strong>"
+            f"<span>{_escape(detail)}</span>"
             "</p>"
         )
     return status_html + ("".join(rows) or "<p class='empty'>산출 가능한 기여도 데이터가 없습니다.</p>")
@@ -2338,6 +2372,8 @@ def _is_public_portfolio_download(source: Path) -> bool:
         "etf_dca_equity_curves.json",
         "summary_image_spec.json",
         "summary_image_metadata.json",
+        "broker_performance_raw.json",
+        "broker_performance_normalized.json",
     }
     return source.name not in private_names
 
@@ -2408,7 +2444,7 @@ def _summary_image_publish_enabled(manifest: dict[str, Any]) -> bool:
 
 def _is_summary_image_artifact(path: Path) -> bool:
     name = path.name.lower()
-    return name.startswith("summary_image_") or name.startswith("summary_card")
+    return name.startswith("summary_card") and path.suffix.lower() in {".svg", ".png", ".jpg", ".jpeg", ".webp"}
 
 
 def _render_ticker_page(
