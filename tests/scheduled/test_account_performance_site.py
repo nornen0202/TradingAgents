@@ -263,8 +263,20 @@ def test_portfolio_page_prioritizes_broker_performance_and_hides_failed_snapshot
             "simple_nav_pnl_krw": 9_761_292,
             "sum_position_contribution_krw": 2_578_672,
             "external_cashflow_net_krw": 0,
+            "explained_change_krw": 2_578_672,
+            "cash_delta_krw": 7_000_000,
+            "position_market_value_delta_krw": 2_761_292,
             "fees_taxes_krw": 14_743,
             "unexplained_difference_krw": 7_182_620,
+            "resolution_actions": [
+                {
+                    "code": "kis_cashflow_api_gap",
+                    "title": "날짜별 입출금 원장 자동화 상태",
+                    "evidence": "KIS 공식 국내주식 주문/계좌 샘플에는 외부 입금/출금 원장 조회가 없습니다.",
+                    "required_input": "브로커가 제공하는 날짜별 외부 입출금 API",
+                    "suggested_file": "KIS API 원천 미제공: CSV/JSON은 선택적 fallback",
+                }
+            ],
         },
         "data_quality": {
             "snapshot_count": 2,
@@ -289,6 +301,9 @@ def test_portfolio_page_prioritizes_broker_performance_and_hides_failed_snapshot
     assert "검증 전 참고 불가" in html
     assert "브로커 앱 기말자산과 TradingAgents 내부 계좌 평가액이 크게 다릅니다." in html
     assert "정합성 상세" in html
+    assert "정합성 해결/자동화 상태" in html
+    assert "날짜별 입출금 원장 자동화 상태" in html
+    assert "KIS API 원천 미제공" in html
     assert "<strong>삼성전자</strong>" in html
     assert "<strong>005930.KS</strong>" not in html
     assert html.index("broker_performance_comparison:broker_end_asset") < html.index(
@@ -420,7 +435,8 @@ def test_portfolio_page_renders_etf_dca_unavailable_without_dated_cashflows():
         {"account_performance": payload},
     )
 
-    assert "입금일 원장 필요" in html
+    assert "KIS 일자 원장 미확인" in html
+    assert "외부 입출금 일자는 API 미제공" in html
     assert "정확한 적립식 ETF 비교를 제공하지 않습니다" in html
     assert "37,665,615 KRW" in html
     assert "ETF 대체 최고 수익률" not in html

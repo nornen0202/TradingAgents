@@ -96,3 +96,24 @@ def test_etf_dca_benchmark_settings_are_loaded(tmp_path: Path):
     assert settings.etf_dca_withdrawal_policy == "pro_rata_current_weights"
     assert settings.etf_dca_min_initial_seed_krw == 10_000
     assert settings.etf_dca_core_satellite_policy_enabled is True
+
+
+def test_default_account_cashflows_path_is_discovered(tmp_path: Path):
+    default_path = tmp_path / "account_cashflows.csv"
+    default_path.write_text("date,type,amount_krw\n2026-05-01,DEPOSIT,10000\n", encoding="utf-8")
+
+    settings = _load_portfolio_performance_settings({}, base_dir=tmp_path)
+
+    assert settings.cashflow_baseline_path == default_path
+
+
+def test_manual_cashflow_path_overrides_default_discovery(tmp_path: Path):
+    (tmp_path / "account_cashflows.csv").write_text("date,type,amount_krw\n2026-05-01,DEPOSIT,10000\n", encoding="utf-8")
+
+    settings = _load_portfolio_performance_settings(
+        {},
+        etf_dca_raw={"manual_cashflow_csv_path": "manual.csv"},
+        base_dir=tmp_path,
+    )
+
+    assert settings.cashflow_baseline_path == tmp_path / "manual.csv"

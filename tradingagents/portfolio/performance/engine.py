@@ -9,6 +9,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Mapping
 
+from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from tradingagents.portfolio.account_models import AccountSnapshot, PortfolioProfile
 from tradingagents.portfolio.benchmarks.dca_engine import build_etf_dca_comparison
 from tradingagents.portfolio.performance.broker_kis import (
@@ -210,6 +211,13 @@ def build_account_performance_outputs(
         snapshot_rows=snapshot_rows,
         ledger_events=ledger_events,
         contribution_rows=contribution,
+        warnings=warnings,
+    )
+    reconciliation = _reconciliation_with_guidance(
+        reconciliation,
+        profile=profile,
+        broker_performance=broker_performance,
+        settings=settings,
         warnings=warnings,
     )
     costs = _cost_summary(ledger_events)
@@ -457,6 +465,7 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
 
     warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
     warning_lines = [f"- {_friendly_data_quality_warning(item)}" for item in warnings[:8]] or ["- 특이사항 없음"]
+    action_lines = _resolution_action_lines(reconciliation.get("resolution_actions"))
     hidden_periods = [
         str(period.get("period") or "-")
         for period in periods
@@ -523,7 +532,8 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
                 [
                     "- 사유: `실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다.`",
                     "- 필요한 실제 성과: `브로커 계좌 수익률` 또는 `정합성 OK/WARNING 내부 스냅샷`",
-                    "- 필요한 현금흐름 입력: `config/account_cashflows.csv` 또는 "
+                    "- KIS 자동화 상태: `체결/손익/권리 이벤트는 자동 조회, 일반 계좌 외부 입출금 일자 원장은 API 미확인`",
+                    "- 선택적 fallback: `config/account_cashflows.csv` 또는 "
                     "`etf_dca_benchmarks.manual_cashflow_csv_path/manual_cashflow_json_path`",
                 ]
             )
@@ -564,6 +574,10 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
             f"- 정합성 상태: `{contribution_status}`",
             "",
             *(contribution_rows or ["- 산출 가능한 기여도 데이터가 없습니다."]),
+            "",
+            "### 정합성 해결 입력",
+            "",
+            *action_lines,
             "",
             "### 데이터 품질",
             "",
@@ -606,6 +620,12 @@ def _snapshot_row(snapshot: AccountSnapshot, *, profile_name: str) -> dict[str, 
         "date": str(snapshot.as_of)[:10],
         "as_of": snapshot.as_of,
         "account_value_krw": float(snapshot.account_value_krw),
+        "settled_cash_krw": _float_or_none(getattr(snapshot, "settled_cash_krw", None)),
+        "available_cash_krw": _float_or_none(getattr(snapshot, "available_cash_krw", None)),
+        "buying_power_krw": _float_or_none(getattr(snapshot, "buying_power_krw", None)),
+        "position_market_value_krw": float(
+            sum(_float_or_none(getattr(position, "market_value_krw", None)) or 0.0 for position in snapshot.positions)
+        ),
         "snapshot_health": str(getattr(snapshot, "snapshot_health", "") or ""),
         "positions_count": len(getattr(snapshot, "positions", ()) or ()),
         "positions": _snapshot_position_rows(getattr(snapshot, "positions", ()) or ()),
@@ -619,6 +639,10 @@ def _snapshot_payload_row(payload: Mapping[str, Any], *, profile_name: str) -> d
         value = _float_or_none(payload.get("total_equity_krw")) or 0.0
     positions = payload.get("positions")
     positions_count = len(positions) if isinstance(positions, list) else _int_or_none(payload.get("positions_count"))
+    position_rows = _payload_position_rows(positions if isinstance(positions, list) else [])
+    position_market_value = _float_or_none(payload.get("position_market_value_krw"))
+    if position_market_value is None:
+        position_market_value = sum(_float_or_none(item.get("market_value_krw")) or 0.0 for item in position_rows)
     as_of = str(payload.get("as_of") or payload.get("generated_at") or payload.get("date") or "")
     return {
         "snapshot_id": str(payload.get("snapshot_id") or ""),
@@ -626,9 +650,13 @@ def _snapshot_payload_row(payload: Mapping[str, Any], *, profile_name: str) -> d
         "date": as_of[:10],
         "as_of": as_of,
         "account_value_krw": float(value),
+        "settled_cash_krw": _float_or_none(payload.get("settled_cash_krw")),
+        "available_cash_krw": _float_or_none(payload.get("available_cash_krw")),
+        "buying_power_krw": _float_or_none(payload.get("buying_power_krw")),
+        "position_market_value_krw": float(position_market_value or 0.0),
         "snapshot_health": str(payload.get("snapshot_health") or ""),
         "positions_count": positions_count,
-        "positions": _payload_position_rows(positions if isinstance(positions, list) else []),
+        "positions": position_rows,
         "broker": str(payload.get("broker") or ""),
     }
 
@@ -644,6 +672,7 @@ def _snapshot_position_rows(positions: Any) -> list[dict[str, Any]]:
                 "broker_symbol": str(getattr(position, "broker_symbol", "") or "").strip().upper(),
                 "canonical_ticker": canonical,
                 "display_name": str(getattr(position, "display_name", "") or canonical),
+                "market_value_krw": _float_or_none(getattr(position, "market_value_krw", None)) or 0.0,
                 "unrealized_pnl_krw": _float_or_none(getattr(position, "unrealized_pnl_krw", None)) or 0.0,
             }
         )
@@ -664,6 +693,7 @@ def _payload_position_rows(positions: list[Any]) -> list[dict[str, Any]]:
                 "broker_symbol": broker_symbol,
                 "canonical_ticker": canonical,
                 "display_name": str(position.get("display_name") or position.get("name") or canonical),
+                "market_value_krw": _float_or_none(position.get("market_value_krw")) or 0.0,
                 "unrealized_pnl_krw": _float_or_none(position.get("unrealized_pnl_krw")) or 0.0,
             }
         )
@@ -846,6 +876,28 @@ def _load_ledger_events(
                     end_date=query_end,
                 ),
             )
+            _extend_kis_ledger_rows(
+                raw_rows,
+                warnings=warnings,
+                endpoint="domestic_period_rights",
+                fetch=lambda query_start=query_start, query_end=query_end: client.fetch_domestic_period_rights(
+                    account_no=profile.account_no,
+                    product_code=profile.product_code,
+                    start_date=query_start,
+                    end_date=query_end,
+                ),
+            )
+            _extend_kis_ledger_rows(
+                raw_rows,
+                warnings=warnings,
+                endpoint="domestic_cashflow_ledger",
+                fetch=lambda query_start=query_start, query_end=query_end: client.fetch_domestic_cashflow_ledger(
+                    account_no=profile.account_no,
+                    product_code=profile.product_code,
+                    start_date=query_start,
+                    end_date=query_end,
+                ),
+            )
         return [_normalize_ledger_event(row, market="KR", source="kis_domestic") for row in raw_rows]
     except Exception as exc:
         warnings.append(f"account_performance_kis_ledger_failed:{_short_error(exc)}")
@@ -889,6 +941,9 @@ def _normalize_ledger_event(row: Mapping[str, Any], *, market: str, source: str)
         (
             "ord_dt",
             "trad_dt",
+            "cash_dfrm_dt",
+            "rfnd_dt",
+            "rqst_dt",
             "bass_dt",
             "sttl_dt",
             "erlm_dt",
@@ -899,7 +954,7 @@ def _normalize_ledger_event(row: Mapping[str, Any], *, market: str, source: str)
     )[:10]
     if len(date_text) == 8 and date_text.isdigit():
         date_text = f"{date_text[:4]}-{date_text[4:6]}-{date_text[6:8]}"
-    ticker = _first_text(row, ("pdno", "ovrs_pdno", "std_pdno", "prdt_code", "symbol", "ticker"))
+    ticker = _first_text(row, ("pdno", "shtn_pdno", "rptt_pdno", "ovrs_pdno", "std_pdno", "prdt_code", "symbol", "ticker"))
     side = _side_from_row(row)
     qty = _first_float(row, ("tot_ccld_qty", "ccld_qty", "ord_qty", "sll_qty", "buy_qty", "qty")) or 0.0
     price = _first_float(row, ("avg_prvs", "avg_unpr", "ccld_unpr", "ord_unpr", "tr_pric", "price"))
@@ -917,6 +972,11 @@ def _normalize_ledger_event(row: Mapping[str, Any], *, market: str, source: str)
             "ovrs_stck_buy_amt",
             "dpst_amt",
             "wthdr_amt",
+            "last_alct_amt",
+            "last_ftsk_chgs",
+            "rdpt_prca",
+            "dlay_int_amt",
+            "rfnd_amt",
             "tr_amt",
             "trns_amt",
             "cashflow_amount",
@@ -1899,8 +1959,17 @@ def _friendly_data_quality_warning(value: Any) -> str:
     text = str(value or "")
     if "etf_alternative_actual_performance_unavailable" in text:
         return "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다."
+    if "etf_alternative_yfinance_empty" in text or "etf_alternative_price_missing" in text:
+        code = text.rsplit(":", 1)[-1] if ":" in text else "ETF"
+        return f"{code} 가격 데이터가 비어 해당 ETF 대체 포트폴리오를 계산하지 않았습니다."
     if "account_performance_snapshot_history_insufficient" in text:
         return "계좌 스냅샷 이력이 부족해 기간별 성과를 계산하지 못했습니다."
+    if "account_performance_snapshot_excluded:under_min_trade_no_positions" in text:
+        return "최소 거래금액 미만이거나 보유가 없는 초기 스냅샷은 성과 기준에서 제외했습니다."
+    if "account_performance_snapshot_excluded:watchlist_only" in text:
+        return "워치리스트 전용 스냅샷은 계좌 성과 기준에서 제외했습니다."
+    if "account_performance_resolution_actions_required" in text:
+        return "성과 정합성을 풀기 위한 추가 입력이 필요합니다."
     if "broker_performance_missing_balance_return" in text:
         return "브로커 계좌 전체 수익률 데이터가 없어 앱 기준 NAV 성과는 표시하지 않았습니다."
     if "broker_performance_missing_end_asset" in text:
@@ -1911,6 +1980,17 @@ def _friendly_data_quality_warning(value: Any) -> str:
         return "브로커 성과 기간과 내부 계좌 스냅샷 기간이 달라 비교 해석에 주의가 필요합니다."
     if "account_performance_unreconciled_pnl" in text:
         return "NAV 변화와 보유/실현 손익 기여도 합계가 맞지 않아 수동 정합성 확인이 필요합니다."
+    if "account_performance_contribution_not_total_return" in text:
+        return "보유/실현 손익 기여도는 총 NAV 수익률 전체를 대체하지 않습니다."
+    if "account_performance_contribution_unresolved_ticker" in text:
+        code = text.rsplit(":", 1)[-1]
+        return f"{code} 종목명을 해석하지 못해 코드로 표시했습니다."
+    if "account_performance_duplicate_actual_windows" in text:
+        return "일부 요청 기간은 실제 사용 가능 기간이 같아 중복 기간으로 묶었습니다."
+    if "account_performance_period_insufficient_history" in text:
+        return "요청 기간 시작일의 계좌 스냅샷이 부족해 해당 기간 성과를 별도로 표시하지 않았습니다."
+    if "account_performance_period_partial" in text:
+        return "요청 기간 전체를 덮지 못하는 부분 기간 산출이 감지됐습니다."
     if "account_performance_cashflow" in text:
         return "입출금 원장이 부족해 현금흐름 보정 성과가 제한됩니다."
     return text
@@ -1966,7 +2046,7 @@ def _contribution_by_ticker(
         display_name = (
             str(getattr(position, "display_name", "") or "").strip()
             or str((start_position or {}).get("display_name") or "").strip()
-            or ticker
+            or _resolved_display_name(ticker)
         )
         rows.append(
             {
@@ -1982,6 +2062,16 @@ def _contribution_by_ticker(
         )
     rows.sort(key=lambda item: abs(int(item["total_contribution_krw"])), reverse=True)
     return rows
+
+
+def _resolved_display_name(ticker: Any) -> str:
+    normalized = str(ticker or "").strip()
+    if not normalized:
+        return "-"
+    try:
+        return resolve_instrument(normalized).display_name or normalized
+    except Exception:
+        return normalized
 
 
 def _positions_by_canonical_from_snapshot_row(row: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
@@ -2023,6 +2113,12 @@ def _canonical_contribution_ticker(
     if base_code and base_code in positions_by_base_code:
         return positions_by_base_code[base_code]
     if base_code and normalized == base_code and warnings is not None:
+        try:
+            resolved = resolve_instrument(normalized)
+            if resolved.display_name and resolved.display_name != normalized:
+                return str(resolved.symbol or normalized).strip().upper()
+        except Exception:
+            pass
         warnings.append(f"account_performance_contribution_unresolved_ticker:{normalized}")
     return normalized
 
@@ -2268,9 +2364,12 @@ def reconcile_account_performance(
             "start_nav_krw": None,
             "end_nav_krw": None,
             "simple_nav_pnl_krw": None,
+            "cash_delta_krw": None,
+            "position_market_value_delta_krw": None,
             "sum_position_contribution_krw": None,
             "external_cashflow_net_krw": None,
             "fees_taxes_krw": None,
+            "explained_change_krw": None,
             "unexplained_difference_krw": None,
             "unexplained_difference_pct_of_nav": None,
             "reconciliation_status": "UNAVAILABLE",
@@ -2283,9 +2382,12 @@ def reconcile_account_performance(
             "start_nav_krw": None,
             "end_nav_krw": None,
             "simple_nav_pnl_krw": None,
+            "cash_delta_krw": None,
+            "position_market_value_delta_krw": None,
             "sum_position_contribution_krw": None,
             "external_cashflow_net_krw": None,
             "fees_taxes_krw": None,
+            "explained_change_krw": None,
             "unexplained_difference_krw": None,
             "unexplained_difference_pct_of_nav": None,
             "reconciliation_status": "UNAVAILABLE",
@@ -2293,6 +2395,16 @@ def reconcile_account_performance(
         }
 
     cashflow_events = _cashflow_events_from_ledger(ledger_events)
+    start_cash = _cash_value(snapshot_rows[0])
+    end_cash = _cash_value(snapshot_rows[-1])
+    cash_delta = end_cash - start_cash if start_cash is not None and end_cash is not None else None
+    start_position_value = _float_or_none(snapshot_rows[0].get("position_market_value_krw"))
+    end_position_value = _float_or_none(snapshot_rows[-1].get("position_market_value_krw"))
+    position_market_value_delta = (
+        end_position_value - start_position_value
+        if start_position_value is not None and end_position_value is not None
+        else None
+    )
     unknown_material = any(
         str(event.event_type or "").lower() == LedgerEventType.UNKNOWN.value
         and abs(float(event.gross_amount_krw or 0.0)) > 0
@@ -2320,7 +2432,8 @@ def reconcile_account_performance(
         if isinstance(item, Mapping)
     )
     fees_taxes = sum(float(event.fee_krw or 0.0) + float(event.tax_krw or 0.0) for event in ledger_events)
-    unexplained = None if external_cashflow_net is None else simple_nav_pnl - contribution_sum - external_cashflow_net
+    explained_change = None if external_cashflow_net is None else contribution_sum + external_cashflow_net
+    unexplained = None if explained_change is None else simple_nav_pnl - explained_change
     unexplained_pct = unexplained / end_nav if unexplained is not None and end_nav else None
     materiality_pct = abs(unexplained_pct) if unexplained_pct is not None else None
     if unexplained is None:
@@ -2345,14 +2458,131 @@ def reconcile_account_performance(
         "start_nav_krw": int(round(start_nav)),
         "end_nav_krw": int(round(end_nav)),
         "simple_nav_pnl_krw": int(round(simple_nav_pnl)),
+        "cash_delta_krw": int(round(cash_delta)) if cash_delta is not None else None,
+        "position_market_value_delta_krw": (
+            int(round(position_market_value_delta)) if position_market_value_delta is not None else None
+        ),
         "sum_position_contribution_krw": int(round(contribution_sum)),
         "external_cashflow_net_krw": int(round(external_cashflow_net)) if external_cashflow_net is not None else None,
         "fees_taxes_krw": int(round(fees_taxes)),
+        "explained_change_krw": int(round(explained_change)) if explained_change is not None else None,
         "unexplained_difference_krw": int(round(unexplained)) if unexplained is not None else None,
         "unexplained_difference_pct_of_nav": round(unexplained_pct, 6) if unexplained_pct is not None else None,
         "reconciliation_status": status,
         "reconciliation_severity": severity,
     }
+
+
+def _resolution_action_lines(actions: Any) -> list[str]:
+    if not isinstance(actions, list) or not actions:
+        return ["- 추가 입력 요청 없음"]
+    lines: list[str] = []
+    for item in actions[:5]:
+        if not isinstance(item, Mapping):
+            continue
+        title = str(item.get("title") or "정합성 보완").strip()
+        evidence = str(item.get("evidence") or "").strip()
+        required = str(item.get("required_input") or "").strip()
+        suggested = str(item.get("suggested_file") or "").strip()
+        parts = [title]
+        if evidence:
+            parts.append(evidence)
+        if required:
+            parts.append(f"필요 입력: {required}")
+        if suggested:
+            parts.append(f"권장 위치: {suggested}")
+        lines.append("- " + " / ".join(parts))
+    return lines or ["- 추가 입력 요청 없음"]
+
+
+def _cash_value(row: Mapping[str, Any]) -> float | None:
+    for key in ("settled_cash_krw", "available_cash_krw", "cash_krw"):
+        value = _float_or_none(row.get(key))
+        if value is not None:
+            return value
+    return None
+
+
+def _reconciliation_with_guidance(
+    reconciliation: dict[str, Any],
+    *,
+    profile: PortfolioProfile,
+    broker_performance: BrokerPerformanceSummary | None,
+    settings: Any,
+    warnings: list[str],
+) -> dict[str, Any]:
+    result = dict(reconciliation)
+    actions: list[dict[str, Any]] = []
+    status = str(result.get("reconciliation_status") or "").upper()
+    needs_guidance = status in {"FAILED", "WARNING", "UNAVAILABLE"}
+    unexplained = _float_or_none(result.get("unexplained_difference_krw"))
+    if status in {"FAILED", "WARNING"} and unexplained is not None:
+        actions.append(
+            {
+                "code": "explain_nav_residual",
+                "title": "NAV 미해명 차이 분해",
+                "evidence": (
+                    f"NAV 변화 {_krw(result.get('simple_nav_pnl_krw'))} 중 "
+                    f"{_krw(result.get('explained_change_krw'))}만 종목 기여도와 외부 현금흐름으로 설명됩니다. "
+                    f"잔차는 {_krw(result.get('unexplained_difference_krw'))}입니다."
+                ),
+                "required_input": "일자별 계좌 평가액, 현금 잔고, 보유 평가액, 입출금/배당/이자/수수료 원장",
+                "suggested_file": "KIS 자동 수집 원장 및 내부 스냅샷",
+            }
+        )
+        if result.get("cash_delta_krw") is not None or result.get("position_market_value_delta_krw") is not None:
+            actions.append(
+                {
+                    "code": "check_cash_and_position_delta",
+                    "title": "현금/보유 평가액 변화 확인",
+                    "evidence": (
+                        f"현금 변화 {_krw(result.get('cash_delta_krw'))}, "
+                        f"보유 평가액 변화 {_krw(result.get('position_market_value_delta_krw'))}입니다. "
+                        "이 값은 진단용이며 수익률로 바로 승격하지 않습니다."
+                    ),
+                    "required_input": "시작/종료 스냅샷의 현금 잔고와 보유 평가액을 같은 기준으로 보존",
+                    "suggested_file": "portfolio-private/account_snapshot.json",
+                }
+            )
+    if needs_guidance and (broker_performance is None or broker_performance.balance_return_pct is None):
+        actions.append(
+            {
+                "code": "provide_broker_nav_performance",
+                "title": "브로커 NAV 성과 확보",
+                "evidence": "KIS 기간매매손익은 매매손익 진단으로만 사용되며 계좌 전체 NAV 수익률이 아닙니다.",
+                "required_input": "period_start, period_end, start_asset_krw, end_asset_krw, deposit_amount_krw, withdrawal_amount_krw, balance_return_pct",
+                "suggested_file": "broker_return_baseline_path",
+            }
+        )
+    cashflow_path = getattr(settings, "cashflow_baseline_path", None)
+    if needs_guidance and not cashflow_path:
+        evidence = "ETF DCA 비교는 입금일/출금일을 임의 합성하지 않습니다."
+        required = "date,type,amount_krw 형식의 외부 입출금 원장"
+        suggested = "config/account_cashflows.csv"
+        if str(getattr(profile, "broker", "") or "").lower() == "kis":
+            evidence = (
+                "KIS 국내주식 공식 주문/계좌 샘플에서 잔고, 체결, 기간손익, 기간별 계좌권리는 자동 조회할 수 있지만 "
+                "일반 계좌의 날짜별 외부 입금/출금 원장 조회 엔드포인트는 확인되지 않습니다."
+            )
+            required = "브로커가 제공하는 날짜별 외부 입출금 API 또는 내보내기 원장"
+            suggested = "KIS API 원천 미제공: CSV/JSON은 선택적 fallback"
+        actions.append(
+            {
+                "code": (
+                    "kis_cashflow_api_gap"
+                    if str(getattr(profile, "broker", "") or "").lower() == "kis"
+                    else "provide_dated_cashflows"
+                ),
+                "title": "날짜별 입출금 원장 자동화 상태",
+                "evidence": evidence,
+                "required_input": required,
+                "suggested_file": suggested,
+            }
+        )
+    result["resolution_actions"] = actions
+    if actions and "account_performance_resolution_actions_required" not in warnings:
+        warnings.append("account_performance_resolution_actions_required")
+    return result
 
 
 def _summary(periods: list[dict[str, Any]]) -> dict[str, Any]:
@@ -2980,6 +3210,12 @@ def _classify_ledger_event_type(row: Mapping[str, Any], *, side: str) -> LedgerE
     if _first_float(row, ("wthdr_amt", "withdrawal_amount", "cash_withdrawal_krw")) is not None:
         return LedgerEventType.WITHDRAWAL
     if _first_float(row, ("dividend_krw", "dvdn_amt", "dividend_amount")) is not None:
+        return LedgerEventType.DIVIDEND
+    if _first_float(row, ("dlay_int_amt",)) not in (None, 0):
+        return LedgerEventType.INTEREST
+    if _first_float(row, ("last_alct_amt", "last_ftsk_chgs", "rdpt_prca")) not in (None, 0) and _first_text(
+        row, ("cash_dfrm_dt", "rght_type_cd", "rght_cblc_type_cd")
+    ):
         return LedgerEventType.DIVIDEND
     if _first_float(row, ("interest_krw", "int_amt", "interest_amount")) is not None:
         return LedgerEventType.INTEREST

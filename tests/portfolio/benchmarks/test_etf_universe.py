@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-import pytest
+try:
+    import pytest
+except ModuleNotFoundError:  # pragma: no cover - CI unittest import compatibility.
+    from tests.pytest_compat import pytest
 
 from tradingagents.portfolio.benchmarks.etf_universe import (
     default_instrument_models,

@@ -1206,7 +1206,10 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     raw_table_rows = _account_performance_period_rows(periods, diagnostics=True)
     contribution_rows = _account_contribution_rows(contribution, reconciliation=reconciliation)
     warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
-    warning_html = "".join(f"<li>{_escape(str(item))}</li>" for item in _prioritized_account_warnings(warnings)[:8]) or "<li>특이사항 없음</li>"
+    warning_html = "".join(
+        f"<li>{_escape(_friendly_account_warning(item))}</li>"
+        for item in _prioritized_account_warnings(warnings)[:8]
+    ) or "<li>특이사항 없음</li>"
     chart_html = _account_performance_svg(payload.get("chart_data") if isinstance(payload.get("chart_data"), dict) else {})
     if not show_snapshot_headline:
         chart_html = (
@@ -1266,6 +1269,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
       {investor_notes}
       {provider_messages}
       {_account_reconciliation_detail_html(reconciliation, quality, broker_comparison)}
+      {_account_reconciliation_guidance_html(reconciliation)}
       <div class="pill-row account-period-tabs">{period_tabs}</div>
       {hidden_period_note}
       {chart_html}
@@ -1427,20 +1431,20 @@ def _render_etf_alternative_comparison(value: Any) -> str:
         <h3>동일 입금일 ETF 대체 포트폴리오 비교</h3>
         <div class="warning-banner account-performance-note">
           정확한 ETF 대체 비교를 계산하려면 날짜별 입금/출금 내역이 필요합니다.
-          현재는 총입금액만 확인되어 정확한 적립식 ETF 비교를 제공하지 않습니다.
+          현재 KIS 자동 원천에서는 총액 또는 다른 계좌 이벤트만 확인되어 정확한 적립식 ETF 비교를 제공하지 않습니다.
         </div>
         <div class="run-grid account-kpi-grid">
           <article class="run-card">
             <h3>현금흐름 상태</h3>
-            <p><strong>입금일 원장 필요</strong><span>총입금 {_escape(_format_krw_value(cashflows.get('broker_deposit_amount_krw')))}</span></p>
+            <p><strong>KIS 일자 원장 미확인</strong><span>총입금 {_escape(_format_krw_value(cashflows.get('broker_deposit_amount_krw')))}</span></p>
           </article>
           <article class="run-card">
             <h3>실제 계좌 기준</h3>
             <p><strong>{_escape(str(value.get('actual_source') or '-'))}</strong><span>{_escape(_format_pct_points_value(actual.get('balance_return_pct')))}</span></p>
           </article>
           <article class="run-card">
-            <h3>해결 방법</h3>
-            <p><strong>cashflow CSV/JSON</strong><span>date, type, amount_krw</span></p>
+            <h3>자동화 상태</h3>
+            <p><strong>체결/손익/권리 자동</strong><span>외부 입출금 일자는 API 미제공</span></p>
           </article>
         </div>
         {warning_html}
@@ -1462,14 +1466,14 @@ def _render_etf_alternative_comparison(value: Any) -> str:
           </article>
           <article class="run-card">
             <h3>날짜별 현금흐름</h3>
-            <p><strong>{int(cashflows.get('dated_flow_count') or 0)}건</strong><span>입금일/출금일 원장 필요</span></p>
+            <p><strong>{int(cashflows.get('dated_flow_count') or 0)}건</strong><span>KIS 일반계좌 입출금 일자 원천 미확인</span></p>
           </article>
           <article class="run-card">
-            <h3>필요 입력</h3>
-            <p><strong>config/account_cashflows.csv</strong><span>date, type, amount_krw</span></p>
+            <h3>자동화 한계</h3>
+            <p><strong>체결/손익/권리 자동</strong><span>외부 입출금 원장은 API 미제공</span></p>
           </article>
         </div>
-        <p class="empty">또는 etf_dca_benchmarks.manual_cashflow_csv_path / manual_cashflow_json_path 설정에 날짜별 입출금 원장을 연결합니다.</p>
+        <p class="empty">CSV/JSON 연결은 KIS가 해당 원장을 제공하지 않을 때 쓰는 선택적 fallback입니다. 임의 날짜 합성은 하지 않습니다.</p>
         {warning_html}
       </div>
         """
@@ -1686,6 +1690,9 @@ def _friendly_etf_warning(value: str) -> str:
         return "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다."
     if "cashflow_dates_required" in text:
         return "날짜별 입금/출금 원장이 필요합니다."
+    if "yfinance_empty" in text or "price_missing" in text:
+        code = text.rsplit(":", 1)[-1] if ":" in text else "ETF"
+        return f"{code} 가격 데이터가 비어 해당 ETF 대체 포트폴리오를 계산하지 않았습니다."
     if "price_missing" in text:
         return "ETF 가격 데이터가 없어 해당 벤치마크를 계산하지 않았습니다."
     if "fx_missing" in text:
@@ -1730,12 +1737,72 @@ def _account_reconciliation_detail_html(
         NAV 변화 {_escape(_format_signed_krw_value(reconciliation.get('simple_nav_pnl_krw')))} /
         기여도 합계 {_escape(_format_signed_krw_value(reconciliation.get('sum_position_contribution_krw')))} /
         외부 현금흐름 {_escape(_format_signed_krw_value(reconciliation.get('external_cashflow_net_krw')))} /
+        설명 가능 변화 {_escape(_format_signed_krw_value(reconciliation.get('explained_change_krw')))} /
+        현금 변화 {_escape(_format_signed_krw_value(reconciliation.get('cash_delta_krw')))} /
+        보유 평가액 변화 {_escape(_format_signed_krw_value(reconciliation.get('position_market_value_delta_krw')))} /
         비용 {_escape(_format_krw_value(reconciliation.get('fees_taxes_krw')))} /
         미해명 차이 {_escape(_format_signed_krw_value(reconciliation.get('unexplained_difference_krw')))} /
         외부자금흐름 감지 {int(quality.get('external_capital_flow_count') or 0)}건 /
         브로커-내부 기말자산 차이 {_escape(_format_signed_krw_value(comparison.get('end_asset_delta_krw')))}
       </div>
     """
+
+
+def _account_reconciliation_guidance_html(reconciliation: dict[str, Any]) -> str:
+    actions = reconciliation.get("resolution_actions") if isinstance(reconciliation, dict) else None
+    if not isinstance(actions, list) or not actions:
+        return ""
+    cards = []
+    for item in actions[:5]:
+        if not isinstance(item, dict):
+            continue
+        title = str(item.get("title") or "정합성 보완").strip()
+        evidence = str(item.get("evidence") or "").strip()
+        required = str(item.get("required_input") or "").strip()
+        suggested = str(item.get("suggested_file") or "").strip()
+        cards.append(
+            "<article class='run-card'>"
+            f"<h3>{_escape(title)}</h3>"
+            f"<p><strong>{_escape(evidence or '-')}</strong><span>{_escape(required or '-')}</span></p>"
+            f"<p><strong>연결 상태</strong><span>{_escape(suggested or '-')}</span></p>"
+            "</article>"
+        )
+    if not cards:
+        return ""
+    return (
+        "<div class='account-reconciliation-guidance'>"
+        "<h3>정합성 해결/자동화 상태</h3>"
+        "<div class='run-grid account-kpi-grid'>"
+        + "".join(cards)
+        + "</div></div>"
+    )
+
+
+def _friendly_account_warning(value: Any) -> str:
+    text = str(value or "")
+    if "etf_alternative_actual_performance_unavailable" in text:
+        return "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다."
+    if "etf_alternative_cashflow_dates_required" in text:
+        return "날짜별 입금/출금 원장이 없어 동일 현금흐름 ETF 비교를 계산하지 않았습니다."
+    if "account_performance_resolution_actions_required" in text:
+        return "성과 정합성을 풀기 위한 자동화 상태와 남은 입력을 표시했습니다."
+    if "account_performance_unreconciled_pnl" in text:
+        return "NAV 변화와 보유/실현 손익 기여도 합계가 맞지 않아 수익률을 기본 해석에서 제외했습니다."
+    if "account_performance_contribution_not_total_return" in text:
+        return "보유/실현 손익 기여도는 총 NAV 수익률 전체를 대체하지 않습니다."
+    if "account_performance_broker_external_flows_not_in_snapshot_ledger" in text:
+        return "브로커 집계 입출금은 있지만 내부 원장에는 날짜별 외부자금흐름이 없습니다."
+    if "broker_performance_missing_balance_return" in text:
+        return "브로커 계좌 전체 수익률 데이터가 없어 KIS 매매손익과 NAV 성과를 분리했습니다."
+    if "broker_performance_missing_end_asset" in text:
+        return "브로커 기말자산 데이터가 없어 내부 계좌 평가액과 직접 대조하지 못했습니다."
+    if "account_performance_kis_ledger_endpoint_failed:domestic_period_rights" in text:
+        return "KIS 기간별 계좌권리 자동 조회가 실패해 배당/권리 현금 이벤트 보강이 제한됐습니다."
+    if "account_performance_kis_ledger_endpoint_failed" in text:
+        return "일부 KIS 원장 API 조회가 실패했지만 가능한 원장만 사용했습니다."
+    if "account_performance_cashflow" in text:
+        return "입출금 원장이 부족해 현금흐름 보정 성과가 제한됩니다."
+    return _friendly_etf_warning(text)
 
 
 def _prioritized_account_warnings(warnings: Any) -> list[str]:
@@ -1745,7 +1812,10 @@ def _prioritized_account_warnings(warnings: Any) -> list[str]:
         "broker_performance_comparison",
         "account_performance_broker_external_flows",
         "account_performance_unreconciled_pnl",
+        "account_performance_resolution_actions_required",
         "account_performance_cashflow",
+        "etf_alternative_actual_performance_unavailable",
+        "etf_alternative_cashflow_dates_required",
     )
     values = [str(item) for item in warnings]
     return sorted(

@@ -175,6 +175,44 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(second["params"]["CTX_AREA_NK100"], "NK")
         self.assertEqual(second["tr_cont"], "N")
 
+    def test_fetch_domestic_period_rights_uses_account_rights_endpoint(self):
+        client = KisClient(
+            app_key="app-key",
+            app_secret="app-secret",
+            session=Mock(),
+            token_file_cache_enabled=False,
+        )
+        client.request_json = Mock(
+            side_effect=[
+                (
+                    {"output": [{"pdno": "005930"}], "ctx_area_fk100": "FK", "ctx_area_nk100": "NK"},
+                    {"tr_cont": "M"},
+                ),
+                (
+                    {"output": [{"pdno": "000660"}]},
+                    {"tr_cont": ""},
+                ),
+            ]
+        )
+
+        rows = client.fetch_domestic_period_rights(
+            account_no="12345678",
+            product_code="01",
+            start_date=date(2026, 5, 1),
+            end_date=date(2026, 5, 5),
+        )
+
+        self.assertEqual([row["pdno"] for row in rows], ["005930", "000660"])
+        first = client.request_json.call_args_list[0].kwargs
+        second = client.request_json.call_args_list[1].kwargs
+        self.assertEqual(first["path"], "/uapi/domestic-stock/v1/trading/period-rights")
+        self.assertEqual(first["tr_id"], "CTRGA011R")
+        self.assertEqual(first["params"]["INQR_DVSN"], "03")
+        self.assertEqual(first["params"]["INQR_STRT_DT"], "20260501")
+        self.assertEqual(second["params"]["CTX_AREA_FK100"], "FK")
+        self.assertEqual(second["params"]["CTX_AREA_NK100"], "NK")
+        self.assertEqual(second["tr_cont"], "N")
+
     def test_fetch_overseas_order_fills_uses_ccnl_and_paginates(self):
         client = KisClient(
             app_key="app-key",

@@ -726,6 +726,10 @@ def _load_portfolio_performance_settings(
         or etf_dca_raw.get("manual_cashflow_json_path")
         or raw.get("cashflow_baseline_path")
     )
+    if not manual_cashflow_path:
+        default_cashflow_path = base_dir / "account_cashflows.csv"
+        if default_cashflow_path.exists():
+            manual_cashflow_path = default_cashflow_path
     return PortfolioPerformanceSettings(
         enabled=bool(raw.get("enabled", True)),
         publish_to_site=bool(raw.get("publish_to_site", True)),

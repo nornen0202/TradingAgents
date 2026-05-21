@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import json
 
-import pytest
+try:
+    import pytest
+except ModuleNotFoundError:  # pragma: no cover - CI unittest import compatibility.
+    from tests.pytest_compat import pytest
 
 from tradingagents.portfolio.benchmarks.dca_engine import build_etf_dca_comparison
 
