@@ -37,6 +37,7 @@ def enrich_candidates_with_prism(
     *,
     confidence_cap: float = 0.25,
     run_market: str | None = None,
+    soft_conflict_allows_pilot: bool = True,
 ) -> list[Any]:
     signals = list((ingestion.signals if ingestion else []) or [])
     same_market_signals = _same_market_signals(signals, run_market=run_market)
@@ -47,7 +48,13 @@ def enrich_candidates_with_prism(
     for candidate in candidates:
         ticker = str(_get(candidate, "instrument").canonical_ticker if _get(candidate, "instrument") else _get(candidate, "canonical_ticker") or "").upper()
         signal = signal_by_ticker.get(ticker)
-        patch = _candidate_prism_patch(candidate, signal, cap=cap, coverage_status=coverage_status)
+        patch = _candidate_prism_patch(
+            candidate,
+            signal,
+            cap=cap,
+            coverage_status=coverage_status,
+            soft_conflict_allows_pilot=soft_conflict_allows_pilot,
+        )
         enriched.append(candidate.__class__(**{**candidate.__dict__, **patch}))
     return enriched
 
@@ -291,6 +298,7 @@ def _candidate_prism_patch(
     *,
     cap: float,
     coverage_status: str = "NO_SIGNAL",
+    soft_conflict_allows_pilot: bool = True,
 ) -> dict[str, Any]:
     data_health = dict(_get(candidate, "data_health") or {})
     notes: list[str] = list(_get(candidate, "external_signal_notes") or [])
@@ -313,15 +321,22 @@ def _candidate_prism_patch(
             },
         }
 
-    agreement, delta, note, block_buy = _classify_candidate(candidate, signal, cap=cap)
+    agreement, delta, note, block_buy = _classify_candidate(
+        candidate,
+        signal,
+        cap=cap,
+        soft_conflict_allows_pilot=soft_conflict_allows_pilot,
+    )
     notes.append(note)
     action_now = str(_get(candidate, "suggested_action_now") or "")
     action_if_triggered = str(_get(candidate, "suggested_action_if_triggered") or "")
     review_required = bool(_get(candidate, "review_required"))
-    if block_buy:
+    if agreement == "conflict_prism_sell_ta_buy":
         review_required = True
         gate_reasons.append("prism_conflict_review_required")
         risk_codes.append("PRISM_CONFLICT_REVIEW")
+    if block_buy:
+        review_required = True
         if action_now in TA_BUY_NOW:
             action_now = "HOLD" if bool(_get(candidate, "is_held")) else "WATCH"
         if action_if_triggered in TA_BUY_TRIGGER:
@@ -419,7 +434,13 @@ def _float_or_default(value: Any, default: float) -> float:
         return default
 
 
-def _classify_candidate(candidate: Any, signal: PrismExternalSignal, *, cap: float) -> tuple[str, float, str, bool]:
+def _classify_candidate(
+    candidate: Any,
+    signal: PrismExternalSignal,
+    *,
+    cap: float,
+    soft_conflict_allows_pilot: bool = True,
+) -> tuple[str, float, str, bool]:
     action = signal.signal_action
     confidence = max(min(float(signal.confidence if signal.confidence is not None else signal.composite_score or 0.5), 1.0), 0.0)
     delta = min(cap, confidence * cap)
@@ -430,12 +451,30 @@ def _classify_candidate(candidate: Any, signal: PrismExternalSignal, *, cap: flo
             f"PRISM {action.value} conflicts with TradingAgents risk reduction; no buy permission is granted.",
             True,
         )
-    if _is_ta_buy(candidate) and action in PRISM_SELL_OR_RISK:
+    if _is_ta_buy(candidate) and action in {PrismSignalAction.STOP_LOSS, PrismSignalAction.EXIT, PrismSignalAction.REDUCE_RISK}:
         return (
             "conflict_prism_sell_ta_buy",
             -delta,
             f"PRISM {action.value} conflicts with TradingAgents buy-side action; immediate buy requires review.",
             True,
+        )
+    if _is_ta_buy(candidate) and action in {
+        PrismSignalAction.SELL,
+        PrismSignalAction.TAKE_PROFIT,
+        PrismSignalAction.TRIM_TO_FUND,
+        PrismSignalAction.NO_ENTRY,
+    }:
+        allow_pilot = soft_conflict_allows_pilot and _soft_conflict_pilot_candidate(candidate)
+        return (
+            "conflict_prism_sell_ta_buy",
+            -delta,
+            (
+                f"PRISM {action.value} conflicts with TradingAgents buy-side action; full-size is blocked, "
+                "but a reviewed pilot can remain visible."
+                if allow_pilot
+                else f"PRISM {action.value} conflicts with TradingAgents buy-side action; immediate buy requires review."
+            ),
+            not allow_pilot,
         )
     if _is_ta_buy(candidate) and action in PRISM_BUY:
         return (
@@ -474,6 +513,21 @@ def _classify_candidate(candidate: Any, signal: PrismExternalSignal, *, cap: flo
             False,
         )
     return ("no_prism_signal", 0.0, "PRISM signal is unknown or not action-bearing.", False)
+
+
+def _soft_conflict_pilot_candidate(candidate: Any) -> bool:
+    data_health = _get(candidate, "data_health") or {}
+    if not isinstance(data_health, dict):
+        data_health = {}
+    timing = str(data_health.get("execution_timing_state") or "").strip().upper()
+    decision_state = str(data_health.get("execution_decision_state") or data_health.get("decision_state") or "").strip().upper()
+    execution_quality = str(data_health.get("execution_data_quality") or "").strip().upper()
+    strong_state = timing in {"PILOT_READY", "CLOSE_CONFIRMED"} or decision_state == "ACTIONABLE_NOW"
+    strong_data = (
+        execution_quality == "REALTIME_EXECUTION_READY"
+        or (data_health.get("session_vwap_ok") is True and data_health.get("relative_volume_ok") is True)
+    )
+    return bool(strong_state and strong_data)
 
 
 def _reconcile_one(
@@ -531,7 +585,12 @@ def _reconcile_one(
             "risk_gate_bypass_allowed": False,
         }
     assert action is not None and signal is not None
-    agreement, delta, note, blocked = _classify_candidate(_ActionShim(action), signal, cap=abs(float(confidence_cap)))
+    agreement, delta, note, blocked = _classify_candidate(
+        _ActionShim(action),
+        signal,
+        cap=abs(float(confidence_cap)),
+        soft_conflict_allows_pilot=True,
+    )
     return {
         "ticker": ticker,
         "run_market": _normalize_run_market(run_market),
@@ -566,6 +625,7 @@ class _ActionShim:
         self.action_if_triggered = _get(action, "action_if_triggered")
         self.portfolio_relative_action = _get(action, "portfolio_relative_action")
         self.risk_action = _get(action, "risk_action")
+        self.data_health = _get(action, "data_health") or {}
         self.is_held = True
         self.confidence = _get(action, "confidence")
 

@@ -19,6 +19,7 @@ from tradingagents.scanner.sector_regime import apply_buy_matrix_overlay
 from tradingagents.summary_image.generator import generate_summary_image_artifacts
 
 from .action_judge import arbitrate_portfolio_actions
+from .action_lift import attach_action_lift_audit
 from .account_models import AccountSnapshot
 from .allocation import build_recommendation
 from .candidates import build_portfolio_candidates
@@ -75,6 +76,7 @@ def run_portfolio_pipeline(
             prism_ingestion,
             confidence_cap=_prism_confidence_cap(external_data_settings),
             run_market=_run_market_from_manifest(manifest),
+            soft_conflict_allows_pilot=bool(getattr(profile, "soft_prism_conflict_allows_pilot", True)),
         )
         semantic_candidates, semantic_verdicts, semantic_warnings = build_semantic_verdicts(
             candidates=candidates,
@@ -130,6 +132,12 @@ def run_portfolio_pipeline(
             recommendation,
             manifest=manifest,
             candidates=scored_candidates,
+        )
+        recommendation = attach_action_lift_audit(
+            recommendation=recommendation,
+            candidates=scored_candidates,
+            snapshot=snapshot,
+            profile=profile,
         )
         all_warnings.extend(action_judge_warnings)
         external_signal_context = _build_external_signal_context(

@@ -24,6 +24,10 @@ def initialize_action_tracker(db_path: Path) -> None:
             "unrealized_return_pct": "REAL",
             "profit_protection_score": "REAL",
             "profit_plan_json": "TEXT",
+            "lift_status": "TEXT",
+            "opportunity_cost_score": "REAL",
+            "pilot_allowed": "INTEGER",
+            "full_size_allowed": "INTEGER",
         })
         _ensure_columns(conn, "action_outcomes", {
             "return_60d": "REAL",
@@ -59,8 +63,9 @@ def record_run_recommendations(run_dir: Path, db_path: Path) -> None:
                   run_id, ticker, action, risk_action, recommended_price, confidence,
                   trigger_type, source, prism_agreement, sell_intent, sell_trigger_status,
                   sell_size_plan, unrealized_return_pct, profit_protection_score,
-                  profit_plan_json, was_executed, skip_reason, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  profit_plan_json, lift_status, opportunity_cost_score, pilot_allowed,
+                  full_size_allowed, was_executed, skip_reason, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["run_id"],
@@ -78,6 +83,10 @@ def record_run_recommendations(run_dir: Path, db_path: Path) -> None:
                     row.get("unrealized_return_pct"),
                     row.get("profit_protection_score"),
                     row.get("profit_plan_json"),
+                    row.get("lift_status"),
+                    row.get("opportunity_cost_score"),
+                    _bool_to_int(row.get("pilot_allowed")),
+                    _bool_to_int(row.get("full_size_allowed")),
                     int(bool(row.get("was_executed"))),
                     row.get("skip_reason"),
                     row["created_at"],
@@ -158,6 +167,7 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         by_prism = _aggregate(conn, "prism_agreement")
         action_buckets = _aggregate_action_buckets(conn)
         profit_taking = _aggregate_profit_taking(conn)
+        calibration = _aggregate_calibration(conn)
     return ActionPerformanceSummary(
         recommendations=recommendations,
         outcomes=outcomes,
@@ -167,6 +177,7 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         prism_agreement=by_prism,
         action_buckets=action_buckets,
         profit_taking=profit_taking,
+        calibration=calibration,
     )
 
 
@@ -188,6 +199,8 @@ def _portfolio_action_rows(run_dir: Path, manifest: dict[str, Any], *, run_id: s
         preferred_action = _preferred_action(action)
         position_metrics = action.get("position_metrics") if isinstance(action.get("position_metrics"), Mapping) else {}
         profit_plan = action.get("profit_taking_plan") if isinstance(action.get("profit_taking_plan"), Mapping) else {}
+        data_health = action.get("data_health") if isinstance(action.get("data_health"), Mapping) else {}
+        lift = data_health.get("action_lift") if isinstance(data_health.get("action_lift"), Mapping) else {}
         rows.append(
             {
                 "run_id": run_id,
@@ -205,6 +218,10 @@ def _portfolio_action_rows(run_dir: Path, manifest: dict[str, Any], *, run_id: s
                 "unrealized_return_pct": _float_or_none(position_metrics.get("unrealized_return_pct")),
                 "profit_protection_score": _float_or_none(position_metrics.get("profit_protection_score")),
                 "profit_plan_json": json.dumps(profit_plan, ensure_ascii=False) if profit_plan else None,
+                "lift_status": lift.get("lift_status") or data_health.get("lift_status"),
+                "opportunity_cost_score": _float_or_none(lift.get("opportunity_cost_score") or data_health.get("opportunity_cost_score")),
+                "pilot_allowed": lift.get("pilot_allowed") if lift else data_health.get("pilot_allowed"),
+                "full_size_allowed": lift.get("full_size_allowed") if lift else data_health.get("full_size_allowed"),
                 "was_executed": bool(int(action.get("delta_krw_now") or 0)),
                 "skip_reason": None if int(action.get("delta_krw_now") or 0) else _skip_reason(action),
                 "created_at": created_at,
@@ -454,6 +471,40 @@ def _aggregate_profit_taking(conn: sqlite3.Connection) -> dict[str, dict[str, An
     return result
 
 
+def _aggregate_calibration(conn: sqlite3.Connection) -> dict[str, Any]:
+    row = conn.execute(
+        """
+        SELECT
+          COUNT(*) AS total,
+          SUM(CASE WHEN UPPER(COALESCE(lift_status, '')) IN (
+            'ACTION_LIFT_FAILURE', 'BUDGET_BLOCKED', 'PILOT_VISIBLE_NO_ORDER',
+            'BUY_SIGNAL_RELABELED_AS_SELL_SIDE', 'PRISM_SOFT_BLOCK_PILOT_ALLOWED'
+          ) THEN 1 ELSE 0 END) AS actionable_not_ordered,
+          AVG(CASE WHEN UPPER(COALESCE(lift_status, '')) IN (
+            'ACTION_LIFT_FAILURE', 'BUDGET_BLOCKED', 'PILOT_VISIBLE_NO_ORDER',
+            'BUY_SIGNAL_RELABELED_AS_SELL_SIDE', 'PRISM_SOFT_BLOCK_PILOT_ALLOWED'
+          ) THEN o.return_5d ELSE NULL END) AS missed_upside_5d,
+          AVG(CASE WHEN UPPER(COALESCE(lift_status, '')) IN (
+            'ACTION_LIFT_FAILURE', 'BUDGET_BLOCKED', 'PILOT_VISIBLE_NO_ORDER',
+            'BUY_SIGNAL_RELABELED_AS_SELL_SIDE', 'PRISM_SOFT_BLOCK_PILOT_ALLOWED'
+          ) THEN o.missed_upside_20d ELSE NULL END) AS missed_upside_20d,
+          AVG(CASE WHEN COALESCE(prism_agreement, '') LIKE 'conflict_%'
+            THEN CASE WHEN o.return_5d > 0 THEN 1.0 ELSE 0.0 END ELSE NULL END) AS prism_conflict_winner_rate
+        FROM action_recommendations r
+        LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
+        """
+    ).fetchone()
+    total = int(row["total"] or 0) if row else 0
+    actionable_not_ordered = int(row["actionable_not_ordered"] or 0) if row else 0
+    return {
+        "actionable_not_ordered_count": actionable_not_ordered,
+        "actionable_not_ordered_rate": (actionable_not_ordered / total if total else 0.0),
+        "missed_upside_5d": row["missed_upside_5d"] if row else None,
+        "missed_upside_20d": row["missed_upside_20d"] if row else None,
+        "prism_conflict_winner_rate": row["prism_conflict_winner_rate"] if row else None,
+    }
+
+
 def _action_bucket(source: str, prism_agreement: str) -> str:
     source_text = source.strip().lower()
     agreement = prism_agreement.strip().lower()
@@ -567,6 +618,19 @@ def _float_or_none(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _bool_to_int(value: Any) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return 1 if value else 0
+    text = str(value).strip().lower()
+    if text in {"1", "true", "yes", "on"}:
+        return 1
+    if text in {"0", "false", "no", "off"}:
+        return 0
+    return None
 
 
 def _count_optional_table(conn: sqlite3.Connection, table: str) -> int:

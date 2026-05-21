@@ -2116,7 +2116,7 @@ def _canonical_contribution_ticker(
         try:
             resolved = resolve_instrument(normalized)
             if resolved.display_name and resolved.display_name != normalized:
-                return str(resolved.symbol or normalized).strip().upper()
+                return str(resolved.primary_symbol or normalized).strip().upper()
         except Exception:
             pass
         warnings.append(f"account_performance_contribution_unresolved_ticker:{normalized}")

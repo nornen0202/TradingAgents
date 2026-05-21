@@ -97,6 +97,7 @@ def render_portfolio_report_markdown(
     consistency_section = render_consistency_section(live_context_delta)
     external_section = render_external_signal_section(external_reconciliation) if external_reconciliation is not None else ""
     quality_gate_sections = _quality_gate_sections(recommendation)
+    action_lift_section = _action_lift_section(recommendation)
     return "\n".join(
         [
             title,
@@ -108,6 +109,8 @@ def render_portfolio_report_markdown(
             *cash_projection_lines,
             f"- 시장 분위기: `{market_label}`",
             "",
+            action_lift_section,
+            "" if action_lift_section else "",
             "## 핵심 요약",
             "",
             manual_review_line,
@@ -280,6 +283,62 @@ def _quality_gate_sections(recommendation: PortfolioRecommendation) -> list[str]
             lines.append(f"- {ticker}: {reason}")
         lines.append("")
     return lines
+
+
+def _action_lift_section(recommendation: PortfolioRecommendation) -> str:
+    audit = recommendation.action_lift_audit or {}
+    entries = [entry for entry in (audit.get("entries") or []) if isinstance(entry, dict)]
+    if not entries:
+        return ""
+    priority_statuses = {
+        "ACTION_LIFT_FAILURE",
+        "BUY_SIGNAL_RELABELED_AS_SELL_SIDE",
+        "BUDGET_BLOCKED",
+        "PILOT_VISIBLE_NO_ORDER",
+        "PRISM_SOFT_BLOCK_PILOT_ALLOWED",
+    }
+    flagged = [entry for entry in entries if str(entry.get("lift_status") or "") in priority_statuses]
+    if not flagged:
+        return ""
+    rows = [
+        "| 종목 | 종목 신호 | 계좌 액션 | 승격 상태 | pilot | full-size | 미주문/차단 사유 | 다음 유효 액션 |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for entry in sorted(flagged, key=lambda item: float(item.get("opportunity_cost_score") or 0.0), reverse=True)[:8]:
+        rows.append(
+            "| "
+            f"{_cell(entry.get('display_name') or entry.get('ticker'))} | "
+            f"{_cell(str(entry.get('stock_entry_state') or '-') + ' / ' + str(entry.get('stock_execution_timing') or '-'))} | "
+            f"{_cell(str(entry.get('account_action_now') or '-') + ' / ' + str(entry.get('account_action_if_triggered') or '-'))} | "
+            f"{_cell(_lift_status_label(str(entry.get('lift_status') or '')))} | "
+            f"{_cell('가능' if entry.get('pilot_allowed') else '불가')} | "
+            f"{_cell('가능' if entry.get('full_size_allowed') else '불가')} | "
+            f"{_cell(', '.join(str(item) for item in (entry.get('block_reasons') or [])[:4]) or '-')} | "
+            f"{_cell(entry.get('next_valid_action') or '-')} |"
+        )
+    return "\n".join(
+        [
+            "## 놓친 기회 위험 / 액션 승격 점검",
+            "",
+            "종목 실행 신호가 계좌 주문 또는 조건부 pilot으로 어떻게 변환됐는지 별도로 점검합니다.",
+            "",
+            *rows,
+        ]
+    )
+
+
+def _lift_status_label(status: str) -> str:
+    mapping = {
+        "ORDER_PROPOSED": "주문 후보 생성",
+        "BUDGET_BLOCKED": "예산/버퍼 차단",
+        "PILOT_VISIBLE_NO_ORDER": "pilot 표시, 주문 없음",
+        "ACTION_LIFT_FAILURE": "액션 승격 실패",
+        "BUY_SIGNAL_RELABELED_AS_SELL_SIDE": "매수 신호가 매도/축소로 표시됨",
+        "PRISM_SOFT_BLOCK_PILOT_ALLOWED": "PRISM 충돌, pilot 수동검토",
+        "HARD_BLOCKED": "하드 차단",
+        "NOT_ACTIONABLE": "비실행",
+    }
+    return mapping.get(status, status or "-")
 
 
 def _strict_summary_line(

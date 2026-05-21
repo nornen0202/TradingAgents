@@ -2342,6 +2342,7 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
     prism_rows = _performance_bucket_rows(summary.get("prism_agreement") if isinstance(summary.get("prism_agreement"), dict) else {})
     action_bucket_rows = _performance_bucket_rows(summary.get("action_buckets") if isinstance(summary.get("action_buckets"), dict) else {})
     profit_rows = _performance_bucket_rows(summary.get("profit_taking") if isinstance(summary.get("profit_taking"), dict) else {})
+    calibration = summary.get("calibration") if isinstance(summary.get("calibration"), dict) else {}
     warnings = outcome_update.get("warnings") if isinstance(outcome_update.get("warnings"), list) else []
     warning_html = "".join(f"<li>{_escape(item)}</li>" for item in warnings[:6])
     update_label = "갱신됨" if outcome_update.get("updated") else ("대기 중" if outcome_update.get("enabled") else "비활성")
@@ -2374,6 +2375,7 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
         <div class="pill-row">{artifact_link}</div>
       </article>
       {unavailable_note}
+      {_performance_calibration_card(calibration)}
       <div class="run-grid">
         {_performance_table('액션별 5일/20일 성과', action_rows)}
         {_performance_table('익절 성과', profit_rows)}
@@ -2382,6 +2384,19 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
       </div>
       {"<details class='advanced-diagnostics'><summary>성과 추적 경고</summary><ul>" + warning_html + "</ul></details>" if warning_html else ""}
     </section>
+    """
+
+
+def _performance_calibration_card(calibration: dict[str, Any]) -> str:
+    if not calibration:
+        return ""
+    return f"""
+      <article class="run-card">
+        <p><strong>액션 승격 미주문 비율</strong><span>{_escape(_format_pct_value(calibration.get('actionable_not_ordered_rate')))}</span></p>
+        <p><strong>미주문 후보 5일 성과</strong><span>{_escape(_format_pct_value(calibration.get('missed_upside_5d')))}</span></p>
+        <p><strong>미주문 후보 20일 missed upside</strong><span>{_escape(_format_pct_value(calibration.get('missed_upside_20d')))}</span></p>
+        <p><strong>PRISM 충돌 상승 비율</strong><span>{_escape(_format_pct_value(calibration.get('prism_conflict_winner_rate')))}</span></p>
+      </article>
     """
 
 
@@ -2654,13 +2669,20 @@ def _decision_primary_condition(raw_decision: Any, *, language: str) -> str:
 
 def _with_portfolio_action(ticker_summary: dict[str, Any], portfolio_summary: dict[str, Any]) -> dict[str, Any]:
     actions_by_ticker = portfolio_summary.get("actions_by_ticker") if isinstance(portfolio_summary, dict) else {}
-    if not isinstance(actions_by_ticker, dict):
-        return ticker_summary
+    action_lift_by_ticker = portfolio_summary.get("action_lift_by_ticker") if isinstance(portfolio_summary, dict) else {}
     ticker = str(ticker_summary.get("ticker") or "").strip()
-    action = actions_by_ticker.get(ticker)
-    if not isinstance(action, dict):
+    extras: dict[str, Any] = {}
+    if isinstance(actions_by_ticker, dict):
+        action = actions_by_ticker.get(ticker)
+        if isinstance(action, dict):
+            extras["portfolio_action"] = action
+    if isinstance(action_lift_by_ticker, dict):
+        lift = action_lift_by_ticker.get(ticker)
+        if isinstance(lift, dict):
+            extras["action_lift_audit"] = lift
+    if not extras:
         return ticker_summary
-    return {**ticker_summary, "portfolio_action": action}
+    return {**ticker_summary, **extras}
 
 
 def _portfolio_execution_view(portfolio_action: dict[str, Any], *, language: str) -> str:
@@ -2714,6 +2736,39 @@ def _portfolio_close_action(portfolio_action: dict[str, Any], *, language: str) 
     if language.lower().startswith("korean"):
         return f"종가 기준 {level} 확인 시 {label}" if level else f"종가 확인 시 {label}"
     return f"At close, {label.lower()} if {level}" if level else f"At close, {label.lower()}"
+
+
+def _action_lift_today_action(action_lift: dict[str, Any], *, language: str) -> str:
+    if not isinstance(action_lift, dict) or not action_lift:
+        return ""
+    korean = language.lower().startswith("korean")
+    status = str(action_lift.get("lift_status") or "").strip().upper()
+    next_action = str(action_lift.get("next_valid_action") or "").strip()
+    if status == "ACTION_LIFT_FAILURE":
+        return (
+            f"액션 승격 실패 점검: {next_action or 'block_reason 확인 후 pilot 전환 여부 검토'}"
+            if korean
+            else f"Action lift failure: {next_action or 'review block reasons before a pilot'}"
+        )
+    if status == "BUY_SIGNAL_RELABELED_AS_SELL_SIDE":
+        return (
+            f"매수 신호가 계좌 sell-side 표현에 묻힘: {next_action or 'pilot 가능 여부 재검토'}"
+            if korean
+            else f"Buy signal was relabeled as sell-side: {next_action or 'review pilot eligibility'}"
+        )
+    if status == "PRISM_SOFT_BLOCK_PILOT_ALLOWED":
+        return (
+            f"PRISM 충돌: full-size 금지, 수동 확인 후 pilot만 검토"
+            if korean
+            else "PRISM conflict: block full-size, review pilot only"
+        )
+    if status == "BUDGET_BLOCKED":
+        return (
+            f"실행 신호는 있으나 예산/버퍼 차단: {next_action or '현금 여력 확인'}"
+            if korean
+            else f"Signal exists but budget/cash buffer blocks it: {next_action or 'check cash capacity'}"
+        )
+    return ""
 
 
 def _portfolio_level_text(portfolio_action: dict[str, Any], *, language: str) -> str:
@@ -2771,6 +2826,7 @@ def _ticker_investor_summary_v2(
     entry_action = _decision_structured_value(ticker_summary.get("decision"), "entry_action").upper()
     research_view = present_investment_view(ticker_summary.get("decision") or ticker_summary.get("error"), language=language)
     portfolio_action = ticker_summary.get("portfolio_action") if isinstance(ticker_summary.get("portfolio_action"), dict) else {}
+    action_lift = ticker_summary.get("action_lift_audit") if isinstance(ticker_summary.get("action_lift_audit"), dict) else {}
     account_execution_view = _portfolio_execution_view(portfolio_action, language=language)
 
     if korean:
@@ -2886,6 +2942,9 @@ def _ticker_investor_summary_v2(
     portfolio_close_action = _portfolio_close_action(portfolio_action, language=language)
     if portfolio_close_action:
         close_action = portfolio_close_action
+    lift_today_action = _action_lift_today_action(action_lift, language=language)
+    if lift_today_action:
+        today_action = lift_today_action
 
     return {
         "investment_view": account_execution_view or research_view,
@@ -3506,6 +3565,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
     report_md = private_dir / "portfolio_report.md"
     report_json = private_dir / "portfolio_report.json"
     candidates_json = private_dir / "portfolio_candidates.json"
+    action_lift_json = private_dir / "action_lift_audit.json"
     summary_svg = private_dir / "summary_card.svg"
     summary_png = private_dir / "summary_card_ai.png"
     summary_spec = private_dir / "summary_image_spec.json"
@@ -3529,6 +3589,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
     candidate_pairs: list[dict[str, str]] = []
     sell_side_counts: dict[str, Any] = {}
     actions_by_ticker: dict[str, dict[str, Any]] = {}
+    action_lift_by_ticker: dict[str, dict[str, Any]] = {}
     account_performance: dict[str, Any] = {}
     if report_json.exists():
         try:
@@ -3547,6 +3608,17 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         except Exception:
             sell_side_counts = {}
             actions_by_ticker = {}
+    if action_lift_json.exists():
+        try:
+            lift_payload = json.loads(action_lift_json.read_text(encoding="utf-8"))
+            for entry in lift_payload.get("entries") or []:
+                if not isinstance(entry, dict):
+                    continue
+                ticker = str(entry.get("ticker") or "").strip()
+                if ticker:
+                    action_lift_by_ticker[ticker] = entry
+        except Exception:
+            action_lift_by_ticker = {}
     if candidates_json.exists():
         try:
             payload_candidates = json.loads(candidates_json.read_text(encoding="utf-8"))
@@ -3586,6 +3658,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "error": payload.get("error"),
         "portfolio_report_md": report_md if report_md.exists() else None,
         "portfolio_report_json": report_json if report_json.exists() else None,
+        "action_lift_audit_json": action_lift_json if action_lift_json.exists() else None,
         "summary_image_svg": summary_svg if summary_svg.exists() else None,
         "summary_image_png": summary_png if summary_png.exists() else None,
         "summary_image_spec_json": summary_spec if summary_spec.exists() else None,
@@ -3601,6 +3674,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "candidate_identity_pairs": candidate_pairs,
         "sell_side_counts": sell_side_counts,
         "actions_by_ticker": actions_by_ticker,
+        "action_lift_by_ticker": action_lift_by_ticker,
         "downloadable_files": files,
         "artifact_count": len(files),
     }

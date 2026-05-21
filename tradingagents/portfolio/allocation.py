@@ -217,7 +217,7 @@ def build_recommendation(
         key=lambda item: (abs(item.delta_krw_now), abs(item.delta_krw_if_triggered), -item.priority),
         reverse=True,
     )
-    actions = _apply_execution_constraints(actions, snapshot)
+    actions = _apply_execution_constraints(actions, snapshot, profile)
     actions.sort(
         key=lambda item: (abs(item.delta_krw_now), abs(item.delta_krw_if_triggered), -item.priority),
         reverse=True,
@@ -694,7 +694,7 @@ def _allocate_now_delta(
     allowed = min(raw_delta, remaining_name_capacity)
     if action == "STARTER_NOW":
         starter_floor = max(snapshot.constraints.min_trade_krw, 300_000)
-        allowed = min(allowed, max(int(profile.intraday_pilot_max_krw), 0))
+        allowed = min(allowed, max(int(profile.intraday_pilot_max_krw), 0), _pilot_name_cap(profile, account_value))
         if allowed < starter_floor:
             return 0
     if allowed < snapshot.constraints.min_trade_krw:
@@ -1265,10 +1265,13 @@ def _fallback_funding_reason_codes(action: PortfolioAction) -> list[str]:
 def _apply_execution_constraints(
     actions: list[PortfolioAction],
     snapshot: AccountSnapshot,
+    profile: PortfolioProfile,
 ) -> list[PortfolioAction]:
     account_value = max(snapshot.account_value_krw, 1)
     turnover_limit = int(snapshot.constraints.max_daily_turnover_ratio * account_value)
     order_limit = max(0, snapshot.constraints.max_order_count_per_day)
+    sleeve_limit = _pilot_sleeve_cap(profile, account_value)
+    sleeve_used = 0
     turnover_used = 0
     orders_used = 0
     constrained: list[PortfolioAction] = []
@@ -1293,6 +1296,14 @@ def _apply_execution_constraints(
         if delta_now != 0 and order_limit > 0 and orders_used >= order_limit:
             delta_now = 0
             gate_reasons.append("max_order_count_per_day_cap")
+        if delta_now > 0 and action.action_now == "STARTER_NOW" and sleeve_limit is not None:
+            remaining_sleeve = max(sleeve_limit - sleeve_used, 0)
+            if remaining_sleeve <= 0:
+                delta_now = 0
+                gate_reasons.append("opportunity_capture_sleeve_cap")
+            elif delta_now > remaining_sleeve:
+                delta_now = min(delta_now, remaining_sleeve)
+                gate_reasons.append("opportunity_capture_sleeve_cap")
         if 0 < abs(delta_now) < snapshot.constraints.min_trade_krw:
             delta_now = 0
             gate_reasons.append("min_trade_floor_after_caps")
@@ -1300,6 +1311,8 @@ def _apply_execution_constraints(
         if delta_now != 0:
             turnover_used += abs(delta_now)
             orders_used += 1
+            if delta_now > 0 and action.action_now == "STARTER_NOW" and sleeve_limit is not None:
+                sleeve_used += delta_now
 
         constrained.append(
             PortfolioAction(
@@ -1320,6 +1333,20 @@ def _normalize_action_value(action_now: str, delta_now: int) -> str:
     if action_now in {"REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW", "STOP_LOSS_NOW", "EXIT_NOW"} and delta_now == 0:
         return "HOLD"
     return action_now
+
+
+def _pilot_name_cap(profile: PortfolioProfile, account_value: int) -> int:
+    if not bool(getattr(profile, "opportunity_capture_enabled", False)):
+        return 10**18
+    pct = max(float(getattr(profile, "opportunity_capture_per_pilot_nav_pct", 1.0) or 0.0), 0.0)
+    return int(max(account_value, 1) * pct / 100.0)
+
+
+def _pilot_sleeve_cap(profile: PortfolioProfile, account_value: int) -> int | None:
+    if not bool(getattr(profile, "opportunity_capture_enabled", False)):
+        return None
+    pct = max(float(getattr(profile, "opportunity_capture_sleeve_nav_pct", 7.5) or 0.0), 0.0)
+    return int(max(account_value, 1) * pct / 100.0)
 
 
 def _signed_clip(value: int, magnitude: int) -> int:
