@@ -58,7 +58,8 @@ def test_account_performance_markdown_uses_friendly_etf_unavailable_copy():
 
     assert "상태: `실제 성과 검증 전`" in markdown
     assert "실제 성과 기준: `검증 전 참고 불가`" in markdown
-    assert "필요한 현금흐름 입력: `config/account_cashflows.csv`" in markdown
+    assert "KIS 자동화 상태: `체결/손익/권리 이벤트는 자동 조회" in markdown
+    assert "선택적 fallback: `config/account_cashflows.csv`" in markdown
     assert "삼성전자 (005930.KS)" in markdown
     assert "정합성 상태: `정합성 미확인`" in markdown
     assert "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다." in markdown
@@ -561,6 +562,46 @@ def test_account_performance_external_deposit_and_withdrawal_drive_same_cashflow
     cashflow = {item["benchmark"]: item for item in period["cashflow_benchmarks"]}
     assert cashflow["KOSPI"]["cashflow_event_count"] == 2
     assert cashflow["KOSPI"]["benchmark_return"] == 1.55
+
+
+def test_account_performance_fetches_kis_period_rights_as_dividend_flow(tmp_path: Path):
+    client = Mock()
+    client.fetch_domestic_order_fills.return_value = []
+    client.fetch_domestic_period_profit.return_value = ([], {})
+    client.fetch_domestic_period_trade_profit.return_value = ([], {})
+    client.fetch_domestic_period_rights.return_value = [
+        {
+            "cash_dfrm_dt": "20260215",
+            "pdno": "005930",
+            "prdt_name": "삼성전자",
+            "last_alct_amt": "50000",
+            "tax_amt": "7700",
+        }
+    ]
+    client.fetch_domestic_cashflow_ledger.return_value = []
+
+    with patch("tradingagents.portfolio.kis.KisClient.from_api_keys", return_value=client):
+        payload = _build_report(
+            tmp_path,
+            market_scope="kr",
+            broker="kis",
+            current_total_equity_krw=1_150_000,
+            benchmarks={
+                "KOSPI": [
+                    {"date": "2026-01-01", "close": 100},
+                    {"date": "2026-02-15", "close": 105},
+                    {"date": "2026-04-01", "close": 110},
+                ],
+                "KOSDAQ": [{"date": "2026-01-01", "close": 100}, {"date": "2026-04-01", "close": 100}],
+            },
+        )
+
+    assert client.fetch_domestic_period_rights.called
+    assert client.fetch_domestic_cashflow_ledger.called
+    assert payload["data_quality"]["cashflow_event_count"] == 1
+    assert payload["data_quality"]["external_capital_flow_count"] == 0
+    assert payload["reconciliation"]["external_cashflow_net_krw"] == 50_000
+    assert payload["reconciliation"]["reconciliation_status"] == "OK"
 
 
 def test_account_performance_unknown_cashflow_classification_flags_simple_nav(tmp_path: Path):

@@ -506,6 +506,53 @@ class KisClient:
             params=params,
         )
 
+    def fetch_domestic_period_rights(
+        self,
+        *,
+        account_no: str,
+        product_code: str,
+        start_date: date | datetime | str,
+        end_date: date | datetime | str,
+        inquiry_code: str = "03",
+        right_type_code: str = "",
+        symbol: str = "",
+        product_type_code: str = "",
+    ) -> list[dict[str, Any]]:
+        params = {
+            "INQR_DVSN": inquiry_code,
+            "CANO": account_no,
+            "ACNT_PRDT_CD": product_code,
+            "INQR_STRT_DT": _date_param(start_date),
+            "INQR_END_DT": _date_param(end_date),
+            "CUST_RNCNO25": "",
+            "HMID": "",
+            "RGHT_TYPE_CD": right_type_code,
+            "PDNO": symbol,
+            "PRDT_TYPE_CD": product_type_code,
+            "CTX_AREA_NK100": "",
+            "CTX_AREA_FK100": "",
+        }
+        rows: list[dict[str, Any]] = []
+        tr_cont = ""
+
+        while True:
+            payload, headers = self.request_json(
+                method="GET",
+                path="/uapi/domestic-stock/v1/trading/period-rights",
+                tr_id="CTRGA011R",
+                params=params,
+                tr_cont=tr_cont,
+            )
+            rows.extend(_coerce_records(payload.get("output")))
+            tr_cont_header = str(headers.get("tr_cont") or "")
+            if tr_cont_header not in {"M", "F"}:
+                break
+            params["CTX_AREA_FK100"] = str(payload.get("ctx_area_fk100") or "")
+            params["CTX_AREA_NK100"] = str(payload.get("ctx_area_nk100") or "")
+            tr_cont = "N"
+
+        return rows
+
     def fetch_domestic_cashflow_ledger(
         self,
         *,

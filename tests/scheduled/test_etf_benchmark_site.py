@@ -20,7 +20,8 @@ def test_etf_benchmark_site_renders_dated_cashflow_unavailable_state():
         build_fixture_comparison(settings=default_settings(use_cashflows=False)).to_public_dict()
     )
 
-    assert "입금일 원장 필요" in html
+    assert "KIS 일자 원장 미확인" in html
+    assert "외부 입출금 일자는 API 미제공" in html
     assert "정확한 적립식 ETF 비교를 제공하지 않습니다" in html
 
 
@@ -39,8 +40,8 @@ def test_etf_benchmark_site_explains_actual_performance_unavailable_state():
     )
 
     assert "실제 계좌 성과가 검증되지 않아" in html
-    assert "config/account_cashflows.csv" in html
-    assert "manual_cashflow_csv_path" in html
+    assert "외부 입출금 원장은 API 미제공" in html
+    assert "선택적 fallback" in html
     assert "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다." in html
     assert "actual_performance_unavailable</span>" not in html
 

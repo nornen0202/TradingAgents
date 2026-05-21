@@ -174,14 +174,39 @@ def build_etf_alternative_comparison(
     )
     if not actual:
         local_warnings.append("etf_alternative_actual_performance_unavailable")
+        flow_load_warnings: list[str] = []
+        all_flows = load_external_capital_flows(
+            getattr(settings, "cashflow_baseline_path", None),
+            warnings=flow_load_warnings,
+        )
+        local_warnings.extend(flow_load_warnings)
+        cashflow_summary = _empty_cashflow_summary(source="baseline" if getattr(settings, "cashflow_baseline_path", None) else "none")
+        cashflow_summary.update(
+            {
+                "available_flow_count": len(all_flows),
+                "dated_flow_count": len(all_flows),
+                "deposit_amount_krw": int(sum(flow.amount_krw for flow in all_flows if flow.flow_type == "deposit")),
+                "withdrawal_amount_krw": int(sum(flow.amount_krw for flow in all_flows if flow.flow_type == "withdrawal")),
+                "missing_reason": "actual_performance_unavailable",
+                "auto_source_status": "broker_actual_performance_unavailable",
+                "missing_data": [
+                    "broker_nav_return",
+                    "reconciled_internal_snapshot",
+                    "dated_external_cashflows",
+                ],
+                "required_input_paths": ["config/account_cashflows.csv"],
+                "fallback_input_paths": ["config/account_cashflows.csv"],
+            }
+        )
         result = EtfAlternativeComparisonSummary(
             status="actual_performance_unavailable",
             period_start=None,
             period_end=None,
             actual_source="unavailable",
             actual={},
-            cashflows=_empty_cashflow_summary(source="unavailable"),
-            warnings=local_warnings,
+            cashflows=cashflow_summary,
+            warnings=list(dict.fromkeys(local_warnings)),
+            raw_cashflows=all_flows,
             policy=_alpha_policy_unavailable(settings=settings, reason="actual_performance_unavailable"),
         )
         _extend_warnings(warnings, local_warnings)
@@ -781,8 +806,9 @@ def _comparison_message(status: str) -> str | None:
     normalized = str(status or "").strip()
     if normalized == "cashflow_dates_required":
         return (
-            "KIS period summary only provides aggregate deposits. Exact same-deposit-date ETF benchmark "
-            "requires dated cashflows. Provide manual cashflow CSV/JSON or enable broker cashflow ledger."
+            "KIS domestic-stock account APIs used here can fetch fills, period profit, trade profit, and rights events, "
+            "but no official dated external deposit/withdrawal ledger is wired. Exact same-deposit-date ETF benchmark "
+            "requires dated cashflows from a broker-provided dated cashflow source; CSV/JSON remains an optional fallback."
         )
     if normalized == "actual_performance_unavailable":
         return "Actual account performance is unavailable because broker performance is missing and snapshot reconciliation is not trusted."

@@ -89,7 +89,7 @@ Artifacts:
 - `etf_alternative_portfolios_public.json`
 - `cashflows_audit.json`
 
-If KIS only provides aggregate deposits and withdrawals, exact DCA comparison is marked unavailable with `etf_alternative_cashflow_dates_required`. TradingAgents does not turn aggregate deposits into fake single-date cashflows.
+For KIS domestic stock accounts, TradingAgents automatically queries the official account endpoints that are available in the project integration: order fills, period profit, period trade profit, and period account-rights rows. Period-rights rows can add dated dividend/rights cash events to reconciliation. The current official domestic-stock samples do not expose a general dated external deposit/withdrawal ledger for ordinary stock accounts, so exact DCA comparison is still marked unavailable with `etf_alternative_cashflow_dates_required` when only aggregate cashflow information is available. TradingAgents does not turn aggregate deposits into fake single-date cashflows. CSV/JSON cashflow files remain an optional fallback when the broker does not provide a dated API source.
 
 The DCA benchmark formulas mirror the broker app-style return:
 
