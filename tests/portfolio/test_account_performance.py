@@ -9,7 +9,7 @@ from unittest.mock import Mock, patch
 from tradingagents.portfolio.account_models import AccountConstraints, AccountSnapshot, PortfolioProfile, Position
 from tradingagents.portfolio.performance import build_account_performance_outputs
 from tradingagents.portfolio.performance.broker_kis import normalize_kis_broker_summary
-from tradingagents.portfolio.performance.engine import render_account_performance_markdown
+from tradingagents.portfolio.performance.engine import _canonical_contribution_ticker, render_account_performance_markdown
 from tradingagents.portfolio.performance.etf_alternatives import load_external_capital_flows
 
 
@@ -521,6 +521,24 @@ def test_contribution_keeps_unresolved_bare_code_with_warning(tmp_path: Path):
     rows = {row["ticker"]: row for row in payload["contribution_by_ticker"]}
     assert rows["123456"]["realized_pnl_krw"] == 50_000
     assert "account_performance_contribution_unresolved_ticker:123456" in payload["data_quality"]["warnings"]
+
+
+def test_known_bare_krx_contribution_tickers_resolve_to_canonical_symbols():
+    warnings: list[str] = []
+
+    assert _canonical_contribution_ticker(
+        "009150",
+        positions_by_canonical={},
+        positions_by_base_code={},
+        warnings=warnings,
+    ) == "009150.KS"
+    assert _canonical_contribution_ticker(
+        "011070",
+        positions_by_canonical={},
+        positions_by_base_code={},
+        warnings=warnings,
+    ) == "011070.KS"
+    assert warnings == []
 
 
 def test_account_performance_external_deposit_and_withdrawal_drive_same_cashflow_benchmark(tmp_path: Path):

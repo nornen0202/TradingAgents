@@ -23,6 +23,10 @@ ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
       unrealized_return_pct REAL,
       profit_protection_score REAL,
       profit_plan_json TEXT,
+      lift_status TEXT,
+      opportunity_cost_score REAL,
+      pilot_allowed INTEGER,
+      full_size_allowed INTEGER,
       was_executed INTEGER DEFAULT 0,
       skip_reason TEXT,
       created_at TEXT NOT NULL
@@ -102,6 +106,7 @@ class ActionPerformanceSummary:
     prism_agreement: dict[str, dict[str, Any]] = field(default_factory=dict)
     action_buckets: dict[str, dict[str, Any]] = field(default_factory=dict)
     profit_taking: dict[str, dict[str, Any]] = field(default_factory=dict)
+    calibration: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -113,6 +118,7 @@ class ActionPerformanceSummary:
             "prism_agreement": self.prism_agreement,
             "action_buckets": self.action_buckets,
             "profit_taking": self.profit_taking,
+            "calibration": self.calibration,
         }
 
 

@@ -145,6 +145,12 @@ class PortfolioProfile:
     profit_take_stage2_fraction: float = 0.30
     profit_take_trailing_fraction: float = 0.25
     profit_take_keep_core_fraction: float = 0.45
+    opportunity_capture_enabled: bool = False
+    opportunity_capture_sleeve_nav_pct: float = 7.5
+    opportunity_capture_per_pilot_nav_pct: float = 1.0
+    opportunity_capture_max_loss_nav_pct: float = 0.3
+    max_pilot_stop_distance_pct: float = 12.0
+    soft_prism_conflict_allows_pilot: bool = True
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)
@@ -283,6 +289,7 @@ class PortfolioRecommendation:
     recommended_buying_power_after_triggered_krw: int | None = None
     recommended_settled_cash_after_now_krw: int | None = None
     recommended_settled_cash_after_triggered_krw: int | None = None
+    action_lift_audit: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)

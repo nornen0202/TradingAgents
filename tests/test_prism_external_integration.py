@@ -7,7 +7,7 @@ from unittest.mock import patch
 from tradingagents.external.prism_conflicts import enrich_candidates_with_prism, reconcile_prism_with_actions
 from tradingagents.external.prism_dashboard import load_dashboard_json_file, parse_dashboard_html
 from tradingagents.external.prism_loader import PrismLoaderConfig, load_prism_signals
-from tradingagents.external.prism_models import PrismIngestionResult
+from tradingagents.external.prism_models import PrismExternalSignal, PrismIngestionResult, PrismSignalAction
 from tradingagents.external.prism_sqlite import load_prism_sqlite
 from tradingagents.performance.action_outcomes import (
     record_run_recommendations,
@@ -208,6 +208,40 @@ def test_prism_sell_ta_add_is_review_conflict():
     assert enriched.prism_agreement == "conflict_prism_sell_ta_buy"
     assert enriched.review_required is True
     assert enriched.suggested_action_now == "WATCH"
+
+
+def test_prism_sell_ta_add_keeps_reviewed_pilot_when_execution_is_strong():
+    ingestion = PrismIngestionResult(
+        enabled=True,
+        ok=True,
+        signals=[
+            PrismExternalSignal(
+                canonical_ticker="005930.KS",
+                display_name="삼성전자",
+                market="KR",
+                signal_action=PrismSignalAction.SELL,
+                confidence=0.8,
+            )
+        ],
+    )
+    candidate = _candidate(
+        ticker="005930.KS",
+        name="삼성전자",
+        data_health={
+            "execution_timing_state": "PILOT_READY",
+            "execution_decision_state": "ACTIONABLE_NOW",
+            "execution_data_quality": "REALTIME_EXECUTION_READY",
+            "session_vwap_ok": True,
+            "relative_volume_ok": True,
+        },
+    )
+
+    enriched = enrich_candidates_with_prism([candidate], ingestion, confidence_cap=0.25)[0]
+
+    assert enriched.prism_agreement == "conflict_prism_sell_ta_buy"
+    assert enriched.review_required is True
+    assert enriched.suggested_action_now == "STARTER_NOW"
+    assert "PRISM_CONFLICT_REVIEW" in enriched.risk_action_reason_codes
 
 
 def test_scanner_filters_low_liquidity_and_overheated_movers():

@@ -36,6 +36,7 @@ def save_portfolio_outputs(
     report_writer_path = private_dir / "portfolio_report_writer.json"
     proposed_orders_path = private_dir / "proposed_orders.json"
     audit_path = private_dir / "decision_audit.json"
+    action_lift_path = private_dir / "action_lift_audit.json"
     funding_plan_path = private_dir / "funding_plan.json"
     would_buy_path = private_dir / "would_buy_if_funded.json"
     would_trim_path = private_dir / "would_trim_first.json"
@@ -50,6 +51,7 @@ def save_portfolio_outputs(
     _write_json(action_judge_path, action_judge_payload)
     _write_json(report_writer_path, report_writer_payload)
     _write_json(proposed_orders_path, {"orders": _build_proposed_orders(snapshot, recommendation)})
+    _write_json(action_lift_path, recommendation.action_lift_audit or {})
     _write_json(funding_plan_path, recommendation.funding_plan or {})
     _write_json(would_buy_path, {"candidates": (recommendation.funding_plan or {}).get("would_buy_if_funded") or []})
     _write_json(would_trim_path, {"candidates": (recommendation.funding_plan or {}).get("trim_first_candidates") or []})
@@ -77,6 +79,7 @@ def save_portfolio_outputs(
                 warnings=warnings,
             ),
             "portfolio_summary_counts": recommendation.data_health_summary,
+            "action_lift_audit": recommendation.action_lift_audit or {},
             "warnings": list(warnings),
             "semantic_verdicts": semantic_verdicts,
             "action_judge": action_judge_payload,
@@ -95,6 +98,7 @@ def save_portfolio_outputs(
         "portfolio_action_judge_json": action_judge_path.as_posix(),
         "portfolio_report_writer_json": report_writer_path.as_posix(),
         "proposed_orders_json": proposed_orders_path.as_posix(),
+        "action_lift_audit_json": action_lift_path.as_posix(),
         "funding_plan_json": funding_plan_path.as_posix(),
         "would_buy_if_funded_json": would_buy_path.as_posix(),
         "would_trim_first_json": would_trim_path.as_posix(),

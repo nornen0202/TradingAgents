@@ -850,6 +850,13 @@ def _execution_health(
     trigger_quality = str(execution_levels.get("trigger_quality") or "").strip().lower()
     payload: dict[str, Any] = {
         "execution_timing_state": "",
+        "execution_decision_state": "",
+        "execution_decision_now": "",
+        "execution_decision_if_triggered": "",
+        "last_price": None,
+        "session_vwap": None,
+        "relative_volume": None,
+        "pilot_invalidation_text": execution_levels.get("failed_breakout_rule"),
         "session_vwap_ok": None,
         "relative_volume_ok": None,
         "trigger_quality": quality_map.get(trigger_quality, 0.0),
@@ -860,6 +867,9 @@ def _execution_health(
     timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
     source = execution_update.get("source") if isinstance(execution_update.get("source"), dict) else {}
     payload["execution_timing_state"] = timing_state
+    payload["execution_decision_state"] = str(execution_update.get("decision_state") or "").strip().upper()
+    payload["execution_decision_now"] = str(execution_update.get("decision_now") or "").strip().upper()
+    payload["execution_decision_if_triggered"] = str(execution_update.get("decision_if_triggered") or "").strip().upper()
     payload["market_session"] = source.get("market_session")
     payload["quote_delay_seconds"] = source.get("quote_delay_seconds")
     payload["provider_realtime_capable"] = source.get("provider_realtime_capable")
@@ -867,6 +877,9 @@ def _execution_health(
     last_price = _safe_float(execution_update.get("last_price"))
     session_vwap = _safe_float(execution_update.get("session_vwap"))
     relative_volume = _safe_float(execution_update.get("relative_volume"))
+    payload["last_price"] = last_price
+    payload["session_vwap"] = session_vwap
+    payload["relative_volume"] = relative_volume
     payload["session_vwap_ok"] = None if last_price is None or session_vwap is None else last_price >= session_vwap
     payload["relative_volume_ok"] = None if relative_volume is None else relative_volume >= 1.0
     return payload

@@ -203,6 +203,71 @@ def test_action_outcome_buckets_include_prism_uncovered(tmp_path):
     assert "PRISM-uncovered-current-market" in summary.action_buckets
 
 
+def test_action_lift_calibration_metrics_are_recorded_and_rendered(tmp_path):
+    run_dir = tmp_path / "run"
+    private = run_dir / "portfolio-private"
+    private.mkdir(parents=True)
+    (run_dir / "run.json").write_text('{"run_id":"run1","started_at":"2026-04-01T09:00:00+09:00"}', encoding="utf-8")
+    (private / "portfolio_report.json").write_text(
+        """
+        {
+          "actions": [
+            {
+              "canonical_ticker": "009150.KS",
+              "action_now": "WATCH",
+              "action_if_triggered": "NONE",
+              "portfolio_relative_action": "WATCH",
+              "delta_krw_now": 0,
+              "confidence": 0.8,
+              "data_health": {
+                "last_price": 1000000,
+                "prism_agreement": "conflict_prism_sell_ta_buy",
+                "action_lift": {
+                  "lift_status": "ACTION_LIFT_FAILURE",
+                  "opportunity_cost_score": 0.85,
+                  "pilot_allowed": true,
+                  "full_size_allowed": false
+                }
+              }
+            }
+          ]
+        }
+        """,
+        encoding="utf-8",
+    )
+    db_path = tmp_path / "perf.sqlite"
+
+    record_run_recommendations(run_dir, db_path)
+    update_action_outcomes(
+        db_path,
+        "2026-04-08",
+        price_history={
+            "009150.KS": [
+                {"date": "2026-04-01", "close": 1000000},
+                {"date": "2026-04-02", "close": 1020000},
+                {"date": "2026-04-03", "close": 1050000},
+            ]
+        },
+    )
+    summary = summarize_action_performance(db_path)
+    html = _render_performance_tracking_section(
+        {
+            "run_id": "run1",
+            "performance": {
+                "enabled": True,
+                "status": "ok",
+                "outcome_update": {"enabled": True, "updated": True},
+                "summary": summary.to_dict(),
+            },
+        }
+    )
+
+    assert summary.calibration["actionable_not_ordered_count"] == 1
+    assert summary.calibration["actionable_not_ordered_rate"] == 1.0
+    assert summary.calibration["missed_upside_5d"] is not None
+    assert "액션 승격 미주문 비율" in html
+
+
 def test_take_profit_if_triggered_is_tracked_as_profit_like(tmp_path):
     run_dir = tmp_path / "run"
     private = run_dir / "portfolio-private"

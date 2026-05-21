@@ -86,6 +86,12 @@ def load_portfolio_profile(path: str | Path, profile_name: str) -> PortfolioProf
         profit_take_stage2_fraction=_to_float(payload.get("profit_take_stage2_fraction"), default=0.30),
         profit_take_trailing_fraction=_to_float(payload.get("profit_take_trailing_fraction"), default=0.25),
         profit_take_keep_core_fraction=_to_float(payload.get("profit_take_keep_core_fraction"), default=0.45),
+        opportunity_capture_enabled=bool(payload.get("opportunity_capture_enabled", False)),
+        opportunity_capture_sleeve_nav_pct=_to_float(payload.get("opportunity_capture_sleeve_nav_pct"), default=7.5),
+        opportunity_capture_per_pilot_nav_pct=_to_float(payload.get("opportunity_capture_per_pilot_nav_pct"), default=1.0),
+        opportunity_capture_max_loss_nav_pct=_to_float(payload.get("opportunity_capture_max_loss_nav_pct"), default=0.3),
+        max_pilot_stop_distance_pct=_to_float(payload.get("max_pilot_stop_distance_pct"), default=12.0),
+        soft_prism_conflict_allows_pilot=bool(payload.get("soft_prism_conflict_allows_pilot", True)),
     )
 
 
