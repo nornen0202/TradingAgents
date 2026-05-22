@@ -95,9 +95,11 @@ If you have separate US PRISM data, provide it as a separate dashboard JSON/SQLi
 ## Conflict Rules
 
 - PRISM `BUY` plus TradingAgents `REDUCE_RISK`, `STOP_LOSS`, or `EXIT` creates a hard conflict and review requirement.
-- PRISM `SELL` or `STOP_LOSS` plus TradingAgents `ADD_NOW` or `STARTER_NOW` blocks immediate buy and requires review.
+- PRISM `STOP_LOSS`, `EXIT`, or `REDUCE_RISK` against a TradingAgents buy remains a hard block.
+- PRISM `SELL`, `TAKE_PROFIT`, `TRIM_TO_FUND`, or `NO_ENTRY` against a strong TradingAgents `STARTER_NOW` / `STARTER_IF_TRIGGERED` candidate blocks full-size exposure. When execution data quality is strong, the report can keep a reviewed pilot visible as `PRISM_SOFT_BLOCK_PILOT_ALLOWED`.
 - PRISM buy-side confirmation can improve ranking, capped by `confidence_cap`.
 - PRISM watch-only signals can raise watchlist priority but do not create an automatic buy.
+- Soft conflict visibility does not bypass disclosure, market warning, data identity, account concentration, stop-distance, cash buffer, or read-only safeguards. It is a report/audit state, not live order execution.
 
 Artifacts are written under each run:
 

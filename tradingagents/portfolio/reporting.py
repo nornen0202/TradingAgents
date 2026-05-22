@@ -288,7 +288,7 @@ def _quality_gate_sections(recommendation: PortfolioRecommendation) -> list[str]
 def _action_lift_section(recommendation: PortfolioRecommendation) -> str:
     audit = recommendation.action_lift_audit or {}
     entries = [entry for entry in (audit.get("entries") or []) if isinstance(entry, dict)]
-    if not entries:
+    if not audit:
         return ""
     priority_statuses = {
         "ACTION_LIFT_FAILURE",
@@ -296,13 +296,22 @@ def _action_lift_section(recommendation: PortfolioRecommendation) -> str:
         "BUDGET_BLOCKED",
         "PILOT_VISIBLE_NO_ORDER",
         "PRISM_SOFT_BLOCK_PILOT_ALLOWED",
+        "HARD_BLOCKED",
     }
     flagged = [entry for entry in entries if str(entry.get("lift_status") or "") in priority_statuses]
     if not flagged:
-        return ""
+        return "\n".join(
+            [
+                "## 놓친 기회 위험 / 액션 승격 점검",
+                "",
+                "종목 실행 신호가 계좌 주문 또는 조건부 pilot으로 어떻게 변환됐는지 별도로 점검합니다.",
+                "",
+                "종목 리포트에서 ACTIONABLE_NOW/Pilot ready였으나 계좌 액션으로 승격되지 않은 후보는 없습니다.",
+            ]
+        )
     rows = [
-        "| 종목 | 종목 신호 | 계좌 액션 | 승격 상태 | pilot | full-size | 미주문/차단 사유 | 다음 유효 액션 |",
-        "|---|---|---|---|---|---|---|---|",
+        "| 종목 | 종목 신호 | 계좌 액션 | 승격 상태 | 기회비용 점수 | pilot 예산 | 최대 손실 | pilot | full-size | 미주문/차단 사유 | 다음 유효 액션 |",
+        "|---|---|---|---|---:|---:|---:|---|---|---|---|",
     ]
     for entry in sorted(flagged, key=lambda item: float(item.get("opportunity_cost_score") or 0.0), reverse=True)[:8]:
         rows.append(
@@ -311,6 +320,9 @@ def _action_lift_section(recommendation: PortfolioRecommendation) -> str:
             f"{_cell(str(entry.get('stock_entry_state') or '-') + ' / ' + str(entry.get('stock_execution_timing') or '-'))} | "
             f"{_cell(str(entry.get('account_action_now') or '-') + ' / ' + str(entry.get('account_action_if_triggered') or '-'))} | "
             f"{_cell(_lift_status_label(str(entry.get('lift_status') or '')))} | "
+            f"{_cell(_score_0_100(entry.get('opportunity_cost_score')))} | "
+            f"{_cell(_krw_or_dash(entry.get('pilot_budget_krw')))} | "
+            f"{_cell(_krw_or_dash(entry.get('max_loss_krw')))} | "
             f"{_cell('가능' if entry.get('pilot_allowed') else '불가')} | "
             f"{_cell('가능' if entry.get('full_size_allowed') else '불가')} | "
             f"{_cell(', '.join(str(item) for item in (entry.get('block_reasons') or [])[:4]) or '-')} | "
@@ -339,6 +351,25 @@ def _lift_status_label(status: str) -> str:
         "NOT_ACTIONABLE": "비실행",
     }
     return mapping.get(status, status or "-")
+
+
+def _score_0_100(value: Any) -> str:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return "-"
+    if number <= 1.0:
+        number *= 100.0
+    return f"{number:.0f}"
+
+
+def _krw_or_dash(value: Any) -> str:
+    try:
+        if value is None:
+            return "-"
+        return _krw(int(round(float(value))))
+    except (TypeError, ValueError):
+        return "-"
 
 
 def _strict_summary_line(
