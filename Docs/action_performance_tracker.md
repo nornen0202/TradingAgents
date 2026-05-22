@@ -97,3 +97,37 @@ profit_plan_json
 ```
 
 Outcome updates compute `avoided_drawdown_20d`, `missed_upside_20d`, and `benchmark_excess_5d` so `TAKE_PROFIT` can be reviewed separately from generic risk reduction.
+
+## Action Lift Calibration
+
+Portfolio action rows can carry Action Lift metadata:
+
+```text
+lift_status
+opportunity_cost_score
+opportunity_capture_score
+pilot_allowed
+full_size_allowed
+```
+
+Calibration denominators intentionally use only TradingAgents portfolio action rows with lift metadata. Scanner-only and PRISM-only skipped discovery rows are excluded from `actionable_not_ordered_rate`, `missed_upside_5d`, `missed_upside_20d`, and `prism_conflict_winner_rate` so skipped discovery candidates do not dilute account action lift failures.
+
+Skipped discovery rows remain tracked separately:
+
+```text
+scanner_candidate_skipped_count
+prism_candidate_skipped_count
+```
+
+The calibration summary includes:
+
+```text
+action_lift_denominator_count
+actionable_not_ordered_count
+actionable_not_ordered_rate
+missed_upside_5d
+missed_upside_20d
+prism_conflict_winner_rate
+scanner_candidate_skipped_count
+prism_candidate_skipped_count
+```

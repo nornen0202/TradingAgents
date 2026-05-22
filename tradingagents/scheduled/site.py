@@ -2392,10 +2392,13 @@ def _performance_calibration_card(calibration: dict[str, Any]) -> str:
         return ""
     return f"""
       <article class="run-card">
+        <p><strong>액션 승격 분모</strong><span>{_escape(str(calibration.get('action_lift_denominator_count') or 0))}</span></p>
         <p><strong>액션 승격 미주문 비율</strong><span>{_escape(_format_pct_value(calibration.get('actionable_not_ordered_rate')))}</span></p>
         <p><strong>미주문 후보 5일 성과</strong><span>{_escape(_format_pct_value(calibration.get('missed_upside_5d')))}</span></p>
         <p><strong>미주문 후보 20일 missed upside</strong><span>{_escape(_format_pct_value(calibration.get('missed_upside_20d')))}</span></p>
         <p><strong>PRISM 충돌 상승 비율</strong><span>{_escape(_format_pct_value(calibration.get('prism_conflict_winner_rate')))}</span></p>
+        <p><strong>Scanner skipped</strong><span>{_escape(str(calibration.get('scanner_candidate_skipped_count') or 0))}</span></p>
+        <p><strong>PRISM skipped</strong><span>{_escape(str(calibration.get('prism_candidate_skipped_count') or 0))}</span></p>
       </article>
     """
 
@@ -3566,6 +3569,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
     report_json = private_dir / "portfolio_report.json"
     candidates_json = private_dir / "portfolio_candidates.json"
     action_lift_json = private_dir / "action_lift_audit.json"
+    portfolio_action_lift_json = private_dir / "portfolio_action_lift_audit.json"
     summary_svg = private_dir / "summary_card.svg"
     summary_png = private_dir / "summary_card_ai.png"
     summary_spec = private_dir / "summary_image_spec.json"
@@ -3608,9 +3612,10 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         except Exception:
             sell_side_counts = {}
             actions_by_ticker = {}
-    if action_lift_json.exists():
+    lift_source_json = action_lift_json if action_lift_json.exists() else portfolio_action_lift_json
+    if lift_source_json.exists():
         try:
-            lift_payload = json.loads(action_lift_json.read_text(encoding="utf-8"))
+            lift_payload = json.loads(lift_source_json.read_text(encoding="utf-8"))
             for entry in lift_payload.get("entries") or []:
                 if not isinstance(entry, dict):
                     continue
@@ -3659,6 +3664,7 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
         "portfolio_report_md": report_md if report_md.exists() else None,
         "portfolio_report_json": report_json if report_json.exists() else None,
         "action_lift_audit_json": action_lift_json if action_lift_json.exists() else None,
+        "portfolio_action_lift_audit_json": portfolio_action_lift_json if portfolio_action_lift_json.exists() else None,
         "summary_image_svg": summary_svg if summary_svg.exists() else None,
         "summary_image_png": summary_png if summary_png.exists() else None,
         "summary_image_spec_json": summary_spec if summary_spec.exists() else None,

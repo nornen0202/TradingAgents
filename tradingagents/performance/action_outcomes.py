@@ -26,6 +26,7 @@ def initialize_action_tracker(db_path: Path) -> None:
             "profit_plan_json": "TEXT",
             "lift_status": "TEXT",
             "opportunity_cost_score": "REAL",
+            "opportunity_capture_score": "REAL",
             "pilot_allowed": "INTEGER",
             "full_size_allowed": "INTEGER",
         })
@@ -63,9 +64,9 @@ def record_run_recommendations(run_dir: Path, db_path: Path) -> None:
                   run_id, ticker, action, risk_action, recommended_price, confidence,
                   trigger_type, source, prism_agreement, sell_intent, sell_trigger_status,
                   sell_size_plan, unrealized_return_pct, profit_protection_score,
-                  profit_plan_json, lift_status, opportunity_cost_score, pilot_allowed,
-                  full_size_allowed, was_executed, skip_reason, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  profit_plan_json, lift_status, opportunity_cost_score, opportunity_capture_score,
+                  pilot_allowed, full_size_allowed, was_executed, skip_reason, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["run_id"],
@@ -85,6 +86,7 @@ def record_run_recommendations(run_dir: Path, db_path: Path) -> None:
                     row.get("profit_plan_json"),
                     row.get("lift_status"),
                     row.get("opportunity_cost_score"),
+                    row.get("opportunity_capture_score"),
                     _bool_to_int(row.get("pilot_allowed")),
                     _bool_to_int(row.get("full_size_allowed")),
                     int(bool(row.get("was_executed"))),
@@ -220,6 +222,7 @@ def _portfolio_action_rows(run_dir: Path, manifest: dict[str, Any], *, run_id: s
                 "profit_plan_json": json.dumps(profit_plan, ensure_ascii=False) if profit_plan else None,
                 "lift_status": lift.get("lift_status") or data_health.get("lift_status"),
                 "opportunity_cost_score": _float_or_none(lift.get("opportunity_cost_score") or data_health.get("opportunity_cost_score")),
+                "opportunity_capture_score": _float_or_none(lift.get("opportunity_capture_score") or data_health.get("opportunity_capture_score")),
                 "pilot_allowed": lift.get("pilot_allowed") if lift else data_health.get("pilot_allowed"),
                 "full_size_allowed": lift.get("full_size_allowed") if lift else data_health.get("full_size_allowed"),
                 "was_executed": bool(int(action.get("delta_krw_now") or 0)),
@@ -474,6 +477,13 @@ def _aggregate_profit_taking(conn: sqlite3.Connection) -> dict[str, dict[str, An
 def _aggregate_calibration(conn: sqlite3.Connection) -> dict[str, Any]:
     row = conn.execute(
         """
+        WITH portfolio_lift_rows AS (
+          SELECT *
+          FROM action_recommendations
+          WHERE source = 'TradingAgents'
+            AND lift_status IS NOT NULL
+            AND UPPER(COALESCE(action, '')) NOT IN ('SCANNER_CANDIDATE_SKIPPED', 'PRISM_CANDIDATE_SKIPPED')
+        )
         SELECT
           COUNT(*) AS total,
           SUM(CASE WHEN UPPER(COALESCE(lift_status, '')) IN (
@@ -490,18 +500,33 @@ def _aggregate_calibration(conn: sqlite3.Connection) -> dict[str, Any]:
           ) THEN o.missed_upside_20d ELSE NULL END) AS missed_upside_20d,
           AVG(CASE WHEN COALESCE(prism_agreement, '') LIKE 'conflict_%'
             THEN CASE WHEN o.return_5d > 0 THEN 1.0 ELSE 0.0 END ELSE NULL END) AS prism_conflict_winner_rate
-        FROM action_recommendations r
+        FROM portfolio_lift_rows r
         LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
+        """
+    ).fetchone()
+    skipped = conn.execute(
+        """
+        SELECT
+          SUM(CASE WHEN UPPER(COALESCE(action, '')) = 'SCANNER_CANDIDATE_SKIPPED'
+                    OR LOWER(COALESCE(source, '')) = 'scanner'
+              THEN 1 ELSE 0 END) AS scanner_skipped,
+          SUM(CASE WHEN UPPER(COALESCE(action, '')) = 'PRISM_CANDIDATE_SKIPPED'
+                    OR COALESCE(source, '') = 'PRISM'
+              THEN 1 ELSE 0 END) AS prism_skipped
+        FROM action_recommendations
         """
     ).fetchone()
     total = int(row["total"] or 0) if row else 0
     actionable_not_ordered = int(row["actionable_not_ordered"] or 0) if row else 0
     return {
+        "action_lift_denominator_count": total,
         "actionable_not_ordered_count": actionable_not_ordered,
         "actionable_not_ordered_rate": (actionable_not_ordered / total if total else 0.0),
         "missed_upside_5d": row["missed_upside_5d"] if row else None,
         "missed_upside_20d": row["missed_upside_20d"] if row else None,
         "prism_conflict_winner_rate": row["prism_conflict_winner_rate"] if row else None,
+        "scanner_candidate_skipped_count": int(skipped["scanner_skipped"] or 0) if skipped else 0,
+        "prism_candidate_skipped_count": int(skipped["prism_skipped"] or 0) if skipped else 0,
     }
 
 

@@ -25,6 +25,7 @@ ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
       profit_plan_json TEXT,
       lift_status TEXT,
       opportunity_cost_score REAL,
+      opportunity_capture_score REAL,
       pilot_allowed INTEGER,
       full_size_allowed INTEGER,
       was_executed INTEGER DEFAULT 0,

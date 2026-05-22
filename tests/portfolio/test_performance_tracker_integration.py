@@ -268,6 +268,80 @@ def test_action_lift_calibration_metrics_are_recorded_and_rendered(tmp_path):
     assert "액션 승격 미주문 비율" in html
 
 
+def test_calibration_denominator_excludes_scanner_and_prism_rows(tmp_path):
+    run_dir = tmp_path / "run"
+    private = run_dir / "portfolio-private"
+    scanner = run_dir / "scanner"
+    prism = run_dir / "external_signals"
+    private.mkdir(parents=True)
+    scanner.mkdir()
+    prism.mkdir()
+    (run_dir / "run.json").write_text('{"run_id":"run1","started_at":"2026-04-01T09:00:00+09:00"}', encoding="utf-8")
+    (private / "portfolio_report.json").write_text(
+        """
+        {
+          "actions": [
+            {
+              "canonical_ticker": "009150.KS",
+              "action_now": "WATCH",
+              "action_if_triggered": "NONE",
+              "portfolio_relative_action": "WATCH",
+              "delta_krw_now": 0,
+              "confidence": 0.8,
+              "data_health": {
+                "action_lift": {
+                  "lift_status": "ACTION_LIFT_FAILURE",
+                  "opportunity_cost_score": 0.85,
+                  "pilot_allowed": true,
+                  "full_size_allowed": false
+                }
+              }
+            }
+          ]
+        }
+        """,
+        encoding="utf-8",
+    )
+    (scanner / "scanner_candidates.json").write_text(
+        """
+        {
+          "candidates": [
+            {"ticker": "000001.KS", "final_score": 80},
+            {"ticker": "000002.KS", "final_score": 79},
+            {"ticker": "000003.KS", "final_score": 78},
+            {"ticker": "000004.KS", "final_score": 77},
+            {"ticker": "000005.KS", "final_score": 76}
+          ]
+        }
+        """,
+        encoding="utf-8",
+    )
+    (prism / "prism_signals.json").write_text(
+        """
+        {
+          "signals": [
+            {"canonical_ticker": "000006.KS", "signal_action": "BUY", "current_price": 1000},
+            {"canonical_ticker": "000007.KS", "signal_action": "BUY", "current_price": 1000},
+            {"canonical_ticker": "000008.KS", "signal_action": "BUY", "current_price": 1000},
+            {"canonical_ticker": "000009.KS", "signal_action": "BUY", "current_price": 1000}
+          ]
+        }
+        """,
+        encoding="utf-8",
+    )
+    db_path = tmp_path / "perf.sqlite"
+
+    record_run_recommendations(run_dir, db_path)
+    summary = summarize_action_performance(db_path)
+
+    assert summary.recommendations == 10
+    assert summary.calibration["action_lift_denominator_count"] == 1
+    assert summary.calibration["actionable_not_ordered_count"] == 1
+    assert summary.calibration["actionable_not_ordered_rate"] == 1.0
+    assert summary.calibration["scanner_candidate_skipped_count"] == 5
+    assert summary.calibration["prism_candidate_skipped_count"] == 4
+
+
 def test_take_profit_if_triggered_is_tracked_as_profit_like(tmp_path):
     run_dir = tmp_path / "run"
     private = run_dir / "portfolio-private"

@@ -205,6 +205,12 @@ def _build_prompt(
         "Return exactly one JSON object and nothing else.\n"
         "Re-rank only the provided tickers. Do not invent new tickers.\n"
         "Be conservative when sector concentration, low data quality, or wait-heavy batches are present.\n"
+        "For stock-level ACTIONABLE_NOW/Pilot ready candidates that remain account WATCH/HOLD, explicitly classify the gap as one of: "
+        "legitimate hard block, full-size blocked but pilot allowed, or action lift failure.\n"
+        "Always distinguish full-size permission from pilot permission; a full-size block does not automatically block a small pilot.\n"
+        "Use snake_case reason codes when applicable: action_lift_failure, full_size_blocked_pilot_allowed, "
+        "pilot_blocked_by_hard_risk, pilot_blocked_by_stop_distance, pilot_blocked_by_account_concentration, "
+        "prism_conflict_full_size_blocked.\n"
         "Schema: "
         '{"priority_order":["ticker"],"reason_by_ticker":{"ticker":{"summary":"...","reason_codes":["snake_case"],"review_required":false}},"portfolio_note":"..."}.\n'
         f"Portfolio context JSON:\n{json.dumps(compact_payload, ensure_ascii=False)}"
