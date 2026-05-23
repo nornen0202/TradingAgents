@@ -36,6 +36,13 @@ def test_prism_numeric_kr_code_infers_kr():
     assert signal.market == "KR"
 
 
+def test_prism_alphanumeric_kr_code_infers_kr():
+    signal = _parse({"ticker": "0001A0", "display_name": "덕양에너젠", "action": "SELL"}, market="US")
+
+    assert signal.canonical_ticker == "0001A0"
+    assert signal.market == "KR"
+
+
 def test_prism_market_conflict_warning():
     signal = _parse({"ticker": "000660.KS", "market": "US", "action": "BUY"}, market="US")
 

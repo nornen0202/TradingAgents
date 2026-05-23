@@ -49,7 +49,7 @@ def load_prism_signals(config: PrismLoaderConfig | Any | None = None) -> PrismIn
         )
     if cfg.use_live_http and cfg.dashboard_base_url:
         warnings: list[str] = []
-        for url in candidate_dashboard_urls(cfg.dashboard_base_url):
+        for url in candidate_dashboard_urls(cfg.dashboard_base_url, market=cfg.market):
             result = fetch_dashboard_json_url(
                 url,
                 timeout_seconds=cfg.timeout_seconds,

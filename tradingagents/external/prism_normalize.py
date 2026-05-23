@@ -29,6 +29,8 @@ def infer_market_from_ticker(value: Any) -> str | None:
         return "KR"
     if re.fullmatch(r"\d{6}", symbol):
         return "KR"
+    if re.fullmatch(r"\d[A-Z0-9]{5}", symbol):
+        return "KR"
     if re.fullmatch(r"[A-Z][A-Z0-9.-]{0,9}", symbol):
         return "US"
     return None

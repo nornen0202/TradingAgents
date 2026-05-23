@@ -48,9 +48,12 @@ HTML fallback remains a separate opt-in:
 [external.prism]
 enabled = true
 dashboard_base_url = "https://analysis.stocksimulation.kr"
+market = "US"
 use_live_http = true
 use_html_scraping = true
 ```
+
+When `dashboard_base_url` is used, the live loader tries market-specific dashboard JSON first. For example, `market = "US"` probes `/us_dashboard_data.json` before the generic KR `/dashboard_data.json`; `market = "KR"` keeps the KR dashboard JSON first. Set `dashboard_json_url` only when you want to pin an exact endpoint.
 
 Environment overrides:
 
@@ -90,7 +93,7 @@ allow_cross_market_candidates = true
 allowed_markets = ["KR"]  # example: allow KR PRISM candidates in a US run
 ```
 
-If you have separate US PRISM data, provide it as a separate dashboard JSON/SQLite source for the US scheduled config, or set `[external.prism].market = "US"` only when the payload itself contains US tickers. The parser still lets strong ticker suffixes override an incorrect default market.
+If you have separate US PRISM data behind the standard dashboard base URL, set `[external.prism].market = "US"` so the loader selects the US JSON endpoint. If you provide a custom `dashboard_json_url`, point it at the exact US JSON/SQLite source. The parser still lets strong ticker/code evidence override an incorrect default market.
 
 ## Conflict Rules
 
