@@ -27,12 +27,32 @@ from .prism_normalize import (
 )
 
 
-DASHBOARD_CANDIDATE_PATHS = (
+_GENERIC_DASHBOARD_CANDIDATE_PATHS = (
     "/dashboard_data.json",
     "/data/dashboard_data.json",
+    "/dashboard_data_en.json",
+    "/data/dashboard_data_en.json",
     "/api/dashboard",
     "/api/dashboard_data",
 )
+_MARKET_DASHBOARD_CANDIDATE_PATHS = {
+    "US": (
+        "/us_dashboard_data.json",
+        "/data/us_dashboard_data.json",
+        "/us_dashboard_data_en.json",
+        "/data/us_dashboard_data_en.json",
+        "/api/dashboard?market=US",
+        "/api/dashboard_data?market=US",
+    ),
+    "KR": (
+        "/dashboard_data.json",
+        "/data/dashboard_data.json",
+        "/dashboard_data_en.json",
+        "/data/dashboard_data_en.json",
+        "/api/dashboard?market=KR",
+        "/api/dashboard_data?market=KR",
+    ),
+}
 
 _SECTION_KEYS = {
     "portfolio",
@@ -239,11 +259,17 @@ def fetch_dashboard_html_url(
     )
 
 
-def candidate_dashboard_urls(base_url: str) -> tuple[str, ...]:
+def candidate_dashboard_urls(base_url: str, *, market: str | None = None) -> tuple[str, ...]:
     base = str(base_url or "").strip().rstrip("/")
     if not base:
         return tuple()
-    return tuple(f"{base}{path}" for path in DASHBOARD_CANDIDATE_PATHS)
+    normalized_market = str(market or "").strip().upper()
+    paths = (
+        *_MARKET_DASHBOARD_CANDIDATE_PATHS.get(normalized_market, tuple()),
+        *_GENERIC_DASHBOARD_CANDIDATE_PATHS,
+    )
+    ordered_paths = tuple(dict.fromkeys(paths))
+    return tuple(f"{base}{path}" for path in ordered_paths)
 
 
 def parse_dashboard_html(

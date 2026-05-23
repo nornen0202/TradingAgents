@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from tradingagents.external.prism_conflicts import enrich_candidates_with_prism, reconcile_prism_with_actions
-from tradingagents.external.prism_dashboard import load_dashboard_json_file, parse_dashboard_html
+from tradingagents.external.prism_dashboard import candidate_dashboard_urls, load_dashboard_json_file, parse_dashboard_html
 from tradingagents.external.prism_loader import PrismLoaderConfig, load_prism_signals
 from tradingagents.external.prism_models import PrismExternalSignal, PrismIngestionResult, PrismSignalAction
 from tradingagents.external.prism_sqlite import load_prism_sqlite
@@ -149,6 +149,40 @@ def test_prism_loader_only_uses_html_scraping_when_explicitly_enabled():
     assert result.ok is True
     assert result.signals
     html_fetch.assert_called_once()
+
+
+def test_prism_live_base_url_prefers_us_market_json_endpoint():
+    urls = candidate_dashboard_urls("https://example.test", market="US")
+
+    assert urls[0] == "https://example.test/us_dashboard_data.json"
+    assert "https://example.test/dashboard_data.json" in urls
+
+
+def test_prism_loader_uses_market_specific_live_json_for_us():
+    def fake_fetch(url, **kwargs):
+        if url.endswith("/us_dashboard_data.json"):
+            return PrismIngestionResult(
+                enabled=True,
+                ok=True,
+                signals=[PrismExternalSignal(canonical_ticker="AAPL", market="US")],
+                source=url,
+            )
+        return PrismIngestionResult(enabled=True, ok=False, warnings=[f"miss:{url}"])
+
+    with patch("tradingagents.external.prism_loader.fetch_dashboard_json_url", side_effect=fake_fetch) as fetch:
+        result = load_prism_signals(
+            PrismLoaderConfig(
+                enabled=True,
+                use_live_http=True,
+                dashboard_base_url="https://example.test",
+                market="US",
+            )
+        )
+
+    assert result.ok is True
+    assert [signal.canonical_ticker for signal in result.signals] == ["AAPL"]
+    assert fetch.call_args_list[0].args[0] == "https://example.test/us_dashboard_data.json"
+    assert fetch.call_args_list[0].kwargs["market"] == "US"
 
 
 def test_prism_sqlite_parser_tolerates_missing_tables(tmp_path):
