@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from tests.portfolio.benchmarks.helpers import build_fixture_comparison, default_settings
 from tradingagents.scheduled.config import SiteSettings
-from tradingagents.scheduled.site import _render_etf_alternative_comparison, _render_etf_benchmark_page
+from tradingagents.scheduled.site import (
+    _portfolio_has_etf_benchmark_page,
+    _render_etf_alternative_comparison,
+    _render_etf_benchmark_page,
+)
 
 
 def test_etf_benchmark_site_renders_equity_curve_and_policy():
@@ -20,9 +24,7 @@ def test_etf_benchmark_site_renders_dated_cashflow_unavailable_state():
         build_fixture_comparison(settings=default_settings(use_cashflows=False)).to_public_dict()
     )
 
-    assert "KIS 일자 원장 미확인" in html
-    assert "외부 입출금 일자는 API 미제공" in html
-    assert "정확한 적립식 ETF 비교를 제공하지 않습니다" in html
+    assert html == ""
 
 
 def test_etf_benchmark_site_explains_actual_performance_unavailable_state():
@@ -39,11 +41,7 @@ def test_etf_benchmark_site_explains_actual_performance_unavailable_state():
         }
     )
 
-    assert "실제 계좌 성과가 검증되지 않아" in html
-    assert "외부 입출금 원장은 API 미제공" in html
-    assert "선택적 fallback" in html
-    assert "실제 계좌 성과가 검증되지 않아 ETF 대체 비교를 계산하지 않았습니다." in html
-    assert "actual_performance_unavailable</span>" not in html
+    assert html == ""
 
 
 def test_standalone_etf_benchmark_page_uses_friendly_status_labels():
@@ -62,8 +60,13 @@ def test_standalone_etf_benchmark_page_uses_friendly_status_labels():
         portfolio_summary={"status_class": "partial_failure", "account_performance": {"etf_alternative_comparison": comparison}},
     )
 
-    assert "실제 성과 검증 전" in html
+    assert "비교 데이터 없음" in html
     assert "실제 성과 출처" in html
-    assert "검증 전 참고 불가" in html
+    assert "비교 제외" in html
+    assert "ETF 대체 비교 데이터가 없습니다." in html
+    assert not _portfolio_has_etf_benchmark_page(
+        {"account_performance": {"etf_alternative_comparison": comparison}}
+    )
+    assert "검증 전 참고 불가" not in html
     assert "actual_performance_unavailable</div>" not in html
     assert "Actual source" not in html

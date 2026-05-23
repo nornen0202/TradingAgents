@@ -162,20 +162,22 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
         site / "downloads" / manifest["run_id"] / "portfolio" / "broker_performance_normalized.json"
     )
     assert "계좌 성과 vs 지수/ETF" in public_html
+    assert public_html.index("TradingAgents 계좌 운용 리포트") < public_html.index("계좌 성과 vs 지수/ETF")
     assert "성과 기준 기간" in public_html
     assert "계좌 수익률" in public_html
-    assert "YTD (부분)" in public_html
-    assert "데이터 부족" in public_html
-    assert "요청 기간 시작일의 계좌 스냅샷 없음" in public_html
+    assert "YTD (부분)" not in public_html
+    assert "데이터 부족" not in public_html
+    assert "요청 기간 시작일의 계좌 스냅샷 없음" not in public_html
     assert "사용 가능 전체 기간 (부분)" in public_html
     assert "부분 산출" in public_html
-    assert "기간별 원시 산출" in public_html
+    assert "기간별 원시 산출" not in public_html
+    assert "데이터 품질 경고" not in public_html
     assert "사용 가능 기간 수익률" in public_html
     assert "보유/실현 손익 기여도" in public_html
     assert "KOSPI" in public_html
     assert "KOSDAQ" in public_html
     assert "account_performance_public.json" in public_html
-    assert public_html.rfind("자료 다운로드") < public_html.rfind("Report vs latest intraday reanalysis")
+    assert "Report vs latest intraday reanalysis" not in public_html
     assert "account_snapshot.json" not in public_html
     assert "account_snapshot.json" not in index_html
     assert "decision_audit.json" not in index_html
@@ -296,19 +298,18 @@ def test_portfolio_page_prioritizes_broker_performance_and_hides_failed_snapshot
     )
 
     assert "한국투자증권 앱 기준 성과" in html
-    assert html.index("한국투자증권 앱 기준 성과") < html.index("내부 스냅샷 수익률")
     assert "12.08%" in html
-    assert "검증 전 참고 불가" in html
-    assert "브로커 앱 기말자산과 TradingAgents 내부 계좌 평가액이 크게 다릅니다." in html
-    assert "정합성 상세" in html
-    assert "정합성 해결/자동화 상태" in html
-    assert "날짜별 입출금 원장 자동화 상태" in html
-    assert "KIS API 원천 미제공" in html
-    assert "<strong>삼성전자</strong>" in html
+    assert "내부 스냅샷 수익률" not in html
+    assert "검증 전 참고 불가" not in html
+    assert "브로커 앱 기말자산과 TradingAgents 내부 계좌 평가액이 크게 다릅니다." not in html
+    assert "정합성 상세" not in html
+    assert "정합성 해결/자동화 상태" not in html
+    assert "날짜별 입출금 원장 자동화 상태" not in html
+    assert "KIS API 원천 미제공" not in html
+    assert "<strong>삼성전자</strong>" not in html
     assert "<strong>005930.KS</strong>" not in html
-    assert html.index("broker_performance_comparison:broker_end_asset") < html.index(
-        "account_performance_period_insufficient_history:YTD"
-    )
+    assert "broker_performance_comparison:broker_end_asset" not in html
+    assert "account_performance_period_insufficient_history:YTD" not in html
 
 
 def test_portfolio_page_renders_etf_dca_comparison_when_available():
@@ -435,11 +436,7 @@ def test_portfolio_page_renders_etf_dca_unavailable_without_dated_cashflows():
         {"account_performance": payload},
     )
 
-    assert "KIS 일자 원장 미확인" in html
-    assert "외부 입출금 일자는 API 미제공" in html
-    assert "정확한 적립식 ETF 비교를 제공하지 않습니다" in html
-    assert "37,665,615 KRW" in html
-    assert "ETF 대체 최고 수익률" not in html
+    assert html == ""
 
 
 def test_build_site_generates_standalone_etf_benchmark_page(tmp_path: Path):
@@ -628,9 +625,9 @@ def test_portfolio_page_normalizes_legacy_duplicate_account_performance_periods(
 
     assert "사용 가능 전체 기간 (부분)" in public_html
     assert "20.00%" in public_html
-    assert "YTD (부분)" in public_html
-    assert "데이터 부족" in public_html
-    assert "요청 기간 시작일의 계좌 스냅샷 없음" in public_html
+    assert "YTD (부분)" not in public_html
+    assert "데이터 부족" not in public_html
+    assert "요청 기간 시작일의 계좌 스냅샷 없음" not in public_html
     assert ytd_period["status"] == "insufficient_history"
     assert ytd_period["actual_return"] is None
     assert ytd_period["period_coverage"]["same_actual_window_as"] == "ALL_AVAILABLE"
@@ -747,15 +744,15 @@ def test_portfolio_page_hides_duplicate_periods_by_default_and_preserves_diagnos
     build_site(archive, site, SiteSettings())
     public_html = (site / "runs" / "20260507T090000_test" / "portfolio.html").read_text(encoding="utf-8")
 
-    default_section = public_html.split("기간별 원시 산출", 1)[0]
+    default_section = public_html
     assert "사용 가능 전체 기간" in default_section
     assert "1M (부분)" not in default_section
     assert "1M/3M/6M/YTD/1Y" in default_section
-    assert "기간별 원시 산출" in public_html
-    assert "1M (부분)" in public_html
+    assert "기간별 원시 산출" not in public_html
+    assert "데이터 품질 경고" not in public_html
 
 
-def test_portfolio_page_shows_friendly_provider_fallback_and_keeps_raw_error_in_diagnostics(tmp_path: Path):
+def test_portfolio_page_hides_provider_fallback_and_raw_error_from_investor_section(tmp_path: Path):
     archive = tmp_path / "archive"
     site = tmp_path / "site"
     run_dir = archive / "runs" / "2026" / "20260506T090000_test"
@@ -832,10 +829,10 @@ def test_portfolio_page_shows_friendly_provider_fallback_and_keeps_raw_error_in_
 
     build_site(archive, site, SiteSettings())
     public_html = (site / "runs" / "20260506T090000_test" / "portfolio.html").read_text(encoding="utf-8")
-    investor_section = public_html.split("데이터 품질 경고", 1)[0]
-    assert "벤치마크 가격: SPY/QQQ = KIS 실패 후 yfinance fallback" in investor_section
+    investor_section = public_html
+    assert "벤치마크 가격: SPY/QQQ = KIS 실패 후 yfinance fallback" not in investor_section
     assert "https://openapi" not in investor_section
-    assert raw_error in public_html
+    assert raw_error not in public_html
 
 
 def test_reconciliation_failed_demotes_excess_headline():
@@ -884,23 +881,7 @@ def test_reconciliation_failed_demotes_excess_headline():
         {"run_id": "run1", "portfolio": {"account_performance": {"publish_to_site": True}}},
         {"account_performance": payload},
     )
-    kpi_section = html.split("<div class=\"account-table-wrap\">", 1)[0]
-
-    assert "성과 신뢰도" in kpi_section
-    assert "낮음" in kpi_section
-    assert "검증 필요 / 정합성 실패" in kpi_section
-    assert "정합성 검증 후 해석" in kpi_section
-    assert "수동 검증 필요" in kpi_section
-    assert "KOSDAQ 161.07%" not in kpi_section
-    default_table = html.split("기간별 원시 산출", 1)[0]
-    assert "검증 전 참고 불가" in default_table
-    assert "28.69%" not in default_table
-    assert "161.07%" not in default_table
-    raw_table = html.split("기간별 원시 산출", 1)[1]
-    assert "28.69%" in raw_table
-    assert "161.07%" in raw_table
-    assert html.count("id='account-perf-ALL'") == 1
-    assert "id='account-perf-raw-ALL'" in html
+    assert html == ""
 
 
 def test_chart_peak_return_labeled_as_peak_not_headline():

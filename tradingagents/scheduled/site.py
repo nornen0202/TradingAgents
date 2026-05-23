@@ -812,14 +812,7 @@ def _render_portfolio_delta_section(manifest: dict[str, Any]) -> str:
 def _render_live_context_delta_section(manifest: dict[str, Any]) -> str:
     delta = manifest.get("live_context_delta") or {}
     if not delta:
-        return (
-            "<section class='section'>"
-            "<div class='section-head'><h2>Report vs latest intraday reanalysis</h2></div>"
-            "<article class='run-card'>"
-            "<p>Latest intraday reanalysis not run.</p>"
-            "</article>"
-            "</section>"
-        )
+        return ""
 
     artifacts = delta.get("artifacts") or {}
     json_name = Path(str(artifacts.get("live_context_delta_json") or "live_context_delta.json")).name
@@ -914,12 +907,7 @@ def _render_live_ticker_context_delta_section(
     if not ticker_delta:
         if delta:
             return ""
-        return (
-            "<section class='section'>"
-            "<div class='section-head'><h2>Latest intraday reanalysis</h2></div>"
-            "<article class='run-card'><p>Latest intraday reanalysis not run.</p></article>"
-            "</section>"
-        )
+        return ""
     return f"""
     <section class="section">
       <div class="section-head">
@@ -1008,7 +996,6 @@ def _render_portfolio_page(
     portfolio_summary: dict[str, Any],
 ) -> str:
     run_dir = Path(manifest["_run_dir"])
-    execution_summary = _load_execution_summary(run_dir)
     report_html = "<p class='empty'>No portfolio markdown report was generated.</p>"
     report_path = portfolio_summary.get("portfolio_report_md")
     if isinstance(report_path, Path) and report_path.exists():
@@ -1048,8 +1035,6 @@ def _render_portfolio_page(
     )
     portfolio_label = _portfolio_report_label(portfolio_summary)
     summary_image_html = _portfolio_summary_image_html(manifest, portfolio_summary)
-    account_performance_badges = _account_performance_status_badges(portfolio_summary)
-
     body = f"""
     <nav class="breadcrumbs">
       <a href="../../index.html">Home</a>
@@ -1065,20 +1050,18 @@ def _render_portfolio_page(
         <div class="status {portfolio_summary.get('status_class', 'pending')}">{_escape(status_label)}</div>
         <p><strong>Account mode</strong><span>{_escape(snapshot_mode)}</span></p>
         <p><strong>Generated</strong><span>{_escape(portfolio_summary.get('generated_at') or '-')}</span></p>
-        {account_performance_badges}
       </div>
     </section>
     {failure_html}
     {summary_image_html}
-    {_render_account_performance_section(manifest, portfolio_summary)}
-    {_render_performance_tracking_section(manifest)}
     <section class="section prose">
       <div class="section-head">
         <h2>{_escape(portfolio_label)}</h2>
       </div>
       {report_html}
     </section>
-    {_render_execution_summary_section(execution_summary)}
+    {_render_account_performance_section(manifest, portfolio_summary)}
+    {_render_performance_tracking_section(manifest)}
     {downloads_html}
     {_render_live_context_delta_section(manifest)}
     """
@@ -1090,7 +1073,10 @@ def _portfolio_has_etf_benchmark_page(portfolio_summary: dict[str, Any]) -> bool
     if not isinstance(payload, dict):
         return False
     comparison = payload.get("etf_alternative_comparison")
-    return isinstance(comparison, dict) and bool(comparison)
+    if not isinstance(comparison, dict) or not comparison:
+        return False
+    status = str(comparison.get("status") or "").strip().lower()
+    return bool(status) and status not in {"cashflow_dates_required", "actual_performance_unavailable"}
 
 
 def _render_etf_benchmark_page(
@@ -1171,13 +1157,16 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     confidence_label = _account_confidence_label(summary)
     reconciliation_label = _account_reconciliation_label(reconciliation)
     reconciliation_status = str(reconciliation.get("reconciliation_status") or "").upper()
+    has_broker_numbers = _broker_performance_has_numbers(broker_performance)
+    if reconciliation_status == "FAILED" and not has_broker_numbers:
+        return ""
     show_snapshot_headline = reconciliation_status != "FAILED" or bool(
         summary.get("show_snapshot_performance_when_unreconciled")
     )
     snapshot_return_value = (
         _format_pct_value(summary.get("actual_return"))
         if show_snapshot_headline
-        else "검증 전 참고 불가"
+        else "성과 미표시"
     )
     snapshot_method_label = (
         "내부 스냅샷 기반 보조 계산"
@@ -1203,24 +1192,21 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
         if isinstance(period, dict)
     )
     table_rows = _account_performance_period_rows(display_periods, hide_untrusted=not show_snapshot_headline)
-    raw_table_rows = _account_performance_period_rows(periods, diagnostics=True)
     contribution_rows = _account_contribution_rows(contribution, reconciliation=reconciliation)
-    warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
-    warning_html = "".join(
-        f"<li>{_escape(_friendly_account_warning(item))}</li>"
-        for item in _prioritized_account_warnings(warnings)[:8]
-    ) or "<li>특이사항 없음</li>"
     chart_html = _account_performance_svg(payload.get("chart_data") if isinstance(payload.get("chart_data"), dict) else {})
     if not show_snapshot_headline:
-        chart_html = (
-            "<div class='warning-banner account-performance-note'>"
-            "내부 스냅샷 성과 차트는 정합성 실패 상태라 기본 해석에서 제외했습니다."
-            "</div>"
-        )
-    broker_html = _render_broker_performance_summary(broker_performance, broker_comparison)
+        chart_html = ""
+    broker_html = _render_broker_performance_summary(
+        broker_performance,
+        broker_comparison,
+        include_reconciliation_warning=show_snapshot_headline,
+    )
     etf_html = _render_etf_alternative_comparison(payload.get("etf_alternative_comparison"))
+    if not show_snapshot_headline and not broker_html and not etf_html:
+        return ""
+    if show_snapshot_headline and not display_periods and not broker_html and not etf_html:
+        return ""
     benchmark_label = ", ".join(benchmarks) or "-"
-    provider_messages = _account_benchmark_provider_messages(quality)
     investor_notes = _account_performance_investor_notes(
         periods=periods,
         summary=summary,
@@ -1229,47 +1215,44 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     )
     benchmark_reliability = _account_benchmark_reliability_label(summary, reconciliation)
     benchmark_headline_value = (
-        "정합성 검증 후 해석"
+        "-"
         if hide_excess_headline
         else f"{str(best.get('benchmark') or '-')} {_format_pct_value(best.get('excess_return'))}"
     )
-    excess_headline_label = "수동 검증 필요" if hide_excess_headline else str(best.get("benchmark") or "-")
-    excess_headline_value = "참고용" if hide_excess_headline else _format_signed_krw_value(best.get("excess_krw"))
-    provider_label = _account_benchmark_provider_label(quality)
-    return f"""
-    <section class="section account-performance">
-      <div class="section-head">
-        <h2>계좌 성과 vs 지수/ETF</h2>
-        <p>{_escape(benchmark_label)}</p>
-      </div>
-      {broker_html}
-      {etf_html}
-      <div class="run-grid account-kpi-grid">
-        <article class="run-card">
-          <h3>성과 신뢰도</h3>
-          <p><strong>{_escape(confidence_label)}</strong><span>{_escape(reconciliation_label)}</span></p>
-        </article>
-        <article class="run-card">
-          <h3>성과 기준 기간</h3>
-          <p><strong>{_escape(default_period_label)}</strong><span>{_escape(coverage_label)}</span></p>
-        </article>
+    excess_headline_label = "초과손익 생략" if hide_excess_headline else str(best.get("benchmark") or "-")
+    excess_headline_value = "-" if hide_excess_headline else _format_signed_krw_value(best.get("excess_krw"))
+    snapshot_card = (
+        f"""
         <article class="run-card">
           <h3>내부 스냅샷 수익률</h3>
           <p><strong>{_escape(snapshot_method_label)}</strong><span>{_escape(snapshot_return_value)}</span></p>
         </article>
+        """
+        if show_snapshot_headline and not hide_excess_headline
+        else ""
+    )
+    benchmark_card = (
+        f"""
         <article class="run-card">
           <h3>벤치마크 비교</h3>
           <p><strong>{_escape(benchmark_reliability)}</strong><span>{_escape(benchmark_headline_value)}</span></p>
         </article>
+        """
+        if show_snapshot_headline and not hide_excess_headline
+        else ""
+    )
+    excess_card = (
+        f"""
         <article class="run-card">
           <h3>초과손익 해석</h3>
           <p><strong>{_escape(excess_headline_label)}</strong><span>{_escape(excess_headline_value)}</span></p>
         </article>
-      </div>
-      {investor_notes}
-      {provider_messages}
-      {_account_reconciliation_detail_html(reconciliation, quality, broker_comparison)}
-      {_account_reconciliation_guidance_html(reconciliation)}
+        """
+        if show_snapshot_headline and not hide_excess_headline
+        else ""
+    )
+    period_table_html = (
+        f"""
       <div class="pill-row account-period-tabs">{period_tabs}</div>
       {hidden_period_note}
       {chart_html}
@@ -1288,6 +1271,12 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
           <tbody>{table_rows}</tbody>
         </table>
       </div>
+        """
+        if show_snapshot_headline
+        else ""
+    )
+    internal_detail_grid = (
+        f"""
       <div class="run-grid">
         <article class="run-card">
           <h3>보유/실현 손익 기여도</h3>
@@ -1299,37 +1288,67 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
           <p><strong>세금</strong><span>{_escape(_format_krw_value(costs.get('taxes_krw')))}</span></p>
           <p><strong>총 비용</strong><span>{_escape(_format_krw_value(costs.get('total_cost_krw')))}</span></p>
         </article>
-        <article class="run-card">
-          <h3>데이터 품질</h3>
-          <p><strong>스냅샷</strong><span>{int(quality.get('snapshot_count') or 0)}</span></p>
-          <p><strong>입출금/외부자금흐름</strong><span>{int(quality.get('external_capital_flow_count') or 0)}건</span></p>
-          <p><strong>성과 보정 이벤트</strong><span>{int(quality.get('cashflow_event_count') or 0)}건</span></p>
-          <p><strong>거래 원장</strong><span>{int(quality.get('ledger_event_count') or 0)}건</span></p>
-          <p><strong>벤치마크 가격</strong><span>{_escape(provider_label)}</span></p>
-        </article>
       </div>
-      <details class="advanced-diagnostics"><summary>기간별 원시 산출</summary><table><tbody>{raw_table_rows}</tbody></table></details>
-      <details class="advanced-diagnostics"><summary>데이터 품질 경고</summary><ul>{warning_html}</ul></details>
+        """
+        if show_snapshot_headline
+        else ""
+    )
+    summary_kpi_grid = (
+        f"""
+      <div class="run-grid account-kpi-grid">
+        <article class="run-card">
+          <h3>성과 신뢰도</h3>
+          <p><strong>{_escape(confidence_label)}</strong><span>{_escape(reconciliation_label)}</span></p>
+        </article>
+        <article class="run-card">
+          <h3>성과 기준 기간</h3>
+          <p><strong>{_escape(default_period_label)}</strong><span>{_escape(coverage_label)}</span></p>
+        </article>
+        {snapshot_card}
+        {benchmark_card}
+        {excess_card}
+      </div>
+        """
+        if show_snapshot_headline
+        else ""
+    )
+    return f"""
+    <section class="section account-performance">
+      <div class="section-head">
+        <h2>계좌 성과 vs 지수/ETF</h2>
+        <p>{_escape(benchmark_label)}</p>
+      </div>
+      {broker_html}
+      {etf_html}
+      {summary_kpi_grid}
+      {investor_notes}
+      {period_table_html}
+      {internal_detail_grid}
       <div class="pill-row">{''.join(download_links)}</div>
     </section>
     """
 
 
-def _render_broker_performance_summary(broker: dict[str, Any], comparison: dict[str, Any]) -> str:
+def _render_broker_performance_summary(
+    broker: dict[str, Any],
+    comparison: dict[str, Any],
+    *,
+    include_reconciliation_warning: bool = True,
+) -> str:
     if not isinstance(broker, dict) or not broker:
         return ""
     broker_name = "한국투자증권" if str(broker.get("broker") or "").lower() == "kis" else str(broker.get("broker") or "브로커")
     period = f"{broker.get('period_start') or '-'} ~ {broker.get('period_end') or '-'}"
     comparison_status = str(comparison.get("comparison_status") or "OK").upper()
     warning = ""
-    if comparison_status == "FAILED":
+    if comparison_status == "FAILED" and include_reconciliation_warning:
         warning = (
             "<div class='warning-banner account-performance-note'>"
             "브로커 앱 기말자산과 TradingAgents 내부 계좌 평가액이 크게 다릅니다. "
-            "내부 스냅샷 수익률과 초과수익은 검증 전 참고 불가입니다."
+            "내부 스냅샷 기반 수익률과 초과수익은 기본 화면에서 제외합니다."
             "</div>"
         )
-    elif comparison_status == "WARNING":
+    elif comparison_status == "WARNING" and include_reconciliation_warning:
         warning = (
             "<div class='warning-banner account-performance-note'>"
             "브로커 앱 성과와 내부 스냅샷 성과의 기간 또는 값이 완전히 일치하지 않습니다."
@@ -1381,6 +1400,21 @@ def _render_broker_performance_summary(broker: dict[str, Any], comparison: dict[
     """
 
 
+def _broker_performance_has_numbers(broker: dict[str, Any]) -> bool:
+    if not isinstance(broker, dict) or not broker:
+        return False
+    return any(
+        _account_performance_number(broker.get(key)) is not None
+        for key in (
+            "balance_return_pct",
+            "investment_pnl_krw",
+            "end_asset_krw",
+            "realized_trade_pnl_krw",
+            "realized_trade_return_pct",
+        )
+    )
+
+
 def _broker_benchmark_cells(values: Any) -> str:
     if not isinstance(values, list) or not values:
         return "-"
@@ -1400,6 +1434,8 @@ def _render_etf_alternative_comparison(value: Any) -> str:
         return ""
     status = str(value.get("status") or "").strip()
     if not status:
+        return ""
+    if status.lower() in {"cashflow_dates_required", "actual_performance_unavailable"}:
         return ""
     actual = value.get("actual") if isinstance(value.get("actual"), dict) else {}
     cashflows = value.get("cashflows") if isinstance(value.get("cashflows"), dict) else {}
@@ -1462,7 +1498,7 @@ def _render_etf_alternative_comparison(value: Any) -> str:
         <div class="run-grid account-kpi-grid">
           <article class="run-card">
             <h3>실제 계좌 성과</h3>
-            <p><strong>검증 전 참고 불가</strong><span>{_escape(reason_text)}</span></p>
+            <p><strong>비교 제외</strong><span>{_escape(reason_text)}</span></p>
           </article>
           <article class="run-card">
             <h3>날짜별 현금흐름</h3>
@@ -1680,7 +1716,7 @@ def _actual_source_label(value: Any) -> str:
     if source == "internal_reconciled_snapshot":
         return "내부 스냅샷 정합 기준"
     if source == "unavailable":
-        return "검증 전 참고 불가"
+        return "비교 제외"
     return source or "-"
 
 
@@ -1714,7 +1750,7 @@ def _etf_status_label(value: Any) -> str:
     if normalized == "ok":
         return "계산 완료"
     if normalized == "actual_performance_unavailable":
-        return "실제 성과 검증 전"
+        return "비교 데이터 없음"
     if normalized == "cashflow_dates_required":
         return "입금일 원장 필요"
     if normalized == "no_alternatives":
@@ -1835,13 +1871,18 @@ def _account_performance_display_periods(periods: list[Any]) -> list[dict[str, A
         and _account_performance_number(period.get("actual_return")) is not None
         and period.get("status") not in {"insufficient_history", "duplicate_actual_window"}
         and not period.get("same_actual_window_as")
+        and period.get("display_eligible") is not False
+        and str(period.get("trust_state") or "") != "unreconciled_reference"
     ]
     if display:
         return display
     return [
         period
         for period in periods
-        if isinstance(period, dict) and _account_performance_number(period.get("actual_return")) is not None
+        if isinstance(period, dict)
+        and _account_performance_number(period.get("actual_return")) is not None
+        and period.get("display_eligible") is not False
+        and str(period.get("trust_state") or "") != "unreconciled_reference"
     ]
 
 
@@ -1893,17 +1934,6 @@ def _account_performance_period_rows(
                 f" / 커버리지 {_escape(ratio)}{_escape(duplicate_text)}</span>"
             )
         if period.get("status") in {"insufficient_history", "duplicate_actual_window"} and not diagnostics:
-            rows.append(
-                "<tr "
-                f"id='{_escape(row_id)}'>"
-                f"<td>{_escape(period_label)}{partial_note}</td>"
-                "<td>데이터 부족</td>"
-                "<td>요청 기간 시작일의 계좌 스냅샷 없음</td>"
-                "<td>-</td>"
-                "<td>-</td>"
-                "<td>-</td>"
-                "</tr>"
-            )
             continue
         if period.get("status") == "insufficient_history":
             rows.append(
@@ -1937,17 +1967,6 @@ def _account_performance_period_rows(
             or period.get("display_eligible") is False
             or str(period.get("trust_state") or "") == "unreconciled_reference"
         ):
-            rows.append(
-                "<tr "
-                f"id='{_escape(row_id)}'>"
-                f"<td>{_escape(period_label)}{partial_note}</td>"
-                f"<td>검증 전 참고 불가<br><span class='account-period-note'>{_escape(method_note)}</span></td>"
-                "<td>정합성 검증 후 해석</td>"
-                "<td>-</td>"
-                "<td>-</td>"
-                "<td>-</td>"
-                "</tr>"
-            )
             continue
         rows.append(
             "<tr "
@@ -2039,22 +2058,13 @@ def _account_confidence_label(summary: dict[str, Any]) -> str:
 
 def _account_reconciliation_label(reconciliation: dict[str, Any]) -> str:
     status = str(reconciliation.get("reconciliation_status") or "UNAVAILABLE").strip().upper()
-    severity = str(reconciliation.get("reconciliation_severity") or "").strip().lower()
     labels = {
-        "OK": "정합성 확인",
-        "WARNING": "정합성 경고",
-        "FAILED": "정합성 실패",
-        "UNAVAILABLE": "정합성 미확인",
+        "OK": "확인됨",
+        "WARNING": "참고용",
+        "FAILED": "성과 미표시",
+        "UNAVAILABLE": "성과 미표시",
     }
-    if status == "FAILED":
-        return "검증 필요 / 정합성 실패"
-    suffix = {
-        "critical": " / 중대",
-        "failed": " / 실패",
-        "warning": " / 경고",
-        "unavailable": " / 불완전",
-    }.get(severity, "")
-    return f"{labels.get(status, '정합성 미확인')}{suffix}"
+    return labels.get(status, "성과 미표시")
 
 
 def _account_performance_status_badges(portfolio_summary: dict[str, Any]) -> str:
@@ -2068,6 +2078,8 @@ def _account_performance_status_badges(portfolio_summary: dict[str, Any]) -> str
     confidence = _account_confidence_label(summary)
     reconciliation_label = _account_reconciliation_label(reconciliation)
     status = str(reconciliation.get("reconciliation_status") or "").strip().upper()
+    if status in {"FAILED", "UNAVAILABLE"}:
+        return ""
     badge_class = "failed" if status == "FAILED" else ("partial_failure" if status in {"WARNING", "UNAVAILABLE"} else "success")
     return (
         f"<div class='status {badge_class}'>계좌 성과: {_escape(reconciliation_label)}</div>"
@@ -2077,11 +2089,11 @@ def _account_performance_status_badges(portfolio_summary: dict[str, Any]) -> str
 
 def _account_benchmark_reliability_label(summary: dict[str, Any], reconciliation: dict[str, Any]) -> str:
     if bool(summary.get("hide_excess_headline")):
-        return "참고용 - 정합성 실패"
+        return "비교 생략"
     warning = str(summary.get("return_method_warning") or "")
     status = str(reconciliation.get("reconciliation_status") or "").upper()
     if warning in {"cashflow_adjustment_unavailable", "broker_external_cashflow_unmodeled"} or status in {"WARNING", "FAILED", "UNAVAILABLE"}:
-        return "참고용 - 검증 필요"
+        return "참고용"
     return "비교 가능"
 
 
@@ -2099,18 +2111,13 @@ def _account_performance_investor_notes(
         notes.append(f"성과 기준 기간: {start} ~ {end} (사용 가능 전체 기간)")
     method_label = _account_return_method_label(summary.get("primary_return_method"), summary.get("return_method_warning"))
     notes.append(f"계좌 수익률: {method_label}")
-    if summary.get("mwr_return") is None:
-        reason = str(summary.get("mwr_unavailable_reason") or "dated_external_cashflows_incomplete")
-        notes.append(f"MWR: 산출 불가 ({reason})")
     if summary.get("return_method_warning") == "cashflow_adjustment_unavailable":
         notes.append("벤치마크 비교: 참고용 - 외부 현금흐름 보정이 불완전합니다.")
     if summary.get("return_method_warning") == "broker_external_cashflow_unmodeled":
-        notes.append("내부 스냅샷 수익률: 브로커 입출금이 반영되지 않아 검증 전 참고 불가입니다.")
+        notes.append("브로커 입출금이 반영되지 않은 보조 계산은 기본 해석에서 제외합니다.")
     status = str(reconciliation.get("reconciliation_status") or "").upper()
-    if status == "FAILED":
-        notes.append("성과 정합성: 실패 - 초과수익은 수동 검증 전까지 headline으로 해석하지 않습니다.")
-    elif status == "WARNING":
-        notes.append("보유/실현 손익 합계와 NAV 변화가 크게 달라 초과수익 해석은 검증이 필요합니다.")
+    if status == "WARNING":
+        notes.append("보유/실현 손익 합계와 NAV 변화가 크게 달라 초과수익 headline은 보조 참고로만 표시합니다.")
     warnings = quality.get("warnings") if isinstance(quality.get("warnings"), list) else []
     if any("account_performance_duplicate_actual_windows" in str(item) for item in warnings):
         notes.append("일부 요청 기간은 실제 사용 가능 기간이 같아 기본 표에서는 합쳐서 보여줍니다.")
@@ -2327,10 +2334,11 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
     performance = manifest.get("performance") or {}
     if not performance.get("enabled"):
         return ""
-    status = str(performance.get("status") or "ok")
     summary = performance.get("summary") if isinstance(performance.get("summary"), dict) else {}
     outcome_update = performance.get("outcome_update") if isinstance(performance.get("outcome_update"), dict) else {}
     artifacts = performance.get("artifacts") if isinstance(performance.get("artifacts"), dict) else {}
+    if int(summary.get("outcomes") or 0) <= 0 or not outcome_update.get("updated"):
+        return ""
     artifact_link = ""
     artifact_name = Path(str(artifacts.get("performance_summary_json") or "")).name
     if artifact_name:
@@ -2343,46 +2351,33 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
     action_bucket_rows = _performance_bucket_rows(summary.get("action_buckets") if isinstance(summary.get("action_buckets"), dict) else {})
     profit_rows = _performance_bucket_rows(summary.get("profit_taking") if isinstance(summary.get("profit_taking"), dict) else {})
     calibration = summary.get("calibration") if isinstance(summary.get("calibration"), dict) else {}
-    warnings = outcome_update.get("warnings") if isinstance(outcome_update.get("warnings"), list) else []
-    warning_html = "".join(f"<li>{_escape(item)}</li>" for item in warnings[:6])
-    update_label = "갱신됨" if outcome_update.get("updated") else ("대기 중" if outcome_update.get("enabled") else "비활성")
-    provider = str(outcome_update.get("provider") or performance.get("provider") or "-")
-    unavailable_reason = str(outcome_update.get("unavailable_reason") or "").strip()
-    failure_reason = str(
-        performance.get("failure_reason")
-        or outcome_update.get("failure_reason")
-        or performance.get("warning")
-        or ""
-    ).strip()
-    unavailable_note = ""
-    if not outcome_update.get("updated"):
-        unavailable_note = "<p class='empty'>성과 추적: 기록은 저장됐지만 아직 성과 계산은 수행되지 않았습니다.</p>"
-        if unavailable_reason:
-            unavailable_note += f"<p class='empty'>{_escape(unavailable_reason)}</p>"
-        if failure_reason:
-            unavailable_note += f"<p class='empty'>failure_reason: {_escape(failure_reason)}</p>"
+    calibration_html = _performance_calibration_card(calibration)
+    tables_html = "".join(
+        table
+        for table in (
+            _performance_table("액션별 5일/20일 성과", action_rows),
+            _performance_table("익절 성과", profit_rows),
+            _performance_table("PRISM 일치/충돌별 성과", prism_rows),
+            _performance_table("추천 출처/PRISM 커버리지별 성과", action_bucket_rows),
+        )
+        if table
+    )
+    if not calibration_html and not tables_html:
+        return ""
     return f"""
     <section class="section">
       <div class="section-head">
         <h2>추천 성과 추적</h2>
-        <p>{_escape(status)}</p>
       </div>
       <article class="run-card">
         <p><strong>기록된 추천</strong><span>{int(summary.get('recommendations') or 0)}</span></p>
         <p><strong>업데이트된 outcome</strong><span>{int(summary.get('outcomes') or 0)}</span></p>
-        <p><strong>가격 데이터 provider</strong><span>{_escape(provider)}</span></p>
-        <p><strong>Outcome 업데이트</strong><span>{_escape(update_label)}</span></p>
         <div class="pill-row">{artifact_link}</div>
       </article>
-      {unavailable_note}
-      {_performance_calibration_card(calibration)}
+      {calibration_html}
       <div class="run-grid">
-        {_performance_table('액션별 5일/20일 성과', action_rows)}
-        {_performance_table('익절 성과', profit_rows)}
-        {_performance_table('PRISM 일치/충돌별 성과', prism_rows)}
-        {_performance_table('추천 출처/PRISM 커버리지별 성과', action_bucket_rows)}
+        {tables_html}
       </div>
-      {"<details class='advanced-diagnostics'><summary>성과 추적 경고</summary><ul>" + warning_html + "</ul></details>" if warning_html else ""}
     </section>
     """
 
@@ -2390,15 +2385,22 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
 def _performance_calibration_card(calibration: dict[str, Any]) -> str:
     if not calibration:
         return ""
+    fields = [
+        ("액션 승격 미주문 비율", _format_pct_value(calibration.get("actionable_not_ordered_rate"))),
+        ("미주문 후보 5일 성과", _format_pct_value(calibration.get("missed_upside_5d"))),
+        ("미주문 후보 20일 missed upside", _format_pct_value(calibration.get("missed_upside_20d"))),
+        ("PRISM 충돌 상승 비율", _format_pct_value(calibration.get("prism_conflict_winner_rate"))),
+    ]
+    rows = [
+        f"<p><strong>{_escape(label)}</strong><span>{_escape(value)}</span></p>"
+        for label, value in fields
+        if value != "-"
+    ]
+    if not rows:
+        return ""
     return f"""
       <article class="run-card">
-        <p><strong>액션 승격 분모</strong><span>{_escape(str(calibration.get('action_lift_denominator_count') or 0))}</span></p>
-        <p><strong>액션 승격 미주문 비율</strong><span>{_escape(_format_pct_value(calibration.get('actionable_not_ordered_rate')))}</span></p>
-        <p><strong>미주문 후보 5일 성과</strong><span>{_escape(_format_pct_value(calibration.get('missed_upside_5d')))}</span></p>
-        <p><strong>미주문 후보 20일 missed upside</strong><span>{_escape(_format_pct_value(calibration.get('missed_upside_20d')))}</span></p>
-        <p><strong>PRISM 충돌 상승 비율</strong><span>{_escape(_format_pct_value(calibration.get('prism_conflict_winner_rate')))}</span></p>
-        <p><strong>Scanner skipped</strong><span>{_escape(str(calibration.get('scanner_candidate_skipped_count') or 0))}</span></p>
-        <p><strong>PRISM skipped</strong><span>{_escape(str(calibration.get('prism_candidate_skipped_count') or 0))}</span></p>
+        {''.join(rows)}
       </article>
     """
 
@@ -2407,6 +2409,8 @@ def _performance_bucket_rows(buckets: dict[str, Any]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for bucket, metrics in buckets.items():
         if not isinstance(metrics, dict):
+            continue
+        if metrics.get("avg_return_5d") is None and metrics.get("avg_return_20d") is None:
             continue
         rows.append(
             {
@@ -2422,21 +2426,20 @@ def _performance_bucket_rows(buckets: dict[str, Any]) -> list[dict[str, Any]]:
 
 def _performance_table(title: str, rows: list[dict[str, Any]]) -> str:
     if not rows:
-        body = "<p class='empty'>아직 outcome 데이터가 없습니다.</p>"
-    else:
-        table_rows = "".join(
-            "<tr>"
-            f"<td>{_escape(row['bucket'])}</td>"
-            f"<td>{row['count']}</td>"
-            f"<td>{_escape(_format_pct_value(row.get('avg_return_5d')))}</td>"
-            f"<td>{_escape(_format_pct_value(row.get('avg_return_20d')))}</td>"
-            "</tr>"
-            for row in rows
-        )
-        body = (
-            "<table><thead><tr><th>구분</th><th>건수</th><th>평균 5일</th><th>평균 20일</th></tr></thead>"
-            f"<tbody>{table_rows}</tbody></table>"
-        )
+        return ""
+    table_rows = "".join(
+        "<tr>"
+        f"<td>{_escape(row['bucket'])}</td>"
+        f"<td>{row['count']}</td>"
+        f"<td>{_escape(_format_pct_value(row.get('avg_return_5d')))}</td>"
+        f"<td>{_escape(_format_pct_value(row.get('avg_return_20d')))}</td>"
+        "</tr>"
+        for row in rows
+    )
+    body = (
+        "<table><thead><tr><th>구분</th><th>건수</th><th>평균 5일</th><th>평균 20일</th></tr></thead>"
+        f"<tbody>{table_rows}</tbody></table>"
+    )
     return f"<article class='run-card'><h3>{_escape(title)}</h3>{body}</article>"
 
 
@@ -3239,31 +3242,8 @@ def _advanced_diagnostics_html(
     stale_after_seconds: int,
     compact: bool = False,
 ) -> str:
-    rows = [
-        ("분석 기준시각", _analysis_asof_label(ticker_summary)),
-        ("실행 기준시각", _execution_value(ticker_summary, "execution_asof", default="미갱신")),
-        ("판단 상태", _execution_display_state(ticker_summary, stale_after_seconds=stale_after_seconds)),
-        ("실행 타이밍", _execution_timing_state_label(ticker_summary)),
-        ("신선도", _execution_staleness(ticker_summary)),
-        ("판단 출처", _decision_source_label(ticker_summary)),
-        ("분석 검토", _analysis_review_required_label(ticker_summary)),
-        ("계좌 검토", _portfolio_review_required_label(ticker_summary)),
-        ("자료 상태", present_data_status(ticker_summary.get("decision"), quality_flags=ticker_summary.get("quality_flags"), language=_manifest_language(manifest))),
-        ("발행 시각", _published_at_label(manifest)),
-        ("과거 리포트 여부", _historical_view_label(manifest)),
-    ]
-    if compact:
-        rows = rows[:4]
-    row_html = "".join(
-        f"<p><strong>{_escape(label)}</strong><span>{_escape(value)}</span></p>"
-        for label, value in rows
-    )
-    return f"""
-      <details class="advanced-diagnostics">
-        <summary>고급 진단</summary>
-        {row_html}
-      </details>
-    """
+    # Public investor pages intentionally omit operator/debug diagnostics.
+    return ""
 
 
 def _download_details_html(links: list[str], *, summary: str, empty_text: str) -> str:
@@ -3697,53 +3677,8 @@ def _load_execution_summary(run_dir: Path) -> dict[str, Any]:
 
 
 def _render_execution_summary_section(summary: dict[str, Any]) -> str:
-    if not summary:
-        return ""
-    pilot_ready = ", ".join(summary.get("pilot_ready") or []) or "-"
-    close_confirm = ", ".join(summary.get("close_confirm") or summary.get("triggered_pending_close") or []) or "-"
-    pilot_blocked_volume = ", ".join(summary.get("pilot_blocked_volume") or []) or "-"
-    next_day = ", ".join(summary.get("next_day_followthrough_pending") or []) or "-"
-    return f"""
-    <section class="section">
-      <div class="section-head">
-        <h2>고급 진단</h2>
-      </div>
-      <details class="run-card advanced-diagnostics">
-        <summary>실행 오버레이 원자료</summary>
-        <p><strong>체크포인트</strong><span>{_escape(summary.get('refresh_checkpoint') or '-')}</span></p>
-        <p><strong>오버레이 단계</strong><span>{_escape(((summary.get('overlay_phase') or {}).get('name')) or '-')}</span></p>
-        <p><strong>실행 기준시각</strong><span>{_escape(summary.get('execution_asof') or '-')}</span></p>
-        <p><strong>장중 pilot 준비</strong><span>{_escape(pilot_ready)}</span></p>
-        <p><strong>종가 확인</strong><span>{_escape(close_confirm)}</span></p>
-        <p><strong>거래량 확인 전 보류</strong><span>{_escape(pilot_blocked_volume)}</span></p>
-        <p><strong>다음 거래일 확인</strong><span>{_escape(next_day)}</span></p>
-        <p><strong>실패 돌파</strong><span>{_escape(', '.join(summary.get('failed_breakout') or []) or '-')}</span></p>
-        <p><strong>전략 후보 유지</strong><span>{_escape(', '.join(summary.get('stale_triggerable') or []) or '-')}</span></p>
-      </details>
-    </section>
-    """
-    def _join(values: Any) -> str:
-        if not isinstance(values, list) or not values:
-            return "-"
-        return ", ".join(str(item) for item in values)
-    return f"""
-    <section class="section">
-      <div class="section-head">
-        <h2>고급 진단</h2>
-      </div>
-      <details class="run-card advanced-diagnostics">
-        <summary>실행 오버레이 원자료</summary>
-        <p><strong>체크포인트</strong><span>{_escape(summary.get('refresh_checkpoint') or '-')}</span></p>
-        <p><strong>오버레이 단계</strong><span>{_escape(((summary.get('overlay_phase') or {}).get('name')) or '-')}</span></p>
-        <p><strong>실행 기준시각</strong><span>{_escape(summary.get('execution_asof') or '-')}</span></p>
-        <p><strong>즉시 검토</strong><span>{_escape(_join(summary.get('actionable_now')))}</span></p>
-        <p><strong>종가 확인 대기</strong><span>{_escape(_join(summary.get('triggered_pending_close')))}</span></p>
-        <p><strong>관찰</strong><span>{_escape(_join(summary.get('wait')))}</span></p>
-        <p><strong>무효화</strong><span>{_escape(_join(summary.get('invalidated')))}</span></p>
-        <p><strong>자료 저하</strong><span>{_escape(_join(summary.get('degraded')))}</span></p>
-      </details>
-    </section>
-    """
+    # Execution overlay raw state is useful for debugging, not for the investor report.
+    return ""
 
 
 def _status_class(status: str) -> str:
@@ -3758,18 +3693,8 @@ def _status_class(status: str) -> str:
 
 
 def _render_run_health_section(manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
-    metrics = _compute_health_metrics(manifest=manifest, portfolio_summary=portfolio_summary)
-    return (
-        "<details class='advanced-diagnostics run-card'>"
-        "<summary>고급 진단</summary>"
-        f"<p><strong>오버레이 상태</strong><span>{_escape(metrics['overlay_health'])}</span></p>"
-        f"<p><strong>판단 보강 상태</strong><span>{_escape(metrics['judge_health'])}</span></p>"
-        f"<p><strong>자료 커버리지</strong><span>{_escape(metrics['data_coverage'])}</span></p>"
-        f"<p><strong>PRISM 커버리지</strong><span>{_escape(metrics['prism_coverage'])}</span></p>"
-        f"<p><strong>신선도</strong><span>{_escape(metrics['freshness'])}</span></p>"
-        f"<p><strong>종목 식별</strong><span>{_escape(metrics['identity_integrity'])}</span></p>"
-        "</details>"
-    )
+    # Suppress engineering health diagnostics from investor-facing pages.
+    return ""
 
 
 def _select_representative_run(manifests: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -4114,18 +4039,13 @@ def _prism_health_label(portfolio_summary: dict[str, Any]) -> str:
 
 
 def _render_health_compact_card(*, manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
-    metrics = _compute_health_metrics(manifest=manifest, portfolio_summary=portfolio_summary)
-    rows = "".join(
-        f"<li><strong>{_escape(key.replace('_', ' '))}</strong>: {_escape(value)}</li>"
-        for key, value in metrics.items()
-    )
-    return f"<details class='run-health-compact advanced-diagnostics'><summary>고급 진단</summary><ul>{rows}</ul></details>"
+    # Suppress engineering health diagnostics from investor-facing pages.
+    return ""
 
 
 def _render_health_compact_inline(*, manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
-    metrics = _compute_health_metrics(manifest=manifest, portfolio_summary=portfolio_summary)
-    compact = " · ".join(f"{key.replace('_', ' ')}={value}" for key, value in metrics.items())
-    return f"<p class='empty'>{_escape(compact)}</p>"
+    # Suppress engineering health diagnostics from investor-facing pages.
+    return ""
 
 
 def _health_badges_html(*, manifest: dict[str, Any], portfolio_summary: dict[str, Any]) -> str:
