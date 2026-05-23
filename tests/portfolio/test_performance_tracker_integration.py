@@ -11,7 +11,7 @@ from tradingagents.scheduled.runner import _run_performance_tracking
 from tradingagents.scheduled.site import _render_performance_tracking_section
 
 
-def test_performance_unavailable_reason_rendered():
+def test_performance_unavailable_reason_is_hidden_from_investor_section():
     html = _render_performance_tracking_section(
         {
             "run_id": "run1",
@@ -29,8 +29,7 @@ def test_performance_unavailable_reason_rendered():
         }
     )
 
-    assert "성과 추적: 기록은 저장됐지만 아직 성과 계산은 수행되지 않았습니다." in html
-    assert "price_provider_unavailable_or_no_price_history" in html
+    assert html == ""
 
 
 def test_action_recommendations_recorded_even_when_outcome_update_disabled(tmp_path):
