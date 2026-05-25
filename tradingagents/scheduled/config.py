@@ -139,6 +139,10 @@ class PortfolioPerformanceSettings:
     publish_to_site: bool = True
     public_sanitization: str = "mask_identifiers"
     periods: tuple[str, ...] = ("1M", "3M", "6M", "YTD", "1Y", "ALL")
+    profit_calendar_enabled: bool = True
+    profit_calendar_weeks: int = 8
+    profit_calendar_months: int = 6
+    profit_calendar_rolling_periods: tuple[str, ...] = ("1W", "1M", "3M", "6M", "YTD", "1Y", "ALL")
     kr_benchmarks: tuple[str, ...] = ("KOSPI", "KOSDAQ")
     us_benchmarks: tuple[str, ...] = ("SPY", "QQQ")
     price_provider: str = "yfinance"
@@ -738,6 +742,14 @@ def _load_portfolio_performance_settings(
         periods=_normalize_string_sequence(
             raw.get("periods"),
             default=("1M", "3M", "6M", "YTD", "1Y", "ALL"),
+            uppercase=True,
+        ),
+        profit_calendar_enabled=bool(raw.get("profit_calendar_enabled", True)),
+        profit_calendar_weeks=max(1, int(raw.get("profit_calendar_weeks", 8) or 8)),
+        profit_calendar_months=max(1, int(raw.get("profit_calendar_months", 6) or 6)),
+        profit_calendar_rolling_periods=_normalize_string_sequence(
+            raw.get("profit_calendar_rolling_periods"),
+            default=("1W", "1M", "3M", "6M", "YTD", "1Y", "ALL"),
             uppercase=True,
         ),
         kr_benchmarks=_normalize_string_sequence(

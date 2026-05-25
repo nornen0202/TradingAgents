@@ -1139,6 +1139,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     contribution = payload.get("contribution_by_ticker") if isinstance(payload.get("contribution_by_ticker"), list) else []
     reconciliation = payload.get("reconciliation") if isinstance(payload.get("reconciliation"), dict) else {}
     broker_performance = payload.get("broker_performance") if isinstance(payload.get("broker_performance"), dict) else {}
+    profit_calendar = payload.get("profit_calendar") if isinstance(payload.get("profit_calendar"), dict) else {}
     broker_comparison = (
         payload.get("broker_performance_comparison")
         if isinstance(payload.get("broker_performance_comparison"), dict)
@@ -1196,15 +1197,16 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     chart_html = _account_performance_svg(payload.get("chart_data") if isinstance(payload.get("chart_data"), dict) else {})
     if not show_snapshot_headline:
         chart_html = ""
+    profit_calendar_html = _render_profit_calendar_section(profit_calendar)
     broker_html = _render_broker_performance_summary(
         broker_performance,
         broker_comparison,
         include_reconciliation_warning=show_snapshot_headline,
     )
     etf_html = _render_etf_alternative_comparison(payload.get("etf_alternative_comparison"))
-    if not show_snapshot_headline and not broker_html and not etf_html:
+    if not show_snapshot_headline and not broker_html and not etf_html and not profit_calendar_html:
         return ""
-    if show_snapshot_headline and not display_periods and not broker_html and not etf_html:
+    if show_snapshot_headline and not display_periods and not broker_html and not etf_html and not profit_calendar_html:
         return ""
     benchmark_label = ", ".join(benchmarks) or "-"
     investor_notes = _account_performance_investor_notes(
@@ -1261,6 +1263,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
           <thead>
             <tr>
               <th>기간</th>
+              <th>수익금</th>
               <th>실제</th>
               <th>단순 기간 수익률 비교</th>
               <th>동일 현금흐름 시뮬레이션</th>
@@ -1318,6 +1321,7 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
         <h2>계좌 성과 vs 지수/ETF</h2>
         <p>{_escape(benchmark_label)}</p>
       </div>
+      {profit_calendar_html}
       {broker_html}
       {etf_html}
       {summary_kpi_grid}
@@ -1327,6 +1331,179 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
       <div class="pill-row">{''.join(download_links)}</div>
     </section>
     """
+
+
+def _render_profit_calendar_section(value: dict[str, Any]) -> str:
+    if not isinstance(value, dict) or not value:
+        return ""
+    weekly = value.get("weekly") if isinstance(value.get("weekly"), list) else []
+    monthly = value.get("monthly") if isinstance(value.get("monthly"), list) else []
+    rolling = value.get("rolling") if isinstance(value.get("rolling"), list) else []
+    summary = value.get("summary") if isinstance(value.get("summary"), dict) else {}
+    if not weekly and not monthly and not rolling:
+        return ""
+    cards = [
+        _profit_kpi_card("이번 주 수익금", summary.get("current_week")),
+        _profit_kpi_card("이번 달 수익금", summary.get("current_month")),
+        _profit_kpi_card("최근 1주", summary.get("rolling_1w")),
+        _profit_kpi_card("최근 1개월", summary.get("rolling_1m")),
+    ]
+    detail_rows = _profit_bucket_rows([*weekly, *monthly, *rolling])
+    return f"""
+      <div class="account-profit-calendar">
+        <h3>기간별 수익금</h3>
+        <div class="run-grid account-kpi-grid profit-kpi-grid">{''.join(cards)}</div>
+        <div class="profit-calendar-grid">
+          <article class="run-card profit-panel">
+            <h3>주간</h3>
+            {_profit_week_strip(weekly)}
+          </article>
+          <article class="run-card profit-panel">
+            <h3>월간</h3>
+            {_profit_month_bars(monthly)}
+          </article>
+        </div>
+        <div class="account-table-wrap profit-detail-table">
+          <h3>롤링 및 상세</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>기간</th>
+                <th>수익금</th>
+                <th>수익률</th>
+                <th>입금/출금</th>
+                <th>기초/기말</th>
+                <th>산출 소스</th>
+              </tr>
+            </thead>
+            <tbody>{detail_rows}</tbody>
+          </table>
+        </div>
+      </div>
+    """
+
+
+def _profit_kpi_card(title: str, bucket: Any) -> str:
+    bucket = bucket if isinstance(bucket, dict) else {}
+    status = _profit_status_label(bucket)
+    return f"""
+      <article class="run-card profit-kpi-card {_profit_value_class(bucket)}">
+        <h3>{_escape(title)}</h3>
+        <p><strong>{_escape(_format_signed_krw_value(bucket.get('investment_pnl_krw')))}</strong><span>{_escape(_format_pct_points_value(bucket.get('return_pct')))}</span></p>
+        <p><strong>{_escape(_profit_period_range(bucket))}</strong><span>{_escape(status)}</span></p>
+      </article>
+    """
+
+
+def _profit_week_strip(weekly: list[Any]) -> str:
+    rows = [bucket for bucket in weekly if isinstance(bucket, dict)]
+    if not rows:
+        return "<p class='empty'>주간 수익금 데이터가 없습니다.</p>"
+    return (
+        "<div class='profit-week-strip'>"
+        + "".join(
+            "<div class='profit-week-item "
+            f"{_profit_value_class(bucket)}'>"
+            f"<strong>{_escape(str(bucket.get('label') or '-'))}</strong>"
+            f"<span>{_escape(_format_signed_krw_value(bucket.get('investment_pnl_krw')))}</span>"
+            f"<em>{_escape(_profit_status_label(bucket))}</em>"
+            "</div>"
+            for bucket in rows
+        )
+        + "</div>"
+    )
+
+
+def _profit_month_bars(monthly: list[Any]) -> str:
+    rows = [bucket for bucket in monthly if isinstance(bucket, dict)]
+    if not rows:
+        return "<p class='empty'>월간 수익금 데이터가 없습니다.</p>"
+    max_abs = max(
+        [
+            abs(float(value))
+            for bucket in rows
+            if (value := _account_performance_number(bucket.get("investment_pnl_krw"))) is not None
+        ]
+        or [1.0]
+    )
+    parts = []
+    for bucket in rows:
+        value = _account_performance_number(bucket.get("investment_pnl_krw"))
+        width = 0.0 if value is None else min(100.0, abs(float(value)) / max_abs * 100.0)
+        parts.append(
+            "<div class='profit-month-row'>"
+            f"<span class='profit-month-label'>{_escape(str(bucket.get('label') or '-'))}</span>"
+            "<span class='profit-month-track'>"
+            f"<i class='{_profit_value_class(bucket)}' style='--profit-width:{width:.1f}%'></i>"
+            "</span>"
+            f"<strong>{_escape(_format_signed_krw_value(bucket.get('investment_pnl_krw')))}</strong>"
+            "</div>"
+        )
+    return "<div class='profit-month-bars'>" + "".join(parts) + "</div>"
+
+
+def _profit_bucket_rows(buckets: list[Any]) -> str:
+    rows = []
+    for bucket in buckets:
+        if not isinstance(bucket, dict):
+            continue
+        status = _profit_status_label(bucket)
+        rows.append(
+            "<tr>"
+            f"<td>{_escape(str(bucket.get('label') or '-'))}<br><span class='account-period-note'>{_escape(_profit_period_range(bucket))}</span></td>"
+            f"<td>{_escape(_format_signed_krw_value(bucket.get('investment_pnl_krw')))}</td>"
+            f"<td>{_escape(_format_pct_points_value(bucket.get('return_pct')))}</td>"
+            f"<td>입금 {_escape(_format_krw_value(bucket.get('deposit_amount_krw')))}<br><span class='account-period-note'>출금 {_escape(_format_krw_value(bucket.get('withdrawal_amount_krw')))}</span></td>"
+            f"<td>{_escape(_format_krw_value(bucket.get('start_asset_krw')))}<br><span class='account-period-note'>{_escape(_format_krw_value(bucket.get('end_asset_krw')))}</span></td>"
+            f"<td>{_escape(_profit_source_label(bucket.get('source')))}<br><span class='account-period-note'>{_escape(status)}</span></td>"
+            "</tr>"
+        )
+    return "".join(rows) or "<tr><td colspan='6'>기간별 수익금 데이터가 없습니다.</td></tr>"
+
+
+def _profit_status_label(bucket: dict[str, Any]) -> str:
+    if not bucket:
+        return "-"
+    trust = str(bucket.get("trust_state") or "").strip()
+    partial = "부분 기간" if bucket.get("partial") else ""
+    labels = {
+        "trusted": "검증",
+        "broker_reported_with_warning": "브로커 경고",
+        "partial_reference": "부분 참고",
+        "cashflow_unadjusted_reference": "현금흐름 검증 필요",
+        "unreconciled_reference": "정합성 검증 필요",
+        "unavailable": "데이터 부족",
+    }
+    base = labels.get(trust, trust or "-")
+    return f"{partial} / {base}" if partial and base != partial else base
+
+
+def _profit_source_label(value: Any) -> str:
+    labels = {
+        "broker_reported": "브로커 앱",
+        "internal_snapshot": "내부 스냅샷",
+        "unavailable": "미산출",
+    }
+    return labels.get(str(value or ""), "-")
+
+
+def _profit_period_range(bucket: dict[str, Any]) -> str:
+    start = str(bucket.get("period_start") or "")
+    end = str(bucket.get("period_end") or "")
+    if not start and not end:
+        return "-"
+    return f"{start} ~ {end}"
+
+
+def _profit_value_class(bucket: dict[str, Any]) -> str:
+    number = _account_performance_number(bucket.get("investment_pnl_krw")) if isinstance(bucket, dict) else None
+    if number is None:
+        return "profit-neutral"
+    if number > 0:
+        return "profit-positive"
+    if number < 0:
+        return "profit-negative"
+    return "profit-neutral"
 
 
 def _render_broker_performance_summary(
@@ -1940,6 +2117,7 @@ def _account_performance_period_rows(
                 "<tr "
                 f"id='{_escape(row_id)}'>"
                 f"<td>{_escape(period_label)}{partial_note}</td>"
+                "<td>-</td>"
                 "<td>데이터 부족</td>"
                 "<td>요청 기간 시작일의 계좌 스냅샷 없음</td>"
                 "<td>-</td>"
@@ -1953,6 +2131,7 @@ def _account_performance_period_rows(
                 "<tr "
                 f"id='{_escape(row_id)}'>"
                 f"<td>{_escape(period_label)}{partial_note}</td>"
+                "<td>-</td>"
                 "<td>중복 기간</td>"
                 f"<td>{_escape(str(period.get('same_actual_window_as') or '-'))}와 동일 실제 기간</td>"
                 "<td>-</td>"
@@ -1972,6 +2151,7 @@ def _account_performance_period_rows(
             "<tr "
             f"id='{_escape(row_id)}'>"
             f"<td>{_escape(period_label)}{partial_note}</td>"
+            f"<td>{_escape(_format_signed_krw_value(period.get('investment_pnl_krw')))}<br><span class='account-period-note'>{_escape(_profit_source_label(period.get('profit_source')))}</span></td>"
             f"<td>{_escape(_format_pct_value(period.get('actual_return')))}<br><span class='account-period-note'>{_escape(method_note)}</span></td>"
             f"<td>{_benchmark_comparison_cells(period.get('simple_benchmarks'))}</td>"
             f"<td>{_benchmark_comparison_cells(period.get('cashflow_benchmarks'))}</td>"
@@ -1980,7 +2160,7 @@ def _account_performance_period_rows(
             "</tr>"
         )
     if not rows:
-        return "<tr><td colspan='6'>성과를 계산할 수 있는 기간 데이터가 아직 부족합니다.</td></tr>"
+        return "<tr><td colspan='7'>성과를 계산할 수 있는 기간 데이터가 아직 부족합니다.</td></tr>"
     return "".join(rows)
 
 
@@ -4302,6 +4482,127 @@ a { color: inherit; }
   overflow-wrap: anywhere;
 }
 
+.account-profit-calendar {
+  margin: 18px 0;
+}
+
+.account-profit-calendar > h3 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  letter-spacing: 0;
+}
+
+.profit-kpi-card.profit-positive strong,
+.profit-positive {
+  color: #0f7c82;
+}
+
+.profit-kpi-card.profit-negative strong,
+.profit-negative {
+  color: #a43d3d;
+}
+
+.profit-kpi-card.profit-neutral strong,
+.profit-neutral {
+  color: var(--text);
+}
+
+.profit-calendar-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  margin: 14px 0;
+}
+
+.profit-panel h3 {
+  margin-top: 0;
+}
+
+.profit-week-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 8px;
+}
+
+.profit-week-item {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdfd;
+}
+
+.profit-week-item strong,
+.profit-week-item span,
+.profit-week-item em {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.profit-week-item strong {
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.profit-week-item span {
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+.profit-week-item em {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: normal;
+}
+
+.profit-month-bars {
+  display: grid;
+  gap: 10px;
+}
+
+.profit-month-row {
+  display: grid;
+  grid-template-columns: 76px minmax(120px, 1fr) minmax(116px, auto);
+  align-items: center;
+  gap: 10px;
+}
+
+.profit-month-label {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.profit-month-track {
+  height: 10px;
+  border-radius: 8px;
+  background: #eef3f2;
+  overflow: hidden;
+}
+
+.profit-month-track i {
+  display: block;
+  width: var(--profit-width);
+  min-width: 2px;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+}
+
+.profit-month-row strong {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.profit-detail-table table {
+  min-width: 940px;
+}
+
+.profit-detail-table h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
 .account-period-tabs {
   margin: 16px 0;
 }
@@ -4460,5 +4761,11 @@ a { color: inherit; }
 @media (max-width: 840px) {
   .hero { grid-template-columns: 1fr; }
   .shell { width: min(100% - 20px, 1180px); }
+  .profit-calendar-grid { grid-template-columns: 1fr; }
+  .profit-month-row { grid-template-columns: 64px minmax(90px, 1fr); }
+  .profit-month-row strong {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
 }
 """

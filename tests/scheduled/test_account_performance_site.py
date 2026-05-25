@@ -312,6 +312,140 @@ def test_portfolio_page_prioritizes_broker_performance_and_hides_failed_snapshot
     assert "account_performance_period_insufficient_history:YTD" not in html
 
 
+def test_account_performance_section_renders_profit_calendar_before_return_table():
+    payload = {
+        "status": "ok",
+        "market_scope": "KR",
+        "benchmarks": ["KOSPI"],
+        "summary": {
+            "default_period": "ALL_AVAILABLE",
+            "default_period_label": "사용 가능 전체 기간",
+            "actual_return": 0.2,
+            "primary_return_method": "available_history_twr_equivalent",
+            "best_excess": {},
+        },
+        "profit_calendar": {
+            "summary": {
+                "current_week": {
+                    "label": "이번 주",
+                    "period_start": "2026-04-13",
+                    "period_end": "2026-04-15",
+                    "investment_pnl_krw": 150_000,
+                    "return_pct": 12.5,
+                    "source": "broker_reported",
+                    "trust_state": "trusted",
+                    "partial": True,
+                },
+                "current_month": {
+                    "label": "이번 달",
+                    "period_start": "2026-04-01",
+                    "period_end": "2026-04-15",
+                    "investment_pnl_krw": 180_000,
+                    "return_pct": 15.0,
+                    "source": "broker_reported",
+                    "trust_state": "trusted",
+                    "partial": True,
+                },
+                "rolling_1w": {
+                    "label": "최근 1주",
+                    "period_start": "2026-04-08",
+                    "period_end": "2026-04-15",
+                    "investment_pnl_krw": 120_000,
+                    "return_pct": 10.0,
+                    "source": "internal_snapshot",
+                    "trust_state": "partial_reference",
+                    "partial": False,
+                },
+                "rolling_1m": {
+                    "label": "최근 1개월",
+                    "period_start": "2026-03-16",
+                    "period_end": "2026-04-15",
+                    "investment_pnl_krw": 220_000,
+                    "return_pct": 18.0,
+                    "source": "internal_snapshot",
+                    "trust_state": "trusted",
+                    "partial": False,
+                },
+            },
+            "weekly": [
+                {
+                    "label": "이번 주",
+                    "period_start": "2026-04-13",
+                    "period_end": "2026-04-15",
+                    "investment_pnl_krw": 150_000,
+                    "return_pct": 12.5,
+                    "source": "broker_reported",
+                    "trust_state": "trusted",
+                    "partial": True,
+                }
+            ],
+            "monthly": [
+                {
+                    "label": "이번 달",
+                    "period_start": "2026-04-01",
+                    "period_end": "2026-04-15",
+                    "investment_pnl_krw": 180_000,
+                    "return_pct": 15.0,
+                    "start_asset_krw": 1_000_000,
+                    "end_asset_krw": 1_350_000,
+                    "deposit_amount_krw": 200_000,
+                    "withdrawal_amount_krw": 0,
+                    "source": "broker_reported",
+                    "trust_state": "trusted",
+                    "partial": True,
+                }
+            ],
+            "rolling": [
+                {
+                    "label": "최근 1주",
+                    "period_start": "2026-04-08",
+                    "period_end": "2026-04-15",
+                    "investment_pnl_krw": 120_000,
+                    "return_pct": 10.0,
+                    "source": "internal_snapshot",
+                    "trust_state": "partial_reference",
+                    "partial": False,
+                }
+            ],
+        },
+        "periods": [
+            {
+                "period": "ALL",
+                "start_date": "2026-04-01",
+                "end_date": "2026-04-15",
+                "investment_pnl_krw": 180_000,
+                "profit_source": "broker_reported",
+                "actual_return": 0.2,
+                "primary_return_method": "available_history_twr_equivalent",
+                "simple_benchmarks": [],
+                "cashflow_benchmarks": [],
+            }
+        ],
+        "chart_data": {"series": []},
+        "costs": {},
+        "contribution_by_ticker": [],
+        "reconciliation": {"reconciliation_status": "OK"},
+        "data_quality": {"warnings": []},
+    }
+
+    html = _render_account_performance_section(
+        {"run_id": "run1", "portfolio": {"account_performance": {"publish_to_site": True}}},
+        {"account_performance": payload},
+    )
+
+    assert "기간별 수익금" in html
+    assert "이번 주 수익금" in html
+    assert "주간" in html
+    assert "월간" in html
+    assert "롤링 및 상세" in html
+    assert "+180,000 KRW" in html
+    assert "브로커 앱" in html
+    assert html.index("기간별 수익금") < html.index("브로커 앱")
+    assert html.index("<th>수익금</th>") < html.index("<th>실제</th>")
+    assert "account_snapshot.json" not in html
+    assert "broker_performance_raw.json" not in html
+
+
 def test_portfolio_page_renders_etf_dca_comparison_when_available():
     payload = {
         "status": "ok",
