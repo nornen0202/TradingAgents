@@ -257,7 +257,57 @@ def _normalize_account_performance_payload(value: Any) -> Any:
         or "primary_return_method" not in summary
     ):
         normalized["summary"] = _account_performance_summary_from_period(default_period, previous=summary)
+    normalized["profit_calendar"] = _normalize_profit_calendar_payload(normalized.get("profit_calendar"))
     return normalized
+
+
+def _normalize_profit_calendar_payload(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    normalized = dict(value)
+    for key in ("weekly", "monthly", "rolling"):
+        rows = normalized.get(key)
+        if isinstance(rows, list):
+            normalized[key] = [_normalize_profit_calendar_bucket(row) for row in rows]
+    summary = normalized.get("summary")
+    if isinstance(summary, dict):
+        normalized["summary"] = {
+            key: _normalize_profit_calendar_bucket(item) if isinstance(item, dict) else item
+            for key, item in summary.items()
+        }
+    return normalized
+
+
+def _normalize_profit_calendar_bucket(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    bucket = dict(value)
+    source = str(bucket.get("source") or "")
+    trust_state = str(bucket.get("trust_state") or "")
+    warnings = [str(item) for item in bucket.get("warnings", [])] if isinstance(bucket.get("warnings"), list) else []
+    unreconciled_internal = (
+        source == "internal_snapshot"
+        and (
+            trust_state == "unreconciled_reference"
+            or bucket.get("display_eligible") is False
+            or "snapshot_reconciliation_failed" in warnings
+        )
+    )
+    if unreconciled_internal:
+        if "reference_investment_pnl_krw" not in bucket:
+            bucket["reference_investment_pnl_krw"] = bucket.get("investment_pnl_krw")
+        if "reference_return_pct" not in bucket:
+            bucket["reference_return_pct"] = bucket.get("return_pct")
+        bucket["profit_krw"] = None
+        bucket["profit_basis"] = "internal_snapshot"
+        bucket["investment_pnl_krw"] = None
+        bucket["return_pct"] = None
+        bucket["display_eligible"] = False
+        return bucket
+    if "profit_krw" not in bucket and bucket.get("investment_pnl_krw") is not None:
+        bucket["profit_krw"] = bucket.get("investment_pnl_krw")
+        bucket.setdefault("profit_basis", "investment_pnl" if source == "broker_reported" else source or "internal_snapshot")
+    return bucket
 
 
 def _account_performance_all_period(periods: list[Any]) -> dict[str, Any] | None:

@@ -7,6 +7,7 @@ from tradingagents.scheduled.config import SiteSettings
 from tradingagents.scheduled.site import (
     _account_benchmark_provider_label,
     _account_performance_svg,
+    _normalize_account_performance_payload,
     _render_account_performance_section,
     build_site,
 )
@@ -597,6 +598,53 @@ def test_account_performance_section_uses_profit_amount_for_broker_realized_cale
     assert "매매손익" in html
     assert "<h3>투자손익</h3>" not in html
     assert "-14,849,627 KRW" not in html
+
+
+def test_account_performance_public_payload_normalizes_legacy_unreconciled_profit_calendar_values():
+    normalized = _normalize_account_performance_payload(
+        {
+            "periods": [],
+            "profit_calendar": {
+                "summary": {
+                    "current_month": {
+                        "label": "이번 달",
+                        "period_start": "2026-05-01",
+                        "period_end": "2026-05-26",
+                        "investment_pnl_krw": 14_849_627,
+                        "return_pct": 64.407131,
+                        "source": "internal_snapshot",
+                        "trust_state": "unreconciled_reference",
+                        "display_eligible": False,
+                        "warnings": ["snapshot_reconciliation_failed"],
+                    }
+                },
+                "weekly": [],
+                "monthly": [
+                    {
+                        "label": "이번 달",
+                        "period_start": "2026-05-01",
+                        "period_end": "2026-05-26",
+                        "investment_pnl_krw": 14_849_627,
+                        "return_pct": 64.407131,
+                        "source": "internal_snapshot",
+                        "trust_state": "unreconciled_reference",
+                        "display_eligible": False,
+                        "warnings": ["snapshot_reconciliation_failed"],
+                    }
+                ],
+                "rolling": [],
+            },
+        }
+    )
+
+    current_month = normalized["profit_calendar"]["summary"]["current_month"]
+    monthly = normalized["profit_calendar"]["monthly"][0]
+    assert current_month["profit_krw"] is None
+    assert current_month["investment_pnl_krw"] is None
+    assert current_month["return_pct"] is None
+    assert current_month["reference_investment_pnl_krw"] == 14_849_627
+    assert monthly["profit_krw"] is None
+    assert monthly["reference_return_pct"] == 64.407131
 
 
 def test_portfolio_page_renders_etf_dca_comparison_when_available():
