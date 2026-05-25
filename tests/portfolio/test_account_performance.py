@@ -8,7 +8,10 @@ from unittest.mock import Mock, patch
 
 from tradingagents.portfolio.account_models import AccountConstraints, AccountSnapshot, PortfolioProfile, Position
 from tradingagents.portfolio.performance import build_account_performance_outputs
-from tradingagents.portfolio.performance.broker_kis import normalize_kis_broker_summary
+from tradingagents.portfolio.performance.broker_kis import (
+    fetch_kis_overseas_broker_performance,
+    normalize_kis_broker_summary,
+)
 from tradingagents.portfolio.performance.engine import _canonical_contribution_ticker, render_account_performance_markdown
 from tradingagents.portfolio.performance.etf_alternatives import load_external_capital_flows
 
@@ -33,6 +36,66 @@ def test_kis_trade_profit_summary_is_normalized_separately_from_account_return()
     assert payload["trade_fees_krw"] == 880
     assert payload["trade_taxes_krw"] == 32_216
     assert "broker_performance_missing_balance_return" in payload["warnings"]
+
+
+def test_kis_overseas_realized_profit_summary_is_normalized_separately_from_account_return():
+    summary = normalize_kis_broker_summary(
+        {
+            "ovrs_rlzt_pfls_amt": "1082652",
+            "rlzt_erng_rt": "10.36",
+            "ovrs_fee": "814",
+            "ovrs_tax": "32908",
+        },
+        period_start=date(2026, 5, 1),
+        period_end=date(2026, 5, 25),
+    )
+
+    payload = summary.to_dict()
+    assert payload["investment_pnl_krw"] is None
+    assert payload["balance_return_pct"] is None
+    assert payload["realized_trade_pnl_krw"] == 1_082_652
+    assert payload["realized_trade_return_pct"] == 10.36
+    assert payload["trade_fees_krw"] == 814
+    assert payload["trade_taxes_krw"] == 32_908
+
+
+def test_kis_overseas_broker_performance_dedupes_rows_across_us_exchanges():
+    duplicate_row = {"trad_dt": "20260520", "pdno": "AAPL", "ovrs_rlzt_pfls_amt": "100000"}
+    client = Mock()
+    client.fetch_overseas_period_profit.side_effect = [
+        ([duplicate_row], {}),
+        ([duplicate_row], {}),
+        ([{"trad_dt": "20260521", "pdno": "VRT", "ovrs_rlzt_pfls_amt": "200000"}], {}),
+    ]
+    profile = PortfolioProfile(
+        name="us_profile",
+        enabled=True,
+        broker="kis",
+        broker_environment="real",
+        read_only=True,
+        account_no="12345678",
+        product_code="01",
+        manual_snapshot_path=None,
+        csv_positions_path=None,
+        private_output_dirname="portfolio-private",
+        watch_tickers=tuple(),
+        trigger_budget_krw=500_000,
+        constraints=AccountConstraints(),
+        market_scope="us",
+    )
+
+    with patch("tradingagents.portfolio.performance.broker_kis.KisClient.from_api_keys", return_value=client):
+        summary = fetch_kis_overseas_broker_performance(
+            profile=profile,
+            period_start=date(2026, 5, 1),
+            period_end=date(2026, 5, 25),
+        )
+
+    assert summary is not None
+    assert summary.realized_trade_pnl_krw == 300_000
+    assert summary.investment_pnl_krw is None
+    assert summary.raw_summary["realized_trade_row_count"] == 2
+    assert client.fetch_overseas_period_profit.call_count == 3
 
 
 def test_account_performance_markdown_uses_friendly_etf_unavailable_copy():
@@ -454,8 +517,83 @@ def test_profit_calendar_uses_matching_broker_baseline_period_before_internal_sn
 
     current_month = payload["profit_calendar"]["summary"]["current_month"]
     assert current_month["source"] == "broker_reported"
+    assert current_month["profit_krw"] == 180_000
+    assert current_month["profit_basis"] == "investment_pnl"
     assert current_month["investment_pnl_krw"] == 180_000
     assert current_month["return_pct"] == 15.0
+
+
+def test_profit_calendar_prefers_broker_realized_trade_profit_when_investment_profit_is_missing(tmp_path: Path):
+    payload = _build_report(
+        tmp_path,
+        market_scope="us",
+        current_as_of="2026-05-26T09:00:00+09:00",
+        current_total_equity_krw=37_905_501,
+        history_snapshots=[
+            {
+                "snapshot_id": "month-start",
+                "as_of": "2026-05-01T09:00:00+09:00",
+                "account_value_krw": 23_055_874,
+                "snapshot_health": "VALID",
+                "positions": [{"canonical_ticker": "AAPL", "market_value_krw": 20_000_000}],
+            }
+        ],
+        benchmarks={
+            "SPY": [{"date": "2026-05-01", "close": 100}, {"date": "2026-05-26", "close": 103}],
+            "QQQ": [{"date": "2026-05-01", "close": 100}, {"date": "2026-05-26", "close": 105}],
+        },
+        broker_baseline={
+            "periods": [
+                {
+                    "period_start": "2026-05-01",
+                    "period_end": "2026-05-26",
+                    "realized_trade_pnl_krw": 1_082_652,
+                    "realized_trade_return_pct": 10.36,
+                }
+            ]
+        },
+    )
+
+    current_month = payload["profit_calendar"]["summary"]["current_month"]
+    assert current_month["source"] == "broker_reported"
+    assert current_month["profit_basis"] == "realized_trade_pnl"
+    assert current_month["profit_krw"] == 1_082_652
+    assert current_month["realized_trade_pnl_krw"] == 1_082_652
+    assert current_month["investment_pnl_krw"] is None
+    assert current_month["return_pct"] == 10.36
+    assert current_month["display_eligible"] is True
+
+
+def test_profit_calendar_redacts_unreconciled_internal_snapshot_profit(tmp_path: Path):
+    payload = _build_report(
+        tmp_path,
+        market_scope="us",
+        current_as_of="2026-05-26T09:00:00+09:00",
+        current_total_equity_krw=37_905_501,
+        history_snapshots=[
+            {
+                "snapshot_id": "month-start",
+                "as_of": "2026-05-01T09:00:00+09:00",
+                "account_value_krw": 23_055_874,
+                "snapshot_health": "VALID",
+                "positions": [{"canonical_ticker": "AAPL", "market_value_krw": 20_000_000}],
+            }
+        ],
+        benchmarks={
+            "SPY": [{"date": "2026-05-01", "close": 100}, {"date": "2026-05-26", "close": 103}],
+            "QQQ": [{"date": "2026-05-01", "close": 100}, {"date": "2026-05-26", "close": 105}],
+        },
+    )
+
+    current_month = payload["profit_calendar"]["summary"]["current_month"]
+    assert payload["reconciliation"]["reconciliation_status"] == "FAILED"
+    assert current_month["source"] == "internal_snapshot"
+    assert current_month["profit_krw"] is None
+    assert current_month["investment_pnl_krw"] is None
+    assert current_month["return_pct"] is None
+    assert current_month["reference_investment_pnl_krw"] == 14_849_627
+    assert current_month["display_eligible"] is False
+    assert "snapshot_reconciliation_failed" in current_month["warnings"]
 
 
 def test_profit_calendar_falls_back_when_broker_bucket_fetch_fails(tmp_path: Path):
@@ -479,9 +617,23 @@ def test_profit_calendar_falls_back_when_broker_bucket_fetch_fails(tmp_path: Pat
                     "as_of": "2026-04-01T09:00:00+09:00",
                     "account_value_krw": 1_000_000,
                     "snapshot_health": "VALID",
-                    "positions": [{"canonical_ticker": "TEST", "market_value_krw": 900_000}],
+                    "positions": [{"canonical_ticker": "TEST", "market_value_krw": 900_000, "unrealized_pnl_krw": 0}],
                 }
             ],
+            positions=(
+                Position(
+                    broker_symbol="TEST",
+                    canonical_ticker="TEST",
+                    display_name="Test",
+                    sector=None,
+                    quantity=1,
+                    available_qty=1,
+                    avg_cost_krw=1_000_000,
+                    market_price_krw=1_350_000,
+                    market_value_krw=1_350_000,
+                    unrealized_pnl_krw=350_000,
+                ),
+            ),
             benchmarks={
                 "KOSPI": [{"date": "2026-04-01", "close": 100}, {"date": "2026-04-15", "close": 103}],
                 "KOSDAQ": [{"date": "2026-04-01", "close": 100}, {"date": "2026-04-15", "close": 100}],

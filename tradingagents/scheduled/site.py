@@ -1389,8 +1389,8 @@ def _profit_kpi_card(title: str, bucket: Any) -> str:
     return f"""
       <article class="run-card profit-kpi-card {_profit_value_class(bucket)}">
         <h3>{_escape(title)}</h3>
-        <p><strong>{_escape(_format_signed_krw_value(bucket.get('investment_pnl_krw')))}</strong><span>{_escape(_format_pct_points_value(bucket.get('return_pct')))}</span></p>
-        <p><strong>{_escape(_profit_period_range(bucket))}</strong><span>{_escape(status)}</span></p>
+        <p><strong>{_escape(_format_signed_krw_value(_profit_amount(bucket)))}</strong><span>{_escape(_format_pct_points_value(_profit_return_pct(bucket)))}</span></p>
+        <p><strong>{_escape(_profit_period_range(bucket))}</strong><span>{_escape(_profit_basis_status(bucket, status))}</span></p>
       </article>
     """
 
@@ -1405,8 +1405,8 @@ def _profit_week_strip(weekly: list[Any]) -> str:
             "<div class='profit-week-item "
             f"{_profit_value_class(bucket)}'>"
             f"<strong>{_escape(str(bucket.get('label') or '-'))}</strong>"
-            f"<span>{_escape(_format_signed_krw_value(bucket.get('investment_pnl_krw')))}</span>"
-            f"<em>{_escape(_profit_status_label(bucket))}</em>"
+            f"<span>{_escape(_format_signed_krw_value(_profit_amount(bucket)))}</span>"
+            f"<em>{_escape(_profit_basis_status(bucket, _profit_status_label(bucket)))}</em>"
             "</div>"
             for bucket in rows
         )
@@ -1422,13 +1422,13 @@ def _profit_month_bars(monthly: list[Any]) -> str:
         [
             abs(float(value))
             for bucket in rows
-            if (value := _account_performance_number(bucket.get("investment_pnl_krw"))) is not None
+            if (value := _account_performance_number(_profit_amount(bucket))) is not None
         ]
         or [1.0]
     )
     parts = []
     for bucket in rows:
-        value = _account_performance_number(bucket.get("investment_pnl_krw"))
+        value = _account_performance_number(_profit_amount(bucket))
         width = 0.0 if value is None else min(100.0, abs(float(value)) / max_abs * 100.0)
         parts.append(
             "<div class='profit-month-row'>"
@@ -1436,7 +1436,7 @@ def _profit_month_bars(monthly: list[Any]) -> str:
             "<span class='profit-month-track'>"
             f"<i class='{_profit_value_class(bucket)}' style='--profit-width:{width:.1f}%'></i>"
             "</span>"
-            f"<strong>{_escape(_format_signed_krw_value(bucket.get('investment_pnl_krw')))}</strong>"
+            f"<strong>{_escape(_format_signed_krw_value(_profit_amount(bucket)))}</strong>"
             "</div>"
         )
     return "<div class='profit-month-bars'>" + "".join(parts) + "</div>"
@@ -1451,11 +1451,11 @@ def _profit_bucket_rows(buckets: list[Any]) -> str:
         rows.append(
             "<tr>"
             f"<td>{_escape(str(bucket.get('label') or '-'))}<br><span class='account-period-note'>{_escape(_profit_period_range(bucket))}</span></td>"
-            f"<td>{_escape(_format_signed_krw_value(bucket.get('investment_pnl_krw')))}</td>"
-            f"<td>{_escape(_format_pct_points_value(bucket.get('return_pct')))}</td>"
+            f"<td>{_escape(_format_signed_krw_value(_profit_amount(bucket)))}</td>"
+            f"<td>{_escape(_format_pct_points_value(_profit_return_pct(bucket)))}</td>"
             f"<td>입금 {_escape(_format_krw_value(bucket.get('deposit_amount_krw')))}<br><span class='account-period-note'>출금 {_escape(_format_krw_value(bucket.get('withdrawal_amount_krw')))}</span></td>"
             f"<td>{_escape(_format_krw_value(bucket.get('start_asset_krw')))}<br><span class='account-period-note'>{_escape(_format_krw_value(bucket.get('end_asset_krw')))}</span></td>"
-            f"<td>{_escape(_profit_source_label(bucket.get('source')))}<br><span class='account-period-note'>{_escape(status)}</span></td>"
+            f"<td>{_escape(_profit_source_label(bucket.get('source')))}<br><span class='account-period-note'>{_escape(_profit_basis_status(bucket, status))}</span></td>"
             "</tr>"
         )
     return "".join(rows) or "<tr><td colspan='6'>기간별 수익금 데이터가 없습니다.</td></tr>"
@@ -1487,6 +1487,37 @@ def _profit_source_label(value: Any) -> str:
     return labels.get(str(value or ""), "-")
 
 
+def _profit_amount(bucket: dict[str, Any]) -> Any:
+    if not isinstance(bucket, dict):
+        return None
+    if "profit_krw" in bucket:
+        return bucket.get("profit_krw")
+    if bucket.get("display_eligible") is False and str(bucket.get("source") or "") == "internal_snapshot":
+        return None
+    return bucket.get("investment_pnl_krw")
+
+
+def _profit_return_pct(bucket: dict[str, Any]) -> Any:
+    if not isinstance(bucket, dict):
+        return None
+    if _profit_amount(bucket) is None:
+        return None
+    return bucket.get("return_pct")
+
+
+def _profit_basis_status(bucket: dict[str, Any], status: str) -> str:
+    basis = str(bucket.get("profit_basis") or "").strip()
+    labels = {
+        "realized_trade_pnl": "실현손익",
+        "investment_pnl": "투자손익",
+        "internal_snapshot": "내부 NAV 참고",
+    }
+    label = labels.get(basis, "")
+    if not label:
+        return status
+    return f"{label} / {status}" if status and status != "-" else label
+
+
 def _profit_period_range(bucket: dict[str, Any]) -> str:
     start = str(bucket.get("period_start") or "")
     end = str(bucket.get("period_end") or "")
@@ -1496,7 +1527,7 @@ def _profit_period_range(bucket: dict[str, Any]) -> str:
 
 
 def _profit_value_class(bucket: dict[str, Any]) -> str:
-    number = _account_performance_number(bucket.get("investment_pnl_krw")) if isinstance(bucket, dict) else None
+    number = _account_performance_number(_profit_amount(bucket)) if isinstance(bucket, dict) else None
     if number is None:
         return "profit-neutral"
     if number > 0:
@@ -1546,6 +1577,38 @@ def _render_broker_performance_summary(
             <p><strong>매매 비용</strong><span>{_escape(_format_krw_value(trade_cost))}</span></p>
           </article>
         """
+    return_html = ""
+    if broker.get("balance_return_pct") is not None or broker.get("net_asset_return_pct") is not None:
+        return_html = f"""
+          <article class="run-card">
+            <h3>브로커 수익률</h3>
+            <p><strong>잔액/순자산 기준</strong><span>{_escape(_format_pct_points_value(broker.get('balance_return_pct')))}</span></p>
+          </article>
+        """
+    investment_html = ""
+    if broker.get("investment_pnl_krw") is not None or broker.get("end_asset_krw") is not None:
+        investment_html = f"""
+          <article class="run-card">
+            <h3>투자손익</h3>
+            <p><strong>{_escape(_format_signed_krw_value(broker.get('investment_pnl_krw')))}</strong><span>기말 {_escape(_format_krw_value(broker.get('end_asset_krw')))}</span></p>
+          </article>
+        """
+    cashflow_html = ""
+    if broker.get("deposit_amount_krw") is not None or broker.get("withdrawal_amount_krw") is not None:
+        cashflow_html = f"""
+          <article class="run-card">
+            <h3>입출금</h3>
+            <p><strong>입금 {_escape(_format_krw_value(broker.get('deposit_amount_krw')))}</strong><span>출금 {_escape(_format_krw_value(broker.get('withdrawal_amount_krw')))}</span></p>
+          </article>
+        """
+    benchmark_html = ""
+    if benchmark_rows != "-":
+        benchmark_html = f"""
+          <article class="run-card">
+            <h3>브로커 기준 벤치마크</h3>
+            <p><strong>앱 수익률 기준</strong><span>{benchmark_rows}</span></p>
+          </article>
+        """
     return f"""
       <div class="account-broker-performance">
         <h3>{_escape(broker_name)} 앱 기준 성과</h3>
@@ -1554,23 +1617,11 @@ def _render_broker_performance_summary(
             <h3>브로커 기준 기간</h3>
             <p><strong>{_escape(period)}</strong><span>{_escape(str(broker.get('account_scope') or '-'))}</span></p>
           </article>
-          <article class="run-card">
-            <h3>브로커 수익률</h3>
-            <p><strong>잔액/순자산 기준</strong><span>{_escape(_format_pct_points_value(broker.get('balance_return_pct')))}</span></p>
-          </article>
-          <article class="run-card">
-            <h3>투자손익</h3>
-            <p><strong>{_escape(_format_signed_krw_value(broker.get('investment_pnl_krw')))}</strong><span>기말 {_escape(_format_krw_value(broker.get('end_asset_krw')))}</span></p>
-          </article>
-          <article class="run-card">
-            <h3>입출금</h3>
-            <p><strong>입금 {_escape(_format_krw_value(broker.get('deposit_amount_krw')))}</strong><span>출금 {_escape(_format_krw_value(broker.get('withdrawal_amount_krw')))}</span></p>
-          </article>
+          {return_html}
+          {investment_html}
+          {cashflow_html}
           {trade_html}
-          <article class="run-card">
-            <h3>브로커 기준 벤치마크</h3>
-            <p><strong>앱 수익률 기준</strong><span>{benchmark_rows}</span></p>
-          </article>
+          {benchmark_html}
         </div>
         {warning}
       </div>

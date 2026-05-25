@@ -465,10 +465,15 @@ def test_account_performance_section_keeps_profit_calendar_when_reconciliation_f
                     "label": "이번 주",
                     "period_start": "2026-04-13",
                     "period_end": "2026-04-15",
-                    "investment_pnl_krw": 150_000,
-                    "return_pct": 12.5,
+                    "profit_krw": None,
+                    "profit_basis": "internal_snapshot",
+                    "investment_pnl_krw": None,
+                    "reference_investment_pnl_krw": 150_000,
+                    "return_pct": None,
+                    "reference_return_pct": 12.5,
                     "source": "internal_snapshot",
                     "trust_state": "unreconciled_reference",
+                    "display_eligible": False,
                     "partial": True,
                 }
             },
@@ -477,10 +482,15 @@ def test_account_performance_section_keeps_profit_calendar_when_reconciliation_f
                     "label": "이번 주",
                     "period_start": "2026-04-13",
                     "period_end": "2026-04-15",
-                    "investment_pnl_krw": 150_000,
-                    "return_pct": 12.5,
+                    "profit_krw": None,
+                    "profit_basis": "internal_snapshot",
+                    "investment_pnl_krw": None,
+                    "reference_investment_pnl_krw": 150_000,
+                    "return_pct": None,
+                    "reference_return_pct": 12.5,
                     "source": "internal_snapshot",
                     "trust_state": "unreconciled_reference",
+                    "display_eligible": False,
                     "partial": True,
                 }
             ],
@@ -513,10 +523,80 @@ def test_account_performance_section_keeps_profit_calendar_when_reconciliation_f
     )
 
     assert "기간별 수익금" in html
-    assert "+150,000 KRW" in html
-    assert "부분 기간 / 정합성 검증 필요" in html
+    assert "+150,000 KRW" not in html
+    assert "내부 NAV 참고 / 부분 기간 / 정합성 검증 필요" in html
     assert "내부 스냅샷 수익률" not in html
     assert "<th>실제</th>" not in html
+
+
+def test_account_performance_section_uses_profit_amount_for_broker_realized_calendar_bucket():
+    payload = {
+        "status": "ok",
+        "market_scope": "US",
+        "benchmarks": ["SPY"],
+        "summary": {"default_period": "1M", "best_excess": {}},
+        "profit_calendar": {
+            "summary": {
+                "current_month": {
+                    "label": "이번 달",
+                    "period_start": "2026-05-01",
+                    "period_end": "2026-05-25",
+                    "profit_krw": 1_082_652,
+                    "profit_basis": "realized_trade_pnl",
+                    "investment_pnl_krw": None,
+                    "realized_trade_pnl_krw": 1_082_652,
+                    "return_pct": 10.36,
+                    "source": "broker_reported",
+                    "trust_state": "trusted",
+                    "display_eligible": True,
+                    "partial": True,
+                }
+            },
+            "weekly": [],
+            "monthly": [
+                {
+                    "label": "이번 달",
+                    "period_start": "2026-05-01",
+                    "period_end": "2026-05-25",
+                    "profit_krw": 1_082_652,
+                    "profit_basis": "realized_trade_pnl",
+                    "investment_pnl_krw": None,
+                    "realized_trade_pnl_krw": 1_082_652,
+                    "return_pct": 10.36,
+                    "source": "broker_reported",
+                    "trust_state": "trusted",
+                    "display_eligible": True,
+                    "partial": True,
+                }
+            ],
+            "rolling": [],
+        },
+        "periods": [],
+        "broker_performance": {
+            "broker": "kis",
+            "account_scope": "US overseas",
+            "period_start": "2026-05-01",
+            "period_end": "2026-05-25",
+            "realized_trade_pnl_krw": 1_082_652,
+            "realized_trade_return_pct": 10.36,
+        },
+        "chart_data": {"series": []},
+        "costs": {},
+        "contribution_by_ticker": [],
+        "reconciliation": {"reconciliation_status": "FAILED"},
+        "data_quality": {"warnings": []},
+    }
+
+    html = _render_account_performance_section(
+        {"run_id": "run1", "portfolio": {"account_performance": {"publish_to_site": True}}},
+        {"account_performance": payload},
+    )
+
+    assert "+1,082,652 KRW" in html
+    assert "실현손익 / 부분 기간 / 검증" in html
+    assert "매매손익" in html
+    assert "<h3>투자손익</h3>" not in html
+    assert "-14,849,627 KRW" not in html
 
 
 def test_portfolio_page_renders_etf_dca_comparison_when_available():

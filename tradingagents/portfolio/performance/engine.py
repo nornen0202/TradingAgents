@@ -13,8 +13,8 @@ from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from tradingagents.portfolio.account_models import AccountSnapshot, PortfolioProfile
 from tradingagents.portfolio.benchmarks.dca_engine import build_etf_dca_comparison
 from tradingagents.portfolio.performance.broker_kis import (
-    fetch_kis_domestic_broker_performance,
-    fetch_kis_domestic_broker_performance_periods,
+    fetch_kis_broker_performance,
+    fetch_kis_broker_performance_periods,
     load_broker_performance_baseline,
     load_broker_performance_baseline_periods,
 )
@@ -1706,10 +1706,9 @@ def _profit_calendar_broker_summaries(
         missing_periods
         and bool(getattr(settings, "prefer_broker_reported_performance", True))
         and profile.broker == "kis"
-        and str(getattr(profile, "market_scope", "kr") or "kr").strip().lower() != "us"
     ):
         results.update(
-            fetch_kis_domestic_broker_performance_periods(
+            fetch_kis_broker_performance_periods(
                 profile=profile,
                 periods=missing_periods,
                 benchmark_prices=benchmark_prices,
@@ -1732,15 +1731,21 @@ def _profit_calendar_bucket(
     requested_end = spec["period_end"]
     key = (requested_start.isoformat(), requested_end.isoformat())
     broker = broker_by_period.get(key)
-    if broker is not None and broker.investment_pnl_krw is not None:
+    broker_profit = _broker_profit_calendar_value(broker) if broker is not None else None
+    if broker is not None and broker_profit is not None:
         warnings = list(broker.warnings)
         return {
             "period_key": spec.get("period_key"),
             "label": spec.get("label"),
             "period_start": requested_start.isoformat(),
             "period_end": requested_end.isoformat(),
+            "profit_krw": broker_profit["profit_krw"],
+            "profit_basis": broker_profit["profit_basis"],
             "investment_pnl_krw": broker.investment_pnl_krw,
-            "return_pct": broker.balance_return_pct,
+            "realized_trade_pnl_krw": broker.realized_trade_pnl_krw,
+            "return_pct": broker_profit["return_pct"],
+            "balance_return_pct": broker.balance_return_pct,
+            "realized_trade_return_pct": broker.realized_trade_return_pct,
             "start_asset_krw": broker.start_asset_krw,
             "end_asset_krw": broker.end_asset_krw,
             "deposit_amount_krw": broker.deposit_amount_krw,
@@ -1781,9 +1786,17 @@ def _profit_calendar_bucket(
         bucket_warnings.append("cashflow_adjustment_unavailable")
     trust_state = "trusted"
     display_eligible = True
+    profit_krw = profit["investment_pnl_krw"]
+    return_pct = profit["return_pct"]
+    reference_investment_pnl = None
+    reference_return_pct = None
     if reconciliation_failed:
         trust_state = "unreconciled_reference"
         display_eligible = False
+        reference_investment_pnl = profit["investment_pnl_krw"]
+        reference_return_pct = profit["return_pct"]
+        profit_krw = None
+        return_pct = None
         bucket_warnings.append("snapshot_reconciliation_failed")
     elif "cashflow_adjustment_unavailable" in bucket_warnings:
         trust_state = "cashflow_unadjusted_reference"
@@ -1797,8 +1810,12 @@ def _profit_calendar_bucket(
         "period_end": requested_end.isoformat(),
         "actual_start_date": start_date.isoformat(),
         "actual_end_date": end_date.isoformat(),
-        "investment_pnl_krw": profit["investment_pnl_krw"],
-        "return_pct": profit["return_pct"],
+        "profit_krw": profit_krw,
+        "profit_basis": "internal_snapshot",
+        "investment_pnl_krw": profit_krw,
+        "reference_investment_pnl_krw": reference_investment_pnl,
+        "return_pct": return_pct,
+        "reference_return_pct": reference_return_pct,
         "start_asset_krw": int(round(start_value)),
         "end_asset_krw": int(round(end_value)),
         "deposit_amount_krw": profit["deposit_amount_krw"],
@@ -1809,6 +1826,24 @@ def _profit_calendar_bucket(
         "partial": bool(spec.get("partial")) or start_date > requested_start or end_date < requested_end,
         "warnings": list(dict.fromkeys(bucket_warnings)),
     }
+
+
+def _broker_profit_calendar_value(broker: BrokerPerformanceSummary | None) -> dict[str, Any] | None:
+    if broker is None:
+        return None
+    if broker.realized_trade_pnl_krw is not None:
+        return {
+            "profit_krw": broker.realized_trade_pnl_krw,
+            "return_pct": broker.realized_trade_return_pct,
+            "profit_basis": "realized_trade_pnl",
+        }
+    if broker.investment_pnl_krw is not None:
+        return {
+            "profit_krw": broker.investment_pnl_krw,
+            "return_pct": broker.balance_return_pct,
+            "profit_basis": "investment_pnl",
+        }
+    return None
 
 
 def _internal_profit_for_window(
@@ -1844,7 +1879,10 @@ def _unavailable_profit_bucket(spec: Mapping[str, Any], *, warning: str) -> dict
         "label": spec.get("label"),
         "period_start": spec["period_start"].isoformat(),
         "period_end": spec["period_end"].isoformat(),
+        "profit_krw": None,
+        "profit_basis": "unavailable",
         "investment_pnl_krw": None,
+        "realized_trade_pnl_krw": None,
         "return_pct": None,
         "start_asset_krw": None,
         "end_asset_krw": None,
@@ -3366,9 +3404,9 @@ def _load_broker_performance(
         return baseline
     if not bool(getattr(settings, "prefer_broker_reported_performance", True)):
         return None
-    if profile.broker != "kis" or market_scope != "kr":
+    if profile.broker != "kis":
         return None
-    broker = fetch_kis_domestic_broker_performance(
+    broker = fetch_kis_broker_performance(
         profile=profile,
         period_start=period_start,
         period_end=period_end,
