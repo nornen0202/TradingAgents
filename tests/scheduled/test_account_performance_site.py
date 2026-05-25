@@ -446,6 +446,79 @@ def test_account_performance_section_renders_profit_calendar_before_return_table
     assert "broker_performance_raw.json" not in html
 
 
+def test_account_performance_section_keeps_profit_calendar_when_reconciliation_failed_without_broker_numbers():
+    payload = {
+        "status": "ok",
+        "market_scope": "KR",
+        "benchmarks": ["KOSPI"],
+        "summary": {
+            "default_period": "ALL_AVAILABLE",
+            "default_period_label": "사용 가능 전체 기간",
+            "actual_return": 0.2,
+            "primary_return_method": "available_history_twr_equivalent",
+            "hide_excess_headline": True,
+            "best_excess": {},
+        },
+        "profit_calendar": {
+            "summary": {
+                "current_week": {
+                    "label": "이번 주",
+                    "period_start": "2026-04-13",
+                    "period_end": "2026-04-15",
+                    "investment_pnl_krw": 150_000,
+                    "return_pct": 12.5,
+                    "source": "internal_snapshot",
+                    "trust_state": "unreconciled_reference",
+                    "partial": True,
+                }
+            },
+            "weekly": [
+                {
+                    "label": "이번 주",
+                    "period_start": "2026-04-13",
+                    "period_end": "2026-04-15",
+                    "investment_pnl_krw": 150_000,
+                    "return_pct": 12.5,
+                    "source": "internal_snapshot",
+                    "trust_state": "unreconciled_reference",
+                    "partial": True,
+                }
+            ],
+            "monthly": [],
+            "rolling": [],
+        },
+        "periods": [
+            {
+                "period": "ALL",
+                "start_date": "2026-04-01",
+                "end_date": "2026-04-15",
+                "investment_pnl_krw": 180_000,
+                "profit_source": "internal_snapshot",
+                "actual_return": 0.2,
+                "trust_state": "unreconciled_reference",
+                "simple_benchmarks": [],
+                "cashflow_benchmarks": [],
+            }
+        ],
+        "chart_data": {"series": []},
+        "costs": {},
+        "contribution_by_ticker": [],
+        "reconciliation": {"reconciliation_status": "FAILED"},
+        "data_quality": {"warnings": []},
+    }
+
+    html = _render_account_performance_section(
+        {"run_id": "run1", "portfolio": {"account_performance": {"publish_to_site": True}}},
+        {"account_performance": payload},
+    )
+
+    assert "기간별 수익금" in html
+    assert "+150,000 KRW" in html
+    assert "부분 기간 / 정합성 검증 필요" in html
+    assert "내부 스냅샷 수익률" not in html
+    assert "<th>실제</th>" not in html
+
+
 def test_portfolio_page_renders_etf_dca_comparison_when_available():
     payload = {
         "status": "ok",
