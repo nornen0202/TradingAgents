@@ -1158,8 +1158,9 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     confidence_label = _account_confidence_label(summary)
     reconciliation_label = _account_reconciliation_label(reconciliation)
     reconciliation_status = str(reconciliation.get("reconciliation_status") or "").upper()
+    profit_calendar_html = _render_profit_calendar_section(profit_calendar)
     has_broker_numbers = _broker_performance_has_numbers(broker_performance)
-    if reconciliation_status == "FAILED" and not has_broker_numbers:
+    if reconciliation_status == "FAILED" and not has_broker_numbers and not profit_calendar_html:
         return ""
     show_snapshot_headline = reconciliation_status != "FAILED" or bool(
         summary.get("show_snapshot_performance_when_unreconciled")
@@ -1197,7 +1198,6 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     chart_html = _account_performance_svg(payload.get("chart_data") if isinstance(payload.get("chart_data"), dict) else {})
     if not show_snapshot_headline:
         chart_html = ""
-    profit_calendar_html = _render_profit_calendar_section(profit_calendar)
     broker_html = _render_broker_performance_summary(
         broker_performance,
         broker_comparison,
