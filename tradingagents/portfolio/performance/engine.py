@@ -14,7 +14,9 @@ from tradingagents.portfolio.account_models import AccountSnapshot, PortfolioPro
 from tradingagents.portfolio.benchmarks.dca_engine import build_etf_dca_comparison
 from tradingagents.portfolio.performance.broker_kis import (
     fetch_kis_domestic_broker_performance,
+    fetch_kis_domestic_broker_performance_periods,
     load_broker_performance_baseline,
+    load_broker_performance_baseline_periods,
 )
 from tradingagents.portfolio.performance.broker_models import (
     BrokerPerformanceComparison,
@@ -240,6 +242,18 @@ def build_account_performance_outputs(
         summary=summary,
         warnings=warnings,
     )
+    profit_calendar = _build_profit_calendar(
+        settings=settings,
+        profile=profile,
+        snapshot_rows=snapshot_rows,
+        ledger_events=ledger_events,
+        cashflow_events=cashflow_events,
+        broker_performance=broker_performance,
+        benchmark_prices=benchmark_prices,
+        end_date=end_date,
+        reconciliation=reconciliation,
+        warnings=warnings,
+    )
     etf_dca_comparison = build_etf_dca_comparison(
         snapshot=snapshot,
         settings=settings,
@@ -258,6 +272,7 @@ def build_account_performance_outputs(
         "summary": summary,
         "periods": periods,
         "chart_data": chart_data,
+        "profit_calendar": profit_calendar,
         "broker_performance": broker_performance.to_dict() if broker_performance else {},
         "broker_performance_comparison": broker_comparison.to_dict() if broker_comparison else {},
         "etf_alternative_comparison": etf_dca_comparison.to_public_dict() if etf_dca_comparison else {},
@@ -1474,6 +1489,13 @@ def _compute_periods(
         best = max(all_rows, key=lambda item: float(item["excess_return"])) if all_rows else None
         worst = min(all_rows, key=lambda item: float(item["excess_return"])) if all_rows else None
         period_values = _snapshot_values_between(snapshot_rows, start, end)
+        period_profit = _internal_profit_for_window(
+            cashflow_events=cashflow_events,
+            start_date=start,
+            end_date=end,
+            start_value=start_value,
+            end_value=end_value,
+        )
         summary_eligible = coverage.is_summary_eligible and (not partial_reasons or min_coverage_ratio <= 0.0)
         coverage_payload = _replace_period_coverage(
             coverage,
@@ -1491,6 +1513,11 @@ def _compute_periods(
                 "partial_reasons": partial_reasons,
                 "actual_start_value_krw": int(round(start_value)),
                 "actual_end_value_krw": int(round(end_value)),
+                "investment_pnl_krw": period_profit["investment_pnl_krw"],
+                "return_pct": period_profit["return_pct"],
+                "deposit_amount_krw": period_profit["deposit_amount_krw"],
+                "withdrawal_amount_krw": period_profit["withdrawal_amount_krw"],
+                "profit_source": "internal_snapshot",
                 "simple_nav_return": _round_or_none(return_profile.get("simple_nav_return")),
                 "twr_return": _round_or_none(return_profile.get("twr_return")),
                 "twr_unavailable_reason": return_profile.get("twr_unavailable_reason"),
@@ -1511,6 +1538,352 @@ def _compute_periods(
         )
     _mark_duplicate_actual_windows(periods, warnings=warnings)
     return periods
+
+
+def _build_profit_calendar(
+    *,
+    settings: Any,
+    profile: PortfolioProfile,
+    snapshot_rows: list[dict[str, Any]],
+    ledger_events: list[LedgerEvent],
+    cashflow_events: list[CashflowEvent],
+    broker_performance: BrokerPerformanceSummary | None,
+    benchmark_prices: Mapping[str, list[dict[str, Any]]],
+    end_date: date,
+    reconciliation: Mapping[str, Any],
+    warnings: list[str],
+) -> dict[str, Any]:
+    if not bool(getattr(settings, "profit_calendar_enabled", True)):
+        return {}
+    specs = _profit_calendar_specs(
+        settings=settings,
+        snapshot_rows=snapshot_rows,
+        end_date=end_date,
+    )
+    all_specs = specs["weekly"] + specs["monthly"] + specs["rolling"]
+    period_pairs = [(spec["period_start"], spec["period_end"]) for spec in all_specs]
+    broker_by_period = _profit_calendar_broker_summaries(
+        settings=settings,
+        profile=profile,
+        broker_performance=broker_performance,
+        periods=period_pairs,
+        benchmark_prices=benchmark_prices,
+        warnings=warnings,
+    )
+    reconciliation_failed = str(reconciliation.get("reconciliation_status") or "").upper() == "FAILED"
+    weekly = [
+        _profit_calendar_bucket(
+            spec,
+            snapshot_rows=snapshot_rows,
+            ledger_events=ledger_events,
+            cashflow_events=cashflow_events,
+            broker_by_period=broker_by_period,
+            reconciliation_failed=reconciliation_failed,
+        )
+        for spec in specs["weekly"]
+    ]
+    monthly = [
+        _profit_calendar_bucket(
+            spec,
+            snapshot_rows=snapshot_rows,
+            ledger_events=ledger_events,
+            cashflow_events=cashflow_events,
+            broker_by_period=broker_by_period,
+            reconciliation_failed=reconciliation_failed,
+        )
+        for spec in specs["monthly"]
+    ]
+    rolling = [
+        _profit_calendar_bucket(
+            spec,
+            snapshot_rows=snapshot_rows,
+            ledger_events=ledger_events,
+            cashflow_events=cashflow_events,
+            broker_by_period=broker_by_period,
+            reconciliation_failed=reconciliation_failed,
+        )
+        for spec in specs["rolling"]
+    ]
+    return {
+        "weekly": weekly,
+        "monthly": monthly,
+        "rolling": rolling,
+        "summary": {
+            "current_week": weekly[0] if weekly else {},
+            "current_month": monthly[0] if monthly else {},
+            "rolling_1w": _first_profit_bucket(rolling, "ROLLING_1W"),
+            "rolling_1m": _first_profit_bucket(rolling, "ROLLING_1M"),
+        },
+    }
+
+
+def _profit_calendar_specs(
+    *,
+    settings: Any,
+    snapshot_rows: list[dict[str, Any]],
+    end_date: date,
+) -> dict[str, list[dict[str, Any]]]:
+    weekly: list[dict[str, Any]] = []
+    monthly: list[dict[str, Any]] = []
+    rolling: list[dict[str, Any]] = []
+    week_start = end_date - timedelta(days=end_date.weekday())
+    week_count = max(1, int(getattr(settings, "profit_calendar_weeks", 8) or 8))
+    for offset in range(week_count):
+        start = week_start - timedelta(days=7 * offset)
+        full_end = start + timedelta(days=6)
+        end = min(full_end, end_date)
+        weekly.append(
+            {
+                "period_key": f"WEEK_{start.strftime('%Y%m%d')}",
+                "label": "이번 주" if offset == 0 else f"{start.isoformat()} 주",
+                "period_start": start,
+                "period_end": end,
+                "partial": end < full_end,
+            }
+        )
+
+    month_count = max(1, int(getattr(settings, "profit_calendar_months", 6) or 6))
+    current_month = date(end_date.year, end_date.month, 1)
+    for offset in range(month_count):
+        start = _month_start_offset(current_month, -offset)
+        full_end = _month_end(start)
+        end = min(full_end, end_date)
+        monthly.append(
+            {
+                "period_key": f"MONTH_{start.strftime('%Y%m')}",
+                "label": "이번 달" if offset == 0 else start.strftime("%Y-%m"),
+                "period_start": start,
+                "period_end": end,
+                "partial": end < full_end,
+            }
+        )
+
+    rolling_periods = tuple(
+        getattr(settings, "profit_calendar_rolling_periods", ("1W", "1M", "3M", "6M", "YTD", "1Y", "ALL"))
+        or ("1W", "1M", "3M", "6M", "YTD", "1Y", "ALL")
+    )
+    for raw_name in rolling_periods:
+        name = str(raw_name or "").strip().upper()
+        if not name:
+            continue
+        start = _period_start(name, end_date=end_date, snapshot_rows=snapshot_rows)
+        rolling.append(
+            {
+                "period_key": f"ROLLING_{name}",
+                "label": _rolling_profit_label(name),
+                "period_start": start,
+                "period_end": end_date,
+                "partial": False,
+            }
+        )
+    return {"weekly": weekly, "monthly": monthly, "rolling": rolling}
+
+
+def _profit_calendar_broker_summaries(
+    *,
+    settings: Any,
+    profile: PortfolioProfile,
+    broker_performance: BrokerPerformanceSummary | None,
+    periods: list[tuple[date, date]],
+    benchmark_prices: Mapping[str, list[dict[str, Any]]],
+    warnings: list[str],
+) -> dict[tuple[str, str], BrokerPerformanceSummary]:
+    unique_periods = list(dict.fromkeys(periods))
+    results = load_broker_performance_baseline_periods(
+        getattr(settings, "broker_return_baseline_path", None),
+        periods=unique_periods,
+        benchmark_prices=benchmark_prices,
+        warnings=warnings,
+    )
+    if broker_performance is not None:
+        results[(broker_performance.period_start, broker_performance.period_end)] = broker_performance
+    missing_periods = [
+        period
+        for period in unique_periods
+        if (period[0].isoformat(), period[1].isoformat()) not in results
+    ]
+    if (
+        missing_periods
+        and bool(getattr(settings, "prefer_broker_reported_performance", True))
+        and profile.broker == "kis"
+        and str(getattr(profile, "market_scope", "kr") or "kr").strip().lower() != "us"
+    ):
+        results.update(
+            fetch_kis_domestic_broker_performance_periods(
+                profile=profile,
+                periods=missing_periods,
+                benchmark_prices=benchmark_prices,
+                warnings=warnings,
+            )
+        )
+    return results
+
+
+def _profit_calendar_bucket(
+    spec: Mapping[str, Any],
+    *,
+    snapshot_rows: list[dict[str, Any]],
+    ledger_events: list[LedgerEvent],
+    cashflow_events: list[CashflowEvent],
+    broker_by_period: Mapping[tuple[str, str], BrokerPerformanceSummary],
+    reconciliation_failed: bool,
+) -> dict[str, Any]:
+    requested_start = spec["period_start"]
+    requested_end = spec["period_end"]
+    key = (requested_start.isoformat(), requested_end.isoformat())
+    broker = broker_by_period.get(key)
+    if broker is not None and broker.investment_pnl_krw is not None:
+        warnings = list(broker.warnings)
+        return {
+            "period_key": spec.get("period_key"),
+            "label": spec.get("label"),
+            "period_start": requested_start.isoformat(),
+            "period_end": requested_end.isoformat(),
+            "investment_pnl_krw": broker.investment_pnl_krw,
+            "return_pct": broker.balance_return_pct,
+            "start_asset_krw": broker.start_asset_krw,
+            "end_asset_krw": broker.end_asset_krw,
+            "deposit_amount_krw": broker.deposit_amount_krw,
+            "withdrawal_amount_krw": broker.withdrawal_amount_krw,
+            "source": "broker_reported",
+            "trust_state": "trusted" if not warnings else "broker_reported_with_warning",
+            "display_eligible": True,
+            "partial": bool(spec.get("partial")),
+            "warnings": warnings,
+        }
+
+    start_snapshot = _first_snapshot_on_or_after(snapshot_rows, requested_start)
+    end_snapshot = _last_snapshot_on_or_before(snapshot_rows, requested_end)
+    if not start_snapshot or not end_snapshot or str(start_snapshot.get("date") or "") >= str(end_snapshot.get("date") or ""):
+        return _unavailable_profit_bucket(spec, warning="snapshot_history_insufficient")
+    start_date = _parse_date(str(start_snapshot.get("date") or "")) or requested_start
+    end_date = _parse_date(str(end_snapshot.get("date") or "")) or requested_end
+    start_value = _float_or_none(start_snapshot.get("account_value_krw"))
+    end_value = _float_or_none(end_snapshot.get("account_value_krw"))
+    if start_value is None or end_value is None or start_value <= 0:
+        return _unavailable_profit_bucket(spec, warning="invalid_snapshot_value")
+
+    profit = _internal_profit_for_window(
+        cashflow_events=cashflow_events,
+        start_date=start_date,
+        end_date=end_date,
+        start_value=start_value,
+        end_value=end_value,
+    )
+    bucket_warnings: list[str] = []
+    if broker is None:
+        bucket_warnings.append("broker_reported_unavailable")
+    else:
+        bucket_warnings.extend(broker.warnings or ["broker_reported_investment_pnl_unavailable"])
+    if start_date > requested_start or end_date < requested_end or bool(spec.get("partial")):
+        bucket_warnings.append("partial_snapshot_coverage")
+    if _has_unknown_material_ledger_events(ledger_events, start_date=start_date, end_date=end_date):
+        bucket_warnings.append("cashflow_adjustment_unavailable")
+    trust_state = "trusted"
+    display_eligible = True
+    if reconciliation_failed:
+        trust_state = "unreconciled_reference"
+        display_eligible = False
+        bucket_warnings.append("snapshot_reconciliation_failed")
+    elif "cashflow_adjustment_unavailable" in bucket_warnings:
+        trust_state = "cashflow_unadjusted_reference"
+        display_eligible = False
+    elif "partial_snapshot_coverage" in bucket_warnings:
+        trust_state = "partial_reference"
+    return {
+        "period_key": spec.get("period_key"),
+        "label": spec.get("label"),
+        "period_start": requested_start.isoformat(),
+        "period_end": requested_end.isoformat(),
+        "actual_start_date": start_date.isoformat(),
+        "actual_end_date": end_date.isoformat(),
+        "investment_pnl_krw": profit["investment_pnl_krw"],
+        "return_pct": profit["return_pct"],
+        "start_asset_krw": int(round(start_value)),
+        "end_asset_krw": int(round(end_value)),
+        "deposit_amount_krw": profit["deposit_amount_krw"],
+        "withdrawal_amount_krw": profit["withdrawal_amount_krw"],
+        "source": "internal_snapshot",
+        "trust_state": trust_state,
+        "display_eligible": display_eligible,
+        "partial": bool(spec.get("partial")) or start_date > requested_start or end_date < requested_end,
+        "warnings": list(dict.fromkeys(bucket_warnings)),
+    }
+
+
+def _internal_profit_for_window(
+    *,
+    cashflow_events: list[CashflowEvent],
+    start_date: date,
+    end_date: date,
+    start_value: float,
+    end_value: float,
+) -> dict[str, Any]:
+    capital_flows = _cashflows_between(
+        cashflow_events,
+        start_date=start_date,
+        end_date=end_date,
+        capital_only=True,
+    )
+    deposits = sum(max(float(event.amount_krw), 0.0) for event in capital_flows)
+    withdrawals = sum(abs(min(float(event.amount_krw), 0.0)) for event in capital_flows)
+    investment_pnl = float(end_value) - float(start_value) - deposits + withdrawals
+    principal = float(start_value) + deposits - withdrawals
+    return {
+        "investment_pnl_krw": int(round(investment_pnl)),
+        "return_pct": _round_or_none(investment_pnl / principal * 100.0 if principal > 0 else None),
+        "deposit_amount_krw": int(round(deposits)),
+        "withdrawal_amount_krw": int(round(withdrawals)),
+        "investment_principal_krw": int(round(principal)) if principal > 0 else None,
+    }
+
+
+def _unavailable_profit_bucket(spec: Mapping[str, Any], *, warning: str) -> dict[str, Any]:
+    return {
+        "period_key": spec.get("period_key"),
+        "label": spec.get("label"),
+        "period_start": spec["period_start"].isoformat(),
+        "period_end": spec["period_end"].isoformat(),
+        "investment_pnl_krw": None,
+        "return_pct": None,
+        "start_asset_krw": None,
+        "end_asset_krw": None,
+        "deposit_amount_krw": None,
+        "withdrawal_amount_krw": None,
+        "source": "unavailable",
+        "trust_state": "unavailable",
+        "display_eligible": False,
+        "partial": bool(spec.get("partial")),
+        "warnings": [warning],
+    }
+
+
+def _first_profit_bucket(buckets: list[dict[str, Any]], period_key: str) -> dict[str, Any]:
+    return next((bucket for bucket in buckets if bucket.get("period_key") == period_key), {})
+
+
+def _month_start_offset(month_start: date, offset_months: int) -> date:
+    month_index = month_start.year * 12 + month_start.month - 1 + offset_months
+    year = month_index // 12
+    month = month_index % 12 + 1
+    return date(year, month, 1)
+
+
+def _month_end(month_start: date) -> date:
+    return _month_start_offset(month_start, 1) - timedelta(days=1)
+
+
+def _rolling_profit_label(period_name: str) -> str:
+    labels = {
+        "1W": "최근 1주",
+        "1M": "최근 1개월",
+        "3M": "최근 3개월",
+        "6M": "최근 6개월",
+        "YTD": "연초 이후",
+        "1Y": "최근 1년",
+        "ALL": "사용 가능 전체 기간",
+    }
+    return labels.get(period_name, period_name)
 
 
 def _build_period_coverage(
@@ -2870,6 +3243,8 @@ def _last_snapshot_on_or_before(rows: list[dict[str, Any]], target: date) -> dic
 
 def _period_start(period_name: str, *, end_date: date, snapshot_rows: list[dict[str, Any]]) -> date:
     normalized = str(period_name or "").strip().upper()
+    if normalized == "1W":
+        return end_date - timedelta(days=7)
     if normalized == "1M":
         return end_date - timedelta(days=30)
     if normalized == "3M":
@@ -3106,6 +3481,7 @@ def _public_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         "summary",
         "periods",
         "chart_data",
+        "profit_calendar",
         "broker_performance",
         "broker_performance_comparison",
         "etf_alternative_comparison",

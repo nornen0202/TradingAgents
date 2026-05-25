@@ -42,6 +42,23 @@ def test_broker_performance_settings_are_loaded(tmp_path: Path):
     assert settings.show_snapshot_performance_when_unreconciled is True
 
 
+def test_profit_calendar_settings_are_loaded(tmp_path: Path):
+    settings = _load_portfolio_performance_settings(
+        {
+            "profit_calendar_enabled": True,
+            "profit_calendar_weeks": 4,
+            "profit_calendar_months": 3,
+            "profit_calendar_rolling_periods": ["1w", "1m", "all"],
+        },
+        base_dir=tmp_path,
+    )
+
+    assert settings.profit_calendar_enabled is True
+    assert settings.profit_calendar_weeks == 4
+    assert settings.profit_calendar_months == 3
+    assert settings.profit_calendar_rolling_periods == ("1W", "1M", "ALL")
+
+
 def test_etf_dca_benchmark_settings_are_loaded(tmp_path: Path):
     settings = _load_portfolio_performance_settings(
         {},

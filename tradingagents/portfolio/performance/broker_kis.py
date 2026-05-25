@@ -67,6 +67,33 @@ def fetch_kis_domestic_broker_performance(
     )
 
 
+def fetch_kis_domestic_broker_performance_periods(
+    *,
+    profile: PortfolioProfile,
+    periods: list[tuple[date, date]],
+    benchmark_prices: Mapping[str, list[dict[str, Any]]] | None = None,
+    warnings: list[str] | None = None,
+) -> dict[tuple[str, str], BrokerPerformanceSummary]:
+    results: dict[tuple[str, str], BrokerPerformanceSummary] = {}
+    cache: dict[tuple[date, date], BrokerPerformanceSummary | None] = {}
+    for period_start, period_end in periods:
+        if period_start > period_end:
+            continue
+        key = (period_start, period_end)
+        if key not in cache:
+            cache[key] = fetch_kis_domestic_broker_performance(
+                profile=profile,
+                period_start=period_start,
+                period_end=period_end,
+                benchmark_prices=benchmark_prices,
+                warnings=warnings,
+            )
+        summary = cache[key]
+        if summary is not None:
+            results[(period_start.isoformat(), period_end.isoformat())] = summary
+    return results
+
+
 def load_broker_performance_baseline(
     path: str | Path | None,
     *,
@@ -82,22 +109,17 @@ def load_broker_performance_baseline(
         if warnings is not None:
             warnings.append(f"broker_performance_baseline_missing:{source}")
         return None
-    try:
-        if source.suffix.lower() == ".csv":
-            with source.open("r", encoding="utf-8-sig", newline="") as handle:
-                reader = csv.DictReader(handle)
-                raw = next(reader, None) or {}
-        else:
-            raw_payload = json.loads(source.read_text(encoding="utf-8"))
-            if isinstance(raw_payload, list):
-                raw = next((item for item in raw_payload if isinstance(item, dict)), {})
-            elif isinstance(raw_payload, dict):
-                raw = raw_payload
-            else:
-                raw = {}
-    except Exception as exc:
-        if warnings is not None:
-            warnings.append(f"broker_performance_baseline_invalid:{_short_error(exc)}")
+    raw_rows = _load_baseline_rows(source, warnings=warnings)
+    if not raw_rows:
+        return None
+
+    raw = _select_baseline_row(
+        raw_rows,
+        period_start=period_start,
+        period_end=period_end,
+        allow_single_fallback=True,
+    )
+    if not raw:
         return None
 
     start = _date_or_none(raw.get("period_start") or raw.get("start_date")) or period_start
@@ -112,6 +134,86 @@ def load_broker_performance_baseline(
         period_end=end,
         benchmark_prices=benchmark_prices,
     )
+
+
+def load_broker_performance_baseline_periods(
+    path: str | Path | None,
+    *,
+    periods: list[tuple[date, date]],
+    benchmark_prices: Mapping[str, list[dict[str, Any]]] | None = None,
+    warnings: list[str] | None = None,
+) -> dict[tuple[str, str], BrokerPerformanceSummary]:
+    if not path:
+        return {}
+    source = Path(path).expanduser()
+    if not source.exists():
+        if warnings is not None:
+            warnings.append(f"broker_performance_baseline_missing:{source}")
+        return {}
+    raw_rows = _load_baseline_rows(source, warnings=warnings)
+    if not raw_rows:
+        return {}
+    results: dict[tuple[str, str], BrokerPerformanceSummary] = {}
+    for period_start, period_end in dict.fromkeys(periods):
+        raw = _select_baseline_row(
+            raw_rows,
+            period_start=period_start,
+            period_end=period_end,
+            allow_single_fallback=False,
+        )
+        if not raw:
+            continue
+        start = _date_or_none(raw.get("period_start") or raw.get("start_date")) or period_start
+        end = _date_or_none(raw.get("period_end") or raw.get("end_date")) or period_end
+        if start is None or end is None:
+            continue
+        results[(period_start.isoformat(), period_end.isoformat())] = normalize_kis_broker_summary(
+            raw,
+            period_start=start,
+            period_end=end,
+            benchmark_prices=benchmark_prices,
+        )
+    return results
+
+
+def _load_baseline_rows(source: Path, *, warnings: list[str] | None = None) -> list[dict[str, Any]]:
+    try:
+        if source.suffix.lower() == ".csv":
+            with source.open("r", encoding="utf-8-sig", newline="") as handle:
+                reader = csv.DictReader(handle)
+                return [dict(row) for row in reader if isinstance(row, Mapping)]
+        raw_payload = json.loads(source.read_text(encoding="utf-8"))
+        if isinstance(raw_payload, list):
+            return [dict(item) for item in raw_payload if isinstance(item, Mapping)]
+        if isinstance(raw_payload, Mapping):
+            rows = raw_payload.get("periods") or raw_payload.get("rows") or raw_payload.get("broker_performance")
+            if isinstance(rows, list):
+                return [dict(item) for item in rows if isinstance(item, Mapping)]
+            return [dict(raw_payload)]
+        return []
+    except Exception as exc:
+        if warnings is not None:
+            warnings.append(f"broker_performance_baseline_invalid:{_short_error(exc)}")
+        return []
+
+
+def _select_baseline_row(
+    rows: list[dict[str, Any]],
+    *,
+    period_start: date | None,
+    period_end: date | None,
+    allow_single_fallback: bool,
+) -> dict[str, Any]:
+    if allow_single_fallback and len(rows) == 1:
+        return rows[0]
+    if period_start is None or period_end is None:
+        return rows[0] if allow_single_fallback and rows else {}
+    for row in rows:
+        start = _date_or_none(row.get("period_start") or row.get("start_date"))
+        end = _date_or_none(row.get("period_end") or row.get("end_date"))
+        if start == period_start and end == period_end:
+            return row
+    return {}
 
 
 def normalize_kis_broker_summary(

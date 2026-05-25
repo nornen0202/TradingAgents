@@ -347,6 +347,153 @@ def test_min_coverage_ratio_zero_is_honored_by_engine(tmp_path: Path):
     assert not any("account_performance_period_insufficient_history:1M" in item for item in payload["data_quality"]["warnings"])
 
 
+def test_profit_calendar_internal_buckets_subtract_external_deposits(tmp_path: Path):
+    client = Mock()
+    client.fetch_domestic_order_fills.return_value = []
+    client.fetch_domestic_period_profit.return_value = ([], {})
+    client.fetch_domestic_period_trade_profit.return_value = ([], {})
+    client.fetch_domestic_period_rights.return_value = []
+    client.fetch_domestic_cashflow_ledger.return_value = [
+        {"date": "2026-04-10", "event_type": "DEPOSIT", "cashflow_amount": "200000"}
+    ]
+
+    with patch("tradingagents.portfolio.kis.KisClient.from_api_keys", return_value=client):
+        payload = _build_report(
+            tmp_path,
+            market_scope="kr",
+            broker="kis",
+            periods=("1W", "ALL"),
+            current_as_of="2026-04-15T09:00:00+09:00",
+            current_total_equity_krw=1_350_000,
+            history_snapshots=[
+                {
+                    "snapshot_id": "month-start",
+                    "as_of": "2026-04-01T09:00:00+09:00",
+                    "account_value_krw": 1_000_000,
+                    "snapshot_health": "VALID",
+                    "positions": [{"canonical_ticker": "TEST", "market_value_krw": 900_000}],
+                },
+                {
+                    "snapshot_id": "last-week",
+                    "as_of": "2026-04-07T09:00:00+09:00",
+                    "account_value_krw": 1_100_000,
+                    "snapshot_health": "VALID",
+                    "positions": [{"canonical_ticker": "TEST", "market_value_krw": 1_000_000}],
+                },
+                {
+                    "snapshot_id": "week-start",
+                    "as_of": "2026-04-14T09:00:00+09:00",
+                    "account_value_krw": 1_200_000,
+                    "snapshot_health": "VALID",
+                    "positions": [{"canonical_ticker": "TEST", "market_value_krw": 1_100_000}],
+                },
+            ],
+            benchmarks={
+                "KOSPI": [
+                    {"date": "2026-04-01", "close": 100},
+                    {"date": "2026-04-07", "close": 101},
+                    {"date": "2026-04-14", "close": 102},
+                    {"date": "2026-04-15", "close": 103},
+                ],
+                "KOSDAQ": [
+                    {"date": "2026-04-01", "close": 100},
+                    {"date": "2026-04-07", "close": 100},
+                    {"date": "2026-04-14", "close": 100},
+                    {"date": "2026-04-15", "close": 100},
+                ],
+            },
+        )
+
+    calendar = payload["profit_calendar"]
+    current_month = calendar["summary"]["current_month"]
+    current_week = calendar["summary"]["current_week"]
+    rolling_1w = calendar["summary"]["rolling_1w"]
+
+    assert current_month["source"] == "internal_snapshot"
+    assert current_month["deposit_amount_krw"] == 200_000
+    assert current_month["investment_pnl_krw"] == 150_000
+    assert current_week["investment_pnl_krw"] == 150_000
+    assert rolling_1w["period_key"] == "ROLLING_1W"
+    assert payload["periods"][0]["period"] == "1W"
+
+
+def test_profit_calendar_uses_matching_broker_baseline_period_before_internal_snapshot(tmp_path: Path):
+    payload = _build_report(
+        tmp_path,
+        market_scope="kr",
+        current_as_of="2026-04-15T09:00:00+09:00",
+        current_total_equity_krw=1_350_000,
+        history_snapshots=[
+            {
+                "snapshot_id": "month-start",
+                "as_of": "2026-04-01T09:00:00+09:00",
+                "account_value_krw": 1_000_000,
+                "snapshot_health": "VALID",
+                "positions": [{"canonical_ticker": "TEST", "market_value_krw": 900_000}],
+            }
+        ],
+        benchmarks={
+            "KOSPI": [{"date": "2026-04-01", "close": 100}, {"date": "2026-04-15", "close": 103}],
+            "KOSDAQ": [{"date": "2026-04-01", "close": 100}, {"date": "2026-04-15", "close": 100}],
+        },
+        broker_baseline={
+            "periods": [
+                {
+                    "period_start": "2026-04-01",
+                    "period_end": "2026-04-15",
+                    "start_asset_krw": 1_000_000,
+                    "end_asset_krw": 1_350_000,
+                    "deposit_amount_krw": 200_000,
+                    "withdrawal_amount_krw": 0,
+                    "investment_pnl_krw": 180_000,
+                    "balance_return_pct": 15.0,
+                }
+            ]
+        },
+    )
+
+    current_month = payload["profit_calendar"]["summary"]["current_month"]
+    assert current_month["source"] == "broker_reported"
+    assert current_month["investment_pnl_krw"] == 180_000
+    assert current_month["return_pct"] == 15.0
+
+
+def test_profit_calendar_falls_back_when_broker_bucket_fetch_fails(tmp_path: Path):
+    client = Mock()
+    client.fetch_domestic_order_fills.return_value = []
+    client.fetch_domestic_period_profit.side_effect = RuntimeError("temporary broker outage")
+    client.fetch_domestic_period_trade_profit.return_value = ([], {})
+    client.fetch_domestic_period_rights.return_value = []
+    client.fetch_domestic_cashflow_ledger.return_value = []
+
+    with patch("tradingagents.portfolio.kis.KisClient.from_api_keys", return_value=client):
+        payload = _build_report(
+            tmp_path,
+            market_scope="kr",
+            broker="kis",
+            current_as_of="2026-04-15T09:00:00+09:00",
+            current_total_equity_krw=1_350_000,
+            history_snapshots=[
+                {
+                    "snapshot_id": "month-start",
+                    "as_of": "2026-04-01T09:00:00+09:00",
+                    "account_value_krw": 1_000_000,
+                    "snapshot_health": "VALID",
+                    "positions": [{"canonical_ticker": "TEST", "market_value_krw": 900_000}],
+                }
+            ],
+            benchmarks={
+                "KOSPI": [{"date": "2026-04-01", "close": 100}, {"date": "2026-04-15", "close": 103}],
+                "KOSDAQ": [{"date": "2026-04-01", "close": 100}, {"date": "2026-04-15", "close": 100}],
+            },
+        )
+
+    current_month = payload["profit_calendar"]["summary"]["current_month"]
+    assert current_month["source"] == "internal_snapshot"
+    assert current_month["investment_pnl_krw"] == 350_000
+    assert "broker_reported_unavailable" in current_month["warnings"]
+
+
 def test_contribution_aggregates_bare_kr_code_with_canonical_position(tmp_path: Path):
     client = Mock()
     client.fetch_domestic_order_fills.return_value = []
