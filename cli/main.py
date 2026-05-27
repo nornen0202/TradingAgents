@@ -1131,6 +1131,50 @@ def run_analysis():
         display_complete_report(final_state)
 
 
+@app.command("youtube-report")
+def youtube_report(
+    url: str = typer.Argument(..., help="YouTube video URL or 11-character video ID."),
+    out: Optional[Path] = typer.Option(
+        None,
+        "--out",
+        "-o",
+        help="Markdown report output path. Defaults to reports/youtube/<video_id>_report.md.",
+    ),
+    language: str = typer.Option("Korean", help="Report language. Korean is the primary supported mode."),
+    transcript_languages: str = typer.Option(
+        "ko,en",
+        help="Comma-separated caption language preference, for example ko,en.",
+    ),
+    no_auto_captions: bool = typer.Option(
+        False,
+        "--no-auto-captions",
+        help="Use only owner-provided captions and skip automatic captions.",
+    ),
+):
+    """Build a report-style summary for one YouTube video."""
+
+    from tradingagents.dataflows.youtube_video import extract_youtube_video_id
+    from tradingagents.youtube_report import write_youtube_video_report
+
+    video_id = extract_youtube_video_id(url)
+    output_path = out or (Path.cwd() / "reports" / "youtube" / f"{video_id}_report.md")
+    languages = [item.strip() for item in transcript_languages.split(",") if item.strip()]
+    path, bundle = write_youtube_video_report(
+        url,
+        output_path,
+        language=language,
+        transcript_languages=languages or ["ko", "en"],
+        include_auto_captions=not no_auto_captions,
+    )
+    transcript = bundle.transcript
+    transcript_note = "none"
+    if transcript:
+        transcript_note = f"{transcript.source}/{transcript.language_name}/{transcript.track_ext}"
+    console.print(f"[green]YouTube report saved:[/green] {path.resolve()}")
+    console.print(f"[dim]Video:[/dim] {bundle.metadata.title}")
+    console.print(f"[dim]Transcript:[/dim] {transcript_note}")
+
+
 @app.command()
 def analyze():
     run_analysis()
