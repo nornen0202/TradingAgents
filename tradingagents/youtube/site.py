@@ -63,7 +63,7 @@ def _discover_manifests(archive_dir: Path, *, max_runs: int) -> list[dict[str, A
 def _render_index_page(manifests: list[dict[str, Any]], settings: YouTubeSiteSettings) -> str:
     latest_videos: list[tuple[dict[str, Any], dict[str, Any]]] = []
     for manifest in manifests:
-        for video in _manifest_videos(manifest):
+        for video in _public_report_videos(manifest):
             latest_videos.append((manifest, video))
             if len(latest_videos) >= settings.max_videos_on_index:
                 break
@@ -98,7 +98,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: YouTubeSiteSet
 
 
 def _render_run_page(manifest: Mapping[str, Any], settings: YouTubeSiteSettings) -> str:
-    videos = "\n".join(_video_card(dict(manifest), video) for video in _manifest_videos(manifest))
+    videos = "\n".join(_video_card(dict(manifest), video) for video in _public_report_videos(manifest))
     if not videos:
         videos = '<p class="muted">이 실행에서 공개할 영상 리포트가 없습니다.</p>'
     run_id = str(manifest.get("run_id") or "run")
@@ -164,7 +164,7 @@ def _render_feed(manifests: list[dict[str, Any]], settings: YouTubeSiteSettings)
     items: list[dict[str, Any]] = []
     for manifest in manifests:
         run_id = str(manifest.get("run_id") or "")
-        for video in _manifest_videos(manifest):
+        for video in _public_report_videos(manifest):
             video_id = str(video.get("video_id") or "")
             items.append(
                 {
@@ -291,6 +291,10 @@ def _manifest_videos(manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
     if not isinstance(videos, list):
         return []
     return [dict(item) for item in videos if isinstance(item, Mapping)]
+
+
+def _public_report_videos(manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
+    return [video for video in _manifest_videos(manifest) if str(video.get("status") or "") != "failed"]
 
 
 def _manifest_run_dir(manifest: Mapping[str, Any]) -> Path:
