@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from http.cookiejar import MozillaCookieJar
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from html import unescape
 import json
+import os
 import re
+import time
 from typing import Any, Iterable
 from urllib.parse import parse_qs, urlparse
 
@@ -13,6 +16,16 @@ import requests
 
 YOUTUBE_VIDEO_URL = "https://www.youtube.com/watch?v={video_id}"
 _VIDEO_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
+_CAPTION_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/125.0.0.0 Safari/537.36"
+    ),
+    "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+}
+_CAPTION_LAST_REQUEST_AT = 0.0
+_CAPTION_SESSIONS: dict[str, requests.Session] = {}
 
 
 @dataclass(frozen=True)
@@ -97,6 +110,7 @@ def fetch_youtube_video(
     *,
     transcript_languages: Iterable[str] = ("ko", "en"),
     include_auto_captions: bool = True,
+    fetch_transcript: bool = True,
     timeout_seconds: float = 30.0,
 ) -> YouTubeVideoBundle:
     """Fetch metadata and the best available transcript for one YouTube video.
@@ -109,12 +123,12 @@ def fetch_youtube_video(
     yt_dlp = _import_ytdlp()
     video_id = extract_youtube_video_id(url_or_id)
     url = YOUTUBE_VIDEO_URL.format(video_id=video_id)
-    options = {
-        "skip_download": True,
-        "quiet": True,
-        "no_warnings": True,
-        "noplaylist": True,
-    }
+    options = _youtube_dl_options(
+        skip_download=True,
+        quiet=True,
+        no_warnings=True,
+        noplaylist=True,
+    )
 
     try:
         with yt_dlp.YoutubeDL(options) as ydl:
@@ -127,13 +141,17 @@ def fetch_youtube_video(
     manual_languages = tuple(sorted(str(key) for key in subtitles.keys()))
     auto_languages = tuple(sorted(str(key) for key in automatic_captions.keys()))
 
-    transcript = _fetch_best_transcript(
-        subtitles=subtitles,
-        automatic_captions=automatic_captions if include_auto_captions else {},
-        transcript_languages=tuple(transcript_languages),
-        timeout_seconds=timeout_seconds,
-    )
+    transcript = None
+    if fetch_transcript:
+        transcript = _fetch_best_transcript(
+            subtitles=subtitles,
+            automatic_captions=automatic_captions if include_auto_captions else {},
+            transcript_languages=tuple(transcript_languages),
+            timeout_seconds=timeout_seconds,
+        )
     transcript_status = "available" if transcript and transcript.raw_text else "unavailable"
+    if not fetch_transcript:
+        transcript_status = "skipped"
 
     return YouTubeVideoBundle(
         metadata=_metadata_from_info(info, video_id=video_id, fallback_url=url),
@@ -153,6 +171,14 @@ def _import_ytdlp() -> Any:
             "Install it in the active environment with: python -m pip install yt-dlp"
         ) from exc
     return yt_dlp
+
+
+def _youtube_dl_options(**base_options: Any) -> dict[str, Any]:
+    options = dict(base_options)
+    cookie_file = _youtube_cookie_file()
+    if cookie_file:
+        options["cookiefile"] = cookie_file
+    return options
 
 
 def _metadata_from_info(info: dict[str, Any], *, video_id: str, fallback_url: str) -> YouTubeVideoMetadata:
@@ -258,8 +284,9 @@ def _download_transcript_track(
     url = str(track.get("url") or "")
     if not url:
         return None
-    response = requests.get(url, timeout=timeout_seconds)
-    response.raise_for_status()
+    response = _download_caption_response(url, timeout_seconds=timeout_seconds)
+    if response is None:
+        return None
     payload = response.text
     ext = str(track.get("ext") or "").lower()
     language_name = str(track.get("name") or language)
@@ -282,6 +309,72 @@ def _download_transcript_track(
         segments=segments,
         raw_text=raw_text,
         track_ext=ext,
+    )
+
+
+def _download_caption_response(url: str, *, timeout_seconds: float) -> requests.Response | None:
+    max_retries = _env_int("TRADINGAGENTS_YOUTUBE_CAPTION_MAX_RETRIES", 2)
+    for attempt in range(max(0, max_retries) + 1):
+        _respect_caption_throttle()
+        try:
+            response = _caption_session().get(url, timeout=timeout_seconds)
+        except requests.RequestException:
+            return None
+        if response.status_code == 429:
+            if attempt >= max_retries:
+                return None
+            time.sleep(_caption_retry_delay(response, attempt))
+            continue
+        try:
+            response.raise_for_status()
+        except requests.RequestException:
+            return None
+        return response
+    return None
+
+
+def _caption_session() -> requests.Session:
+    cookie_file = _youtube_cookie_file() or ""
+    session = _CAPTION_SESSIONS.get(cookie_file)
+    if session is not None:
+        return session
+    session = requests.Session()
+    session.headers.update(_CAPTION_HEADERS)
+    if cookie_file:
+        try:
+            jar = MozillaCookieJar(cookie_file)
+            jar.load(ignore_discard=True, ignore_expires=True)
+            session.cookies = jar
+        except (OSError, ValueError):
+            pass
+    _CAPTION_SESSIONS[cookie_file] = session
+    return session
+
+
+def _respect_caption_throttle() -> None:
+    global _CAPTION_LAST_REQUEST_AT
+    interval = _env_float("TRADINGAGENTS_YOUTUBE_CAPTION_INTERVAL_SECONDS", 1.0)
+    if interval <= 0:
+        _CAPTION_LAST_REQUEST_AT = time.monotonic()
+        return
+    elapsed = time.monotonic() - _CAPTION_LAST_REQUEST_AT
+    if _CAPTION_LAST_REQUEST_AT and elapsed < interval:
+        time.sleep(interval - elapsed)
+    _CAPTION_LAST_REQUEST_AT = time.monotonic()
+
+
+def _caption_retry_delay(response: requests.Response, attempt: int) -> float:
+    retry_after = response.headers.get("Retry-After")
+    if retry_after:
+        try:
+            delay = float(retry_after)
+        except ValueError:
+            delay = 0.0
+        if delay > 0:
+            return min(delay, _env_float("TRADINGAGENTS_YOUTUBE_CAPTION_MAX_RETRY_DELAY_SECONDS", 20.0))
+    return min(
+        2.0 * (attempt + 1),
+        _env_float("TRADINGAGENTS_YOUTUBE_CAPTION_MAX_RETRY_DELAY_SECONDS", 20.0),
     )
 
 
@@ -348,3 +441,23 @@ def _optional_float(value: Any) -> float | None:
 def _text_or_none(value: Any) -> str | None:
     text = str(value or "").strip()
     return text or None
+
+
+def _youtube_cookie_file() -> str | None:
+    value = os.getenv("YOUTUBE_COOKIES_FILE") or os.getenv("TRADINGAGENTS_YOUTUBE_COOKIES_FILE")
+    text = str(value or "").strip()
+    return text if text and os.path.isfile(text) else None
+
+
+def _env_float(name: str, default: float) -> float:
+    try:
+        return float(os.getenv(name, default))
+    except (TypeError, ValueError):
+        return default
+
+
+def _env_int(name: str, default: int) -> int:
+    try:
+        return int(float(os.getenv(name, default)))
+    except (TypeError, ValueError):
+        return default

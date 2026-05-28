@@ -1,12 +1,20 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import os
+from pathlib import Path
+import tempfile
 import unittest
+from unittest.mock import patch
+
+import requests
 
 from tradingagents.dataflows.youtube_video import (
     YouTubeTranscript,
     YouTubeVideoBundle,
     YouTubeVideoMetadata,
+    _download_transcript_track,
+    _youtube_dl_options,
     extract_youtube_video_id,
     _parse_json3_segments,
 )
@@ -44,6 +52,74 @@ class YouTubeVideoReportTests(unittest.TestCase):
         self.assertEqual(len(segments), 1)
         self.assertEqual(segments[0].start_seconds, 1.0)
         self.assertEqual(segments[0].text, "오라클 RPO 5,530억 달러")
+
+    def test_download_transcript_track_treats_rate_limit_as_unavailable(self):
+        class RateLimitedSession:
+            def get(self, _url, timeout):
+                response = requests.Response()
+                response.status_code = 429
+                return response
+
+        with patch("tradingagents.dataflows.youtube_video._caption_session", return_value=RateLimitedSession()), patch(
+            "tradingagents.dataflows.youtube_video._respect_caption_throttle"
+        ), patch("tradingagents.dataflows.youtube_video.time.sleep"):
+            transcript = _download_transcript_track(
+                {"url": "https://www.youtube.com/api/timedtext", "ext": "json3"},
+                language="ko",
+                source="automatic",
+                timeout_seconds=1.0,
+            )
+
+        self.assertIsNone(transcript)
+
+    def test_download_transcript_track_retries_rate_limit_with_browser_headers(self):
+        class FakeResponse:
+            def __init__(self, status_code: int, text: str = "", headers: dict[str, str] | None = None):
+                self.status_code = status_code
+                self.text = text
+                self.headers = headers or {}
+
+            def raise_for_status(self):
+                if self.status_code >= 400:
+                    raise requests.HTTPError(str(self.status_code))
+
+            def json(self):
+                return {"events": [{"tStartMs": 0, "dDurationMs": 1000, "segs": [{"utf8": "오라클"}]}]}
+
+        class FakeSession:
+            def __init__(self):
+                self.calls = 0
+
+            def get(self, _url, timeout):
+                self.calls += 1
+                if self.calls == 1:
+                    return FakeResponse(429, headers={"Retry-After": "1"})
+                return FakeResponse(200, text='{"events":[]}')
+
+        session = FakeSession()
+        with patch("tradingagents.dataflows.youtube_video._caption_session", return_value=session), patch(
+            "tradingagents.dataflows.youtube_video._respect_caption_throttle"
+        ), patch("tradingagents.dataflows.youtube_video.time.sleep") as sleep:
+            transcript = _download_transcript_track(
+                {"url": "https://www.youtube.com/api/timedtext", "ext": "json3"},
+                language="ko",
+                source="automatic",
+                timeout_seconds=1.0,
+            )
+
+        self.assertEqual(session.calls, 2)
+        sleep.assert_called_once()
+        self.assertIsNotNone(transcript)
+        self.assertEqual(transcript.raw_text, "오라클")
+
+    def test_youtube_dl_options_uses_optional_cookie_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cookie_path = Path(tmp) / "cookies.txt"
+            cookie_path.write_text("# Netscape HTTP Cookie File\n", encoding="utf-8")
+            with patch.dict(os.environ, {"YOUTUBE_COOKIES_FILE": str(cookie_path)}, clear=False):
+                options = _youtube_dl_options(skip_download=True)
+
+        self.assertEqual(options["cookiefile"], str(cookie_path))
 
     def test_summarize_financial_entities_extracts_video_claims(self):
         transcript = (

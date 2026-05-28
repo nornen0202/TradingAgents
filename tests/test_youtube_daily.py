@@ -192,6 +192,99 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertTrue(site_index.is_file())
             self.assertIn("Video", site_index.read_text(encoding="utf-8"))
 
+    def test_runner_fetches_transcript_only_after_window_filter(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = _daily_config(root / "archive", root / "site")
+            recent_id = "recent00001"
+            old_id = "oldvideo001"
+            refs = (
+                YouTubeVideoReference(
+                    recent_id,
+                    f"https://www.youtube.com/watch?v={recent_id}",
+                    "Recent",
+                    "fixture",
+                    datetime.now(timezone.utc) - timedelta(hours=1),
+                ),
+                YouTubeVideoReference(
+                    old_id,
+                    f"https://www.youtube.com/watch?v={old_id}",
+                    "Old",
+                    "fixture",
+                    None,
+                ),
+            )
+            calls: list[tuple[str, bool]] = []
+
+            def fetcher(url: str, *, fetch_transcript: bool = True):
+                video_id = url[-11:]
+                calls.append((video_id, fetch_transcript))
+                published_at = datetime.now(timezone.utc) - (timedelta(hours=1) if video_id == recent_id else timedelta(days=3))
+                return _fake_bundle(video_id, published_at=published_at, transcript=fetch_transcript)
+
+            execute_youtube_run(
+                config,
+                reference_lister=lambda _urls, _limit: refs,
+                video_fetcher=fetcher,
+                bundle_verifier=lambda bundle, _draft, _generated_at: VerifiedVideoReport(
+                    status=VERIFIED,
+                    final_report_markdown=f"# Final {bundle.metadata.video_id}\n",
+                    verification={
+                        "status": VERIFIED,
+                        "llm_status": "success",
+                        "generated_at": datetime.now(timezone.utc).isoformat(),
+                        "entity_results": [],
+                        "source_policy": {"raw_transcript_published": False},
+                    },
+                ),
+            )
+
+            self.assertEqual(calls, [(recent_id, False), (recent_id, True), (old_id, False)])
+
+    def test_runner_reuses_previous_successful_video_without_caption_fetch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            config = _daily_config(archive_dir, site_dir)
+            video_id = "reuse000001"
+            previous_video_dir = archive_dir / "runs" / "2026" / "youtube_previous" / "videos" / video_id
+            previous_video_dir.mkdir(parents=True)
+            for filename, text in {
+                "metadata.json": "{}",
+                "draft_report.md": "# Draft\n",
+                "verification.json": json.dumps({"status": VERIFIED}, ensure_ascii=False),
+                "final_report.md": "# Reused final\n",
+                "public_summary.json": json.dumps({"video_id": video_id, "status": VERIFIED}, ensure_ascii=False),
+            }.items():
+                (previous_video_dir / filename).write_text(text, encoding="utf-8")
+            refs = (
+                YouTubeVideoReference(
+                    video_id,
+                    f"https://www.youtube.com/watch?v={video_id}",
+                    "Reusable",
+                    "fixture",
+                    datetime.now(timezone.utc) - timedelta(hours=1),
+                ),
+            )
+            calls: list[tuple[str, bool]] = []
+
+            def fetcher(url: str, *, fetch_transcript: bool = True):
+                calls.append((url[-11:], fetch_transcript))
+                return _fake_bundle(url[-11:], transcript=fetch_transcript)
+
+            manifest = execute_youtube_run(
+                config,
+                reference_lister=lambda _urls, _limit: refs,
+                video_fetcher=fetcher,
+                bundle_verifier=lambda _bundle, _draft, _generated_at: (_ for _ in ()).throw(RuntimeError("should reuse")),
+            )
+
+            self.assertEqual(calls, [(video_id, False)])
+            self.assertEqual(manifest["summary"]["reused_videos"], 1)
+            self.assertEqual(manifest["videos"][0]["reused_from_run"], "youtube_previous")
+            self.assertIn("Reused final", next(archive_dir.glob("runs/*/youtube_*/videos/reuse000001/final_report.md")).read_text(encoding="utf-8"))
+
     def test_site_builder_preserves_root_site_and_does_not_copy_raw_transcript(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -245,6 +338,7 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("actions/upload-pages-artifact", workflow)
         self.assertIn("tradingagents.youtube.runner", workflow)
         self.assertIn("config/scheduled_analysis_korea.toml", workflow)
+        self.assertIn("YOUTUBE_COOKIES_FILE", workflow)
 
     def test_python_module_runner_site_only_entrypoint(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -329,7 +423,12 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertIn("Fixture video", (site_dir / "youtube" / "index.html").read_text(encoding="utf-8"))
 
 
-def _fake_bundle(video_id: str) -> YouTubeVideoBundle:
+def _fake_bundle(
+    video_id: str,
+    *,
+    published_at: datetime | None = None,
+    transcript: bool = True,
+) -> YouTubeVideoBundle:
     video_id = video_id[-11:]
     return YouTubeVideoBundle(
         metadata=YouTubeVideoMetadata(
@@ -339,7 +438,7 @@ def _fake_bundle(video_id: str) -> YouTubeVideoBundle:
             channel="경제사냥꾼",
             channel_id="UC7usMJDHmtbs_oegmzQKKMA",
             upload_date="20260528",
-            published_at=datetime.now(timezone.utc) - timedelta(hours=1),
+            published_at=published_at or datetime.now(timezone.utc) - timedelta(hours=1),
             duration_seconds=600,
             view_count=1000,
             like_count=None,
@@ -348,15 +447,19 @@ def _fake_bundle(video_id: str) -> YouTubeVideoBundle:
             tags=(),
             categories=(),
         ),
-        transcript=YouTubeTranscript(
-            language="ko",
-            language_name="Korean",
-            source="automatic",
-            segments=(),
-            raw_text="오라클 티커는 ORCL. 52주 고점은 200달러 부근이라고 말한다.",
-            track_ext="json3",
+        transcript=(
+            YouTubeTranscript(
+                language="ko",
+                language_name="Korean",
+                source="automatic",
+                segments=(),
+                raw_text="오라클 티커는 ORCL. 52주 고점은 200달러 부근이라고 말한다.",
+                track_ext="json3",
+            )
+            if transcript
+            else None
         ),
-        transcript_status="available",
+        transcript_status="available" if transcript else "skipped",
         available_manual_caption_languages=(),
         available_auto_caption_languages=("ko",),
     )
