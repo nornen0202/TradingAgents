@@ -7,8 +7,11 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tradingagents.dataflows.youtube_video import YouTubeTranscript, YouTubeVideoBundle, YouTubeVideoMetadata
+from tradingagents.scheduled.config import SiteSettings
+from tradingagents.scheduled.site import build_site as build_scheduled_site
 from tradingagents.youtube.channel import YouTubeVideoReference, dedupe_video_references, filter_references_by_window
 from tradingagents.youtube.config import (
     ChannelSettings,
@@ -17,6 +20,7 @@ from tradingagents.youtube.config import (
     VerificationSettings,
     YouTubeDailyConfig,
     YouTubeSiteSettings,
+    load_youtube_config,
 )
 from tradingagents.youtube.runner import execute_youtube_run
 from tradingagents.youtube.site import build_youtube_site
@@ -264,6 +268,65 @@ class YouTubeDailyTests(unittest.TestCase):
 
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertTrue((root / "site" / "youtube" / "index.html").is_file())
+
+    def test_youtube_archive_defaults_to_shared_archive_in_actions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            shared_archive = Path(tmp) / "tradingagents-archive"
+            with patch.dict(
+                "os.environ",
+                {
+                    "TRADINGAGENTS_ARCHIVE_DIR": str(shared_archive),
+                    "TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR": "",
+                },
+                clear=False,
+            ):
+                config = load_youtube_config("config/youtube_daily.toml")
+
+        self.assertEqual(config.storage.archive_dir, shared_archive / "youtube-archive")
+
+    def test_scheduled_site_build_preserves_youtube_addon_and_home_link(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            youtube_run = archive_dir / "youtube-archive" / "runs" / "2026" / "youtube_20260528_220000"
+            video_dir = youtube_run / "videos" / "u2BEOgr8ze8"
+            video_dir.mkdir(parents=True)
+            (video_dir / "final_report.md").write_text("# Final\n\n공개 리포트입니다.", encoding="utf-8")
+            (video_dir / "public_summary.json").write_text(
+                json.dumps({"video_id": "u2BEOgr8ze8", "status": VERIFIED}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            (youtube_run / "youtube_run.json").write_text(
+                json.dumps(
+                    {
+                        "run_id": "youtube_20260528_220000",
+                        "status": "success",
+                        "started_at": "2026-05-28T22:00:00+09:00",
+                        "summary": {"total_videos": 1, "successful_videos": 1, "failed_videos": 0},
+                        "videos": [
+                            {
+                                "video_id": "u2BEOgr8ze8",
+                                "title": "Fixture video",
+                                "video_url": "https://www.youtube.com/watch?v=u2BEOgr8ze8",
+                                "status": VERIFIED,
+                                "final_report_path": "videos/u2BEOgr8ze8/final_report.md",
+                                "public_summary_path": "videos/u2BEOgr8ze8/public_summary.json",
+                            }
+                        ],
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            with patch.dict("os.environ", {"TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR": ""}, clear=False):
+                build_scheduled_site(archive_dir, site_dir, SiteSettings(title="TA", subtitle="Daily"))
+
+            home = (site_dir / "index.html").read_text(encoding="utf-8")
+            self.assertIn("youtube/index.html", home)
+            self.assertTrue((site_dir / "youtube" / "index.html").is_file())
+            self.assertIn("Fixture video", (site_dir / "youtube" / "index.html").read_text(encoding="utf-8"))
 
 
 def _fake_bundle(video_id: str) -> YouTubeVideoBundle:
