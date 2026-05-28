@@ -2,11 +2,15 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import unittest
+from unittest.mock import patch
+
+import requests
 
 from tradingagents.dataflows.youtube_video import (
     YouTubeTranscript,
     YouTubeVideoBundle,
     YouTubeVideoMetadata,
+    _download_transcript_track,
     extract_youtube_video_id,
     _parse_json3_segments,
 )
@@ -44,6 +48,20 @@ class YouTubeVideoReportTests(unittest.TestCase):
         self.assertEqual(len(segments), 1)
         self.assertEqual(segments[0].start_seconds, 1.0)
         self.assertEqual(segments[0].text, "오라클 RPO 5,530억 달러")
+
+    def test_download_transcript_track_treats_rate_limit_as_unavailable(self):
+        with patch(
+            "tradingagents.dataflows.youtube_video.requests.get",
+            side_effect=requests.HTTPError("429 Too Many Requests"),
+        ):
+            transcript = _download_transcript_track(
+                {"url": "https://www.youtube.com/api/timedtext", "ext": "json3"},
+                language="ko",
+                source="automatic",
+                timeout_seconds=1.0,
+            )
+
+        self.assertIsNone(transcript)
 
     def test_summarize_financial_entities_extracts_video_claims(self):
         transcript = (

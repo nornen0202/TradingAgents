@@ -258,8 +258,11 @@ def _download_transcript_track(
     url = str(track.get("url") or "")
     if not url:
         return None
-    response = requests.get(url, timeout=timeout_seconds)
-    response.raise_for_status()
+    try:
+        response = requests.get(url, timeout=timeout_seconds)
+        response.raise_for_status()
+    except requests.RequestException:
+        return None
     payload = response.text
     ext = str(track.get("ext") or "").lower()
     language_name = str(track.get("name") or language)
