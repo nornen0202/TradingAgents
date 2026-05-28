@@ -131,6 +131,46 @@ class YouTubeVideoReportTests(unittest.TestCase):
 
         self.assertEqual(options["proxy"], "http://127.0.0.1:8888")
 
+    def test_youtube_dl_options_uses_optional_youtube_extractor_args(self):
+        env = {
+            "TRADINGAGENTS_YOUTUBE_VISITOR_DATA": "CgthLW1vY2stdmlzaXRvcg==",
+            "TRADINGAGENTS_YOUTUBE_DATA_SYNC_ID": "mock-data-sync-id",
+            "TRADINGAGENTS_YOUTUBE_PLAYER_CLIENTS": "web,ios",
+            "TRADINGAGENTS_YOUTUBE_FETCH_PO_TOKEN": "never",
+            "TRADINGAGENTS_YOUTUBE_PO_TOKEN": "web.subs+c3Vicw==",
+            "TRADINGAGENTS_YOUTUBE_GVS_PO_TOKEN": "Z3ZzMg==",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            options = _youtube_dl_options(skip_download=True)
+
+        youtube_args = options["extractor_args"]["youtube"]
+        self.assertEqual(youtube_args["visitor_data"], ["CgthLW1vY2stdmlzaXRvcg=="])
+        self.assertEqual(youtube_args["data_sync_id"], ["mock-data-sync-id"])
+        self.assertEqual(youtube_args["player_client"], ["web", "ios"])
+        self.assertEqual(youtube_args["fetch_pot"], ["never"])
+        self.assertIn("web.subs+c3Vicw==", youtube_args["po_token"])
+        self.assertIn("web.gvs+Z3ZzMg==", youtube_args["po_token"])
+
+    def test_youtube_dl_options_merges_existing_youtube_extractor_args(self):
+        with patch.dict(os.environ, {"YOUTUBE_SUBS_PO_TOKEN": "bmV3"}, clear=True):
+            options = _youtube_dl_options(
+                skip_download=True,
+                extractor_args={
+                    "youtube": {
+                        "player_client": ["android"],
+                        "po_token": ["web.subs+b2xk"],
+                    },
+                    "other": {"flag": ["1"]},
+                },
+            )
+
+        self.assertEqual(options["extractor_args"]["other"], {"flag": ["1"]})
+        self.assertEqual(options["extractor_args"]["youtube"]["player_client"], ["android"])
+        self.assertEqual(
+            options["extractor_args"]["youtube"]["po_token"],
+            ["web.subs+b2xk", "web.subs+bmV3"],
+        )
+
     def test_parse_youtubei_transcript_segments(self):
         payload = {
             "actions": [

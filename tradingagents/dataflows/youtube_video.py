@@ -196,7 +196,49 @@ def _youtube_dl_options(**base_options: Any) -> dict[str, Any]:
     proxy = _youtube_proxy()
     if proxy:
         options["proxy"] = proxy
+    youtube_args = _youtube_extractor_args()
+    if youtube_args:
+        options["extractor_args"] = _merge_youtube_extractor_args(options.get("extractor_args"), youtube_args)
     return options
+
+
+def _youtube_extractor_args() -> dict[str, list[str]]:
+    args: dict[str, list[str]] = {}
+    visitor_data = _youtube_visitor_data()
+    if visitor_data:
+        args["visitor_data"] = [visitor_data]
+    data_sync_id = _youtube_env_text("TRADINGAGENTS_YOUTUBE_DATA_SYNC_ID", "YOUTUBE_DATA_SYNC_ID")
+    if data_sync_id:
+        args["data_sync_id"] = [data_sync_id]
+    player_clients = _youtube_env_list("TRADINGAGENTS_YOUTUBE_PLAYER_CLIENTS", "YOUTUBE_PLAYER_CLIENTS")
+    if player_clients:
+        args["player_client"] = player_clients
+    fetch_pot = _youtube_env_text("TRADINGAGENTS_YOUTUBE_FETCH_PO_TOKEN", "YOUTUBE_FETCH_PO_TOKEN")
+    if fetch_pot:
+        args["fetch_pot"] = [fetch_pot]
+    po_tokens = _youtube_po_tokens()
+    if po_tokens:
+        args["po_token"] = po_tokens
+    return args
+
+
+def _merge_youtube_extractor_args(
+    existing: Any,
+    youtube_args: dict[str, list[str]],
+) -> dict[str, Any]:
+    merged: dict[str, Any] = {}
+    if isinstance(existing, dict):
+        for key, value in existing.items():
+            merged[key] = dict(value) if isinstance(value, dict) else value
+
+    existing_youtube = merged.get("youtube")
+    youtube: dict[str, Any] = dict(existing_youtube) if isinstance(existing_youtube, dict) else {}
+    for key, values in youtube_args.items():
+        current = youtube.get(key, [])
+        current_values = list(current) if isinstance(current, (list, tuple)) else [str(current)]
+        youtube[key] = _dedupe_texts([*current_values, *values])
+    merged["youtube"] = youtube
+    return merged
 
 
 def _metadata_from_info(info: dict[str, Any], *, video_id: str, fallback_url: str) -> YouTubeVideoMetadata:
@@ -324,6 +366,9 @@ def _fetch_youtubei_transcript(
     context_payload = dict(context)
     client_payload = dict(context_payload.get("client") or {})
     client_payload["originalUrl"] = original_url
+    visitor_data = _youtube_visitor_data()
+    if visitor_data:
+        client_payload["visitorData"] = visitor_data
     context_payload["client"] = client_payload
     headers = {
         "Content-Type": "application/json",
@@ -340,7 +385,7 @@ def _fetch_youtubei_transcript(
         ("X-Youtube-Page-CL", "PAGE_CL"),
         ("X-Youtube-Page-Label", "PAGE_BUILD_LABEL"),
     ):
-        value = bootstrap.get(config_key)
+        value = visitor_data if config_key == "VISITOR_DATA" and visitor_data else bootstrap.get(config_key)
         if value is not None:
             headers[header] = str(value)
     payload = {"context": context_payload, "params": params}
@@ -570,11 +615,16 @@ def _fetch_asr_transcript(
 
 def _caption_session() -> requests.Session:
     cookie_file = _youtube_cookie_file() or ""
-    session = _CAPTION_SESSIONS.get(cookie_file)
+    proxy = _youtube_proxy() or ""
+    visitor_data = _youtube_visitor_data() or ""
+    session_key = json.dumps([cookie_file, proxy, visitor_data], separators=(",", ":"))
+    session = _CAPTION_SESSIONS.get(session_key)
     if session is not None:
         return session
     session = requests.Session()
     session.headers.update(_CAPTION_HEADERS)
+    if visitor_data:
+        session.headers["X-Goog-Visitor-Id"] = visitor_data
     if cookie_file:
         try:
             jar = MozillaCookieJar(cookie_file)
@@ -582,10 +632,9 @@ def _caption_session() -> requests.Session:
             session.cookies = jar
         except (OSError, ValueError):
             pass
-    proxy = _youtube_proxy()
     if proxy:
         session.proxies.update({"http": proxy, "https": proxy})
-    _CAPTION_SESSIONS[cookie_file] = session
+    _CAPTION_SESSIONS[session_key] = session
     return session
 
 
@@ -855,6 +904,58 @@ def _youtube_proxy() -> str | None:
     value = os.getenv("TRADINGAGENTS_YOUTUBE_PROXY") or os.getenv("YOUTUBE_PROXY")
     text = str(value or "").strip()
     return text or None
+
+
+def _youtube_visitor_data() -> str | None:
+    return _youtube_env_text("TRADINGAGENTS_YOUTUBE_VISITOR_DATA", "YOUTUBE_VISITOR_DATA")
+
+
+def _youtube_po_tokens() -> list[str]:
+    tokens: list[str] = []
+    tokens.extend(_youtube_env_list("TRADINGAGENTS_YOUTUBE_PO_TOKEN", "YOUTUBE_PO_TOKEN"))
+    for context, names in (
+        ("subs", ("TRADINGAGENTS_YOUTUBE_SUBS_PO_TOKEN", "YOUTUBE_SUBS_PO_TOKEN")),
+        ("gvs", ("TRADINGAGENTS_YOUTUBE_GVS_PO_TOKEN", "YOUTUBE_GVS_PO_TOKEN")),
+        ("player", ("TRADINGAGENTS_YOUTUBE_PLAYER_PO_TOKEN", "YOUTUBE_PLAYER_PO_TOKEN")),
+    ):
+        for token in _youtube_env_list(*names):
+            tokens.append(_normalize_youtube_po_token(token, context))
+    return _dedupe_texts(tokens)
+
+
+def _normalize_youtube_po_token(token: str, context: str) -> str:
+    text = token.strip()
+    if "+" in text:
+        return text
+    client = _youtube_env_text("TRADINGAGENTS_YOUTUBE_PO_TOKEN_CLIENT", "YOUTUBE_PO_TOKEN_CLIENT") or "web"
+    return f"{client}.{context}+{text}"
+
+
+def _youtube_env_text(*names: str) -> str | None:
+    for name in names:
+        text = str(os.getenv(name, "") or "").strip()
+        if text:
+            return text
+    return None
+
+
+def _youtube_env_list(*names: str) -> list[str]:
+    text = _youtube_env_text(*names)
+    if not text:
+        return []
+    return _dedupe_texts(part.strip() for part in re.split(r"[\n,;]+", text) if part.strip())
+
+
+def _dedupe_texts(values: Iterable[str]) -> list[str]:
+    result: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        text = str(value or "").strip()
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        result.append(text)
+    return result
 
 
 def _asr_fallback_enabled() -> bool:

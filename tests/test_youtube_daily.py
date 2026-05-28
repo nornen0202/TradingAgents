@@ -455,6 +455,11 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("config/scheduled_analysis_korea.toml", workflow)
         self.assertIn("YOUTUBE_COOKIES_FILE", workflow)
         self.assertIn("YOUTUBE_PROXY", workflow)
+        self.assertIn("YOUTUBE_VISITOR_DATA", workflow)
+        self.assertIn("YOUTUBE_PO_TOKEN", workflow)
+        self.assertIn("YOUTUBE_SUBS_PO_TOKEN", workflow)
+        self.assertIn("YOUTUBE_GVS_PO_TOKEN", workflow)
+        self.assertIn("YOUTUBE_PLAYER_CLIENTS", workflow)
         self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_FALLBACK", workflow)
         self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_TIMEOUT_SECONDS", workflow)
 
