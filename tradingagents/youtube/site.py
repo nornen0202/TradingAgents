@@ -294,7 +294,22 @@ def _manifest_videos(manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
 
 
 def _public_report_videos(manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
-    return [video for video in _manifest_videos(manifest) if str(video.get("status") or "") != "failed"]
+    run_dir = _manifest_run_dir(manifest)
+    return [video for video in _manifest_videos(manifest) if _is_public_report_video(video, run_dir)]
+
+
+def _is_public_report_video(video: Mapping[str, Any], run_dir: Path) -> bool:
+    if str(video.get("status") or "") in {"failed", "skipped_no_transcript"}:
+        return False
+    for payload in (video, _read_json_run_artifact(run_dir, video.get("public_summary_path")), _read_json_run_artifact(run_dir, video.get("metadata_path"))):
+        if not isinstance(payload, Mapping):
+            continue
+        transcript_status = payload.get("transcript_status")
+        if transcript_status == "available":
+            return True
+        if transcript_status and transcript_status != "available":
+            return False
+    return True
 
 
 def _manifest_run_dir(manifest: Mapping[str, Any]) -> Path:

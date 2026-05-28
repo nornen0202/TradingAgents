@@ -5,6 +5,7 @@ from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 import inspect
 import json
+import os
 from pathlib import Path
 import shutil
 from time import perf_counter
@@ -111,6 +112,7 @@ def execute_youtube_run(
     reused_count = 0
     metadata_fetch_failures = 0
     transcript_fetch_failures = 0
+    skipped_no_transcript = 0
     for reference in references:
         if selected_count >= config.channel.max_videos:
             break
@@ -152,6 +154,23 @@ def execute_youtube_run(
             except Exception:
                 transcript_fetch_failures += 1
                 bundle = metadata_bundle
+            if not _bundle_has_usable_transcript(bundle):
+                skipped_no_transcript += 1
+                _write_json(video_dir / "metadata.json", _metadata_payload(bundle))
+                _write_json(
+                    video_dir / "collection_status.json",
+                    {
+                        "video_id": bundle.metadata.video_id,
+                        "title": bundle.metadata.title,
+                        "video_url": bundle.metadata.url,
+                        "status": "skipped_no_transcript",
+                        "reason": "usable transcript or ASR text was not available",
+                        "transcript_status": bundle.transcript_status,
+                        "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
+                        "minimum_transcript_chars": _minimum_transcript_chars(),
+                    },
+                )
+                continue
             draft_report = build_youtube_video_report(bundle, generated_at=started_at.replace(tzinfo=None))
             verified = verifier(bundle, draft_report, started_at)
             _write_text(video_dir / "draft_report.md", draft_report)
@@ -223,6 +242,7 @@ def execute_youtube_run(
             "skipped_out_of_window": skipped_count,
             "metadata_fetch_failures": metadata_fetch_failures,
             "transcript_fetch_failures": transcript_fetch_failures,
+            "skipped_no_transcript": skipped_no_transcript,
         },
         "videos": video_summaries,
         "source_policy": {
@@ -247,6 +267,10 @@ def execute_single_video(
 ) -> Path:
     generated_at = datetime.now(ZoneInfo(config.channel.timezone))
     bundle = fetch_youtube_video(video_url)
+    if not _bundle_has_usable_transcript(bundle):
+        raise RuntimeError(
+            "Usable transcript or ASR text was not available; report generation was skipped for this video."
+        )
     draft_report = build_youtube_video_report(bundle, generated_at=generated_at.replace(tzinfo=None))
     if verify:
         verified = verify_youtube_bundle(
@@ -313,6 +337,18 @@ def _bundle_in_window(bundle: YouTubeVideoBundle, *, window_start: datetime, win
     return window_start <= comparable <= window_end
 
 
+def _bundle_has_usable_transcript(bundle: YouTubeVideoBundle) -> bool:
+    text = bundle.transcript.raw_text if bundle.transcript else ""
+    return len(" ".join(str(text or "").split())) >= _minimum_transcript_chars()
+
+
+def _minimum_transcript_chars() -> int:
+    try:
+        return max(1, int(float(os.getenv("TRADINGAGENTS_YOUTUBE_MIN_TRANSCRIPT_CHARS", "120"))))
+    except (TypeError, ValueError):
+        return 120
+
+
 def _to_timezone(value: datetime, tzinfo: Any) -> datetime:
     if value.tzinfo is None:
         value = value.replace(tzinfo=timezone.utc)
@@ -340,6 +376,9 @@ def _manifest_video_item(
         "duration_seconds": metadata.duration_seconds,
         "view_count": metadata.view_count,
         "status": status,
+        "transcript_status": bundle.transcript_status,
+        "transcript_source": getattr(bundle.transcript, "source", None),
+        "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
         "metadata_path": _relative_artifact_path(video_dir / "metadata.json", run_dir),
         "draft_report_path": _relative_artifact_path(video_dir / "draft_report.md", run_dir),
         "verification_path": _relative_artifact_path(video_dir / "verification.json", run_dir),
@@ -377,6 +416,8 @@ def _copy_reusable_video_artifacts(
             continue
         if not isinstance(summary, dict) or summary.get("status") == "failed":
             continue
+        if not _archived_summary_has_usable_transcript(source_video_dir, summary):
+            continue
         required = ("metadata.json", "draft_report.md", "verification.json", "final_report.md", "public_summary.json")
         if not all((source_video_dir / name).is_file() for name in required):
             continue
@@ -388,6 +429,33 @@ def _copy_reusable_video_artifacts(
             "run_id": _run_id_from_video_dir(source_video_dir),
         }
     return None
+
+
+def _archived_summary_has_usable_transcript(video_dir: Path, summary: dict[str, Any]) -> bool:
+    for payload in (summary, _read_json_if_exists(video_dir / "metadata.json")):
+        if not isinstance(payload, dict):
+            continue
+        status = payload.get("transcript_status")
+        if status == "available":
+            chars = payload.get("transcript_chars")
+            if chars is None:
+                metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
+                chars = metadata.get("transcript_chars") if isinstance(metadata, dict) else None
+            try:
+                return chars is None or int(chars) >= _minimum_transcript_chars()
+            except (TypeError, ValueError):
+                return True
+        if status and status != "available":
+            return False
+    return False
+
+
+def _read_json_if_exists(path: Path) -> dict[str, Any] | None:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return payload if isinstance(payload, dict) else None
 
 
 def _run_id_from_video_dir(video_dir: Path) -> str:
@@ -414,6 +482,7 @@ def _metadata_payload(bundle: YouTubeVideoBundle) -> dict[str, Any]:
         "transcript_status": bundle.transcript_status,
         "transcript_source": getattr(bundle.transcript, "source", None),
         "transcript_language": getattr(bundle.transcript, "language_name", None),
+        "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
         "available_manual_caption_languages": list(bundle.available_manual_caption_languages),
         "available_auto_caption_languages": list(bundle.available_auto_caption_languages),
         "raw_transcript_archived": False,
@@ -448,6 +517,9 @@ def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport) -
         "channel": bundle.metadata.channel,
         "published_at": bundle.metadata.published_at.isoformat() if bundle.metadata.published_at else bundle.metadata.upload_date,
         "status": verified.status,
+        "transcript_status": bundle.transcript_status,
+        "transcript_source": getattr(bundle.transcript, "source", None),
+        "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
         "generated_at": verification.get("generated_at"),
         "llm_status": verification.get("llm_status"),
         "entities": entities,

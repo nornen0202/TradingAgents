@@ -6,7 +6,9 @@ from datetime import datetime, timezone
 from html import unescape
 import json
 import os
+from pathlib import Path
 import re
+import tempfile
 import time
 from typing import Any, Iterable
 from urllib.parse import parse_qs, urlparse
@@ -143,10 +145,23 @@ def fetch_youtube_video(
 
     transcript = None
     if fetch_transcript:
+        transcript = _fetch_web_ui_transcript(
+            video_id=video_id,
+            transcript_languages=tuple(transcript_languages),
+            timeout_seconds=timeout_seconds,
+        )
+    if fetch_transcript and not transcript:
         transcript = _fetch_best_transcript(
             subtitles=subtitles,
             automatic_captions=automatic_captions if include_auto_captions else {},
             transcript_languages=tuple(transcript_languages),
+            timeout_seconds=timeout_seconds,
+        )
+    if fetch_transcript and not transcript:
+        transcript = _fetch_asr_transcript(
+            url=url,
+            video_id=video_id,
+            duration_seconds=_optional_int(info.get("duration")),
             timeout_seconds=timeout_seconds,
         )
     transcript_status = "available" if transcript and transcript.raw_text else "unavailable"
@@ -178,6 +193,9 @@ def _youtube_dl_options(**base_options: Any) -> dict[str, Any]:
     cookie_file = _youtube_cookie_file()
     if cookie_file:
         options["cookiefile"] = cookie_file
+    proxy = _youtube_proxy()
+    if proxy:
+        options["proxy"] = proxy
     return options
 
 
@@ -240,6 +258,156 @@ def _fetch_best_transcript(
             )
             if transcript and transcript.raw_text:
                 return transcript
+    return None
+
+
+def _fetch_web_ui_transcript(
+    *,
+    video_id: str,
+    transcript_languages: tuple[str, ...],
+    timeout_seconds: float,
+) -> YouTubeTranscript | None:
+    html = _fetch_watch_html(video_id=video_id, timeout_seconds=timeout_seconds)
+    if not html:
+        return None
+    transcript = _fetch_youtubei_transcript(
+        html=html,
+        video_id=video_id,
+        transcript_languages=transcript_languages,
+        timeout_seconds=timeout_seconds,
+    )
+    if transcript:
+        return transcript
+    return _fetch_player_caption_tracks_from_html(
+        html=html,
+        transcript_languages=transcript_languages,
+        timeout_seconds=timeout_seconds,
+    )
+
+
+def _fetch_watch_html(*, video_id: str, timeout_seconds: float) -> str:
+    session = _caption_session()
+    url = YOUTUBE_VIDEO_URL.format(video_id=video_id)
+    try:
+        response = session.get(
+            url,
+            timeout=timeout_seconds,
+            headers={
+                **_CAPTION_HEADERS,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache",
+            },
+        )
+        response.raise_for_status()
+    except requests.RequestException:
+        return ""
+    return response.text
+
+
+def _fetch_youtubei_transcript(
+    *,
+    html: str,
+    video_id: str,
+    transcript_languages: tuple[str, ...],
+    timeout_seconds: float,
+) -> YouTubeTranscript | None:
+    bootstrap = _extract_youtube_bootstrap_config(html)
+    params = _extract_get_transcript_params(html)
+    if not bootstrap or not params:
+        return None
+    api_key = bootstrap.get("INNERTUBE_API_KEY")
+    context = bootstrap.get("INNERTUBE_CONTEXT")
+    if not isinstance(api_key, str) or not isinstance(context, dict):
+        return None
+    original_url = YOUTUBE_VIDEO_URL.format(video_id=video_id)
+    context_payload = dict(context)
+    client_payload = dict(context_payload.get("client") or {})
+    client_payload["originalUrl"] = original_url
+    context_payload["client"] = client_payload
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Origin": "https://www.youtube.com",
+        "Referer": original_url,
+        "X-Goog-AuthUser": "0",
+        "X-Youtube-Bootstrap-Logged-In": "false",
+    }
+    for header, config_key in (
+        ("X-Youtube-Client-Name", "INNERTUBE_CONTEXT_CLIENT_NAME"),
+        ("X-Youtube-Client-Version", "INNERTUBE_CONTEXT_CLIENT_VERSION"),
+        ("X-Goog-Visitor-Id", "VISITOR_DATA"),
+        ("X-Youtube-Page-CL", "PAGE_CL"),
+        ("X-Youtube-Page-Label", "PAGE_BUILD_LABEL"),
+    ):
+        value = bootstrap.get(config_key)
+        if value is not None:
+            headers[header] = str(value)
+    payload = {"context": context_payload, "params": params}
+    try:
+        response = _caption_session().post(
+            f"https://www.youtube.com/youtubei/v1/get_transcript?key={api_key}",
+            headers=headers,
+            json=payload,
+            timeout=timeout_seconds,
+        )
+        if response.status_code == 429:
+            return None
+        response.raise_for_status()
+        data = response.json()
+    except (requests.RequestException, json.JSONDecodeError):
+        return None
+    segments = _parse_youtubei_transcript_segments(data)
+    raw_text = clean_transcript_text(" ".join(segment.text for segment in segments))
+    if not raw_text:
+        return None
+    language = (_expand_language_priority(transcript_languages) or ("ko",))[0]
+    return YouTubeTranscript(
+        language=language,
+        language_name=language,
+        source="youtubei",
+        segments=segments,
+        raw_text=raw_text,
+        track_ext="youtubei",
+    )
+
+
+def _fetch_player_caption_tracks_from_html(
+    *,
+    html: str,
+    transcript_languages: tuple[str, ...],
+    timeout_seconds: float,
+) -> YouTubeTranscript | None:
+    player_response = _extract_json_variable(html, "ytInitialPlayerResponse")
+    if not isinstance(player_response, dict):
+        return None
+    renderer = (
+        (player_response.get("captions") or {})
+        .get("playerCaptionsTracklistRenderer", {})
+        if isinstance(player_response.get("captions"), dict)
+        else {}
+    )
+    caption_tracks = renderer.get("captionTracks") if isinstance(renderer, dict) else None
+    if not isinstance(caption_tracks, list):
+        return None
+    language_priority = _expand_language_priority(transcript_languages)
+    ordered_tracks = _sort_player_caption_tracks(caption_tracks, language_priority)
+    for track in ordered_tracks:
+        if not isinstance(track, dict):
+            continue
+        base_url = str(track.get("baseUrl") or track.get("url") or "")
+        if not base_url:
+            continue
+        language = str(track.get("languageCode") or "")
+        source = "automatic" if track.get("kind") == "asr" else "manual"
+        transcript = _download_transcript_track(
+            {"url": _with_caption_format(base_url, "json3"), "ext": "json3", "name": _caption_track_name(track, language)},
+            language=language,
+            source=source,
+            timeout_seconds=timeout_seconds,
+        )
+        if transcript:
+            return transcript
     return None
 
 
@@ -333,6 +501,73 @@ def _download_caption_response(url: str, *, timeout_seconds: float) -> requests.
     return None
 
 
+def _fetch_asr_transcript(
+    *,
+    url: str,
+    video_id: str,
+    duration_seconds: int | None,
+    timeout_seconds: float,
+) -> YouTubeTranscript | None:
+    if not _asr_fallback_enabled():
+        return None
+    max_duration = _env_int("TRADINGAGENTS_YOUTUBE_ASR_MAX_DURATION_SECONDS", 1800)
+    if duration_seconds is not None and duration_seconds > max_duration:
+        return None
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        return None
+    yt_dlp = _import_ytdlp()
+    try:
+        from openai import OpenAI
+    except ImportError:
+        return None
+
+    with tempfile.TemporaryDirectory(prefix="tradingagents-youtube-asr-") as tmp:
+        output_template = str(Path(tmp) / "%(id)s.%(ext)s")
+        options = _youtube_dl_options(
+            format="bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best",
+            outtmpl=output_template,
+            quiet=True,
+            no_warnings=True,
+            noplaylist=True,
+            socket_timeout=timeout_seconds,
+        )
+        try:
+            with yt_dlp.YoutubeDL(options) as ydl:
+                info = ydl.extract_info(url, download=True)
+        except Exception:
+            return None
+        audio_path = _downloaded_audio_path(info, Path(tmp), video_id)
+        if audio_path is None or not audio_path.is_file():
+            return None
+        try:
+            client = OpenAI(
+                api_key=api_key,
+                timeout=max(timeout_seconds, _env_float("TRADINGAGENTS_YOUTUBE_ASR_TIMEOUT_SECONDS", 900.0)),
+            )
+            with audio_path.open("rb") as handle:
+                result = client.audio.transcriptions.create(
+                    model=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_MODEL", "whisper-1"),
+                    file=handle,
+                    language=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_LANGUAGE", "ko"),
+                    response_format="verbose_json",
+                )
+        except Exception:
+            return None
+    segments = _segments_from_openai_transcription(result)
+    raw_text = clean_transcript_text(getattr(result, "text", "") or " ".join(segment.text for segment in segments))
+    if not raw_text:
+        return None
+    return YouTubeTranscript(
+        language=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_LANGUAGE", "ko"),
+        language_name="OpenAI ASR",
+        source="asr",
+        segments=segments,
+        raw_text=raw_text,
+        track_ext=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_MODEL", "whisper-1"),
+    )
+
+
 def _caption_session() -> requests.Session:
     cookie_file = _youtube_cookie_file() or ""
     session = _CAPTION_SESSIONS.get(cookie_file)
@@ -347,6 +582,9 @@ def _caption_session() -> requests.Session:
             session.cookies = jar
         except (OSError, ValueError):
             pass
+    proxy = _youtube_proxy()
+    if proxy:
+        session.proxies.update({"http": proxy, "https": proxy})
     _CAPTION_SESSIONS[cookie_file] = session
     return session
 
@@ -397,6 +635,62 @@ def _parse_json3_segments(payload: dict[str, Any]) -> tuple[YouTubeTranscriptSeg
     return tuple(segments)
 
 
+def _parse_youtubei_transcript_segments(payload: dict[str, Any]) -> tuple[YouTubeTranscriptSegment, ...]:
+    segment_list = _find_first_key(payload, "initialSegments")
+    if not isinstance(segment_list, list):
+        return ()
+    segments: list[YouTubeTranscriptSegment] = []
+    for item in segment_list:
+        if not isinstance(item, dict):
+            continue
+        renderer = item.get("transcriptSegmentRenderer")
+        if not isinstance(renderer, dict):
+            continue
+        snippet = renderer.get("snippet")
+        runs = snippet.get("runs") if isinstance(snippet, dict) else None
+        if not isinstance(runs, list):
+            continue
+        text = clean_transcript_text("".join(str(run.get("text") or "") for run in runs if isinstance(run, dict)))
+        if not text:
+            continue
+        start_ms = _optional_float(renderer.get("startMs")) or 0.0
+        duration_ms = _optional_float(renderer.get("durationMs")) or 0.0
+        segments.append(
+            YouTubeTranscriptSegment(
+                start_seconds=start_ms / 1000.0,
+                duration_seconds=duration_ms / 1000.0,
+                text=text,
+            )
+        )
+    return tuple(segments)
+
+
+def _segments_from_openai_transcription(result: Any) -> tuple[YouTubeTranscriptSegment, ...]:
+    raw_segments = getattr(result, "segments", None)
+    if raw_segments is None and isinstance(result, dict):
+        raw_segments = result.get("segments")
+    if not isinstance(raw_segments, list):
+        return ()
+    segments: list[YouTubeTranscriptSegment] = []
+    for item in raw_segments:
+        if isinstance(item, dict):
+            text = item.get("text")
+            start = item.get("start")
+            end = item.get("end")
+        else:
+            text = getattr(item, "text", None)
+            start = getattr(item, "start", None)
+            end = getattr(item, "end", None)
+        cleaned = clean_transcript_text(str(text or ""))
+        if not cleaned:
+            continue
+        start_seconds = _optional_float(start) or 0.0
+        end_seconds = _optional_float(end)
+        duration = max(0.0, end_seconds - start_seconds) if end_seconds is not None else 0.0
+        segments.append(YouTubeTranscriptSegment(start_seconds=start_seconds, duration_seconds=duration, text=cleaned))
+    return tuple(segments)
+
+
 def _parse_text_caption_segments(payload: str) -> tuple[YouTubeTranscriptSegment, ...]:
     lines = []
     for line in payload.splitlines():
@@ -410,6 +704,114 @@ def _parse_text_caption_segments(payload: str) -> tuple[YouTubeTranscriptSegment
     if not lines:
         return ()
     return (YouTubeTranscriptSegment(start_seconds=0.0, duration_seconds=0.0, text=" ".join(lines)),)
+
+
+def _extract_youtube_bootstrap_config(html: str) -> dict[str, Any] | None:
+    match = re.search(r"ytcfg\.set\(({.+?})\);", html)
+    if not match:
+        return None
+    try:
+        payload = json.loads(match.group(1))
+    except json.JSONDecodeError:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def _extract_get_transcript_params(html: str) -> str | None:
+    match = re.search(r'"getTranscriptEndpoint":\{"params":"([^"]+)"\}', html)
+    if not match:
+        return None
+    return match.group(1)
+
+
+def _extract_json_variable(html: str, variable_name: str) -> dict[str, Any] | None:
+    patterns = (
+        rf"var\s+{re.escape(variable_name)}\s*=\s*({{.+?}});</script>",
+        rf"{re.escape(variable_name)}\s*=\s*({{.+?}});</script>",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, html)
+        if not match:
+            continue
+        try:
+            payload = json.loads(match.group(1))
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, dict):
+            return payload
+    return None
+
+
+def _sort_player_caption_tracks(
+    tracks: list[Any],
+    language_priority: tuple[str, ...],
+) -> list[dict[str, Any]]:
+    normalized = [track for track in tracks if isinstance(track, dict)]
+    priority = {language: index for index, language in enumerate(language_priority)}
+
+    def rank(track: dict[str, Any]) -> tuple[int, int]:
+        language = str(track.get("languageCode") or "")
+        language_rank = priority.get(language, len(priority) + 5)
+        if language not in priority:
+            for candidate, index in priority.items():
+                if language.startswith(candidate + "-") or candidate.startswith(language + "-"):
+                    language_rank = min(language_rank, index + 1)
+        source_rank = 1 if track.get("kind") == "asr" else 0
+        return language_rank, source_rank
+
+    return sorted(normalized, key=rank)
+
+
+def _caption_track_name(track: dict[str, Any], fallback: str) -> str:
+    name = track.get("name")
+    if isinstance(name, dict):
+        simple = name.get("simpleText")
+        if simple:
+            return str(simple)
+        runs = name.get("runs")
+        if isinstance(runs, list):
+            text = "".join(str(item.get("text") or "") for item in runs if isinstance(item, dict))
+            if text:
+                return text
+    return fallback
+
+
+def _with_caption_format(url: str, fmt: str) -> str:
+    separator = "&" if "?" in url else "?"
+    if re.search(r"([?&])fmt=", url):
+        return re.sub(r"([?&])fmt=[^&]*", rf"\1fmt={fmt}", url)
+    return f"{url}{separator}fmt={fmt}"
+
+
+def _find_first_key(value: Any, target_key: str) -> Any:
+    if isinstance(value, dict):
+        if target_key in value:
+            return value[target_key]
+        for item in value.values():
+            found = _find_first_key(item, target_key)
+            if found is not None:
+                return found
+    elif isinstance(value, list):
+        for item in value:
+            found = _find_first_key(item, target_key)
+            if found is not None:
+                return found
+    return None
+
+
+def _downloaded_audio_path(info: dict[str, Any], directory: Path, video_id: str) -> Path | None:
+    requested = info.get("requested_downloads")
+    if isinstance(requested, list):
+        for item in requested:
+            if isinstance(item, dict) and item.get("filepath"):
+                path = Path(str(item["filepath"]))
+                if path.is_file():
+                    return path
+    prepared = info.get("_filename")
+    if prepared and Path(str(prepared)).is_file():
+        return Path(str(prepared))
+    matches = sorted(directory.glob(f"{video_id}.*"), key=lambda path: path.stat().st_size, reverse=True)
+    return matches[0] if matches else None
 
 
 def clean_transcript_text(value: str) -> str:
@@ -447,6 +849,17 @@ def _youtube_cookie_file() -> str | None:
     value = os.getenv("YOUTUBE_COOKIES_FILE") or os.getenv("TRADINGAGENTS_YOUTUBE_COOKIES_FILE")
     text = str(value or "").strip()
     return text if text and os.path.isfile(text) else None
+
+
+def _youtube_proxy() -> str | None:
+    value = os.getenv("TRADINGAGENTS_YOUTUBE_PROXY") or os.getenv("YOUTUBE_PROXY")
+    text = str(value or "").strip()
+    return text or None
+
+
+def _asr_fallback_enabled() -> bool:
+    value = str(os.getenv("TRADINGAGENTS_YOUTUBE_ASR_FALLBACK", "1")).strip().lower()
+    return value not in {"0", "false", "no", "off"}
 
 
 def _env_float(name: str, default: float) -> float:

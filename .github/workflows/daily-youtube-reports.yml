@@ -59,6 +59,10 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       YOUTUBE_COOKIES_TXT: ${{ secrets.YOUTUBE_COOKIES_TXT }}
       YOUTUBE_COOKIES_TXT_B64: ${{ secrets.YOUTUBE_COOKIES_TXT_B64 }}
+      YOUTUBE_PROXY: ${{ secrets.YOUTUBE_PROXY }}
+      TRADINGAGENTS_YOUTUBE_ASR_FALLBACK: "1"
+      TRADINGAGENTS_YOUTUBE_ASR_TIMEOUT_SECONDS: "900"
+      TRADINGAGENTS_YOUTUBE_MIN_TRANSCRIPT_CHARS: "120"
     steps:
       - name: Set up Python
         uses: actions/setup-python@v6
