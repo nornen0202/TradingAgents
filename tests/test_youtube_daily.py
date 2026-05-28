@@ -241,6 +241,32 @@ class YouTubeDailyTests(unittest.TestCase):
 
             self.assertEqual(calls, [(recent_id, False), (recent_id, True), (old_id, False)])
 
+    def test_runner_excludes_videos_without_usable_transcript(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = _daily_config(root / "archive", root / "site")
+            video_id = "notext00001"
+            refs = (
+                YouTubeVideoReference(
+                    video_id,
+                    f"https://www.youtube.com/watch?v={video_id}",
+                    "No transcript",
+                    "fixture",
+                    datetime.now(timezone.utc) - timedelta(hours=1),
+                ),
+            )
+
+            manifest = execute_youtube_run(
+                config,
+                reference_lister=lambda _urls, _limit: refs,
+                video_fetcher=lambda url, *, fetch_transcript=True: _fake_bundle(url[-11:], transcript=False),
+                bundle_verifier=lambda _bundle, _draft, _generated_at: (_ for _ in ()).throw(RuntimeError("should skip")),
+            )
+
+            self.assertEqual(manifest["summary"]["total_videos"], 0)
+            self.assertEqual(manifest["summary"]["skipped_no_transcript"], 1)
+            self.assertFalse((root / "site" / "youtube" / "feed.json").read_text(encoding="utf-8").count("No transcript"))
+
     def test_runner_reuses_previous_successful_video_without_caption_fetch(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -255,7 +281,10 @@ class YouTubeDailyTests(unittest.TestCase):
                 "draft_report.md": "# Draft\n",
                 "verification.json": json.dumps({"status": VERIFIED}, ensure_ascii=False),
                 "final_report.md": "# Reused final\n",
-                "public_summary.json": json.dumps({"video_id": video_id, "status": VERIFIED}, ensure_ascii=False),
+                "public_summary.json": json.dumps(
+                    {"video_id": video_id, "status": VERIFIED, "transcript_status": "available", "transcript_chars": 240},
+                    ensure_ascii=False,
+                ),
             }.items():
                 (previous_video_dir / filename).write_text(text, encoding="utf-8")
             refs = (
@@ -338,15 +367,26 @@ class YouTubeDailyTests(unittest.TestCase):
             run_dir = archive_dir / "runs" / "2026" / "youtube_20260528_220000"
             ok_dir = run_dir / "videos" / "u2BEOgr8ze8"
             failed_dir = run_dir / "videos" / "failed00001"
+            unavailable_dir = run_dir / "videos" / "notext00001"
             ok_dir.mkdir(parents=True)
             failed_dir.mkdir(parents=True)
+            unavailable_dir.mkdir(parents=True)
             (ok_dir / "final_report.md").write_text("# Final\n\n공개 리포트입니다.", encoding="utf-8")
             (ok_dir / "public_summary.json").write_text(
-                json.dumps({"video_id": "u2BEOgr8ze8", "status": VERIFIED}, ensure_ascii=False),
+                json.dumps({"video_id": "u2BEOgr8ze8", "status": VERIFIED, "transcript_status": "available"}, ensure_ascii=False),
                 encoding="utf-8",
             )
             (failed_dir / "public_summary.json").write_text(
                 json.dumps({"video_id": "failed00001", "status": "failed"}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            (unavailable_dir / "final_report.md").write_text("# No text\n", encoding="utf-8")
+            (unavailable_dir / "metadata.json").write_text(
+                json.dumps({"transcript_status": "unavailable"}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            (unavailable_dir / "public_summary.json").write_text(
+                json.dumps({"video_id": "notext00001", "status": UNVERIFIED, "transcript_status": "unavailable"}, ensure_ascii=False),
                 encoding="utf-8",
             )
             (run_dir / "youtube_run.json").write_text(
@@ -372,6 +412,15 @@ class YouTubeDailyTests(unittest.TestCase):
                                 "status": "failed",
                                 "public_summary_path": "videos/failed00001/public_summary.json",
                             },
+                            {
+                                "video_id": "notext00001",
+                                "title": "Hidden unavailable transcript",
+                                "video_url": "https://www.youtube.com/watch?v=notext00001",
+                                "status": UNVERIFIED,
+                                "metadata_path": "videos/notext00001/metadata.json",
+                                "final_report_path": "videos/notext00001/final_report.md",
+                                "public_summary_path": "videos/notext00001/public_summary.json",
+                            },
                         ],
                     },
                     ensure_ascii=False,
@@ -391,8 +440,10 @@ class YouTubeDailyTests(unittest.TestCase):
 
             self.assertIn("Visible fixture", index_html)
             self.assertNotIn("Hidden collection failure", index_html)
+            self.assertNotIn("Hidden unavailable transcript", index_html)
             self.assertIn("Visible fixture", run_html)
             self.assertNotIn("Hidden collection failure", run_html)
+            self.assertNotIn("Hidden unavailable transcript", run_html)
             self.assertEqual(feed_titles, ["Visible fixture"])
 
     def test_github_actions_workflow_schedule_and_pages_artifact(self):
@@ -403,6 +454,9 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("tradingagents.youtube.runner", workflow)
         self.assertIn("config/scheduled_analysis_korea.toml", workflow)
         self.assertIn("YOUTUBE_COOKIES_FILE", workflow)
+        self.assertIn("YOUTUBE_PROXY", workflow)
+        self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_FALLBACK", workflow)
+        self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_TIMEOUT_SECONDS", workflow)
 
     def test_python_module_runner_site_only_entrypoint(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -494,6 +548,10 @@ def _fake_bundle(
     transcript: bool = True,
 ) -> YouTubeVideoBundle:
     video_id = video_id[-11:]
+    transcript_text = (
+        "오라클 티커는 ORCL. 52주 고점은 200달러 부근이라고 말한다. "
+        "영상은 투자자가 확인해야 할 숫자 주장과 리스크, 후속 체크포인트를 설명한다. "
+    ) * 3
     return YouTubeVideoBundle(
         metadata=YouTubeVideoMetadata(
             video_id=video_id,
@@ -517,7 +575,7 @@ def _fake_bundle(
                 language_name="Korean",
                 source="automatic",
                 segments=(),
-                raw_text="오라클 티커는 ORCL. 52주 고점은 200달러 부근이라고 말한다.",
+                raw_text=transcript_text,
                 track_ext="json3",
             )
             if transcript

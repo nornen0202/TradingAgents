@@ -3,7 +3,9 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import os
 from pathlib import Path
+import sys
 import tempfile
+import types
 import unittest
 from unittest.mock import patch
 
@@ -14,6 +16,8 @@ from tradingagents.dataflows.youtube_video import (
     YouTubeVideoBundle,
     YouTubeVideoMetadata,
     _download_transcript_track,
+    _fetch_asr_transcript,
+    _parse_youtubei_transcript_segments,
     _youtube_dl_options,
     extract_youtube_video_id,
     _parse_json3_segments,
@@ -120,6 +124,98 @@ class YouTubeVideoReportTests(unittest.TestCase):
                 options = _youtube_dl_options(skip_download=True)
 
         self.assertEqual(options["cookiefile"], str(cookie_path))
+
+    def test_youtube_dl_options_uses_optional_proxy(self):
+        with patch.dict(os.environ, {"TRADINGAGENTS_YOUTUBE_PROXY": "http://127.0.0.1:8888"}, clear=False):
+            options = _youtube_dl_options(skip_download=True)
+
+        self.assertEqual(options["proxy"], "http://127.0.0.1:8888")
+
+    def test_parse_youtubei_transcript_segments(self):
+        payload = {
+            "actions": [
+                {
+                    "updateEngagementPanelAction": {
+                        "content": {
+                            "transcriptRenderer": {
+                                "content": {
+                                    "transcriptSearchPanelRenderer": {
+                                        "body": {
+                                            "transcriptSegmentListRenderer": {
+                                                "initialSegments": [
+                                                    {
+                                                        "transcriptSegmentRenderer": {
+                                                            "startMs": "0",
+                                                            "durationMs": "7000",
+                                                            "snippet": {"runs": [{"text": "종전 합의 임박."}]},
+                                                        }
+                                                    },
+                                                    {
+                                                        "transcriptSegmentRenderer": {
+                                                            "startMs": "7000",
+                                                            "durationMs": "8000",
+                                                            "snippet": {"runs": [{"text": "미군 공군 기지를 때렸거든."}]},
+                                                        }
+                                                    },
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+
+        segments = _parse_youtubei_transcript_segments(payload)
+
+        self.assertEqual(len(segments), 2)
+        self.assertEqual(segments[0].text, "종전 합의 임박.")
+        self.assertEqual(segments[1].start_seconds, 7.0)
+
+    def test_asr_transcript_fallback_uses_downloaded_audio_and_openai(self):
+        class FakeYoutubeDL:
+            def __init__(self, options):
+                self.options = options
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def extract_info(self, _url, download):
+                path = Path(self.options["outtmpl"].replace("%(id)s", "KWDrgODHL60").replace("%(ext)s", "m4a"))
+                path.write_bytes(b"audio")
+                return {"requested_downloads": [{"filepath": str(path)}]}
+
+        class FakeAudioTranscriptions:
+            def create(self, **_kwargs):
+                segment = types.SimpleNamespace(text="종전 합의 임박", start=0.0, end=3.0)
+                return types.SimpleNamespace(text="종전 합의 임박. 미군 공군 기지 공격.", segments=[segment])
+
+        class FakeOpenAI:
+            def __init__(self, **_kwargs):
+                self.audio = types.SimpleNamespace(transcriptions=FakeAudioTranscriptions())
+
+        fake_openai_module = types.SimpleNamespace(OpenAI=FakeOpenAI)
+        fake_ytdlp = types.SimpleNamespace(YoutubeDL=FakeYoutubeDL)
+
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key", "TRADINGAGENTS_YOUTUBE_ASR_FALLBACK": "1"}), patch.dict(
+            sys.modules, {"openai": fake_openai_module}
+        ), patch("tradingagents.dataflows.youtube_video._import_ytdlp", return_value=fake_ytdlp):
+            transcript = _fetch_asr_transcript(
+                url="https://www.youtube.com/watch?v=KWDrgODHL60",
+                video_id="KWDrgODHL60",
+                duration_seconds=888,
+                timeout_seconds=1.0,
+            )
+
+        self.assertIsNotNone(transcript)
+        self.assertEqual(transcript.source, "asr")
+        self.assertIn("미군 공군 기지", transcript.raw_text)
 
     def test_summarize_financial_entities_extracts_video_claims(self):
         transcript = (
