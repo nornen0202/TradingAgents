@@ -1,5 +1,6 @@
 ﻿import re
 import os
+import tempfile
 import unittest
 from collections import deque
 from pathlib import Path
@@ -176,6 +177,38 @@ class CodexProviderTests(unittest.TestCase):
             resolved = resolve_codex_binary("C:/custom/codex.exe")
 
         self.assertEqual(Path(resolved), Path("C:/custom/codex.exe"))
+
+    def test_codex_app_server_seeds_default_home_when_codex_home_env_missing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            default_home = root / "home" / ".codex"
+            default_home.mkdir(parents=True)
+            (default_home / "auth.json").write_text('{"account":"default"}', encoding="utf-8")
+            workspace = root / "workspace"
+
+            class FakeProc:
+                stdin = None
+                stdout = None
+                stderr = None
+
+            with (
+                patch("tradingagents.llm_clients.codex_app_server.resolve_codex_binary", return_value="codex"),
+                patch("tradingagents.llm_clients.codex_app_server.subprocess.Popen", return_value=FakeProc()),
+                patch("tradingagents.llm_clients.codex_app_server.Path.home", return_value=root / "home"),
+                patch.object(CodexAppServerSession, "_start_reader_threads", return_value=None),
+                patch.object(CodexAppServerSession, "_initialize", return_value=None),
+                patch.dict(os.environ, {}, clear=True),
+            ):
+                session = CodexAppServerSession(
+                    codex_binary="codex",
+                    request_timeout=30,
+                    workspace_dir=str(workspace),
+                    cleanup_threads=True,
+                )
+                session.start()
+
+            copied_auth = workspace / ".codex-home" / "auth.json"
+            self.assertEqual(copied_auth.read_text(encoding="utf-8"), '{"account":"default"}')
 
     def test_message_normalization_supports_str_messages_and_openai_dicts(self):
         normalized = normalize_input_messages(

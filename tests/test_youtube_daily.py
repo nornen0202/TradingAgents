@@ -150,6 +150,48 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertEqual(verified.status, LLM_FAILED)
         self.assertEqual(verified.verification["llm_status"], LLM_FAILED)
 
+    def test_verify_bundle_maps_macro_placeholders_to_market_symbols(self):
+        bundle = _fake_bundle("KWDrgODHL60")
+        draft = build_youtube_video_report(bundle, generated_at=datetime(2026, 5, 29, 8, 0))
+        llm = FakeLLM(
+            [
+                json.dumps(
+                    {
+                        "overall_thesis": "매크로 영상",
+                        "entities": [
+                            {"ticker": "MARKET", "name": "한국 증시/코스피", "claims": ["코스피 하락"], "numeric_claims": [], "risks": [], "watch_items": []},
+                            {"ticker": "OIL", "name": "국제유가/브렌트유", "claims": ["브렌트유 반등"], "numeric_claims": [], "risks": [], "watch_items": []},
+                        ],
+                        "verification_items": [],
+                    },
+                    ensure_ascii=False,
+                ),
+                "# 최종 투자자 리포트\n\n- 매크로 심볼을 확인했습니다.",
+            ]
+        )
+        requested_symbols: list[str] = []
+        external_symbols: list[str] = []
+
+        def market_provider(symbol: str) -> MarketSnapshot:
+            requested_symbols.append(symbol)
+            return MarketSnapshot(symbol, datetime.now(timezone.utc).isoformat(), current_price=100.0)
+
+        verified = verify_youtube_bundle(
+            bundle,
+            draft,
+            llm_settings=_llm_settings(),
+            verification_settings=_verification_settings(),
+            market_data_provider=market_provider,
+            external_data_provider=lambda ticker, _generated_at: external_symbols.append(ticker) or {"status": VERIFIED},
+            llm_factory=lambda _settings: llm,
+            generated_at=datetime(2026, 5, 29, 8, 0, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual(requested_symbols, ["^KS11", "BZ=F"])
+        self.assertEqual(external_symbols, [])
+        self.assertEqual([item["ticker"] for item in verified.verification["entity_results"]], ["^KS11", "BZ=F"])
+        self.assertEqual([item["original_ticker"] for item in verified.verification["entity_results"]], ["MARKET", "OIL"])
+
     def test_runner_creates_archive_manifest_and_public_site(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -514,7 +556,9 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("YOUTUBE_GVS_PO_TOKEN", workflow)
         self.assertIn("YOUTUBE_PLAYER_CLIENTS", workflow)
         self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_FALLBACK", workflow)
-        self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_TIMEOUT_SECONDS", workflow)
+        self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_MODEL", workflow)
+        self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_COMPUTE_TYPE", workflow)
+        self.assertNotIn("OPENAI_API_KEY", workflow)
 
     def test_python_module_runner_site_only_entrypoint(self):
         with tempfile.TemporaryDirectory() as tmp:

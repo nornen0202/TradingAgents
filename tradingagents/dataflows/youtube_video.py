@@ -558,59 +558,76 @@ def _fetch_asr_transcript(
     max_duration = _env_int("TRADINGAGENTS_YOUTUBE_ASR_MAX_DURATION_SECONDS", 1800)
     if duration_seconds is not None and duration_seconds > max_duration:
         return None
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        return None
     yt_dlp = _import_ytdlp()
     try:
-        from openai import OpenAI
+        from faster_whisper import WhisperModel
     except ImportError:
         return None
 
     with tempfile.TemporaryDirectory(prefix="tradingagents-youtube-asr-") as tmp:
-        output_template = str(Path(tmp) / "%(id)s.%(ext)s")
-        options = _youtube_dl_options(
-            format="bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best",
-            outtmpl=output_template,
-            quiet=True,
-            no_warnings=True,
-            noplaylist=True,
-            socket_timeout=timeout_seconds,
+        audio_path = _download_audio_for_asr(
+            yt_dlp=yt_dlp,
+            url=url,
+            video_id=video_id,
+            output_dir=Path(tmp),
+            timeout_seconds=timeout_seconds,
         )
-        try:
-            with yt_dlp.YoutubeDL(options) as ydl:
-                info = ydl.extract_info(url, download=True)
-        except Exception:
-            return None
-        audio_path = _downloaded_audio_path(info, Path(tmp), video_id)
         if audio_path is None or not audio_path.is_file():
             return None
         try:
-            client = OpenAI(
-                api_key=api_key,
-                timeout=max(timeout_seconds, _env_float("TRADINGAGENTS_YOUTUBE_ASR_TIMEOUT_SECONDS", 900.0)),
+            model_name = _youtube_asr_model()
+            model = WhisperModel(
+                model_name,
+                device=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_DEVICE", "cpu"),
+                compute_type=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_COMPUTE_TYPE", "int8"),
             )
-            with audio_path.open("rb") as handle:
-                result = client.audio.transcriptions.create(
-                    model=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_MODEL", "whisper-1"),
-                    file=handle,
-                    language=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_LANGUAGE", "ko"),
-                    response_format="verbose_json",
-                )
+            raw_segments, info = model.transcribe(
+                str(audio_path),
+                language=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_LANGUAGE", "ko"),
+                vad_filter=_env_bool("TRADINGAGENTS_YOUTUBE_ASR_VAD_FILTER", True),
+                beam_size=max(1, _env_int("TRADINGAGENTS_YOUTUBE_ASR_BEAM_SIZE", 1)),
+            )
+            segments = _segments_from_local_asr(raw_segments)
+            detected_language = str(getattr(info, "language", "") or os.getenv("TRADINGAGENTS_YOUTUBE_ASR_LANGUAGE", "ko"))
         except Exception:
             return None
-    segments = _segments_from_openai_transcription(result)
-    raw_text = clean_transcript_text(getattr(result, "text", "") or " ".join(segment.text for segment in segments))
+    raw_text = clean_transcript_text(" ".join(segment.text for segment in segments))
     if not raw_text:
         return None
     return YouTubeTranscript(
-        language=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_LANGUAGE", "ko"),
-        language_name="OpenAI ASR",
-        source="asr",
+        language=detected_language,
+        language_name="Local ASR",
+        source="local_asr",
         segments=segments,
         raw_text=raw_text,
-        track_ext=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_MODEL", "whisper-1"),
+        track_ext=_youtube_asr_model(),
     )
+
+
+def _download_audio_for_asr(
+    *,
+    yt_dlp: Any,
+    url: str,
+    video_id: str,
+    output_dir: Path,
+    timeout_seconds: float,
+) -> Path | None:
+    output_template = str(output_dir / "%(id)s.%(ext)s")
+    options = _youtube_dl_options(
+        format="bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best",
+        outtmpl=output_template,
+        quiet=True,
+        no_warnings=True,
+        noplaylist=True,
+        noprogress=True,
+        socket_timeout=timeout_seconds,
+    )
+    try:
+        with yt_dlp.YoutubeDL(options) as ydl:
+            info = ydl.extract_info(url, download=True)
+    except Exception:
+        return None
+    return _downloaded_audio_path(info, output_dir, video_id)
 
 
 def _caption_session() -> requests.Session:
@@ -714,12 +731,7 @@ def _parse_youtubei_transcript_segments(payload: dict[str, Any]) -> tuple[YouTub
     return tuple(segments)
 
 
-def _segments_from_openai_transcription(result: Any) -> tuple[YouTubeTranscriptSegment, ...]:
-    raw_segments = getattr(result, "segments", None)
-    if raw_segments is None and isinstance(result, dict):
-        raw_segments = result.get("segments")
-    if not isinstance(raw_segments, list):
-        return ()
+def _segments_from_local_asr(raw_segments: Iterable[Any]) -> tuple[YouTubeTranscriptSegment, ...]:
     segments: list[YouTubeTranscriptSegment] = []
     for item in raw_segments:
         if isinstance(item, dict):
@@ -923,6 +935,13 @@ def _youtube_po_tokens() -> list[str]:
     return _dedupe_texts(tokens)
 
 
+def _youtube_asr_model() -> str:
+    return (
+        _youtube_env_text("TRADINGAGENTS_YOUTUBE_ASR_MODEL", "TRADINGAGENTS_YOUTUBE_LOCAL_ASR_MODEL")
+        or "base"
+    )
+
+
 def _normalize_youtube_po_token(token: str, context: str) -> str:
     text = token.strip()
     if "+" in text:
@@ -975,3 +994,10 @@ def _env_int(name: str, default: int) -> int:
         return int(float(os.getenv(name, default)))
     except (TypeError, ValueError):
         return default
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return str(value).strip().lower() not in {"0", "false", "no", "off"}

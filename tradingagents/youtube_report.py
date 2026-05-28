@@ -279,9 +279,17 @@ def _render_executive_summary(
         return "- 자막을 확보하지 못해 영상의 실제 논지를 충분히 요약할 수 없습니다."
 
     entities = ", ".join(f"{item.entity.name}({item.entity.ticker})" for item in summaries)
-    if not entities:
-        entities = "명시적으로 식별된 종목 없음"
     term_text = ", ".join(top_terms) if top_terms else "핵심어 추출 부족"
+    if not entities:
+        return "\n".join(
+            [
+                f"- 영상은 `{title}`라는 제목 아래 개별 종목보다 시장/매크로 이슈를 중심으로 다룹니다.",
+                f"- 자막 기준 반복 핵심어는 {term_text}입니다.",
+                "- 이 deterministic 초안은 영상 발화를 구조화한 1차 산출물이며, "
+                "최종 리포트에서는 LLM 검증 단계가 시장·자산 단위 주장과 재검증 필요 수치를 다시 분리합니다.",
+                "- 투자 판단에는 영상 주장과 현재 시장 데이터, 원출처 확인을 별도로 대조해야 합니다.",
+            ]
+        )
     return "\n".join(
         [
             f"- 영상은 `{title}`라는 제목 아래 {entities}를 중심으로 다룹니다.",
@@ -339,7 +347,10 @@ def _render_conclusion(summaries: tuple[EntitySummary, ...], *, has_transcript: 
     if not has_transcript:
         return "현재 구현은 메타데이터 리포트까지만 만들 수 있습니다. 자막 또는 ASR 백엔드를 연결해야 내용 요약이 가능합니다."
     if not summaries:
-        return "자막은 수집됐지만 종목 단위 구조화에는 실패했습니다. 일반 주제 요약 로직 또는 LLM 요약 백엔드가 필요합니다."
+        return (
+            "자막 또는 ASR 본문은 수집됐지만 사전 정의된 종목/티커 중심 영상은 아닙니다. "
+            "이 경우 최종 리포트는 LLM 검증 단계에서 시장·자산·거시 이벤트 단위로 주장과 체크포인트를 재구성해야 합니다."
+        )
     return (
         "단일 영상 기준으로는 자동자막만으로도 메타데이터, 핵심 종목, 반복 논리, 숫자 주장, "
         "리스크와 후속 체크포인트를 리포트 형식으로 추출할 수 있습니다. 다만 이 단계의 산출물은 "
