@@ -83,10 +83,7 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
     storage_raw = raw.get("storage") or {}
     site_raw = raw.get("site") or {}
 
-    archive_dir = _path_from_env(
-        "TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR",
-        storage_raw.get("archive_dir") or "./.runtime/youtube-archive",
-    )
+    archive_dir = _youtube_archive_path(storage_raw.get("archive_dir"))
     site_dir = _path_from_env(
         "TRADINGAGENTS_SITE_DIR",
         storage_raw.get("site_dir") or "./site",
@@ -162,6 +159,23 @@ def with_youtube_overrides(
 def _path_from_env(env_name: str, fallback: Any) -> Path:
     value = os.getenv(env_name) or fallback
     return Path(str(value))
+
+
+def _youtube_archive_path(configured_value: Any) -> Path:
+    explicit_youtube_archive = os.getenv("TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR")
+    if explicit_youtube_archive and explicit_youtube_archive.strip():
+        return Path(explicit_youtube_archive)
+
+    configured_text = str(configured_value or "./.runtime/youtube-archive").strip()
+    shared_archive = os.getenv("TRADINGAGENTS_ARCHIVE_DIR")
+    default_texts = {
+        "./.runtime/youtube-archive",
+        ".runtime/youtube-archive",
+        ".\\.runtime\\youtube-archive",
+    }
+    if shared_archive and shared_archive.strip() and configured_text in default_texts:
+        return Path(shared_archive) / "youtube-archive"
+    return Path(configured_text)
 
 
 def _optional_text(value: Any) -> str | None:

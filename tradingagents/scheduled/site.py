@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
 import shutil
 from datetime import datetime, timezone
@@ -80,6 +81,7 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
             ],
         },
     )
+    _build_youtube_site_addon(archive_dir=archive_dir, site_dir=site_dir)
     return manifests
 
 
@@ -610,6 +612,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
             {latest_health_compact}
             <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open 대표 투자 run</a>
             <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open representative investment run</a>
+            <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
             {latest_portfolio_link}
             {latest_technical_html}
           </div>
@@ -626,6 +629,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
           <div class="hero-card">
             <div class="status pending">no data yet</div>
             <p>The scheduled workflow has not produced an archived run yet.</p>
+            <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
           </div>
         </section>
         """
@@ -683,6 +687,29 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
     </section>
     """
     return _page_template(settings.title, body, prefix="")
+
+
+def _build_youtube_site_addon(*, archive_dir: Path, site_dir: Path) -> None:
+    try:
+        from tradingagents.youtube.config import load_youtube_config
+        from tradingagents.youtube.site import build_youtube_site
+
+        youtube_config = load_youtube_config()
+        youtube_archive_dir = youtube_config.storage.archive_dir
+        shared_youtube_archive = Path(archive_dir) / "youtube-archive"
+        if (
+            not os.getenv("TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR", "").strip()
+            and (shared_youtube_archive.exists() or _is_default_runtime_youtube_archive(youtube_archive_dir))
+        ):
+            youtube_archive_dir = shared_youtube_archive
+        build_youtube_site(youtube_archive_dir, site_dir, youtube_config.site)
+    except Exception as exc:  # pragma: no cover - defensive in Pages jobs
+        print(f"::warning::Could not build YouTube report site add-on: {exc}")
+
+
+def _is_default_runtime_youtube_archive(path: Path) -> bool:
+    normalized = str(path).replace("\\", "/").rstrip("/")
+    return normalized.endswith(".runtime/youtube-archive")
 
 
 def _render_run_page(
