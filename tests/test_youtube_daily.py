@@ -331,6 +331,70 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertNotIn("RAW_TRANSCRIPT_FULL_SHOULD_NOT_PUBLISH", public_text)
             self.assertTrue((site_dir / "youtube" / "feed.json").is_file())
 
+    def test_site_builder_hides_collection_failures_from_report_lists(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_dir = root / "archive"
+            run_dir = archive_dir / "runs" / "2026" / "youtube_20260528_220000"
+            ok_dir = run_dir / "videos" / "u2BEOgr8ze8"
+            failed_dir = run_dir / "videos" / "failed00001"
+            ok_dir.mkdir(parents=True)
+            failed_dir.mkdir(parents=True)
+            (ok_dir / "final_report.md").write_text("# Final\n\n공개 리포트입니다.", encoding="utf-8")
+            (ok_dir / "public_summary.json").write_text(
+                json.dumps({"video_id": "u2BEOgr8ze8", "status": VERIFIED}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            (failed_dir / "public_summary.json").write_text(
+                json.dumps({"video_id": "failed00001", "status": "failed"}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            (run_dir / "youtube_run.json").write_text(
+                json.dumps(
+                    {
+                        "run_id": "youtube_20260528_220000",
+                        "status": "partial_failure",
+                        "started_at": "2026-05-28T22:00:00+09:00",
+                        "summary": {"total_videos": 2, "successful_videos": 1, "failed_videos": 1},
+                        "videos": [
+                            {
+                                "video_id": "u2BEOgr8ze8",
+                                "title": "Visible fixture",
+                                "video_url": "https://www.youtube.com/watch?v=u2BEOgr8ze8",
+                                "status": VERIFIED,
+                                "final_report_path": "videos/u2BEOgr8ze8/final_report.md",
+                                "public_summary_path": "videos/u2BEOgr8ze8/public_summary.json",
+                            },
+                            {
+                                "video_id": "failed00001",
+                                "title": "Hidden collection failure",
+                                "video_url": "https://www.youtube.com/watch?v=failed00001",
+                                "status": "failed",
+                                "public_summary_path": "videos/failed00001/public_summary.json",
+                            },
+                        ],
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            site_dir = root / "site"
+            build_youtube_site(archive_dir, site_dir, YouTubeSiteSettings("YouTube 리포트", 10, 10))
+
+            index_html = (site_dir / "youtube" / "index.html").read_text(encoding="utf-8")
+            run_html = (site_dir / "youtube" / "runs" / "youtube_20260528_220000" / "index.html").read_text(
+                encoding="utf-8"
+            )
+            feed = json.loads((site_dir / "youtube" / "feed.json").read_text(encoding="utf-8"))
+            feed_titles = [item.get("title") for item in feed["items"]]
+
+            self.assertIn("Visible fixture", index_html)
+            self.assertNotIn("Hidden collection failure", index_html)
+            self.assertIn("Visible fixture", run_html)
+            self.assertNotIn("Hidden collection failure", run_html)
+            self.assertEqual(feed_titles, ["Visible fixture"])
+
     def test_github_actions_workflow_schedule_and_pages_artifact(self):
         workflow = Path(".github/workflows/daily-youtube-reports.yml").read_text(encoding="utf-8")
 
