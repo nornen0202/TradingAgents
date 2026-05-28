@@ -31,7 +31,7 @@ def build_youtube_site(
         run_site_dir = youtube_dir / "runs" / _safe_segment(str(manifest.get("run_id") or "run"))
         run_site_dir.mkdir(parents=True, exist_ok=True)
         _write_text(run_site_dir / "index.html", _render_run_page(manifest, settings))
-        for video in _manifest_videos(manifest):
+        for video in _public_report_videos(manifest):
             final_report = _read_run_artifact(run_dir, video.get("final_report_path"))
             public_summary = _read_json_run_artifact(run_dir, video.get("public_summary_path"))
             page = _render_video_page(manifest, video, final_report, public_summary, settings)
@@ -301,15 +301,17 @@ def _public_report_videos(manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
 def _is_public_report_video(video: Mapping[str, Any], run_dir: Path) -> bool:
     if str(video.get("status") or "") in {"failed", "skipped_no_transcript"}:
         return False
+    has_available_transcript = False
     for payload in (video, _read_json_run_artifact(run_dir, video.get("public_summary_path")), _read_json_run_artifact(run_dir, video.get("metadata_path"))):
         if not isinstance(payload, Mapping):
             continue
         transcript_status = payload.get("transcript_status")
         if transcript_status == "available":
-            return True
+            has_available_transcript = True
+            continue
         if transcript_status and transcript_status != "available":
             return False
-    return True
+    return has_available_transcript
 
 
 def _manifest_run_dir(manifest: Mapping[str, Any]) -> Path:

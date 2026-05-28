@@ -323,7 +323,7 @@ class YouTubeDailyTests(unittest.TestCase):
             video_dir.mkdir(parents=True)
             (video_dir / "final_report.md").write_text("# Final\n\n짧은 근거만 공개합니다.", encoding="utf-8")
             (video_dir / "public_summary.json").write_text(
-                json.dumps({"video_id": "u2BEOgr8ze8", "status": VERIFIED}, ensure_ascii=False),
+                json.dumps({"video_id": "u2BEOgr8ze8", "status": VERIFIED, "transcript_status": "available"}, ensure_ascii=False),
                 encoding="utf-8",
             )
             (video_dir / "raw_transcript.txt").write_text("RAW_TRANSCRIPT_FULL_SHOULD_NOT_PUBLISH", encoding="utf-8")
@@ -445,6 +445,59 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertNotIn("Hidden collection failure", run_html)
             self.assertNotIn("Hidden unavailable transcript", run_html)
             self.assertEqual(feed_titles, ["Visible fixture"])
+            self.assertTrue((site_dir / "youtube" / "runs" / "youtube_20260528_220000" / "u2BEOgr8ze8.html").is_file())
+            self.assertFalse((site_dir / "youtube" / "runs" / "youtube_20260528_220000" / "failed00001.html").exists())
+            self.assertFalse((site_dir / "youtube" / "runs" / "youtube_20260528_220000" / "notext00001.html").exists())
+
+    def test_site_builder_hides_legacy_reports_without_transcript_status(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_dir = root / "archive"
+            run_dir = archive_dir / "runs" / "2026" / "youtube_legacy"
+            legacy_dir = run_dir / "videos" / "legacy00001"
+            legacy_dir.mkdir(parents=True)
+            (legacy_dir / "final_report.md").write_text(
+                "# Legacy\n\n자막 본문이나 ASR 전문이 포함되어 있지 않아 확인할 수 없습니다.",
+                encoding="utf-8",
+            )
+            (legacy_dir / "public_summary.json").write_text(
+                json.dumps({"video_id": "legacy00001", "status": UNVERIFIED}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            (run_dir / "youtube_run.json").write_text(
+                json.dumps(
+                    {
+                        "run_id": "youtube_legacy",
+                        "status": "success",
+                        "started_at": "2026-05-28T22:00:00+09:00",
+                        "videos": [
+                            {
+                                "video_id": "legacy00001",
+                                "title": "Legacy no transcript",
+                                "status": UNVERIFIED,
+                                "final_report_path": "videos/legacy00001/final_report.md",
+                                "public_summary_path": "videos/legacy00001/public_summary.json",
+                            }
+                        ],
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            site_dir = root / "site"
+            build_youtube_site(archive_dir, site_dir, YouTubeSiteSettings("YouTube 리포트", 10, 10))
+
+            index_html = (site_dir / "youtube" / "index.html").read_text(encoding="utf-8")
+            run_html = (site_dir / "youtube" / "runs" / "youtube_legacy" / "index.html").read_text(encoding="utf-8")
+            feed = json.loads((site_dir / "youtube" / "feed.json").read_text(encoding="utf-8"))
+            public_text = "\n".join(path.read_text(encoding="utf-8") for path in (site_dir / "youtube").rglob("*") if path.is_file())
+
+            self.assertNotIn("Legacy no transcript", index_html)
+            self.assertNotIn("Legacy no transcript", run_html)
+            self.assertEqual(feed["items"], [])
+            self.assertFalse((site_dir / "youtube" / "runs" / "youtube_legacy" / "legacy00001.html").exists())
+            self.assertNotIn("자막 본문이나 ASR 전문", public_text)
 
     def test_github_actions_workflow_schedule_and_pages_artifact(self):
         workflow = Path(".github/workflows/daily-youtube-reports.yml").read_text(encoding="utf-8")
@@ -511,7 +564,7 @@ class YouTubeDailyTests(unittest.TestCase):
             video_dir.mkdir(parents=True)
             (video_dir / "final_report.md").write_text("# Final\n\n공개 리포트입니다.", encoding="utf-8")
             (video_dir / "public_summary.json").write_text(
-                json.dumps({"video_id": "u2BEOgr8ze8", "status": VERIFIED}, ensure_ascii=False),
+                json.dumps({"video_id": "u2BEOgr8ze8", "status": VERIFIED, "transcript_status": "available"}, ensure_ascii=False),
                 encoding="utf-8",
             )
             (youtube_run / "youtube_run.json").write_text(
