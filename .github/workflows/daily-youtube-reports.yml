@@ -57,6 +57,8 @@ jobs:
       NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      YOUTUBE_COOKIES_TXT: ${{ secrets.YOUTUBE_COOKIES_TXT }}
+      YOUTUBE_COOKIES_TXT_B64: ${{ secrets.YOUTUBE_COOKIES_TXT_B64 }}
     steps:
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -112,6 +114,30 @@ jobs:
           runtime_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
               handle.write(f"TRADINGAGENTS_API_KEYS_PATH={runtime_path}\n")
+
+      - name: Materialize optional YouTube cookies
+        run: |
+          import base64
+          import os
+          from pathlib import Path
+
+          raw = os.environ.get("YOUTUBE_COOKIES_TXT", "").strip()
+          raw_b64 = os.environ.get("YOUTUBE_COOKIES_TXT_B64", "").strip()
+          if raw_b64:
+              try:
+                  raw = base64.b64decode(raw_b64).decode("utf-8")
+              except Exception as exc:
+                  raise SystemExit(f"YOUTUBE_COOKIES_TXT_B64 could not be decoded: {exc}") from exc
+          if not raw:
+              print("::notice::No YouTube cookies secret provided. Caption collection will rely on throttled anonymous requests.")
+              raise SystemExit(0)
+
+          cookie_path = Path(os.environ["RUNNER_TEMP"]) / "youtube-cookies.txt"
+          cookie_path.write_text(raw.rstrip() + "\n", encoding="utf-8")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write(f"YOUTUBE_COOKIES_FILE={cookie_path}\n")
+              handle.write(f"TRADINGAGENTS_YOUTUBE_COOKIES_FILE={cookie_path}\n")
+          print("Materialized YouTube cookies for yt-dlp and caption requests.")
 
       - name: Resolve Codex runtime
         run: |

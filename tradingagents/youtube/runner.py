@@ -3,8 +3,10 @@ from __future__ import annotations
 import argparse
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
+import inspect
 import json
 from pathlib import Path
+import shutil
 from time import perf_counter
 from typing import Any, Callable, Iterable
 from zoneinfo import ZoneInfo
@@ -23,7 +25,7 @@ from tradingagents.youtube_report import build_youtube_video_report
 
 
 ReferenceLister = Callable[[Iterable[str], int], tuple[YouTubeVideoReference, ...]]
-VideoFetcher = Callable[[str], YouTubeVideoBundle]
+VideoFetcher = Callable[..., YouTubeVideoBundle]
 BundleVerifier = Callable[[YouTubeVideoBundle, str, datetime], VerifiedVideoReport]
 
 
@@ -106,17 +108,50 @@ def execute_youtube_run(
     selected_count = 0
     failed_count = 0
     skipped_count = 0
+    reused_count = 0
+    metadata_fetch_failures = 0
+    transcript_fetch_failures = 0
     for reference in references:
         if selected_count >= config.channel.max_videos:
             break
         video_dir = run_dir / "videos" / reference.video_id
         video_dir.mkdir(parents=True, exist_ok=True)
+        metadata_bundle: YouTubeVideoBundle | None = None
         try:
-            bundle = fetcher(reference.url)
-            if not _bundle_in_window(bundle, window_start=window_start, window_end=window_end):
+            metadata_bundle = _call_video_fetcher(fetcher, reference.url, fetch_transcript=False)
+            if not _bundle_in_window(metadata_bundle, window_start=window_start, window_end=window_end):
                 skipped_count += 1
                 continue
             selected_count += 1
+            reused = _copy_reusable_video_artifacts(
+                archive_dir=config.storage.archive_dir,
+                video_id=reference.video_id,
+                current_run_dir=run_dir,
+                target_video_dir=video_dir,
+            )
+            if reused is not None:
+                reused_count += 1
+                status = str(reused.get("status") or "reused")
+                video_summaries.append(
+                    _manifest_video_item(
+                        bundle=metadata_bundle,
+                        status=status,
+                        video_dir=video_dir,
+                        run_dir=run_dir,
+                        error=None,
+                        reused_from_run=str(reused.get("run_id") or ""),
+                    )
+                )
+                continue
+            try:
+                bundle = (
+                    metadata_bundle
+                    if metadata_bundle.transcript is not None and metadata_bundle.transcript_status == "available"
+                    else _call_video_fetcher(fetcher, reference.url, fetch_transcript=True)
+                )
+            except Exception:
+                transcript_fetch_failures += 1
+                bundle = metadata_bundle
             draft_report = build_youtube_video_report(bundle, generated_at=started_at.replace(tzinfo=None))
             verified = verifier(bundle, draft_report, started_at)
             _write_text(video_dir / "draft_report.md", draft_report)
@@ -132,9 +167,12 @@ def execute_youtube_run(
                     video_dir=video_dir,
                     run_dir=run_dir,
                     error=None,
+                    reused_from_run=None,
                 )
             )
         except Exception as exc:
+            if metadata_bundle is None:
+                metadata_fetch_failures += 1
             failed_count += 1
             selected_count += 1
             error_summary = {
@@ -181,7 +219,10 @@ def execute_youtube_run(
             "total_videos": len(video_summaries),
             "successful_videos": successful_count,
             "failed_videos": failed_count,
+            "reused_videos": reused_count,
             "skipped_out_of_window": skipped_count,
+            "metadata_fetch_failures": metadata_fetch_failures,
+            "transcript_fetch_failures": transcript_fetch_failures,
         },
         "videos": video_summaries,
         "source_policy": {
@@ -232,6 +273,25 @@ def _default_reference_lister(channel_urls: Iterable[str], max_entries_per_url: 
     return list_channel_video_references(channel_urls, max_entries_per_url=max_entries_per_url)
 
 
+def _call_video_fetcher(fetcher: VideoFetcher, url: str, *, fetch_transcript: bool) -> YouTubeVideoBundle:
+    try:
+        signature = inspect.signature(fetcher)
+    except (TypeError, ValueError):
+        signature = None
+    if signature is not None:
+        accepts_fetch_transcript = "fetch_transcript" in signature.parameters or any(
+            parameter.kind == inspect.Parameter.VAR_KEYWORD for parameter in signature.parameters.values()
+        )
+        if not accepts_fetch_transcript:
+            return fetcher(url)
+    try:
+        return fetcher(url, fetch_transcript=fetch_transcript)
+    except TypeError as exc:
+        if "fetch_transcript" not in str(exc):
+            raise
+        return fetcher(url)
+
+
 def _default_bundle_verifier(config: YouTubeDailyConfig) -> BundleVerifier:
     def verify(bundle: YouTubeVideoBundle, draft_report: str, generated_at: datetime) -> VerifiedVideoReport:
         return verify_youtube_bundle(
@@ -268,6 +328,7 @@ def _manifest_video_item(
     video_dir: Path,
     run_dir: Path,
     error: str | None,
+    reused_from_run: str | None = None,
 ) -> dict[str, Any]:
     metadata = bundle.metadata
     item = {
@@ -287,7 +348,61 @@ def _manifest_video_item(
     }
     if error:
         item["error"] = error
+    if reused_from_run:
+        item["reused_from_run"] = reused_from_run
     return item
+
+
+def _copy_reusable_video_artifacts(
+    *,
+    archive_dir: Path,
+    video_id: str,
+    current_run_dir: Path,
+    target_video_dir: Path,
+) -> dict[str, Any] | None:
+    candidates = sorted(
+        Path(archive_dir).glob(f"runs/*/*/videos/{video_id}/public_summary.json"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    for summary_path in candidates:
+        source_video_dir = summary_path.parent
+        if source_video_dir.resolve() == target_video_dir.resolve():
+            continue
+        if _is_relative_to(source_video_dir.resolve(), current_run_dir.resolve()):
+            continue
+        try:
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(summary, dict) or summary.get("status") == "failed":
+            continue
+        required = ("metadata.json", "draft_report.md", "verification.json", "final_report.md", "public_summary.json")
+        if not all((source_video_dir / name).is_file() for name in required):
+            continue
+        if target_video_dir.exists():
+            shutil.rmtree(target_video_dir)
+        shutil.copytree(source_video_dir, target_video_dir)
+        return {
+            "status": summary.get("status"),
+            "run_id": _run_id_from_video_dir(source_video_dir),
+        }
+    return None
+
+
+def _run_id_from_video_dir(video_dir: Path) -> str:
+    try:
+        return video_dir.parents[1].name
+    except IndexError:
+        return ""
+
+
+def _is_relative_to(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+        return True
+    except ValueError:
+        return False
 
 
 def _metadata_payload(bundle: YouTubeVideoBundle) -> dict[str, Any]:
