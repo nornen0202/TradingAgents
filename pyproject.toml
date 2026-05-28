@@ -30,6 +30,7 @@ dependencies = [
     "tqdm>=4.67.1",
     "typing-extensions>=4.14.0",
     "yfinance>=0.2.63",
+    "yt-dlp>=2026.3.17",
     "tomli>=2.2.1; python_version < '3.11'",
 ]
 
@@ -43,6 +44,7 @@ translation = [
 [project.scripts]
 tradingagents = "cli.main:app"
 tradingagents-scheduled = "tradingagents.scheduled.runner:main"
+tradingagents-youtube = "tradingagents.youtube.runner:main"
 
 [tool.setuptools.packages.find]
 include = ["tradingagents*", "cli*"]

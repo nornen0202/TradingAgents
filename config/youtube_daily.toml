@@ -1,0 +1,35 @@
+[channel]
+name = "경제사냥꾼"
+urls = [
+  "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
+  "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+]
+lookback_hours = 24
+timezone = "Asia/Seoul"
+max_videos = 50
+
+[llm]
+provider = "codex"
+deep_model = "gpt-5.5"
+codex_reasoning_effort = "medium"
+codex_summary = "none"
+codex_personality = "none"
+codex_request_timeout = 180.0
+codex_max_retries = 2
+codex_cleanup_threads = true
+codex_preflight_mode = "workflow_once"
+
+[verification]
+mode = "external_full"
+publish_unverified = true
+max_claims_per_video = 12
+strict_llm = true
+
+[storage]
+archive_dir = "./.runtime/youtube-archive"
+site_dir = "./site"
+
+[site]
+title = "YouTube 투자자용 검증 리포트"
+max_runs = 30
+max_videos_on_index = 50

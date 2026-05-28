@@ -1,0 +1,289 @@
+name: Daily YouTube Verified Reports
+
+on:
+  schedule:
+    # 22:00 KST daily
+    - cron: '0 13 * * *'
+  workflow_dispatch:
+    inputs:
+      lookback_hours:
+        description: "Lookback window in hours"
+        required: false
+        default: "24"
+        type: string
+      channel_urls:
+        description: "Optional comma-separated YouTube channel tab URLs"
+        required: false
+        type: string
+      publish:
+        description: "Publish /youtube pages into the Pages artifact"
+        required: false
+        default: true
+        type: boolean
+      max_videos:
+        description: "Maximum videos to process"
+        required: false
+        default: "50"
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: daily-youtube-verified-reports
+  cancel-in-progress: true
+
+jobs:
+  build_youtube_pages:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: [self-hosted, Windows]
+    defaults:
+      run:
+        shell: python {0}
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      PYTHONUTF8: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
+      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
+      TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
+      CODEX_BINARY: ${{ vars.CODEX_BINARY }}
+      CODEX_HOME: ${{ vars.CODEX_HOME }}
+      ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+      OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Prepare Codex workspace
+        run: |
+          import os
+          import shutil
+          from pathlib import Path
+
+          runner_temp = Path(os.environ["RUNNER_TEMP"]).resolve()
+          workspace = (runner_temp / "tradingagents-youtube-codex").resolve()
+          if os.path.commonpath([str(workspace), str(runner_temp)]) != str(runner_temp):
+              raise SystemExit(f"Refusing to use Codex workspace outside RUNNER_TEMP: {workspace}")
+          if workspace.exists():
+              shutil.rmtree(workspace, ignore_errors=True)
+          workspace.mkdir(parents=True, exist_ok=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write(f"TRADINGAGENTS_CODEX_WORKSPACE_DIR={workspace}\n")
+          print(f"Using Codex workspace: {workspace}")
+
+      - name: Install TradingAgents
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", "."])
+
+      - name: Materialize runtime API keys
+        run: |
+          import json
+          import os
+          from pathlib import Path
+
+          payload = {}
+          for name in ("ALPHA_VANTAGE_API_KEY", "NAVER_CLIENT_ID", "NAVER_CLIENT_SECRET", "OPENDART_API_KEY", "OPENAI_API_KEY"):
+              value = os.environ.get(name, "").strip()
+              if value:
+                  payload[name] = value
+          if not payload:
+              print("::notice::No optional vendor API keys were provided. YouTube verification will rely on unauthenticated/public fallbacks.")
+              raise SystemExit(0)
+          runtime_path = Path(os.environ["RUNNER_TEMP"]) / "tradingagents-youtube-api-keys.json"
+          runtime_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write(f"TRADINGAGENTS_API_KEYS_PATH={runtime_path}\n")
+
+      - name: Resolve Codex runtime
+        run: |
+          import os
+          import subprocess
+          from pathlib import Path
+
+          def add_env(name, value):
+              with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+                  handle.write(f"{name}={value}\n")
+
+          def usable(path):
+              if not path or not Path(path).exists():
+                  return False
+              try:
+                  result = subprocess.run([str(path), "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, check=False)
+              except OSError:
+                  return False
+              return result.returncode == 0
+
+          candidates = []
+          if os.environ.get("CODEX_BINARY", "").strip():
+              candidates.append(Path(os.environ["CODEX_BINARY"]))
+          user_profile = Path(os.environ.get("USERPROFILE", ""))
+          candidates.append(user_profile / ".codex" / ".sandbox-bin" / "codex.exe")
+          for pattern in (
+              "C:/Users/*/.codex/.sandbox-bin/codex.exe",
+              "C:/Users/*/.vscode/extensions/openai.chatgpt-*/bin/windows-x86_64/codex.exe",
+          ):
+              candidates.extend(sorted(Path("C:/").glob(pattern.removeprefix("C:/")), key=lambda p: p.stat().st_mtime, reverse=True))
+
+          seen = set()
+          for candidate in candidates:
+              key = os.path.normcase(os.path.abspath(candidate))
+              if key in seen:
+                  continue
+              seen.add(key)
+              if usable(candidate):
+                  add_env("CODEX_BINARY", str(candidate))
+                  if not os.environ.get("CODEX_HOME", "").strip() and candidate.parent.name.lower() == ".sandbox-bin":
+                      add_env("CODEX_HOME", str(candidate.parent.parent))
+                  print(f"Resolved Codex binary: {candidate}")
+                  raise SystemExit(0)
+          raise SystemExit("Could not find a usable Codex binary for gpt-5.5 verification.")
+
+      - name: Verify Codex login and model availability
+        run: |
+          import os
+          from pathlib import Path
+          from tradingagents.llm_clients.codex_app_server import CodexAppServerAuthError, CodexAppServerBinaryError, CodexModelUnavailableError
+          from tradingagents.llm_clients.codex_preflight import run_codex_preflight
+
+          try:
+              result = run_codex_preflight(
+                  codex_binary=os.environ.get("CODEX_BINARY") or None,
+                  model="gpt-5.5",
+                  request_timeout=30.0,
+                  workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
+                  cleanup_threads=True,
+                  fallback_models=[],
+              )
+          except CodexAppServerAuthError as exc:
+              raise SystemExit(f"Codex login is required on the self-hosted runner: {exc}") from exc
+          except CodexAppServerBinaryError as exc:
+              raise SystemExit(f"Codex binary is not usable: {exc}") from exc
+          except CodexModelUnavailableError as exc:
+              raise SystemExit(f"gpt-5.5 is not available for this Codex account: {exc}") from exc
+          print("Codex preflight passed:", result.account, result.resolved_model)
+
+      - name: Rebuild base scheduled site
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          args = [
+              sys.executable,
+              "-u",
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              "config/scheduled_analysis_korea.toml",
+              "--site-only",
+              "--site-dir",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
+          ]
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+          subprocess.check_call(args)
+
+      - name: Run YouTube verification reports
+        timeout-minutes: 180
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          lookback_hours = "${{ github.event.inputs.lookback_hours }}".strip() or "24"
+          max_videos = "${{ github.event.inputs.max_videos }}".strip() or "50"
+          channel_urls = "${{ github.event.inputs.channel_urls }}".strip()
+          publish = "${{ github.event.inputs.publish }}".strip().lower()
+
+          args = [
+              sys.executable,
+              "-u",
+              "-m",
+              "tradingagents.youtube.runner",
+              "--config",
+              "config/youtube_daily.toml",
+              "--lookback-hours",
+              lookback_hours,
+              "--max-videos",
+              max_videos,
+              "--site-dir",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
+          ]
+          archive_dir = os.environ.get("TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+          if channel_urls:
+              args += ["--channel-urls", channel_urls]
+          if publish == "false":
+              args += ["--no-publish"]
+          subprocess.check_call(args)
+
+      - name: Add Git Bash to PATH for Pages packaging
+        run: |
+          import os
+          from pathlib import Path
+
+          for candidate in (Path("C:/Program Files/Git/bin"), Path("C:/Program Files/Git/usr/bin")):
+              if (candidate / "bash.exe").exists():
+                  with open(os.environ["GITHUB_PATH"], "a", encoding="utf-8") as handle:
+                      handle.write(f"{candidate}\n")
+                  print(f"Added Git Bash path: {candidate}")
+                  raise SystemExit(0)
+          raise SystemExit("bash.exe was not found under the expected Git for Windows directories.")
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          name: github-pages-youtube
+          path: site
+
+      - name: Clean Codex workspace
+        if: ${{ always() }}
+        run: |
+          import os
+          import shutil
+          from pathlib import Path
+
+          workspace = os.environ.get("TRADINGAGENTS_CODEX_WORKSPACE_DIR", "").strip()
+          temp = os.environ.get("RUNNER_TEMP", "").strip()
+          if workspace and temp:
+              workspace_path = Path(workspace).resolve()
+              temp_path = Path(temp).resolve()
+              if os.path.commonpath([str(workspace_path), str(temp_path)]) == str(temp_path) and workspace_path.exists():
+                  shutil.rmtree(workspace_path, ignore_errors=True)
+
+  deploy:
+    needs: build_youtube_pages
+    if: ${{ needs.build_youtube_pages.result == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-youtube
