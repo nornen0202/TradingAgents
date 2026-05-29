@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import unittest
 from unittest.mock import patch
 
@@ -365,12 +368,65 @@ class YouTubeDailyTests(unittest.TestCase):
 
             self.assertEqual(manifest["summary"]["total_videos"], 3)
             self.assertEqual(manifest["source_policy"]["research_pipeline_version"], 2)
+            self.assertEqual(manifest["parallel_video_execution"]["max_parallel_videos"], 1)
             self.assertTrue(run_manifest.is_file())
             self.assertTrue((first_video_dir / "research_plan.json").is_file())
             self.assertTrue((first_video_dir / "evidence.json").is_file())
             self.assertTrue((first_video_dir / "claim_verification.json").is_file())
             self.assertTrue(site_index.is_file())
             self.assertIn("Video", site_index.read_text(encoding="utf-8"))
+
+    def test_runner_processes_videos_in_parallel_when_configured(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = _daily_config(root / "archive", root / "site")
+            config = replace(config, channel=replace(config.channel, max_parallel_videos=2))
+            refs = tuple(
+                YouTubeVideoReference(
+                    f"parallel00{i}",
+                    f"https://www.youtube.com/watch?v=parallel00{i}",
+                    f"Parallel {i}",
+                    "fixture",
+                    datetime.now(timezone.utc) - timedelta(hours=1),
+                )
+                for i in range(1, 4)
+            )
+            lock = threading.Lock()
+            active_fetches = 0
+            max_active_fetches = 0
+
+            def fetcher(url: str, *, fetch_transcript: bool = True):
+                nonlocal active_fetches, max_active_fetches
+                if fetch_transcript:
+                    with lock:
+                        active_fetches += 1
+                        max_active_fetches = max(max_active_fetches, active_fetches)
+                    time.sleep(0.05)
+                    with lock:
+                        active_fetches -= 1
+                return _fake_bundle(url[-11:], transcript=fetch_transcript)
+
+            manifest = execute_youtube_run(
+                config,
+                reference_lister=lambda _urls, _limit: refs,
+                video_fetcher=fetcher,
+                bundle_verifier=lambda bundle, _draft, _generated_at: VerifiedVideoReport(
+                    status=VERIFIED,
+                    final_report_markdown=f"# Final {bundle.metadata.video_id}\n",
+                    verification={
+                        "status": VERIFIED,
+                        "llm_status": "success",
+                        "generated_at": datetime.now(timezone.utc).isoformat(),
+                        "entity_results": [],
+                        "source_policy": {"raw_transcript_published": False},
+                    },
+                ),
+            )
+
+            self.assertEqual(manifest["summary"]["total_videos"], 3)
+            self.assertTrue(manifest["parallel_video_execution"]["enabled"])
+            self.assertEqual(manifest["parallel_video_execution"]["max_parallel_videos"], 2)
+            self.assertGreaterEqual(max_active_fetches, 2)
 
     def test_runner_fetches_transcript_only_after_window_filter(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -419,7 +475,7 @@ class YouTubeDailyTests(unittest.TestCase):
                 ),
             )
 
-            self.assertEqual(calls, [(recent_id, False), (recent_id, True), (old_id, False)])
+            self.assertEqual(calls, [(recent_id, True), (old_id, False)])
 
     def test_runner_excludes_videos_without_usable_transcript(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -495,7 +551,7 @@ class YouTubeDailyTests(unittest.TestCase):
                 bundle_verifier=lambda _bundle, _draft, _generated_at: (_ for _ in ()).throw(RuntimeError("should reuse")),
             )
 
-            self.assertEqual(calls, [(video_id, False)])
+            self.assertEqual(calls, [])
             self.assertEqual(manifest["summary"]["reused_videos"], 1)
             self.assertEqual(manifest["videos"][0]["reused_from_run"], "youtube_previous")
             self.assertIn("Reused final", next(archive_dir.glob("runs/*/youtube_*/videos/reuse000001/final_report.md")).read_text(encoding="utf-8"))
@@ -696,10 +752,13 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertNotIn("0 13 * * *", workflow)
         self.assertIn("actions/upload-pages-artifact", workflow)
         self.assertIn("tradingagents.youtube.runner", workflow)
+        self.assertIn("max_parallel_videos", workflow)
+        self.assertIn("--max-parallel-videos", workflow)
         self.assertIn("config/scheduled_analysis_korea.toml", workflow)
         config_text = Path("config/youtube_daily.toml").read_text(encoding="utf-8")
         self.assertIn("research_enabled = true", config_text)
         self.assertIn("max_research_queries", config_text)
+        self.assertIn("max_parallel_videos = 4", config_text)
         self.assertIn("YOUTUBE_COOKIES_FILE", workflow)
         self.assertIn("YOUTUBE_PROXY", workflow)
         self.assertIn("YOUTUBE_VISITOR_DATA", workflow)
@@ -762,6 +821,7 @@ class YouTubeDailyTests(unittest.TestCase):
 
         self.assertEqual(config.channel.name, "투자 유튜브 채널")
         self.assertEqual(set(config.channel.urls), expected_urls)
+        self.assertEqual(config.channel.max_parallel_videos, 4)
         self.assertEqual(set(DEFAULT_CHANNEL_URLS), expected_urls)
 
     def test_scheduled_site_build_preserves_youtube_addon_and_home_link(self):
@@ -895,6 +955,7 @@ def _daily_config(archive_dir: Path, site_dir: Path) -> YouTubeDailyConfig:
             lookback_hours=24,
             timezone="Asia/Seoul",
             max_videos=3,
+            max_parallel_videos=1,
         ),
         llm=_llm_settings(),
         verification=_verification_settings(),

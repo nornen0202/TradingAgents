@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import asdict
+from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
+from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 import inspect
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 from time import perf_counter
 from typing import Any, Callable, Iterable
@@ -45,6 +47,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--lookback-hours", type=int, help="Override channel lookback window in hours.")
     parser.add_argument("--channel-urls", help="Comma-separated channel tab URLs override.")
     parser.add_argument("--max-videos", type=int, help="Maximum videos to process.")
+    parser.add_argument("--max-parallel-videos", type=int, help="Maximum YouTube videos to process concurrently.")
     parser.add_argument("--publish", dest="publish", action="store_true", default=True, help="Build public site after run.")
     parser.add_argument("--no-publish", dest="publish", action="store_false", help="Skip public site build after run.")
     args = parser.parse_args(argv)
@@ -55,6 +58,7 @@ def main(argv: list[str] | None = None) -> int:
         site_dir=args.site_dir,
         lookback_hours=args.lookback_hours,
         max_videos=args.max_videos,
+        max_parallel_videos=args.max_parallel_videos,
         channel_urls=_split_csv(args.channel_urls),
     )
 
@@ -106,121 +110,28 @@ def execute_youtube_run(
         include_unknown_dates=True,
     )
 
-    video_summaries: list[dict[str, Any]] = []
-    selected_count = 0
-    failed_count = 0
-    skipped_count = 0
-    reused_count = 0
-    metadata_fetch_failures = 0
-    transcript_fetch_failures = 0
-    skipped_no_transcript = 0
-    for reference in references:
-        if selected_count >= config.channel.max_videos:
-            break
-        video_dir = run_dir / "videos" / reference.video_id
-        video_dir.mkdir(parents=True, exist_ok=True)
-        metadata_bundle: YouTubeVideoBundle | None = None
-        try:
-            metadata_bundle = _call_video_fetcher(fetcher, reference.url, fetch_transcript=False)
-            if not _bundle_in_window(metadata_bundle, window_start=window_start, window_end=window_end):
-                skipped_count += 1
-                continue
-            selected_count += 1
-            reused = _copy_reusable_video_artifacts(
-                archive_dir=config.storage.archive_dir,
-                video_id=reference.video_id,
-                current_run_dir=run_dir,
-                target_video_dir=video_dir,
-            )
-            if reused is not None:
-                reused_count += 1
-                status = str(reused.get("status") or "reused")
-                video_summaries.append(
-                    _manifest_video_item(
-                        bundle=metadata_bundle,
-                        status=status,
-                        video_dir=video_dir,
-                        run_dir=run_dir,
-                        error=None,
-                        reused_from_run=str(reused.get("run_id") or ""),
-                    )
-                )
-                continue
-            try:
-                bundle = (
-                    metadata_bundle
-                    if metadata_bundle.transcript is not None and metadata_bundle.transcript_status == "available"
-                    else _call_video_fetcher(fetcher, reference.url, fetch_transcript=True)
-                )
-            except Exception:
-                transcript_fetch_failures += 1
-                bundle = metadata_bundle
-            if not _bundle_has_usable_transcript(bundle):
-                skipped_no_transcript += 1
-                _write_json(video_dir / "metadata.json", _metadata_payload(bundle))
-                _write_json(
-                    video_dir / "collection_status.json",
-                    {
-                        "video_id": bundle.metadata.video_id,
-                        "title": bundle.metadata.title,
-                        "video_url": bundle.metadata.url,
-                        "status": "skipped_no_transcript",
-                        "reason": "usable transcript or ASR text was not available",
-                        "transcript_status": bundle.transcript_status,
-                        "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
-                        "minimum_transcript_chars": _minimum_transcript_chars(),
-                    },
-                )
-                continue
-            draft_report = build_youtube_video_report(bundle, generated_at=started_at.replace(tzinfo=None))
-            verified = verifier(bundle, draft_report, started_at)
-            _write_text(video_dir / "draft_report.md", draft_report)
-            _write_text(video_dir / "final_report.md", verified.final_report_markdown)
-            _write_json(video_dir / "metadata.json", _metadata_payload(bundle))
-            _write_json(video_dir / "verification.json", verified.verification)
-            _write_json(video_dir / "research_plan.json", verified.verification.get("research_plan") or {})
-            _write_json(video_dir / "evidence.json", verified.verification.get("evidence") or {})
-            _write_json(video_dir / "claim_verification.json", verified.verification.get("claim_verification") or {})
-            public_summary = _public_summary(bundle, verified)
-            _write_json(video_dir / "public_summary.json", public_summary)
-            video_summaries.append(
-                _manifest_video_item(
-                    bundle=bundle,
-                    status=verified.status,
-                    video_dir=video_dir,
-                    run_dir=run_dir,
-                    error=None,
-                    reused_from_run=None,
-                )
-            )
-        except Exception as exc:
-            if metadata_bundle is None:
-                metadata_fetch_failures += 1
-            failed_count += 1
-            selected_count += 1
-            error_summary = {
-                "video_id": reference.video_id,
-                "title": reference.title,
-                "video_url": reference.url,
-                "published_at": reference.published_at.isoformat() if reference.published_at else None,
-                "status": "failed",
-                "error": str(exc),
-                "metadata_path": _relative_artifact_path(video_dir / "metadata.json", run_dir),
-                "public_summary_path": _relative_artifact_path(video_dir / "public_summary.json", run_dir),
-            }
-            _write_json(
-                video_dir / "metadata.json",
-                {
-                    "video_id": reference.video_id,
-                    "url": reference.url,
-                    "title": reference.title,
-                    "source_url": reference.source_url,
-                    "published_at": reference.published_at.isoformat() if reference.published_at else None,
-                    "collection_error": str(exc),
-                },
-            )
-            _write_json(video_dir / "public_summary.json", error_summary)
-            video_summaries.append(error_summary)
+    video_results = _run_video_workers(
+        config=config,
+        references=references,
+        run_dir=run_dir,
+        window_start=window_start,
+        window_end=window_end,
+        started_at=started_at,
+        fetcher=fetcher,
+        verifier=verifier,
+    )
+    video_summaries = [
+        result["manifest_item"]
+        for _, result in sorted(video_results.items())
+        if isinstance(result.get("manifest_item"), dict)
+    ]
+    selected_count = sum(int(result.get("selected", 0)) for result in video_results.values())
+    failed_count = sum(int(result.get("failed", 0)) for result in video_results.values())
+    skipped_count = sum(int(result.get("skipped_out_of_window", 0)) for result in video_results.values())
+    reused_count = sum(int(result.get("reused", 0)) for result in video_results.values())
+    metadata_fetch_failures = sum(int(result.get("metadata_fetch_failures", 0)) for result in video_results.values())
+    transcript_fetch_failures = sum(int(result.get("transcript_fetch_failures", 0)) for result in video_results.values())
+    skipped_no_transcript = sum(int(result.get("skipped_no_transcript", 0)) for result in video_results.values())
 
     successful_count = sum(1 for item in video_summaries if item.get("status") not in {"failed"})
     manifest = {
@@ -239,6 +150,7 @@ def execute_youtube_run(
         "summary": {
             "raw_references": len(raw_references),
             "candidate_references": len(references),
+            "selected_videos": selected_count,
             "total_videos": len(video_summaries),
             "successful_videos": successful_count,
             "failed_videos": failed_count,
@@ -247,6 +159,10 @@ def execute_youtube_run(
             "metadata_fetch_failures": metadata_fetch_failures,
             "transcript_fetch_failures": transcript_fetch_failures,
             "skipped_no_transcript": skipped_no_transcript,
+        },
+        "parallel_video_execution": {
+            "enabled": config.channel.max_parallel_videos > 1,
+            "max_parallel_videos": max(1, int(config.channel.max_parallel_videos or 1)),
         },
         "videos": video_summaries,
         "source_policy": {
@@ -261,6 +177,284 @@ def execute_youtube_run(
     if publish:
         build_youtube_site(config.storage.archive_dir, config.storage.site_dir, config.site)
     return manifest
+
+
+def _run_video_workers(
+    *,
+    config: YouTubeDailyConfig,
+    references: list[YouTubeVideoReference],
+    run_dir: Path,
+    window_start: datetime,
+    window_end: datetime,
+    started_at: datetime,
+    fetcher: VideoFetcher,
+    verifier: BundleVerifier,
+) -> dict[int, dict[str, Any]]:
+    max_workers = min(max(1, int(config.channel.max_parallel_videos or 1)), max(1, config.channel.max_videos))
+    if not references:
+        return {}
+    pending: list[tuple[int, YouTubeVideoReference]] = list(enumerate(references))
+    running: dict[Future[dict[str, Any]], int] = {}
+    results: dict[int, dict[str, Any]] = {}
+    selected_count = 0
+    print(
+        f"Starting YouTube video execution: max_parallel_videos={max_workers}, "
+        f"max_videos={config.channel.max_videos}",
+        flush=True,
+    )
+    with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="youtube-report") as executor:
+        while pending or running:
+            while pending and len(running) < max_workers and selected_count + len(running) < config.channel.max_videos:
+                index, reference = pending.pop(0)
+                future = executor.submit(
+                    _process_video_reference,
+                    config=config,
+                    reference=reference,
+                    run_dir=run_dir,
+                    window_start=window_start,
+                    window_end=window_end,
+                    started_at=started_at,
+                    fetcher=fetcher,
+                    verifier=verifier,
+                )
+                running[future] = index
+            if not running:
+                break
+            done, _ = wait(running.keys(), return_when=FIRST_COMPLETED)
+            for future in done:
+                index = running.pop(future)
+                try:
+                    result = future.result()
+                except Exception as exc:
+                    reference = references[index]
+                    video_dir = run_dir / "videos" / reference.video_id
+                    result = _video_worker_crash_result(reference, video_dir=video_dir, run_dir=run_dir, error=str(exc))
+                results[index] = result
+                selected_count += int(result.get("selected", 0))
+                status = result.get("status") or result.get("reason") or "unknown"
+                print(
+                    f"Finished YouTube candidate {index + 1}/{len(references)}: "
+                    f"{references[index].video_id} status={status}",
+                    flush=True,
+                )
+            if selected_count >= config.channel.max_videos:
+                pending.clear()
+    return results
+
+
+def _process_video_reference(
+    *,
+    config: YouTubeDailyConfig,
+    reference: YouTubeVideoReference,
+    run_dir: Path,
+    window_start: datetime,
+    window_end: datetime,
+    started_at: datetime,
+    fetcher: VideoFetcher,
+    verifier: BundleVerifier,
+) -> dict[str, Any]:
+    video_dir = run_dir / "videos" / reference.video_id
+    video_dir.mkdir(parents=True, exist_ok=True)
+    metadata_bundle: YouTubeVideoBundle | None = None
+    result = _empty_video_worker_result()
+    try:
+        should_fetch_transcript_first = _reference_in_window(
+            reference,
+            window_start=window_start,
+            window_end=window_end,
+        )
+        if should_fetch_transcript_first:
+            result["selected"] = 1
+            reused_result = _reuse_video_result_if_possible(
+                result=result,
+                config=config,
+                reference=reference,
+                run_dir=run_dir,
+                video_dir=video_dir,
+            )
+            if reused_result is not None:
+                return reused_result
+        else:
+            metadata_bundle = _call_video_fetcher(fetcher, reference.url, fetch_transcript=False)
+            if not _bundle_in_window(metadata_bundle, window_start=window_start, window_end=window_end):
+                result["skipped_out_of_window"] = 1
+                result["status"] = "skipped_out_of_window"
+                return result
+            result["selected"] = 1
+            reused_result = _reuse_video_result_if_possible(
+                result=result,
+                config=config,
+                reference=reference,
+                run_dir=run_dir,
+                video_dir=video_dir,
+            )
+            if reused_result is not None:
+                return reused_result
+
+        if should_fetch_transcript_first:
+            try:
+                metadata_bundle = _call_video_fetcher(fetcher, reference.url, fetch_transcript=True)
+            except Exception:
+                result["metadata_fetch_failures"] = 1
+                raise
+        if not _bundle_in_window(metadata_bundle, window_start=window_start, window_end=window_end):
+            result["selected"] = 0
+            result["skipped_out_of_window"] = 1
+            result["status"] = "skipped_out_of_window"
+            return result
+        try:
+            bundle = (
+                metadata_bundle
+                if metadata_bundle.transcript is not None and metadata_bundle.transcript_status == "available"
+                else _call_video_fetcher(fetcher, reference.url, fetch_transcript=True)
+            )
+        except Exception:
+            result["transcript_fetch_failures"] = 1
+            bundle = metadata_bundle
+        if not _bundle_has_usable_transcript(bundle):
+            result["skipped_no_transcript"] = 1
+            result["status"] = "skipped_no_transcript"
+            _write_json(video_dir / "metadata.json", _metadata_payload(bundle))
+            _write_json(
+                video_dir / "collection_status.json",
+                {
+                    "video_id": bundle.metadata.video_id,
+                    "title": bundle.metadata.title,
+                    "video_url": bundle.metadata.url,
+                    "status": "skipped_no_transcript",
+                    "reason": "usable transcript or ASR text was not available",
+                    "transcript_status": bundle.transcript_status,
+                    "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
+                    "minimum_transcript_chars": _minimum_transcript_chars(),
+                },
+            )
+            return result
+        draft_report = build_youtube_video_report(bundle, generated_at=started_at.replace(tzinfo=None))
+        verified = verifier(bundle, draft_report, started_at)
+        _write_text(video_dir / "draft_report.md", draft_report)
+        _write_text(video_dir / "final_report.md", verified.final_report_markdown)
+        _write_json(video_dir / "metadata.json", _metadata_payload(bundle))
+        _write_json(video_dir / "verification.json", verified.verification)
+        _write_json(video_dir / "research_plan.json", verified.verification.get("research_plan") or {})
+        _write_json(video_dir / "evidence.json", verified.verification.get("evidence") or {})
+        _write_json(video_dir / "claim_verification.json", verified.verification.get("claim_verification") or {})
+        public_summary = _public_summary(bundle, verified)
+        _write_json(video_dir / "public_summary.json", public_summary)
+        result["status"] = verified.status
+        result["manifest_item"] = _manifest_video_item(
+            bundle=bundle,
+            status=verified.status,
+            video_dir=video_dir,
+            run_dir=run_dir,
+            error=None,
+            reused_from_run=None,
+        )
+        return result
+    except Exception as exc:
+        if metadata_bundle is None:
+            result["metadata_fetch_failures"] = 1
+        result["selected"] = 1
+        result["failed"] = 1
+        result["status"] = "failed"
+        result["manifest_item"] = _write_failed_video_artifacts(
+            reference,
+            video_dir=video_dir,
+            run_dir=run_dir,
+            error=str(exc),
+        )
+        return result
+
+
+def _reuse_video_result_if_possible(
+    *,
+    result: dict[str, Any],
+    config: YouTubeDailyConfig,
+    reference: YouTubeVideoReference,
+    run_dir: Path,
+    video_dir: Path,
+) -> dict[str, Any] | None:
+    reused = _copy_reusable_video_artifacts(
+        archive_dir=config.storage.archive_dir,
+        video_id=reference.video_id,
+        current_run_dir=run_dir,
+        target_video_dir=video_dir,
+    )
+    if reused is None:
+        return None
+    result["reused"] = 1
+    status = str(reused.get("status") or "reused")
+    result["status"] = status
+    result["manifest_item"] = _manifest_video_item_from_reused_artifacts(
+        reference,
+        status=status,
+        video_dir=video_dir,
+        run_dir=run_dir,
+        reused_from_run=str(reused.get("run_id") or ""),
+    )
+    return result
+
+
+def _empty_video_worker_result() -> dict[str, Any]:
+    return {
+        "selected": 0,
+        "failed": 0,
+        "skipped_out_of_window": 0,
+        "reused": 0,
+        "metadata_fetch_failures": 0,
+        "transcript_fetch_failures": 0,
+        "skipped_no_transcript": 0,
+        "status": "",
+        "manifest_item": None,
+    }
+
+
+def _video_worker_crash_result(
+    reference: YouTubeVideoReference,
+    *,
+    video_dir: Path,
+    run_dir: Path,
+    error: str,
+) -> dict[str, Any]:
+    result = _empty_video_worker_result()
+    result["selected"] = 1
+    result["failed"] = 1
+    result["metadata_fetch_failures"] = 1
+    result["status"] = "failed"
+    result["manifest_item"] = _write_failed_video_artifacts(reference, video_dir=video_dir, run_dir=run_dir, error=error)
+    return result
+
+
+def _write_failed_video_artifacts(
+    reference: YouTubeVideoReference,
+    *,
+    video_dir: Path,
+    run_dir: Path,
+    error: str,
+) -> dict[str, Any]:
+    video_dir.mkdir(parents=True, exist_ok=True)
+    error_summary = {
+        "video_id": reference.video_id,
+        "title": reference.title,
+        "video_url": reference.url,
+        "published_at": reference.published_at.isoformat() if reference.published_at else None,
+        "status": "failed",
+        "error": error,
+        "metadata_path": _relative_artifact_path(video_dir / "metadata.json", run_dir),
+        "public_summary_path": _relative_artifact_path(video_dir / "public_summary.json", run_dir),
+    }
+    _write_json(
+        video_dir / "metadata.json",
+        {
+            "video_id": reference.video_id,
+            "url": reference.url,
+            "title": reference.title,
+            "source_url": reference.source_url,
+            "published_at": reference.published_at.isoformat() if reference.published_at else None,
+            "collection_error": error,
+        },
+    )
+    _write_json(video_dir / "public_summary.json", error_summary)
+    return error_summary
 
 
 def execute_single_video(
@@ -329,12 +523,33 @@ def _default_bundle_verifier(config: YouTubeDailyConfig) -> BundleVerifier:
         return verify_youtube_bundle(
             bundle,
             draft_report,
-            llm_settings=config.llm,
+            llm_settings=_llm_settings_for_video(config, bundle.metadata.video_id),
             verification_settings=config.verification,
             generated_at=generated_at,
         )
 
     return verify
+
+
+def _llm_settings_for_video(config: YouTubeDailyConfig, video_id: str) -> Any:
+    workspace = str(config.llm.codex_workspace_dir or "").strip()
+    if not workspace:
+        return config.llm
+    video_workspace = Path(workspace) / "youtube-videos" / _safe_segment(video_id or "video")
+    return replace(config.llm, codex_workspace_dir=str(video_workspace))
+
+
+def _safe_segment(value: str) -> str:
+    text = re.sub(r"[^A-Za-z0-9_.-]+", "-", str(value or "").strip()).strip(".-")
+    return text[:80] or "video"
+
+
+def _reference_in_window(reference: YouTubeVideoReference, *, window_start: datetime, window_end: datetime) -> bool:
+    published_at = reference.published_at
+    if published_at is None:
+        return False
+    comparable = _to_timezone(published_at, window_end.tzinfo)
+    return window_start <= comparable <= window_end
 
 
 def _bundle_in_window(bundle: YouTubeVideoBundle, *, window_start: datetime, window_end: datetime) -> bool:
@@ -398,6 +613,45 @@ def _manifest_video_item(
     }
     if error:
         item["error"] = error
+    if reused_from_run:
+        item["reused_from_run"] = reused_from_run
+    return item
+
+
+def _manifest_video_item_from_reused_artifacts(
+    reference: YouTubeVideoReference,
+    *,
+    status: str,
+    video_dir: Path,
+    run_dir: Path,
+    reused_from_run: str | None,
+) -> dict[str, Any]:
+    summary = _read_json_if_exists(video_dir / "public_summary.json") or {}
+    metadata_payload = _read_json_if_exists(video_dir / "metadata.json") or {}
+    metadata = metadata_payload.get("metadata") if isinstance(metadata_payload.get("metadata"), dict) else {}
+    item = {
+        "video_id": summary.get("video_id") or metadata.get("video_id") or reference.video_id,
+        "title": summary.get("title") or metadata.get("title") or reference.title,
+        "channel": summary.get("channel") or metadata.get("channel"),
+        "video_url": summary.get("url") or metadata.get("url") or reference.url,
+        "published_at": summary.get("published_at")
+        or metadata.get("published_at")
+        or (reference.published_at.isoformat() if reference.published_at else None),
+        "duration_seconds": metadata.get("duration_seconds"),
+        "view_count": metadata.get("view_count"),
+        "status": status,
+        "transcript_status": summary.get("transcript_status") or metadata_payload.get("transcript_status"),
+        "transcript_source": summary.get("transcript_source") or metadata_payload.get("transcript_source"),
+        "transcript_chars": summary.get("transcript_chars") or metadata_payload.get("transcript_chars") or 0,
+        "metadata_path": _relative_artifact_path(video_dir / "metadata.json", run_dir),
+        "draft_report_path": _relative_artifact_path(video_dir / "draft_report.md", run_dir),
+        "verification_path": _relative_artifact_path(video_dir / "verification.json", run_dir),
+        "research_plan_path": _relative_artifact_path(video_dir / "research_plan.json", run_dir),
+        "evidence_path": _relative_artifact_path(video_dir / "evidence.json", run_dir),
+        "claim_verification_path": _relative_artifact_path(video_dir / "claim_verification.json", run_dir),
+        "final_report_path": _relative_artifact_path(video_dir / "final_report.md", run_dir),
+        "public_summary_path": _relative_artifact_path(video_dir / "public_summary.json", run_dir),
+    }
     if reused_from_run:
         item["reused_from_run"] = reused_from_run
     return item

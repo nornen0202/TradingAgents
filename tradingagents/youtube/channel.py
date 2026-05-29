@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Iterable
 
-from tradingagents.dataflows.youtube_video import YOUTUBE_VIDEO_URL, extract_youtube_video_id
+from tradingagents.dataflows.youtube_video import YOUTUBE_VIDEO_URL, extract_youtube_video_id, _youtube_dl_options
 
 
 @dataclass(frozen=True)
@@ -27,14 +27,14 @@ def list_channel_video_references(
         url = str(channel_url or "").strip()
         if not url:
             continue
-        options = {
-            "extract_flat": True,
-            "skip_download": True,
-            "quiet": True,
-            "no_warnings": True,
-            "playlistend": max_entries_per_url,
-            "ignoreerrors": True,
-        }
+        options = _youtube_dl_options(
+            extract_flat=True,
+            skip_download=True,
+            quiet=True,
+            no_warnings=True,
+            playlistend=max_entries_per_url,
+            ignoreerrors=True,
+        )
         with yt_dlp.YoutubeDL(options) as ydl:
             info = ydl.extract_info(url, download=False)
         references.extend(_references_from_entries(info, source_url=url))
