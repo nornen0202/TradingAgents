@@ -20,9 +20,11 @@ class KISMicrostructureProvider:
         *,
         client: Any | None = None,
         client_factory: Callable[[], Any] | None = None,
+        us_daily_volume_fallback: Callable[[str], float | None] | None = None,
     ) -> None:
         self._client = client
         self._client_factory = client_factory or (lambda: KisClient.from_api_keys(environment="real"))
+        self._us_daily_volume_fallback = us_daily_volume_fallback or _avg20_daily_volume_from_yfinance
 
     def fetch(
         self,
@@ -326,6 +328,10 @@ class KISMicrostructureProvider:
         day_low = _find_float(combined_price, "low", "LOW", "ovrs_nmix_lwpr", default=_min_value(bars, ("low", "LOW", "lprc"))) or last_price
         session_vwap = _vwap_from_cumulative(combined_price) or _vwap_from_bars(bars)
         avg20_daily_volume = _avg_daily_volume(daily_rows)
+        if avg20_daily_volume is None:
+            avg20_daily_volume = self._us_daily_volume_fallback(symbol)
+            if avg20_daily_volume is not None:
+                raw_source_names.append("yfinance.daily_history")
         relative_volume = _relative_volume(volume, avg20_daily_volume, now_local, market="US")
         if session_vwap is None:
             missing.setdefault("session_vwap", "minute_or_cumulative_traded_value_unavailable")
@@ -613,6 +619,25 @@ def _avg_daily_volume(rows: list[dict[str, Any]]) -> float | None:
     if not values:
         return None
     return float(sum(values) / len(values))
+
+
+def _avg20_daily_volume_from_yfinance(symbol: str) -> float | None:
+    try:
+        import yfinance as yf
+
+        from tradingagents.dataflows.stockstats_utils import yf_retry
+
+        ticker_obj = yf.Ticker(str(symbol).upper())
+        daily = yf_retry(lambda: ticker_obj.history(period="3mo", interval="1d", auto_adjust=False))
+    except Exception:
+        return None
+    if daily is None or daily.empty or "Volume" not in daily:
+        return None
+    volume = daily["Volume"].dropna().tail(20)
+    if volume.empty:
+        return None
+    avg = float(volume.mean())
+    return avg if avg > 0 else None
 
 
 def _relative_volume(volume: int, avg20: float | None, now_local: datetime, *, market: str) -> float | None:
