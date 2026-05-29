@@ -159,6 +159,7 @@ def evaluate_execution_state(
         (contract.min_relative_volume is not None and market.relative_volume is None)
         or (contract.session_vwap_preference != SessionVWAPPreference.INDIFFERENT and market.session_vwap is None)
     )
+    microstructure_block_reasons = _microstructure_block_reasons(market)
     pilot_window_open = _pilot_window_open(
         market_asof=market.asof,
         earliest_pilot_time_local=contract.earliest_pilot_time_local,
@@ -209,6 +210,11 @@ def evaluate_execution_state(
                 reason_codes.append("relative_volume_unconfirmed")
             if not vwap_confirmed:
                 reason_codes.append("vwap_unconfirmed")
+        elif microstructure_block_reasons:
+            decision_state = DecisionState.ARMED
+            decision_now = DecisionNow.NONE
+            execution_timing_state = ExecutionTimingState.PILOT_BLOCKED_VOLUME
+            reason_codes.extend(microstructure_block_reasons)
         else:
             decision_state = DecisionState.ACTIONABLE_NOW
             decision_now = _decision_now_from_action(contract.action_if_triggered)
@@ -228,7 +234,7 @@ def evaluate_execution_state(
         if in_zone:
             trigger_status["pullback_zone_active"] = True
             trigger_status["support_hold"] = True
-            if vwap_confirmed:
+            if vwap_confirmed and not microstructure_block_reasons:
                 decision_state = DecisionState.ACTIONABLE_NOW
                 decision_now = _decision_now_from_action(contract.action_if_triggered)
                 execution_timing_state = ExecutionTimingState.SUPPORT_HOLD
@@ -239,7 +245,9 @@ def evaluate_execution_state(
                 execution_timing_state = ExecutionTimingState.PILOT_BLOCKED_VOLUME
                 if contract.session_vwap_preference != SessionVWAPPreference.INDIFFERENT and market.session_vwap is None:
                     reason_codes.append("data_missing_blocked_pilot")
-                reason_codes.append("vwap_unconfirmed")
+                if not vwap_confirmed:
+                    reason_codes.append("vwap_unconfirmed")
+                reason_codes.extend(microstructure_block_reasons)
 
     if market_session == "post_close" and execution_timing_state == ExecutionTimingState.WAITING and contract.breakout_level is not None:
         decision_state = DecisionState.WAIT
@@ -273,6 +281,51 @@ def _vwap_check(pref: SessionVWAPPreference, price: float, vwap: float | None) -
     if pref == SessionVWAPPreference.ABOVE:
         return price >= vwap
     return price <= vwap
+
+
+def _microstructure_block_reasons(market: IntradayMarketSnapshot) -> tuple[str, ...]:
+    if not getattr(market, "microstructure_required", False):
+        return tuple()
+
+    reasons: list[str] = []
+    if market.session_vwap is None:
+        reasons.append("microstructure_session_vwap_missing")
+    if market.relative_volume is None:
+        reasons.append("microstructure_relative_volume_missing")
+    if market.spread_bps is None and market.orderbook_imbalance is None:
+        reasons.append("microstructure_orderbook_missing")
+    if market.execution_strength is None:
+        reasons.append("microstructure_execution_strength_missing")
+
+    market_code = str(market.market or "").strip().upper()
+    if market_code == "KR" or str(market.ticker).upper().endswith((".KS", ".KQ")):
+        if str(market.investor_flow_status or "").lower() != "available":
+            reasons.append("microstructure_investor_flow_missing")
+        if str(market.program_flow_status or "").lower() != "available":
+            reasons.append("microstructure_program_flow_missing")
+        if not _status_is_clear(market.vi_status):
+            reasons.append("microstructure_vi_status_unconfirmed")
+        if not _status_is_clear(market.market_alert_status):
+            reasons.append("microstructure_market_alert_unconfirmed")
+    elif market_code == "US":
+        if not _status_is_clear(market.halt_status):
+            reasons.append("microstructure_halt_status_unconfirmed")
+        investor_status = str(market.investor_flow_status or "").lower()
+        program_status = str(market.program_flow_status or "").lower()
+        if investor_status not in {"not_applicable", "available", ""}:
+            reasons.append("microstructure_investor_flow_unexpected_status")
+        if program_status not in {"not_applicable", "available", ""}:
+            reasons.append("microstructure_program_flow_unexpected_status")
+    return tuple(dict.fromkeys(reasons))
+
+
+def _status_is_clear(value: dict[str, object] | None) -> bool:
+    if not value:
+        return False
+    if value.get("is_clear") is True:
+        return True
+    status = str(value.get("status") or "").strip().lower()
+    return status in {"clear", "normal", "none", "not_applicable"}
 
 
 def _decision_now_from_action(action: ActionIfTriggered) -> DecisionNow:
@@ -428,6 +481,19 @@ def _build_update(
             "provider_realtime_capable": market.provider_realtime_capable,
             "market_session": market.market_session,
             "execution_data_quality": market.execution_data_quality,
+            "market": market.market,
+            "exchange": market.exchange,
+            "checkpoint_id": market.checkpoint_id,
+            "spread_bps": market.spread_bps,
+            "orderbook_imbalance": market.orderbook_imbalance,
+            "execution_strength": market.execution_strength,
+            "source_latency_seconds": market.source_latency_seconds,
+            "investor_flow_status": market.investor_flow_status,
+            "program_flow_status": market.program_flow_status,
+            "vi_status": market.vi_status,
+            "market_alert_status": market.market_alert_status,
+            "halt_status": market.halt_status,
+            "missing_reason": market.missing_reason,
         },
         last_price=market.last_price,
         session_vwap=market.session_vwap,

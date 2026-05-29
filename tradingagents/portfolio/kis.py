@@ -172,6 +172,291 @@ class KisClient:
 
         raise KisApiError(f"KIS API authentication retry exhausted for path: {path}")
 
+    def domestic_price(self, code: str, *, market_division: str = "J") -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/domestic-stock/v1/quotations/inquire-price",
+            tr_id="FHKST01010100",
+            params={
+                "FID_COND_MRKT_DIV_CODE": market_division,
+                "FID_INPUT_ISCD": str(code).zfill(6),
+            },
+        )
+        return payload
+
+    def domestic_time_itemchartprice(
+        self,
+        code: str,
+        *,
+        input_hour: str,
+        market_division: str = "J",
+        include_past_data: str = "Y",
+    ) -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/domestic-stock/v1/quotations/inquire-time-itemchartprice",
+            tr_id="FHKST03010200",
+            params={
+                "FID_COND_MRKT_DIV_CODE": market_division,
+                "FID_INPUT_ISCD": str(code).zfill(6),
+                "FID_INPUT_HOUR_1": input_hour,
+                "FID_PW_DATA_INCU_YN": include_past_data,
+                "FID_ETC_CLS_CODE": "",
+            },
+        )
+        return payload
+
+    def domestic_time_itemconclusion(
+        self,
+        code: str,
+        *,
+        input_hour: str,
+        market_division: str = "J",
+    ) -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/domestic-stock/v1/quotations/inquire-time-itemconclusion",
+            tr_id="FHPST01060000",
+            params={
+                "FID_COND_MRKT_DIV_CODE": market_division,
+                "FID_INPUT_ISCD": str(code).zfill(6),
+                "FID_INPUT_HOUR_1": input_hour,
+            },
+        )
+        return payload
+
+    def domestic_asking_price(self, code: str, *, market_division: str = "J") -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/domestic-stock/v1/quotations/inquire-asking-price-exp-ccn",
+            tr_id="FHKST01010200",
+            params={
+                "FID_COND_MRKT_DIV_CODE": market_division,
+                "FID_INPUT_ISCD": str(code).zfill(6),
+            },
+        )
+        return payload
+
+    def domestic_investor_trend_estimate(self, code: str) -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/domestic-stock/v1/quotations/investor-trend-estimate",
+            tr_id="HHPTJ04160200",
+            params={"MKSC_SHRN_ISCD": str(code).zfill(6)},
+        )
+        return payload
+
+    def domestic_program_trade_by_stock(self, code: str, *, market_division: str = "J") -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/domestic-stock/v1/quotations/program-trade-by-stock",
+            tr_id="FHPPG04650101",
+            params={
+                "FID_COND_MRKT_DIV_CODE": market_division,
+                "FID_INPUT_ISCD": str(code).zfill(6),
+            },
+        )
+        return payload
+
+    def domestic_comp_program_trade_today(
+        self,
+        *,
+        market_class: str,
+        input_hour: str = "",
+        market_division: str = "J",
+    ) -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/domestic-stock/v1/quotations/comp-program-trade-today",
+            tr_id="FHPPG04600101",
+            params={
+                "FID_COND_MRKT_DIV_CODE": market_division,
+                "FID_MRKT_CLS_CODE": market_class,
+                "FID_SCTN_CLS_CODE": "",
+                "FID_INPUT_ISCD": "",
+                "FID_COND_MRKT_DIV_CODE1": "",
+                "FID_INPUT_HOUR_1": input_hour,
+            },
+        )
+        return payload
+
+    def domestic_daily_itemchartprice(
+        self,
+        code: str,
+        *,
+        start_date: date | datetime | str | None = None,
+        end_date: date | datetime | str,
+        market_division: str = "J",
+        period_division: str = "D",
+        adjusted_price: str = "1",
+    ) -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice",
+            tr_id="FHKST03010100",
+            params={
+                "FID_COND_MRKT_DIV_CODE": market_division,
+                "FID_INPUT_ISCD": str(code).zfill(6),
+                "FID_INPUT_DATE_1": _date_param(start_date or end_date),
+                "FID_INPUT_DATE_2": _date_param(end_date),
+                "FID_PERIOD_DIV_CODE": period_division,
+                "FID_ORG_ADJ_PRC": adjusted_price,
+            },
+        )
+        return payload
+
+    def overseas_price(self, symbol: str, *, exchange: str, auth: str = "") -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/overseas-price/v1/quotations/price",
+            tr_id="HHDFS00000300",
+            params={"AUTH": auth, "EXCD": exchange, "SYMB": str(symbol).upper()},
+        )
+        return payload
+
+    def overseas_price_detail(self, symbol: str, *, exchange: str, auth: str = "") -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/overseas-price/v1/quotations/price-detail",
+            tr_id="HHDFS76200200",
+            params={"AUTH": auth, "EXCD": exchange, "SYMB": str(symbol).upper()},
+        )
+        return payload
+
+    def overseas_time_itemchartprice(
+        self,
+        symbol: str,
+        *,
+        exchange: str,
+        nmin: str = "5",
+        include_previous: str = "1",
+        next_flag: str = "",
+        nrec: str = "120",
+        keyb: str = "",
+        auth: str = "",
+        tr_cont: str = "",
+    ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
+        return self.request_json(
+            method="GET",
+            path="/uapi/overseas-price/v1/quotations/inquire-time-itemchartprice",
+            tr_id="HHDFS76950200",
+            tr_cont=tr_cont,
+            params={
+                "AUTH": auth,
+                "EXCD": exchange,
+                "SYMB": str(symbol).upper(),
+                "NMIN": nmin,
+                "PINC": include_previous,
+                "NEXT": next_flag,
+                "NREC": nrec,
+                "FILL": "",
+                "KEYB": keyb,
+            },
+        )
+
+    def overseas_asking_price(self, symbol: str, *, exchange: str, auth: str = "") -> dict[str, Any]:
+        payload, _headers = self.request_json(
+            method="GET",
+            path="/uapi/overseas-price/v1/quotations/inquire-asking-price",
+            tr_id="HHDFS76200100",
+            params={"AUTH": auth, "EXCD": exchange, "SYMB": str(symbol).upper()},
+        )
+        return payload
+
+    def overseas_quot_inquire_ccnl(
+        self,
+        symbol: str,
+        *,
+        exchange: str,
+        today: str = "1",
+        keyb: str = "",
+        auth: str = "",
+        tr_cont: str = "",
+    ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
+        return self.request_json(
+            method="GET",
+            path="/uapi/overseas-price/v1/quotations/inquire-ccnl",
+            tr_id="HHDFS76200300",
+            tr_cont=tr_cont,
+            params={
+                "EXCD": exchange,
+                "TDAY": today,
+                "SYMB": str(symbol).upper(),
+                "AUTH": auth,
+                "KEYB": keyb,
+            },
+        )
+
+    def overseas_volume_power(
+        self,
+        *,
+        exchange: str,
+        nday: str = "0",
+        volume_range: str = "0",
+        keyb: str = "",
+        auth: str = "",
+        tr_cont: str = "",
+    ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
+        return self.request_json(
+            method="GET",
+            path="/uapi/overseas-stock/v1/ranking/volume-power",
+            tr_id="HHDFS76280000",
+            tr_cont=tr_cont,
+            params={
+                "EXCD": exchange,
+                "NDAY": nday,
+                "VOL_RANG": volume_range,
+                "AUTH": auth,
+                "KEYB": keyb,
+            },
+        )
+
+    def overseas_trade_volume(
+        self,
+        *,
+        exchange: str,
+        nday: str = "0",
+        volume_range: str = "0",
+        keyb: str = "",
+        auth: str = "",
+        tr_cont: str = "",
+    ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
+        return self.request_json(
+            method="GET",
+            path="/uapi/overseas-stock/v1/ranking/trade-vol",
+            tr_id="HHDFS76310010",
+            tr_cont=tr_cont,
+            params={
+                "EXCD": exchange,
+                "NDAY": nday,
+                "VOL_RANG": volume_range,
+                "KEYB": keyb,
+                "AUTH": auth,
+                "PRC1": "",
+                "PRC2": "",
+            },
+        )
+
+    def overseas_countries_holiday(
+        self,
+        *,
+        trade_date: str,
+        nk: str = "",
+        fk: str = "",
+        tr_cont: str = "",
+    ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
+        return self.request_json(
+            method="GET",
+            path="/uapi/overseas-stock/v1/quotations/countries-holiday",
+            tr_id="CTOS5011R",
+            tr_cont=tr_cont,
+            params={
+                "TRAD_DT": trade_date,
+                "CTX_AREA_NK": nk,
+                "CTX_AREA_FK": fk,
+            },
+        )
+
     def _is_token_usable(self) -> bool:
         if not self._access_token or not self._token_expires_at:
             return False

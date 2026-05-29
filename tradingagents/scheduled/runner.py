@@ -28,6 +28,7 @@ from tradingagents.dataflows.intraday_market import (
     classify_execution_market_data,
     fetch_intraday_market_snapshot,
 )
+from tradingagents.dataflows.intraday.microstructure import render_microstructure_report
 from tradingagents.dataflows.stockstats_utils import is_retryable_yfinance_error, yf_retry
 from tradingagents.execution.contract_builder import build_execution_contract
 from tradingagents.execution.overlay import evaluate_execution_state
@@ -74,6 +75,7 @@ from .config import (
     load_scheduled_config,
     with_overrides,
 )
+from .market_calendar import market_session_state
 from .site import build_site
 
 
@@ -234,15 +236,28 @@ def execute_scheduled_run(
 
     execution_updates: dict[str, dict[str, Any]] = {}
     if config.execution.execution_refresh_enabled and not portfolio_only:
-        now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
+        checkpoint_timezone = _execution_checkpoint_timezone(config)
+        now_local = datetime.now(ZoneInfo(checkpoint_timezone))
+        now_kst = now_local.astimezone(ZoneInfo("Asia/Seoul"))
         selected_checkpoints, overlay_phase = _select_due_checkpoints(
-            now_kst=now_kst,
+            now_local=now_local,
             checkpoints=_effective_execution_checkpoints(config),
         )
+        session_state = market_session_state(
+            market=config.run.market,
+            now_local=now_local,
+            calendar_name=config.execution.execution_session_calendar,
+        )
+        if config.execution.execution_session_gate_enabled and selected_checkpoints and not session_state.get("is_open"):
+            selected_checkpoints = []
+            overlay_phase = str(session_state.get("phase") or "CLOSED").upper()
         manifest_overlay_phase = {
             "name": overlay_phase,
             "selected_checkpoints": list(selected_checkpoints),
             "now_kst": now_kst.isoformat(),
+            "now_local": now_local.isoformat(),
+            "checkpoint_timezone": checkpoint_timezone,
+            "session_state": session_state,
         }
         execution_updates = _run_execution_overlay_passes(
             config=config,
@@ -358,6 +373,9 @@ def execute_scheduled_run(
             checkpoint=latest_checkpoint,
             max_data_age_seconds=config.execution.execution_max_data_age_seconds,
         )
+        execution_artifacts = execution_updates.get("_artifacts")
+        if isinstance(execution_artifacts, dict) and execution_artifacts:
+            manifest["execution"]["artifacts"] = execution_artifacts
         manifest["execution"]["overlay_phase"] = manifest_overlay_phase
         manifest["market_session_phase"] = _market_session_phase(
             manifest_overlay_phase,
@@ -1616,6 +1634,10 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "codex_workspace_dir": config.llm.codex_workspace_dir,
         "execution_refresh_enabled": config.execution.execution_refresh_enabled,
         "execution_refresh_checkpoints_kst": list(config.execution.execution_refresh_checkpoints_kst),
+        "execution_refresh_checkpoints_local": list(config.execution.execution_refresh_checkpoints_local),
+        "execution_checkpoint_timezone": config.execution.execution_checkpoint_timezone,
+        "execution_session_gate_enabled": config.execution.execution_session_gate_enabled,
+        "execution_session_calendar": config.execution.execution_session_calendar,
         "execution_max_data_age_seconds": config.execution.execution_max_data_age_seconds,
         "execution_publish_debug": config.execution.execution_publish_debug,
         "summary_image_enabled": config.summary_image.enabled,
@@ -1959,10 +1981,19 @@ def _ticker_identity_key(ticker: str) -> str:
 
 
 def _effective_execution_checkpoints(config: ScheduledAnalysisConfig) -> list[str]:
+    local = [str(item).strip() for item in config.execution.execution_refresh_checkpoints_local if str(item).strip()]
+    if local:
+        return local
     configured = [str(item).strip() for item in config.execution.execution_refresh_checkpoints_kst if str(item).strip()]
     if configured:
         return configured
     return list(_default_execution_checkpoints_kst(config.run.market))
+
+
+def _execution_checkpoint_timezone(config: ScheduledAnalysisConfig) -> str:
+    if config.execution.execution_refresh_checkpoints_local:
+        return config.execution.execution_checkpoint_timezone
+    return "Asia/Seoul"
 
 
 def _collect_called_tool_names(final_state: dict[str, Any]) -> set[str]:
@@ -2679,7 +2710,16 @@ def _has_ticker_execution_updates(execution_updates: dict[str, dict[str, Any]]) 
     return any(not str(key).startswith("_") for key in execution_updates)
 
 
-def _select_due_checkpoints(*, now_kst: datetime, checkpoints: list[str]) -> tuple[list[str], str]:
+def _select_due_checkpoints(
+    *,
+    checkpoints: list[str],
+    now_local: datetime | None = None,
+    now_kst: datetime | None = None,
+) -> tuple[list[str], str]:
+    if now_local is None:
+        now_local = now_kst
+    if now_local is None:
+        raise ValueError("now_local or now_kst is required.")
     normalized = [str(item).strip() for item in checkpoints if str(item).strip()]
     if not normalized:
         return (["post_research"], "POST_RESEARCH")
@@ -2691,7 +2731,7 @@ def _select_due_checkpoints(*, now_kst: datetime, checkpoints: list[str]) -> tup
             minute = int(minute_text)
         except Exception:
             continue
-        if (now_kst.hour, now_kst.minute) >= (hour, minute):
+        if (now_local.hour, now_local.minute) >= (hour, minute):
             due.append(item)
     if due:
         # Minimize API usage: execute only the most recent due checkpoint in this run.
@@ -2773,7 +2813,12 @@ def _run_execution_overlay_passes(
             try:
                 contract_dict = json.loads(contract_path.read_text(encoding="utf-8"))
                 contract = _ExecutionContractShim(contract_dict).to_contract()
-                market = fetch_intraday_market_snapshot(ticker, interval="5m")
+                market = fetch_intraday_market_snapshot(
+                    ticker,
+                    interval="5m",
+                    market_timezone=_execution_checkpoint_timezone(config),
+                    checkpoint_id=checkpoint_label,
+                )
                 attempt_payload.update(
                     {
                         "success": True,
@@ -2797,6 +2842,19 @@ def _run_execution_overlay_passes(
                 update_path = ticker_dir / "execution_update.json"
                 _write_json(update_path, update_payload)
                 summary["artifacts"]["execution_update_json"] = _relative_to_run(run_dir, update_path)
+                micro_snapshot_payload = market.to_dict()
+                micro_checkpoint_json = checkpoint_dir / _checkpoint_microstructure_snapshot_filename(checkpoint_label)
+                micro_checkpoint_md = checkpoint_dir / _checkpoint_microstructure_report_filename(checkpoint_label)
+                micro_latest_json = ticker_dir / "microstructure_snapshot.json"
+                micro_latest_md = ticker_dir / "microstructure_report.md"
+                _write_json(micro_checkpoint_json, micro_snapshot_payload)
+                micro_checkpoint_md.write_text(render_microstructure_report(market), encoding="utf-8")
+                _write_json(micro_latest_json, micro_snapshot_payload)
+                micro_latest_md.write_text(render_microstructure_report(market), encoding="utf-8")
+                summary["artifacts"]["microstructure_snapshot_json"] = _relative_to_run(run_dir, micro_latest_json)
+                summary["artifacts"]["microstructure_report_md"] = _relative_to_run(run_dir, micro_latest_md)
+                summary["artifacts"]["microstructure_checkpoint_snapshot_json"] = _relative_to_run(run_dir, micro_checkpoint_json)
+                summary["artifacts"]["microstructure_checkpoint_report_md"] = _relative_to_run(run_dir, micro_checkpoint_md)
                 analysis_payload = _load_ticker_analysis_payload(run_dir=run_dir, ticker_summary=summary)
                 if analysis_payload:
                     intraday_execution_path = ticker_dir / "intraday_execution.json"
@@ -2894,7 +2952,76 @@ def _run_execution_overlay_passes(
                 updates_by_ticker[ticker] = update_payload
                 print(f"::warning::Execution overlay checkpoint '{checkpoint_label}' failed for {ticker}: {exc}")
         updates_by_ticker["_latest_checkpoint"] = {"value": checkpoint_label}
+    if _has_ticker_execution_updates(updates_by_ticker):
+        context_path = run_dir / "chatgpt_execution_context.json"
+        context_payload = _build_chatgpt_execution_context(
+            config=config,
+            updates_by_ticker=updates_by_ticker,
+        )
+        _write_json(context_path, context_payload)
+        updates_by_ticker["_artifacts"] = {
+            "chatgpt_execution_context_json": _relative_to_run(run_dir, context_path),
+        }
     return updates_by_ticker
+
+
+def _build_chatgpt_execution_context(
+    *,
+    config: ScheduledAnalysisConfig,
+    updates_by_ticker: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    latest_checkpoint = str((updates_by_ticker.get("_latest_checkpoint") or {}).get("value") or "")
+    tickers: list[dict[str, Any]] = []
+    for ticker, update in sorted(updates_by_ticker.items()):
+        if ticker.startswith("_") or not isinstance(update, dict):
+            continue
+        source = update.get("source") if isinstance(update.get("source"), dict) else {}
+        tickers.append(
+            {
+                "ticker": ticker,
+                "checkpoint": update.get("refresh_checkpoint") or latest_checkpoint,
+                "execution_asof": update.get("execution_asof"),
+                "market_data_asof": update.get("market_data_asof"),
+                "decision_state": update.get("decision_state"),
+                "decision_now": update.get("decision_now"),
+                "execution_timing_state": update.get("execution_timing_state"),
+                "reason_codes": update.get("reason_codes") or [],
+                "last_price": update.get("last_price"),
+                "session_vwap": update.get("session_vwap"),
+                "relative_volume": update.get("relative_volume"),
+                "spread_bps": source.get("spread_bps"),
+                "orderbook_imbalance": source.get("orderbook_imbalance"),
+                "execution_strength": source.get("execution_strength"),
+                "investor_flow_status": source.get("investor_flow_status"),
+                "program_flow_status": source.get("program_flow_status"),
+                "vi_status": source.get("vi_status"),
+                "market_alert_status": source.get("market_alert_status"),
+                "halt_status": source.get("halt_status"),
+                "missing_reason": source.get("missing_reason") or {},
+                "source": {
+                    "provider": source.get("provider"),
+                    "market": source.get("market"),
+                    "exchange": source.get("exchange"),
+                    "market_session": source.get("market_session"),
+                    "execution_data_quality": source.get("execution_data_quality"),
+                    "quote_delay_seconds": source.get("quote_delay_seconds"),
+                },
+            }
+        )
+    return {
+        "artifact_type": "chatgpt_execution_context",
+        "market": config.run.market,
+        "checkpoint": latest_checkpoint,
+        "checkpoint_timezone": _execution_checkpoint_timezone(config),
+        "generated_at": datetime.now(ZoneInfo(_execution_checkpoint_timezone(config))).isoformat(),
+        "privacy": {
+            "account_identifiers": "excluded",
+            "balances": "excluded",
+            "positions": "excluded",
+            "orders_and_fills": "excluded",
+        },
+        "tickers": tickers,
+    }
 
 
 def _build_intraday_attempt_payload(
@@ -2916,11 +3043,23 @@ def _build_intraday_attempt_payload(
 
 
 def _checkpoint_update_filename(checkpoint_label: str) -> str:
+    return f"execution_update_{_safe_checkpoint_label(checkpoint_label) or 'post_research'}.json"
+
+
+def _checkpoint_microstructure_snapshot_filename(checkpoint_label: str) -> str:
+    return f"microstructure_snapshot_{_safe_checkpoint_label(checkpoint_label) or 'post_research'}.json"
+
+
+def _checkpoint_microstructure_report_filename(checkpoint_label: str) -> str:
+    return f"microstructure_report_{_safe_checkpoint_label(checkpoint_label) or 'post_research'}.md"
+
+
+def _safe_checkpoint_label(checkpoint_label: str) -> str:
     safe_label = "".join(
         char if char.isalnum() or char in {"-", "_", "."} else "_"
         for char in str(checkpoint_label or "post_research")
     ).strip("_")
-    return f"execution_update_{safe_label or 'post_research'}.json"
+    return safe_label
 
 
 def _build_failed_execution_update_payload(

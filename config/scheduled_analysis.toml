@@ -136,7 +136,10 @@ weights = { kospi200 = 0.35, kosdaq150 = 0.15, sp500_krw = 0.30, nasdaq100_krw =
 
 [execution]
 enabled = true
-checkpoints_kst = ["01:35", "03:35", "05:05", "23:35"]
+checkpoints_local = ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "15:50"]
+checkpoint_timezone = "America/New_York"
+session_gate_enabled = true
+session_calendar = "XNYS"
 max_data_age_seconds = 180
 publish_badges = true
 publish_debug = false

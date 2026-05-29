@@ -220,6 +220,64 @@ class ExecutionContract:
 
 
 @dataclass(frozen=True)
+class MicrostructureSnapshot:
+    market: str
+    ticker: str
+    exchange: str | None = None
+    checkpoint_id: str | None = None
+    asof_utc: str | None = None
+    asof_local: str | None = None
+    last_price: float | None = None
+    session_vwap: float | None = None
+    relative_volume: float | None = None
+    spread_bps: float | None = None
+    orderbook_imbalance: float | None = None
+    execution_strength: float | None = None
+    source_latency_seconds: int | None = None
+    data_quality: str = ""
+    investor_flow: dict[str, Any] | None = None
+    program_flow: dict[str, Any] | None = None
+    vi_status: dict[str, Any] | None = None
+    market_alert_status: dict[str, Any] | None = None
+    halt_status: dict[str, Any] | None = None
+    trade_tape_summary: dict[str, Any] | None = None
+    volume_power_rank: dict[str, Any] | None = None
+    investor_flow_status: str | None = None
+    program_flow_status: str | None = None
+    missing_reason: dict[str, str] = field(default_factory=dict)
+    raw_source_names: tuple[str, ...] = field(default_factory=tuple)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "market": self.market,
+            "ticker": self.ticker,
+            "exchange": self.exchange,
+            "checkpoint_id": self.checkpoint_id,
+            "asof_utc": self.asof_utc,
+            "asof_local": self.asof_local,
+            "last_price": self.last_price,
+            "session_vwap": self.session_vwap,
+            "relative_volume": self.relative_volume,
+            "spread_bps": self.spread_bps,
+            "orderbook_imbalance": self.orderbook_imbalance,
+            "execution_strength": self.execution_strength,
+            "source_latency_seconds": self.source_latency_seconds,
+            "data_quality": self.data_quality,
+            "investor_flow": self.investor_flow,
+            "program_flow": self.program_flow,
+            "vi_status": self.vi_status,
+            "market_alert_status": self.market_alert_status,
+            "halt_status": self.halt_status,
+            "trade_tape_summary": self.trade_tape_summary,
+            "volume_power_rank": self.volume_power_rank,
+            "investor_flow_status": self.investor_flow_status,
+            "program_flow_status": self.program_flow_status,
+            "missing_reason": dict(self.missing_reason),
+            "raw_source_names": list(self.raw_source_names),
+        }
+
+
+@dataclass(frozen=True)
 class IntradayMarketSnapshot:
     ticker: str
     asof: str
@@ -238,11 +296,62 @@ class IntradayMarketSnapshot:
     provider_realtime_capable: bool = False
     market_session: str = "unknown"
     execution_data_quality: str = ""
+    market: str | None = None
+    exchange: str | None = None
+    checkpoint_id: str | None = None
+    asof_utc: str | None = None
+    asof_local: str | None = None
+    spread_bps: float | None = None
+    orderbook_imbalance: float | None = None
+    execution_strength: float | None = None
+    source_latency_seconds: int | None = None
+    data_quality: str = ""
+    microstructure_required: bool = False
+    investor_flow: dict[str, Any] | None = None
+    program_flow: dict[str, Any] | None = None
+    vi_status: dict[str, Any] | None = None
+    market_alert_status: dict[str, Any] | None = None
+    halt_status: dict[str, Any] | None = None
+    trade_tape_summary: dict[str, Any] | None = None
+    volume_power_rank: dict[str, Any] | None = None
+    investor_flow_status: str | None = None
+    program_flow_status: str | None = None
+    missing_reason: dict[str, str] = field(default_factory=dict)
+    raw_source_names: tuple[str, ...] = field(default_factory=tuple)
 
     def to_dict(self) -> dict[str, Any]:
+        microstructure = MicrostructureSnapshot(
+            market=self.market or "",
+            ticker=self.ticker,
+            exchange=self.exchange,
+            checkpoint_id=self.checkpoint_id,
+            asof_utc=self.asof_utc,
+            asof_local=self.asof_local,
+            last_price=self.last_price,
+            session_vwap=self.session_vwap,
+            relative_volume=self.relative_volume,
+            spread_bps=self.spread_bps,
+            orderbook_imbalance=self.orderbook_imbalance,
+            execution_strength=self.execution_strength,
+            source_latency_seconds=self.source_latency_seconds,
+            data_quality=self.data_quality or self.execution_data_quality,
+            investor_flow=self.investor_flow,
+            program_flow=self.program_flow,
+            vi_status=self.vi_status,
+            market_alert_status=self.market_alert_status,
+            halt_status=self.halt_status,
+            trade_tape_summary=self.trade_tape_summary,
+            volume_power_rank=self.volume_power_rank,
+            investor_flow_status=self.investor_flow_status,
+            program_flow_status=self.program_flow_status,
+            missing_reason=self.missing_reason,
+            raw_source_names=self.raw_source_names,
+        ).to_dict()
         return {
             "ticker": self.ticker,
             "asof": self.asof,
+            "asof_utc": self.asof_utc,
+            "asof_local": self.asof_local,
             "bar_timestamp": self.bar_timestamp or self.asof,
             "provider": self.provider,
             "provider_timestamp": self.provider_timestamp or self.asof,
@@ -258,6 +367,27 @@ class IntradayMarketSnapshot:
             "volume": self.volume,
             "avg20_daily_volume": self.avg20_daily_volume,
             "relative_volume": self.relative_volume,
+            "market": self.market,
+            "exchange": self.exchange,
+            "checkpoint_id": self.checkpoint_id,
+            "spread_bps": self.spread_bps,
+            "orderbook_imbalance": self.orderbook_imbalance,
+            "execution_strength": self.execution_strength,
+            "source_latency_seconds": self.source_latency_seconds,
+            "data_quality": self.data_quality or self.execution_data_quality,
+            "microstructure_required": self.microstructure_required,
+            "investor_flow": self.investor_flow,
+            "program_flow": self.program_flow,
+            "vi_status": self.vi_status,
+            "market_alert_status": self.market_alert_status,
+            "halt_status": self.halt_status,
+            "trade_tape_summary": self.trade_tape_summary,
+            "volume_power_rank": self.volume_power_rank,
+            "investor_flow_status": self.investor_flow_status,
+            "program_flow_status": self.program_flow_status,
+            "missing_reason": dict(self.missing_reason),
+            "raw_source_names": list(self.raw_source_names),
+            "microstructure": microstructure,
         }
 
 
