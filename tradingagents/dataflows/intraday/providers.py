@@ -77,6 +77,23 @@ class YFinanceIntradayProvider:
             relative_volume = float(intraday_volume / adjusted_baseline)
 
         provider_timestamp = datetime.now(last_ts.tzinfo).isoformat()
+        market = "KR" if market_timezone == "Asia/Seoul" else "US"
+        missing_reason = {}
+        halt_status = None
+        investor_flow_status = None
+        program_flow_status = None
+        microstructure_required = False
+        if market == "US":
+            missing_reason = {
+                "orderbook": "yfinance_does_not_provide_orderbook",
+                "execution_strength": "yfinance_does_not_provide_trade_tape_strength",
+                "halt_status": "yfinance_does_not_provide_halt_status",
+            }
+            halt_status = {"status": "unknown", "is_clear": False, "source": "not_provided"}
+            investor_flow_status = "not_applicable"
+            program_flow_status = "not_applicable"
+            microstructure_required = True
+
         return IntradayMarketSnapshot(
             ticker=ticker,
             asof=last_ts.isoformat(),
@@ -95,7 +112,13 @@ class YFinanceIntradayProvider:
             provider_realtime_capable=self.realtime_capable,
             market_session=_market_session(last_ts, market_timezone=market_timezone),
             checkpoint_id=checkpoint_id,
-            market="KR" if market_timezone == "Asia/Seoul" else "US",
+            market=market,
+            halt_status=halt_status,
+            investor_flow_status=investor_flow_status,
+            program_flow_status=program_flow_status,
+            missing_reason=missing_reason,
+            microstructure_required=microstructure_required,
+            raw_source_names=("yfinance.history", "yfinance.daily_history"),
         )
 
 
