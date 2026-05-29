@@ -15,6 +15,7 @@ from tradingagents.scheduled.site import build_site as build_scheduled_site
 from tradingagents.youtube.channel import YouTubeVideoReference, dedupe_video_references, filter_references_by_window
 from tradingagents.youtube.config import (
     ChannelSettings,
+    DEFAULT_CHANNEL_URLS,
     LLMSettings,
     StorageSettings,
     VerificationSettings,
@@ -748,6 +749,20 @@ class YouTubeDailyTests(unittest.TestCase):
                 config = load_youtube_config("config/youtube_daily.toml")
 
         self.assertEqual(config.storage.archive_dir, shared_archive / "youtube-archive")
+
+    def test_youtube_daily_config_includes_all_default_channels(self):
+        config = load_youtube_config("config/youtube_daily.toml")
+        expected_urls = {
+            "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
+            "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+            "https://www.youtube.com/@sosumonkey/videos",
+            "https://www.youtube.com/@815moneytalk/videos",
+            "https://www.youtube.com/@supe-tv/videos",
+        }
+
+        self.assertEqual(config.channel.name, "투자 유튜브 채널")
+        self.assertEqual(set(config.channel.urls), expected_urls)
+        self.assertEqual(set(DEFAULT_CHANNEL_URLS), expected_urls)
 
     def test_scheduled_site_build_preserves_youtube_addon_and_home_link(self):
         with tempfile.TemporaryDirectory() as tmp:

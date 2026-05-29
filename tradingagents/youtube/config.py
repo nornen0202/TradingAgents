@@ -14,6 +14,9 @@ except ModuleNotFoundError:  # pragma: no cover - Python < 3.11
 DEFAULT_CHANNEL_URLS = (
     "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
     "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+    "https://www.youtube.com/@sosumonkey/videos",
+    "https://www.youtube.com/@815moneytalk/videos",
+    "https://www.youtube.com/@supe-tv/videos",
 )
 
 
@@ -98,7 +101,7 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
 
     return YouTubeDailyConfig(
         channel=ChannelSettings(
-            name=str(channel_raw.get("name") or "경제사냥꾼"),
+            name=str(channel_raw.get("name") or "투자 유튜브 채널"),
             urls=tuple(str(item).strip() for item in (channel_raw.get("urls") or DEFAULT_CHANNEL_URLS) if str(item).strip()),
             lookback_hours=max(1, int(channel_raw.get("lookback_hours") or 24)),
             timezone=str(channel_raw.get("timezone") or "Asia/Seoul"),
