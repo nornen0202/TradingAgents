@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date, timedelta
 
 from tradingagents.dataflows.intraday.microstructure import KISMicrostructureProvider
+from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY
 
 
 class FakeKisClient:
@@ -96,6 +97,50 @@ class FakeKisClient:
         return [{"TVOL": "10000"} for _ in range(20)]
 
 
+class FakeNysKisClient(FakeKisClient):
+    def overseas_price(self, symbol, *, exchange, auth=""):
+        if exchange == "NAS":
+            return {"output": {"rsym": f"DNAS{symbol}"}}
+        if exchange != "NYS":
+            raise RuntimeError("wrong exchange")
+        return {
+            "output": {
+                "LAST": "193",
+                "HIGH": "194",
+                "LOW": "188",
+                "TVOL": "12000",
+                "TAMT": "2292000",
+                "halt_yn": "0",
+                "STRN": "130",
+            }
+        }
+
+
+class IncompleteUsKisClient(FakeKisClient):
+    def overseas_price(self, symbol, *, exchange, auth=""):
+        if exchange != "NAS":
+            raise RuntimeError("wrong exchange")
+        return {
+            "output": {
+                "LAST": "200",
+                "HIGH": "205",
+                "LOW": "195",
+                "TVOL": "10000",
+                "TAMT": "1990000",
+                "halt_yn": "0",
+            }
+        }
+
+    def overseas_asking_price(self, symbol, *, exchange, auth=""):
+        return {"output1": {}}
+
+    def overseas_quot_inquire_ccnl(self, symbol, *, exchange, today="1"):
+        return ({"output1": []}, {})
+
+    def fetch_overseas_daily_price_history(self, *, symbol, exchange_code, start_date, end_date):
+        return []
+
+
 def test_kr_microstructure_snapshot_normalizes_kis_fields():
     snapshot = KISMicrostructureProvider(client=FakeKisClient()).fetch(
         "005930.KS",
@@ -132,3 +177,33 @@ def test_us_microstructure_marks_kr_flow_fields_not_applicable():
     assert snapshot.investor_flow_status == "not_applicable"
     assert snapshot.program_flow_status == "not_applicable"
     assert snapshot.volume_power_rank["rank"] == 1
+
+
+def test_us_microstructure_keeps_probing_until_price_row_has_last_price():
+    snapshot = KISMicrostructureProvider(client=FakeNysKisClient()).fetch(
+        "CRM",
+        market_timezone="America/New_York",
+        checkpoint_id="13:00",
+    )
+
+    assert snapshot.market == "US"
+    assert snapshot.exchange == "NYS"
+    assert snapshot.last_price == 193.0
+    assert snapshot.halt_status["is_clear"] is True
+
+
+def test_us_microstructure_quality_degrades_when_required_fields_are_missing():
+    snapshot = KISMicrostructureProvider(client=IncompleteUsKisClient()).fetch(
+        "NTAP",
+        market_timezone="America/New_York",
+        checkpoint_id="13:00",
+    )
+
+    assert snapshot.execution_data_quality == DELAYED_ANALYSIS_ONLY
+    assert snapshot.data_quality == DELAYED_ANALYSIS_ONLY
+    assert snapshot.investor_flow_status == "not_applicable"
+    assert snapshot.program_flow_status == "not_applicable"
+    assert snapshot.halt_status["is_clear"] is True
+    assert snapshot.missing_reason["relative_volume"] == "avg20_daily_volume_unavailable"
+    assert snapshot.missing_reason["orderbook"] == "kis_orderbook_fields_unavailable"
+    assert snapshot.missing_reason["execution_strength"] == "kis_trade_strength_field_unavailable"

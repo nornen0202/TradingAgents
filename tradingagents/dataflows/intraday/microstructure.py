@@ -5,7 +5,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from tradingagents.dataflows.intraday_market import REALTIME_EXECUTION_READY
+from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY
 from tradingagents.portfolio.instrument_identity import resolve_identity
 from tradingagents.portfolio.kis import KisClient
 from tradingagents.schemas import IntradayMarketSnapshot
@@ -162,12 +162,28 @@ class KISMicrostructureProvider:
         if execution_strength is None:
             missing.setdefault("execution_strength", "kis_trade_strength_field_unavailable")
 
+        if orderbook_metrics["spread_bps"] is None and orderbook_metrics["orderbook_imbalance"] is None:
+            missing.setdefault("orderbook", "kis_orderbook_fields_unavailable")
+
         vi_status = _status_from_keys(price_row, ("vi",), default_name="unknown")
         market_alert_status = _status_from_keys(price_row, ("mrkt_warn", "market_alert", "trht", "halt"), default_name="unknown")
         if not vi_status.get("is_clear"):
             missing.setdefault("vi_status", "vi_status_not_confirmed_by_rest_snapshot")
         if not market_alert_status.get("is_clear"):
             missing.setdefault("market_alert_status", "market_alert_not_confirmed_by_rest_snapshot")
+
+        quality = _microstructure_quality(
+            market="KR",
+            session_vwap=session_vwap,
+            relative_volume=relative_volume,
+            spread_bps=orderbook_metrics["spread_bps"],
+            orderbook_imbalance=orderbook_metrics["orderbook_imbalance"],
+            execution_strength=execution_strength,
+            investor_flow_status="available" if investor_flow.get("rows") else "missing",
+            program_flow_status="available" if program_flow.get("rows") else "missing",
+            vi_status=vi_status,
+            market_alert_status=market_alert_status,
+        )
 
         asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
         return IntradayMarketSnapshot(
@@ -187,7 +203,7 @@ class KISMicrostructureProvider:
             quote_delay_seconds=max(0, int((now_local - asof).total_seconds())),
             provider_realtime_capable=self.realtime_capable,
             market_session=_market_session(now_local, market="KR"),
-            execution_data_quality=REALTIME_EXECUTION_READY,
+            execution_data_quality=quality,
             market="KR",
             exchange="KRX",
             checkpoint_id=checkpoint_id,
@@ -197,7 +213,7 @@ class KISMicrostructureProvider:
             orderbook_imbalance=orderbook_metrics["orderbook_imbalance"],
             execution_strength=execution_strength,
             source_latency_seconds=max(0, int((now_local - asof).total_seconds())),
-            data_quality=REALTIME_EXECUTION_READY,
+            data_quality=quality,
             microstructure_required=True,
             investor_flow=investor_flow,
             program_flow=program_flow,
@@ -227,7 +243,7 @@ class KISMicrostructureProvider:
 
         exchange, price = self._first_successful_us_price(symbol)
         raw_source_names.append("kis.overseas_price")
-        price_row = _first_record(price, "output")
+        price_row = _price_row_from_payload(price)
 
         detail = _call_optional(lambda: self._kis.overseas_price_detail(symbol, exchange=exchange), missing, "price_detail")
         detail_row = {}
@@ -317,6 +333,9 @@ class KISMicrostructureProvider:
             missing.setdefault("relative_volume", "avg20_daily_volume_unavailable")
 
         orderbook_metrics = _orderbook_metrics(orderbook_row or combined_price)
+        if orderbook_metrics["spread_bps"] is None and orderbook_metrics["orderbook_imbalance"] is None:
+            missing.setdefault("orderbook", "kis_orderbook_fields_unavailable")
+
         execution_strength = _find_float(combined_price, "strn", "STRN", "execution_strength")
         if execution_strength is None:
             execution_strength = _find_float(orderbook_row, "strn", "STRN", "execution_strength")
@@ -328,6 +347,15 @@ class KISMicrostructureProvider:
         halt_status = _status_from_keys(combined_price, ("halt", "trht", "mtyp", "stat"), default_name="normal")
         if not halt_status.get("is_clear"):
             missing.setdefault("halt_status", "halt_status_not_confirmed_by_snapshot")
+        quality = _microstructure_quality(
+            market="US",
+            session_vwap=session_vwap,
+            relative_volume=relative_volume,
+            spread_bps=orderbook_metrics["spread_bps"],
+            orderbook_imbalance=orderbook_metrics["orderbook_imbalance"],
+            execution_strength=execution_strength,
+            halt_status=halt_status,
+        )
         asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
         return IntradayMarketSnapshot(
             ticker=ticker,
@@ -346,7 +374,7 @@ class KISMicrostructureProvider:
             quote_delay_seconds=max(0, int((now_local - asof).total_seconds())),
             provider_realtime_capable=self.realtime_capable,
             market_session=_market_session(now_local, market="US"),
-            execution_data_quality=REALTIME_EXECUTION_READY,
+            execution_data_quality=quality,
             market="US",
             exchange=exchange,
             checkpoint_id=checkpoint_id,
@@ -356,7 +384,7 @@ class KISMicrostructureProvider:
             orderbook_imbalance=orderbook_metrics["orderbook_imbalance"],
             execution_strength=execution_strength,
             source_latency_seconds=max(0, int((now_local - asof).total_seconds())),
-            data_quality=REALTIME_EXECUTION_READY,
+            data_quality=quality,
             microstructure_required=True,
             halt_status=halt_status,
             trade_tape_summary=_trade_tape_summary(tape_rows),
@@ -371,9 +399,13 @@ class KISMicrostructureProvider:
         errors: list[str] = []
         for exchange in ("NAS", "NYS", "AMS"):
             try:
-                return exchange, self._kis.overseas_price(symbol, exchange=exchange)
+                payload = self._kis.overseas_price(symbol, exchange=exchange)
             except Exception as exc:
                 errors.append(f"{exchange}:{exc.__class__.__name__}")
+                continue
+            if _price_row_has_last(_price_row_from_payload(payload)):
+                return exchange, payload
+            errors.append(f"{exchange}:no_price")
         raise RuntimeError(f"KIS overseas price lookup failed for {symbol}: {', '.join(errors)}")
 
 
@@ -405,6 +437,8 @@ def render_microstructure_report(snapshot: IntradayMarketSnapshot) -> str:
         )
     if snapshot.market == "US":
         rows.append(("Halt status", _status_label(snapshot.halt_status)))
+        rows.append(("Trade tape", _summary_label(snapshot.trade_tape_summary)))
+        rows.append(("Volume power", _summary_label(snapshot.volume_power_rank)))
     missing = snapshot.missing_reason or {}
     missing_lines = "\n".join(f"- {key}: {value}" for key, value in sorted(missing.items())) or "- none"
     table = "\n".join(f"| {name} | {value} |" for name, value in rows)
@@ -448,6 +482,32 @@ def _records(payload: Any, key: str) -> list[dict[str, Any]]:
     if isinstance(value, list):
         return [item for item in value if isinstance(item, dict)]
     return []
+
+
+def _price_row_from_payload(payload: Any) -> dict[str, Any]:
+    if isinstance(payload, tuple):
+        payload = payload[0]
+    if isinstance(payload, dict):
+        row = _first_record(payload, "output")
+        if row:
+            return row
+        if _price_row_has_last(payload):
+            return payload
+    return {}
+
+
+def _price_row_has_last(row: dict[str, Any]) -> bool:
+    return (
+        _find_float(
+            row,
+            "last",
+            "LAST",
+            "ovrs_nmix_prpr",
+            "stck_prpr",
+            "base",
+        )
+        is not None
+    )
 
 
 def _first_record(payload: Any, key: str) -> dict[str, Any]:
@@ -682,6 +742,58 @@ def _status_label(value: dict[str, Any] | None) -> str:
     if not value:
         return ""
     return str(value.get("status") or "")
+
+
+def _summary_label(value: dict[str, Any] | None) -> str:
+    if not value:
+        return ""
+    status = str(value.get("status") or "").strip()
+    rank = value.get("rank")
+    rows = value.get("rows") or value.get("rows_scanned")
+    if rank not in (None, ""):
+        return f"rank {rank}"
+    if status:
+        return f"{status} ({rows} rows)" if rows not in (None, "") else status
+    if rows not in (None, ""):
+        return f"{rows} rows"
+    return str(value)
+
+
+def _microstructure_quality(
+    *,
+    market: str,
+    session_vwap: float | None,
+    relative_volume: float | None,
+    spread_bps: float | None,
+    orderbook_imbalance: float | None,
+    execution_strength: float | None,
+    investor_flow_status: str | None = None,
+    program_flow_status: str | None = None,
+    vi_status: dict[str, Any] | None = None,
+    market_alert_status: dict[str, Any] | None = None,
+    halt_status: dict[str, Any] | None = None,
+) -> str:
+    missing_required = (
+        session_vwap is None
+        or relative_volume is None
+        or (spread_bps is None and orderbook_imbalance is None)
+        or execution_strength is None
+    )
+    if market == "KR":
+        missing_required = (
+            missing_required
+            or str(investor_flow_status or "").lower() != "available"
+            or str(program_flow_status or "").lower() != "available"
+            or not _status_is_clear(vi_status)
+            or not _status_is_clear(market_alert_status)
+        )
+    if market == "US":
+        missing_required = missing_required or not _status_is_clear(halt_status)
+    return DELAYED_ANALYSIS_ONLY if missing_required else ""
+
+
+def _status_is_clear(value: dict[str, Any] | None) -> bool:
+    return bool(value and value.get("is_clear") is True)
 
 
 def _bar_asof(rows: list[dict[str, Any]], *, fallback: datetime, timezone_name: str) -> datetime:
