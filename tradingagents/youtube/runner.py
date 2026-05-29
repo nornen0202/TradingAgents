@@ -20,8 +20,9 @@ from tradingagents.youtube.channel import (
     list_channel_video_references,
 )
 from tradingagents.youtube.config import YouTubeDailyConfig, load_youtube_config, with_youtube_overrides
+from tradingagents.youtube.research import public_evidence_summary
 from tradingagents.youtube.site import build_youtube_site
-from tradingagents.youtube.verifier import VerifiedVideoReport, verify_youtube_bundle
+from tradingagents.youtube.verifier import RESEARCH_PIPELINE_VERSION, VerifiedVideoReport, verify_youtube_bundle
 from tradingagents.youtube_report import build_youtube_video_report
 
 
@@ -177,6 +178,9 @@ def execute_youtube_run(
             _write_text(video_dir / "final_report.md", verified.final_report_markdown)
             _write_json(video_dir / "metadata.json", _metadata_payload(bundle))
             _write_json(video_dir / "verification.json", verified.verification)
+            _write_json(video_dir / "research_plan.json", verified.verification.get("research_plan") or {})
+            _write_json(video_dir / "evidence.json", verified.verification.get("evidence") or {})
+            _write_json(video_dir / "claim_verification.json", verified.verification.get("claim_verification") or {})
             public_summary = _public_summary(bundle, verified)
             _write_json(video_dir / "public_summary.json", public_summary)
             video_summaries.append(
@@ -248,7 +252,8 @@ def execute_youtube_run(
         "source_policy": {
             "raw_transcript_archived": False,
             "raw_transcript_published": False,
-            "public_artifacts": ["html_report", "public_summary_json"],
+            "research_pipeline_version": RESEARCH_PIPELINE_VERSION,
+            "public_artifacts": ["html_report", "public_summary_json", "evidence_excerpts"],
         },
     }
     _write_json(run_dir / "youtube_run.json", manifest)
@@ -289,6 +294,9 @@ def execute_single_video(
     _write_text(output, markdown)
     if verified is not None:
         _write_json(output.with_name(output.stem + "_verification.json"), verified.verification)
+        _write_json(output.with_name(output.stem + "_research_plan.json"), verified.verification.get("research_plan") or {})
+        _write_json(output.with_name(output.stem + "_evidence.json"), verified.verification.get("evidence") or {})
+        _write_json(output.with_name(output.stem + "_claim_verification.json"), verified.verification.get("claim_verification") or {})
         _write_json(output.with_name(output.stem + "_public_summary.json"), _public_summary(bundle, verified))
     return output
 
@@ -382,6 +390,9 @@ def _manifest_video_item(
         "metadata_path": _relative_artifact_path(video_dir / "metadata.json", run_dir),
         "draft_report_path": _relative_artifact_path(video_dir / "draft_report.md", run_dir),
         "verification_path": _relative_artifact_path(video_dir / "verification.json", run_dir),
+        "research_plan_path": _relative_artifact_path(video_dir / "research_plan.json", run_dir),
+        "evidence_path": _relative_artifact_path(video_dir / "evidence.json", run_dir),
+        "claim_verification_path": _relative_artifact_path(video_dir / "claim_verification.json", run_dir),
         "final_report_path": _relative_artifact_path(video_dir / "final_report.md", run_dir),
         "public_summary_path": _relative_artifact_path(video_dir / "public_summary.json", run_dir),
     }
@@ -418,8 +429,20 @@ def _copy_reusable_video_artifacts(
             continue
         if not _archived_summary_has_usable_transcript(source_video_dir, summary):
             continue
-        required = ("metadata.json", "draft_report.md", "verification.json", "final_report.md", "public_summary.json")
+        required = (
+            "metadata.json",
+            "draft_report.md",
+            "verification.json",
+            "research_plan.json",
+            "evidence.json",
+            "claim_verification.json",
+            "final_report.md",
+            "public_summary.json",
+        )
         if not all((source_video_dir / name).is_file() for name in required):
+            continue
+        verification = _read_json_if_exists(source_video_dir / "verification.json")
+        if not _archived_verification_is_current(verification):
             continue
         if target_video_dir.exists():
             shutil.rmtree(target_video_dir)
@@ -448,6 +471,16 @@ def _archived_summary_has_usable_transcript(video_dir: Path, summary: dict[str, 
         if status and status != "available":
             return False
     return False
+
+
+def _archived_verification_is_current(verification: dict[str, Any] | None) -> bool:
+    if not isinstance(verification, dict):
+        return False
+    try:
+        version = int(verification.get("version") or 0)
+    except (TypeError, ValueError):
+        return False
+    return version >= RESEARCH_PIPELINE_VERSION and isinstance(verification.get("evidence"), dict)
 
 
 def _read_json_if_exists(path: Path) -> dict[str, Any] | None:
@@ -491,6 +524,8 @@ def _metadata_payload(bundle: YouTubeVideoBundle) -> dict[str, Any]:
 
 def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport) -> dict[str, Any]:
     verification = verified.verification
+    claim_verification = verification.get("claim_verification") if isinstance(verification.get("claim_verification"), dict) else {}
+    evidence = verification.get("evidence") if isinstance(verification.get("evidence"), dict) else {}
     entities = []
     for item in verification.get("entity_results") or []:
         if not isinstance(item, dict):
@@ -509,8 +544,23 @@ def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport) -
                 else None,
             }
         )
+    claims = []
+    for item in claim_verification.get("claims") or []:
+        if not isinstance(item, dict):
+            continue
+        claims.append(
+            {
+                "claim_id": item.get("claim_id"),
+                "claim_text": _short_text(item.get("claim_text"), 260),
+                "status": item.get("status"),
+                "confidence": item.get("confidence"),
+                "supporting_evidence_ids": list(item.get("supporting_evidence_ids") or [])[:4],
+                "manual_check_required": item.get("manual_check_required"),
+                "investor_implication": _short_text(item.get("investor_implication"), 260),
+            }
+        )
     return {
-        "version": 1,
+        "version": RESEARCH_PIPELINE_VERSION,
         "video_id": bundle.metadata.video_id,
         "title": bundle.metadata.title,
         "url": bundle.metadata.url,
@@ -522,7 +572,14 @@ def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport) -
         "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
         "generated_at": verification.get("generated_at"),
         "llm_status": verification.get("llm_status"),
+        "research_status": verification.get("research_status"),
+        "claim_verification_status": verification.get("claim_verification_status"),
+        "research_pipeline_version": verification.get("version"),
+        "evidence_count": evidence.get("evidence_count"),
+        "claim_status_summary": _claim_status_summary(claims),
+        "claims": claims[:12],
         "entities": entities,
+        "evidence": public_evidence_summary(evidence, per_claim_limit=2)[:12],
         "source_policy": verification.get("source_policy"),
     }
 
@@ -564,6 +621,14 @@ def _short_text(value: Any, limit: int) -> str:
     if len(text) <= limit:
         return text
     return text[: max(0, limit - 3)].rstrip() + "..."
+
+
+def _claim_status_summary(claims: list[dict[str, Any]]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for claim in claims:
+        status = str(claim.get("status") or "unknown")
+        counts[status] = counts.get(status, 0) + 1
+    return counts
 
 
 def _write_text(path: Path, text: str) -> None:

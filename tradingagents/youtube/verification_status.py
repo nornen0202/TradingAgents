@@ -1,0 +1,8 @@
+VERIFIED = "verified"
+SUPPORTED = "supported"
+PARTIALLY_SUPPORTED = "partially_supported"
+CONTRADICTED = "contradicted"
+UNVERIFIED = "unverified"
+STALE = "stale"
+ASR_UNCERTAIN = "asr_uncertain"
+LLM_FAILED = "llm_failed"

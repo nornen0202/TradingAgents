@@ -12,14 +12,25 @@ import yfinance as yf
 from tradingagents.dataflows.youtube_video import YouTubeVideoBundle
 from tradingagents.llm_clients import create_llm_client
 from tradingagents.youtube.config import LLMSettings, VerificationSettings
+from tradingagents.youtube.research import (
+    collect_research_evidence,
+    fallback_research_plan,
+    public_evidence_summary,
+)
+from tradingagents.youtube.verification_status import (
+    ASR_UNCERTAIN,
+    CONTRADICTED,
+    LLM_FAILED,
+    PARTIALLY_SUPPORTED,
+    STALE,
+    SUPPORTED,
+    UNVERIFIED,
+    VERIFIED,
+)
 from tradingagents.youtube_report import EntitySummary, summarize_financial_entities
 
 
-VERIFIED = "verified"
-CONTRADICTED = "contradicted"
-UNVERIFIED = "unverified"
-STALE = "stale"
-LLM_FAILED = "llm_failed"
+RESEARCH_PIPELINE_VERSION = 2
 
 
 @dataclass(frozen=True)
@@ -47,6 +58,7 @@ class VerifiedVideoReport:
 
 MarketDataProvider = Callable[[str], MarketSnapshot]
 ExternalDataProvider = Callable[[str, datetime], dict[str, Any]]
+ResearchEvidenceProvider = Callable[[Mapping[str, Any], Mapping[str, Any], datetime], dict[str, Any]]
 LLMFactory = Callable[[LLMSettings], Any | None]
 
 
@@ -58,6 +70,7 @@ def verify_youtube_bundle(
     verification_settings: VerificationSettings,
     market_data_provider: MarketDataProvider | None = None,
     external_data_provider: ExternalDataProvider | None = None,
+    research_evidence_provider: ResearchEvidenceProvider | None = None,
     llm_factory: LLMFactory | None = None,
     generated_at: datetime | None = None,
 ) -> VerifiedVideoReport:
@@ -80,6 +93,7 @@ def verify_youtube_bundle(
                 draft_report=draft_report,
                 entity_summaries=entity_summaries,
                 max_claims=verification_settings.max_claims_per_video,
+                max_transcript_chars=verification_settings.max_transcript_chars_for_llm,
             )
         except Exception as exc:
             llm_status = LLM_FAILED
@@ -92,12 +106,47 @@ def verify_youtube_bundle(
         external_data_provider=external_data_provider,
         generated_at=generated_at,
     )
+    research_plan, research_status = _build_research_plan(
+        llm,
+        bundle=bundle,
+        draft_report=draft_report,
+        extracted_claims=extracted_claims,
+        verification_settings=verification_settings,
+    )
+    evidence_bundle = _collect_research_bundle(
+        research_plan,
+        extracted_claims=extracted_claims,
+        generated_at=generated_at,
+        verification_settings=verification_settings,
+        research_evidence_provider=research_evidence_provider,
+    )
+    claim_verification, claim_verification_status = _build_claim_verification(
+        llm,
+        bundle=bundle,
+        extracted_claims=extracted_claims,
+        market_evidence=market_evidence,
+        research_plan=research_plan,
+        evidence_bundle=evidence_bundle,
+        verification_settings=verification_settings,
+    )
+    if (
+        verification_settings.strict_llm
+        and llm_status == "success"
+        and verification_settings.research_enabled
+        and (research_status == LLM_FAILED or claim_verification_status == LLM_FAILED)
+    ):
+        llm_status = LLM_FAILED
     verification = _build_verification_payload(
         bundle=bundle,
         extracted_claims=extracted_claims,
         market_evidence=market_evidence,
+        research_plan=research_plan,
+        evidence_bundle=evidence_bundle,
+        claim_verification=claim_verification,
         generated_at=generated_at,
         llm_status=llm_status,
+        research_status=research_status,
+        claim_verification_status=claim_verification_status,
     )
 
     final_report = ""
@@ -218,7 +267,7 @@ def render_fallback_final_report(
         "",
         "## 핵심 결론",
         "",
-        "- 이 리포트는 영상 자막 기반 초안과 공개 시장 데이터로 자동 생성한 검증 결과입니다.",
+        "- 이 리포트는 영상 자막/ASR 기반 주장, 공개 시장 데이터, 웹/뉴스/공시 근거 묶음으로 자동 생성한 검증 결과입니다.",
         "- LLM 정제 단계가 실패했거나 사용할 수 없어 deterministic 형식으로 작성했습니다.",
         "- 영상 속 주장과 검증된 사실은 구분해서 읽어야 하며, 매수/매도 지시가 아닙니다.",
         "",
@@ -226,11 +275,51 @@ def render_fallback_final_report(
         "",
         f"- 전체 상태: `{verification.get('status') or verification.get('llm_status') or 'unknown'}`",
         f"- LLM 상태: `{verification.get('llm_status') or 'unknown'}`",
+        f"- 리서치 상태: `{verification.get('research_status') or 'unknown'}`",
+        f"- 주장 검증 상태: `{verification.get('claim_verification_status') or 'unknown'}`",
         f"- 영상 URL: {bundle.metadata.url}",
         "",
-        "## 종목별 공개 데이터 확인",
+        "## 주장별 검증",
         "",
     ]
+    claim_items = (verification.get("claim_verification") or {}).get("claims") if isinstance(verification.get("claim_verification"), Mapping) else []
+    if claim_items:
+        for claim in claim_items[:10]:
+            if not isinstance(claim, Mapping):
+                continue
+            lines.extend(
+                [
+                    f"### {claim.get('claim_id') or '-'}",
+                    f"- 영상 주장: {claim.get('claim_text') or '-'}",
+                    f"- 상태: `{claim.get('status') or UNVERIFIED}`",
+                    f"- 확인된 사실: {_join_text(claim.get('verified_facts') or [])}",
+                    f"- 반론/한계: {_join_text(claim.get('counterpoints') or [])}",
+                    f"- 투자 시사점: {claim.get('investor_implication') or '-'}",
+                    "",
+                ]
+            )
+    else:
+        lines.append("- 주장별 검증 결과가 없습니다.")
+    lines.extend(
+        [
+            "## 공개 근거",
+            "",
+        ]
+    )
+    public_evidence = public_evidence_summary(verification.get("evidence") or {})
+    if public_evidence:
+        for item in public_evidence[:8]:
+            url = item.get("source_url") or ""
+            lines.append(f"- [{item.get('title') or item.get('publisher') or 'source'}]({url}) - {item.get('excerpt') or '-'}")
+    else:
+        lines.append("- 공개 가능한 외부 근거를 충분히 확보하지 못했습니다.")
+    lines.extend(
+        [
+            "",
+        "## 종목별 공개 데이터 확인",
+        "",
+        ]
+    )
     entity_results = verification.get("entity_results") if isinstance(verification.get("entity_results"), list) else []
     if not entity_results:
         lines.append("- 식별된 종목 또는 검증 가능한 시장 데이터가 없습니다.")
@@ -279,11 +368,13 @@ def _extract_claims_with_llm(
     draft_report: str,
     entity_summaries: tuple[EntitySummary, ...],
     max_claims: int,
+    max_transcript_chars: int,
 ) -> dict[str, Any]:
     payload = {
         "video": _public_metadata(bundle),
         "deterministic_entities": [_entity_to_dict(item) for item in entity_summaries],
         "draft_report": draft_report[:12000],
+        "transcript_for_claim_extraction": _transcript_for_llm(bundle, max_chars=max_transcript_chars),
         "caption_source": {
             "status": bundle.transcript_status,
             "source": getattr(bundle.transcript, "source", None),
@@ -293,10 +384,12 @@ def _extract_claims_with_llm(
     prompt = (
         "You are TradingAgents' YouTube claim extractor.\n"
         "Return exactly one JSON object and nothing else.\n"
-        "Extract investor-relevant claims from the report without adding new facts.\n"
+        "Extract investor-relevant claims from the video transcript and deterministic draft without adding new facts.\n"
+        "Prefer the transcript over the draft when they differ. Preserve concrete numbers, dates, policy names, "
+        "market moves, and cited external sources as separate numeric_claims or verification_items.\n"
         "Schema: {\"overall_thesis\":\"...\",\"entities\":[{\"ticker\":\"...\",\"name\":\"...\","
         "\"claims\":[\"...\"],\"numeric_claims\":[\"...\"],\"risks\":[\"...\"],"
-        "\"watch_items\":[\"...\"]}],\"verification_items\":[\"...\"]}.\n"
+        "\"watch_items\":[\"...\"]}],\"verification_items\":[\"...\"],\"asr_suspect_terms\":[\"...\"]}.\n"
         f"Limit total claims per video to {max_claims}. Write Korean text where possible.\n\n"
         f"Context JSON:\n{json.dumps(payload, ensure_ascii=False)}"
     )
@@ -320,15 +413,169 @@ def _write_final_report_with_llm(
     }
     prompt = (
         "You are the final investor-facing writer for TradingAgents.\n"
-        "Write a Korean Markdown report for investors using only the supplied payload.\n"
-        "Separate video claims from verified facts. Do not issue buy/sell instructions.\n"
-        "Mark unavailable Bloomberg/Morningstar/closed-source claims as unverified/manual check required.\n"
-        "Do not include raw transcript text. Keep excerpts short.\n\n"
+        "Write a Korean Markdown report for investors from transcript-derived video claims, "
+        "host-collected web/news/market/disclosure evidence, and claim-verification results.\n"
+        "Use the evidence bundle aggressively, but do not invent facts that are not supported by the supplied evidence. "
+        "Separate '영상 주장' from '확인된 사실/근거'. Include source links for the strongest evidence items. "
+        "Discuss bullish logic, counterarguments, data-quality limits, near-term checkpoints, invalidation conditions, "
+        "and concrete observation items that an investor can monitor. Do not issue buy/sell instructions.\n"
+        "Mark unavailable Bloomberg/Morningstar/closed-source claims as unverified/manual check required. "
+        "Do not include raw transcript text. Keep evidence excerpts short.\n\n"
         f"Payload JSON:\n{json.dumps(payload, ensure_ascii=False)}"
     )
     response = llm.invoke(prompt)
     text = str(_normalize_content(getattr(response, "content", response)) or "").strip()
     return text if text.startswith("#") else f"# 투자자용 YouTube 검증 리포트\n\n{text}".strip() + "\n"
+
+
+def _build_research_plan(
+    llm: Any | None,
+    *,
+    bundle: YouTubeVideoBundle,
+    draft_report: str,
+    extracted_claims: Mapping[str, Any],
+    verification_settings: VerificationSettings,
+) -> tuple[dict[str, Any], str]:
+    fallback = fallback_research_plan(
+        extracted_claims,
+        video_title=bundle.metadata.title,
+        max_queries=verification_settings.max_research_queries,
+    )
+    if not verification_settings.research_enabled:
+        fallback["status"] = "disabled"
+        return fallback, "disabled"
+    if llm is None:
+        return fallback, LLM_FAILED
+    payload = {
+        "video": _public_metadata(bundle),
+        "claims": extracted_claims,
+        "draft_report_excerpt": draft_report[:8000],
+        "transcript_private_excerpt": _transcript_for_llm(
+            bundle,
+            max_chars=verification_settings.max_transcript_chars_for_llm,
+        ),
+        "limits": {
+            "max_research_queries": verification_settings.max_research_queries,
+            "max_claims": verification_settings.max_claims_per_video,
+        },
+    }
+    prompt = (
+        "You are TradingAgents' investor research planner for a YouTube video.\n"
+        "Return exactly one JSON object and nothing else.\n"
+        "Use the transcript-derived claims to create a concrete verification plan. "
+        "For each material claim, assign a stable claim_id such as C1, C2, ... and propose Korean/English web, news, "
+        "market-data, disclosure, and official-source queries that would verify or refute it. "
+        "Prioritize official sources, exchange/regulator/company IR, and reputable news. "
+        "Flag ASR-uncertain terms and closed-source-only claims.\n"
+        "Schema: {\"version\":1,\"claims\":[{\"claim_id\":\"C1\",\"entity\":\"...\",\"ticker\":\"...\","
+        "\"claim_text\":\"...\",\"claim_type\":\"market|policy|company|macro|numeric|source_citation|asr_uncertain\","
+        "\"time_window\":\"...\",\"queries\":[{\"query\":\"...\",\"language\":\"ko|en\","
+        "\"source_priority\":[\"official\",\"news\",\"market\"],\"reason\":\"...\"}],"
+        "\"required_evidence\":[\"...\"],\"asr_suspect_terms\":[\"...\"]}],"
+        "\"global_queries\":[{\"query\":\"...\",\"language\":\"ko\",\"reason\":\"...\"}],"
+        "\"closed_source_claims\":[\"...\"],\"asr_suspect_terms\":[\"...\"]}.\n"
+        f"Keep total queries at or below {verification_settings.max_research_queries}.\n\n"
+        f"Payload JSON:\n{json.dumps(payload, ensure_ascii=False)}"
+    )
+    try:
+        response = llm.invoke(prompt)
+        parsed = _extract_json_object(_normalize_content(getattr(response, "content", response)))
+        plan = _normalize_research_plan(parsed, fallback=fallback, max_queries=verification_settings.max_research_queries)
+        plan["status"] = "success"
+        return plan, "success"
+    except Exception as exc:
+        fallback["status"] = LLM_FAILED
+        fallback["llm_error"] = str(exc)
+        return fallback, LLM_FAILED
+
+
+def _collect_research_bundle(
+    research_plan: Mapping[str, Any],
+    *,
+    extracted_claims: Mapping[str, Any],
+    generated_at: datetime,
+    verification_settings: VerificationSettings,
+    research_evidence_provider: ResearchEvidenceProvider | None,
+) -> dict[str, Any]:
+    if not verification_settings.research_enabled:
+        return {
+            "version": 1,
+            "status": "disabled",
+            "generated_at": generated_at.isoformat(),
+            "query_count": 0,
+            "evidence_count": 0,
+            "items": [],
+            "errors": [],
+            "source_policy": {"raw_transcript_included": False, "excerpts_only": True},
+        }
+    if research_evidence_provider is not None:
+        return dict(research_evidence_provider(research_plan, extracted_claims, generated_at))
+    return collect_research_evidence(
+        research_plan,
+        generated_at=generated_at,
+        max_queries=verification_settings.max_research_queries,
+        max_evidence_items=verification_settings.max_evidence_items,
+        max_evidence_per_claim=verification_settings.max_evidence_per_claim,
+        fetch_web_pages=verification_settings.fetch_web_pages,
+        max_web_pages=verification_settings.max_web_pages,
+    )
+
+
+def _build_claim_verification(
+    llm: Any | None,
+    *,
+    bundle: YouTubeVideoBundle,
+    extracted_claims: Mapping[str, Any],
+    market_evidence: list[dict[str, Any]],
+    research_plan: Mapping[str, Any],
+    evidence_bundle: Mapping[str, Any],
+    verification_settings: VerificationSettings,
+) -> tuple[dict[str, Any], str]:
+    fallback = _fallback_claim_verification(
+        extracted_claims=extracted_claims,
+        research_plan=research_plan,
+        evidence_bundle=evidence_bundle,
+        market_evidence=market_evidence,
+        bundle=bundle,
+    )
+    if not verification_settings.research_enabled:
+        fallback["status"] = "disabled"
+        return fallback, "disabled"
+    if llm is None:
+        return fallback, LLM_FAILED
+    payload = {
+        "video": _public_metadata(bundle),
+        "claims": extracted_claims,
+        "research_plan": research_plan,
+        "evidence": _evidence_for_llm(evidence_bundle, limit=verification_settings.max_evidence_items),
+        "market_evidence": market_evidence,
+        "caption_source": {
+            "status": bundle.transcript_status,
+            "source": getattr(bundle.transcript, "source", None),
+            "language": getattr(bundle.transcript, "language_name", None),
+        },
+    }
+    prompt = (
+        "You are TradingAgents' evidence arbiter for an investor-facing YouTube report.\n"
+        "Return exactly one JSON object and nothing else.\n"
+        "For every planned claim, compare the video claim against the supplied web/news/market/disclosure evidence. "
+        "Do not use unsupported memory. Mark missing or weak evidence as unverified. "
+        "Use statuses: supported, partially_supported, contradicted, unverified, stale, asr_uncertain.\n"
+        "Schema: {\"version\":1,\"overall_status\":\"supported|partially_supported|contradicted|unverified|stale|asr_uncertain\","
+        "\"claims\":[{\"claim_id\":\"C1\",\"claim_text\":\"...\",\"status\":\"...\","
+        "\"confidence\":0.0,\"supporting_evidence_ids\":[\"E1\"],\"contradicting_evidence_ids\":[\"E2\"],"
+        "\"verified_facts\":[\"...\"],\"counterpoints\":[\"...\"],\"investor_implication\":\"...\","
+        "\"manual_check_required\":false,\"notes\":\"...\"}],"
+        "\"data_quality_notes\":[\"...\"],\"investor_checkpoints\":[\"...\"]}.\n\n"
+        f"Payload JSON:\n{json.dumps(payload, ensure_ascii=False)}"
+    )
+    try:
+        response = llm.invoke(prompt)
+        parsed = _extract_json_object(_normalize_content(getattr(response, "content", response)))
+        return _normalize_claim_verification(parsed, fallback=fallback), "success"
+    except Exception as exc:
+        fallback["llm_error"] = str(exc)
+        return fallback, LLM_FAILED
 
 
 def _collect_market_evidence(
@@ -461,19 +708,31 @@ def _build_verification_payload(
     bundle: YouTubeVideoBundle,
     extracted_claims: Mapping[str, Any],
     market_evidence: list[dict[str, Any]],
+    research_plan: Mapping[str, Any],
+    evidence_bundle: Mapping[str, Any],
+    claim_verification: Mapping[str, Any],
     generated_at: datetime,
     llm_status: str,
+    research_status: str,
+    claim_verification_status: str,
 ) -> dict[str, Any]:
     return {
-        "version": 1,
+        "version": RESEARCH_PIPELINE_VERSION,
         "status": llm_status if llm_status == LLM_FAILED else "verified_with_caveats",
         "llm_status": llm_status,
+        "research_status": research_status,
+        "claim_verification_status": claim_verification_status,
         "generated_at": generated_at.isoformat(),
         "video": _public_metadata(bundle),
         "claims": extracted_claims,
+        "research_plan": research_plan,
+        "evidence": evidence_bundle,
+        "claim_verification": claim_verification,
         "entity_results": market_evidence,
         "source_policy": {
             "raw_transcript_published": False,
+            "raw_transcript_in_evidence": False,
+            "research_pipeline_version": RESEARCH_PIPELINE_VERSION,
             "closed_source_claims": "unverified_external_source",
             "auto_caption_warning": bundle.transcript is not None and bundle.transcript.source == "automatic",
         },
@@ -483,6 +742,23 @@ def _build_verification_payload(
 def _aggregate_status(verification: Mapping[str, Any], *, llm_status: str) -> str:
     if llm_status == LLM_FAILED:
         return LLM_FAILED
+    claim_statuses = {
+        str(item.get("status") or "")
+        for item in ((verification.get("claim_verification") or {}).get("claims") or [])
+        if isinstance(item, Mapping)
+    }
+    if CONTRADICTED in claim_statuses:
+        return CONTRADICTED
+    if STALE in claim_statuses:
+        return STALE
+    if ASR_UNCERTAIN in claim_statuses:
+        return ASR_UNCERTAIN
+    if UNVERIFIED in claim_statuses:
+        return UNVERIFIED
+    if PARTIALLY_SUPPORTED in claim_statuses:
+        return PARTIALLY_SUPPORTED
+    if SUPPORTED in claim_statuses and claim_statuses <= {SUPPORTED}:
+        return VERIFIED
     statuses = {
         str(item.get("status") or "")
         for item in (verification.get("entity_results") or [])
@@ -517,6 +793,213 @@ def _claims_from_entities(entity_summaries: tuple[EntitySummary, ...], max_claim
         "overall_thesis": "영상 자막 기반 deterministic 추출 결과입니다.",
         "entities": entities,
         "verification_items": [],
+        "asr_suspect_terms": [],
+    }
+
+
+def _normalize_research_plan(
+    payload: Mapping[str, Any],
+    *,
+    fallback: dict[str, Any],
+    max_queries: int,
+) -> dict[str, Any]:
+    claims = payload.get("claims")
+    if not isinstance(claims, list):
+        return fallback
+    normalized_claims: list[dict[str, Any]] = []
+    query_count = 0
+    for index, claim in enumerate(claims, 1):
+        if not isinstance(claim, Mapping):
+            continue
+        queries: list[dict[str, Any]] = []
+        for query_item in claim.get("queries") or []:
+            if query_count >= max_queries:
+                break
+            if isinstance(query_item, Mapping):
+                query = str(query_item.get("query") or "").strip()
+                language = str(query_item.get("language") or "ko").strip()
+                reason = str(query_item.get("reason") or "").strip()
+                priority = _text_list(query_item.get("source_priority"))
+            else:
+                query = str(query_item or "").strip()
+                language = "ko"
+                reason = ""
+                priority = []
+            if not query:
+                continue
+            queries.append(
+                {
+                    "query": query,
+                    "language": language,
+                    "source_priority": priority,
+                    "reason": reason,
+                }
+            )
+            query_count += 1
+        normalized_claims.append(
+            {
+                "claim_id": str(claim.get("claim_id") or f"C{index}").strip(),
+                "entity": str(claim.get("entity") or "").strip(),
+                "ticker": str(claim.get("ticker") or "").strip().upper(),
+                "claim_text": str(claim.get("claim_text") or "").strip(),
+                "claim_type": str(claim.get("claim_type") or "company_or_macro").strip(),
+                "time_window": str(claim.get("time_window") or "").strip(),
+                "queries": queries,
+                "required_evidence": _text_list(claim.get("required_evidence")),
+                "asr_suspect_terms": _text_list(claim.get("asr_suspect_terms")),
+            }
+        )
+    if not normalized_claims:
+        return fallback
+    global_queries: list[dict[str, Any]] = []
+    for query_item in payload.get("global_queries") or []:
+        if query_count >= max_queries:
+            break
+        if isinstance(query_item, Mapping):
+            query = str(query_item.get("query") or "").strip()
+            language = str(query_item.get("language") or "ko").strip()
+            reason = str(query_item.get("reason") or "").strip()
+        else:
+            query = str(query_item or "").strip()
+            language = "ko"
+            reason = ""
+        if not query:
+            continue
+        global_queries.append({"query": query, "language": language, "reason": reason})
+        query_count += 1
+    return {
+        "version": 1,
+        "status": "success",
+        "claims": normalized_claims,
+        "global_queries": global_queries,
+        "closed_source_claims": _text_list(payload.get("closed_source_claims")),
+        "asr_suspect_terms": _text_list(payload.get("asr_suspect_terms")),
+    }
+
+
+def _fallback_claim_verification(
+    *,
+    extracted_claims: Mapping[str, Any],
+    research_plan: Mapping[str, Any],
+    evidence_bundle: Mapping[str, Any],
+    market_evidence: list[dict[str, Any]],
+    bundle: YouTubeVideoBundle,
+) -> dict[str, Any]:
+    evidence_items = [item for item in (evidence_bundle.get("items") or []) if isinstance(item, Mapping)]
+    evidence_by_claim: dict[str, list[Mapping[str, Any]]] = {}
+    for item in evidence_items:
+        evidence_by_claim.setdefault(str(item.get("claim_id") or "GLOBAL"), []).append(item)
+    entity_status_by_claim_text = _entity_status_lookup(market_evidence)
+    claims: list[dict[str, Any]] = []
+    for index, planned in enumerate(research_plan.get("claims") or [], 1):
+        if not isinstance(planned, Mapping):
+            continue
+        claim_id = str(planned.get("claim_id") or f"C{index}")
+        claim_text = str(planned.get("claim_text") or "")
+        evidence_for_claim = evidence_by_claim.get(claim_id, [])
+        status = UNVERIFIED
+        confidence = 0.25
+        if evidence_for_claim:
+            status = PARTIALLY_SUPPORTED
+            confidence = 0.55
+        for token, entity_status in entity_status_by_claim_text.items():
+            if token and token in claim_text:
+                if entity_status == CONTRADICTED:
+                    status = CONTRADICTED
+                    confidence = 0.75
+                elif entity_status == STALE and status not in {CONTRADICTED}:
+                    status = STALE
+                    confidence = 0.45
+                elif entity_status == VERIFIED and status == UNVERIFIED:
+                    status = PARTIALLY_SUPPORTED
+                    confidence = 0.50
+        if _has_asr_warning(bundle, research_plan, planned):
+            status = ASR_UNCERTAIN if status == UNVERIFIED else status
+        claims.append(
+            {
+                "claim_id": claim_id,
+                "claim_text": claim_text,
+                "status": status,
+                "confidence": confidence,
+                "supporting_evidence_ids": [str(item.get("evidence_id") or "") for item in evidence_for_claim[:3] if item.get("evidence_id")],
+                "contradicting_evidence_ids": [],
+                "verified_facts": [
+                    _shorten(str(item.get("title") or item.get("excerpt") or ""), 180)
+                    for item in evidence_for_claim[:2]
+                    if str(item.get("title") or item.get("excerpt") or "").strip()
+                ],
+                "counterpoints": [] if evidence_for_claim else ["자동 조사에서 직접 확인 가능한 외부 근거를 충분히 찾지 못했습니다."],
+                "investor_implication": "관련 뉴스/공시/가격 데이터를 추가 관찰해야 합니다.",
+                "manual_check_required": status in {UNVERIFIED, ASR_UNCERTAIN},
+                "notes": "LLM 주장 판정 실패 시 deterministic fallback으로 산출했습니다.",
+            }
+        )
+    if not claims:
+        for entity in extracted_claims.get("entities") or []:
+            if not isinstance(entity, Mapping):
+                continue
+            for claim_text in (entity.get("claims") or [])[:2]:
+                claims.append(
+                    {
+                        "claim_id": f"C{len(claims) + 1}",
+                        "claim_text": str(claim_text),
+                        "status": UNVERIFIED,
+                        "confidence": 0.2,
+                        "supporting_evidence_ids": [],
+                        "contradicting_evidence_ids": [],
+                        "verified_facts": [],
+                        "counterpoints": ["리서치 플랜이 충분히 생성되지 않았습니다."],
+                        "investor_implication": "수동 확인이 필요합니다.",
+                        "manual_check_required": True,
+                        "notes": "fallback",
+                    }
+                )
+    return {
+        "version": 1,
+        "overall_status": _overall_claim_status([item["status"] for item in claims]),
+        "claims": claims,
+        "data_quality_notes": _data_quality_notes(evidence_bundle, bundle),
+        "investor_checkpoints": _fallback_investor_checkpoints(extracted_claims),
+    }
+
+
+def _normalize_claim_verification(payload: Mapping[str, Any], *, fallback: dict[str, Any]) -> dict[str, Any]:
+    raw_claims = payload.get("claims")
+    if not isinstance(raw_claims, list):
+        return fallback
+    claims: list[dict[str, Any]] = []
+    for index, claim in enumerate(raw_claims, 1):
+        if not isinstance(claim, Mapping):
+            continue
+        status = str(claim.get("status") or UNVERIFIED).strip()
+        if status not in {SUPPORTED, PARTIALLY_SUPPORTED, CONTRADICTED, UNVERIFIED, STALE, ASR_UNCERTAIN}:
+            status = UNVERIFIED
+        claims.append(
+            {
+                "claim_id": str(claim.get("claim_id") or f"C{index}"),
+                "claim_text": str(claim.get("claim_text") or ""),
+                "status": status,
+                "confidence": _bounded_confidence(claim.get("confidence")),
+                "supporting_evidence_ids": _text_list(claim.get("supporting_evidence_ids")),
+                "contradicting_evidence_ids": _text_list(claim.get("contradicting_evidence_ids")),
+                "verified_facts": _text_list(claim.get("verified_facts")),
+                "counterpoints": _text_list(claim.get("counterpoints")),
+                "investor_implication": str(claim.get("investor_implication") or ""),
+                "manual_check_required": bool(claim.get("manual_check_required", status in {UNVERIFIED, ASR_UNCERTAIN})),
+                "notes": str(claim.get("notes") or ""),
+            }
+        )
+    if not claims:
+        return fallback
+    overall = str(payload.get("overall_status") or _overall_claim_status([item["status"] for item in claims]))
+    if overall not in {SUPPORTED, PARTIALLY_SUPPORTED, CONTRADICTED, UNVERIFIED, STALE, ASR_UNCERTAIN}:
+        overall = _overall_claim_status([item["status"] for item in claims])
+    return {
+        "version": 1,
+        "overall_status": overall,
+        "claims": claims,
+        "data_quality_notes": _text_list(payload.get("data_quality_notes")),
+        "investor_checkpoints": _text_list(payload.get("investor_checkpoints")),
     }
 
 
@@ -544,6 +1027,7 @@ def _normalize_claims(payload: Mapping[str, Any], *, fallback: dict[str, Any]) -
         "overall_thesis": str(payload.get("overall_thesis") or fallback.get("overall_thesis") or ""),
         "entities": normalized_entities or fallback.get("entities") or [],
         "verification_items": _text_list(payload.get("verification_items")),
+        "asr_suspect_terms": _text_list(payload.get("asr_suspect_terms")),
     }
 
 
@@ -552,6 +1036,129 @@ def _claim_entities(claims: Mapping[str, Any]) -> list[dict[str, Any]]:
     if not isinstance(entities, list):
         return []
     return [dict(item) for item in entities if isinstance(item, Mapping)]
+
+
+def _evidence_for_llm(evidence_bundle: Mapping[str, Any], *, limit: int) -> dict[str, Any]:
+    items = []
+    for item in evidence_bundle.get("items") or []:
+        if not isinstance(item, Mapping):
+            continue
+        items.append(
+            {
+                "evidence_id": item.get("evidence_id"),
+                "claim_id": item.get("claim_id"),
+                "title": _shorten(str(item.get("title") or ""), 220),
+                "publisher": item.get("publisher"),
+                "source_url": item.get("source_url"),
+                "published_at": item.get("published_at"),
+                "source_tier": item.get("source_tier"),
+                "excerpt": _shorten(str(item.get("excerpt") or ""), 700),
+            }
+        )
+        if len(items) >= limit:
+            break
+    return {
+        "status": evidence_bundle.get("status"),
+        "generated_at": evidence_bundle.get("generated_at"),
+        "evidence_count": evidence_bundle.get("evidence_count"),
+        "items": items,
+        "errors": list(evidence_bundle.get("errors") or [])[:5],
+    }
+
+
+def _transcript_for_llm(bundle: YouTubeVideoBundle, *, max_chars: int) -> str:
+    transcript = bundle.transcript
+    if transcript is None:
+        return ""
+    segments = getattr(transcript, "segments", None) or ()
+    if segments:
+        lines: list[str] = []
+        total = 0
+        for segment in segments:
+            start = getattr(segment, "start", None)
+            text = getattr(segment, "text", "")
+            prefix = f"[{float(start):.1f}s] " if isinstance(start, (int, float)) else ""
+            line = prefix + str(text).strip()
+            if not line.strip():
+                continue
+            if total + len(line) > max_chars:
+                break
+            lines.append(line)
+            total += len(line)
+        if lines:
+            return "\n".join(lines)
+    return str(transcript.raw_text or "")[:max_chars]
+
+
+def _entity_status_lookup(market_evidence: list[dict[str, Any]]) -> dict[str, str]:
+    lookup: dict[str, str] = {}
+    for item in market_evidence:
+        name = str(item.get("name") or "").strip()
+        ticker = str(item.get("ticker") or "").strip()
+        status = str(item.get("status") or "")
+        for token in (name, ticker):
+            if token:
+                lookup[token] = status
+    return lookup
+
+
+def _has_asr_warning(
+    bundle: YouTubeVideoBundle,
+    research_plan: Mapping[str, Any],
+    planned_claim: Mapping[str, Any],
+) -> bool:
+    if bundle.transcript is None:
+        return True
+    if getattr(bundle.transcript, "source", None) == "local_asr":
+        return bool(planned_claim.get("asr_suspect_terms") or research_plan.get("asr_suspect_terms"))
+    return False
+
+
+def _overall_claim_status(statuses: list[str]) -> str:
+    status_set = {str(item) for item in statuses if str(item)}
+    if not status_set:
+        return UNVERIFIED
+    if CONTRADICTED in status_set:
+        return CONTRADICTED
+    if STALE in status_set:
+        return STALE
+    if ASR_UNCERTAIN in status_set:
+        return ASR_UNCERTAIN
+    if UNVERIFIED in status_set:
+        return UNVERIFIED
+    if PARTIALLY_SUPPORTED in status_set:
+        return PARTIALLY_SUPPORTED
+    if SUPPORTED in status_set:
+        return SUPPORTED
+    return UNVERIFIED
+
+
+def _data_quality_notes(evidence_bundle: Mapping[str, Any], bundle: YouTubeVideoBundle) -> list[str]:
+    notes: list[str] = []
+    if evidence_bundle.get("status") != VERIFIED:
+        notes.append("웹/뉴스/공시 근거가 충분히 확보되지 않은 주장이 있습니다.")
+    if bundle.transcript is not None and getattr(bundle.transcript, "source", None) in {"automatic", "local_asr"}:
+        notes.append("자동자막/ASR 기반 분석이므로 고유명사와 숫자는 수동 확인이 필요할 수 있습니다.")
+    if evidence_bundle.get("errors"):
+        notes.append("일부 검색/페이지 수집 요청이 실패했습니다.")
+    return notes
+
+
+def _fallback_investor_checkpoints(extracted_claims: Mapping[str, Any]) -> list[str]:
+    checkpoints: list[str] = []
+    for entity in extracted_claims.get("entities") or []:
+        if not isinstance(entity, Mapping):
+            continue
+        checkpoints.extend(_text_list(entity.get("watch_items")))
+    return checkpoints[:8] or ["영상 주장과 관련된 가격, 공시, 정책 뉴스의 후속 업데이트를 확인합니다."]
+
+
+def _bounded_confidence(value: Any) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    return max(0.0, min(1.0, number))
 
 
 def _entity_to_dict(summary: EntitySummary) -> dict[str, Any]:
