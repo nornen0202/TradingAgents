@@ -56,7 +56,6 @@ jobs:
       NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
       NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       YOUTUBE_COOKIES_TXT: ${{ secrets.YOUTUBE_COOKIES_TXT }}
       YOUTUBE_COOKIES_TXT_B64: ${{ secrets.YOUTUBE_COOKIES_TXT_B64 }}
       YOUTUBE_PROXY: ${{ secrets.YOUTUBE_PROXY }}
@@ -66,8 +65,12 @@ jobs:
       YOUTUBE_GVS_PO_TOKEN: ${{ secrets.YOUTUBE_GVS_PO_TOKEN }}
       YOUTUBE_PLAYER_CLIENTS: ${{ vars.YOUTUBE_PLAYER_CLIENTS }}
       TRADINGAGENTS_YOUTUBE_ASR_FALLBACK: "1"
-      TRADINGAGENTS_YOUTUBE_ASR_TIMEOUT_SECONDS: "900"
+      TRADINGAGENTS_YOUTUBE_ASR_MODEL: "base"
+      TRADINGAGENTS_YOUTUBE_ASR_DEVICE: "cpu"
+      TRADINGAGENTS_YOUTUBE_ASR_COMPUTE_TYPE: "int8"
+      TRADINGAGENTS_YOUTUBE_ASR_BEAM_SIZE: "1"
       TRADINGAGENTS_YOUTUBE_MIN_TRANSCRIPT_CHARS: "120"
+      HF_HUB_DISABLE_SYMLINKS_WARNING: "1"
     steps:
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -112,7 +115,7 @@ jobs:
           from pathlib import Path
 
           payload = {}
-          for name in ("ALPHA_VANTAGE_API_KEY", "NAVER_CLIENT_ID", "NAVER_CLIENT_SECRET", "OPENDART_API_KEY", "OPENAI_API_KEY"):
+          for name in ("ALPHA_VANTAGE_API_KEY", "NAVER_CLIENT_ID", "NAVER_CLIENT_SECRET", "OPENDART_API_KEY"):
               value = os.environ.get(name, "").strip()
               if value:
                   payload[name] = value

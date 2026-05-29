@@ -215,7 +215,7 @@ class YouTubeVideoReportTests(unittest.TestCase):
         self.assertEqual(segments[0].text, "종전 합의 임박.")
         self.assertEqual(segments[1].start_seconds, 7.0)
 
-    def test_asr_transcript_fallback_uses_downloaded_audio_and_openai(self):
+    def test_asr_transcript_fallback_uses_downloaded_audio_and_local_whisper(self):
         class FakeYoutubeDL:
             def __init__(self, options):
                 self.options = options
@@ -231,20 +231,26 @@ class YouTubeVideoReportTests(unittest.TestCase):
                 path.write_bytes(b"audio")
                 return {"requested_downloads": [{"filepath": str(path)}]}
 
-        class FakeAudioTranscriptions:
-            def create(self, **_kwargs):
-                segment = types.SimpleNamespace(text="종전 합의 임박", start=0.0, end=3.0)
-                return types.SimpleNamespace(text="종전 합의 임박. 미군 공군 기지 공격.", segments=[segment])
+        class FakeWhisperModel:
+            def __init__(self, model_name, **kwargs):
+                self.model_name = model_name
+                self.kwargs = kwargs
 
-        class FakeOpenAI:
-            def __init__(self, **_kwargs):
-                self.audio = types.SimpleNamespace(transcriptions=FakeAudioTranscriptions())
+            def transcribe(self, _path, **_kwargs):
+                segments = [
+                    types.SimpleNamespace(text="종전 합의 임박.", start=0.0, end=3.0),
+                    types.SimpleNamespace(text="미군 공군 기지 공격.", start=3.0, end=7.0),
+                ]
+                return iter(segments), types.SimpleNamespace(language="ko")
 
-        fake_openai_module = types.SimpleNamespace(OpenAI=FakeOpenAI)
+        fake_whisper_module = types.SimpleNamespace(WhisperModel=FakeWhisperModel)
         fake_ytdlp = types.SimpleNamespace(YoutubeDL=FakeYoutubeDL)
 
-        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key", "TRADINGAGENTS_YOUTUBE_ASR_FALLBACK": "1"}), patch.dict(
-            sys.modules, {"openai": fake_openai_module}
+        with patch.dict(
+            os.environ,
+            {"TRADINGAGENTS_YOUTUBE_ASR_FALLBACK": "1", "TRADINGAGENTS_YOUTUBE_ASR_MODEL": "base"},
+        ), patch.dict(
+            sys.modules, {"faster_whisper": fake_whisper_module}
         ), patch("tradingagents.dataflows.youtube_video._import_ytdlp", return_value=fake_ytdlp):
             transcript = _fetch_asr_transcript(
                 url="https://www.youtube.com/watch?v=KWDrgODHL60",
@@ -254,7 +260,8 @@ class YouTubeVideoReportTests(unittest.TestCase):
             )
 
         self.assertIsNotNone(transcript)
-        self.assertEqual(transcript.source, "asr")
+        self.assertEqual(transcript.source, "local_asr")
+        self.assertEqual(transcript.track_ext, "base")
         self.assertIn("미군 공군 기지", transcript.raw_text)
 
     def test_summarize_financial_entities_extracts_video_claims(self):
@@ -315,6 +322,47 @@ class YouTubeVideoReportTests(unittest.TestCase):
         self.assertIn("Oracle (ORCL)", report)
         self.assertIn("Salesforce (CRM)", report)
         self.assertIn("5,530억 달러", report)
+
+    def test_build_report_uses_generic_summary_for_macro_video_without_tickers(self):
+        transcript = YouTubeTranscript(
+            language="ko",
+            language_name="Local ASR",
+            source="local_asr",
+            track_ext="base",
+            segments=(),
+            raw_text=(
+                "미국과 이란 충돌로 유가가 5% 움직였고 한국 시장 외국인 수급이 흔들렸다고 말한다. "
+                "호르무즈 해협 통항 재개와 PCE 물가 발표, 브렌트유 가격을 체크해야 한다고 말한다."
+            ),
+        )
+        bundle = YouTubeVideoBundle(
+            metadata=YouTubeVideoMetadata(
+                video_id="KWDrgODHL60",
+                url="https://www.youtube.com/watch?v=KWDrgODHL60",
+                title="이번 미국vs이란 폭격전이, 한국 시장에 끼치는 영향",
+                channel="경제사냥꾼",
+                channel_id="UC7usMJDHmtbs_oegmzQKKMA",
+                upload_date="20260528",
+                published_at=datetime(2026, 5, 28, tzinfo=timezone.utc),
+                duration_seconds=888,
+                view_count=34058,
+                like_count=None,
+                description="",
+                thumbnail_url="",
+                tags=(),
+                categories=(),
+            ),
+            transcript=transcript,
+            transcript_status="available",
+            available_manual_caption_languages=(),
+            available_auto_caption_languages=("ko",),
+        )
+
+        report = build_youtube_video_report(bundle, generated_at=datetime(2026, 5, 29, 8, 0, 0))
+
+        self.assertIn("개별 종목보다 시장/매크로 이슈", report)
+        self.assertIn("local_asr, Local ASR, base", report)
+        self.assertNotIn("AI 인프라/기업용 소프트웨어", report)
 
 
 if __name__ == "__main__":

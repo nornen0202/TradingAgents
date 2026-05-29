@@ -68,7 +68,7 @@ class CodexAppServerSession:
     ) -> None:
         self.codex_binary = codex_binary
         self.request_timeout = float(request_timeout or 0)
-        self.workspace_dir = str(Path(workspace_dir).expanduser())
+        self.workspace_dir = str(Path(workspace_dir).expanduser().resolve())
         self.cleanup_threads = cleanup_threads
         self.client_name = client_name
         self.client_title = client_title
@@ -122,11 +122,10 @@ class CodexAppServerSession:
             self._initialize()
 
     def _seed_codex_home(self, codex_home: Path) -> None:
-        source_home_value = os.environ.get("CODEX_HOME")
-        if not source_home_value:
+        source_home = self._source_codex_home()
+        if source_home is None:
             return
 
-        source_home = Path(source_home_value).expanduser()
         try:
             if source_home.resolve() == codex_home.resolve():
                 return
@@ -149,6 +148,14 @@ class CodexAppServerSession:
                         f"Failed to seed Codex auth from '{source}' to isolated CODEX_HOME "
                         f"'{codex_home}': {exc}"
                     ) from exc
+
+    @staticmethod
+    def _source_codex_home() -> Path | None:
+        source_home_value = os.environ.get("CODEX_HOME")
+        if source_home_value:
+            return Path(source_home_value).expanduser()
+        default_home = Path.home() / ".codex"
+        return default_home if default_home.is_dir() else None
 
     def close(self) -> None:
         with self._lock:

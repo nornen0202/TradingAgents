@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 import json
+import math
 import re
 from typing import Any, Callable, Mapping
 
@@ -128,7 +129,7 @@ def fetch_market_snapshot(ticker: str) -> MarketSnapshot:
         instrument = yf.Ticker(symbol)
         info = instrument.info or {}
         fast_info = getattr(instrument, "fast_info", {}) or {}
-        return MarketSnapshot(
+        snapshot = MarketSnapshot(
             ticker=symbol,
             as_of=datetime.now(timezone.utc).isoformat(),
             current_price=_first_float(fast_info, info, ("last_price", "lastPrice", "currentPrice", "regularMarketPrice")),
@@ -140,6 +141,26 @@ def fetch_market_snapshot(ticker: str) -> MarketSnapshot:
             average_target_price=_first_float(info, fast_info, ("targetMeanPrice", "averageAnalystRating")),
             status=VERIFIED,
         )
+        if not any(
+            value is not None
+            for value in (
+                snapshot.current_price,
+                snapshot.market_cap,
+                snapshot.forward_pe,
+                snapshot.trailing_pe,
+                snapshot.fifty_two_week_high,
+                snapshot.fifty_two_week_low,
+                snapshot.average_target_price,
+            )
+        ):
+            return MarketSnapshot(
+                ticker=symbol,
+                as_of=snapshot.as_of,
+                source=snapshot.source,
+                status=UNVERIFIED,
+                error="no_usable_market_fields",
+            )
+        return snapshot
     except Exception as exc:
         return MarketSnapshot(
             ticker=symbol,
@@ -319,17 +340,19 @@ def _collect_market_evidence(
 ) -> list[dict[str, Any]]:
     results: list[dict[str, Any]] = []
     for entity in _claim_entities(claims):
-        ticker = str(entity.get("ticker") or "").strip().upper()
-        if not ticker or ticker in {"N/A", "UNKNOWN", "-"}:
+        lookup_symbol = _resolve_claim_market_symbol(entity)
+        if lookup_symbol is None:
             continue
+        ticker, is_macro = lookup_symbol
         snapshot = market_data_provider(ticker)
-        external_context = external_data_provider(ticker, generated_at)
+        external_context = _macro_external_context(ticker) if is_macro else external_data_provider(ticker, generated_at)
         entity_claims = [str(item) for item in (entity.get("claims") or [])]
         numeric_claims = [str(item) for item in (entity.get("numeric_claims") or [])]
         notes, status = _verify_claims(entity_claims + numeric_claims, snapshot, external_context)
         results.append(
             {
                 "ticker": ticker,
+                "original_ticker": str(entity.get("ticker") or "").strip().upper(),
                 "name": str(entity.get("name") or ticker),
                 "claims": entity_claims[:5],
                 "numeric_claims": numeric_claims[:5],
@@ -342,6 +365,36 @@ def _collect_market_evidence(
             }
         )
     return results
+
+
+def _resolve_claim_market_symbol(entity: Mapping[str, Any]) -> tuple[str, bool] | None:
+    raw_ticker = str(entity.get("ticker") or "").strip().upper()
+    name = str(entity.get("name") or "").strip()
+    normalized_name = name.lower()
+    placeholder_tickers = {"", "N/A", "UNKNOWN", "-", "MARKET", "INDEX", "OIL", "BRENT", "CRUDE"}
+
+    if "코스피" in name or "kospi" in normalized_name or "한국 증시" in name:
+        return "^KS11", True
+    if "브렌트" in name or "brent" in normalized_name:
+        return "BZ=F", True
+    if "유가" in name or "원유" in name or "crude" in normalized_name:
+        return "CL=F", True
+    if "니케이" in name or "nikkei" in normalized_name:
+        return "^N225", True
+    if "항셍" in name or "hang seng" in normalized_name:
+        return "^HSI", True
+
+    if raw_ticker in placeholder_tickers:
+        return None
+    return raw_ticker, False
+
+
+def _macro_external_context(ticker: str) -> dict[str, Any]:
+    return {
+        "status": VERIFIED,
+        "source": "yfinance_macro_snapshot",
+        "note": f"{ticker} is treated as a market/index/commodity symbol; company news and disclosure lookup is skipped.",
+    }
 
 
 def _verify_claims(
@@ -373,7 +426,9 @@ def _verify_claims(
         if status == VERIFIED:
             status = UNVERIFIED
     if not notes:
-        notes.append("공개 시장 스냅샷은 조회됐지만 모든 영상 주장을 완전 검증한 것은 아닙니다.")
+        notes.append("공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.")
+        if status == VERIFIED:
+            status = UNVERIFIED
     return notes, status
 
 
@@ -581,7 +636,8 @@ def _parse_number(value: Any) -> float | None:
     try:
         if value in (None, ""):
             return None
-        return float(str(value).replace(",", ""))
+        number = float(str(value).replace(",", ""))
+        return None if math.isnan(number) or math.isinf(number) else number
     except (TypeError, ValueError):
         return None
 
