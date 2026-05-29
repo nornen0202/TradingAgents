@@ -193,7 +193,10 @@ def test_us_microstructure_keeps_probing_until_price_row_has_last_price():
 
 
 def test_us_microstructure_quality_degrades_when_required_fields_are_missing():
-    snapshot = KISMicrostructureProvider(client=IncompleteUsKisClient()).fetch(
+    snapshot = KISMicrostructureProvider(
+        client=IncompleteUsKisClient(),
+        us_daily_volume_fallback=lambda _symbol: None,
+    ).fetch(
         "NTAP",
         market_timezone="America/New_York",
         checkpoint_id="13:00",
@@ -207,3 +210,20 @@ def test_us_microstructure_quality_degrades_when_required_fields_are_missing():
     assert snapshot.missing_reason["relative_volume"] == "avg20_daily_volume_unavailable"
     assert snapshot.missing_reason["orderbook"] == "kis_orderbook_fields_unavailable"
     assert snapshot.missing_reason["execution_strength"] == "kis_trade_strength_field_unavailable"
+
+
+def test_us_microstructure_uses_yfinance_daily_volume_fallback_for_rvol():
+    snapshot = KISMicrostructureProvider(
+        client=IncompleteUsKisClient(),
+        us_daily_volume_fallback=lambda _symbol: 10000.0,
+    ).fetch(
+        "NTAP",
+        market_timezone="America/New_York",
+        checkpoint_id="13:00",
+    )
+
+    assert snapshot.relative_volume is not None
+    assert snapshot.avg20_daily_volume == 10000.0
+    assert "relative_volume" not in snapshot.missing_reason
+    assert "yfinance.daily_history" in snapshot.raw_source_names
+    assert snapshot.execution_data_quality == DELAYED_ANALYSIS_ONLY
