@@ -47,6 +47,13 @@ class VerificationSettings:
     publish_unverified: bool
     max_claims_per_video: int
     strict_llm: bool
+    research_enabled: bool = True
+    max_research_queries: int = 10
+    max_evidence_items: int = 24
+    max_evidence_per_claim: int = 3
+    fetch_web_pages: bool = True
+    max_web_pages: int = 4
+    max_transcript_chars_for_llm: int = 24000
 
 
 @dataclass(frozen=True)
@@ -117,6 +124,13 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
             publish_unverified=bool(verification_raw.get("publish_unverified", True)),
             max_claims_per_video=max(1, int(verification_raw.get("max_claims_per_video") or 12)),
             strict_llm=bool(verification_raw.get("strict_llm", True)),
+            research_enabled=bool(verification_raw.get("research_enabled", True)),
+            max_research_queries=max(1, int(verification_raw.get("max_research_queries") or 10)),
+            max_evidence_items=max(1, int(verification_raw.get("max_evidence_items") or 24)),
+            max_evidence_per_claim=max(1, int(verification_raw.get("max_evidence_per_claim") or 3)),
+            fetch_web_pages=bool(verification_raw.get("fetch_web_pages", True)),
+            max_web_pages=max(0, int(verification_raw.get("max_web_pages") or 4)),
+            max_transcript_chars_for_llm=max(1000, int(verification_raw.get("max_transcript_chars_for_llm") or 24000)),
         ),
         storage=StorageSettings(archive_dir=archive_dir, site_dir=site_dir),
         site=YouTubeSiteSettings(

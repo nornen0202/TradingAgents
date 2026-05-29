@@ -24,6 +24,13 @@ mode = "external_full"
 publish_unverified = true
 max_claims_per_video = 12
 strict_llm = true
+research_enabled = true
+max_research_queries = 10
+max_evidence_items = 24
+max_evidence_per_claim = 3
+fetch_web_pages = true
+max_web_pages = 4
+max_transcript_chars_for_llm = 24000
 
 [storage]
 archive_dir = "./.runtime/youtube-archive"

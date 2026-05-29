@@ -22,6 +22,7 @@ from tradingagents.youtube.config import (
     YouTubeSiteSettings,
     load_youtube_config,
 )
+from tradingagents.youtube.research import collect_research_evidence, fallback_research_plan
 from tradingagents.youtube.runner import execute_youtube_run
 from tradingagents.youtube.site import build_youtube_site
 from tradingagents.youtube.verifier import (
@@ -77,6 +78,67 @@ class YouTubeDailyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             _extract_json_object("no json here")
 
+    def test_research_evidence_collector_uses_planned_queries_and_excerpts_only(self):
+        generated_at = datetime(2026, 5, 29, 13, 0, tzinfo=timezone.utc)
+        plan = {
+            "claims": [
+                {
+                    "claim_id": "C1",
+                    "claim_text": "코스피가 정책 리스크로 하락했다",
+                    "queries": [{"query": "코스피 정책 리스크 하락"}],
+                }
+            ]
+        }
+
+        evidence = collect_research_evidence(
+            plan,
+            generated_at=generated_at,
+            max_queries=4,
+            max_evidence_items=4,
+            max_evidence_per_claim=2,
+            fetch_web_pages=True,
+            max_web_pages=1,
+            search_provider=lambda query, _limit, _generated_at: [
+                {
+                    "title": "코스피 정책 뉴스",
+                    "source_url": "https://news.example/article",
+                    "publisher": "Example News",
+                    "excerpt": f"{query} 관련 기사 요약",
+                    "source_tier": "news",
+                }
+            ],
+            url_fetcher=lambda _url, _limit: {
+                "publisher": "Example News",
+                "excerpt": "추가 본문 근거. RAW_TRANSCRIPT_FULL_SHOULD_NOT_APPEAR",
+                "source_tier": "news",
+            },
+        )
+
+        self.assertEqual(evidence["status"], VERIFIED)
+        self.assertEqual(evidence["items"][0]["claim_id"], "C1")
+        self.assertIn("코스피 정책 뉴스", evidence["items"][0]["title"])
+        self.assertFalse(evidence["source_policy"]["raw_transcript_included"])
+
+    def test_fallback_research_plan_builds_claim_queries(self):
+        plan = fallback_research_plan(
+            {
+                "entities": [
+                    {
+                        "ticker": "005930.KS",
+                        "name": "삼성전자",
+                        "claims": ["반도체 정책 수혜를 받을 수 있다"],
+                        "numeric_claims": ["52주 고점 90000원"],
+                    }
+                ]
+            },
+            video_title="삼성전자 영상",
+            max_queries=2,
+        )
+
+        self.assertEqual(plan["status"], "fallback")
+        self.assertEqual(len(plan["claims"]), 2)
+        self.assertIn("삼성전자", plan["claims"][0]["queries"][0]["query"])
+
     def test_verification_statuses_include_contradicted_unverified_stale(self):
         fresh = datetime.now(timezone.utc).isoformat()
         stale = (datetime.now(timezone.utc) - timedelta(days=5)).isoformat()
@@ -113,6 +175,52 @@ class YouTubeDailyTests(unittest.TestCase):
         llm = FakeLLM(
             [
                 '```json\n{"overall_thesis":"오라클 확인","entities":[{"ticker":"ORCL","name":"Oracle","claims":["52주 고점은 200달러 부근"],"numeric_claims":["52주 고점 200"],"risks":[],"watch_items":["실적"]}],"verification_items":[]}\n```',
+                json.dumps(
+                    {
+                        "version": 1,
+                        "claims": [
+                            {
+                                "claim_id": "C1",
+                                "entity": "Oracle",
+                                "ticker": "ORCL",
+                                "claim_text": "52주 고점은 200달러 부근",
+                                "claim_type": "numeric",
+                                "time_window": "최근",
+                                "queries": [{"query": "Oracle 52 week high 200", "language": "en", "source_priority": ["market"], "reason": "price verification"}],
+                                "required_evidence": ["market_data"],
+                                "asr_suspect_terms": [],
+                            }
+                        ],
+                        "global_queries": [],
+                        "closed_source_claims": [],
+                        "asr_suspect_terms": [],
+                    },
+                    ensure_ascii=False,
+                ),
+                json.dumps(
+                    {
+                        "version": 1,
+                        "overall_status": "supported",
+                        "claims": [
+                            {
+                                "claim_id": "C1",
+                                "claim_text": "52주 고점은 200달러 부근",
+                                "status": "supported",
+                                "confidence": 0.91,
+                                "supporting_evidence_ids": ["E1"],
+                                "contradicting_evidence_ids": [],
+                                "verified_facts": ["공개 데이터와 대체로 일치"],
+                                "counterpoints": [],
+                                "investor_implication": "실적 전 고점 재돌파 여부 확인",
+                                "manual_check_required": False,
+                                "notes": "",
+                            }
+                        ],
+                        "data_quality_notes": [],
+                        "investor_checkpoints": ["실적"],
+                    },
+                    ensure_ascii=False,
+                ),
                 "# 최종 투자자 리포트\n\n- 영상 주장과 공개 데이터를 분리했습니다.",
             ]
         )
@@ -121,9 +229,30 @@ class YouTubeDailyTests(unittest.TestCase):
             bundle,
             draft,
             llm_settings=_llm_settings(),
-            verification_settings=_verification_settings(),
+            verification_settings=_verification_settings(research_enabled=True),
             market_data_provider=lambda ticker: MarketSnapshot(ticker, datetime.now(timezone.utc).isoformat(), fifty_two_week_high=198.0),
             external_data_provider=lambda _ticker, _generated_at: {"status": VERIFIED},
+            research_evidence_provider=lambda _plan, _claims, _generated_at: {
+                "version": 1,
+                "status": VERIFIED,
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+                "query_count": 1,
+                "evidence_count": 1,
+                "items": [
+                    {
+                        "evidence_id": "E1",
+                        "claim_id": "C1",
+                        "title": "ORCL market data",
+                        "source_url": "https://finance.yahoo.com/quote/ORCL",
+                        "publisher": "Yahoo Finance",
+                        "published_at": None,
+                        "source_tier": "market_or_news",
+                        "excerpt": "52-week high near 198",
+                    }
+                ],
+                "errors": [],
+                "source_policy": {"raw_transcript_included": False},
+            },
             llm_factory=lambda _settings: llm,
             generated_at=datetime(2026, 5, 28, 22, 0, tzinfo=timezone.utc),
         )
@@ -131,6 +260,9 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertEqual(verified.status, VERIFIED)
         self.assertIn("최종 투자자 리포트", verified.final_report_markdown)
         self.assertEqual(verified.verification["claims"]["entities"][0]["ticker"], "ORCL")
+        self.assertEqual(verified.verification["version"], 2)
+        self.assertEqual(verified.verification["claim_verification"]["claims"][0]["status"], "supported")
+        self.assertEqual(verified.verification["evidence"]["evidence_count"], 1)
 
     def test_verify_bundle_marks_llm_failed_when_codex_json_is_broken(self):
         bundle = _fake_bundle("u2BEOgr8ze8")
@@ -227,10 +359,15 @@ class YouTubeDailyTests(unittest.TestCase):
             )
 
             run_manifest = next(archive_dir.glob("runs/*/*/youtube_run.json"))
+            first_video_dir = next(archive_dir.glob("runs/*/youtube_*/videos/video000001"))
             site_index = site_dir / "youtube" / "index.html"
 
             self.assertEqual(manifest["summary"]["total_videos"], 3)
+            self.assertEqual(manifest["source_policy"]["research_pipeline_version"], 2)
             self.assertTrue(run_manifest.is_file())
+            self.assertTrue((first_video_dir / "research_plan.json").is_file())
+            self.assertTrue((first_video_dir / "evidence.json").is_file())
+            self.assertTrue((first_video_dir / "claim_verification.json").is_file())
             self.assertTrue(site_index.is_file())
             self.assertIn("Video", site_index.read_text(encoding="utf-8"))
 
@@ -321,7 +458,13 @@ class YouTubeDailyTests(unittest.TestCase):
             for filename, text in {
                 "metadata.json": "{}",
                 "draft_report.md": "# Draft\n",
-                "verification.json": json.dumps({"status": VERIFIED}, ensure_ascii=False),
+                "verification.json": json.dumps(
+                    {"version": 2, "status": VERIFIED, "evidence": {"evidence_count": 1}},
+                    ensure_ascii=False,
+                ),
+                "research_plan.json": json.dumps({"version": 1, "claims": []}, ensure_ascii=False),
+                "evidence.json": json.dumps({"version": 1, "items": []}, ensure_ascii=False),
+                "claim_verification.json": json.dumps({"version": 1, "claims": []}, ensure_ascii=False),
                 "final_report.md": "# Reused final\n",
                 "public_summary.json": json.dumps(
                     {"video_id": video_id, "status": VERIFIED, "transcript_status": "available", "transcript_chars": 240},
@@ -553,6 +696,9 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("actions/upload-pages-artifact", workflow)
         self.assertIn("tradingagents.youtube.runner", workflow)
         self.assertIn("config/scheduled_analysis_korea.toml", workflow)
+        config_text = Path("config/youtube_daily.toml").read_text(encoding="utf-8")
+        self.assertIn("research_enabled = true", config_text)
+        self.assertIn("max_research_queries", config_text)
         self.assertIn("YOUTUBE_COOKIES_FILE", workflow)
         self.assertIn("YOUTUBE_PROXY", workflow)
         self.assertIn("YOUTUBE_VISITOR_DATA", workflow)
@@ -710,12 +856,19 @@ def _llm_settings() -> LLMSettings:
     )
 
 
-def _verification_settings() -> VerificationSettings:
+def _verification_settings(*, research_enabled: bool = False) -> VerificationSettings:
     return VerificationSettings(
         mode="external_full",
         publish_unverified=True,
         max_claims_per_video=8,
         strict_llm=True,
+        research_enabled=research_enabled,
+        max_research_queries=4,
+        max_evidence_items=6,
+        max_evidence_per_claim=2,
+        fetch_web_pages=False,
+        max_web_pages=0,
+        max_transcript_chars_for_llm=12000,
     )
 
 
