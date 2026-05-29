@@ -29,6 +29,11 @@ on:
         required: false
         default: "50"
         type: string
+      max_entries_per_url:
+        description: "Maximum channel tab entries to inspect per URL"
+        required: false
+        default: "25"
+        type: string
       max_parallel_videos:
         description: "Maximum videos to analyze concurrently"
         required: false
@@ -347,6 +352,7 @@ jobs:
 
           lookback_hours = "${{ github.event.inputs.lookback_hours }}".strip() or "24"
           max_videos = "${{ github.event.inputs.max_videos }}".strip() or "50"
+          max_entries_per_url = "${{ github.event.inputs.max_entries_per_url }}".strip() or "25"
           max_parallel_videos = "${{ github.event.inputs.max_parallel_videos }}".strip() or "4"
           channel_urls = "${{ github.event.inputs.channel_urls }}".strip()
           publish = "${{ github.event.inputs.publish }}".strip().lower()
@@ -362,6 +368,8 @@ jobs:
               lookback_hours,
               "--max-videos",
               max_videos,
+              "--max-entries-per-url",
+              max_entries_per_url,
               "--max-parallel-videos",
               max_parallel_videos,
               "--site-dir",

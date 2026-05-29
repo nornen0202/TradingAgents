@@ -47,6 +47,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--lookback-hours", type=int, help="Override channel lookback window in hours.")
     parser.add_argument("--channel-urls", help="Comma-separated channel tab URLs override.")
     parser.add_argument("--max-videos", type=int, help="Maximum videos to process.")
+    parser.add_argument("--max-entries-per-url", type=int, help="Maximum flat-list entries to inspect per channel tab URL.")
     parser.add_argument("--max-parallel-videos", type=int, help="Maximum YouTube videos to process concurrently.")
     parser.add_argument("--publish", dest="publish", action="store_true", default=True, help="Build public site after run.")
     parser.add_argument("--no-publish", dest="publish", action="store_false", help="Skip public site build after run.")
@@ -58,6 +59,7 @@ def main(argv: list[str] | None = None) -> int:
         site_dir=args.site_dir,
         lookback_hours=args.lookback_hours,
         max_videos=args.max_videos,
+        max_entries_per_url=args.max_entries_per_url,
         max_parallel_videos=args.max_parallel_videos,
         channel_urls=_split_csv(args.channel_urls),
     )
@@ -102,7 +104,7 @@ def execute_youtube_run(
     fetcher = video_fetcher or fetch_youtube_video
     verifier = bundle_verifier or _default_bundle_verifier(config)
 
-    raw_references = lister(config.channel.urls, max(config.channel.max_videos * 3, config.channel.max_videos))
+    raw_references = lister(config.channel.urls, max(1, int(config.channel.max_entries_per_url or 1)))
     references = filter_references_by_window(
         dedupe_video_references(raw_references),
         now=started_at,
@@ -142,6 +144,7 @@ def execute_youtube_run(
         "channel_urls": list(config.channel.urls),
         "timezone": config.channel.timezone,
         "lookback_hours": config.channel.lookback_hours,
+        "max_entries_per_url": config.channel.max_entries_per_url,
         "started_at": started_at.isoformat(),
         "finished_at": datetime.now(tz).isoformat(),
         "duration_seconds": round(perf_counter() - timer_start, 3),

@@ -368,6 +368,7 @@ class YouTubeDailyTests(unittest.TestCase):
 
             self.assertEqual(manifest["summary"]["total_videos"], 3)
             self.assertEqual(manifest["source_policy"]["research_pipeline_version"], 2)
+            self.assertEqual(manifest["max_entries_per_url"], 25)
             self.assertEqual(manifest["parallel_video_execution"]["max_parallel_videos"], 1)
             self.assertTrue(run_manifest.is_file())
             self.assertTrue((first_video_dir / "research_plan.json").is_file())
@@ -427,6 +428,22 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertTrue(manifest["parallel_video_execution"]["enabled"])
             self.assertEqual(manifest["parallel_video_execution"]["max_parallel_videos"], 2)
             self.assertGreaterEqual(max_active_fetches, 2)
+
+    def test_runner_uses_configured_channel_entry_limit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = _daily_config(root / "archive", root / "site")
+            config = replace(config, channel=replace(config.channel, max_entries_per_url=7))
+            requested_limits: list[int] = []
+
+            execute_youtube_run(
+                config,
+                reference_lister=lambda _urls, limit: requested_limits.append(limit) or (),
+                video_fetcher=lambda _url, *, fetch_transcript=True: (_ for _ in ()).throw(RuntimeError("no videos")),
+                bundle_verifier=lambda _bundle, _draft, _generated_at: (_ for _ in ()).throw(RuntimeError("no videos")),
+            )
+
+            self.assertEqual(requested_limits, [7])
 
     def test_runner_fetches_transcript_only_after_window_filter(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -752,12 +769,15 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertNotIn("0 13 * * *", workflow)
         self.assertIn("actions/upload-pages-artifact", workflow)
         self.assertIn("tradingagents.youtube.runner", workflow)
+        self.assertIn("max_entries_per_url", workflow)
+        self.assertIn("--max-entries-per-url", workflow)
         self.assertIn("max_parallel_videos", workflow)
         self.assertIn("--max-parallel-videos", workflow)
         self.assertIn("config/scheduled_analysis_korea.toml", workflow)
         config_text = Path("config/youtube_daily.toml").read_text(encoding="utf-8")
         self.assertIn("research_enabled = true", config_text)
         self.assertIn("max_research_queries", config_text)
+        self.assertIn("max_entries_per_url = 25", config_text)
         self.assertIn("max_parallel_videos = 4", config_text)
         self.assertIn("YOUTUBE_COOKIES_FILE", workflow)
         self.assertIn("YOUTUBE_PROXY", workflow)
@@ -821,6 +841,7 @@ class YouTubeDailyTests(unittest.TestCase):
 
         self.assertEqual(config.channel.name, "투자 유튜브 채널")
         self.assertEqual(set(config.channel.urls), expected_urls)
+        self.assertEqual(config.channel.max_entries_per_url, 25)
         self.assertEqual(config.channel.max_parallel_videos, 4)
         self.assertEqual(set(DEFAULT_CHANNEL_URLS), expected_urls)
 
@@ -955,6 +976,7 @@ def _daily_config(archive_dir: Path, site_dir: Path) -> YouTubeDailyConfig:
             lookback_hours=24,
             timezone="Asia/Seoul",
             max_videos=3,
+            max_entries_per_url=25,
             max_parallel_videos=1,
         ),
         llm=_llm_settings(),
