@@ -544,7 +544,12 @@ class YouTubeDailyTests(unittest.TestCase):
     def test_github_actions_workflow_schedule_and_pages_artifact(self):
         workflow = Path(".github/workflows/daily-youtube-reports.yml").read_text(encoding="utf-8")
 
-        self.assertIn("0 13 * * *", workflow)
+        self.assertIn("17 13 * * *", workflow)
+        self.assertIn("47 13 * * *", workflow)
+        self.assertIn("schedule_gate", workflow)
+        self.assertIn("actions: read", workflow)
+        self.assertIn("cancel-in-progress: false", workflow)
+        self.assertNotIn("0 13 * * *", workflow)
         self.assertIn("actions/upload-pages-artifact", workflow)
         self.assertIn("tradingagents.youtube.runner", workflow)
         self.assertIn("config/scheduled_analysis_korea.toml", workflow)
