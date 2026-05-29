@@ -154,7 +154,10 @@ class CodexAppServerSession:
         source_home_value = os.environ.get("CODEX_HOME")
         if source_home_value:
             return Path(source_home_value).expanduser()
-        default_home = Path.home() / ".codex"
+        try:
+            default_home = Path.home() / ".codex"
+        except RuntimeError:
+            return None
         return default_home if default_home.is_dir() else None
 
     def close(self) -> None:

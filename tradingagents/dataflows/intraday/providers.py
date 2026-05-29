@@ -15,7 +15,14 @@ class IntradaySnapshotProvider(Protocol):
     name: str
     realtime_capable: bool
 
-    def fetch(self, ticker: str, *, interval: str = "5m", market_timezone: str = "US/Eastern") -> IntradayMarketSnapshot:
+    def fetch(
+        self,
+        ticker: str,
+        *,
+        interval: str = "5m",
+        market_timezone: str = "US/Eastern",
+        checkpoint_id: str | None = None,
+    ) -> IntradayMarketSnapshot:
         ...
 
 
@@ -29,6 +36,7 @@ class YFinanceIntradayProvider:
         *,
         interval: str = "5m",
         market_timezone: str = "US/Eastern",
+        checkpoint_id: str | None = None,
     ) -> IntradayMarketSnapshot:
         ticker_obj = yf.Ticker(ticker)
         history = yf_retry(lambda: ticker_obj.history(period="1d", interval=interval, auto_adjust=False))
@@ -86,6 +94,8 @@ class YFinanceIntradayProvider:
             quote_delay_seconds=_delay_seconds(provider_timestamp, last_ts.isoformat()),
             provider_realtime_capable=self.realtime_capable,
             market_session=_market_session(last_ts, market_timezone=market_timezone),
+            checkpoint_id=checkpoint_id,
+            market="KR" if market_timezone == "Asia/Seoul" else "US",
         )
 
 
@@ -97,6 +107,10 @@ def get_intraday_provider(name: str | None) -> IntradaySnapshotProvider:
         from .kis_quotes import KISQuoteProvider
 
         return KISQuoteProvider()
+    if normalized in {"kis_microstructure", "kis_micro", "kis_full"}:
+        from .microstructure import KISMicrostructureProvider
+
+        return KISMicrostructureProvider()
     raise ValueError(f"Unsupported intraday provider: {name}")
 
 

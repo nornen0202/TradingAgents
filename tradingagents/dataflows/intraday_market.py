@@ -20,6 +20,7 @@ def fetch_intraday_market_snapshot(
     interval: str = "5m",
     market_timezone: str | None = None,
     provider: str | None = None,
+    checkpoint_id: str | None = None,
 ) -> IntradayMarketSnapshot:
     """Fetch an execution-grade intraday snapshot through the configured provider.
 
@@ -37,6 +38,7 @@ def fetch_intraday_market_snapshot(
                 ticker,
                 interval=interval,
                 market_timezone=market_tz,
+                checkpoint_id=checkpoint_id,
             )
             return replace(
                 snapshot,
@@ -61,12 +63,12 @@ def _provider_chain(*, ticker: str, provider: str | None) -> list[str]:
         if values:
             return values
     if _looks_like_kr_symbol(ticker):
-        return ["kis", "yfinance"]
-    return ["yfinance"]
+        return ["kis_microstructure", "kis", "yfinance"]
+    return ["kis_microstructure", "yfinance"]
 
 
 def _default_market_timezone(ticker: str) -> str:
-    return "Asia/Seoul" if _looks_like_kr_symbol(ticker) else "US/Eastern"
+    return "Asia/Seoul" if _looks_like_kr_symbol(ticker) else "America/New_York"
 
 
 def _looks_like_kr_symbol(ticker: str) -> bool:

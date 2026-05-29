@@ -3,14 +3,22 @@ from pathlib import Path
 from tradingagents.scheduled.config import _default_execution_checkpoints_kst, load_scheduled_config
 
 
-def test_us_default_checkpoints_are_three_kst_times():
+def test_us_default_checkpoints_cover_hourly_session_in_kst():
     checkpoints = _default_execution_checkpoints_kst("US")
-    assert len(checkpoints) == 3
+    assert len(checkpoints) == 7
     assert all(len(value) == 5 and value[2] == ":" for value in checkpoints)
 
 
 def test_kr_default_checkpoints_match_operational_profile():
-    assert _default_execution_checkpoints_kst("KR") == ("10:05", "11:05", "12:35", "14:35")
+    assert _default_execution_checkpoints_kst("KR") == (
+        "09:35",
+        "10:35",
+        "11:35",
+        "12:35",
+        "13:35",
+        "14:35",
+        "15:20",
+    )
 
 
 def test_explicit_market_overrides_timezone_inference(tmp_path: Path):
@@ -30,14 +38,16 @@ site_dir = ".site"
     )
     config = load_scheduled_config(config_path)
     assert config.run.market == "US"
-    assert len(config.execution.execution_refresh_checkpoints_kst) == 3
+    assert len(config.execution.execution_refresh_checkpoints_kst) == 7
 
 
 def test_intraday_overlay_workflow_uses_kr_operational_crons():
     workflow = Path(".github/workflows/intraday-overlay-refresh.yml").read_text(encoding="utf-8")
-    assert "KR checkpoints: 10:05, 11:05, 12:35, 14:35 KST." in workflow
-    assert "5 1,2 * * 1-5" in workflow
-    assert "35 3,5 * * 1-5" in workflow
+    assert "KR checkpoints: 09:35, 10:35, 11:35, 12:35, 13:35, 14:35, 15:20 KST." in workflow
+    assert "35 0-5 * * 1-5" in workflow
+    assert "20 6 * * 1-5" in workflow
+    assert "0 14-20 * * 1-5" in workflow
+    assert "50 19,20 * * 1-5" in workflow
     assert "5 0,2,4 * * 1-5" not in workflow
     assert "25 6 * * 1-5" not in workflow
 

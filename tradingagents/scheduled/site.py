@@ -116,6 +116,15 @@ def _copy_artifacts(
             if source.is_file():
                 shutil.copy2(source, download_dir / source.name)
 
+    execution_download_dir = site_dir / "downloads" / manifest["run_id"] / "execution"
+    for artifact_path in ((manifest.get("execution") or {}).get("artifacts") or {}).values():
+        if not artifact_path:
+            continue
+        source = _resolve_artifact_source(run_dir, artifact_path)
+        if source.is_file():
+            execution_download_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, execution_download_dir / source.name)
+
     download_dir = site_dir / "downloads" / manifest["run_id"] / "portfolio"
     copied_any = False
     for artifact_path in ((manifest.get("portfolio") or {}).get("artifacts") or {}).values():
@@ -756,6 +765,15 @@ def _render_run_page(
                 f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
             )
 
+    execution_links: list[str] = []
+    for artifact_path in ((manifest.get("execution") or {}).get("artifacts") or {}).values():
+        if not artifact_path:
+            continue
+        artifact_name = Path(str(artifact_path)).name
+        execution_links.append(
+            f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/execution/{_escape(artifact_name)}'>{_escape(artifact_name)}</a>"
+        )
+
     ticker_cards = []
     for ticker_summary in manifest.get("tickers", []):
         display_summary = _with_portfolio_action(ticker_summary, portfolio_summary)
@@ -819,6 +837,20 @@ def _render_run_page(
     </section>
         """
 
+    execution_html = ""
+    if execution_links:
+        execution_html = f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>장중 실행 컨텍스트</h2>
+      </div>
+      <article class="run-card">
+        <p><strong>용도</strong><span>ChatGPT가 기준시각별 현재가, VWAP, RVOL, 호가/체결강도, 수급 상태를 읽는 공개 실행 컨텍스트</span></p>
+        <div class="pill-row">{''.join(execution_links)}</div>
+      </article>
+    </section>
+        """
+
     warning_html = "".join(
         f"<div class='warning-banner'>{_escape(warning)}</div>"
         for warning in (manifest.get("warnings") or [])
@@ -844,6 +876,7 @@ def _render_run_page(
     {warning_html}
     {delta_html}
     {timeline_html}
+    {execution_html}
     {portfolio_html}
     <section class="section">
       <div class="section-head">

@@ -47,7 +47,7 @@ site_dir = "./site"
         encoding="utf-8",
     )
     config = load_scheduled_config(config_path)
-    assert len(config.execution.execution_refresh_checkpoints_kst) == 3
+    assert len(config.execution.execution_refresh_checkpoints_kst) == 7
 
 
 def test_summary_image_config_accepts_openai_mode_alias(tmp_path: Path):

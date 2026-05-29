@@ -18,6 +18,7 @@ class KISQuoteProvider:
         *,
         interval: str = "5m",
         market_timezone: str = "Asia/Seoul",
+        checkpoint_id: str | None = None,
     ) -> IntradayMarketSnapshot:
         identity = resolve_identity(ticker)
         code = identity.krx_code or identity.broker_symbol or ticker.split(".")[0]
@@ -61,6 +62,9 @@ class KISQuoteProvider:
             quote_delay_seconds=0,
             provider_realtime_capable=self.realtime_capable,
             market_session=_kr_market_session(now),
+            market="KR",
+            exchange="KRX",
+            checkpoint_id=checkpoint_id,
         )
 
 

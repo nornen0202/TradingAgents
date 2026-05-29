@@ -22,7 +22,8 @@ VALID_RUN_MODES = {"full", "overlay_only", "selective_rerun_only", "portfolio_on
 VALID_ANALYSIS_MODES = {"full", "smoke"}
 DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET: dict[str, tuple[str, ...]] = {
     # KST anchors cover morning, lunch, and afternoon refresh windows.
-    "KR": ("10:05", "11:05", "12:35", "14:35"),
+    "KR": ("09:35", "10:35", "11:35", "12:35", "13:35", "14:35", "15:20"),
+    "US": ("10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "15:50"),
 }
 
 
@@ -102,6 +103,10 @@ class SiteSettings:
 class ExecutionSettings:
     execution_refresh_enabled: bool = False
     execution_refresh_checkpoints_kst: tuple[str, ...] = tuple()
+    execution_refresh_checkpoints_local: tuple[str, ...] = tuple()
+    execution_checkpoint_timezone: str = "Asia/Seoul"
+    execution_session_gate_enabled: bool = True
+    execution_session_calendar: str | None = None
     execution_max_data_age_seconds: int = 180
     execution_publish_badges: bool = True
     execution_selective_rerun_enabled: bool = True
@@ -324,6 +329,13 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     declared_market = str(run_raw.get("market", "AUTO")).strip().upper() or "AUTO"
     market_code = _normalize_market_code(declared_market, timezone_name=timezone_name)
     default_checkpoints = _default_execution_checkpoints_kst(market_code)
+    checkpoint_timezone = str(
+        execution_raw.get(
+            "checkpoint_timezone",
+            "America/New_York" if market_code == "US" and execution_raw.get("checkpoints_local") else "Asia/Seoul",
+        )
+    ).strip() or "Asia/Seoul"
+    ZoneInfo(checkpoint_timezone)
 
     base_dir = config_path.parent
     archive_dir = _resolve_path(storage_raw.get("archive_dir", ".tradingagents-scheduled/archive"), base_dir)
@@ -438,8 +450,15 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             execution_refresh_enabled=bool(execution_raw.get("enabled", False)),
             execution_refresh_checkpoints_kst=_normalize_execution_checkpoints(
                 execution_raw.get("checkpoints_kst"),
-                default_checkpoints=default_checkpoints,
+                default_checkpoints=tuple() if execution_raw.get("checkpoints_local") else default_checkpoints,
             ),
+            execution_refresh_checkpoints_local=_normalize_execution_checkpoints(
+                execution_raw.get("checkpoints_local"),
+                default_checkpoints=tuple(),
+            ),
+            execution_checkpoint_timezone=checkpoint_timezone,
+            execution_session_gate_enabled=bool(execution_raw.get("session_gate_enabled", True)),
+            execution_session_calendar=_optional_string(execution_raw.get("session_calendar")),
             execution_max_data_age_seconds=max(30, int(execution_raw.get("max_data_age_seconds", 180))),
             execution_publish_badges=bool(execution_raw.get("publish_badges", True)),
             execution_selective_rerun_enabled=bool(execution_raw.get("selective_rerun_enabled", True)),
@@ -489,11 +508,14 @@ def _default_execution_checkpoints_kst(market_code: str) -> tuple[str, ...]:
     normalized = str(market_code or "").strip().upper()
     if normalized == "US":
         # US checkpoints are derived from New York regular session anchors:
-        # pre-open (09:20 ET), early-session checkpoint (10:00 ET), near-close (15:30 ET),
-        # then converted to KST with DST awareness.
+        # hourly in-session checkpoints plus a near-close checkpoint, then
+        # converted to KST with DST awareness for legacy checkpoints_kst configs.
         return _convert_market_times_to_kst(
             market_timezone="America/New_York",
-            anchor_times=(time(9, 20), time(10, 0), time(15, 30)),
+            anchor_times=tuple(
+                time(hour=hour) for hour in range(10, 16)
+            )
+            + (time(hour=15, minute=50),),
         )
     return DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET["KR"]
 
