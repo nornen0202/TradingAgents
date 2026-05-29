@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import re
 import tempfile
+import threading
 import time
 from typing import Any, Iterable
 from urllib.parse import parse_qs, urlparse
@@ -28,6 +29,8 @@ _CAPTION_HEADERS = {
 }
 _CAPTION_LAST_REQUEST_AT = 0.0
 _CAPTION_SESSIONS: dict[str, requests.Session] = {}
+_CAPTION_REQUEST_LOCK = threading.Lock()
+_CAPTION_SESSION_LOCK = threading.Lock()
 
 
 @dataclass(frozen=True)
@@ -528,11 +531,12 @@ def _download_transcript_track(
 def _download_caption_response(url: str, *, timeout_seconds: float) -> requests.Response | None:
     max_retries = _env_int("TRADINGAGENTS_YOUTUBE_CAPTION_MAX_RETRIES", 2)
     for attempt in range(max(0, max_retries) + 1):
-        _respect_caption_throttle()
-        try:
-            response = _caption_session().get(url, timeout=timeout_seconds)
-        except requests.RequestException:
-            return None
+        with _CAPTION_REQUEST_LOCK:
+            _respect_caption_throttle()
+            try:
+                response = _caption_session().get(url, timeout=timeout_seconds)
+            except requests.RequestException:
+                return None
         if response.status_code == 429:
             if attempt >= max_retries:
                 return None
@@ -635,24 +639,25 @@ def _caption_session() -> requests.Session:
     proxy = _youtube_proxy() or ""
     visitor_data = _youtube_visitor_data() or ""
     session_key = json.dumps([cookie_file, proxy, visitor_data], separators=(",", ":"))
-    session = _CAPTION_SESSIONS.get(session_key)
-    if session is not None:
+    with _CAPTION_SESSION_LOCK:
+        session = _CAPTION_SESSIONS.get(session_key)
+        if session is not None:
+            return session
+        session = requests.Session()
+        session.headers.update(_CAPTION_HEADERS)
+        if visitor_data:
+            session.headers["X-Goog-Visitor-Id"] = visitor_data
+        if cookie_file:
+            try:
+                jar = MozillaCookieJar(cookie_file)
+                jar.load(ignore_discard=True, ignore_expires=True)
+                session.cookies = jar
+            except (OSError, ValueError):
+                pass
+        if proxy:
+            session.proxies.update({"http": proxy, "https": proxy})
+        _CAPTION_SESSIONS[session_key] = session
         return session
-    session = requests.Session()
-    session.headers.update(_CAPTION_HEADERS)
-    if visitor_data:
-        session.headers["X-Goog-Visitor-Id"] = visitor_data
-    if cookie_file:
-        try:
-            jar = MozillaCookieJar(cookie_file)
-            jar.load(ignore_discard=True, ignore_expires=True)
-            session.cookies = jar
-        except (OSError, ValueError):
-            pass
-    if proxy:
-        session.proxies.update({"http": proxy, "https": proxy})
-    _CAPTION_SESSIONS[session_key] = session
-    return session
 
 
 def _respect_caption_throttle() -> None:

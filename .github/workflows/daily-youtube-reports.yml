@@ -29,6 +29,11 @@ on:
         required: false
         default: "50"
         type: string
+      max_parallel_videos:
+        description: "Maximum videos to analyze concurrently"
+        required: false
+        default: "4"
+        type: string
 
 permissions:
   actions: read
@@ -342,6 +347,7 @@ jobs:
 
           lookback_hours = "${{ github.event.inputs.lookback_hours }}".strip() or "24"
           max_videos = "${{ github.event.inputs.max_videos }}".strip() or "50"
+          max_parallel_videos = "${{ github.event.inputs.max_parallel_videos }}".strip() or "4"
           channel_urls = "${{ github.event.inputs.channel_urls }}".strip()
           publish = "${{ github.event.inputs.publish }}".strip().lower()
 
@@ -356,6 +362,8 @@ jobs:
               lookback_hours,
               "--max-videos",
               max_videos,
+              "--max-parallel-videos",
+              max_parallel_videos,
               "--site-dir",
               os.environ["TRADINGAGENTS_SITE_DIR"],
           ]

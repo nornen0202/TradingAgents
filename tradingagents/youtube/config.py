@@ -27,6 +27,7 @@ class ChannelSettings:
     lookback_hours: int
     timezone: str
     max_videos: int
+    max_parallel_videos: int = 4
 
 
 @dataclass(frozen=True)
@@ -106,6 +107,7 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
             lookback_hours=max(1, int(channel_raw.get("lookback_hours") or 24)),
             timezone=str(channel_raw.get("timezone") or "Asia/Seoul"),
             max_videos=max(1, int(channel_raw.get("max_videos") or 50)),
+            max_parallel_videos=max(1, int(channel_raw.get("max_parallel_videos") or 4)),
         ),
         llm=LLMSettings(
             provider=str(llm_raw.get("provider") or "codex"),
@@ -150,6 +152,7 @@ def with_youtube_overrides(
     channel_urls: tuple[str, ...] | None = None,
     lookback_hours: int | None = None,
     max_videos: int | None = None,
+    max_parallel_videos: int | None = None,
     archive_dir: str | Path | None = None,
     site_dir: str | Path | None = None,
 ) -> YouTubeDailyConfig:
@@ -162,6 +165,7 @@ def with_youtube_overrides(
             lookback_hours=max(1, int(lookback_hours or channel.lookback_hours)),
             timezone=channel.timezone,
             max_videos=max(1, int(max_videos or channel.max_videos)),
+            max_parallel_videos=max(1, int(max_parallel_videos or channel.max_parallel_videos)),
         ),
         llm=config.llm,
         verification=config.verification,
