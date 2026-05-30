@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-from tradingagents.dataflows.intraday.microstructure import KISMicrostructureProvider
+from tradingagents.dataflows.intraday.microstructure import KISMicrostructureProvider, render_microstructure_report
+from tradingagents.dataflows.intraday.us_microstructure_sources import USMicrostructureSupplement
 from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY
 
 
@@ -141,6 +142,37 @@ class IncompleteUsKisClient(FakeKisClient):
         return []
 
 
+class FakeReadyUsSupplementProvider:
+    def fetch(self, symbol, *, now_local, interval):
+        return USMicrostructureSupplement(
+            avg20_daily_volume=10000.0,
+            spread_bps=10.0,
+            orderbook_imbalance=0.25,
+            execution_strength=140.0,
+            trade_tape_summary={"rows": 2, "method": "quote_rule_then_tick_rule"},
+            raw_source_names=("massive.aggregates_daily", "massive.last_nbbo", "massive.trades"),
+            limited_reason={"execution_strength": "estimated_from_massive_trades_and_nbbo_quote"},
+        )
+
+
+class FakeLimitedUsSupplementProvider:
+    def fetch(self, symbol, *, now_local, interval):
+        return USMicrostructureSupplement(
+            avg20_daily_volume=10000.0,
+            spread_bps=10.0,
+            orderbook_imbalance=0.25,
+            execution_strength=140.0,
+            trade_tape_summary={"rows": 2, "method": "quote_rule_then_tick_rule"},
+            raw_source_names=("alpaca.iex.daily_bars", "alpaca.iex.latest_quote", "alpaca.iex.trades"),
+            limited_reason={
+                "daily_volume": "alpaca_feed=iex; non_consolidated",
+                "orderbook": "alpaca_feed=iex; non_consolidated",
+                "execution_strength": "alpaca_feed=iex; non_consolidated",
+            },
+            pilot_blockers=("orderbook_iex_limited", "execution_strength_iex_limited"),
+        )
+
+
 def test_kr_microstructure_snapshot_normalizes_kis_fields():
     snapshot = KISMicrostructureProvider(client=FakeKisClient()).fetch(
         "005930.KS",
@@ -227,3 +259,61 @@ def test_us_microstructure_uses_yfinance_daily_volume_fallback_for_rvol():
     assert "relative_volume" not in snapshot.missing_reason
     assert "yfinance.daily_history" in snapshot.raw_source_names
     assert snapshot.execution_data_quality == DELAYED_ANALYSIS_ONLY
+
+
+def test_us_microstructure_uses_external_supplement_for_missing_orderbook_and_strength():
+    snapshot = KISMicrostructureProvider(
+        client=IncompleteUsKisClient(),
+        us_daily_volume_fallback=lambda _symbol: None,
+        us_supplement_provider=FakeReadyUsSupplementProvider(),
+    ).fetch(
+        "NTAP",
+        market_timezone="America/New_York",
+        checkpoint_id="13:00",
+    )
+
+    assert snapshot.relative_volume is not None
+    assert snapshot.spread_bps == 10.0
+    assert snapshot.orderbook_imbalance == 0.25
+    assert snapshot.execution_strength == 140.0
+    assert snapshot.execution_data_quality == ""
+    assert "orderbook" not in snapshot.missing_reason
+    assert snapshot.missing_reason["execution_strength"] == "estimated_from_massive_trades_and_nbbo_quote"
+    assert "massive.last_nbbo" in snapshot.raw_source_names
+
+
+def test_us_microstructure_external_limited_feed_blocks_realtime_quality():
+    snapshot = KISMicrostructureProvider(
+        client=IncompleteUsKisClient(),
+        us_daily_volume_fallback=lambda _symbol: None,
+        us_supplement_provider=FakeLimitedUsSupplementProvider(),
+    ).fetch(
+        "NTAP",
+        market_timezone="America/New_York",
+        checkpoint_id="13:00",
+    )
+
+    assert snapshot.spread_bps == 10.0
+    assert snapshot.execution_strength == 140.0
+    assert snapshot.execution_data_quality == DELAYED_ANALYSIS_ONLY
+    assert snapshot.missing_reason["orderbook"] == "alpaca_feed=iex; non_consolidated"
+    assert "alpaca.iex.latest_quote" in snapshot.raw_source_names
+
+
+def test_microstructure_report_shows_external_sources_and_limited_fields():
+    snapshot = KISMicrostructureProvider(
+        client=IncompleteUsKisClient(),
+        us_daily_volume_fallback=lambda _symbol: None,
+        us_supplement_provider=FakeReadyUsSupplementProvider(),
+    ).fetch(
+        "NTAP",
+        market_timezone="America/New_York",
+        checkpoint_id="13:00",
+    )
+
+    report = render_microstructure_report(snapshot)
+
+    assert "| Spread bps | 10 |" in report
+    assert "| Execution strength | 140 |" in report
+    assert "- execution_strength: estimated_from_massive_trades_and_nbbo_quote" in report
+    assert "massive.last_nbbo" in report

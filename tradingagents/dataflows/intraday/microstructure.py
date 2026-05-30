@@ -6,9 +6,15 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY
+from tradingagents.dataflows.intraday.us_microstructure_sources import (
+    CompositeUSMicrostructureSupplementProvider,
+)
 from tradingagents.portfolio.instrument_identity import resolve_identity
 from tradingagents.portfolio.kis import KisClient
 from tradingagents.schemas import IntradayMarketSnapshot
+
+
+_DEFAULT_SUPPLEMENT_PROVIDER = object()
 
 
 class KISMicrostructureProvider:
@@ -21,10 +27,17 @@ class KISMicrostructureProvider:
         client: Any | None = None,
         client_factory: Callable[[], Any] | None = None,
         us_daily_volume_fallback: Callable[[str], float | None] | None = None,
+        us_supplement_provider: Any = _DEFAULT_SUPPLEMENT_PROVIDER,
     ) -> None:
         self._client = client
         self._client_factory = client_factory or (lambda: KisClient.from_api_keys(environment="real"))
         self._us_daily_volume_fallback = us_daily_volume_fallback or _avg20_daily_volume_from_yfinance
+        if us_supplement_provider is _DEFAULT_SUPPLEMENT_PROVIDER:
+            self._us_supplement_provider = (
+                None if client is not None else CompositeUSMicrostructureSupplementProvider.from_api_keys()
+            )
+        else:
+            self._us_supplement_provider = us_supplement_provider
 
     def fetch(
         self,
@@ -311,6 +324,16 @@ class KISMicrostructureProvider:
                 "daily_volume",
             ) or []
 
+        supplement = None
+        if self._us_supplement_provider is not None:
+            supplement = _call_optional(
+                lambda: self._us_supplement_provider.fetch(symbol, now_local=now_local, interval=interval),
+                missing,
+                "us_market_data_supplement",
+            )
+            if supplement:
+                raw_source_names.extend(getattr(supplement, "raw_source_names", ()))
+
         combined_price = {**detail_row, **price_row}
         last_price = _find_float(
             combined_price,
@@ -328,6 +351,8 @@ class KISMicrostructureProvider:
         day_low = _find_float(combined_price, "low", "LOW", "ovrs_nmix_lwpr", default=_min_value(bars, ("low", "LOW", "lprc"))) or last_price
         session_vwap = _vwap_from_cumulative(combined_price) or _vwap_from_bars(bars)
         avg20_daily_volume = _avg_daily_volume(daily_rows)
+        if avg20_daily_volume is None and supplement is not None:
+            avg20_daily_volume = getattr(supplement, "avg20_daily_volume", None)
         if avg20_daily_volume is None:
             avg20_daily_volume = self._us_daily_volume_fallback(symbol)
             if avg20_daily_volume is not None:
@@ -337,8 +362,21 @@ class KISMicrostructureProvider:
             missing.setdefault("session_vwap", "minute_or_cumulative_traded_value_unavailable")
         if relative_volume is None:
             missing.setdefault("relative_volume", "avg20_daily_volume_unavailable")
+        elif avg20_daily_volume is not None:
+            missing.pop("daily_volume", None)
+            missing.pop("relative_volume", None)
 
         orderbook_metrics = _orderbook_metrics(orderbook_row or combined_price)
+        if (
+            supplement is not None
+            and orderbook_metrics["spread_bps"] is None
+            and orderbook_metrics["orderbook_imbalance"] is None
+        ):
+            supplement_spread = getattr(supplement, "spread_bps", None)
+            supplement_imbalance = getattr(supplement, "orderbook_imbalance", None)
+            if supplement_spread is not None or supplement_imbalance is not None:
+                orderbook_metrics = {"spread_bps": supplement_spread, "orderbook_imbalance": supplement_imbalance}
+                missing.pop("orderbook", None)
         if orderbook_metrics["spread_bps"] is None and orderbook_metrics["orderbook_imbalance"] is None:
             missing.setdefault("orderbook", "kis_orderbook_fields_unavailable")
 
@@ -347,12 +385,21 @@ class KISMicrostructureProvider:
             execution_strength = _find_float(orderbook_row, "strn", "STRN", "execution_strength")
         if execution_strength is None:
             execution_strength = _execution_strength_from_tape(tape_rows)
+        if execution_strength is None and supplement is not None:
+            execution_strength = getattr(supplement, "execution_strength", None)
+            if execution_strength is not None:
+                missing.pop("execution_strength", None)
         if execution_strength is None:
             missing.setdefault("execution_strength", "kis_trade_strength_field_unavailable")
+
+        if supplement is not None:
+            for key, reason in getattr(supplement, "limited_reason", {}).items():
+                missing.setdefault(key, reason)
 
         halt_status = _status_from_keys(combined_price, ("halt", "trht", "mtyp", "stat"), default_name="normal")
         if not halt_status.get("is_clear"):
             missing.setdefault("halt_status", "halt_status_not_confirmed_by_snapshot")
+        source_limit_reasons = tuple(getattr(supplement, "pilot_blockers", ()) or ()) if supplement is not None else ()
         quality = _microstructure_quality(
             market="US",
             session_vwap=session_vwap,
@@ -361,8 +408,15 @@ class KISMicrostructureProvider:
             orderbook_imbalance=orderbook_metrics["orderbook_imbalance"],
             execution_strength=execution_strength,
             halt_status=halt_status,
+            source_limit_reasons=source_limit_reasons,
         )
         asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
+        source_latency_seconds = max(0, int((now_local - asof).total_seconds()))
+        if supplement is not None and getattr(supplement, "source_latency_seconds", None) is not None:
+            source_latency_seconds = max(source_latency_seconds, int(supplement.source_latency_seconds))
+        trade_tape_summary = _trade_tape_summary(tape_rows)
+        if not tape_rows and supplement is not None and getattr(supplement, "trade_tape_summary", None):
+            trade_tape_summary = supplement.trade_tape_summary
         return IntradayMarketSnapshot(
             ticker=ticker,
             asof=asof.isoformat(),
@@ -389,11 +443,11 @@ class KISMicrostructureProvider:
             spread_bps=orderbook_metrics["spread_bps"],
             orderbook_imbalance=orderbook_metrics["orderbook_imbalance"],
             execution_strength=execution_strength,
-            source_latency_seconds=max(0, int((now_local - asof).total_seconds())),
+            source_latency_seconds=source_latency_seconds,
             data_quality=quality,
             microstructure_required=True,
             halt_status=halt_status,
-            trade_tape_summary=_trade_tape_summary(tape_rows),
+            trade_tape_summary=trade_tape_summary,
             volume_power_rank=volume_power_rank,
             investor_flow_status="not_applicable",
             program_flow_status="not_applicable",
@@ -797,12 +851,14 @@ def _microstructure_quality(
     vi_status: dict[str, Any] | None = None,
     market_alert_status: dict[str, Any] | None = None,
     halt_status: dict[str, Any] | None = None,
+    source_limit_reasons: tuple[str, ...] = (),
 ) -> str:
     missing_required = (
         session_vwap is None
         or relative_volume is None
         or (spread_bps is None and orderbook_imbalance is None)
         or execution_strength is None
+        or bool(source_limit_reasons)
     )
     if market == "KR":
         missing_required = (

@@ -74,6 +74,28 @@ class ApiKeysTests(unittest.TestCase):
                 self.assertEqual(api_keys.get_api_key("KIS_ACCOUNT_NO"), "12345678")
                 self.assertEqual(api_keys.get_api_key("KIS_PRODUCT_CODE"), "01")
 
+    def test_reads_market_data_provider_aliases_from_json(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = f"{temp_dir}/api_keys.json"
+            with open(path, "w", encoding="utf-8") as handle:
+                json.dump(
+                    {
+                        "POLYGON_API_KEY": "massive-compatible-key",
+                        "APCA_API_KEY_ID": "alpaca-id",
+                        "APCA_API_SECRET_KEY": "alpaca-secret",
+                        "APCA_API_BASE_URL": "https://paper-api.alpaca.markets/v2",
+                        "APCA_DATA_FEED": "iex",
+                    },
+                    handle,
+                )
+
+            with patch.dict("os.environ", {"TRADINGAGENTS_API_KEYS_PATH": path}, clear=True):
+                self.assertEqual(api_keys.get_api_key("MASSIVE_API_KEY"), "massive-compatible-key")
+                self.assertEqual(api_keys.get_api_key("ALPACA_API_KEY_ID"), "alpaca-id")
+                self.assertEqual(api_keys.get_api_key("ALPACA_SECRET_KEY"), "alpaca-secret")
+                self.assertEqual(api_keys.get_api_key("ALPACA_ENDPOINT"), "https://paper-api.alpaca.markets/v2")
+                self.assertEqual(api_keys.get_api_key("ALPACA_DATA_FEED"), "iex")
+
 
 if __name__ == "__main__":
     unittest.main()
