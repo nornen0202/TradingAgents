@@ -838,6 +838,7 @@ def _render_run_page(
         """
 
     execution_html = ""
+    execution_status = manifest.get("execution") or {}
     if execution_links:
         execution_html = f"""
     <section class="section">
@@ -850,6 +851,25 @@ def _render_run_page(
       </article>
     </section>
         """
+    elif execution_status:
+        overlay_phase = execution_status.get("overlay_phase") if isinstance(execution_status.get("overlay_phase"), dict) else {}
+        selected = overlay_phase.get("selected_checkpoints") or []
+        notes = execution_status.get("notes") or []
+        note_text = " / ".join(str(item) for item in notes if str(item).strip())
+        if not note_text:
+            note_text = "No execution checkpoint was refreshed in this run."
+        if not selected:
+            execution_html = f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>장중 실행 컨텍스트</h2>
+      </div>
+      <article class="run-card">
+        <p><strong>상태</strong><span>이번 run에서는 장중 체크포인트가 선택되지 않아 microstructure 파일이 새로 생성되지 않았습니다.</span></p>
+        <p class="long-field"><strong>메모</strong><span>{_escape(note_text)}</span></p>
+      </article>
+    </section>
+            """
 
     warning_html = "".join(
         f"<div class='warning-banner'>{_escape(warning)}</div>"
