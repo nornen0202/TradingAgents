@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from tradingagents.scheduled.config import load_scheduled_config
-from tradingagents.scheduled.runner import _run_execution_overlay_passes
+from tradingagents.scheduled.runner import _bootstrap_overlay_inputs_from_latest_run, _run_execution_overlay_passes
 from tradingagents.scheduled.site import _copy_artifacts
 from tradingagents.schemas import (
     ActionIfTriggered,
@@ -126,3 +126,102 @@ checkpoint_timezone = "America/New_York"
 
     assert (site_dir / "downloads" / "run" / "AAPL" / "microstructure_snapshot.json").exists()
     assert (site_dir / "downloads" / "run" / "execution" / "chatgpt_execution_context.json").exists()
+
+
+def test_overlay_bootstrap_preserves_latest_microstructure_artifacts(tmp_path: Path):
+    archive_dir = tmp_path / "archive"
+    config_path = tmp_path / "scheduled.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["AAPL"]
+timezone = "Asia/Seoul"
+market = "US"
+run_mode = "overlay_only"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+checkpoints_local = ["10:00"]
+checkpoint_timezone = "America/New_York"
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+
+    full_manifest = _write_source_run(
+        archive_dir,
+        run_id="20260530T010000_full",
+        started_at="2026-05-30T01:00:00+09:00",
+        run_mode="full",
+        microstructure=False,
+    )
+    _write_source_run(
+        archive_dir,
+        run_id="20260530T040000_overlay",
+        started_at="2026-05-30T04:00:00+09:00",
+        run_mode="overlay_only",
+        microstructure=True,
+    )
+    latest_no_micro = _write_source_run(
+        archive_dir,
+        run_id="20260530T160000_overlay",
+        started_at="2026-05-30T16:00:00+09:00",
+        run_mode="overlay_only",
+        microstructure=False,
+    )
+    latest_no_micro["overlay_source_run_id"] = full_manifest["run_id"]
+    (archive_dir / "latest-run.json").write_text(json.dumps(latest_no_micro), encoding="utf-8")
+
+    target_run_dir = archive_dir / "runs" / "2026" / "new_overlay"
+    summaries, source_run_id = _bootstrap_overlay_inputs_from_latest_run(
+        config=config,
+        run_dir=target_run_dir,
+        tickers=["AAPL"],
+    )
+
+    assert source_run_id == "20260530T010000_full"
+    artifacts = summaries[0]["artifacts"]
+    assert artifacts["microstructure_report_md"] == "tickers/AAPL/microstructure_report.md"
+    assert (target_run_dir / "tickers" / "AAPL" / "microstructure_report.md").read_text(encoding="utf-8") == "# micro\n"
+
+
+def _write_source_run(
+    archive_dir: Path,
+    *,
+    run_id: str,
+    started_at: str,
+    run_mode: str,
+    microstructure: bool,
+) -> dict:
+    run_dir = archive_dir / "runs" / started_at[:4] / run_id
+    ticker_dir = run_dir / "tickers" / "AAPL"
+    ticker_dir.mkdir(parents=True)
+    (ticker_dir / "analysis.json").write_text("{}", encoding="utf-8")
+    (ticker_dir / "execution_contract.json").write_text("{}", encoding="utf-8")
+    artifacts = {
+        "analysis_json": "tickers/AAPL/analysis.json",
+        "execution_contract_json": "tickers/AAPL/execution_contract.json",
+    }
+    if microstructure:
+        (ticker_dir / "microstructure_report.md").write_text("# micro\n", encoding="utf-8")
+        (ticker_dir / "microstructure_snapshot.json").write_text("{}", encoding="utf-8")
+        artifacts.update(
+            {
+                "microstructure_report_md": "tickers/AAPL/microstructure_report.md",
+                "microstructure_snapshot_json": "tickers/AAPL/microstructure_snapshot.json",
+            }
+        )
+    manifest = {
+        "version": 1,
+        "run_id": run_id,
+        "started_at": started_at,
+        "settings": {"run_mode": run_mode, "market": "US"},
+        "summary": {"total_tickers": 1, "successful_tickers": 1, "failed_tickers": 0},
+        "tickers": [{"ticker": "AAPL", "status": "success", "artifacts": artifacts}],
+    }
+    (run_dir / "run.json").write_text(json.dumps(manifest), encoding="utf-8")
+    return manifest

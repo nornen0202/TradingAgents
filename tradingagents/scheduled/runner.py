@@ -79,6 +79,16 @@ from .market_calendar import market_session_state
 from .site import build_site
 
 
+_MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS = (
+    "execution_update_json",
+    "execution_update_md",
+    "microstructure_snapshot_json",
+    "microstructure_report_md",
+    "microstructure_checkpoint_snapshot_json",
+    "microstructure_checkpoint_report_md",
+)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Run a non-interactive scheduled TradingAgents analysis and build a static report site."
@@ -2386,6 +2396,7 @@ def _bootstrap_overlay_inputs_from_latest_run(
             "daily_thesis_json",
             "close_plan_json",
             "intraday_execution_json",
+            *_MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS,
         ):
             copied_artifact = _copy_bootstrap_artifact(
                 source_run_dir=source_run_dir,
@@ -2396,6 +2407,15 @@ def _bootstrap_overlay_inputs_from_latest_run(
             )
             if copied_artifact:
                 copied_source_artifacts[artifact_key] = copied_artifact
+        copied_source_artifacts.update(
+            _copy_latest_microstructure_artifacts(
+                archive_dir=config.storage.archive_dir,
+                run_dir=run_dir,
+                target_ticker_dir=target_ticker_dir,
+                ticker=ticker,
+                existing_artifacts=copied_source_artifacts,
+            )
+        )
 
         contract_rel = artifacts.get("execution_contract_json")
         target_contract = target_ticker_dir / "execution_contract.json"
@@ -2461,6 +2481,43 @@ def _copy_bootstrap_artifact(
     return _relative_to_run(run_dir, target_path)
 
 
+def _copy_latest_microstructure_artifacts(
+    *,
+    archive_dir: Path,
+    run_dir: Path,
+    target_ticker_dir: Path,
+    ticker: str,
+    existing_artifacts: dict[str, str],
+) -> dict[str, str]:
+    missing_keys = [key for key in _MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS if key not in existing_artifacts]
+    if not missing_keys:
+        return {}
+
+    copied: dict[str, str] = {}
+    for manifest, source_run_dir in _iter_run_manifests_desc(archive_dir):
+        for source in manifest.get("tickers", []):
+            source_ticker = str(source.get("ticker") or "").strip().upper()
+            if source_ticker != ticker:
+                continue
+            if source.get("status") != "success":
+                continue
+            artifacts = source.get("artifacts") or {}
+            for artifact_key in list(missing_keys):
+                copied_artifact = _copy_bootstrap_artifact(
+                    source_run_dir=source_run_dir,
+                    run_dir=run_dir,
+                    target_ticker_dir=target_ticker_dir,
+                    artifacts=artifacts,
+                    artifact_key=artifact_key,
+                )
+                if copied_artifact:
+                    copied[artifact_key] = copied_artifact
+                    missing_keys.remove(artifact_key)
+            if not missing_keys:
+                return copied
+    return copied
+
+
 def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[str] | None = None) -> dict[str, Any] | None:
     latest_manifest_path = archive_dir / "latest-run.json"
     if not latest_manifest_path.exists():
@@ -2471,6 +2528,13 @@ def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[
     if run_mode == "full" and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers):
         return candidate
 
+    if (
+        run_mode != "full"
+        and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers)
+        and _manifest_has_microstructure_artifact(candidate, tickers=tickers)
+    ):
+        return candidate
+
     source_run_id = str(candidate.get("overlay_source_run_id") or "").strip()
     if source_run_id:
         source_manifest_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
@@ -2478,6 +2542,10 @@ def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[
             resolved = json.loads(source_manifest_path.read_text(encoding="utf-8"))
             if _manifest_has_bootstrap_ready_ticker(resolved, tickers=tickers):
                 return resolved
+
+    latest_microstructure = _find_latest_microstructure_run_manifest(archive_dir, tickers=tickers)
+    if latest_microstructure is not None:
+        return latest_microstructure
 
     latest_full = _find_latest_full_run_manifest(archive_dir, tickers=tickers)
     if latest_full is not None:
@@ -2691,6 +2759,49 @@ def _find_latest_full_run_manifest(archive_dir: Path, *, tickers: list[str] | No
             if _manifest_has_bootstrap_ready_ticker(manifest, tickers=tickers):
                 return manifest
     return None
+
+
+def _find_latest_microstructure_run_manifest(archive_dir: Path, *, tickers: list[str] | None = None) -> dict[str, Any] | None:
+    for manifest, _run_dir in _iter_run_manifests_desc(archive_dir):
+        if _manifest_has_bootstrap_ready_ticker(manifest, tickers=tickers) and _manifest_has_microstructure_artifact(
+            manifest,
+            tickers=tickers,
+        ):
+            return manifest
+    return None
+
+
+def _iter_run_manifests_desc(archive_dir: Path) -> list[tuple[dict[str, Any], Path]]:
+    runs_dir = archive_dir / "runs"
+    if not runs_dir.exists():
+        return []
+    items: list[tuple[dict[str, Any], Path]] = []
+    year_dirs = sorted((path for path in runs_dir.iterdir() if path.is_dir()), reverse=True)
+    for year_dir in year_dirs:
+        run_dirs = sorted((path for path in year_dir.iterdir() if path.is_dir()), reverse=True)
+        for run_dir in run_dirs:
+            manifest_path = run_dir / "run.json"
+            if not manifest_path.exists():
+                continue
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            items.append((manifest, run_dir))
+    return items
+
+
+def _manifest_has_microstructure_artifact(manifest: dict[str, Any], *, tickers: list[str] | None = None) -> bool:
+    target_tickers = {str(item).strip().upper() for item in (tickers or []) if str(item).strip()}
+    for source in manifest.get("tickers", []):
+        ticker = str(source.get("ticker") or "").strip().upper()
+        if not ticker:
+            continue
+        if target_tickers and ticker not in target_tickers:
+            continue
+        if source.get("status") != "success":
+            continue
+        artifacts = source.get("artifacts") or {}
+        if artifacts.get("microstructure_report_md") or artifacts.get("microstructure_snapshot_json"):
+            return True
+    return False
 
 
 def _find_run_manifest_path_by_run_id(archive_dir: Path, run_id: str) -> Path | None:
