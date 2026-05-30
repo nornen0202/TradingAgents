@@ -2,12 +2,17 @@ name: Daily YouTube Verified Reports
 
 on:
   schedule:
-    # Target: 22:00 KST daily. Avoid minute 0 because GitHub may delay or drop
-    # scheduled workflows during the start-of-hour load spike.
+    # Target: 22:00 KST every day, including weekends. Avoid minute 0 because
+    # GitHub may delay or drop scheduled workflows during the start-of-hour
+    # load spike.
     - cron: '17 13 * * *'
     # Backup trigger in the same KST hour. The schedule_gate job skips it when
     # the primary schedule for the evening has already succeeded or is running.
     - cron: '47 13 * * *'
+    # Second-wave backups for GitHub schedule drops. These still run every day,
+    # and schedule_gate prevents duplicate reports inside the same evening.
+    - cron: '17 14 * * *'
+    - cron: '47 14 * * *'
   workflow_dispatch:
     inputs:
       lookback_hours:
