@@ -17,6 +17,7 @@ DEFAULT_CHANNEL_URLS = (
     "https://www.youtube.com/@sosumonkey/videos",
     "https://www.youtube.com/@815moneytalk/videos",
     "https://www.youtube.com/@supe-tv/videos",
+    "https://www.youtube.com/@3protv/videos",
 )
 
 
