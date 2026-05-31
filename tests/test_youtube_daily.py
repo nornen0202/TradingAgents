@@ -841,6 +841,7 @@ class YouTubeDailyTests(unittest.TestCase):
             "https://www.youtube.com/@sosumonkey/videos",
             "https://www.youtube.com/@815moneytalk/videos",
             "https://www.youtube.com/@supe-tv/videos",
+            "https://www.youtube.com/@3protv/videos",
         }
 
         self.assertEqual(config.channel.name, "투자 유튜브 채널")
