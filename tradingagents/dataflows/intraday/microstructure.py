@@ -399,6 +399,9 @@ class KISMicrostructureProvider:
         halt_status = _status_from_keys(combined_price, ("halt", "trht", "mtyp", "stat"), default_name="normal")
         if not halt_status.get("is_clear"):
             missing.setdefault("halt_status", "halt_status_not_confirmed_by_snapshot")
+        luld_status = _unavailable_us_market_status("luld_status", raw_source_names)
+        reg_sho_status = _unavailable_us_market_status("reg_sho_status", raw_source_names)
+        news_halt_status = _unavailable_us_market_status("news_halt_status", raw_source_names)
         source_limit_reasons = tuple(getattr(supplement, "pilot_blockers", ()) or ()) if supplement is not None else ()
         quality = _microstructure_quality(
             market="US",
@@ -447,6 +450,9 @@ class KISMicrostructureProvider:
             data_quality=quality,
             microstructure_required=True,
             halt_status=halt_status,
+            luld_status=luld_status,
+            reg_sho_status=reg_sho_status,
+            news_halt_status=news_halt_status,
             trade_tape_summary=trade_tape_summary,
             volume_power_rank=volume_power_rank,
             investor_flow_status="not_applicable",
@@ -497,8 +503,22 @@ def render_microstructure_report(snapshot: IntradayMarketSnapshot) -> str:
         )
     if snapshot.market == "US":
         rows.append(("Halt status", _status_label(snapshot.halt_status)))
+        rows.append(("LULD status", _status_label(snapshot.luld_status)))
+        rows.append(("Reg SHO status", _status_label(snapshot.reg_sho_status)))
+        rows.append(("News halt status", _status_label(snapshot.news_halt_status)))
         rows.append(("Trade tape", _summary_label(snapshot.trade_tape_summary)))
         rows.append(("Volume power", _summary_label(snapshot.volume_power_rank)))
+    rows.extend(
+        [
+            ("Generated in current run", _format_bool(snapshot.generated_in_current_run)),
+            ("Freshness class", snapshot.freshness_class or ""),
+            ("Execution eligibility", snapshot.execution_eligibility or ""),
+            ("Source run", snapshot.microstructure_source_run_id or ""),
+            ("Backfilled from run", snapshot.backfilled_from_run_id or ""),
+            ("Published in run", snapshot.published_in_run_id or ""),
+            ("Artifact age seconds", _format_number(snapshot.artifact_age_seconds_at_publish)),
+        ]
+    )
     missing = snapshot.missing_reason or {}
     missing_lines = "\n".join(f"- {key}: {value}" for key, value in sorted(missing.items())) or "- none"
     table = "\n".join(f"| {name} | {value} |" for name, value in rows)
@@ -522,6 +542,16 @@ def _call_optional(func: Callable[[], Any], missing: dict[str, str], key: str) -
     except Exception as exc:
         missing[key] = f"{exc.__class__.__name__}: {str(exc)[:160]}"
         return None
+
+
+def _unavailable_us_market_status(field: str, raw_source_names: list[str]) -> dict[str, Any]:
+    return {
+        "status": "not_available_by_provider",
+        "is_clear": None,
+        "source": "configured_us_market_data_sources",
+        "field": field,
+        "raw_source_names": list(raw_source_names),
+    }
 
 
 def _looks_like_kr_symbol(ticker: str) -> bool:
@@ -935,3 +965,11 @@ def _format_number(value: Any) -> str:
     if float(number).is_integer():
         return f"{int(number):,}"
     return f"{number:,.4f}".rstrip("0").rstrip(".")
+
+
+def _format_bool(value: bool | None) -> str:
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    return ""

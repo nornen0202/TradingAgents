@@ -246,6 +246,19 @@ class MicrostructureSnapshot:
     program_flow_status: str | None = None
     missing_reason: dict[str, str] = field(default_factory=dict)
     raw_source_names: tuple[str, ...] = field(default_factory=tuple)
+    published_in_run_id: str | None = None
+    published_at: str | None = None
+    microstructure_source_run_id: str | None = None
+    analysis_source_run_id: str | None = None
+    generated_in_current_run: bool | None = None
+    backfilled_from_run_id: str | None = None
+    artifact_asof: str | None = None
+    artifact_age_seconds_at_publish: int | None = None
+    freshness_class: str | None = None
+    execution_eligibility: str | None = None
+    luld_status: dict[str, Any] | None = None
+    reg_sho_status: dict[str, Any] | None = None
+    news_halt_status: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -274,6 +287,19 @@ class MicrostructureSnapshot:
             "program_flow_status": self.program_flow_status,
             "missing_reason": dict(self.missing_reason),
             "raw_source_names": list(self.raw_source_names),
+            "published_in_run_id": self.published_in_run_id,
+            "published_at": self.published_at,
+            "microstructure_source_run_id": self.microstructure_source_run_id,
+            "analysis_source_run_id": self.analysis_source_run_id,
+            "generated_in_current_run": self.generated_in_current_run,
+            "backfilled_from_run_id": self.backfilled_from_run_id,
+            "artifact_asof": self.artifact_asof,
+            "artifact_age_seconds_at_publish": self.artifact_age_seconds_at_publish,
+            "freshness_class": self.freshness_class,
+            "execution_eligibility": self.execution_eligibility,
+            "luld_status": self.luld_status,
+            "reg_sho_status": self.reg_sho_status,
+            "news_halt_status": self.news_halt_status,
         }
 
 
@@ -318,6 +344,19 @@ class IntradayMarketSnapshot:
     program_flow_status: str | None = None
     missing_reason: dict[str, str] = field(default_factory=dict)
     raw_source_names: tuple[str, ...] = field(default_factory=tuple)
+    published_in_run_id: str | None = None
+    published_at: str | None = None
+    microstructure_source_run_id: str | None = None
+    analysis_source_run_id: str | None = None
+    generated_in_current_run: bool | None = None
+    backfilled_from_run_id: str | None = None
+    artifact_asof: str | None = None
+    artifact_age_seconds_at_publish: int | None = None
+    freshness_class: str | None = None
+    execution_eligibility: str | None = None
+    luld_status: dict[str, Any] | None = None
+    reg_sho_status: dict[str, Any] | None = None
+    news_halt_status: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         microstructure = MicrostructureSnapshot(
@@ -346,6 +385,19 @@ class IntradayMarketSnapshot:
             program_flow_status=self.program_flow_status,
             missing_reason=self.missing_reason,
             raw_source_names=self.raw_source_names,
+            published_in_run_id=self.published_in_run_id,
+            published_at=self.published_at,
+            microstructure_source_run_id=self.microstructure_source_run_id,
+            analysis_source_run_id=self.analysis_source_run_id,
+            generated_in_current_run=self.generated_in_current_run,
+            backfilled_from_run_id=self.backfilled_from_run_id,
+            artifact_asof=self.artifact_asof,
+            artifact_age_seconds_at_publish=self.artifact_age_seconds_at_publish,
+            freshness_class=self.freshness_class,
+            execution_eligibility=self.execution_eligibility,
+            luld_status=self.luld_status,
+            reg_sho_status=self.reg_sho_status,
+            news_halt_status=self.news_halt_status,
         ).to_dict()
         return {
             "ticker": self.ticker,
@@ -387,6 +439,19 @@ class IntradayMarketSnapshot:
             "program_flow_status": self.program_flow_status,
             "missing_reason": dict(self.missing_reason),
             "raw_source_names": list(self.raw_source_names),
+            "published_in_run_id": self.published_in_run_id,
+            "published_at": self.published_at,
+            "microstructure_source_run_id": self.microstructure_source_run_id,
+            "analysis_source_run_id": self.analysis_source_run_id,
+            "generated_in_current_run": self.generated_in_current_run,
+            "backfilled_from_run_id": self.backfilled_from_run_id,
+            "artifact_asof": self.artifact_asof,
+            "artifact_age_seconds_at_publish": self.artifact_age_seconds_at_publish,
+            "freshness_class": self.freshness_class,
+            "execution_eligibility": self.execution_eligibility,
+            "luld_status": self.luld_status,
+            "reg_sho_status": self.reg_sho_status,
+            "news_halt_status": self.news_halt_status,
             "microstructure": microstructure,
         }
 

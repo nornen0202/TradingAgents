@@ -39,6 +39,32 @@ def evaluate_execution_state(
     staleness_seconds = int(max(0, (now - datetime.fromisoformat(market.asof)).total_seconds()))
     data_quality = str(market.execution_data_quality or "").upper()
     market_session = str(market.market_session or "").strip().lower()
+    execution_eligibility = str(getattr(market, "execution_eligibility", "") or "").upper()
+    freshness_class = str(getattr(market, "freshness_class", "") or "").upper()
+
+    if (
+        getattr(market, "generated_in_current_run", None) is False
+        or freshness_class in {"PRIOR_SESSION_BACKFILL", "STALE"}
+        or execution_eligibility in {"HISTORICAL_REFERENCE_ONLY", "NOT_EXECUTION_ELIGIBLE"}
+    ):
+        timing_state = (
+            ExecutionTimingState.STALE_TRIGGERABLE
+            if contract.action_if_triggered != ActionIfTriggered.NONE
+            else ExecutionTimingState.DEGRADED
+        )
+        return _build_update(
+            contract,
+            market,
+            now,
+            staleness_seconds=staleness_seconds,
+            decision_state=DecisionState.DEGRADED,
+            decision_now=DecisionNow.NONE,
+            reason_codes=("microstructure_not_current_run_fresh",),
+            trigger_status=trigger_status,
+            data_health="STALE",
+            refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=timing_state,
+        )
 
     if market_session == "pre_open":
         return _build_update(
@@ -493,7 +519,20 @@ def _build_update(
             "vi_status": market.vi_status,
             "market_alert_status": market.market_alert_status,
             "halt_status": market.halt_status,
+            "luld_status": getattr(market, "luld_status", None),
+            "reg_sho_status": getattr(market, "reg_sho_status", None),
+            "news_halt_status": getattr(market, "news_halt_status", None),
             "missing_reason": market.missing_reason,
+            "published_in_run_id": getattr(market, "published_in_run_id", None),
+            "published_at": getattr(market, "published_at", None),
+            "microstructure_source_run_id": getattr(market, "microstructure_source_run_id", None),
+            "analysis_source_run_id": getattr(market, "analysis_source_run_id", None),
+            "generated_in_current_run": getattr(market, "generated_in_current_run", None),
+            "backfilled_from_run_id": getattr(market, "backfilled_from_run_id", None),
+            "artifact_asof": getattr(market, "artifact_asof", None),
+            "artifact_age_seconds_at_publish": getattr(market, "artifact_age_seconds_at_publish", None),
+            "freshness_class": getattr(market, "freshness_class", None),
+            "execution_eligibility": getattr(market, "execution_eligibility", None),
         },
         last_price=market.last_price,
         session_vwap=market.session_vwap,

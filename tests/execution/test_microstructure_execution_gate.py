@@ -90,6 +90,23 @@ def test_us_not_applicable_investor_and_program_flow_do_not_block_pilot():
     assert "pilot_ready" in update.reason_codes
 
 
+def test_backfilled_microstructure_cannot_create_pilot_ready():
+    update = evaluate_execution_state(
+        _contract(),
+        _market(
+            generated_in_current_run=False,
+            freshness_class="PRIOR_SESSION_BACKFILL",
+            execution_eligibility="HISTORICAL_REFERENCE_ONLY",
+        ),
+        now=datetime.now(timezone.utc),
+        max_data_age_seconds=180,
+    )
+
+    assert update.decision_state == DecisionState.DEGRADED
+    assert update.execution_timing_state == ExecutionTimingState.STALE_TRIGGERABLE
+    assert "microstructure_not_current_run_fresh" in update.reason_codes
+
+
 def test_kr_microstructure_requires_vi_and_market_alert_confirmation():
     update = evaluate_execution_state(
         _contract("005930.KS"),

@@ -5,7 +5,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from tradingagents.scheduled.config import load_scheduled_config
-from tradingagents.scheduled.runner import _bootstrap_overlay_inputs_from_latest_run, _run_execution_overlay_passes
+from tradingagents.scheduled.runner import (
+    FRESHNESS_PRIOR_SESSION_BACKFILL,
+    _bootstrap_overlay_inputs_from_latest_run,
+    _run_execution_overlay_passes,
+    _write_chatgpt_execution_context_from_ticker_artifacts,
+)
 from tradingagents.scheduled.site import _copy_artifacts
 from tradingagents.schemas import (
     ActionIfTriggered,
@@ -186,7 +191,169 @@ checkpoint_timezone = "America/New_York"
     assert source_run_id == "20260530T010000_full"
     artifacts = summaries[0]["artifacts"]
     assert artifacts["microstructure_report_md"] == "tickers/AAPL/microstructure_report.md"
-    assert (target_run_dir / "tickers" / "AAPL" / "microstructure_report.md").read_text(encoding="utf-8") == "# micro\n"
+    report_text = (target_run_dir / "tickers" / "AAPL" / "microstructure_report.md").read_text(encoding="utf-8")
+    assert "Publication Status" in report_text
+    assert "| Generated in current run | false |" in report_text
+
+
+def test_overlay_bootstrap_does_not_drop_tickers_from_partial_overlay_source(tmp_path: Path):
+    archive_dir = tmp_path / "archive"
+    config_path = tmp_path / "scheduled.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["AAPL", "MSFT"]
+timezone = "Asia/Seoul"
+market = "US"
+run_mode = "overlay_only"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+checkpoints_local = ["10:00"]
+checkpoint_timezone = "America/New_York"
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    full_manifest = _write_source_run(
+        archive_dir,
+        run_id="20260530T010000_full",
+        started_at="2026-05-30T01:00:00+09:00",
+        run_mode="full",
+        microstructure=False,
+        tickers=("AAPL", "MSFT"),
+    )
+    partial_overlay = _write_source_run(
+        archive_dir,
+        run_id="20260530T040000_overlay_partial",
+        started_at="2026-05-30T04:00:00+09:00",
+        run_mode="overlay_only",
+        microstructure=True,
+        tickers=("AAPL",),
+    )
+    partial_overlay["overlay_source_run_id"] = full_manifest["run_id"]
+    (archive_dir / "latest-run.json").write_text(json.dumps(partial_overlay), encoding="utf-8")
+
+    summaries, source_run_id = _bootstrap_overlay_inputs_from_latest_run(
+        config=config,
+        run_dir=archive_dir / "runs" / "2026" / "new_overlay",
+        tickers=["AAPL", "MSFT"],
+    )
+
+    assert source_run_id == full_manifest["run_id"]
+    assert {item["ticker"] for item in summaries} == {"AAPL", "MSFT"}
+
+
+def test_backfills_microstructure_per_ticker_with_source_metadata(tmp_path: Path):
+    archive_dir = tmp_path / "archive"
+    config_path = tmp_path / "scheduled.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["AAPL", "MSFT"]
+timezone = "Asia/Seoul"
+market = "US"
+run_mode = "overlay_only"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+checkpoints_local = ["10:00"]
+checkpoint_timezone = "America/New_York"
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    full_manifest = _write_source_run(
+        archive_dir,
+        run_id="20260530T010000_full",
+        started_at="2026-05-30T01:00:00+09:00",
+        run_mode="full",
+        microstructure=False,
+        tickers=("AAPL", "MSFT"),
+    )
+    _write_source_run(
+        archive_dir,
+        run_id="20260530T030000_overlay_aapl",
+        started_at="2026-05-30T03:00:00+09:00",
+        run_mode="overlay_only",
+        microstructure=True,
+        tickers=("AAPL",),
+    )
+    _write_source_run(
+        archive_dir,
+        run_id="20260530T040000_overlay_msft",
+        started_at="2026-05-30T04:00:00+09:00",
+        run_mode="overlay_only",
+        microstructure=True,
+        tickers=("MSFT",),
+    )
+    latest_no_micro = _write_source_run(
+        archive_dir,
+        run_id="20260530T160000_overlay",
+        started_at="2026-05-30T16:00:00+09:00",
+        run_mode="overlay_only",
+        microstructure=False,
+        tickers=("AAPL", "MSFT"),
+    )
+    latest_no_micro["overlay_source_run_id"] = full_manifest["run_id"]
+    (archive_dir / "latest-run.json").write_text(json.dumps(latest_no_micro), encoding="utf-8")
+
+    target_run_dir = archive_dir / "runs" / "2026" / "new_overlay"
+    summaries, _source_run_id = _bootstrap_overlay_inputs_from_latest_run(
+        config=config,
+        run_dir=target_run_dir,
+        tickers=["AAPL", "MSFT"],
+    )
+
+    by_ticker = {item["ticker"]: item for item in summaries}
+    aapl_payload = json.loads(
+        (target_run_dir / by_ticker["AAPL"]["artifacts"]["microstructure_snapshot_json"]).read_text(encoding="utf-8")
+    )
+    msft_payload = json.loads(
+        (target_run_dir / by_ticker["MSFT"]["artifacts"]["microstructure_snapshot_json"]).read_text(encoding="utf-8")
+    )
+    assert aapl_payload["generated_in_current_run"] is False
+    assert aapl_payload["microstructure_source_run_id"] == "20260530T030000_overlay_aapl"
+    assert aapl_payload["freshness_class"] == FRESHNESS_PRIOR_SESSION_BACKFILL
+    assert msft_payload["microstructure_source_run_id"] == "20260530T040000_overlay_msft"
+    aapl_update = json.loads(
+        (target_run_dir / by_ticker["AAPL"]["artifacts"]["execution_update_json"]).read_text(encoding="utf-8")
+    )
+    assert aapl_update["microstructure_publication"]["artifact_asof"] == "2026-05-29T13:00:00-04:00"
+    assert aapl_update["source"]["artifact_asof"] == "2026-05-29T13:00:00-04:00"
+
+    artifacts = _write_chatgpt_execution_context_from_ticker_artifacts(
+        config=config,
+        run_dir=target_run_dir,
+        ticker_summaries=summaries,
+        overlay_phase={"name": "CLOSED", "selected_checkpoints": []},
+    )
+    assert artifacts["chatgpt_execution_context_json"] == "chatgpt_execution_context.json"
+    context = json.loads((target_run_dir / "chatgpt_execution_context.json").read_text(encoding="utf-8"))
+    assert {item["ticker"] for item in context["tickers"]} == {"AAPL", "MSFT"}
+    assert context["tickers"][0]["generated_in_current_run"] is False
+
+    site_dir = tmp_path / "site"
+    _copy_artifacts(
+        site_dir,
+        target_run_dir,
+        {
+            "run_id": "new_overlay",
+            "execution": {"artifacts": artifacts},
+            "tickers": summaries,
+            "portfolio": {"status": "disabled"},
+        },
+        {},
+    )
+    assert (site_dir / "downloads" / "new_overlay" / "execution" / "chatgpt_execution_context.json").exists()
 
 
 def _write_source_run(
@@ -196,32 +363,70 @@ def _write_source_run(
     started_at: str,
     run_mode: str,
     microstructure: bool,
+    tickers: tuple[str, ...] = ("AAPL",),
 ) -> dict:
     run_dir = archive_dir / "runs" / started_at[:4] / run_id
-    ticker_dir = run_dir / "tickers" / "AAPL"
-    ticker_dir.mkdir(parents=True)
-    (ticker_dir / "analysis.json").write_text("{}", encoding="utf-8")
-    (ticker_dir / "execution_contract.json").write_text("{}", encoding="utf-8")
-    artifacts = {
-        "analysis_json": "tickers/AAPL/analysis.json",
-        "execution_contract_json": "tickers/AAPL/execution_contract.json",
-    }
-    if microstructure:
-        (ticker_dir / "microstructure_report.md").write_text("# micro\n", encoding="utf-8")
-        (ticker_dir / "microstructure_snapshot.json").write_text("{}", encoding="utf-8")
-        artifacts.update(
-            {
-                "microstructure_report_md": "tickers/AAPL/microstructure_report.md",
-                "microstructure_snapshot_json": "tickers/AAPL/microstructure_snapshot.json",
-            }
-        )
+    ticker_items = []
+    for ticker in tickers:
+        ticker_dir = run_dir / "tickers" / ticker
+        ticker_dir.mkdir(parents=True)
+        (ticker_dir / "analysis.json").write_text(json.dumps({"ticker": ticker}), encoding="utf-8")
+        (ticker_dir / "execution_contract.json").write_text("{}", encoding="utf-8")
+        artifacts = {
+            "analysis_json": f"tickers/{ticker}/analysis.json",
+            "execution_contract_json": f"tickers/{ticker}/execution_contract.json",
+        }
+        if microstructure:
+            (ticker_dir / "microstructure_report.md").write_text(
+                f"# Microstructure Report - {ticker}\n\n| Field | Value |\n|---|---|\n| As-of | 2026-05-29T13:00:00-04:00 |\n",
+                encoding="utf-8",
+            )
+            (ticker_dir / "microstructure_snapshot.json").write_text(
+                json.dumps(
+                    {
+                        "ticker": ticker,
+                        "asof": "2026-05-29T13:00:00-04:00",
+                        "market_session": "regular",
+                        "execution_data_quality": "REALTIME_EXECUTION_READY",
+                        "microstructure": {
+                            "ticker": ticker,
+                            "asof_local": "2026-05-29T13:00:00-04:00",
+                            "data_quality": "REALTIME_EXECUTION_READY",
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (ticker_dir / "execution_update.json").write_text(
+                json.dumps(
+                    {
+                        "ticker": ticker,
+                        "market_data_asof": "2026-05-29T13:00:00-04:00",
+                        "execution_asof": "2026-05-29T13:01:00-04:00",
+                        "source": {
+                            "provider": "kis_microstructure",
+                            "market_session": "regular",
+                            "execution_data_quality": "REALTIME_EXECUTION_READY",
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            artifacts.update(
+                {
+                    "execution_update_json": f"tickers/{ticker}/execution_update.json",
+                    "microstructure_report_md": f"tickers/{ticker}/microstructure_report.md",
+                    "microstructure_snapshot_json": f"tickers/{ticker}/microstructure_snapshot.json",
+                }
+            )
+        ticker_items.append({"ticker": ticker, "status": "success", "artifacts": artifacts})
     manifest = {
         "version": 1,
         "run_id": run_id,
         "started_at": started_at,
         "settings": {"run_mode": run_mode, "market": "US"},
-        "summary": {"total_tickers": 1, "successful_tickers": 1, "failed_tickers": 0},
-        "tickers": [{"ticker": "AAPL", "status": "success", "artifacts": artifacts}],
+        "summary": {"total_tickers": len(ticker_items), "successful_tickers": len(ticker_items), "failed_tickers": 0},
+        "tickers": ticker_items,
     }
     (run_dir / "run.json").write_text(json.dumps(manifest), encoding="utf-8")
     return manifest

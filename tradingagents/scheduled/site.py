@@ -840,6 +840,14 @@ def _render_run_page(
     execution_html = ""
     execution_status = manifest.get("execution") or {}
     if execution_links:
+        overlay_phase = execution_status.get("overlay_phase") if isinstance(execution_status.get("overlay_phase"), dict) else {}
+        selected = overlay_phase.get("selected_checkpoints") or []
+        checkpoint_notice = ""
+        if not selected:
+            checkpoint_notice = (
+                "<p><strong>상태</strong><span>이번 run에서는 장중 체크포인트가 선택되지 않아 "
+                "microstructure 파일이 새로 생성되지 않았습니다. 링크는 최신 보존/참고 컨텍스트입니다.</span></p>"
+            )
         execution_html = f"""
     <section class="section">
       <div class="section-head">
@@ -847,6 +855,7 @@ def _render_run_page(
       </div>
       <article class="run-card">
         <p><strong>용도</strong><span>ChatGPT가 기준시각별 현재가, VWAP, RVOL, 호가/체결강도, 수급 상태를 읽는 공개 실행 컨텍스트</span></p>
+        {checkpoint_notice}
         <div class="pill-row">{''.join(execution_links)}</div>
       </article>
     </section>
@@ -2947,6 +2956,11 @@ def _render_ticker_page(
         language=language,
         stale_after_seconds=stale_after_seconds,
     )
+    microstructure_status_html = _render_ticker_microstructure_publication_section(
+        run_dir=run_dir,
+        manifest=manifest,
+        ticker_summary=ticker_summary,
+    )
     live_ticker_delta_html = _render_live_ticker_context_delta_section(
         manifest=manifest,
         ticker_summary=ticker_summary,
@@ -2985,6 +2999,7 @@ def _render_ticker_page(
         {_advanced_diagnostics_html(ticker_summary, manifest, stale_after_seconds=stale_after_seconds)}
       </div>
     </section>
+    {microstructure_status_html}
     {live_ticker_delta_html}
     {ticker_delta_html}
     {failure_html}
@@ -3019,6 +3034,60 @@ def _page_template(title: str, body: str, *, prefix: str) -> str:
 </body>
 </html>
 """
+
+
+def _render_ticker_microstructure_publication_section(
+    *,
+    run_dir: Path,
+    manifest: dict[str, Any],
+    ticker_summary: dict[str, Any],
+) -> str:
+    artifacts = ticker_summary.get("artifacts") if isinstance(ticker_summary.get("artifacts"), dict) else {}
+    snapshot_rel = artifacts.get("microstructure_snapshot_json")
+    if not snapshot_rel:
+        return ""
+    snapshot_path = _resolve_artifact_source(run_dir, snapshot_rel)
+    if not snapshot_path.is_file():
+        return ""
+    try:
+        payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+    except Exception:
+        return ""
+    micro = payload.get("microstructure") if isinstance(payload.get("microstructure"), dict) else {}
+    freshness = payload.get("freshness_class") or micro.get("freshness_class") or ""
+    eligibility = payload.get("execution_eligibility") or micro.get("execution_eligibility") or ""
+    generated = payload.get("generated_in_current_run")
+    source_run = payload.get("microstructure_source_run_id") or micro.get("microstructure_source_run_id") or ""
+    backfilled = payload.get("backfilled_from_run_id") or micro.get("backfilled_from_run_id") or ""
+    asof = payload.get("artifact_asof") or payload.get("asof") or micro.get("artifact_asof") or micro.get("asof_local") or ""
+    age = payload.get("artifact_age_seconds_at_publish") or micro.get("artifact_age_seconds_at_publish")
+    generated_text = "true" if generated is True else ("false" if generated is False else "")
+    status = "fresh" if generated is True and str(eligibility).upper() == "LIVE_EXECUTION_OK" else "warning"
+    note = (
+        "이번 run에서 새로 생성된 장중 microstructure입니다."
+        if generated is True
+        else "이 microstructure는 이전 체크포인트에서 보존된 자료이며 현재 실행 판단이 아니라 과거 as-of 참고 자료입니다."
+    )
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>Microstructure freshness</h2>
+      </div>
+      <article class="run-card">
+        <div class="run-card-header">
+          <span>Execution eligibility</span>
+          <span class="status {status}">{_escape(str(eligibility or '-'))}</span>
+        </div>
+        <p><strong>Generated in current run</strong><span>{_escape(generated_text)}</span></p>
+        <p><strong>Freshness class</strong><span>{_escape(str(freshness or '-'))}</span></p>
+        <p><strong>As-of</strong><span>{_escape(str(asof or '-'))}</span></p>
+        <p><strong>Age at publish</strong><span>{_escape(str(age if age not in (None, '') else '-'))}</span></p>
+        <p><strong>Source run</strong><span>{_escape(str(source_run or '-'))}</span></p>
+        <p><strong>Backfilled from</strong><span>{_escape(str(backfilled or '-'))}</span></p>
+        <p class="long-field"><strong>Note</strong><span>{_escape(note)}</span></p>
+      </article>
+    </section>
+    """
 
 
 def _manifest_language(manifest: dict[str, Any]) -> str:

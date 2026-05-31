@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 from copy import deepcopy
+from dataclasses import replace
 import json
 import os
 import re
@@ -58,6 +59,7 @@ from tradingagents.schemas import (
     BreakoutConfirmation,
     EventGuard,
     ExecutionContract,
+    IntradayMarketSnapshot,
     PullbackBuyZone,
     PriceLevel,
     LevelBasis,
@@ -87,6 +89,18 @@ _MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS = (
     "microstructure_checkpoint_snapshot_json",
     "microstructure_checkpoint_report_md",
 )
+
+FRESHNESS_CURRENT_RUN_FRESH = "CURRENT_RUN_FRESH"
+FRESHNESS_HOURLY_ASOF = "HOURLY_ASOF"
+FRESHNESS_DELAYED_CHECKPOINT = "DELAYED_CHECKPOINT"
+FRESHNESS_STALE = "STALE"
+FRESHNESS_PRIOR_SESSION_BACKFILL = "PRIOR_SESSION_BACKFILL"
+
+ELIGIBILITY_LIVE_EXECUTION_OK = "LIVE_EXECUTION_OK"
+ELIGIBILITY_ASOF_ONLY = "ASOF_ONLY"
+ELIGIBILITY_DELAYED_ANALYSIS_ONLY = "DELAYED_ANALYSIS_ONLY"
+ELIGIBILITY_HISTORICAL_REFERENCE_ONLY = "HISTORICAL_REFERENCE_ONLY"
+ELIGIBILITY_NOT_EXECUTION_ELIGIBLE = "NOT_EXECUTION_ELIGIBLE"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -274,6 +288,7 @@ def execute_scheduled_run(
             run_dir=run_dir,
             ticker_summaries=ticker_summaries,
             checkpoints=selected_checkpoints,
+            analysis_source_run_id=source_run_id or run_id,
         )
         if run_mode in {"overlay_only", "selective_rerun_only"} and selected_checkpoints and not _has_ticker_execution_updates(
             execution_updates
@@ -313,6 +328,7 @@ def execute_scheduled_run(
                 run_dir=run_dir,
                 ticker_summaries=ticker_summaries,
                 checkpoints=["selective_rerun"],
+                analysis_source_run_id=source_run_id or run_id,
             )
             execution_updates.update(
                 {key: val for key, val in rerun_updates.items() if not key.startswith("_")}
@@ -404,6 +420,12 @@ def execute_scheduled_run(
             encoding="utf-8",
         )
     elif config.execution.execution_refresh_enabled and not portfolio_only:
+        execution_artifacts = _write_chatgpt_execution_context_from_ticker_artifacts(
+            config=config,
+            run_dir=run_dir,
+            ticker_summaries=ticker_summaries,
+            overlay_phase=manifest_overlay_phase,
+        )
         manifest["execution"] = {
             "run_id": run_id,
             "refresh_checkpoint": None,
@@ -422,6 +444,8 @@ def execute_scheduled_run(
             "market_regime": "pre_open_snapshot",
             "notes": ["No execution checkpoint is due yet; this run is a pre-open snapshot."],
         }
+        if execution_artifacts:
+            manifest["execution"]["artifacts"] = execution_artifacts
         manifest["market_session_phase"] = _market_session_phase(
             manifest_overlay_phase,
             now=started_at,
@@ -2396,7 +2420,6 @@ def _bootstrap_overlay_inputs_from_latest_run(
             "daily_thesis_json",
             "close_plan_json",
             "intraday_execution_json",
-            *_MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS,
         ):
             copied_artifact = _copy_bootstrap_artifact(
                 source_run_dir=source_run_dir,
@@ -2413,7 +2436,10 @@ def _bootstrap_overlay_inputs_from_latest_run(
                 run_dir=run_dir,
                 target_ticker_dir=target_ticker_dir,
                 ticker=ticker,
+                analysis_source_run_id=source_run_id,
                 existing_artifacts=copied_source_artifacts,
+                max_data_age_seconds=config.execution.execution_max_data_age_seconds,
+                checkpoint_timezone=_execution_checkpoint_timezone(config),
             )
         )
 
@@ -2487,7 +2513,10 @@ def _copy_latest_microstructure_artifacts(
     run_dir: Path,
     target_ticker_dir: Path,
     ticker: str,
+    analysis_source_run_id: str | None,
     existing_artifacts: dict[str, str],
+    max_data_age_seconds: int,
+    checkpoint_timezone: str,
 ) -> dict[str, str]:
     missing_keys = [key for key in _MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS if key not in existing_artifacts]
     if not missing_keys:
@@ -2503,12 +2532,16 @@ def _copy_latest_microstructure_artifacts(
                 continue
             artifacts = source.get("artifacts") or {}
             for artifact_key in list(missing_keys):
-                copied_artifact = _copy_bootstrap_artifact(
+                copied_artifact = _copy_microstructure_bootstrap_artifact(
                     source_run_dir=source_run_dir,
+                    source_run_id=str(manifest.get("run_id") or source_run_dir.name),
                     run_dir=run_dir,
                     target_ticker_dir=target_ticker_dir,
                     artifacts=artifacts,
                     artifact_key=artifact_key,
+                    analysis_source_run_id=analysis_source_run_id,
+                    max_data_age_seconds=max_data_age_seconds,
+                    checkpoint_timezone=checkpoint_timezone,
                 )
                 if copied_artifact:
                     copied[artifact_key] = copied_artifact
@@ -2516,6 +2549,196 @@ def _copy_latest_microstructure_artifacts(
             if not missing_keys:
                 return copied
     return copied
+
+
+def _copy_microstructure_bootstrap_artifact(
+    *,
+    source_run_dir: Path,
+    source_run_id: str,
+    run_dir: Path,
+    target_ticker_dir: Path,
+    artifacts: dict[str, Any],
+    artifact_key: str,
+    analysis_source_run_id: str | None,
+    max_data_age_seconds: int,
+    checkpoint_timezone: str,
+) -> str | None:
+    source_rel = artifacts.get(artifact_key)
+    if not source_rel:
+        return None
+    source_path = _resolve_artifact_source(source_run_dir, source_rel)
+    if not source_path.is_file():
+        return None
+
+    target_path = target_ticker_dir / source_path.name
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    metadata: dict[str, Any] | None = None
+    if artifact_key.endswith("_json") and "microstructure" in artifact_key:
+        try:
+            payload = json.loads(source_path.read_text(encoding="utf-8"))
+        except Exception:
+            shutil.copy2(source_path, target_path)
+            return _relative_to_run(run_dir, target_path)
+        metadata = _backfilled_microstructure_metadata_for_payload(
+            payload,
+            run_dir=run_dir,
+            source_run_id=source_run_id,
+            analysis_source_run_id=analysis_source_run_id,
+            checkpoint_timezone=checkpoint_timezone,
+            max_data_age_seconds=max_data_age_seconds,
+        )
+        _merge_microstructure_metadata(payload, metadata)
+        _write_json(target_path, payload)
+    elif artifact_key.endswith("_md") and "microstructure" in artifact_key:
+        text = source_path.read_text(encoding="utf-8")
+        metadata = _backfilled_microstructure_metadata_for_report(
+            text,
+            run_dir=run_dir,
+            source_run_id=source_run_id,
+            analysis_source_run_id=analysis_source_run_id,
+            checkpoint_timezone=checkpoint_timezone,
+            max_data_age_seconds=max_data_age_seconds,
+        )
+        target_path.write_text(_prepend_microstructure_publication_status(text, metadata), encoding="utf-8")
+    elif artifact_key == "execution_update_json":
+        try:
+            payload = json.loads(source_path.read_text(encoding="utf-8"))
+            metadata = _backfilled_microstructure_metadata_for_payload(
+                payload,
+                run_dir=run_dir,
+                source_run_id=source_run_id,
+                analysis_source_run_id=analysis_source_run_id,
+                checkpoint_timezone=checkpoint_timezone,
+                max_data_age_seconds=max_data_age_seconds,
+            )
+            payload["microstructure_publication"] = metadata
+            if isinstance(payload.get("source"), dict):
+                payload["source"].update(metadata)
+            _write_json(target_path, payload)
+        except Exception:
+            shutil.copy2(source_path, target_path)
+    else:
+        shutil.copy2(source_path, target_path)
+    return _relative_to_run(run_dir, target_path)
+
+
+def _backfilled_microstructure_metadata_for_payload(
+    payload: dict[str, Any],
+    *,
+    run_dir: Path,
+    source_run_id: str,
+    analysis_source_run_id: str | None,
+    checkpoint_timezone: str,
+    max_data_age_seconds: int,
+) -> dict[str, Any]:
+    source = payload.get("source") if isinstance(payload.get("source"), dict) else {}
+    micro = payload.get("microstructure") if isinstance(payload.get("microstructure"), dict) else {}
+    market_data_asof = (
+        payload.get("artifact_asof")
+        or payload.get("market_data_asof")
+        or payload.get("asof")
+        or payload.get("asof_local")
+        or source.get("artifact_asof")
+        or source.get("market_data_asof")
+        or source.get("asof")
+        or source.get("asof_local")
+        or micro.get("artifact_asof")
+        or micro.get("asof_local")
+        or micro.get("asof_utc")
+    )
+    return _microstructure_publication_metadata(
+        market_data_asof=str(market_data_asof) if market_data_asof else None,
+        market_session=str(payload.get("market_session") or source.get("market_session") or micro.get("market_session") or ""),
+        execution_data_quality=str(
+            payload.get("execution_data_quality")
+            or payload.get("data_quality")
+            or source.get("execution_data_quality")
+            or source.get("data_quality")
+            or micro.get("data_quality")
+            or ""
+        ),
+        published_in_run_id=run_dir.name,
+        microstructure_source_run_id=source_run_id,
+        analysis_source_run_id=analysis_source_run_id,
+        generated_in_current_run=False,
+        backfilled_from_run_id=source_run_id,
+        published_at=datetime.now(ZoneInfo(checkpoint_timezone)),
+        max_data_age_seconds=max_data_age_seconds,
+    )
+
+
+def _backfilled_microstructure_metadata_for_report(
+    text: str,
+    *,
+    run_dir: Path,
+    source_run_id: str,
+    analysis_source_run_id: str | None,
+    checkpoint_timezone: str,
+    max_data_age_seconds: int,
+) -> dict[str, Any]:
+    asof = None
+    match = re.search(r"^\|\s*As-of\s*\|\s*([^|]+?)\s*\|$", text, flags=re.MULTILINE)
+    if match:
+        asof = match.group(1).strip()
+    return _microstructure_publication_metadata(
+        market_data_asof=asof,
+        market_session=None,
+        execution_data_quality=None,
+        published_in_run_id=run_dir.name,
+        microstructure_source_run_id=source_run_id,
+        analysis_source_run_id=analysis_source_run_id,
+        generated_in_current_run=False,
+        backfilled_from_run_id=source_run_id,
+        published_at=datetime.now(ZoneInfo(checkpoint_timezone)),
+        max_data_age_seconds=max_data_age_seconds,
+    )
+
+
+def _merge_microstructure_metadata(payload: dict[str, Any], metadata: dict[str, Any]) -> None:
+    payload.update(metadata)
+    micro = payload.get("microstructure")
+    if isinstance(micro, dict):
+        micro.update(metadata)
+
+
+def _prepend_microstructure_publication_status(text: str, metadata: dict[str, Any]) -> str:
+    cleaned = re.sub(
+        r"\n## Publication Status\n(?:\|.*\n)+\n",
+        "\n",
+        text,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    status_table = "\n".join(
+        [
+            "## Publication Status",
+            "| Field | Value |",
+            "|---|---|",
+            f"| Generated in current run | {_format_context_value(metadata.get('generated_in_current_run'))} |",
+            f"| Freshness class | {_format_context_value(metadata.get('freshness_class'))} |",
+            f"| Execution eligibility | {_format_context_value(metadata.get('execution_eligibility'))} |",
+            f"| Microstructure source run | {_format_context_value(metadata.get('microstructure_source_run_id'))} |",
+            f"| Backfilled from run | {_format_context_value(metadata.get('backfilled_from_run_id'))} |",
+            f"| Published in run | {_format_context_value(metadata.get('published_in_run_id'))} |",
+            f"| Artifact as-of | {_format_context_value(metadata.get('artifact_asof'))} |",
+            f"| Artifact age seconds at publish | {_format_context_value(metadata.get('artifact_age_seconds_at_publish'))} |",
+            "",
+        ]
+    )
+    if cleaned.startswith("# ") and "\n\n" in cleaned:
+        title, rest = cleaned.split("\n\n", 1)
+        return f"{title}\n\n{status_table}\n{rest}"
+    return f"{status_table}\n{cleaned}"
+
+
+def _format_context_value(value: Any) -> str:
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    if value is None:
+        return ""
+    return str(value)
 
 
 def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[str] | None = None) -> dict[str, Any] | None:
@@ -2528,10 +2751,9 @@ def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[
     if run_mode == "full" and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers):
         return candidate
 
-    if (
-        run_mode != "full"
-        and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers)
-        and _manifest_has_microstructure_artifact(candidate, tickers=tickers)
+    if run_mode != "full" and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers) and _manifest_has_microstructure_artifact(
+        candidate,
+        tickers=tickers,
     ):
         return candidate
 
@@ -2542,10 +2764,6 @@ def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[
             resolved = json.loads(source_manifest_path.read_text(encoding="utf-8"))
             if _manifest_has_bootstrap_ready_ticker(resolved, tickers=tickers):
                 return resolved
-
-    latest_microstructure = _find_latest_microstructure_run_manifest(archive_dir, tickers=tickers)
-    if latest_microstructure is not None:
-        return latest_microstructure
 
     latest_full = _find_latest_full_run_manifest(archive_dir, tickers=tickers)
     if latest_full is not None:
@@ -2727,6 +2945,7 @@ def _investor_failure_reason(reason: str) -> str:
 
 def _manifest_has_bootstrap_ready_ticker(manifest: dict[str, Any], *, tickers: list[str] | None) -> bool:
     target_tickers = {str(item).strip().upper() for item in (tickers or []) if str(item).strip()}
+    covered: set[str] = set()
     for source in manifest.get("tickers", []):
         ticker = str(source.get("ticker") or "").strip().upper()
         if not ticker:
@@ -2737,8 +2956,10 @@ def _manifest_has_bootstrap_ready_ticker(manifest: dict[str, Any], *, tickers: l
             continue
         artifacts = source.get("artifacts") or {}
         if artifacts.get("analysis_json"):
-            return True
-    return False
+            covered.add(ticker)
+    if target_tickers:
+        return target_tickers <= covered
+    return bool(covered)
 
 
 def _find_latest_full_run_manifest(archive_dir: Path, *, tickers: list[str] | None = None) -> dict[str, Any] | None:
@@ -2790,6 +3011,7 @@ def _iter_run_manifests_desc(archive_dir: Path) -> list[tuple[dict[str, Any], Pa
 
 def _manifest_has_microstructure_artifact(manifest: dict[str, Any], *, tickers: list[str] | None = None) -> bool:
     target_tickers = {str(item).strip().upper() for item in (tickers or []) if str(item).strip()}
+    covered: set[str] = set()
     for source in manifest.get("tickers", []):
         ticker = str(source.get("ticker") or "").strip().upper()
         if not ticker:
@@ -2799,9 +3021,11 @@ def _manifest_has_microstructure_artifact(manifest: dict[str, Any], *, tickers: 
         if source.get("status") != "success":
             continue
         artifacts = source.get("artifacts") or {}
-        if artifacts.get("microstructure_report_md") or artifacts.get("microstructure_snapshot_json"):
-            return True
-    return False
+        if artifacts.get("microstructure_report_md") and artifacts.get("microstructure_snapshot_json"):
+            covered.add(ticker)
+    if target_tickers:
+        return target_tickers <= covered
+    return bool(covered)
 
 
 def _find_run_manifest_path_by_run_id(archive_dir: Path, run_id: str) -> Path | None:
@@ -2894,9 +3118,11 @@ def _run_execution_overlay_passes(
     run_dir: Path,
     ticker_summaries: list[dict[str, Any]],
     checkpoints: list[str],
+    analysis_source_run_id: str | None = None,
 ) -> dict[str, dict[str, Any]]:
     updates_by_ticker: dict[str, dict[str, Any]] = {}
     llm_model = config.execution.execution_llm_summary_model
+    run_id = run_dir.name
     for checkpoint in checkpoints:
         checkpoint_label = str(checkpoint).strip() or "post_research"
         for summary in ticker_summaries:
@@ -2929,6 +3155,16 @@ def _run_execution_overlay_passes(
                     interval="5m",
                     market_timezone=_execution_checkpoint_timezone(config),
                     checkpoint_id=checkpoint_label,
+                )
+                market = _annotate_microstructure_market_snapshot(
+                    market,
+                    published_in_run_id=run_id,
+                    microstructure_source_run_id=run_id,
+                    analysis_source_run_id=analysis_source_run_id or run_id,
+                    generated_in_current_run=True,
+                    backfilled_from_run_id=None,
+                    published_at=datetime.now(ZoneInfo(_execution_checkpoint_timezone(config))),
+                    max_data_age_seconds=config.execution.execution_max_data_age_seconds,
                 )
                 attempt_payload.update(
                     {
@@ -3076,6 +3312,98 @@ def _run_execution_overlay_passes(
     return updates_by_ticker
 
 
+def _annotate_microstructure_market_snapshot(
+    market: IntradayMarketSnapshot,
+    *,
+    published_in_run_id: str,
+    microstructure_source_run_id: str,
+    analysis_source_run_id: str | None,
+    generated_in_current_run: bool,
+    backfilled_from_run_id: str | None,
+    published_at: datetime,
+    max_data_age_seconds: int,
+) -> IntradayMarketSnapshot:
+    metadata = _microstructure_publication_metadata(
+        market_data_asof=market.asof,
+        market_session=market.market_session,
+        execution_data_quality=market.execution_data_quality,
+        published_in_run_id=published_in_run_id,
+        microstructure_source_run_id=microstructure_source_run_id,
+        analysis_source_run_id=analysis_source_run_id,
+        generated_in_current_run=generated_in_current_run,
+        backfilled_from_run_id=backfilled_from_run_id,
+        published_at=published_at,
+        max_data_age_seconds=max_data_age_seconds,
+    )
+    return replace(market, **metadata)
+
+
+def _microstructure_publication_metadata(
+    *,
+    market_data_asof: str | None,
+    market_session: str | None,
+    execution_data_quality: str | None,
+    published_in_run_id: str,
+    microstructure_source_run_id: str | None,
+    analysis_source_run_id: str | None,
+    generated_in_current_run: bool,
+    backfilled_from_run_id: str | None,
+    published_at: datetime,
+    max_data_age_seconds: int,
+) -> dict[str, Any]:
+    age_seconds = _age_seconds_at_publish(market_data_asof, published_at)
+    quality = str(execution_data_quality or "").strip().upper()
+    session = str(market_session or "").strip().lower()
+    if not generated_in_current_run:
+        freshness = FRESHNESS_PRIOR_SESSION_BACKFILL
+        eligibility = ELIGIBILITY_HISTORICAL_REFERENCE_ONLY
+    elif quality == DELAYED_ANALYSIS_ONLY:
+        freshness = FRESHNESS_DELAYED_CHECKPOINT
+        eligibility = ELIGIBILITY_DELAYED_ANALYSIS_ONLY
+    elif quality == STALE_INVALID_FOR_EXECUTION:
+        freshness = FRESHNESS_STALE
+        eligibility = ELIGIBILITY_NOT_EXECUTION_ELIGIBLE
+    elif age_seconds is not None and age_seconds <= max_data_age_seconds and session == "regular":
+        freshness = FRESHNESS_CURRENT_RUN_FRESH
+        eligibility = ELIGIBILITY_LIVE_EXECUTION_OK
+    elif age_seconds is not None and age_seconds <= 3600:
+        freshness = FRESHNESS_HOURLY_ASOF
+        eligibility = ELIGIBILITY_ASOF_ONLY
+    else:
+        freshness = FRESHNESS_STALE
+        eligibility = ELIGIBILITY_NOT_EXECUTION_ELIGIBLE
+    return {
+        "published_in_run_id": published_in_run_id,
+        "published_at": published_at.isoformat(),
+        "microstructure_source_run_id": microstructure_source_run_id,
+        "analysis_source_run_id": analysis_source_run_id,
+        "generated_in_current_run": bool(generated_in_current_run),
+        "backfilled_from_run_id": backfilled_from_run_id,
+        "artifact_asof": market_data_asof,
+        "artifact_age_seconds_at_publish": age_seconds,
+        "freshness_class": freshness,
+        "execution_eligibility": eligibility,
+    }
+
+
+def _age_seconds_at_publish(market_data_asof: str | None, published_at: datetime) -> int | None:
+    parsed = _parse_datetime(market_data_asof)
+    if parsed is None:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=published_at.tzinfo)
+    return int(max(0, (published_at.astimezone(parsed.tzinfo) - parsed).total_seconds()))
+
+
+def _parse_datetime(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value))
+    except ValueError:
+        return None
+
+
 def _build_chatgpt_execution_context(
     *,
     config: ScheduledAnalysisConfig,
@@ -3108,7 +3436,20 @@ def _build_chatgpt_execution_context(
                 "vi_status": source.get("vi_status"),
                 "market_alert_status": source.get("market_alert_status"),
                 "halt_status": source.get("halt_status"),
+                "luld_status": source.get("luld_status"),
+                "reg_sho_status": source.get("reg_sho_status"),
+                "news_halt_status": source.get("news_halt_status"),
                 "missing_reason": source.get("missing_reason") or {},
+                "published_in_run_id": source.get("published_in_run_id"),
+                "published_at": source.get("published_at"),
+                "microstructure_source_run_id": source.get("microstructure_source_run_id"),
+                "analysis_source_run_id": source.get("analysis_source_run_id"),
+                "generated_in_current_run": source.get("generated_in_current_run"),
+                "backfilled_from_run_id": source.get("backfilled_from_run_id"),
+                "artifact_asof": source.get("artifact_asof"),
+                "artifact_age_seconds_at_publish": source.get("artifact_age_seconds_at_publish"),
+                "freshness_class": source.get("freshness_class"),
+                "execution_eligibility": source.get("execution_eligibility"),
                 "source": {
                     "provider": source.get("provider"),
                     "market": source.get("market"),
@@ -3116,6 +3457,7 @@ def _build_chatgpt_execution_context(
                     "market_session": source.get("market_session"),
                     "execution_data_quality": source.get("execution_data_quality"),
                     "quote_delay_seconds": source.get("quote_delay_seconds"),
+                    "source_latency_seconds": source.get("source_latency_seconds"),
                 },
             }
         )
@@ -3133,6 +3475,118 @@ def _build_chatgpt_execution_context(
         },
         "tickers": tickers,
     }
+
+
+def _write_chatgpt_execution_context_from_ticker_artifacts(
+    *,
+    config: ScheduledAnalysisConfig,
+    run_dir: Path,
+    ticker_summaries: list[dict[str, Any]],
+    overlay_phase: dict[str, Any],
+) -> dict[str, str]:
+    tickers: list[dict[str, Any]] = []
+    for summary in ticker_summaries:
+        if summary.get("status") != "success":
+            continue
+        ticker = str(summary.get("ticker") or "").strip().upper()
+        artifacts = summary.get("artifacts") or {}
+        update_payload = _load_json_artifact(run_dir, artifacts.get("execution_update_json"))
+        snapshot_payload = _load_json_artifact(run_dir, artifacts.get("microstructure_snapshot_json"))
+        if not update_payload and not snapshot_payload:
+            continue
+        source = {}
+        if isinstance(update_payload.get("source") if isinstance(update_payload, dict) else None, dict):
+            source = update_payload.get("source") or {}
+        elif isinstance(snapshot_payload, dict):
+            source = snapshot_payload
+        micro = source.get("microstructure") if isinstance(source.get("microstructure"), dict) else {}
+        tickers.append(
+            {
+                "ticker": ticker,
+                "checkpoint": (
+                    (update_payload or {}).get("refresh_checkpoint")
+                    or source.get("checkpoint_id")
+                    or micro.get("checkpoint_id")
+                ),
+                "execution_asof": (update_payload or {}).get("execution_asof"),
+                "market_data_asof": (update_payload or {}).get("market_data_asof") or source.get("asof") or micro.get("asof_local"),
+                "decision_state": (update_payload or {}).get("decision_state"),
+                "decision_now": (update_payload or {}).get("decision_now"),
+                "execution_timing_state": (update_payload or {}).get("execution_timing_state"),
+                "reason_codes": (update_payload or {}).get("reason_codes") or [],
+                "last_price": (update_payload or {}).get("last_price") or source.get("last_price"),
+                "session_vwap": (update_payload or {}).get("session_vwap") or source.get("session_vwap"),
+                "relative_volume": (update_payload or {}).get("relative_volume") or source.get("relative_volume"),
+                "spread_bps": source.get("spread_bps") or micro.get("spread_bps"),
+                "orderbook_imbalance": source.get("orderbook_imbalance") or micro.get("orderbook_imbalance"),
+                "execution_strength": source.get("execution_strength") or micro.get("execution_strength"),
+                "investor_flow_status": source.get("investor_flow_status") or micro.get("investor_flow_status"),
+                "program_flow_status": source.get("program_flow_status") or micro.get("program_flow_status"),
+                "vi_status": source.get("vi_status") or micro.get("vi_status"),
+                "market_alert_status": source.get("market_alert_status") or micro.get("market_alert_status"),
+                "halt_status": source.get("halt_status") or micro.get("halt_status"),
+                "luld_status": source.get("luld_status") or micro.get("luld_status"),
+                "reg_sho_status": source.get("reg_sho_status") or micro.get("reg_sho_status"),
+                "news_halt_status": source.get("news_halt_status") or micro.get("news_halt_status"),
+                "missing_reason": source.get("missing_reason") or micro.get("missing_reason") or {},
+                "published_in_run_id": source.get("published_in_run_id") or micro.get("published_in_run_id"),
+                "published_at": source.get("published_at") or micro.get("published_at"),
+                "microstructure_source_run_id": source.get("microstructure_source_run_id") or micro.get("microstructure_source_run_id"),
+                "analysis_source_run_id": source.get("analysis_source_run_id") or micro.get("analysis_source_run_id"),
+                "generated_in_current_run": source.get("generated_in_current_run") if "generated_in_current_run" in source else micro.get("generated_in_current_run"),
+                "backfilled_from_run_id": source.get("backfilled_from_run_id") or micro.get("backfilled_from_run_id"),
+                "artifact_asof": source.get("artifact_asof") or micro.get("artifact_asof"),
+                "artifact_age_seconds_at_publish": source.get("artifact_age_seconds_at_publish")
+                or micro.get("artifact_age_seconds_at_publish"),
+                "freshness_class": source.get("freshness_class") or micro.get("freshness_class"),
+                "execution_eligibility": source.get("execution_eligibility") or micro.get("execution_eligibility"),
+                "source": {
+                    "provider": source.get("provider"),
+                    "market": source.get("market") or micro.get("market"),
+                    "exchange": source.get("exchange") or micro.get("exchange"),
+                    "market_session": source.get("market_session"),
+                    "execution_data_quality": source.get("execution_data_quality") or source.get("data_quality") or micro.get("data_quality"),
+                    "quote_delay_seconds": source.get("quote_delay_seconds"),
+                    "source_latency_seconds": source.get("source_latency_seconds") or micro.get("source_latency_seconds"),
+                },
+            }
+        )
+    if not tickers:
+        return {}
+    context_path = run_dir / "chatgpt_execution_context.json"
+    _write_json(
+        context_path,
+        {
+            "artifact_type": "chatgpt_execution_context",
+            "market": config.run.market,
+            "checkpoint": None,
+            "checkpoint_timezone": _execution_checkpoint_timezone(config),
+            "generated_at": datetime.now(ZoneInfo(_execution_checkpoint_timezone(config))).isoformat(),
+            "generated_in_current_run": False,
+            "overlay_phase": overlay_phase,
+            "privacy": {
+                "account_identifiers": "excluded",
+                "balances": "excluded",
+                "positions": "excluded",
+                "orders_and_fills": "excluded",
+            },
+            "tickers": tickers,
+        },
+    )
+    return {"chatgpt_execution_context_json": _relative_to_run(run_dir, context_path)}
+
+
+def _load_json_artifact(run_dir: Path, relative_path: Any) -> dict[str, Any]:
+    if not relative_path:
+        return {}
+    path = _resolve_artifact_source(run_dir, str(relative_path))
+    if not path.is_file():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    return payload if isinstance(payload, dict) else {}
 
 
 def _build_intraday_attempt_payload(
