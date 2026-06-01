@@ -7,6 +7,7 @@ import re
 import shutil
 from pathlib import Path
 from typing import Any, Mapping
+from urllib.parse import unquote, urlparse
 
 from tradingagents.youtube.config import YouTubeSiteSettings
 
@@ -171,6 +172,9 @@ def _render_feed(manifests: list[dict[str, Any]], settings: YouTubeSiteSettings)
                     "run_id": run_id,
                     "video_id": video_id,
                     "title": video.get("title"),
+                    "channel": video.get("channel"),
+                    "source_url": video.get("source_url"),
+                    "thumbnail_url": video.get("thumbnail_url"),
                     "status": video.get("status"),
                     "published_at": video.get("published_at"),
                     "video_url": video.get("video_url"),
@@ -203,11 +207,30 @@ def _video_card(manifest: Mapping[str, Any], video: Mapping[str, Any]) -> str:
     title = str(video.get("title") or video.get("video_id") or "YouTube report")
     status = str(video.get("status") or "unknown")
     published = str(video.get("published_at") or "")
+    channel = _first_text(video.get("channel"), video.get("channel_name"))
+    source_url = _first_text(video.get("source_url"))
+    source_label = _source_label_from_url(source_url)
+    thumbnail_url = _first_text(video.get("thumbnail_url"))
+    source_parts = []
+    if channel:
+        source_parts.append(f"채널: {channel}")
+    if source_label:
+        source_parts.append(f"출처: {source_label}")
+    source_text = " · ".join(source_parts) or "채널 정보 없음"
+    thumb = (
+        f'<span class="thumb"><img src="{escape(thumbnail_url)}" alt="{escape(title)}" loading="lazy" referrerpolicy="no-referrer"></span>'
+        if thumbnail_url
+        else f'<span class="thumb thumb-empty"><span>{escape(channel or "YouTube")}</span></span>'
+    )
     return f"""
 <a class="card" href="runs/{escape(run_id)}/{escape(video_id)}.html">
-  <span class="badge status-{escape(_safe_segment(status))}">{escape(status)}</span>
-  <strong>{escape(title)}</strong>
-  <small>{escape(published)}</small>
+  {thumb}
+  <span class="card-body">
+    <span class="badge status-{escape(_safe_segment(status))}">{escape(status)}</span>
+    <strong>{escape(title)}</strong>
+    <small class="source-line">{escape(source_text)}</small>
+    <small>{escape(published)}</small>
+  </span>
 </a>
 """
 
@@ -349,9 +372,35 @@ def _public_summary_from_video(video: Mapping[str, Any]) -> dict[str, Any]:
         "video_id": video.get("video_id"),
         "title": video.get("title"),
         "url": video.get("video_url"),
+        "channel": video.get("channel"),
+        "source_url": video.get("source_url"),
+        "thumbnail_url": video.get("thumbnail_url"),
         "published_at": video.get("published_at"),
         "status": video.get("status"),
     }
+
+
+def _first_text(*values: Any) -> str:
+    for value in values:
+        text = str(value or "").strip()
+        if text:
+            return text
+    return ""
+
+
+def _source_label_from_url(url: str) -> str:
+    text = str(url or "").strip()
+    if not text:
+        return ""
+    parsed = urlparse(text)
+    if not parsed.netloc:
+        return text
+    parts = [unquote(part) for part in parsed.path.strip("/").split("/") if part]
+    handle = next((part for part in parts if part.startswith("@")), "")
+    tab = parts[-1] if parts and parts[-1] in {"videos", "shorts", "streams"} else ""
+    tab_label = {"videos": "동영상", "shorts": "쇼츠", "streams": "라이브"}.get(tab, tab)
+    base = handle or parsed.netloc
+    return f"{base} / {tab_label}" if tab_label else base
 
 
 def _format_window(manifest: Mapping[str, Any]) -> str:
@@ -411,8 +460,15 @@ a:hover { text-decoration: underline; }
 section { margin: 28px 0; }
 h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; color: var(--text); min-height: 128px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
 .card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
 .runs { display: grid; gap: 10px; }
 .badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
 .status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }

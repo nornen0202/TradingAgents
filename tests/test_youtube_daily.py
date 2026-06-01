@@ -388,7 +388,7 @@ class YouTubeDailyTests(unittest.TestCase):
                     f"video00000{i}",
                     f"https://www.youtube.com/watch?v=video00000{i}",
                     f"Video {i}",
-                    "fixture",
+                    "https://www.youtube.com/@fixture/videos",
                     datetime.now(timezone.utc) - timedelta(hours=i),
                 )
                 for i in range(1, 4)
@@ -419,12 +419,22 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertEqual(manifest["source_policy"]["research_pipeline_version"], 3)
             self.assertEqual(manifest["max_entries_per_url"], 25)
             self.assertEqual(manifest["parallel_video_execution"]["max_parallel_videos"], 1)
+            self.assertEqual(manifest["videos"][0]["channel"], "경제사냥꾼")
+            self.assertEqual(manifest["videos"][0]["source_url"], "https://www.youtube.com/@fixture/videos")
+            self.assertIn("hqdefault.jpg", manifest["videos"][0]["thumbnail_url"])
             self.assertTrue(run_manifest.is_file())
             self.assertTrue((first_video_dir / "research_plan.json").is_file())
             self.assertTrue((first_video_dir / "evidence.json").is_file())
             self.assertTrue((first_video_dir / "claim_verification.json").is_file())
             self.assertTrue(site_index.is_file())
-            self.assertIn("Video", site_index.read_text(encoding="utf-8"))
+            site_html = site_index.read_text(encoding="utf-8")
+            self.assertIn("Video", site_html)
+            self.assertIn("채널: 경제사냥꾼", site_html)
+            self.assertIn("출처: @fixture / 동영상", site_html)
+            self.assertIn("hqdefault.jpg", site_html)
+            public_summary = json.loads((first_video_dir / "public_summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(public_summary["source_url"], "https://www.youtube.com/@fixture/videos")
+            self.assertIn("hqdefault.jpg", public_summary["thumbnail_url"])
 
     def test_runner_processes_videos_in_parallel_when_configured(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -983,7 +993,7 @@ def _fake_bundle(
             view_count=1000,
             like_count=None,
             description="",
-            thumbnail_url="",
+            thumbnail_url=f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg",
             tags=(),
             categories=(),
         ),

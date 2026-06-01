@@ -342,7 +342,7 @@ def _process_video_reference(
         _write_json(video_dir / "research_plan.json", verified.verification.get("research_plan") or {})
         _write_json(video_dir / "evidence.json", verified.verification.get("evidence") or {})
         _write_json(video_dir / "claim_verification.json", verified.verification.get("claim_verification") or {})
-        public_summary = _public_summary(bundle, verified)
+        public_summary = _public_summary(bundle, verified, source_url=reference.source_url)
         _write_json(video_dir / "public_summary.json", public_summary)
         result["status"] = verified.status
         result["manifest_item"] = _manifest_video_item(
@@ -351,6 +351,7 @@ def _process_video_reference(
             video_dir=video_dir,
             run_dir=run_dir,
             error=None,
+            source_url=reference.source_url,
             reused_from_run=None,
         )
         return result
@@ -440,6 +441,7 @@ def _write_failed_video_artifacts(
         "video_id": reference.video_id,
         "title": reference.title,
         "video_url": reference.url,
+        "source_url": reference.source_url,
         "published_at": reference.published_at.isoformat() if reference.published_at else None,
         "status": "failed",
         "error": error,
@@ -626,6 +628,7 @@ def _manifest_video_item(
     video_dir: Path,
     run_dir: Path,
     error: str | None,
+    source_url: str | None = None,
     reused_from_run: str | None = None,
 ) -> dict[str, Any]:
     metadata = bundle.metadata
@@ -633,10 +636,12 @@ def _manifest_video_item(
         "video_id": metadata.video_id,
         "title": metadata.title,
         "channel": metadata.channel,
+        "source_url": source_url,
         "video_url": metadata.url,
         "published_at": metadata.published_at.isoformat() if metadata.published_at else metadata.upload_date,
         "duration_seconds": metadata.duration_seconds,
         "view_count": metadata.view_count,
+        "thumbnail_url": metadata.thumbnail_url,
         "status": status,
         "transcript_status": bundle.transcript_status,
         "transcript_source": getattr(bundle.transcript, "source", None),
@@ -672,12 +677,14 @@ def _manifest_video_item_from_reused_artifacts(
         "video_id": summary.get("video_id") or metadata.get("video_id") or reference.video_id,
         "title": summary.get("title") or metadata.get("title") or reference.title,
         "channel": summary.get("channel") or metadata.get("channel"),
+        "source_url": summary.get("source_url") or metadata.get("source_url") or reference.source_url,
         "video_url": summary.get("url") or metadata.get("url") or reference.url,
         "published_at": summary.get("published_at")
         or metadata.get("published_at")
         or (reference.published_at.isoformat() if reference.published_at else None),
         "duration_seconds": metadata.get("duration_seconds"),
         "view_count": metadata.get("view_count"),
+        "thumbnail_url": summary.get("thumbnail_url") or metadata.get("thumbnail_url"),
         "status": status,
         "transcript_status": summary.get("transcript_status") or metadata_payload.get("transcript_status"),
         "transcript_source": summary.get("transcript_source") or metadata_payload.get("transcript_source"),
@@ -817,7 +824,7 @@ def _metadata_payload(bundle: YouTubeVideoBundle) -> dict[str, Any]:
     }
 
 
-def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport) -> dict[str, Any]:
+def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport, *, source_url: str | None = None) -> dict[str, Any]:
     verification = verified.verification
     claim_verification = verification.get("claim_verification") if isinstance(verification.get("claim_verification"), dict) else {}
     evidence = verification.get("evidence") if isinstance(verification.get("evidence"), dict) else {}
@@ -864,6 +871,9 @@ def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport) -
         "title": bundle.metadata.title,
         "url": bundle.metadata.url,
         "channel": bundle.metadata.channel,
+        "channel_id": bundle.metadata.channel_id,
+        "source_url": source_url,
+        "thumbnail_url": bundle.metadata.thumbnail_url,
         "published_at": bundle.metadata.published_at.isoformat() if bundle.metadata.published_at else bundle.metadata.upload_date,
         "status": verified.status,
         "transcript_status": bundle.transcript_status,
