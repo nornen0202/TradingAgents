@@ -256,6 +256,12 @@ def _youtube_dl_options(**base_options: Any) -> dict[str, Any]:
     js_runtimes = _yt_dlp_js_runtimes()
     if js_runtimes:
         options.setdefault("js_runtimes", js_runtimes)
+    remote_components = _yt_dlp_remote_components()
+    if remote_components:
+        options.setdefault("remote_components", remote_components)
+    ffmpeg_location = _yt_dlp_ffmpeg_location()
+    if ffmpeg_location:
+        options.setdefault("ffmpeg_location", ffmpeg_location)
     cookie_file = _youtube_cookie_file()
     if cookie_file:
         options["cookiefile"] = cookie_file
@@ -293,6 +299,42 @@ def _yt_dlp_js_runtimes() -> dict[str, dict[str, str]]:
     if node_path:
         return {"node": {"path": node_path}}
     return {}
+
+
+def _yt_dlp_remote_components() -> list[str]:
+    for name in ("TRADINGAGENTS_YTDLP_REMOTE_COMPONENTS", "YOUTUBE_REMOTE_COMPONENTS", "YT_DLP_REMOTE_COMPONENTS"):
+        raw = os.getenv(name)
+        if raw is None:
+            continue
+        text = str(raw or "").strip()
+        if text.lower() in {"", "0", "false", "no", "off", "none"}:
+            return []
+        return _dedupe_texts(part.strip() for part in re.split(r"[\n,;]+", text) if part.strip())
+    # yt-dlp warns that EJS remote components may be needed to solve YouTube's
+    # n challenge when running from the Python package rather than its official
+    # executable. Allow the GitHub-hosted component by default so audio formats
+    # needed by ASR are less likely to disappear.
+    return ["ejs:github"]
+
+
+def _yt_dlp_ffmpeg_location() -> str | None:
+    configured = _youtube_env_text(
+        "TRADINGAGENTS_YOUTUBE_FFMPEG_LOCATION",
+        "TRADINGAGENTS_FFMPEG_LOCATION",
+        "YOUTUBE_FFMPEG_LOCATION",
+        "FFMPEG_LOCATION",
+    )
+    if configured:
+        return configured
+    if ffmpeg := shutil.which("ffmpeg"):
+        return ffmpeg
+    try:
+        import imageio_ffmpeg
+
+        bundled = str(imageio_ffmpeg.get_ffmpeg_exe() or "").strip()
+    except Exception:
+        return None
+    return bundled if bundled and os.path.isfile(bundled) else None
 
 
 def _youtube_extractor_args() -> dict[str, dict[str, list[str]]]:

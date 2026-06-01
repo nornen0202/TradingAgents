@@ -188,11 +188,43 @@ class YouTubeVideoReportTests(unittest.TestCase):
 
         self.assertEqual(options["plugin_dirs"], ["default"])
         self.assertEqual(options["js_runtimes"], {"node": {"path": "C:/Program Files/nodejs/node.exe"}})
+        self.assertEqual(options["remote_components"], ["ejs:github"])
         self.assertEqual(options["extractor_args"]["youtubepot-bgutilhttp"]["base_url"], ["http://127.0.0.1:4416"])
         self.assertEqual(
             options["extractor_args"]["youtubepot-bgutilscript"]["server_home"],
             ["C:/Users/JY/bgutil-ytdlp-pot-provider/server"],
         )
+
+    def test_youtube_dl_options_can_override_remote_components(self):
+        with patch.dict(os.environ, {"TRADINGAGENTS_YTDLP_REMOTE_COMPONENTS": "ejs:npm, ejs:github"}, clear=True):
+            options = _youtube_dl_options(skip_download=True)
+
+        self.assertEqual(options["remote_components"], ["ejs:npm", "ejs:github"])
+
+        with patch.dict(os.environ, {"TRADINGAGENTS_YTDLP_REMOTE_COMPONENTS": "off"}, clear=True):
+            disabled = _youtube_dl_options(skip_download=True)
+
+        self.assertNotIn("remote_components", disabled)
+
+    def test_youtube_dl_options_uses_configured_ffmpeg_location(self):
+        with patch.dict(os.environ, {"TRADINGAGENTS_YOUTUBE_FFMPEG_LOCATION": "C:/ffmpeg/bin/ffmpeg.exe"}, clear=True):
+            options = _youtube_dl_options(skip_download=True)
+
+        self.assertEqual(options["ffmpeg_location"], "C:/ffmpeg/bin/ffmpeg.exe")
+
+    def test_youtube_dl_options_uses_imageio_ffmpeg_when_system_ffmpeg_is_missing(self):
+        fake_imageio_ffmpeg = types.SimpleNamespace(get_ffmpeg_exe=lambda: "C:/Users/JY/AppData/Local/imageio/ffmpeg.exe")
+
+        def which(name: str) -> str | None:
+            return "C:/Program Files/nodejs/node.exe" if name == "node" else None
+
+        with patch.dict(os.environ, {}, clear=True), patch.dict(sys.modules, {"imageio_ffmpeg": fake_imageio_ffmpeg}), patch(
+            "tradingagents.dataflows.youtube_video.shutil.which",
+            side_effect=which,
+        ), patch("tradingagents.dataflows.youtube_video.os.path.isfile", return_value=True):
+            options = _youtube_dl_options(skip_download=True)
+
+        self.assertEqual(options["ffmpeg_location"], "C:/Users/JY/AppData/Local/imageio/ffmpeg.exe")
 
     def test_asr_auto_defaults_to_turbo_on_cuda_and_small_on_cpu(self):
         with patch.dict(os.environ, {"TRADINGAGENTS_YOUTUBE_ASR_MODEL": "auto", "TRADINGAGENTS_YOUTUBE_ASR_DEVICE": "auto"}, clear=True), patch.dict(
