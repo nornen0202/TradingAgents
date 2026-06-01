@@ -429,8 +429,7 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertTrue(site_index.is_file())
             site_html = site_index.read_text(encoding="utf-8")
             self.assertIn("Video", site_html)
-            self.assertIn("채널: 경제사냥꾼", site_html)
-            self.assertIn("출처: @fixture / 동영상", site_html)
+            self.assertIn("출처/채널: 경제사냥꾼 · @fixture / 동영상", site_html)
             self.assertIn("hqdefault.jpg", site_html)
             public_summary = json.loads((first_video_dir / "public_summary.json").read_text(encoding="utf-8"))
             self.assertEqual(public_summary["source_url"], "https://www.youtube.com/@fixture/videos")
@@ -656,6 +655,7 @@ class YouTubeDailyTests(unittest.TestCase):
                             {
                                 "video_id": "u2BEOgr8ze8",
                                 "title": "Fixture video",
+                                "channel": "Fixture channel",
                                 "video_url": "https://www.youtube.com/watch?v=u2BEOgr8ze8",
                                 "status": VERIFIED,
                                 "final_report_path": "videos/u2BEOgr8ze8/final_report.md",
@@ -673,10 +673,15 @@ class YouTubeDailyTests(unittest.TestCase):
 
             build_youtube_site(archive_dir, site_dir, YouTubeSiteSettings("YouTube 리포트", 10, 10))
             public_text = "\n".join(path.read_text(encoding="utf-8") for path in (site_dir / "youtube").rglob("*") if path.is_file())
+            youtube_index = (site_dir / "youtube" / "index.html").read_text(encoding="utf-8")
+            feed = json.loads((site_dir / "youtube" / "feed.json").read_text(encoding="utf-8"))
 
             self.assertEqual((site_dir / "index.html").read_text(encoding="utf-8"), "ROOT_SITE")
             self.assertNotIn("RAW_TRANSCRIPT_FULL_SHOULD_NOT_PUBLISH", public_text)
             self.assertTrue((site_dir / "youtube" / "feed.json").is_file())
+            self.assertIn("출처/채널: Fixture channel", youtube_index)
+            self.assertIn("https://i.ytimg.com/vi/u2BEOgr8ze8/hqdefault.jpg", youtube_index)
+            self.assertEqual(feed["items"][0]["thumbnail_url"], "https://i.ytimg.com/vi/u2BEOgr8ze8/hqdefault.jpg")
 
     def test_site_builder_hides_collection_failures_from_report_lists(self):
         with tempfile.TemporaryDirectory() as tmp:
