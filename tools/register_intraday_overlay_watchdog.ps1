@@ -7,7 +7,7 @@ param(
     [string] $Repo = "nornen0202/TradingAgents",
     [string] $Workflow = "intraday-overlay-refresh.yml",
     [string] $Ref = "main",
-    [int] $RecentRunWindowMinutes = 40
+    [int] $RecentRunWindowMinutes = 20
 )
 
 $ErrorActionPreference = "Stop"
