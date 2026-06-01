@@ -18,7 +18,7 @@ Run from the repository root on the self-hosted Windows runner:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/register_intraday_overlay_watchdog.ps1
 ```
 
-Default KR watchdog times are `09:55`, `10:55`, `11:55`, `12:55`, `13:55`, `14:55`, and `15:40` KST on weekdays. These sit five minutes after the GitHub fallback cron probes, so native GitHub schedule events still have priority.
+Default KR watchdog times are `09:55`, `10:55`, `11:55`, `12:55`, `13:55`, `14:55`, and `15:25` KST on weekdays. The first six sit five minutes after the GitHub fallback cron probes, so native GitHub schedule events still have priority. The final watchdog runs five minutes after the 15:20 close checkpoint because a later post-close dispatch can fall back to the 14:35 artifact instead of producing a fresh 15:20 snapshot.
 
 Dry-run the registration:
 

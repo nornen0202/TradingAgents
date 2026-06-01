@@ -2,7 +2,7 @@
 param(
     [ValidateSet("kr", "us")]
     [string] $Profile = "kr",
-    [string[]] $Times = @("09:55", "10:55", "11:55", "12:55", "13:55", "14:55", "15:40"),
+    [string[]] $Times = @("09:55", "10:55", "11:55", "12:55", "13:55", "14:55", "15:25"),
     [string] $TaskFolder = "\TradingAgents",
     [string] $Repo = "nornen0202/TradingAgents",
     [string] $Workflow = "intraday-overlay-refresh.yml",

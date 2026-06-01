@@ -3,11 +3,12 @@ name: Intraday Overlay Refresh
 on:
   schedule:
     # KR checkpoints: 09:35, 10:35, 11:35, 12:35, 13:35, 14:35, 15:20 KST.
-    # The +15 minute fallback probes absorb occasional GitHub schedule event drops.
+    # Fallback probes absorb occasional GitHub schedule event drops.
+    # The close checkpoint fallback runs at 15:25 KST so it can still capture 15:20 data.
     - cron: '35 0-5 * * 1-5'
     - cron: '20 6 * * 1-5'
     - cron: '50 0-5 * * 1-5'
-    - cron: '35 6 * * 1-5'
+    - cron: '25 6 * * 1-5'
     # US checkpoints: 10:00, 11:00, 12:00, 13:00, 14:00, 15:00, 15:50 America/New_York.
     # These UTC windows intentionally cover both daylight-saving and standard-time sessions.
     - cron: '0 14-20 * * 1-5'
@@ -169,7 +170,7 @@ jobs:
           path: site
 
   overlay_refresh_kr:
-    if: ${{ (github.event_name == 'schedule' && (github.event.schedule == '35 0-5 * * 1-5' || github.event.schedule == '20 6 * * 1-5' || github.event.schedule == '50 0-5 * * 1-5' || github.event.schedule == '35 6 * * 1-5')) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) }}
+    if: ${{ (github.event_name == 'schedule' && (github.event.schedule == '35 0-5 * * 1-5' || github.event.schedule == '20 6 * * 1-5' || github.event.schedule == '50 0-5 * * 1-5' || github.event.schedule == '25 6 * * 1-5')) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 120
     defaults:
@@ -337,7 +338,7 @@ jobs:
           config_path = "config/scheduled_analysis.toml"
           if event_name == "workflow_dispatch" and profile == "kr":
               config_path = "config/scheduled_analysis_korea.toml"
-          if event_name == "schedule" and schedule in {"35 0-5 * * 1-5", "20 6 * * 1-5", "50 0-5 * * 1-5", "35 6 * * 1-5"}:
+          if event_name == "schedule" and schedule in {"35 0-5 * * 1-5", "20 6 * * 1-5", "50 0-5 * * 1-5", "25 6 * * 1-5"}:
               config_path = "config/scheduled_analysis_korea.toml"
 
           args = [
