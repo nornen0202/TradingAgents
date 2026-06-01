@@ -14,14 +14,14 @@ from time import perf_counter
 from typing import Any, Callable, Iterable
 from zoneinfo import ZoneInfo
 
-from tradingagents.dataflows.youtube_video import YouTubeVideoBundle, fetch_youtube_video
+from tradingagents.dataflows.youtube_video import YouTubeVideoBundle, assess_transcript_reliability, fetch_youtube_video
 from tradingagents.youtube.channel import (
     YouTubeVideoReference,
     dedupe_video_references,
     filter_references_by_window,
     list_channel_video_references,
 )
-from tradingagents.youtube.config import YouTubeDailyConfig, load_youtube_config, with_youtube_overrides
+from tradingagents.youtube.config import ASRSettings, YouTubeDailyConfig, load_youtube_config, with_youtube_overrides
 from tradingagents.youtube.research import public_evidence_summary
 from tradingagents.youtube.site import build_youtube_site
 from tradingagents.youtube.verifier import RESEARCH_PIPELINE_VERSION, VerifiedVideoReport, verify_youtube_bundle
@@ -91,6 +91,7 @@ def execute_youtube_run(
     video_fetcher: VideoFetcher | None = None,
     bundle_verifier: BundleVerifier | None = None,
 ) -> dict[str, Any]:
+    _apply_asr_environment(config.asr)
     tz = ZoneInfo(config.channel.timezone)
     started_at = datetime.now(tz)
     timer_start = perf_counter()
@@ -341,7 +342,7 @@ def _process_video_reference(
         _write_json(video_dir / "research_plan.json", verified.verification.get("research_plan") or {})
         _write_json(video_dir / "evidence.json", verified.verification.get("evidence") or {})
         _write_json(video_dir / "claim_verification.json", verified.verification.get("claim_verification") or {})
-        public_summary = _public_summary(bundle, verified)
+        public_summary = _public_summary(bundle, verified, source_url=reference.source_url)
         _write_json(video_dir / "public_summary.json", public_summary)
         result["status"] = verified.status
         result["manifest_item"] = _manifest_video_item(
@@ -350,6 +351,7 @@ def _process_video_reference(
             video_dir=video_dir,
             run_dir=run_dir,
             error=None,
+            source_url=reference.source_url,
             reused_from_run=None,
         )
         return result
@@ -439,6 +441,7 @@ def _write_failed_video_artifacts(
         "video_id": reference.video_id,
         "title": reference.title,
         "video_url": reference.url,
+        "source_url": reference.source_url,
         "published_at": reference.published_at.isoformat() if reference.published_at else None,
         "status": "failed",
         "error": error,
@@ -467,6 +470,7 @@ def execute_single_video(
     verify: bool,
     out: str | None = None,
 ) -> Path:
+    _apply_asr_environment(config.asr)
     generated_at = datetime.now(ZoneInfo(config.channel.timezone))
     bundle = fetch_youtube_video(video_url)
     if not _bundle_has_usable_transcript(bundle):
@@ -500,6 +504,40 @@ def execute_single_video(
 
 def _default_reference_lister(channel_urls: Iterable[str], max_entries_per_url: int) -> tuple[YouTubeVideoReference, ...]:
     return list_channel_video_references(channel_urls, max_entries_per_url=max_entries_per_url)
+
+
+def _apply_asr_environment(settings: ASRSettings) -> None:
+    values = {
+        "TRADINGAGENTS_YOUTUBE_ASR_FALLBACK": "1" if settings.enabled else "0",
+        "TRADINGAGENTS_YOUTUBE_ASR_MODEL": settings.model,
+        "TRADINGAGENTS_YOUTUBE_ASR_DEVICE": settings.device,
+        "TRADINGAGENTS_YOUTUBE_ASR_COMPUTE_TYPE": settings.compute_type,
+        "TRADINGAGENTS_YOUTUBE_ASR_FALLBACK_MODELS": ",".join(settings.fallback_models),
+        "TRADINGAGENTS_YOUTUBE_ASR_BEAM_SIZE": str(settings.beam_size),
+        "TRADINGAGENTS_YOUTUBE_ASR_BEST_OF": str(settings.best_of),
+        "TRADINGAGENTS_YOUTUBE_ASR_TEMPERATURE": settings.temperature,
+        "TRADINGAGENTS_YOUTUBE_ASR_CONDITION_ON_PREVIOUS_TEXT": "1" if settings.condition_on_previous_text else "0",
+        "TRADINGAGENTS_YOUTUBE_ASR_REPETITION_PENALTY": str(settings.repetition_penalty),
+        "TRADINGAGENTS_YOUTUBE_ASR_NO_REPEAT_NGRAM_SIZE": str(settings.no_repeat_ngram_size),
+        "TRADINGAGENTS_YOUTUBE_ASR_WORD_TIMESTAMPS": "1" if settings.word_timestamps else "0",
+        "TRADINGAGENTS_YOUTUBE_ASR_HALLUCINATION_SILENCE_THRESHOLD": str(settings.hallucination_silence_threshold),
+        "TRADINGAGENTS_YOUTUBE_ASR_VAD_FILTER": "1" if settings.vad_filter else "0",
+        "TRADINGAGENTS_YOUTUBE_ASR_VAD_MIN_SILENCE_MS": str(settings.vad_min_silence_ms),
+        "TRADINGAGENTS_YOUTUBE_ASR_VAD_SPEECH_PAD_MS": str(settings.vad_speech_pad_ms),
+        "TRADINGAGENTS_YOUTUBE_ASR_VAD_THRESHOLD": str(settings.vad_threshold),
+        "TRADINGAGENTS_YOUTUBE_ASR_MIN_QUALITY": settings.min_quality,
+        "TRADINGAGENTS_YOUTUBE_ASR_RECHECK_AUTOMATIC": "1" if settings.recheck_automatic else "0",
+        "TRADINGAGENTS_YOUTUBE_TRANSCRIPT_CHUNK_CHARS": str(settings.chunk_chars),
+        "TRADINGAGENTS_YOUTUBE_TRANSCRIPT_MAX_CHUNKS": str(settings.max_chunks),
+        "TRADINGAGENTS_YOUTUBE_TRANSCRIPT_MIN_COVERAGE_CHUNKS": str(settings.min_coverage_chunks),
+    }
+    if settings.hotwords:
+        values["TRADINGAGENTS_YOUTUBE_ASR_HOTWORDS"] = ",".join(settings.hotwords)
+    if settings.initial_prompt:
+        values["TRADINGAGENTS_YOUTUBE_ASR_INITIAL_PROMPT"] = settings.initial_prompt
+    for key, value in values.items():
+        if str(value).strip():
+            os.environ.setdefault(key, str(value))
 
 
 def _call_video_fetcher(fetcher: VideoFetcher, url: str, *, fetch_transcript: bool) -> YouTubeVideoBundle:
@@ -590,6 +628,7 @@ def _manifest_video_item(
     video_dir: Path,
     run_dir: Path,
     error: str | None,
+    source_url: str | None = None,
     reused_from_run: str | None = None,
 ) -> dict[str, Any]:
     metadata = bundle.metadata
@@ -597,10 +636,12 @@ def _manifest_video_item(
         "video_id": metadata.video_id,
         "title": metadata.title,
         "channel": metadata.channel,
+        "source_url": source_url,
         "video_url": metadata.url,
         "published_at": metadata.published_at.isoformat() if metadata.published_at else metadata.upload_date,
         "duration_seconds": metadata.duration_seconds,
         "view_count": metadata.view_count,
+        "thumbnail_url": metadata.thumbnail_url,
         "status": status,
         "transcript_status": bundle.transcript_status,
         "transcript_source": getattr(bundle.transcript, "source", None),
@@ -636,12 +677,14 @@ def _manifest_video_item_from_reused_artifacts(
         "video_id": summary.get("video_id") or metadata.get("video_id") or reference.video_id,
         "title": summary.get("title") or metadata.get("title") or reference.title,
         "channel": summary.get("channel") or metadata.get("channel"),
+        "source_url": summary.get("source_url") or metadata.get("source_url") or reference.source_url,
         "video_url": summary.get("url") or metadata.get("url") or reference.url,
         "published_at": summary.get("published_at")
         or metadata.get("published_at")
         or (reference.published_at.isoformat() if reference.published_at else None),
         "duration_seconds": metadata.get("duration_seconds"),
         "view_count": metadata.get("view_count"),
+        "thumbnail_url": summary.get("thumbnail_url") or metadata.get("thumbnail_url"),
         "status": status,
         "transcript_status": summary.get("transcript_status") or metadata_payload.get("transcript_status"),
         "transcript_source": summary.get("transcript_source") or metadata_payload.get("transcript_source"),
@@ -767,19 +810,21 @@ def _metadata_payload(bundle: YouTubeVideoBundle) -> dict[str, Any]:
     metadata = asdict(bundle.metadata)
     published_at = bundle.metadata.published_at
     metadata["published_at"] = published_at.isoformat() if published_at else None
+    transcript_quality = assess_transcript_reliability(bundle.transcript, duration_seconds=bundle.metadata.duration_seconds)
     return {
         "metadata": metadata,
         "transcript_status": bundle.transcript_status,
         "transcript_source": getattr(bundle.transcript, "source", None),
         "transcript_language": getattr(bundle.transcript, "language_name", None),
         "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
+        "transcript_quality": transcript_quality,
         "available_manual_caption_languages": list(bundle.available_manual_caption_languages),
         "available_auto_caption_languages": list(bundle.available_auto_caption_languages),
         "raw_transcript_archived": False,
     }
 
 
-def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport) -> dict[str, Any]:
+def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport, *, source_url: str | None = None) -> dict[str, Any]:
     verification = verified.verification
     claim_verification = verification.get("claim_verification") if isinstance(verification.get("claim_verification"), dict) else {}
     evidence = verification.get("evidence") if isinstance(verification.get("evidence"), dict) else {}
@@ -813,6 +858,10 @@ def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport) -
                 "confidence": item.get("confidence"),
                 "supporting_evidence_ids": list(item.get("supporting_evidence_ids") or [])[:4],
                 "manual_check_required": item.get("manual_check_required"),
+                "timestamp": item.get("timestamp"),
+                "source_confidence": item.get("source_confidence"),
+                "asr_confidence": item.get("asr_confidence"),
+                "numeric_parse": item.get("numeric_parse") if isinstance(item.get("numeric_parse"), dict) else {},
                 "investor_implication": _short_text(item.get("investor_implication"), 260),
             }
         )
@@ -822,11 +871,15 @@ def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport) -
         "title": bundle.metadata.title,
         "url": bundle.metadata.url,
         "channel": bundle.metadata.channel,
+        "channel_id": bundle.metadata.channel_id,
+        "source_url": source_url,
+        "thumbnail_url": bundle.metadata.thumbnail_url,
         "published_at": bundle.metadata.published_at.isoformat() if bundle.metadata.published_at else bundle.metadata.upload_date,
         "status": verified.status,
         "transcript_status": bundle.transcript_status,
         "transcript_source": getattr(bundle.transcript, "source", None),
         "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
+        "transcript_quality": assess_transcript_reliability(bundle.transcript, duration_seconds=bundle.metadata.duration_seconds),
         "generated_at": verification.get("generated_at"),
         "llm_status": verification.get("llm_status"),
         "research_status": verification.get("research_status"),

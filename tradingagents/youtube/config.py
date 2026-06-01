@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import os
 from pathlib import Path
 from typing import Any
@@ -63,6 +63,34 @@ class VerificationSettings:
 
 
 @dataclass(frozen=True)
+class ASRSettings:
+    enabled: bool = True
+    model: str = "auto"
+    device: str = "auto"
+    compute_type: str = "auto"
+    fallback_models: tuple[str, ...] = ("distil-large-v3", "small", "base")
+    beam_size: int = 5
+    best_of: int = 5
+    temperature: str = "0.0,0.2,0.4"
+    condition_on_previous_text: bool = False
+    repetition_penalty: float = 1.05
+    no_repeat_ngram_size: int = 3
+    word_timestamps: bool = True
+    hallucination_silence_threshold: float = 1.0
+    vad_filter: bool = True
+    vad_min_silence_ms: int = 500
+    vad_speech_pad_ms: int = 300
+    vad_threshold: float = 0.5
+    min_quality: str = "usable"
+    recheck_automatic: bool = True
+    chunk_chars: int = 3200
+    max_chunks: int = 12
+    min_coverage_chunks: int = 5
+    hotwords: tuple[str, ...] = ()
+    initial_prompt: str = ""
+
+
+@dataclass(frozen=True)
 class StorageSettings:
     archive_dir: Path
     site_dir: Path
@@ -82,6 +110,7 @@ class YouTubeDailyConfig:
     verification: VerificationSettings
     storage: StorageSettings
     site: YouTubeSiteSettings
+    asr: ASRSettings = field(default_factory=ASRSettings)
 
 
 def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTubeDailyConfig:
@@ -93,6 +122,7 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
     channel_raw = raw.get("channel") or {}
     llm_raw = raw.get("llm") or {}
     verification_raw = raw.get("verification") or {}
+    asr_raw = raw.get("asr") or {}
     storage_raw = raw.get("storage") or {}
     site_raw = raw.get("site") or {}
 
@@ -140,6 +170,36 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
             max_web_pages=max(0, int(verification_raw.get("max_web_pages") or 4)),
             max_transcript_chars_for_llm=max(1000, int(verification_raw.get("max_transcript_chars_for_llm") or 24000)),
         ),
+        asr=ASRSettings(
+            enabled=bool(asr_raw.get("enabled", True)),
+            model=str(asr_raw.get("model") or "auto"),
+            device=str(asr_raw.get("device") or "auto"),
+            compute_type=str(asr_raw.get("compute_type") or "auto"),
+            fallback_models=tuple(
+                str(item).strip()
+                for item in (asr_raw.get("fallback_models") or ("distil-large-v3", "small", "base"))
+                if str(item).strip()
+            ),
+            beam_size=max(1, int(asr_raw.get("beam_size") or 5)),
+            best_of=max(1, int(asr_raw.get("best_of") or 5)),
+            temperature=str(asr_raw.get("temperature") or "0.0,0.2,0.4"),
+            condition_on_previous_text=bool(asr_raw.get("condition_on_previous_text", False)),
+            repetition_penalty=max(1.0, float(asr_raw.get("repetition_penalty") or 1.05)),
+            no_repeat_ngram_size=max(0, int(asr_raw.get("no_repeat_ngram_size") or 3)),
+            word_timestamps=bool(asr_raw.get("word_timestamps", True)),
+            hallucination_silence_threshold=max(0.0, float(asr_raw.get("hallucination_silence_threshold") or 1.0)),
+            vad_filter=bool(asr_raw.get("vad_filter", True)),
+            vad_min_silence_ms=max(0, int(asr_raw.get("vad_min_silence_ms") or 500)),
+            vad_speech_pad_ms=max(0, int(asr_raw.get("vad_speech_pad_ms") or 300)),
+            vad_threshold=min(max(0.0, float(asr_raw.get("vad_threshold") or 0.5)), 1.0),
+            min_quality=str(asr_raw.get("min_quality") or "usable"),
+            recheck_automatic=bool(asr_raw.get("recheck_automatic", True)),
+            chunk_chars=max(1000, int(asr_raw.get("chunk_chars") or 3200)),
+            max_chunks=max(4, int(asr_raw.get("max_chunks") or 12)),
+            min_coverage_chunks=max(1, int(asr_raw.get("min_coverage_chunks") or 5)),
+            hotwords=tuple(str(item).strip() for item in (asr_raw.get("hotwords") or ()) if str(item).strip()),
+            initial_prompt=str(asr_raw.get("initial_prompt") or ""),
+        ),
         storage=StorageSettings(archive_dir=archive_dir, site_dir=site_dir),
         site=YouTubeSiteSettings(
             title=str(site_raw.get("title") or "YouTube 투자자용 검증 리포트"),
@@ -174,6 +234,7 @@ def with_youtube_overrides(
         ),
         llm=config.llm,
         verification=config.verification,
+        asr=config.asr,
         storage=StorageSettings(
             archive_dir=Path(archive_dir) if archive_dir else storage.archive_dir,
             site_dir=Path(site_dir) if site_dir else storage.site_dir,

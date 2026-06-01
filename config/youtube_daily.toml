@@ -36,7 +36,46 @@ max_evidence_items = 24
 max_evidence_per_claim = 3
 fetch_web_pages = true
 max_web_pages = 4
-max_transcript_chars_for_llm = 24000
+max_transcript_chars_for_llm = 48000
+
+[asr]
+enabled = true
+model = "auto"
+device = "auto"
+compute_type = "auto"
+fallback_models = ["distil-large-v3", "small", "base"]
+beam_size = 5
+best_of = 5
+temperature = "0.0,0.2,0.4"
+condition_on_previous_text = false
+repetition_penalty = 1.05
+no_repeat_ngram_size = 3
+word_timestamps = true
+hallucination_silence_threshold = 1.0
+vad_filter = true
+vad_min_silence_ms = 500
+vad_speech_pad_ms = 300
+vad_threshold = 0.5
+min_quality = "usable"
+recheck_automatic = true
+chunk_chars = 3200
+max_chunks = 12
+min_coverage_chunks = 5
+hotwords = [
+  "코스피",
+  "코스닥",
+  "나스닥",
+  "FOMC",
+  "CPI",
+  "PCE",
+  "영업이익",
+  "컨센서스",
+  "basis point",
+  "삼성전자",
+  "SK하이닉스",
+  "엔비디아",
+  "테슬라",
+]
 
 [storage]
 archive_dir = "./.runtime/youtube-archive"

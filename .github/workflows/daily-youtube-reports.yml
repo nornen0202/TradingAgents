@@ -172,17 +172,36 @@ jobs:
       YOUTUBE_GVS_PO_TOKEN: ${{ secrets.YOUTUBE_GVS_PO_TOKEN }}
       YOUTUBE_PLAYER_CLIENTS: ${{ vars.YOUTUBE_PLAYER_CLIENTS }}
       TRADINGAGENTS_YOUTUBE_ASR_FALLBACK: "1"
-      TRADINGAGENTS_YOUTUBE_ASR_MODEL: "base"
-      TRADINGAGENTS_YOUTUBE_ASR_DEVICE: "cpu"
-      TRADINGAGENTS_YOUTUBE_ASR_COMPUTE_TYPE: "int8"
-      TRADINGAGENTS_YOUTUBE_ASR_BEAM_SIZE: "1"
+      TRADINGAGENTS_YOUTUBE_ASR_MODEL: "auto"
+      TRADINGAGENTS_YOUTUBE_ASR_DEVICE: "auto"
+      TRADINGAGENTS_YOUTUBE_ASR_COMPUTE_TYPE: "auto"
+      TRADINGAGENTS_YOUTUBE_ASR_FALLBACK_MODELS: "distil-large-v3,small,base"
+      TRADINGAGENTS_YOUTUBE_ASR_BEAM_SIZE: "5"
+      TRADINGAGENTS_YOUTUBE_ASR_BEST_OF: "5"
+      TRADINGAGENTS_YOUTUBE_ASR_TEMPERATURE: "0.0,0.2,0.4"
+      TRADINGAGENTS_YOUTUBE_ASR_CONDITION_ON_PREVIOUS_TEXT: "0"
+      TRADINGAGENTS_YOUTUBE_ASR_REPETITION_PENALTY: "1.05"
+      TRADINGAGENTS_YOUTUBE_ASR_NO_REPEAT_NGRAM_SIZE: "3"
+      TRADINGAGENTS_YOUTUBE_ASR_WORD_TIMESTAMPS: "1"
+      TRADINGAGENTS_YOUTUBE_ASR_HALLUCINATION_SILENCE_THRESHOLD: "1.0"
+      TRADINGAGENTS_YOUTUBE_ASR_MIN_QUALITY: "usable"
+      TRADINGAGENTS_YOUTUBE_ASR_RECHECK_AUTOMATIC: "1"
+      TRADINGAGENTS_YOUTUBE_TRANSCRIPT_CHUNK_CHARS: "3200"
+      TRADINGAGENTS_YOUTUBE_TRANSCRIPT_MAX_CHUNKS: "12"
+      TRADINGAGENTS_YOUTUBE_TRANSCRIPT_MIN_COVERAGE_CHUNKS: "5"
       TRADINGAGENTS_YOUTUBE_MIN_TRANSCRIPT_CHARS: "120"
+      TRADINGAGENTS_YOUTUBE_BGUTIL_VERSION: ${{ vars.YOUTUBE_BGUTIL_VERSION }}
       HF_HUB_DISABLE_SYMLINKS_WARNING: "1"
     steps:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
+
+      - name: Set up Node.js for bgutil PO token provider
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
 
       - name: Check out repository
         uses: actions/checkout@v6
@@ -214,6 +233,121 @@ jobs:
 
           subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
           subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", "."])
+
+      - name: Start bgutil PO token provider
+        run: |
+          import os
+          import shutil
+          import subprocess
+          import sys
+          import time
+          import urllib.request
+          from pathlib import Path
+
+          base_url = os.environ.get("TRADINGAGENTS_YOUTUBE_BGUTIL_BASE_URL", "http://127.0.0.1:4416").strip()
+          if not base_url:
+              raise SystemExit(0)
+
+          def ping_provider() -> bool:
+              try:
+                  with urllib.request.urlopen(f"{base_url.rstrip('/')}/ping", timeout=2) as response:
+                      return 200 <= response.status < 300
+              except Exception:
+                  return False
+
+          if ping_provider():
+              with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+                  handle.write(f"TRADINGAGENTS_YOUTUBE_BGUTIL_BASE_URL={base_url}\n")
+              print(f"bgutil provider already reachable at {base_url}")
+              raise SystemExit(0)
+
+          node = shutil.which("node")
+          git = shutil.which("git")
+          npm = shutil.which("npm")
+          npx = shutil.which("npx")
+          if not node or not git or not npm or not npx:
+              print("::warning::bgutil provider setup skipped because node/git/npm/npx is unavailable.")
+              raise SystemExit(0)
+
+          version = os.environ.get("TRADINGAGENTS_YOUTUBE_BGUTIL_VERSION", "").strip() or "1.3.1"
+          provider_root = Path(os.environ["RUNNER_TEMP"]) / f"bgutil-ytdlp-pot-provider-{version}"
+          server_dir = provider_root / "server"
+          log_path = Path(os.environ["RUNNER_TEMP"]) / "bgutil-ytdlp-pot-provider.log"
+          try:
+              if not (server_dir / "build" / "main.js").exists():
+                  if provider_root.exists():
+                      shutil.rmtree(provider_root, ignore_errors=True)
+                  print(f"Cloning bgutil-ytdlp-pot-provider {version}...")
+                  subprocess.check_call([
+                      git,
+                      "clone",
+                      "--depth",
+                      "1",
+                      "--single-branch",
+                      "--branch",
+                      version,
+                      "https://github.com/Brainicism/bgutil-ytdlp-pot-provider.git",
+                      str(provider_root),
+                  ])
+                  subprocess.check_call([npm, "ci"], cwd=server_dir)
+                  subprocess.check_call([npx, "tsc"], cwd=server_dir)
+
+              log_file = log_path.open("a", encoding="utf-8")
+              creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+              process = subprocess.Popen(
+                  [node, str(server_dir / "build" / "main.js")],
+                  cwd=server_dir,
+                  stdout=log_file,
+                  stderr=subprocess.STDOUT,
+                  creationflags=creationflags,
+              )
+              for _ in range(30):
+                  if process.poll() is not None:
+                      break
+                  if ping_provider():
+                      with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+                          handle.write(f"TRADINGAGENTS_YOUTUBE_BGUTIL_BASE_URL={base_url}\n")
+                          handle.write(f"TRADINGAGENTS_YOUTUBE_BGUTIL_SERVER_HOME={server_dir}\n")
+                      print(f"bgutil provider started at {base_url}; log={log_path}")
+                      raise SystemExit(0)
+                  time.sleep(1)
+          except SystemExit:
+              raise
+          except Exception as exc:
+              print(f"::warning::bgutil provider setup failed; continuing with ASR fallback. error={exc!r}; log={log_path}")
+              raise SystemExit(0)
+          print(f"::warning::bgutil provider did not become reachable; continuing with ASR fallback. log={log_path}")
+
+      - name: Probe YouTube ASR and PO token runtime
+        run: |
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          try:
+              result = subprocess.run(["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"], text=True, capture_output=True, check=False)
+              print("nvidia-smi:", result.stdout.strip() or result.stderr.strip() or f"exit={result.returncode}")
+          except OSError:
+              print("nvidia-smi: unavailable")
+          try:
+              import ctranslate2
+              print("ctranslate2 cuda devices:", ctranslate2.get_cuda_device_count())
+          except Exception as exc:
+              print("ctranslate2 probe failed:", exc)
+          from tradingagents.dataflows import youtube_video as youtube_runtime
+
+          print("ASR device:", youtube_runtime._youtube_asr_device())
+          print("ASR model:", youtube_runtime._youtube_asr_model(device=youtube_runtime._youtube_asr_device()))
+          print("ASR compute type:", youtube_runtime._youtube_asr_compute_type(device=youtube_runtime._youtube_asr_device()))
+          options = youtube_runtime._youtube_dl_options(skip_download=True, quiet=True)
+          print("yt-dlp plugin dirs:", options.get("plugin_dirs"))
+          print("yt-dlp js runtimes:", options.get("js_runtimes"))
+          plugin_zip = Path(os.environ.get("APPDATA", "")) / "yt-dlp" / "plugins" / "bgutil-ytdlp-pot-provider.zip"
+          print("bgutil PO token provider zip:", plugin_zip if plugin_zip.exists() else "not found")
+          server_home = Path(os.environ.get("USERPROFILE", "")) / "bgutil-ytdlp-pot-provider" / "server"
+          print("bgutil script server_home:", server_home if server_home.exists() else "not found")
+          print("bgutil generate_once.js:", (server_home / "build" / "generate_once.js").exists())
 
       - name: Materialize runtime API keys
         run: |
