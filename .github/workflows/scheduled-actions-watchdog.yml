@@ -1,0 +1,36 @@
+name: Scheduled Actions Watchdog
+
+on:
+  schedule:
+    # Runs cheaply every 15 minutes, offset from common minute 0 load spikes.
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Inspect due targets without dispatching recovery runs"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: scheduled-actions-watchdog
+  cancel-in-progress: false
+
+jobs:
+  dispatch_missing_scheduled_actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Dispatch missing scheduled actions
+        env:
+          GH_REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REF: main
+          WATCHDOG_DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: python .github/scripts/scheduled_actions_watchdog.py
