@@ -59,7 +59,23 @@ def test_daily_workflow_runs_us_and_kr_ninety_minutes_earlier():
     workflow = Path(".github/workflows/daily-codex-analysis.yml").read_text(encoding="utf-8")
     assert "Target: 8:00 KST weekdays. Schedule 90 minutes early" in workflow
     assert "Target: 20:00 KST weekdays. Schedule 90 minutes early" in workflow
+    assert "Backup probes absorb occasional GitHub schedule event drops" in workflow
     assert "30 21 * * 0-4" in workflow
+    assert "0 22 * * 0-4" in workflow
+    assert "30 22 * * 0-4" in workflow
     assert "30 9 * * 1-5" in workflow
+    assert "0 10 * * 1-5" in workflow
+    assert "30 10 * * 1-5" in workflow
     assert "0 0 * * 1-5" not in workflow
     assert "0 12 * * 1-5" not in workflow
+
+
+def test_daily_workflow_gates_backup_schedules_before_analysis():
+    workflow = Path(".github/workflows/daily-codex-analysis.yml").read_text(encoding="utf-8")
+    assert "  schedule_gate:" in workflow
+    assert "actions: read" in workflow
+    assert "cancel-in-progress: false" in workflow
+    assert "US_SCHEDULES = {\"30 9 * * 1-5\", \"0 10 * * 1-5\", \"30 10 * * 1-5\"}" in workflow
+    assert "KR_SCHEDULES = {\"30 21 * * 0-4\", \"0 22 * * 0-4\", \"30 22 * * 0-4\"}" in workflow
+    assert "No successful or active {profile.upper()} scheduled run" in workflow
+    assert "needs.schedule_gate.outputs.should_run == 'true'" in workflow
