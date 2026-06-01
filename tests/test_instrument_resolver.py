@@ -32,6 +32,19 @@ class InstrumentResolverTests(unittest.TestCase):
         profile = resolve_instrument("035420")
         self.assertEqual(profile.primary_symbol, "035420.KS")
 
+    def test_resolves_ai_pcb_krx_candidates(self):
+        expected = {
+            "두산": "000150.KS",
+            "이수페타시스": "007660.KS",
+            "코리아써키트": "007810.KS",
+            "롯데에너지머티리얼즈": "020150.KS",
+            "심텍": "222800.KQ",
+        }
+        for name, ticker in expected.items():
+            with self.subTest(name=name):
+                profile = resolve_instrument(name)
+                self.assertEqual(profile.primary_symbol, ticker)
+
     def test_resolves_kr_alias_set_for_hynix(self):
         profile = resolve_instrument("SK hynix")
         self.assertEqual(profile.primary_symbol, "000660.KS")
