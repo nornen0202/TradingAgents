@@ -15,10 +15,14 @@ from tradingagents.dataflows.youtube_video import (
     YouTubeTranscript,
     YouTubeVideoBundle,
     YouTubeVideoMetadata,
+    assess_transcript_reliability,
     _download_transcript_track,
     _fetch_asr_transcript,
     _parse_youtubei_transcript_segments,
     _youtube_dl_options,
+    _youtube_asr_compute_type,
+    _youtube_asr_device,
+    _youtube_asr_model,
     extract_youtube_video_id,
     _parse_json3_segments,
 )
@@ -171,6 +175,42 @@ class YouTubeVideoReportTests(unittest.TestCase):
             ["web.subs+b2xk", "web.subs+bmV3"],
         )
 
+    def test_youtube_dl_options_enables_default_plugin_dirs_and_bgutil_args(self):
+        env = {
+            "TRADINGAGENTS_YOUTUBE_BGUTIL_BASE_URL": "http://127.0.0.1:4416",
+            "TRADINGAGENTS_YOUTUBE_BGUTIL_SERVER_HOME": "C:/Users/JY/bgutil-ytdlp-pot-provider/server",
+        }
+        with patch.dict(os.environ, env, clear=True), patch(
+            "tradingagents.dataflows.youtube_video.shutil.which",
+            return_value="C:/Program Files/nodejs/node.exe",
+        ):
+            options = _youtube_dl_options(skip_download=True)
+
+        self.assertEqual(options["plugin_dirs"], ["default"])
+        self.assertEqual(options["js_runtimes"], {"node": {"path": "C:/Program Files/nodejs/node.exe"}})
+        self.assertEqual(options["extractor_args"]["youtubepot-bgutilhttp"]["base_url"], ["http://127.0.0.1:4416"])
+        self.assertEqual(
+            options["extractor_args"]["youtubepot-bgutilscript"]["server_home"],
+            ["C:/Users/JY/bgutil-ytdlp-pot-provider/server"],
+        )
+
+    def test_asr_auto_defaults_to_turbo_on_cuda_and_small_on_cpu(self):
+        with patch.dict(os.environ, {"TRADINGAGENTS_YOUTUBE_ASR_MODEL": "auto", "TRADINGAGENTS_YOUTUBE_ASR_DEVICE": "auto"}, clear=True), patch.dict(
+            sys.modules,
+            {"ctranslate2": types.SimpleNamespace(get_cuda_device_count=lambda: 1)},
+        ):
+            self.assertEqual(_youtube_asr_device(), "cuda")
+            self.assertEqual(_youtube_asr_model(device="cuda"), "turbo")
+            self.assertEqual(_youtube_asr_compute_type(device="cuda"), "float16")
+
+        with patch.dict(os.environ, {"TRADINGAGENTS_YOUTUBE_ASR_MODEL": "auto", "TRADINGAGENTS_YOUTUBE_ASR_DEVICE": "auto"}, clear=True), patch.dict(
+            sys.modules,
+            {"ctranslate2": types.SimpleNamespace(get_cuda_device_count=lambda: 0)},
+        ):
+            self.assertEqual(_youtube_asr_device(), "cpu")
+            self.assertEqual(_youtube_asr_model(device="cpu"), "small")
+            self.assertEqual(_youtube_asr_compute_type(device="cpu"), "int8")
+
     def test_parse_youtubei_transcript_segments(self):
         payload = {
             "actions": [
@@ -216,6 +256,8 @@ class YouTubeVideoReportTests(unittest.TestCase):
         self.assertEqual(segments[1].start_seconds, 7.0)
 
     def test_asr_transcript_fallback_uses_downloaded_audio_and_local_whisper(self):
+        transcribe_calls = []
+
         class FakeYoutubeDL:
             def __init__(self, options):
                 self.options = options
@@ -237,9 +279,10 @@ class YouTubeVideoReportTests(unittest.TestCase):
                 self.kwargs = kwargs
 
             def transcribe(self, _path, **_kwargs):
+                transcribe_calls.append(_kwargs)
                 segments = [
-                    types.SimpleNamespace(text="종전 합의 임박.", start=0.0, end=3.0),
-                    types.SimpleNamespace(text="미군 공군 기지 공격.", start=3.0, end=7.0),
+                    types.SimpleNamespace(text="종전 합의 임박. 유가 5% 하락.", start=0.0, end=3.0),
+                    types.SimpleNamespace(text="미군 공군 기지 공격. 코스피와 나스닥 변동성 확대.", start=3.0, end=7.0),
                 ]
                 return iter(segments), types.SimpleNamespace(language="ko")
 
@@ -248,7 +291,12 @@ class YouTubeVideoReportTests(unittest.TestCase):
 
         with patch.dict(
             os.environ,
-            {"TRADINGAGENTS_YOUTUBE_ASR_FALLBACK": "1", "TRADINGAGENTS_YOUTUBE_ASR_MODEL": "base"},
+            {
+                "TRADINGAGENTS_YOUTUBE_ASR_FALLBACK": "1",
+                "TRADINGAGENTS_YOUTUBE_ASR_MODEL": "base",
+                "TRADINGAGENTS_YOUTUBE_ASR_BEAM_SIZE": "5",
+                "TRADINGAGENTS_YOUTUBE_ASR_MIN_QUALITY": "off",
+            },
         ), patch.dict(
             sys.modules, {"faster_whisper": fake_whisper_module}
         ), patch("tradingagents.dataflows.youtube_video._import_ytdlp", return_value=fake_ytdlp):
@@ -263,6 +311,28 @@ class YouTubeVideoReportTests(unittest.TestCase):
         self.assertEqual(transcript.source, "local_asr")
         self.assertEqual(transcript.track_ext, "base")
         self.assertIn("미군 공군 기지", transcript.raw_text)
+        self.assertEqual(transcribe_calls[0]["beam_size"], 5)
+        self.assertFalse(transcribe_calls[0]["condition_on_previous_text"])
+        self.assertIn("initial_prompt", transcribe_calls[0])
+        self.assertIn("hotwords", transcribe_calls[0])
+
+    def test_transcript_reliability_marks_repetition_as_poor(self):
+        repeated = YouTubeTranscript(
+            language="ko",
+            language_name="Local ASR",
+            source="local_asr",
+            track_ext="turbo",
+            raw_text=" ".join(["반복 문장"] * 20),
+            segments=tuple(
+                types.SimpleNamespace(start_seconds=float(index), duration_seconds=1.0, text="반복 문장")
+                for index in range(8)
+            ),
+        )
+
+        quality = assess_transcript_reliability(repeated, duration_seconds=600)
+
+        self.assertEqual(quality["status"], "poor")
+        self.assertIn("repeated_segment_run", quality["warnings"])
 
     def test_summarize_financial_entities_extracts_video_claims(self):
         transcript = (

@@ -4,12 +4,13 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 import json
 import math
+import os
 import re
 from typing import Any, Callable, Mapping
 
 import yfinance as yf
 
-from tradingagents.dataflows.youtube_video import YouTubeVideoBundle
+from tradingagents.dataflows.youtube_video import YouTubeVideoBundle, YouTubeTranscriptSegment, assess_transcript_reliability
 from tradingagents.llm_clients import create_llm_client
 from tradingagents.youtube.config import LLMSettings, VerificationSettings
 from tradingagents.youtube.research import (
@@ -30,7 +31,7 @@ from tradingagents.youtube.verification_status import (
 from tradingagents.youtube_report import EntitySummary, summarize_financial_entities
 
 
-RESEARCH_PIPELINE_VERSION = 2
+RESEARCH_PIPELINE_VERSION = 3
 
 
 @dataclass(frozen=True)
@@ -277,6 +278,8 @@ def render_fallback_final_report(
         f"- LLM 상태: `{verification.get('llm_status') or 'unknown'}`",
         f"- 리서치 상태: `{verification.get('research_status') or 'unknown'}`",
         f"- 주장 검증 상태: `{verification.get('claim_verification_status') or 'unknown'}`",
+        f"- 자막/ASR 품질: `{(verification.get('transcript_quality') or {}).get('status') or 'unknown'}` "
+        f"(score={(verification.get('transcript_quality') or {}).get('score') or '-'})",
         f"- 영상 URL: {bundle.metadata.url}",
         "",
         "## 주장별 검증",
@@ -291,6 +294,7 @@ def render_fallback_final_report(
                 [
                     f"### {claim.get('claim_id') or '-'}",
                     f"- 영상 주장: {claim.get('claim_text') or '-'}",
+                    f"- 근거 시각/신뢰도: `{claim.get('timestamp') or '-'}` / source `{_display_number(claim.get('source_confidence'))}` / ASR `{_display_number(claim.get('asr_confidence'))}`",
                     f"- 상태: `{claim.get('status') or UNVERIFIED}`",
                     f"- 확인된 사실: {_join_text(claim.get('verified_facts') or [])}",
                     f"- 반론/한계: {_join_text(claim.get('counterpoints') or [])}",
@@ -375,6 +379,8 @@ def _extract_claims_with_llm(
         "deterministic_entities": [_entity_to_dict(item) for item in entity_summaries],
         "draft_report": draft_report[:12000],
         "transcript_for_claim_extraction": _transcript_for_llm(bundle, max_chars=max_transcript_chars),
+        "transcript_chunks_for_claim_extraction": _transcript_chunks_for_llm(bundle, max_chars=max_transcript_chars),
+        "transcript_quality": _transcript_quality_for_payload(bundle),
         "caption_source": {
             "status": bundle.transcript_status,
             "source": getattr(bundle.transcript, "source", None),
@@ -384,12 +390,14 @@ def _extract_claims_with_llm(
     prompt = (
         "You are TradingAgents' YouTube claim extractor.\n"
         "Return exactly one JSON object and nothing else.\n"
-        "Extract investor-relevant claims from the video transcript and deterministic draft without adding new facts.\n"
-        "Prefer the transcript over the draft when they differ. Preserve concrete numbers, dates, policy names, "
-        "market moves, and cited external sources as separate numeric_claims or verification_items.\n"
+        "Extract investor-relevant claims from all timestamped transcript chunks and deterministic draft without adding new facts.\n"
+        "Prefer transcript chunks over the draft when they differ. Use chunk start/end timestamps to avoid missing later-video claims. "
+        "Preserve concrete numbers, dates, policy names, market moves, and cited external sources as separate "
+        "numeric_claims or verification_items.\n"
         "Schema: {\"overall_thesis\":\"...\",\"entities\":[{\"ticker\":\"...\",\"name\":\"...\","
         "\"claims\":[\"...\"],\"numeric_claims\":[\"...\"],\"risks\":[\"...\"],"
-        "\"watch_items\":[\"...\"]}],\"verification_items\":[\"...\"],\"asr_suspect_terms\":[\"...\"]}.\n"
+        "\"watch_items\":[\"...\"],\"source_timestamps\":[\"00:01:23\"],\"source_confidence\":0.0}],"
+        "\"verification_items\":[\"...\"],\"asr_suspect_terms\":[\"...\"],\"data_quality_notes\":[\"...\"]}.\n"
         f"Limit total claims per video to {max_claims}. Write Korean text where possible.\n\n"
         f"Context JSON:\n{json.dumps(payload, ensure_ascii=False)}"
     )
@@ -417,6 +425,7 @@ def _write_final_report_with_llm(
         "host-collected web/news/market/disclosure evidence, and claim-verification results.\n"
         "Use the evidence bundle aggressively, but do not invent facts that are not supported by the supplied evidence. "
         "Separate '영상 주장' from '확인된 사실/근거'. Include source links for the strongest evidence items. "
+        "Use claim timestamps, source_confidence, asr_confidence, and transcript_quality to explain uncertainty. "
         "Discuss bullish logic, counterarguments, data-quality limits, near-term checkpoints, invalidation conditions, "
         "and concrete observation items that an investor can monitor. Do not issue buy/sell instructions.\n"
         "Mark unavailable Bloomberg/Morningstar/closed-source claims as unverified/manual check required. "
@@ -450,10 +459,12 @@ def _build_research_plan(
         "video": _public_metadata(bundle),
         "claims": extracted_claims,
         "draft_report_excerpt": draft_report[:8000],
-        "transcript_private_excerpt": _transcript_for_llm(
+        "transcript_private_excerpt": _transcript_for_llm(bundle, max_chars=verification_settings.max_transcript_chars_for_llm),
+        "transcript_private_chunks": _transcript_chunks_for_llm(
             bundle,
             max_chars=verification_settings.max_transcript_chars_for_llm,
         ),
+        "transcript_quality": _transcript_quality_for_payload(bundle),
         "limits": {
             "max_research_queries": verification_settings.max_research_queries,
             "max_claims": verification_settings.max_claims_per_video,
@@ -462,9 +473,11 @@ def _build_research_plan(
     prompt = (
         "You are TradingAgents' investor research planner for a YouTube video.\n"
         "Return exactly one JSON object and nothing else.\n"
-        "Use the transcript-derived claims to create a concrete verification plan. "
+        "Use the transcript-derived claims and timestamped transcript chunks to create a concrete verification plan. "
         "For each material claim, assign a stable claim_id such as C1, C2, ... and propose Korean/English web, news, "
         "market-data, disclosure, and official-source queries that would verify or refute it. "
+        "Route by claim type: company claims to IR/SEC/DART/exchange/news, macro claims to central banks/statistics agencies/FRED, "
+        "commodity claims to EIA/CME/ICE or other primary sources, and market-price claims to market data. "
         "Prioritize official sources, exchange/regulator/company IR, and reputable news. "
         "Flag ASR-uncertain terms and closed-source-only claims.\n"
         "Schema: {\"version\":1,\"claims\":[{\"claim_id\":\"C1\",\"entity\":\"...\",\"ticker\":\"...\","
@@ -549,6 +562,7 @@ def _build_claim_verification(
         "research_plan": research_plan,
         "evidence": _evidence_for_llm(evidence_bundle, limit=verification_settings.max_evidence_items),
         "market_evidence": market_evidence,
+        "transcript_quality": _transcript_quality_for_payload(bundle),
         "caption_source": {
             "status": bundle.transcript_status,
             "source": getattr(bundle.transcript, "source", None),
@@ -565,7 +579,8 @@ def _build_claim_verification(
         "\"claims\":[{\"claim_id\":\"C1\",\"claim_text\":\"...\",\"status\":\"...\","
         "\"confidence\":0.0,\"supporting_evidence_ids\":[\"E1\"],\"contradicting_evidence_ids\":[\"E2\"],"
         "\"verified_facts\":[\"...\"],\"counterpoints\":[\"...\"],\"investor_implication\":\"...\","
-        "\"manual_check_required\":false,\"notes\":\"...\"}],"
+        "\"manual_check_required\":false,\"timestamp\":\"00:01:23\",\"source_confidence\":0.0,"
+        "\"asr_confidence\":0.0,\"numeric_parse\":{\"claimed\":\"...\",\"observed\":\"...\"},\"notes\":\"...\"}],"
         "\"data_quality_notes\":[\"...\"],\"investor_checkpoints\":[\"...\"]}.\n\n"
         f"Payload JSON:\n{json.dumps(payload, ensure_ascii=False)}"
     )
@@ -729,12 +744,14 @@ def _build_verification_payload(
         "evidence": evidence_bundle,
         "claim_verification": claim_verification,
         "entity_results": market_evidence,
+        "transcript_quality": _transcript_quality_for_payload(bundle),
         "source_policy": {
             "raw_transcript_published": False,
             "raw_transcript_in_evidence": False,
             "research_pipeline_version": RESEARCH_PIPELINE_VERSION,
             "closed_source_claims": "unverified_external_source",
             "auto_caption_warning": bundle.transcript is not None and bundle.transcript.source == "automatic",
+            "local_asr_warning": bundle.transcript is not None and bundle.transcript.source == "local_asr",
         },
     }
 
@@ -986,6 +1003,10 @@ def _normalize_claim_verification(payload: Mapping[str, Any], *, fallback: dict[
                 "counterpoints": _text_list(claim.get("counterpoints")),
                 "investor_implication": str(claim.get("investor_implication") or ""),
                 "manual_check_required": bool(claim.get("manual_check_required", status in {UNVERIFIED, ASR_UNCERTAIN})),
+                "timestamp": str(claim.get("timestamp") or claim.get("source_timestamp") or ""),
+                "source_confidence": _bounded_confidence(claim.get("source_confidence")),
+                "asr_confidence": _bounded_confidence(claim.get("asr_confidence")),
+                "numeric_parse": dict(claim.get("numeric_parse") or {}) if isinstance(claim.get("numeric_parse"), Mapping) else {},
                 "notes": str(claim.get("notes") or ""),
             }
         )
@@ -1021,6 +1042,8 @@ def _normalize_claims(payload: Mapping[str, Any], *, fallback: dict[str, Any]) -
                 "numeric_claims": _text_list(entity.get("numeric_claims")),
                 "risks": _text_list(entity.get("risks")),
                 "watch_items": _text_list(entity.get("watch_items")),
+                "source_timestamps": _text_list(entity.get("source_timestamps")),
+                "source_confidence": _bounded_confidence(entity.get("source_confidence")),
             }
         )
     return {
@@ -1028,6 +1051,7 @@ def _normalize_claims(payload: Mapping[str, Any], *, fallback: dict[str, Any]) -
         "entities": normalized_entities or fallback.get("entities") or [],
         "verification_items": _text_list(payload.get("verification_items")),
         "asr_suspect_terms": _text_list(payload.get("asr_suspect_terms")),
+        "data_quality_notes": _text_list(payload.get("data_quality_notes")),
     }
 
 
@@ -1067,27 +1091,227 @@ def _evidence_for_llm(evidence_bundle: Mapping[str, Any], *, limit: int) -> dict
 
 
 def _transcript_for_llm(bundle: YouTubeVideoBundle, *, max_chars: int) -> str:
+    chunks = _transcript_chunks_for_llm(bundle, max_chars=max_chars)
+    if chunks:
+        lines = []
+        for chunk in chunks:
+            prefix = f"[{chunk.get('start_time')} - {chunk.get('end_time')}] "
+            lines.append(prefix + str(chunk.get("text") or "").strip())
+        return "\n\n".join(lines)[:max_chars]
     transcript = bundle.transcript
     if transcript is None:
         return ""
-    segments = getattr(transcript, "segments", None) or ()
-    if segments:
-        lines: list[str] = []
-        total = 0
-        for segment in segments:
-            start = getattr(segment, "start", None)
-            text = getattr(segment, "text", "")
-            prefix = f"[{float(start):.1f}s] " if isinstance(start, (int, float)) else ""
-            line = prefix + str(text).strip()
-            if not line.strip():
-                continue
-            if total + len(line) > max_chars:
-                break
-            lines.append(line)
-            total += len(line)
-        if lines:
-            return "\n".join(lines)
     return str(transcript.raw_text or "")[:max_chars]
+
+
+def _transcript_chunks_for_llm(bundle: YouTubeVideoBundle, *, max_chars: int) -> list[dict[str, Any]]:
+    transcript = bundle.transcript
+    if transcript is None:
+        return []
+    chunks = _build_transcript_chunks(transcript.segments, transcript.raw_text)
+    if not chunks:
+        return []
+    selected = _select_transcript_chunks(chunks, max_chars=max_chars)
+    return [
+        {
+            "chunk_id": f"T{index + 1}",
+            "source_index": chunk["source_index"],
+            "start_seconds": chunk["start_seconds"],
+            "end_seconds": chunk["end_seconds"],
+            "start_time": _format_timestamp(chunk["start_seconds"]),
+            "end_time": _format_timestamp(chunk["end_seconds"]),
+            "text": chunk["text"],
+            "selection_reason": chunk.get("selection_reason", "coverage"),
+            "score": round(float(chunk.get("score") or 0.0), 3),
+        }
+        for index, chunk in enumerate(selected)
+    ]
+
+
+def _build_transcript_chunks(
+    segments: tuple[YouTubeTranscriptSegment, ...],
+    raw_text: str,
+) -> list[dict[str, Any]]:
+    max_chunk_chars = max(200, int(_env_int_like("TRADINGAGENTS_YOUTUBE_TRANSCRIPT_CHUNK_CHARS", 3200)))
+    chunks: list[dict[str, Any]] = []
+    if segments:
+        current: list[str] = []
+        start_seconds: float | None = None
+        end_seconds = 0.0
+        for segment in segments:
+            text = str(getattr(segment, "text", "") or "").strip()
+            if not text:
+                continue
+            start = float(getattr(segment, "start_seconds", 0.0) or 0.0)
+            duration = float(getattr(segment, "duration_seconds", 0.0) or 0.0)
+            candidate = " ".join([*current, text]).strip()
+            if current and len(candidate) > max_chunk_chars:
+                chunk_text = " ".join(current).strip()
+                chunks.append(
+                    _make_transcript_chunk(
+                        source_index=len(chunks),
+                        start_seconds=start_seconds or 0.0,
+                        end_seconds=end_seconds,
+                        text=chunk_text,
+                    )
+                )
+                current = [text]
+                start_seconds = start
+            else:
+                if start_seconds is None:
+                    start_seconds = start
+                current.append(text)
+            end_seconds = max(end_seconds, start + duration)
+        if current:
+            chunks.append(
+                _make_transcript_chunk(
+                    source_index=len(chunks),
+                    start_seconds=start_seconds or 0.0,
+                    end_seconds=end_seconds,
+                    text=" ".join(current).strip(),
+                )
+            )
+        return chunks
+
+    text = str(raw_text or "").strip()
+    if not text:
+        return []
+    for index, start in enumerate(range(0, len(text), max_chunk_chars)):
+        chunks.append(
+            _make_transcript_chunk(
+                source_index=index,
+                start_seconds=0.0,
+                end_seconds=0.0,
+                text=text[start : start + max_chunk_chars].strip(),
+            )
+        )
+    return chunks
+
+
+def _make_transcript_chunk(*, source_index: int, start_seconds: float, end_seconds: float, text: str) -> dict[str, Any]:
+    return {
+        "source_index": source_index,
+        "start_seconds": round(float(start_seconds or 0.0), 3),
+        "end_seconds": round(float(end_seconds or 0.0), 3),
+        "text": text,
+        "score": _financial_chunk_score(text),
+    }
+
+
+def _select_transcript_chunks(chunks: list[dict[str, Any]], *, max_chars: int) -> list[dict[str, Any]]:
+    if not chunks:
+        return []
+    budget = max(1000, max_chars)
+    total_chars = sum(len(str(chunk.get("text") or "")) for chunk in chunks)
+    if total_chars <= budget:
+        for chunk in chunks:
+            chunk["selection_reason"] = "full_coverage"
+        return chunks
+
+    selected: dict[int, dict[str, Any]] = {}
+
+    def add(index: int, reason: str) -> None:
+        if index < 0 or index >= len(chunks):
+            return
+        item = dict(chunks[index])
+        item["selection_reason"] = reason
+        selected[index] = item
+
+    add(0, "opening_context")
+    add(len(chunks) - 1, "closing_context")
+    max_chunks = max(4, _env_int_like("TRADINGAGENTS_YOUTUBE_TRANSCRIPT_MAX_CHUNKS", 12))
+    ranked = sorted(range(len(chunks)), key=lambda idx: float(chunks[idx].get("score") or 0.0), reverse=True)
+    for index in ranked:
+        if len(selected) >= max(3, max_chunks // 2):
+            break
+        add(index, "claim_dense")
+    stride = max(1, len(chunks) // max(3, _env_int_like("TRADINGAGENTS_YOUTUBE_TRANSCRIPT_MIN_COVERAGE_CHUNKS", 5)))
+    for index in range(stride, len(chunks) - 1, stride):
+        if len(selected) >= max_chunks:
+            break
+        add(index, "time_coverage")
+    for index in ranked:
+        if len(selected) >= max_chunks:
+            break
+        add(index, "claim_dense")
+
+    result: list[dict[str, Any]] = []
+    used = 0
+    for index in sorted(selected):
+        chunk = selected[index]
+        text = str(chunk.get("text") or "")
+        if not text:
+            continue
+        remaining = budget - used
+        if remaining <= 0 or len(result) >= max_chunks:
+            break
+        if len(text) > remaining:
+            if remaining < 500:
+                break
+            chunk = dict(chunk)
+            chunk["text"] = text[:remaining].rsplit(" ", 1)[0].strip() or text[:remaining]
+            chunk["selection_reason"] = f"{chunk.get('selection_reason')}_truncated"
+        result.append(chunk)
+        used += len(str(chunk.get("text") or ""))
+    return result
+
+
+def _financial_chunk_score(text: str) -> float:
+    value = str(text or "")
+    if not value:
+        return 0.0
+    score = 0.0
+    score += min(8, len(re.findall(r"\d", value))) * 0.4
+    score += len(re.findall(r"\b[A-Z]{1,5}(?:\.[A-Z]{1,3})?\b", value)) * 0.7
+    keywords = (
+        "매수",
+        "매도",
+        "투자",
+        "실적",
+        "영업이익",
+        "매출",
+        "가이던스",
+        "컨센서스",
+        "금리",
+        "환율",
+        "유가",
+        "정책",
+        "리스크",
+        "반론",
+        "목표가",
+        "밸류에이션",
+        "FOMC",
+        "CPI",
+        "PCE",
+        "EPS",
+        "PER",
+    )
+    lowered = value.lower()
+    score += sum(1.0 for keyword in keywords if keyword.lower() in lowered)
+    return score
+
+
+def _format_timestamp(seconds: Any) -> str:
+    value = max(0, int(float(seconds or 0)))
+    hours, rem = divmod(value, 3600)
+    minutes, secs = divmod(rem, 60)
+    if hours:
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+    return f"{minutes:02d}:{secs:02d}"
+
+
+def _transcript_quality_for_payload(bundle: YouTubeVideoBundle) -> dict[str, Any]:
+    return assess_transcript_reliability(
+        bundle.transcript,
+        duration_seconds=bundle.metadata.duration_seconds,
+    )
+
+
+def _env_int_like(name: str, default: int) -> int:
+    try:
+        return int(float(os.getenv(name, default)))
+    except (TypeError, ValueError):
+        return default
 
 
 def _entity_status_lookup(market_evidence: list[dict[str, Any]]) -> dict[str, str]:
@@ -1108,6 +1332,9 @@ def _has_asr_warning(
     planned_claim: Mapping[str, Any],
 ) -> bool:
     if bundle.transcript is None:
+        return True
+    quality = _transcript_quality_for_payload(bundle)
+    if str(quality.get("status") or "") == "poor":
         return True
     if getattr(bundle.transcript, "source", None) == "local_asr":
         return bool(planned_claim.get("asr_suspect_terms") or research_plan.get("asr_suspect_terms"))

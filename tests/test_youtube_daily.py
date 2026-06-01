@@ -38,6 +38,7 @@ from tradingagents.youtube.verifier import (
     MarketSnapshot,
     VerifiedVideoReport,
     _extract_json_object,
+    _transcript_chunks_for_llm,
     _verify_claims,
     verify_youtube_bundle,
 )
@@ -142,6 +143,54 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertEqual(plan["status"], "fallback")
         self.assertEqual(len(plan["claims"]), 2)
         self.assertIn("삼성전자", plan["claims"][0]["queries"][0]["query"])
+
+    def test_transcript_chunks_sample_late_claim_dense_sections(self):
+        segments = []
+        for index in range(20):
+            if index == 18:
+                text = "후반 핵심 주장. NVDA 엔비디아 실적과 매출 35% 성장, 목표가 1200달러, 리스크는 밸류에이션."
+            else:
+                text = f"일반 시장 설명 {index}. 특별한 종목 언급은 거의 없습니다."
+            segments.append(
+                YouTubeTranscript(
+                    language="ko",
+                    language_name="Korean",
+                    source="automatic",
+                    segments=(),
+                    raw_text=text,
+                )
+            )
+        bundle = _fake_bundle("chunk00001")
+        transcript_segments = tuple(
+            type("Segment", (), {"start_seconds": float(index * 60), "duration_seconds": 30.0, "text": item.raw_text})()
+            for index, item in enumerate(segments)
+        )
+        bundle = replace(
+            bundle,
+            transcript=YouTubeTranscript(
+                language="ko",
+                language_name="Korean",
+                source="automatic",
+                segments=transcript_segments,
+                raw_text=" ".join(item.raw_text for item in segments),
+                track_ext="json3",
+            ),
+        )
+
+        with patch.dict(
+            "os.environ",
+            {
+                "TRADINGAGENTS_YOUTUBE_TRANSCRIPT_CHUNK_CHARS": "180",
+                "TRADINGAGENTS_YOUTUBE_TRANSCRIPT_MAX_CHUNKS": "5",
+                "TRADINGAGENTS_YOUTUBE_TRANSCRIPT_MIN_COVERAGE_CHUNKS": "3",
+            },
+            clear=False,
+        ):
+            chunks = _transcript_chunks_for_llm(bundle, max_chars=700)
+
+        joined = "\n".join(chunk["text"] for chunk in chunks)
+        self.assertIn("NVDA", joined)
+        self.assertTrue(any(chunk["start_seconds"] >= 900 for chunk in chunks))
 
     def test_verification_statuses_include_contradicted_unverified_stale(self):
         fresh = datetime.now(timezone.utc).isoformat()
@@ -264,7 +313,7 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertEqual(verified.status, VERIFIED)
         self.assertIn("최종 투자자 리포트", verified.final_report_markdown)
         self.assertEqual(verified.verification["claims"]["entities"][0]["ticker"], "ORCL")
-        self.assertEqual(verified.verification["version"], 2)
+        self.assertEqual(verified.verification["version"], 3)
         self.assertEqual(verified.verification["claim_verification"]["claims"][0]["status"], "supported")
         self.assertEqual(verified.verification["evidence"]["evidence_count"], 1)
 
@@ -367,7 +416,7 @@ class YouTubeDailyTests(unittest.TestCase):
             site_index = site_dir / "youtube" / "index.html"
 
             self.assertEqual(manifest["summary"]["total_videos"], 3)
-            self.assertEqual(manifest["source_policy"]["research_pipeline_version"], 2)
+            self.assertEqual(manifest["source_policy"]["research_pipeline_version"], 3)
             self.assertEqual(manifest["max_entries_per_url"], 25)
             self.assertEqual(manifest["parallel_video_execution"]["max_parallel_videos"], 1)
             self.assertTrue(run_manifest.is_file())
@@ -533,7 +582,7 @@ class YouTubeDailyTests(unittest.TestCase):
                 "metadata.json": "{}",
                 "draft_report.md": "# Draft\n",
                 "verification.json": json.dumps(
-                    {"version": 2, "status": VERIFIED, "evidence": {"evidence_count": 1}},
+                    {"version": 3, "status": VERIFIED, "evidence": {"evidence_count": 1}},
                     ensure_ascii=False,
                 ),
                 "research_plan.json": json.dumps({"version": 1, "claims": []}, ensure_ascii=False),
@@ -783,6 +832,10 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("max_research_queries", config_text)
         self.assertIn("max_entries_per_url = 25", config_text)
         self.assertIn("max_parallel_videos = 4", config_text)
+        self.assertIn("[asr]", config_text)
+        self.assertIn('model = "auto"', config_text)
+        self.assertIn("beam_size = 5", config_text)
+        self.assertIn("max_transcript_chars_for_llm = 48000", config_text)
         self.assertIn("YOUTUBE_COOKIES_FILE", workflow)
         self.assertIn("YOUTUBE_PROXY", workflow)
         self.assertIn("YOUTUBE_VISITOR_DATA", workflow)
@@ -792,7 +845,13 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("YOUTUBE_PLAYER_CLIENTS", workflow)
         self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_FALLBACK", workflow)
         self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_MODEL", workflow)
+        self.assertIn('TRADINGAGENTS_YOUTUBE_ASR_MODEL: "auto"', workflow)
         self.assertIn("TRADINGAGENTS_YOUTUBE_ASR_COMPUTE_TYPE", workflow)
+        self.assertIn('TRADINGAGENTS_YOUTUBE_ASR_BEAM_SIZE: "5"', workflow)
+        self.assertIn("actions/setup-node", workflow)
+        self.assertIn("Start bgutil PO token provider", workflow)
+        self.assertIn("TRADINGAGENTS_YOUTUBE_BGUTIL_BASE_URL", workflow)
+        self.assertIn("Probe YouTube ASR and PO token runtime", workflow)
         self.assertNotIn("OPENAI_API_KEY", workflow)
 
     def test_python_module_runner_site_only_entrypoint(self):
@@ -849,6 +908,11 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertEqual(config.channel.max_entries_per_url, 25)
         self.assertEqual(config.channel.max_parallel_videos, 4)
         self.assertEqual(set(DEFAULT_CHANNEL_URLS), expected_urls)
+        self.assertEqual(config.asr.model, "auto")
+        self.assertEqual(config.asr.device, "auto")
+        self.assertEqual(config.asr.beam_size, 5)
+        self.assertEqual(config.asr.max_chunks, 12)
+        self.assertIn("엔비디아", config.asr.hotwords)
 
     def test_scheduled_site_build_preserves_youtube_addon_and_home_link(self):
         with tempfile.TemporaryDirectory() as tmp:

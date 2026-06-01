@@ -4,10 +4,12 @@ from http.cookiejar import MozillaCookieJar
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from html import unescape
+import inspect
 import json
 import os
 from pathlib import Path
 import re
+import shutil
 import tempfile
 import threading
 import time
@@ -31,6 +33,51 @@ _CAPTION_LAST_REQUEST_AT = 0.0
 _CAPTION_SESSIONS: dict[str, requests.Session] = {}
 _CAPTION_REQUEST_LOCK = threading.Lock()
 _CAPTION_SESSION_LOCK = threading.Lock()
+_DEFAULT_FINANCE_HOTWORDS = (
+    "코스피",
+    "코스닥",
+    "나스닥",
+    "S&P 500",
+    "다우존스",
+    "FOMC",
+    "CPI",
+    "PCE",
+    "GDP",
+    "금리",
+    "환율",
+    "원달러",
+    "엔비디아",
+    "NVIDIA",
+    "NVDA",
+    "테슬라",
+    "TSLA",
+    "애플",
+    "AAPL",
+    "마이크로소프트",
+    "MSFT",
+    "알파벳",
+    "GOOGL",
+    "아마존",
+    "AMZN",
+    "메타",
+    "META",
+    "브로드컴",
+    "AVGO",
+    "TSMC",
+    "TSM",
+    "삼성전자",
+    "SK하이닉스",
+    "영업이익",
+    "매출",
+    "EPS",
+    "PER",
+    "PBR",
+    "ROE",
+    "가이던스",
+    "컨센서스",
+    "basis point",
+    "베이시스 포인트",
+)
 
 
 @dataclass(frozen=True)
@@ -167,6 +214,18 @@ def fetch_youtube_video(
             duration_seconds=_optional_int(info.get("duration")),
             timeout_seconds=timeout_seconds,
         )
+    if fetch_transcript and transcript and _should_recheck_caption_with_asr(
+        transcript,
+        duration_seconds=_optional_int(info.get("duration")),
+    ):
+        asr_transcript = _fetch_asr_transcript(
+            url=url,
+            video_id=video_id,
+            duration_seconds=_optional_int(info.get("duration")),
+            timeout_seconds=timeout_seconds,
+        )
+        if _is_better_transcript(asr_transcript, transcript, duration_seconds=_optional_int(info.get("duration"))):
+            transcript = asr_transcript
     transcript_status = "available" if transcript and transcript.raw_text else "unavailable"
     if not fetch_transcript:
         transcript_status = "skipped"
@@ -193,19 +252,50 @@ def _import_ytdlp() -> Any:
 
 def _youtube_dl_options(**base_options: Any) -> dict[str, Any]:
     options = dict(base_options)
+    options.setdefault("plugin_dirs", _yt_dlp_plugin_dirs())
+    js_runtimes = _yt_dlp_js_runtimes()
+    if js_runtimes:
+        options.setdefault("js_runtimes", js_runtimes)
     cookie_file = _youtube_cookie_file()
     if cookie_file:
         options["cookiefile"] = cookie_file
     proxy = _youtube_proxy()
     if proxy:
         options["proxy"] = proxy
-    youtube_args = _youtube_extractor_args()
-    if youtube_args:
-        options["extractor_args"] = _merge_youtube_extractor_args(options.get("extractor_args"), youtube_args)
+    extractor_args = _youtube_extractor_args()
+    if extractor_args:
+        options["extractor_args"] = _merge_extractor_args(options.get("extractor_args"), extractor_args)
     return options
 
 
-def _youtube_extractor_args() -> dict[str, list[str]]:
+def _yt_dlp_plugin_dirs() -> list[str]:
+    configured = _youtube_env_list("TRADINGAGENTS_YTDLP_PLUGIN_DIRS", "YOUTUBE_PLUGIN_DIRS", "YT_DLP_PLUGIN_DIRS")
+    if configured:
+        return configured
+    # Keep yt-dlp's default plugin search path explicit so the Python API sees
+    # zip plugins placed under %APPDATA%\yt-dlp\plugins, including
+    # bgutil-ytdlp-pot-provider.zip.
+    return ["default"]
+
+
+def _yt_dlp_js_runtimes() -> dict[str, dict[str, str]]:
+    configured = _youtube_env_list("TRADINGAGENTS_YTDLP_JS_RUNTIMES", "YOUTUBE_JS_RUNTIMES", "YT_DLP_JS_RUNTIMES")
+    if configured:
+        runtimes: dict[str, dict[str, str]] = {}
+        for item in configured:
+            runtime, _, path = item.partition(":")
+            runtime = runtime.strip().lower()
+            if not runtime:
+                continue
+            runtimes[runtime] = {"path": path.strip()} if path.strip() else {}
+        return runtimes
+    node_path = shutil.which("node")
+    if node_path:
+        return {"node": {"path": node_path}}
+    return {}
+
+
+def _youtube_extractor_args() -> dict[str, dict[str, list[str]]]:
     args: dict[str, list[str]] = {}
     visitor_data = _youtube_visitor_data()
     if visitor_data:
@@ -222,25 +312,76 @@ def _youtube_extractor_args() -> dict[str, list[str]]:
     po_tokens = _youtube_po_tokens()
     if po_tokens:
         args["po_token"] = po_tokens
+    result: dict[str, dict[str, list[str]]] = {}
+    if args:
+        result["youtube"] = args
+    bgutil_http_args = _bgutil_http_extractor_args()
+    if bgutil_http_args:
+        result["youtubepot-bgutilhttp"] = bgutil_http_args
+    bgutil_script_args = _bgutil_script_extractor_args()
+    if bgutil_script_args:
+        result["youtubepot-bgutilscript"] = bgutil_script_args
+    return result
+
+
+def _bgutil_http_extractor_args() -> dict[str, list[str]]:
+    args: dict[str, list[str]] = {}
+    base_url = _youtube_env_text(
+        "TRADINGAGENTS_YOUTUBE_BGUTIL_BASE_URL",
+        "YOUTUBE_BGUTIL_BASE_URL",
+        "YOUTUBEPOT_BGUTIL_BASE_URL",
+    )
+    if base_url:
+        args["base_url"] = [base_url]
     return args
 
 
-def _merge_youtube_extractor_args(
+def _bgutil_script_extractor_args() -> dict[str, list[str]]:
+    args: dict[str, list[str]] = {}
+    server_home = _youtube_env_text(
+        "TRADINGAGENTS_YOUTUBE_BGUTIL_SERVER_HOME",
+        "YOUTUBE_BGUTIL_SERVER_HOME",
+        "YOUTUBEPOT_BGUTIL_SERVER_HOME",
+    )
+    script_path = _youtube_env_text(
+        "TRADINGAGENTS_YOUTUBE_BGUTIL_SCRIPT_PATH",
+        "YOUTUBE_BGUTIL_SCRIPT_PATH",
+        "YOUTUBEPOT_BGUTIL_SCRIPT_PATH",
+    )
+    if server_home:
+        args["server_home"] = [server_home]
+    elif default_server_home := _default_bgutil_server_home():
+        args["server_home"] = [default_server_home]
+    if script_path:
+        args["script_path"] = [script_path]
+    return args
+
+
+def _default_bgutil_server_home() -> str | None:
+    home = Path(os.getenv("USERPROFILE") or os.path.expanduser("~"))
+    server_home = home / "bgutil-ytdlp-pot-provider" / "server"
+    if (server_home / "build" / "generate_once.js").is_file() or (server_home / "src" / "generate_once.ts").is_file():
+        return str(server_home)
+    return None
+
+
+def _merge_extractor_args(
     existing: Any,
-    youtube_args: dict[str, list[str]],
+    additional_args: dict[str, dict[str, list[str]]],
 ) -> dict[str, Any]:
     merged: dict[str, Any] = {}
     if isinstance(existing, dict):
         for key, value in existing.items():
             merged[key] = dict(value) if isinstance(value, dict) else value
 
-    existing_youtube = merged.get("youtube")
-    youtube: dict[str, Any] = dict(existing_youtube) if isinstance(existing_youtube, dict) else {}
-    for key, values in youtube_args.items():
-        current = youtube.get(key, [])
-        current_values = list(current) if isinstance(current, (list, tuple)) else [str(current)]
-        youtube[key] = _dedupe_texts([*current_values, *values])
-    merged["youtube"] = youtube
+    for extractor_key, args in additional_args.items():
+        existing_extractor = merged.get(extractor_key)
+        extractor_args: dict[str, Any] = dict(existing_extractor) if isinstance(existing_extractor, dict) else {}
+        for key, values in args.items():
+            current = extractor_args.get(key, [])
+            current_values = list(current) if isinstance(current, (list, tuple)) else [str(current)]
+            extractor_args[key] = _dedupe_texts([*current_values, *values])
+        merged[extractor_key] = extractor_args
     return merged
 
 
@@ -578,25 +719,26 @@ def _fetch_asr_transcript(
         )
         if audio_path is None or not audio_path.is_file():
             return None
-        try:
-            model_name = _youtube_asr_model()
-            model = WhisperModel(
-                model_name,
-                device=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_DEVICE", "cpu"),
-                compute_type=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_COMPUTE_TYPE", "int8"),
-            )
-            raw_segments, info = model.transcribe(
-                str(audio_path),
-                language=os.getenv("TRADINGAGENTS_YOUTUBE_ASR_LANGUAGE", "ko"),
-                vad_filter=_env_bool("TRADINGAGENTS_YOUTUBE_ASR_VAD_FILTER", True),
-                beam_size=max(1, _env_int("TRADINGAGENTS_YOUTUBE_ASR_BEAM_SIZE", 1)),
-            )
-            segments = _segments_from_local_asr(raw_segments)
-            detected_language = str(getattr(info, "language", "") or os.getenv("TRADINGAGENTS_YOUTUBE_ASR_LANGUAGE", "ko"))
-        except Exception:
+        transcript = _transcribe_audio_with_profiles(
+            WhisperModel,
+            audio_path=audio_path,
+            duration_seconds=duration_seconds,
+        )
+        if transcript is None:
             return None
+        segments, detected_language, model_name = transcript
     raw_text = clean_transcript_text(" ".join(segment.text for segment in segments))
     if not raw_text:
+        return None
+    candidate = YouTubeTranscript(
+        language=detected_language,
+        language_name="Local ASR",
+        source="local_asr",
+        segments=segments,
+        raw_text=raw_text,
+        track_ext=model_name,
+    )
+    if not _transcript_quality_is_usable(candidate, duration_seconds=duration_seconds):
         return None
     return YouTubeTranscript(
         language=detected_language,
@@ -604,8 +746,130 @@ def _fetch_asr_transcript(
         source="local_asr",
         segments=segments,
         raw_text=raw_text,
-        track_ext=_youtube_asr_model(),
+        track_ext=model_name,
     )
+
+
+def _transcribe_audio_with_profiles(
+    WhisperModel: Any,
+    *,
+    audio_path: Path,
+    duration_seconds: int | None,
+) -> tuple[tuple[YouTubeTranscriptSegment, ...], str, str] | None:
+    last_error: Exception | None = None
+    for profile in _youtube_asr_profiles():
+        model_name = profile["model"]
+        try:
+            model = WhisperModel(
+                model_name,
+                device=profile["device"],
+                compute_type=profile["compute_type"],
+            )
+            transcribe_options = _asr_transcribe_options(model, duration_seconds=duration_seconds)
+            raw_segments, info = model.transcribe(str(audio_path), **transcribe_options)
+            segments = _segments_from_local_asr(raw_segments)
+            detected_language = str(
+                getattr(info, "language", "")
+                or os.getenv("TRADINGAGENTS_YOUTUBE_ASR_LANGUAGE", "ko")
+                or "ko"
+            )
+            if segments:
+                return segments, detected_language, model_name
+        except Exception as exc:  # pragma: no cover - live model/runtime fallback
+            last_error = exc
+            continue
+    if last_error and _env_bool("TRADINGAGENTS_YOUTUBE_ASR_DEBUG_ERRORS", False):
+        print(f"::notice::Local ASR failed after all profiles: {last_error}", flush=True)
+    return None
+
+
+def _youtube_asr_profiles() -> tuple[dict[str, str], ...]:
+    device = _youtube_asr_device()
+    model = _youtube_asr_model(device=device)
+    compute_type = _youtube_asr_compute_type(device=device)
+    profiles = [{"model": model, "device": device, "compute_type": compute_type}]
+    fallback_models = _youtube_env_list(
+        "TRADINGAGENTS_YOUTUBE_ASR_FALLBACK_MODELS",
+        "TRADINGAGENTS_YOUTUBE_LOCAL_ASR_FALLBACK_MODELS",
+    )
+    if not fallback_models:
+        fallback_models = ["distil-large-v3", "small"] if device == "cuda" else ["base"]
+    for fallback_model in fallback_models:
+        fallback_device = "cuda" if device == "cuda" and fallback_model not in {"small", "base", "tiny"} else "cpu"
+        fallback_compute = "float16" if fallback_device == "cuda" else "int8"
+        profiles.append({"model": fallback_model, "device": fallback_device, "compute_type": fallback_compute})
+
+    deduped: list[dict[str, str]] = []
+    seen: set[tuple[str, str, str]] = set()
+    for profile in profiles:
+        key = (profile["model"], profile["device"], profile["compute_type"])
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(profile)
+    return tuple(deduped)
+
+
+def _asr_transcribe_options(model: Any, *, duration_seconds: int | None) -> dict[str, Any]:
+    options: dict[str, Any] = {
+        "language": os.getenv("TRADINGAGENTS_YOUTUBE_ASR_LANGUAGE", "ko") or "ko",
+        "vad_filter": _env_bool("TRADINGAGENTS_YOUTUBE_ASR_VAD_FILTER", True),
+        "beam_size": max(1, _env_int("TRADINGAGENTS_YOUTUBE_ASR_BEAM_SIZE", 5)),
+        "best_of": max(1, _env_int("TRADINGAGENTS_YOUTUBE_ASR_BEST_OF", 5)),
+        "patience": max(0.0, _env_float("TRADINGAGENTS_YOUTUBE_ASR_PATIENCE", 1.0)),
+        "condition_on_previous_text": _env_bool("TRADINGAGENTS_YOUTUBE_ASR_CONDITION_ON_PREVIOUS_TEXT", False),
+        "repetition_penalty": max(1.0, _env_float("TRADINGAGENTS_YOUTUBE_ASR_REPETITION_PENALTY", 1.05)),
+        "no_repeat_ngram_size": max(0, _env_int("TRADINGAGENTS_YOUTUBE_ASR_NO_REPEAT_NGRAM_SIZE", 3)),
+        "word_timestamps": _env_bool("TRADINGAGENTS_YOUTUBE_ASR_WORD_TIMESTAMPS", True),
+        "hallucination_silence_threshold": max(
+            0.0,
+            _env_float("TRADINGAGENTS_YOUTUBE_ASR_HALLUCINATION_SILENCE_THRESHOLD", 1.0),
+        ),
+    }
+    temperature = _youtube_env_text("TRADINGAGENTS_YOUTUBE_ASR_TEMPERATURE")
+    if temperature:
+        values = [_optional_float(item) for item in re.split(r"[\s,;]+", temperature) if item.strip()]
+        options["temperature"] = [item for item in values if item is not None] or [0.0]
+    else:
+        options["temperature"] = [0.0, 0.2, 0.4]
+    chunk_length = _env_int("TRADINGAGENTS_YOUTUBE_ASR_CHUNK_LENGTH_SECONDS", 0)
+    if chunk_length > 0:
+        options["chunk_length"] = chunk_length
+    vad_parameters = _youtube_asr_vad_parameters(duration_seconds=duration_seconds)
+    if vad_parameters:
+        options["vad_parameters"] = vad_parameters
+    prompt = _youtube_asr_initial_prompt()
+    if prompt:
+        options["initial_prompt"] = prompt
+    hotwords = _youtube_asr_hotwords()
+    if hotwords:
+        options["hotwords"] = hotwords
+
+    try:
+        signature = inspect.signature(model.transcribe)
+    except (TypeError, ValueError):
+        return options
+    if any(parameter.kind == inspect.Parameter.VAR_KEYWORD for parameter in signature.parameters.values()):
+        return options
+    accepted = set(signature.parameters)
+    return {key: value for key, value in options.items() if key in accepted}
+
+
+def _youtube_asr_vad_parameters(*, duration_seconds: int | None) -> dict[str, Any]:
+    min_silence = _env_int("TRADINGAGENTS_YOUTUBE_ASR_VAD_MIN_SILENCE_MS", 500)
+    speech_pad = _env_int("TRADINGAGENTS_YOUTUBE_ASR_VAD_SPEECH_PAD_MS", 300)
+    threshold = _env_float("TRADINGAGENTS_YOUTUBE_ASR_VAD_THRESHOLD", 0.5)
+    params: dict[str, Any] = {
+        "min_silence_duration_ms": max(0, min_silence),
+        "speech_pad_ms": max(0, speech_pad),
+        "threshold": min(max(threshold, 0.0), 1.0),
+    }
+    max_speech = _env_int("TRADINGAGENTS_YOUTUBE_ASR_VAD_MAX_SPEECH_SECONDS", 0)
+    if max_speech > 0:
+        params["max_speech_duration_s"] = max_speech
+    if duration_seconds is not None and duration_seconds < 90:
+        params["min_silence_duration_ms"] = min(params["min_silence_duration_ms"], 250)
+    return params
 
 
 def _download_audio_for_asr(
@@ -940,11 +1204,173 @@ def _youtube_po_tokens() -> list[str]:
     return _dedupe_texts(tokens)
 
 
-def _youtube_asr_model() -> str:
+def _youtube_asr_model(*, device: str | None = None) -> str:
+    configured = _youtube_env_text("TRADINGAGENTS_YOUTUBE_ASR_MODEL", "TRADINGAGENTS_YOUTUBE_LOCAL_ASR_MODEL")
+    if configured and configured.lower() not in {"auto", "gpu", "cuda"}:
+        return configured
+    device = device or _youtube_asr_device()
+    if device == "cuda":
+        return "turbo"
+    return "small"
+
+
+def _youtube_asr_device() -> str:
+    configured = _youtube_env_text("TRADINGAGENTS_YOUTUBE_ASR_DEVICE", "TRADINGAGENTS_YOUTUBE_LOCAL_ASR_DEVICE")
+    if configured and configured.lower() not in {"auto", "gpu"}:
+        return configured
+    try:
+        import ctranslate2  # type: ignore
+
+        if int(ctranslate2.get_cuda_device_count() or 0) > 0:
+            return "cuda"
+    except Exception:
+        pass
+    return "cpu"
+
+
+def _youtube_asr_compute_type(*, device: str | None = None) -> str:
+    configured = _youtube_env_text("TRADINGAGENTS_YOUTUBE_ASR_COMPUTE_TYPE", "TRADINGAGENTS_YOUTUBE_LOCAL_ASR_COMPUTE_TYPE")
+    if configured and configured.lower() != "auto":
+        return configured
+    return "float16" if (device or _youtube_asr_device()) == "cuda" else "int8"
+
+
+def _youtube_asr_hotwords() -> str:
+    configured = _youtube_env_text("TRADINGAGENTS_YOUTUBE_ASR_HOTWORDS", "TRADINGAGENTS_YOUTUBE_FINANCE_HOTWORDS")
+    values = list(_DEFAULT_FINANCE_HOTWORDS)
+    if configured:
+        values.extend(part.strip() for part in re.split(r"[\n,;]+", configured) if part.strip())
+    return ", ".join(_dedupe_texts(values))
+
+
+def _youtube_asr_initial_prompt() -> str:
+    configured = _youtube_env_text("TRADINGAGENTS_YOUTUBE_ASR_INITIAL_PROMPT")
+    if configured:
+        return configured
+    hotwords = _youtube_asr_hotwords()
     return (
-        _youtube_env_text("TRADINGAGENTS_YOUTUBE_ASR_MODEL", "TRADINGAGENTS_YOUTUBE_LOCAL_ASR_MODEL")
-        or "base"
+        "다음 음성은 한국어 투자/경제 유튜브 영상입니다. "
+        "종목명, 티커, 지수명, 숫자, 금리, 환율, 실적 용어를 정확히 전사하세요. "
+        f"자주 나오는 용어: {hotwords}"
     )
+
+
+def assess_transcript_reliability(
+    transcript: YouTubeTranscript | None,
+    *,
+    duration_seconds: int | None = None,
+) -> dict[str, Any]:
+    if transcript is None:
+        return {
+            "status": "unavailable",
+            "score": 0.0,
+            "warnings": ["transcript_missing"],
+        }
+    text = clean_transcript_text(transcript.raw_text)
+    words = re.findall(r"[A-Za-z0-9가-힣.]+", text)
+    segments = tuple(transcript.segments or ())
+    warnings: list[str] = []
+    score = 1.0
+    if len(text) < _env_int("TRADINGAGENTS_YOUTUBE_MIN_TRANSCRIPT_CHARS", 120):
+        warnings.append("transcript_too_short")
+        score -= 0.45
+    if duration_seconds and duration_seconds > 180 and len(text) / max(duration_seconds / 60.0, 1.0) < 120:
+        warnings.append("low_text_density")
+        score -= 0.25
+    if duration_seconds and len(text) / max(duration_seconds / 60.0, 1.0) > 1800:
+        warnings.append("suspiciously_high_text_density")
+        score -= 0.2
+    if segments:
+        repeated_runs = _max_repeated_segment_run(segments)
+        if repeated_runs >= 4:
+            warnings.append("repeated_segment_run")
+            score -= 0.3
+    repeated_ngram_ratio = _repeated_ngram_ratio(words, n=5)
+    if repeated_ngram_ratio > 0.25:
+        warnings.append("high_repeated_ngram_ratio")
+        score -= 0.3
+    numeric_count = len(re.findall(r"\d", text))
+    if getattr(transcript, "source", None) in {"automatic", "local_asr"} and numeric_count == 0 and duration_seconds and duration_seconds > 300:
+        warnings.append("no_numeric_tokens_in_long_investment_video")
+        score -= 0.1
+    status = "good" if score >= 0.85 else "usable" if score >= 0.55 else "poor"
+    return {
+        "status": status,
+        "score": round(max(0.0, min(1.0, score)), 3),
+        "warnings": warnings,
+        "source": getattr(transcript, "source", None),
+        "language": getattr(transcript, "language_name", None),
+        "model_or_format": getattr(transcript, "track_ext", None),
+        "chars": len(text),
+        "segments": len(segments),
+        "duration_seconds": duration_seconds,
+        "repeated_ngram_ratio": round(repeated_ngram_ratio, 3),
+    }
+
+
+def _transcript_quality_is_usable(transcript: YouTubeTranscript, *, duration_seconds: int | None) -> bool:
+    quality = assess_transcript_reliability(transcript, duration_seconds=duration_seconds)
+    minimum = str(os.getenv("TRADINGAGENTS_YOUTUBE_ASR_MIN_QUALITY", "usable")).strip().lower()
+    if minimum == "off":
+        return True
+    rank = {"poor": 0, "usable": 1, "good": 2}
+    return rank.get(str(quality.get("status") or "poor"), 0) >= rank.get(minimum, 1)
+
+
+def _should_recheck_caption_with_asr(transcript: YouTubeTranscript, *, duration_seconds: int | None) -> bool:
+    if not _env_bool("TRADINGAGENTS_YOUTUBE_ASR_RECHECK_AUTOMATIC", True):
+        return False
+    if not _asr_fallback_enabled():
+        return False
+    if getattr(transcript, "source", None) not in {"automatic", "youtubei"}:
+        return False
+    quality = assess_transcript_reliability(transcript, duration_seconds=duration_seconds)
+    return str(quality.get("status") or "poor") == "poor"
+
+
+def _is_better_transcript(
+    candidate: YouTubeTranscript | None,
+    current: YouTubeTranscript,
+    *,
+    duration_seconds: int | None,
+) -> bool:
+    if candidate is None:
+        return False
+    current_quality = assess_transcript_reliability(current, duration_seconds=duration_seconds)
+    candidate_quality = assess_transcript_reliability(candidate, duration_seconds=duration_seconds)
+    rank = {"unavailable": -1, "poor": 0, "usable": 1, "good": 2}
+    current_rank = rank.get(str(current_quality.get("status") or "poor"), 0)
+    candidate_rank = rank.get(str(candidate_quality.get("status") or "poor"), 0)
+    if candidate_rank > current_rank:
+        return True
+    if candidate_rank == current_rank:
+        return float(candidate_quality.get("score") or 0.0) > float(current_quality.get("score") or 0.0) + 0.15
+    return False
+
+
+def _max_repeated_segment_run(segments: tuple[YouTubeTranscriptSegment, ...]) -> int:
+    max_run = 0
+    current_run = 0
+    previous = None
+    for segment in segments:
+        text = clean_transcript_text(segment.text).lower()
+        if text and text == previous:
+            current_run += 1
+        else:
+            current_run = 1 if text else 0
+        previous = text
+        max_run = max(max_run, current_run)
+    return max_run
+
+
+def _repeated_ngram_ratio(words: list[str], *, n: int) -> float:
+    if len(words) < n * 2:
+        return 0.0
+    grams = [" ".join(words[index : index + n]).lower() for index in range(0, len(words) - n + 1)]
+    if not grams:
+        return 0.0
+    unique = len(set(grams))
+    return max(0.0, 1.0 - unique / len(grams))
 
 
 def _normalize_youtube_po_token(token: str, context: str) -> str:
