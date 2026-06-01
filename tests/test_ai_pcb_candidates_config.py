@@ -19,6 +19,21 @@ def test_ai_pcb_candidates_are_in_kr_daily_analysis_universe_and_watchlist():
     assert {ticker: config.run.ticker_name_overrides[ticker] for ticker in candidates} == candidates
 
 
+def test_domestic_watchlist_additions_are_in_kr_daily_analysis_universe_and_watchlist():
+    config = load_scheduled_config("config/scheduled_analysis_korea.toml")
+    profile = load_portfolio_profile("config/portfolio_profiles.toml", "kr_kis_default")
+    candidates = {
+        "012330.KS": "현대모비스",
+        "035420.KS": "NAVER",
+        "277810.KQ": "레인보우로보틱스",
+    }
+
+    assert config.run.market == "KR"
+    assert candidates.keys() <= set(config.run.tickers)
+    assert candidates.keys() <= set(profile.watch_tickers)
+    assert {ticker: config.run.ticker_name_overrides[ticker] for ticker in candidates} == candidates
+
+
 def test_ai_pcb_and_power_candidates_are_in_us_daily_analysis_universe_and_watchlist():
     config = load_scheduled_config("config/scheduled_analysis.toml")
     profile = load_portfolio_profile("config/portfolio_profiles.toml", "us_kis_default")

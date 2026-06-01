@@ -45,6 +45,16 @@ class InstrumentResolverTests(unittest.TestCase):
                 profile = resolve_instrument(name)
                 self.assertEqual(profile.primary_symbol, ticker)
 
+    def test_resolves_domestic_watchlist_additions(self):
+        expected = {
+            "현대모비스": "012330.KS",
+            "레인보우로보틱스": "277810.KQ",
+        }
+        for name, ticker in expected.items():
+            with self.subTest(name=name):
+                profile = resolve_instrument(name)
+                self.assertEqual(profile.primary_symbol, ticker)
+
     def test_resolves_kr_alias_set_for_hynix(self):
         profile = resolve_instrument("SK hynix")
         self.assertEqual(profile.primary_symbol, "000660.KS")
