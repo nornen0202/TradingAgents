@@ -6,6 +6,7 @@ param(
     [string] $Repo = "nornen0202/TradingAgents",
     [string] $Workflow = "intraday-overlay-refresh.yml",
     [string] $Ref = "main",
+    [string] $GhPath = "",
     [int] $RecentRunWindowMinutes = 40,
     [string] $LogPath = "C:\TradingAgentsData\automation-logs\intraday-overlay-dispatch.log",
     [switch] $Force,
@@ -28,11 +29,35 @@ function Write-DispatchLog {
     }
 }
 
-$gh = Get-Command gh -ErrorAction Stop
+function Resolve-GhPath {
+    if ($GhPath) {
+        if (Test-Path -LiteralPath $GhPath) {
+            return (Resolve-Path -LiteralPath $GhPath).Path
+        }
+        throw "Configured GhPath does not exist: $GhPath"
+    }
+    $command = Get-Command gh -ErrorAction SilentlyContinue
+    if ($command) {
+        return $command.Source
+    }
+    foreach ($candidate in @(
+        "C:\Program Files\GitHub CLI\gh.exe",
+        "C:\Program Files (x86)\GitHub CLI\gh.exe"
+    )) {
+        if (Test-Path -LiteralPath $candidate) {
+            return $candidate
+        }
+    }
+    throw "GitHub CLI gh.exe was not found in PATH or common install locations."
+}
+
+Write-DispatchLog "start profile=$Profile run_mode=$RunMode repo=$Repo workflow=$Workflow ref=$Ref"
+$gh = Resolve-GhPath
+Write-DispatchLog "using gh: $gh"
 $nowUtc = [DateTimeOffset]::UtcNow
 
 if (-not $Force) {
-    $runsJson = & $gh.Source run list `
+    $runsJson = & $gh run list `
         --repo $Repo `
         --workflow $Workflow `
         --limit 12 `
@@ -73,7 +98,7 @@ if ($DryRun) {
 }
 
 Write-DispatchLog "dispatching: gh $($dispatchArgs -join ' ')"
-$dispatchOutput = & $gh.Source @dispatchArgs 2>&1
+$dispatchOutput = & $gh @dispatchArgs 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-DispatchLog "dispatch failed: $dispatchOutput"
     exit $LASTEXITCODE
