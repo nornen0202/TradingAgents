@@ -51,6 +51,26 @@ function Resolve-GhPath {
     throw "GitHub CLI gh.exe was not found in PATH or common install locations."
 }
 
+function Convert-ToUtcDateTime {
+    param([object] $Value)
+    if ($Value -is [DateTime]) {
+        return $Value.ToUniversalTime()
+    }
+    if ($Value -is [DateTimeOffset]) {
+        return $Value.UtcDateTime
+    }
+    $text = [string] $Value
+    if (-not $text) {
+        return $null
+    }
+    $styles = [System.Globalization.DateTimeStyles]::AssumeUniversal -bor [System.Globalization.DateTimeStyles]::AdjustToUniversal
+    $parsed = [DateTimeOffset]::MinValue
+    if ([DateTimeOffset]::TryParse($text, [System.Globalization.CultureInfo]::InvariantCulture, $styles, [ref] $parsed)) {
+        return $parsed.UtcDateTime
+    }
+    return $null
+}
+
 Write-DispatchLog "start profile=$Profile run_mode=$RunMode repo=$Repo workflow=$Workflow ref=$Ref"
 $gh = Resolve-GhPath
 Write-DispatchLog "using gh: $gh"
@@ -67,8 +87,10 @@ if (-not $Force) {
     } else {
         $cutoffUtc = $nowUtc.AddMinutes(-1 * [Math]::Max($RecentRunWindowMinutes, 1))
         $recentRuns = @($runsJson | ConvertFrom-Json | Where-Object {
+            $createdUtc = Convert-ToUtcDateTime $_.createdAt
             ($_.event -eq "schedule" -or $_.event -eq "workflow_dispatch") -and
-            ([DateTimeOffset]::Parse([string] $_.createdAt).UtcDateTime -ge $cutoffUtc.UtcDateTime)
+            $createdUtc -ne $null -and
+            $createdUtc -ge $cutoffUtc.UtcDateTime
         })
         if ($recentRuns.Count -gt 0) {
             $latest = $recentRuns | Select-Object -First 1
