@@ -48,6 +48,46 @@ class InstrumentProfile:
 
 
 _KRX_COMPANIES = {
+    "000150": {
+        "display_name": "두산",
+        "display_name_kr": "두산",
+        "display_name_en": "Doosan Corporation",
+        "symbol": "000150.KS",
+        "aliases": ("두산", "Doosan", "Doosan Corporation", "000150", "000150.KS"),
+    },
+    "007660": {
+        "display_name": "이수페타시스",
+        "display_name_kr": "이수페타시스",
+        "display_name_en": "ISU Petasys",
+        "symbol": "007660.KS",
+        "aliases": ("이수페타시스", "ISU Petasys", "Isu Petasys", "007660", "007660.KS"),
+    },
+    "007810": {
+        "display_name": "코리아써키트",
+        "display_name_kr": "코리아써키트",
+        "display_name_en": "Korea Circuit",
+        "symbol": "007810.KS",
+        "aliases": ("코리아써키트", "Korea Circuit", "007810", "007810.KS"),
+    },
+    "020150": {
+        "display_name": "롯데에너지머티리얼즈",
+        "display_name_kr": "롯데에너지머티리얼즈",
+        "display_name_en": "Lotte Energy Materials",
+        "symbol": "020150.KS",
+        "aliases": (
+            "롯데에너지머티리얼즈",
+            "Lotte Energy Materials",
+            "020150",
+            "020150.KS",
+        ),
+    },
+    "222800": {
+        "display_name": "심텍",
+        "display_name_kr": "심텍",
+        "display_name_en": "SIMMTECH",
+        "symbol": "222800.KQ",
+        "aliases": ("심텍", "SIMMTECH", "Simmtech", "222800", "222800.KQ"),
+    },
     "005930": {
         "display_name": "삼성전자",
         "display_name_kr": "삼성전자",
