@@ -356,6 +356,59 @@ checkpoint_timezone = "America/New_York"
     assert (site_dir / "downloads" / "new_overlay" / "execution" / "chatgpt_execution_context.json").exists()
 
 
+def test_overlay_bootstrap_uses_same_market_partial_full_when_universe_expands(tmp_path: Path):
+    archive_dir = tmp_path / "archive"
+    config_path = tmp_path / "scheduled.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["AAPL", "MSFT"]
+timezone = "Asia/Seoul"
+market = "US"
+run_mode = "overlay_only"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+checkpoints_local = ["10:00"]
+checkpoint_timezone = "America/New_York"
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    latest_kr = _write_source_run(
+        archive_dir,
+        run_id="20260601T090000_kr",
+        started_at="2026-06-01T09:00:00+09:00",
+        run_mode="full",
+        microstructure=False,
+        tickers=("005930.KS",),
+        market="KR",
+    )
+    _write_source_run(
+        archive_dir,
+        run_id="20260530T010000_us_partial",
+        started_at="2026-05-30T01:00:00+09:00",
+        run_mode="full",
+        microstructure=False,
+        tickers=("AAPL",),
+        market="US",
+    )
+    (archive_dir / "latest-run.json").write_text(json.dumps(latest_kr), encoding="utf-8")
+
+    summaries, source_run_id = _bootstrap_overlay_inputs_from_latest_run(
+        config=config,
+        run_dir=archive_dir / "runs" / "2026" / "new_overlay",
+        tickers=["AAPL", "MSFT"],
+    )
+
+    assert source_run_id == "20260530T010000_us_partial"
+    assert {item["ticker"] for item in summaries} == {"AAPL"}
+
+
 def _write_source_run(
     archive_dir: Path,
     *,
@@ -364,6 +417,7 @@ def _write_source_run(
     run_mode: str,
     microstructure: bool,
     tickers: tuple[str, ...] = ("AAPL",),
+    market: str = "US",
 ) -> dict:
     run_dir = archive_dir / "runs" / started_at[:4] / run_id
     ticker_items = []
@@ -424,7 +478,7 @@ def _write_source_run(
         "version": 1,
         "run_id": run_id,
         "started_at": started_at,
-        "settings": {"run_mode": run_mode, "market": "US"},
+        "settings": {"run_mode": run_mode, "market": market},
         "summary": {"total_tickers": len(ticker_items), "successful_tickers": len(ticker_items), "failed_tickers": 0},
         "tickers": ticker_items,
     }
