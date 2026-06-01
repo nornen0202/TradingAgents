@@ -8,7 +8,7 @@ The watchdog does not run analysis locally. It calls:
 gh workflow run intraday-overlay-refresh.yml --repo nornen0202/TradingAgents --ref main -f profile=kr -f run_mode=overlay_only
 ```
 
-Before dispatching, `tools/dispatch_intraday_overlay.ps1` checks recent runs for the same workflow. If a scheduled or manual run already exists inside the recent-run window, it logs a skip and exits.
+Before dispatching, `tools/dispatch_intraday_overlay.ps1` checks recent runs for the same workflow. If a scheduled or manual run already exists inside the recent-run window, it logs a skip and exits. The default window is 20 minutes so the watchdog avoids duplicate native GitHub primary/fallback runs without blocking the next hourly checkpoint.
 
 ## Register KR Watchdog Tasks
 

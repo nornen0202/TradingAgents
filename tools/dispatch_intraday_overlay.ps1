@@ -7,7 +7,7 @@ param(
     [string] $Workflow = "intraday-overlay-refresh.yml",
     [string] $Ref = "main",
     [string] $GhPath = "",
-    [int] $RecentRunWindowMinutes = 40,
+    [int] $RecentRunWindowMinutes = 20,
     [string] $LogPath = "C:\TradingAgentsData\automation-logs\intraday-overlay-dispatch.log",
     [switch] $Force,
     [switch] $DryRun
