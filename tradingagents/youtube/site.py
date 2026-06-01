@@ -167,14 +167,17 @@ def _render_feed(manifests: list[dict[str, Any]], settings: YouTubeSiteSettings)
         run_id = str(manifest.get("run_id") or "")
         for video in _public_report_videos(manifest):
             video_id = str(video.get("video_id") or "")
+            source_url = _first_text(video.get("source_url"))
+            thumbnail_url = _first_text(video.get("thumbnail_url")) or _default_thumbnail_url(video_id)
             items.append(
                 {
                     "run_id": run_id,
                     "video_id": video_id,
                     "title": video.get("title"),
                     "channel": video.get("channel"),
-                    "source_url": video.get("source_url"),
-                    "thumbnail_url": video.get("thumbnail_url"),
+                    "source_url": source_url,
+                    "source_label": _source_label_from_url(source_url),
+                    "thumbnail_url": thumbnail_url,
                     "status": video.get("status"),
                     "published_at": video.get("published_at"),
                     "video_url": video.get("video_url"),
@@ -203,20 +206,23 @@ def _run_card(manifest: Mapping[str, Any]) -> str:
 
 def _video_card(manifest: Mapping[str, Any], video: Mapping[str, Any]) -> str:
     run_id = _safe_segment(str(manifest.get("run_id") or "run"))
-    video_id = _safe_segment(str(video.get("video_id") or "video"))
+    raw_video_id = str(video.get("video_id") or "")
+    video_id = _safe_segment(raw_video_id or "video")
     title = str(video.get("title") or video.get("video_id") or "YouTube report")
     status = str(video.get("status") or "unknown")
     published = str(video.get("published_at") or "")
     channel = _first_text(video.get("channel"), video.get("channel_name"))
     source_url = _first_text(video.get("source_url"))
     source_label = _source_label_from_url(source_url)
-    thumbnail_url = _first_text(video.get("thumbnail_url"))
-    source_parts = []
-    if channel:
-        source_parts.append(f"채널: {channel}")
-    if source_label:
-        source_parts.append(f"출처: {source_label}")
-    source_text = " · ".join(source_parts) or "채널 정보 없음"
+    thumbnail_url = _first_text(video.get("thumbnail_url")) or _default_thumbnail_url(raw_video_id)
+    if channel and source_label:
+        source_text = f"출처/채널: {channel} · {source_label}"
+    elif channel:
+        source_text = f"출처/채널: {channel}"
+    elif source_label:
+        source_text = f"출처: {source_label}"
+    else:
+        source_text = "출처/채널 정보 없음"
     thumb = (
         f'<span class="thumb"><img src="{escape(thumbnail_url)}" alt="{escape(title)}" loading="lazy" referrerpolicy="no-referrer"></span>'
         if thumbnail_url
@@ -401,6 +407,13 @@ def _source_label_from_url(url: str) -> str:
     tab_label = {"videos": "동영상", "shorts": "쇼츠", "streams": "라이브"}.get(tab, tab)
     base = handle or parsed.netloc
     return f"{base} / {tab_label}" if tab_label else base
+
+
+def _default_thumbnail_url(video_id: str) -> str:
+    candidate = str(video_id or "").strip()
+    if re.fullmatch(r"[A-Za-z0-9_-]{11}", candidate):
+        return f"https://i.ytimg.com/vi/{candidate}/hqdefault.jpg"
+    return ""
 
 
 def _format_window(manifest: Mapping[str, Any]) -> str:
