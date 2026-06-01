@@ -3,6 +3,7 @@ param(
     [ValidateSet("kr", "us")]
     [string] $Profile = "kr",
     [string[]] $Times = @("09:55", "10:55", "11:55", "12:55", "13:55", "14:55", "15:25"),
+    [string] $Days = "MON,TUE,WED,THU,FRI",
     [string] $TaskFolder = "\TradingAgents",
     [string] $Repo = "nornen0202/TradingAgents",
     [string] $Workflow = "intraday-overlay-refresh.yml",
@@ -36,7 +37,7 @@ foreach ($timeText in $Times) {
         "/SC",
         "WEEKLY",
         "/D",
-        "MON,TUE,WED,THU,FRI",
+        $Days,
         "/ST",
         $timeText,
         "/TN",

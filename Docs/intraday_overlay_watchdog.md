@@ -33,3 +33,14 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/dispatch_intraday_
 ```
 
 Logs are written to `C:\TradingAgentsData\automation-logs\intraday-overlay-dispatch.log` by default.
+
+## Register US Watchdog Tasks
+
+US watchdog tasks are registered in the runner's local Windows timezone. On the current KST runner, the following pair covers both US daylight-saving and standard-time XNYS checkpoints while keeping GitHub's native schedule as the primary path:
+
+```powershell
+.\tools\register_intraday_overlay_watchdog.ps1 -Profile us -Times "23:10" -Days "MON,TUE,WED,THU,FRI"
+.\tools\register_intraday_overlay_watchdog.ps1 -Profile us -Times @("00:10","01:10","02:10","03:10","04:10","05:00","05:10","06:00") -Days "TUE,WED,THU,FRI,SAT"
+```
+
+These local times dispatch `profile=us` only. The workflow runner still applies the XNYS session gate and checkpoint selection, and the 20-minute recent-run window suppresses nearby duplicate dispatches when native GitHub schedule events are healthy.
