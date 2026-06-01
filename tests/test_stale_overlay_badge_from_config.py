@@ -44,8 +44,11 @@ site_dir = ".site"
 def test_intraday_overlay_workflow_uses_kr_operational_crons():
     workflow = Path(".github/workflows/intraday-overlay-refresh.yml").read_text(encoding="utf-8")
     assert "KR checkpoints: 09:35, 10:35, 11:35, 12:35, 13:35, 14:35, 15:20 KST." in workflow
+    assert "fallback probes absorb occasional GitHub schedule event drops" in workflow
     assert "35 0-5 * * 1-5" in workflow
     assert "20 6 * * 1-5" in workflow
+    assert "50 0-5 * * 1-5" in workflow
+    assert "35 6 * * 1-5" in workflow
     assert "0 14-20 * * 1-5" in workflow
     assert "50 19,20 * * 1-5" in workflow
     assert "5 0,2,4 * * 1-5" not in workflow
