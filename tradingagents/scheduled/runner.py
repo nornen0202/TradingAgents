@@ -2385,7 +2385,11 @@ def _bootstrap_overlay_inputs_from_latest_run(
     run_dir: Path,
     tickers: list[str],
 ) -> tuple[list[dict[str, Any]], str | None]:
-    source_manifest = _resolve_latest_overlay_source_manifest(config.storage.archive_dir, tickers=tickers)
+    source_manifest = _resolve_latest_overlay_source_manifest(
+        config.storage.archive_dir,
+        tickers=tickers,
+        market=config.run.market,
+    )
     if source_manifest is None:
         raise RuntimeError("overlay_only/selective_rerun_only requires an existing latest-run.json from a prior full run.")
     source_run_id = str(source_manifest.get("run_id") or "")
@@ -2741,19 +2745,30 @@ def _format_context_value(value: Any) -> str:
     return str(value)
 
 
-def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[str] | None = None) -> dict[str, Any] | None:
+def _resolve_latest_overlay_source_manifest(
+    archive_dir: Path,
+    *,
+    tickers: list[str] | None = None,
+    market: str | None = None,
+) -> dict[str, Any] | None:
     latest_manifest_path = archive_dir / "latest-run.json"
     if not latest_manifest_path.exists():
         return None
 
     candidate = json.loads(latest_manifest_path.read_text(encoding="utf-8"))
     run_mode = str((((candidate.get("settings") or {}).get("run_mode")) or "full")).strip().lower()
-    if run_mode == "full" and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers):
+    candidate_market_ok = _manifest_market_matches(candidate, market=market)
+    if candidate_market_ok and run_mode == "full" and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers):
         return candidate
 
-    if run_mode != "full" and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers) and _manifest_has_microstructure_artifact(
-        candidate,
-        tickers=tickers,
+    if (
+        candidate_market_ok
+        and run_mode != "full"
+        and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers)
+        and _manifest_has_microstructure_artifact(
+            candidate,
+            tickers=tickers,
+        )
     ):
         return candidate
 
@@ -2762,12 +2777,31 @@ def _resolve_latest_overlay_source_manifest(archive_dir: Path, *, tickers: list[
         source_manifest_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
         if source_manifest_path is not None:
             resolved = json.loads(source_manifest_path.read_text(encoding="utf-8"))
-            if _manifest_has_bootstrap_ready_ticker(resolved, tickers=tickers):
+            if _manifest_market_matches(resolved, market=market) and _manifest_has_bootstrap_ready_ticker(
+                resolved,
+                tickers=tickers,
+            ):
                 return resolved
 
-    latest_full = _find_latest_full_run_manifest(archive_dir, tickers=tickers)
+    latest_full = _find_latest_full_run_manifest(archive_dir, tickers=tickers, market=market)
     if latest_full is not None:
         return latest_full
+
+    partial_full = _find_latest_full_run_manifest(
+        archive_dir,
+        tickers=tickers,
+        market=market,
+        require_all_tickers=False,
+    )
+    if partial_full is not None:
+        return partial_full
+
+    if candidate_market_ok and _manifest_has_bootstrap_ready_ticker(
+        candidate,
+        tickers=tickers,
+        require_all_tickers=False,
+    ):
+        return candidate
 
     # Preserve prior behavior when no better candidate exists.
     return candidate
@@ -2943,7 +2977,21 @@ def _investor_failure_reason(reason: str) -> str:
     return text[:180]
 
 
-def _manifest_has_bootstrap_ready_ticker(manifest: dict[str, Any], *, tickers: list[str] | None) -> bool:
+def _manifest_market_matches(manifest: dict[str, Any], *, market: str | None) -> bool:
+    expected = str(market or "").strip().upper()
+    if not expected:
+        return True
+    settings = manifest.get("settings") or {}
+    actual = str(settings.get("market_scope") or settings.get("market") or "").strip().upper()
+    return not actual or actual == expected
+
+
+def _manifest_has_bootstrap_ready_ticker(
+    manifest: dict[str, Any],
+    *,
+    tickers: list[str] | None,
+    require_all_tickers: bool = True,
+) -> bool:
     target_tickers = {str(item).strip().upper() for item in (tickers or []) if str(item).strip()}
     covered: set[str] = set()
     for source in manifest.get("tickers", []):
@@ -2957,12 +3005,20 @@ def _manifest_has_bootstrap_ready_ticker(manifest: dict[str, Any], *, tickers: l
         artifacts = source.get("artifacts") or {}
         if artifacts.get("analysis_json"):
             covered.add(ticker)
-    if target_tickers:
+    if target_tickers and require_all_tickers:
         return target_tickers <= covered
+    if target_tickers:
+        return bool(target_tickers & covered)
     return bool(covered)
 
 
-def _find_latest_full_run_manifest(archive_dir: Path, *, tickers: list[str] | None = None) -> dict[str, Any] | None:
+def _find_latest_full_run_manifest(
+    archive_dir: Path,
+    *,
+    tickers: list[str] | None = None,
+    market: str | None = None,
+    require_all_tickers: bool = True,
+) -> dict[str, Any] | None:
     runs_dir = archive_dir / "runs"
     if not runs_dir.exists():
         return None
@@ -2974,10 +3030,16 @@ def _find_latest_full_run_manifest(archive_dir: Path, *, tickers: list[str] | No
             if not manifest_path.exists():
                 continue
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if not _manifest_market_matches(manifest, market=market):
+                continue
             run_mode = str((((manifest.get("settings") or {}).get("run_mode")) or "full")).strip().lower()
             if run_mode != "full":
                 continue
-            if _manifest_has_bootstrap_ready_ticker(manifest, tickers=tickers):
+            if _manifest_has_bootstrap_ready_ticker(
+                manifest,
+                tickers=tickers,
+                require_all_tickers=require_all_tickers,
+            ):
                 return manifest
     return None
 
