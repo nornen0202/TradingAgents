@@ -88,6 +88,13 @@ _KRX_COMPANIES = {
         "symbol": "222800.KQ",
         "aliases": ("심텍", "SIMMTECH", "Simmtech", "222800", "222800.KQ"),
     },
+    "277810": {
+        "display_name": "레인보우로보틱스",
+        "display_name_kr": "레인보우로보틱스",
+        "display_name_en": "Rainbow Robotics",
+        "symbol": "277810.KQ",
+        "aliases": ("레인보우로보틱스", "Rainbow Robotics", "277810", "277810.KQ"),
+    },
     "005930": {
         "display_name": "삼성전자",
         "display_name_kr": "삼성전자",
@@ -150,6 +157,13 @@ _KRX_COMPANIES = {
         "display_name_en": "LG Innotek",
         "symbol": "011070.KS",
         "aliases": ("LG이노텍", "LG Innotek", "011070", "011070.KS"),
+    },
+    "012330": {
+        "display_name": "현대모비스",
+        "display_name_kr": "현대모비스",
+        "display_name_en": "Hyundai Mobis",
+        "symbol": "012330.KS",
+        "aliases": ("현대모비스", "Hyundai Mobis", "012330", "012330.KS"),
     },
     "034020": {
         "display_name": "두산에너빌리티",
