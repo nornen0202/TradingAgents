@@ -171,6 +171,7 @@ jobs:
       YOUTUBE_SUBS_PO_TOKEN: ${{ secrets.YOUTUBE_SUBS_PO_TOKEN }}
       YOUTUBE_GVS_PO_TOKEN: ${{ secrets.YOUTUBE_GVS_PO_TOKEN }}
       YOUTUBE_PLAYER_CLIENTS: ${{ vars.YOUTUBE_PLAYER_CLIENTS }}
+      TRADINGAGENTS_YTDLP_REMOTE_COMPONENTS: "ejs:github"
       TRADINGAGENTS_YOUTUBE_ASR_FALLBACK: "1"
       TRADINGAGENTS_YOUTUBE_ASR_MODEL: "auto"
       TRADINGAGENTS_YOUTUBE_ASR_DEVICE: "auto"
@@ -343,6 +344,8 @@ jobs:
           options = youtube_runtime._youtube_dl_options(skip_download=True, quiet=True)
           print("yt-dlp plugin dirs:", options.get("plugin_dirs"))
           print("yt-dlp js runtimes:", options.get("js_runtimes"))
+          print("yt-dlp remote components:", options.get("remote_components"))
+          print("yt-dlp ffmpeg location:", options.get("ffmpeg_location"))
           plugin_zip = Path(os.environ.get("APPDATA", "")) / "yt-dlp" / "plugins" / "bgutil-ytdlp-pot-provider.zip"
           print("bgutil PO token provider zip:", plugin_zip if plugin_zip.exists() else "not found")
           server_home = Path(os.environ.get("USERPROFILE", "")) / "bgutil-ytdlp-pot-provider" / "server"
