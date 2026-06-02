@@ -25,6 +25,8 @@ def test_domestic_watchlist_additions_are_in_kr_daily_analysis_universe_and_watc
     candidates = {
         "012330.KS": "현대모비스",
         "035420.KS": "NAVER",
+        "036930.KQ": "주성엔지니어링",
+        "090360.KQ": "로보스타",
         "277810.KQ": "레인보우로보틱스",
     }
 

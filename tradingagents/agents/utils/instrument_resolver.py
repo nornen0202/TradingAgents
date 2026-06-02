@@ -81,6 +81,20 @@ _KRX_COMPANIES = {
             "020150.KS",
         ),
     },
+    "036930": {
+        "display_name": "주성엔지니어링",
+        "display_name_kr": "주성엔지니어링",
+        "display_name_en": "Jusung Engineering",
+        "symbol": "036930.KQ",
+        "aliases": ("주성엔지니어링", "Jusung Engineering", "036930", "036930.KQ"),
+    },
+    "090360": {
+        "display_name": "로보스타",
+        "display_name_kr": "로보스타",
+        "display_name_en": "Robostar",
+        "symbol": "090360.KQ",
+        "aliases": ("로보스타", "Robostar", "090360", "090360.KQ"),
+    },
     "222800": {
         "display_name": "심텍",
         "display_name_kr": "심텍",

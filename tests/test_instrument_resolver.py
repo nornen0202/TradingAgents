@@ -48,6 +48,8 @@ class InstrumentResolverTests(unittest.TestCase):
     def test_resolves_domestic_watchlist_additions(self):
         expected = {
             "현대모비스": "012330.KS",
+            "주성엔지니어링": "036930.KQ",
+            "로보스타": "090360.KQ",
             "레인보우로보틱스": "277810.KQ",
         }
         for name, ticker in expected.items():
