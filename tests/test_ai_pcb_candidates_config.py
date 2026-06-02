@@ -36,6 +36,29 @@ def test_domestic_watchlist_additions_are_in_kr_daily_analysis_universe_and_watc
     assert {ticker: config.run.ticker_name_overrides[ticker] for ticker in candidates} == candidates
 
 
+def test_ai_infrastructure_candidates_are_in_kr_daily_analysis_universe_and_watchlist():
+    config = load_scheduled_config("config/scheduled_analysis_korea.toml")
+    profile = load_portfolio_profile("config/portfolio_profiles.toml", "kr_kis_default")
+    candidates = {
+        "006400.KS": "삼성SDI",
+        "010120.KS": "LS ELECTRIC",
+        "018260.KS": "삼성SDS",
+        "058610.KQ": "에스피지",
+        "066570.KS": "LG전자",
+        "108490.KQ": "로보티즈",
+        "131290.KQ": "티에스이",
+        "267260.KS": "HD현대일렉트릭",
+        "298040.KS": "효성중공업",
+        "373220.KS": "LG에너지솔루션",
+        "454910.KS": "두산로보틱스",
+    }
+
+    assert config.run.market == "KR"
+    assert candidates.keys() <= set(config.run.tickers)
+    assert candidates.keys() <= set(profile.watch_tickers)
+    assert {ticker: config.run.ticker_name_overrides[ticker] for ticker in candidates} == candidates
+
+
 def test_ai_pcb_and_power_candidates_are_in_us_daily_analysis_universe_and_watchlist():
     config = load_scheduled_config("config/scheduled_analysis.toml")
     profile = load_portfolio_profile("config/portfolio_profiles.toml", "us_kis_default")
@@ -51,4 +74,32 @@ def test_ai_pcb_and_power_candidates_are_in_us_daily_analysis_universe_and_watch
     assert already_present <= set(config.run.tickers)
     assert candidates.keys() <= set(profile.watch_tickers)
     assert already_present <= set(profile.watch_tickers)
+    assert {ticker: config.run.ticker_name_overrides[ticker] for ticker in candidates} == candidates
+
+
+def test_global_ai_infrastructure_candidates_are_in_us_daily_analysis_universe_and_watchlist():
+    config = load_scheduled_config("config/scheduled_analysis.toml")
+    profile = load_portfolio_profile("config/portfolio_profiles.toml", "us_kis_default")
+    candidates = {
+        "AMZN": "Amazon",
+        "ANET": "Arista Networks",
+        "CGNX": "Cognex",
+        "COHR": "Coherent",
+        "CSCO": "Cisco Systems",
+        "DDOG": "Datadog",
+        "FLNC": "Fluence Energy",
+        "FN": "Fabrinet",
+        "FORM": "FormFactor",
+        "META": "Meta Platforms",
+        "MPWR": "Monolithic Power Systems",
+        "MSFT": "Microsoft",
+        "ON": "ON Semiconductor",
+        "QCOM": "Qualcomm",
+        "SNOW": "Snowflake",
+        "SONY": "Sony Group",
+    }
+
+    assert config.run.market == "US"
+    assert candidates.keys() <= set(config.run.tickers)
+    assert candidates.keys() <= set(profile.watch_tickers)
     assert {ticker: config.run.ticker_name_overrides[ticker] for ticker in candidates} == candidates

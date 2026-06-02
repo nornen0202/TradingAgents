@@ -116,6 +116,13 @@ _KRX_COMPANIES = {
         "symbol": "005930.KS",
         "aliases": ("삼성전자", "Samsung Electronics", "SAMSUNG", "005930", "005930.KS"),
     },
+    "006400": {
+        "display_name": "삼성SDI",
+        "display_name_kr": "삼성SDI",
+        "display_name_en": "Samsung SDI",
+        "symbol": "006400.KS",
+        "aliases": ("삼성SDI", "Samsung SDI", "006400", "006400.KS"),
+    },
     "000660": {
         "display_name": "SK하이닉스",
         "display_name_kr": "SK하이닉스",
@@ -151,6 +158,13 @@ _KRX_COMPANIES = {
         "symbol": "009150.KS",
         "aliases": ("삼성전기", "Samsung Electro-Mechanics", "009150", "009150.KS"),
     },
+    "010120": {
+        "display_name": "LS ELECTRIC",
+        "display_name_kr": "LS ELECTRIC",
+        "display_name_en": "LS ELECTRIC",
+        "symbol": "010120.KS",
+        "aliases": ("LS ELECTRIC", "엘에스일렉트릭", "LS일렉트릭", "010120", "010120.KS"),
+    },
     "010140": {
         "display_name": "삼성중공업",
         "display_name_kr": "삼성중공업",
@@ -178,6 +192,13 @@ _KRX_COMPANIES = {
         "display_name_en": "Hyundai Mobis",
         "symbol": "012330.KS",
         "aliases": ("현대모비스", "Hyundai Mobis", "012330", "012330.KS"),
+    },
+    "018260": {
+        "display_name": "삼성SDS",
+        "display_name_kr": "삼성SDS",
+        "display_name_en": "Samsung SDS",
+        "symbol": "018260.KS",
+        "aliases": ("삼성SDS", "Samsung SDS", "018260", "018260.KS"),
     },
     "034020": {
         "display_name": "두산에너빌리티",
@@ -214,6 +235,13 @@ _KRX_COMPANIES = {
         "symbol": "058470.KQ",
         "aliases": ("리노공업", "LEENO Industrial", "058470", "058470.KQ"),
     },
+    "058610": {
+        "display_name": "에스피지",
+        "display_name_kr": "에스피지",
+        "display_name_en": "SPG",
+        "symbol": "058610.KQ",
+        "aliases": ("에스피지", "SPG", "058610", "058610.KQ"),
+    },
     "064400": {
         "display_name": "LG CNS",
         "display_name_kr": "LG CNS",
@@ -227,6 +255,20 @@ _KRX_COMPANIES = {
         "display_name_en": "ISC",
         "symbol": "095340.KS",
         "aliases": ("ISC", "095340", "095340.KS"),
+    },
+    "108490": {
+        "display_name": "로보티즈",
+        "display_name_kr": "로보티즈",
+        "display_name_en": "Robotis",
+        "symbol": "108490.KQ",
+        "aliases": ("로보티즈", "Robotis", "108490", "108490.KQ"),
+    },
+    "131290": {
+        "display_name": "티에스이",
+        "display_name_kr": "티에스이",
+        "display_name_en": "TSE",
+        "symbol": "131290.KQ",
+        "aliases": ("티에스이", "TSE", "131290", "131290.KQ"),
     },
     "396500": {
         "display_name": "TIGER Fn반도체TOP10",
@@ -242,6 +284,20 @@ _KRX_COMPANIES = {
         "symbol": "278470.KS",
         "aliases": ("에이피알", "APR", "278470", "278470.KS"),
     },
+    "267260": {
+        "display_name": "HD현대일렉트릭",
+        "display_name_kr": "HD현대일렉트릭",
+        "display_name_en": "HD Hyundai Electric",
+        "symbol": "267260.KS",
+        "aliases": ("HD현대일렉트릭", "HD Hyundai Electric", "267260", "267260.KS"),
+    },
+    "298040": {
+        "display_name": "효성중공업",
+        "display_name_kr": "효성중공업",
+        "display_name_en": "Hyosung Heavy Industries",
+        "symbol": "298040.KS",
+        "aliases": ("효성중공업", "Hyosung Heavy Industries", "298040", "298040.KS"),
+    },
     "353200": {
         "display_name": "대덕전자",
         "display_name_kr": "대덕전자",
@@ -249,12 +305,26 @@ _KRX_COMPANIES = {
         "symbol": "353200.KS",
         "aliases": ("대덕전자", "Daeduck Electronics", "353200", "353200.KS"),
     },
+    "373220": {
+        "display_name": "LG에너지솔루션",
+        "display_name_kr": "LG에너지솔루션",
+        "display_name_en": "LG Energy Solution",
+        "symbol": "373220.KS",
+        "aliases": ("LG에너지솔루션", "LG Energy Solution", "373220", "373220.KS"),
+    },
     "403870": {
         "display_name": "HPSP",
         "display_name_kr": "HPSP",
         "display_name_en": "HPSP",
         "symbol": "403870.KQ",
         "aliases": ("HPSP", "403870", "403870.KQ"),
+    },
+    "454910": {
+        "display_name": "두산로보틱스",
+        "display_name_kr": "두산로보틱스",
+        "display_name_en": "Doosan Robotics",
+        "symbol": "454910.KS",
+        "aliases": ("두산로보틱스", "Doosan Robotics", "454910", "454910.KS"),
     },
 }
 

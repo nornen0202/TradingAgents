@@ -47,10 +47,21 @@ class InstrumentResolverTests(unittest.TestCase):
 
     def test_resolves_domestic_watchlist_additions(self):
         expected = {
+            "삼성SDI": "006400.KS",
+            "LS ELECTRIC": "010120.KS",
+            "삼성SDS": "018260.KS",
             "현대모비스": "012330.KS",
             "주성엔지니어링": "036930.KQ",
+            "에스피지": "058610.KQ",
+            "LG전자": "066570.KS",
             "로보스타": "090360.KQ",
+            "로보티즈": "108490.KQ",
+            "티에스이": "131290.KQ",
+            "HD현대일렉트릭": "267260.KS",
             "레인보우로보틱스": "277810.KQ",
+            "효성중공업": "298040.KS",
+            "LG에너지솔루션": "373220.KS",
+            "두산로보틱스": "454910.KS",
         }
         for name, ticker in expected.items():
             with self.subTest(name=name):
