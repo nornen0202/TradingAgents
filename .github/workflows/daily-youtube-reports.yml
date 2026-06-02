@@ -2,17 +2,17 @@ name: Daily YouTube Verified Reports
 
 on:
   schedule:
-    # Target: 22:00 KST every day, including weekends. Avoid minute 0 because
+    # Target: 20:00 KST every day, including weekends. Avoid minute 0 because
     # GitHub may delay or drop scheduled workflows during the start-of-hour
     # load spike.
-    - cron: '17 13 * * *'
+    - cron: '17 11 * * *'
     # Backup trigger in the same KST hour. The schedule_gate job skips it when
     # the primary schedule for the evening has already succeeded or is running.
-    - cron: '47 13 * * *'
+    - cron: '47 11 * * *'
     # Second-wave backups for GitHub schedule drops. These still run every day,
     # and schedule_gate prevents duplicate reports inside the same evening.
-    - cron: '17 14 * * *'
-    - cron: '47 14 * * *'
+    - cron: '17 12 * * *'
+    - cron: '47 12 * * *'
   workflow_dispatch:
     inputs:
       lookback_hours:
@@ -91,9 +91,9 @@ jobs:
 
           now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
           if now_kst.hour < 6:
-              window_start_kst = (now_kst - timedelta(days=1)).replace(hour=21, minute=0, second=0, microsecond=0)
+              window_start_kst = (now_kst - timedelta(days=1)).replace(hour=19, minute=0, second=0, microsecond=0)
           else:
-              window_start_kst = now_kst.replace(hour=21, minute=0, second=0, microsecond=0)
+              window_start_kst = now_kst.replace(hour=19, minute=0, second=0, microsecond=0)
           window_start_utc = window_start_kst.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
           repo = os.environ["GH_REPOSITORY"]

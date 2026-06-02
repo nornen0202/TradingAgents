@@ -37,21 +37,41 @@ def _kst(value: str):
 
 
 def test_youtube_watchdog_is_due_after_backup_window():
-    targets = watchdog.due_targets(_kst("2026-06-01T23:57:00"))
+    targets = watchdog.due_targets(_kst("2026-06-01T21:57:00"))
 
     youtube = [target for target in targets if target.name == "youtube-daily"]
     assert len(youtube) == 1
     assert youtube[0].workflow_file == "daily-youtube-reports.yml"
     assert youtube[0].job_names == ("build_youtube_pages",)
+    assert youtube[0].window_start_kst == _kst("2026-06-01T19:00:00")
 
 
-def test_daily_codex_us_watchdog_is_due_on_weekday_evening():
-    targets = watchdog.due_targets(_kst("2026-06-01T20:07:00"))
+def test_daily_codex_us_watchdog_is_due_on_weekday_afternoon():
+    targets = watchdog.due_targets(_kst("2026-06-01T18:07:00"))
 
     codex_us = [target for target in targets if target.name == "daily-codex-us"]
     assert len(codex_us) == 1
     assert codex_us[0].inputs == {"profile": "us"}
     assert codex_us[0].job_names == ("analyze_us",)
+    assert codex_us[0].window_start_kst == _kst("2026-06-01T16:00:00")
+
+
+def test_daily_codex_us_watchdog_yields_before_youtube_window():
+    targets = watchdog.due_targets(_kst("2026-06-01T20:07:00"))
+
+    assert not [target for target in targets if target.name == "daily-codex-us"]
+
+
+def test_daily_codex_kr_watchdog_yields_before_intraday_overlay_window():
+    targets = watchdog.due_targets(_kst("2026-06-01T09:25:00"))
+
+    assert not [target for target in targets if target.name == "daily-codex-kr"]
+
+
+def test_youtube_watchdog_yields_before_us_overlay_window():
+    targets = watchdog.due_targets(_kst("2026-06-01T23:07:00"))
+
+    assert not [target for target in targets if target.name == "youtube-daily"]
 
 
 def test_watchdog_ignores_gate_only_success_when_target_job_skipped():
@@ -59,7 +79,7 @@ def test_watchdog_ignores_gate_only_success_when_target_job_skipped():
         name="youtube-daily",
         workflow_file="daily-youtube-reports.yml",
         job_names=("build_youtube_pages",),
-        window_start_kst=_kst("2026-06-01T21:00:00"),
+        window_start_kst=_kst("2026-06-01T19:00:00"),
         inputs={"lookback_hours": "24", "publish": "true"},
     )
     client = FakeClient(
@@ -74,7 +94,7 @@ def test_watchdog_ignores_gate_only_success_when_target_job_skipped():
 
 
 def test_watchdog_dispatches_when_due_target_is_uncovered():
-    target_time = _kst("2026-06-01T23:57:00")
+    target_time = _kst("2026-06-01T21:57:00")
     client = FakeClient(runs=[])
 
     messages = watchdog.run_watchdog(client=client, now_kst=target_time)
@@ -88,7 +108,7 @@ def test_watchdog_does_not_dispatch_when_target_job_succeeded():
         name="daily-codex-us",
         workflow_file="daily-codex-analysis.yml",
         job_names=("analyze_us",),
-        window_start_kst=_kst("2026-06-01T18:00:00"),
+        window_start_kst=_kst("2026-06-01T16:00:00"),
         inputs={"profile": "us"},
     )
     client = FakeClient(
