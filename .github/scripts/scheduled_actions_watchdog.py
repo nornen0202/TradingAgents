@@ -116,7 +116,7 @@ def _time_between(value: time, start: time, end: time) -> bool:
 
 
 def _youtube_window_start(now_kst: datetime) -> datetime:
-    window = now_kst.replace(hour=21, minute=0, second=0, microsecond=0)
+    window = now_kst.replace(hour=19, minute=0, second=0, microsecond=0)
     if now_kst.hour < 6:
         window -= timedelta(days=1)
     return window
@@ -129,7 +129,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
     kst_weekday = now_kst.weekday()
 
     youtube_window = _youtube_window_start(now_kst)
-    if youtube_window + timedelta(hours=2, minutes=55) <= now_kst < youtube_window + timedelta(hours=9):
+    if youtube_window + timedelta(hours=2, minutes=55) <= now_kst < youtube_window + timedelta(hours=3, minutes=45):
         targets.append(
             WatchdogTarget(
                 name="youtube-daily",
@@ -141,8 +141,8 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
         )
 
     if kst_weekday < 5:
-        codex_us_window = datetime.combine(kst_date, time(18, 0), tzinfo=KST)
-        if _time_between(kst_time, time(19, 45), time(23, 59)):
+        codex_us_window = datetime.combine(kst_date, time(16, 0), tzinfo=KST)
+        if _time_between(kst_time, time(17, 45), time(20, 0)):
             targets.append(
                 WatchdogTarget(
                     name="daily-codex-us",
@@ -154,7 +154,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
             )
 
         codex_kr_window = datetime.combine(kst_date, time(6, 0), tzinfo=KST)
-        if _time_between(kst_time, time(7, 45), time(12, 0)):
+        if _time_between(kst_time, time(7, 45), time(9, 20)):
             targets.append(
                 WatchdogTarget(
                     name="daily-codex-kr",
