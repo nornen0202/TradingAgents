@@ -253,8 +253,8 @@ _KRX_COMPANIES = {
         "display_name": "ISC",
         "display_name_kr": "ISC",
         "display_name_en": "ISC",
-        "symbol": "095340.KS",
-        "aliases": ("ISC", "095340", "095340.KS"),
+        "symbol": "095340.KQ",
+        "aliases": ("ISC", "095340", "095340.KQ"),
     },
     "108490": {
         "display_name": "로보티즈",
