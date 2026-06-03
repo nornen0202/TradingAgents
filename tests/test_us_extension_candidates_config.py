@@ -1,8 +1,10 @@
+from tradingagents.portfolio.profiles import load_portfolio_profile
 from tradingagents.scheduled.config import load_scheduled_config
 
 
 def test_us_extension_candidates_are_in_daily_analysis_universe():
     config = load_scheduled_config("config/scheduled_analysis.toml")
+    profile = load_portfolio_profile("config/portfolio_profiles.toml", "us_kis_default")
     candidates = {
         "CRM": "Salesforce",
         "DELL": "Dell Technologies",
@@ -15,4 +17,5 @@ def test_us_extension_candidates_are_in_daily_analysis_universe():
 
     assert config.run.market == "US"
     assert candidates.keys() <= set(config.run.tickers)
+    assert candidates.keys() <= set(profile.watch_tickers)
     assert {ticker: config.run.ticker_name_overrides[ticker] for ticker in candidates} == candidates

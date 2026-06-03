@@ -98,7 +98,7 @@ def test_global_ai_infrastructure_candidates_are_in_us_daily_analysis_universe_a
     assert candidates.keys() <= set(config.run.tickers)
     assert candidates.keys() <= set(profile.watch_tickers)
     assert {ticker: config.run.ticker_name_overrides[ticker] for ticker in candidates} == candidates
-    assert len(config.run.tickers) == 34
+    assert len(config.run.tickers) == 38
     assert {
         "BA",
         "BE",
@@ -109,12 +109,8 @@ def test_global_ai_infrastructure_candidates_are_in_us_daily_analysis_universe_a
         "FN",
         "FORM",
         "GRID",
-        "HPE",
-        "IBM",
         "INTC",
         "LITE",
-        "NTAP",
-        "OKTA",
         "ON",
         "PAVE",
         "SMMT",

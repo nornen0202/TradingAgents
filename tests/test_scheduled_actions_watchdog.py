@@ -68,8 +68,22 @@ def test_daily_codex_kr_watchdog_yields_before_intraday_overlay_window():
     assert not [target for target in targets if target.name == "daily-codex-kr"]
 
 
-def test_youtube_watchdog_yields_before_us_overlay_window():
+def test_youtube_watchdog_stays_due_during_late_recovery_window():
     targets = watchdog.due_targets(_kst("2026-06-01T23:07:00"))
+
+    assert [target for target in targets if target.name == "youtube-daily"]
+
+
+def test_youtube_watchdog_covers_delayed_after_midnight_run():
+    targets = watchdog.due_targets(_kst("2026-06-02T00:19:00"))
+
+    youtube = [target for target in targets if target.name == "youtube-daily"]
+    assert len(youtube) == 1
+    assert youtube[0].window_start_kst == _kst("2026-06-01T19:00:00")
+
+
+def test_youtube_watchdog_yields_after_late_recovery_window():
+    targets = watchdog.due_targets(_kst("2026-06-02T04:07:00"))
 
     assert not [target for target in targets if target.name == "youtube-daily"]
 

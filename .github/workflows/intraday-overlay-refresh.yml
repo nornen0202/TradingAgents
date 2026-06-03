@@ -301,7 +301,10 @@ jobs:
       - overlay_refresh_kr
     if: ${{ always() && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && (needs.overlay_refresh_us.result == 'success' || needs.overlay_refresh_kr.result == 'success') }}
     runs-on: [self-hosted, Windows]
-    timeout-minutes: 60
+    timeout-minutes: 30
+    concurrency:
+      group: intraday-overlay-publish
+      cancel-in-progress: true
     defaults:
       run:
         shell: python {0}

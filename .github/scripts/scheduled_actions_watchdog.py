@@ -120,6 +120,12 @@ def _youtube_window_start(now_kst: datetime) -> datetime:
     return window
 
 
+def _youtube_watchdog_due(now_kst: datetime, youtube_window: datetime) -> bool:
+    # Scheduled Actions can arrive hours late. Keep this recovery window wide
+    # enough to catch delayed watchdog runs after the direct YouTube probes.
+    return youtube_window + timedelta(hours=2, minutes=55) <= now_kst < youtube_window + timedelta(hours=9)
+
+
 def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
     targets: list[WatchdogTarget] = []
     kst_date = now_kst.date()
@@ -127,7 +133,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
     kst_weekday = now_kst.weekday()
 
     youtube_window = _youtube_window_start(now_kst)
-    if youtube_window + timedelta(hours=2, minutes=55) <= now_kst < youtube_window + timedelta(hours=3, minutes=45):
+    if _youtube_watchdog_due(now_kst, youtube_window):
         targets.append(
             WatchdogTarget(
                 name="youtube-daily",
