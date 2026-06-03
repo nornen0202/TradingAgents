@@ -93,6 +93,44 @@ def test_watchdog_ignores_gate_only_success_when_target_job_skipped():
     assert "No successful target jobs" in reason
 
 
+def test_watchdog_ignores_active_run_without_target_job():
+    target = watchdog.WatchdogTarget(
+        name="daily-codex-us",
+        workflow_file="daily-codex-analysis.yml",
+        job_names=("analyze_us",),
+        window_start_kst=_kst("2026-06-01T16:00:00"),
+        inputs={"profile": "us"},
+    )
+    client = FakeClient(
+        runs=[{"id": 321, "status": "in_progress", "conclusion": ""}],
+        jobs={321: [{"name": "analyze_kr", "status": "in_progress", "conclusion": ""}]},
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert not covered
+    assert "No successful target jobs" in reason
+
+
+def test_watchdog_treats_active_target_job_as_covered():
+    target = watchdog.WatchdogTarget(
+        name="daily-codex-us",
+        workflow_file="daily-codex-analysis.yml",
+        job_names=("analyze_us",),
+        window_start_kst=_kst("2026-06-01T16:00:00"),
+        inputs={"profile": "us"},
+    )
+    client = FakeClient(
+        runs=[{"id": 654, "status": "in_progress", "conclusion": ""}],
+        jobs={654: [{"name": "analyze_us", "status": "in_progress", "conclusion": ""}]},
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert covered
+    assert "covers analyze_us" in reason
+
+
 def test_watchdog_dispatches_when_due_target_is_uncovered():
     target_time = _kst("2026-06-01T21:57:00")
     client = FakeClient(runs=[])

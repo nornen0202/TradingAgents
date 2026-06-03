@@ -74,10 +74,6 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: daily-codex-analysis
-  cancel-in-progress: false
-
 jobs:
   schedule_gate:
     runs-on: ubuntu-latest
@@ -86,6 +82,9 @@ jobs:
       should_run: ${{ steps.gate.outputs.should_run }}
       reason: ${{ steps.gate.outputs.reason }}
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
       - name: Decide scheduled execution
         id: gate
         env:
@@ -96,104 +95,17 @@ jobs:
           WORKFLOW_FILE: daily-codex-analysis.yml
           EVENT_SCHEDULE: ${{ github.event.schedule }}
           REQUESTED_PROFILE: ${{ github.event.inputs.profile }}
-        shell: python
-        run: |
-          import json
-          import os
-          import urllib.parse
-          import urllib.request
-          from datetime import datetime, time, timedelta, timezone
-          from zoneinfo import ZoneInfo
-
-          US_SCHEDULES = {"10 7 * * 1-5", "40 7 * * 1-5", "10 8 * * 1-5"}
-          KR_SCHEDULES = {"10 21 * * 0-4", "40 21 * * 0-4", "10 22 * * 0-4"}
-
-          def write_outputs(profile, should_run, reason):
-              safe_reason = reason.replace("\n", " ")
-              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
-                  handle.write(f"profile={profile}\n")
-                  handle.write(f"should_run={'true' if should_run else 'false'}\n")
-                  handle.write(f"reason={safe_reason}\n")
-              print(reason)
-
-          event_name = os.environ.get("GH_EVENT_NAME", "")
-          if event_name != "schedule":
-              profile = os.environ.get("REQUESTED_PROFILE", "").strip() or "all"
-              write_outputs(profile, True, f"Manual dispatch runs profile={profile}.")
-              raise SystemExit(0)
-
-          schedule = os.environ.get("EVENT_SCHEDULE", "").strip()
-          if schedule in US_SCHEDULES:
-              profile = "us"
-              window_start_time = time(16, 0)
-          elif schedule in KR_SCHEDULES:
-              profile = "kr"
-              window_start_time = time(6, 0)
-          else:
-              write_outputs("", False, f"Unrecognized scheduled cron: {schedule}")
-              raise SystemExit(0)
-
-          now_kst = datetime.now(ZoneInfo("Asia/Seoul"))
-          window_start_kst = now_kst.replace(
-              hour=window_start_time.hour,
-              minute=window_start_time.minute,
-              second=0,
-              microsecond=0,
-          )
-          if now_kst.time() < window_start_time:
-              window_start_kst -= timedelta(days=1)
-          window_start_utc = window_start_kst.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
-
-          repo = os.environ["GH_REPOSITORY"]
-          workflow_file = os.environ["WORKFLOW_FILE"]
-          current_run_id = int(os.environ["GH_RUN_ID"])
-          query = urllib.parse.urlencode(
-              {
-                  "event": "schedule",
-                  "branch": "main",
-                  "created": f">={window_start_utc}",
-                  "per_page": "100",
-              }
-          )
-          url = f"https://api.github.com/repos/{repo}/actions/workflows/{workflow_file}/runs?{query}"
-          request = urllib.request.Request(
-              url,
-              headers={
-                  "Accept": "application/vnd.github+json",
-                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
-                  "X-GitHub-Api-Version": "2022-11-28",
-              },
-          )
-          try:
-              with urllib.request.urlopen(request, timeout=30) as response:
-                  payload = json.loads(response.read().decode("utf-8"))
-          except Exception as exc:
-              print(f"::warning::Could not inspect prior scheduled runs; running to preserve daily coverage: {exc}")
-              write_outputs(profile, True, "Schedule gate API lookup failed; running to preserve daily coverage.")
-              raise SystemExit(0)
-
-          blocking_runs = []
-          for run in payload.get("workflow_runs", []):
-              if int(run.get("id", 0)) == current_run_id:
-                  continue
-              status = run.get("status")
-              conclusion = run.get("conclusion")
-              if status != "completed" or conclusion == "success":
-                  blocking_runs.append(run)
-
-          if blocking_runs:
-              run = blocking_runs[0]
-              write_outputs(
-                  profile,
-                  False,
-                  f"Skipping duplicate {profile.upper()} scheduled run; prior run {run.get('id')} is {run.get('status')}/{run.get('conclusion')}.",
-              )
-          else:
-              write_outputs(
-                  profile,
-                  True,
-                  f"No successful or active {profile.upper()} scheduled run since {window_start_kst.isoformat()}; running now.",
-              )
+          MANUAL_DEFAULT_PROFILE: all
+          SCHEDULE_GATE_TARGETS_JSON: >-
+            {
+              "10 7 * * 1-5": {"profile": "us", "window_start": "16:00", "target_jobs": ["analyze_us"]},
+              "40 7 * * 1-5": {"profile": "us", "window_start": "16:00", "target_jobs": ["analyze_us"]},
+              "10 8 * * 1-5": {"profile": "us", "window_start": "16:00", "target_jobs": ["analyze_us"]},
+              "10 21 * * 0-4": {"profile": "kr", "window_start": "06:00", "target_jobs": ["analyze_kr"]},
+              "40 21 * * 0-4": {"profile": "kr", "window_start": "06:00", "target_jobs": ["analyze_kr"]},
+              "10 22 * * 0-4": {"profile": "kr", "window_start": "06:00", "target_jobs": ["analyze_kr"]}
+            }
+        run: python .github/scripts/scheduled_workflow_gate.py
 
   analyze_us:
     needs:
