@@ -95,9 +95,7 @@ def target_is_covered(
         run_id = int(run.get("id", 0))
         status = str(run.get("status") or "").lower()
         conclusion = str(run.get("conclusion") or "").lower()
-        if status != "completed":
-            return True, f"Run {run_id} is {status or 'active'}."
-        if conclusion not in {"success", ""}:
+        if status == "completed" and conclusion != "success":
             continue
 
         jobs = client.list_jobs(run_id)

@@ -78,8 +78,11 @@ def test_daily_workflow_gates_backup_schedules_before_analysis():
     workflow = Path(".github/workflows/daily-codex-analysis.yml").read_text(encoding="utf-8")
     assert "  schedule_gate:" in workflow
     assert "actions: read" in workflow
-    assert "cancel-in-progress: false" in workflow
-    assert "US_SCHEDULES = {\"10 7 * * 1-5\", \"40 7 * * 1-5\", \"10 8 * * 1-5\"}" in workflow
-    assert "KR_SCHEDULES = {\"10 21 * * 0-4\", \"40 21 * * 0-4\", \"10 22 * * 0-4\"}" in workflow
-    assert "No successful or active {profile.upper()} scheduled run" in workflow
+    assert "concurrency:\n  group: daily-codex-analysis" not in workflow
+    assert "scheduled_workflow_gate.py" in workflow
+    assert "SCHEDULE_GATE_TARGETS_JSON" in workflow
+    assert '"target_jobs": ["analyze_us"]' in workflow
+    assert '"target_jobs": ["analyze_kr"]' in workflow
+    assert "US_SCHEDULES =" not in workflow
+    assert "KR_SCHEDULES =" not in workflow
     assert "needs.schedule_gate.outputs.should_run == 'true'" in workflow
