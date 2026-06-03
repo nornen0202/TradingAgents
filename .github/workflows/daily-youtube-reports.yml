@@ -13,6 +13,10 @@ on:
     # and schedule_gate prevents duplicate reports inside the same evening.
     - cron: '17 12 * * *'
     - cron: '47 12 * * *'
+    # Late recovery probes. These protect against evenings where GitHub drops
+    # every direct YouTube schedule before the watchdog sees the missed target.
+    - cron: '17 13 * * *'
+    - cron: '47 13 * * *'
   workflow_dispatch:
     inputs:
       lookback_hours:
@@ -75,7 +79,9 @@ jobs:
               "17 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
               "47 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
               "17 12 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
-              "47 12 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]}
+              "47 12 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
+              "17 13 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
+              "47 13 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]}
             }
         run: python .github/scripts/scheduled_workflow_gate.py
 
