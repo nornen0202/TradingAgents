@@ -75,7 +75,6 @@ jobs:
           WORKFLOW_FILE: daily-youtube-reports.yml
           EVENT_SCHEDULE: ${{ github.event.schedule }}
           MANUAL_DEFAULT_PROFILE: ""
-          SCHEDULE_GATE_BLOCK_US_INTRADAY_OVERLAY: "1"
           SCHEDULE_GATE_TARGETS_JSON: >-
             {
               "17 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
@@ -151,9 +150,6 @@ jobs:
 
       - name: Check out repository
         uses: actions/checkout@v6
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
 
       - name: Prepare Codex workspace
         run: |
@@ -483,6 +479,11 @@ jobs:
                   print(f"Added Git Bash path: {candidate}")
                   raise SystemExit(0)
           raise SystemExit("bash.exe was not found under the expected Git for Windows directories.")
+
+      - name: Configure GitHub Pages
+        id: configure_pages
+        continue-on-error: true
+        uses: actions/configure-pages@v6
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9

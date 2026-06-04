@@ -122,25 +122,6 @@ def test_scheduled_youtube_skips_when_prior_manual_pages_job_succeeded():
     assert "covers build_youtube_pages" in reason
 
 
-def test_scheduled_youtube_skips_when_us_intraday_overlay_window_is_active():
-    profile, should_run, reason = gate.decide_schedule_gate(
-        event_name="schedule",
-        schedule="17 11 * * *",
-        requested_profile="",
-        manual_default_profile="",
-        workflow_file="daily-youtube-reports.yml",
-        current_run_id=445,
-        client=FakeClient(),
-        targets=_youtube_targets(),
-        now_kst=_kst("2026-06-02T00:19:00"),
-        block_us_intraday_overlay=True,
-    )
-
-    assert profile == "youtube"
-    assert should_run is False
-    assert "US intraday overlay window is active" in reason
-
-
 def test_failed_prior_run_does_not_block_recovery():
     client = FakeClient(
         runs=[{"id": 555, "event": "schedule", "status": "completed", "conclusion": "failure"}],

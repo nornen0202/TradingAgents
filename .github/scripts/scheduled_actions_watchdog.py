@@ -174,7 +174,7 @@ def _time_between(value: time, start: time, end: time) -> bool:
 
 def _youtube_window_start(now_kst: datetime) -> datetime:
     window = now_kst.replace(hour=19, minute=0, second=0, microsecond=0)
-    if now_kst.time() < time(7, 0):
+    if now_kst.time() < time(12, 0):
         window -= timedelta(days=1)
     return window
 
@@ -184,7 +184,7 @@ def _youtube_watchdog_due(now_kst: datetime, youtube_window: datetime) -> bool:
     # enough to catch delayed watchdog runs after the direct YouTube probes and,
     # when US intraday overlay is active, retry once that market-critical window
     # has cleared.
-    return youtube_window + timedelta(hours=2, minutes=55) <= now_kst < youtube_window + timedelta(hours=11, minutes=45)
+    return youtube_window + timedelta(hours=2, minutes=55) <= now_kst < youtube_window + timedelta(hours=17)
 
 
 def _us_intraday_overlay_due(now_kst: datetime) -> bool:
