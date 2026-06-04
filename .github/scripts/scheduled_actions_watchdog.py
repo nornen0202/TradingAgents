@@ -174,15 +174,22 @@ def _time_between(value: time, start: time, end: time) -> bool:
 
 def _youtube_window_start(now_kst: datetime) -> datetime:
     window = now_kst.replace(hour=19, minute=0, second=0, microsecond=0)
-    if now_kst.hour < 6:
+    if now_kst.time() < time(7, 0):
         window -= timedelta(days=1)
     return window
 
 
 def _youtube_watchdog_due(now_kst: datetime, youtube_window: datetime) -> bool:
     # Scheduled Actions can arrive hours late. Keep this recovery window wide
-    # enough to catch delayed watchdog runs after the direct YouTube probes.
-    return youtube_window + timedelta(hours=2, minutes=55) <= now_kst < youtube_window + timedelta(hours=9)
+    # enough to catch delayed watchdog runs after the direct YouTube probes and,
+    # when US intraday overlay is active, retry once that market-critical window
+    # has cleared.
+    return youtube_window + timedelta(hours=2, minutes=55) <= now_kst < youtube_window + timedelta(hours=11, minutes=45)
+
+
+def _us_intraday_overlay_due(now_kst: datetime) -> bool:
+    utc_now = now_kst.astimezone(UTC)
+    return utc_now.weekday() < 5 and _time_between(utc_now.time(), time(14, 20), time(21, 20))
 
 
 def _daily_codex_dependency(profile: str, now_kst: datetime) -> WatchdogDependency:
@@ -212,7 +219,8 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
     kst_weekday = now_kst.weekday()
 
     youtube_window = _youtube_window_start(now_kst)
-    if _youtube_watchdog_due(now_kst, youtube_window):
+    us_intraday_overlay_due = _us_intraday_overlay_due(now_kst)
+    if _youtube_watchdog_due(now_kst, youtube_window) and not us_intraday_overlay_due:
         targets.append(
             WatchdogTarget(
                 name="youtube-daily",
@@ -260,8 +268,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
                 )
             )
 
-    utc_now = now_kst.astimezone(UTC)
-    if utc_now.weekday() < 5 and _time_between(utc_now.time(), time(14, 20), time(21, 20)):
+    if us_intraday_overlay_due:
         targets.append(
             WatchdogTarget(
                 name="intraday-overlay-us",
