@@ -38,13 +38,36 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
 
 jobs:
+  overlay_gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run_us: ${{ steps.gate.outputs.run_us }}
+      run_kr: ${{ steps.gate.outputs.run_kr }}
+      reason: ${{ steps.gate.outputs.reason }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Hold overlay until Daily Codex completed
+        id: gate
+        env:
+          GH_EVENT_NAME: ${{ github.event_name }}
+          GH_REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+          REQUESTED_PROFILE: ${{ github.event.inputs.profile }}
+        run: python .github/scripts/intraday_overlay_gate.py
+
   overlay_refresh_us:
-    if: ${{ (github.event_name == 'schedule' && (github.event.schedule == '0 14-20 * * 1-5' || github.event.schedule == '50 19,20 * * 1-5')) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'us')) }}
+    needs:
+      - overlay_gate
+    if: ${{ needs.overlay_gate.outputs.run_us == 'true' }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 120
     defaults:
@@ -170,7 +193,9 @@ jobs:
           path: site
 
   overlay_refresh_kr:
-    if: ${{ (github.event_name == 'schedule' && (github.event.schedule == '35 0-5 * * 1-5' || github.event.schedule == '20 6 * * 1-5' || github.event.schedule == '50 0-5 * * 1-5' || github.event.schedule == '25 6 * * 1-5')) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr')) }}
+    needs:
+      - overlay_gate
+    if: ${{ needs.overlay_gate.outputs.run_kr == 'true' }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 120
     defaults:

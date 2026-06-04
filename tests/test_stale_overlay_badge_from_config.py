@@ -53,6 +53,11 @@ def test_intraday_overlay_workflow_uses_kr_operational_crons():
     assert "50 19,20 * * 1-5" in workflow
     assert "5 0,2,4 * * 1-5" not in workflow
     assert "35 6 * * 1-5" not in workflow
+    assert "actions: read" in workflow
+    assert "  overlay_gate:" in workflow
+    assert "intraday_overlay_gate.py" in workflow
+    assert "needs.overlay_gate.outputs.run_us == 'true'" in workflow
+    assert "needs.overlay_gate.outputs.run_kr == 'true'" in workflow
     assert "group: intraday-overlay-publish" in workflow
     assert "cancel-in-progress: true" in workflow
     assert "timeout-minutes: 30" in workflow
