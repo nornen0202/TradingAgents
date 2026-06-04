@@ -15,12 +15,21 @@ UTC = timezone.utc
 
 
 @dataclass(frozen=True)
+class WatchdogDependency:
+    name: str
+    workflow_file: str
+    job_names: tuple[str, ...]
+    window_start_kst: datetime
+
+
+@dataclass(frozen=True)
 class WatchdogTarget:
     name: str
     workflow_file: str
     job_names: tuple[str, ...]
     window_start_kst: datetime
     inputs: dict[str, str]
+    dependencies: tuple[WatchdogDependency, ...] = ()
 
 
 class GitHubActionsClient:
@@ -109,6 +118,56 @@ def target_is_covered(
     return False, f"No successful target jobs since {target.window_start_kst.isoformat()}."
 
 
+def dependency_is_satisfied(
+    *,
+    client: GitHubActionsClient,
+    dependency: WatchdogDependency,
+) -> tuple[bool, str]:
+    runs = client.list_runs(
+        dependency.workflow_file,
+        created_since_utc=dependency.window_start_kst.astimezone(UTC),
+    )
+    if not runs:
+        return False, f"No dependency runs since {dependency.window_start_kst.isoformat()}."
+
+    active: list[int] = []
+    required_jobs = set(dependency.job_names)
+    for run in runs:
+        run_id = int(run.get("id", 0))
+        status = str(run.get("status") or "").lower()
+        conclusion = str(run.get("conclusion") or "").lower()
+        if status != "completed":
+            active.append(run_id)
+            continue
+        if conclusion != "success":
+            continue
+
+        successful_jobs = {
+            str(job.get("name"))
+            for job in client.list_jobs(run_id)
+            if str(job.get("status") or "").lower() == "completed"
+            and str(job.get("conclusion") or "").lower() == "success"
+        }
+        if required_jobs <= successful_jobs:
+            return True, f"Dependency {dependency.name} satisfied by run {run_id}."
+
+    if active:
+        return False, f"Dependency {dependency.name} still active in run(s): {', '.join(str(item) for item in active)}."
+    return False, f"Dependency {dependency.name} has no completed successful target jobs since {dependency.window_start_kst.isoformat()}."
+
+
+def dependencies_are_satisfied(
+    *,
+    client: GitHubActionsClient,
+    target: WatchdogTarget,
+) -> tuple[bool, str]:
+    for dependency in target.dependencies:
+        satisfied, reason = dependency_is_satisfied(client=client, dependency=dependency)
+        if not satisfied:
+            return False, reason
+    return True, "All dependencies satisfied."
+
+
 def _time_between(value: time, start: time, end: time) -> bool:
     return start <= value < end
 
@@ -124,6 +183,26 @@ def _youtube_watchdog_due(now_kst: datetime, youtube_window: datetime) -> bool:
     # Scheduled Actions can arrive hours late. Keep this recovery window wide
     # enough to catch delayed watchdog runs after the direct YouTube probes.
     return youtube_window + timedelta(hours=2, minutes=55) <= now_kst < youtube_window + timedelta(hours=9)
+
+
+def _daily_codex_dependency(profile: str, now_kst: datetime) -> WatchdogDependency:
+    if profile == "kr":
+        window_start = datetime.combine(now_kst.date(), time(6, 0), tzinfo=KST)
+        job_names = ("analyze_kr",)
+    elif profile == "us":
+        window_start = datetime.combine(now_kst.date(), time(16, 0), tzinfo=KST)
+        if now_kst.time() < time(16, 0):
+            window_start -= timedelta(days=1)
+        job_names = ("analyze_us",)
+    else:
+        raise ValueError(f"Unsupported Daily Codex dependency profile: {profile}")
+
+    return WatchdogDependency(
+        name=f"daily-codex-{profile}",
+        workflow_file="daily-codex-analysis.yml",
+        job_names=job_names,
+        window_start_kst=window_start,
+    )
 
 
 def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
@@ -177,6 +256,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
                     job_names=("overlay_refresh_kr",),
                     window_start_kst=now_kst - timedelta(minutes=75),
                     inputs={"profile": "kr", "run_mode": "overlay_only"},
+                    dependencies=(_daily_codex_dependency("kr", now_kst),),
                 )
             )
 
@@ -189,6 +269,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
                 job_names=("overlay_refresh_us",),
                 window_start_kst=now_kst - timedelta(minutes=75),
                 inputs={"profile": "us", "run_mode": "overlay_only"},
+                dependencies=(_daily_codex_dependency("us", now_kst),),
             )
         )
 
@@ -198,6 +279,11 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
 def run_watchdog(*, client: GitHubActionsClient, now_kst: datetime, dry_run: bool = False) -> list[str]:
     messages: list[str] = []
     for target in due_targets(now_kst):
+        dependencies_satisfied, dependency_reason = dependencies_are_satisfied(client=client, target=target)
+        if not dependencies_satisfied:
+            messages.append(f"{target.name}: waiting; {dependency_reason}")
+            continue
+
         covered, reason = target_is_covered(client=client, target=target)
         if covered:
             messages.append(f"{target.name}: covered; {reason}")

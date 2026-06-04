@@ -23,6 +23,8 @@ class FakeClient:
     def list_runs(self, workflow_file, *, created_since_utc):
         self.last_workflow_file = workflow_file
         self.last_created_since_utc = created_since_utc
+        if isinstance(self.runs, dict):
+            return self.runs.get(workflow_file, [])
         return self.runs
 
     def list_jobs(self, run_id):
@@ -66,6 +68,28 @@ def test_daily_codex_kr_watchdog_yields_before_intraday_overlay_window():
     targets = watchdog.due_targets(_kst("2026-06-01T09:25:00"))
 
     assert not [target for target in targets if target.name == "daily-codex-kr"]
+
+
+def test_kr_intraday_overlay_watchdog_depends_on_daily_codex_completion():
+    targets = watchdog.due_targets(_kst("2026-06-01T10:07:00"))
+
+    overlay_kr = [target for target in targets if target.name == "intraday-overlay-kr"]
+    assert len(overlay_kr) == 1
+    assert overlay_kr[0].inputs == {"profile": "kr", "run_mode": "overlay_only"}
+    assert overlay_kr[0].dependencies[0].name == "daily-codex-kr"
+    assert overlay_kr[0].dependencies[0].job_names == ("analyze_kr",)
+    assert overlay_kr[0].dependencies[0].window_start_kst == _kst("2026-06-01T06:00:00")
+
+
+def test_us_intraday_overlay_watchdog_uses_previous_daily_window_after_midnight():
+    targets = watchdog.due_targets(_kst("2026-06-02T00:19:00"))
+
+    overlay_us = [target for target in targets if target.name == "intraday-overlay-us"]
+    assert len(overlay_us) == 1
+    assert overlay_us[0].inputs == {"profile": "us", "run_mode": "overlay_only"}
+    assert overlay_us[0].dependencies[0].name == "daily-codex-us"
+    assert overlay_us[0].dependencies[0].job_names == ("analyze_us",)
+    assert overlay_us[0].dependencies[0].window_start_kst == _kst("2026-06-01T16:00:00")
 
 
 def test_youtube_watchdog_stays_due_during_late_recovery_window():
@@ -172,3 +196,33 @@ def test_watchdog_does_not_dispatch_when_target_job_succeeded():
 
     assert covered
     assert "covers analyze_us" in reason
+
+
+def test_watchdog_waits_to_dispatch_overlay_until_daily_dependency_completes():
+    client = FakeClient(
+        runs={
+            "daily-codex-analysis.yml": [{"id": 701, "status": "in_progress", "conclusion": ""}],
+            "intraday-overlay-refresh.yml": [],
+        },
+    )
+
+    messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T10:07:00"))
+
+    assert not client.dispatches
+    assert any("intraday-overlay-kr: waiting" in message for message in messages)
+    assert any("daily-codex-kr still active" in message for message in messages)
+
+
+def test_watchdog_dispatches_overlay_after_daily_dependency_completed():
+    client = FakeClient(
+        runs={
+            "daily-codex-analysis.yml": [{"id": 702, "status": "completed", "conclusion": "success"}],
+            "intraday-overlay-refresh.yml": [],
+        },
+        jobs={702: [{"name": "analyze_kr", "status": "completed", "conclusion": "success"}]},
+    )
+
+    messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T10:07:00"))
+
+    assert ("intraday-overlay-refresh.yml", {"profile": "kr", "run_mode": "overlay_only"}) in client.dispatches
+    assert any("intraday-overlay-kr: dispatched" in message for message in messages)
