@@ -838,7 +838,7 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertNotIn("concurrency:\n  group: daily-youtube-verified-reports", workflow)
         self.assertIn("scheduled_workflow_gate.py", workflow)
         self.assertIn("EVENT_SCHEDULE: ${{ github.event.schedule }}", workflow)
-        self.assertIn('SCHEDULE_GATE_BLOCK_US_INTRADAY_OVERLAY: "1"', workflow)
+        self.assertNotIn("SCHEDULE_GATE_BLOCK_US_INTRADAY_OVERLAY", workflow)
         self.assertIn("SCHEDULE_GATE_TARGETS_JSON", workflow)
         self.assertIn('"target_jobs": ["build_youtube_pages"]', workflow)
         self.assertNotIn("0 13 * * *", workflow)
@@ -878,6 +878,9 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("TRADINGAGENTS_YOUTUBE_BGUTIL_BASE_URL", workflow)
         self.assertIn("Probe YouTube ASR and PO token runtime", workflow)
         self.assertNotIn("OPENAI_API_KEY", workflow)
+        self.assertLess(workflow.index("Run YouTube verification reports"), workflow.index("Configure GitHub Pages"))
+        self.assertLess(workflow.index("Configure GitHub Pages"), workflow.index("Upload GitHub Pages artifact"))
+        self.assertIn("continue-on-error: true", workflow)
 
     def test_python_module_runner_site_only_entrypoint(self):
         with tempfile.TemporaryDirectory() as tmp:

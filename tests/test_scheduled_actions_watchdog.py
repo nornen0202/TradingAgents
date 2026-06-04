@@ -106,7 +106,7 @@ def test_youtube_watchdog_yields_during_us_intraday_overlay_window():
 
 
 def test_youtube_watchdog_recovers_after_us_intraday_overlay_window():
-    targets = watchdog.due_targets(_kst("2026-06-02T06:22:00"))
+    targets = watchdog.due_targets(_kst("2026-06-02T07:08:00"))
 
     youtube = [target for target in targets if target.name == "youtube-daily"]
     assert len(youtube) == 1
@@ -114,7 +114,7 @@ def test_youtube_watchdog_recovers_after_us_intraday_overlay_window():
 
 
 def test_youtube_watchdog_yields_after_late_recovery_window():
-    targets = watchdog.due_targets(_kst("2026-06-02T06:52:00"))
+    targets = watchdog.due_targets(_kst("2026-06-02T12:07:00"))
 
     assert not [target for target in targets if target.name == "youtube-daily"]
 
@@ -210,7 +210,9 @@ def test_watchdog_waits_to_dispatch_overlay_until_daily_dependency_completes():
         runs={
             "daily-codex-analysis.yml": [{"id": 701, "status": "in_progress", "conclusion": ""}],
             "intraday-overlay-refresh.yml": [],
+            "daily-youtube-reports.yml": [{"id": 801, "status": "completed", "conclusion": "success"}],
         },
+        jobs={801: [{"name": "build_youtube_pages", "status": "completed", "conclusion": "success"}]},
     )
 
     messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T10:07:00"))
@@ -225,8 +227,12 @@ def test_watchdog_dispatches_overlay_after_daily_dependency_completed():
         runs={
             "daily-codex-analysis.yml": [{"id": 702, "status": "completed", "conclusion": "success"}],
             "intraday-overlay-refresh.yml": [],
+            "daily-youtube-reports.yml": [{"id": 802, "status": "completed", "conclusion": "success"}],
         },
-        jobs={702: [{"name": "analyze_kr", "status": "completed", "conclusion": "success"}]},
+        jobs={
+            702: [{"name": "analyze_kr", "status": "completed", "conclusion": "success"}],
+            802: [{"name": "build_youtube_pages", "status": "completed", "conclusion": "success"}],
+        },
     )
 
     messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T10:07:00"))
