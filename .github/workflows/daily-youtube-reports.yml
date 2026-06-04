@@ -73,6 +73,7 @@ jobs:
           GH_RUN_ID: ${{ github.run_id }}
           GH_TOKEN: ${{ github.token }}
           WORKFLOW_FILE: daily-youtube-reports.yml
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
           MANUAL_DEFAULT_PROFILE: ""
           SCHEDULE_GATE_TARGETS_JSON: >-
             {
