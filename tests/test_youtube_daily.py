@@ -838,6 +838,7 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertNotIn("concurrency:\n  group: daily-youtube-verified-reports", workflow)
         self.assertIn("scheduled_workflow_gate.py", workflow)
         self.assertIn("EVENT_SCHEDULE: ${{ github.event.schedule }}", workflow)
+        self.assertIn('SCHEDULE_GATE_BLOCK_US_INTRADAY_OVERLAY: "1"', workflow)
         self.assertIn("SCHEDULE_GATE_TARGETS_JSON", workflow)
         self.assertIn('"target_jobs": ["build_youtube_pages"]', workflow)
         self.assertNotIn("0 13 * * *", workflow)

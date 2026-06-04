@@ -86,6 +86,15 @@ def _window_start(now_kst: datetime, window_start_time: time) -> datetime:
     return window_start_kst
 
 
+def _time_between(value: time, start: time, end: time) -> bool:
+    return start <= value < end
+
+
+def _us_intraday_overlay_active(now_kst: datetime) -> bool:
+    utc_now = now_kst.astimezone(UTC)
+    return utc_now.weekday() < 5 and _time_between(utc_now.time(), time(14, 20), time(21, 20))
+
+
 def job_covers_target(job: dict[str, Any], target_job_names: set[str]) -> bool:
     if job.get("name") not in target_job_names:
         return False
@@ -135,6 +144,7 @@ def decide_schedule_gate(
     client: Any,
     targets: dict[str, ScheduleTarget],
     now_kst: datetime,
+    block_us_intraday_overlay: bool = False,
 ) -> tuple[str, bool, str]:
     if event_name != "schedule":
         profile = requested_profile.strip() or manual_default_profile
@@ -143,6 +153,13 @@ def decide_schedule_gate(
     target = targets.get(schedule)
     if target is None:
         return "", False, f"Unrecognized scheduled cron: {schedule}"
+
+    if block_us_intraday_overlay and _us_intraday_overlay_active(now_kst):
+        return (
+            target.profile,
+            False,
+            f"Skipping scheduled {target.profile.upper() or workflow_file} run because the US intraday overlay window is active.",
+        )
 
     window_start_kst = _window_start(now_kst, target.window_start_time)
     window_start_utc = window_start_kst.astimezone(UTC)
@@ -201,6 +218,8 @@ def main() -> int:
         client=client,
         targets=load_schedule_targets(os.environ["SCHEDULE_GATE_TARGETS_JSON"]),
         now_kst=datetime.now(KST),
+        block_us_intraday_overlay=os.environ.get("SCHEDULE_GATE_BLOCK_US_INTRADAY_OVERLAY", "").strip().lower()
+        in {"1", "true", "yes"},
     )
     write_outputs(profile=profile, should_run=should_run, reason=reason)
     return 0

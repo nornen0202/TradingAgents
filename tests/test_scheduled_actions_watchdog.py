@@ -98,8 +98,15 @@ def test_youtube_watchdog_stays_due_during_late_recovery_window():
     assert [target for target in targets if target.name == "youtube-daily"]
 
 
-def test_youtube_watchdog_covers_delayed_after_midnight_run():
+def test_youtube_watchdog_yields_during_us_intraday_overlay_window():
     targets = watchdog.due_targets(_kst("2026-06-02T00:19:00"))
+
+    assert not [target for target in targets if target.name == "youtube-daily"]
+    assert [target for target in targets if target.name == "intraday-overlay-us"]
+
+
+def test_youtube_watchdog_recovers_after_us_intraday_overlay_window():
+    targets = watchdog.due_targets(_kst("2026-06-02T06:22:00"))
 
     youtube = [target for target in targets if target.name == "youtube-daily"]
     assert len(youtube) == 1
@@ -107,7 +114,7 @@ def test_youtube_watchdog_covers_delayed_after_midnight_run():
 
 
 def test_youtube_watchdog_yields_after_late_recovery_window():
-    targets = watchdog.due_targets(_kst("2026-06-02T04:07:00"))
+    targets = watchdog.due_targets(_kst("2026-06-02T06:52:00"))
 
     assert not [target for target in targets if target.name == "youtube-daily"]
 

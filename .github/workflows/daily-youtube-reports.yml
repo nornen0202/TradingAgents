@@ -75,6 +75,7 @@ jobs:
           WORKFLOW_FILE: daily-youtube-reports.yml
           EVENT_SCHEDULE: ${{ github.event.schedule }}
           MANUAL_DEFAULT_PROFILE: ""
+          SCHEDULE_GATE_BLOCK_US_INTRADAY_OVERLAY: "1"
           SCHEDULE_GATE_TARGETS_JSON: >-
             {
               "17 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
