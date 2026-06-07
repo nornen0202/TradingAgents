@@ -139,7 +139,7 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
             urls=tuple(str(item).strip() for item in (channel_raw.get("urls") or DEFAULT_CHANNEL_URLS) if str(item).strip()),
             lookback_hours=max(1, int(channel_raw.get("lookback_hours") or 24)),
             timezone=str(channel_raw.get("timezone") or "Asia/Seoul"),
-            max_videos=max(1, int(channel_raw.get("max_videos") or 50)),
+            max_videos=max(1, int(channel_raw.get("max_videos") or 100)),
             max_entries_per_url=max(1, int(channel_raw.get("max_entries_per_url") or 25)),
             max_parallel_videos=max(1, int(channel_raw.get("max_parallel_videos") or 4)),
         ),

@@ -848,6 +848,7 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("actions/upload-pages-artifact", workflow)
         self.assertIn("tradingagents.youtube.runner", workflow)
         self.assertIn("max_entries_per_url", workflow)
+        self.assertIn('default: "100"', workflow)
         self.assertIn("--max-entries-per-url", workflow)
         self.assertIn("max_parallel_videos", workflow)
         self.assertIn("--max-parallel-videos", workflow)
@@ -856,6 +857,7 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("research_enabled = true", config_text)
         self.assertIn("max_research_queries", config_text)
         self.assertIn("max_entries_per_url = 25", config_text)
+        self.assertIn("max_videos = 100", config_text)
         self.assertIn("max_parallel_videos = 4", config_text)
         self.assertIn("[asr]", config_text)
         self.assertIn('model = "auto"', config_text)
@@ -934,6 +936,7 @@ class YouTubeDailyTests(unittest.TestCase):
 
         self.assertEqual(config.channel.name, "투자 유튜브 채널")
         self.assertEqual(set(config.channel.urls), expected_urls)
+        self.assertEqual(config.channel.max_videos, 100)
         self.assertEqual(config.channel.max_entries_per_url, 25)
         self.assertEqual(config.channel.max_parallel_videos, 4)
         self.assertEqual(set(DEFAULT_CHANNEL_URLS), expected_urls)
