@@ -130,6 +130,10 @@ def _build_single_candidate(
         "vendor_calls": tool_telemetry.get("vendor_calls") or {},
         "fallback_count": int(tool_telemetry.get("fallback_count", 0) or 0),
     }
+    institutional_intelligence = _institutional_intelligence_summary(analysis)
+    if institutional_intelligence:
+        vendor_health["institutional_coverage"] = institutional_intelligence.get("coverage", {})
+        vendor_health["source_quality_score"] = institutional_intelligence.get("source_quality_score")
 
     structured = None
     structured_parse_error: str | None = None
@@ -438,9 +442,17 @@ def _build_single_candidate(
                 "primary_trigger_type": _primary_trigger_type(execution_update if isinstance(execution_update, dict) else None),
             },
             data_health={
-                "coverage_score": 0.0,
+                "coverage_score": institutional_intelligence.get("source_quality_score", 0.0),
                 "vendor_calls": vendor_health["vendor_calls"],
                 "fallback_count": vendor_health["fallback_count"],
+                "source_quality_score": institutional_intelligence.get("source_quality_score", 0.0),
+                "source_cohort": institutional_intelligence.get("source_cohort", "unknown"),
+                "institutional_coverage": institutional_intelligence.get("coverage", {}),
+                "thesis_status": institutional_intelligence.get("thesis_status", "unknown"),
+                "security_readiness": institutional_intelligence.get("security_readiness", "watch_only"),
+                "estimate_revision_direction": institutional_intelligence.get("estimate_revision_direction"),
+                "transcript_available": institutional_intelligence.get("transcript_available", False),
+                "institutional_warnings": institutional_intelligence.get("warnings", []),
                 "quality_flags": list(quality_flags),
                 "legacy_rating": rating_value,
                 "strategy_state": strategy_state,
@@ -883,6 +895,25 @@ def _execution_health(
     payload["session_vwap_ok"] = None if last_price is None or session_vwap is None else last_price >= session_vwap
     payload["relative_volume_ok"] = None if relative_volume is None else relative_volume >= 1.0
     return payload
+
+
+def _institutional_intelligence_summary(analysis: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(analysis, dict):
+        return {}
+    payload = analysis.get("institutional_intelligence")
+    if not isinstance(payload, dict):
+        return {}
+    coverage = payload.get("coverage") if isinstance(payload.get("coverage"), dict) else {}
+    return {
+        "source_quality_score": _safe_float(payload.get("source_quality_score")) or 0.0,
+        "source_cohort": str(payload.get("source_cohort") or "unknown"),
+        "coverage": coverage,
+        "thesis_status": str(payload.get("thesis_status") or "unknown"),
+        "security_readiness": str(payload.get("security_readiness") or "watch_only"),
+        "estimate_revision_direction": payload.get("estimate_revision_direction") or coverage.get("estimate_revision_direction"),
+        "transcript_available": bool(payload.get("transcript_available") or coverage.get("transcript_available")),
+        "warnings": [str(item) for item in (payload.get("warnings") or []) if str(item).strip()],
+    }
 
 
 def _primary_trigger_type(execution_update: dict[str, Any] | None) -> str:

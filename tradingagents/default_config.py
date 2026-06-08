@@ -62,6 +62,11 @@ DEFAULT_CONFIG = {
     "vendor_timeout": 15,
     "empty_result_fallback": True,
     "memory_n_matches": 3,
+    "institutional_data_dir": os.getenv(
+        "TRADINGAGENTS_INSTITUTIONAL_DATA_DIR",
+        str(Path(__file__).resolve().parents[1] / "data" / "institutional"),
+    ),
+    "institutional_confidence_cap_enabled": False,
     # Data vendor configuration
     # Category-level configuration (default for all tools in category)
     "data_vendors": {
@@ -72,6 +77,7 @@ DEFAULT_CONFIG = {
         "macro_data": "alpha_vantage,yfinance",  # Options: alpha_vantage, yfinance, ecos
         "disclosure_data": "opendart",  # Options: opendart
         "social_data": "yfinance",  # Options: yfinance, naver
+        "institutional_data": "yfinance,alpha_vantage,opendart,sec_edgar,daloopa,quartr,factset,lseg,spglobal,moodys,morningstar,pitchbook,datasite,hebbia,third_bridge",
     },
     # Tool-level configuration (takes precedence over category-level)
     "tool_vendors": {

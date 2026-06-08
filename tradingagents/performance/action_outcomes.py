@@ -25,6 +25,9 @@ def initialize_action_tracker(db_path: Path) -> None:
             "profit_protection_score": "REAL",
             "profit_plan_json": "TEXT",
             "lift_status": "TEXT",
+            "source_cohort": "TEXT",
+            "source_quality_score": "REAL",
+            "thesis_status": "TEXT",
             "opportunity_cost_score": "REAL",
             "opportunity_capture_score": "REAL",
             "pilot_allowed": "INTEGER",
@@ -62,11 +65,12 @@ def record_run_recommendations(run_dir: Path, db_path: Path) -> None:
                 """
                 INSERT INTO action_recommendations (
                   run_id, ticker, action, risk_action, recommended_price, confidence,
-                  trigger_type, source, prism_agreement, sell_intent, sell_trigger_status,
+                  trigger_type, source, source_cohort, source_quality_score, thesis_status,
+                  prism_agreement, sell_intent, sell_trigger_status,
                   sell_size_plan, unrealized_return_pct, profit_protection_score,
                   profit_plan_json, lift_status, opportunity_cost_score, opportunity_capture_score,
                   pilot_allowed, full_size_allowed, was_executed, skip_reason, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["run_id"],
@@ -77,6 +81,9 @@ def record_run_recommendations(run_dir: Path, db_path: Path) -> None:
                     row.get("confidence"),
                     row.get("trigger_type"),
                     row.get("source"),
+                    row.get("source_cohort"),
+                    row.get("source_quality_score"),
+                    row.get("thesis_status"),
                     row.get("prism_agreement"),
                     row.get("sell_intent"),
                     row.get("sell_trigger_status"),
@@ -167,6 +174,7 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         learned = int(_count_optional_table(conn, "learned_intuitions"))
         by_action = _aggregate(conn, "action")
         by_prism = _aggregate(conn, "prism_agreement")
+        source_cohorts = _aggregate(conn, "source_cohort")
         action_buckets = _aggregate_action_buckets(conn)
         profit_taking = _aggregate_profit_taking(conn)
         calibration = _aggregate_calibration(conn)
@@ -177,6 +185,7 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         learned_intuitions=learned,
         by_action=by_action,
         prism_agreement=by_prism,
+        source_cohorts=source_cohorts,
         action_buckets=action_buckets,
         profit_taking=profit_taking,
         calibration=calibration,
@@ -213,6 +222,9 @@ def _portfolio_action_rows(run_dir: Path, manifest: dict[str, Any], *, run_id: s
                 "confidence": action.get("confidence"),
                 "trigger_type": action.get("trigger_type"),
                 "source": "TradingAgents",
+                "source_cohort": data_health.get("source_cohort"),
+                "source_quality_score": _float_or_none(data_health.get("source_quality_score")),
+                "thesis_status": data_health.get("thesis_status"),
                 "prism_agreement": action.get("prism_agreement") or (action.get("data_health") or {}).get("prism_agreement"),
                 "sell_intent": action.get("sell_intent"),
                 "sell_trigger_status": action.get("sell_trigger_status"),

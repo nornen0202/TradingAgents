@@ -22,6 +22,16 @@ from tradingagents.agents.utils.fundamental_data_tools import (
     get_cashflow,
     get_income_statement
 )
+from tradingagents.agents.utils.institutional_data_tools import (
+    get_credit_risk_context,
+    get_diligence_context,
+    get_earnings_event_pack,
+    get_estimates_consensus,
+    get_peer_comps,
+    get_public_equity_intelligence_summary,
+    get_source_linked_financials,
+    get_transcript_evidence,
+)
 from tradingagents.agents.utils.news_data_tools import (
     get_company_news,
     get_disclosures,
