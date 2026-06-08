@@ -22,6 +22,8 @@ class FakeClient:
     def list_runs(self, workflow_file, *, created_since_utc):
         self.last_workflow_file = workflow_file
         self.last_created_since_utc = created_since_utc
+        if isinstance(self.runs, dict):
+            return self.runs.get(workflow_file, [])
         return self.runs
 
     def list_jobs(self, run_id):
@@ -47,7 +49,19 @@ def _youtube_targets():
     return gate.load_schedule_targets(
         """
         {
-          "17 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]}
+          "17 11 * * *": {
+            "profile": "youtube",
+            "window_start": "19:00",
+            "target_jobs": ["build_youtube_pages"],
+            "blockers": [
+              {
+                "name": "daily-codex-us-pages",
+                "workflow_file": "daily-codex-analysis.yml",
+                "window_start": "16:00",
+                "target_jobs": ["analyze_us", "build_pages"]
+              }
+            ]
+          }
         }
         """
     )
@@ -120,6 +134,57 @@ def test_scheduled_youtube_skips_when_prior_manual_pages_job_succeeded():
     assert profile == "youtube"
     assert should_run is False
     assert "covers build_youtube_pages" in reason
+
+
+def test_scheduled_youtube_waits_when_daily_codex_pages_build_is_queued():
+    client = FakeClient(
+        runs={
+            "daily-youtube-reports.yml": [],
+            "daily-codex-analysis.yml": [{"id": 901, "event": "schedule", "status": "in_progress", "conclusion": ""}],
+        },
+        jobs={901: [{"name": "build_pages", "status": "queued", "conclusion": ""}]},
+    )
+
+    profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="17 11 * * *",
+        requested_profile="",
+        manual_default_profile="",
+        workflow_file="daily-youtube-reports.yml",
+        current_run_id=902,
+        client=client,
+        targets=_youtube_targets(),
+        now_kst=_kst("2026-06-08T23:53:00"),
+    )
+
+    assert profile == "youtube"
+    assert should_run is False
+    assert "Active blocker daily-codex-us-pages run 901 has build_pages: queued" in reason
+
+
+def test_scheduled_youtube_waits_when_daily_codex_analysis_is_running():
+    client = FakeClient(
+        runs={
+            "daily-youtube-reports.yml": [],
+            "daily-codex-analysis.yml": [{"id": 903, "event": "schedule", "status": "in_progress", "conclusion": ""}],
+        },
+        jobs={903: [{"name": "analyze_us", "status": "in_progress", "conclusion": ""}]},
+    )
+
+    _profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="17 11 * * *",
+        requested_profile="",
+        manual_default_profile="",
+        workflow_file="daily-youtube-reports.yml",
+        current_run_id=904,
+        client=client,
+        targets=_youtube_targets(),
+        now_kst=_kst("2026-06-08T23:53:00"),
+    )
+
+    assert should_run is False
+    assert "has analyze_us: in_progress" in reason
 
 
 def test_failed_prior_run_does_not_block_recovery():

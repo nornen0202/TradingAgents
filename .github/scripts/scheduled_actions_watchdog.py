@@ -23,6 +23,14 @@ class WatchdogDependency:
 
 
 @dataclass(frozen=True)
+class WatchdogBlocker:
+    name: str
+    workflow_file: str
+    job_names: tuple[str, ...]
+    window_start_kst: datetime
+
+
+@dataclass(frozen=True)
 class WatchdogTarget:
     name: str
     workflow_file: str
@@ -30,6 +38,7 @@ class WatchdogTarget:
     window_start_kst: datetime
     inputs: dict[str, str]
     dependencies: tuple[WatchdogDependency, ...] = ()
+    blockers: tuple[WatchdogBlocker, ...] = ()
 
 
 class GitHubActionsClient:
@@ -168,6 +177,41 @@ def dependencies_are_satisfied(
     return True, "All dependencies satisfied."
 
 
+def blocker_is_active(
+    *,
+    client: GitHubActionsClient,
+    blocker: WatchdogBlocker,
+) -> tuple[bool, str]:
+    runs = client.list_runs(
+        blocker.workflow_file,
+        created_since_utc=blocker.window_start_kst.astimezone(UTC),
+    )
+    target_job_names = set(blocker.job_names)
+    for run in runs:
+        run_id = int(run.get("id", 0))
+        status = str(run.get("status") or "").lower()
+        if status == "completed":
+            continue
+        for job in client.list_jobs(run_id):
+            job_name = str(job.get("name") or "")
+            job_status = str(job.get("status") or "").lower()
+            if job_name in target_job_names and job_status != "completed":
+                return True, f"Active blocker {blocker.name} run {run_id} has {job_name}: {job_status}."
+    return False, "No active blocker runs."
+
+
+def blockers_are_clear(
+    *,
+    client: GitHubActionsClient,
+    target: WatchdogTarget,
+) -> tuple[bool, str]:
+    for blocker in target.blockers:
+        active, reason = blocker_is_active(client=client, blocker=blocker)
+        if active:
+            return False, reason
+    return True, "No active blockers."
+
+
 def _time_between(value: time, start: time, end: time) -> bool:
     return start <= value < end
 
@@ -212,6 +256,26 @@ def _daily_codex_dependency(profile: str, now_kst: datetime) -> WatchdogDependen
     )
 
 
+def _daily_codex_active_blocker(profile: str, now_kst: datetime) -> WatchdogBlocker:
+    if profile == "kr":
+        window_start = datetime.combine(now_kst.date(), time(6, 0), tzinfo=KST)
+        job_names = ("analyze_kr", "build_pages")
+    elif profile == "us":
+        window_start = datetime.combine(now_kst.date(), time(16, 0), tzinfo=KST)
+        if now_kst.time() < time(16, 0):
+            window_start -= timedelta(days=1)
+        job_names = ("analyze_us", "build_pages")
+    else:
+        raise ValueError(f"Unsupported Daily Codex blocker profile: {profile}")
+
+    return WatchdogBlocker(
+        name=f"daily-codex-{profile}-pages",
+        workflow_file="daily-codex-analysis.yml",
+        job_names=job_names,
+        window_start_kst=window_start,
+    )
+
+
 def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
     targets: list[WatchdogTarget] = []
     kst_date = now_kst.date()
@@ -228,6 +292,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
                 job_names=("build_youtube_pages",),
                 window_start_kst=youtube_window,
                 inputs={"lookback_hours": "24", "publish": "true"},
+                blockers=(_daily_codex_active_blocker("us", now_kst),),
             )
         )
 
@@ -286,6 +351,11 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
 def run_watchdog(*, client: GitHubActionsClient, now_kst: datetime, dry_run: bool = False) -> list[str]:
     messages: list[str] = []
     for target in due_targets(now_kst):
+        blockers_clear, blocker_reason = blockers_are_clear(client=client, target=target)
+        if not blockers_clear:
+            messages.append(f"{target.name}: waiting; {blocker_reason}")
+            continue
+
         dependencies_satisfied, dependency_reason = dependencies_are_satisfied(client=client, target=target)
         if not dependencies_satisfied:
             messages.append(f"{target.name}: waiting; {dependency_reason}")

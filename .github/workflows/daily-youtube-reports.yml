@@ -77,12 +77,12 @@ jobs:
           MANUAL_DEFAULT_PROFILE: ""
           SCHEDULE_GATE_TARGETS_JSON: >-
             {
-              "17 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
-              "47 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
-              "17 12 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
-              "47 12 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
-              "17 13 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]},
-              "47 13 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"]}
+              "17 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]},
+              "47 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]},
+              "17 12 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]},
+              "47 12 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]},
+              "17 13 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]},
+              "47 13 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]}
             }
         run: python .github/scripts/scheduled_workflow_gate.py
 
