@@ -16,6 +16,9 @@ ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
       confidence REAL,
       trigger_type TEXT,
       source TEXT,
+      source_cohort TEXT,
+      source_quality_score REAL,
+      thesis_status TEXT,
       prism_agreement TEXT,
       sell_intent TEXT,
       sell_trigger_status TEXT,
@@ -105,6 +108,7 @@ class ActionPerformanceSummary:
     learned_intuitions: int = 0
     by_action: dict[str, dict[str, Any]] = field(default_factory=dict)
     prism_agreement: dict[str, dict[str, Any]] = field(default_factory=dict)
+    source_cohorts: dict[str, dict[str, Any]] = field(default_factory=dict)
     action_buckets: dict[str, dict[str, Any]] = field(default_factory=dict)
     profit_taking: dict[str, dict[str, Any]] = field(default_factory=dict)
     calibration: dict[str, Any] = field(default_factory=dict)
@@ -117,6 +121,7 @@ class ActionPerformanceSummary:
             "learned_intuitions": self.learned_intuitions,
             "by_action": self.by_action,
             "prism_agreement": self.prism_agreement,
+            "source_cohorts": self.source_cohorts,
             "action_buckets": self.action_buckets,
             "profit_taking": self.profit_taking,
             "calibration": self.calibration,

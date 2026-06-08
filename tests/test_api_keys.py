@@ -96,6 +96,30 @@ class ApiKeysTests(unittest.TestCase):
                 self.assertEqual(api_keys.get_api_key("ALPACA_ENDPOINT"), "https://paper-api.alpaca.markets/v2")
                 self.assertEqual(api_keys.get_api_key("ALPACA_DATA_FEED"), "iex")
 
+    def test_reads_institutional_vendor_aliases_from_json(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = f"{temp_dir}/api_keys.json"
+            with open(path, "w", encoding="utf-8") as handle:
+                json.dump(
+                    {
+                        "DALOOPA_KEY": "daloopa",
+                        "QUARTR_KEY": "quartr",
+                        "SP_GLOBAL_API_KEY": "spglobal",
+                        "REFINITIV_API_KEY": "lseg",
+                        "PITCHBOOK_KEY": "pitchbook",
+                        "THIRDBRIDGE_API_KEY": "third-bridge",
+                    },
+                    handle,
+                )
+
+            with patch.dict("os.environ", {"TRADINGAGENTS_API_KEYS_PATH": path}, clear=True):
+                self.assertEqual(api_keys.get_api_key("DALOOPA_API_KEY"), "daloopa")
+                self.assertEqual(api_keys.get_api_key("QUARTR_API_KEY"), "quartr")
+                self.assertEqual(api_keys.get_api_key("SPGLOBAL_API_KEY"), "spglobal")
+                self.assertEqual(api_keys.get_api_key("LSEG_API_KEY"), "lseg")
+                self.assertEqual(api_keys.get_api_key("PITCHBOOK_API_KEY"), "pitchbook")
+                self.assertEqual(api_keys.get_api_key("THIRD_BRIDGE_API_KEY"), "third-bridge")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -22,6 +22,10 @@ from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry
+from tradingagents.dataflows.institutional import (
+    build_public_equity_intelligence_artifacts,
+    render_intelligence_markdown,
+)
 from tradingagents.dataflows.intraday_market import (
     DELAYED_ANALYSIS_ONLY,
     REALTIME_EXECUTION_READY,
@@ -1375,6 +1379,49 @@ def _run_single_ticker(
                 "output_model": config.llm.output_model,
             },
         }
+        institutional_outputs: dict[str, Any] = {}
+        institutional_artifacts: dict[str, str] = {}
+        try:
+            institutional_outputs = build_public_equity_intelligence_artifacts(
+                ticker=ticker,
+                curr_date=trade_date,
+                analysis_date=analysis_date,
+                final_state=final_state,
+                tool_events=tool_events,
+            )
+            analysis_payload["institutional_intelligence"] = institutional_outputs["summary"]
+            for artifact_key, filename, payload in (
+                ("public_equity_intelligence_json", "public_equity_intelligence.json", institutional_outputs["full"]),
+                ("source_quality_json", "source_quality.json", institutional_outputs["source_quality"]),
+                ("evidence_ledger_json", "evidence_ledger.json", institutional_outputs["evidence_ledger"]),
+                ("earnings_event_pack_json", "earnings_event_pack.json", institutional_outputs["earnings_event_pack"]),
+                ("thesis_tracker_json", "thesis_tracker.json", institutional_outputs["thesis_tracker"]),
+            ):
+                artifact_path = ticker_dir / filename
+                _write_json(artifact_path, payload)
+                institutional_artifacts[artifact_key] = _relative_to_run(run_dir, artifact_path)
+            intelligence_md_path = ticker_dir / "public_equity_intelligence.md"
+            intelligence_md_path.write_text(
+                render_intelligence_markdown(institutional_outputs),
+                encoding="utf-8",
+            )
+            institutional_artifacts["public_equity_intelligence_markdown"] = _relative_to_run(
+                run_dir,
+                intelligence_md_path,
+            )
+        except Exception as exc:
+            warning = f"institutional_intelligence_failed:{exc}"
+            print(f"::warning::{ticker} {warning}")
+            analysis_payload["institutional_intelligence"] = {
+                "ticker": ticker,
+                "asof": analysis_date,
+                "source_quality_score": 0.0,
+                "source_cohort": "unavailable",
+                "coverage": {},
+                "thesis_status": "unavailable",
+                "security_readiness": "watch_only",
+                "warnings": [warning],
+            }
         analysis_path = ticker_dir / "analysis.json"
         _write_json(analysis_path, analysis_payload)
         execution_artifacts: dict[str, str] = {}
@@ -1439,6 +1486,7 @@ def _run_single_ticker(
                 "report_markdown": _relative_to_run(run_dir, report_file),
                 "final_state_json": _relative_to_run(run_dir, final_state_path),
                 "graph_log_json": _relative_to_run(run_dir, copied_graph_log) if copied_graph_log else None,
+                **institutional_artifacts,
                 **execution_artifacts,
             },
         }

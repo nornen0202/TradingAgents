@@ -2971,6 +2971,10 @@ def _render_ticker_page(
         manifests=manifests or [],
         language=language,
     )
+    institutional_html = _render_ticker_institutional_section(
+        run_dir=run_dir,
+        ticker_summary=ticker_summary,
+    )
     body = f"""
     <nav class="breadcrumbs">
       <a href="../../index.html">Home</a>
@@ -3002,6 +3006,7 @@ def _render_ticker_page(
     {microstructure_status_html}
     {live_ticker_delta_html}
     {ticker_delta_html}
+    {institutional_html}
     {failure_html}
     <section class="section prose">
       <div class="section-head">
@@ -3016,6 +3021,66 @@ def _render_ticker_page(
         body,
         prefix="../../",
     )
+
+
+def _render_ticker_institutional_section(*, run_dir: Path, ticker_summary: dict[str, Any]) -> str:
+    artifacts = ticker_summary.get("artifacts") if isinstance(ticker_summary.get("artifacts"), dict) else {}
+    source_rel = artifacts.get("source_quality_json")
+    analysis_rel = artifacts.get("analysis_json")
+    payload: dict[str, Any] = {}
+    if source_rel:
+        source_path = _resolve_artifact_source(run_dir, source_rel)
+        if source_path.exists():
+            try:
+                loaded = json.loads(source_path.read_text(encoding="utf-8"))
+                payload = loaded if isinstance(loaded, dict) else {}
+            except Exception:
+                payload = {}
+    if not payload and analysis_rel:
+        analysis_path = _resolve_artifact_source(run_dir, analysis_rel)
+        if analysis_path.exists():
+            try:
+                analysis_payload = json.loads(analysis_path.read_text(encoding="utf-8"))
+                payload = analysis_payload.get("institutional_intelligence") if isinstance(analysis_payload, dict) else {}
+                payload = payload if isinstance(payload, dict) else {}
+            except Exception:
+                payload = {}
+    if not payload:
+        return ""
+
+    coverage = payload.get("coverage") if isinstance(payload.get("coverage"), dict) else {}
+    warnings = [str(item) for item in (payload.get("warnings") or []) if str(item).strip()]
+    providers = coverage.get("public_providers") or []
+    institutional = coverage.get("institutional_import_providers") or []
+    warning_html = ""
+    if warnings:
+        warning_html = (
+            "<div class='warning-banner'>"
+            + _escape("; ".join(warnings[:5]))
+            + "</div>"
+        )
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>원천/증거 상태</h2>
+      </div>
+      <div class="ticker-grid">
+        <article class="ticker-card">
+          <p><strong>원천 품질</strong><span>{_escape(payload.get('source_quality_score', '-'))}</span></p>
+          <p><strong>데이터군</strong><span>{_escape(payload.get('source_cohort') or '-')}</span></p>
+          <p><strong>공개 provider</strong><span>{_escape(', '.join(str(item) for item in providers) or '-')}</span></p>
+          <p><strong>기관 import</strong><span>{_escape(', '.join(str(item) for item in institutional) or '-')}</span></p>
+        </article>
+        <article class="ticker-card">
+          <p><strong>실적팩</strong><span>{_escape(coverage.get('earnings_event_status') or '-')}</span></p>
+          <p><strong>전사록</strong><span>{_escape('available' if coverage.get('transcript_available') else 'unavailable')}</span></p>
+          <p><strong>컨센서스 변화</strong><span>{_escape(coverage.get('estimate_revision_direction') or '-')}</span></p>
+          <p><strong>증거 수</strong><span>{_escape(coverage.get('source_ref_count') or 0)}</span></p>
+        </article>
+      </div>
+      {warning_html}
+    </section>
+    """
 
 
 def _page_template(title: str, body: str, *, prefix: str) -> str:

@@ -1,0 +1,23 @@
+{
+  "name": "tradingagents-public-equity-intelligence",
+  "version": "0.1.0",
+  "description": "Public equity research workflows for TradingAgents with source-linked evidence, earnings packs, thesis tracking, and optional institutional vendor imports.",
+  "author": {
+    "name": "TradingAgents"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "TradingAgents Public Equity Intelligence",
+    "shortDescription": "Run source-linked public equity research workflows.",
+    "longDescription": "TradingAgents Public Equity Intelligence helps Codex prepare company tearsheets, earnings reviews, thesis trackers, and portfolio risk checks using TradingAgents artifacts plus optional vendor exports from Daloopa, Quartr, FactSet, LSEG, S&P Global, Moody's, PitchBook, Datasite, Hebbia, and related sources.",
+    "developerName": "TradingAgents",
+    "category": "Finance",
+    "capabilities": [
+      "company-tearsheet",
+      "earnings-deep-dive",
+      "thesis-tracker",
+      "portfolio-risk-review"
+    ],
+    "defaultPrompt": "Use TradingAgents Public Equity Intelligence to review source quality, earnings evidence, thesis status, and portfolio risk for the selected ticker."
+  }
+}
