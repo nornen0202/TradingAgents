@@ -15,10 +15,19 @@ UTC = timezone.utc
 
 
 @dataclass(frozen=True)
+class ScheduleBlocker:
+    name: str
+    workflow_file: str
+    window_start_time: time
+    target_jobs: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class ScheduleTarget:
     profile: str
     window_start_time: time
     target_jobs: tuple[str, ...]
+    blockers: tuple[ScheduleBlocker, ...] = ()
 
 
 class GitHubActionsGateClient:
@@ -66,10 +75,20 @@ def load_schedule_targets(raw_json: str) -> dict[str, ScheduleTarget]:
     payload = json.loads(raw_json)
     targets: dict[str, ScheduleTarget] = {}
     for schedule, raw_target in payload.items():
+        blockers = tuple(
+            ScheduleBlocker(
+                name=str(raw_blocker.get("name", "")),
+                workflow_file=str(raw_blocker["workflow_file"]),
+                window_start_time=_parse_time(str(raw_blocker["window_start"])),
+                target_jobs=tuple(str(item) for item in raw_blocker.get("target_jobs", ())),
+            )
+            for raw_blocker in raw_target.get("blockers", ())
+        )
         targets[schedule] = ScheduleTarget(
             profile=str(raw_target.get("profile", "")),
             window_start_time=_parse_time(str(raw_target["window_start"])),
             target_jobs=tuple(str(item) for item in raw_target.get("target_jobs", ())),
+            blockers=blockers,
         )
     return targets
 
@@ -124,6 +143,41 @@ def _run_covers_target(
     return False, ""
 
 
+def _active_blocker_covers_target(
+    *,
+    client: Any,
+    blocker: ScheduleBlocker,
+    now_kst: datetime,
+) -> tuple[bool, str]:
+    window_start_utc = _window_start(now_kst, blocker.window_start_time).astimezone(UTC)
+    target_job_names = set(blocker.target_jobs)
+    runs = client.list_runs(blocker.workflow_file, created_since_utc=window_start_utc)
+    for run in runs:
+        run_id = int(run.get("id", 0))
+        status = str(run.get("status") or "").lower()
+        if status == "completed":
+            continue
+        for job in client.list_jobs(run_id):
+            job_name = str(job.get("name") or "")
+            job_status = str(job.get("status") or "").lower()
+            if job_name in target_job_names and job_status != "completed":
+                return True, f"Active blocker {blocker.name or blocker.workflow_file} run {run_id} has {job_name}: {job_status}."
+    return False, ""
+
+
+def _active_blockers_clear(
+    *,
+    client: Any,
+    target: ScheduleTarget,
+    now_kst: datetime,
+) -> tuple[bool, str]:
+    for blocker in target.blockers:
+        blocked, reason = _active_blocker_covers_target(client=client, blocker=blocker, now_kst=now_kst)
+        if blocked:
+            return False, reason
+    return True, "No active blockers."
+
+
 def decide_schedule_gate(
     *,
     event_name: str,
@@ -149,6 +203,14 @@ def decide_schedule_gate(
     target_job_names = set(target.target_jobs)
 
     try:
+        blockers_clear, blocker_reason = _active_blockers_clear(client=client, target=target, now_kst=now_kst)
+        if not blockers_clear:
+            return (
+                target.profile,
+                False,
+                f"Skipping {target.profile.upper() or workflow_file} scheduled run; {blocker_reason}",
+            )
+
         runs = client.list_runs(workflow_file, created_since_utc=window_start_utc)
         for run in runs:
             covered, reason = _run_covers_target(

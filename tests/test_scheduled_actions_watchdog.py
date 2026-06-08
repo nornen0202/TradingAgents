@@ -46,6 +46,9 @@ def test_youtube_watchdog_is_due_after_backup_window():
     assert youtube[0].workflow_file == "daily-youtube-reports.yml"
     assert youtube[0].job_names == ("build_youtube_pages",)
     assert youtube[0].window_start_kst == _kst("2026-06-01T19:00:00")
+    assert youtube[0].blockers[0].name == "daily-codex-us-pages"
+    assert youtube[0].blockers[0].job_names == ("analyze_us", "build_pages")
+    assert youtube[0].blockers[0].window_start_kst == _kst("2026-06-01T16:00:00")
 
 
 def test_daily_codex_us_watchdog_is_due_on_weekday_afternoon():
@@ -184,6 +187,22 @@ def test_watchdog_dispatches_when_due_target_is_uncovered():
 
     assert ("daily-youtube-reports.yml", {"lookback_hours": "24", "publish": "true"}) in client.dispatches
     assert any("youtube-daily: dispatched" in message for message in messages)
+
+
+def test_watchdog_waits_to_dispatch_youtube_until_daily_pages_build_finishes():
+    client = FakeClient(
+        runs={
+            "daily-codex-analysis.yml": [{"id": 901, "status": "in_progress", "conclusion": ""}],
+            "daily-youtube-reports.yml": [],
+        },
+        jobs={901: [{"name": "build_pages", "status": "queued", "conclusion": ""}]},
+    )
+
+    messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T23:07:00"))
+
+    assert not client.dispatches
+    assert any("youtube-daily: waiting" in message for message in messages)
+    assert any("daily-codex-us-pages run 901 has build_pages: queued" in message for message in messages)
 
 
 def test_watchdog_does_not_dispatch_when_target_job_succeeded():
