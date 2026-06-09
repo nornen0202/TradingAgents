@@ -115,6 +115,16 @@ def _run_has_successful_target_jobs(*, client: Any, run_id: int, target_job_name
     return required <= successful
 
 
+def _run_created_at(run: dict[str, Any]) -> datetime:
+    raw = str(run.get("created_at") or run.get("createdAt") or "")
+    if not raw:
+        return datetime.min.replace(tzinfo=UTC)
+    try:
+        return datetime.fromisoformat(raw.replace("Z", "+00:00")).astimezone(UTC)
+    except ValueError:
+        return datetime.min.replace(tzinfo=UTC)
+
+
 def daily_dependency_satisfied(*, client: Any, dependency: DailyDependency) -> tuple[bool, str]:
     runs = client.list_runs(
         dependency.workflow_file,
@@ -124,7 +134,7 @@ def daily_dependency_satisfied(*, client: Any, dependency: DailyDependency) -> t
         return False, f"No Daily Codex {dependency.profile.upper()} run since {dependency.window_start_kst.isoformat()}."
 
     active: list[int] = []
-    for run in runs:
+    for run in sorted(runs, key=_run_created_at, reverse=True):
         run_id = int(run.get("id", 0))
         status = str(run.get("status") or "").lower()
         conclusion = str(run.get("conclusion") or "").lower()
@@ -139,6 +149,11 @@ def daily_dependency_satisfied(*, client: Any, dependency: DailyDependency) -> t
             run_id=run_id,
             target_job_names=dependency.target_job_names,
         ):
+            if active:
+                return (
+                    False,
+                    f"Newer Daily Codex {dependency.profile.upper()} run(s) still active: {', '.join(str(item) for item in active)}.",
+                )
             return (
                 True,
                 f"Daily Codex {dependency.profile.upper()} run {run_id} completed successfully after {dependency.window_start_kst.isoformat()}.",
