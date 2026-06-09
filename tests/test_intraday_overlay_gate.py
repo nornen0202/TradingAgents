@@ -90,6 +90,32 @@ def test_kr_overlay_waits_until_daily_pages_build_succeeds():
     assert any("No completed successful Daily Codex KR target job" in message for message in messages)
 
 
+def test_kr_overlay_waits_when_newer_daily_run_is_active_after_prior_success():
+    client = FakeClient(
+        runs=[
+            {"id": 204, "status": "completed", "conclusion": "success", "created_at": "2026-06-04T01:00:00Z"},
+            {"id": 205, "status": "in_progress", "conclusion": "", "created_at": "2026-06-04T01:30:00Z"},
+        ],
+        jobs={
+            204: [
+                {"name": "analyze_kr", "status": "completed", "conclusion": "success"},
+                {"name": "build_pages", "status": "completed", "conclusion": "success"},
+            ]
+        },
+    )
+
+    decisions, messages = gate.decide_intraday_gate(
+        event_name="schedule",
+        schedule="50 0-5 * * 1-5",
+        requested_profile="",
+        client=client,
+        now_kst=_kst("2026-06-04T11:50:00"),
+    )
+
+    assert decisions["kr"] is False
+    assert any("Newer Daily Codex KR run(s) still active" in message for message in messages)
+
+
 def test_kr_overlay_runs_after_completed_daily_codex_target_jobs():
     client = FakeClient(
         runs=[{"id": 104, "status": "completed", "conclusion": "success"}],
