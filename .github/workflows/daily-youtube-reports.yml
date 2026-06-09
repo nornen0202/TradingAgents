@@ -2,21 +2,15 @@ name: Daily YouTube Verified Reports
 
 on:
   schedule:
-    # Target: 20:00 KST every day, including weekends. Avoid minute 0 because
-    # GitHub may delay or drop scheduled workflows during the start-of-hour
-    # load spike.
-    - cron: '17 11 * * *'
-    # Backup trigger in the same KST hour. The schedule_gate job skips it when
-    # the primary schedule for the evening has already succeeded or is running.
-    - cron: '47 11 * * *'
-    # Second-wave backups for GitHub schedule drops. These still run every day,
-    # and schedule_gate prevents duplicate reports inside the same evening.
-    - cron: '17 12 * * *'
-    - cron: '47 12 * * *'
-    # Late recovery probes. These protect against evenings where GitHub drops
-    # every direct YouTube schedule before the watchdog sees the missed target.
-    - cron: '17 13 * * *'
-    - cron: '47 13 * * *'
+    # Target: after the US intraday overlay window, every day including
+    # weekends. Avoid minute 0 because GitHub may delay or drop scheduled
+    # workflows during the start-of-hour load spike.
+    - cron: '20 20 * * *'
+    # Backup probes. The gate skips duplicates and waits while Daily Codex US
+    # or US overlay publish jobs are still active.
+    - cron: '55 20 * * *'
+    - cron: '25 21 * * *'
+    - cron: '55 21 * * *'
   workflow_dispatch:
     inputs:
       lookback_hours:
@@ -77,12 +71,10 @@ jobs:
           MANUAL_DEFAULT_PROFILE: ""
           SCHEDULE_GATE_TARGETS_JSON: >-
             {
-              "17 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]},
-              "47 11 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]},
-              "17 12 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]},
-              "47 12 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]},
-              "17 13 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]},
-              "47 13 * * *": {"profile": "youtube", "window_start": "19:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}]}
+              "20 20 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "23:00", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
+              "55 20 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "23:00", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
+              "25 21 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "23:00", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
+              "55 21 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "16:00", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "23:00", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]}
             }
         run: python .github/scripts/scheduled_workflow_gate.py
 
@@ -416,7 +408,7 @@ jobs:
               "-m",
               "tradingagents.scheduled",
               "--config",
-              "config/scheduled_analysis_korea.toml",
+              "config/scheduled_analysis.toml",
               "--site-only",
               "--site-dir",
               os.environ["TRADINGAGENTS_SITE_DIR"],

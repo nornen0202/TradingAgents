@@ -15,14 +15,14 @@ UTC = timezone.utc
 
 US_SCHEDULES = {"0 14-20 * * 1-5", "50 19,20 * * 1-5"}
 KR_SCHEDULES = {"35 0-5 * * 1-5", "20 6 * * 1-5", "50 0-5 * * 1-5", "25 6 * * 1-5"}
-DAILY_TARGET_JOBS = {"us": "analyze_us", "kr": "analyze_kr"}
+DAILY_TARGET_JOBS = {"us": ("analyze_us", "build_pages"), "kr": ("analyze_kr", "build_pages")}
 
 
 @dataclass(frozen=True)
 class DailyDependency:
     profile: str
     workflow_file: str
-    target_job_name: str
+    target_job_names: tuple[str, ...]
     window_start_kst: datetime
 
 
@@ -96,19 +96,23 @@ def daily_dependency(profile: str, now_kst: datetime) -> DailyDependency:
     return DailyDependency(
         profile=profile,
         workflow_file="daily-codex-analysis.yml",
-        target_job_name=DAILY_TARGET_JOBS[profile],
+        target_job_names=DAILY_TARGET_JOBS[profile],
         window_start_kst=daily_window_start_kst(profile, now_kst),
     )
 
 
-def _run_has_successful_target_job(*, client: Any, run_id: int, target_job_name: str) -> bool:
+def _run_has_successful_target_jobs(*, client: Any, run_id: int, target_job_names: tuple[str, ...]) -> bool:
+    required = set(target_job_names)
+    successful: set[str] = set()
     for job in client.list_jobs(run_id):
-        if job.get("name") != target_job_name:
+        name = str(job.get("name") or "")
+        if name not in required:
             continue
         status = str(job.get("status") or "").lower()
         conclusion = str(job.get("conclusion") or "").lower()
-        return status == "completed" and conclusion == "success"
-    return False
+        if status == "completed" and conclusion == "success":
+            successful.add(name)
+    return required <= successful
 
 
 def daily_dependency_satisfied(*, client: Any, dependency: DailyDependency) -> tuple[bool, str]:
@@ -130,10 +134,10 @@ def daily_dependency_satisfied(*, client: Any, dependency: DailyDependency) -> t
             continue
         if conclusion != "success":
             continue
-        if _run_has_successful_target_job(
+        if _run_has_successful_target_jobs(
             client=client,
             run_id=run_id,
-            target_job_name=dependency.target_job_name,
+            target_job_names=dependency.target_job_names,
         ):
             return (
                 True,

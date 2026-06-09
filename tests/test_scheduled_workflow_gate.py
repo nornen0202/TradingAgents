@@ -49,9 +49,9 @@ def _youtube_targets():
     return gate.load_schedule_targets(
         """
         {
-          "17 11 * * *": {
+          "20 20 * * *": {
             "profile": "youtube",
-            "window_start": "19:00",
+            "window_start": "05:00",
             "target_jobs": ["build_youtube_pages"],
             "blockers": [
               {
@@ -59,6 +59,12 @@ def _youtube_targets():
                 "workflow_file": "daily-codex-analysis.yml",
                 "window_start": "16:00",
                 "target_jobs": ["analyze_us", "build_pages"]
+              },
+              {
+                "name": "intraday-overlay-us-publish",
+                "workflow_file": "intraday-overlay-refresh.yml",
+                "window_start": "23:00",
+                "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]
               }
             ]
           }
@@ -121,7 +127,7 @@ def test_scheduled_youtube_skips_when_prior_manual_pages_job_succeeded():
 
     profile, should_run, reason = gate.decide_schedule_gate(
         event_name="schedule",
-        schedule="17 11 * * *",
+        schedule="20 20 * * *",
         requested_profile="",
         manual_default_profile="",
         workflow_file="daily-youtube-reports.yml",
@@ -147,14 +153,14 @@ def test_scheduled_youtube_waits_when_daily_codex_pages_build_is_queued():
 
     profile, should_run, reason = gate.decide_schedule_gate(
         event_name="schedule",
-        schedule="17 11 * * *",
+        schedule="20 20 * * *",
         requested_profile="",
         manual_default_profile="",
         workflow_file="daily-youtube-reports.yml",
         current_run_id=902,
         client=client,
         targets=_youtube_targets(),
-        now_kst=_kst("2026-06-08T23:53:00"),
+        now_kst=_kst("2026-06-09T05:53:00"),
     )
 
     assert profile == "youtube"
@@ -173,18 +179,45 @@ def test_scheduled_youtube_waits_when_daily_codex_analysis_is_running():
 
     _profile, should_run, reason = gate.decide_schedule_gate(
         event_name="schedule",
-        schedule="17 11 * * *",
+        schedule="20 20 * * *",
         requested_profile="",
         manual_default_profile="",
         workflow_file="daily-youtube-reports.yml",
         current_run_id=904,
         client=client,
         targets=_youtube_targets(),
-        now_kst=_kst("2026-06-08T23:53:00"),
+        now_kst=_kst("2026-06-09T05:53:00"),
     )
 
     assert should_run is False
     assert "has analyze_us: in_progress" in reason
+
+
+def test_scheduled_youtube_waits_when_us_overlay_publish_is_running():
+    client = FakeClient(
+        runs={
+            "daily-youtube-reports.yml": [],
+            "daily-codex-analysis.yml": [],
+            "intraday-overlay-refresh.yml": [{"id": 905, "event": "schedule", "status": "in_progress", "conclusion": ""}],
+        },
+        jobs={905: [{"name": "publish_overlay_site", "status": "in_progress", "conclusion": ""}]},
+    )
+
+    _profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="20 20 * * *",
+        requested_profile="",
+        manual_default_profile="",
+        workflow_file="daily-youtube-reports.yml",
+        current_run_id=906,
+        client=client,
+        targets=_youtube_targets(),
+        now_kst=_kst("2026-06-09T05:53:00"),
+    )
+
+    assert should_run is False
+    assert "intraday-overlay-us-publish" in reason
+    assert "publish_overlay_site: in_progress" in reason
 
 
 def test_failed_prior_run_does_not_block_recovery():

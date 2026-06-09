@@ -98,12 +98,12 @@ jobs:
           MANUAL_DEFAULT_PROFILE: all
           SCHEDULE_GATE_TARGETS_JSON: >-
             {
-              "10 7 * * 1-5": {"profile": "us", "window_start": "16:00", "target_jobs": ["analyze_us"]},
-              "40 7 * * 1-5": {"profile": "us", "window_start": "16:00", "target_jobs": ["analyze_us"]},
-              "10 8 * * 1-5": {"profile": "us", "window_start": "16:00", "target_jobs": ["analyze_us"]},
-              "10 21 * * 0-4": {"profile": "kr", "window_start": "06:00", "target_jobs": ["analyze_kr"]},
-              "40 21 * * 0-4": {"profile": "kr", "window_start": "06:00", "target_jobs": ["analyze_kr"]},
-              "10 22 * * 0-4": {"profile": "kr", "window_start": "06:00", "target_jobs": ["analyze_kr"]}
+              "10 7 * * 1-5": {"profile": "us", "window_start": "16:00", "target_jobs": ["analyze_us"], "blockers": [{"name": "intraday-overlay-kr-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "09:00", "target_jobs": ["overlay_refresh_kr", "publish_overlay_site", "deploy_overlay"]}]},
+              "40 7 * * 1-5": {"profile": "us", "window_start": "16:00", "target_jobs": ["analyze_us"], "blockers": [{"name": "intraday-overlay-kr-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "09:00", "target_jobs": ["overlay_refresh_kr", "publish_overlay_site", "deploy_overlay"]}]},
+              "10 8 * * 1-5": {"profile": "us", "window_start": "16:00", "target_jobs": ["analyze_us"], "blockers": [{"name": "intraday-overlay-kr-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "09:00", "target_jobs": ["overlay_refresh_kr", "publish_overlay_site", "deploy_overlay"]}]},
+              "10 21 * * 0-4": {"profile": "kr", "window_start": "06:00", "target_jobs": ["analyze_kr"], "blockers": [{"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "23:00", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}, {"name": "daily-youtube-publish", "workflow_file": "daily-youtube-reports.yml", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "deploy"]}]},
+              "40 21 * * 0-4": {"profile": "kr", "window_start": "06:00", "target_jobs": ["analyze_kr"], "blockers": [{"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "23:00", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}, {"name": "daily-youtube-publish", "workflow_file": "daily-youtube-reports.yml", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "deploy"]}]},
+              "10 22 * * 0-4": {"profile": "kr", "window_start": "06:00", "target_jobs": ["analyze_kr"], "blockers": [{"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "23:00", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}, {"name": "daily-youtube-publish", "workflow_file": "daily-youtube-reports.yml", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "deploy"]}]}
             }
         run: python .github/scripts/scheduled_workflow_gate.py
 
