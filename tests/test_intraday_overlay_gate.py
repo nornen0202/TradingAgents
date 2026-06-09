@@ -67,10 +67,38 @@ def test_kr_overlay_waits_when_only_daily_gate_job_succeeded():
     assert any("No completed successful Daily Codex KR target job" in message for message in messages)
 
 
-def test_kr_overlay_runs_after_completed_daily_codex_target_job():
+def test_kr_overlay_waits_until_daily_pages_build_succeeds():
     client = FakeClient(
         runs=[{"id": 103, "status": "completed", "conclusion": "success"}],
-        jobs={103: [{"name": "analyze_kr", "status": "completed", "conclusion": "success"}]},
+        jobs={
+            103: [
+                {"name": "analyze_kr", "status": "completed", "conclusion": "success"},
+                {"name": "build_pages", "status": "queued", "conclusion": ""},
+            ]
+        },
+    )
+
+    decisions, messages = gate.decide_intraday_gate(
+        event_name="schedule",
+        schedule="50 0-5 * * 1-5",
+        requested_profile="",
+        client=client,
+        now_kst=_kst("2026-06-04T11:50:00"),
+    )
+
+    assert decisions["kr"] is False
+    assert any("No completed successful Daily Codex KR target job" in message for message in messages)
+
+
+def test_kr_overlay_runs_after_completed_daily_codex_target_jobs():
+    client = FakeClient(
+        runs=[{"id": 104, "status": "completed", "conclusion": "success"}],
+        jobs={
+            104: [
+                {"name": "analyze_kr", "status": "completed", "conclusion": "success"},
+                {"name": "build_pages", "status": "completed", "conclusion": "success"},
+            ]
+        },
     )
 
     decisions, messages = gate.decide_intraday_gate(
@@ -87,8 +115,13 @@ def test_kr_overlay_runs_after_completed_daily_codex_target_job():
 
 def test_us_overlay_after_midnight_uses_previous_kst_daily_window():
     client = FakeClient(
-        runs=[{"id": 104, "status": "completed", "conclusion": "success"}],
-        jobs={104: [{"name": "analyze_us", "status": "completed", "conclusion": "success"}]},
+        runs=[{"id": 105, "status": "completed", "conclusion": "success"}],
+        jobs={
+            105: [
+                {"name": "analyze_us", "status": "completed", "conclusion": "success"},
+                {"name": "build_pages", "status": "completed", "conclusion": "success"},
+            ]
+        },
     )
 
     decisions, _messages = gate.decide_intraday_gate(
@@ -109,7 +142,12 @@ def test_manual_all_profile_can_run_each_side_independently():
             {"id": 201, "status": "completed", "conclusion": "success"},
             {"id": 202, "status": "completed", "conclusion": "failure"},
         ],
-        jobs={201: [{"name": "analyze_us", "status": "completed", "conclusion": "success"}]},
+        jobs={
+            201: [
+                {"name": "analyze_us", "status": "completed", "conclusion": "success"},
+                {"name": "build_pages", "status": "completed", "conclusion": "success"},
+            ]
+        },
     )
 
     decisions, _messages = gate.decide_intraday_gate(
