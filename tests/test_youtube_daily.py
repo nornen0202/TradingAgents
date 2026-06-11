@@ -53,8 +53,10 @@ class FakeResponse:
 class FakeLLM:
     def __init__(self, responses: list[str]):
         self.responses = responses
+        self.prompts: list[str] = []
 
     def invoke(self, _prompt: str):
+        self.prompts.append(_prompt)
         if not self.responses:
             raise RuntimeError("no fake response left")
         return FakeResponse(self.responses.pop(0))
@@ -316,6 +318,11 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertEqual(verified.verification["version"], 3)
         self.assertEqual(verified.verification["claim_verification"]["claims"][0]["status"], "supported")
         self.assertEqual(verified.verification["evidence"]["evidence_count"], 1)
+        self.assertEqual(len(llm.prompts), 4)
+        self.assertNotIn("transcript_for_claim_extraction", llm.prompts[0])
+        self.assertIn("transcript_chunks_for_claim_extraction", llm.prompts[0])
+        self.assertNotIn("transcript_private_excerpt", llm.prompts[1])
+        self.assertIn("transcript_private_chunks", llm.prompts[1])
 
     def test_verify_bundle_marks_llm_failed_when_codex_json_is_broken(self):
         bundle = _fake_bundle("u2BEOgr8ze8")
@@ -862,7 +869,7 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("[asr]", config_text)
         self.assertIn('model = "auto"', config_text)
         self.assertIn("beam_size = 5", config_text)
-        self.assertIn("max_transcript_chars_for_llm = 48000", config_text)
+        self.assertIn("max_transcript_chars_for_llm = 24000", config_text)
         self.assertIn("YOUTUBE_COOKIES_FILE", workflow)
         self.assertIn("YOUTUBE_PROXY", workflow)
         self.assertIn("YOUTUBE_VISITOR_DATA", workflow)

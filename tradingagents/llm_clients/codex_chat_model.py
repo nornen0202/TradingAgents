@@ -29,6 +29,7 @@ from .codex_schema import (
     build_tool_response_schema,
     normalize_tools_for_codex,
 )
+from .usage import record_llm_usage
 
 
 CODEX_MODEL_FALLBACKS = (
@@ -202,6 +203,8 @@ class CodexChatModel(BaseChatModel):
 
             try:
                 usage_metadata = self._extract_usage_metadata(result.notifications)
+                if usage_metadata:
+                    record_llm_usage(provider="codex", model=self.model, usage=usage_metadata)
                 ai_message = (
                     self._parse_tool_response(
                         raw_response,

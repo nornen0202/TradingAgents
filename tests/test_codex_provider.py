@@ -27,6 +27,7 @@ from tradingagents.llm_clients.codex_schema import (
     normalize_tools_for_codex,
 )
 from tradingagents.llm_clients.factory import create_llm_client
+from tradingagents.llm_clients.usage import aggregate_llm_usage, reset_llm_usage, snapshot_llm_usage
 
 
 def lookup_price(ticker: str) -> str:
@@ -280,6 +281,8 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(session.started, 1)
 
     def test_plain_response_captures_usage_metadata_from_notifications(self):
+        reset_llm_usage()
+        self.addCleanup(reset_llm_usage)
         session = FakeCodexSession(responses=['{"answer":"With usage"}'])
 
         original_invoke = session.invoke
@@ -315,6 +318,63 @@ class CodexProviderTests(unittest.TestCase):
         result = llm.invoke("Give me the final answer.")
         self.assertEqual(result.usage_metadata["input_tokens"], 11)
         self.assertEqual(result.usage_metadata["output_tokens"], 7)
+        usage = snapshot_llm_usage()
+        self.assertTrue(usage["available"])
+        self.assertEqual(usage["calls"], 1)
+        self.assertEqual(usage["input_tokens"], 11)
+        self.assertEqual(usage["output_tokens"], 7)
+        self.assertEqual(usage["total_tokens"], 18)
+        self.assertEqual(usage["by_model"]["gpt-5.5"]["calls"], 1)
+
+    def test_aggregate_llm_usage_merges_ticker_and_parent_snapshots(self):
+        aggregated = aggregate_llm_usage(
+            [
+                {
+                    "available": True,
+                    "calls": 1,
+                    "input_tokens": 100,
+                    "output_tokens": 20,
+                    "total_tokens": 120,
+                    "by_model": {
+                        "gpt-5.5": {
+                            "calls": 1,
+                            "input_tokens": 100,
+                            "output_tokens": 20,
+                            "total_tokens": 120,
+                        }
+                    },
+                    "events": [{"provider": "codex", "model": "gpt-5.5", "input_tokens": 100, "output_tokens": 20, "total_tokens": 120}],
+                },
+                {
+                    "available": True,
+                    "calls": 2,
+                    "input_tokens": 30,
+                    "output_tokens": 10,
+                    "total_tokens": 40,
+                    "by_model": {
+                        "gpt-5.4-mini": {
+                            "calls": 2,
+                            "input_tokens": 30,
+                            "output_tokens": 10,
+                            "total_tokens": 40,
+                        }
+                    },
+                    "events": [
+                        {"provider": "codex", "model": "gpt-5.4-mini", "input_tokens": 10, "output_tokens": 4, "total_tokens": 14},
+                        {"provider": "codex", "model": "gpt-5.4-mini", "input_tokens": 20, "output_tokens": 6, "total_tokens": 26},
+                    ],
+                },
+            ]
+        )
+
+        self.assertTrue(aggregated["available"])
+        self.assertEqual(aggregated["calls"], 3)
+        self.assertEqual(aggregated["input_tokens"], 130)
+        self.assertEqual(aggregated["output_tokens"], 30)
+        self.assertEqual(aggregated["total_tokens"], 160)
+        self.assertEqual(aggregated["by_model"]["gpt-5.5"]["calls"], 1)
+        self.assertEqual(aggregated["by_model"]["gpt-5.4-mini"]["calls"], 2)
+        self.assertEqual(len(aggregated["events"]), 3)
 
     def test_invoke_accepts_openai_style_message_dicts(self):
         session = FakeCodexSession(
