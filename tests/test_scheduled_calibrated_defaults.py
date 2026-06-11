@@ -26,6 +26,29 @@ site_dir = "./site"
     assert config.summary_image.enabled is True
     assert config.summary_image.mode == "deterministic_svg"
     assert config.summary_image.publish_to_site is True
+    assert config.execution.execution_llm_summary_model is None
+
+
+def test_blank_execution_summary_model_uses_deterministic_overlay_summary(tmp_path: Path):
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        """
+[run]
+tickers = ["NVDA"]
+
+[execution]
+enabled = true
+llm_summary_model = ""
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+""",
+        encoding="utf-8",
+    )
+
+    config = load_scheduled_config(config_path)
+    assert config.execution.execution_llm_summary_model is None
 
 
 def test_empty_execution_checkpoints_fall_back_to_market_defaults(tmp_path: Path):

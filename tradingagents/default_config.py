@@ -36,7 +36,7 @@ DEFAULT_CONFIG = {
     "execution_max_data_age_seconds": 180,
     "execution_publish_badges": True,
     "execution_publish_debug": False,
-    "execution_llm_summary_model": "gpt-5.4-mini",
+    "execution_llm_summary_model": None,
     "execution_selective_rerun_enabled": True,
     # Output language for analyst reports and final decision
     # Internal agent debate stays in English for reasoning quality

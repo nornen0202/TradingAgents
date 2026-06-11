@@ -274,7 +274,7 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
   - `max_debate_rounds`
   - `max_risk_discuss_rounds`
   - `continue_on_ticker_error`
-  - `report_polisher_enabled`: 기본 `true`. `output_model`로 투자자용 요약을 한 번 더 정제하고, 실패 시 템플릿 요약으로 대체합니다.
+  - `report_polisher_enabled`: 기본 `true`. `quick_model`로 투자자용 요약을 한 번 더 정제하고, 실패 시 템플릿 요약으로 대체합니다.
 - `[llm]`
   - `provider`
   - `quick_model`
@@ -284,7 +284,7 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
   - `enabled`
   - `semantic_judge_enabled`
   - `action_judge_enabled`
-  - `report_polisher_enabled`: 기본 `true`. 계좌/워치리스트 리포트 상단에 투자자용 요약을 추가합니다.
+  - `report_polisher_enabled`: 기본 `true`. `quick_model`로 계좌/워치리스트 리포트 상단에 투자자용 요약을 추가합니다.
 - `[translation]`
   - `backend`
   - `model`
@@ -305,7 +305,7 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
   - `max_data_age_seconds`: stale data fail-closed 기준
   - `publish_badges`: 사이트 배지/상태 노출
   - `selective_rerun_enabled`: 이벤트/무효화 기반 selective rerun
-  - `llm_summary_model`: execution markdown 설명 모델 (기본 `gpt-5.4-mini`)
+  - `llm_summary_model`: execution markdown 설명 모델 (빈 값이면 deterministic 설명 사용)
 
 ### 장중 하이브리드 구조(Research + Deterministic Overlay + Selective Rerun)
 

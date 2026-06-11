@@ -378,7 +378,6 @@ def _extract_claims_with_llm(
         "video": _public_metadata(bundle),
         "deterministic_entities": [_entity_to_dict(item) for item in entity_summaries],
         "draft_report": draft_report[:12000],
-        "transcript_for_claim_extraction": _transcript_for_llm(bundle, max_chars=max_transcript_chars),
         "transcript_chunks_for_claim_extraction": _transcript_chunks_for_llm(bundle, max_chars=max_transcript_chars),
         "transcript_quality": _transcript_quality_for_payload(bundle),
         "caption_source": {
@@ -459,7 +458,6 @@ def _build_research_plan(
         "video": _public_metadata(bundle),
         "claims": extracted_claims,
         "draft_report_excerpt": draft_report[:8000],
-        "transcript_private_excerpt": _transcript_for_llm(bundle, max_chars=verification_settings.max_transcript_chars_for_llm),
         "transcript_private_chunks": _transcript_chunks_for_llm(
             bundle,
             max_chars=verification_settings.max_transcript_chars_for_llm,

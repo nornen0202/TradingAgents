@@ -51,6 +51,7 @@ from tradingagents.external.prism_conflicts import (
 from tradingagents.external.prism_loader import load_prism_signals
 from tradingagents.external.prism_models import PrismSignalAction
 from tradingagents.graph.trading_graph import TradingAgentsGraph
+from tradingagents.llm_clients.usage import aggregate_llm_usage, reset_llm_usage, snapshot_llm_usage
 from tradingagents.live.context_delta import build_live_context_delta, render_report_vs_live_delta_markdown
 from tradingagents.performance.action_outcomes import record_run_recommendations, summarize_action_performance, update_action_outcomes
 from tradingagents.performance.price_history import load_price_history_for_recommendations
@@ -175,6 +176,7 @@ def execute_scheduled_run(
     run_id = _build_run_id(started_at, run_label)
     run_dir = config.storage.archive_dir / "runs" / started_at.strftime("%Y") / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
+    reset_llm_usage()
 
     run_mode = str(config.run.run_mode or "full").strip().lower()
     portfolio_only = run_mode == "portfolio_only"
@@ -224,6 +226,9 @@ def execute_scheduled_run(
             "run_mode=portfolio_only requires [portfolio].enabled=true and a configured portfolio profile."
         )
 
+    pre_ticker_parent_usage = snapshot_llm_usage()
+    reset_llm_usage()
+
     if run_mode == "full":
         if _should_run_tickers_in_parallel(config=config, ticker_count=len(run_tickers)):
             ticker_summaries, parallel_execution_summary, circuit_breaker_summary, parallel_warnings = (
@@ -262,6 +267,7 @@ def execute_scheduled_run(
             tickers=run_tickers,
         )
 
+    reset_llm_usage()
     execution_updates: dict[str, dict[str, Any]] = {}
     if config.execution.execution_refresh_enabled and not portfolio_only:
         checkpoint_timezone = _execution_checkpoint_timezone(config)
@@ -528,6 +534,10 @@ def execute_scheduled_run(
             "portfolio_delta_markdown": _relative_to_run(run_dir, delta_md_path),
         },
     }
+    manifest["llm_usage"] = _aggregate_manifest_llm_usage(
+        ticker_summaries=ticker_summaries,
+        parent_usages=[pre_ticker_parent_usage, snapshot_llm_usage()],
+    )
 
     _write_json(run_dir / "run.json", manifest)
     _write_json(config.storage.archive_dir / "latest-run.json", manifest)
@@ -1274,6 +1284,7 @@ def _run_single_ticker(
     ticker_started = datetime.now(ZoneInfo(config.run.timezone))
     timer_start = perf_counter()
     analysis_date = ticker_started.date().isoformat()
+    reset_llm_usage()
 
     try:
         reset_tool_telemetry()
@@ -1322,6 +1333,7 @@ def _run_single_ticker(
             copied_graph_log.write_text(graph_log.read_text(encoding="utf-8"), encoding="utf-8")
 
         metrics = stats_handler.get_stats()
+        llm_usage = snapshot_llm_usage()
         tool_events = snapshot_tool_telemetry()
         tool_by_vendor: dict[str, int] = {}
         fallback_count = 0
@@ -1330,6 +1342,11 @@ def _run_single_ticker(
             if event.get("fallback"):
                 fallback_count += 1
         effective_tool_calls = max(int(metrics.get("tool_calls", 0) or 0), len(tool_events))
+        metrics_with_usage = {
+            **metrics,
+            "tool_calls": effective_tool_calls,
+            "codex_usage": llm_usage,
+        }
         called_tools = _collect_called_tool_names(final_state)
         quality_flags = _build_analysis_quality_flags(
             config=config,
@@ -1337,7 +1354,7 @@ def _run_single_ticker(
             analysis_date=analysis_date,
             called_tools=called_tools,
             effective_tool_calls=effective_tool_calls,
-            tokens_available=bool(metrics.get("tokens_available", False)),
+            tokens_available=bool(metrics.get("tokens_available", False) or llm_usage.get("available")),
         )
         if "no_tool_calls_detected" in quality_flags:
             print(f"::warning::No tool calls were recorded for {ticker}; report quality may be degraded.")
@@ -1360,7 +1377,8 @@ def _run_single_ticker(
             "started_at": ticker_started.isoformat(),
             "finished_at": datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
             "duration_seconds": round(perf_counter() - timer_start, 2),
-            "metrics": {**metrics, "tool_calls": effective_tool_calls},
+            "metrics": metrics_with_usage,
+            "llm_usage": llm_usage,
             "tool_telemetry": {
                 "total_tool_calls": effective_tool_calls,
                 "vendor_calls": tool_by_vendor,
@@ -1475,7 +1493,8 @@ def _run_single_ticker(
             "started_at": ticker_started.isoformat(),
             "finished_at": analysis_payload["finished_at"],
             "duration_seconds": analysis_payload["duration_seconds"],
-            "metrics": {**metrics, "tool_calls": effective_tool_calls},
+            "metrics": metrics_with_usage,
+            "llm_usage": llm_usage,
             "tool_telemetry": analysis_payload["tool_telemetry"],
             "quality_flags": quality_flags,
             "report_writer": report_writer_payload,
@@ -1501,6 +1520,7 @@ def _run_single_ticker(
             "started_at": ticker_started.isoformat(),
             "finished_at": datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
             "duration_seconds": round(perf_counter() - timer_start, 2),
+            "llm_usage": snapshot_llm_usage(),
         }
         error_path = ticker_dir / "error.json"
         _write_json(error_path, error_payload)
@@ -1516,7 +1536,14 @@ def _run_single_ticker(
             "started_at": error_payload["started_at"],
             "finished_at": error_payload["finished_at"],
             "duration_seconds": error_payload["duration_seconds"],
-            "metrics": {"llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0},
+            "metrics": {
+                "llm_calls": 0,
+                "tool_calls": 0,
+                "tokens_in": 0,
+                "tokens_out": 0,
+                "codex_usage": error_payload["llm_usage"],
+            },
+            "llm_usage": error_payload["llm_usage"],
             "artifacts": {
                 "error_json": _relative_to_run(run_dir, error_path),
             },
@@ -2114,6 +2141,19 @@ def _build_analysis_quality_flags(
     ):
         quality_flags.append("intraday_snapshot_missing_same_day")
     return quality_flags
+
+
+def _aggregate_manifest_llm_usage(
+    *,
+    ticker_summaries: list[dict[str, Any]],
+    parent_usages: list[dict[str, Any]],
+) -> dict[str, Any]:
+    return aggregate_llm_usage(
+        [
+            *(item.get("llm_usage") for item in ticker_summaries),
+            *parent_usages,
+        ]
+    )
 
 
 def _compute_batch_metrics(ticker_summaries: list[dict[str, Any]]) -> dict[str, Any]:

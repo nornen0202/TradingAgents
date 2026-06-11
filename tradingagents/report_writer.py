@@ -379,14 +379,9 @@ def _create_writer_llm(llm_settings: Any | None) -> Any | None:
     if llm_settings is None:
         return None
     provider = str(getattr(llm_settings, "provider", "") or "").strip().lower()
-    model = str(
-        getattr(llm_settings, "output_model", "")
-        or getattr(llm_settings, "deep_model", "")
-        or getattr(llm_settings, "quick_model", "")
-        or ""
-    ).strip()
+    model = _select_writer_model(llm_settings)
     if provider == "codex" and not model:
-        model = "gpt-5.5"
+        model = "gpt-5.4-mini"
     if not provider or not model:
         return None
 
@@ -514,13 +509,21 @@ def _base_metadata(llm_settings: Any | None, *, scope: str) -> dict[str, Any]:
         "status": "skipped",
         "scope": scope,
         "provider": str(getattr(llm_settings, "provider", "") or ""),
-        "model": str(
-            getattr(llm_settings, "output_model", "")
-            or getattr(llm_settings, "deep_model", "")
-            or getattr(llm_settings, "quick_model", "")
-            or ""
-        ),
+        "model": _select_writer_model(llm_settings),
+        "model_role": "quick_model",
     }
+
+
+def _select_writer_model(llm_settings: Any | None) -> str:
+    if llm_settings is None:
+        return ""
+    return str(
+        getattr(llm_settings, "writer_model", "")
+        or getattr(llm_settings, "quick_model", "")
+        or getattr(llm_settings, "output_model", "")
+        or getattr(llm_settings, "deep_model", "")
+        or ""
+    ).strip()
 
 
 def _text_field(
