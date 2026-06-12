@@ -328,7 +328,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
 
     if kst_weekday < 5:
         codex_us_window = datetime.combine(kst_date, time(16, 0), tzinfo=KST)
-        if _time_between(kst_time, time(17, 45), time(20, 0)):
+        if _time_between(kst_time, time(17, 45), time(22, 0)):
             targets.append(
                 WatchdogTarget(
                     name="daily-codex-us",

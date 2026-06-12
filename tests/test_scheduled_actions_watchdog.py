@@ -63,8 +63,14 @@ def test_daily_codex_us_watchdog_is_due_on_weekday_afternoon():
     assert codex_us[0].blockers[0].name == "intraday-overlay-kr-publish"
 
 
-def test_daily_codex_us_watchdog_yields_before_youtube_window():
-    targets = watchdog.due_targets(_kst("2026-06-01T20:07:00"))
+def test_daily_codex_us_watchdog_stays_due_during_late_recovery_window():
+    targets = watchdog.due_targets(_kst("2026-06-01T21:44:00"))
+
+    assert [target for target in targets if target.name == "daily-codex-us"]
+
+
+def test_daily_codex_us_watchdog_yields_after_late_recovery_window():
+    targets = watchdog.due_targets(_kst("2026-06-01T22:07:00"))
 
     assert not [target for target in targets if target.name == "daily-codex-us"]
 

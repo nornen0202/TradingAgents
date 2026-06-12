@@ -58,6 +58,11 @@ def test_intraday_overlay_workflow_uses_kr_operational_crons():
     assert "intraday_overlay_gate.py" in workflow
     assert "needs.overlay_gate.outputs.run_us == 'true'" in workflow
     assert "needs.overlay_gate.outputs.run_kr == 'true'" in workflow
+    assert "GH_RUN_ID: ${{ github.run_id }}" in workflow
+    assert "--skip-site-build" in workflow
+    assert "github-pages-overlay-us" not in workflow
+    assert "github-pages-overlay-kr" not in workflow
+    assert "name: github-pages-overlay" in workflow
     assert "group: intraday-overlay-publish" in workflow
     assert "cancel-in-progress: true" in workflow
     assert "timeout-minutes: 30" in workflow
@@ -74,12 +79,16 @@ def test_daily_workflow_runs_us_and_kr_at_revised_kst_targets():
     assert "10 7 * * 1-5" in workflow
     assert "40 7 * * 1-5" in workflow
     assert "10 8 * * 1-5" in workflow
-    assert "0 0 * * 1-5" not in workflow
-    assert "0 12 * * 1-5" not in workflow
-    assert "30 19 * * 0-4" not in workflow
-    assert "30 5 * * 1-5" not in workflow
-    assert "30 21 * * 0-4" not in workflow
-    assert "30 9 * * 1-5" not in workflow
+    assert "10 9 * * 1-5" in workflow
+    assert "10 10 * * 1-5" in workflow
+    assert "10 11 * * 1-5" in workflow
+    assert "10 12 * * 1-5" in workflow
+    assert "- cron: '0 0 * * 1-5'" not in workflow
+    assert "- cron: '0 12 * * 1-5'" not in workflow
+    assert "- cron: '30 19 * * 0-4'" not in workflow
+    assert "- cron: '30 5 * * 1-5'" not in workflow
+    assert "- cron: '30 21 * * 0-4'" not in workflow
+    assert "- cron: '30 9 * * 1-5'" not in workflow
 
 
 def test_daily_workflow_gates_backup_schedules_before_analysis():

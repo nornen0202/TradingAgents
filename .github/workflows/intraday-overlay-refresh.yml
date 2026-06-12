@@ -59,6 +59,7 @@ jobs:
         env:
           GH_EVENT_NAME: ${{ github.event_name }}
           GH_REPOSITORY: ${{ github.repository }}
+          GH_RUN_ID: ${{ github.run_id }}
           GH_TOKEN: ${{ github.token }}
           EVENT_SCHEDULE: ${{ github.event.schedule }}
           REQUESTED_PROFILE: ${{ github.event.inputs.profile }}
@@ -140,6 +141,7 @@ jobs:
               "site",
               "--label",
               "github-actions-overlay-us",
+              "--skip-site-build",
           ]
 
           archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
@@ -151,46 +153,6 @@ jobs:
               args += ["--tickers", manual_tickers]
 
           subprocess.check_call(args)
-
-      - name: Add Git Bash to PATH for Pages packaging
-        run: |
-          import os
-          from pathlib import Path
-
-          for candidate in (r"C:\Program Files\Git\bin", r"C:\Program Files\Git\usr\bin"):
-              if (Path(candidate) / "bash.exe").exists():
-                  github_path = os.environ.get("GITHUB_PATH")
-                  if not github_path:
-                      raise SystemExit("GITHUB_PATH is unavailable.")
-                  with open(github_path, "a", encoding="utf-8") as handle:
-                      handle.write(candidate + os.linesep)
-                  print(f"Added Git Bash path: {candidate}")
-                  break
-          else:
-              raise SystemExit("bash.exe was not found under the expected Git for Windows directories.")
-
-      - name: Verify site output directory exists (US)
-        run: |
-          from pathlib import Path
-
-          if not Path("site").exists():
-              raise SystemExit("Expected site output directory 'site' was not created.")
-
-      - name: Upload GitHub Pages artifact (US)
-        id: upload_pages_us
-        timeout-minutes: 15
-        continue-on-error: true
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
-        with:
-          name: github-pages-overlay-us
-          path: site
-
-      - name: Retry GitHub Pages artifact upload after transient network failure (US)
-        if: ${{ steps.upload_pages_us.outcome == 'failure' }}
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
-        with:
-          name: github-pages-overlay-us
-          path: site
 
   overlay_refresh_kr:
     needs:
@@ -268,6 +230,7 @@ jobs:
               "site",
               "--label",
               "github-actions-overlay-kr",
+              "--skip-site-build",
           ]
 
           archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
@@ -279,46 +242,6 @@ jobs:
               args += ["--tickers", manual_tickers]
 
           subprocess.check_call(args)
-
-      - name: Add Git Bash to PATH for Pages packaging
-        run: |
-          import os
-          from pathlib import Path
-
-          for candidate in (r"C:\Program Files\Git\bin", r"C:\Program Files\Git\usr\bin"):
-              if (Path(candidate) / "bash.exe").exists():
-                  github_path = os.environ.get("GITHUB_PATH")
-                  if not github_path:
-                      raise SystemExit("GITHUB_PATH is unavailable.")
-                  with open(github_path, "a", encoding="utf-8") as handle:
-                      handle.write(candidate + os.linesep)
-                  print(f"Added Git Bash path: {candidate}")
-                  break
-          else:
-              raise SystemExit("bash.exe was not found under the expected Git for Windows directories.")
-
-      - name: Verify site output directory exists (KR)
-        run: |
-          from pathlib import Path
-
-          if not Path("site").exists():
-              raise SystemExit("Expected site output directory 'site' was not created.")
-
-      - name: Upload GitHub Pages artifact (KR)
-        id: upload_pages_kr
-        timeout-minutes: 15
-        continue-on-error: true
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
-        with:
-          name: github-pages-overlay-kr
-          path: site
-
-      - name: Retry GitHub Pages artifact upload after transient network failure (KR)
-        if: ${{ steps.upload_pages_kr.outcome == 'failure' }}
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
-        with:
-          name: github-pages-overlay-kr
-          path: site
 
   publish_overlay_site:
     needs:

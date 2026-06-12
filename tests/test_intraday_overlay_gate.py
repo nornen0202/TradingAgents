@@ -22,6 +22,8 @@ class FakeClient:
     def list_runs(self, workflow_file, *, created_since_utc):
         self.last_workflow_file = workflow_file
         self.last_created_since_utc = created_since_utc
+        if isinstance(self.runs, dict):
+            return self.runs.get(workflow_file, [])
         return self.runs
 
     def list_jobs(self, run_id):
@@ -133,6 +135,94 @@ def test_kr_overlay_runs_after_completed_daily_codex_target_jobs():
         requested_profile="",
         client=client,
         now_kst=_kst("2026-06-04T11:50:00"),
+    )
+
+    assert decisions["kr"] is True
+    assert any("allowed" in message for message in messages)
+
+
+def test_kr_overlay_holds_stale_delayed_schedule_event():
+    client = FakeClient()
+
+    decisions, messages = gate.decide_intraday_gate(
+        event_name="schedule",
+        schedule="25 6 * * 1-5",
+        requested_profile="",
+        client=client,
+        now_kst=_kst("2026-06-12T19:44:00"),
+    )
+
+    assert decisions["kr"] is False
+    assert any("Scheduled event is stale" in message for message in messages)
+
+
+def test_schedule_freshness_respects_cron_weekday_field():
+    expected = gate._last_scheduled_fire_utc(
+        "25 6 * * 1-5",
+        _kst("2026-06-15T10:00:00").astimezone(gate.UTC),
+    )
+
+    assert expected == _kst("2026-06-12T15:25:00").astimezone(gate.UTC)
+
+
+def test_kr_overlay_waits_when_same_profile_overlay_is_already_active():
+    client = FakeClient(
+        runs={
+            "intraday-overlay-refresh.yml": [
+                {"id": 900, "status": "in_progress", "conclusion": "", "created_at": "2026-06-04T01:40:00Z"}
+            ],
+            "daily-codex-analysis.yml": [
+                {"id": 104, "status": "completed", "conclusion": "success", "created_at": "2026-06-03T21:30:00Z"}
+            ],
+        },
+        jobs={
+            900: [{"name": "overlay_refresh_kr", "status": "queued", "conclusion": ""}],
+            104: [
+                {"name": "analyze_kr", "status": "completed", "conclusion": "success"},
+                {"name": "build_pages", "status": "completed", "conclusion": "success"},
+            ],
+        },
+    )
+
+    decisions, messages = gate.decide_intraday_gate(
+        event_name="schedule",
+        schedule="50 0-5 * * 1-5",
+        requested_profile="",
+        client=client,
+        now_kst=_kst("2026-06-04T10:50:00"),
+        current_run_id=901,
+    )
+
+    assert decisions["kr"] is False
+    assert any("Active KR overlay run 900 has overlay_refresh_kr: queued" in message for message in messages)
+
+
+def test_kr_overlay_ignores_current_run_when_checking_active_overlay():
+    client = FakeClient(
+        runs={
+            "intraday-overlay-refresh.yml": [
+                {"id": 901, "status": "in_progress", "conclusion": "", "created_at": "2026-06-04T01:40:00Z"}
+            ],
+            "daily-codex-analysis.yml": [
+                {"id": 104, "status": "completed", "conclusion": "success", "created_at": "2026-06-03T21:30:00Z"}
+            ],
+        },
+        jobs={
+            901: [{"name": "overlay_refresh_kr", "status": "queued", "conclusion": ""}],
+            104: [
+                {"name": "analyze_kr", "status": "completed", "conclusion": "success"},
+                {"name": "build_pages", "status": "completed", "conclusion": "success"},
+            ],
+        },
+    )
+
+    decisions, messages = gate.decide_intraday_gate(
+        event_name="schedule",
+        schedule="50 0-5 * * 1-5",
+        requested_profile="",
+        client=client,
+        now_kst=_kst("2026-06-04T10:50:00"),
+        current_run_id=901,
     )
 
     assert decisions["kr"] is True

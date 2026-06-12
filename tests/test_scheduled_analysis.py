@@ -261,6 +261,41 @@ NVDA = "NVIDIA Override"
             self.assertNotIn("Quality flags", ticker_html)
             self.assertTrue((site_dir / "downloads" / manifest["run_id"] / "NVDA" / "complete_report.md").exists())
 
+    def test_execute_scheduled_run_can_skip_site_build(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["NVDA"]
+analysts = ["market"]
+timezone = "Asia/Seoul"
+report_polisher_enabled = false
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+
+            config = load_scheduled_config(config_path)
+            with (
+                patch("tradingagents.scheduled.runner.TradingAgentsGraph", _FakeTradingAgentsGraph),
+                patch("tradingagents.scheduled.runner.StatsCallbackHandler", _FakeStatsHandler),
+                patch("tradingagents.scheduled.runner.resolve_trade_date", return_value="2026-04-04"),
+                patch("tradingagents.scheduled.runner.build_site") as build_site_mock,
+            ):
+                manifest = execute_scheduled_run(config, run_label="skip-site", skip_site_build=True)
+
+            self.assertEqual(manifest["status"], "success")
+            self.assertTrue((archive_dir / "latest-run.json").exists())
+            self.assertFalse((site_dir / "index.html").exists())
+            build_site_mock.assert_not_called()
+
     def test_execute_scheduled_run_stops_before_time_budget_exhaustion(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -811,8 +846,9 @@ site_dir = "{site_dir.as_posix()}"
             )
             captured = {}
 
-            def fake_execute(config, *, run_label):
+            def fake_execute(config, *, run_label, skip_site_build=False):
                 captured["config"] = config
+                captured["skip_site_build"] = skip_site_build
                 return {
                     "run_id": "test",
                     "status": "success",
@@ -841,6 +877,7 @@ site_dir = "{site_dir.as_posix()}"
             self.assertEqual(config.run.max_parallel_tickers, 2)
             self.assertEqual(config.run.per_ticker_timeout_minutes, 15)
             self.assertEqual(config.run.daily_active_ticker_limit, 3)
+            self.assertFalse(captured["skip_site_build"])
 
     def test_execute_scheduled_run_supports_account_only_ticker_universe_mode(self):
         with tempfile.TemporaryDirectory() as tmpdir:
