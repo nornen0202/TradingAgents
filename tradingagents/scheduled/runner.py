@@ -132,6 +132,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--per-ticker-timeout-minutes", type=float, help="Timeout for each ticker worker.")
     parser.add_argument("--daily-active-ticker-limit", type=int, help="Limit full analysis to the first N resolved tickers.")
     parser.add_argument("--site-only", action="store_true", help="Only rebuild the static site from archived runs.")
+    parser.add_argument(
+        "--skip-site-build",
+        action="store_true",
+        help="Archive the run without rebuilding the static site. Useful for intermediate overlay workers.",
+    )
     parser.add_argument("--strict", action="store_true", help="Return a non-zero exit code if any ticker fails.")
     parser.add_argument("--label", default="github-actions", help="Run label for archived metadata.")
     args = parser.parse_args(argv)
@@ -157,7 +162,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
-    manifest = execute_scheduled_run(config, run_label=args.label)
+    manifest = execute_scheduled_run(config, run_label=args.label, skip_site_build=args.skip_site_build)
     print(
         f"Completed run {manifest['run_id']} with status {manifest['status']} "
         f"({manifest['summary']['successful_tickers']} success / {manifest['summary']['failed_tickers']} failed)."
@@ -169,6 +174,7 @@ def execute_scheduled_run(
     config: ScheduledAnalysisConfig,
     *,
     run_label: str = "manual",
+    skip_site_build: bool = False,
 ) -> dict[str, Any]:
     tz = ZoneInfo(config.run.timezone)
     started_at = datetime.now(tz)
@@ -541,7 +547,10 @@ def execute_scheduled_run(
 
     _write_json(run_dir / "run.json", manifest)
     _write_json(config.storage.archive_dir / "latest-run.json", manifest)
-    build_site(config.storage.archive_dir, config.storage.site_dir, config.site)
+    if skip_site_build:
+        print("Skipped static site build for this run.", flush=True)
+    else:
+        build_site(config.storage.archive_dir, config.storage.site_dir, config.site)
     return manifest
 
 
