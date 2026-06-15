@@ -3280,7 +3280,6 @@ def _run_execution_overlay_passes(
     analysis_source_run_id: str | None = None,
 ) -> dict[str, dict[str, Any]]:
     updates_by_ticker: dict[str, dict[str, Any]] = {}
-    llm_model = config.execution.execution_llm_summary_model
     run_id = run_dir.name
     for checkpoint in checkpoints:
         checkpoint_label = str(checkpoint).strip() or "post_research"
@@ -3389,7 +3388,7 @@ def _run_execution_overlay_passes(
                     contract,
                     update,
                     llm_settings=config.llm,
-                    llm_model=llm_model,
+                    llm_model=_execution_summary_model_for_update(config=config, update=update),
                     thesis_summary=str((summary.get("decision") or "")[:500]),
                     include_reason_codes=config.execution.execution_publish_debug,
                 )
@@ -3469,6 +3468,51 @@ def _run_execution_overlay_passes(
             "chatgpt_execution_context_json": _relative_to_run(run_dir, context_path),
         }
     return updates_by_ticker
+
+
+def _execution_summary_model_for_update(*, config: ScheduledAnalysisConfig, update: Any) -> str | None:
+    explicit_model = str(config.execution.execution_llm_summary_model or "").strip()
+    if explicit_model:
+        return explicit_model
+
+    decision_state = str(getattr(getattr(update, "decision_state", None), "value", "") or "").upper()
+    decision_now = str(getattr(getattr(update, "decision_now", None), "value", "") or "").upper()
+    decision_if_triggered = str(
+        getattr(getattr(update, "decision_if_triggered", None), "value", "") or ""
+    ).upper()
+    data_health = str(
+        getattr(getattr(update, "data_health", None), "value", getattr(update, "data_health", "")) or ""
+    ).upper()
+    timing_state = str(
+        getattr(
+            getattr(update, "execution_timing_state", None),
+            "value",
+            getattr(update, "execution_timing_state", ""),
+        )
+        or ""
+    ).upper()
+    reason_codes = {
+        str(item).upper()
+        for item in (getattr(update, "reason_codes", None) or ())
+        if str(item).strip()
+    }
+    degraded_or_stale = (
+        decision_state == "DEGRADED"
+        or "DEGRADED" in timing_state
+        or "STALE" in data_health
+        or "STALE" in timing_state
+        or any("STALE" in item or "DELAY" in item or "NO_LIVE_DATA" in item for item in reason_codes)
+    )
+    actionable = (
+        decision_state in {"ACTIONABLE_NOW", "TRIGGERED_PENDING_CLOSE", "INVALIDATED"}
+        or decision_now not in {"", "NONE", "WAIT"}
+        or decision_if_triggered not in {"", "NONE", "WAIT"}
+    )
+    if degraded_or_stale:
+        return config.llm.deep_model
+    if actionable:
+        return config.llm.quick_model
+    return None
 
 
 def _annotate_microstructure_market_snapshot(

@@ -88,13 +88,17 @@ def verify_youtube_bundle(
         extracted_claims = _claims_from_entities(entity_summaries, verification_settings.max_claims_per_video)
     else:
         try:
+            claim_transcript_chars = _adaptive_transcript_chars_for_llm(
+                bundle,
+                verification_settings=verification_settings,
+            )
             extracted_claims = _extract_claims_with_llm(
                 llm,
                 bundle=bundle,
                 draft_report=draft_report,
                 entity_summaries=entity_summaries,
                 max_claims=verification_settings.max_claims_per_video,
-                max_transcript_chars=verification_settings.max_transcript_chars_for_llm,
+                max_transcript_chars=claim_transcript_chars,
             )
         except Exception as exc:
             llm_status = LLM_FAILED
@@ -460,12 +464,19 @@ def _build_research_plan(
         "draft_report_excerpt": draft_report[:8000],
         "transcript_private_chunks": _transcript_chunks_for_llm(
             bundle,
-            max_chars=verification_settings.max_transcript_chars_for_llm,
+            max_chars=_adaptive_transcript_chars_for_llm(
+                bundle,
+                verification_settings=verification_settings,
+            ),
         ),
         "transcript_quality": _transcript_quality_for_payload(bundle),
         "limits": {
             "max_research_queries": verification_settings.max_research_queries,
             "max_claims": verification_settings.max_claims_per_video,
+            "transcript_budget_chars": _adaptive_transcript_chars_for_llm(
+                bundle,
+                verification_settings=verification_settings,
+            ),
         },
     }
     prompt = (
@@ -529,6 +540,8 @@ def _collect_research_bundle(
         max_evidence_per_claim=verification_settings.max_evidence_per_claim,
         fetch_web_pages=verification_settings.fetch_web_pages,
         max_web_pages=verification_settings.max_web_pages,
+        evidence_relevance_gate_enabled=verification_settings.evidence_relevance_gate_enabled,
+        min_evidence_relevance_score=verification_settings.min_evidence_relevance_score,
     )
 
 
@@ -1303,6 +1316,38 @@ def _transcript_quality_for_payload(bundle: YouTubeVideoBundle) -> dict[str, Any
         bundle.transcript,
         duration_seconds=bundle.metadata.duration_seconds,
     )
+
+
+def _adaptive_transcript_chars_for_llm(
+    bundle: YouTubeVideoBundle,
+    *,
+    verification_settings: VerificationSettings,
+) -> int:
+    base = max(1000, int(verification_settings.max_transcript_chars_for_llm or 24000))
+    if not verification_settings.adaptive_transcript_budget_enabled:
+        return base
+    transcript = bundle.transcript
+    if transcript is None:
+        return base
+    quality = _transcript_quality_for_payload(bundle)
+    raw_chars = int(quality.get("chars") or len(str(transcript.raw_text or "")))
+    if raw_chars <= base:
+        return base
+    extended = max(base, int(verification_settings.extended_transcript_chars_for_llm or base))
+    duration_seconds = int(bundle.metadata.duration_seconds or 0)
+    source = str(quality.get("source") or "").strip().lower()
+    status = str(quality.get("status") or "").strip().lower()
+    warnings = [str(item) for item in (quality.get("warnings") or [])]
+    should_extend = (
+        duration_seconds >= 1800
+        or raw_chars >= int(base * 1.35)
+        or source in {"automatic", "local_asr"}
+        or status in {"usable", "poor", "unavailable"}
+        or bool(warnings)
+    )
+    if not should_extend:
+        return base
+    return min(extended, raw_chars)
 
 
 def _env_int_like(name: str, default: int) -> int:

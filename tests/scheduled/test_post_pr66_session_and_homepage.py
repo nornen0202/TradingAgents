@@ -91,6 +91,39 @@ def test_homepage_representative_run_prefers_same_cohort():
     assert "Delayed analysis only" in html
 
 
+def test_homepage_exposes_latest_daily_analysis_when_representative_is_older():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        root = Path(tmpdir)
+        archive_dir = root / "archive"
+        site_dir = root / "site"
+        representative = _manifest(
+            "20260418T010000_github-actions-us",
+            started_at="2026-04-18T01:00:00+00:00",
+            market_session_phase="post_close",
+            portfolio_status="success",
+            total_tickers=20,
+            degraded_count=0,
+        )
+        latest_daily = _manifest(
+            "20260418T020000_github-actions-us",
+            started_at="2026-04-18T02:00:00+00:00",
+            market_session_phase="post_close",
+            portfolio_status="success",
+            total_tickers=20,
+            degraded_count=0,
+        )
+        latest_daily["summary"] = {"total_tickers": 20, "successful_tickers": 18, "failed_tickers": 2}
+        _write_run(archive_dir / "runs" / "2026" / representative["run_id"], representative)
+        _write_run(archive_dir / "runs" / "2026" / latest_daily["run_id"], latest_daily)
+
+        build_site(archive_dir, site_dir, SiteSettings(title="TA", subtitle="Daily"))
+        html = (site_dir / "index.html").read_text(encoding="utf-8")
+
+    assert "Latest daily analysis" in html
+    assert latest_daily["run_id"] in html
+    assert html.index(representative["run_id"]) < html.index("Latest daily analysis")
+
+
 def test_post_close_overlay_not_labeled_in_session():
     manifest = _manifest(
         "20260418T055952_github-actions-overlay-us",

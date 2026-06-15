@@ -61,6 +61,10 @@ class VerificationSettings:
     fetch_web_pages: bool = True
     max_web_pages: int = 4
     max_transcript_chars_for_llm: int = 24000
+    adaptive_transcript_budget_enabled: bool = True
+    extended_transcript_chars_for_llm: int = 48000
+    evidence_relevance_gate_enabled: bool = True
+    min_evidence_relevance_score: float = 0.12
 
 
 @dataclass(frozen=True)
@@ -170,6 +174,18 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
             fetch_web_pages=bool(verification_raw.get("fetch_web_pages", True)),
             max_web_pages=max(0, int(verification_raw.get("max_web_pages") or 4)),
             max_transcript_chars_for_llm=max(1000, int(verification_raw.get("max_transcript_chars_for_llm") or 24000)),
+            adaptive_transcript_budget_enabled=bool(
+                verification_raw.get("adaptive_transcript_budget_enabled", True)
+            ),
+            extended_transcript_chars_for_llm=max(
+                1000,
+                int(verification_raw.get("extended_transcript_chars_for_llm") or 48000),
+            ),
+            evidence_relevance_gate_enabled=bool(verification_raw.get("evidence_relevance_gate_enabled", True)),
+            min_evidence_relevance_score=min(
+                1.0,
+                max(0.0, float(verification_raw.get("min_evidence_relevance_score") or 0.12)),
+            ),
         ),
         asr=ASRSettings(
             enabled=bool(asr_raw.get("enabled", True)),

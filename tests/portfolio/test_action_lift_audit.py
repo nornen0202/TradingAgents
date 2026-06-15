@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 from tradingagents.portfolio.account_models import (
     AccountConstraints,
     AccountSnapshot,
@@ -8,7 +10,7 @@ from tradingagents.portfolio.account_models import (
     PortfolioRecommendation,
     Position,
 )
-from tradingagents.portfolio.action_judge import _build_prompt
+from tradingagents.portfolio.action_judge import _build_prompt, arbitrate_portfolio_actions
 from tradingagents.portfolio.action_lift import attach_action_lift_audit
 from tradingagents.portfolio.reporting import render_portfolio_report_markdown
 from tradingagents.portfolio.state_store import save_portfolio_outputs
@@ -321,6 +323,47 @@ def test_action_judge_prompt_mentions_action_lift_and_pilot_vs_full_size():
     assert "pilot permission" in prompt
     assert "full_size_blocked_pilot_allowed" in prompt
     assert "pilot_blocked_by_account_concentration" in prompt
+
+
+def test_action_judge_expands_eligible_set_for_wait_heavy_batch(monkeypatch):
+    snapshot = _snapshot()
+    actions = tuple(_action(f"00000{index}.KS", f"테스트{index}", priority=index) for index in range(1, 7))
+    recommendation = PortfolioRecommendation(
+        **{
+            **_recommendation(None).__dict__,
+            "actions": actions,
+        }
+    )
+    candidates = [_candidate(action.canonical_ticker, action.display_name) for action in actions]
+    prompts: list[str] = []
+
+    monkeypatch.setattr("tradingagents.portfolio.action_judge._create_action_llm", lambda settings: object())
+
+    def invoke(_llm, prompt: str):
+        prompts.append(prompt)
+        return {
+            "priority_order": [action.canonical_ticker for action in actions],
+            "reason_by_ticker": {},
+            "portfolio_note": "checked",
+        }
+
+    monkeypatch.setattr("tradingagents.portfolio.action_judge._invoke_action_llm", invoke)
+
+    _, payload, warnings = arbitrate_portfolio_actions(
+        recommendation=recommendation,
+        candidates=candidates,
+        snapshot=snapshot,
+        batch_metrics={"wait_count": 6, "bullish_count": 6},
+        warnings=["bullish_wait_concentration"],
+        llm_settings=SimpleNamespace(provider="codex", output_model="gpt-5.5", deep_model="gpt-5.5"),
+        portfolio_settings=SimpleNamespace(action_judge_enabled=True, action_judge_top_n=2),
+    )
+
+    assert warnings == []
+    assert payload["status"] == "success"
+    assert payload["calibration_mode"] == "wait_heavy_constructive_batch"
+    assert payload["eligible_tickers"] == [action.canonical_ticker for action in actions]
+    assert "wait_heavy_constructive_batch" in prompts[0]
 
 
 def test_action_lift_artifact_is_saved_with_report_and_audit(tmp_path):

@@ -326,6 +326,47 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(usage["total_tokens"], 18)
         self.assertEqual(usage["by_model"]["gpt-5.5"]["calls"], 1)
 
+    def test_plain_response_captures_usage_metadata_from_response_event(self):
+        reset_llm_usage()
+        self.addCleanup(reset_llm_usage)
+        session = FakeCodexSession(responses=['{"answer":"With usage"}'])
+
+        original_invoke = session.invoke
+
+        def invoke_with_usage(**kwargs):
+            result = original_invoke(**kwargs)
+            return CodexInvocationResult(
+                final_text=result.final_text,
+                notifications=[
+                    {
+                        "method": "response/completed",
+                        "params": {
+                            "response": {
+                                "id": "resp_abc",
+                                "usage": {"inputTokens": "13", "outputTokens": 8},
+                            }
+                        },
+                    }
+                ],
+            )
+
+        session.invoke = invoke_with_usage
+        llm = create_llm_client(
+            "codex",
+            "gpt-5.5",
+            codex_binary="C:/fake/codex",
+            codex_workspace_dir="C:/tmp/codex-workspace",
+            session_factory=lambda **kwargs: session,
+            preflight_runner=lambda **kwargs: None,
+        ).get_llm()
+
+        result = llm.invoke("Give me the final answer.")
+        self.assertEqual(result.usage_metadata["input_tokens"], 13)
+        self.assertEqual(result.usage_metadata["output_tokens"], 8)
+        usage = snapshot_llm_usage()
+        self.assertTrue(usage["available"])
+        self.assertEqual(usage["total_tokens"], 21)
+
     def test_aggregate_llm_usage_merges_ticker_and_parent_snapshots(self):
         aggregated = aggregate_llm_usage(
             [

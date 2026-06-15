@@ -386,9 +386,10 @@ jobs:
           workspace_dir = Path(os.environ["GITHUB_WORKSPACE"]) / ".codex-preflight"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
-          preferred_model = "gpt-5.5"
+          preferred_deep_model = "gpt-5.5"
+          preferred_quick_model = "gpt-5.4-mini"
           allow_fallback = os.getenv("TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK", "1").strip().lower()
-          fallback_models = [] if allow_fallback in {"0", "false", "no", "off"} else [
+          deep_fallback_models = [] if allow_fallback in {"0", "false", "no", "off"} else [
               "gpt-5.4",
               "gpt-5.3-codex",
               "gpt-5.3-codex-spark",
@@ -404,13 +405,25 @@ jobs:
                   handle.write("\n".join(lines) + "\n")
 
           try:
-              result = run_codex_preflight(
+              deep_result = run_codex_preflight(
                   codex_binary=None,
-                  model=preferred_model,
+                  model=preferred_deep_model,
                   request_timeout=30.0,
                   workspace_dir=workspace_dir,
                   cleanup_threads=True,
-                  fallback_models=fallback_models,
+                  fallback_models=deep_fallback_models,
+              )
+              quick_fallback_models = [] if allow_fallback in {"0", "false", "no", "off"} else [
+                  "gpt-5.4",
+                  deep_result.resolved_model,
+              ]
+              quick_result = run_codex_preflight(
+                  codex_binary=None,
+                  model=preferred_quick_model,
+                  request_timeout=30.0,
+                  workspace_dir=workspace_dir,
+                  cleanup_threads=True,
+                  fallback_models=quick_fallback_models,
               )
           except CodexAppServerAuthError as exc:
               message = (
@@ -463,31 +476,38 @@ jobs:
               )
               raise SystemExit(1)
 
-          if result.fallback_used:
+          if deep_result.fallback_used:
               warning = (
-                  f"Preferred Codex model {result.requested_model} is not available on this runner; "
-                  f"using {result.resolved_model} from model/list."
+                  f"Preferred deep/output Codex model {deep_result.requested_model} is not available on this runner; "
+                  f"using {deep_result.resolved_model} from model/list."
               )
               print(f"::warning::{warning}")
-              if github_env:
-                  with open(github_env, "a", encoding="utf-8") as handle:
-                      handle.write(f"TRADINGAGENTS_CODEX_MODEL={result.resolved_model}\n")
+          if quick_result.fallback_used:
+              warning = (
+                  f"Preferred quick Codex model {quick_result.requested_model} is not available on this runner; "
+                  f"using {quick_result.resolved_model} from model/list."
+              )
+              print(f"::warning::{warning}")
 
           if github_env:
               with open(github_env, "a", encoding="utf-8") as handle:
                   handle.write("TRADINGAGENTS_CODEX_PREFLIGHT_OK=1\n")
-                  handle.write(f"TRADINGAGENTS_CODEX_MODEL={result.resolved_model}\n")
+                  handle.write(f"TRADINGAGENTS_CODEX_DEEP_MODEL={deep_result.resolved_model}\n")
+                  handle.write(f"TRADINGAGENTS_CODEX_OUTPUT_MODEL={deep_result.resolved_model}\n")
+                  handle.write(f"TRADINGAGENTS_CODEX_QUICK_MODEL={quick_result.resolved_model}\n")
 
-          print("Codex account:", result.account)
-          print("First available models:", ", ".join(result.models[:8]))
+          print("Codex account:", deep_result.account)
+          print("First available models:", ", ".join(deep_result.models[:8]))
           write_summary(
               [
                   "## Codex preflight passed",
                   "",
-                  f"- Account: {result.account}",
-                  f"- Requested model: {result.requested_model}",
-                  f"- Resolved model: {result.resolved_model}",
-                  f"- Models: {', '.join(result.models[:8])}",
+                  f"- Account: {deep_result.account}",
+                  f"- Deep/output requested model: {deep_result.requested_model}",
+                  f"- Deep/output resolved model: {deep_result.resolved_model}",
+                  f"- Quick requested model: {quick_result.requested_model}",
+                  f"- Quick resolved model: {quick_result.resolved_model}",
+                  f"- Models: {', '.join(deep_result.models[:8])}",
                   f"- Binary: {os.getenv('CODEX_BINARY', '(auto)')}",
               ]
           )
@@ -910,9 +930,10 @@ jobs:
           workspace_dir = Path(os.environ["GITHUB_WORKSPACE"]) / ".codex-preflight"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
-          preferred_model = "gpt-5.5"
+          preferred_deep_model = "gpt-5.5"
+          preferred_quick_model = "gpt-5.4-mini"
           allow_fallback = os.getenv("TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK", "1").strip().lower()
-          fallback_models = [] if allow_fallback in {"0", "false", "no", "off"} else [
+          deep_fallback_models = [] if allow_fallback in {"0", "false", "no", "off"} else [
               "gpt-5.4",
               "gpt-5.3-codex",
               "gpt-5.3-codex-spark",
@@ -928,13 +949,25 @@ jobs:
                   handle.write("\n".join(lines) + "\n")
 
           try:
-              result = run_codex_preflight(
+              deep_result = run_codex_preflight(
                   codex_binary=None,
-                  model=preferred_model,
+                  model=preferred_deep_model,
                   request_timeout=30.0,
                   workspace_dir=workspace_dir,
                   cleanup_threads=True,
-                  fallback_models=fallback_models,
+                  fallback_models=deep_fallback_models,
+              )
+              quick_fallback_models = [] if allow_fallback in {"0", "false", "no", "off"} else [
+                  "gpt-5.4",
+                  deep_result.resolved_model,
+              ]
+              quick_result = run_codex_preflight(
+                  codex_binary=None,
+                  model=preferred_quick_model,
+                  request_timeout=30.0,
+                  workspace_dir=workspace_dir,
+                  cleanup_threads=True,
+                  fallback_models=quick_fallback_models,
               )
           except CodexAppServerAuthError as exc:
               message = (
@@ -987,31 +1020,38 @@ jobs:
               )
               raise SystemExit(1)
 
-          if result.fallback_used:
+          if deep_result.fallback_used:
               warning = (
-                  f"Preferred Codex model {result.requested_model} is not available on this runner; "
-                  f"using {result.resolved_model} from model/list."
+                  f"Preferred deep/output Codex model {deep_result.requested_model} is not available on this runner; "
+                  f"using {deep_result.resolved_model} from model/list."
               )
               print(f"::warning::{warning}")
-              if github_env:
-                  with open(github_env, "a", encoding="utf-8") as handle:
-                      handle.write(f"TRADINGAGENTS_CODEX_MODEL={result.resolved_model}\n")
+          if quick_result.fallback_used:
+              warning = (
+                  f"Preferred quick Codex model {quick_result.requested_model} is not available on this runner; "
+                  f"using {quick_result.resolved_model} from model/list."
+              )
+              print(f"::warning::{warning}")
 
           if github_env:
               with open(github_env, "a", encoding="utf-8") as handle:
                   handle.write("TRADINGAGENTS_CODEX_PREFLIGHT_OK=1\n")
-                  handle.write(f"TRADINGAGENTS_CODEX_MODEL={result.resolved_model}\n")
+                  handle.write(f"TRADINGAGENTS_CODEX_DEEP_MODEL={deep_result.resolved_model}\n")
+                  handle.write(f"TRADINGAGENTS_CODEX_OUTPUT_MODEL={deep_result.resolved_model}\n")
+                  handle.write(f"TRADINGAGENTS_CODEX_QUICK_MODEL={quick_result.resolved_model}\n")
 
-          print("Codex account:", result.account)
-          print("First available models:", ", ".join(result.models[:8]))
+          print("Codex account:", deep_result.account)
+          print("First available models:", ", ".join(deep_result.models[:8]))
           write_summary(
               [
                   "## Codex preflight passed",
                   "",
-                  f"- Account: {result.account}",
-                  f"- Requested model: {result.requested_model}",
-                  f"- Resolved model: {result.resolved_model}",
-                  f"- Models: {', '.join(result.models[:8])}",
+                  f"- Account: {deep_result.account}",
+                  f"- Deep/output requested model: {deep_result.requested_model}",
+                  f"- Deep/output resolved model: {deep_result.resolved_model}",
+                  f"- Quick requested model: {quick_result.requested_model}",
+                  f"- Quick resolved model: {quick_result.resolved_model}",
+                  f"- Models: {', '.join(deep_result.models[:8])}",
                   f"- Binary: {os.getenv('CODEX_BINARY', '(auto)')}",
               ]
           )
