@@ -12,7 +12,12 @@ import time
 import unittest
 from unittest.mock import patch
 
-from tradingagents.dataflows.youtube_video import YouTubeTranscript, YouTubeVideoBundle, YouTubeVideoMetadata
+from tradingagents.dataflows.youtube_video import (
+    YouTubeTranscript,
+    YouTubeTranscriptSegment,
+    YouTubeVideoBundle,
+    YouTubeVideoMetadata,
+)
 from tradingagents.scheduled.config import SiteSettings
 from tradingagents.scheduled.site import build_site as build_scheduled_site
 from tradingagents.youtube.channel import YouTubeVideoReference, dedupe_video_references, filter_references_by_window
@@ -37,6 +42,7 @@ from tradingagents.youtube.verifier import (
     VERIFIED,
     MarketSnapshot,
     VerifiedVideoReport,
+    _adaptive_transcript_chars_for_llm,
     _extract_json_object,
     _transcript_chunks_for_llm,
     _verify_claims,
@@ -126,6 +132,50 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("코스피 정책 뉴스", evidence["items"][0]["title"])
         self.assertFalse(evidence["source_policy"]["raw_transcript_included"])
 
+    def test_research_evidence_collector_skips_low_relevance_results(self):
+        generated_at = datetime(2026, 5, 29, 13, 0, tzinfo=timezone.utc)
+        plan = {
+            "claims": [
+                {
+                    "claim_id": "C1",
+                    "entity": "IFR",
+                    "claim_text": "IFR에 따르면 한국 공장의 로봇 밀도가 세계 최상위권이다",
+                    "queries": [{"query": "IFR robot density Korea factories"}],
+                }
+            ]
+        }
+
+        evidence = collect_research_evidence(
+            plan,
+            generated_at=generated_at,
+            max_queries=2,
+            max_evidence_items=4,
+            max_evidence_per_claim=3,
+            fetch_web_pages=False,
+            max_web_pages=0,
+            search_provider=lambda _query, _limit, _generated_at: [
+                {
+                    "title": "Ford and Constellium expand aluminum recycling deal",
+                    "source_url": "https://finance.yahoo.com/news/ford-constellium-aluminum",
+                    "publisher": "Yahoo Finance",
+                    "excerpt": "Automotive aluminum supply agreement update.",
+                    "source_tier": "news",
+                },
+                {
+                    "title": "IFR report shows Korea has high robot density in factories",
+                    "source_url": "https://ifr.org/news/korea-robot-density",
+                    "publisher": "International Federation of Robotics",
+                    "excerpt": "The IFR robot density report compares industrial robot installations by country.",
+                    "source_tier": "official",
+                },
+            ],
+        )
+
+        self.assertEqual(evidence["evidence_count"], 1)
+        self.assertIn("IFR report", evidence["items"][0]["title"])
+        self.assertIn("score:", evidence["items"][0]["relevance"])
+        self.assertTrue(any("low_relevance_skipped:C1" in item for item in evidence["errors"]))
+
     def test_fallback_research_plan_builds_claim_queries(self):
         plan = fallback_research_plan(
             {
@@ -193,6 +243,42 @@ class YouTubeDailyTests(unittest.TestCase):
         joined = "\n".join(chunk["text"] for chunk in chunks)
         self.assertIn("NVDA", joined)
         self.assertTrue(any(chunk["start_seconds"] >= 900 for chunk in chunks))
+
+    def test_adaptive_transcript_budget_extends_long_automatic_captions(self):
+        long_text = (
+            "엔비디아 매출 35% 성장과 IFR 로봇 밀도, 한국 공장 자동화 수치를 검증해야 한다. "
+        ) * 900
+        transcript = YouTubeTranscript(
+            language="ko",
+            language_name="Korean",
+            source="automatic",
+            segments=(
+                YouTubeTranscriptSegment(
+                    start_seconds=0.0,
+                    duration_seconds=60.0,
+                    text=long_text[:2500],
+                ),
+            ),
+            raw_text=long_text,
+            track_ext="json3",
+        )
+        bundle = _fake_bundle("abcdefghijk")
+        bundle = replace(
+            bundle,
+            metadata=replace(bundle.metadata, duration_seconds=2400),
+            transcript=transcript,
+        )
+        settings = _verification_settings()
+
+        adaptive_budget = _adaptive_transcript_chars_for_llm(bundle, verification_settings=settings)
+        self.assertGreater(adaptive_budget, settings.max_transcript_chars_for_llm)
+        self.assertLessEqual(adaptive_budget, settings.extended_transcript_chars_for_llm)
+
+        disabled = replace(settings, adaptive_transcript_budget_enabled=False)
+        self.assertEqual(
+            _adaptive_transcript_chars_for_llm(bundle, verification_settings=disabled),
+            settings.max_transcript_chars_for_llm,
+        )
 
     def test_verification_statuses_include_contradicted_unverified_stale(self):
         fresh = datetime.now(timezone.utc).isoformat()
@@ -870,6 +956,10 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn('model = "auto"', config_text)
         self.assertIn("beam_size = 5", config_text)
         self.assertIn("max_transcript_chars_for_llm = 24000", config_text)
+        self.assertIn("adaptive_transcript_budget_enabled = true", config_text)
+        self.assertIn("extended_transcript_chars_for_llm = 48000", config_text)
+        self.assertIn("evidence_relevance_gate_enabled = true", config_text)
+        self.assertIn("min_evidence_relevance_score = 0.12", config_text)
         self.assertIn("YOUTUBE_COOKIES_FILE", workflow)
         self.assertIn("YOUTUBE_PROXY", workflow)
         self.assertIn("YOUTUBE_VISITOR_DATA", workflow)

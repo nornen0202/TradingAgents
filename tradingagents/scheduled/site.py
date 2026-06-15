@@ -586,18 +586,32 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
     )
     latest_technical_html = ""
     latest_technical_run = latest if latest and representative and latest["run_id"] != representative["run_id"] else None
+    latest_daily_run = _select_latest_daily_run(manifests)
     if latest and representative and latest["run_id"] != representative["run_id"]:
         latest_technical_html = (
             "<p class='empty'>"
-            f"가장 최근 기술 run: <a href='runs/{_escape(latest['run_id'])}/index.html'>{_escape(latest['run_id'])}</a>"
+            f"가장 최근 기술 run: "
+            f"<a href='runs/{_escape(latest['run_id'])}/index.html'>{_escape(latest['run_id'])}</a>"
             f" ({_escape(_run_phase_display_label(latest))})"
             "</p>"
         )
     if latest_technical_run:
         latest_technical_html = (
             "<p class='empty'>"
-            f"가장 최근 기술 run / Latest technical run: <a href='runs/{_escape(latest_technical_run['run_id'])}/index.html'>{_escape(latest_technical_run['run_id'])}</a>"
+            f"가장 최근 기술 run / Latest technical run: "
+            f"<a href='runs/{_escape(latest_technical_run['run_id'])}/index.html'>"
+            f"{_escape(latest_technical_run['run_id'])}</a>"
             f" ({_escape(_run_phase_display_label(latest_technical_run))})"
+            "</p>"
+        )
+    latest_daily_html = ""
+    if latest_daily_run and representative and latest_daily_run.get("run_id") != representative.get("run_id"):
+        latest_daily_html = (
+            "<p class='empty'>"
+            f"가장 최근 daily 분석 / Latest daily analysis: "
+            f"<a href='runs/{_escape(latest_daily_run['run_id'])}/index.html'>"
+            f"{_escape(latest_daily_run['run_id'])}</a>"
+            f" ({_escape(_run_phase_display_label(latest_daily_run))})"
             "</p>"
         )
     latest_html = (
@@ -623,6 +637,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
             <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open representative investment run</a>
             <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
             {latest_portfolio_link}
+            {latest_daily_html}
             {latest_technical_html}
           </div>
         </section>
@@ -4212,6 +4227,27 @@ def _select_representative_run(manifests: list[dict[str, Any]]) -> dict[str, Any
         ranked_pool = qualified
     ranked = sorted(ranked_pool, key=_representative_run_sort_key)
     return ranked[0] if ranked else manifests[0]
+
+
+def _select_latest_daily_run(manifests: list[dict[str, Any]]) -> dict[str, Any] | None:
+    for manifest in manifests:
+        if _is_daily_analysis_run(manifest):
+            return manifest
+    return None
+
+
+def _is_daily_analysis_run(manifest: dict[str, Any]) -> bool:
+    run_id = str(manifest.get("run_id") or "").lower()
+    if "overlay" in run_id or "watchdog" in run_id:
+        return False
+    settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
+    run_mode = str(settings.get("run_mode") or manifest.get("run_mode") or "").strip().lower()
+    if run_mode in {"overlay_only", "site_only"}:
+        return False
+    total, successful, _failed = _run_success_counts(manifest)
+    if total <= 0 or successful <= 0:
+        return False
+    return True
 
 
 def _representative_run_sort_key(manifest: dict[str, Any]) -> tuple[int, int, int, int, int, int, str]:

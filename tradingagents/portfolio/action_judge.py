@@ -33,8 +33,13 @@ def arbitrate_portfolio_actions(
     if not action_judge_enabled:
         return recommendation, payload, judge_warnings
 
+    calibration_mode = _calibration_mode_for_warnings(warnings)
+    if calibration_mode == "wait_heavy_constructive_batch":
+        top_n = max(top_n, min(len(recommendation.actions), 10))
+    payload["calibration_mode"] = calibration_mode
     candidate_by_ticker = {candidate.instrument.canonical_ticker: candidate for candidate in candidates}
     eligible = _eligible_actions(recommendation.actions, top_n=top_n)
+    payload["eligible_tickers"] = [action.canonical_ticker for action in eligible]
     if len(eligible) < 2:
         payload["status"] = "not_needed"
         return recommendation, payload, judge_warnings
@@ -86,7 +91,14 @@ def arbitrate_portfolio_actions(
     except Exception as exc:
         payload["status"] = "fallback"
         judge_warnings.append(f"action_judge_failed: {exc}")
-        return recommendation, payload, judge_warnings
+    return recommendation, payload, judge_warnings
+
+
+def _calibration_mode_for_warnings(warnings: list[str]) -> str:
+    joined = " ".join(str(item) for item in warnings).lower()
+    if "bullish_wait_concentration" in joined or "wait-heavy constructive" in joined:
+        return "wait_heavy_constructive_batch"
+    return "standard"
 
 
 def _eligible_actions(actions: tuple[PortfolioAction, ...], *, top_n: int) -> list[PortfolioAction]:
@@ -188,6 +200,7 @@ def _build_prompt(
         "market_regime": recommendation.market_regime,
         "batch_metrics": batch_metrics,
         "warnings": list(warnings),
+        "calibration_mode": _calibration_mode_for_warnings(warnings),
         "eligible_actions": [
             {
                 **action.to_dict(),
@@ -205,6 +218,8 @@ def _build_prompt(
         "Return exactly one JSON object and nothing else.\n"
         "Re-rank only the provided tickers. Do not invent new tickers.\n"
         "Be conservative when sector concentration, low data quality, or wait-heavy batches are present.\n"
+        "When calibration_mode is wait_heavy_constructive_batch, review every eligible WATCH/HOLD action for missed "
+        "pilot-sized opportunities while preserving hard account, stale-data, stop-distance, event, and concentration gates.\n"
         "For stock-level ACTIONABLE_NOW/Pilot ready candidates that remain account WATCH/HOLD, explicitly classify the gap as one of: "
         "legitimate hard block, full-size blocked but pilot allowed, or action lift failure.\n"
         "Always distinguish full-size permission from pilot permission; a full-size block does not automatically block a small pilot.\n"

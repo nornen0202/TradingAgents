@@ -55,6 +55,8 @@ def collect_research_evidence(
     max_evidence_per_claim: int,
     fetch_web_pages: bool,
     max_web_pages: int,
+    evidence_relevance_gate_enabled: bool = True,
+    min_evidence_relevance_score: float = 0.12,
     search_provider: ResearchSearchProvider | None = None,
     url_fetcher: UrlFetcher | None = None,
 ) -> dict[str, Any]:
@@ -68,6 +70,7 @@ def collect_research_evidence(
     seen_urls: set[str] = set()
     fetched_pages = 0
     errors: list[str] = []
+    claim_context = _claim_context_by_id(research_plan)
 
     for query_item in queries:
         if len(evidence) >= max_evidence_items:
@@ -88,8 +91,6 @@ def collect_research_evidence(
             url = str(result.get("source_url") or result.get("url") or "").strip()
             if url and url in seen_urls:
                 continue
-            if url:
-                seen_urls.add(url)
             title = _clean_text(result.get("title") or result.get("name") or query, 180)
             excerpt = _clean_text(result.get("excerpt") or result.get("summary") or result.get("snippet") or "", 700)
             publisher = _clean_text(result.get("publisher") or result.get("source") or _publisher_from_url(url), 120)
@@ -108,6 +109,23 @@ def collect_research_evidence(
                     source_type = str(fetched.get("source_type") or source_type)
                     source_tier = str(fetched.get("source_tier") or source_tier)
 
+            relevance_score, relevance_reason = _evidence_relevance_score(
+                query=query,
+                claim=claim_context.get(claim_id),
+                title=title,
+                excerpt=excerpt,
+                publisher=publisher,
+                source_url=url,
+            )
+            if (
+                evidence_relevance_gate_enabled
+                and claim_id != "GLOBAL"
+                and relevance_score < min_evidence_relevance_score
+            ):
+                errors.append(f"low_relevance_skipped:{claim_id}:{relevance_score:.2f}:{title[:80]}")
+                continue
+            if url:
+                seen_urls.add(url)
             evidence.append(
                 EvidenceItem(
                     evidence_id=f"E{len(evidence) + 1}",
@@ -121,6 +139,7 @@ def collect_research_evidence(
                     published_at=published_at,
                     fetched_at=fetched_at,
                     excerpt=excerpt,
+                    relevance=f"score:{relevance_score:.2f};{relevance_reason}",
                     status=VERIFIED if (url or excerpt) else UNVERIFIED,
                 )
             )
@@ -137,6 +156,8 @@ def collect_research_evidence(
         "source_policy": {
             "raw_transcript_included": False,
             "excerpts_only": True,
+            "evidence_relevance_gate_enabled": evidence_relevance_gate_enabled,
+            "min_evidence_relevance_score": min_evidence_relevance_score,
             "search_providers": ["naver_news", "yfinance_search", "duckduckgo_html"],
         },
     }
@@ -280,6 +301,102 @@ def public_evidence_summary(evidence: Mapping[str, Any], *, per_claim_limit: int
             }
         )
     return public_items
+
+
+_RELEVANCE_TOKEN_RE = re.compile(r"[A-Za-z0-9가-힣][A-Za-z0-9가-힣._%-]{1,}")
+_RELEVANCE_STOPWORDS = {
+    "관련",
+    "기사",
+    "뉴스",
+    "시장",
+    "투자",
+    "증시",
+    "경제",
+    "분석",
+    "전망",
+    "최근",
+    "today",
+    "market",
+    "markets",
+    "stock",
+    "stocks",
+    "news",
+    "finance",
+    "analysis",
+    "investing",
+    "update",
+}
+
+
+def _claim_context_by_id(plan: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
+    context: dict[str, Mapping[str, Any]] = {}
+    for index, claim in enumerate(plan.get("claims") or [], 1):
+        if not isinstance(claim, Mapping):
+            continue
+        claim_id = str(claim.get("claim_id") or f"C{index}")
+        context[claim_id] = claim
+    return context
+
+
+def _evidence_relevance_score(
+    *,
+    query: str,
+    claim: Mapping[str, Any] | None,
+    title: str,
+    excerpt: str,
+    publisher: str,
+    source_url: str,
+) -> tuple[float, str]:
+    claim = claim or {}
+    claim_text = " ".join(
+        str(part or "")
+        for part in (
+            claim.get("claim_text"),
+            claim.get("entity"),
+            claim.get("ticker"),
+            query,
+        )
+    )
+    evidence_text = " ".join(str(part or "") for part in (title, excerpt, publisher, source_url))
+    claim_tokens = _relevance_tokens(claim_text)
+    evidence_tokens = _relevance_tokens(evidence_text)
+    if not claim_tokens:
+        return 1.0, "no_claim_tokens"
+    overlap = claim_tokens & evidence_tokens
+    denominator = max(4, min(len(claim_tokens), 12))
+    score = min(1.0, len(overlap) / denominator)
+
+    numbers = _numeric_tokens(claim_text)
+    if numbers:
+        number_overlap = numbers & _numeric_tokens(evidence_text)
+        if number_overlap:
+            score = min(1.0, score + 0.20)
+
+    ticker = str(claim.get("ticker") or "").strip().lower()
+    entity = str(claim.get("entity") or "").strip().lower()
+    haystack = evidence_text.lower()
+    if ticker and ticker in haystack:
+        score = min(1.0, score + 0.35)
+    if entity and len(entity) >= 2 and entity in haystack:
+        score = min(1.0, score + 0.25)
+
+    if overlap:
+        return score, "overlap:" + ",".join(sorted(overlap)[:8])
+    return score, "no_overlap"
+
+
+def _relevance_tokens(text: str) -> set[str]:
+    tokens = set()
+    for match in _RELEVANCE_TOKEN_RE.findall(str(text or "").lower()):
+        token = match.strip("._%-")
+        if len(token) < 2 or token in _RELEVANCE_STOPWORDS:
+            continue
+        tokens.add(token)
+    return tokens
+
+
+def _numeric_tokens(text: str) -> set[str]:
+    return {match.group(0) for match in re.finditer(r"\d+(?:\.\d+)?%?", str(text or ""))}
 
 
 def _planned_queries(plan: Mapping[str, Any], *, max_queries: int) -> list[dict[str, str]]:

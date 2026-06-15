@@ -305,33 +305,83 @@ class CodexChatModel(BaseChatModel):
 
     def _extract_usage_metadata(self, notifications: list[dict[str, Any]]) -> dict[str, int] | None:
         for event in notifications:
-            params = event.get("params")
-            if not isinstance(params, dict):
-                continue
-            turn = params.get("turn")
-            if not isinstance(turn, dict):
-                continue
-            usage = turn.get("usage") or turn.get("tokenUsage")
-            normalized = self._normalize_usage_payload(usage)
+            normalized = self._normalize_usage_payload(event)
             if normalized:
                 return normalized
         return None
 
     def _normalize_usage_payload(self, usage: Any) -> dict[str, int] | None:
         if isinstance(usage, dict):
-            input_tokens = usage.get("input_tokens") or usage.get("inputTokens")
-            output_tokens = usage.get("output_tokens") or usage.get("outputTokens")
-            if isinstance(input_tokens, int) and isinstance(output_tokens, int):
+            input_tokens = self._first_usage_int(
+                usage,
+                (
+                    "input_tokens",
+                    "inputTokens",
+                    "prompt_tokens",
+                    "promptTokens",
+                    "input_token_count",
+                    "prompt_token_count",
+                    "inputTokenCount",
+                    "promptTokenCount",
+                ),
+            )
+            output_tokens = self._first_usage_int(
+                usage,
+                (
+                    "output_tokens",
+                    "outputTokens",
+                    "completion_tokens",
+                    "completionTokens",
+                    "output_token_count",
+                    "completion_token_count",
+                    "outputTokenCount",
+                    "completionTokenCount",
+                ),
+            )
+            if input_tokens is not None and output_tokens is not None:
                 return {
                     "input_tokens": max(0, input_tokens),
                     "output_tokens": max(0, output_tokens),
                     "total_tokens": max(0, input_tokens) + max(0, output_tokens),
                 }
-            # nested schema fallback
+            for key in (
+                "usage",
+                "tokenUsage",
+                "usage_metadata",
+                "usageMetadata",
+                "turn",
+                "response",
+                "result",
+                "params",
+            ):
+                nested = self._normalize_usage_payload(usage.get(key))
+                if nested:
+                    return nested
             for value in usage.values():
                 nested = self._normalize_usage_payload(value)
                 if nested:
                     return nested
+        if isinstance(usage, list):
+            for value in usage:
+                nested = self._normalize_usage_payload(value)
+                if nested:
+                    return nested
+        return None
+
+    @staticmethod
+    def _first_usage_int(payload: dict[str, Any], keys: Sequence[str]) -> int | None:
+        for key in keys:
+            value = payload.get(key)
+            if isinstance(value, bool):
+                continue
+            if isinstance(value, int):
+                return value
+            if isinstance(value, float) and value.is_integer():
+                return int(value)
+            if isinstance(value, str):
+                stripped = value.strip()
+                if stripped.isdigit():
+                    return int(stripped)
         return None
 
     def _extract_tool_arguments(

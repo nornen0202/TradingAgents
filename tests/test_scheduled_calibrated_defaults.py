@@ -131,3 +131,36 @@ site_dir = "./site"
     assert config.llm.output_model == "gpt-5.4"
     assert config.llm.codex_workspace_dir == str(codex_workspace)
     assert config.execution.execution_llm_summary_model == "gpt-5.4"
+
+
+def test_codex_role_specific_env_overrides_keep_quick_and_deep_separate(tmp_path: Path, monkeypatch):
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        """
+[run]
+tickers = ["AAPL"]
+
+[llm]
+quick_model = "gpt-5.5"
+deep_model = "gpt-5.5"
+output_model = "gpt-5.5"
+
+[execution]
+llm_summary_model = ""
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("TRADINGAGENTS_CODEX_QUICK_MODEL", "gpt-5.4-mini")
+    monkeypatch.setenv("TRADINGAGENTS_CODEX_DEEP_MODEL", "gpt-5.5")
+    monkeypatch.setenv("TRADINGAGENTS_CODEX_OUTPUT_MODEL", "gpt-5.5")
+
+    config = load_scheduled_config(config_path)
+
+    assert config.llm.quick_model == "gpt-5.4-mini"
+    assert config.llm.deep_model == "gpt-5.5"
+    assert config.llm.output_model == "gpt-5.5"
+    assert config.execution.execution_llm_summary_model is None
