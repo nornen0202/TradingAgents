@@ -648,7 +648,66 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(failing_session.closed, 1)
         self.assertEqual(len(failing_session.invocations), 1)
         self.assertEqual(len(recovered_session.invocations), 1)
+        self.assertIn(
+            "previous codex app-server request failed",
+            recovered_session.invocations[0]["prompt"].lower(),
+        )
+        self.assertIn(
+            "do not use codex native tools",
+            recovered_session.invocations[0]["prompt"].lower(),
+        )
         sleep_mock.assert_called_once_with(30.0)
+
+    def test_codex_app_server_thread_forbids_native_tools(self):
+        session = CodexAppServerSession(
+            codex_binary="C:/fake/codex",
+            request_timeout=5.0,
+            workspace_dir="C:/tmp/codex-workspace",
+            cleanup_threads=True,
+        )
+        captured = {}
+
+        def fake_request(method, params=None):
+            if method == "thread/start":
+                captured["thread"] = params
+                return {"thread": {"id": "thread-1"}}
+            if method == "turn/start":
+                return {"turn": {"id": "turn-1"}}
+            if method == "thread/unsubscribe":
+                return {}
+            raise AssertionError(f"Unexpected request method: {method}")
+
+        with (
+            patch.object(session, "start", return_value=None),
+            patch.object(session, "request", side_effect=fake_request),
+            patch.object(session, "_collect_turn", return_value=('{"answer":"ok"}', [])),
+        ):
+            session.invoke(
+                prompt="Return JSON.",
+                model="gpt-5.5",
+                output_schema=build_plain_response_schema(),
+                reasoning_effort="medium",
+                summary="none",
+                personality="none",
+            )
+
+        developer_instructions = captured["thread"]["developerInstructions"]
+        self.assertIn("Do not call Codex built-in tools", developer_instructions)
+        self.assertIn("JSON tool_calls format", developer_instructions)
+
+    def test_codex_app_server_policy_blocked_stderr_fails_fast(self):
+        session = CodexAppServerSession(
+            codex_binary="C:/fake/codex",
+            request_timeout=60.0,
+            workspace_dir="C:/tmp/codex-workspace",
+            cleanup_threads=True,
+        )
+        session._stderr_lines.append(
+            'ERROR codex_core::tools::router: error=`"pwsh.exe" -Command "Get-Date"` rejected: blocked by policy'
+        )
+
+        with self.assertRaisesRegex(CodexAppServerError, "native tool"):
+            session._next_message(60.0)
 
     def test_codex_app_server_turn_timeout_is_total_wall_clock(self):
         session = CodexAppServerSession(

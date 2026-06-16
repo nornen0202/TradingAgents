@@ -153,6 +153,7 @@ class CodexChatModel(BaseChatModel):
         raw_response: str | None = None
         last_error: Exception | None = None
         last_schema_error: Exception | None = None
+        last_app_server_error: Exception | None = None
         for attempt in range(self.codex_max_retries + 1):
             retry_message = None
             if attempt and last_schema_error is not None:
@@ -161,6 +162,14 @@ class CodexChatModel(BaseChatModel):
                     "The previous response did not satisfy TradingAgents validation: "
                     f"{previous_error}. Return only valid JSON that exactly matches the requested "
                     "schema and tool argument requirements."
+                )
+            elif attempt and last_app_server_error is not None:
+                previous_error = str(last_app_server_error)
+                retry_message = (
+                    "The previous Codex app-server request failed before TradingAgents received "
+                    f"a valid final JSON response: {previous_error}. Do not use Codex native tools "
+                    "such as shell, filesystem, browser, web, plugins, or MCP tools. Return JSON "
+                    "directly, or use only the host JSON tool_calls format described above."
                 )
 
             prompt = format_messages_for_codex(
@@ -183,6 +192,7 @@ class CodexChatModel(BaseChatModel):
             except CodexAppServerError as exc:
                 last_error = exc
                 last_schema_error = None
+                last_app_server_error = exc
                 if attempt >= self.codex_max_retries:
                     raise
                 # Transport failures can leave the stdio session unusable.
@@ -190,6 +200,7 @@ class CodexChatModel(BaseChatModel):
                 time.sleep(self._codex_retry_delay(attempt))
                 continue
             raw_response = result.final_text
+            last_app_server_error = None
 
             if run_manager is not None:
                 for notification in result.notifications:
@@ -220,6 +231,7 @@ class CodexChatModel(BaseChatModel):
             except (json.JSONDecodeError, CodexStructuredOutputError, ValueError) as exc:
                 last_error = exc
                 last_schema_error = exc
+                last_app_server_error = None
                 continue
 
         raise CodexStructuredOutputError(

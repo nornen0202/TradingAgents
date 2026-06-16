@@ -3,7 +3,8 @@ from tradingagents.agents.utils.agent_utils import (
     get_language_instruction,
     get_memory_matches,
 )
-from tradingagents.schemas import build_decision_output_instructions, ensure_structured_decision_json
+from tradingagents.agents.utils.decision_retry import invoke_structured_decision_with_retry
+from tradingagents.schemas import build_decision_output_instructions
 
 
 def create_portfolio_manager(llm, memory):
@@ -61,8 +62,11 @@ Risk Analysts Debate History:
 Ground every conclusion in specific evidence from the analysts. {get_language_instruction()}
 {build_decision_output_instructions("portfolio manager final decision")}"""
 
-        response = llm.invoke(prompt)
-        decision_json = ensure_structured_decision_json(response.content)
+        _response, decision_json = invoke_structured_decision_with_retry(
+            llm,
+            prompt,
+            context="portfolio manager final decision",
+        )
 
         new_risk_debate_state = {
             "judge_decision": decision_json,
