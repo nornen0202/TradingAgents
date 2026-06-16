@@ -1,7 +1,8 @@
 import functools
 
 from tradingagents.agents.utils.agent_utils import build_instrument_context, get_memory_matches
-from tradingagents.schemas import build_decision_output_instructions, ensure_structured_decision_json
+from tradingagents.agents.utils.decision_retry import invoke_structured_decision_with_retry
+from tradingagents.schemas import build_decision_output_instructions
 
 
 def create_trader(llm, memory):
@@ -52,8 +53,11 @@ def create_trader(llm, memory):
             context,
         ]
 
-        result = llm.invoke(messages)
-        decision_json = ensure_structured_decision_json(result.content)
+        result, decision_json = invoke_structured_decision_with_retry(
+            llm,
+            messages,
+            context="trader execution plan",
+        )
 
         return {
             "messages": [result],

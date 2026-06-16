@@ -44,6 +44,18 @@ _CODEX_HOME_SEED_FILES = (
     "installation_id",
 )
 _FALSE_VALUES = {"0", "false", "no", "off"}
+_NATIVE_TOOL_BLOCK_PATTERNS = (
+    "rejected: blocked by policy",
+    "blocked by policy",
+)
+
+_TRADINGAGENTS_CODEX_DEVELOPER_INSTRUCTIONS = """
+You are being used as a structured LLM provider inside TradingAgents.
+Do not call Codex built-in tools, including shell/terminal commands, filesystem tools, browser/web tools, plugins, MCP tools, or apply_patch.
+The only permitted host-tool interface is the JSON tool_calls format described in the user prompt; the host application will execute those tool calls outside this Codex thread.
+If a value such as the current date, ticker, market data, or source evidence is not present in the transcript or host tool output, say it is unavailable instead of inspecting the local environment.
+Return the requested final JSON directly and do not add markdown fences or progress narration.
+""".strip()
 
 
 @dataclass(slots=True)
@@ -228,6 +240,7 @@ class CodexAppServerSession:
                     {
                         "approvalPolicy": "never",
                         "cwd": self.workspace_dir,
+                        "developerInstructions": _TRADINGAGENTS_CODEX_DEVELOPER_INSTRUCTIONS,
                         "ephemeral": True,
                         "model": model,
                         "personality": personality,
@@ -397,12 +410,29 @@ class CodexAppServerSession:
         if self._pending:
             return self._pending.popleft()
 
-        try:
-            message = self._stdout_queue.get(timeout=timeout)
-        except queue.Empty as exc:
-            raise CodexAppServerError(
-                f"Timed out waiting for Codex app-server after {timeout}s. stderr_tail={self._stderr_tail()}"
-            ) from exc
+        deadline = None if timeout is None else time.monotonic() + max(0.0, timeout)
+        while True:
+            native_tool_error = self._native_tool_policy_error()
+            if native_tool_error:
+                raise CodexAppServerError(
+                    "Codex attempted to use a native tool that TradingAgents does not permit. "
+                    f"{native_tool_error}. Return JSON directly or use only the host JSON tool_calls interface."
+                )
+
+            wait_timeout = 5.0
+            if deadline is not None:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise CodexAppServerError(
+                        f"Timed out waiting for Codex app-server after {timeout}s. stderr_tail={self._stderr_tail()}"
+                    )
+                wait_timeout = min(wait_timeout, remaining)
+
+            try:
+                message = self._stdout_queue.get(timeout=wait_timeout)
+                break
+            except queue.Empty:
+                continue
 
         if message is None:
             raise CodexAppServerError(
@@ -444,6 +474,13 @@ class CodexAppServerSession:
 
     def _stderr_tail(self) -> str:
         return "\n".join(list(self._stderr_lines)[-40:])
+
+    def _native_tool_policy_error(self) -> str:
+        for line in reversed(self._stderr_lines):
+            lowered = line.lower()
+            if any(pattern in lowered for pattern in _NATIVE_TOOL_BLOCK_PATTERNS):
+                return line
+        return ""
 
     def _restore_deferred(self, deferred: list[dict[str, Any]]) -> None:
         for message in reversed(deferred):

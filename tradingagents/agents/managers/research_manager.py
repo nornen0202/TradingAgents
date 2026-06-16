@@ -1,5 +1,6 @@
 from tradingagents.agents.utils.agent_utils import build_instrument_context, get_memory_matches
-from tradingagents.schemas import build_decision_output_instructions, ensure_structured_decision_json
+from tradingagents.agents.utils.decision_retry import invoke_structured_decision_with_retry
+from tradingagents.schemas import build_decision_output_instructions
 
 
 def create_research_manager(llm, memory):
@@ -61,8 +62,11 @@ Lessons from past mistakes:
 {past_memory_str or "No past reflections available."}
 
 {build_decision_output_instructions("research manager investment plan")}"""
-        response = llm.invoke(prompt)
-        decision_json = ensure_structured_decision_json(response.content)
+        _response, decision_json = invoke_structured_decision_with_retry(
+            llm,
+            prompt,
+            context="research manager investment plan",
+        )
 
         new_investment_debate_state = {
             "judge_decision": decision_json,
