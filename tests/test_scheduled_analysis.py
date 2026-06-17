@@ -723,6 +723,33 @@ max_consecutive_codex_failures = 3
 
             self.assertEqual(reason, "consecutive_codex_failures:3")
 
+    def test_codex_parallel_worker_count_is_capped(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            config_path.write_text(
+                """
+[run]
+tickers = ["A", "B", "C", "D", "E"]
+parallel_ticker_execution = true
+max_parallel_tickers = 5
+
+[llm]
+provider = "codex"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+
+            with patch.dict("os.environ", {"TRADINGAGENTS_CODEX_MAX_PARALLEL_TICKERS_CAP": ""}, clear=False):
+                effective, warning = scheduled_runner._effective_parallel_worker_count(
+                    config=config,
+                    ticker_count=5,
+                )
+
+            self.assertEqual(effective, 4)
+            self.assertEqual(warning, "codex_parallel_ticker_cap_applied:requested=5:cap=4:effective=4")
+
     def test_main_site_only_rebuilds_from_existing_archive(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

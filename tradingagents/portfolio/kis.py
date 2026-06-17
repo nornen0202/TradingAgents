@@ -5,6 +5,7 @@ import os
 import re
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from time import sleep
 from typing import Any
 
 import requests
@@ -17,6 +18,7 @@ from .instrument_identity import resolve_identity
 
 REAL_BASE_URL = "https://openapi.koreainvestment.com:9443"
 DEMO_BASE_URL = "https://openapivts.koreainvestment.com:29443"
+_TRANSIENT_HTTP_STATUS_CODES = {429, 500, 502, 503, 504}
 
 
 class PortfolioConfigurationError(ValueError):
@@ -134,7 +136,10 @@ class KisClient:
         tr_cont: str = "",
     ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
         url = f"{self.base_url}{path}"
-        for attempt in range(2):
+        max_attempts = _kis_request_max_attempts()
+        auth_refreshed = False
+        last_error: Exception | None = None
+        for attempt in range(max_attempts):
             headers = {
                 "content-type": "application/json",
                 "authorization": f"Bearer {self.ensure_access_token()}",
@@ -144,33 +149,53 @@ class KisClient:
                 "custtype": "P",
                 "tr_cont": tr_cont,
             }
-            response = self.session.request(
-                method=method.upper(),
-                url=url,
-                headers=headers,
-                params=params,
-                json=body,
-                timeout=self.timeout_seconds,
-            )
-            if response.status_code == 401 and attempt == 0:
+            try:
+                response = self.session.request(
+                    method=method.upper(),
+                    url=url,
+                    headers=headers,
+                    params=params,
+                    json=body,
+                    timeout=self.timeout_seconds,
+                )
+            except requests.RequestException as exc:
+                last_error = exc
+                if attempt < max_attempts - 1:
+                    _sleep_before_kis_retry(attempt)
+                    continue
+                raise
+
+            if response.status_code == 401 and not auth_refreshed:
+                auth_refreshed = True
                 self.invalidate_access_token()
                 self.issue_access_token(force=True)
                 continue
+            if response.status_code in _TRANSIENT_HTTP_STATUS_CODES and attempt < max_attempts - 1:
+                _sleep_before_kis_retry(attempt, response=response)
+                continue
 
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+            except requests.HTTPError as exc:
+                last_error = exc
+                raise
             payload = response.json()
             rt_cd = str(payload.get("rt_cd", "0"))
             if rt_cd not in {"0", ""}:
-                if attempt == 0 and _looks_like_auth_error(payload):
+                if not auth_refreshed and _looks_like_auth_error(payload):
+                    auth_refreshed = True
                     self.invalidate_access_token()
                     self.issue_access_token(force=True)
+                    continue
+                if _looks_like_transient_kis_error(payload) and attempt < max_attempts - 1:
+                    _sleep_before_kis_retry(attempt, response=response)
                     continue
                 raise KisApiError(
                     f"KIS API error for {path}: {payload.get('msg_cd')} {payload.get('msg1')}"
                 )
             return payload, response.headers
 
-        raise KisApiError(f"KIS API authentication retry exhausted for path: {path}")
+        raise KisApiError(f"KIS API retry exhausted for path: {path}: {last_error}")
 
     def domestic_price(self, code: str, *, market_division: str = "J") -> dict[str, Any]:
         payload, _headers = self.request_json(
@@ -1426,6 +1451,48 @@ def _looks_like_auth_error(payload: dict[str, Any]) -> bool:
     message = f"{payload.get('msg_cd', '')} {payload.get('msg1', '')}".lower()
     auth_markers = ("auth", "token", "access", "expired", "만료", "토큰", "인증")
     return any(marker in message for marker in auth_markers)
+
+
+def _looks_like_transient_kis_error(payload: dict[str, Any]) -> bool:
+    message = f"{payload.get('msg_cd', '')} {payload.get('msg1', '')}".lower()
+    transient_markers = (
+        "temporar",
+        "timeout",
+        "timed out",
+        "too many",
+        "rate",
+        "server",
+        "busy",
+        "internal",
+        "일시",
+        "잠시",
+        "서버",
+        "초과",
+        "혼잡",
+    )
+    return any(marker in message for marker in transient_markers)
+
+
+def _kis_request_max_attempts() -> int:
+    raw = os.getenv("KIS_API_MAX_RETRIES", "3").strip()
+    try:
+        return max(1, int(raw))
+    except ValueError:
+        return 3
+
+
+def _sleep_before_kis_retry(
+    attempt: int,
+    *,
+    response: requests.Response | None = None,
+) -> None:
+    retry_after = None
+    if response is not None:
+        retry_after_header = str(response.headers.get("Retry-After") or "").strip()
+        if retry_after_header.isdigit():
+            retry_after = float(retry_after_header)
+    delay = retry_after if retry_after is not None else min(0.5 * (2 ** max(0, attempt)), 2.0)
+    sleep(max(0.0, delay))
 
 
 def _summarize_optional_kis_error(exc: Exception) -> str:

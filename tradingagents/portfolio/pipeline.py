@@ -25,7 +25,7 @@ from .allocation import build_recommendation
 from .candidates import build_portfolio_candidates
 from .csv_import import load_snapshot_from_positions_csv
 from .gates import apply_gates
-from .kis import PortfolioConfigurationError, load_account_snapshot_from_kis
+from .kis import KisApiError, PortfolioConfigurationError, load_account_snapshot_from_kis
 from .manual_snapshot import load_manual_snapshot
 from .performance import build_account_performance_outputs
 from .profiles import load_portfolio_profile
@@ -320,10 +320,30 @@ def load_snapshot_for_profile(profile) -> Any:
             if profile.csv_positions_path and profile.csv_positions_path.exists():
                 return load_snapshot_from_positions_csv(profile)
             raise
+        except KisApiError as exc:
+            if profile.manual_snapshot_path and profile.manual_snapshot_path.exists():
+                return load_manual_snapshot(profile.manual_snapshot_path)
+            if profile.csv_positions_path and profile.csv_positions_path.exists():
+                return load_snapshot_from_positions_csv(profile)
+            if not bool(getattr(profile, "continue_on_error", True)):
+                raise
+            return _load_watchlist_only_snapshot(
+                profile,
+                source="kis_snapshot_unavailable",
+                warning=(
+                    "KIS account snapshot unavailable; generated a watchlist-only account report. "
+                    f"reason={_short_error(exc)}"
+                ),
+            )
     raise PortfolioConfigurationError(f"Unsupported portfolio broker '{profile.broker}'.")
 
 
-def _load_watchlist_only_snapshot(profile) -> AccountSnapshot:
+def _load_watchlist_only_snapshot(
+    profile,
+    *,
+    source: str = "watchlist_only_profile",
+    warning: str = "No broker account snapshot is configured; generated a watchlist-only account report.",
+) -> AccountSnapshot:
     now = datetime.now().astimezone()
     return AccountSnapshot(
         snapshot_id=f"{now.strftime('%Y%m%dT%H%M%S')}_watchlist_{profile.name}",
@@ -337,15 +357,13 @@ def _load_watchlist_only_snapshot(profile) -> AccountSnapshot:
         total_equity_krw=0,
         snapshot_health="WATCHLIST_ONLY",
         cash_diagnostics={
-            "source": "watchlist_only_profile",
-            "reason": "No broker account snapshot is configured for this scheduled profile.",
+            "source": source,
+            "reason": warning,
         },
         pending_orders=tuple(),
         positions=tuple(),
         constraints=profile.constraints,
-        warnings=(
-            "No broker account snapshot is configured; generated a watchlist-only account report.",
-        ),
+        warnings=(warning,),
     )
 
 
@@ -491,6 +509,8 @@ def _derive_watchlist_reason(snapshot) -> str | None:
     warnings = [str(item).strip().lower() for item in (getattr(snapshot, "warnings", ()) or ()) if str(item).strip()]
     warning_blob = " ".join(warnings)
 
+    if source == "kis_snapshot_unavailable" or "kis account snapshot unavailable" in warning_blob:
+        return "BROKER_SNAPSHOT_UNAVAILABLE"
     if source == "watchlist_only_profile" or "no broker account snapshot is configured" in warning_blob:
         return "NO_BROKER_SNAPSHOT"
     if "no positions" in warning_blob and "insufficient cash" in warning_blob:

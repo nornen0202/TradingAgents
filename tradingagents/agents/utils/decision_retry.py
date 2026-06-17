@@ -13,9 +13,9 @@ def invoke_structured_decision_with_retry(
     prompt: str | Sequence[BaseMessage | Mapping[str, Any]],
     *,
     context: str,
-    max_retries: int = 1,
+    max_retries: int = 2,
 ) -> tuple[Any, str]:
-    """Invoke an LLM and repair structured-decision validation failures once."""
+    """Invoke an LLM and repair structured-decision validation failures."""
     response = llm.invoke(prompt)
     last_content = str(getattr(response, "content", "") or "")
     last_error: StructuredDecisionValidationError | None = None
@@ -39,13 +39,42 @@ def invoke_structured_decision_with_retry(
 
 
 def _build_repair_prompt(*, context: str, validation_error: str, invalid_response: str) -> str:
+    skeleton = _required_decision_skeleton()
     return (
         f"The previous {context} response failed TradingAgents structured-decision validation: "
         f"{validation_error}\n\n"
         "Repair the response now. Preserve the investment conclusion when possible, but return "
         "one complete JSON object that includes every required field from the decision schema. "
-        "Return only JSON, with no markdown fences or prose.\n\n"
+        "Return only JSON, with no markdown fences or prose. Use this top-level JSON shape and "
+        "fill every placeholder with specific, evidence-grounded content:\n"
+        f"{skeleton}\n\n"
         f"Previous invalid response:\n{invalid_response}"
+    )
+
+
+def _required_decision_skeleton() -> str:
+    return (
+        "{\n"
+        '  "rating": "HOLD",\n'
+        '  "portfolio_stance": "NEUTRAL",\n'
+        '  "entry_action": "WAIT",\n'
+        '  "setup_quality": "DEVELOPING",\n'
+        '  "confidence": 0.50,\n'
+        '  "time_horizon": "medium",\n'
+        '  "entry_logic": "State the entry condition.",\n'
+        '  "exit_logic": "State the exit or stop condition.",\n'
+        '  "position_sizing": "State the sizing rule.",\n'
+        '  "risk_limits": "State the risk limit.",\n'
+        '  "catalysts": ["List concrete bullish or neutral catalysts."],\n'
+        '  "invalidators": ["List concrete invalidation conditions."],\n'
+        '  "watchlist_triggers": ["List concrete trigger conditions."],\n'
+        '  "data_coverage": {\n'
+        '    "company_news_count": 0,\n'
+        '    "disclosures_count": 0,\n'
+        '    "social_source": "unavailable",\n'
+        '    "macro_items_count": 0\n'
+        "  }\n"
+        "}"
     )
 
 
