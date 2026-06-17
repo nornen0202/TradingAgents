@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
+from tradingagents.agents.analysts.market_analyst import create_market_analyst
 from tradingagents.agents.utils.agent_utils import bind_tools_for_analyst, needs_initial_tool_call
 
 
@@ -60,6 +61,27 @@ class ToolCallPolicyTests(unittest.TestCase):
 
         self.assertEqual(bound, "bound")
         llm.bind_tools.assert_called_once_with(tools)
+
+    def test_market_analyst_starts_with_deterministic_stock_data_tool_call(self):
+        llm = Mock()
+        llm.bind_tools.side_effect = AssertionError("initial market data should not invoke the LLM")
+        node = create_market_analyst(llm)
+
+        result = node(
+            {
+                "trade_date": "2026-06-17",
+                "company_of_interest": "000660.KS",
+                "instrument_profile": {"primary_symbol": "000660.KS"},
+                "messages": [HumanMessage(content="Analyze 000660.KS")],
+            }
+        )
+
+        message = result["messages"][0]
+        self.assertEqual(result["market_report"], "")
+        self.assertEqual(message.tool_calls[0]["name"], "get_stock_data")
+        self.assertEqual(message.tool_calls[0]["args"]["symbol"], "000660.KS")
+        self.assertEqual(message.tool_calls[0]["args"]["end_date"], "2026-06-17")
+        self.assertEqual(message.tool_calls[0]["args"]["start_date"], "2025-06-12")
 
 
 if __name__ == "__main__":

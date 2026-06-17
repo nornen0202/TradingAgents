@@ -94,6 +94,7 @@ _MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS = (
     "microstructure_checkpoint_snapshot_json",
     "microstructure_checkpoint_report_md",
 )
+_DEFAULT_CODEX_PARALLEL_TICKER_CAP = 4
 
 FRESHNESS_CURRENT_RUN_FRESH = "CURRENT_RUN_FRESH"
 FRESHNESS_HOURLY_ASOF = "HOURLY_ASOF"
@@ -735,6 +736,30 @@ def _parallel_ticker_execution_summary(config: ScheduledAnalysisConfig, *, enabl
     }
 
 
+def _effective_parallel_worker_count(*, config: ScheduledAnalysisConfig, ticker_count: int) -> tuple[int, str | None]:
+    requested = max(1, int(getattr(config.run, "max_parallel_tickers", 1) or 1))
+    effective = min(requested, max(1, ticker_count))
+    if str(getattr(config.llm, "provider", "") or "").strip().lower() != "codex":
+        return effective, None
+
+    cap = _codex_parallel_ticker_cap()
+    capped = min(effective, cap)
+    if capped == effective:
+        return effective, None
+    warning = f"codex_parallel_ticker_cap_applied:requested={requested}:cap={cap}:effective={capped}"
+    return capped, warning
+
+
+def _codex_parallel_ticker_cap() -> int:
+    raw = os.getenv("TRADINGAGENTS_CODEX_MAX_PARALLEL_TICKERS_CAP", "").strip()
+    if not raw:
+        return _DEFAULT_CODEX_PARALLEL_TICKER_CAP
+    try:
+        return max(1, int(raw))
+    except ValueError:
+        return _DEFAULT_CODEX_PARALLEL_TICKER_CAP
+
+
 def _initial_circuit_breaker_summary(config: ScheduledAnalysisConfig) -> dict[str, Any]:
     return {
         "enabled": bool(getattr(config.run, "codex_circuit_breaker_enabled", False)),
@@ -820,7 +845,7 @@ def _run_parallel_tickers(
     max_runtime_seconds: float | None,
     min_remaining_seconds: float,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any], list[str]]:
-    max_workers = min(max(1, int(config.run.max_parallel_tickers or 1)), len(run_tickers))
+    max_workers, cap_warning = _effective_parallel_worker_count(config=config, ticker_count=len(run_tickers))
     timeout_seconds = _per_ticker_timeout_seconds(config)
     pending: list[tuple[int, str]] = list(enumerate(run_tickers))
     running: dict[int, dict[str, Any]] = {}
@@ -829,6 +854,11 @@ def _run_parallel_tickers(
     consecutive_codex_failures = 0
     circuit = _initial_circuit_breaker_summary(config)
     parallel_summary = _parallel_ticker_execution_summary(config, enabled=True)
+    parallel_summary["effective_max_parallel_tickers"] = max_workers
+    if cap_warning:
+        print(f"::warning::{cap_warning}", flush=True)
+        warnings.append(cap_warning)
+        parallel_summary["cap_warning"] = cap_warning
 
     print(
         f"Starting parallel ticker execution: max_parallel_tickers={max_workers}, "

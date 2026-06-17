@@ -64,3 +64,24 @@ def test_structured_decision_retry_repairs_missing_required_fields_for_message_p
     assert llm.calls[1][-2]["content"] == '{"rating":"HOLD"}'
     assert "missing required fields" in llm.calls[1][-1]["content"].lower()
     assert "return only json" in llm.calls[1][-1]["content"].lower()
+
+
+def test_structured_decision_retry_allows_two_repairs_by_default():
+    llm = _RepairingLLM()
+    llm.responses = [
+        _Response('{"rating":"HOLD"}'),
+        _Response('{"rating":"HOLD","confidence":0.5}'),
+        _Response(_valid_decision()),
+    ]
+
+    _response, decision_json = invoke_structured_decision_with_retry(
+        llm,
+        [{"role": "system", "content": "Return a decision."}],
+        context="trader execution plan",
+    )
+
+    parsed = json.loads(decision_json)
+    assert parsed["rating"] == "HOLD"
+    assert len(llm.calls) == 3
+    assert '"portfolio_stance"' in llm.calls[1][-1]["content"]
+    assert '"entry_logic"' in llm.calls[2][-1]["content"]

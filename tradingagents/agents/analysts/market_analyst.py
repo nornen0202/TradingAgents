@@ -1,3 +1,7 @@
+from datetime import date, timedelta
+from uuid import uuid4
+
+from langchain_core.messages import AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from tradingagents.agents.utils.agent_utils import (
     bind_tools_for_analyst,
@@ -15,8 +19,9 @@ def create_market_analyst(llm):
 
     def market_analyst_node(state):
         current_date = state["trade_date"]
+        company = state["company_of_interest"]
         instrument_context = build_instrument_context(
-            state["company_of_interest"],
+            company,
             state.get("instrument_profile"),
         )
 
@@ -25,6 +30,17 @@ def create_market_analyst(llm):
             get_indicators,
             get_intraday_snapshot,
         ]
+
+        if needs_initial_tool_call(state["messages"]):
+            return {
+                "messages": [
+                    _initial_market_data_tool_call(
+                        ticker=_market_data_symbol(company, state.get("instrument_profile")),
+                        current_date=current_date,
+                    )
+                ],
+                "market_report": "",
+            }
 
         system_message = (
             """You are a trading assistant tasked with analyzing market regime first and indicators second. Start by classifying the regime as trending up, trending down, range-bound, high-volatility, or event-driven. Then select the **most relevant indicators** for that regime from the following list. The goal is to choose up to **8 indicators** that provide complementary insights without redundancy. Categories and each category's indicators are:
@@ -96,3 +112,38 @@ Volume-Based Indicators:
         }
 
     return market_analyst_node
+
+
+def _market_data_symbol(ticker, instrument_profile):
+    if isinstance(instrument_profile, dict):
+        primary_symbol = str(instrument_profile.get("primary_symbol") or "").strip()
+        if primary_symbol:
+            return primary_symbol
+    return str(ticker)
+
+
+def _initial_market_data_tool_call(*, ticker: str, current_date: str) -> AIMessage:
+    end_date, start_date = _market_data_window(current_date)
+    return AIMessage(
+        content="",
+        tool_calls=[
+            {
+                "name": "get_stock_data",
+                "args": {
+                    "symbol": ticker,
+                    "start_date": start_date,
+                    "end_date": end_date,
+                },
+                "id": f"call_market_data_{uuid4().hex}",
+            }
+        ],
+    )
+
+
+def _market_data_window(current_date: str) -> tuple[str, str]:
+    try:
+        end = date.fromisoformat(str(current_date)[:10])
+    except ValueError:
+        fallback = str(current_date)
+        return fallback, fallback
+    return end.isoformat(), (end - timedelta(days=370)).isoformat()

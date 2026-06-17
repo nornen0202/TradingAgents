@@ -7,12 +7,14 @@ import requests
 
 from tradingagents.portfolio.account_models import AccountConstraints, PortfolioProfile
 from tradingagents.portfolio.kis import (
+    KisApiError,
     KisClient,
     PortfolioConfigurationError,
     _extract_cash_snapshot,
     load_account_snapshot_from_kis,
     validate_kis_credentials,
 )
+from tradingagents.portfolio.pipeline import _derive_watchlist_reason, load_snapshot_for_profile
 
 
 class PortfolioKisTests(unittest.TestCase):
@@ -100,6 +102,73 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(payload["rt_cd"], "0")
         self.assertEqual(session.post.call_count, 2)
         self.assertEqual(session.request.call_count, 2)
+
+    def test_request_json_retries_transient_http_500(self):
+        session = Mock()
+
+        token_response = Mock()
+        token_response.raise_for_status.return_value = None
+        token_response.json.return_value = {"access_token": "token", "expires_in": 86400}
+        session.post.return_value = token_response
+
+        transient = Mock()
+        transient.status_code = 500
+        transient.headers = {}
+
+        success = Mock()
+        success.status_code = 200
+        success.raise_for_status.return_value = None
+        success.json.return_value = {"rt_cd": "0", "output": []}
+        success.headers = {"tr_cont": ""}
+        session.request.side_effect = [transient, success]
+
+        client = KisClient(
+            app_key="app-key",
+            app_secret="app-secret",
+            session=session,
+            token_file_cache_enabled=False,
+        )
+
+        with patch("tradingagents.portfolio.kis.sleep") as sleep_mock:
+            payload, _headers = client.request_json(
+                method="GET",
+                path="/uapi/domestic-stock/v1/trading/inquire-balance",
+                tr_id="TTTC8434R",
+                params={},
+            )
+
+        self.assertEqual(payload["rt_cd"], "0")
+        self.assertEqual(session.request.call_count, 2)
+        sleep_mock.assert_called_once()
+
+    def test_kis_snapshot_failure_degrades_to_watchlist_only_when_allowed(self):
+        profile = PortfolioProfile(
+            name="kr_kis_default",
+            enabled=True,
+            broker="kis",
+            broker_environment="real",
+            read_only=True,
+            account_no="12345678",
+            product_code="01",
+            manual_snapshot_path=None,
+            csv_positions_path=None,
+            private_output_dirname="portfolio-private",
+            watch_tickers=("000660.KS",),
+            trigger_budget_krw=0,
+            constraints=AccountConstraints(),
+            continue_on_error=True,
+        )
+
+        with patch(
+            "tradingagents.portfolio.pipeline.load_account_snapshot_from_kis",
+            side_effect=KisApiError("500 Server Error"),
+        ):
+            snapshot = load_snapshot_for_profile(profile)
+
+        self.assertEqual(snapshot.snapshot_health, "WATCHLIST_ONLY")
+        self.assertIn("KIS account snapshot unavailable", snapshot.warnings[0])
+        self.assertEqual(snapshot.cash_diagnostics["source"], "kis_snapshot_unavailable")
+        self.assertEqual(_derive_watchlist_reason(snapshot), "BROKER_SNAPSHOT_UNAVAILABLE")
 
     def test_fetch_overseas_present_balance_uses_documented_endpoint_and_paginates(self):
         client = KisClient(
