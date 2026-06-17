@@ -1,3 +1,5 @@
+import json
+import re
 from pathlib import Path
 
 from tradingagents.scheduled.config import _default_execution_checkpoints_kst, load_scheduled_config
@@ -70,8 +72,8 @@ def test_intraday_overlay_workflow_uses_kr_operational_crons():
 
 def test_daily_workflow_runs_us_and_kr_at_revised_kst_targets():
     workflow = Path(".github/workflows/daily-codex-analysis.yml").read_text(encoding="utf-8")
-    assert "Target: 6:00 KST weekdays. Start after the US overlay close window" in workflow
-    assert "Target: 16:00 KST weekdays. Start after the KR overlay close window" in workflow
+    assert "Target: 6:00 KST weekdays for KR. Start after the US overlay close window" in workflow
+    assert "Target: 16:00 KST weekdays for US. Start after the KR overlay close window" in workflow
     assert "Backup probes absorb occasional GitHub schedule event drops" in workflow
     assert "10 21 * * 0-4" in workflow
     assert "40 21 * * 0-4" in workflow
@@ -89,6 +91,26 @@ def test_daily_workflow_runs_us_and_kr_at_revised_kst_targets():
     assert "- cron: '30 5 * * 1-5'" not in workflow
     assert "- cron: '30 21 * * 0-4'" not in workflow
     assert "- cron: '30 9 * * 1-5'" not in workflow
+
+    match = re.search(r"SCHEDULE_GATE_TARGETS_JSON:\s*>-\s*\n(?P<body>(?: {12}.*\n)+)", workflow)
+    assert match is not None
+    targets = json.loads("\n".join(line[12:] for line in match.group("body").splitlines()))
+    for cron in ("10 21 * * 0-4", "40 21 * * 0-4", "10 22 * * 0-4"):
+        assert targets[cron]["profile"] == "kr"
+        assert targets[cron]["window_start"] == "06:00"
+        assert targets[cron]["target_jobs"] == ["analyze_kr"]
+    for cron in (
+        "10 7 * * 1-5",
+        "40 7 * * 1-5",
+        "10 8 * * 1-5",
+        "10 9 * * 1-5",
+        "10 10 * * 1-5",
+        "10 11 * * 1-5",
+        "10 12 * * 1-5",
+    ):
+        assert targets[cron]["profile"] == "us"
+        assert targets[cron]["window_start"] == "16:00"
+        assert targets[cron]["target_jobs"] == ["analyze_us"]
 
 
 def test_daily_workflow_gates_backup_schedules_before_analysis():

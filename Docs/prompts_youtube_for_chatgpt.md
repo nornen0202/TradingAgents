@@ -474,41 +474,37 @@ C. 테마별 우선순위
 
 13. KR/US 재투입용 Context Pack
 
-최종 답변의 맨 끝에는 반드시 아래 delimiter로 감싼 짧은 재투입용 블록을 추가하라.
-이 블록은 Daily-KR 또는 Daily-US 대화의 후속 프롬프트에 붙여넣기 위한 요약이다.
-본문 전체를 다시 요약하지 말고, KR/US 실행 전략을 개선하는 데 필요한 델타 정보만 담아라.
+최종 답변의 맨 끝에는 Daily-KR 또는 Daily-US 대화의 후속 프롬프트에 그대로 붙일 수 있는 재투입용 Context Pack을 추가하라.
+시작 delimiter는 `BEGIN_YOUTUBE_CONTEXT_PACK`, 종료 delimiter는 `END_YOUTUBE_CONTEXT_PACK` 이다.
+delimiter는 각각 단독 줄에 두고, 코드블록으로 감싸지 마라.
 
-블록은 2,000~4,000자 이내로 작성하라.
-각 항목은 짧은 bullet 중심으로 쓰고, 긴 표는 넣지 마라.
+중요:
+이 프롬프트 안의 delimiter 이름은 설명용이다.
+최종 답변의 assistant 메시지 맨 끝에 실제 내용이 채워진 Context Pack을 한 번만 출력하라.
+빈 제목, placeholder bullet, `-`만 있는 항목, 본문 없는 skeleton은 금지한다.
+
+Context Pack은 3,000~6,000자 범위로 작성하라.
+짧은 bullet을 기본으로 하되, KR/US 후속 투자 판단에 직접 도움이 되는 디테일은 충분히 넣어라.
+본문 전체를 다시 요약하지 말고, KR/US 실행 전략을 바꿀 수 있는 델타 정보만 담아라.
+
+각 항목은 반드시 실제 내용으로 채워라.
+
+- as_of_kst: 분석 기준시각, 사용한 최신 run id, 영상 published_at 범위.
+- source_scope: 접근한 run 수, 공개 리포트 수, 중복/실패/비공개/0건 처리 방식, 표본 한계.
+- data_quality: 신뢰도 등급, 독립 출처와 부합하는 주장, ASR 의심/루머/공식 확인 필요 주장.
+- top_cross_market_themes: 최소 5개 테마. 각 테마마다 conviction, 핵심 근거, 왜 지금 투자 판단에 relevant한지, 반대 논리, 무효화 조건을 포함.
+- kr_strategy_implications: KR에서 상향/유지/하향/제외해야 할 후보와 이유. 종목은 가능한 한 6자리 코드+종목명으로 표기.
+- us_strategy_implications: US에서 상향/유지/하향/제외해야 할 후보와 이유. 티커, 섹터 ETF/동조성 확인 포인트 포함.
+- candidate_mapping_kr: 테마별 KR 후보 묶음. 핵심 후보와 2순위 후보를 구분.
+- candidate_mapping_us: 테마별 US 후보 묶음. 핵심 후보와 2순위 후보를 구분.
+- themes_to_defer_or_avoid: SpaceX/OpenAI 우회 테마, 실적 없는 로봇/AI 이름주, 2차전지 반등, 정책 수혜 등 보류/회피할 항목과 이유.
+- near_term_catalysts: 72시간~2주 안에 확인할 FOMC/PCE/CPI/금리/환율/실적/공시/ETF/수급 이벤트.
+- required_verification: 공식 IR, SEC/DART/KRX/KIND, 수주잔고, ASP, 고객 인증, capex, VWAP/RVOL 등 검증 체크리스트.
+- execution_guardrails: YouTube 분석은 실행 신호가 아니며, KR/US 실행 판단은 TradingAgents microstructure, execution_eligibility, freshness_class, 현재가, VWAP, RVOL/거래대금, 수급/섹터 동조, 공시 리스크, 손절·무효화 조건을 우선한다는 점.
+- followup_prompt_goal: 기존 Daily-KR/Daily-US 답변을 전면 재작성하지 말고, 이 Context Pack 때문에 상향/하향/유지/제외되어야 하는 후보와 이유만 델타로 재검토하게 하라는 목표.
+
 미확인 숫자, 루머, ASR 의심 내용은 확정 사실처럼 쓰지 말고 반드시 "미확인", "ASR 의심", "공식 확인 필요"로 표시하라.
-YouTube 분석은 실행 신호가 아니라 테마·리스크·검증 체크리스트라는 점을 명시하라.
-
-반드시 아래 형식을 지켜라.
-
-BEGIN_YOUTUBE_CONTEXT_PACK
-as_of_kst:
-source_scope:
-data_quality:
-top_cross_market_themes:
--
-themes_to_defer_or_avoid:
--
-kr_strategy_implications:
--
-us_strategy_implications:
--
-candidate_mapping_kr:
--
-candidate_mapping_us:
--
-required_verification:
--
-execution_guardrails:
-- YouTube 분석만으로 매수·매도·비중확대·비중축소를 확정하지 말 것.
-- KR/US 실행 판단은 TradingAgents microstructure, execution_eligibility, freshness_class, 현재가, VWAP, RVOL/거래대금, 수급/섹터 동조, 공시 리스크, 손절·무효화 조건이 우선한다.
-followup_prompt_goal:
-- 기존 Daily-KR/Daily-US 답변을 전면 재작성하지 말고, 이 Context Pack 때문에 상향/하향/유지/제외되어야 하는 후보와 이유만 델타로 재검토하게 할 것.
-END_YOUTUBE_CONTEXT_PACK
+Context Pack 자체에 장황한 표는 넣지 말되, 후보와 테마의 우선순위가 모호하지 않게 충분한 근거를 써라.
 
 ────────────────────────
 10. 문체와 답변 방식
