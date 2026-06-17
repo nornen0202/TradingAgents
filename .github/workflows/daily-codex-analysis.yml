@@ -70,7 +70,7 @@ on:
       per_ticker_timeout_minutes:
         description: "Timeout for each ticker worker"
         required: false
-        default: "30"
+        default: "40"
         type: string
 
 permissions:
@@ -513,7 +513,7 @@ jobs:
           )
 
       - name: Run scheduled analysis and build site
-        timeout-minutes: 230
+        timeout-minutes: 300
         run: |
           import os
           import subprocess
@@ -1100,7 +1100,7 @@ jobs:
           print("KIS account snapshot preflight:", account_result)
 
       - name: Run scheduled analysis and build site
-        timeout-minutes: 230
+        timeout-minutes: 300
         run: |
           import os
           import subprocess

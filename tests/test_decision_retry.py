@@ -85,3 +85,23 @@ def test_structured_decision_retry_allows_two_repairs_by_default():
     assert len(llm.calls) == 3
     assert '"portfolio_stance"' in llm.calls[1][-1]["content"]
     assert '"entry_logic"' in llm.calls[2][-1]["content"]
+
+
+def test_structured_decision_retry_allows_three_repairs_by_default():
+    llm = _RepairingLLM()
+    llm.responses = [
+        _Response('{"rating":"HOLD"}'),
+        _Response('{"rating":"HOLD","confidence":0.5}'),
+        _Response('{"rating":"HOLD","confidence":0.5,"time_horizon":"medium"}'),
+        _Response(_valid_decision()),
+    ]
+
+    _response, decision_json = invoke_structured_decision_with_retry(
+        llm,
+        [{"role": "system", "content": "Return a decision."}],
+        context="portfolio manager final decision",
+    )
+
+    parsed = json.loads(decision_json)
+    assert parsed["rating"] == "HOLD"
+    assert len(llm.calls) == 4
