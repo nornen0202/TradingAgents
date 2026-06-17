@@ -94,7 +94,38 @@ _MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS = (
     "microstructure_checkpoint_snapshot_json",
     "microstructure_checkpoint_report_md",
 )
-_DEFAULT_CODEX_PARALLEL_TICKER_CAP = 4
+_DEFAULT_CODEX_PARALLEL_TICKER_CAP = 3
+
+_CODEX_TRANSIENT_FAILURE_PATTERNS = (
+    "timed out waiting for codex app-server",
+    "timed out waiting for codex turn",
+    "codex returned malformed structured output",
+    "decision payload is missing required fields",
+    "per_ticker_timeout",
+)
+
+_CODEX_GLOBAL_FAILURE_PATTERNS = (
+    "codex app-server closed unexpectedly",
+    "codex app-server is not running",
+    "codex initialize response did not include useragent",
+    "failed to write to codex app-server",
+    "failed to start codex app-server",
+    "failed to seed codex auth",
+    "could not find a usable codex binary",
+    "codex binary",
+    "model/list failed",
+)
+
+_CODEX_IMMEDIATE_FATAL_PATTERNS = (
+    "failed to start codex app-server",
+    "failed to seed codex auth",
+    "could not find a usable codex binary",
+    "codex binary",
+    "model/list failed",
+    "not logged in",
+    "authentication",
+    "unauthorized",
+)
 
 FRESHNESS_CURRENT_RUN_FRESH = "CURRENT_RUN_FRESH"
 FRESHNESS_HOURLY_ASOF = "HOURLY_ASOF"
@@ -1257,6 +1288,13 @@ def _circuit_breaker_reason(
     for pattern in getattr(config.run, "fatal_error_patterns", ()) or ():
         if pattern and pattern.lower() in error_text:
             return f"fatal_pattern:{pattern}"
+    immediate_pattern = _first_matching_pattern(error_text, _CODEX_IMMEDIATE_FATAL_PATTERNS)
+    if immediate_pattern:
+        return f"fatal_pattern:{immediate_pattern}"
+    if _is_codex_transient_failure_text(error_text):
+        return None
+    if not _is_codex_global_failure_text(error_text):
+        return None
     threshold = max(1, int(getattr(config.run, "max_consecutive_codex_failures", 3) or 3))
     if consecutive_codex_failures >= threshold:
         return f"consecutive_codex_failures:{consecutive_codex_failures}"
@@ -1265,17 +1303,30 @@ def _circuit_breaker_reason(
 
 def _is_codex_failure_summary(summary: dict[str, Any]) -> bool:
     text = _summary_error_text(summary)
+    return _is_codex_global_failure_text(text)
+
+
+def _is_codex_transient_failure_text(text: str) -> bool:
     if not text:
         return False
-    patterns = (
-        "timed out waiting for codex app-server",
-        "codex app-server",
-        "codexappserver",
-        "model unavailable",
-        "usage limit",
-        "per_ticker_timeout",
+    return _first_matching_pattern(text, _CODEX_TRANSIENT_FAILURE_PATTERNS) is not None
+
+
+def _is_codex_global_failure_text(text: str) -> bool:
+    if not text or _is_codex_transient_failure_text(text):
+        return False
+    return (
+        _first_matching_pattern(text, _CODEX_GLOBAL_FAILURE_PATTERNS) is not None
+        or "usage limit" in text
+        or "model unavailable" in text
     )
-    return any(pattern in text for pattern in patterns)
+
+
+def _first_matching_pattern(text: str, patterns: tuple[str, ...]) -> str | None:
+    for pattern in patterns:
+        if pattern and pattern in text:
+            return pattern
+    return None
 
 
 def _summary_error_text(summary: dict[str, Any]) -> str:

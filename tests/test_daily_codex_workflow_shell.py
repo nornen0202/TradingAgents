@@ -41,6 +41,20 @@ def test_daily_analysis_default_parallel_ticker_workers_is_three():
     assert 'default: "3"' in input_block
 
 
+def test_daily_analysis_default_ticker_timeout_is_forty_minutes():
+    workflow = _workflow_text()
+
+    input_start = workflow.index("      per_ticker_timeout_minutes:")
+    input_block = workflow[input_start : workflow.index("\n\npermissions:", input_start)]
+    assert 'default: "40"' in input_block
+
+
+def test_daily_analysis_job_timeout_covers_full_universe_runs():
+    workflow = _workflow_text()
+
+    assert workflow.count("        timeout-minutes: 300") == 2
+
+
 def test_daily_analysis_deploy_runs_after_final_pages_build():
     workflow = _workflow_text()
 

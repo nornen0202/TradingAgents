@@ -13,7 +13,7 @@ def invoke_structured_decision_with_retry(
     prompt: str | Sequence[BaseMessage | Mapping[str, Any]],
     *,
     context: str,
-    max_retries: int = 2,
+    max_retries: int = 3,
 ) -> tuple[Any, str]:
     """Invoke an LLM and repair structured-decision validation failures."""
     response = llm.invoke(prompt)

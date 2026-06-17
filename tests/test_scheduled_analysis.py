@@ -615,6 +615,91 @@ site_dir = "{site_dir.as_posix()}"
             self.assertTrue(all(item["status"] == "skipped" for item in summaries[1:]))
             self.assertTrue(any("codex_circuit_breaker_opened" in item for item in warnings))
 
+    def test_parallel_ticker_scheduler_continues_after_transient_codex_timeouts(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            run_dir = archive_dir / "runs" / "2026" / "test"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["A", "B", "C", "D"]
+parallel_ticker_execution = true
+max_parallel_tickers = 2
+continue_on_ticker_error = true
+codex_circuit_breaker_enabled = true
+max_consecutive_codex_failures = 3
+fatal_error_patterns = ["usage limit", "model unavailable"]
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+            started: list[str] = []
+
+            def fake_start(**kwargs):
+                ticker = kwargs["ticker"]
+                index = kwargs["index"]
+                started.append(ticker)
+                summary_path = run_dir / "summaries" / f"{index}.json"
+                stdout_path = run_dir / "logs" / f"{index}.out"
+                stderr_path = run_dir / "logs" / f"{index}.err"
+                summary_path.parent.mkdir(parents=True, exist_ok=True)
+                stdout_path.parent.mkdir(parents=True, exist_ok=True)
+                summary_path.write_text(
+                    json.dumps(
+                        {
+                            "ticker": ticker,
+                            "ticker_name": ticker,
+                            "status": "failed",
+                            "analysis_date": "2026-04-05",
+                            "trade_date": None,
+                            "decision": None,
+                            "error": "Timed out waiting for Codex app-server after 170s.",
+                            "started_at": "2026-04-05T09:13:00+09:00",
+                            "finished_at": "2026-04-05T09:14:00+09:00",
+                            "duration_seconds": 60.0,
+                            "metrics": {"llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0},
+                            "artifacts": {},
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                return {
+                    "ticker": ticker,
+                    "index": index,
+                    "process": _FakeWorkerProcess(returncode=1),
+                    "summary_path": summary_path,
+                    "stdout_path": stdout_path,
+                    "stderr_path": stderr_path,
+                    "stdout_handle": stdout_path.open("w", encoding="utf-8"),
+                    "stderr_handle": stderr_path.open("w", encoding="utf-8"),
+                    "started_perf": 0.0,
+                    "started_at": "2026-04-05T09:13:00+09:00",
+                }
+
+            with patch("tradingagents.scheduled.runner._start_ticker_worker", side_effect=fake_start):
+                summaries, _parallel, circuit, warnings = scheduled_runner._run_parallel_tickers(
+                    config=config,
+                    run_tickers=["A", "B", "C", "D"],
+                    run_dir=run_dir,
+                    engine_results_dir=run_dir / "engine-results",
+                    trade_date_override="2026-04-04",
+                    timer_start=0.0,
+                    max_runtime_seconds=None,
+                    min_remaining_seconds=0.0,
+                )
+
+            self.assertEqual(started, ["A", "B", "C", "D"])
+            self.assertFalse(circuit["triggered"])
+            self.assertTrue(all(item["status"] == "failed" for item in summaries))
+            self.assertFalse(any("codex_circuit_breaker_opened" in item for item in warnings))
+
     def test_parallel_ticker_scheduler_marks_worker_timeout(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -699,7 +784,7 @@ site_dir = "{site_dir.as_posix()}"
 
             self.assertFalse(scheduled_runner._should_run_tickers_in_parallel(config=config, ticker_count=2))
 
-    def test_circuit_breaker_opens_after_consecutive_codex_timeouts(self):
+    def test_circuit_breaker_ignores_consecutive_transient_codex_timeouts(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
             config_path = root / "scheduled_analysis.toml"
@@ -721,7 +806,8 @@ max_consecutive_codex_failures = 3
                 consecutive_codex_failures=3,
             )
 
-            self.assertEqual(reason, "consecutive_codex_failures:3")
+            self.assertIsNone(reason)
+            self.assertFalse(scheduled_runner._is_codex_failure_summary(summary))
 
     def test_codex_parallel_worker_count_is_capped(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -747,8 +833,8 @@ provider = "codex"
                     ticker_count=5,
                 )
 
-            self.assertEqual(effective, 4)
-            self.assertEqual(warning, "codex_parallel_ticker_cap_applied:requested=5:cap=4:effective=4")
+            self.assertEqual(effective, 3)
+            self.assertEqual(warning, "codex_parallel_ticker_cap_applied:requested=5:cap=3:effective=3")
 
     def test_main_site_only_rebuilds_from_existing_archive(self):
         with tempfile.TemporaryDirectory() as tmpdir:
