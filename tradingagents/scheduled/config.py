@@ -97,6 +97,7 @@ class SiteSettings:
     title: str = "TradingAgents Daily Reports"
     subtitle: str = "Automated multi-agent market analysis powered by Codex"
     max_runs_on_homepage: int = 30
+    max_published_runs: int = 120
 
 
 @dataclass(frozen=True)
@@ -426,6 +427,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             ).strip()
             or "Automated multi-agent market analysis powered by Codex",
             max_runs_on_homepage=int(site_raw.get("max_runs_on_homepage", 30)),
+            max_published_runs=int(site_raw.get("max_published_runs", 120)),
         ),
         portfolio=PortfolioSettings(
             enabled=bool(portfolio_raw.get("enabled", False)),

@@ -40,13 +40,15 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
     archive_dir = Path(archive_dir)
     site_dir = Path(site_dir)
     manifests = _load_run_manifests(archive_dir)
+    published_manifests = _select_published_manifests(manifests, settings)
+    published_run_ids = {str(manifest.get("run_id") or "") for manifest in published_manifests}
 
     if site_dir.exists():
         shutil.rmtree(site_dir)
     (site_dir / "assets").mkdir(parents=True, exist_ok=True)
     _write_text(site_dir / "assets" / "style.css", _STYLE_CSS)
 
-    for manifest in manifests:
+    for manifest in published_manifests:
         run_dir = Path(manifest["_run_dir"])
         portfolio_summary = _load_portfolio_summary(run_dir)
         _copy_artifacts(site_dir, run_dir, manifest, portfolio_summary)
@@ -70,13 +72,16 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
                 _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests, portfolio_summary=portfolio_summary),
             )
 
-    _write_text(site_dir / "index.html", _render_index_page(manifests, settings))
+    _write_text(site_dir / "index.html", _render_index_page(manifests, settings, published_run_ids=published_run_ids))
     _write_json(
         site_dir / "feed.json",
         {
             "generated_at": datetime.now().isoformat(),
             "runs": [
-                {key: value for key, value in manifest.items() if key != "_run_dir"}
+                {
+                    **{key: value for key, value in manifest.items() if key != "_run_dir"},
+                    "published_to_site": str(manifest.get("run_id") or "") in published_run_ids,
+                }
                 for manifest in manifests
             ],
         },
@@ -98,6 +103,34 @@ def _load_run_manifests(archive_dir: Path) -> list[dict[str, Any]]:
 
     manifests.sort(key=lambda item: item.get("started_at", ""), reverse=True)
     return manifests
+
+
+def _select_published_manifests(manifests: list[dict[str, Any]], settings: SiteSettings) -> list[dict[str, Any]]:
+    if not manifests:
+        return []
+
+    configured_limit = int(getattr(settings, "max_published_runs", 120) or 0)
+    if configured_limit <= 0:
+        return list(manifests)
+
+    homepage_limit = int(getattr(settings, "max_runs_on_homepage", 30) or 0)
+    base_limit = max(configured_limit, homepage_limit, 1)
+    selected: list[dict[str, Any]] = list(manifests[:base_limit])
+    selected_ids = {str(manifest.get("run_id") or "") for manifest in selected}
+
+    for manifest in (
+        manifests[0],
+        _select_representative_run(manifests),
+        _select_latest_daily_run(manifests),
+    ):
+        if not manifest:
+            continue
+        run_id = str(manifest.get("run_id") or "")
+        if run_id and run_id not in selected_ids:
+            selected.append(manifest)
+            selected_ids.add(run_id)
+
+    return selected
 
 
 def _copy_artifacts(
@@ -569,7 +602,12 @@ def _mask_sensitive_text(value: str) -> str:
     return text
 
 
-def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) -> str:
+def _render_index_page(
+    manifests: list[dict[str, Any]],
+    settings: SiteSettings,
+    *,
+    published_run_ids: set[str] | None = None,
+) -> str:
     latest = manifests[0] if manifests else None
     representative = _select_representative_run(manifests)
     latest_portfolio = _load_portfolio_summary(Path(representative["_run_dir"])) if representative else {}
@@ -699,11 +737,15 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: SiteSettings) 
             f"<div class='warning-banner'>{_escape(warning)}</div>" for warning in representative.get("warnings", [])
         )
 
+    archive_count_label = f"{len(manifests)} archived run(s)"
+    if published_run_ids is not None and len(published_run_ids) < len(manifests):
+        archive_count_label = f"{archive_count_label} / {len(published_run_ids)} published on Pages"
+
     body = latest_html + warning_html + f"""
     <section class="section">
       <div class="section-head">
         <h2>Recent runs</h2>
-        <p>{len(manifests)} archived run(s)</p>
+        <p>{_escape(archive_count_label)}</p>
       </div>
       <div class="run-grid">
         {''.join(cards) if cards else '<p class="empty">No archived runs were found.</p>'}
