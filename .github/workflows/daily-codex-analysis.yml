@@ -61,7 +61,7 @@ on:
       max_parallel_tickers:
         description: "Maximum ticker workers to run concurrently"
         required: false
-        default: "3"
+        default: "2"
         type: string
       daily_active_ticker_limit:
         description: "Limit full analysis to the first N resolved tickers; smoke defaults to 3"
@@ -70,7 +70,7 @@ on:
       per_ticker_timeout_minutes:
         description: "Timeout for each ticker worker"
         required: false
-        default: "45"
+        default: "30"
         type: string
 
 permissions:
@@ -513,7 +513,7 @@ jobs:
           )
 
       - name: Run scheduled analysis and build site
-        timeout-minutes: 360
+        timeout-minutes: 240
         run: |
           import os
           import subprocess
@@ -1140,7 +1140,7 @@ jobs:
           print("KIS account snapshot preflight:", account_result)
 
       - name: Run scheduled analysis and build site
-        timeout-minutes: 360
+        timeout-minutes: 240
         run: |
           import os
           import subprocess

@@ -760,6 +760,81 @@ site_dir = "{site_dir.as_posix()}"
             self.assertEqual(summaries[0]["status"], "failed")
             self.assertIn("per_ticker_timeout", summaries[0]["error"])
 
+    def test_parallel_ticker_scheduler_terminates_running_workers_at_runtime_budget(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            run_dir = archive_dir / "runs" / "2026" / "test"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["A"]
+parallel_ticker_execution = true
+max_parallel_tickers = 1
+continue_on_ticker_error = true
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+            process = _FakeWorkerProcess(running=True)
+
+            def fake_start(**kwargs):
+                index = kwargs["index"]
+                stdout_path = run_dir / "logs" / f"{index}.out"
+                stderr_path = run_dir / "logs" / f"{index}.err"
+                stdout_path.parent.mkdir(parents=True, exist_ok=True)
+                return {
+                    "ticker": kwargs["ticker"],
+                    "index": index,
+                    "process": process,
+                    "summary_path": run_dir / "summaries" / f"{index}.json",
+                    "stdout_path": stdout_path,
+                    "stderr_path": stderr_path,
+                    "stdout_handle": stdout_path.open("w", encoding="utf-8"),
+                    "stderr_handle": stderr_path.open("w", encoding="utf-8"),
+                    "started_perf": 0.0,
+                    "started_at": "2026-04-05T09:13:00+09:00",
+                }
+
+            perf_values = [0.0]
+
+            def fake_perf_counter():
+                if perf_values:
+                    return perf_values.pop(0)
+                return 120.0
+
+            with (
+                patch("tradingagents.scheduled.runner._start_ticker_worker", side_effect=fake_start),
+                patch(
+                    "tradingagents.scheduled.runner._terminate_worker_process",
+                    side_effect=lambda proc: proc.kill(),
+                ) as terminate_worker,
+                patch("tradingagents.scheduled.runner.perf_counter", side_effect=fake_perf_counter),
+            ):
+                summaries, _parallel, _circuit, warnings = scheduled_runner._run_parallel_tickers(
+                    config=config,
+                    run_tickers=["A"],
+                    run_dir=run_dir,
+                    engine_results_dir=run_dir / "engine-results",
+                    trade_date_override="2026-04-04",
+                    timer_start=0.0,
+                    max_runtime_seconds=60.0,
+                    min_remaining_seconds=30.0,
+                )
+
+            terminate_worker.assert_called_once_with(process)
+            self.assertTrue(process.terminated)
+            self.assertEqual(summaries[0]["status"], "failed")
+            self.assertIn("run_time_budget_exhausted", summaries[0]["error"])
+            self.assertTrue(summaries[0]["worker"]["budget_exhausted"])
+            self.assertTrue(any("run_time_budget_exhausted" in item for item in warnings))
+
     def test_post_processing_budget_guard_skips_optional_work_when_runtime_is_low(self):
         warnings: list[str] = []
 

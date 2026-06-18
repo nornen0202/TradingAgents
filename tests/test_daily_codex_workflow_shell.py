@@ -33,26 +33,26 @@ def test_daily_analysis_uses_python_shell_for_all_windows_jobs():
     assert workflow.count("        shell: python {0}") == 3
 
 
-def test_daily_analysis_default_parallel_ticker_workers_is_three():
+def test_daily_analysis_default_parallel_ticker_workers_is_two():
     workflow = _workflow_text()
 
     input_start = workflow.index("      max_parallel_tickers:")
     input_block = workflow[input_start : workflow.index("      daily_active_ticker_limit:", input_start)]
-    assert 'default: "3"' in input_block
+    assert 'default: "2"' in input_block
 
 
-def test_daily_analysis_default_ticker_timeout_is_forty_five_minutes():
+def test_daily_analysis_default_ticker_timeout_is_thirty_minutes():
     workflow = _workflow_text()
 
     input_start = workflow.index("      per_ticker_timeout_minutes:")
     input_block = workflow[input_start : workflow.index("\n\npermissions:", input_start)]
-    assert 'default: "45"' in input_block
+    assert 'default: "30"' in input_block
 
 
-def test_daily_analysis_job_timeout_covers_full_universe_runs():
+def test_daily_analysis_job_timeout_bounds_scheduled_runs():
     workflow = _workflow_text()
 
-    assert workflow.count("        timeout-minutes: 360") == 2
+    assert workflow.count("        timeout-minutes: 240") == 2
 
 
 def test_daily_analysis_jobs_skip_inline_site_build_and_fail_on_partial_runs():

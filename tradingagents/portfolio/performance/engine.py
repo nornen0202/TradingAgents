@@ -1053,8 +1053,10 @@ def _load_benchmark_prices(
             status="ok",
         )
     missing = [name for name in benchmarks if name not in prices]
+    provider = str(getattr(settings, "price_provider", "yfinance") or "yfinance").strip().lower()
+    use_kis_benchmarks = profile.broker == "kis" and provider in {"auto", "kis"}
 
-    if profile.broker == "kis" and missing:
+    if use_kis_benchmarks and missing:
         prices.update(
             _fetch_kis_benchmark_prices(
                 profile=profile,
@@ -1068,7 +1070,6 @@ def _load_benchmark_prices(
         )
         missing = [name for name in benchmarks if name not in prices]
 
-    provider = str(getattr(settings, "price_provider", "yfinance") or "yfinance").strip().lower()
     if provider == "local_json":
         for benchmark in missing:
             _mark_benchmark_provider_status(provider_status, benchmark, status="missing")
@@ -1079,7 +1080,13 @@ def _load_benchmark_prices(
         for benchmark in missing:
             _mark_benchmark_provider_status(provider_status, benchmark, status="missing")
         return prices
-    if provider != "yfinance":
+    if provider == "kis":
+        if missing:
+            warnings.append(f"account_performance_benchmark_missing:{','.join(missing)}")
+        for benchmark in missing:
+            _mark_benchmark_provider_status(provider_status, benchmark, status="missing")
+        return prices
+    if provider not in {"auto", "yfinance"}:
         warnings.append(f"account_performance_price_provider_unsupported:{provider}")
         for benchmark in missing:
             _mark_benchmark_provider_status(
@@ -1116,8 +1123,10 @@ def _initial_benchmark_provider_status(
     configured = str(getattr(settings, "price_provider", "yfinance") or "yfinance").strip().lower()
     if getattr(settings, "price_history_path", None):
         preferred = "local_json"
-    elif profile.broker == "kis":
+    elif profile.broker == "kis" and configured in {"auto", "kis"}:
         preferred = "kis"
+    elif configured in {"", "none", "disabled"}:
+        preferred = "none"
     else:
         preferred = configured
     return {

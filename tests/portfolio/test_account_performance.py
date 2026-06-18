@@ -12,7 +12,12 @@ from tradingagents.portfolio.performance.broker_kis import (
     fetch_kis_overseas_broker_performance,
     normalize_kis_broker_summary,
 )
-from tradingagents.portfolio.performance.engine import _canonical_contribution_ticker, render_account_performance_markdown
+from tradingagents.portfolio.performance.engine import (
+    _canonical_contribution_ticker,
+    _initial_benchmark_provider_status,
+    _load_benchmark_prices,
+    render_account_performance_markdown,
+)
 from tradingagents.portfolio.performance.etf_alternatives import load_external_capital_flows
 
 
@@ -36,6 +41,50 @@ def test_kis_trade_profit_summary_is_normalized_separately_from_account_return()
     assert payload["trade_fees_krw"] == 880
     assert payload["trade_taxes_krw"] == 32_216
     assert "broker_performance_missing_balance_return" in payload["warnings"]
+
+
+def test_account_performance_respects_yfinance_benchmark_provider_for_kis_profile():
+    profile = PortfolioProfile(
+        name="us_kis_default",
+        enabled=True,
+        broker="kis",
+        broker_environment="real",
+        read_only=True,
+        account_no="12345678",
+        product_code="01",
+        manual_snapshot_path=None,
+        csv_positions_path=None,
+        private_output_dirname="portfolio-private",
+        watch_tickers=tuple(),
+        trigger_budget_krw=500_000,
+        constraints=AccountConstraints(),
+        market_scope="us",
+    )
+    settings = SimpleNamespace(price_provider="yfinance", price_history_path=None)
+    provider_status = _initial_benchmark_provider_status(profile=profile, settings=settings, benchmarks=("SPY",))
+    warnings: list[str] = []
+
+    with (
+        patch(
+            "tradingagents.portfolio.performance.engine._fetch_yfinance_benchmark_prices",
+            return_value={"SPY": []},
+        ) as yfinance_fetch,
+        patch("tradingagents.portfolio.kis.KisClient.from_api_keys") as kis_from_api_keys,
+    ):
+        _load_benchmark_prices(
+            profile=profile,
+            settings=settings,
+            market_scope="us",
+            benchmarks=("SPY",),
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 4, 1),
+            warnings=warnings,
+            provider_status=provider_status,
+        )
+
+    kis_from_api_keys.assert_not_called()
+    yfinance_fetch.assert_called_once()
+    assert provider_status["SPY"]["preferred_provider"] == "yfinance"
 
 
 def test_kis_overseas_realized_profit_summary_is_normalized_separately_from_account_return():
