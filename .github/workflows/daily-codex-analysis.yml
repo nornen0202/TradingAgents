@@ -70,7 +70,7 @@ on:
       per_ticker_timeout_minutes:
         description: "Timeout for each ticker worker"
         required: false
-        default: "40"
+        default: "45"
         type: string
 
 permissions:
@@ -513,7 +513,7 @@ jobs:
           )
 
       - name: Run scheduled analysis and build site
-        timeout-minutes: 300
+        timeout-minutes: 360
         run: |
           import os
           import subprocess
@@ -543,6 +543,8 @@ jobs:
               site_dir,
               "--label",
               "github-actions-us",
+              "--skip-site-build",
+              "--strict",
           ]
 
           archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
@@ -585,6 +587,44 @@ jobs:
               args += ["--daily-active-ticker-limit", daily_active_ticker_limit]
 
           subprocess.check_call(args)
+
+      - name: Collect US analysis diagnostics
+        if: ${{ always() }}
+        run: |
+          import os
+          import shutil
+          from pathlib import Path
+
+          archive_root = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if not archive_root:
+              archive_root = str(Path(os.environ["GITHUB_WORKSPACE"]) / ".runtime" / "tradingagents-archive")
+
+          runs_root = Path(archive_root) / "runs"
+          destination = Path(os.environ["GITHUB_WORKSPACE"]) / "analysis-diagnostics-us"
+          destination.mkdir(parents=True, exist_ok=True)
+          if not runs_root.exists():
+              raise SystemExit(0)
+
+          run_dirs = [path for path in runs_root.glob("*/*") if path.is_dir()]
+          run_dirs.sort(key=lambda path: path.stat().st_mtime, reverse=True)
+          for run_dir in run_dirs[:2]:
+              target = destination / run_dir.name
+              target.mkdir(parents=True, exist_ok=True)
+              for name in ("run.json", "worker-summaries", "worker-logs"):
+                  source = run_dir / name
+                  if source.is_dir():
+                      shutil.copytree(source, target / name, dirs_exist_ok=True)
+                  elif source.is_file():
+                      shutil.copy2(source, target / name)
+
+      - name: Upload US analysis diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: us-analysis-diagnostics-${{ github.run_id }}
+          path: analysis-diagnostics-us
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Clean Codex runtime workspace
         if: ${{ always() }}
@@ -1100,7 +1140,7 @@ jobs:
           print("KIS account snapshot preflight:", account_result)
 
       - name: Run scheduled analysis and build site
-        timeout-minutes: 300
+        timeout-minutes: 360
         run: |
           import os
           import subprocess
@@ -1128,6 +1168,8 @@ jobs:
               site_dir,
               "--label",
               "github-actions-kr",
+              "--skip-site-build",
+              "--strict",
           ]
 
           archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
@@ -1170,6 +1212,44 @@ jobs:
               args += ["--daily-active-ticker-limit", daily_active_ticker_limit]
 
           subprocess.check_call(args)
+
+      - name: Collect KR analysis diagnostics
+        if: ${{ always() }}
+        run: |
+          import os
+          import shutil
+          from pathlib import Path
+
+          archive_root = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if not archive_root:
+              archive_root = str(Path(os.environ["GITHUB_WORKSPACE"]) / ".runtime" / "tradingagents-archive")
+
+          runs_root = Path(archive_root) / "runs"
+          destination = Path(os.environ["GITHUB_WORKSPACE"]) / "analysis-diagnostics-kr"
+          destination.mkdir(parents=True, exist_ok=True)
+          if not runs_root.exists():
+              raise SystemExit(0)
+
+          run_dirs = [path for path in runs_root.glob("*/*") if path.is_dir()]
+          run_dirs.sort(key=lambda path: path.stat().st_mtime, reverse=True)
+          for run_dir in run_dirs[:2]:
+              target = destination / run_dir.name
+              target.mkdir(parents=True, exist_ok=True)
+              for name in ("run.json", "worker-summaries", "worker-logs"):
+                  source = run_dir / name
+                  if source.is_dir():
+                      shutil.copytree(source, target / name, dirs_exist_ok=True)
+                  elif source.is_file():
+                      shutil.copy2(source, target / name)
+
+      - name: Upload KR analysis diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: kr-analysis-diagnostics-${{ github.run_id }}
+          path: analysis-diagnostics-kr
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Collect private account artifacts
         if: ${{ !cancelled() }}

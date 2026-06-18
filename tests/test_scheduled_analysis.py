@@ -760,6 +760,39 @@ site_dir = "{site_dir.as_posix()}"
             self.assertEqual(summaries[0]["status"], "failed")
             self.assertIn("per_ticker_timeout", summaries[0]["error"])
 
+    def test_post_processing_budget_guard_skips_optional_work_when_runtime_is_low(self):
+        warnings: list[str] = []
+
+        with patch("tradingagents.scheduled.runner.perf_counter", return_value=95.0):
+            available = scheduled_runner._post_processing_budget_available(
+                stage="performance",
+                max_runtime_seconds=100.0,
+                timer_start=0.0,
+                min_required_seconds=10.0,
+                warnings=warnings,
+            )
+
+        self.assertFalse(available)
+        self.assertEqual(
+            warnings,
+            ["post_processing_budget_exhausted:stage=performance:remaining_seconds=5:min_required_seconds=10"],
+        )
+
+    def test_post_processing_budget_guard_allows_optional_work_when_runtime_is_available(self):
+        warnings: list[str] = []
+
+        with patch("tradingagents.scheduled.runner.perf_counter", return_value=80.0):
+            available = scheduled_runner._post_processing_budget_available(
+                stage="portfolio",
+                max_runtime_seconds=100.0,
+                timer_start=0.0,
+                min_required_seconds=10.0,
+                warnings=warnings,
+            )
+
+        self.assertTrue(available)
+        self.assertEqual(warnings, [])
+
     def test_parallel_ticker_execution_is_disabled_when_continue_on_error_is_false(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

@@ -65,8 +65,8 @@ class LLMSettings:
     codex_reasoning_effort: str = "medium"
     codex_summary: str = "none"
     codex_personality: str = "none"
-    codex_request_timeout: float = 300.0
-    codex_max_retries: int = 3
+    codex_request_timeout: float = 600.0
+    codex_max_retries: int = 1
     codex_cleanup_threads: bool = True
     codex_preflight_mode: str = "per_client"
     codex_workspace_dir: str | None = str(Path.home() / ".codex" / "tradingagents-workspace")
@@ -391,8 +391,8 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_summary=str(llm_raw.get("codex_summary", "none")).strip() or "none",
             codex_personality=str(llm_raw.get("codex_personality", "none")).strip() or "none",
-            codex_request_timeout=float(llm_raw.get("codex_request_timeout", 300.0)),
-            codex_max_retries=int(llm_raw.get("codex_max_retries", 3)),
+            codex_request_timeout=float(llm_raw.get("codex_request_timeout", 600.0)),
+            codex_max_retries=int(llm_raw.get("codex_max_retries", 1)),
             codex_cleanup_threads=bool(llm_raw.get("codex_cleanup_threads", True)),
             codex_preflight_mode=str(llm_raw.get("codex_preflight_mode", "per_client")).strip().lower()
             or "per_client",
