@@ -94,7 +94,7 @@ _MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS = (
     "microstructure_checkpoint_snapshot_json",
     "microstructure_checkpoint_report_md",
 )
-_DEFAULT_CODEX_PARALLEL_TICKER_CAP = 3
+_DEFAULT_CODEX_PARALLEL_TICKER_CAP = 4
 
 _CODEX_TRANSIENT_FAILURE_PATTERNS = (
     "timed out waiting for codex app-server",
@@ -169,6 +169,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Archive the run without rebuilding the static site. Useful for intermediate overlay workers.",
     )
+    parser.add_argument(
+        "--disable-execution-refresh",
+        action="store_true",
+        help="Skip live execution overlay refreshes for this run while preserving archived execution contracts.",
+    )
     parser.add_argument("--strict", action="store_true", help="Return a non-zero exit code if any ticker fails.")
     parser.add_argument("--label", default="github-actions", help="Run label for archived metadata.")
     args = parser.parse_args(argv)
@@ -185,6 +190,7 @@ def main(argv: list[str] | None = None) -> int:
         max_parallel_tickers=args.max_parallel_tickers,
         per_ticker_timeout_minutes=args.per_ticker_timeout_minutes,
         daily_active_ticker_limit=args.daily_active_ticker_limit,
+        execution_refresh_enabled=False if args.disable_execution_refresh else None,
     )
 
     if args.site_only:

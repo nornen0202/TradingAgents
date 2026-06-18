@@ -61,16 +61,16 @@ on:
       max_parallel_tickers:
         description: "Maximum ticker workers to run concurrently"
         required: false
-        default: "2"
+        default: "4"
         type: string
       daily_active_ticker_limit:
-        description: "Limit full analysis to the first N resolved tickers; smoke defaults to 3"
+        description: "Optional limit for full analysis; leave blank for no cap. Smoke defaults to 3"
         required: false
         type: string
       per_ticker_timeout_minutes:
         description: "Timeout for each ticker worker"
         required: false
-        default: "30"
+        default: "60"
         type: string
 
 permissions:
@@ -121,6 +121,7 @@ jobs:
       - schedule_gate
     if: ${{ github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' && (needs.schedule_gate.outputs.profile == 'all' || needs.schedule_gate.outputs.profile == 'us') }}
     runs-on: [self-hosted, Windows]
+    timeout-minutes: 720
     defaults:
       run:
         shell: python {0}
@@ -513,7 +514,6 @@ jobs:
           )
 
       - name: Run scheduled analysis and build site
-        timeout-minutes: 240
         run: |
           import os
           import subprocess
@@ -544,6 +544,7 @@ jobs:
               "--label",
               "github-actions-us",
               "--skip-site-build",
+              "--disable-execution-refresh",
               "--strict",
           ]
 
@@ -664,6 +665,7 @@ jobs:
       - schedule_gate
     if: ${{ github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' && (needs.schedule_gate.outputs.profile == 'all' || needs.schedule_gate.outputs.profile == 'kr') }}
     runs-on: [self-hosted, Windows]
+    timeout-minutes: 720
     defaults:
       run:
         shell: python {0}
@@ -1140,7 +1142,6 @@ jobs:
           print("KIS account snapshot preflight:", account_result)
 
       - name: Run scheduled analysis and build site
-        timeout-minutes: 240
         run: |
           import os
           import subprocess
@@ -1169,6 +1170,7 @@ jobs:
               "--label",
               "github-actions-kr",
               "--skip-site-build",
+              "--disable-execution-refresh",
               "--strict",
           ]
 

@@ -33,32 +33,34 @@ def test_daily_analysis_uses_python_shell_for_all_windows_jobs():
     assert workflow.count("        shell: python {0}") == 3
 
 
-def test_daily_analysis_default_parallel_ticker_workers_is_two():
+def test_daily_analysis_default_parallel_ticker_workers_is_four():
     workflow = _workflow_text()
 
     input_start = workflow.index("      max_parallel_tickers:")
     input_block = workflow[input_start : workflow.index("      daily_active_ticker_limit:", input_start)]
-    assert 'default: "2"' in input_block
+    assert 'default: "4"' in input_block
 
 
-def test_daily_analysis_default_ticker_timeout_is_thirty_minutes():
+def test_daily_analysis_default_ticker_timeout_is_sixty_minutes():
     workflow = _workflow_text()
 
     input_start = workflow.index("      per_ticker_timeout_minutes:")
     input_block = workflow[input_start : workflow.index("\n\npermissions:", input_start)]
-    assert 'default: "30"' in input_block
+    assert 'default: "60"' in input_block
 
 
 def test_daily_analysis_job_timeout_bounds_scheduled_runs():
     workflow = _workflow_text()
 
-    assert workflow.count("        timeout-minutes: 240") == 2
+    assert workflow.count("    timeout-minutes: 720") == 2
+    assert "        timeout-minutes: 240" not in workflow
 
 
-def test_daily_analysis_jobs_skip_inline_site_build_and_fail_on_partial_runs():
+def test_daily_analysis_jobs_skip_inline_site_build_execution_refresh_and_fail_on_partial_runs():
     workflow = _workflow_text()
 
     assert workflow.count('"--skip-site-build",') == 2
+    assert workflow.count('"--disable-execution-refresh",') == 2
     assert workflow.count('"--strict",') == 2
 
 

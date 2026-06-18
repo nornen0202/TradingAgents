@@ -558,9 +558,11 @@ def with_overrides(
     max_parallel_tickers: int | None = None,
     per_ticker_timeout_minutes: float | None = None,
     daily_active_ticker_limit: int | None = None,
+    execution_refresh_enabled: bool | None = None,
 ) -> ScheduledAnalysisConfig:
     run = config.run
     storage = config.storage
+    execution = config.execution
 
     if tickers is not None:
         run = replace(run, tickers=_normalize_tickers(tickers))
@@ -578,12 +580,14 @@ def with_overrides(
         run = replace(run, per_ticker_timeout_minutes=max(0.0, float(per_ticker_timeout_minutes or 0.0)))
     if daily_active_ticker_limit is not None:
         run = replace(run, daily_active_ticker_limit=max(0, int(daily_active_ticker_limit or 0)))
+    if execution_refresh_enabled is not None:
+        execution = replace(execution, execution_refresh_enabled=bool(execution_refresh_enabled))
     if archive_dir:
         storage = replace(storage, archive_dir=Path(archive_dir).expanduser().resolve())
     if site_dir:
         storage = replace(storage, site_dir=Path(site_dir).expanduser().resolve())
 
-    return replace(config, run=run, storage=storage)
+    return replace(config, run=run, storage=storage, execution=execution)
 
 
 def _normalize_tickers(values: Iterable[str]) -> list[str]:
