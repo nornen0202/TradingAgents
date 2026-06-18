@@ -1026,6 +1026,51 @@ def _run_parallel_tickers(
                 running.clear()
                 break
 
+        remaining_seconds = _remaining_runtime_seconds(
+            max_runtime_seconds=max_runtime_seconds,
+            timer_start=timer_start,
+        )
+        if remaining_seconds is not None and remaining_seconds <= 0 and (pending or running):
+            budgeted_tickers = [state.get("ticker") for state in running.values()]
+            budgeted_tickers.extend(ticker for _, ticker in pending)
+            skipped = [str(ticker) for ticker in budgeted_tickers if ticker]
+            warning = _run_time_budget_warning(
+                remaining_seconds=remaining_seconds,
+                min_remaining_seconds=min_remaining_seconds,
+                skipped=skipped,
+            )
+            print(f"::warning::{warning}", flush=True)
+            warnings.append(warning)
+            for skipped_index, skipped_ticker in pending:
+                results[skipped_index] = _skipped_ticker_summary(
+                    config=config,
+                    ticker=skipped_ticker,
+                    reason="run_time_budget_exhausted",
+                )
+            pending.clear()
+            for index, state in list(running.items()):
+                process: subprocess.Popen[Any] = state["process"]
+                elapsed = perf_counter() - float(state["started_perf"])
+                if process.poll() is None:
+                    _terminate_worker_process(process)
+                summary = _worker_failed_summary(
+                    config=config,
+                    state=state,
+                    reason="run_time_budget_exhausted",
+                    elapsed_seconds=elapsed,
+                )
+                summary["worker"] = {
+                    "mode": "subprocess",
+                    "exit_code": process.returncode,
+                    "elapsed_seconds": round(elapsed, 2),
+                    "timeout": True,
+                    "budget_exhausted": True,
+                }
+                results[index] = summary
+                _close_worker_log_handles(state)
+            running.clear()
+            break
+
         if pending or running:
             sleep(0.25)
 

@@ -70,13 +70,19 @@ def test_daily_codex_us_watchdog_stays_due_during_late_recovery_window():
 
 
 def test_daily_codex_us_watchdog_yields_after_late_recovery_window():
-    targets = watchdog.due_targets(_kst("2026-06-01T22:07:00"))
+    targets = watchdog.due_targets(_kst("2026-06-01T23:17:00"))
 
     assert not [target for target in targets if target.name == "daily-codex-us"]
 
 
-def test_daily_codex_kr_watchdog_yields_before_intraday_overlay_window():
-    targets = watchdog.due_targets(_kst("2026-06-01T09:25:00"))
+def test_daily_codex_kr_watchdog_stays_due_after_delayed_cancel_window():
+    targets = watchdog.due_targets(_kst("2026-06-01T12:37:00"))
+
+    assert [target for target in targets if target.name == "daily-codex-kr"]
+
+
+def test_daily_codex_kr_watchdog_yields_after_recovery_window():
+    targets = watchdog.due_targets(_kst("2026-06-01T15:47:00"))
 
     assert not [target for target in targets if target.name == "daily-codex-kr"]
 
@@ -277,7 +283,8 @@ def test_watchdog_waits_to_dispatch_overlay_until_daily_dependency_completes():
 
     messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T10:07:00"))
 
-    assert not client.dispatches
+    assert ("daily-codex-analysis.yml", {"profile": "kr"}) in client.dispatches
+    assert ("intraday-overlay-refresh.yml", {"profile": "kr", "run_mode": "overlay_only"}) not in client.dispatches
     assert any("intraday-overlay-kr: waiting" in message for message in messages)
     assert any("daily-codex-kr still active" in message for message in messages)
 
