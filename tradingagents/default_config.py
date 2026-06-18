@@ -30,6 +30,7 @@ DEFAULT_CONFIG = {
     "codex_max_retries": 2,
     "codex_cleanup_threads": True,
     "codex_preflight_mode": "per_client",
+    "codex_fallback_on_app_server_error": False,
     "execution_refresh_enabled": False,
     # Empty means "derive by market defaults" in scheduled runner/config paths.
     "execution_refresh_checkpoints_kst": [],

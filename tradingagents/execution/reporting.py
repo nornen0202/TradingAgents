@@ -91,6 +91,9 @@ def _generate_llm_summary(
                 "codex_max_retries": getattr(llm_settings, "codex_max_retries", 2),
                 "codex_cleanup_threads": getattr(llm_settings, "codex_cleanup_threads", True),
                 "codex_preflight_mode": getattr(llm_settings, "codex_preflight_mode", "per_client"),
+                "codex_fallback_on_app_server_error": getattr(
+                    llm_settings, "codex_fallback_on_app_server_error", False
+                ),
             }
         llm = create_llm_client(provider=provider, model=model, **kwargs).get_llm()
         payload = {
@@ -107,6 +110,8 @@ def _generate_llm_summary(
         response = llm.invoke(prompt)
         content = getattr(response, "content", response)
         text = str(content or "").strip()
+        if "TRADINGAGENTS_CODEX_FALLBACK_RESPONSE" in text:
+            return _deterministic_summary(update)
         return text or _deterministic_summary(update)
     except Exception:
         return _deterministic_summary(update)
