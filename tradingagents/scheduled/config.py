@@ -69,6 +69,7 @@ class LLMSettings:
     codex_max_retries: int = 1
     codex_cleanup_threads: bool = True
     codex_preflight_mode: str = "per_client"
+    codex_fallback_on_app_server_error: bool = False
     codex_workspace_dir: str | None = str(Path.home() / ".codex" / "tradingagents-workspace")
     codex_binary: str | None = None
 
@@ -396,6 +397,9 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             codex_cleanup_threads=bool(llm_raw.get("codex_cleanup_threads", True)),
             codex_preflight_mode=str(llm_raw.get("codex_preflight_mode", "per_client")).strip().lower()
             or "per_client",
+            codex_fallback_on_app_server_error=bool(
+                llm_raw.get("codex_fallback_on_app_server_error", False)
+            ),
             codex_workspace_dir=codex_workspace_override
             or _optional_string(llm_raw.get("codex_workspace_dir"))
             or str(Path.home() / ".codex" / "tradingagents-workspace"),

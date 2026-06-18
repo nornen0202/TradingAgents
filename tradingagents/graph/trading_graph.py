@@ -183,6 +183,9 @@ class TradingAgentsGraph:
             kwargs["codex_max_retries"] = self.config.get("codex_max_retries")
             kwargs["codex_cleanup_threads"] = self.config.get("codex_cleanup_threads")
             kwargs["codex_preflight_mode"] = self.config.get("codex_preflight_mode")
+            kwargs["codex_fallback_on_app_server_error"] = self.config.get(
+                "codex_fallback_on_app_server_error"
+            )
 
         return kwargs
 

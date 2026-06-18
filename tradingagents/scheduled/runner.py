@@ -1826,6 +1826,7 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     graph_config["codex_max_retries"] = config.llm.codex_max_retries
     graph_config["codex_cleanup_threads"] = config.llm.codex_cleanup_threads
     graph_config["codex_preflight_mode"] = config.llm.codex_preflight_mode
+    graph_config["codex_fallback_on_app_server_error"] = config.llm.codex_fallback_on_app_server_error
     if config.run.market == "KR":
         graph_config["market_country"] = "KR"
         graph_config["timezone"] = "Asia/Seoul"
@@ -1909,6 +1910,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "output_model": config.llm.output_model,
         "codex_reasoning_effort": config.llm.codex_reasoning_effort,
         "codex_preflight_mode": config.llm.codex_preflight_mode,
+        "codex_fallback_on_app_server_error": config.llm.codex_fallback_on_app_server_error,
         "output_language": config.run.output_language,
         "translation_backend": config.translation.backend,
         "translation_model": config.translation.model,

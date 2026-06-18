@@ -105,3 +105,45 @@ def test_structured_decision_retry_allows_three_repairs_by_default():
     parsed = json.loads(decision_json)
     assert parsed["rating"] == "HOLD"
     assert len(llm.calls) == 4
+
+
+def test_structured_decision_retry_returns_safe_fallback_for_codex_provider_marker():
+    class FallbackLLM:
+        def invoke(self, prompt):
+            return _Response(
+                "TRADINGAGENTS_CODEX_FALLBACK_RESPONSE\n"
+                "Codex app-server did not return a response before timeout."
+            )
+
+    _response, decision_json = invoke_structured_decision_with_retry(
+        FallbackLLM(),
+        [{"role": "system", "content": "Return a decision."}],
+        context="portfolio manager final decision",
+    )
+
+    parsed = json.loads(decision_json)
+    assert parsed["rating"] == "NO_TRADE"
+    assert parsed["entry_action"] == "WAIT"
+    assert "CODEX_PROVIDER_UNAVAILABLE" in parsed["risk_action_reason_codes"]
+
+
+def test_structured_decision_retry_returns_safe_fallback_after_exhausted_repairs():
+    class InvalidLLM:
+        def __init__(self):
+            self.calls = 0
+
+        def invoke(self, prompt):
+            self.calls += 1
+            return _Response('{"rating":"HOLD"}')
+
+    llm = InvalidLLM()
+    _response, decision_json = invoke_structured_decision_with_retry(
+        llm,
+        [{"role": "system", "content": "Return a decision."}],
+        context="research manager investment plan",
+        max_retries=1,
+    )
+
+    parsed = json.loads(decision_json)
+    assert parsed["rating"] == "NO_TRADE"
+    assert llm.calls == 2

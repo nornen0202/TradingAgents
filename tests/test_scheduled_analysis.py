@@ -370,6 +370,7 @@ analysis_mode = "smoke"
 
 [llm]
 codex_preflight_mode = "workflow_once"
+codex_fallback_on_app_server_error = true
 
 [storage]
 archive_dir = "./archive"
@@ -389,6 +390,7 @@ site_dir = "./site"
             self.assertEqual(config.run.daily_active_ticker_limit, 4)
             self.assertEqual(config.run.analysis_mode, "smoke")
             self.assertEqual(config.llm.codex_preflight_mode, "workflow_once")
+            self.assertTrue(config.llm.codex_fallback_on_app_server_error)
 
     def test_execute_scheduled_run_records_parallel_manifest_state(self):
         with tempfile.TemporaryDirectory() as tmpdir:

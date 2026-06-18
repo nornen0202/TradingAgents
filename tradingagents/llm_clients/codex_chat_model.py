@@ -44,6 +44,13 @@ CODEX_MODEL_FALLBACKS = (
 _FALSE_MODEL_FALLBACK_VALUES = {"0", "false", "no", "off"}
 
 
+def _truncate_fallback_error(error: Exception, *, max_chars: int = 500) -> str:
+    text = str(error).replace("\r", " ").replace("\n", " ").strip()
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 3] + "..."
+
+
 class CodexChatModel(BaseChatModel):
     """LangChain chat model that talks to `codex app-server` over stdio."""
 
@@ -57,6 +64,7 @@ class CodexChatModel(BaseChatModel):
     codex_max_retries: int = 2
     codex_cleanup_threads: bool = True
     codex_preflight_mode: str = "per_client"
+    codex_fallback_on_app_server_error: bool = False
     session_factory: Callable[..., CodexAppServerSession] | None = Field(
         default=None, exclude=True, repr=False
     )
@@ -194,6 +202,8 @@ class CodexChatModel(BaseChatModel):
                 last_schema_error = None
                 last_app_server_error = exc
                 if attempt >= self.codex_max_retries:
+                    if self.codex_fallback_on_app_server_error:
+                        return self._fallback_chat_result(exc)
                     raise
                 # Transport failures can leave the stdio session unusable.
                 self.close()
@@ -239,6 +249,23 @@ class CodexChatModel(BaseChatModel):
             f"{self.codex_max_retries + 1} attempt(s): {last_error}. "
             f"Last response: {raw_response!r}"
         )
+
+    def _fallback_chat_result(self, error: Exception) -> ChatResult:
+        content = (
+            "TRADINGAGENTS_CODEX_FALLBACK_RESPONSE\n"
+            "Codex app-server did not return a response before the configured timeout. "
+            "No additional LLM synthesis is available for this step. "
+            "Use only previously collected market data, tool outputs, and deterministic safety rules. "
+            f"Provider error: {_truncate_fallback_error(error)}"
+        )
+        message = AIMessage(
+            content=content,
+            response_metadata={
+                "codex_fallback": True,
+                "codex_error": str(error),
+            },
+        )
+        return ChatResult(generations=[ChatGeneration(message=message)])
 
     def _parse_plain_response(self, raw_response: str) -> AIMessage:
         payload = json.loads(strip_json_fence(raw_response))

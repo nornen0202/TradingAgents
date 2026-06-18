@@ -363,6 +363,9 @@ def _create_semantic_llm(llm_settings: Any | None) -> Any | None:
             "codex_max_retries": getattr(llm_settings, "codex_max_retries", 2),
             "codex_cleanup_threads": getattr(llm_settings, "codex_cleanup_threads", True),
             "codex_preflight_mode": getattr(llm_settings, "codex_preflight_mode", "per_client"),
+            "codex_fallback_on_app_server_error": getattr(
+                llm_settings, "codex_fallback_on_app_server_error", False
+            ),
         }
     return create_llm_client(provider=provider, model=model, **kwargs).get_llm()
 

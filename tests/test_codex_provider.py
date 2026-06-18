@@ -658,6 +658,30 @@ class CodexProviderTests(unittest.TestCase):
         )
         sleep_mock.assert_called_once_with(30.0)
 
+    def test_codex_app_server_error_can_return_fallback_message_when_enabled(self):
+        class FailingCodexSession(FakeCodexSession):
+            def invoke(self, **kwargs):
+                self.invocations.append(kwargs)
+                raise CodexAppServerError("Timed out waiting for Codex app-server after 600s")
+
+        session = FailingCodexSession()
+        llm = create_llm_client(
+            "codex",
+            "gpt-5.5",
+            codex_binary="C:/fake/codex",
+            codex_workspace_dir="C:/tmp/codex-workspace",
+            codex_max_retries=0,
+            codex_fallback_on_app_server_error=True,
+            session_factory=lambda **kwargs: session,
+            preflight_runner=lambda **kwargs: None,
+        ).get_llm()
+
+        result = llm.invoke("fallback instead of failing")
+
+        self.assertIn("TRADINGAGENTS_CODEX_FALLBACK_RESPONSE", result.content)
+        self.assertTrue(result.response_metadata["codex_fallback"])
+        self.assertEqual(len(session.invocations), 1)
+
     def test_codex_app_server_thread_forbids_native_tools(self):
         session = CodexAppServerSession(
             codex_binary="C:/fake/codex",
