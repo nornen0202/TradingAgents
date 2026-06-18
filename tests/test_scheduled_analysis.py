@@ -943,8 +943,8 @@ provider = "codex"
                     ticker_count=5,
                 )
 
-            self.assertEqual(effective, 3)
-            self.assertEqual(warning, "codex_parallel_ticker_cap_applied:requested=5:cap=3:effective=3")
+            self.assertEqual(effective, 4)
+            self.assertEqual(warning, "codex_parallel_ticker_cap_applied:requested=5:cap=4:effective=4")
 
     def test_main_site_only_rebuilds_from_existing_archive(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -1091,6 +1091,7 @@ site_dir = "{site_dir.as_posix()}"
                         "15",
                         "--daily-active-ticker-limit",
                         "3",
+                        "--disable-execution-refresh",
                     ]
                 )
 
@@ -1100,6 +1101,7 @@ site_dir = "{site_dir.as_posix()}"
             self.assertEqual(config.run.max_parallel_tickers, 2)
             self.assertEqual(config.run.per_ticker_timeout_minutes, 15)
             self.assertEqual(config.run.daily_active_ticker_limit, 3)
+            self.assertFalse(config.execution.execution_refresh_enabled)
             self.assertFalse(captured["skip_site_build"])
 
     def test_execute_scheduled_run_supports_account_only_ticker_universe_mode(self):
