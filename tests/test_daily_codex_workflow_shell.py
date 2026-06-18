@@ -41,18 +41,34 @@ def test_daily_analysis_default_parallel_ticker_workers_is_three():
     assert 'default: "3"' in input_block
 
 
-def test_daily_analysis_default_ticker_timeout_is_forty_minutes():
+def test_daily_analysis_default_ticker_timeout_is_forty_five_minutes():
     workflow = _workflow_text()
 
     input_start = workflow.index("      per_ticker_timeout_minutes:")
     input_block = workflow[input_start : workflow.index("\n\npermissions:", input_start)]
-    assert 'default: "40"' in input_block
+    assert 'default: "45"' in input_block
 
 
 def test_daily_analysis_job_timeout_covers_full_universe_runs():
     workflow = _workflow_text()
 
-    assert workflow.count("        timeout-minutes: 300") == 2
+    assert workflow.count("        timeout-minutes: 360") == 2
+
+
+def test_daily_analysis_jobs_skip_inline_site_build_and_fail_on_partial_runs():
+    workflow = _workflow_text()
+
+    assert workflow.count('"--skip-site-build",') == 2
+    assert workflow.count('"--strict",') == 2
+
+
+def test_daily_analysis_uploads_diagnostics_even_on_failure():
+    workflow = _workflow_text()
+
+    assert "Collect US analysis diagnostics" in workflow
+    assert "Upload US analysis diagnostics" in workflow
+    assert "Collect KR analysis diagnostics" in workflow
+    assert "Upload KR analysis diagnostics" in workflow
 
 
 def test_daily_analysis_deploy_runs_after_final_pages_build():

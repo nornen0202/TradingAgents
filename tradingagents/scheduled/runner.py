@@ -250,6 +250,7 @@ def execute_scheduled_run(
     circuit_breaker_summary = _initial_circuit_breaker_summary(config)
     max_runtime_seconds = _max_runtime_seconds(config)
     min_remaining_seconds = _min_remaining_seconds_for_next_ticker(config)
+    post_processing_min_seconds = max(600.0, min_remaining_seconds)
     if run_mode == "selective_rerun_only" and not config.execution.execution_refresh_enabled:
         raise RuntimeError(
             "run_mode=selective_rerun_only requires [execution].enabled=true to compute rerun targets."
@@ -307,7 +308,16 @@ def execute_scheduled_run(
 
     reset_llm_usage()
     execution_updates: dict[str, dict[str, Any]] = {}
+    execution_refresh_budget_available = True
     if config.execution.execution_refresh_enabled and not portfolio_only:
+        execution_refresh_budget_available = _post_processing_budget_available(
+            stage="execution_overlay",
+            max_runtime_seconds=max_runtime_seconds,
+            timer_start=run_timer_start,
+            min_required_seconds=post_processing_min_seconds,
+            warnings=run_warnings,
+        )
+    if config.execution.execution_refresh_enabled and not portfolio_only and execution_refresh_budget_available:
         checkpoint_timezone = _execution_checkpoint_timezone(config)
         now_local = datetime.now(ZoneInfo(checkpoint_timezone))
         now_kst = now_local.astimezone(ZoneInfo("Asia/Seoul"))
@@ -345,6 +355,11 @@ def execute_scheduled_run(
                 f"run_mode={run_mode} produced no execution updates. "
                 "Check execution_contract artifacts and intraday market data availability."
             )
+    elif config.execution.execution_refresh_enabled and not portfolio_only:
+        manifest_overlay_phase = {
+            "name": "SKIPPED_RUNTIME_BUDGET",
+            "selected_checkpoints": [],
+        }
     else:
         manifest_overlay_phase = {
             "name": "PORTFOLIO_ONLY" if portfolio_only else "DISABLED",
@@ -528,6 +543,16 @@ def execute_scheduled_run(
         }
 
     if config.portfolio.enabled and config.portfolio.profile_path:
+        portfolio_budget_available = _post_processing_budget_available(
+            stage="portfolio",
+            max_runtime_seconds=max_runtime_seconds,
+            timer_start=run_timer_start,
+            min_required_seconds=post_processing_min_seconds,
+            warnings=manifest["warnings"],
+        )
+    else:
+        portfolio_budget_available = False
+    if config.portfolio.enabled and config.portfolio.profile_path and portfolio_budget_available:
         portfolio_status = run_portfolio_pipeline(
             run_dir=run_dir,
             manifest=manifest,
@@ -546,11 +571,25 @@ def execute_scheduled_run(
                 "::warning::Portfolio pipeline failed: "
                 f"{portfolio_status.get('error', 'unknown error')}"
             )
+    elif config.portfolio.enabled and config.portfolio.profile_path:
+        manifest["portfolio"] = {"status": "skipped", "reason": "runtime_budget_exhausted"}
     else:
         manifest["portfolio"] = {"status": "disabled"}
 
     if config.performance.enabled and not portfolio_only:
+        performance_budget_available = _post_processing_budget_available(
+            stage="performance",
+            max_runtime_seconds=max_runtime_seconds,
+            timer_start=run_timer_start,
+            min_required_seconds=post_processing_min_seconds,
+            warnings=manifest["warnings"],
+        )
+    else:
+        performance_budget_available = False
+    if config.performance.enabled and not portfolio_only and performance_budget_available:
         manifest["performance"] = _run_performance_tracking(config=config, run_dir=run_dir, started_at=started_at)
+    elif config.performance.enabled and not portfolio_only:
+        manifest["performance"] = {"status": "skipped", "reason": "runtime_budget_exhausted"}
 
     manifest["run_quality"] = _compute_run_quality(manifest=manifest)
     manifest["usefulness_rank"] = manifest["run_quality"]["usefulness_rank"]
@@ -1005,6 +1044,31 @@ def _run_time_budget_warning(
         f"min_required_seconds={int(min_remaining_seconds)}:"
         f"skipped_tickers={','.join(skipped)}"
     )
+
+
+def _post_processing_budget_available(
+    *,
+    stage: str,
+    max_runtime_seconds: float | None,
+    timer_start: float,
+    min_required_seconds: float,
+    warnings: list[str],
+) -> bool:
+    remaining_seconds = _remaining_runtime_seconds(
+        max_runtime_seconds=max_runtime_seconds,
+        timer_start=timer_start,
+    )
+    if remaining_seconds is None or remaining_seconds >= min_required_seconds:
+        return True
+    warning = (
+        "post_processing_budget_exhausted:"
+        f"stage={stage}:"
+        f"remaining_seconds={int(max(remaining_seconds, 0))}:"
+        f"min_required_seconds={int(min_required_seconds)}"
+    )
+    print(f"::warning::{warning}", flush=True)
+    warnings.append(warning)
+    return False
 
 
 def _per_ticker_timeout_seconds(config: ScheduledAnalysisConfig) -> float:
