@@ -298,9 +298,10 @@ class CodexChatModel(BaseChatModel):
         if mode == "final":
             tool_calls = payload.get("tool_calls", [])
             if tool_calls not in ([], None):
-                raise CodexStructuredOutputError(
-                    f"`mode=final` must not include tool calls, got: {tool_calls!r}"
-                )
+                if not content.strip():
+                    raise CodexStructuredOutputError(
+                        f"`mode=final` with empty content must not include tool calls, got: {tool_calls!r}"
+                    )
             return AIMessage(content=content)
 
         if mode != "tool_calls":

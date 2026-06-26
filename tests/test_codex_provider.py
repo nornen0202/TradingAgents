@@ -510,6 +510,26 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(result.tool_calls[0]["name"], "lookup_price")
         self.assertEqual(result.tool_calls[0]["args"], {"ticker": "NVDA"})
 
+    def test_final_response_ignores_stray_tool_calls_when_content_is_present(self):
+        session = FakeCodexSession(
+            responses=[
+                '{"mode":"final","content":"Use the completed analysis.","tool_calls":[{"name":"lookup_price","arguments":{"ticker":"NVDA"}}]}'
+            ],
+        )
+        llm = create_llm_client(
+            "codex",
+            "gpt-5.5",
+            codex_binary="C:/fake/codex",
+            codex_workspace_dir="C:/tmp/codex-workspace",
+            session_factory=lambda **kwargs: session,
+            preflight_runner=lambda **kwargs: None,
+        ).get_llm()
+
+        result = llm.bind_tools([lookup_price]).invoke("Analyze NVDA")
+
+        self.assertEqual(result.content, "Use the completed analysis.")
+        self.assertEqual(result.tool_calls, [])
+
     def test_bind_tools_honors_required_and_named_tool_choice(self):
         required_session = FakeCodexSession(
             responses=[
