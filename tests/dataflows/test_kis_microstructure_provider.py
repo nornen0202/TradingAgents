@@ -117,6 +117,30 @@ class FakeNysKisClient(FakeKisClient):
         }
 
 
+class RealisticDomesticTapeKisClient(FakeKisClient):
+    def domestic_price(self, code):
+        payload = super().domestic_price(code)
+        payload["output"].pop("cttr", None)
+        payload["output"].pop("tbuy_cntg_strength", None)
+        payload["output"]["mrkt_warn_cls_code"] = "00"
+        return payload
+
+    def domestic_time_itemconclusion(self, code, *, input_hour):
+        return {
+            "output2": [
+                {
+                    "stck_cntg_hour": "145835",
+                    "stck_prpr": "105",
+                    "askp": "106",
+                    "bidp": "104",
+                    "tday_rltv": "109.30",
+                    "acml_vol": "1000",
+                    "cnqn": "7",
+                }
+            ]
+        }
+
+
 class IncompleteUsKisClient(FakeKisClient):
     def overseas_price(self, symbol, *, exchange, auth=""):
         if exchange != "NAS":
@@ -190,6 +214,20 @@ def test_kr_microstructure_snapshot_normalizes_kis_fields():
     assert snapshot.program_flow_status == "available"
     assert snapshot.vi_status["is_clear"] is True
     assert snapshot.market_alert_status["is_clear"] is True
+
+
+def test_kr_microstructure_uses_kis_tday_rltv_and_clear_00_market_alert_code():
+    snapshot = KISMicrostructureProvider(client=RealisticDomesticTapeKisClient()).fetch(
+        "005930.KS",
+        market_timezone="Asia/Seoul",
+        checkpoint_id="14:35",
+    )
+
+    assert snapshot.execution_strength == 109.3
+    assert snapshot.market_alert_status["is_clear"] is True
+    assert snapshot.execution_data_quality != DELAYED_ANALYSIS_ONLY
+    assert "execution_strength" not in snapshot.missing_reason
+    assert "market_alert_status" not in snapshot.missing_reason
 
 
 def test_us_microstructure_marks_kr_flow_fields_not_applicable():

@@ -169,9 +169,21 @@ class KISMicrostructureProvider:
             missing.setdefault("relative_volume", "avg20_daily_volume_unavailable")
 
         orderbook_metrics = _orderbook_metrics(orderbook_row)
-        execution_strength = _find_float(price_row, "cttr", "tbuy_cntg_strength", "execution_strength")
+        execution_strength = _find_float(
+            price_row,
+            "cttr",
+            "tbuy_cntg_strength",
+            "execution_strength",
+            "tday_rltv",
+        )
         if execution_strength is None:
-            execution_strength = _find_float(orderbook_row, "cttr", "tbuy_cntg_strength", "execution_strength")
+            execution_strength = _find_float(
+                orderbook_row,
+                "cttr",
+                "tbuy_cntg_strength",
+                "execution_strength",
+                "tday_rltv",
+            )
         if execution_strength is None:
             execution_strength = _execution_strength_from_tape(tape_rows)
         if execution_strength is None:
@@ -763,10 +775,15 @@ def _orderbook_metrics(row: dict[str, Any]) -> dict[str, float | None]:
 
 
 def _execution_strength_from_tape(rows: list[dict[str, Any]]) -> float | None:
+    for row in rows:
+        direct = _find_float(row, "tday_rltv", "cttr", "tbuy_cntg_strength", "execution_strength")
+        if direct is not None:
+            return direct
+
     buy_volume = 0.0
     sell_volume = 0.0
     for row in rows:
-        volume = abs(_find_float(row, "cntg_vol", "volume", "EVOL", "evol") or 0.0)
+        volume = abs(_find_float(row, "cntg_vol", "cnqn", "volume", "EVOL", "evol") or 0.0)
         sign_text = " ".join(str(row.get(key) or "") for key in ("ccld_dvsn", "sign", "MTYP", "mtyp")).lower()
         if any(token in sign_text for token in ("buy", "bid", "매수", "+", "2")):
             buy_volume += volume
@@ -838,7 +855,7 @@ def _status_from_keys(row: dict[str, Any], tokens: tuple[str, ...], *, default_n
     matched = {
         key: value
         for key, value in relevant.items()
-        if str(value or "").strip() not in {"", "0", "N", "n", "normal", "NORMAL"}
+        if str(value or "").strip() not in {"", "0", "00", "000", "N", "n", "normal", "NORMAL", "none", "NONE"}
     }
     if matched:
         return {"status": "flagged", "is_clear": False, "raw": _compact_record(matched)}

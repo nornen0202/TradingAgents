@@ -127,17 +127,25 @@ _CODEX_IMMEDIATE_FATAL_PATTERNS = (
     "unauthorized",
 )
 
-FRESHNESS_CURRENT_RUN_FRESH = "CURRENT_RUN_FRESH"
-FRESHNESS_HOURLY_ASOF = "HOURLY_ASOF"
+FRESHNESS_CURRENT_RUN_FRESH = "LIVE_CHECKPOINT"
+FRESHNESS_HOURLY_ASOF = "CURRENT_SESSION"
 FRESHNESS_DELAYED_CHECKPOINT = "DELAYED_CHECKPOINT"
 FRESHNESS_STALE = "STALE"
 FRESHNESS_PRIOR_SESSION_BACKFILL = "PRIOR_SESSION_BACKFILL"
 
-ELIGIBILITY_LIVE_EXECUTION_OK = "LIVE_EXECUTION_OK"
-ELIGIBILITY_ASOF_ONLY = "ASOF_ONLY"
+ELIGIBILITY_LIVE_EXECUTION_OK = "LIVE_EXECUTION_READY"
+ELIGIBILITY_ASOF_ONLY = "ASOF_EXECUTION_READY"
 ELIGIBILITY_DELAYED_ANALYSIS_ONLY = "DELAYED_ANALYSIS_ONLY"
 ELIGIBILITY_HISTORICAL_REFERENCE_ONLY = "HISTORICAL_REFERENCE_ONLY"
 ELIGIBILITY_NOT_EXECUTION_ELIGIBLE = "NOT_EXECUTION_ELIGIBLE"
+
+_EXECUTION_READY_ELIGIBILITIES = {
+    ELIGIBILITY_LIVE_EXECUTION_OK,
+    "ACTIONABLE",
+    "ACTIONABLE_NOW",
+    "PILOT_READY",
+    "LIVE_EXECUTION_OK",
+}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -3805,6 +3813,38 @@ def _parse_datetime(value: str | None) -> datetime | None:
         return None
 
 
+def _build_context_gate_payload(update: dict[str, Any], source: dict[str, Any]) -> dict[str, Any]:
+    micro = source.get("microstructure") if isinstance(source.get("microstructure"), dict) else {}
+    missing_core_fields = [
+        field
+        for field in ("last_price", "session_vwap", "relative_volume")
+        if update.get(field) is None and source.get(field) is None and micro.get(field) is None
+    ]
+    missing_reason = source.get("missing_reason") if isinstance(source.get("missing_reason"), dict) else {}
+    freshness_class = str(source.get("freshness_class") or "").strip().upper()
+    execution_eligibility = str(source.get("execution_eligibility") or "").strip().upper()
+    generated = source.get("generated_in_current_run")
+    current_run_fresh = (
+        generated is True
+        and freshness_class in {FRESHNESS_CURRENT_RUN_FRESH, "CURRENT_SESSION", "FRESH", "CURRENT_RUN_FRESH"}
+    )
+    asof_execution_possible = not missing_core_fields and execution_eligibility in _EXECUTION_READY_ELIGIBILITIES
+    current_execution_promotion = "POSSIBLE" if current_run_fresh and asof_execution_possible else "RECHECK_REQUIRED"
+    if generated is False or freshness_class in {FRESHNESS_PRIOR_SESSION_BACKFILL, "HISTORICAL_REFERENCE", FRESHNESS_STALE}:
+        current_execution_promotion = "BLOCKED"
+    blocking_reasons = list(update.get("reason_codes") or [])
+    blocking_reasons.extend(f"missing_{field}" for field in missing_core_fields)
+    blocking_reasons.extend(f"limited_{key}" for key in sorted(missing_reason))
+    return {
+        "core_fields_present": not missing_core_fields,
+        "missing_core_fields": missing_core_fields,
+        "asof_execution_possible": bool(asof_execution_possible),
+        "asof_execution_status": "EXECUTION_POSSIBLE" if asof_execution_possible else "EXECUTION_BLOCKED",
+        "current_execution_promotion": current_execution_promotion,
+        "blocking_reasons": list(dict.fromkeys(str(reason) for reason in blocking_reasons if str(reason).strip())),
+    }
+
+
 def _build_chatgpt_execution_context(
     *,
     config: ScheduledAnalysisConfig,
@@ -3816,6 +3856,7 @@ def _build_chatgpt_execution_context(
         if ticker.startswith("_") or not isinstance(update, dict):
             continue
         source = update.get("source") if isinstance(update.get("source"), dict) else {}
+        gate_payload = _build_context_gate_payload(update, source)
         tickers.append(
             {
                 "ticker": ticker,
@@ -3851,6 +3892,7 @@ def _build_chatgpt_execution_context(
                 "artifact_age_seconds_at_publish": source.get("artifact_age_seconds_at_publish"),
                 "freshness_class": source.get("freshness_class"),
                 "execution_eligibility": source.get("execution_eligibility"),
+                "asof_execution_gate": gate_payload,
                 "source": {
                     "provider": source.get("provider"),
                     "market": source.get("market"),
@@ -3868,6 +3910,11 @@ def _build_chatgpt_execution_context(
         "checkpoint": latest_checkpoint,
         "checkpoint_timezone": _execution_checkpoint_timezone(config),
         "generated_at": datetime.now(ZoneInfo(_execution_checkpoint_timezone(config))).isoformat(),
+        "generated_in_current_run": True,
+        "overlay_phase": {
+            "name": f"CHECKPOINT_{latest_checkpoint.replace(':', '_')}" if latest_checkpoint else "CHECKPOINT",
+            "selected_checkpoints": [latest_checkpoint] if latest_checkpoint else [],
+        },
         "privacy": {
             "account_identifiers": "excluded",
             "balances": "excluded",
@@ -3901,6 +3948,8 @@ def _write_chatgpt_execution_context_from_ticker_artifacts(
         elif isinstance(snapshot_payload, dict):
             source = snapshot_payload
         micro = source.get("microstructure") if isinstance(source.get("microstructure"), dict) else {}
+        gate_source = {**micro, **source}
+        gate_payload = _build_context_gate_payload(update_payload or {}, gate_source)
         tickers.append(
             {
                 "ticker": ticker,
@@ -3941,6 +3990,7 @@ def _write_chatgpt_execution_context_from_ticker_artifacts(
                 or micro.get("artifact_age_seconds_at_publish"),
                 "freshness_class": source.get("freshness_class") or micro.get("freshness_class"),
                 "execution_eligibility": source.get("execution_eligibility") or micro.get("execution_eligibility"),
+                "asof_execution_gate": gate_payload,
                 "source": {
                     "provider": source.get("provider"),
                     "market": source.get("market") or micro.get("market"),
