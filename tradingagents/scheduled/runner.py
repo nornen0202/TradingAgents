@@ -3824,25 +3824,52 @@ def _build_context_gate_payload(update: dict[str, Any], source: dict[str, Any]) 
     freshness_class = str(source.get("freshness_class") or "").strip().upper()
     execution_eligibility = str(source.get("execution_eligibility") or "").strip().upper()
     generated = source.get("generated_in_current_run")
+    provider_limitations = _context_provider_limitations(source, micro)
+    status_recheck_required = any(item.startswith("status_unavailable:") for item in provider_limitations)
     current_run_fresh = (
         generated is True
         and freshness_class in {FRESHNESS_CURRENT_RUN_FRESH, "CURRENT_SESSION", "FRESH", "CURRENT_RUN_FRESH"}
     )
     asof_execution_possible = not missing_core_fields and execution_eligibility in _EXECUTION_READY_ELIGIBILITIES
-    current_execution_promotion = "POSSIBLE" if current_run_fresh and asof_execution_possible else "RECHECK_REQUIRED"
+    current_execution_promotion = (
+        "POSSIBLE"
+        if current_run_fresh and asof_execution_possible and not status_recheck_required
+        else "RECHECK_REQUIRED"
+    )
     if generated is False or freshness_class in {FRESHNESS_PRIOR_SESSION_BACKFILL, "HISTORICAL_REFERENCE", FRESHNESS_STALE}:
         current_execution_promotion = "BLOCKED"
     blocking_reasons = list(update.get("reason_codes") or [])
     blocking_reasons.extend(f"missing_{field}" for field in missing_core_fields)
     blocking_reasons.extend(f"limited_{key}" for key in sorted(missing_reason))
+    blocking_reasons.extend(provider_limitations)
     return {
         "core_fields_present": not missing_core_fields,
         "missing_core_fields": missing_core_fields,
         "asof_execution_possible": bool(asof_execution_possible),
         "asof_execution_status": "EXECUTION_POSSIBLE" if asof_execution_possible else "EXECUTION_BLOCKED",
         "current_execution_promotion": current_execution_promotion,
+        "provider_limitations": provider_limitations,
+        "provider_status_recheck_required": status_recheck_required,
         "blocking_reasons": list(dict.fromkeys(str(reason) for reason in blocking_reasons if str(reason).strip())),
     }
+
+
+def _context_provider_limitations(source: dict[str, Any], micro: dict[str, Any]) -> list[str]:
+    limitations: list[str] = []
+    for key in ("luld_status", "reg_sho_status", "news_halt_status"):
+        status = source.get(key) if isinstance(source.get(key), dict) else micro.get(key)
+        if isinstance(status, dict):
+            value = str(status.get("status") or "").strip().lower()
+            if value == "not_available_by_provider":
+                limitations.append(f"status_unavailable:{key}")
+    missing_reason = source.get("missing_reason") if isinstance(source.get("missing_reason"), dict) else {}
+    if not missing_reason and isinstance(micro.get("missing_reason"), dict):
+        missing_reason = micro.get("missing_reason") or {}
+    for key, value in sorted(missing_reason.items()):
+        text = str(value or "").strip().lower()
+        if "delayed" in text or "iex" in text or "non_consolidated" in text:
+            limitations.append(f"feed_limited:{key}")
+    return list(dict.fromkeys(limitations))
 
 
 def _build_chatgpt_execution_context(

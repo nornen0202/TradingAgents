@@ -8,6 +8,7 @@ from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.runner import (
     FRESHNESS_PRIOR_SESSION_BACKFILL,
     _bootstrap_overlay_inputs_from_latest_run,
+    _build_context_gate_payload,
     _run_execution_overlay_passes,
     _write_chatgpt_execution_context_from_ticker_artifacts,
 )
@@ -361,6 +362,32 @@ checkpoint_timezone = "America/New_York"
         {},
     )
     assert (site_dir / "downloads" / "new_overlay" / "execution" / "chatgpt_execution_context.json").exists()
+
+
+def test_context_gate_flags_us_provider_status_recheck():
+    gate = _build_context_gate_payload(
+        {
+            "last_price": 101.0,
+            "session_vwap": 100.0,
+            "relative_volume": 1.2,
+            "reason_codes": ["pilot_ready"],
+        },
+        {
+            "generated_in_current_run": True,
+            "freshness_class": "LIVE_CHECKPOINT",
+            "execution_eligibility": "LIVE_EXECUTION_READY",
+            "luld_status": {"status": "not_available_by_provider", "is_clear": None},
+            "news_halt_status": {"status": "not_available_by_provider", "is_clear": None},
+            "missing_reason": {"orderbook": "alpaca_feed=iex; non_consolidated"},
+        },
+    )
+
+    assert gate["core_fields_present"] is True
+    assert gate["asof_execution_possible"] is True
+    assert gate["current_execution_promotion"] == "RECHECK_REQUIRED"
+    assert gate["provider_status_recheck_required"] is True
+    assert "status_unavailable:luld_status" in gate["provider_limitations"]
+    assert "feed_limited:orderbook" in gate["provider_limitations"]
 
 
 def test_overlay_bootstrap_uses_same_market_partial_full_when_universe_expands(tmp_path: Path):
