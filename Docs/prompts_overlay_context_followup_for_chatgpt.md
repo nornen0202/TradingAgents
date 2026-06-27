@@ -9,6 +9,10 @@
 - Overlay는 기존 Daily-KR/Daily-US의 투자 논리를 대체하지 않는다. 장중 실행 가능성, 보류, 축소, 무효화, 다음 확인 조건을 업데이트하는 용도다.
 - 데이터가 stale, degraded, partial failure, delayed analysis only, market closed, outside regular session이면 신규 매수/비중확대 결론을 강화하지 말고 보수적 게이트로만 사용하라.
 - 기존 답변의 microstructure, execution_eligibility, freshness_class, 현재가, VWAP, RVOL/거래대금, 수급/섹터 동조, 공시/뉴스 리스크, stop/invalidation 조건을 최상위 게이트로 유지하라.
+- Overlay Context Pack 또는 `chatgpt_execution_context.json`에 `asof_execution_gate`가 있으면 반드시 해석하라. `core_fields_present=true`이면 last_price/VWAP/RVOL이 구조적으로 존재하는 것이므로 “확인 불가”라고 쓰지 말고, stale/backfill/지연 여부를 별도 표시하라.
+- `asof_execution_gate.asof_execution_possible=true`는 마지막 유효 as-of 기준 조건 검토가 가능하다는 뜻이다. `current_execution_promotion`이 `RECHECK_REQUIRED` 또는 `BLOCKED`이면 현재 즉시 주문으로 승격하지 말라.
+- US에서 `provider_status_recheck_required=true`, `status_unavailable:luld_status`, `status_unavailable:news_halt_status`, `feed_limited:*`가 있으면 halt/LULD/news halt와 NBBO/SIP 품질을 브로커·거래소·실시간 데이터로 재확인해야 한다고 표시하라.
+- 무료 웹 시세나 검색 기반 현재가는 overlay microstructure 값을 덮어쓰는 원천이 아니다. 충돌 시 “overlay as-of 기준”과 “현재 무료/검색 재확인 기준”으로 분리하라.
 - YouTube Context Pack이 이미 반영된 대화라면, YouTube 테마 논리는 배경으로만 두고 overlay의 장중 실행 데이터가 우선한다.
 - Overlay만으로 공격적 신규 진입을 확정하지 말라. 장중 pilot/starter는 overlay의 실행 조건, 데이터 신선도, 유동성, 손절/무효화 조건이 모두 충족될 때만 제한적으로 검토하라.
 - 이전 overlay 또는 초기 Daily 결론과 충돌하면, 왜 충돌하는지와 어떤 조건이 충족되면 기존 결론으로 복귀할 수 있는지 명시하라.
