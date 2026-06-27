@@ -119,6 +119,13 @@ checkpoint_timezone = "America/New_York"
     assert (ticker_dir / "execution" / "checkpoints" / "microstructure_snapshot_10_00.json").exists()
     assert (run_dir / "chatgpt_execution_context.json").exists()
     assert updates["_artifacts"]["chatgpt_execution_context_json"] == "chatgpt_execution_context.json"
+    context = json.loads((run_dir / "chatgpt_execution_context.json").read_text(encoding="utf-8"))
+    ticker_context = context["tickers"][0]
+    assert context["generated_in_current_run"] is True
+    assert ticker_context["freshness_class"] == "LIVE_CHECKPOINT"
+    assert ticker_context["execution_eligibility"] == "LIVE_EXECUTION_READY"
+    assert ticker_context["asof_execution_gate"]["core_fields_present"] is True
+    assert ticker_context["asof_execution_gate"]["asof_execution_possible"] is True
 
     manifest = {
         "run_id": "run",

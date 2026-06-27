@@ -3184,7 +3184,11 @@ def _render_ticker_microstructure_publication_section(
     asof = payload.get("artifact_asof") or payload.get("asof") or micro.get("artifact_asof") or micro.get("asof_local") or ""
     age = payload.get("artifact_age_seconds_at_publish") or micro.get("artifact_age_seconds_at_publish")
     generated_text = "true" if generated is True else ("false" if generated is False else "")
-    status = "fresh" if generated is True and str(eligibility).upper() == "LIVE_EXECUTION_OK" else "warning"
+    status = (
+        "fresh"
+        if generated is True and str(eligibility).upper() in {"LIVE_EXECUTION_READY", "LIVE_EXECUTION_OK", "PILOT_READY", "ACTIONABLE_NOW"}
+        else "warning"
+    )
     note = (
         "이번 run에서 새로 생성된 장중 microstructure입니다."
         if generated is True
