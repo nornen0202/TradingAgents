@@ -73,6 +73,13 @@ def test_daily_analysis_uploads_diagnostics_even_on_failure():
     assert "Upload KR analysis diagnostics" in workflow
 
 
+def test_daily_analysis_schedule_gate_requires_pages_build_for_daily_coverage():
+    workflow = _workflow_text()
+
+    assert '"target_jobs": ["analyze_us", "build_pages"]' in workflow
+    assert '"target_jobs": ["analyze_kr", "build_pages"]' in workflow
+
+
 def test_daily_analysis_deploy_runs_after_final_pages_build():
     workflow = _workflow_text()
 

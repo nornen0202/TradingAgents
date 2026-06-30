@@ -58,7 +58,7 @@ def test_daily_codex_us_watchdog_is_due_on_weekday_afternoon():
     codex_us = [target for target in targets if target.name == "daily-codex-us"]
     assert len(codex_us) == 1
     assert codex_us[0].inputs == {"profile": "us"}
-    assert codex_us[0].job_names == ("analyze_us",)
+    assert codex_us[0].job_names == ("analyze_us", "build_pages")
     assert codex_us[0].window_start_kst == _kst("2026-06-01T16:00:00")
     assert codex_us[0].blockers[0].name == "intraday-overlay-kr-publish"
 
@@ -223,7 +223,7 @@ def test_watchdog_treats_active_target_job_as_covered():
     covered, reason = watchdog.target_is_covered(client=client, target=target)
 
     assert covered
-    assert "covers analyze_us" in reason
+    assert "active target job(s): analyze_us" in reason
 
 
 def test_watchdog_dispatches_when_due_target_is_uncovered():
@@ -268,7 +268,31 @@ def test_watchdog_does_not_dispatch_when_target_job_succeeded():
     covered, reason = watchdog.target_is_covered(client=client, target=target)
 
     assert covered
-    assert "covers analyze_us" in reason
+    assert "covers target job set: analyze_us" in reason
+
+
+def test_watchdog_retries_when_analysis_succeeded_but_pages_failed():
+    target = watchdog.WatchdogTarget(
+        name="daily-codex-us",
+        workflow_file="daily-codex-analysis.yml",
+        job_names=("analyze_us", "build_pages"),
+        window_start_kst=_kst("2026-06-01T16:00:00"),
+        inputs={"profile": "us"},
+    )
+    client = FakeClient(
+        runs=[{"id": 457, "status": "completed", "conclusion": "success"}],
+        jobs={
+            457: [
+                {"name": "analyze_us", "status": "completed", "conclusion": "success"},
+                {"name": "build_pages", "status": "completed", "conclusion": "failure"},
+            ]
+        },
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert not covered
+    assert "No successful target jobs" in reason
 
 
 def test_watchdog_waits_to_dispatch_overlay_until_daily_dependency_completes():

@@ -88,16 +88,6 @@ class GitHubActionsClient:
         )
 
 
-def _job_covers_target(job: dict[str, Any], target_job_names: set[str]) -> bool:
-    if job.get("name") not in target_job_names:
-        return False
-    status = str(job.get("status") or "").lower()
-    conclusion = str(job.get("conclusion") or "").lower()
-    if status != "completed":
-        return True
-    return conclusion == "success"
-
-
 def target_is_covered(
     *,
     client: GitHubActionsClient,
@@ -117,12 +107,27 @@ def target_is_covered(
             continue
 
         jobs = client.list_jobs(run_id)
+        active_matches: list[str] = []
+        successful_matches: set[str] = set()
         for job in jobs:
-            if _job_covers_target(job, target_job_names):
-                job_name = job.get("name")
-                job_status = job.get("status")
-                job_conclusion = job.get("conclusion")
-                return True, f"Run {run_id} covers {job_name}: {job_status}/{job_conclusion}."
+            job_name = str(job.get("name") or "")
+            if job_name not in target_job_names:
+                continue
+            job_status = str(job.get("status") or "").lower()
+            job_conclusion = str(job.get("conclusion") or "").lower()
+            if job_status != "completed":
+                active_matches.append(f"{job_name}: {job_status}/{job_conclusion}")
+            elif job_conclusion == "success":
+                successful_matches.add(job_name)
+        if active_matches:
+            return True, f"Run {run_id} has active target job(s): {', '.join(active_matches)}."
+        if status != "completed" and successful_matches:
+            covered = ", ".join(sorted(successful_matches))
+            missing = ", ".join(sorted(target_job_names - successful_matches))
+            return True, f"Run {run_id} is still active after target job(s) succeeded: {covered}; waiting for {missing}."
+        if target_job_names <= successful_matches:
+            covered = ", ".join(sorted(successful_matches))
+            return True, f"Run {run_id} covers target job set: {covered}."
 
     return False, f"No successful target jobs since {target.window_start_kst.isoformat()}."
 
@@ -333,7 +338,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
                 WatchdogTarget(
                     name="daily-codex-us",
                     workflow_file="daily-codex-analysis.yml",
-                    job_names=("analyze_us",),
+                    job_names=("analyze_us", "build_pages"),
                     window_start_kst=codex_us_window,
                     inputs={"profile": "us"},
                     blockers=(_intraday_overlay_active_blocker("kr", now_kst),),
@@ -346,7 +351,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
                 WatchdogTarget(
                     name="daily-codex-kr",
                     workflow_file="daily-codex-analysis.yml",
-                    job_names=("analyze_kr",),
+                    job_names=("analyze_kr", "build_pages"),
                     window_start_kst=codex_kr_window,
                     inputs={"profile": "kr"},
                     blockers=(

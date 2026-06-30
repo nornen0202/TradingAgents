@@ -93,7 +93,7 @@ def test_scheduled_codex_skips_when_watchdog_dispatch_target_job_is_running():
 
     assert profile == "us"
     assert should_run is False
-    assert "workflow_dispatch run 111 covers analyze_us" in reason
+    assert "workflow_dispatch run 111 has active target job(s): analyze_us" in reason
 
 
 def test_scheduled_codex_does_not_skip_for_other_profile_target_job():
@@ -139,7 +139,117 @@ def test_scheduled_youtube_skips_when_prior_manual_pages_job_succeeded():
 
     assert profile == "youtube"
     assert should_run is False
-    assert "covers build_youtube_pages" in reason
+    assert "covers target job set: build_youtube_pages" in reason
+
+
+def test_scheduled_codex_retries_when_analysis_succeeded_but_pages_did_not():
+    targets = gate.load_schedule_targets(
+        """
+        {
+          "10 7 * * 1-5": {
+            "profile": "us",
+            "window_start": "16:00",
+            "target_jobs": ["analyze_us", "build_pages"]
+          }
+        }
+        """
+    )
+    client = FakeClient(
+        runs=[{"id": 112, "event": "schedule", "status": "completed", "conclusion": "success"}],
+        jobs={
+            112: [
+                {"name": "analyze_us", "status": "completed", "conclusion": "success"},
+                {"name": "build_pages", "status": "completed", "conclusion": "failure"},
+            ]
+        },
+    )
+
+    profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="10 7 * * 1-5",
+        requested_profile="",
+        manual_default_profile="all",
+        workflow_file="daily-codex-analysis.yml",
+        current_run_id=222,
+        client=client,
+        targets=targets,
+        now_kst=_kst("2026-06-03T18:10:00"),
+    )
+
+    assert profile == "us"
+    assert should_run is True
+    assert "running now" in reason
+
+
+def test_scheduled_codex_skips_only_when_analysis_and_pages_both_succeeded():
+    targets = gate.load_schedule_targets(
+        """
+        {
+          "10 7 * * 1-5": {
+            "profile": "us",
+            "window_start": "16:00",
+            "target_jobs": ["analyze_us", "build_pages"]
+          }
+        }
+        """
+    )
+    client = FakeClient(
+        runs=[{"id": 113, "event": "schedule", "status": "completed", "conclusion": "success"}],
+        jobs={
+            113: [
+                {"name": "analyze_us", "status": "completed", "conclusion": "success"},
+                {"name": "build_pages", "status": "completed", "conclusion": "success"},
+            ]
+        },
+    )
+
+    _profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="10 7 * * 1-5",
+        requested_profile="",
+        manual_default_profile="all",
+        workflow_file="daily-codex-analysis.yml",
+        current_run_id=222,
+        client=client,
+        targets=targets,
+        now_kst=_kst("2026-06-03T18:10:00"),
+    )
+
+    assert should_run is False
+    assert "covers target job set: analyze_us, build_pages" in reason
+
+
+def test_scheduled_codex_waits_when_prior_run_is_between_analysis_and_pages():
+    targets = gate.load_schedule_targets(
+        """
+        {
+          "10 7 * * 1-5": {
+            "profile": "us",
+            "window_start": "16:00",
+            "target_jobs": ["analyze_us", "build_pages"]
+          }
+        }
+        """
+    )
+    client = FakeClient(
+        runs=[{"id": 114, "event": "schedule", "status": "in_progress", "conclusion": ""}],
+        jobs={114: [{"name": "analyze_us", "status": "completed", "conclusion": "success"}]},
+    )
+
+    _profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="10 7 * * 1-5",
+        requested_profile="",
+        manual_default_profile="all",
+        workflow_file="daily-codex-analysis.yml",
+        current_run_id=222,
+        client=client,
+        targets=targets,
+        now_kst=_kst("2026-06-03T18:10:00"),
+    )
+
+    assert should_run is False
+    assert "waiting for build_pages" in reason
 
 
 def test_scheduled_youtube_waits_when_daily_codex_pages_build_is_queued():
