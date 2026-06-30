@@ -80,6 +80,17 @@ def test_daily_analysis_schedule_gate_requires_pages_build_for_daily_coverage():
     assert '"target_jobs": ["analyze_kr", "build_pages"]' in workflow
 
 
+def test_daily_analysis_self_hosted_jobs_serialize_workspace_checkout():
+    workflow = _workflow_text()
+
+    for job_name in ("analyze_us", "analyze_kr", "build_pages"):
+        job_start = workflow.index(f"  {job_name}:")
+        job_block = workflow[job_start : job_start + 1200]
+        assert "concurrency:" in job_block
+        assert "group: daily-codex-analysis-self-hosted-${{ github.ref }}" in job_block
+        assert "cancel-in-progress: false" in job_block
+
+
 def test_daily_analysis_deploy_runs_after_final_pages_build():
     workflow = _workflow_text()
 

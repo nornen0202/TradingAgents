@@ -121,6 +121,9 @@ jobs:
       - schedule_gate
     if: ${{ github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' && (needs.schedule_gate.outputs.profile == 'all' || needs.schedule_gate.outputs.profile == 'us') }}
     runs-on: [self-hosted, Windows]
+    concurrency:
+      group: daily-codex-analysis-self-hosted-${{ github.ref }}
+      cancel-in-progress: false
     timeout-minutes: 720
     defaults:
       run:
@@ -665,6 +668,9 @@ jobs:
       - schedule_gate
     if: ${{ github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' && (needs.schedule_gate.outputs.profile == 'all' || needs.schedule_gate.outputs.profile == 'kr') }}
     runs-on: [self-hosted, Windows]
+    concurrency:
+      group: daily-codex-analysis-self-hosted-${{ github.ref }}
+      cancel-in-progress: false
     timeout-minutes: 720
     defaults:
       run:
@@ -1332,6 +1338,9 @@ jobs:
       - analyze_kr
     if: ${{ always() && github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && ((needs.schedule_gate.outputs.profile == 'all' && needs.analyze_us.result == 'success' && needs.analyze_kr.result == 'success') || (needs.schedule_gate.outputs.profile == 'us' && needs.analyze_us.result == 'success') || (needs.schedule_gate.outputs.profile == 'kr' && needs.analyze_kr.result == 'success')) }}
     runs-on: [self-hosted, Windows]
+    concurrency:
+      group: daily-codex-analysis-self-hosted-${{ github.ref }}
+      cancel-in-progress: false
     defaults:
       run:
         shell: python {0}
