@@ -1,0 +1,24 @@
+[source]
+enabled = true
+mode = "public_preview"
+channel = "stock_ai_agent"
+public_preview_url = "https://t.me/s/stock_ai_agent"
+lookback_minutes = 360
+max_messages = 80
+timeout_seconds = 8
+max_payload_bytes = 5000000
+download_pdfs = false
+private_archive_dir = "./.runtime/prism-telegram-private"
+state_path = "./.runtime/prism-telegram-state.json"
+session_path = "./.runtime/telegram-stock-ai-agent"
+max_pdf_bytes = 20000000
+fallback_to_public_preview = true
+
+[storage]
+archive_dir = "./.runtime/prism-telegram-archive"
+site_dir = "./site"
+
+[site]
+title = "PRISM Telegram 리포트"
+max_runs = 30
+max_messages_on_index = 80

@@ -11,9 +11,12 @@ Configured source priority:
 3. `PRISM_DASHBOARD_JSON_URL` when `use_live_http = true`
 4. `PRISM_DASHBOARD_BASE_URL` candidate JSON endpoints when `use_live_http = true`
 5. dashboard HTML embedded JSON only when both `use_live_http = true` and `use_html_scraping = true`
-6. graceful empty result
+6. optional `[external.prism.telegram]` advisory evidence merge
+7. graceful empty result
 
 Live HTTP is disabled by default. HTML scraping is also disabled by default and is implemented only as an opt-in fallback for dashboard pages that embed JSON in script tags. Tests do not call live dashboards unless `RUN_LIVE_PRISM_TESTS=1`.
+
+Telegram is a secondary evidence source. Dashboard JSON/SQLite remains primary; when Telegram and dashboard signals overlap, the dashboard signal is kept and Telegram is attached as supporting evidence. See [Docs/prism_telegram_integration.md](prism_telegram_integration.md).
 
 ## Example
 

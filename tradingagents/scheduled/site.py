@@ -87,6 +87,7 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
         },
     )
     _build_youtube_site_addon(archive_dir=archive_dir, site_dir=site_dir)
+    _build_prism_telegram_site_addon(archive_dir=archive_dir, site_dir=site_dir)
     return manifests
 
 
@@ -674,6 +675,7 @@ def _render_index_page(
             <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open 대표 투자 run</a>
             <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open representative investment run</a>
             <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
+            <a class="button" href="prism-telegram/index.html">Open PRISM Telegram 리포트</a>
             {latest_portfolio_link}
             {latest_daily_html}
             {latest_technical_html}
@@ -692,6 +694,7 @@ def _render_index_page(
             <div class="status pending">no data yet</div>
             <p>The scheduled workflow has not produced an archived run yet.</p>
             <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
+            <a class="button" href="prism-telegram/index.html">Open PRISM Telegram 리포트</a>
           </div>
         </section>
         """
@@ -771,6 +774,29 @@ def _build_youtube_site_addon(*, archive_dir: Path, site_dir: Path) -> None:
         build_youtube_site(youtube_archive_dir, site_dir, youtube_config.site)
     except Exception as exc:  # pragma: no cover - defensive in Pages jobs
         print(f"::warning::Could not build YouTube report site add-on: {exc}")
+
+
+def _build_prism_telegram_site_addon(*, archive_dir: Path, site_dir: Path) -> None:
+    try:
+        from tradingagents.prism_telegram.config import load_prism_telegram_config
+        from tradingagents.prism_telegram.site import build_prism_telegram_site
+
+        prism_telegram_config = load_prism_telegram_config()
+        prism_telegram_archive_dir = prism_telegram_config.storage.archive_dir
+        shared_archive = Path(archive_dir) / "prism-telegram-archive"
+        if (
+            not os.getenv("TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR", "").strip()
+            and (shared_archive.exists() or _is_default_runtime_prism_telegram_archive(prism_telegram_archive_dir))
+        ):
+            prism_telegram_archive_dir = shared_archive
+        build_prism_telegram_site(prism_telegram_archive_dir, site_dir, prism_telegram_config.site)
+    except Exception as exc:  # pragma: no cover - defensive in Pages jobs
+        print(f"::warning::Could not build PRISM Telegram report site add-on: {exc}")
+
+
+def _is_default_runtime_prism_telegram_archive(path: Path) -> bool:
+    normalized = str(path).replace("\\", "/").rstrip("/")
+    return normalized.endswith(".runtime/prism-telegram-archive")
 
 
 def _is_default_runtime_youtube_archive(path: Path) -> bool:

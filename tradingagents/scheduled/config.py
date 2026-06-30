@@ -191,6 +191,28 @@ class PortfolioPerformanceSettings:
 
 
 @dataclass(frozen=True)
+class PrismTelegramSettings:
+    enabled: bool = False
+    mode: str = "public_preview"
+    channel: str = "stock_ai_agent"
+    public_preview_url: str | None = None
+    lookback_minutes: int = 180
+    max_messages: int = 50
+    timeout_seconds: float = 8.0
+    max_payload_bytes: int = 5_000_000
+    download_pdfs: bool = False
+    private_archive_dir: Path | None = None
+    state_path: Path | None = None
+    session_path: Path | None = None
+    session_string: str | None = None
+    api_id: str | None = None
+    api_hash: str | None = None
+    bot_token: str | None = None
+    max_pdf_bytes: int = 20_000_000
+    fallback_to_public_preview: bool = True
+
+
+@dataclass(frozen=True)
 class PrismDashboardSettings:
     enabled: bool = False
     mode: str = "advisory"
@@ -209,6 +231,7 @@ class PrismDashboardSettings:
     use_for_ui_comparison: bool = True
     allow_cross_market_candidates: bool = False
     allowed_markets: tuple[str, ...] = tuple()
+    telegram: PrismTelegramSettings = field(default_factory=PrismTelegramSettings)
 
     @property
     def dashboard_url(self) -> str | None:
@@ -699,6 +722,7 @@ def _load_external_data_settings(
         prism_raw = external_data_raw.get("prism") or external_data_raw.get("prism_dashboard") or {}
     if not isinstance(prism_raw, dict):
         prism_raw = {}
+    telegram_raw = prism_raw.get("telegram") if isinstance(prism_raw.get("telegram"), dict) else {}
     enabled = _env_bool("PRISM_EXTERNAL_ENABLED", bool(prism_raw.get("enabled", False)))
     local_json = _env_optional_path("PRISM_DASHBOARD_JSON_PATH", _first_config_value(prism_raw, "local_dashboard_json_path", "local_json_path"), base_dir)
     sqlite_path = _env_optional_path("PRISM_SQLITE_DB_PATH", _first_config_value(prism_raw, "local_sqlite_db_path", "sqlite_path"), base_dir)
@@ -726,7 +750,56 @@ def _load_external_data_settings(
             use_for_ui_comparison=bool(prism_raw.get("use_for_ui_comparison", True)),
             allow_cross_market_candidates=bool(prism_raw.get("allow_cross_market_candidates", False)),
             allowed_markets=_normalize_market_sequence(prism_raw.get("allowed_markets")),
+            telegram=_load_prism_telegram_settings(telegram_raw, base_dir=base_dir),
         )
+    )
+
+
+def _load_prism_telegram_settings(raw: dict[str, object], *, base_dir: Path) -> PrismTelegramSettings:
+    raw = raw if isinstance(raw, dict) else {}
+    return PrismTelegramSettings(
+        enabled=_env_bool("PRISM_TELEGRAM_ENABLED", bool(raw.get("enabled", False))),
+        mode=(
+            _env_string("PRISM_TELEGRAM_MODE", _optional_string(raw.get("mode")))
+            or "public_preview"
+        ).strip().lower(),
+        channel=_env_string("PRISM_TELEGRAM_CHANNEL", _optional_string(raw.get("channel"))) or "stock_ai_agent",
+        public_preview_url=_env_string(
+            "PRISM_TELEGRAM_PUBLIC_PREVIEW_URL",
+            _optional_string(raw.get("public_preview_url")),
+        ),
+        lookback_minutes=max(
+            0,
+            _env_int("PRISM_TELEGRAM_LOOKBACK_MINUTES", int(raw.get("lookback_minutes", 180) or 180)),
+        ),
+        max_messages=max(
+            1,
+            _env_int("PRISM_TELEGRAM_MAX_MESSAGES", int(raw.get("max_messages", 50) or 50)),
+        ),
+        timeout_seconds=max(
+            1.0,
+            _env_float("PRISM_TELEGRAM_TIMEOUT_SECONDS", float(raw.get("timeout_seconds", 8.0) or 8.0)),
+        ),
+        max_payload_bytes=max(
+            1024,
+            _env_int("PRISM_TELEGRAM_MAX_PAYLOAD_BYTES", int(raw.get("max_payload_bytes", 5_000_000) or 5_000_000)),
+        ),
+        download_pdfs=_env_bool("PRISM_TELEGRAM_DOWNLOAD_PDFS", bool(raw.get("download_pdfs", False))),
+        private_archive_dir=_env_optional_path("PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR", raw.get("private_archive_dir"), base_dir),
+        state_path=_env_optional_path("PRISM_TELEGRAM_STATE_PATH", raw.get("state_path"), base_dir),
+        session_path=_env_optional_path("TELEGRAM_SESSION_PATH", raw.get("session_path"), base_dir),
+        session_string=_env_string("TELEGRAM_SESSION_STRING", _optional_string(raw.get("session_string"))),
+        api_id=_env_string("TELEGRAM_API_ID", _optional_string(raw.get("api_id"))),
+        api_hash=_env_string("TELEGRAM_API_HASH", _optional_string(raw.get("api_hash"))),
+        bot_token=_env_string("TELEGRAM_BOT_TOKEN", _optional_string(raw.get("bot_token"))),
+        max_pdf_bytes=max(
+            1024,
+            _env_int("PRISM_TELEGRAM_MAX_PDF_BYTES", int(raw.get("max_pdf_bytes", 20_000_000) or 20_000_000)),
+        ),
+        fallback_to_public_preview=_env_bool(
+            "PRISM_TELEGRAM_FALLBACK_TO_PUBLIC_PREVIEW",
+            bool(raw.get("fallback_to_public_preview", True)),
+        ),
     )
 
 
