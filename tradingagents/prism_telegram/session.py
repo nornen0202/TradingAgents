@@ -44,12 +44,17 @@ def main(argv: list[str] | None = None) -> int:
         session = StringSession()
 
     client = TelegramClient(session, api_id, api_hash)
-    with client:
-        client.start(phone=args.phone or None, password=_prompt_password)
+    try:
+        if args.phone:
+            client.start(phone=args.phone, password=_prompt_password)
+        else:
+            client.start(password=_prompt_password)
         if args.session_path:
             print(f"Authorized Telegram user session at {Path(args.session_path).expanduser()}.")
             return 0
         session_string = client.session.save()
+    finally:
+        client.disconnect()
 
     if args.quiet:
         print(session_string)
