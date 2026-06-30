@@ -53,6 +53,7 @@ tradingagents = "cli.main:app"
 tradingagents-scheduled = "tradingagents.scheduled.runner:main"
 tradingagents-youtube = "tradingagents.youtube.runner:main"
 tradingagents-prism-telegram = "tradingagents.prism_telegram.runner:main"
+tradingagents-prism-telegram-session = "tradingagents.prism_telegram.session:main"
 
 [tool.setuptools.packages.find]
 include = ["tradingagents*", "cli*"]

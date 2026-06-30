@@ -1,13 +1,13 @@
 [source]
 enabled = true
-mode = "public_preview"
+mode = "user_session"
 channel = "stock_ai_agent"
 public_preview_url = "https://t.me/s/stock_ai_agent"
 lookback_minutes = 360
 max_messages = 80
 timeout_seconds = 8
 max_payload_bytes = 5000000
-download_pdfs = false
+download_pdfs = true
 private_archive_dir = "./.runtime/prism-telegram-private"
 state_path = "./.runtime/prism-telegram-state.json"
 session_path = "./.runtime/telegram-stock-ai-agent"
