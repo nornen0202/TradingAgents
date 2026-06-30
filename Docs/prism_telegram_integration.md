@@ -16,11 +16,11 @@ Telegram signals never bypass TradingAgents risk gates, account constraints, or 
 ```toml
 [external.prism.telegram]
 enabled = true
-mode = "public_preview"
+mode = "user_session"
 channel = "stock_ai_agent"
 lookback_minutes = 360
 max_messages = 80
-download_pdfs = false
+download_pdfs = true
 ```
 
 Supported modes:
@@ -51,6 +51,23 @@ PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR=C:/TradingAgentsData/prism-telegram-private
 ```
 
 The private archive can contain raw PDFs and local paths. The public site only publishes message metadata, ticker-level signals, and short PDF text summaries.
+
+To generate the user session string on a trusted local machine:
+
+```powershell
+python -m pip install -e ".[telegram]"
+$env:TELEGRAM_API_ID = "<your api_id>"
+$env:TELEGRAM_API_HASH = "<your api_hash>"
+python -m tradingagents.prism_telegram.session
+```
+
+Telegram will ask for the account phone number, the login code, and the 2FA password when the account has one. Save the printed value as the `TELEGRAM_SESSION_STRING` GitHub Actions secret. As an alternative for a self-hosted runner, create a persistent session file:
+
+```powershell
+python -m tradingagents.prism_telegram.session --session-path C:\TradingAgentsData\telegram-stock-ai-agent
+```
+
+In that case, set the repository variable `TELEGRAM_SESSION_PATH` to the same path on the runner.
 
 ## Bot Token Notes
 
@@ -88,4 +105,4 @@ GitHub Actions workflow:
 .github/workflows/daily-prism-telegram-reports.yml
 ```
 
-Use repository secrets for `TELEGRAM_BOT_TOKEN`, `TELEGRAM_API_ID`, `TELEGRAM_API_HASH`, and `TELEGRAM_SESSION_STRING`.
+Use repository secrets for `TELEGRAM_BOT_TOKEN`, `TELEGRAM_API_ID`, `TELEGRAM_API_HASH`, and `TELEGRAM_SESSION_STRING`. The daily workflow defaults to `user_session` mode and PDF downloads, but can be overridden with repository variables `PRISM_TELEGRAM_MODE` and `PRISM_TELEGRAM_DOWNLOAD_PDFS` or by manual workflow inputs.

@@ -9,7 +9,7 @@ on:
       mode:
         description: "Collection mode: public_preview / bot_api / user_session"
         required: false
-        default: "public_preview"
+        default: "user_session"
         type: choice
         options:
           - public_preview
@@ -28,8 +28,11 @@ on:
       download_pdfs:
         description: "Download PDFs in authenticated modes"
         required: false
-        default: false
-        type: boolean
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
 
 permissions:
   contents: read
@@ -50,8 +53,8 @@ jobs:
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
       PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR: ${{ vars.PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR }}
-      PRISM_TELEGRAM_MODE: ${{ github.event.inputs.mode }}
-      PRISM_TELEGRAM_DOWNLOAD_PDFS: ${{ github.event.inputs.download_pdfs }}
+      PRISM_TELEGRAM_MODE: ${{ github.event.inputs.mode || vars.PRISM_TELEGRAM_MODE || 'user_session' }}
+      PRISM_TELEGRAM_DOWNLOAD_PDFS: ${{ github.event.inputs.download_pdfs || vars.PRISM_TELEGRAM_DOWNLOAD_PDFS || 'true' }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
       TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
@@ -106,8 +109,8 @@ jobs:
 
           lookback_minutes = "${{ github.event.inputs.lookback_minutes }}".strip() or "360"
           max_messages = "${{ github.event.inputs.max_messages }}".strip() or "80"
-          mode = os.environ.get("PRISM_TELEGRAM_MODE", "").strip() or "public_preview"
-          download_pdfs = os.environ.get("PRISM_TELEGRAM_DOWNLOAD_PDFS", "").strip().lower()
+          mode = os.environ.get("PRISM_TELEGRAM_MODE", "").strip() or "user_session"
+          download_pdfs = os.environ.get("PRISM_TELEGRAM_DOWNLOAD_PDFS", "").strip().lower() or "true"
 
           args = [
               sys.executable,
