@@ -91,6 +91,26 @@ def test_daily_analysis_self_hosted_jobs_serialize_workspace_checkout():
         assert "cancel-in-progress: false" in job_block
 
 
+def test_daily_analysis_cleans_pages_diagnostics_before_self_hosted_checkout():
+    workflow = _workflow_text()
+
+    for job_name in ("analyze_us", "analyze_kr", "build_pages"):
+        job_start = workflow.index(f"  {job_name}:")
+        checkout = workflow.index("      - name: Check out repository", job_start)
+        job_before_checkout = workflow[job_start:checkout]
+        assert '"_diag" / "pages"' in job_before_checkout
+        assert "*.log" in job_before_checkout
+
+
+def test_daily_analysis_configures_pages_only_in_final_build_job():
+    workflow = _workflow_text()
+
+    assert workflow.count("      - name: Configure GitHub Pages") == 1
+    build_pages_start = workflow.index("  build_pages:")
+    configure_pages = workflow.index("      - name: Configure GitHub Pages")
+    assert configure_pages > build_pages_start
+
+
 def test_daily_analysis_deploy_runs_after_final_pages_build():
     workflow = _workflow_text()
 
