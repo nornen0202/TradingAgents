@@ -136,6 +136,13 @@ jobs:
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      PRISM_TELEGRAM_MODE: ${{ vars.PRISM_TELEGRAM_MODE || 'user_session' }}
+      PRISM_TELEGRAM_DOWNLOAD_PDFS: ${{ vars.PRISM_TELEGRAM_DOWNLOAD_PDFS || 'true' }}
+      PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR: ${{ vars.PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR }}
+      TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+      TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+      TELEGRAM_SESSION_STRING: ${{ secrets.TELEGRAM_SESSION_STRING }}
+      TELEGRAM_SESSION_PATH: ${{ vars.TELEGRAM_SESSION_PATH }}
       CODEX_BINARY: ${{ vars.CODEX_BINARY }}
       CODEX_HOME: ${{ vars.CODEX_HOME }}
       TRADINGAGENTS_TRANSLATION_MODEL_PATH: ${{ vars.TRADINGAGENTS_TRANSLATION_MODEL_PATH }}
@@ -267,7 +274,7 @@ jobs:
           import sys
 
           subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
-          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation,telegram]"])
 
       - name: Materialize runtime API keys
         if: ${{ github.event.inputs.site_only != 'true' }}
@@ -699,6 +706,13 @@ jobs:
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      PRISM_TELEGRAM_MODE: ${{ vars.PRISM_TELEGRAM_MODE || 'user_session' }}
+      PRISM_TELEGRAM_DOWNLOAD_PDFS: ${{ vars.PRISM_TELEGRAM_DOWNLOAD_PDFS || 'true' }}
+      PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR: ${{ vars.PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR }}
+      TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+      TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+      TELEGRAM_SESSION_STRING: ${{ secrets.TELEGRAM_SESSION_STRING }}
+      TELEGRAM_SESSION_PATH: ${{ vars.TELEGRAM_SESSION_PATH }}
       CODEX_BINARY: ${{ vars.CODEX_BINARY }}
       CODEX_HOME: ${{ vars.CODEX_HOME }}
       TRADINGAGENTS_TRANSLATION_MODEL_PATH: ${{ vars.TRADINGAGENTS_TRANSLATION_MODEL_PATH }}
@@ -826,7 +840,7 @@ jobs:
           import sys
 
           subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
-          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation,telegram]"])
 
       - name: Materialize runtime API keys
         if: ${{ github.event.inputs.site_only != 'true' }}
