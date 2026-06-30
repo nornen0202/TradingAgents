@@ -47,6 +47,10 @@ class PrismSourceKind(str, Enum):
     CSV = "csv"
     MANUAL_JSON = "manual_json"
     PRISM_API = "prism_api"
+    TELEGRAM_PUBLIC_PREVIEW = "telegram_public_preview"
+    TELEGRAM_USER_SESSION = "telegram_user_session"
+    TELEGRAM_BOT_API = "telegram_bot_api"
+    MIXED = "mixed"
 
 
 @dataclass(frozen=True)

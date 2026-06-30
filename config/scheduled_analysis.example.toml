@@ -177,6 +177,22 @@ confidence_cap = 0.25
 # - set use_live_http=true only when you accept live dashboard reads
 # - set use_html_scraping=true only when JSON endpoints are unavailable and embedded dashboard JSON is acceptable
 
+[external.prism.telegram]
+enabled = false
+mode = "public_preview" # public_preview / bot_api / user_session
+channel = "stock_ai_agent"
+public_preview_url = "https://t.me/s/stock_ai_agent"
+lookback_minutes = 360
+max_messages = 80
+timeout_seconds = 8
+max_payload_bytes = 5000000
+download_pdfs = false
+private_archive_dir = ""
+state_path = ""
+session_path = ""
+max_pdf_bytes = 20000000
+fallback_to_public_preview = true
+
 [scanner]
 enabled = false
 market = "KR"

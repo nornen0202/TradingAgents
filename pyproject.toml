@@ -38,6 +38,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+telegram = [
+    "pypdf>=5.0.0",
+    "telethon>=1.36.0",
+]
 translation = [
     "ctranslate2>=4.6.0",
     "sentencepiece>=0.2.0",
@@ -48,6 +52,7 @@ translation = [
 tradingagents = "cli.main:app"
 tradingagents-scheduled = "tradingagents.scheduled.runner:main"
 tradingagents-youtube = "tradingagents.youtube.runner:main"
+tradingagents-prism-telegram = "tradingagents.prism_telegram.runner:main"
 
 [tool.setuptools.packages.find]
 include = ["tradingagents*", "cli*"]

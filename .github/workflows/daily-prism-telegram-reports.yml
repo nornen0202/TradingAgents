@@ -1,0 +1,153 @@
+name: Daily PRISM Telegram Reports
+
+on:
+  schedule:
+    # After the YouTube add-on window and before the next KR daily run.
+    - cron: '35 22 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Collection mode: public_preview / bot_api / user_session"
+        required: false
+        default: "public_preview"
+        type: choice
+        options:
+          - public_preview
+          - bot_api
+          - user_session
+      lookback_minutes:
+        description: "Lookback window in minutes"
+        required: false
+        default: "360"
+        type: string
+      max_messages:
+        description: "Maximum Telegram messages to process"
+        required: false
+        default: "80"
+        type: string
+      download_pdfs:
+        description: "Download PDFs in authenticated modes"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build_prism_telegram_pages:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: [self-hosted, Windows]
+    defaults:
+      run:
+        shell: python {0}
+    env:
+      PYTHONUTF8: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
+      TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
+      PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR: ${{ vars.PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR }}
+      PRISM_TELEGRAM_MODE: ${{ github.event.inputs.mode }}
+      PRISM_TELEGRAM_DOWNLOAD_PDFS: ${{ github.event.inputs.download_pdfs }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+      TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+      TELEGRAM_SESSION_STRING: ${{ secrets.TELEGRAM_SESSION_STRING }}
+      TELEGRAM_SESSION_PATH: ${{ vars.TELEGRAM_SESSION_PATH }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install TradingAgents
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[telegram]"])
+
+      - name: Rebuild base scheduled site
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          args = [
+              sys.executable,
+              "-u",
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              "config/scheduled_analysis.toml",
+              "--site-only",
+              "--site-dir",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
+          ]
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+          subprocess.check_call(args)
+
+      - name: Run PRISM Telegram report collection
+        timeout-minutes: 45
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          lookback_minutes = "${{ github.event.inputs.lookback_minutes }}".strip() or "360"
+          max_messages = "${{ github.event.inputs.max_messages }}".strip() or "80"
+          mode = os.environ.get("PRISM_TELEGRAM_MODE", "").strip() or "public_preview"
+          download_pdfs = os.environ.get("PRISM_TELEGRAM_DOWNLOAD_PDFS", "").strip().lower()
+
+          args = [
+              sys.executable,
+              "-u",
+              "-m",
+              "tradingagents.prism_telegram",
+              "--config",
+              "config/prism_telegram_daily.toml",
+              "--mode",
+              mode,
+              "--lookback-minutes",
+              lookback_minutes,
+              "--max-messages",
+              max_messages,
+              "--site-dir",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
+          ]
+          archive_dir = os.environ.get("TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+          if download_pdfs in {"1", "true", "yes", "on"}:
+              args += ["--download-pdfs"]
+          subprocess.check_call(args)
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          name: github-pages-prism-telegram
+          path: site
+
+  deploy:
+    needs: build_prism_telegram_pages
+    if: ${{ needs.build_prism_telegram_pages.result == 'success' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-prism-telegram
