@@ -163,6 +163,7 @@ site_dir = "./site"
                     "tradingagents.scheduled.runner._fetch_recent_trade_date_history",
                     side_effect=TypeError("'NoneType' object is not subscriptable"),
                 ),
+                patch("tradingagents.scheduled.runner._expected_completed_daily_trade_date", return_value=None),
                 patch("tradingagents.scheduled.runner._previous_business_day", return_value=date(2026, 4, 15)),
             ):
                 trade_date = resolve_trade_date("NVDA", config)

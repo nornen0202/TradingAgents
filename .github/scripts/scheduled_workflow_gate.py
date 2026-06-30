@@ -132,13 +132,29 @@ def _run_covers_target(
         return False, ""
 
     jobs = client.list_jobs(run_id)
+    active_matches: list[str] = []
+    successful_matches: set[str] = set()
     for job in jobs:
-        if job_covers_target(job, target_job_names):
-            job_name = job.get("name")
-            job_status = job.get("status")
-            job_conclusion = job.get("conclusion")
-            event = run.get("event", "unknown")
-            return True, f"Prior {event} run {run_id} covers {job_name}: {job_status}/{job_conclusion}."
+        job_name = str(job.get("name") or "")
+        if job_name not in target_job_names:
+            continue
+        job_status = str(job.get("status") or "").lower()
+        job_conclusion = str(job.get("conclusion") or "").lower()
+        if job_status != "completed":
+            active_matches.append(f"{job_name}: {job_status}/{job_conclusion}")
+        elif job_conclusion == "success":
+            successful_matches.add(job_name)
+
+    event = run.get("event", "unknown")
+    if active_matches:
+        return True, f"Prior {event} run {run_id} has active target job(s): {', '.join(active_matches)}."
+    if status != "completed" and successful_matches:
+        covered = ", ".join(sorted(successful_matches))
+        missing = ", ".join(sorted(target_job_names - successful_matches))
+        return True, f"Prior {event} run {run_id} is still active after target job(s) succeeded: {covered}; waiting for {missing}."
+    if target_job_names.issubset(successful_matches):
+        covered = ", ".join(sorted(successful_matches))
+        return True, f"Prior {event} run {run_id} covers target job set: {covered}."
 
     return False, ""
 

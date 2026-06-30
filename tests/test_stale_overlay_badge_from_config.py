@@ -98,7 +98,7 @@ def test_daily_workflow_runs_us_and_kr_at_revised_kst_targets():
     for cron in ("10 21 * * 0-4", "40 21 * * 0-4", "10 22 * * 0-4"):
         assert targets[cron]["profile"] == "kr"
         assert targets[cron]["window_start"] == "06:00"
-        assert targets[cron]["target_jobs"] == ["analyze_kr"]
+        assert targets[cron]["target_jobs"] == ["analyze_kr", "build_pages"]
     for cron in (
         "10 7 * * 1-5",
         "40 7 * * 1-5",
@@ -110,7 +110,7 @@ def test_daily_workflow_runs_us_and_kr_at_revised_kst_targets():
     ):
         assert targets[cron]["profile"] == "us"
         assert targets[cron]["window_start"] == "16:00"
-        assert targets[cron]["target_jobs"] == ["analyze_us"]
+        assert targets[cron]["target_jobs"] == ["analyze_us", "build_pages"]
 
 
 def test_daily_workflow_gates_backup_schedules_before_analysis():
@@ -120,8 +120,8 @@ def test_daily_workflow_gates_backup_schedules_before_analysis():
     assert "concurrency:\n  group: daily-codex-analysis" not in workflow
     assert "scheduled_workflow_gate.py" in workflow
     assert "SCHEDULE_GATE_TARGETS_JSON" in workflow
-    assert '"target_jobs": ["analyze_us"]' in workflow
-    assert '"target_jobs": ["analyze_kr"]' in workflow
+    assert '"target_jobs": ["analyze_us", "build_pages"]' in workflow
+    assert '"target_jobs": ["analyze_kr", "build_pages"]' in workflow
     assert "US_SCHEDULES =" not in workflow
     assert "KR_SCHEDULES =" not in workflow
     assert "needs.schedule_gate.outputs.should_run == 'true'" in workflow

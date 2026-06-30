@@ -10,7 +10,7 @@ import shutil
 import subprocess
 import sys
 import traceback
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from time import perf_counter, sleep
 from typing import Any
@@ -82,7 +82,7 @@ from .config import (
     load_scheduled_config,
     with_overrides,
 )
-from .market_calendar import market_session_state
+from .market_calendar import default_calendar_name, market_session_state
 from .site import build_site
 
 
@@ -653,7 +653,11 @@ def resolve_trade_date(
         return now.date().isoformat()
     if mode == "previous_business_day":
         return _previous_business_day(now.date()).isoformat()
-    kr_daily_thesis_run = mode == "latest_available" and _is_kr_daily_thesis_run(ticker=ticker, config=config)
+    expected_completed_date = _expected_completed_daily_trade_date(
+        ticker=normalized_symbol,
+        config=config,
+        now=now,
+    )
 
     normalized_symbol = (normalized_symbol or "").strip().upper()
     if not _looks_like_yahoo_ticker_format(normalized_symbol):
@@ -670,7 +674,7 @@ def resolve_trade_date(
     except Exception as exc:
         if not is_retryable_yfinance_error(exc):
             raise
-        fallback = _completed_daily_trade_date_for_kr(now) if kr_daily_thesis_run else _previous_business_day(now.date())
+        fallback = expected_completed_date or _previous_business_day(now.date())
         fallback_date = fallback.isoformat()
         print(
             "::warning::"
@@ -690,10 +694,16 @@ def resolve_trade_date(
     last_date = last_value.date() if hasattr(last_value, "date") else last_value
     if not isinstance(last_date, date):
         raise RuntimeError(f"Unexpected trade date index value for {ticker}: {last_index!r}")
-    if kr_daily_thesis_run:
-        completed_cutoff = _completed_daily_trade_date_for_kr(now)
-        if last_date > completed_cutoff:
-            return completed_cutoff.isoformat()
+    if expected_completed_date is not None:
+        if last_date > expected_completed_date:
+            return expected_completed_date.isoformat()
+        if last_date < expected_completed_date:
+            market = _trade_date_market(ticker=normalized_symbol, config=config)
+            raise RuntimeError(
+                f"Refusing stale latest_available trade date for {ticker} ({normalized_symbol}): "
+                f"vendor latest row is {last_date.isoformat()} but {market} calendar expects "
+                f"completed daily bar {expected_completed_date.isoformat()} as of {now.isoformat()}."
+            )
     return last_date.isoformat()
 
 
@@ -742,11 +752,74 @@ def _fetch_recent_trade_date_history(symbol: str, *, lookback_days: int) -> Any:
     return history
 
 
-def _is_kr_daily_thesis_run(*, ticker: str, config: ScheduledAnalysisConfig) -> bool:
-    if str(config.run.market or "").strip().upper() != "KR":
-        return False
-    symbol = str(ticker or "").strip().upper()
-    return symbol.endswith((".KS", ".KQ")) or (len(symbol) == 6 and symbol.isdigit())
+def _expected_completed_daily_trade_date(
+    *,
+    ticker: str,
+    config: ScheduledAnalysisConfig,
+    now: datetime,
+) -> date | None:
+    market = _trade_date_market(ticker=ticker, config=config)
+    if market not in {"KR", "US"}:
+        return None
+    calendar_name = default_calendar_name(market)
+    calendar_date = _completed_daily_trade_date_from_exchange_calendar(
+        now=now,
+        market=market,
+        calendar_name=calendar_name,
+    )
+    if calendar_date is not None:
+        return calendar_date
+    if market == "KR":
+        return _completed_daily_trade_date_for_kr(now)
+    return _completed_daily_trade_date_for_us(now)
+
+
+def _trade_date_market(*, ticker: str, config: ScheduledAnalysisConfig) -> str:
+    configured = str(getattr(config.run, "market", "") or "").strip().upper()
+    if configured in {"KR", "US"}:
+        return configured
+    try:
+        country = str(resolve_instrument(ticker).country or "").strip().upper()
+    except Exception:
+        country = ""
+    if country in {"KR", "US"}:
+        return country
+    return configured or "US"
+
+
+def _completed_daily_trade_date_from_exchange_calendar(
+    *,
+    now: datetime,
+    market: str,
+    calendar_name: str,
+) -> date | None:
+    try:
+        import pandas as pd
+        import exchange_calendars as xcals
+    except Exception:
+        return None
+
+    try:
+        local_now = _market_local_now(now=now, market=market)
+        cutoff_utc = pd.Timestamp((local_now - timedelta(minutes=5)).astimezone(timezone.utc))
+        calendar = xcals.get_calendar(calendar_name)
+        schedule = calendar.schedule
+        closes = pd.to_datetime(schedule["close"], utc=True)
+        eligible = schedule.loc[closes <= cutoff_utc]
+        if eligible.empty:
+            return None
+        session_label = eligible.index[-1]
+        session_date = getattr(session_label, "date", lambda: session_label)()
+        return session_date if isinstance(session_date, date) else None
+    except Exception:
+        return None
+
+
+def _market_local_now(*, now: datetime, market: str) -> datetime:
+    market_tz = "Asia/Seoul" if str(market or "").upper() == "KR" else "America/New_York"
+    if now.tzinfo is None:
+        return now.replace(tzinfo=ZoneInfo(market_tz))
+    return now.astimezone(ZoneInfo(market_tz))
 
 
 def _completed_daily_trade_date_for_kr(now: datetime) -> date:
@@ -757,6 +830,15 @@ def _completed_daily_trade_date_for_kr(now: datetime) -> date:
     # last completed daily bar. Only after the close-plan window do we allow
     # same-day daily thesis generation.
     if local.time() < time(hour=15, minute=35):
+        return _previous_business_day(local.date())
+    return local.date()
+
+
+def _completed_daily_trade_date_for_us(now: datetime) -> date:
+    local = now.astimezone(ZoneInfo("America/New_York")) if now.tzinfo else now.replace(tzinfo=ZoneInfo("America/New_York"))
+    if local.date().weekday() >= 5:
+        return _previous_business_day(local.date())
+    if local.time() < time(hour=16, minute=5):
         return _previous_business_day(local.date())
     return local.date()
 
