@@ -63,26 +63,26 @@ jobs:
 
     steps:
       - name: Prepare runner diagnostics
+        shell: pwsh
         run: |
-          import os
-          from pathlib import Path
+          $runnerTemp = (Resolve-Path $env:RUNNER_TEMP).Path
+          $runnerRoot = Split-Path (Split-Path $runnerTemp -Parent) -Parent
+          $pagesDiag = Join-Path $runnerRoot "_diag\pages"
+          if (-not (Test-Path -LiteralPath $pagesDiag)) {
+            Write-Output "GitHub Pages diagnostics directory does not exist: $pagesDiag"
+            exit 0
+          }
 
-          runner_temp = Path(os.environ["RUNNER_TEMP"]).resolve()
-          pages_diag = runner_temp.parent.parent / "_diag" / "pages"
-          if not pages_diag.exists():
-              print(f"GitHub Pages diagnostics directory does not exist: {pages_diag}")
-              raise SystemExit(0)
-
-          removed = 0
-          for candidate in pages_diag.glob("*.log"):
-              if not candidate.is_file():
-                  continue
-              try:
-                  candidate.unlink()
-                  removed += 1
-              except OSError as exc:
-                  print(f"::warning::Could not remove {candidate}: {exc}")
-          print(f"Removed {removed} stale GitHub Pages diagnostic log(s) from {pages_diag}")
+          $removed = 0
+          Get-ChildItem -LiteralPath $pagesDiag -Filter "*.log" -File -ErrorAction SilentlyContinue | ForEach-Object {
+            try {
+              Remove-Item -LiteralPath $_.FullName -Force -ErrorAction Stop
+              $removed += 1
+            } catch {
+              Write-Output "::warning::Could not remove $($_.FullName): $($_.Exception.Message)"
+            }
+          }
+          Write-Output "Removed $removed stale GitHub Pages diagnostic log(s) from $pagesDiag"
 
       - name: Check out repository
         uses: actions/checkout@v6
