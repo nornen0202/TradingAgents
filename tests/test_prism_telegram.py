@@ -3,7 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 from pathlib import Path
-from types import SimpleNamespace
+import sys
+from types import ModuleType
 from unittest.mock import patch
 
 from tradingagents.external.prism_loader import PrismLoaderConfig, load_prism_signals
@@ -217,3 +218,39 @@ def test_bot_api_missing_token_falls_back_to_public_preview():
     assert result.ok is True
     assert result.signals[0].canonical_ticker == "AMD"
     assert any("telegram_bot_token_missing" in warning for warning in result.warnings)
+
+
+def test_session_cli_uses_telethon_default_phone_prompt_when_phone_omitted(monkeypatch, capsys):
+    from tradingagents.prism_telegram import session as session_cli
+
+    calls: list[dict[str, object]] = []
+
+    class FakeStringSession:
+        def save(self) -> str:
+            return "SESSION_STRING"
+
+    class FakeTelegramClient:
+        def __init__(self, session, api_id, api_hash):
+            self.session = session
+            self.api_id = api_id
+            self.api_hash = api_hash
+
+        def start(self, **kwargs):
+            calls.append(kwargs)
+
+        def disconnect(self):
+            calls.append({"disconnect": True})
+
+    telethon_module = ModuleType("telethon")
+    telethon_sessions_module = ModuleType("telethon.sessions")
+    telethon_module.TelegramClient = FakeTelegramClient
+    telethon_sessions_module.StringSession = FakeStringSession
+    monkeypatch.setitem(sys.modules, "telethon", telethon_module)
+    monkeypatch.setitem(sys.modules, "telethon.sessions", telethon_sessions_module)
+
+    result = session_cli.main(["--api-id", "123", "--api-hash", "hash", "--quiet"])
+
+    assert result == 0
+    assert calls[0].get("phone") is None
+    assert "phone" not in calls[0]
+    assert "SESSION_STRING" in capsys.readouterr().out
