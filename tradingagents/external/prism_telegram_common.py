@@ -165,6 +165,12 @@ def normalize_channel(value: Any) -> str:
     return text or DEFAULT_TELEGRAM_CHANNEL
 
 
+def looks_like_pdf_document(filename: str | None, mime_type: str | None) -> bool:
+    name = str(filename or "").strip().lower()
+    mime = str(mime_type or "").strip().lower().split(";", 1)[0]
+    return name.endswith(".pdf") or mime == "application/pdf"
+
+
 def public_preview_url_for_channel(channel: str, configured_url: str | None = None) -> str:
     if configured_url and configured_url.strip():
         return configured_url.strip()

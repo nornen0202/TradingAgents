@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -92,6 +93,38 @@ def test_document_filename_yields_watch_signal_without_publishing_private_path()
     assert signal.canonical_ticker == "ASML"
     assert signal.signal_action == PrismSignalAction.WATCH
     assert public["documents"][0].get("local_path") is None
+
+
+def test_user_session_skips_non_pdf_media_without_filename():
+    from tradingagents.external.prism_telegram_user import _documents_for_message
+
+    class FakeFile:
+        name = None
+        title = None
+        mime_type = "image/jpeg"
+        size = 1234
+
+    class FakeMessage:
+        id = 12110
+        file = FakeFile()
+
+    class FakeClient:
+        async def download_media(self, *_args, **_kwargs):
+            raise AssertionError("non-PDF media should not be downloaded")
+
+    docs = asyncio.run(
+        _documents_for_message(
+            FakeClient(),
+            FakeMessage(),
+            PrismTelegramRuntimeConfig(download_pdfs=True),
+            channel="stock_ai_agent",
+        )
+    )
+
+    assert len(docs) == 1
+    assert docs[0].mime_type == "image/jpeg"
+    assert docs[0].local_path is None
+    assert docs[0].text_summary is None
 
 
 def test_prism_loader_keeps_dashboard_primary_and_merges_telegram_evidence():
