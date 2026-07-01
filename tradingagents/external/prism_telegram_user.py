@@ -16,6 +16,7 @@ from .prism_telegram_common import (
     PrismTelegramRuntimeConfig,
     extract_pdf_text_summary,
     filter_messages_by_lookback,
+    looks_like_pdf_document,
     messages_to_ingestion,
     normalize_channel,
 )
@@ -157,7 +158,7 @@ async def _documents_for_message(
     )
     if not cfg.download_pdfs:
         return [document]
-    if filename and not filename.lower().endswith(".pdf"):
+    if not looks_like_pdf_document(filename, mime_type):
         return [document]
     if document.size_bytes is not None and document.size_bytes > cfg.max_pdf_bytes:
         return [replace(document, text_summary={"status": "skipped", "warning": "telegram_pdf_too_large"})]
