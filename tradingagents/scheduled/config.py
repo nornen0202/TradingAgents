@@ -31,6 +31,7 @@ DEFAULT_EXECUTION_CHECKPOINTS_BY_MARKET: dict[str, tuple[str, ...]] = {
 class RunSettings:
     tickers: list[str]
     market: str = "AUTO"
+    market_declared: bool = False
     ticker_universe_mode: str = "config_only"
     analysts: list[str] = field(default_factory=lambda: list(ALL_ANALYSTS))
     output_language: str = "Korean"
@@ -351,6 +352,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
 
     timezone_name = str(run_raw.get("timezone", "Asia/Seoul")).strip()
     ZoneInfo(timezone_name)
+    market_declared = "market" in run_raw and bool(str(run_raw.get("market") or "").strip())
     declared_market = str(run_raw.get("market", "AUTO")).strip().upper() or "AUTO"
     market_code = _normalize_market_code(declared_market, timezone_name=timezone_name)
     default_checkpoints = _default_execution_checkpoints_kst(market_code)
@@ -377,6 +379,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         run=RunSettings(
             tickers=tickers,
             market=market_code,
+            market_declared=market_declared,
             ticker_universe_mode=_normalize_ticker_universe_mode(run_raw.get("ticker_universe_mode", "config_only")),
             analysts=analysts,
             output_language=str(run_raw.get("output_language", "Korean")).strip() or "Korean",
