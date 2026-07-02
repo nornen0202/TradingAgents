@@ -49,7 +49,16 @@ def run_prism_like_scanner(
         )
     signal_by_ticker = best_prism_signal_by_ticker(filtered_external_signals)
     candidates: list[ScannerCandidate] = []
+    excluded_cross_market_rows = 0
+    normalized_market = normalize_market(market)
     for row in rows:
+        ticker = _row_ticker(row, market=market)
+        if not ticker:
+            continue
+        row_market = normalize_market(row.get("market") or market, ticker=ticker)
+        if normalized_market != "UNKNOWN" and row_market != normalized_market:
+            excluded_cross_market_rows += 1
+            continue
         candidate = _scan_row(
             row,
             market=market,
@@ -58,10 +67,14 @@ def run_prism_like_scanner(
             max_daily_change_pct=max_daily_change_pct,
             min_volume_ratio_to_market_avg=min_volume_ratio_to_market_avg,
             exclude_halted_or_low_liquidity=exclude_halted_or_low_liquidity,
-            prism_signal=signal_by_ticker.get(_row_ticker(row, market=market) or ""),
+            prism_signal=signal_by_ticker.get(ticker),
         )
         if candidate is not None:
             candidates.append(candidate)
+    if excluded_cross_market_rows:
+        warnings.append(
+            f"스캐너 입력 {len(rows)}개 중 현재 시장 {market}와 일치하지 않아 {excluded_cross_market_rows}개 제외"
+        )
     candidates.sort(key=lambda item: item.final_score, reverse=True)
     result = ScannerResult(
         run_id=run_id or f"scanner_{datetime.now().strftime('%Y%m%dT%H%M%S')}",
@@ -74,6 +87,7 @@ def run_prism_like_scanner(
             "scanner_discovered": len(candidates[: max(0, int(max_candidates))]),
             "prism_imported_same_market": len(filtered_external_signals),
             "prism_excluded_cross_market": excluded_cross_market,
+            "scanner_excluded_cross_market_rows": excluded_cross_market_rows,
         },
     )
     if output_path:
