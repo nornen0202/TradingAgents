@@ -35,7 +35,44 @@ on:
           - "false"
 
 jobs:
+  prepare_self_hosted_runner:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: [self-hosted, Windows]
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Clear stale runner diagnostic logs
+        run: |
+          $runnerTemp = (Resolve-Path $env:RUNNER_TEMP).Path
+          $runnerRoot = Split-Path (Split-Path $runnerTemp -Parent) -Parent
+          $diagDirs = @(
+            (Join-Path $runnerRoot "_diag\pages"),
+            (Join-Path $runnerRoot "_diag\blocks")
+          )
+
+          foreach ($diagDir in $diagDirs) {
+            if (-not (Test-Path -LiteralPath $diagDir)) {
+              Write-Output "Runner diagnostics directory does not exist: $diagDir"
+              continue
+            }
+
+            $removed = 0
+            Get-ChildItem -LiteralPath $diagDir -File -ErrorAction SilentlyContinue | ForEach-Object {
+              try {
+                Remove-Item -LiteralPath $_.FullName -Force -ErrorAction Stop
+                $removed += 1
+              } catch {
+                Write-Output "::warning::Could not remove $($_.FullName): $($_.Exception.Message)"
+              }
+            }
+            Write-Output "Removed $removed stale runner diagnostic file(s) from $diagDir"
+          }
+
   build_prism_telegram_pages:
+    needs: prepare_self_hosted_runner
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: [self-hosted, Windows]
     permissions:
