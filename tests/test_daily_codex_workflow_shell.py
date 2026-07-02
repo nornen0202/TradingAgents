@@ -20,7 +20,7 @@ def test_daily_analysis_jobs_do_not_depend_on_windows_powershell():
 def test_daily_analysis_sets_up_python_before_first_script_step():
     workflow = _workflow_text()
 
-    for job_name in ("analyze_us:", "analyze_kr:"):
+    for job_name in ("analyze_us:", "analyze_kr:", "prepare_pages_runner:", "build_pages:"):
         job_start = workflow.index(f"  {job_name}")
         setup_python = workflow.index("      - name: Set up Python", job_start)
         first_python_run = workflow.index("        run: |", job_start)
