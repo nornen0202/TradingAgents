@@ -38,8 +38,8 @@ def _codex_targets():
     return gate.load_schedule_targets(
         """
         {
-          "10 7 * * 1-5": {"profile": "us", "window_start": "16:00", "target_jobs": ["analyze_us"]},
-          "10 21 * * 0-4": {"profile": "kr", "window_start": "06:00", "target_jobs": ["analyze_kr"]}
+          "50 8 * * 1-5": {"profile": "us", "window_start": "17:45", "target_jobs": ["analyze_us"]},
+          "35 19 * * 0-4": {"profile": "kr", "window_start": "04:30", "target_jobs": ["analyze_kr"]}
         }
         """
     )
@@ -57,13 +57,13 @@ def _youtube_targets():
               {
                 "name": "daily-codex-us-pages",
                 "workflow_file": "daily-codex-analysis.yml",
-                "window_start": "16:00",
+                "window_start": "17:45",
                 "target_jobs": ["analyze_us", "build_pages"]
               },
               {
                 "name": "intraday-overlay-us-publish",
                 "workflow_file": "intraday-overlay-refresh.yml",
-                "window_start": "23:00",
+                "window_start": "22:30",
                 "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]
               }
             ]
@@ -81,14 +81,14 @@ def test_scheduled_codex_skips_when_watchdog_dispatch_target_job_is_running():
 
     profile, should_run, reason = gate.decide_schedule_gate(
         event_name="schedule",
-        schedule="10 7 * * 1-5",
+        schedule="50 8 * * 1-5",
         requested_profile="",
         manual_default_profile="all",
         workflow_file="daily-codex-analysis.yml",
         current_run_id=222,
         client=client,
         targets=_codex_targets(),
-        now_kst=_kst("2026-06-03T16:40:00"),
+        now_kst=_kst("2026-06-03T18:40:00"),
     )
 
     assert profile == "us"
@@ -104,14 +104,14 @@ def test_scheduled_codex_does_not_skip_for_other_profile_target_job():
 
     profile, should_run, reason = gate.decide_schedule_gate(
         event_name="schedule",
-        schedule="10 7 * * 1-5",
+        schedule="50 8 * * 1-5",
         requested_profile="",
         manual_default_profile="all",
         workflow_file="daily-codex-analysis.yml",
         current_run_id=222,
         client=client,
         targets=_codex_targets(),
-        now_kst=_kst("2026-06-03T16:40:00"),
+        now_kst=_kst("2026-06-03T18:40:00"),
     )
 
     assert profile == "us"
@@ -146,9 +146,9 @@ def test_scheduled_codex_retries_when_analysis_succeeded_but_pages_did_not():
     targets = gate.load_schedule_targets(
         """
         {
-          "10 7 * * 1-5": {
+          "50 8 * * 1-5": {
             "profile": "us",
-            "window_start": "16:00",
+            "window_start": "17:45",
             "target_jobs": ["analyze_us", "build_pages"]
           }
         }
@@ -166,7 +166,7 @@ def test_scheduled_codex_retries_when_analysis_succeeded_but_pages_did_not():
 
     profile, should_run, reason = gate.decide_schedule_gate(
         event_name="schedule",
-        schedule="10 7 * * 1-5",
+        schedule="50 8 * * 1-5",
         requested_profile="",
         manual_default_profile="all",
         workflow_file="daily-codex-analysis.yml",
@@ -185,9 +185,9 @@ def test_scheduled_codex_skips_only_when_analysis_and_pages_both_succeeded():
     targets = gate.load_schedule_targets(
         """
         {
-          "10 7 * * 1-5": {
+          "50 8 * * 1-5": {
             "profile": "us",
-            "window_start": "16:00",
+            "window_start": "17:45",
             "target_jobs": ["analyze_us", "build_pages"]
           }
         }
@@ -205,7 +205,7 @@ def test_scheduled_codex_skips_only_when_analysis_and_pages_both_succeeded():
 
     _profile, should_run, reason = gate.decide_schedule_gate(
         event_name="schedule",
-        schedule="10 7 * * 1-5",
+        schedule="50 8 * * 1-5",
         requested_profile="",
         manual_default_profile="all",
         workflow_file="daily-codex-analysis.yml",
@@ -223,9 +223,9 @@ def test_scheduled_codex_waits_when_prior_run_is_between_analysis_and_pages():
     targets = gate.load_schedule_targets(
         """
         {
-          "10 7 * * 1-5": {
+          "50 8 * * 1-5": {
             "profile": "us",
-            "window_start": "16:00",
+            "window_start": "17:45",
             "target_jobs": ["analyze_us", "build_pages"]
           }
         }
@@ -238,7 +238,7 @@ def test_scheduled_codex_waits_when_prior_run_is_between_analysis_and_pages():
 
     _profile, should_run, reason = gate.decide_schedule_gate(
         event_name="schedule",
-        schedule="10 7 * * 1-5",
+        schedule="50 8 * * 1-5",
         requested_profile="",
         manual_default_profile="all",
         workflow_file="daily-codex-analysis.yml",
@@ -338,14 +338,14 @@ def test_failed_prior_run_does_not_block_recovery():
 
     _profile, should_run, reason = gate.decide_schedule_gate(
         event_name="schedule",
-        schedule="10 7 * * 1-5",
+        schedule="50 8 * * 1-5",
         requested_profile="",
         manual_default_profile="all",
         workflow_file="daily-codex-analysis.yml",
         current_run_id=666,
         client=client,
         targets=_codex_targets(),
-        now_kst=_kst("2026-06-03T16:40:00"),
+        now_kst=_kst("2026-06-03T18:40:00"),
     )
 
     assert should_run is True

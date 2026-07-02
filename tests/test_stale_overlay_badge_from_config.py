@@ -45,14 +45,19 @@ site_dir = ".site"
 
 def test_intraday_overlay_workflow_uses_kr_operational_crons():
     workflow = Path(".github/workflows/intraday-overlay-refresh.yml").read_text(encoding="utf-8")
-    assert "KR checkpoints: 09:35, 10:35, 11:35, 12:35, 13:35, 14:35, 15:20 KST." in workflow
-    assert "Fallback probes absorb occasional GitHub schedule event drops" in workflow
-    assert "35 0-5 * * 1-5" in workflow
-    assert "20 6 * * 1-5" in workflow
-    assert "50 0-5 * * 1-5" in workflow
-    assert "25 6 * * 1-5" in workflow
-    assert "0 14-20 * * 1-5" in workflow
-    assert "50 19,20 * * 1-5" in workflow
+    assert "KR overlay starts: 10:05, 12:00, 13:20 KST." in workflow
+    assert "Target deploys are roughly 11:05, 13:00, and before 14:30 KST." in workflow
+    assert "5 1 * * 1-5" in workflow
+    assert "0 3 * * 1-5" in workflow
+    assert "20 4 * * 1-5" in workflow
+    assert "40 13,15 * * 1-5" in workflow
+    assert "10 17 * * 1-5" in workflow
+    assert "35 0-5 * * 1-5" not in workflow
+    assert "20 6 * * 1-5" not in workflow
+    assert "50 0-5 * * 1-5" not in workflow
+    assert "25 6 * * 1-5" not in workflow
+    assert "0 14-20 * * 1-5" not in workflow
+    assert "50 19,20 * * 1-5" not in workflow
     assert "5 0,2,4 * * 1-5" not in workflow
     assert "35 6 * * 1-5" not in workflow
     assert "actions: read" in workflow
@@ -72,19 +77,25 @@ def test_intraday_overlay_workflow_uses_kr_operational_crons():
 
 def test_daily_workflow_runs_us_and_kr_at_revised_kst_targets():
     workflow = Path(".github/workflows/daily-codex-analysis.yml").read_text(encoding="utf-8")
-    assert "Target: 6:00 KST weekdays for KR. Start after the US overlay close window" in workflow
-    assert "Target: 16:00 KST weekdays for US. Start after the KR overlay close window" in workflow
-    assert "Backup probes absorb occasional GitHub schedule event drops" in workflow
-    assert "10 21 * * 0-4" in workflow
-    assert "40 21 * * 0-4" in workflow
-    assert "10 22 * * 0-4" in workflow
-    assert "10 7 * * 1-5" in workflow
-    assert "40 7 * * 1-5" in workflow
-    assert "10 8 * * 1-5" in workflow
-    assert "10 9 * * 1-5" in workflow
-    assert "10 10 * * 1-5" in workflow
-    assert "10 11 * * 1-5" in workflow
-    assert "10 12 * * 1-5" in workflow
+    assert "KR target: deploy the main report by about 10:00 KST" in workflow
+    assert "US target: deploy the main report by about 22:30 KST" in workflow
+    assert "the gate skips duplicates" in workflow
+    assert "35 19 * * 0-4" in workflow
+    assert "5 20 * * 0-4" in workflow
+    assert "35 20 * * 0-4" in workflow
+    assert "50 8 * * 1-5" in workflow
+    assert "20 9 * * 1-5" in workflow
+    assert "50 9 * * 1-5" in workflow
+    assert "10 21 * * 0-4" not in workflow
+    assert "40 21 * * 0-4" not in workflow
+    assert "10 22 * * 0-4" not in workflow
+    assert "10 7 * * 1-5" not in workflow
+    assert "40 7 * * 1-5" not in workflow
+    assert "10 8 * * 1-5" not in workflow
+    assert "10 9 * * 1-5" not in workflow
+    assert "10 10 * * 1-5" not in workflow
+    assert "10 11 * * 1-5" not in workflow
+    assert "10 12 * * 1-5" not in workflow
     assert "- cron: '0 0 * * 1-5'" not in workflow
     assert "- cron: '0 12 * * 1-5'" not in workflow
     assert "- cron: '30 19 * * 0-4'" not in workflow
@@ -95,21 +106,17 @@ def test_daily_workflow_runs_us_and_kr_at_revised_kst_targets():
     match = re.search(r"SCHEDULE_GATE_TARGETS_JSON:\s*>-\s*\n(?P<body>(?: {12}.*\n)+)", workflow)
     assert match is not None
     targets = json.loads("\n".join(line[12:] for line in match.group("body").splitlines()))
-    for cron in ("10 21 * * 0-4", "40 21 * * 0-4", "10 22 * * 0-4"):
+    for cron in ("35 19 * * 0-4", "5 20 * * 0-4", "35 20 * * 0-4"):
         assert targets[cron]["profile"] == "kr"
-        assert targets[cron]["window_start"] == "06:00"
+        assert targets[cron]["window_start"] == "04:30"
         assert targets[cron]["target_jobs"] == ["analyze_kr", "build_pages"]
     for cron in (
-        "10 7 * * 1-5",
-        "40 7 * * 1-5",
-        "10 8 * * 1-5",
-        "10 9 * * 1-5",
-        "10 10 * * 1-5",
-        "10 11 * * 1-5",
-        "10 12 * * 1-5",
+        "50 8 * * 1-5",
+        "20 9 * * 1-5",
+        "50 9 * * 1-5",
     ):
         assert targets[cron]["profile"] == "us"
-        assert targets[cron]["window_start"] == "16:00"
+        assert targets[cron]["window_start"] == "17:45"
         assert targets[cron]["target_jobs"] == ["analyze_us", "build_pages"]
 
 

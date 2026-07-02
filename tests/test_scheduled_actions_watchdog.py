@@ -48,8 +48,9 @@ def test_youtube_watchdog_is_due_after_backup_window():
     assert youtube[0].window_start_kst == _kst("2026-06-02T05:00:00")
     assert youtube[0].blockers[0].name == "daily-codex-us-pages"
     assert youtube[0].blockers[0].job_names == ("analyze_us", "build_pages")
-    assert youtube[0].blockers[0].window_start_kst == _kst("2026-06-01T16:00:00")
+    assert youtube[0].blockers[0].window_start_kst == _kst("2026-06-01T17:45:00")
     assert youtube[0].blockers[1].name == "intraday-overlay-us-publish"
+    assert youtube[0].blockers[1].window_start_kst == _kst("2026-06-01T22:30:00")
 
 
 def test_daily_codex_us_watchdog_is_due_on_weekday_afternoon():
@@ -59,7 +60,7 @@ def test_daily_codex_us_watchdog_is_due_on_weekday_afternoon():
     assert len(codex_us) == 1
     assert codex_us[0].inputs == {"profile": "us"}
     assert codex_us[0].job_names == ("analyze_us", "build_pages")
-    assert codex_us[0].window_start_kst == _kst("2026-06-01T16:00:00")
+    assert codex_us[0].window_start_kst == _kst("2026-06-01T17:45:00")
     assert codex_us[0].blockers[0].name == "intraday-overlay-kr-publish"
 
 
@@ -75,19 +76,19 @@ def test_daily_codex_us_watchdog_yields_after_late_recovery_window():
     assert not [target for target in targets if target.name == "daily-codex-us"]
 
 
-def test_daily_codex_kr_watchdog_stays_due_after_delayed_cancel_window():
-    targets = watchdog.due_targets(_kst("2026-06-01T12:37:00"))
+def test_daily_codex_kr_watchdog_stays_due_before_ten_kst_target():
+    targets = watchdog.due_targets(_kst("2026-06-01T09:37:00"))
 
     assert [target for target in targets if target.name == "daily-codex-kr"]
 
 
 def test_daily_codex_kr_watchdog_yields_after_recovery_window():
-    targets = watchdog.due_targets(_kst("2026-06-01T15:47:00"))
+    targets = watchdog.due_targets(_kst("2026-06-01T10:17:00"))
 
     assert not [target for target in targets if target.name == "daily-codex-kr"]
 
 
-def test_daily_codex_kr_watchdog_waits_for_previous_youtube_publish():
+def test_daily_codex_kr_watchdog_does_not_wait_for_youtube_publish():
     client = FakeClient(
         runs={
             "daily-youtube-reports.yml": [{"id": 301, "status": "in_progress", "conclusion": ""}],
@@ -99,9 +100,9 @@ def test_daily_codex_kr_watchdog_waits_for_previous_youtube_publish():
 
     messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T07:58:00"))
 
-    assert not client.dispatches
-    assert any("daily-codex-kr: waiting" in message for message in messages)
-    assert any("daily-youtube-publish" in message for message in messages)
+    assert ("daily-codex-analysis.yml", {"profile": "kr"}) in client.dispatches
+    assert any("daily-codex-kr: dispatched" in message for message in messages)
+    assert not any("daily-codex-kr: waiting" in message for message in messages)
 
 
 def test_daily_codex_us_watchdog_waits_for_kr_overlay_publish():
@@ -128,7 +129,7 @@ def test_kr_intraday_overlay_watchdog_depends_on_daily_codex_completion():
     assert overlay_kr[0].inputs == {"profile": "kr", "run_mode": "overlay_only"}
     assert overlay_kr[0].dependencies[0].name == "daily-codex-kr"
     assert overlay_kr[0].dependencies[0].job_names == ("analyze_kr", "build_pages")
-    assert overlay_kr[0].dependencies[0].window_start_kst == _kst("2026-06-01T06:00:00")
+    assert overlay_kr[0].dependencies[0].window_start_kst == _kst("2026-06-01T04:30:00")
 
 
 def test_us_intraday_overlay_watchdog_uses_previous_daily_window_after_midnight():
@@ -139,7 +140,7 @@ def test_us_intraday_overlay_watchdog_uses_previous_daily_window_after_midnight(
     assert overlay_us[0].inputs == {"profile": "us", "run_mode": "overlay_only"}
     assert overlay_us[0].dependencies[0].name == "daily-codex-us"
     assert overlay_us[0].dependencies[0].job_names == ("analyze_us", "build_pages")
-    assert overlay_us[0].dependencies[0].window_start_kst == _kst("2026-06-01T16:00:00")
+    assert overlay_us[0].dependencies[0].window_start_kst == _kst("2026-06-01T17:45:00")
 
 
 def test_youtube_watchdog_stays_due_during_late_recovery_window():

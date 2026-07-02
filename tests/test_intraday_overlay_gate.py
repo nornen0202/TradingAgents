@@ -39,7 +39,7 @@ def test_kr_overlay_waits_when_daily_codex_workflow_is_still_active():
 
     decisions, messages = gate.decide_intraday_gate(
         event_name="schedule",
-        schedule="35 0-5 * * 1-5",
+        schedule="5 1 * * 1-5",
         requested_profile="",
         client=client,
         now_kst=_kst("2026-06-04T10:35:00"),
@@ -48,7 +48,7 @@ def test_kr_overlay_waits_when_daily_codex_workflow_is_still_active():
     assert decisions == {"us": False, "kr": False}
     assert any("still active" in message for message in messages)
     assert client.last_workflow_file == "daily-codex-analysis.yml"
-    assert client.last_created_since_utc == _kst("2026-06-04T06:00:00").astimezone(gate.UTC)
+    assert client.last_created_since_utc == _kst("2026-06-04T04:30:00").astimezone(gate.UTC)
 
 
 def test_kr_overlay_waits_when_only_daily_gate_job_succeeded():
@@ -59,10 +59,10 @@ def test_kr_overlay_waits_when_only_daily_gate_job_succeeded():
 
     decisions, messages = gate.decide_intraday_gate(
         event_name="schedule",
-        schedule="20 6 * * 1-5",
+        schedule="20 4 * * 1-5",
         requested_profile="",
         client=client,
-        now_kst=_kst("2026-06-04T15:20:00"),
+        now_kst=_kst("2026-06-04T13:20:00"),
     )
 
     assert decisions["kr"] is False
@@ -82,10 +82,10 @@ def test_kr_overlay_waits_until_daily_pages_build_succeeds():
 
     decisions, messages = gate.decide_intraday_gate(
         event_name="schedule",
-        schedule="50 0-5 * * 1-5",
+        schedule="0 3 * * 1-5",
         requested_profile="",
         client=client,
-        now_kst=_kst("2026-06-04T11:50:00"),
+        now_kst=_kst("2026-06-04T12:00:00"),
     )
 
     assert decisions["kr"] is False
@@ -108,10 +108,10 @@ def test_kr_overlay_waits_when_newer_daily_run_is_active_after_prior_success():
 
     decisions, messages = gate.decide_intraday_gate(
         event_name="schedule",
-        schedule="50 0-5 * * 1-5",
+        schedule="0 3 * * 1-5",
         requested_profile="",
         client=client,
-        now_kst=_kst("2026-06-04T11:50:00"),
+        now_kst=_kst("2026-06-04T12:00:00"),
     )
 
     assert decisions["kr"] is False
@@ -131,10 +131,10 @@ def test_kr_overlay_runs_after_completed_daily_codex_target_jobs():
 
     decisions, messages = gate.decide_intraday_gate(
         event_name="schedule",
-        schedule="50 0-5 * * 1-5",
+        schedule="0 3 * * 1-5",
         requested_profile="",
         client=client,
-        now_kst=_kst("2026-06-04T11:50:00"),
+        now_kst=_kst("2026-06-04T12:00:00"),
     )
 
     assert decisions["kr"] is True
@@ -146,7 +146,7 @@ def test_kr_overlay_holds_stale_delayed_schedule_event():
 
     decisions, messages = gate.decide_intraday_gate(
         event_name="schedule",
-        schedule="25 6 * * 1-5",
+        schedule="20 4 * * 1-5",
         requested_profile="",
         client=client,
         now_kst=_kst("2026-06-12T19:44:00"),
@@ -158,11 +158,11 @@ def test_kr_overlay_holds_stale_delayed_schedule_event():
 
 def test_schedule_freshness_respects_cron_weekday_field():
     expected = gate._last_scheduled_fire_utc(
-        "25 6 * * 1-5",
+        "20 4 * * 1-5",
         _kst("2026-06-15T10:00:00").astimezone(gate.UTC),
     )
 
-    assert expected == _kst("2026-06-12T15:25:00").astimezone(gate.UTC)
+    assert expected == _kst("2026-06-12T13:20:00").astimezone(gate.UTC)
 
 
 def test_kr_overlay_waits_when_same_profile_overlay_is_already_active():
@@ -186,7 +186,7 @@ def test_kr_overlay_waits_when_same_profile_overlay_is_already_active():
 
     decisions, messages = gate.decide_intraday_gate(
         event_name="schedule",
-        schedule="50 0-5 * * 1-5",
+        schedule="5 1 * * 1-5",
         requested_profile="",
         client=client,
         now_kst=_kst("2026-06-04T10:50:00"),
@@ -218,7 +218,7 @@ def test_kr_overlay_ignores_current_run_when_checking_active_overlay():
 
     decisions, messages = gate.decide_intraday_gate(
         event_name="schedule",
-        schedule="50 0-5 * * 1-5",
+        schedule="5 1 * * 1-5",
         requested_profile="",
         client=client,
         now_kst=_kst("2026-06-04T10:50:00"),
@@ -242,14 +242,14 @@ def test_us_overlay_after_midnight_uses_previous_kst_daily_window():
 
     decisions, _messages = gate.decide_intraday_gate(
         event_name="schedule",
-        schedule="50 19,20 * * 1-5",
+        schedule="40 13,15 * * 1-5",
         requested_profile="",
         client=client,
-        now_kst=_kst("2026-06-05T05:50:00"),
+        now_kst=_kst("2026-06-05T00:40:00"),
     )
 
     assert decisions["us"] is True
-    assert client.last_created_since_utc == _kst("2026-06-04T16:00:00").astimezone(gate.UTC)
+    assert client.last_created_since_utc == _kst("2026-06-04T17:45:00").astimezone(gate.UTC)
 
 
 def test_manual_all_profile_can_run_each_side_independently():

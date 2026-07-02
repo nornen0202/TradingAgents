@@ -236,16 +236,16 @@ def _youtube_watchdog_due(now_kst: datetime, youtube_window: datetime) -> bool:
 
 def _us_intraday_overlay_due(now_kst: datetime) -> bool:
     utc_now = now_kst.astimezone(UTC)
-    return utc_now.weekday() < 5 and _time_between(utc_now.time(), time(14, 20), time(21, 20))
+    return utc_now.weekday() < 5 and _time_between(utc_now.time(), time(13, 35), time(18, 30))
 
 
 def _daily_codex_dependency(profile: str, now_kst: datetime) -> WatchdogDependency:
     if profile == "kr":
-        window_start = datetime.combine(now_kst.date(), time(6, 0), tzinfo=KST)
+        window_start = datetime.combine(now_kst.date(), time(4, 30), tzinfo=KST)
         job_names = ("analyze_kr", "build_pages")
     elif profile == "us":
-        window_start = datetime.combine(now_kst.date(), time(16, 0), tzinfo=KST)
-        if now_kst.time() < time(16, 0):
+        window_start = datetime.combine(now_kst.date(), time(17, 45), tzinfo=KST)
+        if now_kst.time() < time(17, 45):
             window_start -= timedelta(days=1)
         job_names = ("analyze_us", "build_pages")
     else:
@@ -261,11 +261,11 @@ def _daily_codex_dependency(profile: str, now_kst: datetime) -> WatchdogDependen
 
 def _daily_codex_active_blocker(profile: str, now_kst: datetime) -> WatchdogBlocker:
     if profile == "kr":
-        window_start = datetime.combine(now_kst.date(), time(6, 0), tzinfo=KST)
+        window_start = datetime.combine(now_kst.date(), time(4, 30), tzinfo=KST)
         job_names = ("analyze_kr", "build_pages")
     elif profile == "us":
-        window_start = datetime.combine(now_kst.date(), time(16, 0), tzinfo=KST)
-        if now_kst.time() < time(16, 0):
+        window_start = datetime.combine(now_kst.date(), time(17, 45), tzinfo=KST)
+        if now_kst.time() < time(17, 45):
             window_start -= timedelta(days=1)
         job_names = ("analyze_us", "build_pages")
     else:
@@ -281,11 +281,11 @@ def _daily_codex_active_blocker(profile: str, now_kst: datetime) -> WatchdogBloc
 
 def _intraday_overlay_active_blocker(profile: str, now_kst: datetime) -> WatchdogBlocker:
     if profile == "kr":
-        window_start = datetime.combine(now_kst.date(), time(9, 0), tzinfo=KST)
+        window_start = datetime.combine(now_kst.date(), time(9, 30), tzinfo=KST)
         job_names = ("overlay_refresh_kr", "publish_overlay_site", "deploy_overlay")
     elif profile == "us":
-        window_start = datetime.combine(now_kst.date(), time(23, 0), tzinfo=KST)
-        if now_kst.time() < time(23, 0):
+        window_start = datetime.combine(now_kst.date(), time(22, 30), tzinfo=KST)
+        if now_kst.time() < time(22, 30):
             window_start -= timedelta(days=1)
         job_names = ("overlay_refresh_us", "publish_overlay_site", "deploy_overlay")
     else:
@@ -332,8 +332,8 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
         )
 
     if kst_weekday < 5:
-        codex_us_window = datetime.combine(kst_date, time(16, 0), tzinfo=KST)
-        if _time_between(kst_time, time(17, 45), time(23, 15)):
+        codex_us_window = datetime.combine(kst_date, time(17, 45), tzinfo=KST)
+        if _time_between(kst_time, time(17, 50), time(22, 45)):
             targets.append(
                 WatchdogTarget(
                     name="daily-codex-us",
@@ -345,8 +345,8 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
                 )
             )
 
-        codex_kr_window = datetime.combine(kst_date, time(6, 0), tzinfo=KST)
-        if _time_between(kst_time, time(7, 45), time(15, 45)):
+        codex_kr_window = datetime.combine(kst_date, time(4, 30), tzinfo=KST)
+        if _time_between(kst_time, time(4, 45), time(10, 15)):
             targets.append(
                 WatchdogTarget(
                     name="daily-codex-kr",
@@ -354,14 +354,11 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
                     job_names=("analyze_kr", "build_pages"),
                     window_start_kst=codex_kr_window,
                     inputs={"profile": "kr"},
-                    blockers=(
-                        _intraday_overlay_active_blocker("us", now_kst),
-                        _youtube_active_blocker(now_kst),
-                    ),
+                    blockers=(_intraday_overlay_active_blocker("us", now_kst),),
                 )
             )
 
-        if _time_between(kst_time, time(9, 50), time(15, 45)):
+        if _time_between(kst_time, time(10, 0), time(13, 40)):
             targets.append(
                 WatchdogTarget(
                     name="intraday-overlay-kr",

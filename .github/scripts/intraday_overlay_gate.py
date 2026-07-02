@@ -13,8 +13,8 @@ from zoneinfo import ZoneInfo
 KST = ZoneInfo("Asia/Seoul")
 UTC = timezone.utc
 
-US_SCHEDULES = {"0 14-20 * * 1-5", "50 19,20 * * 1-5"}
-KR_SCHEDULES = {"35 0-5 * * 1-5", "20 6 * * 1-5", "50 0-5 * * 1-5", "25 6 * * 1-5"}
+US_SCHEDULES = {"40 13,15 * * 1-5", "10 17 * * 1-5"}
+KR_SCHEDULES = {"5 1 * * 1-5", "0 3 * * 1-5", "20 4 * * 1-5"}
 DAILY_TARGET_JOBS = {"us": ("analyze_us", "build_pages"), "kr": ("analyze_kr", "build_pages")}
 OVERLAY_TARGET_JOBS = {
     "us": ("overlay_refresh_us", "publish_overlay_site", "deploy_overlay"),
@@ -85,9 +85,9 @@ def requested_profiles(*, event_name: str, schedule: str, requested_profile: str
 
 def daily_window_start_kst(profile: str, now_kst: datetime) -> datetime:
     if profile == "kr":
-        start = time(6, 0)
+        start = time(4, 30)
     elif profile == "us":
-        start = time(16, 0)
+        start = time(17, 45)
     else:
         raise ValueError(f"Unsupported profile: {profile}")
 
@@ -241,9 +241,9 @@ def daily_dependency_satisfied(*, client: Any, dependency: DailyDependency) -> t
 
 def overlay_window_start_kst(profile: str, now_kst: datetime) -> datetime:
     if profile == "kr":
-        start = time(9, 0)
+        start = time(9, 30)
     elif profile == "us":
-        start = time(23, 0)
+        start = time(22, 30)
     else:
         raise ValueError(f"Unsupported profile: {profile}")
     window_start = now_kst.replace(hour=start.hour, minute=start.minute, second=0, microsecond=0)
