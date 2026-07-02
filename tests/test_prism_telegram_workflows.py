@@ -15,6 +15,7 @@ def test_prism_telegram_workflow_keeps_pages_permission_off_self_hosted_build_jo
     assert "path: source-${{ github.run_id }}" in build_job
     assert "TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\\site-${{ github.run_id }}" in build_job
     assert "working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}" in build_job
+    assert "Prepare runner diagnostics" not in build_job
 
     assert "permissions:\n      pages: write\n      id-token: write" in deploy_job
 

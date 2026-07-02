@@ -60,28 +60,6 @@ jobs:
       TELEGRAM_SESSION_PATH: ${{ vars.TELEGRAM_SESSION_PATH }}
 
     steps:
-      - name: Prepare runner diagnostics
-        shell: pwsh
-        run: |
-          $runnerTemp = (Resolve-Path $env:RUNNER_TEMP).Path
-          $runnerRoot = Split-Path (Split-Path $runnerTemp -Parent) -Parent
-          $pagesDiag = Join-Path $runnerRoot "_diag\pages"
-          if (-not (Test-Path -LiteralPath $pagesDiag)) {
-            Write-Output "GitHub Pages diagnostics directory does not exist: $pagesDiag"
-            exit 0
-          }
-
-          $removed = 0
-          Get-ChildItem -LiteralPath $pagesDiag -Filter "*.log" -File -ErrorAction SilentlyContinue | ForEach-Object {
-            try {
-              Remove-Item -LiteralPath $_.FullName -Force -ErrorAction Stop
-              $removed += 1
-            } catch {
-              Write-Output "::warning::Could not remove $($_.FullName): $($_.Exception.Message)"
-            }
-          }
-          Write-Output "Removed $removed stale GitHub Pages diagnostic log(s) from $pagesDiag"
-
       - name: Check out repository
         uses: actions/checkout@v6
         with:
