@@ -30,7 +30,7 @@ def test_daily_analysis_sets_up_python_before_first_script_step():
 def test_daily_analysis_uses_python_shell_for_all_windows_jobs():
     workflow = _workflow_text()
 
-    assert workflow.count("        shell: python {0}") == 3
+    assert workflow.count("        shell: python {0}") == 4
 
 
 def test_daily_analysis_default_parallel_ticker_workers_is_four():
@@ -83,7 +83,7 @@ def test_daily_analysis_schedule_gate_requires_pages_build_for_daily_coverage():
 def test_daily_analysis_self_hosted_jobs_serialize_workspace_checkout():
     workflow = _workflow_text()
 
-    for job_name in ("analyze_us", "analyze_kr", "build_pages"):
+    for job_name in ("analyze_us", "analyze_kr", "prepare_pages_runner", "build_pages"):
         job_start = workflow.index(f"  {job_name}:")
         job_block = workflow[job_start : job_start + 1200]
         assert "concurrency:" in job_block
@@ -94,12 +94,30 @@ def test_daily_analysis_self_hosted_jobs_serialize_workspace_checkout():
 def test_daily_analysis_cleans_pages_diagnostics_before_self_hosted_checkout():
     workflow = _workflow_text()
 
-    for job_name in ("analyze_us", "analyze_kr", "build_pages"):
+    for job_name in ("analyze_us", "analyze_kr"):
         job_start = workflow.index(f"  {job_name}:")
         checkout = workflow.index("      - name: Check out repository", job_start)
         job_before_checkout = workflow[job_start:checkout]
         assert '"_diag" / "pages"' in job_before_checkout
         assert "*.log" in job_before_checkout
+
+
+def test_daily_pages_build_uses_runner_diagnostics_preflight():
+    workflow = _workflow_text()
+
+    preflight = workflow.split("  prepare_pages_runner:", 1)[1].split("  build_pages:", 1)[0]
+    build_pages = workflow.split("  build_pages:", 1)[1].split("  deploy:", 1)[0]
+
+    assert "Clear stale runner diagnostic logs" in preflight
+    assert '"_diag" / "pages"' in preflight
+    assert '"_diag" / "blocks"' in preflight
+    assert "contents: read" in preflight
+    assert "needs.prepare_pages_runner.result == 'success'" in build_pages
+    assert "      - prepare_pages_runner" in build_pages
+    assert "permissions:\n      contents: read" in build_pages
+    assert "pages: write" not in build_pages
+    assert "id-token: write" not in build_pages
+    assert "Prepare GitHub Pages diagnostics" not in build_pages
 
 
 def test_daily_analysis_configures_pages_only_in_final_build_job():
@@ -120,3 +138,4 @@ def test_daily_analysis_deploy_runs_after_final_pages_build():
     assert "      - build_pages" in deploy_block
     assert "if: ${{ always() && needs.build_pages.result == 'success' }}" in deploy_block
     assert "artifact_name: github-pages-final" in deploy_block
+    assert "permissions:\n      pages: write\n      id-token: write" in deploy_block

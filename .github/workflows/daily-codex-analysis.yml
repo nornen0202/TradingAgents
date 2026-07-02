@@ -76,8 +76,6 @@ on:
 permissions:
   actions: read
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   schedule_gate:
@@ -1377,7 +1375,7 @@ jobs:
           legacy_codex_home = Path(os.environ.get("USERPROFILE", "")) / ".codex" / "tradingagents-workspace" / ".codex-home"
           remove_codex_log_files(legacy_codex_home)
 
-  build_pages:
+  prepare_pages_runner:
     needs:
       - schedule_gate
       - analyze_us
@@ -1387,6 +1385,53 @@ jobs:
     concurrency:
       group: daily-codex-analysis-self-hosted-${{ github.ref }}
       cancel-in-progress: false
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: python {0}
+    steps:
+      - name: Clear stale runner diagnostic logs
+        run: |
+          import os
+          from pathlib import Path
+
+          runner_temp = Path(os.environ["RUNNER_TEMP"]).resolve()
+          runner_root = runner_temp.parent.parent
+          diag_dirs = (
+              runner_root / "_diag" / "pages",
+              runner_root / "_diag" / "blocks",
+          )
+
+          for diag_dir in diag_dirs:
+              if not diag_dir.exists():
+                  print(f"Runner diagnostics directory does not exist: {diag_dir}")
+                  continue
+
+              removed = 0
+              for candidate in diag_dir.iterdir():
+                  if not candidate.is_file():
+                      continue
+                  try:
+                      candidate.unlink()
+                      removed += 1
+                  except OSError as exc:
+                      print(f"::warning::Could not remove {candidate}: {exc}")
+              print(f"Removed {removed} stale runner diagnostic file(s) from {diag_dir}")
+
+  build_pages:
+    needs:
+      - schedule_gate
+      - analyze_us
+      - analyze_kr
+      - prepare_pages_runner
+    if: ${{ always() && github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' && needs.prepare_pages_runner.result == 'success' && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && ((needs.schedule_gate.outputs.profile == 'all' && needs.analyze_us.result == 'success' && needs.analyze_kr.result == 'success') || (needs.schedule_gate.outputs.profile == 'us' && needs.analyze_us.result == 'success') || (needs.schedule_gate.outputs.profile == 'kr' && needs.analyze_kr.result == 'success')) }}
+    runs-on: [self-hosted, Windows]
+    concurrency:
+      group: daily-codex-analysis-self-hosted-${{ github.ref }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
     defaults:
       run:
         shell: python {0}
@@ -1402,28 +1447,6 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.13"
-
-      - name: Prepare GitHub Pages diagnostics
-        run: |
-          import os
-          from pathlib import Path
-
-          runner_temp = Path(os.environ["RUNNER_TEMP"]).resolve()
-          pages_diag = runner_temp.parent.parent / "_diag" / "pages"
-          if not pages_diag.exists():
-              print(f"GitHub Pages diagnostics directory does not exist: {pages_diag}")
-              raise SystemExit(0)
-
-          removed = 0
-          for candidate in pages_diag.glob("*.log"):
-              if not candidate.is_file():
-                  continue
-              try:
-                  candidate.unlink()
-                  removed += 1
-              except OSError as exc:
-                  print(f"::warning::Could not remove {candidate}: {exc}")
-          print(f"Removed {removed} stale GitHub Pages diagnostic log(s) from {pages_diag}")
 
       - name: Check out repository
         uses: actions/checkout@v6
@@ -1501,6 +1524,9 @@ jobs:
       - build_pages
     if: ${{ always() && needs.build_pages.result == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     environment:
