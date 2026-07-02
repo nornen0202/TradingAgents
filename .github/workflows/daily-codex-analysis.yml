@@ -1391,6 +1391,11 @@ jobs:
       run:
         shell: python {0}
     steps:
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
       - name: Clear stale runner diagnostic logs
         run: |
           import os
