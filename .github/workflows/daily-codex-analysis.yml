@@ -1396,6 +1396,7 @@ jobs:
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
     steps:
       - name: Set up Python
         uses: actions/setup-python@v6
