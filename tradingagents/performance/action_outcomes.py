@@ -6,6 +6,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
+from tradingagents.external.prism_normalize import normalize_market
+
 from .models import ACTION_TRACKER_SCHEMA, ActionPerformanceSummary
 from .price_history import BENCHMARK_KEY
 
@@ -16,6 +18,7 @@ def initialize_action_tracker(db_path: Path) -> None:
         for statement in ACTION_TRACKER_SCHEMA:
             conn.execute(statement)
         _ensure_columns(conn, "action_recommendations", {
+            "market": "TEXT",
             "prism_agreement": "TEXT",
             "skip_reason": "TEXT",
             "sell_intent": "TEXT",
@@ -48,15 +51,24 @@ def initialize_action_tracker(db_path: Path) -> None:
         conn.commit()
 
 
-def record_run_recommendations(run_dir: Path, db_path: Path) -> None:
+def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str | None = None) -> None:
     initialize_action_tracker(db_path)
     run_dir = Path(run_dir)
     manifest = _load_json(run_dir / "run.json")
     run_id = str(manifest.get("run_id") or run_dir.name)
+    market = _normalize_target_market(run_market) or _manifest_run_market(manifest)
     created_at = str(manifest.get("finished_at") or manifest.get("started_at") or datetime.now().astimezone().isoformat())
-    rows = _portfolio_action_rows(run_dir, manifest, run_id=run_id, created_at=created_at)
-    rows.extend(_scanner_rows(run_dir, run_id=run_id, created_at=created_at))
-    rows.extend(_prism_skipped_rows(run_dir, run_id=run_id, created_at=created_at, existing_tickers={row["ticker"] for row in rows}))
+    rows = _portfolio_action_rows(run_dir, manifest, run_id=run_id, created_at=created_at, run_market=market)
+    rows.extend(_scanner_rows(run_dir, run_id=run_id, created_at=created_at, run_market=market))
+    rows.extend(
+        _prism_skipped_rows(
+            run_dir,
+            run_id=run_id,
+            created_at=created_at,
+            existing_tickers={row["ticker"] for row in rows},
+            run_market=market,
+        )
+    )
     with sqlite3.connect(db_path) as conn:
         for row in rows:
             if _recommendation_exists(conn, row):
@@ -64,17 +76,18 @@ def record_run_recommendations(run_dir: Path, db_path: Path) -> None:
             conn.execute(
                 """
                 INSERT INTO action_recommendations (
-                  run_id, ticker, action, risk_action, recommended_price, confidence,
+                  run_id, ticker, market, action, risk_action, recommended_price, confidence,
                   trigger_type, source, source_cohort, source_quality_score, thesis_status,
                   prism_agreement, sell_intent, sell_trigger_status,
                   sell_size_plan, unrealized_return_pct, profit_protection_score,
                   profit_plan_json, lift_status, opportunity_cost_score, opportunity_capture_score,
                   pilot_allowed, full_size_allowed, was_executed, skip_reason, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["run_id"],
                     row["ticker"],
+                    row.get("market") or _ticker_market(row["ticker"], None),
                     row["action"],
                     row.get("risk_action"),
                     row.get("recommended_price"),
@@ -192,7 +205,14 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
     )
 
 
-def _portfolio_action_rows(run_dir: Path, manifest: dict[str, Any], *, run_id: str, created_at: str) -> list[dict[str, Any]]:
+def _portfolio_action_rows(
+    run_dir: Path,
+    manifest: dict[str, Any],
+    *,
+    run_id: str,
+    created_at: str,
+    run_market: str | None = None,
+) -> list[dict[str, Any]]:
     report_path = _resolve_artifact(run_dir, ((manifest.get("portfolio") or {}).get("artifacts") or {}).get("portfolio_report_json"))
     if report_path is None:
         candidate = run_dir / "portfolio-private" / "portfolio_report.json"
@@ -207,6 +227,9 @@ def _portfolio_action_rows(run_dir: Path, manifest: dict[str, Any], *, run_id: s
         ticker = str(action.get("canonical_ticker") or "").strip().upper()
         if not ticker:
             continue
+        ticker_market = _ticker_market(ticker, None)
+        if not _market_matches(ticker_market, run_market):
+            continue
         preferred_action = _preferred_action(action)
         position_metrics = action.get("position_metrics") if isinstance(action.get("position_metrics"), Mapping) else {}
         profit_plan = action.get("profit_taking_plan") if isinstance(action.get("profit_taking_plan"), Mapping) else {}
@@ -216,6 +239,7 @@ def _portfolio_action_rows(run_dir: Path, manifest: dict[str, Any], *, run_id: s
             {
                 "run_id": run_id,
                 "ticker": ticker,
+                "market": ticker_market,
                 "action": preferred_action,
                 "risk_action": action.get("risk_action"),
                 "recommended_price": _recommended_price(action),
@@ -245,7 +269,7 @@ def _portfolio_action_rows(run_dir: Path, manifest: dict[str, Any], *, run_id: s
     return rows
 
 
-def _scanner_rows(run_dir: Path, *, run_id: str, created_at: str) -> list[dict[str, Any]]:
+def _scanner_rows(run_dir: Path, *, run_id: str, created_at: str, run_market: str | None = None) -> list[dict[str, Any]]:
     path = run_dir / "scanner" / "scanner_candidates.json"
     payload = _load_json(path)
     rows: list[dict[str, Any]] = []
@@ -255,10 +279,14 @@ def _scanner_rows(run_dir: Path, *, run_id: str, created_at: str) -> list[dict[s
         ticker = str(item.get("ticker") or "").strip().upper()
         if not ticker:
             continue
+        ticker_market = _ticker_market(ticker, item.get("market"))
+        if not _market_matches(ticker_market, run_market):
+            continue
         rows.append(
             {
                 "run_id": run_id,
                 "ticker": ticker,
+                "market": ticker_market,
                 "action": "scanner_candidate_skipped",
                 "risk_action": None,
                 "recommended_price": None,
@@ -274,7 +302,14 @@ def _scanner_rows(run_dir: Path, *, run_id: str, created_at: str) -> list[dict[s
     return rows
 
 
-def _prism_skipped_rows(run_dir: Path, *, run_id: str, created_at: str, existing_tickers: set[str]) -> list[dict[str, Any]]:
+def _prism_skipped_rows(
+    run_dir: Path,
+    *,
+    run_id: str,
+    created_at: str,
+    existing_tickers: set[str],
+    run_market: str | None = None,
+) -> list[dict[str, Any]]:
     payload = _load_json(run_dir / "external_signals" / "prism_signals.json")
     rows: list[dict[str, Any]] = []
     for signal in payload.get("signals") or []:
@@ -283,10 +318,14 @@ def _prism_skipped_rows(run_dir: Path, *, run_id: str, created_at: str, existing
         ticker = str(signal.get("canonical_ticker") or "").strip().upper()
         if not ticker or ticker in existing_tickers:
             continue
+        ticker_market = _ticker_market(ticker, signal.get("market"))
+        if not _market_matches(ticker_market, run_market):
+            continue
         rows.append(
             {
                 "run_id": run_id,
                 "ticker": ticker,
+                "market": ticker_market,
                 "action": "prism_candidate_skipped",
                 "risk_action": signal.get("signal_action"),
                 "recommended_price": signal.get("current_price"),
@@ -573,6 +612,27 @@ def _recommendation_exists(conn: sqlite3.Connection, row: dict[str, Any]) -> boo
         (row["run_id"], row["ticker"], row["action"], row.get("source")),
     ).fetchone()
     return existing is not None
+
+
+def _manifest_run_market(manifest: Mapping[str, Any]) -> str | None:
+    settings = manifest.get("settings") if isinstance(manifest.get("settings"), Mapping) else {}
+    return _normalize_target_market(settings.get("market"))
+
+
+def _normalize_target_market(value: Any) -> str | None:
+    normalized = normalize_market(value)
+    return normalized if normalized in {"KR", "US"} else None
+
+
+def _ticker_market(ticker: Any, explicit_market: Any) -> str:
+    return normalize_market(explicit_market, ticker=str(ticker or "").strip().upper())
+
+
+def _market_matches(ticker_market: str, run_market: str | None) -> bool:
+    target = _normalize_target_market(run_market)
+    if not target:
+        return True
+    return _normalize_target_market(ticker_market) == target
 
 
 def _preferred_action(action: Mapping[str, Any]) -> str:

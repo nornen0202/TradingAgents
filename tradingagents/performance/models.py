@@ -10,6 +10,7 @@ ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       run_id TEXT NOT NULL,
       ticker TEXT NOT NULL,
+      market TEXT,
       action TEXT NOT NULL,
       risk_action TEXT,
       recommended_price REAL,

@@ -2252,7 +2252,8 @@ def _run_performance_tracking(
 ) -> dict[str, Any]:
     db_path = config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")
     try:
-        record_run_recommendations(run_dir, db_path)
+        performance_market = _performance_market_filter(config)
+        record_run_recommendations(run_dir, db_path, run_market=performance_market)
         outcome_update: dict[str, Any] = {
             "enabled": bool(config.performance.update_outcomes_on_run),
             "provider": config.performance.price_provider,
@@ -2266,6 +2267,7 @@ def _run_performance_tracking(
                     provider=config.performance.price_provider,
                     price_history_path=config.performance.price_history_path,
                     benchmark_ticker=config.performance.benchmark_ticker,
+                    market=performance_market,
                     lookback_days=config.performance.price_lookback_days,
                     asof_date=started_at.date().isoformat(),
                 )
@@ -2325,6 +2327,10 @@ def _run_performance_tracking(
             "warning": f"performance_tracking_failed:{exc}",
             "failure_reason": str(exc),
         }
+
+
+def _performance_market_filter(config: ScheduledAnalysisConfig) -> str | None:
+    return config.run.market if bool(getattr(config.run, "market_declared", False)) else None
 
 
 def _resolve_run_tickers(config: ScheduledAnalysisConfig) -> list[str]:

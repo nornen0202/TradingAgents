@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping
 
+from tradingagents.external.prism_normalize import normalize_market
+
 
 BENCHMARK_KEY = "__BENCHMARK__"
 
@@ -27,6 +29,7 @@ def load_price_history_for_recommendations(
     provider: str = "none",
     price_history_path: str | Path | None = None,
     benchmark_ticker: str | None = None,
+    market: str | None = None,
     lookback_days: int = 120,
     asof_date: str | None = None,
 ) -> PriceHistoryLoadResult:
@@ -53,7 +56,8 @@ def load_price_history_for_recommendations(
         warnings.append(f"performance_price_provider_unsupported:{provider}")
         return PriceHistoryLoadResult(price_history=history, provider=provider, warnings=warnings)
 
-    tickers = _recommendation_tickers(db_path)
+    tickers, market_filter_warnings = _recommendation_tickers(db_path, market=market)
+    warnings.extend(market_filter_warnings)
     missing = [ticker for ticker in tickers if ticker not in {key.upper() for key in history}]
     if benchmark_ticker and BENCHMARK_KEY not in history:
         missing.append(str(benchmark_ticker).strip().upper())
@@ -97,12 +101,46 @@ def _load_price_history_json(path: Path, *, benchmark_ticker: str | None = None)
     return PriceHistoryLoadResult(price_history=history, provider="local_json")
 
 
-def _recommendation_tickers(db_path: Path) -> list[str]:
+def _recommendation_tickers(db_path: Path, *, market: str | None = None) -> tuple[list[str], list[str]]:
     if not Path(db_path).exists():
-        return []
+        return [], []
+    target_market = _normalize_target_market(market)
     with sqlite3.connect(db_path) as conn:
-        rows = conn.execute("SELECT DISTINCT ticker FROM action_recommendations ORDER BY ticker").fetchall()
-    return [str(row[0]).strip().upper() for row in rows if str(row[0]).strip()]
+        columns = _table_columns(conn, "action_recommendations")
+        if "market" in columns:
+            rows = conn.execute("SELECT DISTINCT ticker, market FROM action_recommendations ORDER BY ticker").fetchall()
+        else:
+            rows = conn.execute("SELECT DISTINCT ticker FROM action_recommendations ORDER BY ticker").fetchall()
+    tickers: list[str] = []
+    skipped = 0
+    for row in rows:
+        ticker = str(row[0]).strip().upper()
+        if not ticker:
+            continue
+        row_market = str(row[1]).strip().upper() if len(row) > 1 and row[1] else None
+        inferred_market = normalize_market(row_market, ticker=ticker)
+        if target_market and inferred_market != target_market:
+            skipped += 1
+            continue
+        tickers.append(ticker)
+    warnings = (
+        [f"performance_price_history_market_filter:{target_market}:skipped={skipped}"]
+        if target_market and skipped
+        else []
+    )
+    return tickers, warnings
+
+
+def _normalize_target_market(value: str | None) -> str | None:
+    normalized = normalize_market(value)
+    return normalized if normalized in {"KR", "US"} else None
+
+
+def _table_columns(conn: sqlite3.Connection, table: str) -> set[str]:
+    try:
+        return {str(row[1]) for row in conn.execute(f"PRAGMA table_info({table})")}
+    except sqlite3.Error:
+        return set()
 
 
 def _fetch_yfinance_price_history(

@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from tradingagents.performance.action_outcomes import record_run_recommendations, summarize_action_performance, update_action_outcomes
-from tradingagents.performance.price_history import _fetch_yfinance_price_history
+from tradingagents.performance.price_history import _fetch_yfinance_price_history, load_price_history_for_recommendations
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.runner import _run_performance_tracking
 from tradingagents.scheduled.site import _render_performance_tracking_section
@@ -169,6 +169,74 @@ def test_yfinance_close_dataframe_is_converted_to_scalar_rows(monkeypatch):
     assert history["AAPL"][0]["close"] == 100.0
     assert history["AAPL"][1]["close"] == 103.0
     assert not any("Series" in warning for warning in warnings)
+
+
+def test_price_history_loader_filters_recommendations_to_run_market(tmp_path, monkeypatch):
+    db_path = tmp_path / "perf.sqlite"
+    us_run = tmp_path / "us_run"
+    kr_run = tmp_path / "kr_run"
+    for run_dir, ticker, market in ((us_run, "AAPL", "US"), (kr_run, "000660.KS", "KR")):
+        private = run_dir / "portfolio-private"
+        private.mkdir(parents=True)
+        (run_dir / "run.json").write_text(
+            f'{{"run_id":"{run_dir.name}","started_at":"2026-04-01T09:00:00+09:00","settings":{{"market":"{market}"}}}}',
+            encoding="utf-8",
+        )
+        (private / "portfolio_report.json").write_text(
+            f"""
+            {{
+              "actions": [
+                {{
+                  "canonical_ticker": "{ticker}",
+                  "action_now": "WATCH",
+                  "action_if_triggered": "STARTER_IF_TRIGGERED",
+                  "portfolio_relative_action": "ADD",
+                  "delta_krw_now": 0,
+                  "confidence": 0.5
+                }}
+              ]
+            }}
+            """,
+            encoding="utf-8",
+        )
+        record_run_recommendations(run_dir, db_path, run_market=market)
+
+    downloaded = []
+    fake_yfinance = SimpleNamespace(download=lambda ticker, **kwargs: downloaded.append(ticker) or SimpleNamespace(empty=True))
+    monkeypatch.setitem(sys.modules, "yfinance", fake_yfinance)
+
+    result = load_price_history_for_recommendations(db_path, provider="yfinance", market="US")
+
+    assert downloaded == ["AAPL"]
+    assert "performance_price_history_market_filter:US:skipped=1" in result.warnings
+
+
+def test_prism_skipped_rows_are_recorded_for_current_market_only(tmp_path):
+    run_dir = tmp_path / "run"
+    prism = run_dir / "external_signals"
+    prism.mkdir(parents=True)
+    (run_dir / "run.json").write_text(
+        '{"run_id":"run1","started_at":"2026-04-01T09:00:00+09:00","settings":{"market":"US"}}',
+        encoding="utf-8",
+    )
+    (prism / "prism_signals.json").write_text(
+        """
+        {
+          "signals": [
+            {"canonical_ticker": "000660.KS", "market": "KR", "signal_action": "BUY"},
+            {"canonical_ticker": "AAPL", "market": "US", "signal_action": "BUY"}
+          ]
+        }
+        """,
+        encoding="utf-8",
+    )
+    db_path = tmp_path / "perf.sqlite"
+
+    record_run_recommendations(run_dir, db_path, run_market="US")
+
+    with sqlite3.connect(db_path) as conn:
+        rows = conn.execute("SELECT ticker, market FROM action_recommendations ORDER BY ticker").fetchall()
+    assert rows == [("AAPL", "US")]
 
 
 def test_action_outcome_buckets_include_prism_uncovered(tmp_path):
