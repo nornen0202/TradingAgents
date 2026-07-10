@@ -70,6 +70,13 @@ class YFinanceIntradayProvider:
             avg20_volume = float(daily["Volume"].tail(20).mean())
 
         intraday_volume = int(volumes.sum())
+        intraday_trading_value = float((typical_price * volumes).sum())
+        first_price = float(closes.iloc[0]) if not closes.empty else None
+        price_change_pct = (
+            float((float(closes.iloc[-1]) / first_price - 1.0) * 100.0)
+            if first_price and first_price > 0
+            else None
+        )
         relative_volume = None
         if avg20_volume and avg20_volume > 0:
             progress = _session_progress_fraction(last_ts, market_timezone=market_timezone)
@@ -106,6 +113,8 @@ class YFinanceIntradayProvider:
             volume=intraday_volume,
             avg20_daily_volume=avg20_volume,
             relative_volume=relative_volume,
+            trading_value=intraday_trading_value,
+            price_change_pct=price_change_pct,
             bar_timestamp=last_ts.isoformat(),
             provider_timestamp=provider_timestamp,
             quote_delay_seconds=_delay_seconds(provider_timestamp, last_ts.isoformat()),

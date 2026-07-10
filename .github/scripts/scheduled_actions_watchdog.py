@@ -239,14 +239,29 @@ def _us_intraday_overlay_due(now_kst: datetime) -> bool:
     return utc_now.weekday() < 5 and _time_between(utc_now.time(), time(13, 35), time(18, 30))
 
 
+def _latest_overlay_checkpoint(profile: str, now_kst: datetime) -> datetime | None:
+    candidates: list[datetime] = []
+    if profile == "kr":
+        checkpoint_times = (time(10, 5), time(12, 0), time(13, 20))
+        day_offsets = (0,)
+    elif profile == "us":
+        checkpoint_times = (time(0, 40), time(2, 10), time(22, 40))
+        day_offsets = (-1, 0)
+    else:
+        raise ValueError(f"Unsupported overlay checkpoint profile: {profile}")
+    for day_offset in day_offsets:
+        checkpoint_date = (now_kst + timedelta(days=day_offset)).date()
+        for checkpoint_time in checkpoint_times:
+            candidate = datetime.combine(checkpoint_date, checkpoint_time, tzinfo=KST)
+            if candidate <= now_kst:
+                candidates.append(candidate)
+    return max(candidates) if candidates else None
+
+
 def _daily_codex_dependency(profile: str, now_kst: datetime) -> WatchdogDependency:
     if profile == "kr":
-        window_start = datetime.combine(now_kst.date(), time(4, 30), tzinfo=KST)
         job_names = ("analyze_kr", "build_pages")
     elif profile == "us":
-        window_start = datetime.combine(now_kst.date(), time(17, 45), tzinfo=KST)
-        if now_kst.time() < time(17, 45):
-            window_start -= timedelta(days=1)
         job_names = ("analyze_us", "build_pages")
     else:
         raise ValueError(f"Unsupported Daily Codex dependency profile: {profile}")
@@ -255,7 +270,7 @@ def _daily_codex_dependency(profile: str, now_kst: datetime) -> WatchdogDependen
         name=f"daily-codex-{profile}",
         workflow_file="daily-codex-analysis.yml",
         job_names=job_names,
-        window_start_kst=window_start,
+        window_start_kst=now_kst - timedelta(hours=24),
     )
 
 
@@ -359,24 +374,30 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
             )
 
         if _time_between(kst_time, time(10, 0), time(13, 40)):
+            kr_checkpoint = _latest_overlay_checkpoint("kr", now_kst)
+            if kr_checkpoint is None:
+                return targets
             targets.append(
                 WatchdogTarget(
-                    name="intraday-overlay-kr",
+                    name=f"intraday-overlay-kr-{kr_checkpoint.strftime('%H%M')}",
                     workflow_file="intraday-overlay-refresh.yml",
                     job_names=("overlay_refresh_kr",),
-                    window_start_kst=now_kst - timedelta(minutes=75),
+                    window_start_kst=kr_checkpoint,
                     inputs={"profile": "kr", "run_mode": "overlay_only"},
                     dependencies=(_daily_codex_dependency("kr", now_kst),),
                 )
             )
 
     if us_intraday_overlay_due:
+        us_checkpoint = _latest_overlay_checkpoint("us", now_kst)
+        if us_checkpoint is None:
+            return targets
         targets.append(
             WatchdogTarget(
-                name="intraday-overlay-us",
+                name=f"intraday-overlay-us-{us_checkpoint.strftime('%m%d-%H%M')}",
                 workflow_file="intraday-overlay-refresh.yml",
                 job_names=("overlay_refresh_us",),
-                window_start_kst=now_kst - timedelta(minutes=75),
+                window_start_kst=us_checkpoint,
                 inputs={"profile": "us", "run_mode": "overlay_only"},
                 dependencies=(_daily_codex_dependency("us", now_kst),),
             )

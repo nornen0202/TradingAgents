@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import Future, ThreadPoolExecutor, wait
 from copy import deepcopy
 from dataclasses import replace
 import json
@@ -82,6 +83,7 @@ from .config import (
     load_scheduled_config,
     with_overrides,
 )
+from .decision_bundle import build_and_write_decision_bundle
 from .market_calendar import default_calendar_name, market_session_state
 from .site import build_site
 
@@ -248,15 +250,25 @@ def execute_scheduled_run(
     run_warnings: list[str] = []
     configured_ticker_count = len(run_tickers)
     active_ticker_limit = _active_ticker_limit(config)
+    active_universe_metadata: dict[str, Any] = {
+        "mode": "all_configured",
+        "configured_count": configured_ticker_count,
+        "active_count": configured_ticker_count,
+        "omitted_count": 0,
+    }
     if run_mode == "full" and active_ticker_limit and len(run_tickers) > active_ticker_limit:
-        omitted = run_tickers[active_ticker_limit:]
+        run_tickers, omitted, active_universe_metadata = _select_daily_active_tickers(
+            config=config,
+            tickers=run_tickers,
+            started_at=started_at,
+            active_ticker_limit=active_ticker_limit,
+        )
         warning = (
             "daily_active_ticker_limit_applied:"
             f"limit={active_ticker_limit}:omitted_tickers={','.join(omitted)}"
         )
         print(f"::warning::{warning}", flush=True)
         run_warnings.append(warning)
-        run_tickers = run_tickers[:active_ticker_limit]
     ticker_summaries: list[dict[str, Any]] = []
     engine_results_dir = run_dir / "engine-results"
     run_trade_date = _resolve_run_trade_date(config=config, tickers=run_tickers) if run_mode == "full" else None
@@ -447,6 +459,7 @@ def execute_scheduled_run(
         },
         "parallel_ticker_execution": parallel_execution_summary,
         "circuit_breaker": circuit_breaker_summary,
+        "active_universe": active_universe_metadata,
         "tickers": ticker_summaries,
     }
     if scanner_status:
@@ -589,6 +602,11 @@ def execute_scheduled_run(
         manifest["portfolio"] = {"status": "skipped", "reason": "runtime_budget_exhausted"}
     else:
         manifest["portfolio"] = {"status": "disabled"}
+
+    manifest["decision_bundle"] = build_and_write_decision_bundle(
+        run_dir=run_dir,
+        manifest=manifest,
+    )
 
     if config.performance.enabled and not portfolio_only:
         performance_budget_available = _post_processing_budget_available(
@@ -2381,6 +2399,94 @@ def _resolve_run_tickers(config: ScheduledAnalysisConfig) -> list[str]:
     return merged or configured
 
 
+def _select_daily_active_tickers(
+    *,
+    config: ScheduledAnalysisConfig,
+    tickers: list[str],
+    started_at: datetime,
+    active_ticker_limit: int,
+) -> tuple[list[str], list[str], dict[str, Any]]:
+    normalized = [str(ticker).strip().upper() for ticker in tickers if str(ticker).strip()]
+    holdings: list[str] = []
+    if config.portfolio.enabled and config.portfolio.profile_path:
+        try:
+            profile = load_portfolio_profile(config.portfolio.profile_path, config.portfolio.profile_name)
+            snapshot = load_snapshot_for_profile(profile)
+            holding_set = {
+                str(position.canonical_ticker).strip().upper()
+                for position in snapshot.positions
+                if str(position.canonical_ticker or "").strip()
+            }
+            holdings = [ticker for ticker in normalized if ticker in holding_set]
+        except Exception as exc:
+            print(f"::warning::Could not prioritize holdings for active universe: {exc}")
+
+    configured_set = {str(ticker).strip().upper() for ticker in config.run.tickers}
+    scanner_additions = [ticker for ticker in normalized if ticker not in configured_set and ticker not in holdings]
+    rotation_pool = [ticker for ticker in normalized if ticker not in holdings and ticker not in scanner_additions]
+    if rotation_pool:
+        offset = started_at.date().toordinal() % len(rotation_pool)
+        rotation_pool = rotation_pool[offset:] + rotation_pool[:offset]
+
+    effective_limit = max(int(active_ticker_limit), len(holdings))
+    selected = [*holdings, *scanner_additions]
+    selected = selected[:effective_limit]
+    if len(selected) < effective_limit:
+        selected.extend(rotation_pool[: effective_limit - len(selected)])
+    selected_set = set(selected)
+    omitted = [ticker for ticker in normalized if ticker not in selected_set]
+    cached_coverage = _cached_coverage_for_tickers(config.storage.archive_dir, omitted)
+    return selected, omitted, {
+        "mode": "holdings_first_rotating_coverage",
+        "configured_count": len(normalized),
+        "requested_limit": int(active_ticker_limit),
+        "effective_limit": effective_limit,
+        "active_count": len(selected),
+        "omitted_count": len(omitted),
+        "holding_tickers": holdings,
+        "scanner_additions": scanner_additions,
+        "rotating_tickers": [ticker for ticker in selected if ticker not in holdings and ticker not in scanner_additions],
+        "omitted_tickers": omitted,
+        "cached_coverage": cached_coverage,
+        "rotation_date": started_at.date().isoformat(),
+    }
+
+
+def _cached_coverage_for_tickers(archive_dir: Path, tickers: list[str]) -> list[dict[str, Any]]:
+    remaining = set(tickers)
+    coverage: list[dict[str, Any]] = []
+    if not remaining:
+        return coverage
+    for manifest, _run_dir in _iter_run_manifests_desc(archive_dir):
+        run_id = str(manifest.get("run_id") or "")
+        for summary in manifest.get("tickers") or []:
+            ticker = str(summary.get("ticker") or "").strip().upper()
+            if ticker not in remaining or summary.get("status") != "success":
+                continue
+            coverage.append(
+                {
+                    "ticker": ticker,
+                    "source_run_id": run_id,
+                    "analysis_date": summary.get("analysis_date") or summary.get("trade_date"),
+                    "status_ko": "이전 성공 분석 참고",
+                }
+            )
+            remaining.remove(ticker)
+        if not remaining:
+            break
+    coverage.extend(
+        {
+            "ticker": ticker,
+            "source_run_id": None,
+            "analysis_date": None,
+            "status_ko": "이전 성공 분석 없음",
+        }
+        for ticker in sorted(remaining)
+    )
+    coverage.sort(key=lambda item: str(item.get("ticker") or ""))
+    return coverage
+
+
 def _ticker_identity_key(ticker: str) -> str:
     normalized = str(ticker or "").strip().upper()
     if len(normalized) == 6 and normalized.isdigit():
@@ -3577,6 +3683,12 @@ def _run_execution_overlay_passes(
     run_id = run_dir.name
     for checkpoint in checkpoints:
         checkpoint_label = str(checkpoint).strip() or "post_research"
+        market_results = _fetch_overlay_market_snapshots(
+            config=config,
+            ticker_summaries=ticker_summaries,
+            run_dir=run_dir,
+            checkpoint_label=checkpoint_label,
+        )
         for summary in ticker_summaries:
             if summary.get("status") != "success":
                 continue
@@ -3602,12 +3714,12 @@ def _run_execution_overlay_passes(
             try:
                 contract_dict = json.loads(contract_path.read_text(encoding="utf-8"))
                 contract = _ExecutionContractShim(contract_dict).to_contract()
-                market = fetch_intraday_market_snapshot(
-                    ticker,
-                    interval="5m",
-                    market_timezone=_execution_checkpoint_timezone(config),
-                    checkpoint_id=checkpoint_label,
-                )
+                market_result = market_results.get(ticker)
+                if isinstance(market_result, Exception):
+                    raise market_result
+                if not isinstance(market_result, IntradayMarketSnapshot):
+                    raise RuntimeError(f"Intraday snapshot was not produced for {ticker}.")
+                market = market_result
                 market = _annotate_microstructure_market_snapshot(
                     market,
                     published_in_run_id=run_id,
@@ -3762,6 +3874,62 @@ def _run_execution_overlay_passes(
             "chatgpt_execution_context_json": _relative_to_run(run_dir, context_path),
         }
     return updates_by_ticker
+
+
+def _fetch_overlay_market_snapshots(
+    *,
+    config: ScheduledAnalysisConfig,
+    ticker_summaries: list[dict[str, Any]],
+    run_dir: Path,
+    checkpoint_label: str,
+) -> dict[str, IntradayMarketSnapshot | Exception]:
+    eligible_tickers: list[str] = []
+    for summary in ticker_summaries:
+        if summary.get("status") != "success":
+            continue
+        ticker = str(summary.get("ticker") or "").strip().upper()
+        artifacts = summary.get("artifacts") or {}
+        contract_rel = artifacts.get("execution_contract_json")
+        if not ticker or not contract_rel or not (run_dir / contract_rel).exists():
+            continue
+        eligible_tickers.append(ticker)
+
+    if not eligible_tickers:
+        return {}
+
+    worker_limit = max(1, int(os.getenv("TRADINGAGENTS_OVERLAY_MAX_WORKERS", "4") or 4))
+    max_workers = min(worker_limit, len(eligible_tickers))
+    per_ticker_budget = max(30.0, float(os.getenv("TRADINGAGENTS_OVERLAY_TICKER_TIMEOUT_SECONDS", "45") or 45))
+    wave_count = max(1, (len(eligible_tickers) + max_workers - 1) // max_workers)
+    batch_timeout = max(60.0, per_ticker_budget * wave_count + 30.0)
+    timezone_name = _execution_checkpoint_timezone(config)
+    executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="overlay-snapshot")
+    future_by_ticker: dict[Future[IntradayMarketSnapshot], str] = {
+        executor.submit(
+            fetch_intraday_market_snapshot,
+            ticker,
+            interval="5m",
+            market_timezone=timezone_name,
+            checkpoint_id=checkpoint_label,
+        ): ticker
+        for ticker in eligible_tickers
+    }
+    done, pending = wait(future_by_ticker, timeout=batch_timeout)
+    results: dict[str, IntradayMarketSnapshot | Exception] = {}
+    for future in done:
+        ticker = future_by_ticker[future]
+        try:
+            results[ticker] = future.result()
+        except Exception as exc:
+            results[ticker] = exc
+    for future in pending:
+        ticker = future_by_ticker[future]
+        future.cancel()
+        results[ticker] = TimeoutError(
+            f"Intraday snapshot batch exceeded {batch_timeout:.0f}s; {ticker} was cancelled or still running."
+        )
+    executor.shutdown(wait=False, cancel_futures=True)
+    return results
 
 
 def _execution_summary_model_for_update(*, config: ScheduledAnalysisConfig, update: Any) -> str | None:
@@ -3985,6 +4153,20 @@ def _build_chatgpt_execution_context(
                 "last_price": update.get("last_price"),
                 "session_vwap": update.get("session_vwap"),
                 "relative_volume": update.get("relative_volume"),
+                "intraday_volume": update.get("intraday_volume"),
+                "avg20_daily_volume": update.get("avg20_daily_volume"),
+                "trading_value": source.get("trading_value"),
+                "price_change_pct": source.get("price_change_pct"),
+                "day_high": update.get("day_high"),
+                "day_low": update.get("day_low"),
+                "price_state": update.get("price_state"),
+                "volume_state": update.get("volume_state"),
+                "event_state": update.get("event_state"),
+                "decision_if_triggered": update.get("decision_if_triggered"),
+                "trigger_status": update.get("trigger_status") or {},
+                "changed_fields": update.get("changed_fields") or [],
+                "staleness_seconds": update.get("staleness_seconds"),
+                "data_health": update.get("data_health"),
                 "spread_bps": source.get("spread_bps"),
                 "orderbook_imbalance": source.get("orderbook_imbalance"),
                 "execution_strength": source.get("execution_strength"),
@@ -4082,6 +4264,20 @@ def _write_chatgpt_execution_context_from_ticker_artifacts(
                 "last_price": (update_payload or {}).get("last_price") or source.get("last_price"),
                 "session_vwap": (update_payload or {}).get("session_vwap") or source.get("session_vwap"),
                 "relative_volume": (update_payload or {}).get("relative_volume") or source.get("relative_volume"),
+                "intraday_volume": (update_payload or {}).get("intraday_volume") or source.get("volume"),
+                "avg20_daily_volume": (update_payload or {}).get("avg20_daily_volume") or source.get("avg20_daily_volume"),
+                "trading_value": source.get("trading_value"),
+                "price_change_pct": source.get("price_change_pct"),
+                "day_high": (update_payload or {}).get("day_high") or source.get("day_high"),
+                "day_low": (update_payload or {}).get("day_low") or source.get("day_low"),
+                "price_state": (update_payload or {}).get("price_state"),
+                "volume_state": (update_payload or {}).get("volume_state"),
+                "event_state": (update_payload or {}).get("event_state"),
+                "decision_if_triggered": (update_payload or {}).get("decision_if_triggered"),
+                "trigger_status": (update_payload or {}).get("trigger_status") or {},
+                "changed_fields": (update_payload or {}).get("changed_fields") or [],
+                "staleness_seconds": (update_payload or {}).get("staleness_seconds"),
+                "data_health": (update_payload or {}).get("data_health"),
                 "spread_bps": source.get("spread_bps") or micro.get("spread_bps"),
                 "orderbook_imbalance": source.get("orderbook_imbalance") or micro.get("orderbook_imbalance"),
                 "execution_strength": source.get("execution_strength") or micro.get("execution_strength"),

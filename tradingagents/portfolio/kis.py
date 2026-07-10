@@ -5,7 +5,7 @@ import os
 import re
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from time import sleep
+from time import monotonic, sleep
 from typing import Any
 
 import requests
@@ -79,7 +79,13 @@ class KisClient:
                 "KIS app credentials are missing. Configure KIS_APP_KEY/KIS_APP_SECRET "
                 "or KIS_Developers_APP_KEY/KIS_Developers_APP_SECRET."
             )
-        return cls(app_key=app_key, app_secret=app_secret, environment=environment)
+        timeout_seconds = float(os.getenv("KIS_HTTP_TIMEOUT_SECONDS", "15") or 15)
+        return cls(
+            app_key=app_key,
+            app_secret=app_secret,
+            environment=environment,
+            timeout_seconds=max(1.0, timeout_seconds),
+        )
 
     def issue_access_token(self, *, force: bool = False) -> str:
         if not force:
@@ -1102,6 +1108,8 @@ class KisClient:
         exchange_code: str,
         start_date: date | datetime | str,
         end_date: date | datetime | str,
+        max_pages: int = 3,
+        max_elapsed_seconds: float = 45.0,
     ) -> list[dict[str, Any]]:
         params = {
             "AUTH": "",
@@ -1113,23 +1121,50 @@ class KisClient:
         }
         rows: list[dict[str, Any]] = []
         tr_cont = ""
+        started_at = monotonic()
+        seen_page_fingerprints: set[str] = set()
+        page_limit = max(1, int(max_pages or 1))
+        elapsed_limit = max(1.0, float(max_elapsed_seconds or 1.0))
 
-        while True:
+        for _page_index in range(page_limit):
+            if monotonic() - started_at >= elapsed_limit:
+                break
             payload, headers = self.request_json(
                 method="GET",
                 path="/uapi/overseas-price/v1/quotations/dailyprice",
                 tr_id="HHDFS76240000",
-                params=params,
+                params=dict(params),
                 tr_cont=tr_cont,
             )
-            rows.extend(_coerce_records(payload.get("output1")))
-            rows.extend(_coerce_records(payload.get("output2")))
+            page_rows = [
+                *_coerce_records(payload.get("output1")),
+                *_coerce_records(payload.get("output2")),
+            ]
+            if not page_rows:
+                break
+            page_fingerprint = _records_fingerprint(page_rows)
+            if page_fingerprint in seen_page_fingerprints:
+                break
+            seen_page_fingerprints.add(page_fingerprint)
+            rows.extend(page_rows)
+
+            page_dates = [candidate for candidate in (_row_date_candidate(row) for row in page_rows) if candidate]
+            if page_dates:
+                oldest_date = min(page_dates)
+                if oldest_date <= _date_from_param(_date_param(start_date)):
+                    break
+                next_cursor = oldest_date - timedelta(days=1)
+                current_cursor = _date_from_param(str(params.get("BYMD") or ""))
+                if next_cursor >= current_cursor:
+                    break
+                params["BYMD"] = _date_param(next_cursor)
+
             tr_cont_header = str(headers.get("tr_cont") or "")
             if tr_cont_header not in {"M", "F"}:
                 break
             tr_cont = "N"
 
-        return _filter_rows_by_date(rows, start_date=start_date, end_date=end_date)
+        return _filter_rows_by_date(_dedupe_records(rows), start_date=start_date, end_date=end_date)
 
 
 def validate_kis_credentials(
@@ -1348,6 +1383,22 @@ def _coerce_records(value: Any) -> list[dict[str, Any]]:
     if isinstance(value, dict):
         return [value] if value else []
     return []
+
+
+def _records_fingerprint(rows: list[dict[str, Any]]) -> str:
+    return json.dumps(rows, sort_keys=True, ensure_ascii=False, default=str)
+
+
+def _dedupe_records(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    deduped: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for row in rows:
+        fingerprint = json.dumps(row, sort_keys=True, ensure_ascii=False, default=str)
+        if fingerprint in seen:
+            continue
+        seen.add(fingerprint)
+        deduped.append(row)
+    return deduped
 
 
 def _date_param(value: date | datetime | str) -> str:

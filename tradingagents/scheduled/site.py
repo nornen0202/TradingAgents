@@ -72,6 +72,8 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
                 _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests, portfolio_summary=portfolio_summary),
             )
 
+    _publish_latest_decision_bundles(site_dir=site_dir, manifests=published_manifests)
+
     _write_text(site_dir / "index.html", _render_index_page(manifests, settings, published_run_ids=published_run_ids))
     _write_json(
         site_dir / "feed.json",
@@ -159,6 +161,14 @@ def _copy_artifacts(
             execution_download_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, execution_download_dir / source.name)
 
+    for artifact_path in ((manifest.get("decision_bundle") or {}).get("artifacts") or {}).values():
+        if not artifact_path:
+            continue
+        source = _resolve_artifact_source(run_dir, artifact_path)
+        if source.is_file():
+            execution_download_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, execution_download_dir / source.name)
+
     download_dir = site_dir / "downloads" / manifest["run_id"] / "portfolio"
     copied_any = False
     for artifact_path in ((manifest.get("portfolio") or {}).get("artifacts") or {}).values():
@@ -175,28 +185,14 @@ def _copy_artifacts(
             copied_any = True
 
     if copied_any:
-        delta_artifacts = ((manifest.get("portfolio_delta") or {}).get("artifacts") or {}).values()
-        for artifact_path in delta_artifacts:
-            if not artifact_path:
-                continue
-            source = _resolve_artifact_source(run_dir, artifact_path)
-            if source.is_file():
-                download_dir.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(source, download_dir / source.name)
-        for artifact_path in ((manifest.get("live_context_delta") or {}).get("artifacts") or {}).values():
-            if not artifact_path:
-                continue
-            source = _resolve_artifact_source(run_dir, artifact_path)
-            if source.is_file():
-                download_dir.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(source, download_dir / source.name)
-        for artifact_path in ((manifest.get("performance") or {}).get("artifacts") or {}).values():
-            if not artifact_path:
-                continue
-            source = _resolve_artifact_source(run_dir, artifact_path)
-            if source.is_file():
-                download_dir.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(source, download_dir / source.name)
+        for section in ("portfolio_delta", "live_context_delta", "performance"):
+            for artifact_path in ((manifest.get(section) or {}).get("artifacts") or {}).values():
+                if not artifact_path:
+                    continue
+                source = _resolve_artifact_source(run_dir, artifact_path)
+                if source.is_file():
+                    download_dir.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(source, download_dir / source.name)
         return
 
     for source in portfolio_summary.get("downloadable_files", []):
@@ -209,27 +205,71 @@ def _copy_artifacts(
         download_dir.mkdir(parents=True, exist_ok=True)
         _copy_public_portfolio_artifact(source, download_dir / source.name)
 
-    for artifact_path in ((manifest.get("portfolio_delta") or {}).get("artifacts") or {}).values():
-        if not artifact_path:
+    for section in ("portfolio_delta", "live_context_delta", "performance"):
+        for artifact_path in ((manifest.get(section) or {}).get("artifacts") or {}).values():
+            if not artifact_path:
+                continue
+            source = _resolve_artifact_source(run_dir, artifact_path)
+            if source.is_file():
+                download_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, download_dir / source.name)
+
+
+def _publish_latest_decision_bundles(*, site_dir: Path, manifests: list[dict[str, Any]]) -> None:
+    for market in ("kr", "us"):
+        market_manifests = [manifest for manifest in manifests if _manifest_market(manifest) == market]
+        if not market_manifests:
             continue
-        source = _resolve_artifact_source(run_dir, artifact_path)
-        if source.is_file():
-            download_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, download_dir / source.name)
-    for artifact_path in ((manifest.get("live_context_delta") or {}).get("artifacts") or {}).values():
-        if not artifact_path:
+        latest_manifest = market_manifests[0]
+        latest_status = latest_manifest.get("decision_bundle") or {}
+        target_dir = site_dir / "latest" / market
+        target_dir.mkdir(parents=True, exist_ok=True)
+        _write_json(
+            target_dir / "status.json",
+            {
+                "market": market.upper(),
+                "latest_run_id": latest_manifest.get("run_id"),
+                "latest_run_started_at": latest_manifest.get("started_at"),
+                "decision_ready": latest_status.get("decision_ready") is True,
+                "quality_label_ko": latest_status.get("quality_label_ko"),
+                "fresh_row_ratio": latest_status.get("fresh_row_ratio"),
+            },
+        )
+        ready_manifest = next(
+            (
+                manifest
+                for manifest in market_manifests
+                if ((manifest.get("decision_bundle") or {}).get("decision_ready") is True)
+            ),
+            None,
+        )
+        if ready_manifest is None:
             continue
-        source = _resolve_artifact_source(run_dir, artifact_path)
-        if source.is_file():
-            download_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, download_dir / source.name)
-    for artifact_path in ((manifest.get("performance") or {}).get("artifacts") or {}).values():
-        if not artifact_path:
-            continue
-        source = _resolve_artifact_source(run_dir, artifact_path)
-        if source.is_file():
-            download_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, download_dir / source.name)
+        ready_bundle = ready_manifest.get("decision_bundle") or {}
+        source_run_dir = Path(str(ready_manifest.get("_run_dir") or ""))
+        copied: dict[str, str] = {}
+        for artifact_key, artifact_path in (ready_bundle.get("artifacts") or {}).items():
+            source = _resolve_artifact_source(source_run_dir, artifact_path)
+            if not source.is_file():
+                continue
+            target_name = {
+                "decision_bundle_v2_json": "decision_bundle.json",
+                "strategy_table_ko_md": "strategy_table_ko.md",
+                "decision_bundle_status_json": "decision_bundle_status.json",
+            }.get(str(artifact_key), source.name)
+            shutil.copy2(source, target_dir / target_name)
+            copied[str(artifact_key)] = target_name
+        if copied:
+            _write_json(
+                target_dir / "source.json",
+                {
+                    "market": market.upper(),
+                    "decision_ready_run_id": ready_manifest.get("run_id"),
+                    "decision_ready_run_started_at": ready_manifest.get("started_at"),
+                    "artifacts": copied,
+                    "latest_non_ready_runs_do_not_advance_this_pointer": True,
+                },
+            )
 
 
 def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
@@ -970,6 +1010,7 @@ def _render_run_page(
     delta_html = _render_portfolio_delta_section(manifest)
     live_delta_html = _render_live_context_delta_section(manifest)
     timeline_html = _render_session_timeline_section(manifest, manifests or [])
+    strategy_html = _render_strategy_table_section(manifest)
     body = f"""
     <nav class="breadcrumbs"><a href="../../index.html">Home</a></nav>
     <section class="hero compact">
@@ -988,6 +1029,7 @@ def _render_run_page(
     {warning_html}
     {delta_html}
     {timeline_html}
+    {strategy_html}
     {execution_html}
     {portfolio_html}
     <section class="section">
@@ -1003,6 +1045,62 @@ def _render_run_page(
     {live_delta_html}
     """
     return _page_template(f"{manifest['run_id']} | {settings.title}", body, prefix="../../")
+
+
+def _render_strategy_table_section(manifest: dict[str, Any]) -> str:
+    bundle = manifest.get("decision_bundle") if isinstance(manifest.get("decision_bundle"), dict) else {}
+    rows = list(bundle.get("top_strategy_rows") or [])
+    if not rows:
+        return ""
+    decision_ready = bundle.get("decision_ready") is True
+    status_label = "장중 투자 판단 가능" if decision_ready else str(bundle.get("quality_label_ko") or "데이터 확인 전 대기")
+    table_rows: list[str] = []
+    for display_priority, row in enumerate(rows, start=1):
+        table_rows.append(
+            "<tr>"
+            f"<td>{display_priority}</td>"
+            f"<td><strong>{_escape(str(row.get('ticker') or '-'))}</strong><br><span class='muted'>{_escape(str(row.get('display_name') or ''))}</span></td>"
+            f"<td>{_escape(str(row.get('strategy_ko') or '판단 자료 부족'))}</td>"
+            f"<td>{_escape(_format_price(row.get('last_price')))}</td>"
+            f"<td>{_escape(str(row.get('vwap_position_ko') or 'VWAP 미확인'))}</td>"
+            f"<td>{_escape(_format_rvol(row.get('relative_volume')))}</td>"
+            f"<td>{_escape(str(row.get('sync_summary_ko') or '비교 지표 미수집'))}</td>"
+            f"<td>{_escape(str(row.get('execution_condition_ko') or '-'))}</td>"
+            f"<td>{_escape(str(row.get('risk_condition_ko') or '-'))}</td>"
+            "</tr>"
+        )
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <h2>종목별 투자 전략표</h2>
+        <p>{_escape(status_label)}</p>
+      </div>
+      <article class="run-card">
+        <p><strong>데이터 상태</strong><span>{_escape(status_label)}</span></p>
+        <p><strong>현재 세션 핵심 데이터 충족률</strong><span>{float(bundle.get('fresh_row_ratio') or 0) * 100:.1f}%</span></p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>우선</th><th>종목</th><th>현재 전략</th><th>현재가</th><th>VWAP</th><th>상대 거래량</th><th>섹터·지수 동조</th><th>실행 조건</th><th>위험·무효화</th></tr></thead>
+            <tbody>{''.join(table_rows)}</tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+    """
+
+
+def _format_price(value: Any) -> str:
+    try:
+        return f"{float(value):,.2f}" if value is not None else "-"
+    except (TypeError, ValueError):
+        return "-"
+
+
+def _format_rvol(value: Any) -> str:
+    try:
+        return f"{float(value):.2f}배" if value is not None else "-"
+    except (TypeError, ValueError):
+        return "-"
 
 
 def _render_portfolio_delta_section(manifest: dict[str, Any]) -> str:

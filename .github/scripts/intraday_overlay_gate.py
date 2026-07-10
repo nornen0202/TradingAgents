@@ -21,6 +21,7 @@ OVERLAY_TARGET_JOBS = {
     "kr": ("overlay_refresh_kr", "publish_overlay_site", "deploy_overlay"),
 }
 DEFAULT_MAX_SCHEDULE_DELAY_MINUTES = 90
+DEFAULT_BASELINE_MAX_AGE_HOURS = 24
 
 
 @dataclass(frozen=True)
@@ -102,7 +103,7 @@ def daily_dependency(profile: str, now_kst: datetime) -> DailyDependency:
         profile=profile,
         workflow_file="daily-codex-analysis.yml",
         target_job_names=DAILY_TARGET_JOBS[profile],
-        window_start_kst=daily_window_start_kst(profile, now_kst),
+        window_start_kst=now_kst - timedelta(hours=DEFAULT_BASELINE_MAX_AGE_HOURS),
     )
 
 
@@ -224,14 +225,15 @@ def daily_dependency_satisfied(*, client: Any, dependency: DailyDependency) -> t
             run_id=run_id,
             target_job_names=dependency.target_job_names,
         ):
-            if active:
-                return (
-                    False,
-                    f"Newer Daily Codex {dependency.profile.upper()} run(s) still active: {', '.join(str(item) for item in active)}.",
-                )
+            active_note = (
+                f"; newer run(s) still active: {', '.join(str(item) for item in active)}"
+                if active
+                else ""
+            )
             return (
                 True,
-                f"Daily Codex {dependency.profile.upper()} run {run_id} completed successfully after {dependency.window_start_kst.isoformat()}.",
+                f"Daily Codex {dependency.profile.upper()} baseline run {run_id} completed successfully "
+                f"within {DEFAULT_BASELINE_MAX_AGE_HOURS}h{active_note}.",
             )
 
     if active:

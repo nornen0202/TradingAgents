@@ -158,6 +158,10 @@ class KISMicrostructureProvider:
         if last_price is None:
             raise RuntimeError(f"KIS domestic microstructure response did not include price for {ticker}.")
         volume = int(_find_float(price_row, "acml_vol", "volume", default=_sum_volume(bars)) or 0)
+        trading_value = _find_float(price_row, "acml_tr_pbmn", "tr_pbmn", "amount")
+        if trading_value is None and volume > 0:
+            trading_value = float(last_price * volume)
+        price_change_pct = _find_float(price_row, "prdy_ctrt", "change_rate", "rate")
         day_high = _find_float(price_row, "stck_hgpr", "high", default=_max_value(bars, ("stck_hgpr", "high", "hprc"))) or last_price
         day_low = _find_float(price_row, "stck_lwpr", "low", default=_min_value(bars, ("stck_lwpr", "low", "lprc"))) or last_price
         session_vwap = _vwap_from_cumulative(price_row) or _vwap_from_bars(bars)
@@ -225,6 +229,8 @@ class KISMicrostructureProvider:
             volume=volume,
             avg20_daily_volume=avg20_daily_volume,
             relative_volume=relative_volume,
+            trading_value=trading_value,
+            price_change_pct=price_change_pct,
             bar_timestamp=asof.isoformat(),
             provider_timestamp=now_local.isoformat(),
             quote_delay_seconds=max(0, int((now_local - asof).total_seconds())),
@@ -323,8 +329,24 @@ class KISMicrostructureProvider:
             volume_power_payload = volume_power[0] if isinstance(volume_power, tuple) else volume_power
             volume_power_rank = _ranking_for_symbol(volume_power_payload, symbol)
 
+        supplement = None
+        if self._us_supplement_provider is not None:
+            supplement = _call_optional(
+                lambda: self._us_supplement_provider.fetch(symbol, now_local=now_local, interval=interval),
+                missing,
+                "us_market_data_supplement",
+            )
+            if supplement:
+                raw_source_names.extend(getattr(supplement, "raw_source_names", ()))
+
+        avg20_daily_volume = getattr(supplement, "avg20_daily_volume", None) if supplement is not None else None
+        if avg20_daily_volume is None:
+            avg20_daily_volume = self._us_daily_volume_fallback(symbol)
+            if avg20_daily_volume is not None:
+                raw_source_names.append("yfinance.daily_history")
+
         daily_rows = []
-        if hasattr(self._kis, "fetch_overseas_daily_price_history"):
+        if avg20_daily_volume is None and hasattr(self._kis, "fetch_overseas_daily_price_history"):
             daily_rows = _call_optional(
                 lambda: self._kis.fetch_overseas_daily_price_history(
                     symbol=symbol,
@@ -335,16 +357,9 @@ class KISMicrostructureProvider:
                 missing,
                 "daily_volume",
             ) or []
-
-        supplement = None
-        if self._us_supplement_provider is not None:
-            supplement = _call_optional(
-                lambda: self._us_supplement_provider.fetch(symbol, now_local=now_local, interval=interval),
-                missing,
-                "us_market_data_supplement",
-            )
-            if supplement:
-                raw_source_names.extend(getattr(supplement, "raw_source_names", ()))
+            avg20_daily_volume = _avg_daily_volume(daily_rows)
+            if avg20_daily_volume is not None:
+                raw_source_names.append("kis.overseas_daily_price_history")
 
         combined_price = {**detail_row, **price_row}
         last_price = _find_float(
@@ -359,16 +374,13 @@ class KISMicrostructureProvider:
         if last_price is None:
             raise RuntimeError(f"KIS overseas microstructure response did not include price for {ticker}.")
         volume = int(_find_float(combined_price, "tvol", "TVOL", "acml_vol", "evol", "EVOL", default=_sum_volume(bars)) or 0)
+        trading_value = _find_float(combined_price, "tamt", "TAMT", "acml_tr_pbmn", "amount")
+        if trading_value is None and volume > 0:
+            trading_value = float(last_price * volume)
+        price_change_pct = _find_float(combined_price, "rate", "RATE", "prdy_ctrt", "change_rate")
         day_high = _find_float(combined_price, "high", "HIGH", "ovrs_nmix_hgpr", default=_max_value(bars, ("high", "HIGH", "hprc"))) or last_price
         day_low = _find_float(combined_price, "low", "LOW", "ovrs_nmix_lwpr", default=_min_value(bars, ("low", "LOW", "lprc"))) or last_price
         session_vwap = _vwap_from_cumulative(combined_price) or _vwap_from_bars(bars)
-        avg20_daily_volume = _avg_daily_volume(daily_rows)
-        if avg20_daily_volume is None and supplement is not None:
-            avg20_daily_volume = getattr(supplement, "avg20_daily_volume", None)
-        if avg20_daily_volume is None:
-            avg20_daily_volume = self._us_daily_volume_fallback(symbol)
-            if avg20_daily_volume is not None:
-                raw_source_names.append("yfinance.daily_history")
         relative_volume = _relative_volume(volume, avg20_daily_volume, now_local, market="US")
         if session_vwap is None:
             missing.setdefault("session_vwap", "minute_or_cumulative_traded_value_unavailable")
@@ -444,6 +456,8 @@ class KISMicrostructureProvider:
             volume=volume,
             avg20_daily_volume=avg20_daily_volume,
             relative_volume=relative_volume,
+            trading_value=trading_value,
+            price_change_pct=price_change_pct,
             bar_timestamp=asof.isoformat(),
             provider_timestamp=now_local.isoformat(),
             quote_delay_seconds=max(0, int((now_local - asof).total_seconds())),
