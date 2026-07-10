@@ -513,6 +513,8 @@ def _build_update(
             "spread_bps": market.spread_bps,
             "orderbook_imbalance": market.orderbook_imbalance,
             "execution_strength": market.execution_strength,
+            "trading_value": market.trading_value,
+            "price_change_pct": market.price_change_pct,
             "source_latency_seconds": market.source_latency_seconds,
             "investor_flow_status": market.investor_flow_status,
             "program_flow_status": market.program_flow_status,

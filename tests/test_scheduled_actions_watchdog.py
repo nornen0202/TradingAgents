@@ -124,23 +124,25 @@ def test_daily_codex_us_watchdog_waits_for_kr_overlay_publish():
 def test_kr_intraday_overlay_watchdog_depends_on_daily_codex_completion():
     targets = watchdog.due_targets(_kst("2026-06-01T10:07:00"))
 
-    overlay_kr = [target for target in targets if target.name == "intraday-overlay-kr"]
+    overlay_kr = [target for target in targets if target.name.startswith("intraday-overlay-kr-")]
     assert len(overlay_kr) == 1
     assert overlay_kr[0].inputs == {"profile": "kr", "run_mode": "overlay_only"}
     assert overlay_kr[0].dependencies[0].name == "daily-codex-kr"
     assert overlay_kr[0].dependencies[0].job_names == ("analyze_kr", "build_pages")
-    assert overlay_kr[0].dependencies[0].window_start_kst == _kst("2026-06-01T04:30:00")
+    assert overlay_kr[0].window_start_kst == _kst("2026-06-01T10:05:00")
+    assert overlay_kr[0].dependencies[0].window_start_kst == _kst("2026-05-31T10:07:00")
 
 
 def test_us_intraday_overlay_watchdog_uses_previous_daily_window_after_midnight():
     targets = watchdog.due_targets(_kst("2026-06-02T00:19:00"))
 
-    overlay_us = [target for target in targets if target.name == "intraday-overlay-us"]
+    overlay_us = [target for target in targets if target.name.startswith("intraday-overlay-us-")]
     assert len(overlay_us) == 1
     assert overlay_us[0].inputs == {"profile": "us", "run_mode": "overlay_only"}
     assert overlay_us[0].dependencies[0].name == "daily-codex-us"
     assert overlay_us[0].dependencies[0].job_names == ("analyze_us", "build_pages")
-    assert overlay_us[0].dependencies[0].window_start_kst == _kst("2026-06-01T17:45:00")
+    assert overlay_us[0].window_start_kst == _kst("2026-06-01T22:40:00")
+    assert overlay_us[0].dependencies[0].window_start_kst == _kst("2026-06-01T00:19:00")
 
 
 def test_youtube_watchdog_stays_due_during_late_recovery_window():
@@ -153,7 +155,7 @@ def test_youtube_watchdog_yields_during_us_intraday_overlay_window():
     targets = watchdog.due_targets(_kst("2026-06-02T00:19:00"))
 
     assert not [target for target in targets if target.name == "youtube-daily"]
-    assert [target for target in targets if target.name == "intraday-overlay-us"]
+    assert [target for target in targets if target.name.startswith("intraday-overlay-us-")]
 
 
 def test_youtube_watchdog_recovers_after_us_intraday_overlay_window():
@@ -310,7 +312,7 @@ def test_watchdog_waits_to_dispatch_overlay_until_daily_dependency_completes():
 
     assert ("daily-codex-analysis.yml", {"profile": "kr"}) in client.dispatches
     assert ("intraday-overlay-refresh.yml", {"profile": "kr", "run_mode": "overlay_only"}) not in client.dispatches
-    assert any("intraday-overlay-kr: waiting" in message for message in messages)
+    assert any("intraday-overlay-kr-1005: waiting" in message for message in messages)
     assert any("daily-codex-kr still active" in message for message in messages)
 
 
@@ -333,4 +335,20 @@ def test_watchdog_dispatches_overlay_after_daily_dependency_completed():
     messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T10:07:00"))
 
     assert ("intraday-overlay-refresh.yml", {"profile": "kr", "run_mode": "overlay_only"}) in client.dispatches
-    assert any("intraday-overlay-kr: dispatched" in message for message in messages)
+    assert any("intraday-overlay-kr-1005: dispatched" in message for message in messages)
+
+
+def test_watchdog_reuses_fixed_checkpoint_window_between_poll_cycles():
+    first = [
+        target
+        for target in watchdog.due_targets(_kst("2026-06-01T10:07:00"))
+        if target.name.startswith("intraday-overlay-kr-")
+    ][0]
+    later = [
+        target
+        for target in watchdog.due_targets(_kst("2026-06-01T11:37:00"))
+        if target.name.startswith("intraday-overlay-kr-")
+    ][0]
+
+    assert first.name == later.name == "intraday-overlay-kr-1005"
+    assert first.window_start_kst == later.window_start_kst == _kst("2026-06-01T10:05:00")

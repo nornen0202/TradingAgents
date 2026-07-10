@@ -410,6 +410,7 @@ def _build_external_signal_context(
         ingestion=ingestion,
         reconciliation=reconciliation,
         allow_cross_market_candidates=bool(getattr(settings, "allow_cross_market_candidates", False)),
+        max_signal_age_hours=float(getattr(settings, "max_signal_age_hours", 72.0) or 72.0),
     )
     return {
         "status": {

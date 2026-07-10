@@ -48,7 +48,7 @@ def test_kr_overlay_waits_when_daily_codex_workflow_is_still_active():
     assert decisions == {"us": False, "kr": False}
     assert any("still active" in message for message in messages)
     assert client.last_workflow_file == "daily-codex-analysis.yml"
-    assert client.last_created_since_utc == _kst("2026-06-04T04:30:00").astimezone(gate.UTC)
+    assert client.last_created_since_utc == _kst("2026-06-03T10:35:00").astimezone(gate.UTC)
 
 
 def test_kr_overlay_waits_when_only_daily_gate_job_succeeded():
@@ -92,7 +92,7 @@ def test_kr_overlay_waits_until_daily_pages_build_succeeds():
     assert any("No completed successful Daily Codex KR target job" in message for message in messages)
 
 
-def test_kr_overlay_waits_when_newer_daily_run_is_active_after_prior_success():
+def test_kr_overlay_uses_recent_successful_baseline_while_newer_daily_run_is_active():
     client = FakeClient(
         runs=[
             {"id": 204, "status": "completed", "conclusion": "success", "created_at": "2026-06-04T01:00:00Z"},
@@ -114,8 +114,8 @@ def test_kr_overlay_waits_when_newer_daily_run_is_active_after_prior_success():
         now_kst=_kst("2026-06-04T12:00:00"),
     )
 
-    assert decisions["kr"] is False
-    assert any("Newer Daily Codex KR run(s) still active" in message for message in messages)
+    assert decisions["kr"] is True
+    assert any("newer run(s) still active" in message for message in messages)
 
 
 def test_kr_overlay_runs_after_completed_daily_codex_target_jobs():
@@ -229,7 +229,7 @@ def test_kr_overlay_ignores_current_run_when_checking_active_overlay():
     assert any("allowed" in message for message in messages)
 
 
-def test_us_overlay_after_midnight_uses_previous_kst_daily_window():
+def test_us_overlay_after_midnight_uses_24_hour_baseline_window():
     client = FakeClient(
         runs=[{"id": 105, "status": "completed", "conclusion": "success"}],
         jobs={
@@ -249,7 +249,7 @@ def test_us_overlay_after_midnight_uses_previous_kst_daily_window():
     )
 
     assert decisions["us"] is True
-    assert client.last_created_since_utc == _kst("2026-06-04T17:45:00").astimezone(gate.UTC)
+    assert client.last_created_since_utc == _kst("2026-06-04T00:40:00").astimezone(gate.UTC)
 
 
 def test_manual_all_profile_can_run_each_side_independently():

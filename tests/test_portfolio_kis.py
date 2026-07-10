@@ -320,6 +320,73 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(second["params"]["CTX_AREA_NK200"], "NK200")
         self.assertEqual(second["tr_cont"], "N")
 
+    def test_overseas_daily_history_advances_cursor_and_stops_repeated_page(self):
+        client = KisClient(
+            app_key="app-key",
+            app_secret="app-secret",
+            session=Mock(),
+            token_file_cache_enabled=False,
+        )
+        first_page = {
+            "output2": [
+                {"xymd": "20260710", "tvol": "100"},
+                {"xymd": "20260709", "tvol": "90"},
+            ]
+        }
+        repeated_page = {
+            "output2": [
+                {"xymd": "20260710", "tvol": "100"},
+                {"xymd": "20260709", "tvol": "90"},
+            ]
+        }
+        client.request_json = Mock(
+            side_effect=[
+                (first_page, {"tr_cont": "M"}),
+                (repeated_page, {"tr_cont": "M"}),
+            ]
+        )
+
+        rows = client.fetch_overseas_daily_price_history(
+            symbol="AAPL",
+            exchange_code="NAS",
+            start_date=date(2026, 6, 1),
+            end_date=date(2026, 7, 10),
+        )
+
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(client.request_json.call_count, 2)
+        first = client.request_json.call_args_list[0].kwargs
+        second = client.request_json.call_args_list[1].kwargs
+        self.assertEqual(first["params"]["BYMD"], "20260710")
+        self.assertEqual(second["params"]["BYMD"], "20260708")
+        self.assertEqual(second["tr_cont"], "N")
+
+    def test_overseas_daily_history_respects_page_limit(self):
+        client = KisClient(
+            app_key="app-key",
+            app_secret="app-secret",
+            session=Mock(),
+            token_file_cache_enabled=False,
+        )
+        client.request_json = Mock(
+            side_effect=[
+                ({"output2": [{"xymd": "20260710", "tvol": "100"}]}, {"tr_cont": "M"}),
+                ({"output2": [{"xymd": "20260709", "tvol": "90"}]}, {"tr_cont": "M"}),
+                ({"output2": [{"xymd": "20260708", "tvol": "80"}]}, {"tr_cont": "M"}),
+            ]
+        )
+
+        rows = client.fetch_overseas_daily_price_history(
+            symbol="AAPL",
+            exchange_code="NAS",
+            start_date=date(2026, 6, 1),
+            end_date=date(2026, 7, 10),
+            max_pages=2,
+        )
+
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(client.request_json.call_count, 2)
+
     def test_extract_cash_snapshot_marks_watchlist_only_when_cash_is_below_min_trade(self):
         profile = PortfolioProfile(
             name="kis-test",

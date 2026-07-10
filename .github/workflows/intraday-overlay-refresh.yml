@@ -52,7 +52,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Hold overlay until Daily Codex completed
+      - name: Require a successful research baseline from the last 24 hours
         id: gate
         env:
           GH_EVENT_NAME: ${{ github.event_name }}
@@ -97,6 +97,9 @@ jobs:
       KIS_Developers_APP_SECRET: ${{ secrets.KIS_Developers_APP_SECRET }}
       KIS_Developers_ACCOUNT_NO: ${{ secrets.KIS_Developers_ACCOUNT_NO }}
       KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
+      KIS_HTTP_TIMEOUT_SECONDS: "8"
+      TRADINGAGENTS_OVERLAY_MAX_WORKERS: "4"
+      TRADINGAGENTS_OVERLAY_TICKER_TIMEOUT_SECONDS: "45"
 
     steps:
       - name: Check out repository
@@ -152,6 +155,21 @@ jobs:
 
           subprocess.check_call(args)
 
+      - name: Validate US decision bundle quality
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip() or ".runtime/tradingagents-archive"
+          subprocess.check_call([
+              sys.executable,
+              ".github/scripts/verify_decision_bundle.py",
+              "--archive-dir",
+              archive_dir,
+              "--latest",
+          ])
+
   overlay_refresh_kr:
     needs:
       - overlay_gate
@@ -186,6 +204,9 @@ jobs:
       KIS_Developers_APP_SECRET: ${{ secrets.KIS_Developers_APP_SECRET }}
       KIS_Developers_ACCOUNT_NO: ${{ secrets.KIS_Developers_ACCOUNT_NO }}
       KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
+      KIS_HTTP_TIMEOUT_SECONDS: "8"
+      TRADINGAGENTS_OVERLAY_MAX_WORKERS: "4"
+      TRADINGAGENTS_OVERLAY_TICKER_TIMEOUT_SECONDS: "45"
 
     steps:
       - name: Check out repository
@@ -240,6 +261,21 @@ jobs:
               args += ["--tickers", manual_tickers]
 
           subprocess.check_call(args)
+
+      - name: Validate KR decision bundle quality
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip() or ".runtime/tradingagents-archive"
+          subprocess.check_call([
+              sys.executable,
+              ".github/scripts/verify_decision_bundle.py",
+              "--archive-dir",
+              archive_dir,
+              "--latest",
+          ])
 
   publish_overlay_site:
     needs:
@@ -329,6 +365,28 @@ jobs:
 
           if not Path("site").exists():
               raise SystemExit("Expected site output directory 'site' was not created.")
+
+      - name: Verify stable decision bundle Pages paths
+        run: |
+          import subprocess
+          import sys
+
+          profile = "${{ github.event.inputs.profile }}".strip()
+          schedule = "${{ github.event.schedule }}".strip()
+          markets = ["us", "kr"] if profile in {"", "all"} else [profile]
+          if schedule in {"5 1 * * 1-5", "0 3 * * 1-5", "20 4 * * 1-5"}:
+              markets = ["kr"]
+          elif schedule:
+              markets = ["us"]
+          for market in markets:
+              subprocess.check_call([
+                  sys.executable,
+                  ".github/scripts/verify_decision_bundle.py",
+                  "--site-dir",
+                  "site",
+                  "--market",
+                  market,
+              ])
 
       - name: Upload final GitHub Pages artifact
         id: upload_pages_final

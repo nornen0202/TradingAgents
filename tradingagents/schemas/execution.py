@@ -316,6 +316,8 @@ class IntradayMarketSnapshot:
     volume: int
     avg20_daily_volume: float | None
     relative_volume: float | None
+    trading_value: float | None = None
+    price_change_pct: float | None = None
     bar_timestamp: str | None = None
     provider_timestamp: str | None = None
     quote_delay_seconds: int | None = None
@@ -419,6 +421,8 @@ class IntradayMarketSnapshot:
             "volume": self.volume,
             "avg20_daily_volume": self.avg20_daily_volume,
             "relative_volume": self.relative_volume,
+            "trading_value": self.trading_value,
+            "price_change_pct": self.price_change_pct,
             "market": self.market,
             "exchange": self.exchange,
             "checkpoint_id": self.checkpoint_id,

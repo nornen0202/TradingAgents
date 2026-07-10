@@ -170,6 +170,103 @@ def present_account_action(action: str, *, conditional: bool = False, language: 
     return mapping.get(normalized, _humanize_code(normalized, korean=False))
 
 
+def present_execution_state(value: str, *, language: str = "Korean") -> str:
+    normalized = str(value or "").strip().upper()
+    if is_korean(language):
+        return {
+            "WAIT": "조건 충족 전 대기",
+            "ARMED": "실행 조건 감시 중",
+            "TRIGGERED_PENDING_CLOSE": "조건 충족, 종가 확인 대기",
+            "ACTIONABLE_NOW": "지금 실행 검토 가능",
+            "INVALIDATED": "투자 근거 무효화",
+            "DEGRADED": "데이터 확인 전 대기",
+        }.get(normalized, _humanize_code(normalized, korean=True))
+    return _humanize_code(normalized, korean=False)
+
+
+def present_execution_timing(value: str, *, language: str = "Korean") -> str:
+    normalized = str(value or "").strip().upper()
+    if is_korean(language):
+        return {
+            "WAITING": "대기",
+            "NO_LIVE_DATA": "실시간 데이터 없음",
+            "PRE_OPEN_THESIS_ONLY": "장 시작 전 연구만 유효",
+            "PILOT_READY": "소액 시험 진입 검토 가능",
+            "PILOT_BLOCKED_VOLUME": "거래량 부족으로 진입 보류",
+            "PILOT_BLOCKED_FAILED_BREAKOUT": "돌파 실패로 진입 보류",
+            "CLOSE_CONFIRM_PENDING": "종가 확인 대기",
+            "CLOSE_CONFIRMED": "종가 조건 확인 완료",
+            "NEXT_DAY_FOLLOWTHROUGH_PENDING": "다음 거래일 추세 확인 대기",
+            "FAILED_BREAKOUT": "돌파 실패",
+            "SUPPORT_HOLD": "지지선 유지",
+            "SUPPORT_FAIL": "지지선 이탈",
+            "STALE_TRIGGERABLE": "과거 조건, 최신 데이터 재확인 필요",
+            "INVALIDATED": "투자 근거 무효화",
+            "DEGRADED": "데이터 품질 저하",
+            "LIVE_BREAKOUT": "장중 돌파 확인",
+            "LATE_SESSION_CONFIRM": "장 후반 확인",
+            "CLOSE_CONFIRM": "종가 확인",
+            "ACTIONABLE_LIVE": "장중 실행 검토 가능",
+        }.get(normalized, _humanize_code(normalized, korean=True))
+    return _humanize_code(normalized, korean=False)
+
+
+def present_strategy_category(value: str, *, language: str = "Korean") -> str:
+    normalized = str(value or "").strip().upper()
+    if is_korean(language):
+        return {
+            "BUY_NOW": "지금 분할매수 검토",
+            "BUY_ON_CONFIRMATION": "조건 확인 후 분할매수 검토",
+            "HOLD": "보유 유지",
+            "REDUCE": "비중 축소 검토",
+            "SELL": "매도·청산 검토",
+            "WAIT": "조건 충족 전 대기",
+            "AVOID": "신규 매수 회피",
+            "DATA_CHECK": "데이터 확인 전 대기",
+            "WAIT_CLOSE": "종가 확인 후 판단",
+            "WAIT_NEXT_SESSION": "다음 거래일 확인 후 판단",
+            "WATCH_ONLY": "관심종목으로 관찰",
+            "INSUFFICIENT_DATA": "판단 자료 부족",
+            "AVOID_OR_EXCLUDE": "신규 매수 회피·후보 제외",
+            "TRIM_OR_RISK_REDUCE_REVIEW": "비중 축소·위험 완화 검토",
+            "HOLD_MAINTAIN": "보유 유지",
+            "ORDER_REVIEW_NOW": "지금 주문 조건 검토",
+            "PILOT_REVIEW_ONLY": "소액 시험 진입만 검토",
+            "WAIT_INTRADAY": "장중 조건 확인 대기",
+            "WAIT_CLOSE_CONFIRMATION": "종가 확인 대기",
+        }.get(normalized, _humanize_code(normalized, korean=True))
+    return _humanize_code(normalized, korean=False)
+
+
+def present_reason_code(value: str, *, language: str = "Korean") -> str:
+    normalized = str(value or "").strip().upper()
+    if not is_korean(language):
+        return _humanize_code(normalized, korean=False)
+    direct = {
+        "PRICE_ABOVE_TRIGGER": "매수 기준가 상회",
+        "PRICE_BELOW_TRIGGER": "매수 기준가 미충족",
+        "VWAP_OK": "VWAP 위에서 거래",
+        "VWAP_NOT_OK": "VWAP 조건 미충족",
+        "VOLUME_OK": "거래량 조건 충족",
+        "VOLUME_NOT_OK": "거래량 조건 미충족",
+        "SUPPORT_HOLD": "지지선 유지",
+        "SUPPORT_FAIL": "지지선 이탈",
+        "FAILED_BREAKOUT": "돌파 후 안착 실패",
+        "NO_LIVE_DATA": "실시간 데이터 없음",
+        "STALE_DATA": "데이터 기준시각 경과",
+        "DELAYED_DATA": "지연 데이터",
+        "CASH_BUFFER_BLOCK": "최소 현금 여유 부족",
+        "HALT_STATUS_RECHECK_REQUIRED": "거래정지 여부 재확인 필요",
+    }
+    if normalized in direct:
+        return direct[normalized]
+    if normalized.startswith("MISSING_"):
+        return f"{_humanize_code(normalized.removeprefix('MISSING_'), korean=True)} 누락"
+    if normalized.startswith("LIMITED_"):
+        return f"{_humanize_code(normalized.removeprefix('LIMITED_'), korean=True)} 제한"
+    return _humanize_code(normalized, korean=True)
+
+
 def present_market_regime(value: str, *, language: str = "Korean") -> str:
     korean = is_korean(language)
     normalized = str(value or "").strip().lower()

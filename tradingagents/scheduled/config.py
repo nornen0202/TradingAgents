@@ -226,6 +226,7 @@ class PrismDashboardSettings:
     use_live_http: bool = False
     use_html_scraping: bool = False
     confidence_cap: float = 0.25
+    max_signal_age_hours: float = 72.0
     market: str | None = None
     use_for_candidate_generation: bool = False
     use_for_performance_benchmark: bool = False
@@ -747,6 +748,7 @@ def _load_external_data_settings(
             use_live_http=_env_bool("PRISM_USE_LIVE_HTTP", bool(prism_raw.get("use_live_http", False))),
             use_html_scraping=_env_bool("PRISM_USE_HTML_SCRAPING", bool(prism_raw.get("use_html_scraping", False))),
             confidence_cap=float(prism_raw.get("confidence_cap", 0.25) or 0.25),
+            max_signal_age_hours=max(1.0, float(prism_raw.get("max_signal_age_hours", 72.0) or 72.0)),
             market=_optional_string(prism_raw.get("market")) or default_market,
             use_for_candidate_generation=bool(prism_raw.get("use_for_candidate_generation", False)),
             use_for_performance_benchmark=bool(prism_raw.get("use_for_performance_benchmark", False)),

@@ -11,15 +11,15 @@ max_risk_discuss_rounds = 1
 latest_market_data_lookback_days = 14
 continue_on_ticker_error = true
 report_polisher_enabled = true
-max_runtime_minutes = 0
-min_remaining_minutes_for_next_ticker = 0
+max_runtime_minutes = 105
+min_remaining_minutes_for_next_ticker = 15
 parallel_ticker_execution = true
 max_parallel_tickers = 4
-per_ticker_timeout_minutes = 60
+per_ticker_timeout_minutes = 30
 codex_circuit_breaker_enabled = true
 max_consecutive_codex_failures = 3
 fatal_error_patterns = ["usage limit", "model unavailable"]
-daily_active_ticker_limit = 0
+daily_active_ticker_limit = 14
 analysis_mode = "full"
 
 [llm]
@@ -170,6 +170,7 @@ max_payload_bytes = 5000000
 use_live_http = true
 use_html_scraping = true
 confidence_cap = 0.25
+max_signal_age_hours = 72
 market = "US"
 use_for_candidate_generation = true
 use_for_performance_benchmark = true

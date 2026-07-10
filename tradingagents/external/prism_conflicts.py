@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -108,13 +108,21 @@ def write_prism_signal_artifacts(
     ingestion: PrismIngestionResult,
     reconciliation: dict[str, Any],
     allow_cross_market_candidates: bool = False,
+    max_signal_age_hours: float = 72.0,
 ) -> dict[str, str]:
     output_dir = run_dir / "external_signals"
     output_dir.mkdir(parents=True, exist_ok=True)
     signals_path = output_dir / "prism_signals.json"
+    current_signals_path = output_dir / "prism_current_signals.json"
     status_path = output_dir / "prism_ingestion_status.json"
     reconciliation_path = output_dir / "prism_reconciliation.json"
     signals_path.write_text(json.dumps(ingestion.signals_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
+    current_payload = build_current_prism_signals_payload(
+        ingestion=ingestion,
+        run_market=str(reconciliation.get("run_market") or ""),
+        max_signal_age_hours=max_signal_age_hours,
+    )
+    current_signals_path.write_text(json.dumps(current_payload, indent=2, ensure_ascii=False), encoding="utf-8")
     status_payload = ingestion.status_dict()
     coverage = reconciliation.get("coverage_summary") if isinstance(reconciliation, dict) else None
     if isinstance(coverage, dict):
@@ -130,9 +138,70 @@ def write_prism_signal_artifacts(
     reconciliation_path.write_text(json.dumps(reconciliation, indent=2, ensure_ascii=False), encoding="utf-8")
     return {
         "external_prism_signals_json": signals_path.as_posix(),
+        "external_prism_current_signals_json": current_signals_path.as_posix(),
         "external_prism_ingestion_status_json": status_path.as_posix(),
         "external_prism_reconciliation_json": reconciliation_path.as_posix(),
     }
+
+
+def build_current_prism_signals_payload(
+    *,
+    ingestion: PrismIngestionResult,
+    run_market: str,
+    max_signal_age_hours: float = 72.0,
+) -> dict[str, Any]:
+    normalized_market = _normalize_run_market(run_market)
+    asof = ingestion.ingested_at
+    if asof.tzinfo is None:
+        asof = asof.replace(tzinfo=timezone.utc)
+    cutoff = asof - timedelta(hours=max(1.0, float(max_signal_age_hours or 72.0)))
+    raw_signals = list(ingestion.signals or [])
+    same_market = _same_market_signals(raw_signals, run_market=normalized_market)
+    with_asof = [signal for signal in same_market if signal.source_asof is not None]
+    fresh = []
+    for signal in with_asof:
+        source_asof = signal.source_asof
+        if source_asof is None:
+            continue
+        if source_asof.tzinfo is None:
+            source_asof = source_asof.replace(tzinfo=asof.tzinfo)
+        if source_asof >= cutoff:
+            fresh.append(signal)
+    latest_by_ticker = _latest_prism_signal_by_ticker(fresh)
+    current = [
+        signal
+        for _, signal in sorted(latest_by_ticker.items())
+        if signal.signal_action != PrismSignalAction.UNKNOWN
+    ]
+    return {
+        "artifact_type": "prism_current_signals",
+        "run_market": normalized_market,
+        "generated_at": asof.isoformat(),
+        "max_signal_age_hours": float(max_signal_age_hours),
+        "quality": {
+            "raw_signal_count": len(raw_signals),
+            "cross_market_excluded_count": len(raw_signals) - len(same_market),
+            "missing_source_asof_count": len(same_market) - len(with_asof),
+            "expired_signal_count": len(with_asof) - len(fresh),
+            "duplicate_ticker_count": len(fresh) - len(latest_by_ticker),
+            "current_signal_count": len(current),
+        },
+        "signals": [signal.to_dict() for signal in current],
+    }
+
+
+def _latest_prism_signal_by_ticker(signals: Iterable[PrismExternalSignal]) -> dict[str, PrismExternalSignal]:
+    result: dict[str, PrismExternalSignal] = {}
+    for signal in signals:
+        ticker = str(signal.canonical_ticker or "").strip().upper()
+        if not ticker:
+            continue
+        current = result.get(ticker)
+        current_asof = current.source_asof if current is not None else None
+        signal_asof = signal.source_asof
+        if current is None or (signal_asof is not None and (current_asof is None or signal_asof >= current_asof)):
+            result[ticker] = signal
+    return result
 
 
 def best_prism_signal_by_ticker(signals: Iterable[PrismExternalSignal]) -> dict[str, PrismExternalSignal]:
