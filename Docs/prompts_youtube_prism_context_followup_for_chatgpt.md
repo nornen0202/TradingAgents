@@ -10,6 +10,7 @@
 4. 원본 `prism_signals.json`의 과거 행, 기준시각 없는 행, 다른 시장 행은 현재 전략 변경 근거로 사용하지 않는다.
 5. YouTube 단독 주장은 공식 공시, IR 또는 신뢰할 수 있는 최신 자료로 확인되지 않으면 검증 우선순위만 높인다.
 6. 최신 decision bundle이 있으면 그 실행 gate와 위험선을 최우선한다.
+7. `conditional_strategy_ready=true`인 조건부 전략을 YouTube·PRISM만으로 즉시 주문 전략으로 올리지 않는다.
 
 ## 전략 변경 기준
 

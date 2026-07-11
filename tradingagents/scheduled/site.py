@@ -231,8 +231,10 @@ def _publish_latest_decision_bundles(*, site_dir: Path, manifests: list[dict[str
                 "latest_run_id": latest_manifest.get("run_id"),
                 "latest_run_started_at": latest_manifest.get("started_at"),
                 "decision_ready": latest_status.get("decision_ready") is True,
+                "conditional_strategy_ready": latest_status.get("conditional_strategy_ready") is True,
                 "quality_label_ko": latest_status.get("quality_label_ko"),
                 "fresh_row_ratio": latest_status.get("fresh_row_ratio"),
+                "conditional_row_ratio": latest_status.get("conditional_row_ratio"),
             },
         )
         ready_manifest = next(
@@ -1078,6 +1080,7 @@ def _render_strategy_table_section(manifest: dict[str, Any]) -> str:
       <article class="run-card">
         <p><strong>데이터 상태</strong><span>{_escape(status_label)}</span></p>
         <p><strong>현재 세션 핵심 데이터 충족률</strong><span>{float(bundle.get('fresh_row_ratio') or 0) * 100:.1f}%</span></p>
+        <p><strong>조건부 전략 가능 비율</strong><span>{float(bundle.get('conditional_row_ratio') or 0) * 100:.1f}%</span></p>
         <div class="table-scroll">
           <table>
             <thead><tr><th>우선</th><th>종목</th><th>현재 전략</th><th>현재가</th><th>VWAP</th><th>상대 거래량</th><th>섹터·지수 동조</th><th>실행 조건</th><th>위험·무효화</th></tr></thead>

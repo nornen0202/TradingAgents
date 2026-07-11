@@ -18,7 +18,13 @@ def test_valid_live_bundle_passes_and_ratio_is_recomputed(tmp_path: Path):
     bundle = {
         "version": 2,
         "run_id": "live-run",
-        "quality": {"decision_ready": True, "fresh_row_ratio": 1.0, "minimum_fresh_row_ratio": 0.8},
+        "quality": {
+            "decision_ready": True,
+            "conditional_strategy_ready": True,
+            "fresh_row_ratio": 1.0,
+            "conditional_row_ratio": 1.0,
+            "minimum_fresh_row_ratio": 0.8,
+        },
         "strategy_table": [
             {
                 "ticker": "NVDA",
@@ -28,7 +34,7 @@ def test_valid_live_bundle_passes_and_ratio_is_recomputed(tmp_path: Path):
                 "market_data_asof": "2026-07-10T12:00:00-04:00",
                 "session_vwap": 198,
                 "relative_volume": 1.2,
-                "quality": {"execution_ready": True},
+                "quality": {"execution_ready": True, "conditional_strategy_ready": True},
             }
         ],
     }
@@ -44,7 +50,13 @@ def test_ready_bundle_fails_when_live_row_is_missing_vwap(tmp_path: Path):
     bundle = {
         "version": 2,
         "run_id": "broken-live-run",
-        "quality": {"decision_ready": True, "fresh_row_ratio": 1.0, "minimum_fresh_row_ratio": 0.8},
+        "quality": {
+            "decision_ready": True,
+            "conditional_strategy_ready": True,
+            "fresh_row_ratio": 1.0,
+            "conditional_row_ratio": 1.0,
+            "minimum_fresh_row_ratio": 0.8,
+        },
         "strategy_table": [
             {
                 "ticker": "NVDA",
@@ -54,7 +66,7 @@ def test_ready_bundle_fails_when_live_row_is_missing_vwap(tmp_path: Path):
                 "market_data_asof": "2026-07-10T12:00:00-04:00",
                 "session_vwap": None,
                 "relative_volume": 1.2,
-                "quality": {"execution_ready": True},
+                "quality": {"execution_ready": True, "conditional_strategy_ready": True},
             }
         ],
     }

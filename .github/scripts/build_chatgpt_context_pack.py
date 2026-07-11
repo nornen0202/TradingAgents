@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 
-VALID_MODES = {"auto", "execution", "research", "outage"}
+VALID_MODES = {"auto", "conditional", "execution", "research", "outage"}
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -52,6 +52,41 @@ def _prism_current(run_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
     return _load_json(path) if path is not None else {}
 
 
+def _compact_decision_bundle(bundle: dict[str, Any], *, max_new_candidates: int = 5) -> dict[str, Any]:
+    if not bundle:
+        return {}
+    rows = [row for row in (bundle.get("strategy_table") or []) if isinstance(row, dict)]
+    held_rows = [row for row in rows if row.get("is_held") is True]
+    new_rows = [row for row in rows if row.get("is_held") is not True]
+    selected_rows = [*held_rows, *new_rows[: max(0, int(max_new_candidates))]]
+    compact_rows = []
+    for display_priority, row in enumerate(selected_rows, start=1):
+        compact = {key: value for key, value in row.items() if key != "raw_codes"}
+        compact["display_priority"] = display_priority
+        compact_rows.append(compact)
+    selected_benchmarks = {
+        str(sync.get("benchmark") or "")
+        for row in compact_rows
+        for sync in (row.get("sector_sync") or {}, row.get("index_sync") or {})
+        if isinstance(sync, dict) and str(sync.get("benchmark") or "")
+    }
+    benchmark_context = bundle.get("benchmark_context") if isinstance(bundle.get("benchmark_context"), dict) else {}
+    compact_bundle = dict(bundle)
+    compact_bundle["strategy_table"] = compact_rows
+    compact_bundle["benchmark_context"] = {
+        key: value for key, value in benchmark_context.items() if str(key) in selected_benchmarks
+    }
+    compact_bundle["transmission_scope"] = {
+        "source_ticker_count": len(rows),
+        "transmitted_ticker_count": len(compact_rows),
+        "held_ticker_count": len(held_rows),
+        "new_candidate_limit": int(max_new_candidates),
+        "omitted_nonheld_ticker_count": max(0, len(new_rows) - int(max_new_candidates)),
+        "raw_codes_omitted": True,
+    }
+    return compact_bundle
+
+
 def choose_report_mode(*, requested_mode: str, manifest: dict[str, Any], bundle: dict[str, Any]) -> str:
     requested = str(requested_mode or "auto").strip().lower()
     if requested not in VALID_MODES:
@@ -63,6 +98,8 @@ def choose_report_mode(*, requested_mode: str, manifest: dict[str, Any], bundle:
         return requested
     if decision_ready:
         return "execution"
+    if bool((bundle.get("quality") or {}).get("conditional_strategy_ready")):
+        return "conditional"
     run_mode = str(((manifest.get("settings") or {}).get("run_mode") or "")).lower()
     run_id = str(manifest.get("run_id") or "").lower()
     if run_mode in {"overlay_only", "selective_rerun_only"} or "overlay" in run_id:
@@ -82,7 +119,7 @@ def build_context_pack(
     if not manifest:
         raise FileNotFoundError(f"run.json is missing under {run_dir}")
     prompt = prompt_path.read_text(encoding="utf-8").strip()
-    bundle = _decision_bundle(run_dir, manifest)
+    bundle = _compact_decision_bundle(_decision_bundle(run_dir, manifest))
     prism = _prism_current(run_dir, manifest)
     mode = choose_report_mode(requested_mode=requested_mode, manifest=manifest, bundle=bundle)
     source_payload: dict[str, Any] = {
@@ -123,7 +160,7 @@ def build_context_pack_from_bundle(
     extra_paths: list[Path] | None = None,
     max_payload_chars: int = 80_000,
 ) -> tuple[str, dict[str, Any]]:
-    bundle = _load_json(bundle_path)
+    bundle = _compact_decision_bundle(_load_json(bundle_path))
     if not bundle:
         raise FileNotFoundError(f"Decision bundle is missing or invalid: {bundle_path}")
     run_id = str(bundle.get("run_id") or bundle_path.stem)
@@ -197,6 +234,9 @@ def _render_context_payload(
         "transmission_key": transmission_key,
         "payload_chars": len(payload),
         "decision_ready": bool((bundle.get("quality") or {}).get("decision_ready")),
+        "conditional_strategy_ready": bool(
+            (bundle.get("quality") or {}).get("conditional_strategy_ready")
+        ),
         "decision_bundle_present": bool(bundle),
         "prism_current_signal_count": len((source_payload.get("prism_current_signals") or {}).get("signals") or []),
     }
