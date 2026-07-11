@@ -197,11 +197,19 @@ def _latest_prism_signal_by_ticker(signals: Iterable[PrismExternalSignal]) -> di
         if not ticker:
             continue
         current = result.get(ticker)
-        current_asof = current.source_asof if current is not None else None
-        signal_asof = signal.source_asof
+        current_asof = _normalized_prism_asof(current.source_asof) if current is not None else None
+        signal_asof = _normalized_prism_asof(signal.source_asof)
         if current is None or (signal_asof is not None and (current_asof is None or signal_asof >= current_asof)):
             result[ticker] = signal
     return result
+
+
+def _normalized_prism_asof(value: datetime | None) -> datetime | None:
+    if value is None:
+        return None
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
 def best_prism_signal_by_ticker(signals: Iterable[PrismExternalSignal]) -> dict[str, PrismExternalSignal]:
