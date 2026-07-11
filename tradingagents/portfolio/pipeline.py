@@ -51,13 +51,15 @@ def run_portfolio_pipeline(
     if not profile.enabled:
         return {"status": "disabled", "reason": f"profile {profile.name} is disabled"}
     run_mode = str(((manifest.get("settings") or {}).get("run_mode")) or "").strip().lower()
-    if run_mode == "portfolio_only":
+    if run_mode in {"portfolio_only", "overlay_only", "selective_rerun_only"}:
         portfolio_settings = replace(
             portfolio_settings,
             semantic_judge_enabled=False,
             action_judge_enabled=False,
             report_polisher_enabled=False,
         )
+    if run_mode in {"overlay_only", "selective_rerun_only"} and portfolio_performance_settings is not None:
+        portfolio_performance_settings = replace(portfolio_performance_settings, enabled=False)
 
     private_dir = run_dir / profile.private_output_dirname
     status_path = private_dir / "status.json"

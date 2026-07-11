@@ -97,6 +97,11 @@ site_dir = "{(tmp_path / 'site').as_posix()}"
 [execution]
 enabled = true
 checkpoints_kst = ["22:35"]
+
+[performance]
+enabled = true
+update_outcomes_on_run = true
+price_provider = "yfinance"
 """,
         encoding="utf-8",
     )
@@ -109,6 +114,7 @@ checkpoints_kst = ["22:35"]
     with (
         patch("tradingagents.scheduled.runner._run_single_ticker", side_effect=AssertionError("full research must be skipped in overlay_only")),
         patch("tradingagents.scheduled.runner._run_execution_overlay_passes", side_effect=fake_overlay),
+        patch("tradingagents.scheduled.runner._run_performance_tracking", side_effect=AssertionError("overlay must skip long-horizon performance tracking")),
         patch("tradingagents.scheduled.runner.build_site", return_value=[]),
     ):
         manifest = execute_scheduled_run(config, run_label="overlay-test")
@@ -116,6 +122,7 @@ checkpoints_kst = ["22:35"]
     assert manifest["settings"]["run_mode"] == "overlay_only"
     assert manifest["summary"]["total_tickers"] == 1
     assert manifest["tickers"][0]["quality_flags"] == ("overlay_only_mode",)
+    assert manifest["performance"] == {"status": "skipped", "reason": "overlay_fast_path"}
 
 
 def test_portfolio_only_mode_skips_ticker_analysis_and_runs_portfolio_pipeline(tmp_path: Path):

@@ -21,7 +21,7 @@ def test_current_prism_signals_filters_market_age_missing_asof_and_duplicates():
                 canonical_ticker="NVDA",
                 market="US",
                 signal_action=PrismSignalAction.HOLD,
-                source_asof=now - timedelta(hours=2),
+                source_asof=(now - timedelta(hours=2)).replace(tzinfo=None),
                 confidence=0.7,
             ),
             PrismExternalSignal(

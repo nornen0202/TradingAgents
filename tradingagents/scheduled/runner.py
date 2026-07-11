@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import Future, ThreadPoolExecutor, wait
 from copy import deepcopy
 from dataclasses import replace
 import json
 import os
+from queue import Empty, Queue
 import re
 import shutil
 import subprocess
 import sys
+from threading import Thread
 import traceback
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
@@ -608,7 +609,8 @@ def execute_scheduled_run(
         manifest=manifest,
     )
 
-    if config.performance.enabled and not portfolio_only:
+    performance_enabled_for_run = config.performance.enabled and not portfolio_only and run_mode == "full"
+    if performance_enabled_for_run:
         performance_budget_available = _post_processing_budget_available(
             stage="performance",
             max_runtime_seconds=max_runtime_seconds,
@@ -618,10 +620,12 @@ def execute_scheduled_run(
         )
     else:
         performance_budget_available = False
-    if config.performance.enabled and not portfolio_only and performance_budget_available:
+    if performance_enabled_for_run and performance_budget_available:
         manifest["performance"] = _run_performance_tracking(config=config, run_dir=run_dir, started_at=started_at)
-    elif config.performance.enabled and not portfolio_only:
+    elif performance_enabled_for_run:
         manifest["performance"] = {"status": "skipped", "reason": "runtime_budget_exhausted"}
+    elif config.performance.enabled and not portfolio_only:
+        manifest["performance"] = {"status": "skipped", "reason": "overlay_fast_path"}
 
     manifest["run_quality"] = _compute_run_quality(manifest=manifest)
     manifest["usefulness_rank"] = manifest["run_quality"]["usefulness_rank"]
@@ -3903,32 +3907,53 @@ def _fetch_overlay_market_snapshots(
     wave_count = max(1, (len(eligible_tickers) + max_workers - 1) // max_workers)
     batch_timeout = max(60.0, per_ticker_budget * wave_count + 30.0)
     timezone_name = _execution_checkpoint_timezone(config)
-    executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="overlay-snapshot")
-    future_by_ticker: dict[Future[IntradayMarketSnapshot], str] = {
-        executor.submit(
-            fetch_intraday_market_snapshot,
-            ticker,
-            interval="5m",
-            market_timezone=timezone_name,
-            checkpoint_id=checkpoint_label,
-        ): ticker
-        for ticker in eligible_tickers
-    }
-    done, pending = wait(future_by_ticker, timeout=batch_timeout)
+    deadline = perf_counter() + batch_timeout
+    work_queue: Queue[str] = Queue()
+    result_queue: Queue[tuple[str, IntradayMarketSnapshot | Exception]] = Queue()
+    for ticker in eligible_tickers:
+        work_queue.put(ticker)
+
+    def worker() -> None:
+        while perf_counter() < deadline:
+            try:
+                ticker = work_queue.get_nowait()
+            except Empty:
+                return
+            try:
+                result: IntradayMarketSnapshot | Exception = fetch_intraday_market_snapshot(
+                    ticker,
+                    interval="5m",
+                    market_timezone=timezone_name,
+                    checkpoint_id=checkpoint_label,
+                )
+            except Exception as exc:
+                result = exc
+            result_queue.put((ticker, result))
+
+    workers = [
+        Thread(target=worker, name=f"overlay-snapshot-{index + 1}", daemon=True)
+        for index in range(max_workers)
+    ]
+    for worker_thread in workers:
+        worker_thread.start()
+
     results: dict[str, IntradayMarketSnapshot | Exception] = {}
-    for future in done:
-        ticker = future_by_ticker[future]
+    while len(results) < len(eligible_tickers):
+        remaining = deadline - perf_counter()
+        if remaining <= 0:
+            break
         try:
-            results[ticker] = future.result()
-        except Exception as exc:
-            results[ticker] = exc
-    for future in pending:
-        ticker = future_by_ticker[future]
-        future.cancel()
+            ticker, result = result_queue.get(timeout=min(1.0, remaining))
+        except Empty:
+            continue
+        results[ticker] = result
+
+    for ticker in eligible_tickers:
+        if ticker in results:
+            continue
         results[ticker] = TimeoutError(
-            f"Intraday snapshot batch exceeded {batch_timeout:.0f}s; {ticker} was cancelled or still running."
+            f"Intraday snapshot batch exceeded {batch_timeout:.0f}s; {ticker} did not finish before the hard deadline."
         )
-    executor.shutdown(wait=False, cancel_futures=True)
     return results
 
 
