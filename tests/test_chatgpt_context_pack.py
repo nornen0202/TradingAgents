@@ -14,7 +14,14 @@ sys.modules[SPEC.name] = pack
 SPEC.loader.exec_module(pack)
 
 
-def _write_run(tmp_path: Path, *, run_id: str, run_mode: str, decision_ready: bool) -> Path:
+def _write_run(
+    tmp_path: Path,
+    *,
+    run_id: str,
+    run_mode: str,
+    decision_ready: bool,
+    conditional_strategy_ready: bool = False,
+) -> Path:
     run_dir = tmp_path / run_id
     run_dir.mkdir()
     manifest = {
@@ -30,7 +37,10 @@ def _write_run(tmp_path: Path, *, run_id: str, run_mode: str, decision_ready: bo
         json.dumps(
             {
                 "run_id": run_id,
-                "quality": {"decision_ready": decision_ready},
+                "quality": {
+                    "decision_ready": decision_ready,
+                    "conditional_strategy_ready": conditional_strategy_ready,
+                },
                 "strategy_table": [{"ticker": "NVDA", "strategy_ko": "보유 유지"}],
             }
         ),
@@ -65,6 +75,24 @@ def test_non_ready_overlay_selects_compact_outage_mode(tmp_path: Path):
     assert metadata["mode"] == "outage"
     assert metadata["decision_ready"] is False
     assert "REPORT_MODE: OUTAGE" in payload
+
+
+def test_current_but_limited_overlay_selects_conditional_mode(tmp_path: Path):
+    run_dir = _write_run(
+        tmp_path,
+        run_id="overlay-conditional",
+        run_mode="overlay_only",
+        decision_ready=False,
+        conditional_strategy_ready=True,
+    )
+    prompt = tmp_path / "prompt.md"
+    prompt.write_text("한국어 조건부 전략", encoding="utf-8")
+
+    payload, metadata = pack.build_context_pack(run_dir=run_dir, prompt_path=prompt)
+
+    assert metadata["mode"] == "conditional"
+    assert metadata["conditional_strategy_ready"] is True
+    assert "REPORT_MODE: CONDITIONAL" in payload
 
 
 def test_non_ready_full_run_selects_research_mode_and_execution_override_is_rejected(tmp_path: Path):
@@ -104,3 +132,40 @@ def test_public_bundle_file_can_build_payload_without_archive(tmp_path: Path):
     assert metadata["mode"] == "execution"
     assert metadata["decision_bundle_present"] is True
     assert "overlay-public-us" in payload
+
+
+def test_context_pack_keeps_all_holdings_and_only_five_new_candidates():
+    rows = [
+        {"ticker": "HELD1", "is_held": True, "strategy_ko": "보유 유지", "raw_codes": {"x": 1}},
+        {"ticker": "HELD2", "is_held": True, "strategy_ko": "보유 유지", "raw_codes": {"x": 2}},
+        *[
+            {
+                "ticker": f"NEW{index}",
+                "is_held": False,
+                "strategy_ko": "조건 충족 전 대기",
+                "raw_codes": {"x": index},
+            }
+            for index in range(1, 8)
+        ],
+    ]
+
+    compact = pack._compact_decision_bundle({"strategy_table": rows, "benchmark_context": {}})
+
+    assert [row["ticker"] for row in compact["strategy_table"]] == [
+        "HELD1",
+        "HELD2",
+        "NEW1",
+        "NEW2",
+        "NEW3",
+        "NEW4",
+        "NEW5",
+    ]
+    assert all("raw_codes" not in row for row in compact["strategy_table"])
+    assert compact["transmission_scope"] == {
+        "source_ticker_count": 9,
+        "transmitted_ticker_count": 7,
+        "held_ticker_count": 2,
+        "new_candidate_limit": 5,
+        "omitted_nonheld_ticker_count": 2,
+        "raw_codes_omitted": True,
+    }

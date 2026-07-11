@@ -11,7 +11,12 @@ from tradingagents.scheduled.decision_bundle import (
 from tradingagents.scheduled.site import _publish_latest_decision_bundles
 
 
-def _live_context(*, generated: bool = True, freshness: str = "LIVE_CHECKPOINT") -> dict:
+def _live_context(
+    *,
+    generated: bool = True,
+    freshness: str = "LIVE_CHECKPOINT",
+    eligibility: str | None = None,
+) -> dict:
     return {
         "artifact_type": "chatgpt_execution_context",
         "market": "US",
@@ -36,7 +41,8 @@ def _live_context(*, generated: bool = True, freshness: str = "LIVE_CHECKPOINT")
                 "spread_bps": 1.2,
                 "generated_in_current_run": generated,
                 "freshness_class": freshness,
-                "execution_eligibility": "LIVE_EXECUTION_READY" if generated else "HISTORICAL_REFERENCE_ONLY",
+                "execution_eligibility": eligibility
+                or ("LIVE_EXECUTION_READY" if generated else "HISTORICAL_REFERENCE_ONLY"),
                 "microstructure_source_run_id": "overlay-us-live",
                 "asof_execution_gate": {
                     "core_fields_present": True,
@@ -81,6 +87,7 @@ def test_builds_korean_action_first_strategy_table():
 
     row = bundle["strategy_table"][0]
     assert bundle["quality"]["decision_ready"] is True
+    assert bundle["quality"]["conditional_strategy_ready"] is True
     assert row["strategy_code"] == "BUY_NOW"
     assert row["strategy_ko"] == "지금 분할매수 검토"
     assert row["vwap_position_ko"].startswith("VWAP 위")
@@ -109,6 +116,35 @@ def test_stale_context_is_never_promoted_to_actionable_strategy():
     assert bundle["quality"]["decision_ready"] is False
     assert bundle["strategy_table"][0]["strategy_code"] == "DATA_CHECK"
     assert "과거 데이터" in bundle["strategy_table"][0]["data_status_ko"]
+
+
+def test_delayed_current_session_data_produces_conditional_strategy_not_data_check():
+    context = _live_context(
+        freshness="DELAYED_CHECKPOINT",
+        eligibility="DELAYED_ANALYSIS_ONLY",
+    )
+    context["tickers"][0]["decision_state"] = "DEGRADED"
+    context["tickers"][0]["decision_now"] = "STARTER_NOW"
+    bundle = build_decision_bundle(
+        run_id="overlay-us-conditional",
+        market="US",
+        generated_at="2026-07-10T12:01:00-04:00",
+        analysis_source_run_id="daily-us",
+        ticker_summaries=[{"ticker": "NVDA", "status": "success"}],
+        execution_context=context,
+        portfolio_candidates=[{"canonical_ticker": "NVDA", "is_held": False}],
+        portfolio_actions=[{"canonical_ticker": "NVDA", "action_now": "STARTER_NOW"}],
+        benchmark_loader=lambda _symbols: {},
+    )
+
+    row = bundle["strategy_table"][0]
+    assert bundle["quality"]["decision_ready"] is False
+    assert bundle["quality"]["conditional_strategy_ready"] is True
+    assert bundle["quality"]["conditional_row_ratio"] == 1.0
+    assert row["strategy_ko"] == "조건 확인 후 분할매수 검토"
+    assert row["quality"]["execution_ready"] is False
+    assert row["quality"]["conditional_strategy_ready"] is True
+    assert row["data_status_ko"] == "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인"
 
 
 def test_latest_pointer_ignores_newer_non_ready_run(tmp_path: Path):
@@ -199,3 +235,26 @@ def test_candidate_invalidation_condition_is_shown_in_korean_strategy_table():
     )
 
     assert bundle["strategy_table"][0]["risk_condition_ko"] == "199달러 종가 하회"
+
+
+def test_hold_action_does_not_create_contradictory_risk_wording():
+    bundle = build_decision_bundle(
+        run_id="overlay-us-risk-hold",
+        market="US",
+        generated_at="2026-07-10T12:01:00-04:00",
+        analysis_source_run_id="daily-us",
+        ticker_summaries=[{"ticker": "NVDA", "status": "success"}],
+        execution_context=_live_context(),
+        portfolio_candidates=[{"canonical_ticker": "NVDA", "is_held": True}],
+        portfolio_actions=[
+            {
+                "canonical_ticker": "NVDA",
+                "action_now": "HOLD",
+                "risk_action": "HOLD",
+                "risk_action_level": {"price": 199},
+            }
+        ],
+        benchmark_loader=lambda _symbols: {},
+    )
+
+    assert bundle["strategy_table"][0]["risk_condition_ko"] == "199 이탈 시 전략 재평가"

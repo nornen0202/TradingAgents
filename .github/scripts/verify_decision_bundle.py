@@ -38,7 +38,9 @@ def validate_bundle(bundle: dict[str, Any]) -> list[str]:
         return [*errors, "strategy_table must contain at least one row"]
     quality = bundle.get("quality") if isinstance(bundle.get("quality"), dict) else {}
     decision_ready = quality.get("decision_ready") is True
+    conditional_strategy_ready = quality.get("conditional_strategy_ready") is True
     ready_rows = 0
+    conditional_rows = 0
     for index, row in enumerate(rows):
         if not isinstance(row, dict):
             errors.append(f"strategy_table[{index}] is not an object")
@@ -47,17 +49,34 @@ def validate_bundle(bundle: dict[str, Any]) -> list[str]:
             if row.get(field) in (None, ""):
                 errors.append(f"strategy_table[{index}] missing {field}")
         row_ready = bool((row.get("quality") or {}).get("execution_ready"))
+        row_conditional = bool((row.get("quality") or {}).get("conditional_strategy_ready"))
         if row_ready:
             ready_rows += 1
+        if row_conditional:
+            conditional_rows += 1
+        if row_ready or row_conditional:
             for field in REQUIRED_LIVE_FIELDS:
                 if row.get(field) in (None, ""):
-                    errors.append(f"live strategy row {row.get('ticker')} missing {field}")
+                    errors.append(f"current-session strategy row {row.get('ticker')} missing {field}")
     actual_ratio = ready_rows / len(rows)
     declared_ratio = float(quality.get("fresh_row_ratio") or 0.0)
     if abs(actual_ratio - declared_ratio) > 0.001:
         errors.append(f"fresh_row_ratio mismatch: declared={declared_ratio:.4f}, actual={actual_ratio:.4f}")
     if decision_ready and actual_ratio < float(quality.get("minimum_fresh_row_ratio") or 0.8):
         errors.append("decision_ready=true but fresh row ratio is below the minimum")
+    actual_conditional_ratio = conditional_rows / len(rows)
+    declared_conditional_ratio = float(quality.get("conditional_row_ratio") or 0.0)
+    if abs(actual_conditional_ratio - declared_conditional_ratio) > 0.001:
+        errors.append(
+            "conditional_row_ratio mismatch: "
+            f"declared={declared_conditional_ratio:.4f}, actual={actual_conditional_ratio:.4f}"
+        )
+    if conditional_strategy_ready and actual_conditional_ratio < float(
+        quality.get("minimum_fresh_row_ratio") or 0.8
+    ):
+        errors.append("conditional_strategy_ready=true but conditional row ratio is below the minimum")
+    if decision_ready and not conditional_strategy_ready:
+        errors.append("decision_ready=true requires conditional_strategy_ready=true")
     return errors
 
 
@@ -71,6 +90,9 @@ def verify_run_dir(run_dir: Path, *, require_ready: bool = False) -> dict[str, A
     return {
         "run_id": bundle.get("run_id") or run_dir.name,
         "decision_ready": decision_ready,
+        "conditional_strategy_ready": bool(
+            (bundle.get("quality") or {}).get("conditional_strategy_ready")
+        ),
         "fresh_row_ratio": (bundle.get("quality") or {}).get("fresh_row_ratio"),
         "row_count": len(bundle.get("strategy_table") or []),
         "bundle_sha256": hashlib.sha256(bundle_path.read_bytes()).hexdigest(),
@@ -94,6 +116,7 @@ def verify_site(site_dir: Path, *, market: str) -> dict[str, Any]:
         "market": market.upper(),
         "latest_run_id": status.get("latest_run_id"),
         "latest_decision_ready": status.get("decision_ready") is True,
+        "latest_conditional_strategy_ready": status.get("conditional_strategy_ready") is True,
         "stable_source_run_id": source.get("decision_ready_run_id"),
         "errors": errors,
     }
@@ -125,7 +148,9 @@ def main() -> int:
         for error in result["errors"]:
             print(f"::error::{error}")
         return 1
-    if result.get("decision_ready") is False or result.get("latest_decision_ready") is False:
+    if result.get("conditional_strategy_ready") is True or result.get("latest_conditional_strategy_ready") is True:
+        print("::warning::Decision bundle supports conditional strategy only; recheck live order and market status before execution.")
+    elif result.get("decision_ready") is False or result.get("latest_decision_ready") is False:
         print("::warning::Decision bundle is valid but not ready for current-session investment decisions.")
     return 0
 

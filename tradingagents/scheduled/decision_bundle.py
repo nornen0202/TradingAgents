@@ -19,6 +19,7 @@ from tradingagents.presentation import (
 DECISION_BUNDLE_VERSION = 2
 DEFAULT_MIN_FRESH_ROW_RATIO = 0.80
 CURRENT_FRESHNESS = {"LIVE_CHECKPOINT", "CURRENT_SESSION", "CURRENT_RUN_FRESH", "FRESH"}
+CONDITIONAL_FRESHNESS = {*CURRENT_FRESHNESS, "DELAYED_CHECKPOINT"}
 CURRENT_ELIGIBILITY = {
     "LIVE_EXECUTION_READY",
     "ASOF_EXECUTION_READY",
@@ -27,6 +28,7 @@ CURRENT_ELIGIBILITY = {
     "ACTIONABLE_NOW",
     "PILOT_READY",
 }
+CONDITIONAL_ELIGIBILITY = {*CURRENT_ELIGIBILITY, "DELAYED_ANALYSIS_ONLY"}
 
 _STRATEGY_ORDER = {
     "SELL": 0,
@@ -106,8 +108,10 @@ def build_and_write_decision_bundle(
     return {
         "version": DECISION_BUNDLE_VERSION,
         "decision_ready": bundle["quality"]["decision_ready"],
+        "conditional_strategy_ready": bundle["quality"]["conditional_strategy_ready"],
         "quality_label_ko": bundle["quality"]["quality_label_ko"],
         "fresh_row_ratio": bundle["quality"]["fresh_row_ratio"],
+        "conditional_row_ratio": bundle["quality"]["conditional_row_ratio"],
         "strategy_counts": bundle["summary"]["strategy_counts"],
         "top_strategy_rows": select_investor_strategy_rows(bundle["strategy_table"]),
         "artifacts": {
@@ -231,6 +235,7 @@ def render_strategy_table_markdown(bundle: dict[str, Any]) -> str:
         f"- 실행 기준 run: `{bundle.get('execution_source_run_id') or '-'}`",
         f"- 데이터 상태: **{quality.get('quality_label_ko') or '판단 자료 부족'}**",
         f"- 현재 세션 핵심 데이터 충족률: **{float(quality.get('fresh_row_ratio') or 0) * 100:.1f}%**",
+        f"- 조건부 전략 가능 비율: **{float(quality.get('conditional_row_ratio') or 0) * 100:.1f}%**",
         "",
         "| 우선 | 종목 | 보유 | 현재 전략 | 현재가 / 기준시각 | VWAP 대비 | 상대 거래량 | 거래대금 | 섹터·지수 동조 | 실행 조건 | 위험·무효화 | 데이터 상태 |",
         "|---:|---|---|---|---|---|---:|---:|---|---|---|---|",
@@ -285,8 +290,21 @@ def _build_strategy_row(
     eligibility = str(context.get("execution_eligibility") or "").upper()
     core_ready = bool(gate.get("core_fields_present")) and generated_current and freshness in CURRENT_FRESHNESS
     execution_ready = core_ready and eligibility in CURRENT_ELIGIBILITY
+    conditional_ready = (
+        bool(gate.get("core_fields_present"))
+        and generated_current
+        and freshness in CONDITIONAL_FRESHNESS
+        and eligibility in CONDITIONAL_ELIGIBILITY
+    )
     is_held = bool(candidate.get("is_held"))
-    strategy_code = _strategy_code(context=context, candidate=candidate, action=action, is_held=is_held, execution_ready=execution_ready)
+    strategy_code = _strategy_code(
+        context=context,
+        candidate=candidate,
+        action=action,
+        is_held=is_held,
+        execution_ready=execution_ready,
+        conditional_ready=conditional_ready,
+    )
     last_price = _float_or_none(context.get("last_price"))
     session_vwap = _float_or_none(context.get("session_vwap"))
     vwap_distance_pct = (
@@ -301,7 +319,11 @@ def _build_strategy_row(
     sector_sync = _sync_payload(stock_change_pct, benchmark_context.get(sector_symbol) if sector_symbol else None, sector_symbol)
     index_sync = _sync_payload(stock_change_pct, benchmark_context.get(index_symbol), index_symbol)
     reason_codes = [str(item) for item in (context.get("reason_codes") or []) if str(item).strip()]
-    data_status = _data_status_ko(context=context, execution_ready=execution_ready)
+    data_status = _data_status_ko(
+        context=context,
+        execution_ready=execution_ready,
+        conditional_ready=conditional_ready,
+    )
     return {
         "table_priority": 0,
         "portfolio_priority": action.get("priority"),
@@ -346,6 +368,7 @@ def _build_strategy_row(
             "execution_eligibility": context.get("execution_eligibility"),
             "core_fields_present": bool(gate.get("core_fields_present")),
             "execution_ready": execution_ready,
+            "conditional_strategy_ready": conditional_ready,
         },
     }
 
@@ -357,6 +380,7 @@ def _strategy_code(
     action: dict[str, Any],
     is_held: bool,
     execution_ready: bool,
+    conditional_ready: bool,
 ) -> str:
     action_now = str(action.get("action_now") or candidate.get("suggested_action_now") or "").upper()
     risk_action = str(action.get("risk_action") or candidate.get("risk_action") or "").upper()
@@ -371,11 +395,23 @@ def _strategy_code(
         return "SELL" if is_held else "AVOID"
     if timing == "SUPPORT_FAIL" or decision_state == "INVALIDATED":
         return "REDUCE" if is_held else "AVOID"
-    if not execution_ready:
+    triggered_action = str(action.get("action_if_triggered") or candidate.get("suggested_action_if_triggered") or context.get("decision_if_triggered") or "").upper()
+    if not execution_ready and not conditional_ready:
         return "DATA_CHECK"
+    if not execution_ready:
+        if decision_state == "TRIGGERED_PENDING_CLOSE":
+            return "WAIT_CLOSE"
+        if action_now in {"ADD_NOW", "STARTER_NOW"} or decision_now in {"ADD_NOW", "STARTER_NOW"}:
+            return "BUY_ON_CONFIRMATION"
+        if triggered_action in {"ADD", "STARTER", "ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}:
+            return "BUY_ON_CONFIRMATION"
+        if is_held:
+            return "HOLD"
+        if action_now == "AVOID" or risk_action in {"REDUCE_RISK", "STOP_LOSS", "EXIT"}:
+            return "AVOID"
+        return "WAIT"
     if action_now in {"ADD_NOW", "STARTER_NOW"} or decision_now in {"ADD_NOW", "STARTER_NOW"}:
         return "BUY_NOW"
-    triggered_action = str(action.get("action_if_triggered") or candidate.get("suggested_action_if_triggered") or context.get("decision_if_triggered") or "").upper()
     if decision_state == "TRIGGERED_PENDING_CLOSE":
         return "WAIT_CLOSE"
     if triggered_action in {"ADD", "STARTER", "ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"} and decision_state in {"ARMED", "WAIT"}:
@@ -390,10 +426,17 @@ def _strategy_code(
 def _build_quality(*, rows: list[dict[str, Any]], context: dict[str, Any], min_fresh_row_ratio: float) -> dict[str, Any]:
     total = len(rows)
     ready_rows = sum(bool((row.get("quality") or {}).get("execution_ready")) for row in rows)
+    conditional_rows = sum(bool((row.get("quality") or {}).get("conditional_strategy_ready")) for row in rows)
     fresh_ratio = ready_rows / total if total else 0.0
+    conditional_ratio = conditional_rows / total if total else 0.0
     decision_ready = bool(total and context and fresh_ratio >= float(min_fresh_row_ratio))
+    conditional_strategy_ready = bool(
+        total and context and conditional_ratio >= float(min_fresh_row_ratio)
+    )
     if decision_ready:
         label = "장중 투자 판단 가능"
+    elif conditional_strategy_ready:
+        label = "장중 조건부 전략 가능, 주문 전 재확인"
     elif context:
         label = "일부 또는 지연 데이터, 확인 후 판단"
     else:
@@ -402,10 +445,13 @@ def _build_quality(*, rows: list[dict[str, Any]], context: dict[str, Any], min_f
     missing_sector_sync = sum((row.get("sector_sync") or {}).get("status_code") in {"NO_BENCHMARK", "NO_STOCK_CHANGE"} for row in rows)
     return {
         "decision_ready": decision_ready,
+        "conditional_strategy_ready": conditional_strategy_ready,
         "quality_label_ko": label,
         "minimum_fresh_row_ratio": float(min_fresh_row_ratio),
         "fresh_row_ratio": round(fresh_ratio, 4),
+        "conditional_row_ratio": round(conditional_ratio, 4),
         "ready_rows": ready_rows,
+        "conditional_rows": conditional_rows,
         "total_rows": total,
         "missing_spread_rows": missing_spread,
         "missing_sector_sync_rows": missing_sector_sync,
@@ -436,7 +482,24 @@ def _risk_condition(*, context: dict[str, Any], candidate: dict[str, Any], actio
     if isinstance(risk_level, dict):
         level = risk_level.get("price") or risk_level.get("level") or risk_level.get("value")
         if level not in (None, ""):
-            return f"{_fmt_number(level)} 이탈 시 {present_account_action(risk_action or 'REDUCE_RISK')}"
+            explicit_risk_actions = {
+                "REDUCE_NOW",
+                "TAKE_PROFIT_NOW",
+                "STOP_LOSS_NOW",
+                "TRIM_NOW",
+                "EXIT_NOW",
+                "TRIM_TO_FUND",
+                "REDUCE_RISK",
+                "TAKE_PROFIT",
+                "STOP_LOSS",
+                "EXIT",
+            }
+            response = (
+                present_account_action(risk_action)
+                if risk_action in explicit_risk_actions
+                else "전략 재평가"
+            )
+            return f"{_fmt_number(level)} 이탈 시 {response}"
     timing = str(context.get("execution_timing_state") or "").upper()
     if timing == "SUPPORT_FAIL":
         return "지지선 이탈 상태, 비중 축소 우선 검토"
@@ -445,9 +508,11 @@ def _risk_condition(*, context: dict[str, Any], candidate: dict[str, Any], actio
     return "현재 명시된 위험 행동 없음"
 
 
-def _data_status_ko(*, context: dict[str, Any], execution_ready: bool) -> str:
+def _data_status_ko(*, context: dict[str, Any], execution_ready: bool, conditional_ready: bool) -> str:
     if execution_ready:
         return "현재 세션 데이터 사용 가능"
+    if conditional_ready:
+        return "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인"
     if not context:
         return "장중 데이터 없음"
     if context.get("generated_in_current_run") is False:
