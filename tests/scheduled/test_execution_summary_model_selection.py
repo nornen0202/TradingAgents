@@ -54,7 +54,7 @@ def test_execution_summary_model_selection_uses_quick_for_actionable_updates(tmp
         update=_update(state="ACTIONABLE_NOW", now="STARTER_NOW"),
     )
 
-    assert model == "gpt-5.4-mini"
+    assert model == "gpt-5.6-terra"
 
 
 def test_execution_summary_model_selection_uses_deep_for_degraded_or_stale_updates(tmp_path: Path):
@@ -65,7 +65,7 @@ def test_execution_summary_model_selection_uses_deep_for_degraded_or_stale_updat
         update=_update(state="DEGRADED", data_health="STALE"),
     )
 
-    assert model == "gpt-5.5"
+    assert model == "gpt-5.6-sol"
 
 
 def test_execution_summary_model_selection_honors_explicit_override(tmp_path: Path):

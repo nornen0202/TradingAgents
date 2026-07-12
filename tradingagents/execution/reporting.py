@@ -5,6 +5,7 @@ from typing import Iterable
 from typing import Any
 
 from tradingagents.llm_clients.factory import create_llm_client
+from tradingagents.llm_clients.role_config import codex_client_kwargs
 from tradingagents.schemas import ExecutionContract, ExecutionUpdate
 
 
@@ -81,20 +82,7 @@ def _generate_llm_summary(
     try:
         kwargs: dict[str, Any] = {}
         if provider == "codex":
-            kwargs = {
-                "codex_binary": getattr(llm_settings, "codex_binary", None),
-                "codex_reasoning_effort": getattr(llm_settings, "codex_reasoning_effort", "medium"),
-                "codex_summary": getattr(llm_settings, "codex_summary", "none"),
-                "codex_personality": getattr(llm_settings, "codex_personality", "none"),
-                "codex_workspace_dir": getattr(llm_settings, "codex_workspace_dir", None),
-                "codex_request_timeout": getattr(llm_settings, "codex_request_timeout", 120.0),
-                "codex_max_retries": getattr(llm_settings, "codex_max_retries", 2),
-                "codex_cleanup_threads": getattr(llm_settings, "codex_cleanup_threads", True),
-                "codex_preflight_mode": getattr(llm_settings, "codex_preflight_mode", "per_client"),
-                "codex_fallback_on_app_server_error": getattr(
-                    llm_settings, "codex_fallback_on_app_server_error", False
-                ),
-            }
+            kwargs = codex_client_kwargs(llm_settings, role="execution_summary")
         llm = create_llm_client(provider=provider, model=model, **kwargs).get_llm()
         payload = {
             "contract": contract.to_dict(),

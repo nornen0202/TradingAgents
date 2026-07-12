@@ -311,6 +311,7 @@ class CodexProviderTests(unittest.TestCase):
             "gpt-5.5",
             codex_binary="C:/fake/codex",
             codex_workspace_dir="C:/tmp/codex-workspace",
+            model_role="deep",
             session_factory=lambda **kwargs: session,
             preflight_runner=lambda **kwargs: None,
         ).get_llm()
@@ -325,6 +326,8 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(usage["output_tokens"], 7)
         self.assertEqual(usage["total_tokens"], 18)
         self.assertEqual(usage["by_model"]["gpt-5.5"]["calls"], 1)
+        self.assertEqual(usage["by_role"]["deep"]["calls"], 1)
+        self.assertEqual(usage["events"][0]["role"], "deep")
 
     def test_plain_response_captures_usage_metadata_from_response_event(self):
         reset_llm_usage()
@@ -384,7 +387,15 @@ class CodexProviderTests(unittest.TestCase):
                             "total_tokens": 120,
                         }
                     },
-                    "events": [{"provider": "codex", "model": "gpt-5.5", "input_tokens": 100, "output_tokens": 20, "total_tokens": 120}],
+                    "by_role": {
+                        "deep": {
+                            "calls": 1,
+                            "input_tokens": 100,
+                            "output_tokens": 20,
+                            "total_tokens": 120,
+                        }
+                    },
+                    "events": [{"provider": "codex", "model": "gpt-5.5", "role": "deep", "input_tokens": 100, "output_tokens": 20, "total_tokens": 120}],
                 },
                 {
                     "available": True,
@@ -400,9 +411,17 @@ class CodexProviderTests(unittest.TestCase):
                             "total_tokens": 40,
                         }
                     },
+                    "by_role": {
+                        "writer": {
+                            "calls": 2,
+                            "input_tokens": 30,
+                            "output_tokens": 10,
+                            "total_tokens": 40,
+                        }
+                    },
                     "events": [
-                        {"provider": "codex", "model": "gpt-5.4-mini", "input_tokens": 10, "output_tokens": 4, "total_tokens": 14},
-                        {"provider": "codex", "model": "gpt-5.4-mini", "input_tokens": 20, "output_tokens": 6, "total_tokens": 26},
+                        {"provider": "codex", "model": "gpt-5.4-mini", "role": "writer", "input_tokens": 10, "output_tokens": 4, "total_tokens": 14},
+                        {"provider": "codex", "model": "gpt-5.4-mini", "role": "writer", "input_tokens": 20, "output_tokens": 6, "total_tokens": 26},
                     ],
                 },
             ]
@@ -415,6 +434,8 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(aggregated["total_tokens"], 160)
         self.assertEqual(aggregated["by_model"]["gpt-5.5"]["calls"], 1)
         self.assertEqual(aggregated["by_model"]["gpt-5.4-mini"]["calls"], 2)
+        self.assertEqual(aggregated["by_role"]["deep"]["calls"], 1)
+        self.assertEqual(aggregated["by_role"]["writer"]["calls"], 2)
         self.assertEqual(len(aggregated["events"]), 3)
 
     def test_invoke_accepts_openai_style_message_dicts(self):

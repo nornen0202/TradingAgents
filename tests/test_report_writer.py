@@ -25,10 +25,12 @@ class _FakeLLM:
 def _llm_settings():
     return SimpleNamespace(
         provider="codex",
+        writer_model="gpt-5.6-luna",
         output_model="gpt-5.5",
         deep_model="gpt-5.5",
         quick_model="gpt-5.5",
         codex_reasoning_effort="medium",
+        codex_writer_reasoning_effort="low",
         codex_summary="none",
         codex_personality="none",
         codex_request_timeout=30.0,
@@ -67,18 +69,20 @@ def _structured_decision():
 
 
 class ReportWriterTests(unittest.TestCase):
-    def test_writer_prefers_quick_model_for_low_risk_polishing(self):
+    def test_writer_prefers_dedicated_luna_model_for_low_risk_polishing(self):
         settings = _llm_settings()
         settings.quick_model = "gpt-5.4-mini"
-        self.assertEqual(_select_writer_model(settings), "gpt-5.4-mini")
+        self.assertEqual(_select_writer_model(settings), "gpt-5.6-luna")
 
         with patch("tradingagents.report_writer.create_llm_client") as create_client:
             create_client.return_value.get_llm.return_value = object()
 
             _create_writer_llm(settings)
 
-        self.assertEqual(create_client.call_args.kwargs["model"], "gpt-5.4-mini")
+        self.assertEqual(create_client.call_args.kwargs["model"], "gpt-5.6-luna")
         self.assertEqual(create_client.call_args.kwargs["provider"], "codex")
+        self.assertEqual(create_client.call_args.kwargs["codex_reasoning_effort"], "low")
+        self.assertEqual(create_client.call_args.kwargs["model_role"], "writer")
 
     def test_ticker_writer_adds_summary_without_mutating_decision(self):
         final_state = {

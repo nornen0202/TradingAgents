@@ -32,7 +32,7 @@ from .codex_schema import (
 from .usage import record_llm_usage
 
 
-CODEX_MODEL_FALLBACKS = (
+CODEX_QUALITY_FALLBACKS = (
     "gpt-5.5",
     "gpt-5.4",
     "gpt-5.3-codex",
@@ -41,6 +41,14 @@ CODEX_MODEL_FALLBACKS = (
     "gpt-5.2",
     "gpt-5.4-mini",
 )
+CODEX_EFFICIENCY_FALLBACKS = (
+    "gpt-5.4-mini",
+    "gpt-5.4",
+    "gpt-5.5",
+    "gpt-5.3-codex-spark",
+    "gpt-5.2",
+)
+_QUALITY_ROLES = {"deep", "judge", "unspecified"}
 _FALSE_MODEL_FALLBACK_VALUES = {"0", "false", "no", "off"}
 
 
@@ -65,6 +73,7 @@ class CodexChatModel(BaseChatModel):
     codex_cleanup_threads: bool = True
     codex_preflight_mode: str = "per_client"
     codex_fallback_on_app_server_error: bool = False
+    model_role: str = "unspecified"
     session_factory: Callable[..., CodexAppServerSession] | None = Field(
         default=None, exclude=True, repr=False
     )
@@ -89,6 +98,7 @@ class CodexChatModel(BaseChatModel):
             "model": self.model,
             "codex_binary": self.codex_binary,
             "codex_reasoning_effort": self.codex_reasoning_effort,
+            "model_role": self.model_role,
             "codex_summary": self.codex_summary,
             "codex_personality": self.codex_personality,
         }
@@ -108,7 +118,11 @@ class CodexChatModel(BaseChatModel):
             fallback_models = (
                 ()
                 if fallback_flag.strip().lower() in _FALSE_MODEL_FALLBACK_VALUES
-                else CODEX_MODEL_FALLBACKS
+                else (
+                    CODEX_QUALITY_FALLBACKS
+                    if self.model_role in _QUALITY_ROLES
+                    else CODEX_EFFICIENCY_FALLBACKS
+                )
             )
             result = runner(
                 codex_binary=self.codex_binary,
@@ -225,7 +239,12 @@ class CodexChatModel(BaseChatModel):
             try:
                 usage_metadata = self._extract_usage_metadata(result.notifications)
                 if usage_metadata:
-                    record_llm_usage(provider="codex", model=self.model, usage=usage_metadata)
+                    record_llm_usage(
+                        provider="codex",
+                        model=self.model,
+                        role=self.model_role,
+                        usage=usage_metadata,
+                    )
                 ai_message = (
                     self._parse_tool_response(
                         raw_response,

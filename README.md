@@ -112,9 +112,11 @@ docker compose --profile ollama run --rm tradingagents-ollama
 
 최신 `main` 기준 기본 모델 역할은 아래와 같습니다.
 
-- `quick_think_llm`: `gpt-5.4-mini`
-- `deep_think_llm`: `gpt-5.5`
-- `output_think_llm`: `gpt-5.5`
+- `quick_think_llm`: `gpt-5.6-terra`
+- `deep_think_llm`: `gpt-5.6-sol`
+- `output_think_llm`: `gpt-5.6-luna`
+
+스케줄 분석은 `writer_model=gpt-5.6-luna`, `judge_model=gpt-5.6-sol`을 추가로 분리합니다. 기본 reasoning effort는 quick/output/writer=`low`, deep/judge=`medium`입니다.
 
 예시:
 
@@ -124,9 +126,9 @@ from tradingagents.default_config import DEFAULT_CONFIG
 
 config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
-config["quick_think_llm"] = "gpt-5.4-mini"
-config["deep_think_llm"] = "gpt-5.5"
-config["output_think_llm"] = "gpt-5.5"
+config["quick_think_llm"] = "gpt-5.6-terra"
+config["deep_think_llm"] = "gpt-5.6-sol"
+config["output_think_llm"] = "gpt-5.6-luna"
 
 graph = TradingAgentsGraph(debug=True, config=config)
 final_state, decision = graph.propagate("NVDA", "2026-01-15")

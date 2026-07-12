@@ -1938,6 +1938,9 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
         "allow_large_model": config.translation.allow_large_model,
     }
     graph_config["codex_reasoning_effort"] = config.llm.codex_reasoning_effort
+    graph_config["codex_quick_reasoning_effort"] = config.llm.codex_quick_reasoning_effort
+    graph_config["codex_deep_reasoning_effort"] = config.llm.codex_deep_reasoning_effort
+    graph_config["codex_output_reasoning_effort"] = config.llm.codex_output_reasoning_effort
     graph_config["codex_summary"] = config.llm.codex_summary
     graph_config["codex_personality"] = config.llm.codex_personality
     graph_config["codex_request_timeout"] = config.llm.codex_request_timeout
@@ -2026,7 +2029,14 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "quick_model": config.llm.quick_model,
         "deep_model": config.llm.deep_model,
         "output_model": config.llm.output_model,
+        "writer_model": config.llm.writer_model,
+        "judge_model": config.llm.judge_model,
         "codex_reasoning_effort": config.llm.codex_reasoning_effort,
+        "codex_quick_reasoning_effort": config.llm.codex_quick_reasoning_effort,
+        "codex_deep_reasoning_effort": config.llm.codex_deep_reasoning_effort,
+        "codex_output_reasoning_effort": config.llm.codex_output_reasoning_effort,
+        "codex_writer_reasoning_effort": config.llm.codex_writer_reasoning_effort,
+        "codex_judge_reasoning_effort": config.llm.codex_judge_reasoning_effort,
         "codex_preflight_mode": config.llm.codex_preflight_mode,
         "codex_fallback_on_app_server_error": config.llm.codex_fallback_on_app_server_error,
         "output_language": config.run.output_language,

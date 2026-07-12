@@ -60,10 +60,18 @@ class RunSettings:
 @dataclass(frozen=True)
 class LLMSettings:
     provider: str = "codex"
-    deep_model: str = "gpt-5.5"
-    quick_model: str = "gpt-5.4-mini"
-    output_model: str = "gpt-5.5"
+    deep_model: str = "gpt-5.6-sol"
+    quick_model: str = "gpt-5.6-terra"
+    output_model: str = "gpt-5.6-luna"
+    writer_model: str = "gpt-5.6-luna"
+    judge_model: str = "gpt-5.6-sol"
     codex_reasoning_effort: str = "medium"
+    codex_quick_reasoning_effort: str = "low"
+    codex_deep_reasoning_effort: str = "medium"
+    codex_output_reasoning_effort: str = "low"
+    codex_writer_reasoning_effort: str = "low"
+    codex_judge_reasoning_effort: str = "medium"
+    codex_execution_summary_reasoning_effort: str = "low"
     codex_summary: str = "none"
     codex_personality: str = "none"
     codex_request_timeout: float = 600.0
@@ -373,6 +381,8 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     quick_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_QUICK_MODEL")) or codex_model_override
     deep_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_DEEP_MODEL")) or codex_model_override
     output_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_OUTPUT_MODEL")) or codex_model_override
+    writer_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_WRITER_MODEL")) or codex_model_override
+    judge_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_JUDGE_MODEL")) or codex_model_override
     execution_model_override = _optional_string(os.getenv("TRADINGAGENTS_EXECUTION_LLM_SUMMARY_MODEL")) or codex_model_override
     codex_workspace_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_WORKSPACE_DIR"))
 
@@ -413,10 +423,46 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         ),
         llm=LLMSettings(
             provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
-            deep_model=deep_model_override or str(llm_raw.get("deep_model", "gpt-5.5")).strip() or "gpt-5.5",
-            quick_model=quick_model_override or str(llm_raw.get("quick_model", "gpt-5.4-mini")).strip() or "gpt-5.4-mini",
-            output_model=output_model_override or str(llm_raw.get("output_model", "gpt-5.5")).strip() or "gpt-5.5",
+            deep_model=deep_model_override
+            or str(llm_raw.get("deep_model", "gpt-5.6-sol")).strip()
+            or "gpt-5.6-sol",
+            quick_model=quick_model_override
+            or str(llm_raw.get("quick_model", "gpt-5.6-terra")).strip()
+            or "gpt-5.6-terra",
+            output_model=output_model_override
+            or str(llm_raw.get("output_model", "gpt-5.6-luna")).strip()
+            or "gpt-5.6-luna",
+            writer_model=writer_model_override
+            or str(llm_raw.get("writer_model", "gpt-5.6-luna")).strip()
+            or "gpt-5.6-luna",
+            judge_model=judge_model_override
+            or str(llm_raw.get("judge_model", "gpt-5.6-sol")).strip()
+            or "gpt-5.6-sol",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
+            codex_quick_reasoning_effort=str(
+                llm_raw.get("codex_quick_reasoning_effort", "low")
+            ).strip()
+            or "low",
+            codex_deep_reasoning_effort=str(
+                llm_raw.get("codex_deep_reasoning_effort", "medium")
+            ).strip()
+            or "medium",
+            codex_output_reasoning_effort=str(
+                llm_raw.get("codex_output_reasoning_effort", "low")
+            ).strip()
+            or "low",
+            codex_writer_reasoning_effort=str(
+                llm_raw.get("codex_writer_reasoning_effort", "low")
+            ).strip()
+            or "low",
+            codex_judge_reasoning_effort=str(
+                llm_raw.get("codex_judge_reasoning_effort", "medium")
+            ).strip()
+            or "medium",
+            codex_execution_summary_reasoning_effort=str(
+                llm_raw.get("codex_execution_summary_reasoning_effort", "low")
+            ).strip()
+            or "low",
             codex_summary=str(llm_raw.get("codex_summary", "none")).strip() or "none",
             codex_personality=str(llm_raw.get("codex_personality", "none")).strip() or "none",
             codex_request_timeout=float(llm_raw.get("codex_request_timeout", 600.0)),
