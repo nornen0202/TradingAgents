@@ -14,7 +14,9 @@ def reset_llm_usage() -> None:
         _EVENTS.clear()
 
 
-def record_llm_usage(*, provider: str, model: str, usage: Mapping[str, Any]) -> None:
+def record_llm_usage(
+    *, provider: str, model: str, usage: Mapping[str, Any], role: str = "unspecified"
+) -> None:
     normalized = _normalize_usage(usage)
     if normalized is None:
         return
@@ -23,6 +25,7 @@ def record_llm_usage(*, provider: str, model: str, usage: Mapping[str, Any]) -> 
             {
                 "provider": str(provider or "unknown"),
                 "model": str(model or "unknown"),
+                "role": str(role or "unspecified"),
                 **normalized,
             }
         )
@@ -39,6 +42,7 @@ def aggregate_llm_usage(snapshots: Iterable[Mapping[str, Any] | None]) -> dict[s
     input_tokens = 0
     output_tokens = 0
     by_model: dict[str, dict[str, int]] = {}
+    by_role: dict[str, dict[str, int]] = {}
 
     for snapshot in snapshots:
         if not isinstance(snapshot, Mapping):
@@ -57,6 +61,17 @@ def aggregate_llm_usage(snapshots: Iterable[Mapping[str, Any] | None]) -> dict[s
             target["input_tokens"] += int(payload.get("input_tokens") or 0)
             target["output_tokens"] += int(payload.get("output_tokens") or 0)
             target["total_tokens"] += int(payload.get("total_tokens") or 0)
+        for role, payload in (snapshot.get("by_role") or {}).items():
+            if not isinstance(payload, Mapping):
+                continue
+            target = by_role.setdefault(
+                str(role),
+                {"calls": 0, "input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
+            )
+            target["calls"] += int(payload.get("calls") or 0)
+            target["input_tokens"] += int(payload.get("input_tokens") or 0)
+            target["output_tokens"] += int(payload.get("output_tokens") or 0)
+            target["total_tokens"] += int(payload.get("total_tokens") or 0)
         for event in snapshot.get("events") or ():
             if isinstance(event, Mapping):
                 events.append(dict(event))
@@ -69,6 +84,7 @@ def aggregate_llm_usage(snapshots: Iterable[Mapping[str, Any] | None]) -> dict[s
         "output_tokens": output_tokens,
         "total_tokens": total_tokens,
         "by_model": by_model,
+        "by_role": by_role,
         "events": events,
     }
 
@@ -78,6 +94,7 @@ def _summarize_events(events: tuple[Mapping[str, Any], ...]) -> dict[str, Any]:
     input_tokens = sum(int(event.get("input_tokens") or 0) for event in events)
     output_tokens = sum(int(event.get("output_tokens") or 0) for event in events)
     by_model: dict[str, dict[str, int]] = {}
+    by_role: dict[str, dict[str, int]] = {}
     for event in events:
         model = str(event.get("model") or "unknown")
         target = by_model.setdefault(
@@ -88,6 +105,15 @@ def _summarize_events(events: tuple[Mapping[str, Any], ...]) -> dict[str, Any]:
         target["input_tokens"] += int(event.get("input_tokens") or 0)
         target["output_tokens"] += int(event.get("output_tokens") or 0)
         target["total_tokens"] += int(event.get("total_tokens") or 0)
+        role = str(event.get("role") or "unspecified")
+        role_target = by_role.setdefault(
+            role,
+            {"calls": 0, "input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
+        )
+        role_target["calls"] += 1
+        role_target["input_tokens"] += int(event.get("input_tokens") or 0)
+        role_target["output_tokens"] += int(event.get("output_tokens") or 0)
+        role_target["total_tokens"] += int(event.get("total_tokens") or 0)
 
     return {
         "available": calls > 0,
@@ -96,6 +122,7 @@ def _summarize_events(events: tuple[Mapping[str, Any], ...]) -> dict[str, Any]:
         "output_tokens": output_tokens,
         "total_tokens": input_tokens + output_tokens,
         "by_model": by_model,
+        "by_role": by_role,
         "events": deepcopy(list(events)),
     }
 

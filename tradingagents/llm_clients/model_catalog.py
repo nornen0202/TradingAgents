@@ -11,11 +11,16 @@ ProviderModeOptions = Dict[str, Dict[str, List[ModelOption]]]
 MODEL_OPTIONS: ProviderModeOptions = {
     "openai": {
         "quick": [
+            ("GPT-5.6 Terra - Balanced intelligence and cost", "gpt-5.6-terra"),
+            ("GPT-5.6 Luna - Efficient high-volume model", "gpt-5.6-luna"),
+            ("GPT-5.6 Sol - Frontier capability", "gpt-5.6-sol"),
             ("GPT-5.5 - Latest frontier model", "gpt-5.5"),
             ("GPT-5.2 - Strong reasoning, cost-effective", "gpt-5.2"),
             ("GPT-4.1 - Smartest non-reasoning model", "gpt-4.1"),
         ],
         "deep": [
+            ("GPT-5.6 Sol - Frontier capability", "gpt-5.6-sol"),
+            ("GPT-5.6 Terra - Balanced intelligence and cost", "gpt-5.6-terra"),
             ("GPT-5.5 - Latest frontier model", "gpt-5.5"),
             ("GPT-5.2 - Strong reasoning, cost-effective", "gpt-5.2"),
             ("GPT-4.1 - Smartest non-reasoning model", "gpt-4.1"),
@@ -23,6 +28,9 @@ MODEL_OPTIONS: ProviderModeOptions = {
     },
     "codex": {
         "quick": [
+            ("GPT-5.6 Terra - Balanced Codex model", "gpt-5.6-terra"),
+            ("GPT-5.6 Luna - Efficient Codex model", "gpt-5.6-luna"),
+            ("GPT-5.6 Sol - Frontier Codex model", "gpt-5.6-sol"),
             ("GPT-5.5 - Frontier Codex model", "gpt-5.5"),
             ("GPT-5.4 Mini - Lightweight Codex model", "gpt-5.4-mini"),
             ("GPT-5.3 Codex - Coding-optimized fallback", "gpt-5.3-codex"),
@@ -30,6 +38,8 @@ MODEL_OPTIONS: ProviderModeOptions = {
             ("GPT-4.1 - Strong non-reasoning fallback", "gpt-4.1"),
         ],
         "deep": [
+            ("GPT-5.6 Sol - Frontier Codex model", "gpt-5.6-sol"),
+            ("GPT-5.6 Terra - Balanced Codex model", "gpt-5.6-terra"),
             ("GPT-5.5 - Frontier Codex model", "gpt-5.5"),
             ("GPT-5.3 Codex - Coding-optimized fallback", "gpt-5.3-codex"),
             ("GPT-5.2 - Strong Codex reasoning", "gpt-5.2"),

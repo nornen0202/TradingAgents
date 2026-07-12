@@ -10,9 +10,9 @@ DEFAULT_CONFIG = {
     ),
     # LLM settings
     "llm_provider": "openai",
-    "deep_think_llm": "gpt-5.5",
-    "quick_think_llm": "gpt-5.4-mini",
-    "output_think_llm": "gpt-5.5",
+    "deep_think_llm": "gpt-5.6-sol",
+    "quick_think_llm": "gpt-5.6-terra",
+    "output_think_llm": "gpt-5.6-luna",
     "backend_url": "https://api.openai.com/v1",
     # Provider-specific thinking configuration
     "google_thinking_level": None,      # "high", "minimal", etc.
@@ -20,6 +20,9 @@ DEFAULT_CONFIG = {
     "anthropic_effort": None,           # "high", "medium", "low"
     "codex_binary": os.getenv("CODEX_BINARY"),
     "codex_reasoning_effort": "medium",
+    "codex_quick_reasoning_effort": "low",
+    "codex_deep_reasoning_effort": "medium",
+    "codex_output_reasoning_effort": "low",
     "codex_summary": "none",
     "codex_personality": "none",
     "codex_workspace_dir": os.getenv(

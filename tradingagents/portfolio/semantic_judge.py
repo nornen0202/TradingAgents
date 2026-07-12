@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from tradingagents.llm_clients import create_llm_client
+from tradingagents.llm_clients.role_config import codex_client_kwargs
 
 from .account_models import PortfolioCandidate
 from .instrument_identity import resolve_identity
@@ -347,26 +348,17 @@ def _create_semantic_llm(llm_settings: Any | None) -> Any | None:
     if llm_settings is None:
         return None
     provider = str(getattr(llm_settings, "provider", "") or "").strip().lower()
-    model = str(getattr(llm_settings, "deep_model", "") or "").strip()
+    model = str(
+        getattr(llm_settings, "judge_model", "")
+        or getattr(llm_settings, "deep_model", "")
+        or ""
+    ).strip()
     if not provider or not model:
         return None
 
     kwargs: dict[str, Any] = {}
     if provider == "codex":
-        kwargs = {
-            "codex_binary": getattr(llm_settings, "codex_binary", None),
-            "codex_reasoning_effort": getattr(llm_settings, "codex_reasoning_effort", "medium"),
-            "codex_summary": getattr(llm_settings, "codex_summary", "none"),
-            "codex_personality": getattr(llm_settings, "codex_personality", "none"),
-            "codex_workspace_dir": getattr(llm_settings, "codex_workspace_dir", None),
-            "codex_request_timeout": getattr(llm_settings, "codex_request_timeout", 120.0),
-            "codex_max_retries": getattr(llm_settings, "codex_max_retries", 2),
-            "codex_cleanup_threads": getattr(llm_settings, "codex_cleanup_threads", True),
-            "codex_preflight_mode": getattr(llm_settings, "codex_preflight_mode", "per_client"),
-            "codex_fallback_on_app_server_error": getattr(
-                llm_settings, "codex_fallback_on_app_server_error", False
-            ),
-        }
+        kwargs = codex_client_kwargs(llm_settings, role="judge")
     return create_llm_client(provider=provider, model=model, **kwargs).get_llm()
 
 

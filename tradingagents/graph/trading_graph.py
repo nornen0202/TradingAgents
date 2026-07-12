@@ -11,6 +11,7 @@ from typing import Dict, Any, Tuple, List, Optional
 from langgraph.prebuilt import ToolNode
 
 from tradingagents.llm_clients import create_llm_client
+from tradingagents.llm_clients.role_config import codex_client_kwargs
 
 from tradingagents.agents import *
 from tradingagents.default_config import DEFAULT_CONFIG
@@ -81,17 +82,21 @@ class TradingAgentsGraph:
         )
 
         # Initialize LLMs with provider-specific thinking configuration
-        llm_kwargs = self._get_provider_kwargs()
+        deep_kwargs = self._get_provider_kwargs("deep")
+        quick_kwargs = self._get_provider_kwargs("quick")
+        output_kwargs = self._get_provider_kwargs("output")
 
         # Add callbacks to kwargs if provided (passed to LLM constructor)
         if self.callbacks:
-            llm_kwargs["callbacks"] = self.callbacks
+            deep_kwargs["callbacks"] = self.callbacks
+            quick_kwargs["callbacks"] = self.callbacks
+            output_kwargs["callbacks"] = self.callbacks
 
         deep_client = create_llm_client(
             provider=self.config["llm_provider"],
             model=self.config["deep_think_llm"],
             base_url=self.config.get("backend_url"),
-            **llm_kwargs,
+            **deep_kwargs,
         )
         output_model = (
             self.config.get("output_think_llm")
@@ -102,13 +107,13 @@ class TradingAgentsGraph:
             provider=self.config["llm_provider"],
             model=self.config["quick_think_llm"],
             base_url=self.config.get("backend_url"),
-            **llm_kwargs,
+            **quick_kwargs,
         )
         output_client = create_llm_client(
             provider=self.config["llm_provider"],
             model=output_model,
             base_url=self.config.get("backend_url"),
-            **llm_kwargs,
+            **output_kwargs,
         )
 
         self.deep_thinking_llm = deep_client.get_llm()
@@ -154,7 +159,7 @@ class TradingAgentsGraph:
         # Set up the graph
         self.graph = self.graph_setup.setup_graph(selected_analysts or ["market", "social", "news", "fundamentals"])
 
-    def _get_provider_kwargs(self) -> Dict[str, Any]:
+    def _get_provider_kwargs(self, role: str) -> Dict[str, Any]:
         """Get provider-specific kwargs for LLM client creation."""
         kwargs = {}
         provider = self.config.get("llm_provider", "").lower()
@@ -174,18 +179,7 @@ class TradingAgentsGraph:
             if effort:
                 kwargs["effort"] = effort
         elif provider == "codex":
-            kwargs["codex_binary"] = self.config.get("codex_binary")
-            kwargs["codex_reasoning_effort"] = self.config.get("codex_reasoning_effort")
-            kwargs["codex_summary"] = self.config.get("codex_summary")
-            kwargs["codex_personality"] = self.config.get("codex_personality")
-            kwargs["codex_workspace_dir"] = self.config.get("codex_workspace_dir")
-            kwargs["codex_request_timeout"] = self.config.get("codex_request_timeout")
-            kwargs["codex_max_retries"] = self.config.get("codex_max_retries")
-            kwargs["codex_cleanup_threads"] = self.config.get("codex_cleanup_threads")
-            kwargs["codex_preflight_mode"] = self.config.get("codex_preflight_mode")
-            kwargs["codex_fallback_on_app_server_error"] = self.config.get(
-                "codex_fallback_on_app_server_error"
-            )
+            kwargs.update(codex_client_kwargs(self.config, role=role))
 
         return kwargs
 

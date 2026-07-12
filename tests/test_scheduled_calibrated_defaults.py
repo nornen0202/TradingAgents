@@ -20,9 +20,16 @@ site_dir = "./site"
     config = load_scheduled_config(config_path)
     assert config.run.max_debate_rounds == 2
     assert config.run.max_risk_discuss_rounds == 2
-    assert config.llm.deep_model == "gpt-5.5"
-    assert config.llm.quick_model == "gpt-5.4-mini"
-    assert config.llm.output_model == "gpt-5.5"
+    assert config.llm.deep_model == "gpt-5.6-sol"
+    assert config.llm.quick_model == "gpt-5.6-terra"
+    assert config.llm.output_model == "gpt-5.6-luna"
+    assert config.llm.writer_model == "gpt-5.6-luna"
+    assert config.llm.judge_model == "gpt-5.6-sol"
+    assert config.llm.codex_quick_reasoning_effort == "low"
+    assert config.llm.codex_deep_reasoning_effort == "medium"
+    assert config.llm.codex_output_reasoning_effort == "low"
+    assert config.llm.codex_writer_reasoning_effort == "low"
+    assert config.llm.codex_judge_reasoning_effort == "medium"
     assert config.summary_image.enabled is True
     assert config.summary_image.mode == "deterministic_svg"
     assert config.summary_image.publish_to_site is True
@@ -129,6 +136,8 @@ site_dir = "./site"
     assert config.llm.quick_model == "gpt-5.4"
     assert config.llm.deep_model == "gpt-5.4"
     assert config.llm.output_model == "gpt-5.4"
+    assert config.llm.writer_model == "gpt-5.4"
+    assert config.llm.judge_model == "gpt-5.4"
     assert config.llm.codex_workspace_dir == str(codex_workspace)
     assert config.execution.execution_llm_summary_model == "gpt-5.4"
 
@@ -157,10 +166,14 @@ site_dir = "./site"
     monkeypatch.setenv("TRADINGAGENTS_CODEX_QUICK_MODEL", "gpt-5.4-mini")
     monkeypatch.setenv("TRADINGAGENTS_CODEX_DEEP_MODEL", "gpt-5.5")
     monkeypatch.setenv("TRADINGAGENTS_CODEX_OUTPUT_MODEL", "gpt-5.5")
+    monkeypatch.setenv("TRADINGAGENTS_CODEX_WRITER_MODEL", "gpt-5.4-mini")
+    monkeypatch.setenv("TRADINGAGENTS_CODEX_JUDGE_MODEL", "gpt-5.5")
 
     config = load_scheduled_config(config_path)
 
     assert config.llm.quick_model == "gpt-5.4-mini"
     assert config.llm.deep_model == "gpt-5.5"
     assert config.llm.output_model == "gpt-5.5"
+    assert config.llm.writer_model == "gpt-5.4-mini"
+    assert config.llm.judge_model == "gpt-5.5"
     assert config.execution.execution_llm_summary_model is None

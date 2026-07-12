@@ -62,3 +62,9 @@ class ModelValidationTests(unittest.TestCase):
             client.get_llm()
 
         self.assertEqual(caught, [])
+
+    def test_gpt_5_6_family_is_available_for_openai_and_codex(self):
+        for provider in ("openai", "codex"):
+            for model in ("gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"):
+                with self.subTest(provider=provider, model=model):
+                    self.assertTrue(validate_model(provider, model))

@@ -32,6 +32,7 @@ class CodexClient(BaseLLMClient):
             codex_cleanup_threads=self.kwargs.get("codex_cleanup_threads", True),
             codex_preflight_mode=self.kwargs.get("codex_preflight_mode", "per_client"),
             codex_fallback_on_app_server_error=self.kwargs.get("codex_fallback_on_app_server_error", False),
+            model_role=self.kwargs.get("model_role", "unspecified"),
             session_factory=self.kwargs.get("session_factory"),
             preflight_runner=self.kwargs.get("preflight_runner"),
             callbacks=self.kwargs.get("callbacks"),
