@@ -90,6 +90,7 @@ jobs:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
+      TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "1"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
@@ -369,32 +370,75 @@ jobs:
                   if not os.environ.get("CODEX_HOME", "").strip() and candidate.parent.name.lower() == ".sandbox-bin":
                       add_env("CODEX_HOME", str(candidate.parent.parent))
                   print(f"Resolved Codex binary: {candidate}")
+                  version = subprocess.run(
+                      [str(candidate), "--version"],
+                      capture_output=True,
+                      text=True,
+                      check=False,
+                  )
+                  print(f"Resolved Codex version: {(version.stdout or version.stderr).strip() or 'unknown'}")
                   raise SystemExit(0)
-          raise SystemExit("Could not find a usable Codex binary for gpt-5.5 verification.")
+          raise SystemExit("Could not find a usable Codex binary for GPT-5.6 role verification.")
 
       - name: Verify Codex login and model availability
         run: |
           import os
           from pathlib import Path
           from tradingagents.llm_clients.codex_app_server import CodexAppServerAuthError, CodexAppServerBinaryError, CodexModelUnavailableError
-          from tradingagents.llm_clients.codex_preflight import run_codex_preflight
+          from tradingagents.llm_clients.codex_preflight import codex_preflight_fallback_models, run_codex_preflight
 
           try:
-              result = run_codex_preflight(
+              judge_result = run_codex_preflight(
                   codex_binary=os.environ.get("CODEX_BINARY") or None,
-                  model="gpt-5.5",
+                  model="gpt-5.6-sol",
                   request_timeout=30.0,
                   workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
                   cleanup_threads=True,
-                  fallback_models=[],
+                  fallback_models=codex_preflight_fallback_models("judge"),
+              )
+              quick_result = run_codex_preflight(
+                  codex_binary=os.environ.get("CODEX_BINARY") or None,
+                  model="gpt-5.6-terra",
+                  request_timeout=30.0,
+                  workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
+                  cleanup_threads=True,
+                  fallback_models=codex_preflight_fallback_models("quick"),
+              )
+              writer_result = run_codex_preflight(
+                  codex_binary=os.environ.get("CODEX_BINARY") or None,
+                  model="gpt-5.6-luna",
+                  request_timeout=30.0,
+                  workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
+                  cleanup_threads=True,
+                  fallback_models=codex_preflight_fallback_models("writer"),
               )
           except CodexAppServerAuthError as exc:
               raise SystemExit(f"Codex login is required on the self-hosted runner: {exc}") from exc
           except CodexAppServerBinaryError as exc:
               raise SystemExit(f"Codex binary is not usable: {exc}") from exc
           except CodexModelUnavailableError as exc:
-              raise SystemExit(f"gpt-5.5 is not available for this Codex account: {exc}") from exc
-          print("Codex preflight passed:", result.account, result.resolved_model)
+              raise SystemExit(f"No configured GPT-5.6 role model or compatibility fallback is available: {exc}") from exc
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
+              handle.write("TRADINGAGENTS_CODEX_PREFLIGHT_OK=1\n")
+              handle.write(f"TRADINGAGENTS_YOUTUBE_DEEP_MODEL={judge_result.resolved_model}\n")
+              handle.write(f"TRADINGAGENTS_YOUTUBE_QUICK_MODEL={quick_result.resolved_model}\n")
+              handle.write(f"TRADINGAGENTS_YOUTUBE_OUTPUT_MODEL={writer_result.resolved_model}\n")
+
+          print("Codex account:", judge_result.account)
+          print("YouTube judge model:", judge_result.resolved_model)
+          print("YouTube extraction/research model:", quick_result.resolved_model)
+          print("YouTube writer model:", writer_result.resolved_model)
+          for role, result in (
+              ("judge", judge_result),
+              ("extraction/research", quick_result),
+              ("writer", writer_result),
+          ):
+              if result.fallback_used:
+                  print(
+                      f"::warning::Preferred YouTube {role} model {result.requested_model} is unavailable; "
+                      f"using compatibility model {result.resolved_model}."
+                  )
 
       - name: Rebuild base scheduled site
         run: |

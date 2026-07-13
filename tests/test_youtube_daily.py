@@ -32,7 +32,10 @@ from tradingagents.youtube.config import (
     load_youtube_config,
 )
 from tradingagents.youtube.research import collect_research_evidence, fallback_research_plan
-from tradingagents.youtube.runner import execute_youtube_run
+from tradingagents.youtube.runner import (
+    _archived_verification_is_current,
+    execute_youtube_run,
+)
 from tradingagents.youtube.site import build_youtube_site
 from tradingagents.youtube.verifier import (
     CONTRADICTED,
@@ -401,7 +404,7 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertEqual(verified.status, VERIFIED)
         self.assertIn("최종 투자자 리포트", verified.final_report_markdown)
         self.assertEqual(verified.verification["claims"]["entities"][0]["ticker"], "ORCL")
-        self.assertEqual(verified.verification["version"], 3)
+        self.assertEqual(verified.verification["version"], 4)
         self.assertEqual(verified.verification["claim_verification"]["claims"][0]["status"], "supported")
         self.assertEqual(verified.verification["evidence"]["evidence_count"], 1)
         self.assertEqual(len(llm.prompts), 4)
@@ -509,7 +512,7 @@ class YouTubeDailyTests(unittest.TestCase):
             site_index = site_dir / "youtube" / "index.html"
 
             self.assertEqual(manifest["summary"]["total_videos"], 3)
-            self.assertEqual(manifest["source_policy"]["research_pipeline_version"], 3)
+            self.assertEqual(manifest["source_policy"]["research_pipeline_version"], 4)
             self.assertEqual(manifest["max_entries_per_url"], 25)
             self.assertEqual(manifest["parallel_video_execution"]["max_parallel_videos"], 1)
             self.assertEqual(manifest["videos"][0]["channel"], "경제사냥꾼")
@@ -684,7 +687,7 @@ class YouTubeDailyTests(unittest.TestCase):
                 "metadata.json": "{}",
                 "draft_report.md": "# Draft\n",
                 "verification.json": json.dumps(
-                    {"version": 3, "status": VERIFIED, "evidence": {"evidence_count": 1}},
+                    {"version": 4, "status": VERIFIED, "evidence": {"evidence_count": 1}},
                     ensure_ascii=False,
                 ),
                 "research_plan.json": json.dumps({"version": 1, "claims": []}, ensure_ascii=False),
@@ -723,6 +726,10 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertEqual(manifest["summary"]["reused_videos"], 1)
             self.assertEqual(manifest["videos"][0]["reused_from_run"], "youtube_previous")
             self.assertIn("Reused final", next(archive_dir.glob("runs/*/youtube_*/videos/reuse000001/final_report.md")).read_text(encoding="utf-8"))
+
+    def test_runner_invalidates_archived_reports_from_pre_role_routing_pipeline(self):
+        self.assertFalse(_archived_verification_is_current({"version": 3, "evidence": {}}))
+        self.assertTrue(_archived_verification_is_current({"version": 4, "evidence": {}}))
 
     def test_site_builder_preserves_root_site_and_does_not_copy_raw_transcript(self):
         with tempfile.TemporaryDirectory() as tmp:
