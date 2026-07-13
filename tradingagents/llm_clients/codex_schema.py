@@ -71,33 +71,11 @@ def _tool_items_schema(tool_schemas: Sequence[dict[str, Any]]) -> dict[str, Any]
     if len(tool_schemas) == 1:
         return _tool_call_variant(tool_schemas[0])
 
-    tool_names = [
-        tool_schema.get("function", {}).get("name")
-        for tool_schema in tool_schemas
-        if tool_schema.get("function", {}).get("name")
-    ]
-    argument_properties: dict[str, Any] = {}
-    for tool_schema in tool_schemas:
-        parameters = tool_schema.get("function", {}).get("parameters") or {}
-        properties = parameters.get("properties") or {}
-        if not isinstance(properties, dict):
-            continue
-        for name, schema in properties.items():
-            if name not in argument_properties:
-                argument_properties[name] = schema
+    # Keep every argument payload inside the strict output schema. Encoding the
+    # payload as an arbitrary JSON string lets malformed suffixes pass the outer
+    # schema and fail only after the model response reaches the host parser.
     return {
-        "type": "object",
-        "properties": {
-            "name": {
-                "type": "string",
-                "enum": tool_names,
-            },
-            "arguments_json": {
-                "type": "string",
-            },
-        },
-        "required": ["name", "arguments_json"],
-        "additionalProperties": False,
+        "anyOf": [_tool_call_variant(tool_schema) for tool_schema in tool_schemas],
     }
 
 

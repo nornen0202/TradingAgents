@@ -303,11 +303,15 @@ class CodexProviderTests(unittest.TestCase):
             normalize_tools_for_codex([lookup_price, lookup_volume])
         )
         generic_items = generic_schema["properties"]["tool_calls"]["items"]
-        self.assertEqual(generic_items["properties"]["name"]["type"], "string")
-        self.assertIn("enum", generic_items["properties"]["name"])
-        self.assertEqual(
-            generic_items["properties"]["arguments_json"]["type"], "string"
-        )
+        self.assertEqual(len(generic_items["anyOf"]), 2)
+        branches_by_name = {
+            branch["properties"]["name"]["const"]: branch
+            for branch in generic_items["anyOf"]
+        }
+        self.assertEqual(set(branches_by_name), {"lookup_price", "lookup_volume"})
+        for branch in branches_by_name.values():
+            self.assertIn("arguments", branch["required"])
+            self.assertEqual(branch["properties"]["arguments"]["type"], "object")
 
     def test_plain_final_response_parsing(self):
         session = FakeCodexSession(
@@ -581,10 +585,10 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(result.tool_calls[0]["args"], {"ticker": "NVDA"})
         self.assertRegex(result.tool_calls[0]["id"], r"^call_[0-9a-f]{32}$")
 
-    def test_multi_tool_response_parses_arguments_json(self):
+    def test_multi_tool_response_uses_schema_validated_argument_objects(self):
         session = FakeCodexSession(
             responses=[
-                '{"mode":"tool_calls","content":"","tool_calls":[{"name":"lookup_price","arguments_json":"{\\"ticker\\":\\"NVDA\\"}"}]}'
+                '{"mode":"tool_calls","content":"","tool_calls":[{"name":"lookup_price","arguments":{"ticker":"NVDA"}}]}'
             ],
         )
         llm = create_llm_client(
@@ -600,6 +604,10 @@ class CodexProviderTests(unittest.TestCase):
 
         self.assertEqual(result.tool_calls[0]["name"], "lookup_price")
         self.assertEqual(result.tool_calls[0]["args"], {"ticker": "NVDA"})
+        invocation = session.invocations[0]
+        tool_items = invocation["output_schema"]["properties"]["tool_calls"]["items"]
+        self.assertIn("anyOf", tool_items)
+        self.assertNotIn("arguments_json", invocation["prompt"])
 
     def test_final_response_ignores_stray_tool_calls_when_content_is_present(self):
         session = FakeCodexSession(
