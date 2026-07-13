@@ -37,7 +37,6 @@ def format_messages_for_codex(
     tool_names: Iterable[str] = (),
     tool_schemas: Sequence[Mapping[str, Any]] = (),
     tool_choice: str | None = None,
-    tool_arguments_as_json_string: bool = False,
     retry_message: str | None = None,
 ) -> str:
     """Render a chat transcript into a single text prompt for Codex."""
@@ -63,10 +62,6 @@ def format_messages_for_codex(
         lines.append(f"You must call the tool named `{tool_choice}` for this turn.")
     elif tool_choice == "auto":
         lines.append("Use tool calls only if they are necessary to answer correctly.")
-    if tool_arguments_as_json_string:
-        lines.append(
-            "When returning tool calls, encode each tool argument object as a JSON string in `arguments_json`."
-        )
     schema_lines = _format_tool_schema_lines(tool_schemas)
     if schema_lines:
         lines.append("Tool argument requirements:")

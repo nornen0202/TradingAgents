@@ -170,7 +170,6 @@ class CodexChatModel(BaseChatModel):
         tools = tool_binding["tools"]
         effective_tool_choice = tool_binding["tool_choice"]
         output_schema = tool_binding["output_schema"]
-        tool_arguments_as_json_string = tool_binding["tool_arguments_as_json_string"]
 
         raw_response: str | None = None
         last_error: Exception | None = None
@@ -199,7 +198,6 @@ class CodexChatModel(BaseChatModel):
                 tool_names=[tool["function"]["name"] for tool in tools],
                 tool_schemas=tools,
                 tool_choice=effective_tool_choice,
-                tool_arguments_as_json_string=tool_arguments_as_json_string,
                 retry_message=retry_message,
             )
             try:
@@ -249,7 +247,6 @@ class CodexChatModel(BaseChatModel):
                     self._parse_tool_response(
                         raw_response,
                         tools,
-                        tool_arguments_as_json_string=tool_arguments_as_json_string,
                     )
                     if tools
                     else self._parse_plain_response(raw_response)
@@ -302,8 +299,6 @@ class CodexChatModel(BaseChatModel):
         self,
         raw_response: str,
         tools: Sequence[dict[str, Any]],
-        *,
-        tool_arguments_as_json_string: bool,
     ) -> AIMessage:
         payload = json.loads(strip_json_fence(raw_response))
         if not isinstance(payload, dict):
@@ -339,10 +334,7 @@ class CodexChatModel(BaseChatModel):
             if not isinstance(item, dict):
                 raise CodexStructuredOutputError(f"Tool call entries must be objects, got: {item!r}")
             name = item.get("name")
-            arguments = self._extract_tool_arguments(
-                item,
-                tool_arguments_as_json_string=tool_arguments_as_json_string,
-            )
+            arguments = self._extract_tool_arguments(item)
             if not isinstance(name, str) or not isinstance(arguments, dict):
                 raise CodexStructuredOutputError(
                     f"Tool call entries must include string name and object arguments, got: {item!r}"
@@ -446,27 +438,7 @@ class CodexChatModel(BaseChatModel):
     def _extract_tool_arguments(
         self,
         item: dict[str, Any],
-        *,
-        tool_arguments_as_json_string: bool,
     ) -> dict[str, Any]:
-        if tool_arguments_as_json_string:
-            raw_arguments = item.get("arguments_json")
-            if not isinstance(raw_arguments, str):
-                raise CodexStructuredOutputError(
-                    f"Tool call entries must include string arguments_json, got: {item!r}"
-                )
-            try:
-                parsed = json.loads(raw_arguments)
-            except json.JSONDecodeError as exc:
-                raise CodexStructuredOutputError(
-                    f"Tool call arguments_json must contain valid JSON, got: {raw_arguments!r}"
-                ) from exc
-            if not isinstance(parsed, dict):
-                raise CodexStructuredOutputError(
-                    f"Tool call arguments_json must decode to an object, got: {parsed!r}"
-                )
-            return parsed
-
         arguments = item.get("arguments")
         if not isinstance(arguments, dict):
             raise CodexStructuredOutputError(
@@ -528,7 +500,6 @@ class CodexChatModel(BaseChatModel):
                 "tools": [],
                 "tool_choice": None,
                 "output_schema": build_plain_response_schema(),
-                "tool_arguments_as_json_string": False,
             }
 
         if tool_choice in (None, "auto"):
@@ -536,7 +507,6 @@ class CodexChatModel(BaseChatModel):
                 "tools": tool_list,
                 "tool_choice": None if tool_choice is None else "auto",
                 "output_schema": build_tool_response_schema(tool_list, allow_final=True),
-                "tool_arguments_as_json_string": len(tool_list) > 1,
             }
 
         if tool_choice in (False, "none"):
@@ -544,7 +514,6 @@ class CodexChatModel(BaseChatModel):
                 "tools": [],
                 "tool_choice": "none",
                 "output_schema": build_plain_response_schema(),
-                "tool_arguments_as_json_string": False,
             }
 
         if tool_choice in (True, "any", "required"):
@@ -553,7 +522,6 @@ class CodexChatModel(BaseChatModel):
                 "tools": tool_list,
                 "tool_choice": normalized_choice,
                 "output_schema": build_tool_response_schema(tool_list, allow_final=False),
-                "tool_arguments_as_json_string": len(tool_list) > 1,
             }
 
         selected_tool_name = self._extract_named_tool_choice(tool_choice)
@@ -581,7 +549,6 @@ class CodexChatModel(BaseChatModel):
             "tools": selected_tools,
             "tool_choice": selected_tool_name,
             "output_schema": build_tool_response_schema(selected_tools, allow_final=False),
-            "tool_arguments_as_json_string": False,
         }
 
     def _extract_named_tool_choice(self, tool_choice: Any) -> str | None:
