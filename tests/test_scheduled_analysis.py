@@ -871,6 +871,36 @@ site_dir = "{site_dir.as_posix()}"
         self.assertTrue(available)
         self.assertEqual(warnings, [])
 
+    def test_single_ticker_uses_isolated_worker_when_timeout_is_configured(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            archive_dir = root / "archive"
+            site_dir = root / "site"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["A"]
+parallel_ticker_execution = true
+max_parallel_tickers = 1
+per_ticker_timeout_minutes = 1
+continue_on_ticker_error = true
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{site_dir.as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            config = load_scheduled_config(config_path)
+
+            self.assertTrue(
+                scheduled_runner._should_run_tickers_in_parallel(
+                    config=config,
+                    ticker_count=1,
+                )
+            )
+
     def test_parallel_ticker_execution_is_disabled_when_continue_on_error_is_false(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

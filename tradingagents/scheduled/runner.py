@@ -902,10 +902,15 @@ def _active_ticker_limit(config: ScheduledAnalysisConfig) -> int:
 
 
 def _should_run_tickers_in_parallel(*, config: ScheduledAnalysisConfig, ticker_count: int) -> bool:
+    max_parallel_tickers = int(getattr(config.run, "max_parallel_tickers", 1) or 1)
+    per_ticker_timeout = float(
+        getattr(config.run, "per_ticker_timeout_minutes", 0.0) or 0.0
+    )
+    needs_isolated_worker = max_parallel_tickers > 1 or per_ticker_timeout > 0
     return (
-        ticker_count > 1
+        ticker_count > 0
         and bool(getattr(config.run, "parallel_ticker_execution", False))
-        and int(getattr(config.run, "max_parallel_tickers", 1) or 1) > 1
+        and needs_isolated_worker
         and bool(config.run.continue_on_ticker_error)
         and config.config_path is not None
     )
