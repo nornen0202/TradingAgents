@@ -1,4 +1,4 @@
-﻿import re
+import re
 import os
 import tempfile
 import unittest
@@ -20,14 +20,21 @@ from tradingagents.llm_clients.codex_app_server import (
 )
 from tradingagents.llm_clients.codex_message_codec import normalize_input_messages
 from tradingagents.llm_clients.codex_binary import resolve_codex_binary
-from tradingagents.llm_clients.codex_preflight import run_codex_preflight
+from tradingagents.llm_clients.codex_preflight import (
+    codex_preflight_fallback_models,
+    run_codex_preflight,
+)
 from tradingagents.llm_clients.codex_schema import (
     build_plain_response_schema,
     build_tool_response_schema,
     normalize_tools_for_codex,
 )
 from tradingagents.llm_clients.factory import create_llm_client
-from tradingagents.llm_clients.usage import aggregate_llm_usage, reset_llm_usage, snapshot_llm_usage
+from tradingagents.llm_clients.usage import (
+    aggregate_llm_usage,
+    reset_llm_usage,
+    snapshot_llm_usage,
+)
 
 
 def lookup_price(ticker: str) -> str:
@@ -100,18 +107,28 @@ class FakeCodexSession:
         )
         if not self.responses:
             raise AssertionError("No fake Codex responses left.")
-        return CodexInvocationResult(final_text=self.responses.popleft(), notifications=[])
+        return CodexInvocationResult(
+            final_text=self.responses.popleft(), notifications=[]
+        )
 
 
 class CodexProviderTests(unittest.TestCase):
     def test_resolve_codex_binary_uses_windows_vscode_fallback(self):
         fake_home = Path("C:/Users/tester")
-        candidate = fake_home / ".vscode/extensions/openai.chatgpt-1.0.0/bin/windows-x86_64/codex.exe"
+        candidate = (
+            fake_home
+            / ".vscode/extensions/openai.chatgpt-1.0.0/bin/windows-x86_64/codex.exe"
+        )
 
         with (
             patch("tradingagents.llm_clients.codex_binary.os.name", "nt"),
-            patch("tradingagents.llm_clients.codex_binary.Path.home", return_value=fake_home),
-            patch("tradingagents.llm_clients.codex_binary.shutil.which", return_value=None),
+            patch(
+                "tradingagents.llm_clients.codex_binary.Path.home",
+                return_value=fake_home,
+            ),
+            patch(
+                "tradingagents.llm_clients.codex_binary.shutil.which", return_value=None
+            ),
             patch(
                 "tradingagents.llm_clients.codex_binary.Path.glob",
                 return_value=[candidate],
@@ -128,12 +145,21 @@ class CodexProviderTests(unittest.TestCase):
     def test_resolve_codex_binary_skips_unusable_path_alias_on_windows(self):
         fake_home = Path("C:/Users/tester")
         alias_path = "C:/Program Files/WindowsApps/OpenAI.Codex/app/resources/codex.exe"
-        candidate = fake_home / ".vscode/extensions/openai.chatgpt-1.0.0/bin/windows-x86_64/codex.exe"
+        candidate = (
+            fake_home
+            / ".vscode/extensions/openai.chatgpt-1.0.0/bin/windows-x86_64/codex.exe"
+        )
 
         with (
             patch("tradingagents.llm_clients.codex_binary.os.name", "nt"),
-            patch("tradingagents.llm_clients.codex_binary.Path.home", return_value=fake_home),
-            patch("tradingagents.llm_clients.codex_binary.shutil.which", return_value=alias_path),
+            patch(
+                "tradingagents.llm_clients.codex_binary.Path.home",
+                return_value=fake_home,
+            ),
+            patch(
+                "tradingagents.llm_clients.codex_binary.shutil.which",
+                return_value=alias_path,
+            ),
             patch(
                 "tradingagents.llm_clients.codex_binary.Path.glob",
                 return_value=[candidate],
@@ -154,8 +180,12 @@ class CodexProviderTests(unittest.TestCase):
     def test_resolve_codex_binary_uses_env_override(self):
         with (
             patch("tradingagents.llm_clients.codex_binary.os.name", "nt"),
-            patch("tradingagents.llm_clients.codex_binary.shutil.which", return_value=None),
-            patch.dict("os.environ", {"CODEX_BINARY": "C:/custom/codex.exe"}, clear=False),
+            patch(
+                "tradingagents.llm_clients.codex_binary.shutil.which", return_value=None
+            ),
+            patch.dict(
+                "os.environ", {"CODEX_BINARY": "C:/custom/codex.exe"}, clear=False
+            ),
             patch("pathlib.Path.is_file", return_value=True),
             patch(
                 "tradingagents.llm_clients.codex_binary._is_usable_codex_binary",
@@ -184,7 +214,9 @@ class CodexProviderTests(unittest.TestCase):
             root = Path(tmp)
             default_home = root / "home" / ".codex"
             default_home.mkdir(parents=True)
-            (default_home / "auth.json").write_text('{"account":"default"}', encoding="utf-8")
+            (default_home / "auth.json").write_text(
+                '{"account":"default"}', encoding="utf-8"
+            )
             workspace = root / "workspace"
 
             class FakeProc:
@@ -193,10 +225,21 @@ class CodexProviderTests(unittest.TestCase):
                 stderr = None
 
             with (
-                patch("tradingagents.llm_clients.codex_app_server.resolve_codex_binary", return_value="codex"),
-                patch("tradingagents.llm_clients.codex_app_server.subprocess.Popen", return_value=FakeProc()),
-                patch("tradingagents.llm_clients.codex_app_server.Path.home", return_value=root / "home"),
-                patch.object(CodexAppServerSession, "_start_reader_threads", return_value=None),
+                patch(
+                    "tradingagents.llm_clients.codex_app_server.resolve_codex_binary",
+                    return_value="codex",
+                ),
+                patch(
+                    "tradingagents.llm_clients.codex_app_server.subprocess.Popen",
+                    return_value=FakeProc(),
+                ),
+                patch(
+                    "tradingagents.llm_clients.codex_app_server.Path.home",
+                    return_value=root / "home",
+                ),
+                patch.object(
+                    CodexAppServerSession, "_start_reader_threads", return_value=None
+                ),
                 patch.object(CodexAppServerSession, "_initialize", return_value=None),
                 patch.dict(os.environ, {}, clear=True),
             ):
@@ -209,7 +252,9 @@ class CodexProviderTests(unittest.TestCase):
                 session.start()
 
             copied_auth = workspace / ".codex-home" / "auth.json"
-            self.assertEqual(copied_auth.read_text(encoding="utf-8"), '{"account":"default"}')
+            self.assertEqual(
+                copied_auth.read_text(encoding="utf-8"), '{"account":"default"}'
+            )
 
     def test_message_normalization_supports_str_messages_and_openai_dicts(self):
         normalized = normalize_input_messages(
@@ -260,7 +305,9 @@ class CodexProviderTests(unittest.TestCase):
         generic_items = generic_schema["properties"]["tool_calls"]["items"]
         self.assertEqual(generic_items["properties"]["name"]["type"], "string")
         self.assertIn("enum", generic_items["properties"]["name"])
-        self.assertEqual(generic_items["properties"]["arguments_json"]["type"], "string")
+        self.assertEqual(
+            generic_items["properties"]["arguments_json"]["type"], "string"
+        )
 
     def test_plain_final_response_parsing(self):
         session = FakeCodexSession(
@@ -395,7 +442,16 @@ class CodexProviderTests(unittest.TestCase):
                             "total_tokens": 120,
                         }
                     },
-                    "events": [{"provider": "codex", "model": "gpt-5.5", "role": "deep", "input_tokens": 100, "output_tokens": 20, "total_tokens": 120}],
+                    "events": [
+                        {
+                            "provider": "codex",
+                            "model": "gpt-5.5",
+                            "role": "deep",
+                            "input_tokens": 100,
+                            "output_tokens": 20,
+                            "total_tokens": 120,
+                        }
+                    ],
                 },
                 {
                     "available": True,
@@ -420,8 +476,22 @@ class CodexProviderTests(unittest.TestCase):
                         }
                     },
                     "events": [
-                        {"provider": "codex", "model": "gpt-5.4-mini", "role": "writer", "input_tokens": 10, "output_tokens": 4, "total_tokens": 14},
-                        {"provider": "codex", "model": "gpt-5.4-mini", "role": "writer", "input_tokens": 20, "output_tokens": 6, "total_tokens": 26},
+                        {
+                            "provider": "codex",
+                            "model": "gpt-5.4-mini",
+                            "role": "writer",
+                            "input_tokens": 10,
+                            "output_tokens": 4,
+                            "total_tokens": 14,
+                        },
+                        {
+                            "provider": "codex",
+                            "model": "gpt-5.4-mini",
+                            "role": "writer",
+                            "input_tokens": 20,
+                            "output_tokens": 6,
+                            "total_tokens": 26,
+                        },
                     ],
                 },
             ]
@@ -566,12 +636,14 @@ class CodexProviderTests(unittest.TestCase):
             preflight_runner=lambda **kwargs: None,
         ).get_llm()
 
-        required_result = required_llm.bind_tools([lookup_price], tool_choice="required").invoke(
-            "Analyze NVDA"
-        )
+        required_result = required_llm.bind_tools(
+            [lookup_price], tool_choice="required"
+        ).invoke("Analyze NVDA")
         self.assertTrue(required_result.tool_calls)
         self.assertEqual(
-            required_session.invocations[0]["output_schema"]["properties"]["mode"]["const"],
+            required_session.invocations[0]["output_schema"]["properties"]["mode"][
+                "const"
+            ],
             "tool_calls",
         )
         self.assertIn(
@@ -598,7 +670,9 @@ class CodexProviderTests(unittest.TestCase):
             tool_choice={"type": "function", "function": {"name": "lookup_price"}},
         ).invoke("Analyze MSFT")
         self.assertEqual(named_result.tool_calls[0]["name"], "lookup_price")
-        tool_item = named_session.invocations[0]["output_schema"]["properties"]["tool_calls"]["items"]
+        tool_item = named_session.invocations[0]["output_schema"]["properties"][
+            "tool_calls"
+        ]["items"]
         self.assertEqual(tool_item["properties"]["name"]["const"], "lookup_price")
         self.assertIn(
             "must call the tool named `lookup_price`",
@@ -682,7 +756,9 @@ class CodexProviderTests(unittest.TestCase):
             preflight_runner=lambda **kwargs: None,
         ).get_llm()
 
-        with patch("tradingagents.llm_clients.codex_chat_model.time.sleep") as sleep_mock:
+        with patch(
+            "tradingagents.llm_clients.codex_chat_model.time.sleep"
+        ) as sleep_mock:
             result = llm.invoke("recover after transient transport failure")
 
         self.assertEqual(result.content, "Recovered")
@@ -703,7 +779,9 @@ class CodexProviderTests(unittest.TestCase):
         class FailingCodexSession(FakeCodexSession):
             def invoke(self, **kwargs):
                 self.invocations.append(kwargs)
-                raise CodexAppServerError("Timed out waiting for Codex app-server after 600s")
+                raise CodexAppServerError(
+                    "Timed out waiting for Codex app-server after 600s"
+                )
 
         session = FailingCodexSession()
         llm = create_llm_client(
@@ -745,7 +823,9 @@ class CodexProviderTests(unittest.TestCase):
         with (
             patch.object(session, "start", return_value=None),
             patch.object(session, "request", side_effect=fake_request),
-            patch.object(session, "_collect_turn", return_value=('{"answer":"ok"}', [])),
+            patch.object(
+                session, "_collect_turn", return_value=('{"answer":"ok"}', [])
+            ),
         ):
             session.invoke(
                 prompt="Return JSON.",
@@ -799,7 +879,9 @@ class CodexProviderTests(unittest.TestCase):
                 side_effect=[100.0, 101.0, 106.1],
             ),
         ):
-            with self.assertRaisesRegex(CodexAppServerError, "Timed out waiting for Codex turn"):
+            with self.assertRaisesRegex(
+                CodexAppServerError, "Timed out waiting for Codex turn"
+            ):
                 session._collect_turn("turn-1")
 
     def test_provider_codex_smoke_covers_bind_tools_and_direct_invoke_paths(self):
@@ -819,7 +901,10 @@ class CodexProviderTests(unittest.TestCase):
         ).get_llm()
 
         analyst_prompt = ChatPromptTemplate.from_messages(
-            [("system", "Use tools when you need extra data."), ("human", "Analyze NVDA.")]
+            [
+                ("system", "Use tools when you need extra data."),
+                ("human", "Analyze NVDA."),
+            ]
         )
         market_result = (analyst_prompt | llm.bind_tools([lookup_price])).invoke({})
         self.assertTrue(market_result.tool_calls)
@@ -829,7 +914,9 @@ class CodexProviderTests(unittest.TestCase):
         self.assertIn("Rating: Buy", decision.content)
         self.assertEqual(len(session.invocations), 2)
 
-    def test_codex_workflow_once_preflight_skips_client_preflight_when_env_says_ready(self):
+    def test_codex_workflow_once_preflight_skips_client_preflight_when_env_says_ready(
+        self,
+    ):
         calls = {"count": 0}
 
         def preflight_runner(**kwargs):
@@ -849,7 +936,9 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(calls["count"], 0)
         self.assertTrue(llm._preflight_done)
 
-    def test_codex_workflow_once_preflight_falls_back_to_client_preflight_without_env(self):
+    def test_codex_workflow_once_preflight_falls_back_to_client_preflight_without_env(
+        self,
+    ):
         calls = {"count": 0}
 
         def preflight_runner(**kwargs):
@@ -937,6 +1026,27 @@ class CodexProviderTests(unittest.TestCase):
         self.assertEqual(result.resolved_model, "gpt-5.4")
         self.assertTrue(result.fallback_used)
 
+    def test_workflow_preflight_fallback_policy_is_independent_from_runtime_fail_fast(
+        self,
+    ):
+        with patch.dict(
+            os.environ,
+            {
+                "TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK": "0",
+                "TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK": "1",
+            },
+            clear=False,
+        ):
+            self.assertEqual(codex_preflight_fallback_models("judge")[0], "gpt-5.5")
+            self.assertEqual(
+                codex_preflight_fallback_models("quick")[0], "gpt-5.4-mini"
+            )
+
+    def test_workflow_preflight_fallback_policy_can_be_explicitly_disabled(self):
+        self.assertEqual(
+            codex_preflight_fallback_models("judge", allow_fallback="0"), ()
+        )
+
     def test_preflight_raises_model_unavailable_when_no_fallback_matches(self):
         factory = lambda **kwargs: FakeCodexSession(
             models_payload={"data": [{"id": "gpt-5.3-codex", "model": "gpt-5.3-codex"}]}
@@ -999,7 +1109,9 @@ class CodexProviderTests(unittest.TestCase):
             responses=['{"answer":"Should not run"}'],
             models_payload={"data": [{"id": "gpt-5.4", "model": "gpt-5.4"}]},
         )
-        with patch.dict(os.environ, {"TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK": "0"}, clear=False):
+        with patch.dict(
+            os.environ, {"TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK": "0"}, clear=False
+        ):
             with self.assertRaises(CodexModelUnavailableError):
                 create_llm_client(
                     provider="codex",

@@ -20,7 +20,12 @@ def test_daily_analysis_jobs_do_not_depend_on_windows_powershell():
 def test_daily_analysis_sets_up_python_before_first_script_step():
     workflow = _workflow_text()
 
-    for job_name in ("analyze_us:", "analyze_kr:", "prepare_pages_runner:", "build_pages:"):
+    for job_name in (
+        "analyze_us:",
+        "analyze_kr:",
+        "prepare_pages_runner:",
+        "build_pages:",
+    ):
         job_start = workflow.index(f"  {job_name}")
         setup_python = workflow.index("      - name: Set up Python", job_start)
         first_python_run = workflow.index("        run: |", job_start)
@@ -37,7 +42,9 @@ def test_daily_analysis_default_parallel_ticker_workers_is_four():
     workflow = _workflow_text()
 
     input_start = workflow.index("      max_parallel_tickers:")
-    input_block = workflow[input_start : workflow.index("      daily_active_ticker_limit:", input_start)]
+    input_block = workflow[
+        input_start : workflow.index("      daily_active_ticker_limit:", input_start)
+    ]
     assert 'default: "4"' in input_block
 
 
@@ -45,7 +52,9 @@ def test_daily_analysis_default_ticker_timeout_is_sixty_minutes():
     workflow = _workflow_text()
 
     input_start = workflow.index("      per_ticker_timeout_minutes:")
-    input_block = workflow[input_start : workflow.index("\n\npermissions:", input_start)]
+    input_block = workflow[
+        input_start : workflow.index("\n\npermissions:", input_start)
+    ]
     assert 'default: "60"' in input_block
 
 
@@ -91,21 +100,35 @@ def test_daily_analysis_self_hosted_jobs_serialize_workspace_checkout():
         assert "cancel-in-progress: false" in job_block
 
 
-def test_daily_analysis_cleans_pages_diagnostics_before_self_hosted_checkout():
+def test_daily_analysis_does_not_delete_runner_owned_pages_diagnostics():
     workflow = _workflow_text()
 
     for job_name in ("analyze_us", "analyze_kr"):
         job_start = workflow.index(f"  {job_name}:")
         checkout = workflow.index("      - name: Check out repository", job_start)
         job_before_checkout = workflow[job_start:checkout]
-        assert '"_diag" / "pages"' in job_before_checkout
-        assert "*.log" in job_before_checkout
+        assert '"_diag" / "pages"' not in job_before_checkout
+        assert "remove_pages_diagnostic_logs" not in job_before_checkout
+
+
+def test_daily_analysis_preflight_can_select_compatibility_models_while_runtime_stays_fail_fast():
+    workflow = _workflow_text()
+
+    assert workflow.count('TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"') == 2
+    assert (
+        workflow.count('TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "1"') == 2
+    )
+    assert workflow.count('codex_preflight_fallback_models("deep")') == 2
+    assert workflow.count('codex_preflight_fallback_models("quick")') == 2
+    assert 'os.getenv("TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK", "1")' not in workflow
 
 
 def test_daily_pages_build_uses_runner_diagnostics_preflight():
     workflow = _workflow_text()
 
-    preflight = workflow.split("  prepare_pages_runner:", 1)[1].split("  build_pages:", 1)[0]
+    preflight = workflow.split("  prepare_pages_runner:", 1)[1].split(
+        "  build_pages:", 1
+    )[0]
     build_pages = workflow.split("  build_pages:", 1)[1].split("  deploy:", 1)[0]
 
     assert "Clear stale runner diagnostic logs" in preflight
@@ -136,6 +159,8 @@ def test_daily_analysis_deploy_runs_after_final_pages_build():
     deploy_block = workflow[deploy_start:]
 
     assert "      - build_pages" in deploy_block
-    assert "if: ${{ always() && needs.build_pages.result == 'success' }}" in deploy_block
+    assert (
+        "if: ${{ always() && needs.build_pages.result == 'success' }}" in deploy_block
+    )
     assert "artifact_name: github-pages-final" in deploy_block
     assert "permissions:\n      pages: write\n      id-token: write" in deploy_block

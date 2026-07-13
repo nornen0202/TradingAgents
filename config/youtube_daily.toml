@@ -17,8 +17,13 @@ max_parallel_videos = 4
 
 [llm]
 provider = "codex"
-deep_model = "gpt-5.5"
+quick_model = "gpt-5.6-terra"
+deep_model = "gpt-5.6-sol"
+output_model = "gpt-5.6-luna"
 codex_reasoning_effort = "medium"
+codex_quick_reasoning_effort = "low"
+codex_deep_reasoning_effort = "medium"
+codex_output_reasoning_effort = "low"
 codex_summary = "none"
 codex_personality = "none"
 codex_request_timeout = 180.0

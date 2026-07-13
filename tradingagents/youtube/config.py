@@ -46,6 +46,11 @@ class LLMSettings:
     codex_max_retries: int
     codex_cleanup_threads: bool
     codex_preflight_mode: str
+    quick_model: str | None = None
+    output_model: str | None = None
+    codex_quick_reasoning_effort: str | None = None
+    codex_deep_reasoning_effort: str | None = None
+    codex_output_reasoning_effort: str | None = None
 
 
 @dataclass(frozen=True)
@@ -118,7 +123,9 @@ class YouTubeDailyConfig:
     asr: ASRSettings = field(default_factory=ASRSettings)
 
 
-def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTubeDailyConfig:
+def load_youtube_config(
+    path: str | Path = "config/youtube_daily.toml",
+) -> YouTubeDailyConfig:
     config_path = Path(path)
     raw: dict[str, Any] = {}
     if config_path.exists():
@@ -140,40 +147,105 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
     return YouTubeDailyConfig(
         channel=ChannelSettings(
             name=str(channel_raw.get("name") or "투자 유튜브 채널"),
-            urls=tuple(str(item).strip() for item in (channel_raw.get("urls") or DEFAULT_CHANNEL_URLS) if str(item).strip()),
+            urls=tuple(
+                str(item).strip()
+                for item in (channel_raw.get("urls") or DEFAULT_CHANNEL_URLS)
+                if str(item).strip()
+            ),
             lookback_hours=max(1, int(channel_raw.get("lookback_hours") or 24)),
             timezone=str(channel_raw.get("timezone") or "Asia/Seoul"),
             max_videos=max(1, int(channel_raw.get("max_videos") or 100)),
-            max_entries_per_url=max(1, int(channel_raw.get("max_entries_per_url") or 25)),
-            max_parallel_videos=max(1, int(channel_raw.get("max_parallel_videos") or 4)),
+            max_entries_per_url=max(
+                1, int(channel_raw.get("max_entries_per_url") or 25)
+            ),
+            max_parallel_videos=max(
+                1, int(channel_raw.get("max_parallel_videos") or 4)
+            ),
         ),
         llm=LLMSettings(
             provider=str(llm_raw.get("provider") or "codex"),
-            deep_model=str(llm_raw.get("deep_model") or "gpt-5.5"),
-            codex_binary=_optional_text(os.getenv("CODEX_BINARY") or llm_raw.get("codex_binary")),
-            codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort") or "medium"),
+            deep_model=_first_text(
+                os.getenv("TRADINGAGENTS_YOUTUBE_DEEP_MODEL"),
+                os.getenv("TRADINGAGENTS_CODEX_JUDGE_MODEL"),
+                os.getenv("TRADINGAGENTS_CODEX_DEEP_MODEL"),
+                llm_raw.get("deep_model"),
+                default="gpt-5.6-sol",
+            ),
+            codex_binary=_optional_text(
+                os.getenv("CODEX_BINARY") or llm_raw.get("codex_binary")
+            ),
+            codex_reasoning_effort=_first_text(
+                os.getenv("TRADINGAGENTS_CODEX_REASONING_EFFORT"),
+                llm_raw.get("codex_reasoning_effort"),
+                default="medium",
+            ),
             codex_summary=str(llm_raw.get("codex_summary") or "none"),
             codex_personality=str(llm_raw.get("codex_personality") or "none"),
             codex_workspace_dir=_optional_text(
-                os.getenv("TRADINGAGENTS_CODEX_WORKSPACE_DIR") or llm_raw.get("codex_workspace_dir")
+                os.getenv("TRADINGAGENTS_CODEX_WORKSPACE_DIR")
+                or llm_raw.get("codex_workspace_dir")
             ),
             codex_request_timeout=float(llm_raw.get("codex_request_timeout") or 180.0),
             codex_max_retries=int(llm_raw.get("codex_max_retries") or 2),
             codex_cleanup_threads=bool(llm_raw.get("codex_cleanup_threads", True)),
-            codex_preflight_mode=str(llm_raw.get("codex_preflight_mode") or "workflow_once"),
+            codex_preflight_mode=str(
+                llm_raw.get("codex_preflight_mode") or "workflow_once"
+            ),
+            quick_model=_first_text(
+                os.getenv("TRADINGAGENTS_YOUTUBE_QUICK_MODEL"),
+                os.getenv("TRADINGAGENTS_CODEX_QUICK_MODEL"),
+                llm_raw.get("quick_model"),
+                default="gpt-5.6-terra",
+            ),
+            output_model=_first_text(
+                os.getenv("TRADINGAGENTS_YOUTUBE_OUTPUT_MODEL"),
+                os.getenv("TRADINGAGENTS_CODEX_WRITER_MODEL"),
+                os.getenv("TRADINGAGENTS_CODEX_OUTPUT_MODEL"),
+                llm_raw.get("output_model"),
+                default="gpt-5.6-luna",
+            ),
+            codex_quick_reasoning_effort=_first_text(
+                os.getenv("TRADINGAGENTS_YOUTUBE_QUICK_REASONING_EFFORT"),
+                os.getenv("TRADINGAGENTS_CODEX_QUICK_REASONING_EFFORT"),
+                llm_raw.get("codex_quick_reasoning_effort"),
+                default="low",
+            ),
+            codex_deep_reasoning_effort=_first_text(
+                os.getenv("TRADINGAGENTS_YOUTUBE_DEEP_REASONING_EFFORT"),
+                os.getenv("TRADINGAGENTS_CODEX_DEEP_REASONING_EFFORT"),
+                llm_raw.get("codex_deep_reasoning_effort"),
+                llm_raw.get("codex_reasoning_effort"),
+                default="medium",
+            ),
+            codex_output_reasoning_effort=_first_text(
+                os.getenv("TRADINGAGENTS_YOUTUBE_OUTPUT_REASONING_EFFORT"),
+                os.getenv("TRADINGAGENTS_CODEX_OUTPUT_REASONING_EFFORT"),
+                llm_raw.get("codex_output_reasoning_effort"),
+                default="low",
+            ),
         ),
         verification=VerificationSettings(
             mode=str(verification_raw.get("mode") or "external_full"),
             publish_unverified=bool(verification_raw.get("publish_unverified", True)),
-            max_claims_per_video=max(1, int(verification_raw.get("max_claims_per_video") or 12)),
+            max_claims_per_video=max(
+                1, int(verification_raw.get("max_claims_per_video") or 12)
+            ),
             strict_llm=bool(verification_raw.get("strict_llm", True)),
             research_enabled=bool(verification_raw.get("research_enabled", True)),
-            max_research_queries=max(1, int(verification_raw.get("max_research_queries") or 10)),
-            max_evidence_items=max(1, int(verification_raw.get("max_evidence_items") or 24)),
-            max_evidence_per_claim=max(1, int(verification_raw.get("max_evidence_per_claim") or 3)),
+            max_research_queries=max(
+                1, int(verification_raw.get("max_research_queries") or 10)
+            ),
+            max_evidence_items=max(
+                1, int(verification_raw.get("max_evidence_items") or 24)
+            ),
+            max_evidence_per_claim=max(
+                1, int(verification_raw.get("max_evidence_per_claim") or 3)
+            ),
             fetch_web_pages=bool(verification_raw.get("fetch_web_pages", True)),
             max_web_pages=max(0, int(verification_raw.get("max_web_pages") or 4)),
-            max_transcript_chars_for_llm=max(1000, int(verification_raw.get("max_transcript_chars_for_llm") or 24000)),
+            max_transcript_chars_for_llm=max(
+                1000, int(verification_raw.get("max_transcript_chars_for_llm") or 24000)
+            ),
             adaptive_transcript_budget_enabled=bool(
                 verification_raw.get("adaptive_transcript_budget_enabled", True)
             ),
@@ -181,10 +253,15 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
                 1000,
                 int(verification_raw.get("extended_transcript_chars_for_llm") or 48000),
             ),
-            evidence_relevance_gate_enabled=bool(verification_raw.get("evidence_relevance_gate_enabled", True)),
+            evidence_relevance_gate_enabled=bool(
+                verification_raw.get("evidence_relevance_gate_enabled", True)
+            ),
             min_evidence_relevance_score=min(
                 1.0,
-                max(0.0, float(verification_raw.get("min_evidence_relevance_score") or 0.12)),
+                max(
+                    0.0,
+                    float(verification_raw.get("min_evidence_relevance_score") or 0.12),
+                ),
             ),
         ),
         asr=ASRSettings(
@@ -194,27 +271,42 @@ def load_youtube_config(path: str | Path = "config/youtube_daily.toml") -> YouTu
             compute_type=str(asr_raw.get("compute_type") or "auto"),
             fallback_models=tuple(
                 str(item).strip()
-                for item in (asr_raw.get("fallback_models") or ("distil-large-v3", "small", "base"))
+                for item in (
+                    asr_raw.get("fallback_models")
+                    or ("distil-large-v3", "small", "base")
+                )
                 if str(item).strip()
             ),
             beam_size=max(1, int(asr_raw.get("beam_size") or 5)),
             best_of=max(1, int(asr_raw.get("best_of") or 5)),
             temperature=str(asr_raw.get("temperature") or "0.0,0.2,0.4"),
-            condition_on_previous_text=bool(asr_raw.get("condition_on_previous_text", False)),
-            repetition_penalty=max(1.0, float(asr_raw.get("repetition_penalty") or 1.05)),
+            condition_on_previous_text=bool(
+                asr_raw.get("condition_on_previous_text", False)
+            ),
+            repetition_penalty=max(
+                1.0, float(asr_raw.get("repetition_penalty") or 1.05)
+            ),
             no_repeat_ngram_size=max(0, int(asr_raw.get("no_repeat_ngram_size") or 3)),
             word_timestamps=bool(asr_raw.get("word_timestamps", True)),
-            hallucination_silence_threshold=max(0.0, float(asr_raw.get("hallucination_silence_threshold") or 1.0)),
+            hallucination_silence_threshold=max(
+                0.0, float(asr_raw.get("hallucination_silence_threshold") or 1.0)
+            ),
             vad_filter=bool(asr_raw.get("vad_filter", True)),
             vad_min_silence_ms=max(0, int(asr_raw.get("vad_min_silence_ms") or 500)),
             vad_speech_pad_ms=max(0, int(asr_raw.get("vad_speech_pad_ms") or 300)),
-            vad_threshold=min(max(0.0, float(asr_raw.get("vad_threshold") or 0.5)), 1.0),
+            vad_threshold=min(
+                max(0.0, float(asr_raw.get("vad_threshold") or 0.5)), 1.0
+            ),
             min_quality=str(asr_raw.get("min_quality") or "usable"),
             recheck_automatic=bool(asr_raw.get("recheck_automatic", True)),
             chunk_chars=max(1000, int(asr_raw.get("chunk_chars") or 3200)),
             max_chunks=max(4, int(asr_raw.get("max_chunks") or 12)),
             min_coverage_chunks=max(1, int(asr_raw.get("min_coverage_chunks") or 5)),
-            hotwords=tuple(str(item).strip() for item in (asr_raw.get("hotwords") or ()) if str(item).strip()),
+            hotwords=tuple(
+                str(item).strip()
+                for item in (asr_raw.get("hotwords") or ())
+                if str(item).strip()
+            ),
             initial_prompt=str(asr_raw.get("initial_prompt") or ""),
         ),
         storage=StorageSettings(archive_dir=archive_dir, site_dir=site_dir),
@@ -246,8 +338,12 @@ def with_youtube_overrides(
             lookback_hours=max(1, int(lookback_hours or channel.lookback_hours)),
             timezone=channel.timezone,
             max_videos=max(1, int(max_videos or channel.max_videos)),
-            max_entries_per_url=max(1, int(max_entries_per_url or channel.max_entries_per_url)),
-            max_parallel_videos=max(1, int(max_parallel_videos or channel.max_parallel_videos)),
+            max_entries_per_url=max(
+                1, int(max_entries_per_url or channel.max_entries_per_url)
+            ),
+            max_parallel_videos=max(
+                1, int(max_parallel_videos or channel.max_parallel_videos)
+            ),
         ),
         llm=config.llm,
         verification=config.verification,
@@ -285,3 +381,11 @@ def _youtube_archive_path(configured_value: Any) -> Path:
 def _optional_text(value: Any) -> str | None:
     text = str(value or "").strip()
     return text or None
+
+
+def _first_text(*values: Any, default: str) -> str:
+    for value in values:
+        text = str(value or "").strip()
+        if text:
+            return text
+    return default
