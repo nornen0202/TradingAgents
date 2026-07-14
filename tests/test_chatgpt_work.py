@@ -462,6 +462,43 @@ def test_advisory_source_health_detects_stale_producer(tmp_path: Path):
     assert packet["body"]["source"]["stale_after_hours"] == 36
 
 
+def test_youtube_packet_preserves_evidence_ids_for_claim_mapping(tmp_path: Path):
+    run_dir = tmp_path / "run"
+    summary_dir = run_dir / "videos" / "video-1"
+    summary_dir.mkdir(parents=True)
+    (summary_dir / "public_summary.json").write_text(
+        json.dumps(
+            {
+                "video_id": "video-1",
+                "published_at": "2026-07-14T06:30:00+09:00",
+                "claims": [{"claim_id": "C1", "supporting_evidence_ids": ["E1"]}],
+                "evidence": [
+                    {
+                        "evidence_id": "E1",
+                        "claim_id": "C1",
+                        "title": "Official filing",
+                        "source_url": "https://example.test/filing",
+                        "source_tier": "official",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    event = work_packet._youtube_event(
+        {
+            "video_id": "video-1",
+            "published_at": "2026-07-14T06:30:00+09:00",
+            "public_summary_path": "videos/video-1/public_summary.json",
+        },
+        run_dir,
+    )
+
+    assert event["summary"]["claims"][0]["supporting_evidence_ids"] == ["E1"]
+    assert event["summary"]["evidence"][0]["evidence_id"] == "E1"
+
+
 def test_public_packet_budget_drops_oldest_events_deterministically():
     body = {
         "kind": "prism",

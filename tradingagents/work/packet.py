@@ -604,7 +604,15 @@ def _youtube_event(item: dict[str, Any], run_dir: Path) -> dict[str, Any]:
         "evidence": [
             {
                 key: evidence.get(key)
-                for key in ("claim_id", "title", "source_url", "publisher", "published_at", "source_tier")
+                for key in (
+                    "evidence_id",
+                    "claim_id",
+                    "title",
+                    "source_url",
+                    "publisher",
+                    "published_at",
+                    "source_tier",
+                )
                 if evidence.get(key) is not None
             }
             for evidence in (summary.get("evidence") or [])[:3]
