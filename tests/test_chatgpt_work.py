@@ -6,8 +6,6 @@ import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
-import pytest
-
 from tradingagents.work import packet as work_packet
 from tradingagents.work.packet import WORK_SCHEMA, build_surface_packet
 from tradingagents.work.runtime import WorkRuntime, WorkRuntimeError
@@ -410,8 +408,12 @@ def test_invalid_state_fails_closed_and_visible_receipt_can_recover(tmp_path: Pa
     packet = json.loads(Path(prepared["packet_path"]).read_text(encoding="utf-8"))
     runtime.state_path.write_text("{broken", encoding="utf-8")
 
-    with pytest.raises(WorkRuntimeError, match="Invalid canonical Work state"):
+    try:
         runtime.status()
+    except WorkRuntimeError as exc:
+        assert "Invalid canonical Work state" in str(exc)
+    else:
+        raise AssertionError("corrupt canonical Work state must fail closed")
 
     recovered = runtime.recover("kr", prepared["event_id"], packet["source_sha256"], state_revision=7)
     assert recovered["status"] == "recovered_visible_receipt"
