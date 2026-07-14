@@ -159,6 +159,17 @@ def test_work_packet_expires_rows_independently(tmp_path: Path):
     fresh["ticker"] = "MSFT"
     fresh["market_data_asof"] = "2026-07-14T10:35:00-04:00"
     bundle["strategy_table"].append(fresh)
+    expired_conditional = json.loads(json.dumps(bundle["strategy_table"][0]))
+    expired_conditional["ticker"] = "AAPL"
+    expired_conditional["quality"].update(
+        {
+            "row_mode": "CONDITIONAL",
+            "execution_ready": False,
+            "conditional_strategy_ready": True,
+            "current_execution_promotion": "RECHECK_REQUIRED",
+        }
+    )
+    bundle["strategy_table"].append(expired_conditional)
     bundle_path.write_text(json.dumps(bundle), encoding="utf-8")
 
     packet = build_surface_packet(
@@ -174,6 +185,9 @@ def test_work_packet_expires_rows_independently(tmp_path: Path):
     assert rows["NVDA"]["quality"]["row_mode"] == "BLOCKED_STALE"
     assert rows["NVDA"]["quality"]["source_row_mode"] == "IMMEDIATE"
     assert rows["MSFT"]["quality"]["row_mode"] == "IMMEDIATE"
+    assert rows["AAPL"]["quality"]["row_mode"] == "BLOCKED_STALE"
+    assert rows["AAPL"]["quality"]["source_row_mode"] == "CONDITIONAL"
+    assert rows["AAPL"]["quality"]["conditional_strategy_ready"] is False
     assert packet["body"]["guardrails"]["valid_until"] == "2026-07-14T11:05:00-04:00"
 
 

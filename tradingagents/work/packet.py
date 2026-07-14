@@ -423,10 +423,11 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
         expired = bool(valid_until and valid_until < current_now.astimezone(valid_until.tzinfo))
         quality["row_valid_until"] = valid_until.isoformat() if valid_until else None
         quality["expired_at_build"] = expired
-        if expired and quality.get("row_mode") == "IMMEDIATE":
-            quality["source_row_mode"] = "IMMEDIATE"
+        if expired and quality.get("row_mode") in {"IMMEDIATE", "CONDITIONAL"}:
+            quality["source_row_mode"] = quality.get("row_mode")
             quality["row_mode"] = "BLOCKED_STALE"
             quality["execution_ready"] = False
+            quality["conditional_strategy_ready"] = False
             blockers = [str(item) for item in (quality.get("provider_blockers") or []) if str(item)]
             quality["provider_blockers"] = list(dict.fromkeys([*blockers, "work_packet_row_expired"]))
         row["quality"] = quality
