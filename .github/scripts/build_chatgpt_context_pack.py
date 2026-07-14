@@ -3,8 +3,16 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from pathlib import Path
 from typing import Any
+
+# This file is also a directly executable repository helper.  Python otherwise
+# places only .github/scripts on sys.path, so a clean checkout cannot import the
+# adjacent tradingagents package unless the project happens to be installed.
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from tradingagents.work.packet import compact_decision_bundle
 

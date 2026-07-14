@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -12,6 +13,19 @@ pack = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
 sys.modules[SPEC.name] = pack
 SPEC.loader.exec_module(pack)
+
+
+def test_direct_cli_runs_from_clean_checkout_without_installed_package(tmp_path: Path):
+    result = subprocess.run(
+        [sys.executable, "-I", "-S", str(MODULE_PATH.resolve()), "--help"],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "Build a deterministic, deduplicated ChatGPT context payload." in result.stdout
 
 
 def _write_run(
