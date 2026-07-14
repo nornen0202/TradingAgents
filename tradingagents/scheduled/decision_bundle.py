@@ -288,13 +288,36 @@ def _build_strategy_row(
     generated_current = context.get("generated_in_current_run") is True
     freshness = str(context.get("freshness_class") or "").upper()
     eligibility = str(context.get("execution_eligibility") or "").upper()
+    promotion = str(gate.get("current_execution_promotion") or "").upper()
+    provider_limitations = [
+        str(item)
+        for item in (gate.get("provider_limitations") or [])
+        if str(item).strip()
+    ]
+    provider_recheck_required = bool(gate.get("provider_status_recheck_required"))
+    # Older fixtures and archived bundles predate current_execution_promotion.  Treat
+    # a missing value as legacy-compatible only when no provider status blocker is
+    # present; every newly generated context supplies POSSIBLE/RECHECK_REQUIRED/BLOCKED.
+    promotion_allows_execution = (
+        promotion == "POSSIBLE"
+        if promotion
+        else not provider_recheck_required and not any(
+            item.startswith("status_unavailable:") for item in provider_limitations
+        )
+    )
     core_ready = bool(gate.get("core_fields_present")) and generated_current and freshness in CURRENT_FRESHNESS
-    execution_ready = core_ready and eligibility in CURRENT_ELIGIBILITY
+    execution_ready = (
+        core_ready
+        and eligibility in CURRENT_ELIGIBILITY
+        and promotion_allows_execution
+        and not provider_recheck_required
+    )
     conditional_ready = (
         bool(gate.get("core_fields_present"))
         and generated_current
         and freshness in CONDITIONAL_FRESHNESS
         and eligibility in CONDITIONAL_ELIGIBILITY
+        and promotion != "BLOCKED"
     )
     is_held = bool(candidate.get("is_held"))
     strategy_code = _strategy_code(
@@ -344,6 +367,24 @@ def _build_strategy_row(
         "trading_value": _float_or_none(context.get("trading_value")),
         "price_change_pct": stock_change_pct,
         "spread_bps": _float_or_none(context.get("spread_bps")),
+        "day_high": _float_or_none(context.get("day_high")),
+        "day_low": _float_or_none(context.get("day_low")),
+        "staleness_seconds": _int_or_none(context.get("staleness_seconds")),
+        "orderbook_imbalance": _float_or_none(context.get("orderbook_imbalance")),
+        "execution_strength": context.get("execution_strength"),
+        "investor_flow_status": context.get("investor_flow_status"),
+        "program_flow_status": context.get("program_flow_status"),
+        "vi_status": context.get("vi_status"),
+        "market_alert_status": context.get("market_alert_status"),
+        "halt_status": context.get("halt_status"),
+        "luld_status": context.get("luld_status"),
+        "reg_sho_status": context.get("reg_sho_status"),
+        "news_halt_status": context.get("news_halt_status"),
+        "provider": (context.get("source") or {}).get("provider") if isinstance(context.get("source"), dict) else None,
+        "market_session": (context.get("source") or {}).get("market_session") if isinstance(context.get("source"), dict) else None,
+        "quote_delay_seconds": _float_or_none((context.get("source") or {}).get("quote_delay_seconds")) if isinstance(context.get("source"), dict) else None,
+        "source_latency_seconds": _float_or_none((context.get("source") or {}).get("source_latency_seconds")) if isinstance(context.get("source"), dict) else None,
+        "confidence": _float_or_none(action.get("confidence") if action.get("confidence") is not None else candidate.get("confidence")),
         "sector_sync": sector_sync,
         "index_sync": index_sync,
         "sync_summary_ko": _sync_summary(sector_sync, index_sync),
@@ -369,6 +410,19 @@ def _build_strategy_row(
             "core_fields_present": bool(gate.get("core_fields_present")),
             "execution_ready": execution_ready,
             "conditional_strategy_ready": conditional_ready,
+            "row_mode": _row_mode(
+                context=context,
+                execution_ready=execution_ready,
+                conditional_ready=conditional_ready,
+            ),
+            "current_execution_promotion": promotion or None,
+            "provider_status_recheck_required": provider_recheck_required,
+            "provider_limitations": provider_limitations,
+            "blocking_reasons": [
+                str(item)
+                for item in (gate.get("blocking_reasons") or [])
+                if str(item).strip()
+            ],
         },
     }
 
@@ -387,6 +441,9 @@ def _strategy_code(
     decision_now = str(context.get("decision_now") or "").upper()
     decision_state = str(context.get("decision_state") or "").upper()
     timing = str(context.get("execution_timing_state") or "").upper()
+    triggered_action = str(action.get("action_if_triggered") or candidate.get("suggested_action_if_triggered") or context.get("decision_if_triggered") or "").upper()
+    if not execution_ready and not conditional_ready:
+        return "DATA_CHECK"
     if action_now in {"EXIT_NOW", "STOP_LOSS_NOW"} or decision_now == "EXIT_NOW":
         return "SELL"
     if action_now in {"REDUCE_NOW", "TRIM_NOW", "TAKE_PROFIT_NOW"} or decision_now == "REDUCE_NOW":
@@ -395,9 +452,6 @@ def _strategy_code(
         return "SELL" if is_held else "AVOID"
     if timing == "SUPPORT_FAIL" or decision_state == "INVALIDATED":
         return "REDUCE" if is_held else "AVOID"
-    triggered_action = str(action.get("action_if_triggered") or candidate.get("suggested_action_if_triggered") or context.get("decision_if_triggered") or "").upper()
-    if not execution_ready and not conditional_ready:
-        return "DATA_CHECK"
     if not execution_ready:
         if decision_state == "TRIGGERED_PENDING_CLOSE":
             return "WAIT_CLOSE"
@@ -429,23 +483,52 @@ def _build_quality(*, rows: list[dict[str, Any]], context: dict[str, Any], min_f
     conditional_rows = sum(bool((row.get("quality") or {}).get("conditional_strategy_ready")) for row in rows)
     fresh_ratio = ready_rows / total if total else 0.0
     conditional_ratio = conditional_rows / total if total else 0.0
-    decision_ready = bool(total and context and fresh_ratio >= float(min_fresh_row_ratio))
+    held_rows = [row for row in rows if row.get("is_held") is True]
+    held_ready_rows = sum(bool((row.get("quality") or {}).get("execution_ready")) for row in held_rows)
+    held_conditional_rows = sum(
+        bool((row.get("quality") or {}).get("conditional_strategy_ready")) for row in held_rows
+    )
+    held_execution_coverage = held_ready_rows / len(held_rows) if held_rows else 1.0
+    held_conditional_coverage = held_conditional_rows / len(held_rows) if held_rows else 1.0
+    # A portfolio-level READY label may never hide a stale held position behind
+    # an aggregate 80% threshold.  Row-level signals remain available in MIXED
+    # mode even when this portfolio-wide gate is false.
+    decision_ready = bool(
+        total
+        and context
+        and fresh_ratio >= float(min_fresh_row_ratio)
+        and held_execution_coverage == 1.0
+    )
     conditional_strategy_ready = bool(
-        total and context and conditional_ratio >= float(min_fresh_row_ratio)
+        total
+        and context
+        and conditional_ratio >= float(min_fresh_row_ratio)
+        and held_conditional_coverage == 1.0
     )
     if decision_ready:
+        report_mode = "READY"
         label = "장중 투자 판단 가능"
+    elif ready_rows:
+        report_mode = "MIXED"
+        label = "일부 종목 장중 판단 가능, 종목별 데이터 상태 확인"
     elif conditional_strategy_ready:
+        report_mode = "CONDITIONAL"
         label = "장중 조건부 전략 가능, 주문 전 재확인"
+    elif conditional_rows:
+        report_mode = "MIXED"
+        label = "일부 종목 조건부 전략 가능, 주문 전 재확인"
     elif context:
+        report_mode = "OUTAGE"
         label = "일부 또는 지연 데이터, 확인 후 판단"
     else:
+        report_mode = "RESEARCH"
         label = "연구 자료만 제공, 장중 데이터 대기"
     missing_spread = sum(row.get("spread_bps") is None for row in rows)
     missing_sector_sync = sum((row.get("sector_sync") or {}).get("status_code") in {"NO_BENCHMARK", "NO_STOCK_CHANGE"} for row in rows)
     return {
         "decision_ready": decision_ready,
         "conditional_strategy_ready": conditional_strategy_ready,
+        "report_mode": report_mode,
         "quality_label_ko": label,
         "minimum_fresh_row_ratio": float(min_fresh_row_ratio),
         "fresh_row_ratio": round(fresh_ratio, 4),
@@ -453,10 +536,33 @@ def _build_quality(*, rows: list[dict[str, Any]], context: dict[str, Any], min_f
         "ready_rows": ready_rows,
         "conditional_rows": conditional_rows,
         "total_rows": total,
+        "held_rows": len(held_rows),
+        "held_ready_rows": held_ready_rows,
+        "held_conditional_rows": held_conditional_rows,
+        "held_execution_coverage": round(held_execution_coverage, 4),
+        "held_conditional_coverage": round(held_conditional_coverage, 4),
+        "blocked_held_tickers": [
+            str(row.get("ticker") or "")
+            for row in held_rows
+            if not bool((row.get("quality") or {}).get("execution_ready"))
+        ],
         "missing_spread_rows": missing_spread,
         "missing_sector_sync_rows": missing_sector_sync,
         "current_context_present": bool(context),
     }
+
+
+def _row_mode(*, context: dict[str, Any], execution_ready: bool, conditional_ready: bool) -> str:
+    if execution_ready:
+        return "IMMEDIATE"
+    if conditional_ready:
+        return "CONDITIONAL"
+    generated_current = context.get("generated_in_current_run") is True
+    freshness = str(context.get("freshness_class") or "").upper()
+    eligibility = str(context.get("execution_eligibility") or "").upper()
+    if not generated_current or "PRIOR" in freshness or "STALE" in freshness or "HISTORICAL" in eligibility:
+        return "BLOCKED_STALE"
+    return "MISSING"
 
 
 def _execution_condition(*, context: dict[str, Any], candidate: dict[str, Any], action: dict[str, Any]) -> str:

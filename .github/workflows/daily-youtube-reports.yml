@@ -94,6 +94,7 @@ jobs:
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
+      TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
       CODEX_BINARY: ${{ vars.CODEX_BINARY }}
       CODEX_HOME: ${{ vars.CODEX_HOME }}
       ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
@@ -503,6 +504,29 @@ jobs:
               args += ["--no-publish"]
           subprocess.check_call(args)
 
+      - name: Rebuild merged site and Work context after YouTube collection
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false' }}
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          args = [
+              sys.executable,
+              "-u",
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              "config/scheduled_analysis.toml",
+              "--site-only",
+              "--site-dir",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
+          ]
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+          subprocess.check_call(args)
+
       - name: Add Git Bash to PATH for Pages packaging
         run: |
           import os
@@ -518,10 +542,12 @@ jobs:
 
       - name: Configure GitHub Pages
         id: configure_pages
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false' }}
         continue-on-error: true
         uses: actions/configure-pages@v6
 
       - name: Upload GitHub Pages artifact
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-youtube
@@ -544,8 +570,11 @@ jobs:
 
   deploy:
     needs: build_youtube_pages
-    if: ${{ needs.build_youtube_pages.result == 'success' }}
+    if: ${{ needs.build_youtube_pages.result == 'success' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: tradingagents-pages-deploy
+      cancel-in-progress: false
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     environment:

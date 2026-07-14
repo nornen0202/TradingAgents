@@ -108,6 +108,7 @@ class SiteSettings:
     subtitle: str = "Automated multi-agent market analysis powered by Codex"
     max_runs_on_homepage: int = 30
     max_published_runs: int = 120
+    public_base_url: str = ""
 
 
 @dataclass(frozen=True)
@@ -505,6 +506,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             or "Automated multi-agent market analysis powered by Codex",
             max_runs_on_homepage=int(site_raw.get("max_runs_on_homepage", 30)),
             max_published_runs=int(site_raw.get("max_published_runs", 120)),
+            public_base_url=str(site_raw.get("public_base_url", "")).strip(),
         ),
         portfolio=PortfolioSettings(
             enabled=bool(portfolio_raw.get("enabled", False)),

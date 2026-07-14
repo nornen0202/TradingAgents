@@ -80,17 +80,78 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
         {
             "generated_at": datetime.now().isoformat(),
             "runs": [
-                {
-                    **{key: value for key, value in manifest.items() if key != "_run_dir"},
-                    "published_to_site": str(manifest.get("run_id") or "") in published_run_ids,
-                }
+                _compact_feed_manifest(
+                    manifest,
+                    published_to_site=str(manifest.get("run_id") or "") in published_run_ids,
+                )
                 for manifest in manifests
             ],
         },
     )
     _build_youtube_site_addon(archive_dir=archive_dir, site_dir=site_dir)
     _build_prism_telegram_site_addon(archive_dir=archive_dir, site_dir=site_dir)
+    from tradingagents.work.site import build_work_site
+
+    build_work_site(
+        site_dir=site_dir,
+        archive_dir=archive_dir,
+        public_base_url=getattr(settings, "public_base_url", ""),
+    )
     return manifests
+
+
+def _compact_feed_manifest(manifest: dict[str, Any], *, published_to_site: bool) -> dict[str, Any]:
+    settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
+    decision_bundle = manifest.get("decision_bundle") if isinstance(manifest.get("decision_bundle"), dict) else {}
+    summary = manifest.get("summary") if isinstance(manifest.get("summary"), dict) else {}
+    portfolio = manifest.get("portfolio") if isinstance(manifest.get("portfolio"), dict) else {}
+    account_performance = (
+        portfolio.get("account_performance")
+        if isinstance(portfolio.get("account_performance"), dict)
+        else {}
+    )
+    tickers = [item for item in (manifest.get("tickers") or []) if isinstance(item, dict)]
+    return {
+        "run_id": manifest.get("run_id"),
+        "label": manifest.get("label"),
+        "started_at": manifest.get("started_at"),
+        "finished_at": manifest.get("finished_at"),
+        "status": manifest.get("status"),
+        "market": settings.get("market") or manifest.get("market"),
+        "run_mode": settings.get("run_mode"),
+        "settings": {
+            "market": settings.get("market") or manifest.get("market"),
+            "run_mode": settings.get("run_mode"),
+        },
+        "summary": {
+            "total_tickers": summary.get("total_tickers"),
+        },
+        "portfolio": {
+            "status": portfolio.get("status"),
+            "account_performance": {
+                key: account_performance.get(key)
+                for key in ("enabled", "status", "publish_to_site")
+                if account_performance.get(key) is not None
+            },
+        },
+        "ticker_count": len(tickers),
+        "success_count": sum(str(item.get("status") or "").lower() == "success" for item in tickers),
+        "decision_bundle": {
+            key: decision_bundle.get(key)
+            for key in (
+                "version",
+                "decision_ready",
+                "conditional_strategy_ready",
+                "quality_label_ko",
+                "fresh_row_ratio",
+                "conditional_row_ratio",
+                "strategy_counts",
+            )
+            if decision_bundle.get(key) is not None
+        },
+        "published_to_site": published_to_site,
+        "run_url": f"runs/{manifest.get('run_id')}/index.html" if published_to_site else None,
+    }
 
 
 def _load_run_manifests(archive_dir: Path) -> list[dict[str, Any]]:

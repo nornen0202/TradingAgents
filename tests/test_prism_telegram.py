@@ -74,6 +74,35 @@ Reason: trailing stop activated""",
     assert stop_signal.stop_loss_price == 232.71
 
 
+def test_multi_ticker_message_scopes_prices_and_scores_to_each_ticker_block():
+    message = PrismTelegramMessage(
+        message_id="multi",
+        text="""Holdings
+Alpha Corp (AAA)
+Current: $10.00
+Target: $12.00
+Stop: $9.00
+Score: 8/10
+Beta Corp (BBB)
+Current: $20.00
+Target: $24.00
+Stop: $18.00
+Score: 6/10""",
+        posted_at=datetime(2026, 7, 14, tzinfo=timezone.utc),
+    )
+
+    by_ticker = {item.canonical_ticker: item for item in message_to_signals(message, default_market="US")}
+
+    assert by_ticker["AAA"].current_price == 10.0
+    assert by_ticker["AAA"].target_price == 12.0
+    assert by_ticker["AAA"].stop_loss_price == 9.0
+    assert by_ticker["AAA"].confidence == 0.8
+    assert by_ticker["BBB"].current_price == 20.0
+    assert by_ticker["BBB"].target_price == 24.0
+    assert by_ticker["BBB"].stop_loss_price == 18.0
+    assert by_ticker["BBB"].confidence == 0.6
+
+
 def test_document_filename_yields_watch_signal_without_publishing_private_path():
     message = PrismTelegramMessage(
         message_id="3",

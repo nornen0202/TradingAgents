@@ -21,6 +21,15 @@ GitHub Pages에 전달하는 단일 투자 판단 계약입니다. 내부 기계
 핵심 시세 필드가 빠진 자료는 리서치에는 사용할 수 있지만 즉시 매수·매도 판단으로
 승격할 수 없습니다.
 
+추가로 모든 보유 종목 행이 실행 가능해야 합니다. 신규 후보가 많아 80%를 넘더라도
+stale 보유 행이 하나라도 있으면 portfolio-wide `decision_ready`는 false입니다.
+일부 행만 유효하면 `quality.report_mode=MIXED`로 게시하며, 행별 `row_mode`는
+`IMMEDIATE`, `CONDITIONAL`, `BLOCKED_STALE`, `MISSING` 중 하나입니다.
+
+`IMMEDIATE`는 `current_execution_promotion=POSSIBLE`이고 provider 상태 재확인
+blocker가 없을 때만 허용됩니다. stale BUY/SELL/REDUCE 의도는 즉시 행동으로
+표시하지 않습니다.
+
 `quality.conditional_strategy_ready=true`는 현재 세션의 현재가·VWAP·상대 거래량과
 기준시각은 충족하지만 일부 호가·수급·시장 상태가 지연 또는 제한된 경우입니다.
 이 계층은 실제 값을 이용한 보유·축소·종가 확인·조건부 매수 전략을 제공하지만,
@@ -43,6 +52,9 @@ GitHub Pages에 전달하는 단일 투자 판단 계약입니다. 내부 기계
 payload로 결합합니다. 산출된 `TRANSMISSION_KEY`를 자동화 상태에 기록해 같은 run과
 내용을 중복 전송하지 않습니다. 준비되지 않은 main은 연구 전용, 준비되지 않은
 overlay는 데이터 장애 모드로 전송합니다.
+
+현재 key는 source hash뿐 아니라 prompt SHA-256과 contract version을 포함합니다.
+일부 행만 실행/조건부인 overlay는 전체 장애로 숨기지 않고 `MIXED`로 전송합니다.
 
 ChatGPT 사용자용 분류는 다음 한국어 표현을 사용합니다.
 

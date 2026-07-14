@@ -121,6 +121,7 @@ class CodexProviderTests(unittest.TestCase):
         )
 
         with (
+            patch.dict("os.environ", {"CODEX_BINARY": ""}, clear=False),
             patch("tradingagents.llm_clients.codex_binary.os.name", "nt"),
             patch(
                 "tradingagents.llm_clients.codex_binary.Path.home",
@@ -151,6 +152,7 @@ class CodexProviderTests(unittest.TestCase):
         )
 
         with (
+            patch.dict("os.environ", {"CODEX_BINARY": ""}, clear=False),
             patch("tradingagents.llm_clients.codex_binary.os.name", "nt"),
             patch(
                 "tradingagents.llm_clients.codex_binary.Path.home",

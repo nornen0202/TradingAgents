@@ -65,6 +65,19 @@ def test_ready_bundle_selects_execution_mode_and_stable_transmission_key(tmp_pat
     assert first_payload.count("모든 답변은 한국어로 작성한다.") == 1
 
 
+def test_prompt_revision_changes_transmission_key(tmp_path: Path):
+    run_dir = _write_run(tmp_path, run_id="same-source", run_mode="full", decision_ready=True)
+    prompt = tmp_path / "prompt.md"
+    prompt.write_text("프롬프트 V1", encoding="utf-8")
+    _first_payload, first = pack.build_context_pack(run_dir=run_dir, prompt_path=prompt)
+    prompt.write_text("프롬프트 V2", encoding="utf-8")
+    _second_payload, second = pack.build_context_pack(run_dir=run_dir, prompt_path=prompt)
+
+    assert first["source_sha256"] == second["source_sha256"]
+    assert first["prompt_sha256"] != second["prompt_sha256"]
+    assert first["transmission_key"] != second["transmission_key"]
+
+
 def test_non_ready_overlay_selects_compact_outage_mode(tmp_path: Path):
     run_dir = _write_run(tmp_path, run_id="overlay-stale", run_mode="overlay_only", decision_ready=False)
     prompt = tmp_path / "prompt.md"
@@ -167,5 +180,6 @@ def test_context_pack_keeps_all_holdings_and_only_five_new_candidates():
         "held_ticker_count": 2,
         "new_candidate_limit": 5,
         "omitted_nonheld_ticker_count": 2,
+        "all_holdings_included": True,
         "raw_codes_omitted": True,
     }

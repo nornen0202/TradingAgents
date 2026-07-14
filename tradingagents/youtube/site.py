@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from html import escape
+import hashlib
 import json
 import re
 import shutil
@@ -165,8 +166,13 @@ def _render_feed(manifests: list[dict[str, Any]], settings: YouTubeSiteSettings)
     items: list[dict[str, Any]] = []
     for manifest in manifests:
         run_id = str(manifest.get("run_id") or "")
+        run_dir = _manifest_run_dir(manifest)
         for video in _public_report_videos(manifest):
             video_id = str(video.get("video_id") or "")
+            public_summary = _read_json_run_artifact(run_dir, video.get("public_summary_path")) or _public_summary_from_video(video)
+            content_sha256 = hashlib.sha256(
+                json.dumps(public_summary, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            ).hexdigest()
             source_url = _first_text(video.get("source_url"))
             thumbnail_url = _first_text(video.get("thumbnail_url")) or _default_thumbnail_url(video_id)
             items.append(
@@ -182,13 +188,21 @@ def _render_feed(manifests: list[dict[str, Any]], settings: YouTubeSiteSettings)
                     "published_at": video.get("published_at"),
                     "video_url": video.get("video_url"),
                     "report_url": f"runs/{_safe_segment(run_id)}/{_safe_segment(video_id)}.html",
+                    "summary_url": f"runs/{_safe_segment(run_id)}/{_safe_segment(video_id)}.json",
+                    "content_sha256": content_sha256,
                 }
             )
+    published_items = items[: settings.max_videos_on_index]
+    occurred = sorted(str(item.get("published_at") or "") for item in published_items if item.get("published_at"))
     return {
-        "version": 1,
+        "version": 2,
         "title": settings.title,
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
-        "items": items[: settings.max_videos_on_index],
+        "total_items": len(items),
+        "truncated": len(published_items) < len(items),
+        "oldest_occurred_at": occurred[0] if occurred else None,
+        "newest_occurred_at": occurred[-1] if occurred else None,
+        "items": published_items,
     }
 
 

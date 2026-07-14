@@ -328,6 +328,7 @@ selective_rerun_enabled = true
     }
 
     with (
+        patch("tradingagents.scheduled.runner._resolve_run_trade_date", return_value="2026-04-14"),
         patch("tradingagents.scheduled.runner._run_single_ticker", return_value=ticker_summary) as run_single,
         patch("tradingagents.scheduled.runner._run_execution_overlay_passes", side_effect=_fake_overlay_updates),
         patch("tradingagents.scheduled.runner.collect_event_signals", return_value={}),

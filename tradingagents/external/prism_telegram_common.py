@@ -227,12 +227,6 @@ def message_to_signals(
 ) -> list[PrismExternalSignal]:
     action = _infer_action(message)
     trigger_type = _infer_trigger_type(message)
-    confidence = _infer_confidence(message)
-    current_price = _first_price(message.text)
-    stop_loss = _first_named_price(message.text, ("Stop Loss", "손절가", "Stop"))
-    target = _first_named_price(message.text, ("Target", "목표가"))
-    risk_reward = _first_metric(message.text, r"R/R\s*:\s*([0-9]+(?:\.[0-9]+)?)")
-    win_rate = _first_metric(message.text, r"Trigger Win Rate\s*:\s*([0-9]+(?:\.[0-9]+)?)%")
     mentions = _ticker_mentions(message)
     signals: list[PrismExternalSignal] = []
     seen: set[str] = set()
@@ -245,6 +239,15 @@ def message_to_signals(
             continue
         seen.add(canonical)
         row_warnings: list[str] = []
+        scoped_text = _mention_scoped_text(message.text, mention.ticker, multi_ticker=len(mentions) > 1)
+        confidence = _infer_confidence_text(scoped_text)
+        current_price = _first_price(scoped_text)
+        stop_loss = _first_named_price(scoped_text, ("Stop Loss", "손절가", "Stop"))
+        target = _first_named_price(scoped_text, ("Target", "목표가"))
+        risk_reward = _first_metric(scoped_text, r"R/R\s*:\s*([0-9]+(?:\.[0-9]+)?)")
+        win_rate = _first_metric(scoped_text, r"Trigger Win Rate\s*:\s*([0-9]+(?:\.[0-9]+)?)%")
+        if len(mentions) > 1 and any(value is not None for value in (current_price, stop_loss, target)):
+            row_warnings.append("multi_ticker_prices_scoped_to_mention_block")
         market, market_warnings = normalize_market_with_warnings(
             None,
             ticker=canonical,
@@ -461,12 +464,33 @@ def _signal_tags(message: PrismTelegramMessage, trigger_type: str) -> tuple[str,
 
 
 def _infer_confidence(message: PrismTelegramMessage) -> float | None:
-    score = _first_metric(message.text, r"점수\s*:\s*([0-9]+(?:\.[0-9]+)?)")
+    return _infer_confidence_text(message.text)
+
+
+def _infer_confidence_text(text: str) -> float | None:
+    score = _first_metric(text, r"점수\s*:\s*([0-9]+(?:\.[0-9]+)?)")
     if score is None:
-        score = _first_metric(message.text, r"(?:매수\s*)?Score\s*:\s*([0-9]+(?:\.[0-9]+)?)")
+        score = _first_metric(text, r"(?:매수\s*)?Score\s*:\s*([0-9]+(?:\.[0-9]+)?)")
     if score is not None:
         return max(0.0, min(score if score <= 1.0 else score / 10.0, 1.0))
     return 0.45
+
+
+def _mention_scoped_text(text: str, ticker: str, *, multi_ticker: bool) -> str:
+    if not multi_ticker:
+        return text
+    lines = _message_lines(text)
+    ticker_pattern = re.compile(rf"\({re.escape(str(ticker).upper())}\)", flags=re.IGNORECASE)
+    any_ticker_pattern = re.compile(r"\((?:[A-Z][A-Z0-9.\-]{0,9}|\d{6})\)")
+    start = next((index for index, line in enumerate(lines) if ticker_pattern.search(line)), None)
+    if start is None:
+        return ""
+    selected = [lines[start]]
+    for line in lines[start + 1 :]:
+        if any_ticker_pattern.search(line):
+            break
+        selected.append(line)
+    return "\n".join(selected)
 
 
 def _first_price(text: str) -> float | None:

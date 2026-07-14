@@ -6,8 +6,10 @@ import json
 from pathlib import Path
 from typing import Any
 
+from tradingagents.work.packet import compact_decision_bundle
 
-VALID_MODES = {"auto", "conditional", "execution", "research", "outage"}
+
+VALID_MODES = {"auto", "conditional", "execution", "mixed", "research", "outage"}
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -53,38 +55,7 @@ def _prism_current(run_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
 
 
 def _compact_decision_bundle(bundle: dict[str, Any], *, max_new_candidates: int = 5) -> dict[str, Any]:
-    if not bundle:
-        return {}
-    rows = [row for row in (bundle.get("strategy_table") or []) if isinstance(row, dict)]
-    held_rows = [row for row in rows if row.get("is_held") is True]
-    new_rows = [row for row in rows if row.get("is_held") is not True]
-    selected_rows = [*held_rows, *new_rows[: max(0, int(max_new_candidates))]]
-    compact_rows = []
-    for display_priority, row in enumerate(selected_rows, start=1):
-        compact = {key: value for key, value in row.items() if key != "raw_codes"}
-        compact["display_priority"] = display_priority
-        compact_rows.append(compact)
-    selected_benchmarks = {
-        str(sync.get("benchmark") or "")
-        for row in compact_rows
-        for sync in (row.get("sector_sync") or {}, row.get("index_sync") or {})
-        if isinstance(sync, dict) and str(sync.get("benchmark") or "")
-    }
-    benchmark_context = bundle.get("benchmark_context") if isinstance(bundle.get("benchmark_context"), dict) else {}
-    compact_bundle = dict(bundle)
-    compact_bundle["strategy_table"] = compact_rows
-    compact_bundle["benchmark_context"] = {
-        key: value for key, value in benchmark_context.items() if str(key) in selected_benchmarks
-    }
-    compact_bundle["transmission_scope"] = {
-        "source_ticker_count": len(rows),
-        "transmitted_ticker_count": len(compact_rows),
-        "held_ticker_count": len(held_rows),
-        "new_candidate_limit": int(max_new_candidates),
-        "omitted_nonheld_ticker_count": max(0, len(new_rows) - int(max_new_candidates)),
-        "raw_codes_omitted": True,
-    }
-    return compact_bundle
+    return compact_decision_bundle(bundle, max_new_candidates=max_new_candidates)
 
 
 def choose_report_mode(*, requested_mode: str, manifest: dict[str, Any], bundle: dict[str, Any]) -> str:
@@ -92,14 +63,23 @@ def choose_report_mode(*, requested_mode: str, manifest: dict[str, Any], bundle:
     if requested not in VALID_MODES:
         raise ValueError(f"Unsupported mode: {requested_mode}")
     decision_ready = bool((bundle.get("quality") or {}).get("decision_ready"))
+    rows = [row for row in (bundle.get("strategy_table") or []) if isinstance(row, dict)]
+    ready_rows = sum(bool((row.get("quality") or {}).get("execution_ready")) for row in rows)
+    conditional_rows = sum(bool((row.get("quality") or {}).get("conditional_strategy_ready")) for row in rows)
     if requested == "execution" and not decision_ready:
         raise ValueError("Execution mode requires decision_bundle.quality.decision_ready=true.")
+    if requested == "conditional" and not conditional_rows:
+        raise ValueError("Conditional mode requires at least one conditional-ready row.")
     if requested != "auto":
         return requested
     if decision_ready:
         return "execution"
+    if ready_rows:
+        return "mixed"
     if bool((bundle.get("quality") or {}).get("conditional_strategy_ready")):
         return "conditional"
+    if conditional_rows:
+        return "mixed"
     run_mode = str(((manifest.get("settings") or {}).get("run_mode") or "")).lower()
     run_id = str(manifest.get("run_id") or "").lower()
     if run_mode in {"overlay_only", "selective_rerun_only"} or "overlay" in run_id:
@@ -205,6 +185,7 @@ def _render_context_payload(
 ) -> tuple[str, dict[str, Any]]:
     source_json = json.dumps(source_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     source_sha256 = hashlib.sha256(source_json.encode("utf-8")).hexdigest()
+    prompt_sha256 = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
     payload_body = "\n\n".join(
         [
             prompt,
@@ -213,12 +194,14 @@ def _render_context_payload(
             + "\nEND_TRADINGAGENTS_CONTEXT",
         ]
     )
-    transmission_key = f"{run_id}:{mode}:{source_sha256}"
+    key_material = f"chatgpt-context-v2:{run_id}:{mode}:{source_sha256}:{prompt_sha256}"
+    transmission_key = hashlib.sha256(key_material.encode("utf-8")).hexdigest()
     header = "\n".join(
         [
             f"REPORT_MODE: {mode.upper()}",
             f"SOURCE_RUN_ID: {run_id}",
             f"SOURCE_SHA256: {source_sha256}",
+            f"PROMPT_SHA256: {prompt_sha256}",
             f"TRANSMISSION_KEY: {transmission_key}",
             "이 payload와 동일한 TRANSMISSION_KEY가 이미 전송됐다면 내용을 다시 붙여넣지 말고 no-op으로 종료하세요.",
         ]
@@ -231,6 +214,7 @@ def _render_context_payload(
         "run_id": run_id,
         "mode": mode,
         "source_sha256": source_sha256,
+        "prompt_sha256": prompt_sha256,
         "transmission_key": transmission_key,
         "payload_chars": len(payload),
         "decision_ready": bool((bundle.get("quality") or {}).get("decision_ready")),
