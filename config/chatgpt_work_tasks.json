@@ -11,28 +11,28 @@
       "title": "TradingAgents KR Investment Briefing",
       "surface": "kr",
       "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=10,13,14;BYMINUTE=40;BYSECOND=0",
-      "prompt": "Use $tradingagents-daily-investment-work in kr mode from the local C:\\Projects\\TradingAgents project. First acknowledge only a matching receipt visible in the prior task result, then prepare and render the complete Korean KR intraday investment briefing. Never acknowledge the current response in the same invocation, and never use Chrome or the ChatGPT web composer."
+      "prompt": "Use $tradingagents-daily-investment-work in kr mode from the local C:\\Projects\\TradingAgents project. Prepare the canonical event, compose and validate the complete Korean KR intraday investment briefing, then acknowledge the exact event and emit its receipt/state. Never use Chrome or the ChatGPT web composer."
     },
     {
       "id": "tradingagents-work-us",
       "title": "TradingAgents US Investment Briefing",
       "surface": "us",
       "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA;BYHOUR=1,3,23;BYMINUTE=10;BYSECOND=0",
-      "prompt": "Use $tradingagents-daily-investment-work in us mode from the local C:\\Projects\\TradingAgents project. First acknowledge only a matching receipt visible in the prior task result, then prepare and render the complete Korean US intraday investment briefing. Never acknowledge the current response in the same invocation, and never use Chrome or the ChatGPT web composer."
+      "prompt": "Use $tradingagents-daily-investment-work in us mode from the local C:\\Projects\\TradingAgents project. Prepare the canonical event, compose and validate the complete Korean US intraday investment briefing, then acknowledge the exact event and emit its receipt/state. Never use Chrome or the ChatGPT web composer."
     },
     {
       "id": "tradingagents-work-youtube",
       "title": "TradingAgents YouTube Verification Delta",
       "surface": "youtube",
       "rrule": "FREQ=DAILY;BYHOUR=7,8,9;BYMINUTE=30;BYSECOND=0",
-      "prompt": "Use $tradingagents-daily-investment-work in youtube mode from the local C:\\Projects\\TradingAgents project. First acknowledge only a matching receipt visible in the prior task result, then process new or revised canonical YouTube events and render the Korean verification delta. Never acknowledge the current response in the same invocation, and never use Chrome or the ChatGPT web composer."
+      "prompt": "Use $tradingagents-daily-investment-work in youtube mode from the local C:\\Projects\\TradingAgents project. Prepare and process only new or revised canonical YouTube events, compose and validate the Korean verification delta, then acknowledge the exact event and emit its receipt/state. Never use Chrome or the ChatGPT web composer."
     },
     {
       "id": "tradingagents-work-prism",
       "title": "TradingAgents PRISM Research Delta",
       "surface": "prism",
       "rrule": "FREQ=DAILY;BYHOUR=8,9,10;BYMINUTE=35;BYSECOND=0",
-      "prompt": "Use $tradingagents-daily-investment-work in prism mode from the local C:\\Projects\\TradingAgents project. First acknowledge only a matching receipt visible in the prior task result, then process new or revised sanitized PRISM events and render the Korean research delta. Never acknowledge the current response in the same invocation, and never access the Telegram session/private archive or the ChatGPT web composer."
+      "prompt": "Use $tradingagents-daily-investment-work in prism mode from the local C:\\Projects\\TradingAgents project. Prepare and process only new or revised sanitized PRISM events, compose and validate the Korean research delta, then acknowledge the exact event and emit its receipt/state. Never access the Telegram session/private archive, Chrome, or the ChatGPT web composer."
     }
   ]
 }

@@ -22,6 +22,6 @@
 5. 근거와 반대 근거, 보조 신호 충돌
 6. 다음 checkpoint에서 확인할 값
 
-답변은 자동 주문 지시가 아니다. 본문 뒤에 다음 receipt 한 개를 출력하고, 그 다음 줄부터 Skill의 `BEGIN_TRADINGAGENTS_WORK_STATE` 복구 mirror를 출력한다. 현재 응답에서는 ACK하지 않으며 mirror result는 `PENDING_ACK`이다.
+답변은 자동 주문 지시가 아니다. 본문을 완성한 뒤 Skill 절차로 ACK하고, 성공했을 때만 다음 receipt 한 개를 출력한다. 그 다음 줄부터 `BEGIN_TRADINGAGENTS_WORK_STATE` 복구 mirror를 출력하며 result는 `SUCCESS`다. ACK 실패 시 receipt를 성공으로 표시하지 않고 result를 `PENDING_ACK`로 둔다.
 
 `WORK_RECEIPT {"event_id":"<event_id>","source_sha256":"<source_sha256>","prompt_contract_version":"<version>","status":"rendered"}`
