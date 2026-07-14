@@ -118,6 +118,117 @@ def test_stale_context_is_never_promoted_to_actionable_strategy():
     assert "과거 데이터" in bundle["strategy_table"][0]["data_status_ko"]
 
 
+def test_stale_held_exit_is_data_check_and_blocks_portfolio_ready():
+    context = _live_context()
+    fresh_template = context["tickers"][0]
+    context["tickers"] = []
+    candidates = []
+    actions = []
+    summaries = []
+    for index in range(4):
+        ticker = f"NEW{index}"
+        context["tickers"].append({**fresh_template, "ticker": ticker})
+        candidates.append({"canonical_ticker": ticker, "is_held": False})
+        summaries.append({"ticker": ticker, "status": "success"})
+    context["tickers"].append(
+        {
+            **fresh_template,
+            "ticker": "HELD",
+            "decision_now": "EXIT_NOW",
+            "generated_in_current_run": False,
+            "freshness_class": "PRIOR_SESSION_BACKFILL",
+            "execution_eligibility": "HISTORICAL_REFERENCE_ONLY",
+        }
+    )
+    candidates.append({"canonical_ticker": "HELD", "is_held": True})
+    actions.append({"canonical_ticker": "HELD", "action_now": "EXIT_NOW"})
+    summaries.append({"ticker": "HELD", "status": "success"})
+
+    bundle = build_decision_bundle(
+        run_id="overlay-us-held-stale",
+        market="US",
+        generated_at="2026-07-10T12:01:00-04:00",
+        analysis_source_run_id="daily-us",
+        ticker_summaries=summaries,
+        execution_context=context,
+        portfolio_candidates=candidates,
+        portfolio_actions=actions,
+        benchmark_loader=lambda _symbols: {},
+    )
+
+    held = next(row for row in bundle["strategy_table"] if row["ticker"] == "HELD")
+    assert bundle["quality"]["fresh_row_ratio"] == 0.8
+    assert bundle["quality"]["decision_ready"] is False
+    assert bundle["quality"]["blocked_held_tickers"] == ["HELD"]
+    assert held["strategy_code"] == "DATA_CHECK"
+    assert held["quality"]["row_mode"] == "BLOCKED_STALE"
+
+
+def test_provider_recheck_gate_downgrades_row_to_conditional():
+    context = _live_context()
+    context["tickers"][0]["asof_execution_gate"].update(
+        {
+            "current_execution_promotion": "RECHECK_REQUIRED",
+            "provider_status_recheck_required": True,
+            "provider_limitations": ["status_unavailable:luld_status"],
+        }
+    )
+    bundle = build_decision_bundle(
+        run_id="overlay-us-provider-recheck",
+        market="US",
+        generated_at="2026-07-10T12:01:00-04:00",
+        analysis_source_run_id="daily-us",
+        ticker_summaries=[{"ticker": "NVDA", "status": "success"}],
+        execution_context=context,
+        portfolio_candidates=[{"canonical_ticker": "NVDA", "is_held": True}],
+        portfolio_actions=[{"canonical_ticker": "NVDA", "action_now": "STARTER_NOW"}],
+        benchmark_loader=lambda _symbols: {},
+    )
+
+    row = bundle["strategy_table"][0]
+    assert bundle["quality"]["decision_ready"] is False
+    assert bundle["quality"]["conditional_strategy_ready"] is True
+    assert row["quality"]["execution_ready"] is False
+    assert row["quality"]["conditional_strategy_ready"] is True
+    assert row["quality"]["row_mode"] == "CONDITIONAL"
+    assert row["quality"]["current_execution_promotion"] == "RECHECK_REQUIRED"
+
+
+def test_mixed_mode_keeps_fresh_held_reduce_while_other_held_row_is_stale():
+    context = _live_context()
+    first = context["tickers"][0]
+    context["tickers"] = [
+        {**first, "ticker": "FRESH", "decision_now": "REDUCE_NOW"},
+        {
+            **first,
+            "ticker": "STALE",
+            "generated_in_current_run": False,
+            "freshness_class": "PRIOR_SESSION_BACKFILL",
+            "execution_eligibility": "HISTORICAL_REFERENCE_ONLY",
+        },
+    ]
+    bundle = build_decision_bundle(
+        run_id="overlay-kr-mixed",
+        market="KR",
+        generated_at="2026-07-10T12:01:00+09:00",
+        analysis_source_run_id="daily-kr",
+        ticker_summaries=[{"ticker": "FRESH"}, {"ticker": "STALE"}],
+        execution_context=context,
+        portfolio_candidates=[
+            {"canonical_ticker": "FRESH", "is_held": True},
+            {"canonical_ticker": "STALE", "is_held": True},
+        ],
+        portfolio_actions=[{"canonical_ticker": "FRESH", "action_now": "REDUCE_NOW"}],
+        benchmark_loader=lambda _symbols: {},
+    )
+
+    fresh = next(row for row in bundle["strategy_table"] if row["ticker"] == "FRESH")
+    assert bundle["quality"]["report_mode"] == "MIXED"
+    assert bundle["quality"]["decision_ready"] is False
+    assert fresh["strategy_code"] == "REDUCE"
+    assert fresh["quality"]["row_mode"] == "IMMEDIATE"
+
+
 def test_delayed_current_session_data_produces_conditional_strategy_not_data_check():
     context = _live_context(
         freshness="DELAYED_CHECKPOINT",

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from html import escape
+import hashlib
 import json
 import shutil
 from pathlib import Path
@@ -31,9 +32,14 @@ def build_prism_telegram_site(
         for message in _public_messages(manifest):
             metadata = _read_json_run_artifact(run_dir, message.get("metadata_path")) or {}
             signals = _read_json_run_artifact(run_dir, message.get("signals_path")) or {}
+            message_id = _safe_segment(str(message.get("message_id") or "message"))
             _write_text(
-                run_site_dir / f"{_safe_segment(str(message.get('message_id') or 'message'))}.html",
+                run_site_dir / f"{message_id}.html",
                 _render_message_page(manifest, message, metadata, signals, settings),
+            )
+            _write_json(
+                run_site_dir / f"{message_id}.json",
+                _public_message_summary(manifest, message, signals),
             )
     _write_text(output_dir / "index.html", _render_index_page(manifests, settings))
     _write_json(output_dir / "feed.json", _render_feed(manifests, settings))
@@ -177,8 +183,14 @@ def _render_feed(manifests: list[dict[str, Any]], settings: PrismTelegramSiteSet
     items: list[dict[str, Any]] = []
     for manifest in manifests:
         run_id = str(manifest.get("run_id") or "")
+        run_dir = _manifest_run_dir(manifest)
         for message in _public_messages(manifest):
             message_id = str(message.get("message_id") or "")
+            signals = _read_json_run_artifact(run_dir, message.get("signals_path")) or {}
+            public_summary = _public_message_summary(manifest, message, signals)
+            content_sha256 = hashlib.sha256(
+                json.dumps(public_summary, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            ).hexdigest()
             items.append(
                 {
                     "run_id": run_id,
@@ -188,13 +200,68 @@ def _render_feed(manifests: list[dict[str, Any]], settings: PrismTelegramSiteSet
                     "text_preview": message.get("text_preview"),
                     "signals_count": message.get("signals_count"),
                     "report_url": f"runs/{_safe_segment(run_id)}/{_safe_segment(message_id)}.html",
+                    "summary_url": f"runs/{_safe_segment(run_id)}/{_safe_segment(message_id)}.json",
+                    "content_sha256": content_sha256,
                 }
             )
+    published_items = items[: settings.max_messages_on_index]
+    occurred = sorted(str(item.get("posted_at") or "") for item in published_items if item.get("posted_at"))
     return {
-        "version": 1,
+        "version": 2,
         "title": settings.title,
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
-        "items": items[: settings.max_messages_on_index],
+        "total_items": len(items),
+        "truncated": len(published_items) < len(items),
+        "oldest_occurred_at": occurred[0] if occurred else None,
+        "newest_occurred_at": occurred[-1] if occurred else None,
+        "items": published_items,
+    }
+
+
+def _public_message_summary(
+    manifest: Mapping[str, Any],
+    message: Mapping[str, Any],
+    signals_payload: Mapping[str, Any],
+) -> dict[str, Any]:
+    preview = str(message.get("text_preview") or "")[:1200]
+    simulation_only = "시뮬" in preview or "simulation" in preview.lower()
+    signals = []
+    for signal in signals_payload.get("signals") or []:
+        if not isinstance(signal, Mapping):
+            continue
+        signals.append(
+            {
+                key: signal.get(key)
+                for key in (
+                    "canonical_ticker",
+                    "display_name",
+                    "market",
+                    "source_asof",
+                    "signal_action",
+                    "trigger_type",
+                    "trigger_score",
+                    "composite_score",
+                    "risk_reward_ratio",
+                    "stop_loss_price",
+                    "target_price",
+                    "confidence",
+                    "warnings",
+                )
+                if signal.get(key) is not None
+            }
+        )
+    return {
+        "version": 1,
+        "run_id": manifest.get("run_id"),
+        "channel": (manifest.get("source") or {}).get("channel") if isinstance(manifest.get("source"), Mapping) else None,
+        "message_id": str(message.get("message_id") or ""),
+        "posted_at": message.get("posted_at"),
+        "source_url": message.get("url"),
+        "preview": preview,
+        "signals": signals,
+        "simulation_only": simulation_only,
+        "actionability": "research_only",
+        "execution_eligible": False,
     }
 
 

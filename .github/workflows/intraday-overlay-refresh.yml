@@ -76,6 +76,8 @@ jobs:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
+      TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       CODEX_BINARY: ${{ vars.CODEX_BINARY }}
       CODEX_HOME: ${{ vars.CODEX_HOME }}
@@ -294,6 +296,8 @@ jobs:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
+      TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -409,6 +413,9 @@ jobs:
       - publish_overlay_site
     if: ${{ always() && needs.publish_overlay_site.result == 'success' }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: tradingagents-pages-deploy
+      cancel-in-progress: false
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     environment:

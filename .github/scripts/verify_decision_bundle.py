@@ -58,12 +58,32 @@ def validate_bundle(bundle: dict[str, Any]) -> list[str]:
             for field in REQUIRED_LIVE_FIELDS:
                 if row.get(field) in (None, ""):
                     errors.append(f"current-session strategy row {row.get('ticker')} missing {field}")
+        promotion = str((row.get("quality") or {}).get("current_execution_promotion") or "")
+        if row_ready and promotion and promotion != "POSSIBLE":
+            errors.append(f"execution-ready row {row.get('ticker')} has promotion={promotion}")
+        if (
+            not row_ready
+            and not row_conditional
+            and str(row.get("strategy_code") or "") in {"BUY_NOW", "SELL", "REDUCE"}
+        ):
+            errors.append(
+                f"blocked row {row.get('ticker')} exposes immediate strategy {row.get('strategy_code')}"
+            )
     actual_ratio = ready_rows / len(rows)
     declared_ratio = float(quality.get("fresh_row_ratio") or 0.0)
     if abs(actual_ratio - declared_ratio) > 0.001:
         errors.append(f"fresh_row_ratio mismatch: declared={declared_ratio:.4f}, actual={actual_ratio:.4f}")
     if decision_ready and actual_ratio < float(quality.get("minimum_fresh_row_ratio") or 0.8):
         errors.append("decision_ready=true but fresh row ratio is below the minimum")
+    blocked_held = [
+        str(row.get("ticker") or "")
+        for row in rows
+        if isinstance(row, dict)
+        and row.get("is_held") is True
+        and not bool((row.get("quality") or {}).get("execution_ready"))
+    ]
+    if decision_ready and blocked_held:
+        errors.append(f"decision_ready=true with blocked held rows: {', '.join(blocked_held)}")
     actual_conditional_ratio = conditional_rows / len(rows)
     declared_conditional_ratio = float(quality.get("conditional_row_ratio") or 0.0)
     if abs(actual_conditional_ratio - declared_conditional_ratio) > 0.001:

@@ -87,6 +87,7 @@ jobs:
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site-${{ github.run_id }}
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
+      TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
       PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR: ${{ vars.PRISM_TELEGRAM_PRIVATE_ARCHIVE_DIR }}
       PRISM_TELEGRAM_MODE: ${{ github.event.inputs.mode || vars.PRISM_TELEGRAM_MODE || 'user_session' }}
       PRISM_TELEGRAM_DOWNLOAD_PDFS: ${{ github.event.inputs.download_pdfs || vars.PRISM_TELEGRAM_DOWNLOAD_PDFS || 'true' }}
@@ -177,6 +178,29 @@ jobs:
               args += ["--download-pdfs"]
           subprocess.check_call(args)
 
+      - name: Rebuild merged site and Work context after PRISM collection
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          args = [
+              sys.executable,
+              "-u",
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              "config/scheduled_analysis.toml",
+              "--site-only",
+              "--site-dir",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
+          ]
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if archive_dir:
+              args += ["--archive-dir", archive_dir]
+          subprocess.check_call(args)
+
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
@@ -187,6 +211,9 @@ jobs:
     needs: build_prism_telegram_pages
     if: ${{ needs.build_prism_telegram_pages.result == 'success' }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: tradingagents-pages-deploy
+      cancel-in-progress: false
     permissions:
       pages: write
       id-token: write
