@@ -14,11 +14,9 @@ from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY, REALT
 from tradingagents.presentation import (
     present_account_action,
     present_action_summary,
-    present_data_status,
     present_decision_payload,
     present_investment_view,
     present_primary_condition,
-    present_snapshot_mode,
     sanitize_investor_text,
 )
 from tradingagents.schemas import parse_structured_decision
@@ -59,17 +57,12 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
         if portfolio_summary.get("status_path"):
             _write_text(
                 site_dir / "runs" / manifest["run_id"] / "portfolio.html",
-                _render_portfolio_page(manifest, settings, portfolio_summary=portfolio_summary),
+                _render_portfolio_page(manifest, settings, portfolio_summary={}),
             )
-            if _portfolio_has_etf_benchmark_page(portfolio_summary):
-                _write_text(
-                    site_dir / "runs" / manifest["run_id"] / "etf_benchmark.html",
-                    _render_etf_benchmark_page(manifest, settings, portfolio_summary=portfolio_summary),
-                )
-        for ticker_summary in manifest.get("tickers", []):
+        for ticker_summary in _public_ticker_summaries(manifest):
             _write_text(
                 site_dir / "runs" / manifest["run_id"] / f"{ticker_summary['ticker']}.html",
-                _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests, portfolio_summary=portfolio_summary),
+                _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests, portfolio_summary={}),
             )
 
     _publish_latest_decision_bundles(site_dir=site_dir, manifests=published_manifests)
@@ -97,20 +90,20 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
         archive_dir=archive_dir,
         public_base_url=getattr(settings, "public_base_url", ""),
     )
+    from tradingagents.scheduled.mobile_site import build_mobile_site
+
+    build_mobile_site(
+        site_dir=site_dir,
+        archive_dir=archive_dir,
+        public_base_url=getattr(settings, "public_base_url", ""),
+    )
     return manifests
 
 
 def _compact_feed_manifest(manifest: dict[str, Any], *, published_to_site: bool) -> dict[str, Any]:
     settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
     decision_bundle = manifest.get("decision_bundle") if isinstance(manifest.get("decision_bundle"), dict) else {}
-    summary = manifest.get("summary") if isinstance(manifest.get("summary"), dict) else {}
-    portfolio = manifest.get("portfolio") if isinstance(manifest.get("portfolio"), dict) else {}
-    account_performance = (
-        portfolio.get("account_performance")
-        if isinstance(portfolio.get("account_performance"), dict)
-        else {}
-    )
-    tickers = [item for item in (manifest.get("tickers") or []) if isinstance(item, dict)]
+    tickers = _public_ticker_summaries(manifest)
     return {
         "run_id": manifest.get("run_id"),
         "label": manifest.get("label"),
@@ -124,15 +117,7 @@ def _compact_feed_manifest(manifest: dict[str, Any], *, published_to_site: bool)
             "run_mode": settings.get("run_mode"),
         },
         "summary": {
-            "total_tickers": summary.get("total_tickers"),
-        },
-        "portfolio": {
-            "status": portfolio.get("status"),
-            "account_performance": {
-                key: account_performance.get(key)
-                for key in ("enabled", "status", "publish_to_site")
-                if account_performance.get(key) is not None
-            },
+            "total_tickers": len(tickers),
         },
         "ticker_count": len(tickers),
         "success_count": sum(str(item.get("status") or "").lower() == "success" for item in tickers),
@@ -145,7 +130,6 @@ def _compact_feed_manifest(manifest: dict[str, Any], *, published_to_site: bool)
                 "quality_label_ko",
                 "fresh_row_ratio",
                 "conditional_row_ratio",
-                "strategy_counts",
             )
             if decision_bundle.get(key) is not None
         },
@@ -167,6 +151,98 @@ def _load_run_manifests(archive_dir: Path) -> list[dict[str, Any]]:
 
     manifests.sort(key=lambda item: item.get("started_at", ""), reverse=True)
     return manifests
+
+
+def _public_ticker_summaries(manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    """Exclude account-only tickers from legacy public run/ticker pages.
+
+    New account-aware runs record the independently public watchlist and scanner
+    universe in ``active_universe``.  A holding that is absent from both sets is
+    private even when it was analyzed in the same run.  Older manifests without
+    provenance fail closed because they cannot prove that a ticker was part of
+    an independently public universe rather than an account-only holding.
+    """
+
+    tickers = [item for item in (manifest.get("tickers") or []) if isinstance(item, dict)]
+    active = manifest.get("active_universe") if isinstance(manifest.get("active_universe"), dict) else {}
+    has_public_contract = "expected_watchlist_tickers" in active or "scanner_candidates" in active
+    if not has_public_contract:
+        return []
+    allowed = {
+        _public_ticker_identity(value)
+        for value in [*(active.get("expected_watchlist_tickers") or []), *(active.get("scanner_candidates") or [])]
+        if _public_ticker_identity(value)
+    }
+    return [
+        _sanitize_public_ticker_summary(item)
+        for item in tickers
+        if _public_ticker_identity(item.get("ticker")) in allowed
+    ]
+
+
+_PUBLIC_TICKER_PRIVATE_KEYS = {
+    "account",
+    "account_action",
+    "account_id",
+    "account_number",
+    "action_lift_audit",
+    "average_cost",
+    "avg_price",
+    "cash_available",
+    "cash_balance",
+    "cost_basis",
+    "current_weight",
+    "delta_krw",
+    "delta_krw_now",
+    # Failure details are operational diagnostics and can contain local paths,
+    # broker context, or account-only ticker names.  Public pages only expose
+    # the failed status; the detailed error remains in the private archive and
+    # GitHub Actions logs.
+    "error",
+    "exception",
+    "holding",
+    "holding_value",
+    "holdings",
+    "is_held",
+    "is_owned",
+    "market_value",
+    "owned",
+    "portfolio",
+    "portfolio_action",
+    "portfolio_context",
+    "portfolio_relative_action",
+    "position",
+    "position_size",
+    "position_value",
+    "quantity",
+    "shares",
+    "target_value",
+    "target_weight",
+    "target_weight_now",
+    "traceback",
+}
+
+
+def _sanitize_public_ticker_summary(value: Any) -> Any:
+    """Drop account-derived fields before any legacy public rendering."""
+
+    if isinstance(value, dict):
+        return {
+            key: _sanitize_public_ticker_summary(item)
+            for key, item in value.items()
+            if str(key).strip().lower() not in _PUBLIC_TICKER_PRIVATE_KEYS
+        }
+    if isinstance(value, list):
+        return [_sanitize_public_ticker_summary(item) for item in value]
+    return value
+
+
+def _public_ticker_identity(value: Any) -> str:
+    ticker = str(value or "").strip().upper()
+    for suffix in (".KS", ".KQ"):
+        if ticker.endswith(suffix):
+            return ticker[: -len(suffix)]
+    return ticker
 
 
 def _select_published_manifests(manifests: list[dict[str, Any]], settings: SiteSettings) -> list[dict[str, Any]]:
@@ -203,77 +279,11 @@ def _copy_artifacts(
     manifest: dict[str, Any],
     portfolio_summary: dict[str, Any],
 ) -> None:
-    for ticker_summary in manifest.get("tickers", []):
-        download_dir = site_dir / "downloads" / manifest["run_id"] / ticker_summary["ticker"]
-        download_dir.mkdir(parents=True, exist_ok=True)
-        for relative_path in (ticker_summary.get("artifacts") or {}).values():
-            if not relative_path:
-                continue
-            source = _resolve_artifact_source(run_dir, relative_path)
-            if source.is_file():
-                shutil.copy2(source, download_dir / source.name)
-
-    execution_download_dir = site_dir / "downloads" / manifest["run_id"] / "execution"
-    for artifact_path in ((manifest.get("execution") or {}).get("artifacts") or {}).values():
-        if not artifact_path:
-            continue
-        source = _resolve_artifact_source(run_dir, artifact_path)
-        if source.is_file():
-            execution_download_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, execution_download_dir / source.name)
-
-    for artifact_path in ((manifest.get("decision_bundle") or {}).get("artifacts") or {}).values():
-        if not artifact_path:
-            continue
-        source = _resolve_artifact_source(run_dir, artifact_path)
-        if source.is_file():
-            execution_download_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, execution_download_dir / source.name)
-
-    download_dir = site_dir / "downloads" / manifest["run_id"] / "portfolio"
-    copied_any = False
-    for artifact_path in ((manifest.get("portfolio") or {}).get("artifacts") or {}).values():
-        if not artifact_path:
-            continue
-        source = _resolve_artifact_source(run_dir, artifact_path)
-        if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
-            continue
-        if not _should_publish_portfolio_artifact(source):
-            continue
-        if source.is_file():
-            download_dir.mkdir(parents=True, exist_ok=True)
-            _copy_public_portfolio_artifact(source, download_dir / source.name)
-            copied_any = True
-
-    if copied_any:
-        for section in ("portfolio_delta", "live_context_delta", "performance"):
-            for artifact_path in ((manifest.get(section) or {}).get("artifacts") or {}).values():
-                if not artifact_path:
-                    continue
-                source = _resolve_artifact_source(run_dir, artifact_path)
-                if source.is_file():
-                    download_dir.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(source, download_dir / source.name)
-        return
-
-    for source in portfolio_summary.get("downloadable_files", []):
-        if not isinstance(source, Path) or not source.is_file():
-            continue
-        if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
-            continue
-        if not _should_publish_portfolio_artifact(source):
-            continue
-        download_dir.mkdir(parents=True, exist_ok=True)
-        _copy_public_portfolio_artifact(source, download_dir / source.name)
-
-    for section in ("portfolio_delta", "live_context_delta", "performance"):
-        for artifact_path in ((manifest.get(section) or {}).get("artifacts") or {}).values():
-            if not artifact_path:
-                continue
-            source = _resolve_artifact_source(run_dir, artifact_path)
-            if source.is_file():
-                download_dir.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(source, download_dir / source.name)
+    # GitHub Pages is public.  Raw ticker, execution, decision, portfolio,
+    # performance, and delta artifacts may contain portfolio membership, account
+    # amounts, or machine-only execution fields.  Investor pages are rendered
+    # from in-memory summaries; no archive artifact is copied to the public tree.
+    del site_dir, run_dir, manifest, portfolio_summary
 
 
 def _publish_latest_decision_bundles(*, site_dir: Path, manifests: list[dict[str, Any]]) -> None:
@@ -310,26 +320,51 @@ def _publish_latest_decision_bundles(*, site_dir: Path, manifests: list[dict[str
             continue
         ready_bundle = ready_manifest.get("decision_bundle") or {}
         source_run_dir = Path(str(ready_manifest.get("_run_dir") or ""))
-        copied: dict[str, str] = {}
-        for artifact_key, artifact_path in (ready_bundle.get("artifacts") or {}).items():
-            source = _resolve_artifact_source(source_run_dir, artifact_path)
-            if not source.is_file():
+        artifact_path = (ready_bundle.get("artifacts") or {}).get("decision_bundle_v2_json")
+        source = _resolve_artifact_source(source_run_dir, artifact_path) if artifact_path else Path()
+        if source.is_file():
+            try:
+                raw_bundle = json.loads(source.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                raw_bundle = {}
+            from tradingagents.scheduled.mobile_site import sanitize_public_decision_bundle
+
+            active = (
+                ready_manifest.get("active_universe")
+                if isinstance(ready_manifest.get("active_universe"), dict)
+                else {}
+            )
+            has_public_contract = "expected_watchlist_tickers" in active or "scanner_candidates" in active
+            allowed_tickers = (
+                [*(active.get("expected_watchlist_tickers") or []), *(active.get("scanner_candidates") or [])]
+                if has_public_contract
+                else []
+            )
+            public_bundle = sanitize_public_decision_bundle(raw_bundle, allowed_tickers=allowed_tickers)
+            if not public_bundle:
                 continue
-            target_name = {
-                "decision_bundle_v2_json": "decision_bundle.json",
-                "strategy_table_ko_md": "strategy_table_ko.md",
-                "decision_bundle_status_json": "decision_bundle_status.json",
-            }.get(str(artifact_key), source.name)
-            shutil.copy2(source, target_dir / target_name)
-            copied[str(artifact_key)] = target_name
-        if copied:
+            _write_json(target_dir / "decision_bundle.json", public_bundle)
+            _write_json(
+                target_dir / "decision_bundle_status.json",
+                {
+                    "market": market.upper(),
+                    "run_id": ready_manifest.get("run_id"),
+                    "decision_ready": True,
+                    "privacy": "PUBLIC_RESEARCH_ONLY_NO_PORTFOLIO_MEMBERSHIP_OR_ACTIONS",
+                },
+            )
             _write_json(
                 target_dir / "source.json",
                 {
                     "market": market.upper(),
                     "decision_ready_run_id": ready_manifest.get("run_id"),
                     "decision_ready_run_started_at": ready_manifest.get("started_at"),
-                    "artifacts": copied,
+                    "artifacts": {
+                        "public_decision_bundle_json": "decision_bundle.json",
+                        "public_decision_bundle_status_json": "decision_bundle_status.json",
+                    },
+                    "privacy": "PUBLIC_RESEARCH_ONLY_NO_PORTFOLIO_MEMBERSHIP_OR_ACTIONS",
+                    "reference_only": ready_manifest.get("run_id") != latest_manifest.get("run_id"),
                     "latest_non_ready_runs_do_not_advance_this_pointer": True,
                 },
             )
@@ -716,13 +751,12 @@ def _render_index_page(
     representative = _select_representative_run(manifests)
     latest_portfolio = _load_portfolio_summary(Path(representative["_run_dir"])) if representative else {}
     latest_health_badges = ""
-    latest_health_compact = _render_health_compact_card(manifest=representative, portfolio_summary=latest_portfolio) if representative else ""
+    latest_health_compact = ""
     representative_badge = ""
     if representative and _run_phase_label(representative) in {"delayed_analysis_only", "post_close"}:
         representative_badge = "<div class='warning-banner'>Not for live execution</div>"
-    latest_portfolio_label = _portfolio_report_label(latest_portfolio)
     latest_portfolio_link = (
-        f"<a class=\"button\" href=\"runs/{_escape(representative['run_id'])}/portfolio.html\">Open {_escape(latest_portfolio_label.lower())}</a>"
+        "<a class=\"button\" href=\"mobile/private.html\">Open encrypted private dashboard</a>"
         if representative and latest_portfolio.get("status_path")
         else ""
     )
@@ -756,6 +790,9 @@ def _render_index_page(
             f" ({_escape(_run_phase_display_label(latest_daily_run))})"
             "</p>"
         )
+    representative_public_tickers = _public_ticker_summaries(representative) if representative else []
+    representative_public_success = sum(item.get("status") == "success" for item in representative_public_tickers)
+    representative_public_failed = len(representative_public_tickers) - representative_public_success
     latest_html = (
         f"""
         <section class="hero">
@@ -769,14 +806,15 @@ def _render_index_page(
             <p><strong>Run ID</strong><span>{_escape(representative['run_id'])}</span></p>
             <p><strong>Started</strong><span>{_escape(representative['started_at'])}</span></p>
             <p><strong>세션 단계</strong><span>{_escape(_run_phase_display_label(representative))}</span></p>
-            <p><strong>Tickers</strong><span>{representative['summary']['total_tickers']}</span></p>
-            <p><strong>Success</strong><span>{representative['summary']['successful_tickers']}</span></p>
-            <p><strong>Failed</strong><span>{representative['summary']['failed_tickers']}</span></p>
+            <p><strong>Public tickers</strong><span>{len(representative_public_tickers)}</span></p>
+            <p><strong>Success</strong><span>{representative_public_success}</span></p>
+            <p><strong>Failed</strong><span>{representative_public_failed}</span></p>
             {representative_badge}
             {latest_health_badges}
             {latest_health_compact}
             <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open 대표 투자 run</a>
             <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open representative investment run</a>
+            <a class="button" href="mobile/index.html">Open 모바일 공개 리서치</a>
             <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
             <a class="button" href="prism-telegram/index.html">Open PRISM Telegram 리포트</a>
             {latest_portfolio_link}
@@ -796,6 +834,8 @@ def _render_index_page(
           <div class="hero-card">
             <div class="status pending">no data yet</div>
             <p>The scheduled workflow has not produced an archived run yet.</p>
+            <a class="button" href="mobile/index.html">Open 모바일 공개 리서치</a>
+            <a class="button" href="mobile/private.html">Open encrypted private dashboard</a>
             <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
             <a class="button" href="prism-telegram/index.html">Open PRISM Telegram 리포트</a>
           </div>
@@ -805,19 +845,13 @@ def _render_index_page(
 
     cards = []
     for manifest in manifests[: settings.max_runs_on_homepage]:
+        public_tickers = _public_ticker_summaries(manifest)
+        public_success = sum(item.get("status") == "success" for item in public_tickers)
+        public_failed = len(public_tickers) - public_success
         portfolio_summary = _load_portfolio_summary(Path(manifest["_run_dir"]))
-        portfolio_label = _portfolio_report_label(portfolio_summary)
         portfolio_link = (
-            f"<p><a href=\"runs/{_escape(manifest['run_id'])}/portfolio.html\">{_escape(portfolio_label)}</a></p>"
+            "<p><a href=\"mobile/private.html\">Encrypted private dashboard</a></p>"
             if portfolio_summary.get("status_path")
-            else ""
-        )
-        sell_side_counts = portfolio_summary.get("sell_side_counts") if isinstance(portfolio_summary.get("sell_side_counts"), dict) else {}
-        sell_side_line = (
-            f"<p>이익실현 {int(sell_side_counts.get('TAKE_PROFIT') or 0)} / "
-            f"리스크 축소 {int(sell_side_counts.get('REDUCE_RISK') or 0)} / "
-            f"손절·청산 {int(sell_side_counts.get('STOP_LOSS') or 0) + int(sell_side_counts.get('EXIT') or 0)}</p>"
-            if sell_side_counts
             else ""
         )
         cards.append(
@@ -828,20 +862,17 @@ def _render_index_page(
                 <span class="status {manifest['status']}">{_escape(manifest['status'].replace('_', ' '))}</span>
               </div>
               <p>{_escape(manifest['started_at'])}</p>
-              <p>{manifest['summary']['successful_tickers']} succeeded, {manifest['summary']['failed_tickers']} failed</p>
+              <p>{public_success} public succeeded, {public_failed} public failed</p>
               <p>{_escape(manifest['settings'].get('output_language', '-'))} report</p>
               <p>{_escape(_run_category(manifest))}</p>
-              {sell_side_line}
               {portfolio_link}
             </article>
             """
         )
 
+    # Run warnings are operational diagnostics and may name private tickers or
+    # local paths, so the public homepage never renders their raw text.
     warning_html = ""
-    if representative and representative.get("warnings"):
-        warning_html = "".join(
-            f"<div class='warning-banner'>{_escape(warning)}</div>" for warning in representative.get("warnings", [])
-        )
 
     archive_count_label = f"{len(manifests)} archived run(s)"
     if published_run_ids is not None and len(published_run_ids) < len(manifests):
@@ -875,8 +906,8 @@ def _build_youtube_site_addon(*, archive_dir: Path, site_dir: Path) -> None:
         ):
             youtube_archive_dir = shared_youtube_archive
         build_youtube_site(youtube_archive_dir, site_dir, youtube_config.site)
-    except Exception as exc:  # pragma: no cover - defensive in Pages jobs
-        print(f"::warning::Could not build YouTube report site add-on: {exc}")
+    except Exception as exc:
+        raise RuntimeError("Could not build required YouTube report site add-on.") from exc
 
 
 def _build_prism_telegram_site_addon(*, archive_dir: Path, site_dir: Path) -> None:
@@ -893,8 +924,8 @@ def _build_prism_telegram_site_addon(*, archive_dir: Path, site_dir: Path) -> No
         ):
             prism_telegram_archive_dir = shared_archive
         build_prism_telegram_site(prism_telegram_archive_dir, site_dir, prism_telegram_config.site)
-    except Exception as exc:  # pragma: no cover - defensive in Pages jobs
-        print(f"::warning::Could not build PRISM Telegram report site add-on: {exc}")
+    except Exception as exc:
+        raise RuntimeError("Could not build required PRISM Telegram report site add-on.") from exc
 
 
 def _is_default_runtime_prism_telegram_archive(path: Path) -> bool:
@@ -916,55 +947,16 @@ def _render_run_page(
 ) -> str:
     portfolio_summary = portfolio_summary or {}
     portfolio_status = manifest.get("portfolio") or {}
-    portfolio_status_value = str(
-        portfolio_status.get("status") or portfolio_summary.get("status") or "unknown"
-    ).strip()
-    portfolio_status_class = _status_class(portfolio_status_value)
-    portfolio_status_label = _portfolio_status_label(portfolio_status_value)
-    portfolio_profile = portfolio_status.get("profile") or portfolio_summary.get("profile") or "-"
-    portfolio_label = _portfolio_report_label(portfolio_summary)
     language = _manifest_language(manifest)
     stale_after_seconds = _execution_stale_threshold_seconds(manifest)
 
-    portfolio_links: list[str] = []
-    for artifact_path in (portfolio_status.get("artifacts") or {}).values():
-        if not artifact_path:
-            continue
-        artifact_name = Path(str(artifact_path)).name
-        artifact = Path(artifact_name)
-        if _is_summary_image_artifact(artifact) and not _summary_image_publish_enabled(manifest):
-            continue
-        if not _should_publish_portfolio_artifact(artifact):
-            continue
-        portfolio_links.append(
-            f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(artifact_name)}'>{_escape(artifact_name)}</a>"
-        )
-    if not portfolio_links:
-        for source in portfolio_summary.get("downloadable_files", []):
-            if not isinstance(source, Path):
-                continue
-            if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
-                continue
-            if not _should_publish_portfolio_artifact(source):
-                continue
-            portfolio_links.append(
-                f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
-            )
-
     execution_links: list[str] = []
-    for artifact_path in ((manifest.get("execution") or {}).get("artifacts") or {}).values():
-        if not artifact_path:
-            continue
-        artifact_name = Path(str(artifact_path)).name
-        execution_links.append(
-            f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/execution/{_escape(artifact_name)}'>{_escape(artifact_name)}</a>"
-        )
 
+    public_tickers = _public_ticker_summaries(manifest)
     ticker_cards = []
-    for ticker_summary in manifest.get("tickers", []):
-        display_summary = _with_portfolio_action(ticker_summary, portfolio_summary)
+    for ticker_summary in public_tickers:
         investor_summary = _ticker_investor_summary(
-            display_summary,
+            ticker_summary,
             manifest,
             language=language,
             stale_after_seconds=stale_after_seconds,
@@ -994,31 +986,14 @@ def _render_run_page(
 
     portfolio_html = ""
     if portfolio_status or portfolio_summary:
-        rendered_links = []
-        if portfolio_summary.get("status_path"):
-            rendered_links.append("<a class='pill' href='portfolio.html'>portfolio.html</a>")
-        if _portfolio_has_etf_benchmark_page(portfolio_summary):
-            rendered_links.append("<a class='pill' href='etf_benchmark.html'>etf_benchmark.html</a>")
-        rendered_page = (
-            "".join(rendered_links)
-            if rendered_links
-            else f"<span class='empty'>No published {_escape(portfolio_label.lower())}</span>"
-        )
-        portfolio_html = f"""
+        portfolio_html = """
     <section class="section">
       <div class="section-head">
-        <h2>{_escape(portfolio_label)}</h2>
+        <h2>개인 포트폴리오</h2>
       </div>
       <article class="run-card">
-        <div class="run-card-header">
-          <span>Status</span>
-          <span class="status {portfolio_status_class}">{_escape(portfolio_status_label)}</span>
-        </div>
-        <p><strong>Profile</strong><span>{_escape(str(portfolio_profile))}</span></p>
-        <p><strong>Report page</strong><span>{rendered_page}</span></p>
-        <div class="pill-row">
-          {''.join(portfolio_links) if portfolio_links else "<span class='empty'>No downloads</span>"}
-        </div>
+        <p class="long-field"><strong>공개 정책</strong><span>보유종목, 계좌 금액, 포트폴리오 액션 및 원시 자료는 GitHub Pages에 게시하지 않습니다.</span></p>
+        <a class="button" href="../../mobile/private.html">암호화된 개인 액션표 열기</a>
       </article>
     </section>
         """
@@ -1049,10 +1024,7 @@ def _render_run_page(
     elif execution_status:
         overlay_phase = execution_status.get("overlay_phase") if isinstance(execution_status.get("overlay_phase"), dict) else {}
         selected = overlay_phase.get("selected_checkpoints") or []
-        notes = execution_status.get("notes") or []
-        note_text = " / ".join(str(item) for item in notes if str(item).strip())
-        if not note_text:
-            note_text = "No execution checkpoint was refreshed in this run."
+        note_text = "No execution checkpoint was refreshed in this run."
         if not selected:
             execution_html = f"""
     <section class="section">
@@ -1066,14 +1038,13 @@ def _render_run_page(
     </section>
             """
 
-    warning_html = "".join(
-        f"<div class='warning-banner'>{_escape(warning)}</div>"
-        for warning in (manifest.get("warnings") or [])
-    )
-    delta_html = _render_portfolio_delta_section(manifest)
-    live_delta_html = _render_live_context_delta_section(manifest)
+    # Raw warnings can contain account-only tickers, paths, or broker context.
+    # Operational diagnostics stay in the private archive rather than Pages.
+    warning_html = ""
+    delta_html = ""
+    live_delta_html = ""
     timeline_html = _render_session_timeline_section(manifest, manifests or [])
-    strategy_html = _render_strategy_table_section(manifest)
+    strategy_html = ""
     body = f"""
     <nav class="breadcrumbs"><a href="../../index.html">Home</a></nav>
     <section class="hero compact">
@@ -1086,7 +1057,7 @@ def _render_run_page(
         <div class="status {manifest['status']}">{_escape(manifest['status'].replace('_', ' '))}</div>
         <p><strong>Started</strong><span>{_escape(manifest['started_at'])}</span></p>
         <p><strong>Report language</strong><span>{_escape(manifest['settings'].get('output_language', '-'))}</span></p>
-        <p><strong>Tickers</strong><span>{manifest['summary']['successful_tickers']} success / {manifest['summary']['failed_tickers']} failed</span></p>
+        <p><strong>Public tickers</strong><span>{sum(item.get('status') == 'success' for item in public_tickers)} success / {sum(item.get('status') != 'success' for item in public_tickers)} failed</span></p>
       </div>
     </section>
     {warning_html}
@@ -1098,7 +1069,7 @@ def _render_run_page(
     <section class="section">
       <div class="section-head">
         <h2>Tickers</h2>
-        <p>{manifest['summary']['successful_tickers']} success / {manifest['summary']['failed_tickers']} failed</p>
+        <p>{len(public_tickers)} public watchlist/scanner ticker(s)</p>
       </div>
       {_render_run_health_section(manifest, portfolio_summary)}
       <div class="ticker-grid">
@@ -1320,6 +1291,10 @@ def _render_ticker_delta_section(
     previous_ticker = _find_ticker_summary(previous, ticker)
     if not previous_ticker:
         return ""
+    # Historical manifests may have been enriched with account actions.  Never
+    # let a previous-run comparison reintroduce those values into public HTML.
+    previous_ticker = _sanitize_public_ticker_summary(previous_ticker)
+    ticker_summary = _sanitize_public_ticker_summary(ticker_summary)
     stale_after_seconds = _execution_stale_threshold_seconds(manifest)
     previous_today = _ticker_investor_summary(
         previous_ticker,
@@ -1379,46 +1354,7 @@ def _render_portfolio_page(
     *,
     portfolio_summary: dict[str, Any],
 ) -> str:
-    run_dir = Path(manifest["_run_dir"])
-    report_html = "<p class='empty'>No portfolio markdown report was generated.</p>"
-    report_path = portfolio_summary.get("portfolio_report_md")
-    if isinstance(report_path, Path) and report_path.exists():
-        report_html = _render_markdown(report_path.read_text(encoding="utf-8"))
-
-    download_links = []
-    for source in portfolio_summary.get("downloadable_files", []):
-        if not isinstance(source, Path):
-            continue
-        if _is_summary_image_artifact(source) and not _summary_image_publish_enabled(manifest):
-            continue
-        if not _is_public_portfolio_download(source):
-            continue
-        download_links.append(
-            f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/portfolio/{_escape(source.name)}'>{_escape(source.name)}</a>"
-        )
-
-    failure_html = ""
-    if portfolio_summary.get("status") == "failed":
-        failure_html = (
-            "<section class='section'>"
-            "<div class='section-head'><h2>Failure</h2></div>"
-            f"<pre class='error-block'>{_escape(portfolio_summary.get('error') or 'Unknown error')}</pre>"
-            "</section>"
-        )
-
-    downloads_html = _download_details_html(
-        download_links,
-        summary="자료 다운로드",
-        empty_text="다운로드 가능한 파일 없음",
-    )
-    status_label = _portfolio_status_label(str(portfolio_summary.get("status") or "unknown"))
-    snapshot_mode = (
-        present_snapshot_mode(str(portfolio_summary.get("snapshot_health")), language="English")
-        if portfolio_summary.get("snapshot_health")
-        else _portfolio_report_label(portfolio_summary)
-    )
-    portfolio_label = _portfolio_report_label(portfolio_summary)
-    summary_image_html = _portfolio_summary_image_html(manifest, portfolio_summary)
+    del portfolio_summary
     body = f"""
     <nav class="breadcrumbs">
       <a href="../../index.html">Home</a>
@@ -1426,30 +1362,19 @@ def _render_portfolio_page(
     </nav>
     <section class="hero compact">
       <div>
-        <p class="eyebrow">{_escape(portfolio_label)}</p>
-        <h1>{_escape(manifest['run_id'])}</h1>
-        <p class="subtitle">{_escape(status_label)}</p>
+        <p class="eyebrow">Private portfolio gateway</p>
+        <h1>개인 계좌 자료는 공개하지 않습니다</h1>
+        <p class="subtitle">보유종목, 금액, 수량, 계좌 액션과 원시 리포트는 AES-256-GCM 암호화 모바일 화면에서만 확인할 수 있습니다.</p>
       </div>
       <div class="hero-card">
-        <div class="status {portfolio_summary.get('status_class', 'pending')}">{_escape(status_label)}</div>
-        <p><strong>Account mode</strong><span>{_escape(snapshot_mode)}</span></p>
-        <p><strong>Generated</strong><span>{_escape(portfolio_summary.get('generated_at') or '-')}</span></p>
+        <div class="status success">privacy protected</div>
+        <p><strong>Run</strong><span>{_escape(manifest.get('run_id') or '-')}</span></p>
+        <a class="button" href="../../mobile/private.html">암호화된 개인 액션표 열기</a>
+        <a class="button" href="../../mobile/index.html">공개 모바일 리서치 열기</a>
       </div>
     </section>
-    {failure_html}
-    {summary_image_html}
-    <section class="section prose">
-      <div class="section-head">
-        <h2>{_escape(portfolio_label)}</h2>
-      </div>
-      {report_html}
-    </section>
-    {_render_account_performance_section(manifest, portfolio_summary)}
-    {_render_performance_tracking_section(manifest)}
-    {downloads_html}
-    {_render_live_context_delta_section(manifest)}
     """
-    return _page_template(f"{manifest['run_id']} {portfolio_label.lower()} | {settings.title}", body, prefix="../../")
+    return _page_template(f"Private portfolio gateway | {settings.title}", body, prefix="../../")
 
 
 def _portfolio_has_etf_benchmark_page(portfolio_summary: dict[str, Any]) -> bool:
@@ -1537,7 +1462,6 @@ def _render_account_performance_section(manifest: dict[str, Any], portfolio_summ
     method_label = _account_return_method_label(summary.get("primary_return_method"), summary.get("return_method_warning"))
     coverage_label = _account_summary_coverage_label(summary)
     best = summary.get("best_excess") if isinstance(summary.get("best_excess"), dict) else {}
-    worst = summary.get("worst_excess") if isinstance(summary.get("worst_excess"), dict) else {}
     hide_excess_headline = bool(summary.get("hide_excess_headline"))
     confidence_label = _account_confidence_label(summary)
     reconciliation_label = _account_reconciliation_label(reconciliation)
@@ -3171,14 +3095,7 @@ def _render_ticker_page(
         if report_path.exists():
             report_html = _render_markdown(report_path.read_text(encoding="utf-8"))
 
-    download_links = []
-    for relative_path in (ticker_summary.get("artifacts") or {}).values():
-        if not relative_path:
-            continue
-        artifact_name = Path(str(relative_path)).name
-        download_links.append(
-            f"<a class='pill' href='../../downloads/{_escape(manifest['run_id'])}/{_escape(ticker_summary['ticker'])}/{_escape(artifact_name)}'>{_escape(artifact_name)}</a>"
-        )
+    download_links: list[str] = []
     downloads_html = _download_details_html(
         download_links,
         summary="자료 다운로드",
@@ -3190,13 +3107,12 @@ def _render_ticker_page(
         failure_html = (
             "<section class='section'>"
             "<div class='section-head'><h2>Failure</h2></div>"
-            f"<pre class='error-block'>{_escape(ticker_summary.get('error') or 'Unknown error')}</pre>"
+            "<p class='empty'>Analysis did not complete. Detailed diagnostics are kept in the private archive and workflow logs.</p>"
             "</section>"
         )
 
-    display_summary = _with_portfolio_action(ticker_summary, portfolio_summary or {})
     investor_summary = _ticker_investor_summary(
-        display_summary,
+        ticker_summary,
         manifest,
         language=language,
         stale_after_seconds=stale_after_seconds,
@@ -3206,10 +3122,7 @@ def _render_ticker_page(
         manifest=manifest,
         ticker_summary=ticker_summary,
     )
-    live_ticker_delta_html = _render_live_ticker_context_delta_section(
-        manifest=manifest,
-        ticker_summary=ticker_summary,
-    )
+    live_ticker_delta_html = ""
     ticker_delta_html = _render_ticker_delta_section(
         manifest=manifest,
         ticker_summary=ticker_summary,
@@ -3508,7 +3421,7 @@ def _action_lift_today_action(action_lift: dict[str, Any], *, language: str) -> 
         )
     if status == "PRISM_SOFT_BLOCK_PILOT_ALLOWED":
         return (
-            f"PRISM 충돌: full-size 금지, 수동 확인 후 pilot만 검토"
+            "PRISM 충돌: full-size 금지, 수동 확인 후 pilot만 검토"
             if korean
             else "PRISM conflict: block full-size, review pilot only"
         )

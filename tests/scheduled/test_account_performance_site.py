@@ -162,22 +162,11 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     broker_normalized_download = (
         site / "downloads" / manifest["run_id"] / "portfolio" / "broker_performance_normalized.json"
     )
-    assert "계좌 성과 vs 지수/ETF" in public_html
-    assert public_html.index("TradingAgents 계좌 운용 리포트") < public_html.index("계좌 성과 vs 지수/ETF")
-    assert "성과 기준 기간" in public_html
-    assert "계좌 수익률" in public_html
-    assert "YTD (부분)" not in public_html
-    assert "데이터 부족" not in public_html
-    assert "요청 기간 시작일의 계좌 스냅샷 없음" not in public_html
-    assert "사용 가능 전체 기간 (부분)" in public_html
-    assert "부분 산출" in public_html
-    assert "기간별 원시 산출" not in public_html
-    assert "데이터 품질 경고" not in public_html
-    assert "사용 가능 기간 수익률" in public_html
-    assert "보유/실현 손익 기여도" in public_html
-    assert "KOSPI" in public_html
-    assert "KOSDAQ" in public_html
-    assert "account_performance_public.json" in public_html
+    assert "개인 계좌 자료는 공개하지 않습니다" in public_html
+    assert "암호화된 개인 액션표 열기" in public_html
+    assert "계좌 성과 vs 지수/ETF" not in public_html
+    assert "계좌 수익률" not in public_html
+    assert "account_performance_public.json" not in public_html
     assert "Report vs latest intraday reanalysis" not in public_html
     assert "account_snapshot.json" not in public_html
     assert "account_snapshot.json" not in index_html
@@ -194,7 +183,7 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     assert not summary_spec_download.exists()
     assert not broker_raw_download.exists()
     assert not broker_normalized_download.exists()
-    assert (site / "downloads" / manifest["run_id"] / "portfolio" / "account_performance_public.json").exists()
+    assert not (site / "downloads").exists()
 
 
 def test_portfolio_page_prioritizes_broker_performance_and_hides_failed_snapshot_headline():
@@ -774,7 +763,7 @@ def test_portfolio_page_renders_etf_dca_unavailable_without_dated_cashflows():
     assert html == ""
 
 
-def test_build_site_generates_standalone_etf_benchmark_page(tmp_path: Path):
+def test_build_site_does_not_publish_account_derived_etf_benchmark_page(tmp_path: Path):
     archive = tmp_path / "archive"
     site = tmp_path / "site"
     run_dir = archive / "runs" / "2026" / "20260401T090000_test"
@@ -841,10 +830,9 @@ def test_build_site_generates_standalone_etf_benchmark_page(tmp_path: Path):
     build_site(archive, site, SiteSettings())
 
     run_html = (site / "runs" / "20260401T090000_test" / "index.html").read_text(encoding="utf-8")
-    etf_html = (site / "runs" / "20260401T090000_test" / "etf_benchmark.html").read_text(encoding="utf-8")
-    assert "etf_benchmark.html" in run_html
-    assert "동일 입금일 ETF 대체 비교" in etf_html
-    assert (site / "downloads" / "20260401T090000_test" / "portfolio" / "etf_dca_comparison.json").exists()
+    assert "etf_benchmark.html" not in run_html
+    assert not (site / "runs" / "20260401T090000_test" / "etf_benchmark.html").exists()
+    assert not (site / "downloads").exists()
 
 
 def test_portfolio_page_normalizes_legacy_duplicate_account_performance_periods(tmp_path: Path):
@@ -951,27 +939,9 @@ def test_portfolio_page_normalizes_legacy_duplicate_account_performance_periods(
     build_site(archive, site, SiteSettings())
 
     public_html = (site / "runs" / manifest["run_id"] / "portfolio.html").read_text(encoding="utf-8")
-    published_payload = json.loads(
-        (site / "downloads" / manifest["run_id"] / "portfolio" / "account_performance_public.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    ytd_period = next(period for period in published_payload["periods"] if period["period"] == "YTD")
-
-    assert "사용 가능 전체 기간 (부분)" in public_html
-    assert "20.00%" in public_html
-    assert "YTD (부분)" not in public_html
-    assert "데이터 부족" not in public_html
-    assert "요청 기간 시작일의 계좌 스냅샷 없음" not in public_html
-    assert ytd_period["status"] == "insufficient_history"
-    assert ytd_period["actual_return"] is None
-    assert ytd_period["period_coverage"]["same_actual_window_as"] == "ALL_AVAILABLE"
-    assert published_payload["summary"]["default_period"] == "ALL_AVAILABLE"
-    assert published_payload["summary"]["source_period"] == "ALL"
-    assert any(
-        "account_performance_period_insufficient_history:YTD" in item
-        for item in published_payload["data_quality"]["warnings"]
-    )
+    assert "개인 계좌 자료는 공개하지 않습니다" in public_html
+    assert "20.00%" not in public_html
+    assert not (site / "downloads").exists()
 
 
 def test_portfolio_page_hides_duplicate_periods_by_default_and_preserves_diagnostics(tmp_path: Path):
@@ -1080,9 +1050,9 @@ def test_portfolio_page_hides_duplicate_periods_by_default_and_preserves_diagnos
     public_html = (site / "runs" / "20260507T090000_test" / "portfolio.html").read_text(encoding="utf-8")
 
     default_section = public_html
-    assert "사용 가능 전체 기간" in default_section
-    assert "1M (부분)" not in default_section
-    assert "1M/3M/6M/YTD/1Y" in default_section
+    assert "개인 계좌 자료는 공개하지 않습니다" in default_section
+    assert "사용 가능 전체 기간" not in default_section
+    assert "1M/3M/6M/YTD/1Y" not in default_section
     assert "기간별 원시 산출" not in public_html
     assert "데이터 품질 경고" not in public_html
 

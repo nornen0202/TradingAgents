@@ -77,6 +77,8 @@ jobs:
     runs-on: [self-hosted, Windows]
     permissions:
       contents: read
+    outputs:
+      pages_snapshot_generated_epoch_ms: ${{ steps.stamp_pages_snapshot.outputs.generated_epoch_ms }}
     defaults:
       run:
         shell: python {0}
@@ -99,14 +101,14 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           path: source-${{ github.run_id }}
           clean: false
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
@@ -180,6 +182,8 @@ jobs:
 
       - name: Rebuild merged site and Work context after PRISM collection
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        env:
+          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -201,6 +205,35 @@ jobs:
               args += ["--archive-dir", archive_dir]
           subprocess.check_call(args)
 
+      - name: Stamp rollback-resistant Pages snapshot
+        id: stamp_pages_snapshot
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/pages_snapshot.py",
+                  "stamp",
+                  "--site-dir",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
+                  "--repository",
+                  "${{ github.repository }}",
+                  "--workflow",
+                  "${{ github.workflow }}",
+                  "--run-id",
+                  "${{ github.run_id }}",
+                  "--run-attempt",
+                  "${{ github.run_attempt }}",
+                  "--commit-sha",
+                  "${{ github.sha }}",
+                  "--require-private-envelope",
+              ]
+          )
+
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
@@ -215,6 +248,7 @@ jobs:
       group: tradingagents-pages-deploy
       cancel-in-progress: false
     permissions:
+      contents: read
       pages: write
       id-token: write
     timeout-minutes: 45
@@ -222,9 +256,24 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Check out deployment guard
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Refuse stale Pages snapshot rollback
+        id: pages_guard
+        env:
+          PAGES_PUBLIC_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: >-
+          python .github/scripts/pages_snapshot.py guard
+          --candidate-generated-epoch-ms "${{ needs.build_prism_telegram_pages.outputs.pages_snapshot_generated_epoch_ms }}"
+          --candidate-run-id "${{ github.run_id }}"
+          --candidate-run-attempt "${{ github.run_attempt }}"
+          --public-base-url "$PAGES_PUBLIC_BASE_URL"
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        if: ${{ steps.pages_guard.outputs.should_deploy == 'true' }}
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
         with:
           artifact_name: github-pages-prism-telegram
           timeout: 1800000

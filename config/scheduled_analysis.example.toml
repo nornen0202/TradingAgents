@@ -3,7 +3,7 @@
 [run]
 tickers = ["NVDA", "MSFT", "TSLA"]
 run_mode = "full" # full / overlay_only / selective_rerun_only / portfolio_only
-ticker_universe_mode = "config_only"
+ticker_universe_mode = "config_plus_account"
 analysts = ["market", "social", "news", "fundamentals"]
 output_language = "Korean"
 trade_date_mode = "latest_available"
@@ -13,15 +13,15 @@ max_risk_discuss_rounds = 1
 latest_market_data_lookback_days = 14
 continue_on_ticker_error = true
 report_polisher_enabled = true
-max_runtime_minutes = 105
-min_remaining_minutes_for_next_ticker = 15
+max_runtime_minutes = 0
+min_remaining_minutes_for_next_ticker = 0
 parallel_ticker_execution = true
 max_parallel_tickers = 4
-per_ticker_timeout_minutes = 30
+per_ticker_timeout_minutes = 60
 codex_circuit_breaker_enabled = true
 max_consecutive_codex_failures = 3
 fatal_error_patterns = ["usage limit", "model unavailable"]
-daily_active_ticker_limit = 14
+daily_active_ticker_limit = 0
 analysis_mode = "full"
 
 [llm]
@@ -80,7 +80,7 @@ report_polisher_enabled = true
 
 [portfolio_performance]
 enabled = true
-publish_to_site = true
+publish_to_site = false
 public_sanitization = "mask_identifiers"
 periods = ["1M", "3M", "6M", "YTD", "1Y", "ALL"]
 profit_calendar_enabled = true
@@ -162,8 +162,8 @@ llm_summary_model = "" # empty uses deterministic execution summaries
 [summary_image]
 enabled = true
 mode = "deterministic_svg" # deterministic_svg / openai_image / both
-publish_to_site = true
-redact_account_values = false
+publish_to_site = false
+redact_account_values = true
 image_model = "gpt-image-2"
 image_size = "1024x1536"
 image_quality = "medium"

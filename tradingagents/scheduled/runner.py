@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 from copy import deepcopy
-from dataclasses import replace
+from dataclasses import dataclass, replace
 import json
 import os
 from queue import Empty, Queue
@@ -99,6 +99,18 @@ _MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS = (
 )
 _DEFAULT_CODEX_PARALLEL_TICKER_CAP = 4
 
+
+@dataclass(frozen=True)
+class _ResolvedRunTickerUniverse:
+    tickers: tuple[str, ...]
+    configured_tickers: tuple[str, ...]
+    profile_watch_tickers: tuple[str, ...]
+    holding_tickers: tuple[str, ...]
+    mode: str
+    account_snapshot_status: str
+    account_snapshot_health: str | None = None
+    warnings: tuple[str, ...] = ()
+
 _CODEX_TRANSIENT_FAILURE_PATTERNS = (
     "timed out waiting for codex app-server",
     "timed out waiting for codex turn",
@@ -185,7 +197,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Skip live execution overlay refreshes for this run while preserving archived execution contracts.",
     )
-    parser.add_argument("--strict", action="store_true", help="Return a non-zero exit code if any ticker fails.")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Return non-zero when a ticker fails or required full-universe coverage is incomplete.",
+    )
     parser.add_argument("--label", default="github-actions", help="Run label for archived metadata.")
     args = parser.parse_args(argv)
 
@@ -216,7 +232,15 @@ def main(argv: list[str] | None = None) -> int:
         f"Completed run {manifest['run_id']} with status {manifest['status']} "
         f"({manifest['summary']['successful_tickers']} success / {manifest['summary']['failed_tickers']} failed)."
     )
-    return 1 if args.strict and manifest["summary"]["failed_tickers"] else 0
+    strict_failed = bool(manifest["summary"]["failed_tickers"])
+    if args.strict and _strict_required_coverage_failed(manifest):
+        strict_failed = True
+        print(
+            "::error::Required ticker-universe coverage is incomplete; "
+            "see active_universe.coverage and missing_analysis_tickers.",
+            flush=True,
+        )
+    return 1 if args.strict and strict_failed else 0
 
 
 def execute_scheduled_run(
@@ -235,11 +259,13 @@ def execute_scheduled_run(
 
     run_mode = str(config.run.run_mode or "full").strip().lower()
     portfolio_only = run_mode == "portfolio_only"
+    resolved_universe: _ResolvedRunTickerUniverse | None = None
     if portfolio_only:
         run_tickers: list[str] = []
         scanner_status = None
     else:
-        base_run_tickers = _resolve_run_tickers(config)
+        resolved_universe = _resolve_run_ticker_universe(config)
+        base_run_tickers = list(resolved_universe.tickers)
         run_tickers, scanner_status = _augment_run_tickers_with_scanner(
             config=config,
             base_tickers=base_run_tickers,
@@ -248,7 +274,7 @@ def execute_scheduled_run(
             asof=started_at.isoformat(),
         )
     source_run_id: str | None = None
-    run_warnings: list[str] = []
+    run_warnings: list[str] = list(resolved_universe.warnings) if resolved_universe else []
     configured_ticker_count = len(run_tickers)
     active_ticker_limit = _active_ticker_limit(config)
     active_universe_metadata: dict[str, Any] = {
@@ -257,19 +283,22 @@ def execute_scheduled_run(
         "active_count": configured_ticker_count,
         "omitted_count": 0,
     }
-    if run_mode == "full" and active_ticker_limit and len(run_tickers) > active_ticker_limit:
+    if run_mode in {"full", "overlay_only"}:
+        selection_limit = active_ticker_limit if run_mode == "full" else 0
         run_tickers, omitted, active_universe_metadata = _select_daily_active_tickers(
             config=config,
             tickers=run_tickers,
             started_at=started_at,
-            active_ticker_limit=active_ticker_limit,
+            active_ticker_limit=selection_limit,
+            resolved_universe=resolved_universe,
         )
-        warning = (
-            "daily_active_ticker_limit_applied:"
-            f"limit={active_ticker_limit}:omitted_tickers={','.join(omitted)}"
-        )
-        print(f"::warning::{warning}", flush=True)
-        run_warnings.append(warning)
+        if run_mode == "full" and active_ticker_limit and omitted:
+            warning = (
+                "daily_active_ticker_limit_applied:"
+                f"limit={active_ticker_limit}:omitted_tickers={','.join(omitted)}"
+            )
+            print(f"::warning::{warning}", flush=True)
+            run_warnings.append(warning)
     ticker_summaries: list[dict[str, Any]] = []
     engine_results_dir = run_dir / "engine-results"
     run_trade_date = _resolve_run_trade_date(config=config, tickers=run_tickers) if run_mode == "full" else None
@@ -425,6 +454,11 @@ def execute_scheduled_run(
             )
             execution_updates["_latest_checkpoint"] = {"value": "selective_rerun"}
 
+    active_universe_metadata = _finalize_active_universe_coverage(
+        metadata=active_universe_metadata,
+        expected_tickers=run_tickers,
+        ticker_summaries=ticker_summaries,
+    )
     finished_at = datetime.now(tz)
     failures = sum(1 for item in ticker_summaries if item["status"] != "success")
     successes = len(ticker_summaries) - failures
@@ -463,6 +497,9 @@ def execute_scheduled_run(
         "active_universe": active_universe_metadata,
         "tickers": ticker_summaries,
     }
+    github_actions_receipt = _github_actions_source_receipt()
+    if github_actions_receipt:
+        manifest["github_actions"] = github_actions_receipt
     if scanner_status:
         manifest["scanner"] = scanner_status
     if run_trade_date:
@@ -603,6 +640,14 @@ def execute_scheduled_run(
         manifest["portfolio"] = {"status": "skipped", "reason": "runtime_budget_exhausted"}
     else:
         manifest["portfolio"] = {"status": "disabled"}
+
+    if run_mode in {"full", "overlay_only"}:
+        active_universe_metadata = _reconcile_fresh_portfolio_coverage(
+            metadata=active_universe_metadata,
+            portfolio_status=manifest.get("portfolio") or {},
+            ticker_summaries=ticker_summaries,
+        )
+        manifest["active_universe"] = active_universe_metadata
 
     manifest["decision_bundle"] = build_and_write_decision_bundle(
         run_dir=run_dir,
@@ -2200,11 +2245,16 @@ def _augment_run_tickers_with_scanner(
         run_market=run_market,
         run_tickers=base_tickers,
     ).to_dict() if prism_ingestion is not None else None
+    base_identity = {_ticker_identity_key(ticker) for ticker in base_tickers}
     return tickers, {
         "enabled": config.scanner.enabled,
         "market": config.scanner.market,
         "candidate_count": len(scanner_result.candidates) if scanner_result else 0,
-        "added_tickers": [ticker for ticker in tickers if ticker not in set(base_tickers)],
+        "added_tickers": [
+            ticker
+            for ticker in tickers
+            if _ticker_identity_key(ticker) not in base_identity
+        ],
         "warnings": list(dict.fromkeys(warnings)),
         "artifacts": artifacts,
         "prism_candidate_source": prism_ingestion.status_dict() if prism_ingestion is not None else None,
@@ -2236,7 +2286,7 @@ def _augment_with_prism_candidates(
         allowed_markets=allowed_markets,
     )
     result = list(tickers)
-    seen = {str(ticker).strip().upper() for ticker in result}
+    seen_identity = {_ticker_identity_key(ticker) for ticker in result}
     ranked = sorted(
         best_prism_signal_by_ticker(external_signals).values(),
         key=lambda signal: (float(signal.confidence or 0.0), float(signal.composite_score or signal.trigger_score or 0.0)),
@@ -2247,10 +2297,13 @@ def _augment_with_prism_candidates(
         if signal.signal_action not in {PrismSignalAction.BUY, PrismSignalAction.ADD, PrismSignalAction.WATCH}:
             continue
         ticker = str(signal.canonical_ticker or "").strip().upper()
-        if not ticker or ticker in seen:
+        if not ticker:
+            continue
+        identity = _ticker_identity_key(ticker)
+        if identity in seen_identity:
             continue
         result.append(ticker)
-        seen.add(ticker)
+        seen_identity.add(identity)
         added += 1
         if added >= max_new:
             break
@@ -2370,52 +2423,105 @@ def _performance_market_filter(config: ScheduledAnalysisConfig) -> str | None:
     return config.run.market if bool(getattr(config.run, "market_declared", False)) else None
 
 
-def _resolve_run_tickers(config: ScheduledAnalysisConfig) -> list[str]:
-    configured = list(config.run.tickers)
-    mode = str(config.run.ticker_universe_mode or "config_only").strip().lower()
-    if mode == "config_only":
-        return configured
+def _resolve_run_ticker_universe(config: ScheduledAnalysisConfig) -> _ResolvedRunTickerUniverse:
+    configured = _unique_tickers(getattr(config.run, "tickers", ()))
+    mode = str(getattr(config.run, "ticker_universe_mode", "config_only") or "config_only").strip().lower()
+    warnings: list[str] = []
+    profile_watch_tickers: list[str] = []
+    holding_tickers: list[str] = []
+    account_snapshot_status = "disabled"
+    account_snapshot_health: str | None = None
 
-    if not config.portfolio.enabled or not config.portfolio.profile_path:
-        print(
-            "::warning::ticker_universe_mode requested account tickers, but portfolio profile is disabled; "
-            "falling back to configured tickers."
+    portfolio = getattr(config, "portfolio", None)
+    portfolio_enabled = bool(getattr(portfolio, "enabled", False))
+    profile_path = getattr(portfolio, "profile_path", None)
+    if portfolio_enabled and profile_path:
+        try:
+            profile = load_portfolio_profile(profile_path, getattr(portfolio, "profile_name", "default"))
+            profile_watch_tickers = _unique_tickers(getattr(profile, "watch_tickers", ()))
+        except Exception as exc:
+            account_snapshot_status = "profile_load_failed"
+            warnings.append(f"ticker_universe_profile_load_failed:mode={mode}:error={exc}")
+        else:
+            try:
+                snapshot = load_snapshot_for_profile(profile)
+                account_snapshot_health = str(
+                    getattr(snapshot, "snapshot_health", "VALID") or "VALID"
+                ).strip().upper()
+                diagnostics = getattr(snapshot, "cash_diagnostics", {}) or {}
+                diagnostic_source = (
+                    str(diagnostics.get("source") or "").strip().lower()
+                    if isinstance(diagnostics, dict)
+                    else ""
+                )
+                snapshot_warnings = [
+                    str(item).strip().lower()
+                    for item in (getattr(snapshot, "warnings", ()) or ())
+                    if str(item).strip()
+                ]
+                warning_blob = " ".join(snapshot_warnings)
+                if account_snapshot_health == "WATCHLIST_ONLY":
+                    account_snapshot_status = (
+                        "snapshot_unavailable"
+                        if diagnostic_source == "kis_snapshot_unavailable"
+                        or "kis account snapshot unavailable" in warning_blob
+                        else "watchlist_only"
+                    )
+                elif account_snapshot_health == "INVALID_SNAPSHOT":
+                    account_snapshot_status = "invalid_snapshot"
+                else:
+                    account_snapshot_status = "loaded"
+
+                if account_snapshot_status == "loaded":
+                    holding_tickers = _unique_tickers(
+                        sorted(
+                            str(position.canonical_ticker).strip().upper()
+                            for position in getattr(snapshot, "positions", ())
+                            if str(getattr(position, "canonical_ticker", "") or "").strip()
+                        )
+                    )
+                else:
+                    warnings.append(
+                        "ticker_universe_account_snapshot_degraded:"
+                        f"mode={mode}:health={account_snapshot_health}:"
+                        f"source={diagnostic_source or 'unknown'}"
+                    )
+            except Exception as exc:
+                account_snapshot_status = "snapshot_load_failed"
+                warnings.append(f"ticker_universe_account_snapshot_failed:mode={mode}:error={exc}")
+    elif mode in {"config_plus_account", "account_only"}:
+        warnings.append(
+            "ticker_universe_account_source_unavailable:portfolio profile is disabled; "
+            "falling back to configured tickers"
         )
-        return configured
 
-    try:
-        profile = load_portfolio_profile(config.portfolio.profile_path, config.portfolio.profile_name)
-        snapshot = load_snapshot_for_profile(profile)
-    except Exception as exc:
-        print(
-            "::warning::Could not load account snapshot for ticker_universe_mode "
-            f"'{mode}': {exc}. Falling back to configured tickers."
-        )
-        return configured
-
-    account_tickers = sorted(
-        {str(position.canonical_ticker).strip().upper() for position in snapshot.positions if position.canonical_ticker}
-    )
     if mode == "account_only":
-        if account_tickers:
-            return account_tickers
-        print("::warning::ticker_universe_mode=account_only produced no account holdings; using configured tickers.")
-        return configured
+        if holding_tickers:
+            resolved = holding_tickers
+        else:
+            warnings.append("ticker_universe_account_only_empty:using configured tickers")
+            resolved = configured
+    elif mode == "config_plus_account":
+        resolved = _unique_tickers((*configured, *profile_watch_tickers, *holding_tickers))
+    else:
+        resolved = configured
 
-    merged: list[str] = []
-    seen: set[str] = set()
-    seen_identity: set[str] = set()
-    for ticker in [*configured, *account_tickers]:
-        normalized = str(ticker or "").strip().upper()
-        if not normalized or normalized in seen:
-            continue
-        identity_key = _ticker_identity_key(normalized)
-        if identity_key in seen_identity:
-            continue
-        seen.add(normalized)
-        seen_identity.add(identity_key)
-        merged.append(normalized)
-    return merged or configured
+    for warning in warnings:
+        print(f"::warning::{warning}", flush=True)
+    return _ResolvedRunTickerUniverse(
+        tickers=tuple(resolved or configured),
+        configured_tickers=tuple(configured),
+        profile_watch_tickers=tuple(profile_watch_tickers),
+        holding_tickers=tuple(holding_tickers),
+        mode=mode,
+        account_snapshot_status=account_snapshot_status,
+        account_snapshot_health=account_snapshot_health,
+        warnings=tuple(warnings),
+    )
+
+
+def _resolve_run_tickers(config: ScheduledAnalysisConfig) -> list[str]:
+    return list(_resolve_run_ticker_universe(config).tickers)
 
 
 def _select_daily_active_tickers(
@@ -2424,51 +2530,375 @@ def _select_daily_active_tickers(
     tickers: list[str],
     started_at: datetime,
     active_ticker_limit: int,
+    resolved_universe: _ResolvedRunTickerUniverse | None = None,
 ) -> tuple[list[str], list[str], dict[str, Any]]:
-    normalized = [str(ticker).strip().upper() for ticker in tickers if str(ticker).strip()]
-    holdings: list[str] = []
-    if config.portfolio.enabled and config.portfolio.profile_path:
-        try:
-            profile = load_portfolio_profile(config.portfolio.profile_path, config.portfolio.profile_name)
-            snapshot = load_snapshot_for_profile(profile)
-            holding_set = {
-                str(position.canonical_ticker).strip().upper()
-                for position in snapshot.positions
-                if str(position.canonical_ticker or "").strip()
-            }
-            holdings = [ticker for ticker in normalized if ticker in holding_set]
-        except Exception as exc:
-            print(f"::warning::Could not prioritize holdings for active universe: {exc}")
+    normalized = _unique_tickers(tickers)
+    universe = resolved_universe or _resolve_run_ticker_universe(config)
+    holding_identity = {_ticker_identity_key(ticker) for ticker in universe.holding_tickers}
+    holdings = [ticker for ticker in normalized if _ticker_identity_key(ticker) in holding_identity]
 
-    configured_set = {str(ticker).strip().upper() for ticker in config.run.tickers}
-    scanner_additions = [ticker for ticker in normalized if ticker not in configured_set and ticker not in holdings]
-    rotation_pool = [ticker for ticker in normalized if ticker not in holdings and ticker not in scanner_additions]
-    if rotation_pool:
+    if universe.mode == "account_only":
+        expected_watchlist: list[str] = []
+    elif universe.mode == "config_plus_account":
+        expected_watchlist = _unique_tickers(
+            (*universe.configured_tickers, *universe.profile_watch_tickers)
+        )
+    else:
+        expected_watchlist = list(universe.configured_tickers)
+    watchlist_identity = {_ticker_identity_key(ticker) for ticker in expected_watchlist}
+    watchlist_pool = [
+        ticker
+        for ticker in normalized
+        if _ticker_identity_key(ticker) in watchlist_identity
+        and _ticker_identity_key(ticker) not in holding_identity
+    ]
+    scanner_candidates = [
+        ticker
+        for ticker in normalized
+        if _ticker_identity_key(ticker) not in holding_identity
+        and _ticker_identity_key(ticker) not in watchlist_identity
+    ]
+
+    requested_limit = max(0, int(active_ticker_limit or 0))
+    rotation_pool = list(watchlist_pool)
+    if requested_limit and rotation_pool:
         offset = started_at.date().toordinal() % len(rotation_pool)
         rotation_pool = rotation_pool[offset:] + rotation_pool[:offset]
 
-    effective_limit = max(int(active_ticker_limit), len(holdings))
-    selected = [*holdings, *scanner_additions]
-    selected = selected[:effective_limit]
-    if len(selected) < effective_limit:
-        selected.extend(rotation_pool[: effective_limit - len(selected)])
-    selected_set = set(selected)
-    omitted = [ticker for ticker in normalized if ticker not in selected_set]
+    effective_limit = len(normalized) if requested_limit <= 0 else max(requested_limit, len(holdings))
+    selected = list(holdings)
+    remaining_slots = max(0, effective_limit - len(selected))
+    selected.extend(rotation_pool[:remaining_slots])
+    remaining_slots = max(0, effective_limit - len(selected))
+    selected.extend(scanner_candidates[:remaining_slots])
+
+    selected_identity = {_ticker_identity_key(ticker) for ticker in selected}
+    omitted = [ticker for ticker in normalized if _ticker_identity_key(ticker) not in selected_identity]
+    selected_scanner = [
+        ticker for ticker in scanner_candidates if _ticker_identity_key(ticker) in selected_identity
+    ]
+    omitted_scanner = [
+        ticker for ticker in scanner_candidates if _ticker_identity_key(ticker) not in selected_identity
+    ]
+    selected_watchlist = [
+        ticker for ticker in rotation_pool if _ticker_identity_key(ticker) in selected_identity
+    ]
+    expected_holding_identity = {_ticker_identity_key(ticker) for ticker in universe.holding_tickers}
+    missing_holdings = [
+        ticker
+        for ticker in universe.holding_tickers
+        if _ticker_identity_key(ticker) not in selected_identity
+    ]
+    missing_watchlist = [
+        ticker
+        for ticker in expected_watchlist
+        if _ticker_identity_key(ticker) not in selected_identity
+    ]
+    selected_expected_holdings = expected_holding_identity & selected_identity
+    selected_expected_watchlist = watchlist_identity & selected_identity
     cached_coverage = _cached_coverage_for_tickers(config.storage.archive_dir, omitted)
     return selected, omitted, {
-        "mode": "holdings_first_rotating_coverage",
+        "mode": "full_required_coverage" if requested_limit <= 0 else "holdings_first_watchlist_rotation",
         "configured_count": len(normalized),
-        "requested_limit": int(active_ticker_limit),
+        "configured_input_count": len(universe.configured_tickers),
+        "profile_watchlist_count": len(universe.profile_watch_tickers),
+        "resolved_base_count": len(universe.tickers),
+        "account_holding_count": len(universe.holding_tickers),
+        "account_snapshot_status": universe.account_snapshot_status,
+        "account_snapshot_health": universe.account_snapshot_health,
+        "ticker_universe_mode": universe.mode,
+        "requested_limit": requested_limit,
         "effective_limit": effective_limit,
         "active_count": len(selected),
         "omitted_count": len(omitted),
         "holding_tickers": holdings,
-        "scanner_additions": scanner_additions,
-        "rotating_tickers": [ticker for ticker in selected if ticker not in holdings and ticker not in scanner_additions],
+        "expected_holding_tickers": list(universe.holding_tickers),
+        "missing_holding_tickers": missing_holdings,
+        "watchlist_tickers": selected_watchlist,
+        "expected_watchlist_tickers": expected_watchlist,
+        "missing_watchlist_tickers": missing_watchlist,
+        "scanner_candidates": scanner_candidates,
+        "scanner_additions": selected_scanner,
+        "omitted_scanner_additions": omitted_scanner,
+        "rotating_tickers": selected_watchlist,
         "omitted_tickers": omitted,
         "cached_coverage": cached_coverage,
         "rotation_date": started_at.date().isoformat(),
+        "coverage": {
+            "complete": (
+                not missing_holdings
+                and not missing_watchlist
+                and (
+                    universe.mode == "config_only"
+                    or universe.account_snapshot_status == "loaded"
+                )
+            ),
+            "holding_expected_count": len(expected_holding_identity),
+            "holding_selected_count": len(selected_expected_holdings),
+            "holding_missing_count": len(missing_holdings),
+            "watchlist_expected_count": len(watchlist_identity),
+            "watchlist_selected_count": len(selected_expected_watchlist),
+            "watchlist_missing_count": len(missing_watchlist),
+        },
     }
+
+
+def _finalize_active_universe_coverage(
+    *,
+    metadata: dict[str, Any],
+    expected_tickers: list[str],
+    ticker_summaries: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Reconcile selection-time coverage with the summaries actually produced.
+
+    Selection coverage alone is insufficient for overlay runs: a prior source
+    run can contain only a subset of the requested universe.  This receipt is
+    identity-aware and makes a missing, failed, duplicate, or unexpected row
+    fail the final coverage contract.
+    """
+
+    coverage = metadata.get("coverage")
+    if not isinstance(coverage, dict):
+        return metadata
+
+    expected = _unique_tickers(expected_tickers)
+    expected_by_identity = {
+        _ticker_identity_key(ticker): ticker
+        for ticker in expected
+    }
+    actual_rows: dict[str, list[dict[str, Any]]] = {}
+    unexpected: list[str] = []
+    for summary in ticker_summaries:
+        ticker = str(summary.get("ticker") or "").strip().upper()
+        if not ticker:
+            continue
+        identity = _ticker_identity_key(ticker)
+        actual_rows.setdefault(identity, []).append(summary)
+        if identity not in expected_by_identity:
+            unexpected.append(ticker)
+
+    missing = [
+        ticker
+        for identity, ticker in expected_by_identity.items()
+        if identity not in actual_rows
+    ]
+    failed = [
+        ticker
+        for identity, ticker in expected_by_identity.items()
+        if any(
+            str(row.get("status") or "").strip().lower() != "success"
+            for row in actual_rows.get(identity, ())
+        )
+    ]
+    duplicate_identities = [
+        expected_by_identity.get(identity, identity)
+        for identity, rows in actual_rows.items()
+        if len(rows) > 1
+    ]
+    successful_identities = {
+        identity
+        for identity, rows in actual_rows.items()
+        if identity in expected_by_identity
+        and len(rows) == 1
+        and str(rows[0].get("status") or "").strip().lower() == "success"
+    }
+    selection_complete = coverage.get("complete") is True
+    analysis_complete = bool(
+        expected_by_identity
+        and len(expected_by_identity) == len(ticker_summaries)
+        and successful_identities == set(expected_by_identity)
+        and not missing
+        and not failed
+        and not unexpected
+        and not duplicate_identities
+    )
+
+    metadata = dict(metadata)
+    metadata.update(
+        {
+            "missing_analysis_tickers": missing,
+            "failed_analysis_tickers": failed,
+            "unexpected_analysis_tickers": _unique_tickers(unexpected),
+            "duplicate_analysis_tickers": _unique_tickers(duplicate_identities),
+        }
+    )
+    metadata["coverage"] = {
+        **coverage,
+        "selection_complete": selection_complete,
+        "analysis_complete": analysis_complete,
+        "analysis_expected_count": len(expected_by_identity),
+        "analysis_successful_count": len(successful_identities),
+        "analysis_failed_count": len(failed),
+        "analysis_missing_count": len(missing),
+        "analysis_unexpected_count": len(_unique_tickers(unexpected)),
+        "analysis_duplicate_count": len(_unique_tickers(duplicate_identities)),
+        "complete": selection_complete and analysis_complete,
+    }
+    return metadata
+
+
+def _reconcile_fresh_portfolio_coverage(
+    *,
+    metadata: dict[str, Any],
+    portfolio_status: dict[str, Any],
+    ticker_summaries: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Rebase holding coverage on the snapshot read after ticker research.
+
+    A full run can last hours.  Reusing its opening snapshot would make the
+    final action table stale, while trusting an empty watchlist-only fallback
+    could incorrectly treat every sale as completed.  The portfolio pipeline
+    therefore supplies one private, end-of-run holding receipt.  Only a
+    complete receipt can replace the opening expected-holdings set.
+    """
+
+    mode = str(metadata.get("ticker_universe_mode") or "").strip().lower()
+    coverage = metadata.get("coverage")
+    if mode not in {"config_plus_account", "account_only"} or not isinstance(coverage, dict):
+        return metadata
+
+    opening_holdings = _unique_tickers(metadata.get("expected_holding_tickers") or [])
+    private_snapshot = portfolio_status.get("private_coverage_snapshot")
+    if not isinstance(private_snapshot, dict) or private_snapshot.get("holding_set_complete") is not True:
+        result = dict(metadata)
+        result["account_snapshot_status"] = "fresh_snapshot_unavailable"
+        result["fresh_snapshot_drift"] = {
+            "status": "UNAVAILABLE",
+            "snapshot_id": private_snapshot.get("snapshot_id") if isinstance(private_snapshot, dict) else None,
+            "as_of": private_snapshot.get("as_of") if isinstance(private_snapshot, dict) else None,
+            "snapshot_health": (
+                private_snapshot.get("snapshot_health") if isinstance(private_snapshot, dict) else None
+            ),
+            "opening_holding_count": len(opening_holdings),
+            "fresh_holding_count": None,
+            "added_holding_tickers": [],
+            "removed_holding_tickers": [],
+        }
+        result["coverage"] = {
+            **coverage,
+            "fresh_snapshot_complete": False,
+            "selection_complete": False,
+            "complete": False,
+        }
+        return result
+
+    # The portfolio pipeline emits a sorted canonical receipt.  Sort again at
+    # the trust boundary so custom/test pipeline implementations cannot make
+    # manifest diffs depend on broker response ordering.
+    fresh_holdings = sorted(_unique_tickers(private_snapshot.get("canonical_holding_tickers") or []))
+    opening_by_identity = {_ticker_identity_key(ticker): ticker for ticker in opening_holdings}
+    fresh_by_identity = {_ticker_identity_key(ticker): ticker for ticker in fresh_holdings}
+    successful_identity = {
+        _ticker_identity_key(str(summary.get("ticker") or "").strip().upper())
+        for summary in ticker_summaries
+        if str(summary.get("ticker") or "").strip()
+        and str(summary.get("status") or "").strip().lower() == "success"
+    }
+    missing_holdings = [
+        ticker
+        for identity, ticker in fresh_by_identity.items()
+        if identity not in successful_identity
+    ]
+    covered_holdings = [
+        ticker
+        for identity, ticker in fresh_by_identity.items()
+        if identity in successful_identity
+    ]
+    added_holdings = [
+        ticker
+        for identity, ticker in fresh_by_identity.items()
+        if identity not in opening_by_identity
+    ]
+    removed_holdings = [
+        ticker
+        for identity, ticker in opening_by_identity.items()
+        if identity not in fresh_by_identity
+    ]
+    missing_watchlist = _unique_tickers(metadata.get("missing_watchlist_tickers") or [])
+    selection_complete = not missing_holdings and not missing_watchlist
+    analysis_complete = coverage.get("analysis_complete") is True
+
+    result = dict(metadata)
+    result.update(
+        {
+            "account_snapshot_status": "loaded",
+            "account_snapshot_health": str(private_snapshot.get("snapshot_health") or "VALID").upper(),
+            "account_holding_count": len(fresh_by_identity),
+            "holding_tickers": covered_holdings,
+            "expected_holding_tickers": fresh_holdings,
+            "missing_holding_tickers": missing_holdings,
+            "fresh_snapshot_drift": {
+                "status": "VERIFIED",
+                "snapshot_id": private_snapshot.get("snapshot_id"),
+                "as_of": private_snapshot.get("as_of"),
+                "snapshot_health": private_snapshot.get("snapshot_health"),
+                "opening_holding_count": len(opening_by_identity),
+                "fresh_holding_count": len(fresh_by_identity),
+                "added_holding_tickers": added_holdings,
+                "removed_holding_tickers": removed_holdings,
+            },
+        }
+    )
+    result["coverage"] = {
+        **coverage,
+        "fresh_snapshot_complete": True,
+        "holding_expected_count": len(fresh_by_identity),
+        "holding_selected_count": len(covered_holdings),
+        "holding_missing_count": len(missing_holdings),
+        "selection_complete": selection_complete,
+        "complete": selection_complete and analysis_complete,
+    }
+    return result
+
+
+def _strict_required_coverage_failed(manifest: dict[str, Any]) -> bool:
+    """Fail strict full-coverage runs without breaking intentional smoke caps."""
+
+    active = manifest.get("active_universe")
+    if not isinstance(active, dict) or active.get("mode") != "full_required_coverage":
+        return False
+    coverage = active.get("coverage")
+    return not isinstance(coverage, dict) or coverage.get("complete") is not True
+
+
+def _github_actions_source_receipt() -> dict[str, Any]:
+    """Bind an archived run to the exact producer workflow invocation."""
+
+    run_id = str(os.getenv("GITHUB_RUN_ID") or "").strip()
+    repository = str(os.getenv("GITHUB_REPOSITORY") or "").strip()
+    workflow = str(os.getenv("GITHUB_WORKFLOW") or "").strip()
+    sha = str(os.getenv("GITHUB_SHA") or "").strip().lower()
+    if (
+        not run_id.isdigit()
+        or int(run_id) <= 0
+        or not repository
+        or not workflow
+        or not re.fullmatch(r"[0-9a-f]{40}", sha)
+    ):
+        return {}
+    attempt_text = str(os.getenv("GITHUB_RUN_ATTEMPT") or "").strip()
+    return {
+        "run_id": int(run_id),
+        "run_attempt": int(attempt_text) if attempt_text.isdigit() and int(attempt_text) > 0 else 1,
+        "repository": repository,
+        "workflow": workflow,
+        "sha": sha,
+    }
+
+
+def _unique_tickers(tickers: Any) -> list[str]:
+    result: list[str] = []
+    seen_identity: set[str] = set()
+    for ticker in tickers or ():
+        normalized = str(ticker or "").strip().upper()
+        if not normalized:
+            continue
+        identity = _ticker_identity_key(normalized)
+        if identity in seen_identity:
+            continue
+        seen_identity.add(identity)
+        result.append(normalized)
+    return result
 
 
 def _cached_coverage_for_tickers(archive_dir: Path, tickers: list[str]) -> list[dict[str, Any]]:
@@ -2907,18 +3337,28 @@ def _bootstrap_overlay_inputs_from_latest_run(
         market=config.run.market,
     )
     if source_manifest is None:
-        raise RuntimeError("overlay_only/selective_rerun_only requires an existing latest-run.json from a prior full run.")
+        raise RuntimeError(
+            "Overlay bootstrap requires one prior source run with successful analysis artifacts "
+            f"for every target; target_tickers={','.join(_unique_tickers(tickers))}"
+        )
     source_run_id = str(source_manifest.get("run_id") or "")
     source_started_at = str(source_manifest.get("started_at") or "")
     if not source_run_id or len(source_started_at) < 4:
         raise RuntimeError("latest-run.json is missing run_id/started_at required for overlay bootstrap.")
     source_run_dir = config.storage.archive_dir / "runs" / source_started_at[:4] / source_run_id
     summaries: list[dict[str, Any]] = []
-    target_tickers = {str(item).strip().upper() for item in tickers}
+    target_by_identity = {
+        _ticker_identity_key(item): str(item).strip().upper()
+        for item in tickers
+        if str(item).strip()
+    }
+    bootstrapped_identities: set[str] = set()
     for source in source_manifest.get("tickers", []):
-        ticker = str(source.get("ticker") or "").strip().upper()
-        if not ticker or (target_tickers and ticker not in target_tickers):
+        source_ticker = str(source.get("ticker") or "").strip().upper()
+        identity = _ticker_identity_key(source_ticker)
+        if not source_ticker or identity not in target_by_identity or identity in bootstrapped_identities:
             continue
+        ticker = target_by_identity[identity]
         if source.get("status") != "success":
             continue
         artifacts = source.get("artifacts") or {}
@@ -2955,7 +3395,7 @@ def _bootstrap_overlay_inputs_from_latest_run(
                 archive_dir=config.storage.archive_dir,
                 run_dir=run_dir,
                 target_ticker_dir=target_ticker_dir,
-                ticker=ticker,
+                ticker=source_ticker,
                 analysis_source_run_id=source_run_id,
                 existing_artifacts=copied_source_artifacts,
                 max_data_age_seconds=config.execution.execution_max_data_age_seconds,
@@ -2995,6 +3435,17 @@ def _bootstrap_overlay_inputs_from_latest_run(
                     "execution_contract_json": _relative_to_run(run_dir, target_contract),
                 },
             }
+        )
+        bootstrapped_identities.add(identity)
+    missing = [
+        ticker
+        for identity, ticker in target_by_identity.items()
+        if identity not in bootstrapped_identities
+    ]
+    if missing:
+        raise RuntimeError(
+            "Overlay bootstrap is incomplete; a successful analysis artifact is required for every target. "
+            f"source_run_id={source_run_id}; missing_tickers={','.join(missing)}"
         )
     if not summaries:
         raise RuntimeError("No successful tickers available in latest run to bootstrap overlay-only mode.")
@@ -3302,25 +3753,7 @@ def _resolve_latest_overlay_source_manifest(
     latest_full = _find_latest_full_run_manifest(archive_dir, tickers=tickers, market=market)
     if latest_full is not None:
         return latest_full
-
-    partial_full = _find_latest_full_run_manifest(
-        archive_dir,
-        tickers=tickers,
-        market=market,
-        require_all_tickers=False,
-    )
-    if partial_full is not None:
-        return partial_full
-
-    if candidate_market_ok and _manifest_has_bootstrap_ready_ticker(
-        candidate,
-        tickers=tickers,
-        require_all_tickers=False,
-    ):
-        return candidate
-
-    # Preserve prior behavior when no better candidate exists.
-    return candidate
+    return None
 
 
 def _find_previous_comparable_manifest(
@@ -3508,19 +3941,24 @@ def _manifest_has_bootstrap_ready_ticker(
     tickers: list[str] | None,
     require_all_tickers: bool = True,
 ) -> bool:
-    target_tickers = {str(item).strip().upper() for item in (tickers or []) if str(item).strip()}
+    target_tickers = {
+        _ticker_identity_key(item)
+        for item in (tickers or [])
+        if str(item).strip()
+    }
     covered: set[str] = set()
     for source in manifest.get("tickers", []):
         ticker = str(source.get("ticker") or "").strip().upper()
         if not ticker:
             continue
-        if target_tickers and ticker not in target_tickers:
+        identity = _ticker_identity_key(ticker)
+        if target_tickers and identity not in target_tickers:
             continue
         if source.get("status") != "success":
             continue
         artifacts = source.get("artifacts") or {}
         if artifacts.get("analysis_json"):
-            covered.add(ticker)
+            covered.add(identity)
     if target_tickers and require_all_tickers:
         return target_tickers <= covered
     if target_tickers:
@@ -3588,19 +4026,24 @@ def _iter_run_manifests_desc(archive_dir: Path) -> list[tuple[dict[str, Any], Pa
 
 
 def _manifest_has_microstructure_artifact(manifest: dict[str, Any], *, tickers: list[str] | None = None) -> bool:
-    target_tickers = {str(item).strip().upper() for item in (tickers or []) if str(item).strip()}
+    target_tickers = {
+        _ticker_identity_key(item)
+        for item in (tickers or [])
+        if str(item).strip()
+    }
     covered: set[str] = set()
     for source in manifest.get("tickers", []):
         ticker = str(source.get("ticker") or "").strip().upper()
         if not ticker:
             continue
-        if target_tickers and ticker not in target_tickers:
+        identity = _ticker_identity_key(ticker)
+        if target_tickers and identity not in target_tickers:
             continue
         if source.get("status") != "success":
             continue
         artifacts = source.get("artifacts") or {}
         if artifacts.get("microstructure_report_md") and artifacts.get("microstructure_snapshot_json"):
-            covered.add(ticker)
+            covered.add(identity)
     if target_tickers:
         return target_tickers <= covered
     return bool(covered)

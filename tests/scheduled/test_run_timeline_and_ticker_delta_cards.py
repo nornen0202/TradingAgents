@@ -59,6 +59,10 @@ def test_run_timeline_and_ticker_delta_cards():
             "settings": {"output_language": "Korean", "market": "us"},
             "summary": {"total_tickers": 1, "successful_tickers": 1, "failed_tickers": 0},
             "portfolio": {"status": "disabled"},
+            "active_universe": {
+                "expected_watchlist_tickers": ["NVDA"],
+                "scanner_candidates": [],
+            },
             "tickers": [
                 {
                     "ticker": "NVDA",
@@ -85,6 +89,10 @@ def test_run_timeline_and_ticker_delta_cards():
             "settings": {"output_language": "Korean", "market": "us"},
             "summary": {"total_tickers": 1, "successful_tickers": 1, "failed_tickers": 0},
             "portfolio": {"status": "disabled"},
+            "active_universe": {
+                "expected_watchlist_tickers": ["NVDA"],
+                "scanner_candidates": [],
+            },
             "tickers": [
                 {
                     "ticker": "NVDA",

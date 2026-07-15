@@ -4,6 +4,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pytest
+
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.runner import (
     FRESHNESS_PRIOR_SESSION_BACKFILL,
@@ -137,8 +139,7 @@ checkpoint_timezone = "America/New_York"
     site_dir = tmp_path / "site"
     _copy_artifacts(site_dir, run_dir, manifest, {})
 
-    assert (site_dir / "downloads" / "run" / "AAPL" / "microstructure_snapshot.json").exists()
-    assert (site_dir / "downloads" / "run" / "execution" / "chatgpt_execution_context.json").exists()
+    assert not (site_dir / "downloads").exists()
 
 
 def test_overlay_bootstrap_preserves_latest_microstructure_artifacts(tmp_path: Path):
@@ -361,7 +362,7 @@ checkpoint_timezone = "America/New_York"
         },
         {},
     )
-    assert (site_dir / "downloads" / "new_overlay" / "execution" / "chatgpt_execution_context.json").exists()
+    assert not (site_dir / "downloads").exists()
 
 
 def test_context_gate_flags_us_provider_status_recheck():
@@ -390,7 +391,7 @@ def test_context_gate_flags_us_provider_status_recheck():
     assert "feed_limited:orderbook" in gate["provider_limitations"]
 
 
-def test_overlay_bootstrap_uses_same_market_partial_full_when_universe_expands(tmp_path: Path):
+def test_overlay_bootstrap_fails_closed_when_same_market_full_is_partial(tmp_path: Path):
     archive_dir = tmp_path / "archive"
     config_path = tmp_path / "scheduled.toml"
     config_path.write_text(
@@ -433,14 +434,12 @@ checkpoint_timezone = "America/New_York"
     )
     (archive_dir / "latest-run.json").write_text(json.dumps(latest_kr), encoding="utf-8")
 
-    summaries, source_run_id = _bootstrap_overlay_inputs_from_latest_run(
-        config=config,
-        run_dir=archive_dir / "runs" / "2026" / "new_overlay",
-        tickers=["AAPL", "MSFT"],
-    )
-
-    assert source_run_id == "20260530T010000_us_partial"
-    assert {item["ticker"] for item in summaries} == {"AAPL"}
+    with pytest.raises(RuntimeError, match="for every target"):
+        _bootstrap_overlay_inputs_from_latest_run(
+            config=config,
+            run_dir=archive_dir / "runs" / "2026" / "new_overlay",
+            tickers=["AAPL", "MSFT"],
+        )
 
 
 def _write_source_run(

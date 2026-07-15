@@ -26,4 +26,5 @@ def test_run_page_explains_when_no_microstructure_checkpoint_was_due(tmp_path: P
 
     assert "장중 실행 컨텍스트" in html
     assert "microstructure 파일이 새로 생성되지 않았습니다" in html
-    assert "No execution checkpoint is due yet" in html
+    assert "No execution checkpoint was refreshed in this run" in html
+    assert "this run is a pre-open snapshot" not in html

@@ -7,6 +7,12 @@ import re
 from pathlib import Path
 from typing import Any
 
+from tradingagents.scheduled.mobile_site import (
+    PRIVATE_SCHEMA,
+    decode_dashboard_key,
+    decrypt_private_payload,
+)
+
 
 EXPECTED_BENCHMARKS = {
     "kr": ("KOSPI", "KOSDAQ"),
@@ -26,8 +32,15 @@ SENSITIVE_LITERAL_ENV_NAMES = (
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Verify a public account performance site artifact.")
+    parser = argparse.ArgumentParser(
+        description="Verify private account performance artifacts and the public privacy boundary."
+    )
     parser.add_argument("--site-dir", required=True, help="Generated static site directory.")
+    parser.add_argument(
+        "--archive-dir",
+        default=os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", ""),
+        help="Private scheduled archive containing the selected run.",
+    )
     parser.add_argument("--market", required=True, choices=sorted(EXPECTED_BENCHMARKS), help="kr or us.")
     parser.add_argument("--run-label", help="Expected scheduled run label.")
     args = parser.parse_args()
@@ -38,43 +51,46 @@ def main() -> None:
     run_id = str(run.get("run_id") or "").strip()
     _assert(run_id, "Selected run is missing run_id.")
 
-    summary = run.get("summary") if isinstance(run.get("summary"), dict) else {}
-    settings = run.get("settings") if isinstance(run.get("settings"), dict) else {}
-    portfolio = run.get("portfolio") if isinstance(run.get("portfolio"), dict) else {}
+    archive_dir = Path(args.archive_dir).resolve() if str(args.archive_dir).strip() else None
+    _assert(archive_dir is not None, "--archive-dir or TRADINGAGENTS_ARCHIVE_DIR is required.")
+    run_dir = _find_archive_run(archive_dir, run_id)
+    private_manifest = _read_json(run_dir / "run.json")
+    summary = private_manifest.get("summary") if isinstance(private_manifest.get("summary"), dict) else {}
+    settings = private_manifest.get("settings") if isinstance(private_manifest.get("settings"), dict) else {}
+    portfolio = private_manifest.get("portfolio") if isinstance(private_manifest.get("portfolio"), dict) else {}
     account_performance = portfolio.get("account_performance") if isinstance(portfolio.get("account_performance"), dict) else {}
     _assert(settings.get("run_mode") == "portfolio_only", f"{run_id} was not generated with run_mode=portfolio_only.")
     _assert(int(summary.get("total_tickers") or 0) == 0, f"{run_id} unexpectedly ran ticker analysis.")
-    _assert(str(portfolio.get("status") or "") != "failed", f"{run_id} portfolio pipeline failed: {portfolio}")
+    # Keep private portfolio payloads out of Actions logs even on verifier failure.
+    _assert(str(portfolio.get("status") or "") != "failed", f"{run_id} portfolio pipeline failed.")
     _assert(account_performance.get("enabled") is True, f"{run_id} account performance is not enabled.")
     _assert(str(account_performance.get("status") or "") != "failed", f"{run_id} account performance failed.")
 
     html_path = site_dir / "runs" / run_id / "portfolio.html"
     html = _read_text(html_path)
-    required_fragments = (
+    for fragment in (
+        "개인 계좌 자료는 공개하지 않습니다",
+        "암호화된 개인 액션표 열기",
+    ):
+        _assert(fragment in html, f"{html_path} is missing {fragment!r}.")
+    for forbidden in (
         "계좌 성과 vs 지수/ETF",
         "실제 계좌 수익률",
-        "복잡하게 운용한 프리미엄",
-        "단순 기간 수익률 비교",
-        "동일 현금흐름 시뮬레이션",
-        "종목별 기여도",
-        "매매 비용",
-        "데이터 품질",
         "account_performance_public.json",
         "account_performance_chart_data.json",
         "account_performance_report.md",
-        *expected,
-    )
-    for fragment in required_fragments:
-        _assert(fragment in html, f"{html_path} is missing {fragment!r}.")
-    _assert("account_snapshot.json" not in html, f"{html_path} links account_snapshot.json.")
+        "account_snapshot.json",
+    ):
+        _assert(forbidden not in html, f"{html_path} publicly exposes {forbidden!r}.")
     _assert_no_sensitive_text(html, html_path)
+    _assert(not (site_dir / "downloads").exists(), "Public Pages unexpectedly contains raw downloads.")
 
-    download_dir = site_dir / "downloads" / run_id / "portfolio"
-    public_json = download_dir / "account_performance_public.json"
-    chart_json = download_dir / "account_performance_chart_data.json"
-    report_md = download_dir / "account_performance_report.md"
+    private_dir = run_dir / "portfolio-private"
+    public_json = private_dir / "account_performance_public.json"
+    chart_json = private_dir / "account_performance_chart_data.json"
+    report_md = private_dir / "account_performance_report.md"
     for path in (public_json, chart_json, report_md):
-        _assert(path.exists(), f"Expected public artifact is missing: {path}")
+        _assert(path.exists(), f"Expected private verification artifact is missing: {path}")
 
     public_payload = _read_json(public_json)
     chart_payload = _read_json(chart_json)
@@ -104,11 +120,28 @@ def main() -> None:
             f"{public_json} has no periods but did not explain the partial data quality.",
         )
 
-    sanitized_snapshot = download_dir / "account_snapshot.json"
-    if sanitized_snapshot.exists():
-        snapshot_text = _read_text(sanitized_snapshot)
-        _assert_no_sensitive_text(snapshot_text, sanitized_snapshot)
-        _assert("***MASKED***" in snapshot_text, f"{sanitized_snapshot} did not mask public identifiers.")
+    envelope_path = site_dir / "mobile" / "private.enc.json"
+    envelope = _read_json(envelope_path)
+    key_text = os.environ.get("TRADINGAGENTS_MOBILE_DASHBOARD_KEY", "").strip()
+    _assert(key_text, "TRADINGAGENTS_MOBILE_DASHBOARD_KEY is required for encrypted mobile verification.")
+    private_mobile = decrypt_private_payload(envelope, key=decode_dashboard_key(key_text))
+    _assert(private_mobile.get("schema") == PRIVATE_SCHEMA, "Unexpected private mobile schema.")
+    markets = private_mobile.get("markets") if isinstance(private_mobile.get("markets"), dict) else {}
+    _assert(args.market in markets, f"Encrypted mobile payload is missing {args.market.upper()}.")
+
+    sensitive_filenames = {
+        "account_snapshot.json",
+        "portfolio_report.json",
+        "portfolio_report.md",
+        "account_performance_public.json",
+        "account_performance_chart_data.json",
+        "account_performance_report.md",
+    }
+    published_names = {path.name for path in site_dir.rglob("*") if path.is_file()}
+    _assert(
+        not (published_names & sensitive_filenames),
+        f"Public Pages contains private artifact filenames: {sorted(published_names & sensitive_filenames)}",
+    )
 
     print(
         "Verified account performance site:",
@@ -119,11 +152,22 @@ def main() -> None:
                 "benchmarks": list(expected),
                 "portfolio_status": portfolio.get("status"),
                 "account_performance_status": account_performance.get("status"),
-                "site": str(html_path),
+                "public_gateway": str(html_path),
+                "private_performance_artifact": str(public_json),
+                "encrypted_mobile_envelope": str(envelope_path),
             },
             ensure_ascii=False,
         ),
     )
+
+
+def _find_archive_run(archive_dir: Path, run_id: str) -> Path:
+    direct = archive_dir / "runs" / run_id[:4] / run_id
+    if (direct / "run.json").is_file():
+        return direct
+    matches = [path.parent for path in (archive_dir / "runs").rglob("run.json") if path.parent.name == run_id]
+    _assert(len(matches) == 1, f"Could not uniquely resolve private archive run {run_id!r}.")
+    return matches[0]
 
 
 def _select_run(*, site_dir: Path, market: str, run_label: str | None) -> dict[str, Any]:
@@ -133,6 +177,11 @@ def _select_run(*, site_dir: Path, market: str, run_label: str | None) -> dict[s
     candidates: list[dict[str, Any]] = []
     for run in runs:
         if not isinstance(run, dict):
+            continue
+        if run.get("published_to_site") is not True:
+            continue
+        run_url = str(run.get("run_url") or "").strip()
+        if not run_url or not (site_dir / run_url).is_file():
             continue
         settings = run.get("settings") if isinstance(run.get("settings"), dict) else {}
         if settings.get("run_mode") != "portfolio_only":

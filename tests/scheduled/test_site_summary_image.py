@@ -5,7 +5,7 @@ from tradingagents.scheduled.config import SiteSettings
 from tradingagents.scheduled.site import build_site
 
 
-def test_portfolio_page_publishes_summary_image(tmp_path: Path):
+def test_public_portfolio_gateway_never_publishes_non_redacted_summary_image(tmp_path: Path):
     archive_dir = tmp_path / "archive"
     site_dir = tmp_path / "site"
     run_id = "20260426T013659_github-actions-us"
@@ -58,6 +58,6 @@ def test_portfolio_page_publishes_summary_image(tmp_path: Path):
     build_site(archive_dir, site_dir, SiteSettings(title="TA", subtitle="Daily"))
 
     portfolio_html = (site_dir / "runs" / run_id / "portfolio.html").read_text(encoding="utf-8")
-    assert "요약 이미지" in portfolio_html
-    assert "summary_card.svg" in portfolio_html
-    assert (site_dir / "downloads" / run_id / "portfolio" / "summary_card.svg").exists()
+    assert "개인 계좌 자료는 공개하지 않습니다" in portfolio_html
+    assert "summary_card.svg" not in portfolio_html
+    assert not (site_dir / "downloads" / run_id / "portfolio" / "summary_card.svg").exists()

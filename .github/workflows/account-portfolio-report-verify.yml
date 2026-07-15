@@ -29,6 +29,8 @@ jobs:
   verify_kr:
     if: ${{ github.event.inputs.profile == 'all' || github.event.inputs.profile == 'kr' }}
     runs-on: [self-hosted, Windows]
+    outputs:
+      pages_snapshot_generated_epoch_ms: ${{ steps.stamp_pages_snapshot.outputs.generated_epoch_ms }}
     timeout-minutes: 25
     defaults:
       run:
@@ -50,15 +52,15 @@ jobs:
       KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
 
       - name: Install TradingAgents
         run: |
@@ -121,6 +123,8 @@ jobs:
           )
 
       - name: Run KR portfolio-only account report
+        env:
+          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -145,6 +149,8 @@ jobs:
           subprocess.check_call(args)
 
       - name: Verify KR public account performance report
+        env:
+          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import subprocess
           import sys
@@ -162,10 +168,37 @@ jobs:
               ]
           )
 
+      - name: Stamp KR rollback-resistant Pages snapshot
+        id: stamp_pages_snapshot
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/pages_snapshot.py",
+                  "stamp",
+                  "--site-dir",
+                  "site",
+                  "--repository",
+                  "${{ github.repository }}",
+                  "--workflow",
+                  "${{ github.workflow }}",
+                  "--run-id",
+                  "${{ github.run_id }}",
+                  "--run-attempt",
+                  "${{ github.run_attempt }}",
+                  "--commit-sha",
+                  "${{ github.sha }}",
+                  "--require-private-envelope",
+              ]
+          )
+
       - name: Upload KR generated site
         if: ${{ !cancelled() }}
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: account-performance-kr-site-${{ github.run_id }}
           path: site
@@ -181,6 +214,8 @@ jobs:
       - verify_kr
     if: ${{ always() && (github.event.inputs.profile == 'us' || (github.event.inputs.profile == 'all' && needs.verify_kr.result == 'success')) }}
     runs-on: [self-hosted, Windows]
+    outputs:
+      pages_snapshot_generated_epoch_ms: ${{ steps.stamp_pages_snapshot.outputs.generated_epoch_ms }}
     timeout-minutes: 25
     defaults:
       run:
@@ -202,15 +237,15 @@ jobs:
       KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
 
       - name: Install TradingAgents
         run: |
@@ -276,6 +311,8 @@ jobs:
           )
 
       - name: Run US portfolio-only account report
+        env:
+          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -300,6 +337,8 @@ jobs:
           subprocess.check_call(args)
 
       - name: Verify US public account performance report
+        env:
+          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import subprocess
           import sys
@@ -317,10 +356,37 @@ jobs:
               ]
           )
 
+      - name: Stamp US rollback-resistant Pages snapshot
+        id: stamp_pages_snapshot
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/pages_snapshot.py",
+                  "stamp",
+                  "--site-dir",
+                  "site",
+                  "--repository",
+                  "${{ github.repository }}",
+                  "--workflow",
+                  "${{ github.workflow }}",
+                  "--run-id",
+                  "${{ github.run_id }}",
+                  "--run-attempt",
+                  "${{ github.run_attempt }}",
+                  "--commit-sha",
+                  "${{ github.sha }}",
+                  "--require-private-envelope",
+              ]
+          )
+
       - name: Upload US generated site
         if: ${{ !cancelled() }}
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: account-performance-us-site-${{ github.run_id }}
           path: site
@@ -344,8 +410,51 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Check out deployment guard
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Select final account Pages artifact
+        id: select_account_snapshot
+        shell: python {0}
+        env:
+          REQUESTED_PROFILE: ${{ github.event.inputs.profile }}
+          KR_SNAPSHOT_EPOCH_MS: ${{ needs.verify_kr.outputs.pages_snapshot_generated_epoch_ms }}
+          US_SNAPSHOT_EPOCH_MS: ${{ needs.verify_us.outputs.pages_snapshot_generated_epoch_ms }}
+        run: |
+          import os
+          from pathlib import Path
+
+          profile = os.environ.get("REQUESTED_PROFILE", "").strip().lower()
+          if profile == "kr":
+              artifact = "account-performance-pages-kr"
+              epoch = os.environ.get("KR_SNAPSHOT_EPOCH_MS", "").strip()
+          elif profile in {"us", "all"}:
+              # The US job runs after KR for profile=all and rebuilds the site
+              # from the shared archive, so it is the only complete final artifact.
+              artifact = "account-performance-pages-us"
+              epoch = os.environ.get("US_SNAPSHOT_EPOCH_MS", "").strip()
+          else:
+              raise SystemExit(f"Unsupported account profile: {profile!r}")
+          if not epoch.isdigit() or int(epoch) <= 0:
+              raise SystemExit(f"Selected account snapshot has no valid generation time: {profile}")
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8", newline="\n") as handle:
+              handle.write(f"artifact_name={artifact}\n")
+              handle.write(f"generated_epoch_ms={epoch}\n")
+
+      - name: Refuse stale Pages snapshot rollback
+        id: pages_guard
+        env:
+          PAGES_PUBLIC_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: >-
+          python .github/scripts/pages_snapshot.py guard
+          --candidate-generated-epoch-ms "${{ steps.select_account_snapshot.outputs.generated_epoch_ms }}"
+          --candidate-run-id "${{ github.run_id }}"
+          --candidate-run-attempt "${{ github.run_attempt }}"
+          --public-base-url "$PAGES_PUBLIC_BASE_URL"
+
       - name: Deploy account performance site to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        if: ${{ steps.pages_guard.outputs.should_deploy == 'true' }}
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
         with:
-          artifact_name: ${{ (needs.verify_us.result == 'success' && 'account-performance-pages-us') || 'account-performance-pages-kr' }}
+          artifact_name: ${{ steps.select_account_snapshot.outputs.artifact_name }}

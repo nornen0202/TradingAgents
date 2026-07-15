@@ -1,10 +1,14 @@
 ﻿import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 from tradingagents.scheduled.runner import execute_scheduled_run, load_scheduled_config
+
+
+_TEST_MOBILE_KEY = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8"
 
 
 class _FakeStatsHandler:
@@ -89,6 +93,7 @@ class _FakeStructuredDecisionGraph:
 
 
 class PortfolioPipelineTests(unittest.TestCase):
+    @patch.dict(os.environ, {"TRADINGAGENTS_MOBILE_DASHBOARD_KEY": _TEST_MOBILE_KEY})
     def test_execute_scheduled_run_generates_private_portfolio_artifacts(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -214,12 +219,29 @@ enabled = false
 
             report_payload = json.loads((private_dir / "portfolio_report.json").read_text(encoding="utf-8"))
             audit_payload = json.loads((private_dir / "decision_audit.json").read_text(encoding="utf-8"))
+            status_payload = json.loads((private_dir / "status.json").read_text(encoding="utf-8"))
             report_markdown = (private_dir / "portfolio_report.md").read_text(encoding="utf-8")
             public_portfolio_page = (site_dir / "runs" / manifest["run_id"] / "portfolio.html").read_text(encoding="utf-8")
             self.assertEqual(report_payload["snapshot_id"], "20260410T073000_manual_test")
             self.assertEqual(report_payload["market_regime"], "constructive_but_selective")
             self.assertGreaterEqual(len(report_payload["actions"]), 2)
             self.assertEqual(audit_payload["snapshot_health"], "VALID")
+            self.assertEqual(
+                status_payload["private_coverage_snapshot"],
+                {
+                    "snapshot_id": "20260410T073000_manual_test",
+                    "as_of": "2026-04-10T07:30:00+09:00",
+                    "snapshot_health": "VALID",
+                    "holding_set_complete": True,
+                    "canonical_holding_tickers": ["000660.KS"],
+                },
+            )
+            self.assertEqual(
+                (manifest.get("portfolio") or {})["private_coverage_snapshot"][
+                    "canonical_holding_tickers"
+                ],
+                ["000660.KS"],
+            )
             self.assertIn("핵심 요약", report_markdown)
             self.assertIn("지금 할 일", report_markdown)
             self.assertIn("조건 충족 시", report_markdown)
@@ -228,11 +250,17 @@ enabled = false
             self.assertNotIn("timing_readiness", report_markdown)
             self.assertNotIn("reason_codes", report_markdown)
             self.assertNotIn("Data Health", report_markdown)
-            self.assertIn("Account report", public_portfolio_page)
+            self.assertIn("개인 계좌 자료는 공개하지 않습니다", public_portfolio_page)
+            self.assertIn("암호화된 개인 액션표 열기", public_portfolio_page)
+            self.assertNotIn("Account report", public_portfolio_page)
             self.assertNotIn("RULE_ONLY", public_portfolio_page)
             self.assertNotIn("timing_readiness", public_portfolio_page)
-            self.assertIn("TradingAgents 계좌 운용 리포트", public_portfolio_page)
+            self.assertNotIn("TradingAgents 계좌 운용 리포트", public_portfolio_page)
+            self.assertNotIn("portfolio_report.md", public_portfolio_page)
+            self.assertNotIn("portfolio_report.json", public_portfolio_page)
+            self.assertFalse((site_dir / "downloads").exists())
 
+    @patch.dict(os.environ, {"TRADINGAGENTS_MOBILE_DASHBOARD_KEY": _TEST_MOBILE_KEY})
     def test_execute_scheduled_run_applies_portfolio_llm_judges_when_enabled(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -402,12 +430,18 @@ enabled = false
             self.assertGreaterEqual(len(semantic_payload["verdicts"]), 2)
             self.assertEqual(report_payload["actions"][0]["decision_source"], "RULE+DEEP+CODEX")
             self.assertIn("semiconductor_priority", report_payload["actions"][0]["reason_codes"])
-            self.assertIn("Account report", public_portfolio_page)
+            self.assertIn("개인 계좌 자료는 공개하지 않습니다", public_portfolio_page)
+            self.assertIn("암호화된 개인 액션표 열기", public_portfolio_page)
+            self.assertNotIn("Account report", public_portfolio_page)
+            self.assertNotIn("portfolio_report.md", public_portfolio_page)
+            self.assertNotIn("portfolio_report.json", public_portfolio_page)
 
             published_portfolio_dir = site_dir / "downloads" / manifest["run_id"] / "portfolio"
-            self.assertTrue((published_portfolio_dir / "portfolio_report.md").exists())
-            self.assertTrue((published_portfolio_dir / "portfolio_report.json").exists())
+            self.assertFalse((published_portfolio_dir / "portfolio_report.md").exists())
+            self.assertFalse((published_portfolio_dir / "portfolio_report.json").exists())
+            self.assertFalse((site_dir / "downloads").exists())
 
+    @patch.dict(os.environ, {"TRADINGAGENTS_MOBILE_DASHBOARD_KEY": _TEST_MOBILE_KEY})
     def test_execute_scheduled_run_marks_watchlist_only_for_empty_underfunded_snapshot(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -509,6 +543,7 @@ enabled = false
 
             self.assertEqual((manifest.get("portfolio") or {}).get("status"), "watchlist_only")
 
+    @patch.dict(os.environ, {"TRADINGAGENTS_MOBILE_DASHBOARD_KEY": _TEST_MOBILE_KEY})
     def test_execute_scheduled_run_generates_watchlist_only_profile_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -585,8 +620,13 @@ enabled = false
 
             self.assertEqual(status_payload["status"], "watchlist_only")
             self.assertEqual(snapshot_payload["snapshot_health"], "WATCHLIST_ONLY")
-            self.assertIn("Watchlist report", public_portfolio_page)
-            self.assertIn("TradingAgents 포트폴리오 워치리스트 리포트", public_portfolio_page)
+            self.assertIn("개인 계좌 자료는 공개하지 않습니다", public_portfolio_page)
+            self.assertIn("암호화된 개인 액션표 열기", public_portfolio_page)
+            self.assertNotIn("Watchlist report", public_portfolio_page)
+            self.assertNotIn("TradingAgents 포트폴리오 워치리스트 리포트", public_portfolio_page)
+            self.assertNotIn("portfolio_report.md", public_portfolio_page)
+            self.assertNotIn("portfolio_report.json", public_portfolio_page)
+            self.assertFalse((site_dir / "downloads").exists())
 
 
 if __name__ == "__main__":

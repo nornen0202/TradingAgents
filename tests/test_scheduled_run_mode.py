@@ -3,7 +3,12 @@ from pathlib import Path
 from unittest.mock import patch
 
 from tradingagents.scheduled.config import load_scheduled_config
-from tradingagents.scheduled.runner import execute_scheduled_run
+from tradingagents.scheduled.runner import (
+    _bootstrap_overlay_inputs_from_latest_run,
+    _manifest_has_bootstrap_ready_ticker,
+    _resolve_latest_overlay_source_manifest,
+    execute_scheduled_run,
+)
 
 
 class _NoopUpdate:
@@ -123,6 +128,95 @@ price_provider = "yfinance"
     assert manifest["summary"]["total_tickers"] == 1
     assert manifest["tickers"][0]["quality_flags"] == ("overlay_only_mode",)
     assert manifest["performance"] == {"status": "skipped", "reason": "overlay_fast_path"}
+
+
+def test_overlay_source_resolution_fails_closed_on_partial_target_coverage(tmp_path: Path):
+    archive_dir = tmp_path / "archive"
+    archive_dir.mkdir(parents=True)
+    partial = {
+        "run_id": "partial-full",
+        "started_at": "2026-07-15T20:00:00-04:00",
+        "settings": {"run_mode": "full", "market": "US"},
+        "tickers": [
+            {
+                "ticker": "NVDA",
+                "status": "success",
+                "artifacts": {"analysis_json": "tickers/NVDA/analysis.json"},
+            }
+        ],
+    }
+    (archive_dir / "latest-run.json").write_text(json.dumps(partial), encoding="utf-8")
+
+    resolved = _resolve_latest_overlay_source_manifest(
+        archive_dir,
+        tickers=["NVDA", "AAPL"],
+        market="US",
+    )
+
+    assert resolved is None
+
+
+def test_overlay_bootstrap_matches_kr_alias_identity(tmp_path: Path):
+    archive_dir = tmp_path / "archive"
+    source_run_dir = archive_dir / "runs" / "2026" / "alias-full"
+    source_ticker_dir = source_run_dir / "tickers" / "005930"
+    source_ticker_dir.mkdir(parents=True)
+    (source_ticker_dir / "analysis.json").write_text(
+        json.dumps({"ticker": "005930", "decision": "HOLD", "trade_date": "2026-07-15"}),
+        encoding="utf-8",
+    )
+    (source_ticker_dir / "execution_contract.json").write_text("{}", encoding="utf-8")
+    source_manifest = {
+        "run_id": "alias-full",
+        "started_at": "2026-07-15T15:00:00+09:00",
+        "settings": {"run_mode": "full", "market": "KR"},
+        "tickers": [
+            {
+                "ticker": "005930",
+                "status": "success",
+                "decision": "HOLD",
+                "artifacts": {
+                    "analysis_json": "tickers/005930/analysis.json",
+                    "execution_contract_json": "tickers/005930/execution_contract.json",
+                },
+            }
+        ],
+    }
+    (source_run_dir / "run.json").write_text(json.dumps(source_manifest), encoding="utf-8")
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    (archive_dir / "latest-run.json").write_text(json.dumps(source_manifest), encoding="utf-8")
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["005930.KS"]
+run_mode = "overlay_only"
+market = "KR"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+
+    assert _manifest_has_bootstrap_ready_ticker(
+        source_manifest,
+        tickers=["005930.KS"],
+    )
+    summaries, source_run_id = _bootstrap_overlay_inputs_from_latest_run(
+        config=config,
+        run_dir=tmp_path / "overlay-run",
+        tickers=["005930.KS"],
+    )
+
+    assert source_run_id == "alias-full"
+    assert [summary["ticker"] for summary in summaries] == ["005930.KS"]
+    assert (tmp_path / "overlay-run" / "tickers" / "005930.KS" / "analysis.json").is_file()
 
 
 def test_portfolio_only_mode_skips_ticker_analysis_and_runs_portfolio_pipeline(tmp_path: Path):

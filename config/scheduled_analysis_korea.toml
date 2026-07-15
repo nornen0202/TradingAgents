@@ -1,7 +1,7 @@
 [run]
 tickers = ["000150.KS", "000660.KS", "005380.KS", "005930.KS", "006400.KS", "007660.KS", "007810.KS", "009150.KS", "010120.KS", "011070.KS", "012330.KS", "012450.KS", "018260.KS", "034020.KS", "035420.KS", "036930.KQ", "042700.KS", "058470.KQ", "058610.KQ", "064400.KS", "066570.KS", "095340.KQ", "108490.KQ", "131290.KQ", "222800.KQ", "267260.KS", "277810.KQ", "278470.KS", "298040.KS", "353200.KS", "373220.KS", "454910.KS"]
 market = "KR"
-ticker_universe_mode = "config_only"
+ticker_universe_mode = "config_plus_account"
 analysts = ["market", "social", "news", "fundamentals"]
 output_language = "Korean"
 trade_date_mode = "latest_available"
@@ -11,15 +11,15 @@ max_risk_discuss_rounds = 1
 latest_market_data_lookback_days = 14
 continue_on_ticker_error = true
 report_polisher_enabled = true
-max_runtime_minutes = 105
-min_remaining_minutes_for_next_ticker = 15
+max_runtime_minutes = 0
+min_remaining_minutes_for_next_ticker = 0
 parallel_ticker_execution = true
 max_parallel_tickers = 4
-per_ticker_timeout_minutes = 30
+per_ticker_timeout_minutes = 60
 codex_circuit_breaker_enabled = true
 max_consecutive_codex_failures = 3
 fatal_error_patterns = ["usage limit", "model unavailable"]
-daily_active_ticker_limit = 14
+daily_active_ticker_limit = 0
 analysis_mode = "full"
 
 [llm]
@@ -77,7 +77,7 @@ report_polisher_enabled = true
 
 [portfolio_performance]
 enabled = true
-publish_to_site = true
+publish_to_site = false
 public_sanitization = "mask_identifiers"
 periods = ["1M", "3M", "6M", "YTD", "1Y", "ALL"]
 profit_calendar_enabled = true
@@ -159,8 +159,8 @@ llm_summary_model = ""
 [summary_image]
 enabled = true
 mode = "deterministic_svg"
-publish_to_site = true
-redact_account_values = false
+publish_to_site = false
+redact_account_values = true
 image_model = "gpt-image-2"
 image_size = "1024x1536"
 image_quality = "medium"

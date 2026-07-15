@@ -33,7 +33,7 @@ on:
       ticker_universe_mode:
         description: "Ticker source mode: config_only / config_plus_account / account_only"
         required: false
-        default: "config_only"
+        default: "config_plus_account"
         type: choice
         options:
           - config_only
@@ -84,7 +84,7 @@ jobs:
       reason: ${{ steps.gate.outputs.reason }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Decide scheduled execution
         id: gate
@@ -163,7 +163,7 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
@@ -241,7 +241,7 @@ jobs:
               raise SystemExit("C: free space is below 5GB after cleanup; refusing to start analysis.")
 
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Install TradingAgents
         run: |
@@ -727,7 +727,7 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
@@ -805,7 +805,7 @@ jobs:
               raise SystemExit("C: free space is below 5GB after cleanup; refusing to start analysis.")
 
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Install TradingAgents
         run: |
@@ -1383,7 +1383,7 @@ jobs:
         shell: python {0}
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
@@ -1428,6 +1428,8 @@ jobs:
       cancel-in-progress: false
     permissions:
       contents: read
+    outputs:
+      pages_snapshot_generated_epoch_ms: ${{ steps.stamp_pages_snapshot.outputs.generated_epoch_ms }}
     defaults:
       run:
         shell: python {0}
@@ -1441,15 +1443,15 @@ jobs:
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
 
       - name: Install TradingAgents for site rebuild
         run: |
@@ -1460,6 +1462,8 @@ jobs:
           subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", "."])
 
       - name: Rebuild final GitHub Pages site from archive
+        env:
+          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -1485,6 +1489,33 @@ jobs:
           if archive_dir:
               args += ["--archive-dir", archive_dir]
           subprocess.check_call(args)
+
+      - name: Stamp rollback-resistant Pages snapshot
+        id: stamp_pages_snapshot
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/pages_snapshot.py",
+                  "stamp",
+                  "--site-dir",
+                  "site",
+                  "--repository",
+                  "${{ github.repository }}",
+                  "--workflow",
+                  "${{ github.workflow }}",
+                  "--run-id",
+                  "${{ github.run_id }}",
+                  "--run-attempt",
+                  "${{ github.run_attempt }}",
+                  "--commit-sha",
+                  "${{ github.sha }}",
+                  "--require-private-envelope",
+              ]
+          )
 
       - name: Add Git Bash to PATH for Pages packaging
         run: |
@@ -1527,14 +1558,30 @@ jobs:
     permissions:
       pages: write
       id-token: write
+      contents: read
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Check out deployment guard
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Refuse stale Pages snapshot rollback
+        id: pages_guard
+        env:
+          PAGES_PUBLIC_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: >-
+          python .github/scripts/pages_snapshot.py guard
+          --candidate-generated-epoch-ms "${{ needs.build_pages.outputs.pages_snapshot_generated_epoch_ms }}"
+          --candidate-run-id "${{ github.run_id }}"
+          --candidate-run-attempt "${{ github.run_attempt }}"
+          --public-base-url "$PAGES_PUBLIC_BASE_URL"
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        if: ${{ steps.pages_guard.outputs.should_deploy == 'true' }}
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
         with:
           artifact_name: github-pages-final

@@ -122,23 +122,51 @@ def augment_universe_with_scanner(
     max_new_tickers: int = 5,
 ) -> list[str]:
     result: list[str] = []
-    seen: set[str] = set()
+    seen_identity: set[str] = set()
     for ticker in base_tickers:
         text = str(ticker or "").strip().upper()
-        if text and text not in seen:
-            seen.add(text)
-            result.append(text)
+        if not text:
+            continue
+        identity = _ticker_identity_key(text)
+        if identity in seen_identity:
+            continue
+        seen_identity.add(identity)
+        result.append(text)
+    limit = max(0, int(max_new_tickers or 0))
+    if limit <= 0:
+        return result
     added = 0
     for candidate in (scanner_result.candidates if scanner_result else ()):
         ticker = str(candidate.ticker or "").strip().upper()
-        if not ticker or ticker in seen:
+        if not ticker:
             continue
-        seen.add(ticker)
+        identity = _ticker_identity_key(ticker)
+        if identity in seen_identity:
+            continue
+        seen_identity.add(identity)
         result.append(ticker)
         added += 1
-        if added >= max_new_tickers:
+        if added >= limit:
             break
     return result
+
+
+def _ticker_identity_key(ticker: str) -> str:
+    """Return the analysis identity before a scanner slot is consumed.
+
+    KIS commonly reports Korean holdings as a bare six-digit code while the
+    research configuration and scanner use Yahoo's ``.KS``/``.KQ`` suffixes.
+    Those spellings must share one quota slot and one analysis.
+    """
+
+    normalized = str(ticker or "").strip().upper()
+    if len(normalized) == 6 and normalized.isdigit():
+        return f"KR:{normalized}"
+    if normalized.endswith((".KS", ".KQ")):
+        base = normalized[:-3]
+        if len(base) == 6 and base.isdigit():
+            return f"KR:{base}"
+    return normalized
 
 
 def _load_ohlcv_fixture(path: str | Path) -> tuple[list[dict[str, Any]], list[str]]:

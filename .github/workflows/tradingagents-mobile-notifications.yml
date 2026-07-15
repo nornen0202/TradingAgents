@@ -1,0 +1,183 @@
+name: TradingAgents Mobile Notifications
+
+on:
+  workflow_run:
+    workflows:
+      - Daily Codex Analysis
+      - Intraday Overlay Refresh
+      - Account Portfolio Report Verify
+      - Daily YouTube Verified Reports
+      - Daily PRISM Telegram Reports
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      upstream_run_id:
+        description: "Completed upstream GitHub Actions run ID to inspect and notify"
+        required: true
+        type: string
+      dry_run:
+        description: "Compose and validate without contacting Telegram"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: tradingagents-mobile-notification-${{ github.event.workflow_run.id || inputs.upstream_run_id }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.workflow_run.head_repository.full_name == github.repository &&
+          github.event.workflow_run.head_branch == 'main'
+        )
+      }}
+    runs-on: ubuntu-latest
+    outputs:
+      workflow_name: ${{ steps.inspect.outputs.workflow_name }}
+      conclusion: ${{ steps.inspect.outputs.conclusion }}
+      should_notify: ${{ steps.inspect.outputs.should_notify }}
+      reason: ${{ steps.inspect.outputs.reason }}
+    steps:
+      - name: Check out trusted notifier code from main
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Inspect and validate upstream workflow
+        id: inspect
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPSTREAM_RUN_ID: ${{ github.event.workflow_run.id || inputs.upstream_run_id }}
+        run: >-
+          python -m tradingagents.notifications inspect
+          --repository "$GITHUB_REPOSITORY"
+          --upstream-run-id "$UPSTREAM_RUN_ID"
+          --github-output "$GITHUB_OUTPUT"
+
+  notify_remote:
+    name: Send remote-safe completion notification
+    needs:
+      - resolve
+    if: ${{ needs.resolve.outputs.should_notify == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out trusted notifier code from main
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Send Telegram completion or failure notification
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPSTREAM_RUN_ID: ${{ github.event.workflow_run.id || inputs.upstream_run_id }}
+          NOTIFICATION_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.TELEGRAM_NOTIFICATION_CHAT_ID }}
+          MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
+        run: |
+          set -euo pipefail
+          archive_dir="$RUNNER_TEMP/no-local-archive"
+          mkdir -p "$archive_dir"
+          args=(
+            -m tradingagents.notifications notify
+            --repository "$GITHUB_REPOSITORY"
+            --upstream-run-id "$UPSTREAM_RUN_ID"
+            --archive-dir "$archive_dir"
+            --ledger-path "$RUNNER_TEMP/telegram-notification-ledger.json"
+            --public-base-url "https://nornen0202.github.io/TradingAgents"
+          )
+          if [[ "$NOTIFICATION_DRY_RUN" == "true" ]]; then
+            args+=(--dry-run)
+          fi
+          python "${args[@]}"
+
+  notify_private_cards:
+    name: Add private archive action cards
+    needs:
+      - resolve
+      - notify_remote
+    if: >-
+      ${{
+        always() &&
+        needs.resolve.outputs.should_notify == 'true' &&
+        needs.resolve.outputs.conclusion == 'success' &&
+        needs.notify_remote.result == 'success'
+      }}
+    runs-on: [self-hosted, Windows]
+    timeout-minutes: 30
+    continue-on-error: true
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Check out trusted notifier code from main
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: main
+          path: notifier-${{ github.run_id }}
+          clean: false
+          persist-credentials: false
+
+      - name: Send private action-card continuation when available
+        working-directory: notifier-${{ github.run_id }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPSTREAM_RUN_ID: ${{ github.event.workflow_run.id || inputs.upstream_run_id }}
+          NOTIFICATION_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+          TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.TELEGRAM_NOTIFICATION_CHAT_ID }}
+        run: |
+          $archiveDir = $env:TRADINGAGENTS_ARCHIVE_DIR
+          if ([string]::IsNullOrWhiteSpace($archiveDir)) {
+            $archiveDir = "C:\TradingAgentsData\archive"
+          }
+          $ledgerPath = Join-Path $archiveDir "notifications\telegram-ledger.json"
+          $arguments = @(
+            "-m", "tradingagents.notifications", "notify",
+            "--repository", $env:GITHUB_REPOSITORY,
+            "--upstream-run-id", $env:UPSTREAM_RUN_ID,
+            "--archive-dir", $archiveDir,
+            "--ledger-path", $ledgerPath,
+            "--public-base-url", "https://nornen0202.github.io/TradingAgents",
+            "--cards-only"
+          )
+          if ($env:NOTIFICATION_DRY_RUN -eq "true") {
+            $arguments += "--dry-run"
+          }
+          python @arguments
+
+      - name: Remove isolated notifier checkout
+        if: ${{ always() }}
+        run: |
+          $workspace = [System.IO.Path]::GetFullPath($env:GITHUB_WORKSPACE).TrimEnd('\')
+          $target = [System.IO.Path]::GetFullPath(
+            (Join-Path $workspace "notifier-$env:GITHUB_RUN_ID")
+          )
+          if (-not $target.StartsWith("$workspace\", [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to remove a path outside GITHUB_WORKSPACE."
+          }
+          if (Test-Path -LiteralPath $target) {
+            Remove-Item -LiteralPath $target -Recurse -Force
+          }

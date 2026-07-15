@@ -25,7 +25,10 @@ def test_prism_telegram_workflow_keeps_pages_permission_off_self_hosted_build_jo
     assert "working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}" in build_job
     assert "Prepare runner diagnostics" not in build_job
 
-    assert "permissions:\n      pages: write\n      id-token: write" in deploy_job
+    assert "permissions:" in deploy_job
+    assert "contents: read" in deploy_job
+    assert "pages: write" in deploy_job
+    assert "id-token: write" in deploy_job
 
 
 def test_daily_codex_pages_job_preserves_prism_telegram_archive_location() -> None:
