@@ -576,7 +576,7 @@ class WorkflowDefinitionTests(unittest.TestCase):
     def test_every_pages_builder_receives_the_mobile_encryption_key(self):
         root = Path(__file__).parents[1] / ".github" / "workflows"
         expected_counts = {
-            "daily-codex-analysis.yml": 1,
+            "daily-codex-analysis.yml": 3,
             "intraday-overlay-refresh.yml": 1,
             "account-portfolio-report-verify.yml": 4,
             "daily-youtube-reports.yml": 1,
