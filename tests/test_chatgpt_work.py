@@ -75,6 +75,62 @@ def _write_market_run(
     return run_dir
 
 
+def _write_universe_contract(
+    run_dir: Path,
+    *,
+    expected_holdings: list[str],
+    missing_holdings: list[str],
+    expected_watchlist: list[str],
+    missing_watchlist: list[str],
+    failed_tickers: list[str],
+) -> None:
+    manifest_path = run_dir / "run.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    selected = [
+        ticker
+        for ticker in dict.fromkeys([*expected_holdings, *expected_watchlist])
+        if ticker not in {*missing_holdings, *missing_watchlist}
+    ]
+    failed = set(failed_tickers)
+    selection_complete = not missing_holdings and not missing_watchlist
+    analysis_complete = not (failed & set(selected))
+    manifest["active_universe"] = {
+        "ticker_universe_mode": "config_plus_account",
+        "account_snapshot_status": "loaded",
+        "account_holding_count": len(expected_holdings),
+        "expected_holding_tickers": expected_holdings,
+        "missing_holding_tickers": missing_holdings,
+        "expected_watchlist_tickers": expected_watchlist,
+        "missing_watchlist_tickers": missing_watchlist,
+        "missing_analysis_tickers": [],
+        "coverage": {
+            "complete": selection_complete and analysis_complete,
+            "selection_complete": selection_complete,
+            "analysis_complete": analysis_complete,
+            "analysis_expected_count": len(selected),
+            "analysis_successful_count": len(selected) - len(failed & set(selected)),
+            "analysis_failed_count": len(failed & set(selected)),
+            "analysis_missing_count": 0,
+            "holding_expected_count": len(expected_holdings),
+            "holding_selected_count": len(expected_holdings) - len(missing_holdings),
+            "holding_missing_count": len(missing_holdings),
+            "watchlist_expected_count": len(expected_watchlist),
+            "watchlist_selected_count": len(expected_watchlist) - len(missing_watchlist),
+            "watchlist_missing_count": len(missing_watchlist),
+        },
+    }
+    manifest["tickers"] = [
+        {"ticker": ticker, "status": "failed" if ticker in failed else "success"}
+        for ticker in selected
+    ]
+    manifest["summary"] = {
+        "total_tickers": len(selected),
+        "successful_tickers": len(selected) - len(failed & set(selected)),
+        "failed_tickers": len(failed & set(selected)),
+    }
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+
 def test_non_ready_latest_market_run_still_builds_work_event(tmp_path: Path):
     archive = tmp_path / "archive"
     _write_market_run(
@@ -117,6 +173,56 @@ def test_prompt_revision_changes_work_event_id(monkeypatch):
     assert first["event_id"] != second["event_id"]
 
 
+def test_missing_manifest_status_is_unverified_not_ok(tmp_path: Path):
+    archive = tmp_path / "archive"
+    _write_market_run(
+        archive,
+        run_id="status-unknown-kr",
+        market="kr",
+        started_at="2026-07-14T10:00:00+09:00",
+        row_mode="IMMEDIATE",
+    )
+
+    packet = build_surface_packet(
+        "kr",
+        archive_dir=archive,
+        youtube_archive_dir=tmp_path / "youtube",
+        prism_archive_dir=tmp_path / "prism",
+        now=datetime(2026, 7, 14, 1, 5, tzinfo=timezone.utc),
+        public=False,
+    )
+
+    assert packet["body"]["source_health"] == "UNVERIFIED"
+    assert packet["body"]["guardrails"]["decision_ready"] is True
+    assert packet["body"]["guardrails"]["report_mode"] == "READY"
+
+
+def test_compact_market_packet_keeps_all_required_watchlist_and_limits_only_discovery():
+    watchlist = [f"WATCH{i}" for i in range(8)]
+    discovery = [f"SCAN{i}" for i in range(8)]
+    rows = [
+        {"ticker": "HELD", "is_held": True, "quality": {}},
+        *({"ticker": ticker, "is_held": False, "quality": {}} for ticker in watchlist),
+        *({"ticker": ticker, "is_held": False, "quality": {}} for ticker in discovery),
+    ]
+
+    compact = work_packet.compact_decision_bundle(
+        {"strategy_table": rows, "benchmark_context": {}},
+        required_watchlist_tickers=watchlist,
+        max_new_candidates=5,
+    )
+
+    transmitted = [row["ticker"] for row in compact["strategy_table"]]
+    scope = compact["transmission_scope"]
+    assert transmitted == ["HELD", *watchlist, *discovery[:5]]
+    assert scope["all_holdings_included"] is True
+    assert scope["all_required_watchlist_included"] is True
+    assert scope["required_watchlist_ticker_count"] == len(watchlist)
+    assert scope["transmitted_required_watchlist_count"] == len(watchlist)
+    assert scope["scanner_candidate_limit"] == 5
+    assert scope["omitted_nonheld_ticker_count"] == 3
+
+
 def test_public_market_packet_omits_portfolio_membership(tmp_path: Path):
     archive = tmp_path / "archive"
     _write_market_run(
@@ -142,6 +248,259 @@ def test_public_market_packet_omits_portfolio_membership(tmp_path: Path):
     serialized = json.dumps(packet, ensure_ascii=False)
     assert "is_held" not in serialized
     assert "held_ticker_count" not in serialized
+
+
+def test_public_market_packet_keeps_allowlisted_research_row_without_membership(tmp_path: Path):
+    archive = tmp_path / "archive"
+    run_dir = _write_market_run(
+        archive,
+        run_id="allowlisted-held-kr",
+        market="kr",
+        started_at="2026-07-14T10:00:00+09:00",
+        row_mode="IMMEDIATE",
+    )
+    _write_universe_contract(
+        run_dir,
+        expected_holdings=["005930.KS"],
+        missing_holdings=[],
+        expected_watchlist=["005930"],
+        missing_watchlist=[],
+        failed_tickers=[],
+    )
+
+    packet = build_surface_packet(
+        "kr",
+        archive_dir=archive,
+        youtube_archive_dir=tmp_path / "youtube",
+        prism_archive_dir=tmp_path / "prism",
+        now=datetime(2026, 7, 14, 1, 5, tzinfo=timezone.utc),
+        public=True,
+    )
+
+    rows = packet["body"]["current"]["bundle"]["strategy_table"]
+    serialized = json.dumps(packet, ensure_ascii=False)
+    assert [row["ticker"] for row in rows] == ["005930.KS"]
+    assert "is_held" not in serialized
+    assert "strategy_ko" not in serialized
+
+
+def test_public_market_packet_fails_closed_without_public_universe_contract(tmp_path: Path):
+    archive = tmp_path / "archive"
+    _write_market_run(
+        archive,
+        run_id="legacy-unknown-us",
+        market="us",
+        started_at="2026-07-14T10:00:00-04:00",
+        row_mode="IMMEDIATE",
+    )
+
+    packet = build_surface_packet(
+        "us",
+        archive_dir=archive,
+        youtube_archive_dir=tmp_path / "youtube",
+        prism_archive_dir=tmp_path / "prism",
+        now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc),
+        public=True,
+    )
+
+    assert packet["body"]["current"]["bundle"]["strategy_table"] == []
+
+
+def test_private_market_packet_reports_complete_required_universe(tmp_path: Path):
+    archive = tmp_path / "archive"
+    run_dir = _write_market_run(
+        archive,
+        run_id="complete-required-us",
+        market="us",
+        started_at="2026-07-14T10:00:00-04:00",
+        row_mode="IMMEDIATE",
+    )
+    _write_universe_contract(
+        run_dir,
+        expected_holdings=["NVDA"],
+        missing_holdings=[],
+        expected_watchlist=["AAPL", "MSFT"],
+        missing_watchlist=[],
+        failed_tickers=[],
+    )
+
+    packet = build_surface_packet(
+        "us",
+        archive_dir=archive,
+        youtube_archive_dir=tmp_path / "youtube",
+        prism_archive_dir=tmp_path / "prism",
+        now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc),
+        public=False,
+    )
+
+    coverage = packet["body"]["current"]["universe_coverage"]
+    assert coverage == {
+        "status": "COMPLETE",
+        "complete": True,
+        "source_run_id": "complete-required-us",
+        "ticker_universe_mode": "config_plus_account",
+        "account_snapshot_status": "loaded",
+        "expected_holding_count": 1,
+        "missing_holding_count": 0,
+        "expected_watchlist_count": 2,
+        "missing_watchlist_count": 0,
+        "expected_analysis_count": 3,
+        "missing_analysis_count": 0,
+        "analysis_total_count": 3,
+        "analysis_successful_count": 3,
+        "analysis_failed_count": 0,
+        "missing_holding_tickers": [],
+        "missing_watchlist_tickers": [],
+        "missing_analysis_tickers": [],
+        "failed_tickers": [],
+    }
+
+
+def test_private_market_packet_reports_missing_and_failed_required_universe(tmp_path: Path):
+    archive = tmp_path / "archive"
+    run_dir = _write_market_run(
+        archive,
+        run_id="incomplete-required-us",
+        market="us",
+        started_at="2026-07-14T10:00:00-04:00",
+        row_mode="CONDITIONAL",
+    )
+    _write_universe_contract(
+        run_dir,
+        expected_holdings=["NVDA", "SGOV"],
+        missing_holdings=["SGOV"],
+        expected_watchlist=["AAPL", "MSFT"],
+        missing_watchlist=["AAPL"],
+        failed_tickers=["MSFT"],
+    )
+
+    packet = build_surface_packet(
+        "us",
+        archive_dir=archive,
+        youtube_archive_dir=tmp_path / "youtube",
+        prism_archive_dir=tmp_path / "prism",
+        now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc),
+        public=False,
+    )
+
+    coverage = packet["body"]["current"]["universe_coverage"]
+    assert coverage["status"] == "INCOMPLETE"
+    assert coverage["complete"] is False
+    assert coverage["missing_holding_tickers"] == ["SGOV"]
+    assert coverage["missing_watchlist_tickers"] == ["AAPL"]
+    assert coverage["failed_tickers"] == ["MSFT"]
+    assert coverage["analysis_failed_count"] == 1
+
+
+def test_market_universe_coverage_rejects_partial_overlay_summary(tmp_path: Path):
+    archive = tmp_path / "archive"
+    run_dir = _write_market_run(
+        archive,
+        run_id="partial-overlay-us",
+        market="us",
+        started_at="2026-07-15T22:10:00+09:00",
+        row_mode="IMMEDIATE",
+    )
+    _write_universe_contract(
+        run_dir,
+        expected_holdings=["NVDA"],
+        missing_holdings=[],
+        expected_watchlist=["AAPL", "MSFT"],
+        missing_watchlist=[],
+        failed_tickers=[],
+    )
+    manifest_path = run_dir / "run.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["tickers"] = manifest["tickers"][:2]
+    manifest["summary"] = {
+        "total_tickers": 2,
+        "successful_tickers": 2,
+        "failed_tickers": 0,
+    }
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    packet = build_surface_packet(
+        "us",
+        archive_dir=archive,
+        youtube_archive_dir=tmp_path / "youtube",
+        prism_archive_dir=tmp_path / "prism",
+        now=datetime(2026, 7, 15, 13, 15, tzinfo=timezone.utc),
+        public=False,
+    )
+
+    coverage = packet["body"]["current"]["universe_coverage"]
+    assert coverage["status"] == "INCOMPLETE"
+    assert coverage["complete"] is False
+    assert coverage["expected_analysis_count"] == 3
+    assert coverage["analysis_total_count"] == 2
+
+
+def test_public_market_universe_coverage_omits_private_ticker_names(tmp_path: Path):
+    archive = tmp_path / "archive"
+    run_dir = _write_market_run(
+        archive,
+        run_id="public-incomplete-us",
+        market="us",
+        started_at="2026-07-14T10:00:00-04:00",
+        row_mode="CONDITIONAL",
+    )
+    _write_universe_contract(
+        run_dir,
+        expected_holdings=["NVDA", "SGOV"],
+        missing_holdings=["SGOV"],
+        expected_watchlist=["AAPL", "MSFT"],
+        missing_watchlist=["AAPL"],
+        failed_tickers=["MSFT"],
+    )
+    manifest_path = run_dir / "run.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["active_universe"]["fresh_snapshot_drift"] = {
+        "status": "VERIFIED",
+        "added_holding_tickers": ["WORK.DRIFT.ADDED.PRIVATE"],
+        "removed_holding_tickers": ["WORK.DRIFT.REMOVED.PRIVATE"],
+    }
+    manifest["portfolio"] = {
+        "status": "success",
+        "private_coverage_snapshot": {
+            "holding_set_complete": True,
+            "canonical_holding_tickers": ["WORK.SNAPSHOT.HOLD.PRIVATE"],
+        },
+    }
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    packet = build_surface_packet(
+        "us",
+        archive_dir=archive,
+        youtube_archive_dir=tmp_path / "youtube",
+        prism_archive_dir=tmp_path / "prism",
+        now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc),
+        public=True,
+    )
+
+    coverage = packet["body"]["current"]["universe_coverage"]
+    assert coverage["status"] == "INCOMPLETE"
+    assert coverage["portfolio_coverage_details_omitted"] is True
+    assert "account_snapshot_status" not in coverage
+    assert "expected_holding_count" not in coverage
+    assert "analysis_total_count" not in coverage
+    assert "analysis_successful_count" not in coverage
+    assert "analysis_failed_count" not in coverage
+    assert "expected_analysis_count" not in coverage
+    assert "missing_analysis_count" not in coverage
+    serialized = json.dumps(coverage, ensure_ascii=False)
+    serialized_packet = json.dumps(packet, ensure_ascii=False)
+    assert "SGOV" not in serialized
+    assert "AAPL" not in serialized
+    assert "MSFT" not in serialized
+    assert "missing_holding_tickers" not in serialized
+    assert "missing_watchlist_tickers" not in serialized
+    assert "missing_analysis_tickers" not in serialized
+    assert "failed_tickers" not in serialized
+    assert "WORK.DRIFT.ADDED.PRIVATE" not in serialized_packet
+    assert "WORK.DRIFT.REMOVED.PRIVATE" not in serialized_packet
+    assert "WORK.SNAPSHOT.HOLD.PRIVATE" not in serialized_packet
+    assert "private_coverage_snapshot" not in serialized_packet
+    assert "fresh_snapshot_drift" not in serialized_packet
 
 
 def test_work_packet_expires_rows_independently(tmp_path: Path):
@@ -598,13 +957,64 @@ def test_work_site_preserves_prior_content_addressed_events(tmp_path: Path):
     assert (archive / "work-public" / "v1" / "us" / "events" / first_name).is_file()
 
 
+def test_work_site_purges_legacy_public_market_event_with_private_actions(tmp_path: Path):
+    archive = tmp_path / "archive"
+    site = tmp_path / "site"
+    _write_market_run(
+        archive,
+        run_id="safe-current-us",
+        market="us",
+        started_at="2026-07-14T11:00:00-04:00",
+        row_mode="CONDITIONAL",
+    )
+    legacy = work_packet.seal_packet(
+        "us",
+        body={
+            "kind": "market",
+            "market": "US",
+            "current": {
+                "private_portfolio_overlay": {
+                    "privacy": "LOCAL_ONLY_DO_NOT_PUBLISH",
+                    "actions": [{"canonical_ticker": "SECRET", "action_now": "SELL"}],
+                }
+            },
+        },
+    )
+    legacy_name = "legacy-private.json"
+    legacy_path = archive / "work-public" / "v1" / "us" / "events" / legacy_name
+    legacy_path.parent.mkdir(parents=True, exist_ok=True)
+    legacy_path.write_text(json.dumps(legacy, ensure_ascii=False), encoding="utf-8")
+
+    build_work_site(site_dir=site, archive_dir=archive)
+
+    assert not legacy_path.exists()
+    assert not (site / "work" / "v1" / "us" / "events" / legacy_name).exists()
+    assert "SECRET" not in (site / "work" / "v1" / "us" / "latest.json").read_text(encoding="utf-8")
+
+
 def test_market_prompts_require_row_gate_and_receipt():
     for surface in ("kr", "us"):
         text = work_packet.prompt_text(surface)
         assert "row_mode=IMMEDIATE" in text
         assert "전역 report mode" in text
+        assert "current.universe_coverage" in text
+        assert "COMPLETE|INCOMPLETE|UNVERIFIED" in text
+        assert "COVERAGE_RECEIPT" in text
+        assert "response_scanner_limit" in text
+        assert "MOBILE_HANDOFF" in text
+        assert "전송·게시 완료를 주장" in text
         assert "WORK_RECEIPT" in text
         assert "비신뢰" in text
+
+
+def test_all_work_prompts_fail_closed_on_stale_data_and_do_not_claim_mobile_delivery():
+    for surface in ("kr", "us", "youtube", "prism"):
+        text = work_packet.prompt_text(surface)
+        assert "COVERAGE_RECEIPT" in text
+        assert "MOBILE_HANDOFF" in text
+        assert "PENDING_EXTERNAL_VERIFICATION" in text
+        assert "복호화 키를 출력하지 않는다" in text
+        assert "STALE" in text
 
 
 def test_scheduled_work_task_manifest_uses_gpt56_local_mode_and_unique_surfaces():
@@ -613,9 +1023,44 @@ def test_scheduled_work_task_manifest_uses_gpt56_local_mode_and_unique_surfaces(
     assert manifest["execution_mode"] == "local"
     assert manifest["model"] == "gpt-5.6-sol"
     assert manifest["reasoning_effort"] == "xhigh"
+    boundary = manifest["capability_boundary"]
+    assert boundary["local_archives_require_local_host"] is True
+    assert boundary["chatgpt_web_direct_local_file_access"] is False
+    assert boundary["mobile_delivery_owner"] == "external_github_notification_pipeline"
+    assert boundary["task_must_not_claim_external_delivery"] is True
     assert {task["surface"] for task in manifest["tasks"]} == {"kr", "us", "youtube", "prism"}
     assert all("Chrome" in task["prompt"] or "ChatGPT web" in task["prompt"] for task in manifest["tasks"])
+    assert all("COVERAGE_RECEIPT" in task["prompt"] for task in manifest["tasks"])
+    assert all("MOBILE_HANDOFF" in task["prompt"] for task in manifest["tasks"])
+    assert all("never claim Telegram or Pages delivery completed" in task["prompt"] for task in manifest["tasks"])
     youtube = next(task for task in manifest["tasks"] if task["surface"] == "youtube")
     prism = next(task for task in manifest["tasks"] if task["surface"] == "prism")
     assert "BYMINUTE=30" in youtube["rrule"]
     assert "BYMINUTE=35" in prism["rrule"]
+
+
+def test_work_skill_and_operations_doc_state_local_and_mobile_delivery_boundaries():
+    skill = Path(".agents/skills/tradingagents-daily-investment-work/SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    operations = Path("Docs/chatgpt_work_migration_ko.md").read_text(encoding="utf-8")
+
+    assert "ChatGPT web Scheduled tasks" in skill
+    assert "cannot directly read this computer's folder" in skill
+    assert "current.universe_coverage" in skill
+    assert "Never claim external delivery without its receipt" in skill
+    assert (
+        "Never print, log, persist in Pages, or place `MOBILE_DASHBOARD_KEY` "
+        "in a query string or server-visible request"
+    ) in skill
+    assert "Telegram private link's URL fragment" in skill
+    assert "https://help.openai.com/en/articles/20001275/" in operations
+    assert (
+        "https://help.openai.com/en/articles/10291617-scheduled-tasks-in-chatgpt"
+        in operations
+    )
+    assert "Scheduled Tasks는 공식적으로 Pro 모델을 지원하지 않는다" in operations
+    assert "https://learn.chatgpt.com/docs/remote-connections" in operations
+    assert "AES-256-GCM" in operations
+    assert "#key=..." in operations
+    assert "외부 GitHub workflow가 임의의 개인 ChatGPT 대화에 결과를 주입" in operations

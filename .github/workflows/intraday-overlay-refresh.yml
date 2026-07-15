@@ -50,7 +50,7 @@ jobs:
       reason: ${{ steps.gate.outputs.reason }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Require a successful research baseline from the last 24 hours
         id: gate
@@ -105,10 +105,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
@@ -145,6 +145,7 @@ jobs:
               "--label",
               "github-actions-overlay-us",
               "--skip-site-build",
+              "--strict",
           ]
 
           archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
@@ -212,10 +213,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
@@ -252,6 +253,7 @@ jobs:
               "--label",
               "github-actions-overlay-kr",
               "--skip-site-build",
+              "--strict",
           ]
 
           archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
@@ -289,6 +291,8 @@ jobs:
     concurrency:
       group: intraday-overlay-publish
       cancel-in-progress: true
+    outputs:
+      pages_snapshot_generated_epoch_ms: ${{ steps.stamp_pages_snapshot.outputs.generated_epoch_ms }}
     defaults:
       run:
         shell: python {0}
@@ -300,10 +304,10 @@ jobs:
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
@@ -316,6 +320,8 @@ jobs:
           subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
 
       - name: Rebuild final merged overlay site
+        env:
+          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -392,6 +398,33 @@ jobs:
                   market,
               ])
 
+      - name: Stamp rollback-resistant Pages snapshot
+        id: stamp_pages_snapshot
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/pages_snapshot.py",
+                  "stamp",
+                  "--site-dir",
+                  "site",
+                  "--repository",
+                  "${{ github.repository }}",
+                  "--workflow",
+                  "${{ github.workflow }}",
+                  "--run-id",
+                  "${{ github.run_id }}",
+                  "--run-attempt",
+                  "${{ github.run_attempt }}",
+                  "--commit-sha",
+                  "${{ github.sha }}",
+                  "--require-private-envelope",
+              ]
+          )
+
       - name: Upload final GitHub Pages artifact
         id: upload_pages_final
         timeout-minutes: 15
@@ -422,8 +455,23 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Check out deployment guard
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Refuse stale Pages snapshot rollback
+        id: pages_guard
+        env:
+          PAGES_PUBLIC_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: >-
+          python .github/scripts/pages_snapshot.py guard
+          --candidate-generated-epoch-ms "${{ needs.publish_overlay_site.outputs.pages_snapshot_generated_epoch_ms }}"
+          --candidate-run-id "${{ github.run_id }}"
+          --candidate-run-attempt "${{ github.run_attempt }}"
+          --public-base-url "$PAGES_PUBLIC_BASE_URL"
+
       - name: Deploy overlay refresh site to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        if: ${{ steps.pages_guard.outputs.should_deploy == 'true' }}
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
         with:
           artifact_name: github-pages-overlay

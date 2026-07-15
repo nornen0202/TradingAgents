@@ -409,11 +409,27 @@ def _coverage_snapshot(packet: dict[str, Any]) -> dict[str, Any]:
             )
         }
     current = body.get("current") if isinstance(body.get("current"), dict) else {}
+    universe = (
+        current.get("universe_coverage")
+        if isinstance(current.get("universe_coverage"), dict)
+        else {}
+    )
     return {
         "current_run_id": current.get("run_id"),
         "current_started_at": current.get("started_at"),
         "session_id": body.get("session_id"),
         "source_health": body.get("source_health"),
+        "universe_status": universe.get("status"),
+        "universe_complete": universe.get("complete"),
+        "universe_source_run_id": universe.get("source_run_id"),
+        "expected_holding_count": universe.get("expected_holding_count"),
+        "missing_holding_count": universe.get("missing_holding_count"),
+        "expected_watchlist_count": universe.get("expected_watchlist_count"),
+        "missing_watchlist_count": universe.get("missing_watchlist_count"),
+        "expected_analysis_count": universe.get("expected_analysis_count"),
+        "missing_analysis_count": universe.get("missing_analysis_count"),
+        "analysis_total_count": universe.get("analysis_total_count"),
+        "analysis_failed_count": universe.get("analysis_failed_count"),
     }
 
 

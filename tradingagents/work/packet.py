@@ -3,19 +3,20 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from collections.abc import Iterable
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 
 WORK_SCHEMA = "tradingagents.work-context/v1"
 WORK_STATE_SCHEMA = "tradingagents.work-state/v1"
 SURFACES = ("kr", "us", "youtube", "prism")
 PROMPT_CONTRACTS = {
-    "kr": "market-work-v4-kr",
-    "us": "market-work-v4-us",
-    "youtube": "youtube-work-v3",
-    "prism": "prism-work-v3",
+    "kr": "market-work-v5-kr",
+    "us": "market-work-v5-us",
+    "youtube": "youtube-work-v4",
+    "prism": "prism-work-v4",
 }
 PROMPT_FILENAMES = {
     "kr": "market_kr.md",
@@ -76,13 +77,33 @@ def compact_decision_bundle(
     bundle: dict[str, Any],
     *,
     max_new_candidates: int = 5,
+    required_watchlist_tickers: Iterable[Any] = (),
 ) -> dict[str, Any]:
     if not bundle:
         return {}
     rows = [row for row in (bundle.get("strategy_table") or []) if isinstance(row, dict)]
     held = [row for row in rows if row.get("is_held") is True]
     nonheld = [row for row in rows if row.get("is_held") is not True]
-    selected = [*held, *nonheld[: max(0, int(max_new_candidates))]]
+    required_identities = {
+        _market_ticker_identity(ticker)
+        for ticker in required_watchlist_tickers
+        if _market_ticker_identity(ticker)
+    }
+    required_nonheld = [
+        row
+        for row in nonheld
+        if _market_ticker_identity(row.get("ticker")) in required_identities
+    ]
+    discovery_candidates = [
+        row
+        for row in nonheld
+        if _market_ticker_identity(row.get("ticker")) not in required_identities
+    ]
+    selected = [
+        *held,
+        *required_nonheld,
+        *discovery_candidates[: max(0, int(max_new_candidates))],
+    ]
     compact_rows = [_compact_market_row(row, index) for index, row in enumerate(selected, start=1)]
     selected_benchmarks = {
         str(sync.get("benchmark") or "")
@@ -118,12 +139,37 @@ def compact_decision_bundle(
             "source_ticker_count": len(rows),
             "transmitted_ticker_count": len(compact_rows),
             "held_ticker_count": len(held),
-            "new_candidate_limit": int(max_new_candidates),
-            "omitted_nonheld_ticker_count": max(0, len(nonheld) - int(max_new_candidates)),
+            "required_watchlist_ticker_count": len(required_identities),
+            "transmitted_required_watchlist_count": len(
+                {
+                    _market_ticker_identity(row.get("ticker"))
+                    for row in compact_rows
+                    if _market_ticker_identity(row.get("ticker")) in required_identities
+                }
+            ),
+            "scanner_candidate_limit": int(max_new_candidates),
+            "omitted_nonheld_ticker_count": max(
+                0,
+                len(nonheld) - len(required_nonheld) - int(max_new_candidates),
+            ),
             "all_holdings_included": len([row for row in compact_rows if row.get("is_held")]) == len(held),
+            "all_required_watchlist_included": required_identities
+            <= {
+                _market_ticker_identity(row.get("ticker"))
+                for row in compact_rows
+                if _market_ticker_identity(row.get("ticker"))
+            },
             "raw_codes_omitted": True,
         },
     }
+
+
+def _market_ticker_identity(value: Any) -> str:
+    ticker = str(value or "").strip().upper()
+    for suffix in (".KS", ".KQ"):
+        if ticker.endswith(suffix):
+            return ticker[: -len(suffix)]
+    return ticker
 
 
 def _compact_market_row(row: dict[str, Any], display_priority: int) -> dict[str, Any]:
@@ -275,10 +321,30 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
         ),
         None,
     )
+    active_universe = (
+        current["manifest"].get("active_universe")
+        if isinstance(current["manifest"].get("active_universe"), dict)
+        else {}
+    )
+    has_public_universe_contract = (
+        "expected_watchlist_tickers" in active_universe
+        or "scanner_candidates" in active_universe
+    )
+    public_tickers = (
+        [
+            *(active_universe.get("expected_watchlist_tickers") or []),
+            *(active_universe.get("scanner_candidates") or []),
+        ]
+        if has_public_universe_contract
+        else []
+    )
     bundle = (
-        _compact_public_market_bundle(current["bundle"])
+        _compact_public_market_bundle(current["bundle"], allowed_tickers=public_tickers)
         if public
-        else compact_decision_bundle(current["bundle"])
+        else compact_decision_bundle(
+            current["bundle"],
+            required_watchlist_tickers=active_universe.get("expected_watchlist_tickers") or [],
+        )
     )
     _apply_market_row_validity(bundle, now=now)
     current_payload: dict[str, Any] = {
@@ -286,6 +352,10 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
         "started_at": current["manifest"].get("started_at"),
         "run_mode": ((current["manifest"].get("settings") or {}).get("run_mode")),
         "bundle": bundle,
+        "universe_coverage": _market_universe_coverage(
+            current["manifest"],
+            public=public,
+        ),
     }
     if not public:
         private_overlay = _local_private_overlay(current["run_dir"], current["manifest"], bundle)
@@ -306,12 +376,14 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
     manifest_status = str(current["manifest"].get("status") or "unknown").strip().lower()
     if guardrails.get("expired_at_build") is True:
         source_health = "STALE"
+    elif manifest_status == "success":
+        source_health = "OK"
     elif manifest_status in {"failed", "failure", "error"}:
         source_health = "FAILED"
     elif manifest_status in {"partial", "partial_failure", "degraded"}:
         source_health = "DEGRADED"
     else:
-        source_health = "OK"
+        source_health = "UNVERIFIED"
     return {
         "kind": "market",
         "market": surface.upper(),
@@ -330,16 +402,142 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
     }
 
 
-def _compact_public_market_bundle(bundle: dict[str, Any], *, max_candidates: int = 5) -> dict[str, Any]:
+def _market_universe_coverage(manifest: dict[str, Any], *, public: bool) -> dict[str, Any]:
+    """Summarize whether the required holdings/watchlist universe was actually analyzed.
+
+    The local Work packet keeps exact missing symbols so the report can name gaps.
+    Public recovery packets expose counts only; an out-of-watchlist holding must
+    never become discoverable from Pages metadata.
+    """
+
+    active = manifest.get("active_universe") if isinstance(manifest.get("active_universe"), dict) else {}
+    coverage = active.get("coverage") if isinstance(active.get("coverage"), dict) else {}
+    summary = manifest.get("summary") if isinstance(manifest.get("summary"), dict) else {}
+    tickers = [item for item in (manifest.get("tickers") or []) if isinstance(item, dict)]
+    failed_tickers = [
+        str(item.get("ticker") or "").strip().upper()
+        for item in tickers
+        if str(item.get("ticker") or "").strip()
+        and str(item.get("status") or "").strip().lower() != "success"
+    ]
+    missing_holdings = [
+        str(item).strip().upper()
+        for item in (active.get("missing_holding_tickers") or [])
+        if str(item).strip()
+    ]
+    missing_watchlist = [
+        str(item).strip().upper()
+        for item in (active.get("missing_watchlist_tickers") or [])
+        if str(item).strip()
+    ]
+    missing_analysis = [
+        str(item).strip().upper()
+        for item in (active.get("missing_analysis_tickers") or [])
+        if str(item).strip()
+    ]
+    total = int(summary.get("total_tickers") or len(tickers))
+    successful = int(
+        summary.get("successful_tickers")
+        or sum(str(item.get("status") or "").strip().lower() == "success" for item in tickers)
+    )
+    failed = int(summary.get("failed_tickers") or len(failed_tickers))
+    mode = str(active.get("ticker_universe_mode") or "").strip().lower()
+    snapshot_status = str(active.get("account_snapshot_status") or "").strip().lower()
+    expected_analysis_count = int(coverage.get("analysis_expected_count") or 0)
+    has_contract = bool(
+        coverage
+        and "complete" in coverage
+        and "selection_complete" in coverage
+        and "analysis_complete" in coverage
+        and "analysis_expected_count" in coverage
+    )
+    account_required = mode in {"config_plus_account", "account_only"}
+    account_ready = not account_required or snapshot_status == "loaded"
+    complete = bool(
+        has_contract
+        and coverage.get("complete") is True
+        and coverage.get("selection_complete") is True
+        and coverage.get("analysis_complete") is True
+        and account_ready
+        and not missing_holdings
+        and not missing_watchlist
+        and not missing_analysis
+        and failed == 0
+        and expected_analysis_count > 0
+        and total == expected_analysis_count
+        and successful == expected_analysis_count
+    )
+    status = "COMPLETE" if complete else "INCOMPLETE" if has_contract else "UNVERIFIED"
+    payload: dict[str, Any] = {
+        "status": status,
+        "complete": complete,
+        "source_run_id": manifest.get("run_id"),
+        "ticker_universe_mode": mode or None,
+        "account_snapshot_status": snapshot_status or "unverified",
+        "expected_holding_count": int(
+            coverage.get("holding_expected_count")
+            or active.get("account_holding_count")
+            or len(active.get("expected_holding_tickers") or [])
+        ),
+        "missing_holding_count": len(missing_holdings),
+        "expected_watchlist_count": int(
+            coverage.get("watchlist_expected_count")
+            or len(active.get("expected_watchlist_tickers") or [])
+        ),
+        "missing_watchlist_count": len(missing_watchlist),
+        "expected_analysis_count": expected_analysis_count,
+        "missing_analysis_count": len(missing_analysis),
+        "analysis_total_count": total,
+        "analysis_successful_count": successful,
+        "analysis_failed_count": failed,
+    }
+    if public:
+        for key in (
+            "account_snapshot_status",
+            "expected_holding_count",
+            "missing_holding_count",
+            "analysis_total_count",
+            "analysis_successful_count",
+            "analysis_failed_count",
+            "expected_analysis_count",
+            "missing_analysis_count",
+        ):
+            payload.pop(key, None)
+        payload["portfolio_coverage_details_omitted"] = True
+    else:
+        payload.update(
+            {
+                "missing_holding_tickers": missing_holdings,
+                "missing_watchlist_tickers": missing_watchlist,
+                "missing_analysis_tickers": missing_analysis,
+                "failed_tickers": failed_tickers,
+            }
+        )
+    return payload
+
+
+def _compact_public_market_bundle(
+    bundle: dict[str, Any],
+    *,
+    allowed_tickers: list[Any],
+    max_candidates: int | None = None,
+) -> dict[str, Any]:
     """Build a recovery packet without publishing portfolio membership or actions."""
 
     if not bundle:
         return {}
+    from tradingagents.scheduled.mobile_site import sanitize_public_decision_bundle
+
+    sanitized = sanitize_public_decision_bundle(
+        bundle,
+        max_candidates=max_candidates,
+        allowed_tickers=allowed_tickers,
+    )
     rows = [
         row
-        for row in (bundle.get("strategy_table") or [])
-        if isinstance(row, dict) and row.get("is_held") is not True
-    ][: max(0, int(max_candidates))]
+        for row in (sanitized.get("strategy_table") or [])
+        if isinstance(row, dict)
+    ]
     compact_rows = []
     for index, row in enumerate(rows, start=1):
         compact = _compact_market_row(row, index)
@@ -371,7 +569,7 @@ def _compact_public_market_bundle(bundle: dict[str, Any], *, max_candidates: int
             if quality.get(key) is not None
         }
         compact_rows.append(compact)
-    quality = bundle.get("quality") if isinstance(bundle.get("quality"), dict) else {}
+    quality = sanitized.get("quality") if isinstance(sanitized.get("quality"), dict) else {}
     public_quality = {
         key: quality.get(key)
         for key in (
@@ -386,7 +584,7 @@ def _compact_public_market_bundle(bundle: dict[str, Any], *, max_candidates: int
     }
     public_quality["portfolio_membership_omitted"] = True
     return {
-        key: bundle.get(key)
+        key: sanitized.get(key)
         for key in (
             "artifact_type",
             "version",
@@ -398,7 +596,7 @@ def _compact_public_market_bundle(bundle: dict[str, Any], *, max_candidates: int
             "checkpoint",
             "checkpoint_timezone",
         )
-        if bundle.get(key) is not None
+        if sanitized.get(key) is not None
     } | {
         "quality": public_quality,
         "strategy_table": compact_rows,
@@ -771,6 +969,7 @@ def _compact_support_event(event: dict[str, Any], *, kind: str) -> dict[str, Any
 
 def _market_guardrails(surface: str, bundle: dict[str, Any], *, now: datetime) -> dict[str, Any]:
     rows = bundle.get("strategy_table") or []
+    quality = bundle.get("quality") if isinstance(bundle.get("quality"), dict) else {}
     asofs = [str(row.get("market_data_asof")) for row in rows if isinstance(row, dict) and row.get("market_data_asof")]
     latest_asof = max(asofs) if asofs else None
     actionable_validities = [
@@ -794,6 +993,9 @@ def _market_guardrails(surface: str, bundle: dict[str, Any], *, now: datetime) -
         "market_data_asof": latest_asof,
         "valid_until": valid_until,
         "expired_at_build": bool(valid_until and (_datetime(valid_until) or now) < now.astimezone((_datetime(valid_until) or now).tzinfo)),
+        "decision_ready": quality.get("decision_ready") is True,
+        "conditional_strategy_ready": quality.get("conditional_strategy_ready") is True,
+        "report_mode": quality.get("report_mode") or _market_report_mode(bundle),
         "required_rechecks": required,
         "stale_buy_sell_reduce_is_reference_only": True,
         "supporting_context_may_promote_execution": False,

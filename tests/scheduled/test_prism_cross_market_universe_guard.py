@@ -44,3 +44,17 @@ def test_cross_market_candidates_can_be_enabled_explicitly():
     )
 
     assert tickers == ["AAPL", "000660.KS"]
+
+
+def test_kr_alias_does_not_consume_prism_candidate_quota():
+    tickers = _augment_with_prism_candidates(
+        ["005930.KS"],
+        [
+            _signal("005930", "KR"),
+            _signal("000660.KS", "KR"),
+        ],
+        max_new=1,
+        run_market="KR",
+    )
+
+    assert tickers == ["005930.KS", "000660.KS"]

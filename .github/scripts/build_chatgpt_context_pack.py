@@ -14,7 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from tradingagents.work.packet import compact_decision_bundle
+from tradingagents.work.packet import compact_decision_bundle  # noqa: E402
 
 
 VALID_MODES = {"auto", "conditional", "execution", "mixed", "research", "outage"}
@@ -62,8 +62,17 @@ def _prism_current(run_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
     return _load_json(path) if path is not None else {}
 
 
-def _compact_decision_bundle(bundle: dict[str, Any], *, max_new_candidates: int = 5) -> dict[str, Any]:
-    return compact_decision_bundle(bundle, max_new_candidates=max_new_candidates)
+def _compact_decision_bundle(
+    bundle: dict[str, Any],
+    *,
+    max_new_candidates: int = 5,
+    required_watchlist_tickers: list[str] | None = None,
+) -> dict[str, Any]:
+    return compact_decision_bundle(
+        bundle,
+        max_new_candidates=max_new_candidates,
+        required_watchlist_tickers=required_watchlist_tickers or [],
+    )
 
 
 def choose_report_mode(*, requested_mode: str, manifest: dict[str, Any], bundle: dict[str, Any]) -> str:
@@ -107,7 +116,15 @@ def build_context_pack(
     if not manifest:
         raise FileNotFoundError(f"run.json is missing under {run_dir}")
     prompt = prompt_path.read_text(encoding="utf-8").strip()
-    bundle = _compact_decision_bundle(_decision_bundle(run_dir, manifest))
+    active_universe = (
+        manifest.get("active_universe")
+        if isinstance(manifest.get("active_universe"), dict)
+        else {}
+    )
+    bundle = _compact_decision_bundle(
+        _decision_bundle(run_dir, manifest),
+        required_watchlist_tickers=list(active_universe.get("expected_watchlist_tickers") or []),
+    )
     prism = _prism_current(run_dir, manifest)
     mode = choose_report_mode(requested_mode=requested_mode, manifest=manifest, bundle=bundle)
     source_payload: dict[str, Any] = {

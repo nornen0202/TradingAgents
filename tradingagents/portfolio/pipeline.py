@@ -211,6 +211,20 @@ def run_portfolio_pipeline(
             "status": status_value,
             "profile": profile.name,
             "snapshot_health": snapshot.snapshot_health,
+            "private_coverage_snapshot": {
+                "snapshot_id": getattr(snapshot, "snapshot_id", None),
+                "as_of": getattr(snapshot, "as_of", None),
+                "snapshot_health": snapshot.snapshot_health,
+                "holding_set_complete": str(snapshot.snapshot_health or "").strip().upper()
+                not in {"WATCHLIST_ONLY", "INVALID_SNAPSHOT"},
+                "canonical_holding_tickers": sorted(
+                    {
+                        str(getattr(position, "canonical_ticker", "") or "").strip().upper()
+                        for position in snapshot.positions
+                        if str(getattr(position, "canonical_ticker", "") or "").strip()
+                    }
+                ),
+            },
             "watchlist_reason": _derive_watchlist_reason(snapshot),
             "semantic_health": semantic_health,
             "action_summary": _build_action_summary(recommendation),

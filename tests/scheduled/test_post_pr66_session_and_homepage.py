@@ -137,7 +137,7 @@ def test_post_close_overlay_not_labeled_in_session():
     assert _run_phase_label(manifest) != "in_session"
 
 
-def test_homepage_run_card_exposes_take_profit_count():
+def test_homepage_run_card_does_not_expose_private_sell_side_counts():
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)
         run = _manifest(
@@ -160,4 +160,5 @@ def test_homepage_run_card_exposes_take_profit_count():
 
         html = _render_index_page([run], SiteSettings(title="TA", subtitle="Daily"))
 
-    assert "이익실현 2 / 리스크 축소 1 / 손절·청산 1" in html
+    assert "이익실현 2 / 리스크 축소 1 / 손절·청산 1" not in html
+    assert "Encrypted private dashboard" in html

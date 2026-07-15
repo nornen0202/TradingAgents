@@ -260,7 +260,10 @@ NVDA = "NVIDIA Override"
             self.assertNotIn("Fallback count", ticker_html)
             self.assertIn("NVIDIA Override (NVDA)", ticker_html)
             self.assertNotIn("Quality flags", ticker_html)
-            self.assertTrue((site_dir / "downloads" / manifest["run_id"] / "NVDA" / "complete_report.md").exists())
+            self.assertFalse(
+                (site_dir / "downloads" / manifest["run_id"] / "NVDA" / "complete_report.md").exists()
+            )
+            self.assertFalse((site_dir / "downloads").exists())
 
     def test_execute_scheduled_run_can_skip_site_build(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -1135,6 +1138,41 @@ site_dir = "{site_dir.as_posix()}"
             self.assertFalse(config.execution.execution_refresh_enabled)
             self.assertFalse(captured["skip_site_build"])
 
+    def test_main_strict_fails_when_required_account_coverage_is_incomplete(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            config_path = root / "scheduled_analysis.toml"
+            config_path.write_text(
+                f"""
+[run]
+tickers = ["NVDA"]
+
+[storage]
+archive_dir = "{(root / 'archive').as_posix()}"
+site_dir = "{(root / 'site').as_posix()}"
+""",
+                encoding="utf-8",
+            )
+            manifest = {
+                "run_id": "coverage-incomplete",
+                "status": "success",
+                "summary": {"successful_tickers": 1, "failed_tickers": 0},
+                "active_universe": {
+                    "mode": "full_required_coverage",
+                    "coverage": {
+                        "selection_complete": False,
+                        "analysis_complete": True,
+                        "complete": False,
+                    },
+                    "missing_holding_tickers": [],
+                },
+            }
+
+            with patch("tradingagents.scheduled.runner.execute_scheduled_run", return_value=manifest):
+                exit_code = main(["--config", str(config_path), "--strict"])
+
+            self.assertEqual(exit_code, 1)
+
     def test_execute_scheduled_run_supports_account_only_ticker_universe_mode(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -1179,8 +1217,23 @@ profile_name = "kr_kis_default"
             )
             with (
                 patch("tradingagents.scheduled.runner.load_portfolio_profile"),
-                patch("tradingagents.scheduled.runner.load_snapshot_for_profile", return_value=fake_snapshot),
-                patch("tradingagents.scheduled.runner.run_portfolio_pipeline", return_value={"status": "disabled"}),
+                patch(
+                    "tradingagents.scheduled.runner.load_snapshot_for_profile",
+                    return_value=fake_snapshot,
+                ) as snapshot_loader,
+                patch(
+                    "tradingagents.scheduled.runner.run_portfolio_pipeline",
+                    return_value={
+                        "status": "success",
+                        "private_coverage_snapshot": {
+                            "snapshot_id": "fresh-account-only",
+                            "as_of": "2026-04-04T15:40:00+09:00",
+                            "snapshot_health": "VALID",
+                            "holding_set_complete": True,
+                            "canonical_holding_tickers": ["005930.KS", "000660.KS"],
+                        },
+                    },
+                ),
                 patch("tradingagents.scheduled.runner.TradingAgentsGraph", _FakeTradingAgentsGraph),
                 patch("tradingagents.scheduled.runner.StatsCallbackHandler", _FakeStatsHandler),
                 patch("tradingagents.scheduled.runner.resolve_trade_date", return_value="2026-04-04"),
@@ -1189,6 +1242,13 @@ profile_name = "kr_kis_default"
 
             analyzed = [item["ticker"] for item in manifest["tickers"]]
             self.assertEqual(sorted(analyzed), ["000660.KS", "005930.KS"])
+            snapshot_loader.assert_called_once()
+            self.assertEqual(
+                manifest["active_universe"]["expected_holding_tickers"],
+                ["000660.KS", "005930.KS"],
+            )
+            self.assertEqual(manifest["active_universe"]["missing_holding_tickers"], [])
+            self.assertTrue(manifest["active_universe"]["coverage"]["complete"])
 
     def test_execute_scheduled_run_marks_quality_flag_when_no_tool_calls(self):
         with tempfile.TemporaryDirectory() as tmpdir:

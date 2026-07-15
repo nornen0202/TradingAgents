@@ -161,7 +161,7 @@ def test_public_bundle_file_can_build_payload_without_archive(tmp_path: Path):
     assert "overlay-public-us" in payload
 
 
-def test_context_pack_keeps_all_holdings_and_only_five_new_candidates():
+def test_context_pack_keeps_all_holdings_and_only_five_unclassified_discovery_candidates():
     rows = [
         {"ticker": "HELD1", "is_held": True, "strategy_ko": "보유 유지", "raw_codes": {"x": 1}},
         {"ticker": "HELD2", "is_held": True, "strategy_ko": "보유 유지", "raw_codes": {"x": 2}},
@@ -192,8 +192,11 @@ def test_context_pack_keeps_all_holdings_and_only_five_new_candidates():
         "source_ticker_count": 9,
         "transmitted_ticker_count": 7,
         "held_ticker_count": 2,
-        "new_candidate_limit": 5,
+        "required_watchlist_ticker_count": 0,
+        "transmitted_required_watchlist_count": 0,
+        "scanner_candidate_limit": 5,
         "omitted_nonheld_ticker_count": 2,
         "all_holdings_included": True,
+        "all_required_watchlist_included": True,
         "raw_codes_omitted": True,
     }

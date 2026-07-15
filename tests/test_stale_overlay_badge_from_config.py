@@ -67,6 +67,7 @@ def test_intraday_overlay_workflow_uses_kr_operational_crons():
     assert "needs.overlay_gate.outputs.run_kr == 'true'" in workflow
     assert "GH_RUN_ID: ${{ github.run_id }}" in workflow
     assert "--skip-site-build" in workflow
+    assert workflow.count('"--strict",') == 2
     assert "github-pages-overlay-us" not in workflow
     assert "github-pages-overlay-kr" not in workflow
     assert "name: github-pages-overlay" in workflow

@@ -35,6 +35,10 @@ class InvestorModeUiTests(unittest.TestCase):
                         "batch_metrics": {},
                         "warnings": [],
                         "portfolio": {"status": "disabled"},
+                        "active_universe": {
+                            "expected_watchlist_tickers": ["005930.KS"],
+                            "scanner_candidates": [],
+                        },
                         "tickers": [
                             {
                                 "ticker": "005930.KS",

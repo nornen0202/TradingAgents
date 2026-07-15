@@ -266,6 +266,20 @@ def test_latest_pointer_ignores_newer_non_ready_run(tmp_path: Path):
     stale_dir.mkdir()
     for name in ("decision_bundle_v2.json", "strategy_table_ko.md", "decision_bundle_status.json"):
         (ready_dir / name).write_text("{}" if name.endswith(".json") else "# 전략표", encoding="utf-8")
+    (ready_dir / "decision_bundle_v2.json").write_text(
+        json.dumps(
+            {
+                "run_id": "older-ready-us",
+                "market": "US",
+                "quality": {"decision_ready": True},
+                "strategy_table": [
+                    {"ticker": "HELD", "is_held": True, "strategy_ko": "보유 유지"},
+                    {"ticker": "PUBLIC", "is_held": False, "last_price": 10},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     manifests = [
         {
             "run_id": "newer-stale-us",
@@ -278,6 +292,10 @@ def test_latest_pointer_ignores_newer_non_ready_run(tmp_path: Path):
             "run_id": "older-ready-us",
             "started_at": "2026-07-10T12:00:00+09:00",
             "settings": {"market": "US"},
+            "active_universe": {
+                "expected_watchlist_tickers": ["PUBLIC"],
+                "scanner_candidates": [],
+            },
             "_run_dir": str(ready_dir),
             "decision_bundle": {
                 "decision_ready": True,
@@ -299,7 +317,10 @@ def test_latest_pointer_ignores_newer_non_ready_run(tmp_path: Path):
     assert status["latest_run_id"] == "newer-stale-us"
     assert status["decision_ready"] is False
     assert source["decision_ready_run_id"] == "older-ready-us"
-    assert (site_dir / "latest" / "us" / "decision_bundle.json").exists()
+    public_bundle = json.loads((site_dir / "latest" / "us" / "decision_bundle.json").read_text(encoding="utf-8"))
+    assert [row["ticker"] for row in public_bundle["strategy_table"]] == ["PUBLIC"]
+    assert "is_held" not in json.dumps(public_bundle)
+    assert not (site_dir / "latest" / "us" / "strategy_table_ko.md").exists()
 
 
 def test_investor_table_keeps_all_holdings_and_limits_new_candidates():

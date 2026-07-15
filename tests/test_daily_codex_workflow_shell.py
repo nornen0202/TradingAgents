@@ -48,6 +48,16 @@ def test_daily_analysis_default_parallel_ticker_workers_is_four():
     assert 'default: "4"' in input_block
 
 
+def test_daily_analysis_default_universe_includes_account_holdings():
+    workflow = _workflow_text()
+
+    input_start = workflow.index("      ticker_universe_mode:")
+    input_block = workflow[
+        input_start : workflow.index("      trade_date:", input_start)
+    ]
+    assert 'default: "config_plus_account"' in input_block
+
+
 def test_daily_analysis_default_ticker_timeout_is_sixty_minutes():
     workflow = _workflow_text()
 

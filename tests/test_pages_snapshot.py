@@ -1,0 +1,141 @@
+from __future__ import annotations
+
+import importlib.util
+import json
+from pathlib import Path
+
+import pytest
+
+
+SCRIPT = Path(__file__).parents[1] / ".github" / "scripts" / "pages_snapshot.py"
+WORKFLOWS = Path(__file__).parents[1] / ".github" / "workflows"
+SPEC = importlib.util.spec_from_file_location("pages_snapshot", SCRIPT)
+assert SPEC and SPEC.loader
+pages_snapshot = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(pages_snapshot)
+
+
+def _private_envelope(site: Path) -> None:
+    mobile = site / "mobile"
+    mobile.mkdir(parents=True)
+    (mobile / "private.html").write_text("private", encoding="utf-8")
+    (mobile / "private.js").write_text("private", encoding="utf-8")
+    (mobile / "private.enc.json").write_text(
+        json.dumps(
+            {
+                "schema": "tradingagents.mobile-encrypted/v1",
+                "alg": "A256GCM",
+                "nonce": "nonce",
+                "aad": "aad",
+                "ciphertext": "ciphertext",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_stamp_requires_encrypted_private_mobile_payload(tmp_path: Path) -> None:
+    site = tmp_path / "site"
+    site.mkdir()
+    (site / "index.html").write_text("ok", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="encrypted mobile artifact"):
+        pages_snapshot.create_snapshot(
+            site,
+            repository="owner/repo",
+            workflow="Daily",
+            run_id=10,
+            run_attempt=1,
+            commit_sha="abc",
+            generated_epoch_ms=1000,
+            require_private_envelope=True,
+        )
+
+    _private_envelope(site)
+    snapshot = pages_snapshot.create_snapshot(
+        site,
+        repository="owner/repo",
+        workflow="Daily",
+        run_id=10,
+        run_attempt=1,
+        commit_sha="abc",
+        generated_epoch_ms=1000,
+        require_private_envelope=True,
+    )
+
+    assert snapshot["generated_epoch_ms"] == 1000
+    assert json.loads((site / "pages-snapshot.json").read_text(encoding="utf-8"))["run_id"] == 10
+
+
+def test_snapshot_guard_refuses_older_or_duplicate_snapshot() -> None:
+    candidate = {
+        "schema": pages_snapshot.SNAPSHOT_SCHEMA,
+        "generated_epoch_ms": 2000,
+        "run_id": 20,
+        "run_attempt": 1,
+    }
+    newer_live = {**candidate, "generated_epoch_ms": 3000, "run_id": 30}
+    duplicate_live = dict(candidate)
+
+    assert pages_snapshot.should_deploy(candidate, None)[0] is True
+    assert pages_snapshot.should_deploy(candidate, newer_live)[0] is False
+    assert pages_snapshot.should_deploy(candidate, duplicate_live)[0] is False
+
+
+def test_snapshot_guard_breaks_equal_timestamp_tie_by_run_attempt() -> None:
+    live = {
+        "schema": pages_snapshot.SNAPSHOT_SCHEMA,
+        "generated_epoch_ms": 2000,
+        "run_id": 20,
+        "run_attempt": 1,
+    }
+    candidate = {**live, "run_attempt": 2}
+
+    assert pages_snapshot.should_deploy(candidate, live)[0] is True
+
+
+def test_stamp_rejects_plaintext_private_payload(tmp_path: Path) -> None:
+    site = tmp_path / "site"
+    site.mkdir()
+    (site / "index.html").write_text("ok", encoding="utf-8")
+    _private_envelope(site)
+    (site / "mobile" / "private.json").write_text("{}", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="unencrypted private payload"):
+        pages_snapshot.create_snapshot(
+            site,
+            repository="owner/repo",
+            workflow="Daily",
+            run_id=10,
+            run_attempt=1,
+            commit_sha="abc",
+            require_private_envelope=True,
+        )
+
+
+@pytest.mark.parametrize(
+    "workflow_name",
+    (
+        "daily-codex-analysis.yml",
+        "intraday-overlay-refresh.yml",
+        "account-portfolio-report-verify.yml",
+        "daily-youtube-reports.yml",
+        "daily-prism-telegram-reports.yml",
+    ),
+)
+def test_pages_workflows_stamp_encrypted_snapshot_and_guard_deploy(workflow_name: str) -> None:
+    text = (WORKFLOWS / workflow_name).read_text(encoding="utf-8")
+
+    assert "pages_snapshot.py" in text
+    assert '"--require-private-envelope"' in text
+    assert "Refuse stale Pages snapshot rollback" in text
+    assert "steps.pages_guard.outputs.should_deploy == 'true'" in text
+    assert "actions/deploy-pages@v5" not in text
+
+
+def test_account_all_explicitly_selects_final_us_merged_snapshot() -> None:
+    text = (WORKFLOWS / "account-portfolio-report-verify.yml").read_text(encoding="utf-8")
+
+    assert 'elif profile in {"us", "all"}:' in text
+    assert 'artifact = "account-performance-pages-us"' in text
+    assert "steps.select_account_snapshot.outputs.artifact_name" in text
