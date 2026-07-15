@@ -572,6 +572,16 @@ class WorkflowDefinitionTests(unittest.TestCase):
         self.assertIn("TELEGRAM_NOTIFICATION_CHAT_ID", text)
         self.assertIn("MOBILE_DASHBOARD_KEY", text)
         self.assertIn("--cards-only", text)
+        private_job = text.split("  notify_private_cards:", 1)[1]
+        setup = private_job.index("      - name: Set up Python")
+        send = private_job.index(
+            "      - name: Send private action-card continuation when available"
+        )
+        self.assertLess(setup, send)
+        self.assertIn(
+            "uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+            private_job[setup:send],
+        )
 
     def test_every_pages_builder_receives_the_mobile_encryption_key(self):
         root = Path(__file__).parents[1] / ".github" / "workflows"
