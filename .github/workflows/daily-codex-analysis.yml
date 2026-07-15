@@ -530,6 +530,8 @@ jobs:
           )
 
       - name: Run scheduled analysis and build site
+        env:
+          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -1183,6 +1185,8 @@ jobs:
           print("KIS account snapshot preflight:", account_result)
 
       - name: Run scheduled analysis and build site
+        env:
+          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
