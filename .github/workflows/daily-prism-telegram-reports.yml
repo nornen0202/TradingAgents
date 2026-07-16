@@ -123,6 +123,8 @@ jobs:
 
       - name: Rebuild base scheduled site
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        env:
+          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess

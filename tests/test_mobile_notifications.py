@@ -589,8 +589,8 @@ class WorkflowDefinitionTests(unittest.TestCase):
             "daily-codex-analysis.yml": 3,
             "intraday-overlay-refresh.yml": 1,
             "account-portfolio-report-verify.yml": 4,
-            "daily-youtube-reports.yml": 1,
-            "daily-prism-telegram-reports.yml": 1,
+            "daily-youtube-reports.yml": 2,
+            "daily-prism-telegram-reports.yml": 2,
         }
         assignment = (
             "TRADINGAGENTS_MOBILE_DASHBOARD_KEY: "

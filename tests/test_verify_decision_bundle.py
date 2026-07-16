@@ -75,3 +75,63 @@ def test_ready_bundle_fails_when_live_row_is_missing_vwap(tmp_path: Path):
     result = verify.verify_run_dir(tmp_path, require_ready=True)
 
     assert any("missing session_vwap" in error for error in result["errors"])
+
+
+def test_public_stable_site_contract_does_not_require_private_markdown(tmp_path: Path):
+    target = tmp_path / "latest" / "kr"
+    target.mkdir(parents=True)
+    (target / "status.json").write_text(
+        json.dumps(
+            {
+                "latest_run_id": "ready-kr",
+                "decision_ready": True,
+                "conditional_strategy_ready": True,
+            }
+        ),
+        encoding="utf-8",
+    )
+    (target / "source.json").write_text(
+        json.dumps(
+            {
+                "decision_ready_run_id": "ready-kr",
+                "artifacts": {
+                    "public_decision_bundle_json": "decision_bundle.json",
+                    "public_decision_bundle_status_json": "decision_bundle_status.json",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    (target / "decision_bundle.json").write_text(json.dumps({"version": 2}), encoding="utf-8")
+    (target / "decision_bundle_status.json").write_text(
+        json.dumps({"decision_ready": True}),
+        encoding="utf-8",
+    )
+
+    result = verify.verify_site(tmp_path, market="kr")
+
+    assert result["errors"] == []
+    assert not (target / "strategy_table_ko.md").exists()
+
+
+def test_public_stable_site_requires_declared_json_artifacts(tmp_path: Path):
+    target = tmp_path / "latest" / "us"
+    target.mkdir(parents=True)
+    (target / "status.json").write_text(
+        json.dumps({"latest_run_id": "ready-us", "decision_ready": True}),
+        encoding="utf-8",
+    )
+    (target / "source.json").write_text(
+        json.dumps(
+            {
+                "decision_ready_run_id": "ready-us",
+                "artifacts": {"public_decision_bundle_json": "decision_bundle.json"},
+            }
+        ),
+        encoding="utf-8",
+    )
+    (target / "decision_bundle.json").write_text(json.dumps({"version": 2}), encoding="utf-8")
+
+    result = verify.verify_site(tmp_path, market="us")
+
+    assert any("public_decision_bundle_status_json" in error for error in result["errors"])
