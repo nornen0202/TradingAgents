@@ -4,6 +4,9 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
+OUTCOME_CALCULATION_VERSION = 2
+
+
 ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
     """
     CREATE TABLE IF NOT EXISTS action_recommendations (
@@ -58,6 +61,7 @@ ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
       avoided_drawdown_20d REAL,
       missed_upside_20d REAL,
       outcome_label TEXT,
+      calculation_version INTEGER DEFAULT 2,
       updated_at TEXT,
       FOREIGN KEY(recommendation_id) REFERENCES action_recommendations(id)
     )
@@ -97,6 +101,7 @@ ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
     """,
     "CREATE INDEX IF NOT EXISTS idx_action_recommendations_run ON action_recommendations(run_id)",
     "CREATE INDEX IF NOT EXISTS idx_action_recommendations_ticker ON action_recommendations(ticker)",
+    "CREATE INDEX IF NOT EXISTS idx_action_outcomes_recommendation ON action_outcomes(recommendation_id)",
     "CREATE INDEX IF NOT EXISTS idx_trade_journal_ticker ON trade_journal(ticker)",
 )
 

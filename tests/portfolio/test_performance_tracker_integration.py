@@ -4,8 +4,17 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from tradingagents.performance.action_outcomes import record_run_recommendations, summarize_action_performance, update_action_outcomes
-from tradingagents.performance.price_history import _fetch_yfinance_price_history, load_price_history_for_recommendations
+from tradingagents.performance.action_outcomes import (
+    initialize_action_tracker,
+    record_run_recommendations,
+    summarize_action_performance,
+    update_action_outcomes,
+)
+from tradingagents.performance.price_history import (
+    PriceHistoryLoadResult,
+    _fetch_yfinance_price_history,
+    load_price_history_for_recommendations,
+)
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.runner import _run_performance_tracking
 from tradingagents.scheduled.site import _render_performance_tracking_section
@@ -169,6 +178,296 @@ def test_yfinance_close_dataframe_is_converted_to_scalar_rows(monkeypatch):
     assert history["AAPL"][0]["close"] == 100.0
     assert history["AAPL"][1]["close"] == 103.0
     assert not any("Series" in warning for warning in warnings)
+
+
+def test_yfinance_due_tickers_and_benchmark_are_downloaded_once(monkeypatch):
+    import pandas as pd
+
+    dates = pd.to_datetime(["2026-04-01", "2026-04-02"])
+    frame = pd.DataFrame(
+        {
+            ("Close", "AAPL"): [100.0, 103.0],
+            ("Close", "MSFT"): [200.0, 204.0],
+            ("Close", "^GSPC"): [5000.0, 5050.0],
+        },
+        index=dates,
+    )
+    calls = []
+    fake_yfinance = SimpleNamespace(download=lambda tickers, **kwargs: calls.append((tickers, kwargs)) or frame)
+    monkeypatch.setitem(sys.modules, "yfinance", fake_yfinance)
+
+    history, warnings = _fetch_yfinance_price_history(
+        ["AAPL", "MSFT", "^GSPC"],
+        benchmark_ticker="^GSPC",
+        lookback_days=120,
+        asof_date="2026-04-02",
+    )
+
+    assert len(calls) == 1
+    assert set(calls[0][0]) == {"AAPL", "MSFT", "^GSPC"}
+    assert calls[0][1]["threads"] is True
+    assert calls[0][1]["timeout"] == 10
+    assert history["AAPL"][1]["close"] == 103.0
+    assert history["MSFT"][1]["close"] == 204.0
+    assert history["__BENCHMARK__"][1]["close"] == 5050.0
+    assert not any("no_close" in warning for warning in warnings)
+
+
+def test_partial_batch_does_not_assign_another_tickers_close(monkeypatch):
+    import pandas as pd
+
+    dates = pd.to_datetime(["2026-04-01", "2026-04-02"])
+    frame = pd.DataFrame({("Close", "AAPL"): [100.0, 103.0]}, index=dates)
+    fake_yfinance = SimpleNamespace(download=lambda *args, **kwargs: frame)
+    monkeypatch.setitem(sys.modules, "yfinance", fake_yfinance)
+
+    history, warnings = _fetch_yfinance_price_history(
+        ["AAPL", "MSFT"],
+        benchmark_ticker=None,
+        lookback_days=120,
+        asof_date="2026-04-02",
+    )
+
+    assert "AAPL" in history
+    assert "MSFT" not in history
+    assert "performance_yfinance_no_close:MSFT" in warnings
+
+
+def test_due_recommendation_ids_bind_download_and_incremental_update(tmp_path, monkeypatch):
+    import pandas as pd
+
+    db_path = tmp_path / "perf.sqlite"
+    initialize_action_tracker(db_path)
+    with sqlite3.connect(db_path) as conn:
+        old_id = conn.execute(
+            "INSERT INTO action_recommendations (run_id, ticker, market, action, created_at) VALUES (?, ?, ?, ?, ?)",
+            ("old", "005930.KS", "KR", "WATCH", "2025-01-01T09:00:00+09:00"),
+        ).lastrowid
+        active_id = conn.execute(
+            "INSERT INTO action_recommendations (run_id, ticker, market, action, created_at) VALUES (?, ?, ?, ?, ?)",
+            ("active", "005930.KS", "KR", "WATCH", "2026-07-15T09:00:00+09:00"),
+        ).lastrowid
+        current_id = conn.execute(
+            "INSERT INTO action_recommendations (run_id, ticker, market, action, created_at) VALUES (?, ?, ?, ?, ?)",
+            ("current", "005930.KS", "KR", "WATCH", "2026-07-16T09:00:00+09:00"),
+        ).lastrowid
+        conn.execute(
+            "INSERT INTO action_outcomes (recommendation_id, return_5d, return_60d, updated_at) VALUES (?, ?, ?, ?)",
+            (old_id, 0.11, 0.25, "2025-05-01"),
+        )
+        conn.execute(
+            "INSERT INTO action_outcomes (recommendation_id, return_5d, return_60d, calculation_version, updated_at) VALUES (?, ?, ?, ?, ?)",
+            (active_id, 0.01, 0.02, 1, "2026-07-19"),
+        )
+        conn.execute(
+            "INSERT INTO action_outcomes (recommendation_id, return_5d, return_60d, updated_at) VALUES (?, ?, ?, ?)",
+            (current_id, 0.03, 0.04, "2026-07-20"),
+        )
+        conn.commit()
+
+    dates = pd.to_datetime([f"2026-07-{day:02d}" for day in range(15, 21)])
+    frame = pd.DataFrame({("Close", "005930.KS"): [100, 101, 102, 103, 104, 110]}, index=dates)
+    calls = []
+    fake_yfinance = SimpleNamespace(download=lambda ticker, **kwargs: calls.append(ticker) or frame)
+    monkeypatch.setitem(sys.modules, "yfinance", fake_yfinance)
+
+    result = load_price_history_for_recommendations(
+        db_path,
+        provider="yfinance",
+        market="KR",
+        lookback_days=120,
+        asof_date="2026-07-20",
+    )
+
+    assert result.due_recommendation_ids == (active_id,)
+    assert result.due_recommendation_count == 1
+    assert calls == ["005930.KS"]
+
+    update_action_outcomes(
+        db_path,
+        "2026-07-20",
+        price_history=result.price_history,
+        recommendation_ids=result.due_recommendation_ids,
+    )
+    with sqlite3.connect(db_path) as conn:
+        outcomes = dict(
+            conn.execute(
+                "SELECT recommendation_id, return_5d FROM action_outcomes ORDER BY recommendation_id"
+            ).fetchall()
+        )
+        versions = dict(
+            conn.execute(
+                "SELECT recommendation_id, calculation_version FROM action_outcomes ORDER BY recommendation_id"
+            ).fetchall()
+        )
+        index_names = {row[1] for row in conn.execute("PRAGMA index_list(action_outcomes)")}
+    assert outcomes[old_id] == 0.11
+    assert outcomes[active_id] == 0.1
+    assert outcomes[current_id] == 0.03
+    assert versions[active_id] == 2
+    assert "idx_action_outcomes_recommendation" in index_names
+
+    second = load_price_history_for_recommendations(
+        db_path,
+        provider="yfinance",
+        market="KR",
+        lookback_days=120,
+        asof_date="2026-07-20",
+    )
+    assert second.due_recommendation_count == 0
+    assert calls == ["005930.KS"]
+
+
+def test_existing_outcome_schema_is_versioned_and_scheduled_for_correction(tmp_path, monkeypatch):
+    db_path = tmp_path / "legacy.sqlite"
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            """
+            CREATE TABLE action_recommendations (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              run_id TEXT NOT NULL,
+              ticker TEXT NOT NULL,
+              action TEXT NOT NULL,
+              created_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            "CREATE TABLE action_outcomes (recommendation_id INTEGER, return_60d REAL, updated_at TEXT)"
+        )
+        recommendation_id = conn.execute(
+            "INSERT INTO action_recommendations (run_id, ticker, action, created_at) VALUES (?, ?, ?, ?)",
+            ("legacy", "AAPL", "WATCH", "2026-07-15T09:00:00Z"),
+        ).lastrowid
+        conn.execute(
+            "INSERT INTO action_outcomes (recommendation_id, return_60d, updated_at) VALUES (?, ?, ?)",
+            (recommendation_id, 0.05, "2026-07-20"),
+        )
+        conn.commit()
+
+    initialize_action_tracker(db_path)
+    with sqlite3.connect(db_path) as conn:
+        version = conn.execute(
+            "SELECT calculation_version FROM action_outcomes WHERE recommendation_id = ?",
+            (recommendation_id,),
+        ).fetchone()[0]
+        index_names = {row[1] for row in conn.execute("PRAGMA index_list(action_outcomes)")}
+    assert version == 1
+    assert "idx_action_outcomes_recommendation" in index_names
+
+    calls = []
+    fake_yfinance = SimpleNamespace(
+        download=lambda ticker, **kwargs: calls.append(ticker) or SimpleNamespace(empty=True)
+    )
+    monkeypatch.setitem(sys.modules, "yfinance", fake_yfinance)
+    result = load_price_history_for_recommendations(
+        db_path,
+        provider="yfinance",
+        market="US",
+        lookback_days=120,
+        asof_date="2026-07-20",
+    )
+
+    assert result.due_recommendation_ids == (recommendation_id,)
+    assert calls == ["AAPL"]
+
+
+def test_immature_horizons_are_pending_and_future_recommendation_is_not_written(tmp_path):
+    db_path = tmp_path / "perf.sqlite"
+    initialize_action_tracker(db_path)
+    with sqlite3.connect(db_path) as conn:
+        active_id = conn.execute(
+            "INSERT INTO action_recommendations (run_id, ticker, action, created_at) VALUES (?, ?, ?, ?)",
+            ("active", "AAPL", "STARTER_NOW", "2026-04-01T09:00:00Z"),
+        ).lastrowid
+        future_id = conn.execute(
+            "INSERT INTO action_recommendations (run_id, ticker, action, created_at) VALUES (?, ?, ?, ?)",
+            ("future", "AAPL", "STARTER_NOW", "2026-05-01T09:00:00Z"),
+        ).lastrowid
+        weekend_boundary_id = conn.execute(
+            "INSERT INTO action_recommendations (run_id, ticker, action, created_at) VALUES (?, ?, ?, ?)",
+            ("weekend", "AAPL", "STARTER_NOW", "2026-03-29T09:00:00Z"),
+        ).lastrowid
+        conn.commit()
+
+    update_action_outcomes(
+        db_path,
+        "2026-04-03",
+        price_history={
+            "AAPL": [
+                {"date": "2026-04-01", "close": 100.0},
+                {"date": "2026-04-02", "close": 102.0},
+                {"date": "2026-04-03", "close": 103.0},
+            ]
+        },
+        recommendation_ids=(active_id, future_id, weekend_boundary_id),
+    )
+
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        row = conn.execute(
+            "SELECT * FROM action_outcomes WHERE recommendation_id = ?",
+            (active_id,),
+        ).fetchone()
+        future_count = conn.execute(
+            "SELECT COUNT(*) FROM action_outcomes WHERE recommendation_id = ?",
+            (future_id,),
+        ).fetchone()[0]
+        weekend_row = conn.execute(
+            "SELECT return_1d, return_3d FROM action_outcomes WHERE recommendation_id = ?",
+            (weekend_boundary_id,),
+        ).fetchone()
+    assert row["return_1d"] == 0.02
+    assert row["return_3d"] is None
+    assert row["return_5d"] is None
+    assert row["return_60d"] is None
+    assert row["max_drawdown_20d"] is None
+    assert row["outcome_label"] == "pending"
+    assert future_count == 0
+    assert tuple(weekend_row) == (0.02, None)
+
+
+def test_performance_runner_treats_empty_due_set_as_up_to_date(tmp_path):
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        """
+[run]
+tickers = ["AAPL"]
+
+[storage]
+archive_dir = "./archive"
+site_dir = "./site"
+
+[performance]
+enabled = true
+store_path = "./performance.sqlite"
+update_outcomes_on_run = true
+price_provider = "yfinance"
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    (run_dir / "run.json").write_text(
+        '{"run_id":"run1","started_at":"2026-04-01T09:00:00+09:00"}',
+        encoding="utf-8",
+    )
+
+    with patch(
+        "tradingagents.scheduled.runner.load_price_history_for_recommendations",
+        return_value=PriceHistoryLoadResult(provider="yfinance", due_recommendation_ids=()),
+    ):
+        payload = _run_performance_tracking(
+            config=config,
+            run_dir=run_dir,
+            started_at=datetime(2026, 4, 1, tzinfo=timezone.utc),
+        )
+
+    assert payload["status"] == "ok"
+    assert payload["outcome_update"]["updated"] is True
+    assert payload["outcome_update"]["up_to_date"] is True
+    assert "unavailable_reason" not in payload["outcome_update"]
 
 
 def test_price_history_loader_filters_recommendations_to_run_market(tmp_path, monkeypatch):
@@ -377,12 +676,15 @@ def test_action_lift_calibration_metrics_are_recorded_and_rendered(tmp_path):
         db_path,
         "2026-04-08",
         price_history={
-            "009150.KS": [
-                {"date": "2026-04-01", "close": 1000000},
-                {"date": "2026-04-02", "close": 1020000},
-                {"date": "2026-04-03", "close": 1050000},
-            ]
-        },
+                "009150.KS": [
+                    {"date": "2026-04-01", "close": 1000000},
+                    {"date": "2026-04-02", "close": 1020000},
+                    {"date": "2026-04-03", "close": 1050000},
+                    {"date": "2026-04-06", "close": 1060000},
+                    {"date": "2026-04-07", "close": 1070000},
+                    {"date": "2026-04-08", "close": 1080000},
+                ]
+            },
     )
     summary = summarize_action_performance(db_path)
     html = _render_performance_tracking_section(
@@ -510,15 +812,11 @@ def test_take_profit_if_triggered_is_tracked_as_profit_like(tmp_path):
     record_run_recommendations(run_dir, db_path)
     update_action_outcomes(
         db_path,
-        "2026-04-08",
+        "2026-04-21",
         price_history={
             "005930.KS": [
-                {"date": "2026-04-01", "close": 100000},
-                {"date": "2026-04-02", "close": 99000},
-                {"date": "2026-04-03", "close": 97000},
-                {"date": "2026-04-06", "close": 95000},
-                {"date": "2026-04-07", "close": 96000},
-                {"date": "2026-04-08", "close": 94000},
+                {"date": f"2026-04-{day:02d}", "close": 101000 - (day * 1000)}
+                for day in range(1, 22)
             ]
         },
     )

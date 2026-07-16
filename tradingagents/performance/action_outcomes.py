@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 from tradingagents.external.prism_normalize import normalize_market
 
-from .models import ACTION_TRACKER_SCHEMA, ActionPerformanceSummary
+from .models import ACTION_TRACKER_SCHEMA, OUTCOME_CALCULATION_VERSION, ActionPerformanceSummary
 from .price_history import BENCHMARK_KEY
 
 
@@ -47,6 +47,7 @@ def initialize_action_tracker(db_path: Path) -> None:
             "benchmark_key": "TEXT",
             "avoided_drawdown_20d": "REAL",
             "missed_upside_20d": "REAL",
+            "calculation_version": "INTEGER DEFAULT 1",
         })
         conn.commit()
 
@@ -124,13 +125,68 @@ def update_action_outcomes(
     *,
     price_history: Mapping[str, Any] | None = None,
     price_history_path: str | Path | None = None,
+    refresh_window_days: int = 120,
+    recommendation_ids: Sequence[int] | None = None,
 ) -> None:
     initialize_action_tracker(db_path)
     prices = _normalize_price_history(price_history or (_load_json(Path(price_history_path)) if price_history_path else {}))
     benchmark_series = prices.get(BENCHMARK_KEY)
+    price_tickers = sorted(key for key in prices if key != BENCHMARK_KEY)
+    if not price_tickers:
+        return
+    selected_ids = tuple(dict.fromkeys(int(item) for item in recommendation_ids or () if int(item) > 0))
+    if recommendation_ids is not None and not selected_ids:
+        return
+    cutoff_date = _outcome_refresh_cutoff_date(asof_date, refresh_window_days)
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
-        recommendations = list(conn.execute("SELECT * FROM action_recommendations"))
+        placeholders = ",".join("?" for _ in price_tickers)
+        if recommendation_ids is not None:
+            id_placeholders = ",".join("?" for _ in selected_ids)
+            recommendations = list(
+                conn.execute(
+                    f"""
+                    SELECT *
+                    FROM action_recommendations
+                    WHERE id IN ({id_placeholders})
+                      AND upper(ticker) IN ({placeholders})
+                    """,
+                    (*selected_ids, *price_tickers),
+                )
+            )
+        elif cutoff_date:
+            recommendations = list(
+                conn.execute(
+                    f"""
+                    SELECT DISTINCT r.*
+                    FROM action_recommendations r
+                    LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
+                    WHERE substr(r.created_at, 1, 10) >= ?
+                      AND upper(r.ticker) IN ({placeholders})
+                      AND (
+                        o.recommendation_id IS NULL
+                        OR COALESCE(o.calculation_version, 1) < ?
+                        OR (
+                          o.return_60d IS NULL
+                          AND substr(COALESCE(o.updated_at, ''), 1, 10) < ?
+                        )
+                      )
+                    """,
+                    (
+                        cutoff_date,
+                        *price_tickers,
+                        OUTCOME_CALCULATION_VERSION,
+                        str(asof_date)[:10],
+                    ),
+                )
+            )
+        else:
+            recommendations = list(
+                conn.execute(
+                    f"SELECT * FROM action_recommendations WHERE upper(ticker) IN ({placeholders})",
+                    price_tickers,
+                )
+            )
         for row in recommendations:
             ticker = str(row["ticker"])
             series = prices.get(ticker)
@@ -148,8 +204,8 @@ def update_action_outcomes(
                   benchmark_return_20d, benchmark_excess_20d, benchmark_return_60d,
                   benchmark_excess_60d, benchmark_key,
                   max_drawdown_20d, max_favorable_excursion_20d, avoided_drawdown_20d,
-                  missed_upside_20d, outcome_label, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  missed_upside_20d, outcome_label, calculation_version, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["id"],
@@ -171,10 +227,22 @@ def update_action_outcomes(
                     returns.get("avoided_drawdown_20d"),
                     returns.get("missed_upside_20d"),
                     returns.get("outcome_label"),
+                    OUTCOME_CALCULATION_VERSION,
                     asof_date,
                 ),
             )
         conn.commit()
+
+
+def _outcome_refresh_cutoff_date(asof_date: str, refresh_window_days: int) -> str | None:
+    text = str(asof_date or "").strip()[:10]
+    if not text:
+        return None
+    try:
+        parsed = date.fromisoformat(text)
+    except ValueError:
+        return None
+    return (parsed - timedelta(days=max(1, int(refresh_window_days or 1)))).isoformat()
 
 
 def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
@@ -350,15 +418,21 @@ def _compute_returns(
 ) -> dict[str, Any]:
     created_date = str(row["created_at"] or "")[:10]
     start_index = _start_index_for_date(series, created_date)
+    if start_index is None:
+        return {}
     base_price = _float_or_none(row["recommended_price"]) or series[start_index][1]
     if base_price <= 0:
         return {}
     values: dict[str, Any] = {}
     for horizon in horizons:
-        target_index = min(start_index + int(horizon), len(series) - 1)
+        target_index = start_index + int(horizon)
+        if target_index >= len(series):
+            values[f"return_{int(horizon)}d"] = None
+            continue
         ret = (series[target_index][1] - base_price) / base_price
         values[f"return_{int(horizon)}d"] = round(ret, 6)
-    window = [price for _date, price in series[start_index : min(start_index + 21, len(series))]]
+    window_end = start_index + 20
+    window = [price for _date, price in series[start_index : window_end + 1]] if window_end < len(series) else []
     if window:
         values["max_drawdown_20d"] = round((min(window) - base_price) / base_price, 6)
         values["max_favorable_excursion_20d"] = round((max(window) - base_price) / base_price, 6)
@@ -376,21 +450,27 @@ def _compute_returns(
     return values
 
 
-def _start_index_for_date(series: list[tuple[str, float]], created_date: str) -> int:
+def _start_index_for_date(series: list[tuple[str, float]], created_date: str) -> int | None:
+    if not series or not created_date or created_date > series[-1][0]:
+        return None
     for index, (date_text, _price) in enumerate(series):
         if date_text >= created_date:
             return index
-    return max(len(series) - 1, 0)
+    return None
 
 
 def _benchmark_return(series: list[tuple[str, float]] | None, *, created_date: str, horizon: int) -> float | None:
     if not series:
         return None
     start_index = _start_index_for_date(series, created_date)
+    if start_index is None:
+        return None
     base = series[start_index][1]
     if base <= 0:
         return None
-    target_index = min(start_index + int(horizon), len(series) - 1)
+    target_index = start_index + int(horizon)
+    if target_index >= len(series):
+        return None
     return round((series[target_index][1] - base) / base, 6)
 
 
