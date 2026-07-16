@@ -39,6 +39,7 @@ class WatchdogTarget:
     inputs: dict[str, str]
     dependencies: tuple[WatchdogDependency, ...] = ()
     blockers: tuple[WatchdogBlocker, ...] = ()
+    max_failed_attempts: int = 2
 
 
 class GitHubActionsClient:
@@ -99,13 +100,10 @@ def target_is_covered(
     if not runs:
         return False, f"No runs since {target.window_start_kst.isoformat()}."
 
+    failed_attempts: list[int] = []
     for run in runs:
         run_id = int(run.get("id", 0))
         status = str(run.get("status") or "").lower()
-        conclusion = str(run.get("conclusion") or "").lower()
-        if status == "completed" and conclusion != "success":
-            continue
-
         jobs = client.list_jobs(run_id)
         active_matches: list[str] = []
         successful_matches: set[str] = set()
@@ -128,6 +126,16 @@ def target_is_covered(
         if target_job_names <= successful_matches:
             covered = ", ".join(sorted(successful_matches))
             return True, f"Run {run_id} covers target job set: {covered}."
+
+        if status == "completed":
+            failed_attempts.append(run_id)
+
+    if target.max_failed_attempts > 0 and len(failed_attempts) >= target.max_failed_attempts:
+        attempts = ", ".join(str(run_id) for run_id in failed_attempts[: target.max_failed_attempts])
+        return True, (
+            f"Retry budget exhausted after {target.max_failed_attempts} unsuccessful run(s) "
+            f"in this window: {attempts}."
+        )
 
     return False, f"No successful target jobs since {target.window_start_kst.isoformat()}."
 
@@ -421,7 +429,8 @@ def run_watchdog(*, client: GitHubActionsClient, now_kst: datetime, dry_run: boo
 
         covered, reason = target_is_covered(client=client, target=target)
         if covered:
-            messages.append(f"{target.name}: covered; {reason}")
+            state = "suppressed" if reason.startswith("Retry budget exhausted") else "covered"
+            messages.append(f"{target.name}: {state}; {reason}")
             continue
         if dry_run:
             messages.append(f"{target.name}: would dispatch; {reason}")

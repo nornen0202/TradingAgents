@@ -127,9 +127,27 @@ def verify_site(site_dir: Path, *, market: str) -> dict[str, Any]:
     source = {}
     if (target / "source.json").exists():
         source = _load_json(target / "source.json")
-        for name in ("decision_bundle.json", "strategy_table_ko.md", "decision_bundle_status.json"):
-            if not (target / name).is_file():
+        artifacts = source.get("artifacts") if isinstance(source.get("artifacts"), dict) else {}
+        required_artifacts = {
+            "public_decision_bundle_json": "decision_bundle.json",
+            "public_decision_bundle_status_json": "decision_bundle_status.json",
+        }
+        for artifact_key, expected_name in required_artifacts.items():
+            name = str(artifacts.get(artifact_key) or "").strip()
+            if not name:
+                errors.append(f"stable latest source missing artifact declaration: {artifact_key}")
+                continue
+            if name != expected_name or Path(name).name != name:
+                errors.append(f"stable latest artifact path is invalid for {artifact_key}: {name}")
+                continue
+            artifact_path = target / name
+            if not artifact_path.is_file():
                 errors.append(f"stable latest artifact missing: {name}")
+                continue
+            try:
+                _load_json(artifact_path)
+            except (OSError, ValueError) as exc:
+                errors.append(f"stable latest artifact is not valid JSON: {name}: {exc}")
     elif status.get("decision_ready") is True:
         errors.append("status says decision-ready but source.json is missing")
     return {

@@ -229,6 +229,56 @@ def test_watchdog_treats_active_target_job_as_covered():
     assert "active target job(s): analyze_us" in reason
 
 
+def test_watchdog_accepts_successful_target_job_when_later_publish_job_fails():
+    target = watchdog.WatchdogTarget(
+        name="intraday-overlay-kr-1005",
+        workflow_file="intraday-overlay-refresh.yml",
+        job_names=("overlay_refresh_kr",),
+        window_start_kst=_kst("2026-06-01T10:05:00"),
+        inputs={"profile": "kr", "run_mode": "overlay_only"},
+    )
+    client = FakeClient(
+        runs=[{"id": 655, "status": "completed", "conclusion": "failure"}],
+        jobs={
+            655: [
+                {"name": "overlay_refresh_kr", "status": "completed", "conclusion": "success"},
+                {"name": "publish_overlay_site", "status": "completed", "conclusion": "failure"},
+            ]
+        },
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert covered
+    assert "covers target job set: overlay_refresh_kr" in reason
+
+
+def test_watchdog_suppresses_repeated_failures_after_retry_budget():
+    target = watchdog.WatchdogTarget(
+        name="youtube-daily",
+        workflow_file="daily-youtube-reports.yml",
+        job_names=("build_youtube_pages",),
+        window_start_kst=_kst("2026-06-01T05:00:00"),
+        inputs={"lookback_hours": "24", "publish": "true"},
+        max_failed_attempts=2,
+    )
+    client = FakeClient(
+        runs=[
+            {"id": 702, "status": "completed", "conclusion": "failure"},
+            {"id": 701, "status": "completed", "conclusion": "failure"},
+        ],
+        jobs={
+            702: [{"name": "build_youtube_pages", "status": "completed", "conclusion": "failure"}],
+            701: [{"name": "build_youtube_pages", "status": "completed", "conclusion": "failure"}],
+        },
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert covered
+    assert "Retry budget exhausted" in reason
+
+
 def test_watchdog_dispatches_when_due_target_is_uncovered():
     target_time = _kst("2026-06-02T06:57:00")
     client = FakeClient(runs=[])
