@@ -1,14 +1,29 @@
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.runner import (
+    _ResolvedRunTickerUniverse,
     _bootstrap_overlay_inputs_from_latest_run,
+    _freeze_overlay_universe_to_latest_full_baseline,
     _manifest_has_bootstrap_ready_ticker,
+    _manifest_production_priority,
     _resolve_latest_overlay_source_manifest,
     execute_scheduled_run,
 )
+
+
+def _recent_started_at(*, hours_ago: float = 1.0) -> str:
+    return (datetime.now(timezone.utc) - timedelta(hours=hours_ago)).isoformat()
+
+
+def test_overlay_production_label_token_matching_does_not_reject_latest() -> None:
+    assert _manifest_production_priority({"label": "latest-production"}) == 1
+    assert _manifest_production_priority({"label": "github-actions-test"}) == 0
 
 
 class _NoopUpdate:
@@ -31,6 +46,50 @@ def _fake_overlay_updates(**kwargs):
         }
     updates["_latest_checkpoint"] = {"value": "22:35"}
     return updates
+
+
+def _write_full_overlay_baseline(
+    archive_dir: Path,
+    *,
+    tickers: list[str],
+    market: str = "US",
+    run_id: str = "20260716T180000_full",
+    started_at: str | None = None,
+    label: str = "github-actions",
+    set_latest: bool = True,
+) -> dict:
+    run_dir = archive_dir / "runs" / "2026" / run_id
+    rows = []
+    for ticker in tickers:
+        ticker_dir = run_dir / "tickers" / ticker
+        ticker_dir.mkdir(parents=True, exist_ok=True)
+        (ticker_dir / "analysis.json").write_text(
+            json.dumps(
+                {"ticker": ticker, "decision": "HOLD", "trade_date": "2026-07-16"},
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        rows.append(
+            {
+                "ticker": ticker,
+                "status": "success",
+                "decision": "HOLD",
+                "artifacts": {"analysis_json": f"tickers/{ticker}/analysis.json"},
+            }
+        )
+    manifest = {
+        "run_id": run_id,
+        "label": label,
+        "started_at": started_at or _recent_started_at(),
+        "settings": {"run_mode": "full", "market": market},
+        "tickers": rows,
+    }
+    (run_dir / "run.json").write_text(json.dumps(manifest), encoding="utf-8")
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    if set_latest:
+        (archive_dir / "latest-run.json").write_text(json.dumps(manifest), encoding="utf-8")
+    return manifest
 
 
 def test_overlay_only_mode_uses_latest_run_without_full_research(tmp_path: Path):
@@ -69,7 +128,7 @@ def test_overlay_only_mode_uses_latest_run_without_full_research(tmp_path: Path)
 
     latest_manifest = {
         "run_id": "20260414T220000_full",
-        "started_at": "2026-04-14T22:00:00+09:00",
+        "started_at": _recent_started_at(),
         "tickers": [
             {
                 "ticker": "NVDA",
@@ -130,12 +189,274 @@ price_provider = "yfinance"
     assert manifest["performance"] == {"status": "skipped", "reason": "overlay_fast_path"}
 
 
+def test_overlay_freezes_full_baseline_and_defers_new_dynamic_candidates(tmp_path: Path):
+    archive_dir = tmp_path / "archive"
+    _write_full_overlay_baseline(archive_dir, tickers=["NVDA", "AAPL"])
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["NVDA", "AAPL"]
+market = "US"
+run_mode = "overlay_only"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+checkpoints_local = ["10:00"]
+checkpoint_timezone = "America/New_York"
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    scanner_receipt = {
+        "enabled": True,
+        "added_tickers": ["ABT"],
+        "candidate_count": 0,
+        "source_counts": {"prism_imported_same_market": 3},
+    }
+
+    with (
+        patch(
+            "tradingagents.scheduled.runner._augment_run_tickers_with_scanner",
+            return_value=(["NVDA", "AAPL", "ABT"], scanner_receipt),
+        ),
+        patch(
+            "tradingagents.scheduled.runner._run_execution_overlay_passes",
+            side_effect=_fake_overlay_updates,
+        ),
+        patch("tradingagents.scheduled.runner.build_site", return_value=[]),
+    ):
+        manifest = execute_scheduled_run(config, run_label="overlay-freeze-test")
+
+    assert [row["ticker"] for row in manifest["tickers"]] == ["NVDA", "AAPL"]
+    assert manifest["summary"]["total_tickers"] == 2
+    assert manifest["overlay_universe"]["baseline_run_id"] == "20260716T180000_full"
+    assert manifest["overlay_universe"]["deferred_new_candidates"] == ["ABT"]
+    assert manifest["scanner"]["deferred_added_tickers"] == ["ABT"]
+    assert manifest["active_universe"]["coverage"]["complete"] is True
+    assert any(
+        warning.startswith("overlay_dynamic_candidates_deferred_until_full_run:")
+        for warning in manifest["warnings"]
+    )
+
+
+def test_overlay_prefers_older_complete_production_baseline_over_newer_partial_custom(
+    tmp_path: Path,
+) -> None:
+    archive_dir = tmp_path / "archive"
+    friday = datetime(2026, 7, 17, 20, 0, tzinfo=timezone.utc)
+    monday = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
+    complete = _write_full_overlay_baseline(
+        archive_dir,
+        tickers=["NVDA", "AAPL"],
+        run_id="20260717T200000_production_full",
+        started_at=friday.isoformat(),
+        set_latest=False,
+    )
+    _write_full_overlay_baseline(
+        archive_dir,
+        tickers=["NVDA"],
+        run_id="20260720T130000_manual_partial",
+        started_at=(monday - timedelta(hours=1)).isoformat(),
+        label="manual-custom",
+        set_latest=True,
+    )
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["NVDA", "AAPL", "NEW"]
+market = "US"
+run_mode = "overlay_only"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    universe = _ResolvedRunTickerUniverse(
+        tickers=("NVDA", "AAPL", "NEW"),
+        configured_tickers=("NVDA", "AAPL", "NEW"),
+        profile_watch_tickers=(),
+        holding_tickers=("NVDA",),
+        mode="config_plus_account",
+        account_snapshot_status="loaded",
+        account_snapshot_health="VALID",
+    )
+
+    tickers, _selection, _scanner, metadata, warnings = (
+        _freeze_overlay_universe_to_latest_full_baseline(
+            config=config,
+            resolved_universe=universe,
+            requested_base_tickers=["NVDA", "AAPL", "NEW"],
+            discovered_tickers=["NVDA", "AAPL", "NEW"],
+            scanner_status=None,
+            now=monday,
+        )
+    )
+
+    assert tickers == ["NVDA", "AAPL"]
+    assert metadata["baseline_run_id"] == complete["run_id"]
+    assert metadata["deferred_nonholding_tickers"] == ["NEW"]
+    assert metadata["baseline_max_age_hours"] == 96
+    assert metadata["baseline_max_newer_sessions"] == 1
+    assert any("overlay_nonholding_universe_changes_deferred" in warning for warning in warnings)
+
+
+def test_overlay_fails_closed_when_complete_baseline_is_truly_stale(tmp_path: Path) -> None:
+    archive_dir = tmp_path / "archive"
+    now = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
+    _write_full_overlay_baseline(
+        archive_dir,
+        tickers=["NVDA"],
+        run_id="20260713T140000_stale_full",
+        started_at=(now - timedelta(days=7)).isoformat(),
+    )
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["NVDA"]
+market = "US"
+run_mode = "overlay_only"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    universe = _ResolvedRunTickerUniverse(
+        tickers=("NVDA",),
+        configured_tickers=("NVDA",),
+        profile_watch_tickers=(),
+        holding_tickers=("NVDA",),
+        mode="config_plus_account",
+        account_snapshot_status="loaded",
+        account_snapshot_health="VALID",
+    )
+
+    with pytest.raises(RuntimeError, match="OVERLAY_BASELINE_STALE"):
+        _freeze_overlay_universe_to_latest_full_baseline(
+            config=config,
+            resolved_universe=universe,
+            requested_base_tickers=["NVDA"],
+            discovered_tickers=["NVDA"],
+            scanner_status=None,
+            now=now,
+        )
+
+
+def test_overlay_rejects_manual_custom_run_as_only_baseline(tmp_path: Path) -> None:
+    archive_dir = tmp_path / "archive"
+    now = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
+    _write_full_overlay_baseline(
+        archive_dir,
+        tickers=["NVDA"],
+        run_id="20260720T130000_manual_custom",
+        started_at=(now - timedelta(hours=1)).isoformat(),
+        label="manual-custom",
+    )
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["NVDA"]
+market = "US"
+run_mode = "overlay_only"
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+[execution]
+enabled = true
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    universe = _ResolvedRunTickerUniverse(
+        tickers=("NVDA",),
+        configured_tickers=("NVDA",),
+        profile_watch_tickers=(),
+        holding_tickers=(),
+        mode="config_only",
+        account_snapshot_status="disabled",
+    )
+    with pytest.raises(RuntimeError, match="OVERLAY_BASELINE_MISSING"):
+        _freeze_overlay_universe_to_latest_full_baseline(
+            config=config,
+            resolved_universe=universe,
+            requested_base_tickers=["NVDA"],
+            discovered_tickers=["NVDA"],
+            scanner_status=None,
+            now=now,
+        )
+
+
+def test_overlay_keeps_current_holding_coverage_gap_fatal(tmp_path: Path):
+    archive_dir = tmp_path / "archive"
+    _write_full_overlay_baseline(archive_dir, tickers=["NVDA"])
+    config_path = tmp_path / "scheduled_analysis.toml"
+    config_path.write_text(
+        f"""
+[run]
+tickers = ["NVDA"]
+market = "US"
+run_mode = "overlay_only"
+
+[storage]
+archive_dir = "{archive_dir.as_posix()}"
+site_dir = "{(tmp_path / 'site').as_posix()}"
+
+[execution]
+enabled = true
+""",
+        encoding="utf-8",
+    )
+    config = load_scheduled_config(config_path)
+    universe = _ResolvedRunTickerUniverse(
+        tickers=("NVDA", "ABT"),
+        configured_tickers=("NVDA",),
+        profile_watch_tickers=(),
+        holding_tickers=("ABT",),
+        mode="config_plus_account",
+        account_snapshot_status="loaded",
+        account_snapshot_health="VALID",
+    )
+
+    with (
+        patch("tradingagents.scheduled.runner._resolve_run_ticker_universe", return_value=universe),
+        patch(
+            "tradingagents.scheduled.runner._augment_run_tickers_with_scanner",
+            return_value=(["NVDA", "ABT"], None),
+        ),
+    ):
+        try:
+            execute_scheduled_run(config, run_label="overlay-holding-gap-test")
+            assert False, "expected a fatal current-holding baseline coverage gap"
+        except RuntimeError as exc:
+            assert "OVERLAY_BASELINE_HOLDING_COVERAGE_GAP" in str(exc)
+            assert "ABT" in str(exc)
+
+
 def test_overlay_source_resolution_fails_closed_on_partial_target_coverage(tmp_path: Path):
     archive_dir = tmp_path / "archive"
     archive_dir.mkdir(parents=True)
     partial = {
         "run_id": "partial-full",
-        "started_at": "2026-07-15T20:00:00-04:00",
+        "started_at": _recent_started_at(),
         "settings": {"run_mode": "full", "market": "US"},
         "tickers": [
             {
@@ -168,7 +489,7 @@ def test_overlay_bootstrap_matches_kr_alias_identity(tmp_path: Path):
     (source_ticker_dir / "execution_contract.json").write_text("{}", encoding="utf-8")
     source_manifest = {
         "run_id": "alias-full",
-        "started_at": "2026-07-15T15:00:00+09:00",
+        "started_at": _recent_started_at(),
         "settings": {"run_mode": "full", "market": "KR"},
         "tickers": [
             {
@@ -291,7 +612,7 @@ def test_overlay_only_mode_prefers_full_source_when_latest_is_overlay(tmp_path: 
         json.dumps(
             {
                 "run_id": "20260414T235900_overlay",
-                "started_at": "2026-04-14T23:59:00+09:00",
+                "started_at": _recent_started_at(hours_ago=0.5),
                 "overlay_source_run_id": "20260414T220000_full",
                 "settings": {"run_mode": "overlay_only"},
                 "tickers": [
@@ -310,7 +631,7 @@ def test_overlay_only_mode_prefers_full_source_when_latest_is_overlay(tmp_path: 
         json.dumps(
             {
                 "run_id": "20260414T220000_full",
-                "started_at": "2026-04-14T22:00:00+09:00",
+                "started_at": _recent_started_at(hours_ago=1.0),
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {
@@ -478,7 +799,7 @@ def test_overlay_only_mode_falls_back_to_latest_matching_full_run(tmp_path: Path
         json.dumps(
             {
                 "run_id": "20260414T235900_full_us",
-                "started_at": "2026-04-14T23:59:00+09:00",
+                "started_at": _recent_started_at(hours_ago=0.5),
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {
@@ -505,7 +826,7 @@ def test_overlay_only_mode_falls_back_to_latest_matching_full_run(tmp_path: Path
         json.dumps(
             {
                 "run_id": "20260414T220000_full_kr",
-                "started_at": "2026-04-14T22:00:00+09:00",
+                "started_at": _recent_started_at(hours_ago=1.0),
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {
@@ -526,7 +847,7 @@ def test_overlay_only_mode_falls_back_to_latest_matching_full_run(tmp_path: Path
         json.dumps(
             {
                 "run_id": "20260414T235900_full_us",
-                "started_at": "2026-04-14T23:59:00+09:00",
+                "started_at": _recent_started_at(hours_ago=0.5),
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {
@@ -587,7 +908,7 @@ def test_overlay_only_mode_copies_source_report_markdown(tmp_path: Path):
         json.dumps(
             {
                 "run_id": "20260414T220000_full",
-                "started_at": "2026-04-14T22:00:00+09:00",
+                "started_at": _recent_started_at(),
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {
@@ -613,7 +934,7 @@ def test_overlay_only_mode_copies_source_report_markdown(tmp_path: Path):
         json.dumps(
             {
                 "run_id": "20260414T220000_full",
-                "started_at": "2026-04-14T22:00:00+09:00",
+                "started_at": _recent_started_at(),
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {

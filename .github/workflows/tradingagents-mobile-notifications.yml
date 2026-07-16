@@ -75,6 +75,9 @@ jobs:
       - resolve
     if: ${{ needs.resolve.outputs.should_notify == 'true' }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: tradingagents-mobile-notification-ledger
+      cancel-in-progress: false
     steps:
       - name: Check out trusted notifier code from main
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -87,14 +90,49 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Restore persistent Telegram incident ledger
+        id: restore_telegram_ledger
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/telegram-notification-ledger.json
+          key: telegram-notification-ledger-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            telegram-notification-ledger-v1-
+
+      - name: Initialize Telegram incident ledger on cache miss
+        env:
+          TELEGRAM_LEDGER_PATH: ${{ runner.temp }}/telegram-notification-ledger.json
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ["TELEGRAM_LEDGER_PATH"])
+          if not path.exists():
+              path.write_text(
+                  json.dumps(
+                      {
+                          "schema": "tradingagents.telegram-notification-ledger/v1",
+                          "entries": {},
+                          "incidents": {},
+                      },
+                      indent=2,
+                      sort_keys=True,
+                  )
+                  + "\n",
+                  encoding="utf-8",
+              )
+          PY
+
       - name: Send Telegram completion or failure notification
+        id: notify_telegram
         env:
           GH_TOKEN: ${{ github.token }}
           UPSTREAM_RUN_ID: ${{ github.event.workflow_run.id || inputs.upstream_run_id }}
           NOTIFICATION_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.TELEGRAM_NOTIFICATION_CHAT_ID }}
-          MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           set -euo pipefail
           archive_dir="$RUNNER_TEMP/no-local-archive"
@@ -111,6 +149,13 @@ jobs:
             args+=(--dry-run)
           fi
           python "${args[@]}"
+
+      - name: Persist Telegram incident ledger and partial delivery cursor
+        if: ${{ always() }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/telegram-notification-ledger.json
+          key: telegram-notification-ledger-v1-${{ github.run_id }}-${{ github.run_attempt }}
 
   notify_private_cards:
     name: Add private archive action cards

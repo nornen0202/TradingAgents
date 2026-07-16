@@ -98,6 +98,9 @@ _MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS = (
     "microstructure_checkpoint_report_md",
 )
 _DEFAULT_CODEX_PARALLEL_TICKER_CAP = 4
+_OVERLAY_BASELINE_MAX_AGE = timedelta(hours=96)
+_OVERLAY_BASELINE_FUTURE_SKEW = timedelta(minutes=15)
+_OVERLAY_BASELINE_MAX_NEWER_SESSIONS = 1
 
 
 @dataclass(frozen=True)
@@ -259,12 +262,21 @@ def execute_scheduled_run(
 
     run_mode = str(config.run.run_mode or "full").strip().lower()
     portfolio_only = run_mode == "portfolio_only"
+    if run_mode == "overlay_only" and not config.execution.execution_refresh_enabled:
+        raise RuntimeError(
+            "run_mode=overlay_only requires [execution].enabled=true to refresh execution overlays. "
+            "Use run_mode=full for research-only runs or enable [execution] in the scheduled config."
+        )
     resolved_universe: _ResolvedRunTickerUniverse | None = None
+    selection_universe: _ResolvedRunTickerUniverse | None = None
+    overlay_universe_metadata: dict[str, Any] | None = None
+    overlay_universe_warnings: list[str] = []
     if portfolio_only:
         run_tickers: list[str] = []
         scanner_status = None
     else:
         resolved_universe = _resolve_run_ticker_universe(config)
+        selection_universe = resolved_universe
         base_run_tickers = list(resolved_universe.tickers)
         run_tickers, scanner_status = _augment_run_tickers_with_scanner(
             config=config,
@@ -273,8 +285,24 @@ def execute_scheduled_run(
             run_id=run_id,
             asof=started_at.isoformat(),
         )
+        if run_mode == "overlay_only":
+            (
+                run_tickers,
+                selection_universe,
+                scanner_status,
+                overlay_universe_metadata,
+                overlay_universe_warnings,
+            ) = _freeze_overlay_universe_to_latest_full_baseline(
+                config=config,
+                resolved_universe=resolved_universe,
+                requested_base_tickers=base_run_tickers,
+                discovered_tickers=run_tickers,
+                scanner_status=scanner_status,
+                now=started_at,
+            )
     source_run_id: str | None = None
     run_warnings: list[str] = list(resolved_universe.warnings) if resolved_universe else []
+    run_warnings.extend(overlay_universe_warnings)
     configured_ticker_count = len(run_tickers)
     active_ticker_limit = _active_ticker_limit(config)
     active_universe_metadata: dict[str, Any] = {
@@ -290,8 +318,10 @@ def execute_scheduled_run(
             tickers=run_tickers,
             started_at=started_at,
             active_ticker_limit=selection_limit,
-            resolved_universe=resolved_universe,
+            resolved_universe=selection_universe,
         )
+        if overlay_universe_metadata:
+            active_universe_metadata["overlay_baseline"] = overlay_universe_metadata
         if run_mode == "full" and active_ticker_limit and omitted:
             warning = (
                 "daily_active_ticker_limit_applied:"
@@ -310,11 +340,6 @@ def execute_scheduled_run(
     if run_mode == "selective_rerun_only" and not config.execution.execution_refresh_enabled:
         raise RuntimeError(
             "run_mode=selective_rerun_only requires [execution].enabled=true to compute rerun targets."
-        )
-    if run_mode == "overlay_only" and not config.execution.execution_refresh_enabled:
-        raise RuntimeError(
-            "run_mode=overlay_only requires [execution].enabled=true to refresh execution overlays. "
-            "Use run_mode=full for research-only runs or enable [execution] in the scheduled config."
         )
     if portfolio_only and (not config.portfolio.enabled or not config.portfolio.profile_path):
         raise RuntimeError(
@@ -502,6 +527,8 @@ def execute_scheduled_run(
         manifest["github_actions"] = github_actions_receipt
     if scanner_status:
         manifest["scanner"] = scanner_status
+    if overlay_universe_metadata:
+        manifest["overlay_universe"] = overlay_universe_metadata
     if run_trade_date:
         manifest["daily_thesis_trade_date"] = run_trade_date
         manifest["settings"]["daily_thesis_trade_date"] = run_trade_date
@@ -741,6 +768,13 @@ def resolve_trade_date(
     except Exception as exc:
         if not is_retryable_yfinance_error(exc):
             raise
+        market = _trade_date_market(ticker=normalized_symbol, config=config)
+        if market == "KR" and expected_completed_date is None:
+            raise RuntimeError(
+                f"Refusing to synthesize an unverified latest_available trade date for {ticker} "
+                f"({normalized_symbol}): the authoritative KR exchange calendar is unavailable "
+                "and the vendor latest-trade-date lookup failed."
+            ) from exc
         fallback = expected_completed_date or _previous_business_day(now.date())
         fallback_date = fallback.isoformat()
         print(
@@ -837,13 +871,17 @@ def _expected_completed_daily_trade_date(
     if calendar_date is not None:
         return calendar_date
     if market == "KR":
-        return _completed_daily_trade_date_for_kr(now)
+        # A weekday-only fallback cannot distinguish KRX holidays (for example
+        # Children's Day) from trading sessions.  A successful vendor history
+        # lookup remains direct evidence of the last available bar, but without
+        # the authoritative calendar we must not synthesize a KR session date.
+        return None
     return _completed_daily_trade_date_for_us(now)
 
 
 def _trade_date_market(*, ticker: str, config: ScheduledAnalysisConfig) -> str:
     configured = str(getattr(config.run, "market", "") or "").strip().upper()
-    if configured in {"KR", "US"}:
+    if bool(getattr(config.run, "market_declared", False)) and configured in {"KR", "US"}:
         return configured
     try:
         country = str(resolve_instrument(ticker).country or "").strip().upper()
@@ -2268,6 +2306,171 @@ def _augment_run_tickers_with_scanner(
     }
 
 
+def _freeze_overlay_universe_to_latest_full_baseline(
+    *,
+    config: ScheduledAnalysisConfig,
+    resolved_universe: _ResolvedRunTickerUniverse,
+    requested_base_tickers: list[str],
+    discovered_tickers: list[str],
+    scanner_status: dict[str, Any] | None,
+    now: datetime | None = None,
+) -> tuple[
+    list[str],
+    _ResolvedRunTickerUniverse,
+    dict[str, Any] | None,
+    dict[str, Any],
+    list[str],
+]:
+    """Keep intraday overlays on one coherent full-research baseline.
+
+    Scanner and PRISM inputs can change between the daily research run and an
+    intraday checkpoint.  Such a change is useful evidence for the next full
+    run, but it cannot be overlaid safely because no daily thesis exists for
+    it yet.  Current account holdings are the exception: silently omitting a
+    newly held ticker would make the private action table unsafe, so a holding
+    coverage gap remains fatal.
+    """
+
+    baseline = _resolve_latest_full_overlay_baseline_manifest(
+        config.storage.archive_dir,
+        market=config.run.market,
+        requested_tickers=requested_base_tickers,
+        required_holding_tickers=list(resolved_universe.holding_tickers),
+        now=now,
+    )
+    if baseline is None:
+        # Keep the established explicit holding-gap error when otherwise valid
+        # recent baselines exist but none includes a newly acquired holding.
+        baseline = _resolve_latest_full_overlay_baseline_manifest(
+            config.storage.archive_dir,
+            market=config.run.market,
+            requested_tickers=requested_base_tickers,
+            required_holding_tickers=None,
+            now=now,
+        )
+    if baseline is None:
+        stale_baseline = _resolve_latest_full_overlay_baseline_manifest(
+            config.storage.archive_dir,
+            market=config.run.market,
+            requested_tickers=requested_base_tickers,
+            required_holding_tickers=list(resolved_universe.holding_tickers),
+            now=now,
+            max_age=None,
+        )
+        if stale_baseline is not None:
+            raise RuntimeError(
+                "OVERLAY_BASELINE_STALE: overlay_only requires a complete same-market full "
+                f"baseline no older than {int(_OVERLAY_BASELINE_MAX_AGE.total_seconds() // 3600)} hours "
+                f"and no more than {_OVERLAY_BASELINE_MAX_NEWER_SESSIONS} newer exchange session; "
+                f"baseline_run_id={stale_baseline.get('run_id')}; "
+                f"baseline_started_at={stale_baseline.get('started_at')}"
+            )
+        raise RuntimeError(
+            "OVERLAY_BASELINE_MISSING: overlay_only requires a prior full run "
+            "covering every current base-universe ticker with successful analysis artifacts."
+        )
+
+    baseline_tickers = _successful_manifest_tickers(baseline)
+    if not baseline_tickers:
+        raise RuntimeError(
+            "OVERLAY_BASELINE_MISSING: latest full run has no successful analysis artifacts."
+        )
+    baseline_identity = {_ticker_identity_key(ticker) for ticker in baseline_tickers}
+    holding_identity = {
+        _ticker_identity_key(ticker) for ticker in resolved_universe.holding_tickers
+    }
+
+    missing_holdings = [
+        ticker
+        for ticker in resolved_universe.holding_tickers
+        if _ticker_identity_key(ticker) not in baseline_identity
+    ]
+    if missing_holdings:
+        raise RuntimeError(
+            "OVERLAY_BASELINE_HOLDING_COVERAGE_GAP: current account holdings must be "
+            "analyzed by a full run before an overlay can be published; "
+            f"baseline_run_id={baseline.get('run_id')}; "
+            f"missing_holding_tickers={','.join(missing_holdings)}"
+        )
+
+    scanner_added = _unique_tickers((scanner_status or {}).get("added_tickers") or [])
+    scanner_added_identity = {_ticker_identity_key(ticker) for ticker in scanner_added}
+    deferred_dynamic = [
+        ticker
+        for ticker in scanner_added
+        if _ticker_identity_key(ticker) not in baseline_identity
+    ]
+    deferred_requested = [
+        ticker
+        for ticker in requested_base_tickers
+        if _ticker_identity_key(ticker) not in baseline_identity
+        and _ticker_identity_key(ticker) not in scanner_added_identity
+        and _ticker_identity_key(ticker) not in holding_identity
+    ]
+    deferred_all = _unique_tickers((*deferred_requested, *deferred_dynamic))
+
+    warnings: list[str] = []
+    if deferred_dynamic:
+        warning = (
+            "overlay_dynamic_candidates_deferred_until_full_run:"
+            f"tickers={','.join(deferred_dynamic)}"
+        )
+        print(f"::warning::{warning}", flush=True)
+        warnings.append(warning)
+    if deferred_requested:
+        warning = (
+            "overlay_nonholding_universe_changes_deferred_until_full_run:"
+            f"tickers={','.join(deferred_requested)}"
+        )
+        print(f"::warning::{warning}", flush=True)
+        warnings.append(warning)
+
+    def covered(values: tuple[str, ...]) -> tuple[str, ...]:
+        return tuple(
+            ticker
+            for ticker in values
+            if _ticker_identity_key(ticker) in baseline_identity
+        )
+
+    selection_universe = replace(
+        resolved_universe,
+        tickers=tuple(baseline_tickers),
+        configured_tickers=covered(resolved_universe.configured_tickers),
+        profile_watch_tickers=covered(resolved_universe.profile_watch_tickers),
+    )
+    scanner_receipt = dict(scanner_status) if scanner_status else None
+    if scanner_receipt is not None:
+        scanner_receipt.update(
+            {
+                "overlay_policy": "freeze_to_latest_successful_full_baseline",
+                "executed_added_tickers": [
+                    ticker
+                    for ticker in scanner_added
+                    if _ticker_identity_key(ticker) in baseline_identity
+                ],
+                "deferred_added_tickers": deferred_dynamic,
+            }
+        )
+
+    metadata = {
+        "status": "FROZEN",
+        "policy": "latest_complete_same_market_full_baseline_within_age_window",
+        "baseline_max_age_hours": int(_OVERLAY_BASELINE_MAX_AGE.total_seconds() // 3600),
+        "baseline_max_newer_sessions": _OVERLAY_BASELINE_MAX_NEWER_SESSIONS,
+        "baseline_age_seconds": _manifest_age_seconds(baseline, now=now, market=config.run.market),
+        "baseline_run_id": str(baseline.get("run_id") or ""),
+        "baseline_started_at": str(baseline.get("started_at") or ""),
+        "baseline_tickers": baseline_tickers,
+        "baseline_ticker_count": len(baseline_tickers),
+        "live_discovered_tickers": _unique_tickers(discovered_tickers),
+        "deferred_new_candidates": deferred_dynamic,
+        "deferred_nonholding_tickers": deferred_requested,
+        "deferred_tickers": deferred_all,
+        "holding_coverage_gap": [],
+    }
+    return baseline_tickers, selection_universe, scanner_receipt, metadata, warnings
+
+
 def _augment_with_prism_candidates(
     tickers: list[str],
     external_signals: list[Any],
@@ -2877,13 +3080,17 @@ def _github_actions_source_receipt() -> dict[str, Any]:
     ):
         return {}
     attempt_text = str(os.getenv("GITHUB_RUN_ATTEMPT") or "").strip()
-    return {
+    receipt: dict[str, Any] = {
         "run_id": int(run_id),
         "run_attempt": int(attempt_text) if attempt_text.isdigit() and int(attempt_text) > 0 else 1,
         "repository": repository,
         "workflow": workflow,
         "sha": sha,
     }
+    recovery_source = str(os.getenv("TRADINGAGENTS_RECOVERY_SOURCE") or "").strip().lower()
+    if re.fullmatch(r"[a-z0-9_-]{1,64}", recovery_source):
+        receipt["recovery_source"] = recovery_source
+    return receipt
 
 
 def _unique_tickers(tickers: Any) -> list[str]:
@@ -3754,6 +3961,222 @@ def _resolve_latest_overlay_source_manifest(
     if latest_full is not None:
         return latest_full
     return None
+
+
+def _resolve_latest_full_overlay_baseline_manifest(
+    archive_dir: Path,
+    *,
+    market: str | None = None,
+    requested_tickers: list[str] | None = None,
+    required_holding_tickers: list[str] | None = None,
+    now: datetime | None = None,
+    max_age: timedelta | None = _OVERLAY_BASELINE_MAX_AGE,
+) -> dict[str, Any] | None:
+    """Resolve the newest complete, same-market and sufficiently recent full baseline."""
+
+    candidates: list[dict[str, Any]] = []
+    latest_manifest_path = archive_dir / "latest-run.json"
+    if latest_manifest_path.exists():
+        candidate = json.loads(latest_manifest_path.read_text(encoding="utf-8"))
+        candidates.append(candidate)
+        source_run_id = str(candidate.get("overlay_source_run_id") or "").strip()
+        if source_run_id:
+            source_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
+            if source_path is not None:
+                candidates.append(json.loads(source_path.read_text(encoding="utf-8")))
+    candidates.extend(manifest for manifest, _run_dir in _iter_run_manifests_desc(archive_dir))
+
+    unique: dict[str, dict[str, Any]] = {}
+    for index, candidate in enumerate(candidates):
+        identity = str(candidate.get("run_id") or f"anonymous-{index}").strip()
+        unique.setdefault(identity, candidate)
+    eligible: list[dict[str, Any]] = []
+    for candidate in unique.values():
+        if not _manifest_is_complete_overlay_baseline(
+            candidate,
+            market=market,
+            requested_tickers=requested_tickers,
+            required_holding_tickers=required_holding_tickers,
+        ):
+            continue
+        if max_age is not None:
+            age_seconds = _manifest_age_seconds(candidate, now=now, market=market)
+            if age_seconds is None:
+                continue
+            if age_seconds < -int(_OVERLAY_BASELINE_FUTURE_SKEW.total_seconds()):
+                continue
+            if age_seconds > int(max_age.total_seconds()):
+                continue
+            if _overlay_newer_session_count(candidate, now=now, market=market) > _OVERLAY_BASELINE_MAX_NEWER_SESSIONS:
+                continue
+        eligible.append(candidate)
+    if not eligible:
+        return None
+    eligible.sort(
+        key=lambda manifest: (
+            _manifest_requested_coverage_count(manifest, requested_tickers),
+            _manifest_production_priority(manifest),
+            _manifest_started_at_for_sort(manifest, market=market),
+        ),
+        reverse=True,
+    )
+    return eligible[0]
+
+
+def _manifest_is_complete_overlay_baseline(
+    manifest: dict[str, Any],
+    *,
+    market: str | None,
+    requested_tickers: list[str] | None,
+    required_holding_tickers: list[str] | None,
+) -> bool:
+    settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
+    if str(settings.get("run_mode") or "full").strip().lower() != "full":
+        return False
+    if _manifest_production_priority(manifest) == 0:
+        return False
+    if not _manifest_market_matches(manifest, market=market):
+        return False
+    status = str(manifest.get("status") or "success").strip().lower()
+    if status not in {"success", "completed", "complete"}:
+        return False
+    summary = manifest.get("summary") if isinstance(manifest.get("summary"), dict) else {}
+    if int(summary.get("failed_tickers") or 0) > 0:
+        return False
+    active = manifest.get("active_universe") if isinstance(manifest.get("active_universe"), dict) else {}
+    coverage = active.get("coverage") if isinstance(active.get("coverage"), dict) else {}
+    if coverage and coverage.get("complete") is not True:
+        return False
+    rows = [item for item in (manifest.get("tickers") or []) if isinstance(item, dict)]
+    successful = _successful_manifest_tickers(manifest)
+    if not rows or len(successful) != len(rows):
+        return False
+    configured_count = int(summary.get("configured_ticker_count") or len(rows))
+    if configured_count > len(successful):
+        return False
+    if requested_tickers and not _manifest_has_bootstrap_ready_ticker(
+        manifest,
+        tickers=requested_tickers,
+        require_all_tickers=False,
+    ):
+        return False
+    if required_holding_tickers and not _manifest_has_bootstrap_ready_ticker(
+        manifest,
+        tickers=required_holding_tickers,
+        require_all_tickers=True,
+    ):
+        return False
+    return True
+
+
+def _manifest_requested_coverage_count(
+    manifest: dict[str, Any],
+    requested_tickers: list[str] | None,
+) -> int:
+    requested = {
+        _ticker_identity_key(ticker)
+        for ticker in (requested_tickers or [])
+        if str(ticker).strip()
+    }
+    covered = {_ticker_identity_key(ticker) for ticker in _successful_manifest_tickers(manifest)}
+    return len(requested & covered) if requested else len(covered)
+
+
+def _manifest_production_priority(manifest: dict[str, Any]) -> int:
+    label = str(manifest.get("label") or "").strip().lower()
+    if re.search(r"(?:^|[-_\s])(?:manual|custom|smoke|test)(?:$|[-_\s])", label):
+        return 0
+    return 1
+
+
+def _manifest_started_at_for_sort(manifest: dict[str, Any], *, market: str | None) -> float:
+    parsed = _parse_datetime(str(manifest.get("started_at") or ""))
+    if parsed is None:
+        return float("-inf")
+    if parsed.tzinfo is None:
+        timezone_name = "US/Eastern" if str(market or "").upper() == "US" else "Asia/Seoul"
+        parsed = parsed.replace(tzinfo=ZoneInfo(timezone_name))
+    return parsed.timestamp()
+
+
+def _manifest_age_seconds(
+    manifest: dict[str, Any],
+    *,
+    now: datetime | None,
+    market: str | None,
+) -> int | None:
+    parsed = _parse_datetime(str(manifest.get("started_at") or ""))
+    if parsed is None:
+        return None
+    timezone_name = "US/Eastern" if str(market or "").upper() == "US" else "Asia/Seoul"
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=ZoneInfo(timezone_name))
+    current = now or datetime.now(ZoneInfo(timezone_name))
+    if current.tzinfo is None:
+        current = current.replace(tzinfo=ZoneInfo(timezone_name))
+    return int((current.astimezone(parsed.tzinfo) - parsed).total_seconds())
+
+
+def _overlay_newer_session_count(
+    manifest: dict[str, Any],
+    *,
+    now: datetime | None,
+    market: str | None,
+) -> int:
+    """Count expected exchange sessions after the baseline through the current day."""
+
+    parsed = _parse_datetime(str(manifest.get("started_at") or ""))
+    if parsed is None:
+        return _OVERLAY_BASELINE_MAX_NEWER_SESSIONS + 1
+    timezone_name = "US/Eastern" if str(market or "").upper() == "US" else "Asia/Seoul"
+    zone = ZoneInfo(timezone_name)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=zone)
+    current = now or datetime.now(zone)
+    if current.tzinfo is None:
+        current = current.replace(tzinfo=zone)
+    baseline_date = parsed.astimezone(zone).date()
+    current_date = current.astimezone(zone).date()
+    if current_date <= baseline_date:
+        return 0
+    try:
+        import exchange_calendars as xcals
+        import pandas as pd
+
+        calendar = xcals.get_calendar(default_calendar_name(str(market or "")))
+        sessions = calendar.sessions_in_range(
+            pd.Timestamp(baseline_date),
+            pd.Timestamp(current_date),
+        )
+        return sum(1 for session in sessions if session.date() > baseline_date)
+    except Exception:
+        cursor = baseline_date + timedelta(days=1)
+        count = 0
+        while cursor <= current_date:
+            if cursor.weekday() < 5:
+                count += 1
+            cursor += timedelta(days=1)
+        return count
+
+
+def _successful_manifest_tickers(manifest: dict[str, Any]) -> list[str]:
+    tickers: list[str] = []
+    seen: set[str] = set()
+    for source in manifest.get("tickers", []):
+        ticker = str(source.get("ticker") or "").strip().upper()
+        identity = _ticker_identity_key(ticker)
+        artifacts = source.get("artifacts") or {}
+        if (
+            not ticker
+            or not identity
+            or identity in seen
+            or str(source.get("status") or "").strip().lower() != "success"
+            or not artifacts.get("analysis_json")
+        ):
+            continue
+        tickers.append(ticker)
+        seen.add(identity)
+    return tickers
 
 
 def _find_previous_comparable_manifest(

@@ -7,11 +7,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-from tradingagents.scheduled.mobile_site import (
-    PRIVATE_SCHEMA,
-    decode_dashboard_key,
-    decrypt_private_payload,
-)
+from tradingagents.scheduled.mobile_site import STRATEGY_SCHEMA
 
 
 EXPECTED_BENCHMARKS = {
@@ -69,8 +65,8 @@ def main() -> None:
     html_path = site_dir / "runs" / run_id / "portfolio.html"
     html = _read_text(html_path)
     for fragment in (
-        "개인 계좌 자료는 공개하지 않습니다",
-        "암호화된 개인 액션표 열기",
+        "계좌번호와 고객 식별정보는 제외",
+        "통합 투자 전략 열기",
     ):
         _assert(fragment in html, f"{html_path} is missing {fragment!r}.")
     for forbidden in (
@@ -120,14 +116,12 @@ def main() -> None:
             f"{public_json} has no periods but did not explain the partial data quality.",
         )
 
-    envelope_path = site_dir / "mobile" / "private.enc.json"
-    envelope = _read_json(envelope_path)
-    key_text = os.environ.get("TRADINGAGENTS_MOBILE_DASHBOARD_KEY", "").strip()
-    _assert(key_text, "TRADINGAGENTS_MOBILE_DASHBOARD_KEY is required for encrypted mobile verification.")
-    private_mobile = decrypt_private_payload(envelope, key=decode_dashboard_key(key_text))
-    _assert(private_mobile.get("schema") == PRIVATE_SCHEMA, "Unexpected private mobile schema.")
+    strategy_path = site_dir / "mobile" / "strategy.json"
+    private_mobile = _read_json(strategy_path)
+    _assert(private_mobile.get("schema") == STRATEGY_SCHEMA, "Unexpected mobile strategy schema.")
     markets = private_mobile.get("markets") if isinstance(private_mobile.get("markets"), dict) else {}
-    _assert(args.market in markets, f"Encrypted mobile payload is missing {args.market.upper()}.")
+    _assert(args.market in markets, f"Mobile strategy payload is missing {args.market.upper()}.")
+    _assert_no_sensitive_text(json.dumps(private_mobile, ensure_ascii=False), strategy_path)
 
     sensitive_filenames = {
         "account_snapshot.json",
@@ -154,7 +148,7 @@ def main() -> None:
                 "account_performance_status": account_performance.get("status"),
                 "public_gateway": str(html_path),
                 "private_performance_artifact": str(public_json),
-                "encrypted_mobile_envelope": str(envelope_path),
+                "mobile_strategy_payload": str(strategy_path),
             },
             ensure_ascii=False,
         ),

@@ -162,8 +162,8 @@ def test_portfolio_page_renders_account_performance_and_masks_identifiers(tmp_pa
     broker_normalized_download = (
         site / "downloads" / manifest["run_id"] / "portfolio" / "broker_performance_normalized.json"
     )
-    assert "개인 계좌 자료는 공개하지 않습니다" in public_html
-    assert "암호화된 개인 액션표 열기" in public_html
+    assert "계좌번호와 고객 식별정보는 제외" in public_html
+    assert "통합 투자 전략 열기" in public_html
     assert "계좌 성과 vs 지수/ETF" not in public_html
     assert "계좌 수익률" not in public_html
     assert "account_performance_public.json" not in public_html
@@ -939,7 +939,7 @@ def test_portfolio_page_normalizes_legacy_duplicate_account_performance_periods(
     build_site(archive, site, SiteSettings())
 
     public_html = (site / "runs" / manifest["run_id"] / "portfolio.html").read_text(encoding="utf-8")
-    assert "개인 계좌 자료는 공개하지 않습니다" in public_html
+    assert "계좌번호와 고객 식별정보는 제외" in public_html
     assert "20.00%" not in public_html
     assert not (site / "downloads").exists()
 
@@ -1050,7 +1050,7 @@ def test_portfolio_page_hides_duplicate_periods_by_default_and_preserves_diagnos
     public_html = (site / "runs" / "20260507T090000_test" / "portfolio.html").read_text(encoding="utf-8")
 
     default_section = public_html
-    assert "개인 계좌 자료는 공개하지 않습니다" in default_section
+    assert "계좌번호와 고객 식별정보는 제외" in default_section
     assert "사용 가능 전체 기간" not in default_section
     assert "1M/3M/6M/YTD/1Y" not in default_section
     assert "기간별 원시 산출" not in public_html

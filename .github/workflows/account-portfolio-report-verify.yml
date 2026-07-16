@@ -123,8 +123,6 @@ jobs:
           )
 
       - name: Run KR portfolio-only account report
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -149,8 +147,6 @@ jobs:
           subprocess.check_call(args)
 
       - name: Verify KR public account performance report
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import subprocess
           import sys
@@ -191,7 +187,7 @@ jobs:
                   "${{ github.run_attempt }}",
                   "--commit-sha",
                   "${{ github.sha }}",
-                  "--require-private-envelope",
+                  "--require-strategy-payload",
               ]
           )
 
@@ -311,8 +307,6 @@ jobs:
           )
 
       - name: Run US portfolio-only account report
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -337,8 +331,6 @@ jobs:
           subprocess.check_call(args)
 
       - name: Verify US public account performance report
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import subprocess
           import sys
@@ -379,7 +371,7 @@ jobs:
                   "${{ github.run_attempt }}",
                   "--commit-sha",
                   "${{ github.sha }}",
-                  "--require-private-envelope",
+                  "--require-strategy-payload",
               ]
           )
 

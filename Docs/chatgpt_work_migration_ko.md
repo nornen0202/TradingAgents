@@ -2,20 +2,22 @@
 
 ## 운영 결론
 
-KR·US·YouTube·PRISM 분석은 서로 역할이 다른 두 경로로 운영한다.
+KR·US·YouTube·PRISM 분석은 로컬 Work 산출물을 content-addressed 정본으로 남긴 뒤 대화와 웹·모바일이 같은 결과를 읽는 구조로 운영한다.
 
-1. **분석·대화 경로**: ChatGPT 데스크톱 Work의 로컬 프로젝트 예약 작업이 정본 archive를 읽고 상세 브리핑을 만든다.
-2. **스마트폰 전달 경로**: GitHub Actions가 producer 완료를 감지해 Telegram 알림을 보내고, GitHub Pages에 공개 안전 화면과 암호화 개인 액션표를 게시한다.
+1. **분석·정본 경로**: ChatGPT 데스크톱 Work의 로컬 프로젝트 예약 작업이 producer archive를 읽고 Markdown과 구조화 전략을 `archive/work-reports/<surface>`에 publish한다.
+2. **대화·스마트폰 소비 경로**: Work 대화는 같은 보고서를 보여 주고, Pages/mobile builder는 credential-free 구조화 보고서를 읽는다. GitHub Actions와 Telegram은 별도 전달 receipt를 담당한다.
 
 ChatGPT 모바일의 **원격** 메뉴는 보조 관제 수단이다. Remote 연결이 끊겨도 이미 게시된 Pages와 Telegram 메시지는 스마트폰에서 계속 볼 수 있다. 다만 새로운 로컬 분석을 생산하는 self-hosted runner와 ChatGPT 로컬 Scheduled task는 각각 필요한 PC·앱·네트워크가 켜져 있어야 한다.
 
 ```text
 self-hosted producer
-  ├─ canonical local archive ──> local ChatGPT Work briefing / Scheduled inbox
+  ├─ canonical local archive ──> local ChatGPT Work
+  │                              ├─ Scheduled inbox
+  │                              └─ archive/work-reports/<surface>/latest.json
   └─ GitHub workflow completion
        ├─ Telegram completion/failure alert
        ├─ /mobile/ public sanitized research
-       └─ /mobile/private.html#key=... + AES-GCM ciphertext
+       └─ /mobile/private.html + plaintext strategy report
 ```
 
 ## 공식 ChatGPT 기능 경계
@@ -34,13 +36,14 @@ self-hosted producer
 
 - 시장·계좌 archive: `C:\TradingAgentsData\archive`
 - sanitized PRISM archive: `C:\TradingAgentsData\prism-telegram-archive`
-- Work state·ledger·immutable outbox: `.runtime/chatgpt-work`
+- Work state·ledger·immutable outbox·draft 경로: `.runtime/chatgpt-work`
+- 최종 Work 보고서: `C:\TradingAgentsData\archive\work-reports\<surface>\latest.json`
 
-Work가 읽으면 안 되는 자료:
+Work 보고서에 읽거나 기록하면 안 되는 자료:
 
 - `C:\TradingAgentsData\telegram-stock-ai-agent.session`
 - `C:\TradingAgentsData\prism-telegram-private`
-- API key, bot token, 계좌 식별자, 모바일 dashboard 복호화 키
+- API key, bot token, 계좌 식별자, session path
 
 ### 공개 모바일 Pages
 
@@ -53,16 +56,9 @@ Work가 읽으면 안 되는 자료:
 
 공개 Work fallback인 `/work/v1`도 같은 원칙을 따른다. 공개 packet은 개인 전략 복구용이 아니라 source 장애 때 제한된 공개 리서치를 확인하는 용도다.
 
-### 암호화 개인 모바일 Pages
+### Plaintext 전략 Pages
 
-개인 액션표 plaintext는 Pages artifact에 쓰지 않는다. site build가 메모리에서 private payload를 만들고 AES-256-GCM으로 암호화한 `mobile/private.enc.json`만 게시한다.
-
-- 암호문: GitHub Pages
-- 복호화 키: `MOBILE_DASHBOARD_KEY` secret
-- 키 전달: Telegram 링크의 `#key=...` fragment
-- 복호화: `mobile/private.html`의 Web Crypto API
-
-URL fragment는 일반 HTTP request target에 포함되지 않으므로 GitHub Pages 서버에는 키가 전달되지 않는다. 그래도 Telegram 계정, 공유된 링크, 브라우저 화면·기록이 노출되면 키가 유출될 수 있다. 개인 링크를 전달하지 말고, 노출이 의심되면 secret을 회전한 뒤 site를 다시 배포한다. 공개 HTML·JSON·workflow log에는 키를 출력하지 않는다.
+사용자 선택에 따라 종합 전략 보고서는 별도 복호화 없이 `mobile/private.html`에서 읽는다. Pages builder는 검증된 `tradingagents.work-report/v1`만 사용하며 계좌 식별자, API/bot credential, token, session path 또는 로컬 비밀 경로를 포함한 보고서는 publish 단계에서 거부한다. 보유·관심 전략 자체는 표시하되 원시 계좌번호나 인증정보는 표시하지 않는다.
 
 ## 모바일 알림 수명주기
 
@@ -77,16 +73,15 @@ URL fragment는 일반 HTTP request target에 포함되지 않으므로 GitHub P
 처리 순서는 다음과 같다.
 
 1. main branch의 신뢰된 notifier code로 upstream run ID·workflow·결론을 검증한다.
-2. GitHub-hosted runner가 성공/실패 공통 Telegram 알림과 Pages 링크를 보낸다. 민감 링크 전송 전에는 Telegram `getChat` 응답의 chat ID가 설정값과 같고 `type=private`인지 검증한다. 따라서 실패도 스마트폰에서 알 수 있고, 개인 키·액션 카드는 group/channel로 보내지 않는다.
+2. GitHub-hosted runner가 성공/실패 공통 Telegram 알림과 Pages 링크를 보낸다. 숫자형 양의 개인 chat ID만 허용하며, 개인 액션 카드 전송 전에는 Telegram `getChat` 응답의 chat ID와 `type=private`까지 검증한다. credential이나 session 정보는 어떤 chat에도 보내지 않는다.
 3. 성공 run이면 self-hosted Windows runner가 로컬 archive에서 개인 액션 카드가 있는지 확인하고 별도 continuation을 보낸다.
-4. 동일 upstream run의 동시 실행은 workflow concurrency로 직렬화한다. self-hosted 개인 액션 카드는 archive의 지속 ledger로 재전송을 억제한다. GitHub-hosted 기본 알림 ledger는 runner 수명 동안만 유지되므로 같은 upstream run을 나중에 수동 재실행하면 알림이 다시 올 수 있다.
+4. 동일 upstream run과 hosted incident ledger 갱신은 workflow concurrency로 직렬화한다. self-hosted 개인 액션 카드는 archive ledger를 사용하고, GitHub-hosted 기본 알림은 `actions/cache`에 보존한 ledger와 부분 전송 cursor를 사용한다. 최초 실패는 알리되 동일 원인 fingerprint는 마지막 실제 발송부터 6시간 동안 억제한다. 억제된 사건은 cooldown을 연장하지 않는다.
 5. Telegram API 오류는 성공처럼 삼키지 않고 재시도 후 job 실패로 남겨 관제할 수 있게 한다.
 
 필수 GitHub secret:
 
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_NOTIFICATION_CHAT_ID` (양의 정수인 본인 1:1 private chat ID; group/supergroup/channel은 거부)
-- `MOBILE_DASHBOARD_KEY` (32-byte AES key를 padding 없이 인코딩한 43자리 base64url)
 
 Work 응답 자체에는 다음 handoff만 남긴다. 이것은 알림 성공 receipt가 아니다.
 
@@ -129,13 +124,23 @@ python -m tradingagents.work prepare --surface kr --archive-dir C:\TradingAgents
 
 로컬 packet이 없으면 public Pages로 개인 전략을 재구성하지 않고 `ERROR`로 끝낸다. `current`와 `last_ready`를 합치지 않고 응답 현재 시각에 source·시장 데이터·행별 유효시간을 다시 검사한다. stale/failed/missing data는 현재 주문 행동으로 표현하지 않는다.
 
-보고서를 완성하고 coverage·mobile handoff를 출력한 다음에만 정확한 event를 ACK한다.
+실행 순서는 `prepare → Markdown/structured JSON 작성 → publish → ACK`다. KR·US는 publish가 없으면 ACK가 실패한다. YouTube·PRISM publish는 선택 가능하다.
+
+구조화 보고서는 packet의 `surface`, `event_id`, `source_sha256`에 묶인다. KR·US `strategies`는 prepared packet의 전체 ticker를 canonical identity 기준으로 정확히 한 번씩 포함해야 하며 누락·중복·unknown ticker는 publish가 거부한다. 구조화 `coverage_receipt`는 packet의 `current.universe_coverage`와 정확히 일치해야 한다. Report execution은 packet readiness를 승격하거나 유효시간을 연장할 수 없고 packet blockers·required rechecks를 모두 보존한다. stale 시에는 `execution.readiness`만 `NEEDS_LIVE_RECHECK`로 낮추고 분석 시점 `thesis`와 조건·무효화·기간을 지우지 않는다.
+
+시장 packet의 supporting context는 보유→관심→탐색 종목 순서의 round-robin으로 YouTube 12건, PRISM 20건까지 고르고, 잘린 수와 실제 전송 수를 coverage에 기록한다. structured report는 `external_evidence_receipt`를 그대로 돌려주고 정상·관련 event의 정확한 `event_key`와 영향을 받은 필드를 종목별 `source_contributions`에 묶어야 한다. 따라서 모델이 외부 근거를 받았지만 조용히 무시하거나, 받지 않은 근거를 인용한 보고서는 publish되지 않는다.
+
+```powershell
+python -m tradingagents.work publish --surface kr --event-id <event_id> --source-sha256 <source_sha256> --markdown-file <report_markdown_path> --structured-file <report_structured_path> --archive-dir C:\TradingAgentsData\archive
+```
+
+publish는 동일 내용을 `work-reports/<surface>/events/<report_sha256>.json`과 `latest.json`에 기록한다. 보고서를 완성·검증·publish하고 coverage·mobile handoff를 출력한 다음에만 정확한 event를 ACK한다.
 
 ```powershell
 python -m tradingagents.work ack --surface kr --event-id <event_id> --status rendered
 ```
 
-ACK는 Work event 렌더링 receipt다. producer 신선도, Telegram 전송, Pages 배포 성공을 의미하지 않는다. ACK 실패 시 `PENDING_ACK`로 남겨 다음 run이 같은 event를 `RESUME`하게 한다. 공개 Pages event ID는 로컬 ACK·recover에 사용하지 않는다.
+ACK는 Work event 렌더링 receipt다. producer 신선도, Telegram 전송, Pages 배포 성공을 의미하지 않는다. ACK 실패 시 `PENDING_ACK`로 남겨 다음 run이 같은 event를 `RESUME`하게 한다. 공개 Pages event ID는 로컬 ACK·recover에 사용하지 않는다. State 복구는 canonical ACK ledger가 증명하는 receipt만 허용하며 KR·US는 exact `report_sha256`와 content-addressed latest report까지 일치해야 한다. 이미 state가 있는 동일 surface를 과거 receipt로 덮어쓰지 않는다.
 
 ## YouTube·PRISM 안전 규칙
 
@@ -145,8 +150,11 @@ ACK는 Work event 렌더링 receipt다. producer 신선도, Telegram 전송, Pag
 - source health와 producer/event 시각을 응답 현재 시각에 재검증
 - stale/failed/missing 또는 유효한 새 event 없음: `NO_ACTIONABLE_DELTA`
 - `coverage.truncated=true`: 전수 분석이라고 표현 금지
-- YouTube·PRISM: 항상 execution-ineligible, 시장 실행 전략 상향 금지
+- YouTube·PRISM: `balanced_external`로 종목 순위, thesis confidence, 기존 위험 한도 안의 크기, 리서치 우선순위에 상·하향 반영
+- YouTube·PRISM: 항상 execution-ineligible이며 시장·계좌·위험 실행 gate 우회 금지
 - PRISM Work: Telegram session/private archive 직접 접근 금지
+
+시장 structured report는 양의 고유 rank, 알려진 portfolio role, 0~1 confidence를 사용한다. 모든 thesis는 무효화 조건 발생 시 실제로 취할 `invalidation_action`을 포함한다. 실행 가능한 thesis는 구체적인 진입·무효화 조건과 horizon·position sizing을 포함하고 placeholder·tautology를 허용하지 않는다. `top_actions`의 ticker/readiness/action은 대응하는 strategy와 정확히 일치해야 하며, RESEARCH가 조건을 제시하지 못하면 필요한 데이터와 이유 및 보류·제외·재분석 행동을 명시한다.
 
 ## 예약 정의
 
@@ -164,19 +172,19 @@ YouTube와 PRISM은 state lock 충돌을 줄이도록 실행 분을 엇갈린다
 
 1. Work packet·prompt·Skill·task manifest 계약 테스트와 Skill validation을 통과시킨다.
 2. 실제 최신 KR·US packet에서 `universe_coverage=COMPLETE`, 누락 0, 분석 실패 0인지 확인한다.
-3. 네 surface의 `prepare`가 NEW/RESUME/NOOP을 결정적으로 반환하는지 확인한다.
-4. `/mobile/`, `/mobile/public.json`, `/mobile/private.html`, `/mobile/private.enc.json`이 200인지 확인한다.
-5. 공개 site 전체에서 보유 여부, 계좌 금액, action, key가 평문으로 검색되지 않는지 확인한다.
-6. Telegram에 producer 성공과 실패 테스트 알림이 모두 도착하는지 확인한다.
-7. Telegram 개인 링크로 360/390/430 px viewport에서 KR·US 액션 카드가 복호화되고 가로 overflow가 없는지 확인한다.
-8. 과거 raw decision bundle·portfolio 공개 URL이 404인지 확인한다.
-9. ChatGPT Remote를 끊은 상태에서도 기존 Telegram 메시지와 Pages를 스마트폰에서 열 수 있는지 확인한다.
+3. 네 surface의 `prepare`가 NEW/RESUME/NOOP을 결정적으로 반환하고, KR·US는 publish 전 ACK가 거부되는지 확인한다.
+4. report event/source binding, 전체 ticker coverage, content-addressed event와 latest hash를 확인한다.
+5. `/mobile/`, `/mobile/public.json`, `/mobile/private.html`과 `/work/v1/<surface>/report/latest.json`을 확인한다.
+6. 공개 site 전체에 계좌 식별자, credential, token, session 경로, key가 없는지 확인한다.
+7. Telegram에 producer 성공과 실패 테스트 알림이 모두 도착하는지 확인한다.
+8. 360/390/430 px viewport에서 KR·US 액션 카드가 가로 overflow 없이 보이는지 확인한다.
+9. 과거 raw decision bundle·portfolio 공개 URL이 404인지 확인한다.
 10. 다음 정규 full run에서 보유·관심종목 전수 분석과 완료 알림을 다시 확인한다.
 
 ## 장애와 롤백
 
 - Telegram 실패: workflow run과 notifier log를 확인하고 secret/chat ID/API 상태를 복구한 뒤 같은 upstream run ID로 수동 재실행한다.
-- private dashboard 복호화 실패: key 형식, ciphertext 배포 시각, browser Web Crypto 지원을 확인하고 key를 URL query나 공개 log로 옮기지 않는다.
+- strategy dashboard 로드 실패: `work-reports/<surface>/latest.json` binding·hash·Pages build 시각을 확인한다.
 - local Work 실패: PC·ChatGPT 앱·archive 경로·state lock을 확인한다. public packet으로 ACK하지 않는다.
-- Pages privacy 회귀: 배포를 중단하고 key 회전, public artifact 삭제, 전체 site 안전 rebuild를 우선한다.
+- Pages privacy 회귀: 배포를 중단하고 노출 artifact를 제거한 뒤 식별자 검사와 전체 site 안전 rebuild를 우선한다. 이미 노출된 credential이 있으면 해당 credential을 별도로 폐기·회전한다.
 - Work task 롤백: task를 pause할 수 있지만 Chrome-to-ChatGPT 자동화와 같은 surface를 동시에 실행하지 않는다.

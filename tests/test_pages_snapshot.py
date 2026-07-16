@@ -15,31 +15,28 @@ pages_snapshot = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(pages_snapshot)
 
 
-def _private_envelope(site: Path) -> None:
+def _strategy_payload(site: Path) -> None:
     mobile = site / "mobile"
     mobile.mkdir(parents=True)
     (mobile / "private.html").write_text("private", encoding="utf-8")
     (mobile / "private.js").write_text("private", encoding="utf-8")
-    (mobile / "private.enc.json").write_text(
+    (mobile / "strategy.json").write_text(
         json.dumps(
             {
-                "schema": "tradingagents.mobile-encrypted/v1",
-                "alg": "A256GCM",
-                "nonce": "nonce",
-                "aad": "aad",
-                "ciphertext": "ciphertext",
+                "schema": "tradingagents.mobile-strategy/v1",
+                "markets": {"kr": {}},
             }
         ),
         encoding="utf-8",
     )
 
 
-def test_stamp_requires_encrypted_private_mobile_payload(tmp_path: Path) -> None:
+def test_stamp_requires_plaintext_mobile_strategy_payload(tmp_path: Path) -> None:
     site = tmp_path / "site"
     site.mkdir()
     (site / "index.html").write_text("ok", encoding="utf-8")
 
-    with pytest.raises(ValueError, match="encrypted mobile artifact"):
+    with pytest.raises(ValueError, match="mobile strategy artifact"):
         pages_snapshot.create_snapshot(
             site,
             repository="owner/repo",
@@ -48,10 +45,10 @@ def test_stamp_requires_encrypted_private_mobile_payload(tmp_path: Path) -> None
             run_attempt=1,
             commit_sha="abc",
             generated_epoch_ms=1000,
-            require_private_envelope=True,
+            require_strategy_payload=True,
         )
 
-    _private_envelope(site)
+    _strategy_payload(site)
     snapshot = pages_snapshot.create_snapshot(
         site,
         repository="owner/repo",
@@ -60,7 +57,7 @@ def test_stamp_requires_encrypted_private_mobile_payload(tmp_path: Path) -> None
         run_attempt=1,
         commit_sha="abc",
         generated_epoch_ms=1000,
-        require_private_envelope=True,
+        require_strategy_payload=True,
     )
 
     assert snapshot["generated_epoch_ms"] == 1000
@@ -94,14 +91,14 @@ def test_snapshot_guard_breaks_equal_timestamp_tie_by_run_attempt() -> None:
     assert pages_snapshot.should_deploy(candidate, live)[0] is True
 
 
-def test_stamp_rejects_plaintext_private_payload(tmp_path: Path) -> None:
+def test_stamp_rejects_obsolete_encrypted_payload(tmp_path: Path) -> None:
     site = tmp_path / "site"
     site.mkdir()
     (site / "index.html").write_text("ok", encoding="utf-8")
-    _private_envelope(site)
-    (site / "mobile" / "private.json").write_text("{}", encoding="utf-8")
+    _strategy_payload(site)
+    (site / "mobile" / "private.enc.json").write_text("{}", encoding="utf-8")
 
-    with pytest.raises(ValueError, match="unencrypted private payload"):
+    with pytest.raises(ValueError, match="obsolete mobile artifact"):
         pages_snapshot.create_snapshot(
             site,
             repository="owner/repo",
@@ -109,7 +106,29 @@ def test_stamp_rejects_plaintext_private_payload(tmp_path: Path) -> None:
             run_id=10,
             run_attempt=1,
             commit_sha="abc",
-            require_private_envelope=True,
+            require_strategy_payload=True,
+        )
+
+
+def test_stamp_rejects_raw_account_identifier_in_strategy_payload(tmp_path: Path) -> None:
+    site = tmp_path / "site"
+    site.mkdir()
+    (site / "index.html").write_text("ok", encoding="utf-8")
+    _strategy_payload(site)
+    strategy_path = site / "mobile" / "strategy.json"
+    payload = json.loads(strategy_path.read_text(encoding="utf-8"))
+    payload["markets"]["kr"]["account_id"] = "RAW-123456"
+    strategy_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Forbidden account identifier"):
+        pages_snapshot.create_snapshot(
+            site,
+            repository="owner/repo",
+            workflow="Daily",
+            run_id=10,
+            run_attempt=1,
+            commit_sha="abc",
+            require_strategy_payload=True,
         )
 
 
@@ -123,11 +142,11 @@ def test_stamp_rejects_plaintext_private_payload(tmp_path: Path) -> None:
         "daily-prism-telegram-reports.yml",
     ),
 )
-def test_pages_workflows_stamp_encrypted_snapshot_and_guard_deploy(workflow_name: str) -> None:
+def test_pages_workflows_stamp_strategy_snapshot_and_guard_deploy(workflow_name: str) -> None:
     text = (WORKFLOWS / workflow_name).read_text(encoding="utf-8")
 
     assert "pages_snapshot.py" in text
-    assert '"--require-private-envelope"' in text
+    assert '"--require-strategy-payload"' in text
     assert "Refuse stale Pages snapshot rollback" in text
     assert "steps.pages_guard.outputs.should_deploy == 'true'" in text
     assert "actions/deploy-pages@v5" not in text

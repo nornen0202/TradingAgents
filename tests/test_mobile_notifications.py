@@ -5,6 +5,7 @@ import json
 import tempfile
 import unittest
 import urllib.error
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from tradingagents.notifications.__main__ import _requires_private_chat
@@ -12,10 +13,12 @@ from tradingagents.notifications.telegram import (
     AtomicNotificationLedger,
     NotificationError,
     TelegramBotClient,
+    _diagnostic_signature,
     chunk_text,
     compose_notification,
     inspect_workflow_run,
     notification_event_key,
+    notification_incident_key,
 )
 
 
@@ -76,6 +79,44 @@ class WorkflowInspectionTests(unittest.TestCase):
         self.assertFalse(result["should_notify"])
         self.assertEqual(result["reason"], "no_work_gate_skip")
 
+    def test_superseded_pages_guard_does_not_emit_completion_notification(self):
+        result = inspect_workflow_run(
+            _run(name="Intraday Overlay Refresh"),
+            [
+                {"name": "overlay_refresh_us", "conclusion": "success"},
+                {
+                    "name": "deploy_overlay",
+                    "conclusion": "success",
+                    "steps": [
+                        {"name": "Refuse stale Pages snapshot rollback", "conclusion": "success"},
+                        {"name": "Deploy overlay refresh site to GitHub Pages", "conclusion": "skipped"},
+                    ],
+                },
+            ],
+            repository="nornen0202/TradingAgents",
+        )
+        self.assertFalse(result["should_notify"])
+        self.assertEqual(result["reason"], "no_work_superseded")
+
+    def test_real_pages_deploy_emits_completion_notification(self):
+        result = inspect_workflow_run(
+            _run(name="Intraday Overlay Refresh"),
+            [
+                {"name": "overlay_refresh_us", "conclusion": "success"},
+                {
+                    "name": "deploy_overlay",
+                    "conclusion": "success",
+                    "steps": [
+                        {"name": "Refuse stale Pages snapshot rollback", "conclusion": "success"},
+                        {"name": "Deploy overlay refresh site to GitHub Pages", "conclusion": "success"},
+                    ],
+                },
+            ],
+            repository="nornen0202/TradingAgents",
+        )
+        self.assertTrue(result["should_notify"])
+        self.assertEqual(result["reason"], "terminal_job_succeeded")
+
     def test_failure_notifies_even_when_terminal_job_never_started(self):
         result = inspect_workflow_run(
             _run(conclusion="failure", head_sha=""),
@@ -84,6 +125,172 @@ class WorkflowInspectionTests(unittest.TestCase):
         )
         self.assertTrue(result["should_notify"])
         self.assertEqual(result["reason"], "upstream_failed")
+
+    def test_intraday_recovery_failure_is_eligible_and_matches_native_incident(self):
+        recovery = inspect_workflow_run(
+            _run(
+                name="Intraday Overlay Refresh",
+                event="workflow_dispatch",
+                conclusion="failure",
+                display_title=(
+                    "Intraday Overlay Refresh [profile=us] "
+                    "[run_mode=overlay_only] [request_scope=default_universe] "
+                    "[recovery_source=cloud_watchdog]"
+                ),
+            ),
+            [
+                {
+                    "name": "overlay_refresh_us",
+                    "conclusion": "failure",
+                    "steps": [{"name": "Run overlay refresh mode", "conclusion": "failure"}],
+                }
+            ],
+            repository="nornen0202/TradingAgents",
+        )
+        native = inspect_workflow_run(
+            _run(
+                name="Intraday Overlay Refresh",
+                event="schedule",
+                conclusion="failure",
+                display_title=(
+                    "Intraday Overlay Refresh [profile=us] "
+                    "[run_mode=overlay_only] [request_scope=default_universe] "
+                    "[recovery_source=native]"
+                ),
+            ),
+            [
+                {
+                    "name": "overlay_refresh_us",
+                    "conclusion": "failure",
+                    "steps": [{"name": "Run overlay refresh mode", "conclusion": "failure"}],
+                }
+            ],
+            repository="nornen0202/TradingAgents",
+        )
+
+        self.assertTrue(recovery["should_notify"])
+        self.assertEqual(recovery["reason"], "upstream_failed")
+        self.assertEqual(recovery["recovery_source"], "cloud_watchdog")
+        self.assertEqual(recovery["failure_fingerprint"], native["failure_fingerprint"])
+
+    def test_manual_or_distinct_failure_context_gets_a_distinct_fingerprint(self):
+        base_title = (
+            "Intraday Overlay Refresh [profile=us] [run_mode=overlay_only] "
+            "[request_scope=default_universe]"
+        )
+        automated = inspect_workflow_run(
+            _run(
+                name="Intraday Overlay Refresh",
+                event="schedule",
+                conclusion="failure",
+                display_title=f"{base_title} [recovery_source=native]",
+            ),
+            [{"name": "overlay_refresh_us", "conclusion": "failure"}],
+            repository="nornen0202/TradingAgents",
+        )
+        manual = inspect_workflow_run(
+            _run(
+                name="Intraday Overlay Refresh",
+                event="workflow_dispatch",
+                conclusion="failure",
+                display_title=f"{base_title} [recovery_source=manual]",
+            ),
+            [{"name": "overlay_refresh_us", "conclusion": "failure"}],
+            repository="nornen0202/TradingAgents",
+        )
+        deploy_failure = inspect_workflow_run(
+            _run(
+                name="Intraday Overlay Refresh",
+                event="workflow_dispatch",
+                conclusion="failure",
+                display_title=f"{base_title} [recovery_source=cloud_watchdog]",
+            ),
+            [{"name": "deploy_overlay", "conclusion": "failure"}],
+            repository="nornen0202/TradingAgents",
+        )
+
+        self.assertNotEqual(automated["failure_fingerprint"], manual["failure_fingerprint"])
+        self.assertNotEqual(automated["failure_fingerprint"], deploy_failure["failure_fingerprint"])
+
+    def test_log_signature_deduplicates_same_root_across_runs_but_distinguishes_errors(self):
+        title = (
+            "Intraday Overlay Refresh [profile=us] [run_mode=overlay_only] "
+            "[request_scope=default_universe] [recovery_source=native]"
+        )
+        jobs = [{"name": "overlay_refresh_us", "conclusion": "failure"}]
+        baseline_signature = _diagnostic_signature(
+            "2026-07-17T00:00:00Z RuntimeError: OVERLAY_BASELINE_HOLDING_COVERAGE_GAP"
+        )
+        timeout_signature = _diagnostic_signature(
+            "2026-07-17T00:01:00Z TimeoutError: KIS quote request timed out"
+        )
+        first = inspect_workflow_run(
+            _run(id=100, name="Intraday Overlay Refresh", conclusion="failure", display_title=title),
+            jobs,
+            repository="nornen0202/TradingAgents",
+            failure_diagnostics={"job.log": baseline_signature},
+        )
+        same = inspect_workflow_run(
+            _run(id=101, name="Intraday Overlay Refresh", conclusion="failure", display_title=title),
+            jobs,
+            repository="nornen0202/TradingAgents",
+            failure_diagnostics={"job.log": baseline_signature},
+        )
+        different = inspect_workflow_run(
+            _run(id=102, name="Intraday Overlay Refresh", conclusion="failure", display_title=title),
+            jobs,
+            repository="nornen0202/TradingAgents",
+            failure_diagnostics={"job.log": timeout_signature},
+        )
+        self.assertEqual(first["failure_fingerprint"], same["failure_fingerprint"])
+        self.assertNotEqual(first["failure_fingerprint"], different["failure_fingerprint"])
+
+    def test_missing_log_signature_fails_open_per_run(self):
+        title = (
+            "Intraday Overlay Refresh [profile=us] [run_mode=overlay_only] "
+            "[request_scope=default_universe] [recovery_source=native]"
+        )
+        jobs = [{"name": "overlay_refresh_us", "conclusion": "failure"}]
+        first = inspect_workflow_run(
+            _run(id=200, name="Intraday Overlay Refresh", conclusion="failure", display_title=title),
+            jobs,
+            repository="nornen0202/TradingAgents",
+        )
+        second = inspect_workflow_run(
+            _run(id=201, name="Intraday Overlay Refresh", conclusion="failure", display_title=title),
+            jobs,
+            repository="nornen0202/TradingAgents",
+        )
+        self.assertNotEqual(first["failure_fingerprint"], second["failure_fingerprint"])
+        self.assertEqual(first["failure_context"]["diagnostic_mode"], "run_scoped_fallback")
+
+    def test_intraday_native_failure_keeps_first_root_alert(self):
+        result = inspect_workflow_run(
+            _run(
+                name="Intraday Overlay Refresh",
+                event="schedule",
+                conclusion="failure",
+                display_title=(
+                    "Intraday Overlay Refresh [profile=us] [recovery_source=native]"
+                ),
+            ),
+            [{"name": "overlay_refresh_us", "conclusion": "failure"}],
+            repository="nornen0202/TradingAgents",
+        )
+
+        self.assertTrue(result["should_notify"])
+        self.assertEqual(result["reason"], "upstream_failed")
+        self.assertEqual(result["recovery_source"], "native")
+
+    def test_unattempted_cancelled_probe_is_no_work(self):
+        result = inspect_workflow_run(
+            _run(conclusion="cancelled"),
+            [{"name": "deploy", "conclusion": "skipped"}],
+            repository="nornen0202/TradingAgents",
+        )
+
+        self.assertFalse(result["should_notify"])
+        self.assertEqual(result["reason"], "no_work_unattempted")
 
     def test_success_requires_commit_provenance(self):
         with self.assertRaises(NotificationError):
@@ -233,14 +440,14 @@ class AtomicLedgerTests(unittest.TestCase):
             first = ledger.deliver(
                 event_key="event-1",
                 chunks=["private message", "second"],
-                buttons=[[{"text": "private", "url": "https://example.test/#key=secret"}]],
+                buttons=[[{"text": "private", "url": "https://example.test/?opaque=secret"}]],
                 sender=lambda text, _buttons: sent.append(text) or len(sent),
                 receipt_metadata={"upstream_run_id": 1},
             )
             second = ledger.deliver(
                 event_key="event-1",
                 chunks=["private message", "second"],
-                buttons=[[{"text": "private", "url": "https://example.test/#key=secret"}]],
+                buttons=[[{"text": "private", "url": "https://example.test/?opaque=secret"}]],
                 sender=lambda *_args: 999,
                 receipt_metadata={"upstream_run_id": 1},
             )
@@ -250,6 +457,68 @@ class AtomicLedgerTests(unittest.TestCase):
             stored = path.read_text(encoding="utf-8")
             self.assertNotIn("private message", stored)
             self.assertNotIn("secret", stored)
+
+    def test_incident_cooldown_sends_first_suppresses_duplicate_and_expires(self):
+        with tempfile.TemporaryDirectory() as temp:
+            now = [datetime(2026, 7, 17, 0, 0, tzinfo=timezone.utc)]
+            sent = []
+            ledger = AtomicNotificationLedger(
+                Path(temp) / "ledger.json",
+                clock=lambda: now[0],
+            )
+
+            first = ledger.deliver(
+                event_key="run-1",
+                incident_key="incident-a",
+                incident_cooldown_seconds=3600,
+                chunks=["failure one"],
+                buttons=None,
+                sender=lambda text, _buttons: sent.append(text) or len(sent),
+                receipt_metadata={},
+            )
+            now[0] += timedelta(minutes=30)
+            duplicate = ledger.deliver(
+                event_key="run-2",
+                incident_key="incident-a",
+                incident_cooldown_seconds=3600,
+                chunks=["same incident, different run"],
+                buttons=None,
+                sender=lambda text, _buttons: sent.append(text) or len(sent),
+                receipt_metadata={},
+            )
+            now[0] += timedelta(minutes=31)
+            reminder = ledger.deliver(
+                event_key="run-3",
+                incident_key="incident-a",
+                incident_cooldown_seconds=3600,
+                chunks=["same incident after cooldown"],
+                buttons=None,
+                sender=lambda text, _buttons: sent.append(text) or len(sent),
+                receipt_metadata={},
+            )
+
+            self.assertEqual(first["status"], "SENT")
+            self.assertEqual(duplicate["reason"], "INCIDENT_COOLDOWN")
+            self.assertEqual(reminder["status"], "SENT")
+            self.assertEqual(sent, ["failure one", "same incident after cooldown"])
+            stored = json.loads((Path(temp) / "ledger.json").read_text(encoding="utf-8"))
+            self.assertEqual(stored["incidents"]["incident-a"]["suppressed_count"], 1)
+
+    def test_distinct_incident_is_not_suppressed_inside_cooldown(self):
+        with tempfile.TemporaryDirectory() as temp:
+            sent = []
+            ledger = AtomicNotificationLedger(Path(temp) / "ledger.json")
+            for event_key, incident_key in (("run-1", "incident-a"), ("run-2", "incident-b")):
+                ledger.deliver(
+                    event_key=event_key,
+                    incident_key=incident_key,
+                    incident_cooldown_seconds=3600,
+                    chunks=[incident_key],
+                    buttons=None,
+                    sender=lambda text, _buttons: sent.append(text) or len(sent),
+                    receipt_metadata={},
+                )
+            self.assertEqual(sent, ["incident-a", "incident-b"])
 
     def test_partial_delivery_resumes_at_unsent_chunk(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -265,6 +534,8 @@ class AtomicLedgerTests(unittest.TestCase):
             with self.assertRaises(NotificationError):
                 ledger.deliver(
                     event_key="event-2",
+                    incident_key="incident-partial",
+                    incident_cooldown_seconds=3600,
                     chunks=["one", "two", "three"],
                     buttons=None,
                     sender=first_sender,
@@ -274,6 +545,8 @@ class AtomicLedgerTests(unittest.TestCase):
             resumed = []
             result = ledger.deliver(
                 event_key="event-2",
+                incident_key="incident-partial",
+                incident_cooldown_seconds=3600,
                 chunks=["one", "two", "three"],
                 buttons=None,
                 sender=lambda text, _buttons: resumed.append(text) or 20 + len(resumed),
@@ -281,6 +554,30 @@ class AtomicLedgerTests(unittest.TestCase):
             )
             self.assertEqual(result["status"], "SENT")
             self.assertEqual(resumed, ["two", "three"])
+
+    def test_pending_incident_suppresses_a_different_run_until_resume_or_expiry(self):
+        with tempfile.TemporaryDirectory() as temp:
+            ledger = AtomicNotificationLedger(Path(temp) / "ledger.json")
+            with self.assertRaises(NotificationError):
+                ledger.deliver(
+                    event_key="run-partial",
+                    incident_key="incident-partial",
+                    incident_cooldown_seconds=3600,
+                    chunks=["one", "two"],
+                    buttons=None,
+                    sender=lambda *_args: (_ for _ in ()).throw(NotificationError("network")),
+                    receipt_metadata={},
+                )
+            duplicate = ledger.deliver(
+                event_key="run-next",
+                incident_key="incident-partial",
+                incident_cooldown_seconds=3600,
+                chunks=["same incident"],
+                buttons=None,
+                sender=lambda *_args: 99,
+                receipt_metadata={},
+            )
+            self.assertEqual(duplicate["reason"], "INCIDENT_COOLDOWN")
 
     def test_corrupt_ledger_fails_closed(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -297,14 +594,12 @@ class AtomicLedgerTests(unittest.TestCase):
 
 
 class CompositionTests(unittest.TestCase):
-    def test_only_sensitive_links_or_private_cards_require_get_chat_validation(self):
+    def test_only_private_card_content_requires_get_chat_validation(self):
         public = [[{"text": "report", "url": "https://example.test/mobile/"}]]
-        private = [[{"text": "private", "url": "https://example.test/private.html#key=abc&market=kr"}]]
         self.assertFalse(_requires_private_chat(public, cards_only=False))
-        self.assertTrue(_requires_private_chat(private, cards_only=False))
         self.assertTrue(_requires_private_chat([], cards_only=True))
 
-    def test_remote_success_includes_public_mobile_and_fragment_private_links(self):
+    def test_remote_success_includes_plaintext_mobile_strategy_link(self):
         context = inspect_workflow_run(
             _run(),
             [
@@ -318,18 +613,18 @@ class CompositionTests(unittest.TestCase):
                 context,
                 archive_dir=Path(temp),
                 public_base_url="https://example.test/TradingAgents",
-                mobile_dashboard_key="A" * 43,
             )
         urls = [button["url"] for row in buttons for button in row]
         self.assertTrue(chunks)
         self.assertIn("kr", metadata["surfaces"])
         self.assertIn("https://example.test/TradingAgents/mobile/?market=kr", urls)
         self.assertIn(
-            f"https://example.test/TradingAgents/mobile/private.html#key={'A' * 43}&market=kr",
+            "https://example.test/TradingAgents/mobile/private.html?market=kr",
             urls,
         )
+        self.assertFalse(any("#" in url for url in urls))
 
-    def test_youtube_uses_existing_mobile_safe_report_without_private_key_link(self):
+    def test_youtube_uses_existing_mobile_safe_report(self):
         context = inspect_workflow_run(
             _run(name="Daily YouTube Verified Reports"),
             [{"name": "deploy", "conclusion": "success"}],
@@ -340,11 +635,10 @@ class CompositionTests(unittest.TestCase):
                 context,
                 archive_dir=Path(temp),
                 public_base_url="https://example.test/TradingAgents",
-                mobile_dashboard_key="A" * 43,
             )
         urls = [button["url"] for row in buttons for button in row]
         self.assertIn("https://example.test/TradingAgents/youtube/", urls)
-        self.assertFalse(any("#key=" in url for url in urls))
+        self.assertFalse(any("#" in url for url in urls))
 
     def test_private_cards_are_loaded_only_from_matching_archive_window(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -449,14 +743,12 @@ class CompositionTests(unittest.TestCase):
                 context,
                 archive_dir=archive,
                 public_base_url="https://example.test/TradingAgents",
-                mobile_dashboard_key=None,
                 cards_only=True,
             )
             _full_chunks, full_buttons, _full_metadata = compose_notification(
                 context,
                 archive_dir=archive,
                 public_base_url="https://example.test/TradingAgents",
-                mobile_dashboard_key="A" * 43,
             )
             manifest_path = run_dir / "run.json"
             incomplete_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -466,7 +758,6 @@ class CompositionTests(unittest.TestCase):
                 context,
                 archive_dir=archive,
                 public_base_url="https://example.test/TradingAgents",
-                mobile_dashboard_key=None,
                 cards_only=True,
             )
             incomplete_manifest["active_universe"]["coverage"]["complete"] = True
@@ -479,7 +770,6 @@ class CompositionTests(unittest.TestCase):
                 context,
                 archive_dir=archive,
                 public_base_url="https://example.test/TradingAgents",
-                mobile_dashboard_key=None,
                 cards_only=True,
             )
             incomplete_manifest["github_actions"]["run_id"] = 999
@@ -488,7 +778,6 @@ class CompositionTests(unittest.TestCase):
                 context,
                 archive_dir=archive,
                 public_base_url="https://example.test/TradingAgents",
-                mobile_dashboard_key=None,
                 cards_only=True,
             )
         self.assertIn("005930.KS", "\n".join(chunks))
@@ -510,7 +799,7 @@ class CompositionTests(unittest.TestCase):
         self.assertEqual(unmatched_chunks, [])
         self.assertEqual(unmatched_metadata["run_ids"], [])
 
-    def test_missing_dashboard_key_keeps_public_alert_but_omits_private_content(self):
+    def test_plaintext_strategy_link_is_direct(self):
         context = inspect_workflow_run(
             _run(),
             [
@@ -524,16 +813,18 @@ class CompositionTests(unittest.TestCase):
                 context,
                 archive_dir=Path(temp),
                 public_base_url="https://example.test/TradingAgents",
-                mobile_dashboard_key=None,
             )
 
         text = "\n".join(chunks)
         urls = [button["url"] for row in buttons for button in row]
-        self.assertIn("MOBILE_DASHBOARD_KEY", text)
         self.assertIn("분석·배포 완료", text)
-        self.assertFalse(any("private.html" in url or "#key=" in url for url in urls))
+        self.assertIn(
+            "https://example.test/TradingAgents/mobile/private.html?market=kr",
+            urls,
+        )
+        self.assertFalse(any("#" in url for url in urls))
 
-    def test_failure_message_does_not_expose_dashboard_key(self):
+    def test_failure_message_contains_only_failure_context(self):
         context = inspect_workflow_run(
             _run(conclusion="failure"),
             [{"name": "analyze_kr", "conclusion": "failure"}],
@@ -543,9 +834,10 @@ class CompositionTests(unittest.TestCase):
             context,
             archive_dir=Path("missing"),
             public_base_url="https://example.test/TradingAgents",
-            mobile_dashboard_key="do-not-leak",
         )
-        self.assertNotIn("do-not-leak", "\n".join(chunks) + json.dumps(buttons))
+        rendered = "\n".join(chunks) + json.dumps(buttons)
+        self.assertIn("TradingAgents 자동화 FAILURE", rendered)
+        self.assertNotIn("private.html", rendered)
 
     def test_event_key_is_stable_and_destination_scoped(self):
         first = notification_event_key(
@@ -560,6 +852,25 @@ class CompositionTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertNotEqual(first, other)
 
+    def test_incident_key_is_fingerprint_and_destination_scoped(self):
+        first = notification_incident_key(
+            repository="r/x", failure_fingerprint="a" * 64, chat_id="one"
+        )
+        second = notification_incident_key(
+            repository="r/x", failure_fingerprint="a" * 64, chat_id="one"
+        )
+        other = notification_incident_key(
+            repository="r/x", failure_fingerprint="b" * 64, chat_id="one"
+        )
+        self.assertEqual(first, second)
+        self.assertNotEqual(first, other)
+        self.assertEqual(
+            notification_incident_key(
+                repository="r/x", failure_fingerprint="invalid", chat_id="one"
+            ),
+            "",
+        )
+
 
 class WorkflowDefinitionTests(unittest.TestCase):
     def test_central_workflow_is_remote_safe_and_secret_scoped(self):
@@ -570,8 +881,13 @@ class WorkflowDefinitionTests(unittest.TestCase):
         self.assertIn("head_repository.full_name == github.repository", text)
         self.assertIn("head_branch == 'main'", text)
         self.assertIn("TELEGRAM_NOTIFICATION_CHAT_ID", text)
-        self.assertIn("MOBILE_DASHBOARD_KEY", text)
+        self.assertNotIn("MOBILE_DASHBOARD_KEY", text)
         self.assertIn("--cards-only", text)
+        self.assertIn("group: tradingagents-mobile-notification-ledger", text)
+        self.assertIn("actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9", text)
+        self.assertIn("actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9", text)
+        self.assertIn("if: ${{ always() }}", text)
+        self.assertIn("telegram-notification-ledger-v1-", text)
         private_job = text.split("  notify_private_cards:", 1)[1]
         setup = private_job.index("      - name: Set up Python")
         send = private_job.index(
@@ -583,22 +899,41 @@ class WorkflowDefinitionTests(unittest.TestCase):
             private_job[setup:send],
         )
 
-    def test_every_pages_builder_receives_the_mobile_encryption_key(self):
+    def test_intraday_and_notification_workflows_use_direct_strategy_payload(self):
         root = Path(__file__).parents[1] / ".github" / "workflows"
-        expected_counts = {
-            "daily-codex-analysis.yml": 3,
-            "intraday-overlay-refresh.yml": 1,
-            "account-portfolio-report-verify.yml": 4,
-            "daily-youtube-reports.yml": 2,
-            "daily-prism-telegram-reports.yml": 2,
-        }
-        assignment = (
-            "TRADINGAGENTS_MOBILE_DASHBOARD_KEY: "
-            "${{ secrets.MOBILE_DASHBOARD_KEY }}"
-        )
-        for filename, expected in expected_counts.items():
+        for filename in (
+            "intraday-overlay-refresh.yml",
+            "tradingagents-mobile-notifications.yml",
+        ):
             text = (root / filename).read_text(encoding="utf-8")
-            self.assertEqual(text.count(assignment), expected, filename)
+            self.assertNotIn("MOBILE_DASHBOARD_KEY", text, filename)
+        intraday = (root / "intraday-overlay-refresh.yml").read_text(encoding="utf-8")
+        self.assertIn("--require-strategy-payload", intraday)
+
+    def test_intraday_recovery_sources_and_local_retry_budget_are_explicit(self):
+        root = Path(__file__).parents[1]
+        workflow = (root / ".github" / "workflows" / "intraday-overlay-refresh.yml").read_text(
+            encoding="utf-8"
+        )
+        local_dispatcher = (root / "tools" / "dispatch_intraday_overlay.ps1").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("[recovery_source=${{", workflow)
+        self.assertIn("TRADINGAGENTS_RECOVERY_SOURCE", workflow)
+        self.assertIn("cloud_watchdog", workflow)
+        self.assertIn("local_watchdog", workflow)
+        self.assertIn("--require-strategy-payload", workflow)
+        self.assertIn("MaxIdenticalFailedAttempts", local_dispatcher)
+        self.assertIn("FailureCooldownMinutes", local_dispatcher)
+        self.assertIn("recovery_source=local_watchdog", local_dispatcher)
+        self.assertIn('$eligibleProfiles = if ($Profile -eq "all") { @("kr", "us") }', local_dispatcher)
+        self.assertIn("$_ -notin $exhaustedProfiles", local_dispatcher)
+        self.assertIn("foreach ($dispatchProfile in $eligibleProfiles)", local_dispatcher)
+        self.assertIn('"profile=$dispatchProfile"', local_dispatcher)
+        self.assertNotIn('"profile=$Profile",', local_dispatcher)
+        self.assertIn("Get-FailureDiagnosticSignature", local_dispatcher)
+        self.assertIn('"diagnostic=unavailable"', local_dispatcher)
 
 
 if __name__ == "__main__":

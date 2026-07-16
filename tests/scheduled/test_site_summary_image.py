@@ -58,6 +58,6 @@ def test_public_portfolio_gateway_never_publishes_non_redacted_summary_image(tmp
     build_site(archive_dir, site_dir, SiteSettings(title="TA", subtitle="Daily"))
 
     portfolio_html = (site_dir / "runs" / run_id / "portfolio.html").read_text(encoding="utf-8")
-    assert "개인 계좌 자료는 공개하지 않습니다" in portfolio_html
+    assert "계좌번호와 고객 식별정보는 제외" in portfolio_html
     assert "summary_card.svg" not in portfolio_html
     assert not (site_dir / "downloads" / run_id / "portfolio" / "summary_card.svg").exists()

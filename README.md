@@ -354,6 +354,14 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 
 참고: 저장소에는 2시간 단위 overlay 전용 워크플로우(.github/workflows/intraday-overlay-refresh.yml)가 포함되어 있으며, `profile` 입력으로 `us/kr/all`을 선택해 미국장·한국장을 분리/동시 운영할 수 있습니다.
 
+`overlay_only`의 실행 종목은 마지막 성공 `full` run의 성공 종목으로 고정됩니다. 장중에 새로 발견된 PRISM/scanner 후보는 다음 `full` run까지 `deferred_new_candidates`로 남기고 기존 종목 overlay를 중단시키지 않습니다. 단, 새 실제 보유종목이 baseline에 없으면 계좌 coverage 누락을 숨기지 않고 실패 처리합니다.
+
+### 통합 투자 전략과 모바일 화면
+
+KR/US Work 자동화는 계좌·관심종목 분석과 관련 YouTube·PRISM context를 다시 종합하고, 최종 보고서를 archive의 `work-reports/<surface>/latest.json`에 영속화합니다. 다음 Pages build는 이 보고서와 구조화된 종목 조건을 `mobile/strategy.json`에 결합하며, `/mobile/private.html`은 별도 암호화 키 없이 바로 열립니다. 계좌번호·토큰·주문번호 같은 원시 식별자는 계속 게시하지 않습니다.
+
+투자 논리와 주문 가능 상태는 분리됩니다. 시세 유효기간이 지나도 분석 시점의 BUY/HOLD/REDUCE/SELL 논리는 보존하고, 주문 상태만 `NEEDS_LIVE_RECHECK`로 낮춥니다. 상세 설계와 완료 기준은 [통합 투자 전략 파이프라인](Docs/integrated_investment_strategy_pipeline_ko.md), HTS 읽기 범위는 [한국투자 HTS 읽기 전용 연동 방안](Docs/kis_hts_readonly_integration_ko.md)을 참고하세요. 반복 실패 사건은 [Intraday Overlay Refresh run 29523335052 분석](Docs/intraday_overlay_failure_29523335052_ko.md)에 기록했습니다.
+
 ### checkpoints_kst 동작 방식 (중요)
 
 `checkpoints_kst`는 백그라운드 스케줄러가 아닙니다. 프로세스가 해당 시각까지 대기했다가 자동 실행하지 않습니다.

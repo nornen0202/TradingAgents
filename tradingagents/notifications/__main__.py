@@ -5,15 +5,16 @@ import json
 import os
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qs, urlsplit
 
 from .telegram import (
     AtomicNotificationLedger,
+    DEFAULT_FAILURE_INCIDENT_COOLDOWN_MINUTES,
     GitHubActionsClient,
     NotificationError,
     TelegramBotClient,
     compose_notification,
     notification_event_key,
+    notification_incident_key,
 )
 
 
@@ -35,6 +36,11 @@ def _parser() -> argparse.ArgumentParser:
     )
     notify_parser.add_argument("--dry-run", action="store_true")
     notify_parser.add_argument("--cards-only", action="store_true")
+    notify_parser.add_argument(
+        "--failure-incident-cooldown-minutes",
+        type=int,
+        default=DEFAULT_FAILURE_INCIDENT_COOLDOWN_MINUTES,
+    )
     return parser
 
 
@@ -67,12 +73,10 @@ def _notify(args: argparse.Namespace) -> dict[str, Any]:
 
     bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "")
     chat_id = os.getenv("TELEGRAM_NOTIFICATION_CHAT_ID", "")
-    mobile_key = os.getenv("MOBILE_DASHBOARD_KEY", "")
     chunks, buttons, composition = compose_notification(
         context,
         archive_dir=args.archive_dir,
         public_base_url=args.public_base_url,
-        mobile_dashboard_key=mobile_key,
         cards_only=args.cards_only,
     )
     if not chunks:
@@ -89,6 +93,13 @@ def _notify(args: argparse.Namespace) -> dict[str, Any]:
     )
     if args.cards_only:
         event_key = f"{event_key}-cards"
+    incident_key = ""
+    if not args.cards_only:
+        incident_key = notification_incident_key(
+            repository=args.repository,
+            failure_fingerprint=str(context.get("failure_fingerprint") or ""),
+            chat_id=chat_id,
+        )
     if args.dry_run:
         return {
             "status": "DRY_RUN",
@@ -96,6 +107,7 @@ def _notify(args: argparse.Namespace) -> dict[str, Any]:
             "chunk_count": len(chunks),
             "chunk_lengths": [len(chunk) for chunk in chunks],
             "button_count": sum(len(row) for row in buttons),
+            "incident_key": incident_key or None,
             **composition,
         }
 
@@ -116,6 +128,12 @@ def _notify(args: argparse.Namespace) -> dict[str, Any]:
         buttons=buttons,
         sender=lambda text, keyboard: client.send_message(text, buttons=keyboard),
         receipt_metadata=receipt_metadata,
+        incident_key=incident_key or None,
+        incident_cooldown_seconds=max(
+            0,
+            int(args.failure_incident_cooldown_minutes),
+        )
+        * 60,
     )
     return {**result, "chunk_count": len(chunks), **composition}
 
@@ -125,16 +143,8 @@ def _requires_private_chat(
     *,
     cards_only: bool,
 ) -> bool:
-    if cards_only:
-        return True
-    for row in buttons:
-        for button in row:
-            if not isinstance(button, dict):
-                continue
-            fragment = parse_qs(urlsplit(str(button.get("url") or "")).fragment)
-            if "key" in fragment or "k" in fragment:
-                return True
-    return False
+    _ = buttons
+    return cards_only
 
 
 def main() -> int:
@@ -144,8 +154,8 @@ def main() -> int:
     except NotificationError as exc:
         print(json.dumps({"status": "ERROR", "error": str(exc)}, ensure_ascii=False))
         return 2
-    # Result objects intentionally contain no bot token, chat ID, dashboard key,
-    # message body, or private URL.
+    # Result objects intentionally contain no bot token, chat ID, message body,
+    # or personal strategy URL.
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 

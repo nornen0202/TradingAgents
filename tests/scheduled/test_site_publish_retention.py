@@ -80,8 +80,8 @@ def test_site_limits_published_runs_but_keeps_latest_daily_and_representative(tm
         failed=13,
     )
     representative = _manifest(
-        "20260609T195243_github-actions-us",
-        started_at="2026-06-09T14:00:00+00:00",
+        "20260616T140000_github-actions-us",
+        started_at="2026-06-16T14:00:00+00:00",
         successful=38,
         failed=0,
     )

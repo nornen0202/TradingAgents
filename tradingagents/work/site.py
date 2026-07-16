@@ -6,8 +6,16 @@ import shutil
 from pathlib import Path
 from typing import Any
 
-from .packet import PROMPT_CONTRACTS, SURFACES, WORK_SCHEMA, build_surface_packet, prompt_path, seal_packet
-from .runtime import validate_packet
+from .packet import (
+    PROMPT_CONTRACTS,
+    SURFACES,
+    WORK_REPORT_SCHEMA,
+    WORK_SCHEMA,
+    build_surface_packet,
+    prompt_path,
+    seal_packet,
+)
+from .runtime import validate_packet, validate_work_report
 
 
 def build_work_site(
@@ -86,11 +94,57 @@ def build_work_site(
             "source_health": (packet.get("body") or {}).get("source_health"),
             "report_mode": (packet.get("body") or {}).get("report_mode"),
         }
+        report_status = _publish_latest_report(
+            root=root,
+            archive_dir=Path(archive_dir),
+            surface=surface,
+            url_prefix=prefix,
+        )
+        if report_status:
+            status["integrated_report"] = report_status
         _write_json(root / surface / "status.json", status)
         index["streams"][surface] = status
 
     _write_json(root / "index.json", index)
     return index
+
+
+def _publish_latest_report(
+    *,
+    root: Path,
+    archive_dir: Path,
+    surface: str,
+    url_prefix: str,
+) -> dict[str, Any]:
+    latest_source = archive_dir / "work-reports" / surface / "latest.json"
+    if not latest_source.is_file():
+        return {}
+    try:
+        report = json.loads(latest_source.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"Invalid latest Work report for {surface}: {exc}") from exc
+    if not isinstance(report, dict):
+        raise ValueError(f"Invalid latest Work report for {surface}: expected object")
+    validate_work_report(report)
+    if report.get("schema") != WORK_REPORT_SCHEMA or report.get("surface") != surface:
+        raise ValueError(f"Latest Work report binding mismatch: {surface}")
+    report_sha = str(report["report_sha256"])
+    content_source = archive_dir / "work-reports" / surface / "events" / f"{report_sha}.json"
+    if not content_source.is_file() or content_source.read_bytes() != latest_source.read_bytes():
+        raise ValueError(f"Latest Work report is not backed by its content-addressed event: {surface}")
+    target_root = root / surface / "report"
+    _write_bytes(target_root / "events" / f"{report_sha}.json", content_source.read_bytes())
+    _write_bytes(target_root / "latest.json", latest_source.read_bytes())
+    return {
+        "schema": WORK_REPORT_SCHEMA,
+        "report_id": report.get("report_id"),
+        "report_sha256": report_sha,
+        "event_id": report.get("event_id"),
+        "source_sha256": report.get("source_sha256"),
+        "published_at": report.get("published_at"),
+        "latest_url": f"{url_prefix}/{surface}/report/latest.json",
+        "event_url": f"{url_prefix}/{surface}/report/events/{report_sha}.json",
+    }
 
 
 def _fit_packet_budget(packet: dict[str, Any], *, max_chars: int) -> dict[str, Any]:

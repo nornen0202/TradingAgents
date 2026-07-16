@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
 import re
@@ -8,6 +9,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import zipfile
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -17,6 +19,7 @@ from typing import Any, Callable, Iterator, Sequence
 
 LEDGER_SCHEMA = "tradingagents.telegram-notification-ledger/v1"
 MAX_TELEGRAM_TEXT_CHARS = 3_500
+DEFAULT_FAILURE_INCIDENT_COOLDOWN_MINUTES = 360
 _CURRENT_FRESHNESS = {"LIVE_CHECKPOINT", "CURRENT_SESSION", "CURRENT_RUN_FRESH", "FRESH"}
 _MAX_ACTION_DATA_AGE = timedelta(minutes=30)
 _MAX_CLOCK_SKEW = timedelta(minutes=5)
@@ -55,6 +58,7 @@ def inspect_workflow_run(
     jobs: Sequence[dict[str, Any]],
     *,
     repository: str,
+    failure_diagnostics: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Validate a workflow_run payload and decide whether it represents real work."""
 
@@ -101,6 +105,13 @@ def inspect_workflow_run(
         for job in terminal_jobs
         if str(job.get("conclusion") or "").lower() not in {"", "skipped"}
     ]
+    terminal_deploy_superseded = _terminal_deploy_was_superseded(terminal_jobs)
+    attempted_job_names = [
+        str(job.get("name") or "")
+        for job in jobs
+        if str(job.get("name") or "").strip()
+        and str(job.get("conclusion") or "").lower() not in {"", "skipped"}
+    ]
     successful_job_names = {
         str(job.get("name") or "")
         for job in jobs
@@ -122,12 +133,46 @@ def inspect_workflow_run(
     # conclusions.  They commonly have no jobs to inspect, but still need a
     # phone alert.  A wholly skipped workflow is the opposite: it represents a
     # scheduler/no-work outcome and must not create a false failure alert.
+    display_title = str(run.get("display_title") or "")
+    recovery_source = _workflow_recovery_source(
+        event=str(run.get("event") or ""),
+        display_title=display_title,
+    )
+    failure_context = _workflow_failure_context(
+        workflow_name=workflow_name,
+        conclusion=conclusion,
+        head_sha=head_sha,
+        event=str(run.get("event") or ""),
+        display_title=display_title,
+        recovery_source=recovery_source,
+        jobs=jobs,
+        upstream_run_id=upstream_run_id,
+        failure_diagnostics=failure_diagnostics or {},
+    )
+    failure_fingerprint = (
+        hashlib.sha256(
+            json.dumps(
+                failure_context,
+                ensure_ascii=True,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        if conclusion != "success"
+        else ""
+    )
     if conclusion == "skipped":
         should_notify = False
         reason = "no_work_workflow_skipped"
+    elif conclusion in {"cancelled", "neutral"} and not attempted_job_names:
+        should_notify = False
+        reason = "no_work_unattempted"
     elif conclusion != "success":
         should_notify = True
         reason = "upstream_failed"
+    elif successful_terminal_jobs and terminal_deploy_superseded:
+        should_notify = False
+        reason = "no_work_superseded"
     elif successful_terminal_jobs:
         should_notify = True
         reason = "terminal_job_succeeded"
@@ -149,9 +194,138 @@ def inspect_workflow_run(
         "updated_at": str(run.get("updated_at") or ""),
         "successful_terminal_jobs": successful_terminal_jobs,
         "attempted_terminal_jobs": attempted_terminal_jobs,
+        "terminal_deploy_superseded": terminal_deploy_superseded,
+        "attempted_job_names": attempted_job_names,
         "run_labels": list(spec.run_labels),
         "surfaces": surfaces,
+        "display_title": display_title,
+        "recovery_source": recovery_source,
+        "failure_context": failure_context,
+        "failure_fingerprint": failure_fingerprint,
     }
+
+
+def _workflow_recovery_source(*, event: str, display_title: str) -> str:
+    match = re.search(
+        r"\[recovery_source=(native|manual|cloud_watchdog|local_watchdog)\]",
+        str(display_title or ""),
+        flags=re.IGNORECASE,
+    )
+    if match:
+        return match.group(1).lower()
+    return "native" if str(event or "").lower() == "schedule" else "manual"
+
+
+def _workflow_failure_context(
+    *,
+    workflow_name: str,
+    conclusion: str,
+    head_sha: str,
+    event: str,
+    display_title: str,
+    recovery_source: str,
+    jobs: Sequence[dict[str, Any]],
+    upstream_run_id: int,
+    failure_diagnostics: dict[str, str],
+) -> dict[str, Any]:
+    failed_stages: list[str] = []
+    for job in jobs:
+        job_name = _fingerprint_token(job.get("name") or "unknown_job")
+        job_conclusion = str(job.get("conclusion") or "").strip().lower()
+        if job_conclusion in {"", "success", "skipped", "neutral"}:
+            continue
+        failed_steps = [
+            step
+            for step in (job.get("steps") or [])
+            if str(step.get("conclusion") or "").strip().lower()
+            not in {"", "success", "skipped", "neutral"}
+        ]
+        if failed_steps:
+            for step in failed_steps:
+                failed_stages.append(
+                    f"{job_name}/{_fingerprint_token(step.get('name') or 'unknown_step')}:"
+                    f"{str(step.get('conclusion') or '').strip().lower()}"
+                )
+        else:
+            failed_stages.append(f"{job_name}:{job_conclusion}")
+    if not failed_stages:
+        failed_stages.append(f"workflow:{str(conclusion or 'unknown').lower()}")
+
+    profile = _workflow_marker(display_title, "profile", {"kr", "us", "all"})
+    if not profile:
+        job_names = {str(job.get("name") or "").lower() for job in jobs}
+        has_kr = any(name.endswith("_kr") for name in job_names)
+        has_us = any(name.endswith("_us") for name in job_names)
+        profile = "all" if has_kr and has_us else "kr" if has_kr else "us" if has_us else "unknown"
+    run_mode = _workflow_marker(
+        display_title,
+        "run_mode",
+        {"overlay_only", "selective_rerun_only", "full", "smoke", "site_only"},
+    )
+    if not run_mode:
+        run_mode = "overlay_only" if workflow_name == "Intraday Overlay Refresh" else "default"
+    request_scope = _workflow_marker(
+        display_title,
+        "request_scope",
+        {"default_universe", "custom_tickers", "custom_sources"},
+    ) or "default_universe"
+    origin_class = "manual" if recovery_source == "manual" else "automated"
+    diagnostic_signatures = sorted(
+        {
+            str(value).lower()
+            for value in failure_diagnostics.values()
+            if re.fullmatch(r"[0-9a-f]{64}", str(value).lower())
+        }
+    )
+    context = {
+        "schema": "tradingagents.notification-failure-context/v1",
+        "workflow": workflow_name,
+        "conclusion": str(conclusion or "").lower(),
+        "head_sha": str(head_sha or "unknown").lower(),
+        "profile": profile,
+        "run_mode": run_mode,
+        "request_scope": request_scope,
+        "origin_class": origin_class,
+        "event_class": "manual" if str(event or "").lower() == "workflow_dispatch" and origin_class == "manual" else "automated",
+        "failed_stages": sorted(set(failed_stages)),
+        "diagnostic_signatures": diagnostic_signatures,
+        "diagnostic_mode": "stable_log_signature" if diagnostic_signatures else "run_scoped_fallback",
+    }
+    if not diagnostic_signatures:
+        # Without a stable diagnostic signature, treating two failures as the
+        # same root cause could hide a new actionable incident in the same
+        # broad workflow step.  Fail open to one alert per run instead.
+        context["run_nonce"] = int(upstream_run_id)
+    return context
+
+
+def _workflow_marker(display_title: str, key: str, allowed: set[str]) -> str:
+    match = re.search(
+        rf"\[{re.escape(key)}=([a-z0-9_-]+)\]",
+        str(display_title or ""),
+        flags=re.IGNORECASE,
+    )
+    value = match.group(1).lower() if match else ""
+    return value if value in allowed else ""
+
+
+def _fingerprint_token(value: Any) -> str:
+    normalized = re.sub(r"\s+", " ", str(value or "")).strip().lower()
+    return re.sub(r"[^a-z0-9_.:/ -]+", "?", normalized)[:160] or "unknown"
+
+
+def _terminal_deploy_was_superseded(terminal_jobs: Sequence[dict[str, Any]]) -> bool:
+    deploy_steps = [
+        step
+        for job in terminal_jobs
+        if str(job.get("conclusion") or "").lower() == "success"
+        for step in (job.get("steps") or [])
+        if re.search(r"\bdeploy\b", str(step.get("name") or ""), flags=re.IGNORECASE)
+    ]
+    return bool(deploy_steps) and all(
+        str(step.get("conclusion") or "").lower() in {"skipped", "neutral"}
+        for step in deploy_steps
+    )
 
 
 class GitHubActionsClient:
@@ -173,7 +347,38 @@ class GitHubActionsClient:
             if len(batch) < 100:
                 break
             page += 1
-        return inspect_workflow_run(run, jobs, repository=self.repository)
+        diagnostics = (
+            self._failure_diagnostics(run_id=int(run_id))
+            if str(run.get("conclusion") or "").lower() != "success"
+            else {}
+        )
+        return inspect_workflow_run(
+            run,
+            jobs,
+            repository=self.repository,
+            failure_diagnostics=diagnostics,
+        )
+
+    def _failure_diagnostics(self, *, run_id: int) -> dict[str, str]:
+        try:
+            raw = self._get_bytes(f"/actions/runs/{int(run_id)}/logs", max_bytes=32_000_000)
+            with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+                diagnostics: dict[str, str] = {}
+                for name in sorted(archive.namelist()):
+                    if name.endswith("/"):
+                        continue
+                    try:
+                        text = archive.read(name).decode("utf-8", errors="replace")
+                    except (KeyError, OSError):
+                        continue
+                    signature = _diagnostic_signature(text)
+                    if signature:
+                        diagnostics[name[:160]] = signature
+                return diagnostics
+        except (NotificationError, OSError, zipfile.BadZipFile):
+            # The incident fingerprint deliberately becomes run-scoped when
+            # logs are unavailable, so a possibly new root cause is alerted.
+            return {}
 
     def _get(self, path: str) -> dict[str, Any]:
         request = urllib.request.Request(
@@ -194,6 +399,25 @@ class GitHubActionsClient:
             raise NotificationError(f"GitHub Actions metadata request failed.{suffix}") from None
         if not isinstance(payload, dict):
             raise NotificationError("GitHub Actions metadata response was not an object.")
+        return payload
+
+    def _get_bytes(self, path: str, *, max_bytes: int) -> bytes:
+        request = urllib.request.Request(
+            f"https://api.github.com/repos/{self.repository}{path}",
+            headers={
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {self.token}",
+                "X-GitHub-Api-Version": "2022-11-28",
+                "User-Agent": "TradingAgents-notifier",
+            },
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
+                payload = response.read(max_bytes + 1)
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, OSError):
+            raise NotificationError("GitHub Actions log request failed.") from None
+        if len(payload) > max_bytes:
+            raise NotificationError("GitHub Actions log archive exceeded the safe size limit.")
         return payload
 
 
@@ -221,7 +445,7 @@ class TelegramBotClient:
             ) from None
         # Telegram private user chats use positive numeric IDs; groups and
         # channels use negative IDs (or channel usernames).  The notification
-        # can contain holdings and a mobile decryption link, so fail closed
+        # can contain holdings and personal strategy links, so fail closed
         # instead of permitting a group/channel destination.
         if numeric_chat_id <= 0 or normalized_chat_id != str(numeric_chat_id):
             raise NotificationError(
@@ -364,10 +588,17 @@ class TelegramBotClient:
 class AtomicNotificationLedger:
     """Durable resumable delivery state; message bodies and secret URLs are never stored."""
 
-    def __init__(self, path: Path, *, lock_timeout_seconds: float = 30.0) -> None:
+    def __init__(
+        self,
+        path: Path,
+        *,
+        lock_timeout_seconds: float = 30.0,
+        clock: Callable[[], datetime] | None = None,
+    ) -> None:
         self.path = Path(path)
         self.lock_path = self.path.with_suffix(self.path.suffix + ".lock")
         self.lock_timeout_seconds = lock_timeout_seconds
+        self._clock = clock or (lambda: datetime.now(timezone.utc))
 
     def deliver(
         self,
@@ -377,6 +608,8 @@ class AtomicNotificationLedger:
         buttons: Sequence[Sequence[dict[str, str]]] | None,
         sender: Callable[[str, Sequence[Sequence[dict[str, str]]] | None], int],
         receipt_metadata: dict[str, Any],
+        incident_key: str | None = None,
+        incident_cooldown_seconds: float = 0.0,
     ) -> dict[str, Any]:
         if not event_key or not chunks:
             raise NotificationError("Notification event key and chunks are required.")
@@ -384,6 +617,7 @@ class AtomicNotificationLedger:
         with _exclusive_lock(self.lock_path, timeout_seconds=self.lock_timeout_seconds):
             ledger = self._load()
             entries = ledger.setdefault("entries", {})
+            incidents = ledger.setdefault("incidents", {})
             current = entries.get(event_key)
             if isinstance(current, dict):
                 if current.get("content_sha256") != digest:
@@ -391,20 +625,70 @@ class AtomicNotificationLedger:
                 if current.get("status") == "delivered":
                     return {
                         "status": "NOOP",
+                        "reason": "EVENT_ALREADY_DELIVERED",
                         "event_key": event_key,
                         "message_ids": list(current.get("message_ids") or []),
                     }
             else:
+                normalized_incident_key = str(incident_key or "").strip()
+                if normalized_incident_key and incident_cooldown_seconds > 0:
+                    prior_incident = incidents.get(normalized_incident_key)
+                    if isinstance(prior_incident, dict):
+                        incident_at = _try_datetime(
+                            str(
+                                prior_incident.get("last_delivered_at")
+                                or prior_incident.get("first_seen_at")
+                                or ""
+                            )
+                        )
+                        now = _normalized_utc(self._clock())
+                        if (
+                            incident_at is not None
+                            and now - incident_at < timedelta(seconds=incident_cooldown_seconds)
+                        ):
+                            prior_incident.update(
+                                {
+                                    "last_seen_at": now.isoformat(),
+                                    "last_event_key": event_key,
+                                    "suppressed_count": int(
+                                        prior_incident.get("suppressed_count") or 0
+                                    )
+                                    + 1,
+                                }
+                            )
+                            self._write(ledger)
+                            return {
+                                "status": "NOOP",
+                                "reason": "INCIDENT_COOLDOWN",
+                                "event_key": event_key,
+                                "incident_key": normalized_incident_key,
+                                "message_ids": [],
+                            }
+                now_text = _normalized_utc(self._clock()).isoformat()
                 current = {
                     "status": "pending",
                     "content_sha256": digest,
                     "chunk_count": len(chunks),
                     "sent_chunks": 0,
                     "message_ids": [],
-                    "created_at": _utc_now(),
+                    "created_at": now_text,
                     **_safe_receipt_metadata(receipt_metadata),
                 }
                 entries[event_key] = current
+                if normalized_incident_key:
+                    previous_incident = incidents.get(normalized_incident_key)
+                    previous_suppressed_count = (
+                        int(previous_incident.get("suppressed_count") or 0)
+                        if isinstance(previous_incident, dict)
+                        else 0
+                    )
+                    incidents[normalized_incident_key] = {
+                        "status": "pending",
+                        "event_key": event_key,
+                        "first_seen_at": now_text,
+                        "last_seen_at": now_text,
+                        "suppressed_count": previous_suppressed_count,
+                    }
                 self._write(ledger)
 
             sent_chunks = int(current.get("sent_chunks") or 0)
@@ -419,18 +703,37 @@ class AtomicNotificationLedger:
                         "status": "pending",
                         "sent_chunks": index + 1,
                         "message_ids": message_ids,
-                        "updated_at": _utc_now(),
+                        "updated_at": _normalized_utc(self._clock()).isoformat(),
                     }
                 )
                 self._write(ledger)
 
-            current.update({"status": "delivered", "delivered_at": _utc_now()})
+            delivered_at = _normalized_utc(self._clock()).isoformat()
+            current.update({"status": "delivered", "delivered_at": delivered_at})
+            normalized_incident_key = str(incident_key or "").strip()
+            if normalized_incident_key:
+                incident = incidents.setdefault(normalized_incident_key, {})
+                incident.update(
+                    {
+                        "status": "delivered",
+                        "event_key": event_key,
+                        "last_event_key": event_key,
+                        "last_delivered_at": delivered_at,
+                        "last_seen_at": delivered_at,
+                        "suppressed_count": int(incident.get("suppressed_count") or 0),
+                    }
+                )
             self._write(ledger)
-            return {"status": "SENT", "event_key": event_key, "message_ids": message_ids}
+            return {
+                "status": "SENT",
+                "event_key": event_key,
+                "incident_key": normalized_incident_key or None,
+                "message_ids": message_ids,
+            }
 
     def _load(self) -> dict[str, Any]:
         if not self.path.exists():
-            return {"schema": LEDGER_SCHEMA, "entries": {}}
+            return {"schema": LEDGER_SCHEMA, "entries": {}, "incidents": {}}
         try:
             payload = json.loads(self.path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
@@ -439,6 +742,9 @@ class AtomicNotificationLedger:
             raise NotificationError("Notification ledger schema is invalid.")
         if not isinstance(payload.get("entries"), dict):
             raise NotificationError("Notification ledger entries are invalid.")
+        if payload.get("incidents") is not None and not isinstance(payload.get("incidents"), dict):
+            raise NotificationError("Notification ledger incidents are invalid.")
+        payload.setdefault("incidents", {})
         return payload
 
     def _write(self, ledger: dict[str, Any]) -> None:
@@ -485,6 +791,15 @@ def chunk_text(text: str, limit: int = MAX_TELEGRAM_TEXT_CHARS) -> list[str]:
 def notification_event_key(*, repository: str, upstream_run_id: int, conclusion: str, chat_id: str) -> str:
     chat_hash = hashlib.sha256(str(chat_id).encode("utf-8")).hexdigest()[:16]
     material = f"telegram-notification/v1\0{repository}\0{int(upstream_run_id)}\0{conclusion}\0{chat_hash}"
+    return hashlib.sha256(material.encode("utf-8")).hexdigest()[:40]
+
+
+def notification_incident_key(*, repository: str, failure_fingerprint: str, chat_id: str) -> str:
+    fingerprint = str(failure_fingerprint or "").strip().lower()
+    if not re.fullmatch(r"[0-9a-f]{64}", fingerprint):
+        return ""
+    chat_hash = hashlib.sha256(str(chat_id).encode("utf-8")).hexdigest()[:16]
+    material = f"telegram-failure-incident/v1\0{repository}\0{fingerprint}\0{chat_hash}"
     return hashlib.sha256(material.encode("utf-8")).hexdigest()[:40]
 
 
@@ -583,7 +898,6 @@ def compose_notification(
     *,
     archive_dir: Path,
     public_base_url: str,
-    mobile_dashboard_key: str | None,
     cards_only: bool = False,
 ) -> tuple[list[str], list[list[dict[str, str]]], dict[str, Any]]:
     workflow_name = str(context["workflow_name"])
@@ -596,17 +910,24 @@ def compose_notification(
     if conclusion != "success":
         if cards_only:
             return [], [], {"markets": [], "run_ids": [], "surfaces": []}
+        failure_fingerprint = str(context.get("failure_fingerprint") or "").lower()
         text = "\n".join(
             [
                 f"🚨 TradingAgents 자동화 {conclusion.upper()}",
                 f"워크플로: {workflow_name}",
                 f"완료 시각: {completed}",
                 f"GitHub 실행 ID: {run_id}",
+                f"장애 식별자: {failure_fingerprint[:12] or '확인 불가'}",
                 "분석 또는 배포가 완료되지 않았습니다. 기존 투자 전략을 최신 결과로 간주하지 마세요.",
             ]
         )
         buttons = [[{"text": "실패 로그 확인", "url": actions_url}]] if _is_https_url(actions_url) else []
-        return chunk_text(text), buttons, {"markets": [], "run_ids": []}
+        return chunk_text(text), buttons, {
+            "markets": [],
+            "run_ids": [],
+            "surfaces": [],
+            "failure_fingerprint": failure_fingerprint,
+        }
 
     market_runs = find_market_runs(
         archive_dir=archive_dir,
@@ -622,10 +943,8 @@ def compose_notification(
     expected_markets = {surface.upper() for surface in surfaces if surface in {"kr", "us"}}
     if expected_markets:
         market_runs = [item for item in market_runs if str(item.get("market") or "").upper() in expected_markets]
-    dashboard_key = str(mobile_dashboard_key or "").strip()
-    dashboard_key_available = bool(re.fullmatch(r"[A-Za-z0-9_-]{43}", dashboard_key))
     lines = (
-        ["🔐 TradingAgents 개인 종목 액션 카드"]
+        ["TradingAgents 개인 종목 액션 카드"]
         if cards_only
         else [
             "✅ TradingAgents 분석·배포 완료",
@@ -643,7 +962,7 @@ def compose_notification(
                 "사이트 재배포·YouTube·PRISM 작업이면 아래 공개 페이지에서 최신 결과를 확인하세요.",
             ]
         )
-    if market_runs and (cards_only or dashboard_key_available):
+    if market_runs:
         for item in market_runs:
             lines.extend(
                 _market_action_card_lines(
@@ -652,15 +971,6 @@ def compose_notification(
                     workflow_updated_at=str(context.get("updated_at") or ""),
                 )
             )
-    elif not cards_only and (market_runs or expected_markets):
-        lines.extend(
-            [
-                "",
-                "⚠️ 개인 액션 알림을 열 수 없습니다.",
-                "MOBILE_DASHBOARD_KEY가 없거나 형식이 올바르지 않아 개인 링크와 종목 액션 카드를 제외했습니다.",
-                "공개 리포트는 아래 링크에서 확인하고, 키 설정을 복구하기 전에는 최신 개인 전략으로 간주하지 마세요.",
-            ]
-        )
     lines.append("모든 전략은 참고용이며, 주문 전 가격·시각·데이터 상태를 다시 확인하세요.")
 
     buttons: list[list[dict[str, str]]] = []
@@ -673,13 +983,12 @@ def compose_notification(
             {"text": f"{market.upper()} 모바일", "url": mobile_url},
         ]
         buttons.append(row)
-        if dashboard_key_available:
-            private_url = (
-                f"{base}/mobile/private.html"
-                f"#key={urllib.parse.quote(dashboard_key, safe='')}&market={urllib.parse.quote(market)}"
-                f"&run={urllib.parse.quote(str(item['run_id']), safe='')}"
-            )
-            buttons.append([{"text": f"🔐 {market.upper()} 개인 액션표", "url": private_url}])
+        private_url = (
+            f"{base}/mobile/private.html"
+            f"?market={urllib.parse.quote(market)}"
+            f"&run={urllib.parse.quote(str(item['run_id']), safe='')}"
+        )
+        buttons.append([{"text": f"{market.upper()} 투자 전략", "url": private_url}])
     if not cards_only:
         represented = {str(item["market"]).lower() for item in market_runs}
         for surface in surfaces:
@@ -692,12 +1001,12 @@ def compose_notification(
                     {"text": f"{surface.upper()} 모바일", "url": mobile_url},
                 ]
             )
-            if dashboard_key_available and surface in {"kr", "us"}:
+            if surface in {"kr", "us"}:
                 private_url = (
                     f"{base}/mobile/private.html"
-                    f"#key={urllib.parse.quote(dashboard_key, safe='')}&market={urllib.parse.quote(surface)}"
+                    f"?market={urllib.parse.quote(surface)}"
                 )
-                buttons.append([{"text": f"🔐 {surface.upper()} 개인 보기", "url": private_url}])
+                buttons.append([{"text": f"{surface.upper()} 투자 전략", "url": private_url}])
     if not cards_only and not market_runs and not surfaces and base:
         buttons.append([{"text": "TradingAgents 리포트", "url": f"{base}/"}])
     if not cards_only and _is_https_url(actions_url):
@@ -960,6 +1269,32 @@ def _content_digest(
     return hashlib.sha256(raw).hexdigest()
 
 
+def _diagnostic_signature(log_text: str) -> str:
+    candidates: list[str] = []
+    pattern = re.compile(
+        r"(?:OVERLAY_[A-Z0-9_]+|##\[error\]|(?:runtime|value|type|key|connection|timeout)?error\s*:|exception\s*:)",
+        flags=re.IGNORECASE,
+    )
+    for raw_line in str(log_text or "").splitlines():
+        line = re.sub(r"\x1b\[[0-9;]*m", "", raw_line).strip()
+        line = re.sub(r"^\d{4}-\d{2}-\d{2}T\S+Z\s+", "", line)
+        if not pattern.search(line):
+            continue
+        # Only the digest is persisted.  Normalization removes volatile URLs,
+        # paths and long tokens while preserving stable error codes/messages.
+        line = re.sub(r"https?://\S+", "<url>", line)
+        line = re.sub(r"[A-Za-z]:\\[^\s]+", "<path>", line)
+        line = re.sub(r"\b[0-9a-f]{32,}\b", "<hex>", line, flags=re.IGNORECASE)
+        line = re.sub(r"\s+", " ", line).strip()[:500]
+        if line:
+            candidates.append(line)
+        if len(candidates) >= 3:
+            break
+    if not candidates:
+        return ""
+    return hashlib.sha256("\n".join(candidates).encode("utf-8")).hexdigest()
+
+
 def _safe_receipt_metadata(value: dict[str, Any]) -> dict[str, Any]:
     allowed = {
         "repository",
@@ -1018,6 +1353,12 @@ def _format_kst(value: str) -> str:
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _normalized_utc(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
 def _format_price(value: Any) -> str:

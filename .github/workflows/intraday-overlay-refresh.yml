@@ -1,4 +1,10 @@
 name: Intraday Overlay Refresh
+run-name: >-
+  Intraday Overlay Refresh
+  [profile=${{ inputs.profile || (github.event.schedule == '5 1 * * 1-5' && 'kr') || (github.event.schedule == '0 3 * * 1-5' && 'kr') || (github.event.schedule == '20 4 * * 1-5' && 'kr') || (github.event_name == 'schedule' && 'us') || 'all' }}]
+  [run_mode=${{ inputs.run_mode || 'overlay_only' }}]
+  [request_scope=${{ inputs.tickers && 'custom_tickers' || 'default_universe' }}]
+  [recovery_source=${{ inputs.recovery_source || (github.event_name == 'schedule' && 'native') || 'manual' }}]
 
 on:
   schedule:
@@ -34,6 +40,18 @@ on:
         description: "Optional comma-separated tickers override"
         required: false
         type: string
+      recovery_source:
+        description: "Dispatch origin marker used for retry and notification policy"
+        required: false
+        default: "manual"
+        type: choice
+        options:
+          - manual
+          - cloud_watchdog
+          - local_watchdog
+
+env:
+  TRADINGAGENTS_RECOVERY_SOURCE: ${{ inputs.recovery_source || (github.event_name == 'schedule' && 'native') || 'manual' }}
 
 permissions:
   actions: read
@@ -320,8 +338,6 @@ jobs:
           subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
 
       - name: Rebuild final merged overlay site
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -421,7 +437,7 @@ jobs:
                   "${{ github.run_attempt }}",
                   "--commit-sha",
                   "${{ github.sha }}",
-                  "--require-private-envelope",
+                  "--require-strategy-payload",
               ]
           )
 
