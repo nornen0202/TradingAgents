@@ -13,10 +13,11 @@
 7. 후보 액션은 packet의 허용 목록만 사용하고, 현재 주문·목표가·손절가를 새로 만들지 않는다.
 8. 출처 URL과 evidence ID가 없는 핵심 주장은 사실로 단정하지 않는다.
 9. ACK는 `prepare`가 만든 정확한 로컬 delivery event를 렌더링했다는 뜻일 뿐 producer source가 신선하거나 Telegram/Pages가 전달됐다는 증거가 아니다.
+10. `balanced_external` 정책으로 supported/partially supported/unverified를 서로 다른 가중치로 사용한다. 관련 ticker·market·theme와 event key를 명시하고, 후속 시장 종합에서 순위·thesis confidence·기존 위험 한도 안의 크기·리서치 우선순위에 실제 반영할 방향을 제안한다. 시장·계좌 execution gate 우회는 금지한다.
 
 ## 출력
 
-1. 모바일 한 화면용 핵심 delta 최대 3개와 source health
+1. 모바일 한 화면용 핵심 delta 최대 5개와 source health
 2. 새 event/revision/중복 제외 수, 전송/생략 수, coverage truncation
 3. 검증된 핵심 변화, 반증 또는 미검증 주장
 4. KR·US 연구/관심종목 영향과 허용 액션
@@ -27,7 +28,15 @@
 
 `COVERAGE_RECEIPT {"event_id":"<event_id>","status":"COMPLETE|PARTIAL|UNVERIFIED","window_events":<int|null>,"transmitted_events":<int|null>,"truncated":<bool|null>,"new_events":<int|null>,"revised_events":<int|null>}`
 
-ChatGPT Work는 외부 전달자가 아니다. Telegram 알림과 공개/암호화 모바일 Pages 게시 완료를 주장하거나 복호화 키를 출력하지 않는다.
+## 선택적 archive publish
+
+웹·모바일 handoff가 필요하면 Markdown과 structured JSON을 prepare가 알려 준 경로에 쓴 뒤 ACK 전에 publish한다. structured JSON은 packet과 일치하는 `binding={surface,event_id,source_sha256}`, `title`, ISO `generated_at`, `as_of`, `source_health`, `report_mode`, `summary`, `top_actions`, `strategies`, `coverage_receipt`, `source_summary`, `next_checkpoint`를 포함한다. `strategies`는 관련 종목별 연구 영향과 `source_contributions`를 담고 execution readiness는 `RESEARCH_ONLY`로 둔다.
+
+`python -m tradingagents.work publish --surface youtube --event-id <event_id> --source-sha256 <source_sha256> --markdown-file <report_markdown_path> --structured-file <report_structured_path> --archive-dir C:\TradingAgentsData\archive`
+
+YouTube/PRISM surface의 publish는 선택 사항이므로 보고서 파일을 만들지 않은 delta도 ACK할 수 있다. 단 publish를 시도했다면 성공 receipt를 확인한 뒤 ACK한다.
+
+ChatGPT Work는 외부 전달자가 아니다. Telegram 알림과 plaintext 전략 Pages 게시 완료를 주장하지 않는다. 보고서에는 계좌 식별자·credential·token·session 경로를 출력하지 않는다.
 
 `MOBILE_HANDOFF {"owner":"external_github_notification_pipeline","status":"PENDING_EXTERNAL_VERIFICATION","work_sent_notification":false}`
 

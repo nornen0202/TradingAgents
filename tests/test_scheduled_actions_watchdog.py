@@ -15,9 +15,10 @@ SPEC.loader.exec_module(watchdog)
 
 
 class FakeClient:
-    def __init__(self, *, runs=None, jobs=None):
+    def __init__(self, *, runs=None, jobs=None, diagnostics=None):
         self.runs = runs or []
         self.jobs = jobs or {}
+        self.diagnostics = diagnostics
         self.dispatches = []
 
     def list_runs(self, workflow_file, *, created_since_utc):
@@ -33,6 +34,11 @@ class FakeClient:
     def dispatch(self, workflow_file, inputs):
         self.dispatches.append((workflow_file, inputs))
 
+    def failure_diagnostic_signature(self, run_id):
+        if self.diagnostics is None:
+            return "a" * 64
+        return self.diagnostics.get(run_id, "")
+
 
 def _kst(value: str):
     return datetime.fromisoformat(value).replace(tzinfo=watchdog.KST)
@@ -44,7 +50,9 @@ def test_youtube_watchdog_is_due_after_backup_window():
     youtube = [target for target in targets if target.name == "youtube-daily"]
     assert len(youtube) == 1
     assert youtube[0].workflow_file == "daily-youtube-reports.yml"
-    assert youtube[0].job_names == ("build_youtube_pages",)
+    assert youtube[0].job_names == ("build_youtube_pages", "deploy")
+    assert youtube[0].work_job_names == ("build_youtube_pages",)
+    assert youtube[0].inputs["recovery_source"] == "cloud_watchdog"
     assert youtube[0].window_start_kst == _kst("2026-06-02T05:00:00")
     assert youtube[0].blockers[0].name == "daily-codex-us-pages"
     assert youtube[0].blockers[0].job_names == ("analyze_us", "build_pages")
@@ -58,8 +66,9 @@ def test_daily_codex_us_watchdog_is_due_on_weekday_afternoon():
 
     codex_us = [target for target in targets if target.name == "daily-codex-us"]
     assert len(codex_us) == 1
-    assert codex_us[0].inputs == {"profile": "us"}
-    assert codex_us[0].job_names == ("analyze_us", "build_pages")
+    assert codex_us[0].inputs == {"profile": "us", "recovery_source": "cloud_watchdog"}
+    assert codex_us[0].job_names == ("analyze_us", "build_pages", "deploy")
+    assert codex_us[0].work_job_names == ("analyze_us",)
     assert codex_us[0].window_start_kst == _kst("2026-06-01T17:45:00")
     assert codex_us[0].blockers[0].name == "intraday-overlay-kr-publish"
 
@@ -100,7 +109,10 @@ def test_daily_codex_kr_watchdog_does_not_wait_for_youtube_publish():
 
     messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T07:58:00"))
 
-    assert ("daily-codex-analysis.yml", {"profile": "kr"}) in client.dispatches
+    assert (
+        "daily-codex-analysis.yml",
+        {"profile": "kr", "recovery_source": "cloud_watchdog"},
+    ) in client.dispatches
     assert any("daily-codex-kr: dispatched" in message for message in messages)
     assert not any("daily-codex-kr: waiting" in message for message in messages)
 
@@ -126,7 +138,18 @@ def test_kr_intraday_overlay_watchdog_depends_on_daily_codex_completion():
 
     overlay_kr = [target for target in targets if target.name.startswith("intraday-overlay-kr-")]
     assert len(overlay_kr) == 1
-    assert overlay_kr[0].inputs == {"profile": "kr", "run_mode": "overlay_only"}
+    assert overlay_kr[0].inputs == {
+        "profile": "kr",
+        "run_mode": "overlay_only",
+        "recovery_source": "cloud_watchdog",
+    }
+    assert overlay_kr[0].job_names == (
+        "overlay_gate",
+        "overlay_refresh_kr",
+        "publish_overlay_site",
+        "deploy_overlay",
+    )
+    assert overlay_kr[0].work_job_names == ("overlay_refresh_kr",)
     assert overlay_kr[0].dependencies[0].name == "daily-codex-kr"
     assert overlay_kr[0].dependencies[0].job_names == ("analyze_kr", "build_pages")
     assert overlay_kr[0].window_start_kst == _kst("2026-06-01T10:05:00")
@@ -138,7 +161,17 @@ def test_us_intraday_overlay_watchdog_uses_previous_daily_window_after_midnight(
 
     overlay_us = [target for target in targets if target.name.startswith("intraday-overlay-us-")]
     assert len(overlay_us) == 1
-    assert overlay_us[0].inputs == {"profile": "us", "run_mode": "overlay_only"}
+    assert overlay_us[0].inputs == {
+        "profile": "us",
+        "run_mode": "overlay_only",
+        "recovery_source": "cloud_watchdog",
+    }
+    assert overlay_us[0].job_names == (
+        "overlay_gate",
+        "overlay_refresh_us",
+        "publish_overlay_site",
+        "deploy_overlay",
+    )
     assert overlay_us[0].dependencies[0].name == "daily-codex-us"
     assert overlay_us[0].dependencies[0].job_names == ("analyze_us", "build_pages")
     assert overlay_us[0].window_start_kst == _kst("2026-06-01T22:40:00")
@@ -172,7 +205,7 @@ def test_youtube_watchdog_yields_after_late_recovery_window():
     assert not [target for target in targets if target.name == "youtube-daily"]
 
 
-def test_watchdog_ignores_gate_only_success_when_target_job_skipped():
+def test_watchdog_accepts_completed_success_with_explicit_no_work_target():
     target = watchdog.WatchdogTarget(
         name="youtube-daily",
         workflow_file="daily-youtube-reports.yml",
@@ -187,8 +220,8 @@ def test_watchdog_ignores_gate_only_success_when_target_job_skipped():
 
     covered, reason = watchdog.target_is_covered(client=client, target=target)
 
-    assert not covered
-    assert "No successful target jobs" in reason
+    assert covered
+    assert "explicit no-work" in reason
 
 
 def test_watchdog_ignores_active_run_without_target_job():
@@ -229,11 +262,17 @@ def test_watchdog_treats_active_target_job_as_covered():
     assert "active target job(s): analyze_us" in reason
 
 
-def test_watchdog_accepts_successful_target_job_when_later_publish_job_fails():
+def test_watchdog_requires_publish_and_deploy_after_overlay_success():
     target = watchdog.WatchdogTarget(
         name="intraday-overlay-kr-1005",
         workflow_file="intraday-overlay-refresh.yml",
-        job_names=("overlay_refresh_kr",),
+        job_names=(
+            "overlay_gate",
+            "overlay_refresh_kr",
+            "publish_overlay_site",
+            "deploy_overlay",
+        ),
+        work_job_names=("overlay_refresh_kr",),
         window_start_kst=_kst("2026-06-01T10:05:00"),
         inputs={"profile": "kr", "run_mode": "overlay_only"},
     )
@@ -241,16 +280,18 @@ def test_watchdog_accepts_successful_target_job_when_later_publish_job_fails():
         runs=[{"id": 655, "status": "completed", "conclusion": "failure"}],
         jobs={
             655: [
+                {"name": "overlay_gate", "status": "completed", "conclusion": "success"},
                 {"name": "overlay_refresh_kr", "status": "completed", "conclusion": "success"},
                 {"name": "publish_overlay_site", "status": "completed", "conclusion": "failure"},
+                {"name": "deploy_overlay", "status": "completed", "conclusion": "skipped"},
             ]
         },
     )
 
     covered, reason = watchdog.target_is_covered(client=client, target=target)
 
-    assert covered
-    assert "covers target job set: overlay_refresh_kr" in reason
+    assert not covered
+    assert "No successful target jobs" in reason
 
 
 def test_watchdog_suppresses_repeated_failures_after_retry_budget():
@@ -279,13 +320,199 @@ def test_watchdog_suppresses_repeated_failures_after_retry_budget():
     assert "Retry budget exhausted" in reason
 
 
+def test_watchdog_retry_budget_only_counts_identical_target_job_failures():
+    target = watchdog.WatchdogTarget(
+        name="intraday-overlay-us",
+        workflow_file="intraday-overlay-refresh.yml",
+        job_names=("overlay_refresh_us",),
+        window_start_kst=_kst("2026-06-01T22:40:00"),
+        inputs={"profile": "us"},
+        max_failed_attempts=2,
+    )
+    client = FakeClient(
+        runs=[
+            {"id": 712, "status": "completed", "head_sha": "b" * 40},
+            {"id": 711, "status": "completed", "head_sha": "a" * 40},
+        ],
+        jobs={
+            712: [{"name": "overlay_refresh_us", "status": "completed", "conclusion": "failure"}],
+            711: [{"name": "overlay_refresh_us", "status": "completed", "conclusion": "failure"}],
+        },
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert not covered
+    assert "No successful target jobs" in reason
+
+
+def test_watchdog_uses_failure_cooldown_window_across_overlay_checkpoints():
+    target = watchdog.WatchdogTarget(
+        name="intraday-overlay-kr-1200",
+        workflow_file="intraday-overlay-refresh.yml",
+        job_names=("overlay_gate", "overlay_refresh_kr", "publish_overlay_site", "deploy_overlay"),
+        work_job_names=("overlay_refresh_kr",),
+        window_start_kst=_kst("2026-06-01T12:00:00"),
+        inputs={"profile": "kr"},
+        max_failed_attempts=2,
+        failure_window_start_kst=_kst("2026-06-01T09:30:00"),
+    )
+    client = FakeClient(
+        runs=[
+            {
+                "id": 722,
+                "status": "completed",
+                "head_sha": "a" * 40,
+                "created_at": "2026-06-01T02:00:00Z",
+            },
+            {
+                "id": 721,
+                "status": "completed",
+                "head_sha": "a" * 40,
+                "created_at": "2026-06-01T01:00:00Z",
+            },
+        ],
+        jobs={
+            722: [{"name": "overlay_refresh_kr", "status": "completed", "conclusion": "failure"}],
+            721: [{"name": "overlay_refresh_kr", "status": "completed", "conclusion": "failure"}],
+        },
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert covered
+    assert "identical target-job failure" in reason
+
+
+def test_watchdog_success_resets_older_identical_failure_budget():
+    target = watchdog.WatchdogTarget(
+        name="intraday-overlay-kr-1200",
+        workflow_file="intraday-overlay-refresh.yml",
+        job_names=("overlay_refresh_kr",),
+        window_start_kst=_kst("2026-06-01T12:00:00"),
+        inputs={"profile": "kr"},
+        max_failed_attempts=2,
+        failure_window_start_kst=_kst("2026-06-01T09:30:00"),
+    )
+    client = FakeClient(
+        runs=[
+            {"id": 744, "status": "completed", "head_sha": "a" * 40, "created_at": "2026-06-01T03:01:00Z"},
+            {"id": 743, "status": "completed", "head_sha": "a" * 40, "created_at": "2026-06-01T02:00:00Z"},
+            {"id": 742, "status": "completed", "head_sha": "a" * 40, "created_at": "2026-06-01T01:00:00Z"},
+            {"id": 741, "status": "completed", "head_sha": "a" * 40, "created_at": "2026-06-01T00:45:00Z"},
+        ],
+        jobs={
+            744: [{"name": "overlay_refresh_kr", "status": "completed", "conclusion": "failure"}],
+            743: [{"name": "overlay_refresh_kr", "status": "completed", "conclusion": "success"}],
+            742: [{"name": "overlay_refresh_kr", "status": "completed", "conclusion": "failure"}],
+            741: [{"name": "overlay_refresh_kr", "status": "completed", "conclusion": "failure"}],
+        },
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert not covered
+    assert "No successful target jobs" in reason
+
+
+def test_watchdog_skipped_target_jobs_do_not_consume_retry_budget():
+    target = watchdog.WatchdogTarget(
+        name="intraday-overlay-us",
+        workflow_file="intraday-overlay-refresh.yml",
+        job_names=("overlay_refresh_us",),
+        window_start_kst=_kst("2026-06-01T22:40:00"),
+        inputs={"profile": "us"},
+        max_failed_attempts=2,
+    )
+    client = FakeClient(
+        runs=[
+            {"id": 732, "status": "completed", "conclusion": "success"},
+            {"id": 731, "status": "completed", "conclusion": "success"},
+        ],
+        jobs={
+            732: [{"name": "overlay_refresh_us", "status": "completed", "conclusion": "skipped"}],
+            731: [{"name": "overlay_refresh_us", "status": "completed", "conclusion": "skipped"}],
+        },
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert covered
+    assert "explicit no-work" in reason
+
+
+def test_watchdog_repeated_log_unavailable_failure_has_bounded_budget():
+    target = watchdog.WatchdogTarget(
+        name="intraday-overlay-us",
+        workflow_file="intraday-overlay-refresh.yml",
+        job_names=("overlay_refresh_us",),
+        window_start_kst=_kst("2026-06-01T22:40:00"),
+        inputs={"profile": "us"},
+        max_failed_attempts=2,
+    )
+    client = FakeClient(
+        runs=[
+            {"id": 752, "status": "completed", "conclusion": "failure", "head_sha": "a" * 40},
+            {"id": 751, "status": "completed", "conclusion": "failure", "head_sha": "a" * 40},
+        ],
+        jobs={
+            752: [{"name": "overlay_refresh_us", "status": "completed", "conclusion": "failure"}],
+            751: [{"name": "overlay_refresh_us", "status": "completed", "conclusion": "failure"}],
+        },
+        diagnostics={},
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert covered
+    assert "Retry budget exhausted" in reason
+
+
+def test_watchdog_repeated_missing_publish_and_deploy_consumes_budget():
+    required = ("overlay_gate", "overlay_refresh_kr", "publish_overlay_site", "deploy_overlay")
+    target = watchdog.WatchdogTarget(
+        name="intraday-overlay-kr",
+        workflow_file="intraday-overlay-refresh.yml",
+        job_names=required,
+        work_job_names=("overlay_refresh_kr",),
+        window_start_kst=_kst("2026-06-01T10:05:00"),
+        inputs={"profile": "kr", "run_mode": "overlay_only"},
+        max_failed_attempts=2,
+    )
+    incomplete_jobs = [
+        {"name": "overlay_gate", "status": "completed", "conclusion": "success"},
+        {"name": "overlay_refresh_kr", "status": "completed", "conclusion": "success"},
+        {"name": "publish_overlay_site", "status": "completed", "conclusion": "skipped"},
+        {"name": "deploy_overlay", "status": "completed", "conclusion": "skipped"},
+    ]
+    client = FakeClient(
+        runs=[
+            {"id": 772, "status": "completed", "conclusion": "success", "head_sha": "a" * 40},
+            {"id": 771, "status": "completed", "conclusion": "success", "head_sha": "a" * 40},
+        ],
+        jobs={772: incomplete_jobs, 771: incomplete_jobs},
+    )
+
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+
+    assert covered
+    assert "Retry budget exhausted" in reason
+
+
 def test_watchdog_dispatches_when_due_target_is_uncovered():
     target_time = _kst("2026-06-02T06:57:00")
     client = FakeClient(runs=[])
 
     messages = watchdog.run_watchdog(client=client, now_kst=target_time)
 
-    assert ("daily-youtube-reports.yml", {"lookback_hours": "24", "publish": "true"}) in client.dispatches
+    assert (
+        "daily-youtube-reports.yml",
+        {
+            "lookback_hours": "24",
+            "publish": "true",
+            "recovery_source": "cloud_watchdog",
+        },
+    ) in client.dispatches
     assert any("youtube-daily: dispatched" in message for message in messages)
 
 
@@ -355,13 +582,29 @@ def test_watchdog_waits_to_dispatch_overlay_until_daily_dependency_completes():
             "intraday-overlay-refresh.yml": [],
             "daily-youtube-reports.yml": [{"id": 801, "status": "completed", "conclusion": "success"}],
         },
-        jobs={801: [{"name": "build_youtube_pages", "status": "completed", "conclusion": "success"}]},
+        jobs={
+            701: [{"name": "analyze_kr", "status": "in_progress", "conclusion": ""}],
+            801: [
+                {"name": "build_youtube_pages", "status": "completed", "conclusion": "success"},
+                {"name": "deploy", "status": "completed", "conclusion": "success"},
+            ],
+        },
     )
 
     messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T10:07:00"))
 
-    assert ("daily-codex-analysis.yml", {"profile": "kr"}) in client.dispatches
-    assert ("intraday-overlay-refresh.yml", {"profile": "kr", "run_mode": "overlay_only"}) not in client.dispatches
+    assert (
+        "daily-codex-analysis.yml",
+        {"profile": "kr", "recovery_source": "cloud_watchdog"},
+    ) not in client.dispatches
+    assert (
+        "intraday-overlay-refresh.yml",
+        {
+            "profile": "kr",
+            "run_mode": "overlay_only",
+            "recovery_source": "cloud_watchdog",
+        },
+    ) not in client.dispatches
     assert any("intraday-overlay-kr-1005: waiting" in message for message in messages)
     assert any("daily-codex-kr still active" in message for message in messages)
 
@@ -384,7 +627,14 @@ def test_watchdog_dispatches_overlay_after_daily_dependency_completed():
 
     messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-06-01T10:07:00"))
 
-    assert ("intraday-overlay-refresh.yml", {"profile": "kr", "run_mode": "overlay_only"}) in client.dispatches
+    assert (
+        "intraday-overlay-refresh.yml",
+        {
+            "profile": "kr",
+            "run_mode": "overlay_only",
+            "recovery_source": "cloud_watchdog",
+        },
+    ) in client.dispatches
     assert any("intraday-overlay-kr-1005: dispatched" in message for message in messages)
 
 

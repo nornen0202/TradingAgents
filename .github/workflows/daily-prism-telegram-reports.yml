@@ -123,8 +123,6 @@ jobs:
 
       - name: Rebuild base scheduled site
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -184,8 +182,6 @@ jobs:
 
       - name: Rebuild merged site and Work context after PRISM collection
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -232,7 +228,7 @@ jobs:
                   "${{ github.run_attempt }}",
                   "--commit-sha",
                   "${{ github.sha }}",
-                  "--require-private-envelope",
+                  "--require-strategy-payload",
               ]
           )
 

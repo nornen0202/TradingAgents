@@ -1,4 +1,10 @@
 name: Daily Codex Analysis
+run-name: >-
+  Daily Codex Analysis
+  [profile=${{ inputs.profile || ((github.event.schedule == '35 19 * * 0-4' || github.event.schedule == '5 20 * * 0-4' || github.event.schedule == '35 20 * * 0-4') && 'kr') || (github.event_name == 'schedule' && 'us') || 'all' }}]
+  [run_mode=${{ (inputs.site_only && 'site_only') || inputs.analysis_mode || 'full' }}]
+  [request_scope=${{ inputs.tickers && 'custom_tickers' || 'default_universe' }}]
+  [recovery_source=${{ inputs.recovery_source || (github.event_name == 'schedule' && 'native') || 'manual' }}]
 
 on:
   schedule:
@@ -56,6 +62,14 @@ on:
         options:
           - full
           - smoke
+      recovery_source:
+        description: "Dispatch origin marker used for retry and notification policy"
+        required: false
+        default: "manual"
+        type: choice
+        options:
+          - manual
+          - cloud_watchdog
       max_parallel_tickers:
         description: "Maximum ticker workers to run concurrently"
         required: false
@@ -530,8 +544,6 @@ jobs:
           )
 
       - name: Run scheduled analysis and build site
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -1185,8 +1197,6 @@ jobs:
           print("KIS account snapshot preflight:", account_result)
 
       - name: Run scheduled analysis and build site
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -1466,8 +1476,6 @@ jobs:
           subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", "."])
 
       - name: Rebuild final GitHub Pages site from archive
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -1517,7 +1525,7 @@ jobs:
                   "${{ github.run_attempt }}",
                   "--commit-sha",
                   "${{ github.sha }}",
-                  "--require-private-envelope",
+                  "--require-strategy-payload",
               ]
           )
 

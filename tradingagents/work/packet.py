@@ -11,12 +11,13 @@ from typing import Any
 
 WORK_SCHEMA = "tradingagents.work-context/v1"
 WORK_STATE_SCHEMA = "tradingagents.work-state/v1"
+WORK_REPORT_SCHEMA = "tradingagents.work-report/v1"
 SURFACES = ("kr", "us", "youtube", "prism")
 PROMPT_CONTRACTS = {
-    "kr": "market-work-v5-kr",
-    "us": "market-work-v5-us",
-    "youtube": "youtube-work-v4",
-    "prism": "prism-work-v4",
+    "kr": "market-work-v9-kr",
+    "us": "market-work-v9-us",
+    "youtube": "youtube-work-v5",
+    "prism": "prism-work-v5",
 }
 PROMPT_FILENAMES = {
     "kr": "market_kr.md",
@@ -76,7 +77,7 @@ def workflow_contract_hashes(surface: str) -> dict[str, str]:
 def compact_decision_bundle(
     bundle: dict[str, Any],
     *,
-    max_new_candidates: int = 5,
+    max_new_candidates: int = 10,
     required_watchlist_tickers: Iterable[Any] = (),
 ) -> dict[str, Any]:
     if not bundle:
@@ -238,7 +239,83 @@ def _compact_market_row(row: dict[str, Any], display_priority: int) -> dict[str,
             quality["row_mode"] = "MISSING"
     compact["quality"] = quality
     compact["display_priority"] = display_priority
+    compact["thesis"] = _market_row_thesis(compact)
+    execution = _market_row_execution(compact)
+    if isinstance(row.get("execution"), dict):
+        # Row-level validity is applied before packet compaction.  Preserve its
+        # readiness downgrade, blockers, and required rechecks instead of
+        # silently rebuilding an executable gate from the compact row.
+        execution.update(row["execution"])
+    compact["execution"] = execution
     return compact
+
+
+def _market_row_thesis(row: dict[str, Any]) -> dict[str, Any]:
+    """Keep the analysis-time thesis independent from live execution freshness."""
+
+    code = str(row.get("strategy_code") or "RESEARCH").strip().upper()
+    stance = {
+        "STARTER": "BUY",
+        "ADD": "BUY",
+        "BUY": "BUY",
+        "HOLD": "HOLD",
+        "WAIT": "HOLD",
+        "WATCH": "RESEARCH",
+        "REDUCE": "REDUCE",
+        "TRIM": "REDUCE",
+        "TAKE_PROFIT": "REDUCE",
+        "SELL": "SELL",
+        "EXIT": "SELL",
+        "STOP_LOSS": "SELL",
+        "AVOID": "AVOID",
+        "DATA_CHECK": "RESEARCH",
+    }.get(code, "RESEARCH")
+    entry = str(row.get("execution_condition_ko") or "").strip()
+    invalidation = str(row.get("risk_condition_ko") or "").strip()
+    reasons = row.get("reason_codes_ko")
+    if isinstance(reasons, str):
+        rationale = [reasons] if reasons.strip() else []
+    elif isinstance(reasons, list):
+        rationale = [str(item) for item in reasons if str(item).strip()]
+    else:
+        rationale = []
+    return {
+        "stance": stance,
+        "strategy_code": code,
+        "label_ko": row.get("strategy_ko"),
+        "confidence": row.get("confidence"),
+        "analysis_asof": row.get("market_data_asof"),
+        "rationale": rationale,
+        "entry_conditions": [entry] if entry else [],
+        "invalidation_conditions": [invalidation] if invalidation else [],
+    }
+
+
+def _market_row_execution(row: dict[str, Any]) -> dict[str, Any]:
+    quality = row.get("quality") if isinstance(row.get("quality"), dict) else {}
+    row_mode = str(quality.get("row_mode") or "MISSING").upper()
+    readiness = {
+        "IMMEDIATE": "READY_NOW",
+        "CONDITIONAL": "WAIT_FOR_TRIGGER",
+        "BLOCKED_STALE": "NEEDS_LIVE_RECHECK",
+        "MISSING": "DATA_OUTAGE",
+    }.get(row_mode, "NEEDS_LIVE_RECHECK")
+    return {
+        "readiness": readiness,
+        "source_row_mode": row_mode,
+        "as_of": row.get("market_data_asof"),
+        "valid_until": quality.get("row_valid_until"),
+        "action_now": row.get("strategy_ko") if readiness == "READY_NOW" else None,
+        "action_if_triggered": (
+            row.get("strategy_ko") if readiness == "WAIT_FOR_TRIGGER" else None
+        ),
+        "required_rechecks": [],
+        "blockers": [
+            str(item)
+            for item in (quality.get("provider_blockers") or [])
+            if str(item).strip()
+        ],
+    }
 
 
 def build_surface_packet(
@@ -309,7 +386,11 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
             "report_mode": "RESEARCH",
             "current": {},
             "last_ready": {},
-            "supporting_context": _supporting_context(roots, now=now),
+            "supporting_context": _supporting_context(
+                roots,
+                now=now,
+                market=surface,
+            ),
             "guardrails": _market_guardrails(surface, {}, now=now),
         }
     current = sources[0]
@@ -338,6 +419,11 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
         if has_public_universe_contract
         else []
     )
+    # Stamp freshness on the source rows before selecting the public/private
+    # projection. Public compaction deliberately removes the generated
+    # execution object; applying freshness afterwards would recreate private
+    # action fields inside a Pages recovery packet.
+    _apply_market_row_validity(current["bundle"], now=now)
     bundle = (
         _compact_public_market_bundle(current["bundle"], allowed_tickers=public_tickers)
         if public
@@ -346,7 +432,6 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
             required_watchlist_tickers=active_universe.get("expected_watchlist_tickers") or [],
         )
     )
-    _apply_market_row_validity(bundle, now=now)
     current_payload: dict[str, Any] = {
         "run_id": current["manifest"].get("run_id"),
         "started_at": current["manifest"].get("started_at"),
@@ -373,6 +458,11 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
     quality = bundle.get("quality") or {}
     mode = str(quality.get("report_mode") or _market_report_mode(bundle)).upper()
     guardrails = _market_guardrails(surface, bundle, now=now)
+    market_tickers = [
+        row.get("ticker")
+        for row in (bundle.get("strategy_table") or [])
+        if isinstance(row, dict) and row.get("ticker")
+    ]
     manifest_status = str(current["manifest"].get("status") or "unknown").strip().lower()
     if guardrails.get("expired_at_build") is True:
         source_health = "STALE"
@@ -397,7 +487,12 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
         "report_mode": mode,
         "current": current_payload,
         "last_ready": last_ready,
-        "supporting_context": _supporting_context(roots, now=now),
+        "supporting_context": _supporting_context(
+            roots,
+            now=now,
+            market=surface,
+            tickers=market_tickers,
+        ),
         "guardrails": guardrails,
     }
 
@@ -550,6 +645,8 @@ def _compact_public_market_bundle(
             "risk_condition_ko",
             "decision_state_ko",
             "execution_timing_ko",
+            "thesis",
+            "execution",
         ):
             compact.pop(key, None)
         quality = compact.get("quality") if isinstance(compact.get("quality"), dict) else {}
@@ -621,6 +718,13 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
         expired = bool(valid_until and valid_until < current_now.astimezone(valid_until.tzinfo))
         quality["row_valid_until"] = valid_until.isoformat() if valid_until else None
         quality["expired_at_build"] = expired
+        execution = (
+            dict(row.get("execution"))
+            if isinstance(row.get("execution"), dict)
+            else _market_row_execution(row)
+        )
+        execution["as_of"] = row.get("market_data_asof")
+        execution["valid_until"] = quality["row_valid_until"]
         if expired and quality.get("row_mode") in {"IMMEDIATE", "CONDITIONAL"}:
             quality["source_row_mode"] = quality.get("row_mode")
             quality["row_mode"] = "BLOCKED_STALE"
@@ -628,7 +732,23 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
             quality["conditional_strategy_ready"] = False
             blockers = [str(item) for item in (quality.get("provider_blockers") or []) if str(item)]
             quality["provider_blockers"] = list(dict.fromkeys([*blockers, "work_packet_row_expired"]))
+            execution["source_readiness"] = execution.get("readiness")
+            execution["readiness"] = "NEEDS_LIVE_RECHECK"
+            execution["action_now"] = None
+            execution["action_if_triggered"] = None
+            execution["blockers"] = list(
+                dict.fromkeys([*(execution.get("blockers") or []), "work_packet_row_expired"])
+            )
+            execution["required_rechecks"] = list(
+                dict.fromkeys(
+                    [
+                        *(execution.get("required_rechecks") or []),
+                        "실시간 시세와 주문 가능 상태 재확인",
+                    ]
+                )
+            )
         row["quality"] = quality
+        row["execution"] = execution
 
 
 def _market_sources(archive_dir: Path, market: str) -> list[dict[str, Any]]:
@@ -698,6 +818,10 @@ def _local_private_overlay(run_dir: Path, manifest: dict[str, Any], bundle: dict
                     "sell_size_plan",
                     "position_metrics",
                     "profit_taking_plan",
+                    "trigger_conditions",
+                    "rationale",
+                    "invalidators",
+                    "external_signals",
                     "reason_codes",
                     "gate_reasons",
                 )
@@ -727,7 +851,7 @@ def _youtube_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
     cutoff = now.astimezone().timestamp() - 72 * 3600
     included = [item for item in ordered if (_timestamp(item.get("occurred_at")) or 0) >= cutoff]
     window_count = len(included)
-    included = included[:30]
+    included = included[:60]
     source = _producer_snapshot(manifests, event_count=window_count, now=now, stale_after_hours=36)
     return {
         "kind": "youtube",
@@ -735,6 +859,7 @@ def _youtube_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
         "source": source,
         "window_hours": 72,
         "execution_eligible": False,
+        "evidence_policy": _balanced_external_policy(),
         "coverage": {
             "total_unique_events": len(ordered),
             "window_events": window_count,
@@ -788,7 +913,7 @@ def _youtube_event(item: dict[str, Any], run_dir: Path) -> dict[str, Any]:
                 )
                 if claim.get(key) is not None
             }
-            for claim in (summary.get("claims") or [])[:3]
+            for claim in (summary.get("claims") or [])[:6]
             if isinstance(claim, dict)
         ],
         "entities": [
@@ -797,7 +922,7 @@ def _youtube_event(item: dict[str, Any], run_dir: Path) -> dict[str, Any]:
                 for key in ("ticker", "name", "status", "verification_notes")
                 if entity.get(key) is not None
             }
-            for entity in (summary.get("entities") or [])[:4]
+            for entity in (summary.get("entities") or [])[:10]
             if isinstance(entity, dict)
         ],
         "evidence": [
@@ -814,7 +939,7 @@ def _youtube_event(item: dict[str, Any], run_dir: Path) -> dict[str, Any]:
                 )
                 if evidence.get(key) is not None
             }
-            for evidence in (summary.get("evidence") or [])[:3]
+            for evidence in (summary.get("evidence") or [])[:6]
             if isinstance(evidence, dict)
         ],
     }
@@ -823,6 +948,7 @@ def _youtube_event(item: dict[str, Any], run_dir: Path) -> dict[str, Any]:
         "event_key": str(compact.get("video_id")),
         "content_sha256": content_sha,
         "occurred_at": compact.get("published_at"),
+        "relevance": _youtube_relevance(compact),
         "summary": compact,
     }
 
@@ -842,7 +968,7 @@ def _prism_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
     ordered = sorted(events.values(), key=lambda item: str(item.get("occurred_at") or ""), reverse=True)
     cutoff = now.astimezone().timestamp() - 24 * 3600
     window = [item for item in ordered if (_timestamp(item.get("occurred_at")) or 0) >= cutoff]
-    included = window[:80]
+    included = window[:120]
     source = _producer_snapshot(manifests, event_count=len(window), now=now, stale_after_hours=30)
     return {
         "kind": "prism",
@@ -850,6 +976,7 @@ def _prism_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
         "source": source,
         "window_hours": 24,
         "execution_eligible": False,
+        "evidence_policy": _balanced_external_policy(),
         "coverage": {
             "total_unique_events": len(ordered),
             "window_events": len(window),
@@ -874,7 +1001,7 @@ def _prism_event(channel: str, message: dict[str, Any], run_dir: Path) -> dict[s
     simulation = "시뮬" in preview or "simulation" in preview.lower()
     signals = []
     source_signals = [item for item in (signals_payload.get("signals") or []) if isinstance(item, dict)]
-    for signal in source_signals[:8]:
+    for signal in source_signals[:16]:
         if not isinstance(signal, dict):
             continue
         signals.append(
@@ -915,26 +1042,307 @@ def _prism_event(channel: str, message: dict[str, Any], run_dir: Path) -> dict[s
         "event_key": f"{channel}:{message.get('message_id')}",
         "content_sha256": sha256_json(compact),
         "occurred_at": message.get("posted_at"),
+        "relevance": _prism_relevance(compact),
         "summary": compact,
     }
 
 
-def _supporting_context(roots: dict[str, Path], *, now: datetime) -> dict[str, Any]:
+def _balanced_external_policy() -> dict[str, Any]:
+    return {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+            "ranking",
+            "confidence",
+            "position_size_within_existing_risk_limits",
+            "research_priority",
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "matching_multi_source_signal_may_raise_thesis_priority": True,
+        "conflicting_signal_must_be_visible": True,
+        "may_bypass_market_or_portfolio_execution_gate": False,
+    }
+
+
+def _youtube_relevance(summary: dict[str, Any]) -> dict[str, Any]:
+    tickers = list(
+        dict.fromkeys(
+            str(entity.get("ticker") or "").strip().upper()
+            for entity in (summary.get("entities") or [])
+            if isinstance(entity, dict) and str(entity.get("ticker") or "").strip()
+        )
+    )
+    markets = list(dict.fromkeys(_ticker_market(ticker) for ticker in tickers if _ticker_market(ticker)))
+    themes = [
+        str(entity.get("name") or "").strip()
+        for entity in (summary.get("entities") or [])
+        if isinstance(entity, dict)
+        and not str(entity.get("ticker") or "").strip()
+        and str(entity.get("name") or "").strip()
+    ][:8]
+    return {
+        "tickers": tickers,
+        "markets": markets,
+        "themes": themes,
+        "match_basis": "verified_entities" if tickers else "title_and_claim_context",
+    }
+
+
+def _prism_relevance(summary: dict[str, Any]) -> dict[str, Any]:
+    signals = [item for item in (summary.get("signals") or []) if isinstance(item, dict)]
+    tickers = list(
+        dict.fromkeys(
+            str(item.get("canonical_ticker") or "").strip().upper()
+            for item in signals
+            if str(item.get("canonical_ticker") or "").strip()
+        )
+    )
+    markets = list(
+        dict.fromkeys(
+            str(item.get("market") or _ticker_market(item.get("canonical_ticker")) or "")
+            .strip()
+            .upper()
+            for item in signals
+            if str(item.get("market") or _ticker_market(item.get("canonical_ticker")) or "").strip()
+        )
+    )
+    return {
+        "tickers": tickers,
+        "markets": markets,
+        "themes": [],
+        "match_basis": "normalized_prism_signals" if tickers else "message_context",
+    }
+
+
+def _ticker_market(value: Any) -> str | None:
+    ticker = str(value or "").strip().upper()
+    identity = _market_ticker_identity(ticker)
+    if ticker.endswith((".KS", ".KQ")) or (identity.isdigit() and len(identity) == 6):
+        return "KR"
+    return "US" if identity else None
+
+
+def _rank_support_events(
+    events: Iterable[Any],
+    *,
+    market: str | None,
+    tickers: Iterable[Any],
+) -> list[dict[str, Any]]:
+    target_market = str(market or "").strip().upper()
+    target_tickers = {
+        _market_ticker_identity(item)
+        for item in tickers
+        if _market_ticker_identity(item)
+    }
+    ranked: list[tuple[int, str, dict[str, Any]]] = []
+    for value in events:
+        if not isinstance(value, dict):
+            continue
+        item = dict(value)
+        relevance = dict(item.get("relevance") or {})
+        event_tickers = {
+            _market_ticker_identity(ticker)
+            for ticker in (relevance.get("tickers") or [])
+            if _market_ticker_identity(ticker)
+        }
+        matched = sorted(target_tickers & event_tickers)
+        event_markets = {str(entry).upper() for entry in (relevance.get("markets") or []) if str(entry)}
+        market_match = bool(target_market and target_market in event_markets)
+        score = len(matched) * 100 + (20 if market_match else 0)
+        relevance.update(
+            {
+                "matched_tickers": matched,
+                "market_match": market_match,
+                "score": score,
+            }
+        )
+        item["relevance"] = relevance
+        ranked.append((score, str(item.get("occurred_at") or ""), item))
+    ranked.sort(key=lambda entry: (entry[0], entry[1]), reverse=True)
+    return [item for _, _, item in ranked]
+
+
+def _select_fair_support_events(
+    events: Iterable[Any],
+    *,
+    market: str | None,
+    tickers: Iterable[Any],
+    cap: int,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Select relevant events without letting one high-volume ticker consume the cap."""
+
+    ticker_order = list(
+        dict.fromkeys(
+            identity
+            for value in tickers
+            if (identity := _market_ticker_identity(value))
+        )
+    )
+    ranked = _rank_support_events(events, market=market, tickers=ticker_order)
+    limit = max(0, int(cap))
+    if not ranked or limit <= 0:
+        return ranked, []
+
+    buckets = {
+        ticker: [
+            event
+            for event in ranked
+            if ticker in ((event.get("relevance") or {}).get("matched_tickers") or [])
+        ]
+        for ticker in ticker_order
+    }
+    offsets = {ticker: 0 for ticker in ticker_order}
+    selected: list[dict[str, Any]] = []
+    selected_keys: set[tuple[str, str]] = set()
+
+    # Round-robin matched events first. compact_decision_bundle orders holdings
+    # before watchlist/discovery rows, so a crowded discovery ticker cannot
+    # starve a holding when the number of matched tickers itself exceeds cap.
+    while len(selected) < limit:
+        progressed = False
+        for ticker in ticker_order:
+            bucket = buckets[ticker]
+            while offsets[ticker] < len(bucket):
+                event = bucket[offsets[ticker]]
+                offsets[ticker] += 1
+                key = _support_event_selection_key(event)
+                if key in selected_keys:
+                    continue
+                selected.append(event)
+                selected_keys.add(key)
+                progressed = True
+                break
+            if len(selected) >= limit:
+                break
+        if not progressed:
+            break
+
+    # Use remaining capacity for market/theme-only events and additional
+    # per-ticker evidence in the original relevance/recency order.
+    for event in ranked:
+        if len(selected) >= limit:
+            break
+        key = _support_event_selection_key(event)
+        if key in selected_keys:
+            continue
+        selected.append(event)
+        selected_keys.add(key)
+    return ranked, selected
+
+
+def _support_event_selection_key(event: dict[str, Any]) -> tuple[str, str]:
+    return str(event.get("event_key") or ""), str(event.get("content_sha256") or "")
+
+
+def _supporting_context_coverage(
+    source_coverage: Any,
+    *,
+    ranked_events: list[dict[str, Any]],
+    selected_events: list[dict[str, Any]],
+    cap: int,
+) -> dict[str, Any]:
+    coverage = dict(source_coverage) if isinstance(source_coverage, dict) else {}
+    source_window = coverage.get("window_events")
+    window_events = (
+        source_window
+        if isinstance(source_window, int) and not isinstance(source_window, bool)
+        else len(ranked_events)
+    )
+    window_events = max(window_events, len(ranked_events))
+    transmitted = len(selected_events)
+    occurred = [
+        (timestamp, event.get("occurred_at"))
+        for event in selected_events
+        if (timestamp := _timestamp(event.get("occurred_at"))) is not None
+    ]
+    coverage.update(
+        {
+            "window_events": window_events,
+            "available_events_before_context_cap": len(ranked_events),
+            "context_event_cap": max(0, int(cap)),
+            "transmitted_events": transmitted,
+            "truncated": window_events > transmitted,
+            "omitted_events": max(0, window_events - transmitted),
+            "omitted_due_to_context_cap": max(0, len(ranked_events) - transmitted),
+            "omitted_before_context_selection": max(0, window_events - len(ranked_events)),
+            "oldest_occurred_at": min(occurred, default=(None, None))[1],
+            "newest_occurred_at": max(occurred, default=(None, None))[1],
+        }
+    )
+    return coverage
+
+
+def _external_evidence_receipt_contract(
+    sources: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    return {
+        "schema": "tradingagents.external-evidence-receipt/v1",
+        "sources": {
+            source: {
+                "source_health": payload.get("source_health"),
+                "event_keys": [
+                    str(event.get("event_key"))
+                    for event in (payload.get("events") or [])
+                    if isinstance(event, dict) and event.get("event_key") is not None
+                ],
+                "coverage": payload.get("coverage") if isinstance(payload.get("coverage"), dict) else {},
+            }
+            for source, payload in sources.items()
+        },
+    }
+
+
+def _supporting_context(
+    roots: dict[str, Path],
+    *,
+    now: datetime,
+    market: str | None = None,
+    tickers: Iterable[Any] = (),
+) -> dict[str, Any]:
+    target_tickers = list(tickers)
     youtube = _youtube_body(roots["youtube"], now=now)
     prism = _prism_body(roots["prism"], now=now)
-    return {
+    youtube_ranked, youtube_events = _select_fair_support_events(
+        youtube.get("events") or [],
+        market=market,
+        tickers=target_tickers,
+        cap=12,
+    )
+    prism_ranked, prism_events = _select_fair_support_events(
+        prism.get("events") or [],
+        market=market,
+        tickers=target_tickers,
+        cap=20,
+    )
+    sources = {
         "youtube": {
             "source_health": youtube.get("source_health"),
-            "coverage": youtube.get("coverage"),
-            "events": [_compact_support_event(item, kind="youtube") for item in (youtube.get("events") or [])[:3]],
+            "coverage": _supporting_context_coverage(
+                youtube.get("coverage"),
+                ranked_events=youtube_ranked,
+                selected_events=youtube_events,
+                cap=12,
+            ),
+            "events": [_compact_support_event(item, kind="youtube") for item in youtube_events],
             "execution_eligible": False,
         },
         "prism": {
             "source_health": prism.get("source_health"),
-            "coverage": prism.get("coverage"),
-            "events": [_compact_support_event(item, kind="prism") for item in (prism.get("events") or [])[:5]],
+            "coverage": _supporting_context_coverage(
+                prism.get("coverage"),
+                ranked_events=prism_ranked,
+                selected_events=prism_events,
+                cap=20,
+            ),
+            "events": [_compact_support_event(item, kind="prism") for item in prism_events],
             "execution_eligible": False,
         },
+    }
+    return {
+        "policy": _balanced_external_policy(),
+        **sources,
+        "receipt_contract": _external_evidence_receipt_contract(sources),
     }
 
 
@@ -944,6 +1352,7 @@ def _compact_support_event(event: dict[str, Any], *, kind: str) -> dict[str, Any
         "event_key": event.get("event_key"),
         "content_sha256": event.get("content_sha256"),
         "occurred_at": event.get("occurred_at"),
+        "relevance": event.get("relevance"),
     }
     if kind == "youtube":
         base["summary"] = {
@@ -952,7 +1361,8 @@ def _compact_support_event(event: dict[str, Any], *, kind: str) -> dict[str, Any
             "channel": summary.get("channel"),
             "source_url": summary.get("source_url"),
             "claim_status_summary": summary.get("claim_status_summary"),
-            "claims": (summary.get("claims") or [])[:2],
+            "claims": (summary.get("claims") or [])[:4],
+            "entities": (summary.get("entities") or [])[:8],
         }
     else:
         base["summary"] = {
@@ -960,7 +1370,7 @@ def _compact_support_event(event: dict[str, Any], *, kind: str) -> dict[str, Any
             "posted_at": summary.get("posted_at"),
             "source_url": summary.get("source_url"),
             "preview": _truncate_value(summary.get("preview"), 500),
-            "signals": (summary.get("signals") or [])[:5],
+            "signals": (summary.get("signals") or [])[:12],
             "simulation_only": summary.get("simulation_only"),
             "actionability": "research_only",
         }
@@ -999,6 +1409,7 @@ def _market_guardrails(surface: str, bundle: dict[str, Any], *, now: datetime) -
         "required_rechecks": required,
         "stale_buy_sell_reduce_is_reference_only": True,
         "supporting_context_may_promote_execution": False,
+        "external_evidence_policy": _balanced_external_policy(),
     }
 
 

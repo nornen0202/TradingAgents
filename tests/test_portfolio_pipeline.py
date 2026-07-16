@@ -1,14 +1,10 @@
 ﻿import json
-import os
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 from tradingagents.scheduled.runner import execute_scheduled_run, load_scheduled_config
-
-
-_TEST_MOBILE_KEY = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8"
 
 
 class _FakeStatsHandler:
@@ -93,7 +89,6 @@ class _FakeStructuredDecisionGraph:
 
 
 class PortfolioPipelineTests(unittest.TestCase):
-    @patch.dict(os.environ, {"TRADINGAGENTS_MOBILE_DASHBOARD_KEY": _TEST_MOBILE_KEY})
     def test_execute_scheduled_run_generates_private_portfolio_artifacts(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -250,8 +245,8 @@ enabled = false
             self.assertNotIn("timing_readiness", report_markdown)
             self.assertNotIn("reason_codes", report_markdown)
             self.assertNotIn("Data Health", report_markdown)
-            self.assertIn("개인 계좌 자료는 공개하지 않습니다", public_portfolio_page)
-            self.assertIn("암호화된 개인 액션표 열기", public_portfolio_page)
+            self.assertIn("계좌번호와 고객 식별정보는 제외", public_portfolio_page)
+            self.assertIn("통합 투자 전략 열기", public_portfolio_page)
             self.assertNotIn("Account report", public_portfolio_page)
             self.assertNotIn("RULE_ONLY", public_portfolio_page)
             self.assertNotIn("timing_readiness", public_portfolio_page)
@@ -260,7 +255,6 @@ enabled = false
             self.assertNotIn("portfolio_report.json", public_portfolio_page)
             self.assertFalse((site_dir / "downloads").exists())
 
-    @patch.dict(os.environ, {"TRADINGAGENTS_MOBILE_DASHBOARD_KEY": _TEST_MOBILE_KEY})
     def test_execute_scheduled_run_applies_portfolio_llm_judges_when_enabled(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -430,8 +424,8 @@ enabled = false
             self.assertGreaterEqual(len(semantic_payload["verdicts"]), 2)
             self.assertEqual(report_payload["actions"][0]["decision_source"], "RULE+DEEP+CODEX")
             self.assertIn("semiconductor_priority", report_payload["actions"][0]["reason_codes"])
-            self.assertIn("개인 계좌 자료는 공개하지 않습니다", public_portfolio_page)
-            self.assertIn("암호화된 개인 액션표 열기", public_portfolio_page)
+            self.assertIn("계좌번호와 고객 식별정보는 제외", public_portfolio_page)
+            self.assertIn("통합 투자 전략 열기", public_portfolio_page)
             self.assertNotIn("Account report", public_portfolio_page)
             self.assertNotIn("portfolio_report.md", public_portfolio_page)
             self.assertNotIn("portfolio_report.json", public_portfolio_page)
@@ -441,7 +435,6 @@ enabled = false
             self.assertFalse((published_portfolio_dir / "portfolio_report.json").exists())
             self.assertFalse((site_dir / "downloads").exists())
 
-    @patch.dict(os.environ, {"TRADINGAGENTS_MOBILE_DASHBOARD_KEY": _TEST_MOBILE_KEY})
     def test_execute_scheduled_run_marks_watchlist_only_for_empty_underfunded_snapshot(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -543,7 +536,6 @@ enabled = false
 
             self.assertEqual((manifest.get("portfolio") or {}).get("status"), "watchlist_only")
 
-    @patch.dict(os.environ, {"TRADINGAGENTS_MOBILE_DASHBOARD_KEY": _TEST_MOBILE_KEY})
     def test_execute_scheduled_run_generates_watchlist_only_profile_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -620,8 +612,8 @@ enabled = false
 
             self.assertEqual(status_payload["status"], "watchlist_only")
             self.assertEqual(snapshot_payload["snapshot_health"], "WATCHLIST_ONLY")
-            self.assertIn("개인 계좌 자료는 공개하지 않습니다", public_portfolio_page)
-            self.assertIn("암호화된 개인 액션표 열기", public_portfolio_page)
+            self.assertIn("계좌번호와 고객 식별정보는 제외", public_portfolio_page)
+            self.assertIn("통합 투자 전략 열기", public_portfolio_page)
             self.assertNotIn("Watchlist report", public_portfolio_page)
             self.assertNotIn("TradingAgents 포트폴리오 워치리스트 리포트", public_portfolio_page)
             self.assertNotIn("portfolio_report.md", public_portfolio_page)

@@ -74,3 +74,25 @@ def test_representative_run_prefers_recent_successful_account_report():
     selected = _select_representative_run([newer, older])
 
     assert selected is newer
+
+
+def test_representative_run_never_falls_back_from_july_latest_to_june_archive():
+    june_qualified = _manifest(
+        "20260609T090000_github-actions-us",
+        started_at="2026-06-09T09:00:00+00:00",
+        total=40,
+        successful=40,
+        failed=0,
+    )
+    july_latest = _manifest(
+        "20260716T230000_github-actions-us",
+        started_at="2026-07-16T23:00:00+00:00",
+        total=40,
+        successful=39,
+        failed=1,
+        portfolio_status="failed",
+    )
+
+    selected = _select_representative_run([june_qualified, july_latest])
+
+    assert selected is july_latest

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import base64
 import json
 from pathlib import Path
 
@@ -9,17 +8,19 @@ import pytest
 from tradingagents.scheduled.config import SiteSettings
 from tradingagents.scheduled.mobile_site import (
     MOBILE_SCHEMA,
-    PRIVATE_SCHEMA,
+    STRATEGY_SCHEMA,
     assert_public_payload_safe,
+    assert_strategy_payload_safe,
     build_mobile_site,
-    decode_dashboard_key,
-    decrypt_private_payload,
-    encrypt_private_payload,
     sanitize_public_decision_bundle,
+    _load_latest_work_report,
     _private_market_payload,
+    _public_quality,
+    _strip_strategy_identifiers,
 )
 from tradingagents.scheduled.site import _public_ticker_summaries, build_site
-from tradingagents.work.packet import _compact_public_market_bundle
+from tradingagents.work.packet import _compact_public_market_bundle, sha256_json
+from tradingagents.work.runtime import _report_policy
 
 
 def _packet(market: str, *, public: bool) -> dict:
@@ -99,15 +100,28 @@ def _packet(market: str, *, public: bool) -> dict:
             "actions": [
                 {
                     "canonical_ticker": "SECRET.HOLD",
+                    "confidence": 0.73,
                     "action_now": "REDUCE_RISK",
                     "delta_krw_now": -987654321,
                     "target_weight_now": 0.12,
+                    "action_if_triggered": "REDUCE_IF_TRIGGERED",
+                    "trigger_conditions": ["VWAP 하향 이탈", "거래량 1.5배 이상"],
+                    "risk_action": "STOP_LOSS_IF_TRIGGERED",
+                    "risk_action_level": "종가 기준 손실 제한",
+                    "position_metrics": {
+                        "current_weight": 0.18,
+                        "account_id": "RAW-ACCOUNT-123456",
+                        "cano": "12345678",
+                        "order_reference": "ORDER-PRIVATE-999",
+                    },
                 }
             ],
         }
     return {
         "surface": market,
         "event_id": f"{market}:event",
+        "source_sha256": f"source-{market}",
+        "workflow_contract_sha256": "f" * 64,
         "body": {
             "market": market.upper(),
             "source_health": "OK",
@@ -207,38 +221,62 @@ def test_public_mobile_sanitizer_does_not_truncate_safe_watchlist_rows() -> None
     assert [row["ticker"] for row in packet_bundle["strategy_table"]] == tickers
 
 
-def test_aes_gcm_private_payload_round_trip_and_wrong_key_fails() -> None:
-    key = bytes(range(32))
-    payload = {
-        "schema": PRIVATE_SCHEMA,
-        "generated_at": "2026-07-16T09:00:00+09:00",
-        "markets": {"kr": {"rows": [{"ticker": "SECRET.HOLD", "delta_krw_now": -987654321}]}},
-    }
-    envelope = encrypt_private_payload(payload, key=key, nonce=b"\x01" * 12)
-    serialized = json.dumps(envelope)
-
-    assert "SECRET.HOLD" not in serialized
-    assert "987654321" not in serialized
-    assert "plaintext_sha256" not in envelope
-    assert decrypt_private_payload(envelope, key=key) == payload
-    with pytest.raises(Exception):
-        decrypt_private_payload(envelope, key=b"x" * 32)
-    wrong_context = {
-        **envelope,
-        "aad": base64.urlsafe_b64encode(b"wrong-context").decode("ascii").rstrip("="),
-    }
-    with pytest.raises(ValueError, match="authenticated context"):
-        decrypt_private_payload(wrong_context, key=key)
+def test_strategy_safety_check_rejects_nested_raw_account_identifier() -> None:
+    with pytest.raises(ValueError, match="Forbidden account identifier"):
+        assert_strategy_payload_safe(
+            {"markets": {"kr": {"rows": [{"position_metrics": {"account_id": "123-456"}}]}}}
+        )
 
 
-def test_dashboard_key_accepts_only_browser_compatible_base64url() -> None:
-    key = bytes(range(32))
-    encoded = base64.urlsafe_b64encode(key).decode("ascii").rstrip("=")
-    assert decode_dashboard_key(encoded) == key
-    with pytest.raises(ValueError, match="43-character base64url"):
-        decode_dashboard_key(key.hex())
-    with pytest.raises(ValueError, match="43-character base64url"):
-        decode_dashboard_key("short")
+@pytest.mark.parametrize(
+    "sensitive_text",
+    (
+        "CANO 12345678",
+        "ODNO=87654321",
+        "ACNT_PRDT_CD: 01",
+        "order reference ORDER-1234",
+        "client id CLIENT-1234",
+        "access token alphabetic-secret",
+        "token: alphabetic-secret",
+        "api_key=alphabetic-secret",
+        r"C:\Users\investor\private\receipt.json",
+        r"C:\TradingAgentsData\automation-logs\private.log",
+    ),
+)
+def test_strategy_safety_scans_and_redacts_sensitive_string_values(sensitive_text: str) -> None:
+    with pytest.raises(ValueError, match="Forbidden identifier value"):
+        assert_strategy_payload_safe({"rationale": sensitive_text})
+    sanitized = _strip_strategy_identifiers({"rationale": sensitive_text})
+    serialized = json.dumps(sanitized, ensure_ascii=False)
+    assert sensitive_text not in serialized
+    assert_strategy_payload_safe(sanitized)
+
+
+def test_strategy_string_scanner_avoids_general_account_status_false_positive() -> None:
+    payload = {"rationale": "account id unavailable"}
+    assert _strip_strategy_identifiers(payload) == payload
+    assert_strategy_payload_safe(payload)
+
+
+@pytest.mark.parametrize(
+    "identifier_key",
+    (
+        "order_id",
+        "order_no",
+        "order_number",
+        "order_reference",
+        "odno",
+        "cano",
+        "acnt_prdt_cd",
+        "custtype",
+        "client_id",
+    ),
+)
+def test_strategy_safety_check_rejects_raw_order_and_kis_identifiers(identifier_key: str) -> None:
+    with pytest.raises(ValueError, match="Forbidden account identifier"):
+        assert_strategy_payload_safe(
+            {"markets": {"kr": {"integrated_report": {identifier_key: "RAW-PRIVATE-1234"}}}}
+        )
 
 
 def test_private_action_matches_kr_broker_and_canonical_ticker_aliases() -> None:
@@ -251,31 +289,143 @@ def test_private_action_matches_kr_broker_and_canonical_ticker_aliases() -> None
     assert market["rows"][0]["portfolio_action"]["action_now"] == "REDUCE_RISK"
 
 
-def test_mobile_build_writes_only_ciphertext_for_private_values(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    key = bytes(range(32))
-    encoded_key = base64.urlsafe_b64encode(key).decode("ascii").rstrip("=")
-    monkeypatch.setenv("TRADINGAGENTS_MOBILE_DASHBOARD_KEY", encoded_key)
+def _write_valid_work_report(
+    archive: Path,
+    *,
+    market: str,
+    event_id: str,
+    source_sha256: str,
+    source_run_id: str,
+    tickers: list[str],
+) -> dict:
+    strategies = []
+    for index, ticker in enumerate(tickers, start=1):
+        strategies.append(
+            {
+                "ticker": ticker,
+                "display_name": "Private holding" if index == 1 else "Public candidate",
+                "rank": index,
+                "portfolio_role": "HOLDING" if index == 1 else "WATCHLIST",
+                "thesis": {
+                    "stance": "REDUCE" if index == 1 else "RESEARCH",
+                    "confidence": 0.73,
+                    "rationale": "리스크 대비 비중과 진입 조건을 점검",
+                    "entry_conditions": ["VWAP 하향 이탈"],
+                    "invalidation_conditions": ["종가가 무효화 가격 하회"],
+                    "invalidation_action": (
+                        "보유 비중을 절반 축소하고 다음 정규장에서 재평가"
+                        if index == 1
+                        else "신규 주문을 보류하고 실시간 가격·거래량 확인 후 재분석"
+                    ),
+                    "horizon": "다음 정규장 마감까지",
+                    "position_sizing": "기존 위험 한도 내",
+                },
+                "execution": {
+                    "readiness": "NEEDS_LIVE_RECHECK",
+                    "required_rechecks": ["실시간 가격 재확인"],
+                },
+                "source_contributions": [
+                    {
+                        "source": "youtube",
+                        "summary": "강세 근거",
+                        "execution_gate_override": False,
+                    }
+                ],
+            }
+        )
+    structured = {
+        "binding": {
+            "surface": market,
+            "event_id": event_id,
+            "source_sha256": source_sha256,
+        },
+        "title": f"{market.upper()} 통합 투자 전략",
+        "generated_at": "2026-07-16T09:05:00+09:00",
+        "as_of": "2026-07-16T09:05:00+09:00",
+        "summary": "분석 시점 전략을 유지하고 주문 전에 가격을 재확인",
+        "top_actions": [
+            {"ticker": ticker, "readiness": "NEEDS_LIVE_RECHECK"}
+            for ticker in tickers
+        ],
+        "strategies": strategies,
+        "coverage_receipt": {"status": "COMPLETE", "source_run_id": source_run_id},
+        "source_summary": {"youtube": "반영", "prism": "반영", market: "핵심"},
+        "next_checkpoint": "다음 시장 데이터 갱신 시점",
+    }
+    material = {
+        "schema": "tradingagents.work-report/v1",
+        "surface": market,
+        "event_id": event_id,
+        "source_sha256": source_sha256,
+        "prompt_contract_version": "mobile-test-v1",
+        "workflow_contract_sha256": "f" * 64,
+        "policy": _report_policy(),
+        "report_markdown": "# 통합 전략\n\n분석 논리는 유지하되 주문 전 실시간 재확인이 필요합니다.",
+        "structured_report": structured,
+    }
+    report_sha256 = sha256_json(material)
+    report = {
+        **material,
+        "report_id": f"{market}:{report_sha256[:32]}",
+        "report_sha256": report_sha256,
+        "published_at": "2026-07-16T09:05:00+09:00",
+    }
+    report_dir = archive / "work-reports" / market
+    event_path = report_dir / "events" / f"{report_sha256}.json"
+    event_path.parent.mkdir(parents=True, exist_ok=True)
+    serialized = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
+    event_path.write_text(serialized, encoding="utf-8")
+    (report_dir / "latest.json").write_text(serialized, encoding="utf-8")
+    return report
 
+
+def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     def fake_packet(market: str, **kwargs) -> dict:
         return _packet(market, public=bool(kwargs.get("public")))
 
     monkeypatch.setattr("tradingagents.scheduled.mobile_site.build_surface_packet", fake_packet)
-    status = build_mobile_site(site_dir=tmp_path / "site", archive_dir=tmp_path / "archive")
+    archive = tmp_path / "archive"
+    _write_valid_work_report(
+        archive,
+        market="kr",
+        event_id="kr:event",
+        source_sha256="source-kr",
+        source_run_id="run-kr",
+        tickers=["SECRET.HOLD", "PUBLIC"],
+    )
+    mobile = tmp_path / "site" / "mobile"
+    mobile.mkdir(parents=True)
+    (mobile / "private.enc.json").write_text("legacy", encoding="utf-8")
+    (mobile / "private.json").write_text("legacy", encoding="utf-8")
+
+    status = build_mobile_site(site_dir=tmp_path / "site", archive_dir=archive)
     mobile = tmp_path / "site" / "mobile"
     public_payload = json.loads((mobile / "public.json").read_text(encoding="utf-8"))
-    envelope = json.loads((mobile / "private.enc.json").read_text(encoding="utf-8"))
-    private_payload = decrypt_private_payload(envelope, key=key)
+    strategy_payload = json.loads((mobile / "strategy.json").read_text(encoding="utf-8"))
+    serialized_strategy = json.dumps(strategy_payload, ensure_ascii=False)
 
     assert status["private_dashboard"]["enabled"] is True
+    assert status["private_dashboard"]["storage"] == "PLAINTEXT_ACTION_DATA"
+    assert status["strategy_payload_url"] == "mobile/strategy.json"
     assert public_payload["schema"] == MOBILE_SCHEMA
     assert "SECRET.HOLD" not in json.dumps(public_payload, ensure_ascii=False)
-    assert private_payload["markets"]["kr"]["rows"][0]["ticker"] == "SECRET.HOLD"
-    assert private_payload["markets"]["kr"]["rows"][0]["portfolio_action"]["delta_krw_now"] == -987654321
-    assert private_payload["markets"]["kr"]["portfolio_action_count"] == 1
-    assert private_payload["markets"]["kr"]["manifest_status"] == "success"
-    assert private_payload["markets"]["kr"]["decision_ready"] is False
-    assert private_payload["markets"]["kr"]["universe_coverage"]["expected_analysis_count"] == 2
-    assert private_payload["markets"]["kr"]["provenance"] == {
+    assert strategy_payload["schema"] == STRATEGY_SCHEMA
+    assert strategy_payload["markets"]["kr"]["rows"][0]["ticker"] == "SECRET.HOLD"
+    assert strategy_payload["markets"]["kr"]["rows"][0]["universe_role"] == "HOLDING"
+    action = strategy_payload["markets"]["kr"]["rows"][0]["portfolio_action"]
+    assert action["delta_krw_now"] == -987654321
+    assert action["trigger_conditions"] == ["VWAP 하향 이탈", "거래량 1.5배 이상"]
+    assert "account_id" not in action["position_metrics"]
+    assert "cano" not in action["position_metrics"]
+    assert "order_reference" not in action["position_metrics"]
+    assert strategy_payload["markets"]["kr"]["portfolio_action_count"] == 1
+    assert strategy_payload["markets"]["kr"]["manifest_status"] == "success"
+    assert strategy_payload["markets"]["kr"]["decision_ready"] is False
+    assert strategy_payload["markets"]["kr"]["universe_coverage"]["expected_analysis_count"] == 2
+    assert strategy_payload["markets"]["kr"]["provenance"] == {
         "surface_run_id": "run-kr",
         "manifest_run_id": "run-kr",
         "universe_source_run_id": "run-kr",
@@ -283,11 +433,23 @@ def test_mobile_build_writes_only_ciphertext_for_private_values(tmp_path: Path, 
         "analysis_source_run_id": "run-kr",
         "execution_source_run_id": "run-kr",
     }
+    report = strategy_payload["markets"]["kr"]["integrated_report"]
+    assert report["structured_report"]["strategies"][0]["thesis"]["stance"] == "REDUCE"
+    assert report["structured_report"]["strategies"][0]["thesis"]["invalidation_action"] == (
+        "보유 비중을 절반 축소하고 다음 정규장에서 재평가"
+    )
+    assert report["lineage"]["status"] == "CURRENT_PACKET"
+    assert "source_sha256" not in serialized_strategy
+    assert "report_sha256" not in serialized_strategy
+    assert "RAW-ACCOUNT" not in serialized_strategy
+    assert "BLOCKED_STALE" not in serialized_strategy
+    assert "현재 조건부 실행 가능: 없음" not in serialized_strategy
+    assert "주문 전 실시간 재확인" in report["report_markdown"]
+    assert _load_latest_work_report(archive, "kr")["report_id"].startswith("kr:")
+    assert_strategy_payload_safe(strategy_payload)
 
-    all_public_bytes = b"\n".join(path.read_bytes() for path in mobile.rglob("*") if path.is_file())
-    assert b"SECRET.HOLD" not in all_public_bytes
-    assert b"987654321" not in all_public_bytes
-    assert encoded_key.encode("ascii") not in all_public_bytes
+    assert not (mobile / "private.enc.json").exists()
+    assert not (mobile / "private.json").exists()
     assert b"viewport-fit=cover" in (mobile / "index.html").read_bytes()
     assert b"data-valid-until" in (mobile / "index.html").read_bytes()
     mobile_css = (mobile / "mobile.css").read_text(encoding="utf-8")
@@ -297,16 +459,42 @@ def test_mobile_build_writes_only_ciphertext_for_private_values(tmp_path: Path, 
     assert "grid-template-columns: repeat(2, minmax(0, 1fr))" in mobile_css
     assert ".cards { display: grid; grid-template-columns: minmax(0, 1fr);" in mobile_css
     assert ".market-panel, #private-root { min-width: 0; max-width: 100%; }" in mobile_css
-    assert b"crypto.subtle.decrypt" in (mobile / "private.js").read_bytes()
     private_js = (mobile / "private.js").read_text(encoding="utf-8")
+    private_html = (mobile / "private.html").read_text(encoding="utf-8")
     assert "리스크 축소" in private_js
     assert "currency: 'KRW'" in private_js
     assert "style: 'percent'" in private_js
-    assert "history.replaceState" in private_js
-    assert "[A-Za-z0-9_-]{43}" in private_js
-    assert "[0-9a-fA-F]{64}" not in private_js
-    assert "암호화 context가 올바르지 않습니다" in private_js
-    assert "데이터 만료·불완전 — 지금 주문하지 마세요" in private_js
+    assert "fetch('strategy.json'" in private_js
+    assert "crypto.subtle" not in private_js
+    assert "AES-GCM" not in private_js
+    assert "private.enc.json" not in private_js
+    assert "분석 시점 결론" in private_js
+    assert "확인할 진입·축소 조건" in private_js
+    assert "조건 충족 후 행동" in private_js
+    assert "무효화·손실 제한 조건" in private_js
+    assert "무효화 시 행동" in private_js
+    assert "humanPlan(thesis.invalidation_action || workExecution.risk_action)" in private_js
+    assert "row.execution_condition_ko" in private_js
+    assert "action.trigger_conditions" in private_js
+    assert "const analysisAction = (hasWork ? workConclusion : baseConclusion)" in private_js
+    assert "const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions)" in private_js
+    assert "distinctConditions(...values).slice(0, 3)" in private_js
+    assert "기본 분석·전체 조건 보기" in private_js
+    assert "별도 단계 실행 계획 없음" not in private_js
+    assert "CUSTOM: '세부 실행 계획 확인'" in private_js
+    assert "sizingText(action.delta_krw_if_triggered, action.target_weight_if_triggered)" in private_js
+    assert "text.split(/\\s+(?:\\/|\\||·)\\s+|\\n+/)" in private_js
+    assert "const baseConclusion = action.action_now ? actionLabel(action.action_now)" in private_js
+    assert "조건 정보 없음" in private_js
+    assert "행동 계획 정보 없음" in private_js
+    assert "slice(0, Math.min(3, ranked.length))" in private_js
+    assert "topActions.slice(0, 3)" in private_js
+    assert "(strategy.thesis || {}).stance" in private_js
+    assert "strategy.rank ?? row.portfolio_priority" in private_js
+    assert "현재 실행 가능: 없음" not in private_js
+    assert "BLOCKED_STALE" not in private_js
+    assert "AES" not in private_html
+    assert "복호화" not in private_html
     assert "guardrails.expired_at_build" in private_js
     assert "!Number.isFinite(marketValid)" in private_js
     assert "!Number.isFinite(valid)" in private_js
@@ -315,24 +503,240 @@ def test_mobile_build_writes_only_ciphertext_for_private_values(tmp_path: Path, 
     assert "accountReady" in private_js
     assert "quality.decision_ready === true" in private_js
     assert "boundRunIds.every((value) => value === runId)" in private_js
+    for readiness, investor_code in {
+        "READY_NOW": "READY",
+        "WAIT_FOR_TRIGGER": "CONDITIONAL",
+        "NEEDS_LIVE_RECHECK": "RECHECK",
+        "MARKET_CLOSED": "RECHECK",
+        "DATA_OUTAGE": "RECHECK",
+        "RESEARCH_ONLY": "RESEARCH",
+    }.items():
+        assert f"{readiness}: {{code: '{investor_code}'" in private_js
+    assert "readinessSeverity(workGate.code) >= readinessSeverity(base.code)" in private_js
+    assert "알 수 없는 Work 준비 상태" in private_js
+    assert "function marketHealth(item, rows)" in private_js
+    assert "className: 'missing', label: '전략 행 없음'" in private_js
+    assert "className: 'degraded', label: expired ? '데이터 만료 · 재확인'" in private_js
+    assert "health health-neutral" in private_js
+    assert "health health-${esc(health.className)}" in private_js
+    assert '<meta name="robots" content="noindex,nofollow,noarchive">' in private_html
     assert "requestedRun" in private_js
 
 
-def test_mobile_build_without_key_fails_when_private_actions_exist(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("TRADINGAGENTS_MOBILE_DASHBOARD_KEY", raising=False)
+def test_expired_machine_state_is_normalized_out_of_every_mobile_artifact(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def expired_packet(market: str, **kwargs) -> dict:
+        packet = _packet(market, public=bool(kwargs.get("public")))
+        rows = packet["body"]["current"]["bundle"]["strategy_table"]
+        for row in rows:
+            row["quality"] = {
+                **(row.get("quality") or {}),
+                "row_mode": "BLOCKED_STALE",
+                "expired_at_build": True,
+                "row_valid_until": "2026-07-16T08:30:00+09:00",
+            }
+        if not kwargs.get("public"):
+            packet["body"]["current"]["private_portfolio_overlay"]["actions"][0][
+                "execution_feasibility_now"
+            ] = "blocked_stale_or_degraded_data"
+        return packet
+
+    monkeypatch.setattr(
+        "tradingagents.scheduled.mobile_site.build_surface_packet",
+        expired_packet,
+    )
+    mobile = tmp_path / "site" / "mobile"
+    build_mobile_site(site_dir=tmp_path / "site", archive_dir=tmp_path / "archive")
+
+    artifacts = [path for path in mobile.rglob("*") if path.is_file()]
+    assert artifacts
+    assert all(b"blocked_stale" not in path.read_bytes().lower() for path in artifacts)
+    public = json.loads((mobile / "public.json").read_text(encoding="utf-8"))
+    strategy = json.loads((mobile / "strategy.json").read_text(encoding="utf-8"))
+    public_quality = public["markets"]["kr"]["rows"][0]["quality"]
+    assert "row_mode" not in public_quality
+    assert public_quality["investor_state"] == "RECHECK"
+    assert public_quality["investor_label"] == "주문 전 재확인"
+    assert strategy["markets"]["kr"]["rows"][0]["quality"]["investor_state"] == "RECHECK"
+    assert (
+        strategy["markets"]["kr"]["rows"][0]["portfolio_action"][
+            "execution_feasibility_now"
+        ]
+        == "RECHECK_REQUIRED_or_degraded_data"
+    )
+
+
+def test_validated_work_conclusion_is_authoritative_over_conflicting_base_action(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def conflicting_packet(market: str, **kwargs) -> dict:
+        packet = _packet(market, public=bool(kwargs.get("public")))
+        if not kwargs.get("public"):
+            held = packet["body"]["current"]["bundle"]["strategy_table"][0]
+            held["strategy_code"] = "BUY"
+            held["strategy_ko"] = "분할매수"
+            packet["body"]["current"]["private_portfolio_overlay"]["actions"][0][
+                "action_now"
+            ] = "BUY_NOW"
+        return packet
+
+    monkeypatch.setattr(
+        "tradingagents.scheduled.mobile_site.build_surface_packet",
+        conflicting_packet,
+    )
+    archive = tmp_path / "archive"
+    _write_valid_work_report(
+        archive,
+        market="kr",
+        event_id="kr:event",
+        source_sha256="source-kr",
+        source_run_id="run-kr",
+        tickers=["SECRET.HOLD", "PUBLIC"],
+    )
+    build_mobile_site(site_dir=tmp_path / "site", archive_dir=archive)
+    mobile = tmp_path / "site" / "mobile"
+    strategy = json.loads((mobile / "strategy.json").read_text(encoding="utf-8"))
+    market = strategy["markets"]["kr"]
+    assert market["rows"][0]["portfolio_action"]["action_now"] == "BUY_NOW"
+    assert market["integrated_report"]["structured_report"]["strategies"][0]["thesis"][
+        "stance"
+    ] == "REDUCE"
+    private_js = (mobile / "private.js").read_text(encoding="utf-8")
+    assert "const analysisAction = (hasWork ? workConclusion : baseConclusion)" in private_js
+    assert "const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions)" in private_js
+    assert "기본 분석 결론" in private_js
+
+
+def test_mobile_quality_exposes_investor_state_instead_of_machine_state() -> None:
+    quality = _public_quality({"row_mode": "BLOCKED_STALE", "expired_at_build": True})
+    assert "row_mode" not in quality
+    assert quality["investor_state"] == "RECHECK"
+    assert quality["investor_label"] == "주문 전 재확인"
+
+
+def test_mobile_work_report_requires_matching_content_addressed_event(tmp_path: Path) -> None:
+    archive = tmp_path / "archive"
+    report = _write_valid_work_report(
+        archive,
+        market="kr",
+        event_id="kr:event",
+        source_sha256="source-kr",
+        source_run_id="run-kr",
+        tickers=["SECRET.HOLD", "PUBLIC"],
+    )
+    event_path = (
+        archive
+        / "work-reports"
+        / "kr"
+        / "events"
+        / f"{report['report_sha256']}.json"
+    )
+    event_path.unlink()
+
+    assert _load_latest_work_report(
+        archive,
+        "kr",
+        current_packet=_packet("kr", public=False),
+    ) == {}
+
+
+def test_mobile_separates_unrelated_work_report_as_past_reference(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         "tradingagents.scheduled.mobile_site.build_surface_packet",
         lambda market, **kwargs: _packet(market, public=bool(kwargs.get("public"))),
     )
-    with pytest.raises(ValueError, match="required when private portfolio actions exist"):
-        build_mobile_site(site_dir=tmp_path / "site", archive_dir=tmp_path / "archive")
+    archive = tmp_path / "archive"
+    _write_valid_work_report(
+        archive,
+        market="kr",
+        event_id="kr:previous-event",
+        source_sha256="previous-source",
+        source_run_id="previous-run",
+        tickers=["SECRET.HOLD", "PUBLIC"],
+    )
 
+    build_mobile_site(site_dir=tmp_path / "site", archive_dir=archive)
+    strategy = json.loads(
+        (tmp_path / "site" / "mobile" / "strategy.json").read_text(encoding="utf-8")
+    )
+    market = strategy["markets"]["kr"]
+
+    assert "integrated_report" not in market
+    assert market["reference_report"]["lineage"]["status"] == "PAST_REFERENCE"
+    assert market["reference_report"]["lineage"]["current_action_cards_enriched"] is False
+    private_js = (tmp_path / "site" / "mobile" / "private.js").read_text(encoding="utf-8")
+    assert "현재 카드 순위·실행 판단에는 반영하지 않았습니다" in private_js
+    assert "item.integrated_report || {}" in private_js
+
+
+def test_mobile_accepts_report_bound_to_current_analysis_source_lineage(tmp_path: Path) -> None:
+    archive = tmp_path / "archive"
+    _write_valid_work_report(
+        archive,
+        market="kr",
+        event_id="kr:prior-overlay-event",
+        source_sha256="prior-overlay-source",
+        source_run_id="run-kr",
+        tickers=["SECRET.HOLD", "PUBLIC"],
+    )
+
+    report = _load_latest_work_report(
+        archive,
+        "kr",
+        current_packet=_packet("kr", public=False),
+    )
+
+    assert report["lineage"]["status"] == "CURRENT_ANALYSIS_LINEAGE"
+    assert report["lineage"]["ticker_coverage_matches"] is True
+    assert report["analysis_only"] is True
+    assert "주문 전 실시간 재확인" in report["report_markdown"]
+    assert report["structured_report"]["top_actions"]
+    assert all(
+        "execution" not in strategy
+        for strategy in report["structured_report"]["strategies"]
+    )
+    assert report["structured_report"]["strategies"][0]["thesis"]["stance"] == "REDUCE"
+
+
+def test_mobile_does_not_enrich_current_cards_across_workflow_contract_change(tmp_path: Path) -> None:
+    archive = tmp_path / "archive"
+    _write_valid_work_report(
+        archive,
+        market="kr",
+        event_id="kr:event",
+        source_sha256="source-kr",
+        source_run_id="run-kr",
+        tickers=["SECRET.HOLD", "PUBLIC"],
+    )
+    packet = _packet("kr", public=False)
+    packet["workflow_contract_sha256"] = "e" * 64
+
+    report = _load_latest_work_report(archive, "kr", current_packet=packet)
+
+    assert report["lineage"]["status"] == "PAST_REFERENCE"
+    assert report["lineage"]["reason"] == "workflow_contract_mismatch"
+    assert report["lineage"]["current_action_cards_enriched"] is False
+
+
+def test_mobile_build_needs_no_key_when_private_actions_exist(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "tradingagents.scheduled.mobile_site.build_surface_packet",
+        lambda market, **kwargs: _packet(market, public=bool(kwargs.get("public"))),
+    )
+    status = build_mobile_site(site_dir=tmp_path / "site", archive_dir=tmp_path / "archive")
+
+    assert status["private_dashboard"]["enabled"] is True
+    assert (tmp_path / "site" / "mobile" / "strategy.json").exists()
     assert not (tmp_path / "site" / "mobile" / "private.enc.json").exists()
 
 
-def test_mobile_research_only_build_can_omit_private_key(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("TRADINGAGENTS_MOBILE_DASHBOARD_KEY", raising=False)
-
+def test_mobile_research_only_build_still_publishes_strategy_view(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     def research_packet(market: str, **kwargs) -> dict:
         packet = _packet(market, public=bool(kwargs.get("public")))
         packet["body"]["current"].pop("private_portfolio_overlay", None)
@@ -343,7 +747,8 @@ def test_mobile_research_only_build_can_omit_private_key(tmp_path: Path, monkeyp
     monkeypatch.setattr("tradingagents.scheduled.mobile_site.build_surface_packet", research_packet)
     status = build_mobile_site(site_dir=tmp_path / "site", archive_dir=tmp_path / "archive")
 
-    assert status["private_dashboard"]["enabled"] is False
+    assert status["private_dashboard"]["enabled"] is True
+    assert (tmp_path / "site" / "mobile" / "strategy.json").exists()
     assert not (tmp_path / "site" / "mobile" / "private.enc.json").exists()
 
 
@@ -448,10 +853,7 @@ def test_full_site_never_copies_raw_private_or_execution_artifacts(tmp_path: Pat
         ],
     }
     (run_dir / "run.json").write_text(json.dumps(manifest), encoding="utf-8")
-    monkeypatch.setenv(
-        "TRADINGAGENTS_MOBILE_DASHBOARD_KEY",
-        base64.urlsafe_b64encode(bytes(range(32))).decode("ascii").rstrip("="),
-    )
+    monkeypatch.setattr("tradingagents.work.site.build_work_site", lambda **_kwargs: {})
 
     build_site(archive, site, SiteSettings(title="TA", subtitle="Daily"))
 
@@ -473,7 +875,12 @@ def test_full_site_never_copies_raw_private_or_execution_artifacts(tmp_path: Pat
     assert b"RAW-WARNING-PRIVATE-TICKER" not in all_bytes
     assert b"RAW-EXECUTION-NOTE" not in all_bytes
     assert b"PRIVATE-ERROR-C:/Users/JY" not in all_bytes
-    assert b"SECRET.HOLD" not in all_bytes
+    public_surface_bytes = b"\n".join(
+        path.read_bytes()
+        for path in site.rglob("*")
+        if path.is_file() and path != site / "mobile" / "strategy.json"
+    )
+    assert b"SECRET.HOLD" not in public_surface_bytes
     for private_ticker_marker in (
         b"FRESH.NEW.PRIVATE",
         b"ANALYSIS.MISSING.PRIVATE",
@@ -484,7 +891,7 @@ def test_full_site_never_copies_raw_private_or_execution_artifacts(tmp_path: Pat
         assert private_ticker_marker not in all_bytes
     assert not (site / "runs" / run_id / "SECRET.HOLD.html").exists()
     assert not (site / "downloads").exists()
-    assert "개인 계좌 자료는 공개하지 않습니다" in (
+    assert "계좌번호와 고객 식별정보는 제외" in (
         site / "runs" / run_id / "portfolio.html"
     ).read_text(encoding="utf-8")
     sanitized_latest = json.loads((site / "latest" / "us" / "decision_bundle.json").read_text(encoding="utf-8"))

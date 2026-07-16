@@ -1,25 +1,19 @@
 from __future__ import annotations
 
-import base64
-import hashlib
 import html
 import json
-import os
-import secrets
+import re
 from collections.abc import Iterable
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-
 from tradingagents.work.packet import build_surface_packet
+from tradingagents.work.runtime import WorkRuntimeError, validate_work_report
 
 
 MOBILE_SCHEMA = "tradingagents.mobile-dashboard/v1"
-ENCRYPTED_SCHEMA = "tradingagents.mobile-encrypted/v1"
-PRIVATE_SCHEMA = "tradingagents.mobile-private/v1"
-PRIVATE_AAD = b"TradingAgents/mobile-private/v1"
+STRATEGY_SCHEMA = "tradingagents.mobile-strategy/v1"
 MARKETS = ("kr", "us")
 
 _PUBLIC_ROW_FIELDS = (
@@ -66,6 +60,13 @@ _PRIVATE_ROW_FIELDS = (
     "data_status_ko",
     "decision_state_ko",
     "execution_timing_ko",
+    "display_priority",
+    "table_priority",
+    "portfolio_priority",
+    "universe_role",
+    "candidate_source",
+    "is_watchlist",
+    "is_scanner_candidate",
     "reason_codes_ko",
     "quality",
 )
@@ -77,17 +78,23 @@ _PRIVATE_ACTION_FIELDS = (
     "delta_krw_now",
     "target_weight_now",
     "action_if_triggered",
+    "trigger_conditions",
     "delta_krw_if_triggered",
     "target_weight_if_triggered",
     "strategy_state",
     "execution_feasibility_now",
     "portfolio_relative_action",
     "risk_action",
+    "risk_action_level",
+    "risk_condition",
+    "invalidation_condition",
     "sell_side_category",
     "sell_intent",
     "sell_size_plan",
     "position_metrics",
     "profit_taking_plan",
+    "priority",
+    "rationale",
     "reason_codes",
     "gate_reasons",
 )
@@ -112,6 +119,63 @@ _FORBIDDEN_PUBLIC_KEYS = {
     "avg_price",
 }
 
+_FORBIDDEN_STRATEGY_IDENTIFIER_KEYS = {
+    "account_id",
+    "account_name",
+    "account_no",
+    "account_number",
+    "access_token",
+    "api_key",
+    "broker_account_id",
+    "broker_account_no",
+    "cano",
+    "acnt_prdt_cd",
+    "client_id",
+    "credentials",
+    "customer_id",
+    "custtype",
+    "odno",
+    "order_id",
+    "order_no",
+    "order_number",
+    "order_reference",
+    "password",
+    "refresh_token",
+    "secret",
+    "token",
+    "user_id",
+    "username",
+}
+
+_INVESTOR_ROW_STATES = {
+    "IMMEDIATE": ("READY", "실시간 조건 확인"),
+    "CONDITIONAL": ("CONDITIONAL", "조건 확인 필요"),
+    "BLOCKED_STALE": ("RECHECK", "주문 전 재확인"),
+    "BLOCKED_INCOMPLETE": ("UNAVAILABLE", "데이터 재확인"),
+    "MISSING": ("UNAVAILABLE", "데이터 재확인"),
+}
+_MOBILE_MACHINE_STATUS_REPLACEMENTS = {
+    "BLOCKED_STALE": "RECHECK_REQUIRED",
+    "BLOCKED_INCOMPLETE": "UNAVAILABLE",
+}
+_STRATEGY_SENSITIVE_TEXT_PATTERNS = (
+    re.compile(
+        r"(?i)(?:\baccount\s*(?:number|no\.?|id)|계좌\s*(?:번호|ID)|\bCANO|\bACNT_PRDT_CD|"
+        r"\bODNO|\border[_\s-]?(?:id|no|number|reference)|\bclient[_\s-]?id|"
+        r"\bcustomer[_\s-]?id|\bbroker[_\s-]?account[_\s-]?id)"
+        r"(?:\s*[:=#]\s*|\s+)(?=[A-Z0-9._-]{2,}(?:\b|$))(?=[A-Z0-9._-]*\d)[A-Z0-9._-]+"
+    ),
+    re.compile(
+        r"(?i)\b(?:(?:(?:access|refresh|bot)[_\s-]?)?token|"
+        r"api[_\s-]?key|app[_\s-]?(?:key|secret)|password|authorization)"
+        r"(?:\s*[:=#]\s*|\s+)[A-Z0-9._-]{3,}"
+    ),
+    re.compile(
+        r"(?i)(?:[A-Z]:[\\/]+[^\r\n<>|\"']+|\\\\[^\\/\s]+[\\/]+[^\r\n<>|\"']+|"
+        r"/(?:Users|home|var|tmp|opt|etc|mnt)/[^\s<>\"']+)"
+    ),
+)
+
 
 def build_mobile_site(
     *,
@@ -119,10 +183,10 @@ def build_mobile_site(
     archive_dir: Path,
     public_base_url: str = "",
 ) -> dict[str, Any]:
-    """Build a public research hub and an optional encrypted personal dashboard.
+    """Build the public research hub and a plaintext, action-only strategy view.
 
-    Plaintext personal rows never touch ``site_dir``.  The private payload is built
-    in memory and only the AES-GCM envelope is written to the Pages artifact.
+    The strategy artifact deliberately contains the investment actions requested
+    for the mobile report, while raw broker/account identifiers are removed.
     """
 
     site_root = Path(site_dir)
@@ -136,10 +200,10 @@ def build_mobile_site(
         "privacy": "PUBLIC_RESEARCH_ONLY_NO_PORTFOLIO_MEMBERSHIP_OR_ACTIONS",
         "markets": {},
     }
-    private_payload = {
-        "schema": PRIVATE_SCHEMA,
+    strategy_payload = {
+        "schema": STRATEGY_SCHEMA,
         "generated_at": generated_at,
-        "privacy": "CLIENT_SIDE_DECRYPTION_REQUIRED",
+        "privacy": "PLAINTEXT_ACTION_DATA_NO_RAW_ACCOUNT_IDENTIFIERS",
         "markets": {},
     }
 
@@ -149,53 +213,58 @@ def build_mobile_site(
             public_packet = build_surface_packet(market, archive_dir=archive_dir, public=True)
         private_packet = build_surface_packet(market, archive_dir=archive_dir, public=False)
         public_payload["markets"][market] = _public_market_payload(public_packet)
-        private_payload["markets"][market] = _private_market_payload(private_packet)
-
-    key_text = os.getenv("TRADINGAGENTS_MOBILE_DASHBOARD_KEY", "").strip()
-    envelope: dict[str, Any] | None = None
-    if key_text:
-        key = decode_dashboard_key(key_text)
-        envelope = encrypt_private_payload(private_payload, key=key)
-    elif _private_payload_has_portfolio_actions(private_payload):
-        # A successful production build must never silently drop an action
-        # dashboard merely because its encryption secret was not injected.
-        # Research-only builds remain useful without the optional key.
-        raise ValueError(
-            "TRADINGAGENTS_MOBILE_DASHBOARD_KEY is required when private portfolio actions exist."
+        market_payload = _private_market_payload(private_packet)
+        integrated_report = _load_latest_work_report(
+            Path(archive_dir),
+            market,
+            current_packet=private_packet,
         )
+        current_integrated_report: dict[str, Any] = {}
+        if integrated_report:
+            lineage = integrated_report.get("lineage") if isinstance(integrated_report.get("lineage"), dict) else {}
+            if lineage.get("status") in {"CURRENT_PACKET", "CURRENT_ANALYSIS_LINEAGE"}:
+                market_payload["integrated_report"] = integrated_report
+                current_integrated_report = integrated_report
+            else:
+                # A valid content-addressed report can remain useful as an
+                # analysis-time reference, but it must not rank or enrich the
+                # current run's action cards without a proved source lineage.
+                market_payload["reference_report"] = integrated_report
+        _annotate_market_roles(
+            market_payload,
+            archive_dir=Path(archive_dir),
+            integrated_report=current_integrated_report,
+        )
+        strategy_payload["markets"][market] = market_payload
 
+    public_payload = _normalize_mobile_machine_values(public_payload)
+    strategy_payload = _normalize_mobile_machine_values(
+        _strip_strategy_identifiers(strategy_payload)
+    )
     assert_public_payload_safe(public_payload)
+    assert_strategy_payload_safe(strategy_payload)
     _write_json(mobile_root / "public.json", public_payload)
+    _write_json(mobile_root / "strategy.json", strategy_payload)
     _write_text(mobile_root / "index.html", _public_html(public_payload, public_base_url=public_base_url))
     _write_text(mobile_root / "mobile.css", _MOBILE_CSS)
     _write_text(mobile_root / "private.html", _private_html())
     _write_text(mobile_root / "private.js", _PRIVATE_JS)
-
-    private_status: dict[str, Any]
-    if envelope is not None:
-        _write_json(mobile_root / "private.enc.json", envelope)
-        private_status = {
-            "enabled": True,
-            "envelope_sha256": _sha256_json(envelope),
-            "key_delivery": "URL_FRAGMENT_ONLY",
-        }
-    else:
-        (mobile_root / "private.enc.json").unlink(missing_ok=True)
-        private_status = {
-            "enabled": False,
-            "reason": "TRADINGAGENTS_MOBILE_DASHBOARD_KEY_NOT_CONFIGURED",
-        }
+    # Delete artifacts produced by the retired encryption implementation even
+    # when callers build into an existing directory without clearing it first.
+    (mobile_root / "private.enc.json").unlink(missing_ok=True)
+    (mobile_root / "private.json").unlink(missing_ok=True)
 
     status = {
         "schema": MOBILE_SCHEMA,
         "generated_at": generated_at,
         "public_url": _join_url(public_base_url, "mobile/"),
-        "private_url_template": _join_url(
-            public_base_url,
-            "mobile/private.html#key=<base64url-key>&market=<kr|us>",
-        ),
-        "public_payload_sha256": _sha256_json(public_payload),
-        "private_dashboard": private_status,
+        "strategy_url": _join_url(public_base_url, "mobile/private.html"),
+        "strategy_payload_url": _join_url(public_base_url, "mobile/strategy.json"),
+        "private_dashboard": {
+            "enabled": True,
+            "storage": "PLAINTEXT_ACTION_DATA",
+            "raw_account_identifiers_omitted": True,
+        },
     }
     _write_json(mobile_root / "status.json", status)
     return status
@@ -282,53 +351,6 @@ def sanitize_public_decision_bundle(
     return result
 
 
-def decode_dashboard_key(value: str) -> bytes:
-    text = str(value or "").strip()
-    if not text:
-        raise ValueError("Dashboard encryption key is empty.")
-    if len(text) != 43 or any(character not in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_" for character in text):
-        raise ValueError("TRADINGAGENTS_MOBILE_DASHBOARD_KEY must be a 43-character base64url key.")
-    try:
-        candidate = base64.urlsafe_b64decode(text + "=")
-    except (ValueError, TypeError) as exc:
-        raise ValueError("TRADINGAGENTS_MOBILE_DASHBOARD_KEY is not valid base64url.") from exc
-    if len(candidate) != 32 or _b64url(candidate) != text:
-        raise ValueError("TRADINGAGENTS_MOBILE_DASHBOARD_KEY must decode to exactly 32 bytes.")
-    return candidate
-
-
-def encrypt_private_payload(payload: dict[str, Any], *, key: bytes, nonce: bytes | None = None) -> dict[str, Any]:
-    if len(key) != 32:
-        raise ValueError("AES-256-GCM requires a 32-byte key.")
-    nonce_bytes = nonce or secrets.token_bytes(12)
-    if len(nonce_bytes) != 12:
-        raise ValueError("AES-GCM nonce must be 12 bytes.")
-    plaintext = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    ciphertext = AESGCM(key).encrypt(nonce_bytes, plaintext, PRIVATE_AAD)
-    return {
-        "schema": ENCRYPTED_SCHEMA,
-        "alg": "A256GCM",
-        "aad": _b64url(PRIVATE_AAD),
-        "nonce": _b64url(nonce_bytes),
-        "ciphertext": _b64url(ciphertext),
-    }
-
-
-def decrypt_private_payload(envelope: dict[str, Any], *, key: bytes) -> dict[str, Any]:
-    if envelope.get("schema") != ENCRYPTED_SCHEMA or envelope.get("alg") != "A256GCM":
-        raise ValueError("Unsupported mobile dashboard envelope.")
-    nonce = _b64url_decode(envelope.get("nonce"))
-    ciphertext = _b64url_decode(envelope.get("ciphertext"))
-    aad = _b64url_decode(envelope.get("aad"))
-    if aad != PRIVATE_AAD:
-        raise ValueError("Invalid mobile dashboard authenticated context.")
-    plaintext = AESGCM(key).decrypt(nonce, ciphertext, aad)
-    payload = json.loads(plaintext)
-    if not isinstance(payload, dict) or payload.get("schema") != PRIVATE_SCHEMA:
-        raise ValueError("Invalid private mobile dashboard payload.")
-    return payload
-
-
 def assert_public_payload_safe(value: Any, *, path: str = "$") -> None:
     if isinstance(value, dict):
         for key, item in value.items():
@@ -339,6 +361,70 @@ def assert_public_payload_safe(value: Any, *, path: str = "$") -> None:
     elif isinstance(value, list):
         for index, item in enumerate(value):
             assert_public_payload_safe(item, path=f"{path}[{index}]")
+
+
+def assert_strategy_payload_safe(value: Any, *, path: str = "$") -> None:
+    """Reject raw identifiers if a future payload field bypasses the allow-lists."""
+
+    if isinstance(value, dict):
+        for key, item in value.items():
+            normalized = str(key).strip().lower()
+            if normalized in _FORBIDDEN_STRATEGY_IDENTIFIER_KEYS:
+                raise ValueError(f"Forbidden account identifier in mobile strategy payload at {path}.{key}")
+            assert_strategy_payload_safe(item, path=f"{path}.{key}")
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            assert_strategy_payload_safe(item, path=f"{path}[{index}]")
+    elif isinstance(value, str) and _find_sensitive_strategy_text(value):
+        raise ValueError(f"Forbidden identifier value in mobile strategy payload at {path}")
+
+
+def _strip_strategy_identifiers(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: _strip_strategy_identifiers(item)
+            for key, item in value.items()
+            if str(key).strip().lower() not in _FORBIDDEN_STRATEGY_IDENTIFIER_KEYS
+        }
+    if isinstance(value, list):
+        return [_strip_strategy_identifiers(item) for item in value]
+    if isinstance(value, str):
+        return _redact_account_identifiers(value)
+    return value
+
+
+def _redact_account_identifiers(value: str) -> str:
+    """Redact labelled identifiers, credentials and local user paths."""
+
+    text = str(value or "")
+    text = _STRATEGY_SENSITIVE_TEXT_PATTERNS[0].sub("[식별정보 제외]", text)
+    text = _STRATEGY_SENSITIVE_TEXT_PATTERNS[1].sub("[비밀정보 제외]", text)
+    return _STRATEGY_SENSITIVE_TEXT_PATTERNS[2].sub("[로컬 경로 제외]", text)
+
+
+def _find_sensitive_strategy_text(value: str) -> str | None:
+    for pattern in _STRATEGY_SENSITIVE_TEXT_PATTERNS:
+        if pattern.search(str(value or "")):
+            return pattern.pattern
+    return None
+
+
+def _normalize_mobile_machine_values(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {key: _normalize_mobile_machine_values(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_normalize_mobile_machine_values(item) for item in value]
+    if isinstance(value, str):
+        text = value
+        for machine_value, investor_value in _MOBILE_MACHINE_STATUS_REPLACEMENTS.items():
+            text = re.sub(
+                re.escape(machine_value),
+                investor_value,
+                text,
+                flags=re.IGNORECASE,
+            )
+        return text
+    return value
 
 
 def _read_public_work_packet(site_root: Path, market: str) -> dict[str, Any]:
@@ -406,6 +492,36 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
         if isinstance(current.get("universe_coverage"), dict)
         else {}
     )
+    safe_universe_coverage = _safe_mapping(
+        universe_coverage,
+        (
+            "status",
+            "complete",
+            "source_run_id",
+            "ticker_universe_mode",
+            "account_snapshot_status",
+            "expected_holding_count",
+            "missing_holding_count",
+            "expected_watchlist_count",
+            "missing_watchlist_count",
+            "expected_analysis_count",
+            "missing_analysis_count",
+            "analysis_total_count",
+            "analysis_successful_count",
+            "analysis_failed_count",
+        ),
+    )
+    safe_quality = _safe_mapping(
+        quality,
+        (
+            "decision_ready",
+            "conditional_strategy_ready",
+            "quality_label_ko",
+            "fresh_row_ratio",
+            "conditional_row_ratio",
+            "total_rows",
+        ),
+    )
     overlay = current.get("private_portfolio_overlay") if isinstance(current.get("private_portfolio_overlay"), dict) else {}
     actions = []
     for action_source in overlay.get("actions") or []:
@@ -430,6 +546,7 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
             for key in _PRIVATE_ROW_FIELDS
             if row_source.get(key) is not None
         }
+        row["quality"] = _public_quality(row_source.get("quality"))
         action = next(
             (action_by_ticker[key] for key in _ticker_identity_keys(row.get("ticker")) if key in action_by_ticker),
             None,
@@ -447,46 +564,404 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
         "manifest_status": source_metadata.get("status"),
         "decision_ready": quality.get("decision_ready"),
         "source": _safe_mapping(source_metadata, ("run_id", "last_run_at", "status")),
-        "guardrails": body.get("guardrails") if isinstance(body.get("guardrails"), dict) else {},
-        "quality": quality,
-        "universe_coverage": universe_coverage,
+        "guardrails": _safe_mapping(
+            body.get("guardrails"),
+            ("valid_until", "expired_at_build", "decision_ready", "conditional_strategy_ready"),
+        ),
+        "quality": safe_quality,
+        "universe_coverage": safe_universe_coverage,
         "provenance": {
             "surface_run_id": current.get("run_id"),
             "manifest_run_id": source_metadata.get("run_id"),
-            "universe_source_run_id": universe_coverage.get("source_run_id"),
+            "universe_source_run_id": safe_universe_coverage.get("source_run_id"),
             "decision_bundle_run_id": bundle.get("run_id"),
             "analysis_source_run_id": bundle.get("analysis_source_run_id"),
             "execution_source_run_id": bundle.get("execution_source_run_id"),
         },
         "portfolio_action_count": len(actions),
         "rows": rows,
-        "coverage": universe_coverage,
-        "transmission_scope": (
-            bundle.get("transmission_scope")
-            if isinstance(bundle.get("transmission_scope"), dict)
-            else {}
-        ),
+        "coverage": safe_universe_coverage,
     }
 
 
-def _private_payload_has_portfolio_actions(payload: dict[str, Any]) -> bool:
-    markets = payload.get("markets") if isinstance(payload.get("markets"), dict) else {}
-    for market in markets.values():
-        if not isinstance(market, dict):
+def _load_latest_work_report(
+    archive_dir: Path,
+    market: str,
+    *,
+    current_packet: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Load a validated, content-addressed Work report and classify its lineage.
+
+    A report is never allowed to influence current action cards merely because a
+    file named ``latest.json`` exists.  The runtime report contract, immutable
+    event bytes, ticker coverage, and current packet lineage are all checked
+    before the caller decides whether it is current analysis or prior reference.
+    Receipt hashes stay out of the mobile payload.
+    """
+
+    reports_root = Path(archive_dir) / "work-reports"
+    normalized_market = str(market or "").strip().lower()
+    candidates = [
+        reports_root / normalized_market / "latest.json",
+        reports_root / normalized_market.upper() / "latest.json",
+        reports_root / f"latest-{normalized_market}.json",
+        reports_root / f"latest_{normalized_market}.json",
+    ]
+    if reports_root.exists():
+        try:
+            discovered = sorted(
+                reports_root.rglob("latest.json"),
+                key=lambda path: path.stat().st_mtime,
+                reverse=True,
+            )
+        except OSError:
+            discovered = []
+        candidates.extend(discovered)
+
+    seen: set[Path] = set()
+    for path in candidates:
+        if path in seen or not path.is_file():
             continue
-        if isinstance(market.get("portfolio_action_count"), int) and market["portfolio_action_count"] > 0:
-            return True
-        for row in market.get("rows") or []:
-            if isinstance(row, dict) and isinstance(row.get("portfolio_action"), dict):
+        seen.add(path)
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, dict):
+            continue
+        surface = str(payload.get("surface") or payload.get("market") or path.parent.name).strip().lower()
+        if surface and surface not in {normalized_market, normalized_market.upper().lower()}:
+            continue
+        try:
+            validate_work_report(payload)
+        except (WorkRuntimeError, TypeError, ValueError):
+            continue
+        if not _work_report_has_immutable_backing(
+            payload,
+            latest_path=path,
+            reports_root=reports_root,
+            market=normalized_market,
+        ):
+            continue
+        sanitized = _sanitize_work_report(payload, market=normalized_market)
+        if sanitized:
+            lineage = _work_report_lineage(payload, current_packet)
+            sanitized["lineage"] = lineage
+            if lineage.get("status") == "CURRENT_ANALYSIS_LINEAGE":
+                sanitized = _analysis_only_work_report(sanitized)
+            return sanitized
+    return {}
+
+
+def _work_report_has_immutable_backing(
+    payload: dict[str, Any],
+    *,
+    latest_path: Path,
+    reports_root: Path,
+    market: str,
+) -> bool:
+    report_sha = str(payload.get("report_sha256") or "").strip().lower()
+    if len(report_sha) != 64 or any(character not in "0123456789abcdef" for character in report_sha):
+        return False
+    try:
+        latest_bytes = latest_path.read_bytes()
+    except OSError:
+        return False
+    surface = str(payload.get("surface") or market).strip().lower()
+    candidates = (
+        latest_path.parent / "events" / f"{report_sha}.json",
+        reports_root / surface / "events" / f"{report_sha}.json",
+        reports_root / market / "events" / f"{report_sha}.json",
+    )
+    seen: set[Path] = set()
+    for event_path in candidates:
+        if event_path in seen:
+            continue
+        seen.add(event_path)
+        try:
+            if event_path.is_file() and event_path.read_bytes() == latest_bytes:
                 return True
+        except OSError:
+            continue
     return False
 
 
+def _work_report_lineage(
+    report: dict[str, Any],
+    current_packet: dict[str, Any] | None,
+) -> dict[str, Any]:
+    if not isinstance(current_packet, dict) or not current_packet:
+        return {
+            "status": "UNVERIFIED_REFERENCE",
+            "current_action_cards_enriched": False,
+            "reason": "current_packet_unavailable",
+        }
+
+    body = current_packet.get("body") if isinstance(current_packet.get("body"), dict) else {}
+    current = body.get("current") if isinstance(body.get("current"), dict) else {}
+    bundle = current.get("bundle") if isinstance(current.get("bundle"), dict) else {}
+    universe = current.get("universe_coverage") if isinstance(current.get("universe_coverage"), dict) else {}
+    structured = report.get("structured_report") if isinstance(report.get("structured_report"), dict) else {}
+    coverage = structured.get("coverage_receipt") if isinstance(structured.get("coverage_receipt"), dict) else {}
+
+    current_tickers = _strategy_ticker_identities(bundle.get("strategy_table"))
+    report_tickers = _strategy_ticker_identities(structured.get("strategies"))
+    ticker_coverage_matches = bool(current_tickers) and current_tickers == report_tickers
+    exact_packet = (
+        str(report.get("event_id") or "") == str(current_packet.get("event_id") or "")
+        and str(report.get("source_sha256") or "") == str(current_packet.get("source_sha256") or "")
+    )
+    contract_matches = (
+        bool(str(report.get("workflow_contract_sha256") or ""))
+        and str(report.get("workflow_contract_sha256"))
+        == str(current_packet.get("workflow_contract_sha256") or "")
+    )
+
+    report_source_run_id = str(coverage.get("source_run_id") or "").strip()
+    current_lineage_ids = {
+        str(value).strip()
+        for value in (
+            current.get("run_id"),
+            bundle.get("run_id"),
+            bundle.get("analysis_source_run_id"),
+            universe.get("source_run_id"),
+        )
+        if str(value or "").strip()
+    }
+    analysis_lineage_matches = bool(
+        report_source_run_id and report_source_run_id in current_lineage_ids
+    )
+
+    if exact_packet and contract_matches and ticker_coverage_matches:
+        status = "CURRENT_PACKET"
+        reason = "event_source_and_ticker_coverage_match"
+    elif contract_matches and analysis_lineage_matches and ticker_coverage_matches:
+        status = "CURRENT_ANALYSIS_LINEAGE"
+        reason = "analysis_source_run_and_ticker_coverage_match"
+    else:
+        status = "PAST_REFERENCE"
+        if not contract_matches:
+            reason = "workflow_contract_mismatch"
+        elif not ticker_coverage_matches:
+            reason = "ticker_coverage_mismatch"
+        elif not analysis_lineage_matches:
+            reason = "packet_source_lineage_mismatch"
+        else:
+            reason = "packet_binding_mismatch"
+    return {
+        "status": status,
+        "current_action_cards_enriched": status in {"CURRENT_PACKET", "CURRENT_ANALYSIS_LINEAGE"},
+        "reason": reason,
+        "workflow_contract_matches": contract_matches,
+        "ticker_coverage_matches": ticker_coverage_matches,
+        "report_ticker_count": len(report_tickers),
+        "current_ticker_count": len(current_tickers),
+        "report_source_run_id": report_source_run_id or None,
+        "current_analysis_source_run_id": bundle.get("analysis_source_run_id") or current.get("run_id"),
+    }
+
+
+def _analysis_only_work_report(report: dict[str, Any]) -> dict[str, Any]:
+    """Keep the full analysis while preventing reuse of an older execution gate."""
+
+    result = dict(report)
+    structured = (
+        dict(result.get("structured_report"))
+        if isinstance(result.get("structured_report"), dict)
+        else {}
+    )
+    strategies: list[dict[str, Any]] = []
+    for item in structured.get("strategies") or []:
+        if not isinstance(item, dict):
+            continue
+        strategy = dict(item)
+        strategy.pop("execution", None)
+        strategies.append(strategy)
+    structured["strategies"] = strategies
+    result["structured_report"] = structured
+    # The report narrative and top actions are valuable analysis-time context.
+    # Only per-ticker execution gates are removed; the UI labels the narrative
+    # as reference material and keeps the current overlay authoritative.
+    result["analysis_only"] = True
+    return result
+
+
+def _strategy_ticker_identities(rows: Any) -> set[str]:
+    if not isinstance(rows, list):
+        return set()
+    identities: set[str] = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        keys = _ticker_identity_keys(row.get("ticker"))
+        if keys:
+            # ``_ticker_identity_keys`` returns both broker and canonical aliases;
+            # its last entry is the suffix-free identity used for equality.
+            identities.add(keys[-1])
+    return identities
+
+
+def _sanitize_work_report(payload: dict[str, Any], *, market: str) -> dict[str, Any]:
+    structured = payload.get("structured_report") if isinstance(payload.get("structured_report"), dict) else {}
+    report_markdown = _sanitize_work_report_text(str(payload.get("report_markdown") or ""))
+    allowed_structured = {
+        key: structured.get(key)
+        for key in (
+            "title",
+            "generated_at",
+            "as_of",
+            "source_health",
+            "report_mode",
+            "summary",
+            "top_actions",
+            "strategies",
+            "coverage_receipt",
+            "source_summary",
+            "next_checkpoint",
+        )
+        if structured.get(key) is not None
+    }
+    if not report_markdown and not allowed_structured:
+        return {}
+    result = {
+        "schema": "tradingagents.mobile-work-report/v1",
+        "source_schema": payload.get("schema"),
+        "market": market.upper(),
+        "event_id": payload.get("event_id"),
+        "report_id": payload.get("report_id"),
+        "published_at": payload.get("published_at"),
+        "report_markdown": report_markdown,
+        "structured_report": allowed_structured,
+    }
+    return _sanitize_work_report_value(_strip_strategy_identifiers(result))
+
+
+def _sanitize_work_report_value(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {key: _sanitize_work_report_value(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_sanitize_work_report_value(item) for item in value]
+    if isinstance(value, str):
+        return _sanitize_work_report_text(value)
+    return value
+
+
+def _sanitize_work_report_text(value: str) -> str:
+    text = str(value or "")
+    empty_state_line = re.compile(
+        r"(?im)^\s*(?:[-*]\s*)?(?:현재\s*조건부\s*실행\s*가능|현재\s*실행\s*가능|지금\s*실행\s*가능)"
+        r"\s*[:：]\s*(?:없음|none|해당\s*없음|-+)\s*[.!。]?\s*$"
+    )
+    text = empty_state_line.sub("", text)
+    replacements = {
+        "BLOCKED_STALE": "주문 전 실시간 재확인",
+        "BLOCKED_INCOMPLETE": "필수 데이터 재확인",
+        "NEEDS_LIVE_RECHECK": "주문 전 실시간 재확인",
+    }
+    for machine_value, investor_value in replacements.items():
+        text = text.replace(machine_value, investor_value)
+    return re.sub(r"\n{3,}", "\n\n", text).strip()
+
+
+def _annotate_market_roles(
+    market_payload: dict[str, Any],
+    *,
+    archive_dir: Path,
+    integrated_report: dict[str, Any],
+) -> None:
+    rows = market_payload.get("rows") if isinstance(market_payload.get("rows"), list) else []
+    active_universe = _load_active_universe(archive_dir, str(market_payload.get("run_id") or ""))
+    holding_ids = _identity_set(active_universe.get("expected_holding_tickers"))
+    watchlist_ids = _identity_set(active_universe.get("expected_watchlist_tickers"))
+    scanner_ids = _identity_set(active_universe.get("scanner_candidates"))
+    work_roles: dict[str, str] = {}
+    structured = (
+        integrated_report.get("structured_report")
+        if isinstance(integrated_report.get("structured_report"), dict)
+        else {}
+    )
+    for strategy in structured.get("strategies") or []:
+        if not isinstance(strategy, dict):
+            continue
+        role = _normalize_universe_role(strategy.get("portfolio_role"))
+        for identity in _ticker_identity_keys(strategy.get("ticker")):
+            if role:
+                work_roles[identity] = role
+
+    counts = {"HOLDING": 0, "WATCHLIST": 0, "NEW_CANDIDATE": 0}
+    for index, row in enumerate(rows, start=1):
+        if not isinstance(row, dict):
+            continue
+        identities = set(_ticker_identity_keys(row.get("ticker")))
+        explicit = _normalize_universe_role(row.get("universe_role") or row.get("candidate_source"))
+        work_role = next((work_roles[key] for key in identities if key in work_roles), "")
+        if row.get("is_held") is True or identities.intersection(holding_ids):
+            role = "HOLDING"
+        elif work_role:
+            role = work_role
+        elif row.get("is_scanner_candidate") is True or identities.intersection(scanner_ids):
+            role = "NEW_CANDIDATE"
+        elif row.get("is_watchlist") is True or identities.intersection(watchlist_ids):
+            role = "WATCHLIST"
+        elif explicit:
+            role = explicit
+        else:
+            role = "WATCHLIST"
+        row["universe_role"] = role
+        row.setdefault("display_priority", index)
+        counts[role] = counts.get(role, 0) + 1
+    market_payload["role_counts"] = counts
+
+
+def _load_active_universe(archive_dir: Path, run_id: str) -> dict[str, Any]:
+    if not run_id:
+        return {}
+    runs_root = Path(archive_dir) / "runs"
+    candidates = [runs_root / run_id / "run.json"]
+    if runs_root.is_dir():
+        try:
+            candidates.extend(path / run_id / "run.json" for path in runs_root.iterdir() if path.is_dir())
+        except OSError:
+            pass
+    for path in candidates:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        active = payload.get("active_universe") if isinstance(payload, dict) else None
+        if isinstance(active, dict):
+            return active
+    return {}
+
+
+def _identity_set(values: Any) -> set[str]:
+    result: set[str] = set()
+    for value in values or []:
+        ticker = value
+        if isinstance(value, dict):
+            ticker = value.get("ticker") or value.get("canonical_ticker") or value.get("symbol")
+        result.update(_ticker_identity_keys(ticker))
+    return result
+
+
+def _normalize_universe_role(value: Any) -> str:
+    text = str(value or "").strip().upper()
+    if not text:
+        return ""
+    if "HOLD" in text or "OWN" in text or "보유" in text:
+        return "HOLDING"
+    if "SCANNER" in text or "NEW" in text or "DISCOVERY" in text or "신규" in text:
+        return "NEW_CANDIDATE"
+    if "WATCH" in text or "관심" in text:
+        return "WATCHLIST"
+    return ""
+
+
 def _public_quality(value: Any) -> dict[str, Any]:
-    return _safe_mapping(
+    source = value if isinstance(value, dict) else {}
+    result = _safe_mapping(
         value,
         (
-            "row_mode",
             "execution_ready",
             "conditional_strategy_ready",
             "current_execution_promotion",
@@ -499,6 +974,14 @@ def _public_quality(value: Any) -> dict[str, Any]:
             "expired_at_build",
         ),
     )
+    machine_mode = str(source.get("row_mode") or "MISSING").strip().upper()
+    investor_state, investor_label = _INVESTOR_ROW_STATES.get(
+        machine_mode,
+        ("RESEARCH", "분석 시점 참고"),
+    )
+    result["investor_state"] = investor_state
+    result["investor_label"] = investor_label
+    return result
 
 
 def _safe_mapping(value: Any, keys: tuple[str, ...]) -> dict[str, Any]:
@@ -531,7 +1014,7 @@ def _public_html(payload: dict[str, Any], *, public_base_url: str) -> str:
             <section class="market-panel" data-market="{market}" id="market-{market}">
               <div class="market-head">
                 <div><p class="eyebrow">{market.upper()} MARKET</p><h2>{market.upper()} 리서치 후보</h2></div>
-                <span class="health health-{_css_token(item.get('source_health'))}">{_escape(item.get('source_health') or 'MISSING')}</span>
+                <span class="health health-{_css_token(item.get('source_health'))}">{_escape(_source_health_label(item.get('source_health')))}</span>
               </div>
               <div class="source-meta">
                 <span>Run {_escape(item.get('run_id') or '-')}</span>
@@ -560,9 +1043,9 @@ def _public_html(payload: dict[str, Any], *, public_base_url: str) -> str:
     <section class="hero-mobile">
       <p class="eyebrow">MOBILE INVESTMENT HUB</p>
       <h1>장중 리서치 한눈에 보기</h1>
-      <p>보유 여부와 계좌 액션은 공개하지 않습니다. 행별 데이터 유효시간이 지나면 화면에서 자동으로 실행 차단 상태로 바뀝니다.</p>
+      <p>공개 리서치 후보의 분석 시점 근거를 보여 줍니다. 주문 전에는 현재가와 진입·무효화 조건을 다시 확인하세요.</p>
       <div class="privacy-banner">공개 안전 모드 · 개인 계좌 정보 없음</div>
-      <a class="private-link" href="{_escape(private_url)}">암호화된 내 액션표 열기</a>
+      <a class="private-link" href="{_escape(private_url)}">통합 투자 전략 열기</a>
     </section>
     <nav class="market-tabs" aria-label="시장 선택">
       <button type="button" data-target="kr" aria-pressed="true">KR</button>
@@ -590,9 +1073,9 @@ def _public_html(payload: dict[str, Any], *, public_base_url: str) -> str:
         const deadline = Date.parse(card.dataset.validUntil || '');
         if (!Number.isFinite(deadline)) return;
         if (deadline <= now) {{
-          card.dataset.rowMode = 'BLOCKED_STALE';
+          card.dataset.rowMode = 'REFERENCE';
           const badge = card.querySelector('.row-mode');
-          if (badge) badge.textContent = 'BLOCKED_STALE';
+          if (badge) badge.textContent = '주문 전 재확인';
           const warning = card.querySelector('.expiry-warning');
           if (warning) warning.hidden = false;
         }} else {{
@@ -611,12 +1094,13 @@ def _public_html(payload: dict[str, Any], *, public_base_url: str) -> str:
 
 def _public_card(row: dict[str, Any]) -> str:
     quality = row.get("quality") if isinstance(row.get("quality"), dict) else {}
-    mode = str(quality.get("row_mode") or "MISSING")
+    mode = str(quality.get("investor_state") or "UNAVAILABLE")
+    mode_label = str(quality.get("investor_label") or "데이터 재확인")
     valid_until = str(quality.get("row_valid_until") or "")
     return f"""
     <article class="action-card" data-row-mode="{_escape(mode)}" data-valid-until="{_escape(valid_until)}">
-      <div class="card-title"><div><strong>{_escape(row.get('ticker') or '-')}</strong><span>{_escape(row.get('display_name') or '')}</span></div><span class="row-mode mode-{_css_token(mode)}">{_escape(mode)}</span></div>
-      <p class="expiry-warning" hidden>유효시간 경과 · 실행 차단</p>
+      <div class="card-title"><div><strong>{_escape(row.get('ticker') or '-')}</strong><span>{_escape(row.get('display_name') or '')}</span></div><span class="row-mode mode-{_css_token(mode)}">{_escape(mode_label)}</span></div>
+      <p class="expiry-warning" hidden>분석 시점 이후 데이터입니다. 주문 전 현재가와 조건을 다시 확인하세요.</p>
       <div class="price-line"><strong>{_fmt_price(row.get('last_price'))}</strong><span>{_escape(row.get('market_data_asof') or '-')}</span></div>
       <dl>
         <div><dt>VWAP</dt><dd>{_escape(row.get('vwap_position_ko') or '-')}</dd></div>
@@ -636,19 +1120,21 @@ def _private_html() -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#081a2b">
   <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex,nofollow,noarchive">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'">
-  <title>TradingAgents 암호화 개인 액션표</title>
+  <title>TradingAgents 통합 투자 전략</title>
   <link rel="stylesheet" href="mobile.css">
 </head>
 <body class="private-body">
-  <header class="topbar"><a href="index.html">공개 리서치</a><span>암호화 개인 액션</span></header>
+  <header class="topbar"><a href="index.html">공개 리서치</a><span>통합 투자 전략</span></header>
   <main>
     <section class="hero-mobile">
-      <p class="eyebrow">PRIVATE · AES-256-GCM</p>
-      <h1>내 투자 전략 액션표</h1>
-      <p>복호화 키는 URL의 #key fragment에서만 읽으며 서버로 전송하거나 기기에 저장하지 않습니다.</p>
+      <p class="eyebrow">KR · US · YOUTUBE · PRISM · WORK</p>
+      <h1>한눈에 보는 투자 전략</h1>
+      <p>분석 시점의 전략과 주문 직전 실시간 확인 상태를 분리했습니다. 보유·관심·신규 후보별로 조건, 실행 행동, 무효화 기준을 확인하세요.</p>
+      <div class="privacy-banner">링크에서 바로 열립니다 · 계좌번호와 고객 식별정보는 제외합니다.</div>
     </section>
-    <div id="private-status" class="privacy-banner" role="status">암호화 payload를 여는 중입니다.</div>
+    <div id="private-status" class="privacy-banner" role="status">통합 전략 데이터를 불러오는 중입니다.</div>
     <nav id="private-tabs" class="market-tabs" aria-label="시장 선택" hidden></nav>
     <div id="private-root"></div>
   </main>
@@ -693,15 +1179,18 @@ h2 { margin: 0; font-size: 1.25rem; }
 .market-tabs button[aria-pressed="true"] { border-color: var(--accent); background: rgba(89,214,199,.14); color: var(--text); }
 .market-panel, #private-root { min-width: 0; max-width: 100%; }
 .market-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 8px 0; }
-.health, .row-mode, .held-badge { display: inline-flex; align-items: center; flex: 0 0 auto; min-height: 28px; padding: 4px 8px; border-radius: 999px; background: var(--panel-2); color: var(--muted); font-size: .7rem; font-weight: 850; letter-spacing: .03em; }
+.health, .row-mode, .held-badge, .role-badge { display: inline-flex; align-items: center; flex: 0 0 auto; min-height: 28px; padding: 4px 8px; border-radius: 999px; background: var(--panel-2); color: var(--muted); font-size: .7rem; font-weight: 850; letter-spacing: .03em; }
 .health-ok, .mode-immediate { color: var(--ok); }
 .health-degraded, .mode-conditional { color: var(--warn); }
-.health-failed, .health-stale, .mode-blocked_stale, .mode-missing { color: var(--danger); }
+.health-missing, .health-unavailable { color: var(--danger); }
+.health-neutral { color: var(--muted); }
+.health-failed, .health-stale, .mode-missing, .mode-recheck { color: var(--danger); }
 .source-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 12px; color: var(--muted); font-size: .78rem; }
 .source-meta span, .card-title strong, .card-title div > span, .price-line strong, .price-line span { min-width: 0; overflow-wrap: anywhere; }
 .cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 .action-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 17px; background: linear-gradient(145deg, rgba(16,43,67,.96), rgba(10,29,47,.96)); box-shadow: 0 12px 28px rgba(0,0,0,.18); }
-.action-card[data-row-mode="BLOCKED_STALE"], .action-card[data-row-mode="MISSING"] { border-color: rgba(255,124,131,.28); }
+.action-card[data-readiness="RECHECK"], .action-card[data-readiness="RESEARCH"] { border-color: rgba(255,196,91,.28); }
+.action-card[hidden] { display: none; }
 .card-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .card-title div { min-width: 0; }
 .card-title strong { display: block; font-size: 1.12rem; }
@@ -715,7 +1204,28 @@ dl div { display: grid; grid-template-columns: minmax(86px, .65fr) minmax(0, 1.3
 dt { color: var(--muted); font-size: .8rem; }
 dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .private-action { margin: 12px 0; padding: 12px; border-radius: 12px; background: rgba(89,214,199,.08); }
-.private-action strong { display: block; color: var(--accent); }
+.private-action strong { display: block; margin-bottom: 4px; color: var(--accent); }
+.readiness-note { margin: 10px 0 0; color: var(--muted); font-size: .8rem; }
+.condition-grid { display: grid; gap: 9px; margin: 12px 0; }
+.condition-block { padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.025); }
+.condition-block strong { display: block; margin-bottom: 4px; color: var(--muted); font-size: .76rem; }
+.condition-block p { margin: 0; font-size: .9rem; }
+.condition-block.risk { border-color: rgba(255,124,131,.26); }
+.role-badge { margin-left: 6px; color: var(--accent); }
+.strategy-filters { display: flex; flex-wrap: wrap; gap: 7px; max-width: 100%; margin: 10px 0 14px; padding-bottom: 3px; }
+.strategy-filters button { flex: 1 1 calc(33.333% - 7px); min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); font: inherit; font-size: .8rem; font-weight: 800; }
+.strategy-filters button[aria-pressed="true"] { border-color: var(--accent); background: rgba(89,214,199,.14); color: var(--text); }
+.integrated-report { margin: 14px 0 18px; padding: 16px; border: 1px solid rgba(89,214,199,.3); border-radius: 17px; background: linear-gradient(145deg, rgba(13,46,61,.98), rgba(10,29,47,.98)); }
+.integrated-report h3 { margin: 0; font-size: 1.08rem; }
+.integrated-report .summary { margin: 9px 0; color: #dbeaf3; }
+.work-top-actions { display: grid; gap: 8px; margin: 12px 0; }
+.work-action { padding: 10px 11px; border-left: 3px solid var(--accent); border-radius: 8px; background: rgba(89,214,199,.07); }
+.work-action strong { display: block; font-size: .86rem; }
+.work-action span { color: var(--muted); font-size: .8rem; }
+.source-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.source-chip { padding: 5px 8px; border-radius: 999px; background: rgba(255,255,255,.07); color: var(--muted); font-size: .72rem; }
+.markdown-report { max-height: 32rem; margin: 4px 0 0; padding: 12px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; background: rgba(0,0,0,.18); color: #dce8f0; white-space: pre-wrap; overflow-wrap: anywhere; font: .78rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.card-rationale { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
 .held-badge { margin-left: 6px; color: var(--accent); }
 .empty, .footer-note { color: var(--muted); }
 .footer-note { margin: 24px 2px 0; font-size: .78rem; }
@@ -736,22 +1246,17 @@ _PRIVATE_JS = r"""
   const root = document.getElementById('private-root');
   const tabs = document.getElementById('private-tabs');
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (ch) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-  const b64 = (value) => {
-    const normalized = String(value || '').replace(/-/g, '+').replace(/_/g, '/');
-    const padded = normalized + '='.repeat((4 - normalized.length % 4) % 4);
-    const raw = atob(padded);
-    return Uint8Array.from(raw, (ch) => ch.charCodeAt(0));
-  };
   const fmt = (value) => Number.isFinite(Number(value)) ? Number(value).toLocaleString(undefined, {maximumFractionDigits: 2}) : '-';
   const actionLabels = {
-    NO_ACTION: '지금은 주문 없음', HOLD: '보유 유지', WATCH: '관찰', WAIT: '대기',
-    STARTER: '초기 분할매수', STARTER_NOW: '지금 초기 분할매수 검토',
-    ADD: '분할 추가매수', ADD_NOW: '지금 분할 추가매수 검토', BUY: '매수 검토', BUY_NOW: '지금 매수 검토',
-    REDUCE: '비중 축소', REDUCE_NOW: '지금 비중 축소 검토', TRIM_NOW: '지금 일부 축소 검토',
+    NO_ACTION: '분석 결론 유지', HOLD: '보유 유지', WATCH: '관심 종목으로 관찰', WAIT: '조건 확인 전 대기',
+    STARTER: '초기 분할매수', STARTER_NOW: '초기 분할매수 검토',
+    ADD: '분할 추가매수', ADD_NOW: '분할 추가매수 검토', BUY: '매수 검토', BUY_NOW: '매수 검토',
+    REDUCE: '비중 축소', REDUCE_NOW: '비중 축소 검토', TRIM_NOW: '일부 축소 검토',
     REDUCE_RISK: '리스크 축소', REDUCE_IF_TRIGGERED: '조건 충족 시 비중 축소',
-    TAKE_PROFIT: '이익 실현', TAKE_PROFIT_NOW: '지금 이익 실현 검토', TAKE_PROFIT_IF_TRIGGERED: '조건 충족 시 이익 실현',
-    STOP_LOSS: '손절 검토', STOP_LOSS_NOW: '지금 손절 검토', STOP_LOSS_IF_TRIGGERED: '조건 충족 시 손절',
-    EXIT: '청산 검토', EXIT_NOW: '지금 청산 검토', EXIT_IF_TRIGGERED: '조건 충족 시 청산', SELL: '매도 검토'
+    TAKE_PROFIT: '이익 실현', TAKE_PROFIT_NOW: '이익 실현 검토', TAKE_PROFIT_IF_TRIGGERED: '조건 충족 시 이익 실현',
+    STOP_LOSS: '손절 검토', STOP_LOSS_NOW: '손절 검토', STOP_LOSS_IF_TRIGGERED: '조건 충족 시 손절',
+    EXIT: '청산 검토', EXIT_NOW: '청산 검토', EXIT_IF_TRIGGERED: '조건 충족 시 청산', SELL: '매도 검토',
+    CUSTOM: '세부 실행 계획 확인'
   };
   const actionLabel = (value) => actionLabels[String(value || '').toUpperCase()] || String(value || '-');
   const won = (value) => {
@@ -759,12 +1264,92 @@ _PRIVATE_JS = r"""
     return new Intl.NumberFormat('ko-KR', {style: 'currency', currency: 'KRW', maximumFractionDigits: 0, signDisplay: 'always'}).format(Number(value));
   };
   const percent = (value) => Number.isFinite(Number(value)) ? new Intl.NumberFormat('ko-KR', {style: 'percent', maximumFractionDigits: 1}).format(Number(value)) : '-';
-  const fragment = new URLSearchParams(location.hash.replace(/^#/, ''));
-  const keyText = fragment.get('key') || fragment.get('k') || '';
-  const requestedMarket = fragment.get('market') === 'us' ? 'us' : 'kr';
-  const requestedRun = fragment.get('run') || '';
-  if (location.hash) history.replaceState(history.state, document.title, `${location.pathname}${location.search}`);
+  const sizingText = (delta, target) => combineDistinct(
+    Number.isFinite(Number(delta)) && Number(delta) !== 0 ? `조정 금액 ${won(delta)}` : '',
+    Number.isFinite(Number(target)) && Number(target) >= 0 && Number(target) <= 1 ? `목표 비중 ${percent(target)}` : '',
+  );
+  const query = new URLSearchParams(location.search);
+  const requestedMarket = query.get('market') === 'us' ? 'us' : 'kr';
+  const requestedRun = query.get('run') || '';
   let expiryTimer;
+
+  function valueText(value) {
+    if (value == null || value === '') return '';
+    if (Array.isArray(value)) return value.map(valueText).filter(Boolean).join(' · ');
+    if (typeof value === 'object') {
+      for (const field of ['text', 'label', 'summary', 'condition', 'action', 'description', 'stance']) {
+        if (value[field]) return valueText(value[field]);
+      }
+      return '';
+    }
+    return String(value);
+  }
+  function combineDistinct(...values) {
+    const parts = values.map(valueText).map((value) => value.trim()).filter(Boolean);
+    return [...new Set(parts)].join(' · ');
+  }
+  function conditionItems(value) {
+    if (value == null || value === '') return [];
+    if (Array.isArray(value)) return value.flatMap(conditionItems);
+    if (typeof value === 'object') {
+      for (const field of ['condition', 'text', 'label', 'summary', 'description']) {
+        if (value[field]) return conditionItems(value[field]);
+      }
+      return [];
+    }
+    const text = String(value).trim();
+    if (!text || /^(?:none|n\/a|custom|unknown|-+)$/i.test(text)) return [];
+    return text.split(/\s+(?:\/|\||·)\s+|\n+/).map((item) => item.trim()).filter(Boolean);
+  }
+  function distinctConditions(...values) {
+    const seen = new Set();
+    const result = [];
+    values.flatMap(conditionItems).forEach((item) => {
+      const key = item.replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+      if (!seen.has(key)) { seen.add(key); result.push(item); }
+    });
+    return result;
+  }
+  function conciseConditions(...values) {
+    return distinctConditions(...values).slice(0, 3).map((item) => item.length > 180 ? `${item.slice(0, 177)}…` : item).join(' · ');
+  }
+  function fullConditions(...values) { return distinctConditions(...values).join(' · '); }
+  function humanPlan(value) {
+    if (value == null || value === '') return '';
+    if (typeof value === 'string') return /^CUSTOM$/i.test(value.trim()) ? '' : value.trim();
+    if (Array.isArray(value)) return combineDistinct(...value.map(humanPlan));
+    if (typeof value === 'object') {
+      for (const field of ['text', 'summary', 'plan', 'description', 'action', 'label']) {
+        if (value[field]) return humanPlan(value[field]);
+      }
+      if (value.enabled === false) return '';
+      const stages = [1, 2, 3].map((stage) => {
+        const fraction = value[`stage_${stage}_fraction`];
+        return Number.isFinite(Number(fraction)) ? `${stage}차 ${percent(fraction)}` : '';
+      }).filter(Boolean);
+      return stages.length ? `단계 실행 비중 ${stages.join(' · ')}` : '';
+    }
+    return '';
+  }
+  function tickerKeys(value) {
+    const ticker = String(value || '').trim().toUpperCase();
+    const result = ticker ? [ticker] : [];
+    if (ticker.endsWith('.KS') || ticker.endsWith('.KQ')) result.push(ticker.slice(0, -3));
+    return result;
+  }
+  function workStrategy(item, ticker) {
+    const structured = ((item.integrated_report || {}).structured_report || {});
+    const wanted = new Set(tickerKeys(ticker));
+    return (structured.strategies || []).find((strategy) => tickerKeys(strategy.ticker).some((value) => wanted.has(value))) || {};
+  }
+  function normalizeRole(value, held) {
+    if (held) return 'HOLDING';
+    const role = String(value || '').toUpperCase();
+    if (role.includes('HOLD') || role.includes('OWN') || role.includes('보유')) return 'HOLDING';
+    if (role.includes('NEW') || role.includes('SCANNER') || role.includes('DISCOVERY') || role.includes('신규')) return 'NEW_CANDIDATE';
+    return 'WATCHLIST';
+  }
+  const roleLabel = (role) => ({HOLDING: '보유', WATCHLIST: '관심', NEW_CANDIDATE: '신규 후보'}[role] || '관심');
 
   function immediateContractComplete(market) {
     const coverage = (market || {}).universe_coverage || {};
@@ -806,51 +1391,195 @@ _PRIVATE_JS = r"""
       && runId !== ''
       && boundRunIds.every((value) => value === runId);
   }
-  function effectiveMode(row, market) {
+  function baseLiveReadiness(row, market) {
     const quality = row.quality || {};
     const sourceHealth = String((market || {}).source_health || 'MISSING').toUpperCase();
     const guardrails = (market || {}).guardrails || {};
     const marketValid = Date.parse(guardrails.valid_until || '');
-    if (sourceHealth !== 'OK') return 'BLOCKED_STALE';
-    if (guardrails.expired_at_build === true || !Number.isFinite(marketValid) || marketValid <= Date.now()) return 'BLOCKED_STALE';
+    if (sourceHealth !== 'OK') return {code: 'RECHECK', label: '주문 전 실시간 확인', note: '원천 데이터 상태를 다시 확인하세요.'};
+    if (guardrails.expired_at_build === true || !Number.isFinite(marketValid) || marketValid <= Date.now()) {
+      return {code: 'RECHECK', label: '주문 전 실시간 확인', note: '분석 시점 이후 가격이 변했을 수 있습니다.'};
+    }
     const valid = Date.parse(quality.row_valid_until || '');
-    if (quality.expired_at_build === true || !Number.isFinite(valid) || valid <= Date.now()) return 'BLOCKED_STALE';
-    const declared = String(quality.row_mode || 'MISSING').toUpperCase();
-    if (declared === 'IMMEDIATE' && (
+    if (quality.expired_at_build === true || !Number.isFinite(valid) || valid <= Date.now()) {
+      return {code: 'RECHECK', label: '주문 전 실시간 확인', note: '이 종목의 실시간 조건을 다시 확인하세요.'};
+    }
+    const declared = String(quality.investor_state || 'UNAVAILABLE').toUpperCase();
+    if (declared === 'READY' && (
       !immediateContractComplete(market)
       || quality.execution_ready !== true
       || quality.generated_in_current_run !== true
-    )) return 'BLOCKED_INCOMPLETE';
-    return declared;
+    )) return {code: 'RECHECK', label: '주문 전 실시간 확인', note: '분석 커버리지와 주문 조건을 한 번 더 확인하세요.'};
+    if (declared === 'READY') return {code: 'READY', label: '실시간 조건 확인됨', note: '표시된 조건과 주문 수량을 최종 확인하세요.'};
+    if (declared === 'CONDITIONAL') return {code: 'CONDITIONAL', label: '조건 확인 후 실행', note: '아래 진입·축소 조건이 실제로 충족됐는지 확인하세요.'};
+    if (declared === 'RECHECK') return {code: 'RECHECK', label: '주문 전 실시간 확인', note: '분석 시점 이후 가격과 주문 조건을 다시 확인하세요.'};
+    return {code: 'RESEARCH', label: '분석 시점 참고', note: '실시간 데이터 확인 후 전략을 적용하세요.'};
   }
-  function card(row, market) {
-    const mode = effectiveMode(row, market);
+  const workReadinessPolicy = {
+    READY_NOW: {code: 'READY', label: '실시간 조건 확인됨', note: 'Work 분석은 현재 실행 가능으로 분류했습니다. 표시된 조건과 주문 수량을 최종 확인하세요.'},
+    WAIT_FOR_TRIGGER: {code: 'CONDITIONAL', label: '조건 확인 후 실행', note: 'Work 분석의 진입·축소 조건이 실제로 충족되기 전에는 실행하지 마세요.'},
+    NEEDS_LIVE_RECHECK: {code: 'RECHECK', label: '주문 전 실시간 확인', note: '분석 결론은 유지하되 현재가·거래량·호가를 다시 확인하세요.'},
+    MARKET_CLOSED: {code: 'RECHECK', label: '개장 후 다시 확인', note: '시장 폐장 중 생성된 판단입니다. 개장 후 가격과 주문 가능 상태를 다시 확인하세요.'},
+    DATA_OUTAGE: {code: 'RECHECK', label: '데이터 복구 후 확인', note: '필수 데이터가 중단됐습니다. 데이터 복구와 최신 시세를 확인하기 전에는 실행하지 마세요.'},
+    RESEARCH_ONLY: {code: 'RESEARCH', label: '분석 참고 전용', note: '리서치 전용 판단이며 현재 주문 행동으로 사용하지 마세요.'},
+  };
+  const readinessSeverity = (code) => ({READY: 0, CONDITIONAL: 1, RECHECK: 2, RESEARCH: 3}[code] ?? 3);
+  function liveReadiness(row, market, strategy) {
+    const base = baseLiveReadiness(row, market);
+    const workExecution = strategy.execution || {};
+    const declared = String(workExecution.readiness || '').trim().toUpperCase();
+    if (!declared) return base;
+    const configured = workReadinessPolicy[declared];
+    const workGate = configured
+      ? {...configured}
+      : {code: 'RECHECK', label: 'Work 상태 재확인', note: `알 수 없는 Work 준비 상태(${declared})입니다. 주문 전에 원본 분석을 다시 확인하세요.`};
+    const explicitRechecks = valueText(workExecution.required_rechecks);
+    if (explicitRechecks && workGate.code !== 'READY') workGate.note = explicitRechecks;
+    return readinessSeverity(workGate.code) >= readinessSeverity(base.code) ? workGate : base;
+  }
+  function sourceChips(value) {
+    const entries = Array.isArray(value)
+      ? value
+      : value && typeof value === 'object'
+        ? Object.entries(value).map(([source, detail]) => ({source, detail}))
+        : [];
+    return entries.map((item) => {
+      const source = valueText(item.source || item.name || item.label || item.channel || '출처');
+      const detail = valueText(item.detail || item.summary || item.contribution || item.weight || item.confidence || '반영');
+      return `<span class="source-chip">${esc(source)} · ${esc(detail)}</span>`;
+    }).join('');
+  }
+  function rowPriority(row, strategy) {
     const action = row.portfolio_action || {};
-    const actionNow = mode === 'IMMEDIATE'
-      ? actionLabel(action.action_now || row.strategy_ko || '데이터 확인 전 대기')
-      : mode === 'CONDITIONAL'
-        ? '지금은 주문하지 말고 조건 충족을 기다리세요'
-        : '데이터 만료·불완전 — 지금 주문하지 마세요';
-    const conditional = actionLabel(action.action_if_triggered || row.execution_condition_ko || '-');
-    const risk = actionLabel(action.risk_action || row.risk_condition_ko || '-');
-    return `<article class="action-card" data-row-mode="${esc(mode)}">
-      <div class="card-title"><div><strong>${esc(row.ticker || '-')} ${row.is_held ? '<span class="held-badge">보유</span>' : ''}</strong><span>${esc(row.display_name || '')}</span></div><span class="row-mode mode-${esc(mode.toLowerCase())}">${esc(mode)}</span></div>
-      ${mode.startsWith('BLOCKED_') ? '<p class="expiry-warning">커버리지·상태·유효시간 확인 필요 · 지금 주문하지 마세요</p>' : ''}
-      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>${esc(row.market_data_asof || '-')}</span></div>
-      <div class="private-action"><strong>지금 할 일</strong>${esc(actionNow)}</div>
+    const code = `${action.action_now || ''} ${action.action_if_triggered || ''} ${(strategy.execution || {}).action_now || ''} ${(strategy.thesis || {}).stance || ''}`.toUpperCase();
+    let score = /EXIT|STOP|SELL|REDUCE|TRIM|TAKE_PROFIT/.test(code) ? 100 : /BUY|ADD|STARTER/.test(code) ? 80 : row.is_held ? 50 : 20;
+    const rank = Number(strategy.rank ?? row.portfolio_priority ?? row.table_priority ?? row.display_priority);
+    if (Number.isFinite(rank)) score += Math.max(0, 20 - rank);
+    return score;
+  }
+  function card(row, market, topTickers) {
+    const strategy = workStrategy(market, row.ticker);
+    const hasWork = Object.keys(strategy).length > 0;
+    const thesis = strategy.thesis || {};
+    const workExecution = strategy.execution || {};
+    const readiness = liveReadiness(row, market, strategy);
+    const action = row.portfolio_action || {};
+    const role = normalizeRole(strategy.portfolio_role || row.universe_role, row.is_held === true);
+    const workConclusion = combineDistinct(thesis.stance ? actionLabel(thesis.stance) : '', workExecution.action_now ? actionLabel(workExecution.action_now) : '');
+    const baseConclusion = action.action_now ? actionLabel(action.action_now) : valueText(row.strategy_ko);
+    const analysisAction = (hasWork ? workConclusion : baseConclusion) || '결론 정보 없음';
+    const workEntryConditions = conciseConditions(thesis.entry_conditions);
+    const baseEntryConditions = conciseConditions(row.execution_condition_ko, action.trigger_conditions);
+    const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions) || '조건 정보 없음';
+    const workTriggeredAction = combineDistinct(
+      workExecution.action_if_triggered ? actionLabel(workExecution.action_if_triggered) : '',
+      humanPlan(thesis.position_sizing),
+    );
+    const baseTriggeredAction = combineDistinct(
+      action.action_if_triggered ? actionLabel(action.action_if_triggered) : '',
+      sizingText(action.delta_krw_if_triggered, action.target_weight_if_triggered),
+      humanPlan(action.sell_size_plan),
+    );
+    const triggeredAction = (hasWork ? workTriggeredAction : baseTriggeredAction) || '행동 계획 정보 없음';
+    const workInvalidation = conciseConditions(thesis.invalidation_conditions);
+    const baseInvalidation = conciseConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
+    const invalidation = (hasWork ? workInvalidation : baseInvalidation) || '무효화 조건 정보 없음';
+    const baseRiskAction = combineDistinct(
+      action.risk_action ? actionLabel(action.risk_action) : '',
+      humanPlan(action.risk_action_level),
+      humanPlan(action.profit_taking_plan),
+    );
+    const workRiskAction = humanPlan(thesis.invalidation_action || workExecution.risk_action);
+    const riskAction = (hasWork ? workRiskAction : baseRiskAction) || '무효화 시 행동 정보 없음';
+    const confidence = hasWork ? thesis.confidence : action.confidence;
+    const confidenceText = Number.isFinite(Number(confidence)) && Number(confidence) >= 0 && Number(confidence) <= 1 ? percent(confidence) : valueText(confidence);
+    const tickerIdentity = tickerKeys(row.ticker)[0];
+    const fullWorkEntry = fullConditions(thesis.entry_conditions);
+    const fullWorkInvalidation = fullConditions(thesis.invalidation_conditions);
+    const fullBaseEntry = fullConditions(row.execution_condition_ko, action.trigger_conditions);
+    const fullBaseInvalidation = fullConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
+    const supportingDetail = `<details><summary>${hasWork ? '기본 분석·전체 조건 보기' : '전체 조건 보기'}</summary>
+      ${hasWork ? `<p><strong>기본 분석 결론</strong><br>${esc(baseConclusion || '정보 없음')}</p>` : ''}
+      ${fullWorkEntry ? `<p><strong>Work 전체 진입·축소 조건</strong><br>${esc(fullWorkEntry)}</p>` : ''}
+      ${fullWorkInvalidation ? `<p><strong>Work 전체 무효화 조건</strong><br>${esc(fullWorkInvalidation)}</p>` : ''}
+      ${fullBaseEntry ? `<p><strong>기본 분석 전체 조건</strong><br>${esc(fullBaseEntry)}</p>` : ''}
+      ${fullBaseInvalidation ? `<p><strong>기본 분석 전체 무효화 조건</strong><br>${esc(fullBaseInvalidation)}</p>` : ''}
+      ${action.rationale ? `<p><strong>기본 분석 근거</strong><br>${esc(valueText(action.rationale))}</p>` : ''}
+    </details>`;
+    return `<article class="action-card" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
+      <div class="card-title"><div><strong>${esc(row.ticker || '-')} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span>${esc(row.display_name || strategy.display_name || '')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
+      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>${esc(row.market_data_asof || workExecution.as_of || '-')}</span></div>
+      <div class="private-action"><strong>분석 시점 결론</strong>${esc(analysisAction)}<p class="readiness-note">${esc(readiness.note)}</p></div>
+      <div class="condition-grid">
+        <div class="condition-block"><strong>확인할 진입·축소 조건</strong><p>${esc(entryCondition)}</p></div>
+        <div class="condition-block"><strong>조건 충족 후 행동</strong><p>${esc(triggeredAction)}</p></div>
+        <div class="condition-block risk"><strong>무효화·손실 제한 조건</strong><p>${esc(invalidation)}</p></div>
+        <div class="condition-block risk"><strong>무효화 시 행동</strong><p>${esc(riskAction)}</p></div>
+      </div>
       <dl>
-        <div><dt>조건 충족 시</dt><dd>${esc(conditional)}</dd></div>
-        <div><dt>위험·무효화</dt><dd>${esc(risk)}</dd></div>
         <div><dt>VWAP</dt><dd>${esc(row.vwap_position_ko || '-')}</dd></div>
         <div><dt>상대 거래량</dt><dd>${fmt(row.relative_volume)}배</dd></div>
-        <div><dt>데이터</dt><dd>${esc(row.data_status_ko || (row.quality || {}).freshness_class || '-')}</dd></div>
+        <div><dt>분석 신뢰도</dt><dd>${esc(confidenceText || '-')}</dd></div>
       </dl>
-      <details><summary>포트폴리오 세부 액션</summary><dl>
+      ${(hasWork ? thesis.rationale : action.rationale) ? `<p class="card-rationale"><strong>판단 근거</strong><br>${esc(valueText(hasWork ? thesis.rationale : action.rationale))}</p>` : ''}
+      ${supportingDetail}
+      <details><summary>금액·비중·출처 세부 보기</summary><dl>
         <div><dt>현재 증감</dt><dd>${esc(won(action.delta_krw_now))}</dd></div>
         <div><dt>조건부 증감</dt><dd>${esc(won(action.delta_krw_if_triggered))}</dd></div>
         <div><dt>목표 비중</dt><dd>${esc(percent(action.target_weight_now ?? action.target_weight_if_triggered))}</dd></div>
-      </dl></details>
+        <div><dt>이익 실현 계획</dt><dd>${esc(humanPlan(action.profit_taking_plan) || '-')}</dd></div>
+      </dl><div class="source-chips">${sourceChips(strategy.source_contributions)}</div></details>
     </article>`;
+  }
+  function workTopAction(item) {
+    if (typeof item === 'string') return `<div class="work-action"><strong>${esc(item)}</strong></div>`;
+    const title = combineDistinct(item.ticker, item.display_name, item.title) || '핵심 액션';
+    const detail = combineDistinct(item.action, item.action_now, item.action_if_triggered, item.summary, item.rationale, item.condition);
+    return `<div class="work-action"><strong>${esc(title)}</strong>${detail ? `<span>${esc(detail)}</span>` : ''}</div>`;
+  }
+  function integratedReport(item, field = 'integrated_report') {
+    const report = item[field] || {};
+    const isReference = field === 'reference_report';
+    const analysisOnly = report.analysis_only === true;
+    const structured = report.structured_report || {};
+    if (!report.report_markdown && !Object.keys(structured).length) return '';
+    const title = structured.title || `${item.market || ''} ChatGPT Work 통합 전략`;
+    const summary = valueText(structured.summary);
+    const topActions = Array.isArray(structured.top_actions) ? structured.top_actions : [];
+    const contributions = sourceChips(structured.source_summary);
+    return `<section class="integrated-report${isReference ? ' reference-report' : ''}">
+      <p class="eyebrow">${isReference ? 'CHATGPT WORK · PREVIOUS REFERENCE' : 'CHATGPT WORK · INTEGRATED'}</p>
+      <h3>${esc(title)}</h3>
+      ${isReference ? '<p class="expiry-warning">현재 분석 source와 lineage가 일치하지 않아 이전 분석 참고로만 표시합니다. 현재 카드 순위·실행 판단에는 반영하지 않았습니다.</p>' : ''}
+      ${analysisOnly ? '<p class="readiness-note">Work 종합 전략 전문과 thesis·순위·출처를 유지했습니다. 핵심 액션은 분석 시점 참고이며, 카드의 실행 행동과 준비 상태는 현재 overlay를 사용합니다.</p>' : ''}
+      ${structured.as_of || report.published_at ? `<p class="readiness-note">분석 기준 ${esc(structured.as_of || report.published_at)}</p>` : ''}
+      ${summary ? `<p class="summary">${esc(summary)}</p>` : ''}
+      ${analysisOnly && topActions.length ? '<p class="readiness-note"><strong>분석 시점 핵심 액션 참고:</strong> 현재 주문 가능 여부가 아니라 Work 분석 당시 제안입니다.</p>' : ''}
+      ${topActions.length ? `<div class="work-top-actions">${topActions.slice(0, 3).map(workTopAction).join('')}</div>` : ''}
+      ${topActions.length > 3 ? `<details><summary>통합 핵심 액션 전체 보기</summary><div class="work-top-actions">${topActions.map(workTopAction).join('')}</div></details>` : ''}
+      ${contributions ? `<div class="source-chips">${contributions}</div>` : ''}
+      ${structured.next_checkpoint ? `<p class="readiness-note"><strong>다음 확인:</strong> ${esc(valueText(structured.next_checkpoint))}</p>` : ''}
+      ${report.report_markdown ? `<details><summary>통합 리포트 전체 보기</summary><pre class="markdown-report">${esc(report.report_markdown)}</pre></details>` : ''}
+    </section>`;
+  }
+  function marketHealth(item, rows) {
+    const sourceHealth = String((item || {}).source_health || 'MISSING').toUpperCase();
+    const sourceStatus = String(((item || {}).source || {}).status || (item || {}).manifest_status || '').toLowerCase();
+    const coverage = (item || {}).universe_coverage || (item || {}).coverage || {};
+    const validUntil = Date.parse(((item || {}).guardrails || {}).valid_until || '');
+    const expired = ((item || {}).guardrails || {}).expired_at_build === true || !Number.isFinite(validUntil) || validUntil <= Date.now();
+    if (!rows.length) return {className: 'missing', label: '전략 행 없음', empty: '현재 확인 가능한 전략 행이 없습니다. 분석 커버리지가 복구된 뒤 다시 확인하세요.'};
+    if (sourceHealth === 'MISSING' || sourceHealth === 'FAILED' || ['failed', 'error'].includes(sourceStatus)) {
+      return {className: 'missing', label: '원천 분석 사용 불가', empty: '원천 분석을 사용할 수 없어 현재 전략을 실행 판단에 쓰지 마세요.'};
+    }
+    if (coverage.status !== 'COMPLETE' || coverage.complete !== true) {
+      return {className: 'missing', label: '커버리지 불완전', empty: '필수 종목 분석이 불완전합니다. 누락 분석이 복구될 때까지 기다리세요.'};
+    }
+    if (sourceHealth !== 'OK' || expired) {
+      return {className: 'degraded', label: expired ? '데이터 만료 · 재확인' : '원천 상태 재확인', empty: ''};
+    }
+    if (immediateContractComplete(item)) return {className: 'ok', label: '실행 데이터 확인됨', empty: ''};
+    return {className: 'degraded', label: '전략 제공 · 주문 전 확인', empty: ''};
   }
   function render(payload) {
     const markets = payload.markets || {};
@@ -862,14 +1591,33 @@ _PRIVATE_JS = r"""
     root.innerHTML = ['kr', 'us'].map((market) => {
       const item = markets[market] || {};
       const rows = Array.isArray(item.rows) ? item.rows : [];
-      return `<section class="market-panel" data-market="${market}"><div class="market-head"><div><p class="eyebrow">${market.toUpperCase()} PRIVATE</p><h2>${market.toUpperCase()} 개인 액션</h2></div><span class="health health-${esc(String(item.source_health || 'missing').toLowerCase())}">${esc(item.source_health || 'MISSING')}</span></div><div class="source-meta"><span>Run ${esc(item.run_id || '-')}</span><span>${rows.length}개 행</span></div><div class="cards">${rows.map((row) => card(row, item)).join('') || '<p class="empty">개인 액션 데이터가 없습니다.</p>'}</div></section>`;
+      const ranked = [...rows].sort((left, right) => rowPriority(right, workStrategy(item, right.ticker)) - rowPriority(left, workStrategy(item, left.ticker)));
+      const topTickers = new Set(ranked.slice(0, Math.min(3, ranked.length)).map((row) => tickerKeys(row.ticker)[0]));
+      const counts = item.role_counts || {};
+      const sourceLabel = item.integrated_report
+        ? item.integrated_report.analysis_only === true ? 'Work 분석 결합 · 현재 실행 우선' : '현재 Work 종합 완료'
+        : item.reference_report ? '기본 전략 · 이전 Work 참고' : '기본 전략';
+      const health = marketHealth(item, rows);
+      const cards = ranked.map((row) => card(row, item, topTickers)).join('');
+      const empty = health.empty || '현재 표시할 전략 데이터가 없습니다. 원천 상태와 분석 커버리지를 확인하세요.';
+      return `<section class="market-panel" data-market="${market}"><div class="market-head"><div><p class="eyebrow">${market.toUpperCase()} STRATEGY</p><h2>${market.toUpperCase()} 투자 액션</h2></div><div><span class="health health-neutral">${esc(sourceLabel)}</span><span class="health health-${esc(health.className)}">${esc(health.label)}</span></div></div><div class="source-meta"><span>분석 run ${esc(item.run_id || '-')}</span><span>${rows.length}개 종목</span></div>${integratedReport(item)}${integratedReport(item, 'reference_report')}<nav class="strategy-filters" aria-label="종목 유형"><button type="button" data-group-target="TOP" aria-pressed="true">핵심 ${topTickers.size}</button><button type="button" data-group-target="HOLDING" aria-pressed="false">보유 ${counts.HOLDING || 0}</button><button type="button" data-group-target="WATCHLIST" aria-pressed="false">관심 ${counts.WATCHLIST || 0}</button><button type="button" data-group-target="NEW_CANDIDATE" aria-pressed="false">신규 ${counts.NEW_CANDIDATE || 0}</button><button type="button" data-group-target="ALL" aria-pressed="false">전체 ${rows.length}</button></nav><div class="cards">${cards || `<p class="empty">${esc(empty)}</p>`}</div></section>`;
     }).join('');
     const buttons = [...tabs.querySelectorAll('button')];
     const panels = [...root.querySelectorAll('[data-market]')];
     const select = (market) => { buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.target === market))); panels.forEach((panel) => panel.hidden = panel.dataset.market !== market); };
     buttons.forEach((button) => button.addEventListener('click', () => select(button.dataset.target)));
+    panels.forEach((panel) => {
+      const filters = [...panel.querySelectorAll('[data-group-target]')];
+      const cards = [...panel.querySelectorAll('.action-card')];
+      const selectGroup = (group) => {
+        filters.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.groupTarget === group)));
+        cards.forEach((entry) => { entry.hidden = group === 'TOP' ? entry.dataset.top !== 'true' : group !== 'ALL' && entry.dataset.group !== group; });
+      };
+      filters.forEach((button) => button.addEventListener('click', () => selectGroup(button.dataset.groupTarget)));
+      selectGroup('TOP');
+    });
     select(requestedMarket);
-    status.textContent = `복호화 완료 · ${payload.generated_at || '-'}`;
+    status.textContent = `전략 데이터 업데이트 · ${payload.generated_at || '-'} · 계좌 식별정보 제외`;
     clearTimeout(expiryTimer);
     const now = Date.now();
     const deadlines = Object.values(markets).flatMap((item) => [
@@ -879,22 +1627,13 @@ _PRIVATE_JS = r"""
     if (deadlines.length) expiryTimer = setTimeout(() => render(payload), Math.max(50, Math.min(...deadlines) - now + 50));
   }
   async function start() {
-    if (!keyText) throw new Error('URL에 #key=... 복호화 키가 없습니다. Telegram의 개인 링크를 사용하세요.');
-    if (!/^[A-Za-z0-9_-]{43}$/.test(keyText)) throw new Error('복호화 키 형식이 올바르지 않습니다.');
-    const response = await fetch('private.enc.json', {cache: 'no-store', credentials: 'omit'});
-    if (!response.ok) throw new Error('암호화 개인 대시보드가 아직 게시되지 않았습니다.');
-    const envelope = await response.json();
-    if (envelope.schema !== 'tradingagents.mobile-encrypted/v1' || envelope.alg !== 'A256GCM') throw new Error('지원하지 않는 암호화 형식입니다.');
-    if (envelope.aad !== 'VHJhZGluZ0FnZW50cy9tb2JpbGUtcHJpdmF0ZS92MQ') throw new Error('암호화 context가 올바르지 않습니다.');
-    const keyBytes = b64(keyText);
-    if (keyBytes.byteLength !== 32) throw new Error('복호화 키 길이가 올바르지 않습니다.');
-    const key = await crypto.subtle.importKey('raw', keyBytes, 'AES-GCM', false, ['decrypt']);
-    const plaintext = await crypto.subtle.decrypt({name: 'AES-GCM', iv: b64(envelope.nonce), additionalData: b64(envelope.aad), tagLength: 128}, key, b64(envelope.ciphertext));
-    const payload = JSON.parse(new TextDecoder().decode(plaintext));
-    if (payload.schema !== 'tradingagents.mobile-private/v1') throw new Error('개인 대시보드 payload 계약이 올바르지 않습니다.');
+    const response = await fetch('strategy.json', {cache: 'no-store', credentials: 'omit'});
+    if (!response.ok) throw new Error('통합 투자 전략이 아직 게시되지 않았습니다.');
+    const payload = await response.json();
+    if (payload.schema !== 'tradingagents.mobile-strategy/v1') throw new Error('통합 전략 데이터 형식이 올바르지 않습니다.');
     render(payload);
   }
-  start().catch((error) => { status.classList.add('error'); status.textContent = error.message || '개인 대시보드를 열 수 없습니다.'; root.replaceChildren(); });
+  start().catch((error) => { status.classList.add('error'); status.textContent = error.message || '통합 투자 전략을 열 수 없습니다.'; root.replaceChildren(); });
 })();
 """.strip()
 
@@ -908,20 +1647,6 @@ def _write_text(path: Path, value: str) -> None:
     path.write_text(value, encoding="utf-8")
 
 
-def _b64url(value: bytes) -> str:
-    return base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
-
-
-def _b64url_decode(value: Any) -> bytes:
-    text = str(value or "")
-    return base64.urlsafe_b64decode(text + "=" * (-len(text) % 4))
-
-
-def _sha256_json(payload: dict[str, Any]) -> str:
-    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
-
-
 def _join_url(base: str, suffix: str) -> str:
     root = str(base or "").strip().rstrip("/")
     return f"{root}/{suffix.lstrip('/')}" if root else suffix
@@ -933,6 +1658,16 @@ def _escape(value: Any) -> str:
 
 def _css_token(value: Any) -> str:
     return "".join(character.lower() if character.isalnum() else "_" for character in str(value or "missing")).strip("_") or "missing"
+
+
+def _source_health_label(value: Any) -> str:
+    return {
+        "OK": "데이터 수집 완료",
+        "DEGRADED": "일부 데이터 재확인",
+        "STALE": "주문 전 실시간 재확인",
+        "FAILED": "데이터 확인 필요",
+        "MISSING": "데이터 확인 필요",
+    }.get(str(value or "MISSING").strip().upper(), "데이터 확인 필요")
 
 
 def _fmt_price(value: Any) -> str:

@@ -161,4 +161,4 @@ def test_homepage_run_card_does_not_expose_private_sell_side_counts():
         html = _render_index_page([run], SiteSettings(title="TA", subtitle="Daily"))
 
     assert "이익실현 2 / 리스크 축소 1 / 손절·청산 1" not in html
-    assert "Encrypted private dashboard" in html
+    assert "통합 투자 전략" in html

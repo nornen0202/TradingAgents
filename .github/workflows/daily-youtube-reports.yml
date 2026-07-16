@@ -1,4 +1,10 @@
 name: Daily YouTube Verified Reports
+run-name: >-
+  Daily YouTube Verified Reports
+  [profile=all]
+  [run_mode=full]
+  [request_scope=${{ inputs.channel_urls && 'custom_sources' || 'default_universe' }}]
+  [recovery_source=${{ inputs.recovery_source || (github.event_name == 'schedule' && 'native') || 'manual' }}]
 
 on:
   schedule:
@@ -42,6 +48,14 @@ on:
         required: false
         default: "4"
         type: string
+      recovery_source:
+        description: "Dispatch origin marker used for retry and notification policy"
+        required: false
+        default: "manual"
+        type: choice
+        options:
+          - manual
+          - cloud_watchdog
 
 permissions:
   actions: read
@@ -444,8 +458,6 @@ jobs:
                   )
 
       - name: Rebuild base scheduled site
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -510,8 +522,6 @@ jobs:
 
       - name: Rebuild merged site and Work context after YouTube collection
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false' }}
-        env:
-          TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}
         run: |
           import os
           import subprocess
@@ -557,7 +567,7 @@ jobs:
                   "${{ github.run_attempt }}",
                   "--commit-sha",
                   "${{ github.sha }}",
-                  "--require-private-envelope",
+                  "--require-strategy-payload",
               ]
           )
 

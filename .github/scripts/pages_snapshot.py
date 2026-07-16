@@ -10,6 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
+from tradingagents.scheduled.mobile_site import STRATEGY_SCHEMA, assert_strategy_payload_safe
+
 
 SNAPSHOT_SCHEMA = "tradingagents.pages-snapshot/v1"
 SNAPSHOT_FILENAME = "pages-snapshot.json"
@@ -24,13 +26,13 @@ def create_snapshot(
     run_attempt: int,
     commit_sha: str,
     generated_epoch_ms: int | None = None,
-    require_private_envelope: bool = False,
+    require_strategy_payload: bool = False,
 ) -> dict[str, Any]:
     root = Path(site_dir)
     if not root.is_dir() or not (root / "index.html").is_file():
         raise ValueError(f"Pages site is incomplete: {root}")
-    if require_private_envelope:
-        _validate_private_envelope(root)
+    if require_strategy_payload:
+        _validate_strategy_payload(root)
     # Use the snapshot's last materialized file time rather than the later guard
     # step time.  A slow verifier must not make an older site appear newer than
     # a concurrently completed build.
@@ -107,24 +109,25 @@ def fetch_live_snapshot(
     raise RuntimeError(f"Could not verify deployed Pages snapshot marker: {last_error}") from last_error
 
 
-def _validate_private_envelope(site_dir: Path) -> None:
+def _validate_strategy_payload(site_dir: Path) -> None:
     mobile = site_dir / "mobile"
-    for name in ("private.html", "private.js", "private.enc.json"):
+    for name in ("private.html", "private.js", "strategy.json"):
         if not (mobile / name).is_file():
-            raise ValueError(f"Production Pages snapshot is missing encrypted mobile artifact: mobile/{name}")
-    if (mobile / "private.json").exists():
-        raise ValueError("Production Pages snapshot contains an unencrypted private payload.")
+            raise ValueError(f"Production Pages snapshot is missing mobile strategy artifact: mobile/{name}")
+    for stale_name in ("private.enc.json", "private.json"):
+        if (mobile / stale_name).exists():
+            raise ValueError(f"Production Pages snapshot contains obsolete mobile artifact: mobile/{stale_name}")
     try:
-        envelope = json.loads((mobile / "private.enc.json").read_text(encoding="utf-8"))
+        payload = json.loads((mobile / "strategy.json").read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise ValueError("Encrypted mobile envelope is invalid JSON.") from exc
-    if not isinstance(envelope, dict):
-        raise ValueError("Encrypted mobile envelope must be a JSON object.")
-    if envelope.get("schema") != "tradingagents.mobile-encrypted/v1" or envelope.get("alg") != "A256GCM":
-        raise ValueError("Encrypted mobile envelope contract is invalid.")
-    for key in ("nonce", "aad", "ciphertext"):
-        if not isinstance(envelope.get(key), str) or not envelope[key]:
-            raise ValueError(f"Encrypted mobile envelope is missing {key}.")
+        raise ValueError("Mobile strategy payload is invalid JSON.") from exc
+    if not isinstance(payload, dict):
+        raise ValueError("Mobile strategy payload must be a JSON object.")
+    if payload.get("schema") != STRATEGY_SCHEMA:
+        raise ValueError("Mobile strategy payload contract is invalid.")
+    if not isinstance(payload.get("markets"), dict):
+        raise ValueError("Mobile strategy payload is missing markets.")
+    assert_strategy_payload_safe(payload)
 
 
 def _site_generation_epoch_ms(site_dir: Path) -> int:
@@ -169,7 +172,7 @@ def main() -> int:
     stamp.add_argument("--run-id", required=True, type=int)
     stamp.add_argument("--run-attempt", required=True, type=int)
     stamp.add_argument("--commit-sha", required=True)
-    stamp.add_argument("--require-private-envelope", action="store_true")
+    stamp.add_argument("--require-strategy-payload", action="store_true")
     stamp.add_argument("--output")
 
     guard = subparsers.add_parser("guard")
@@ -188,7 +191,7 @@ def main() -> int:
             run_id=args.run_id,
             run_attempt=args.run_attempt,
             commit_sha=args.commit_sha,
-            require_private_envelope=args.require_private_envelope,
+            require_strategy_payload=args.require_strategy_payload,
         )
         _write_outputs(
             {

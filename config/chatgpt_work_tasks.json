@@ -12,7 +12,7 @@
     "mobile_channels": [
       "telegram",
       "public_sanitized_pages",
-      "aes_gcm_private_mobile_pages"
+      "plaintext_strategy_pages"
     ],
     "task_must_not_claim_external_delivery": true
   },
@@ -22,28 +22,28 @@
       "title": "TradingAgents KR Investment Briefing",
       "surface": "kr",
       "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=10,13,14;BYMINUTE=40;BYSECOND=0",
-      "prompt": "Use $tradingagents-daily-investment-work in kr mode from the local C:\\Projects\\TradingAgents project. Prepare the canonical local event, fail closed on stale or unavailable local data, verify full holdings and watchlist production coverage, compose the mobile-first Korean KR intraday briefing with COVERAGE_RECEIPT and MOBILE_HANDOFF, then acknowledge the exact event and emit its receipt/state. This is a local-host task: never use Chrome or the ChatGPT web composer, never claim ChatGPT web/mobile read private local state, and never claim Telegram or Pages delivery completed without an external delivery receipt."
+      "prompt": "Use $tradingagents-daily-investment-work in kr mode from the local C:\\Projects\\TradingAgents project. Prepare the canonical local event, fail closed for current execution only when market data is stale or unavailable while preserving the analysis-time thesis, verify full holdings and watchlist production coverage, and apply balanced_external evidence to thesis ranking/confidence/risk-bounded sizing/research priority without bypassing execution gates. Compose the mobile-first Korean KR briefing and packet-bound structured report, preserve analysis-time thesis separately from execution readiness, publish both to the content-addressed local work-reports archive, then and only then acknowledge the exact event and emit COVERAGE_RECEIPT, MOBILE_HANDOFF, and receipt/state. Never use Chrome or the ChatGPT web composer, claim ChatGPT web/mobile read private local state, or claim Telegram or Pages delivery completed without an external delivery receipt."
     },
     {
       "id": "tradingagents-work-us",
       "title": "TradingAgents US Investment Briefing",
       "surface": "us",
       "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA;BYHOUR=1,3,23;BYMINUTE=10;BYSECOND=0",
-      "prompt": "Use $tradingagents-daily-investment-work in us mode from the local C:\\Projects\\TradingAgents project. Prepare the canonical local event, fail closed on stale or unavailable local data, verify full holdings and watchlist production coverage, compose the mobile-first Korean US intraday briefing with COVERAGE_RECEIPT and MOBILE_HANDOFF, then acknowledge the exact event and emit its receipt/state. This is a local-host task: never use Chrome or the ChatGPT web composer, never claim ChatGPT web/mobile read private local state, and never claim Telegram or Pages delivery completed without an external delivery receipt."
+      "prompt": "Use $tradingagents-daily-investment-work in us mode from the local C:\\Projects\\TradingAgents project. Prepare the canonical local event, fail closed for current execution only when market data is stale or unavailable while preserving the analysis-time thesis, verify full holdings and watchlist production coverage, and apply balanced_external evidence to thesis ranking/confidence/risk-bounded sizing/research priority without bypassing execution gates. Compose the mobile-first Korean US briefing and packet-bound structured report, preserve analysis-time thesis separately from execution readiness, publish both to the content-addressed local work-reports archive, then and only then acknowledge the exact event and emit COVERAGE_RECEIPT, MOBILE_HANDOFF, and receipt/state. Never use Chrome or the ChatGPT web composer, claim ChatGPT web/mobile read private local state, or claim Telegram or Pages delivery completed without an external delivery receipt."
     },
     {
       "id": "tradingagents-work-youtube",
       "title": "TradingAgents YouTube Verification Delta",
       "surface": "youtube",
       "rrule": "FREQ=DAILY;BYHOUR=7,8,9;BYMINUTE=30;BYSECOND=0",
-      "prompt": "Use $tradingagents-daily-investment-work in youtube mode from the local C:\\Projects\\TradingAgents project. Prepare and process only new or revised canonical local YouTube events, fail closed on stale or unavailable source data, compose the mobile-first Korean verification delta with COVERAGE_RECEIPT and MOBILE_HANDOFF, then acknowledge the exact event and emit its receipt/state. Never use Chrome or the ChatGPT web composer, never substitute public Pages for private local state, and never claim Telegram or Pages delivery completed without an external delivery receipt."
+      "prompt": "Use $tradingagents-daily-investment-work in youtube mode from the local C:\\Projects\\TradingAgents project. Prepare and process only new or revised canonical local YouTube events, fail closed on stale or unavailable source data, and apply balanced_external relevance/evidence weighting for later thesis ranking/confidence/risk-bounded sizing/research priority without bypassing execution gates. Compose the mobile-first Korean verification delta with COVERAGE_RECEIPT and MOBILE_HANDOFF; optionally publish the packet-bound Markdown/structured report for Pages/mobile, then acknowledge the exact event and emit its receipt/state. Never use Chrome or the ChatGPT web composer, substitute public Pages for private local state, or claim Telegram or Pages delivery completed without an external delivery receipt."
     },
     {
       "id": "tradingagents-work-prism",
       "title": "TradingAgents PRISM Research Delta",
       "surface": "prism",
       "rrule": "FREQ=DAILY;BYHOUR=8,9,10;BYMINUTE=35;BYSECOND=0",
-      "prompt": "Use $tradingagents-daily-investment-work in prism mode from the local C:\\Projects\\TradingAgents project. Prepare and process only new or revised sanitized local PRISM events, fail closed on stale or unavailable source data, compose the mobile-first Korean research delta with COVERAGE_RECEIPT and MOBILE_HANDOFF, then acknowledge the exact event and emit its receipt/state. Never access the Telegram session/private archive, Chrome, or the ChatGPT web composer, never substitute public Pages for private local state, and never claim Telegram or Pages delivery completed without an external delivery receipt."
+      "prompt": "Use $tradingagents-daily-investment-work in prism mode from the local C:\\Projects\\TradingAgents project. Prepare and process only new or revised sanitized local PRISM events, fail closed on stale or unavailable source data, and apply balanced_external relevance/evidence weighting for later thesis ranking/confidence/risk-bounded sizing/research priority without bypassing execution gates. Compose the mobile-first Korean research delta with COVERAGE_RECEIPT and MOBILE_HANDOFF; optionally publish the packet-bound Markdown/structured report for Pages/mobile, then acknowledge the exact event and emit its receipt/state. Never access the Telegram session/private archive, Chrome, or the ChatGPT web composer, substitute public Pages for private local state, or claim Telegram or Pages delivery completed without an external delivery receipt."
     }
   ]
 }

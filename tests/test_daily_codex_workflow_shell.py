@@ -83,21 +83,14 @@ def test_daily_analysis_jobs_skip_inline_site_build_execution_refresh_and_fail_o
     assert workflow.count('"--strict",') == 2
 
 
-def test_daily_analysis_site_only_builds_receive_dashboard_key_at_step_scope():
+def test_daily_analysis_site_builds_do_not_require_dashboard_encryption_key():
     workflow = _workflow_text()
 
     marker = "      - name: Run scheduled analysis and build site"
     assert workflow.count(marker) == 2
-    assert workflow.count(
-        "TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}"
-    ) == 3
-    for block in workflow.split(marker)[1:]:
-        step_header = block.split("        run: |", 1)[0]
-        assert "        env:" in step_header
-        assert (
-            "TRADINGAGENTS_MOBILE_DASHBOARD_KEY: ${{ secrets.MOBILE_DASHBOARD_KEY }}"
-            in step_header
-        )
+    assert "TRADINGAGENTS_MOBILE_DASHBOARD_KEY" not in workflow
+    assert "MOBILE_DASHBOARD_KEY" not in workflow
+    assert '"--require-strategy-payload"' in workflow
 
 
 def test_daily_analysis_uploads_diagnostics_even_on_failure():

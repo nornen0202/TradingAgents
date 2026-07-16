@@ -749,15 +749,14 @@ def _render_index_page(
 ) -> str:
     latest = manifests[0] if manifests else None
     representative = _select_representative_run(manifests)
-    latest_portfolio = _load_portfolio_summary(Path(representative["_run_dir"])) if representative else {}
     latest_health_badges = ""
     latest_health_compact = ""
     representative_badge = ""
     if representative and _run_phase_label(representative) in {"delayed_analysis_only", "post_close"}:
         representative_badge = "<div class='warning-banner'>Not for live execution</div>"
     latest_portfolio_link = (
-        "<a class=\"button\" href=\"mobile/private.html\">Open encrypted private dashboard</a>"
-        if representative and latest_portfolio.get("status_path")
+        "<a class=\"button\" href=\"mobile/private.html\">Open 통합 투자 전략</a>"
+        if representative
         else ""
     )
     latest_technical_html = ""
@@ -835,7 +834,7 @@ def _render_index_page(
             <div class="status pending">no data yet</div>
             <p>The scheduled workflow has not produced an archived run yet.</p>
             <a class="button" href="mobile/index.html">Open 모바일 공개 리서치</a>
-            <a class="button" href="mobile/private.html">Open encrypted private dashboard</a>
+            <a class="button" href="mobile/private.html">Open 통합 투자 전략</a>
             <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
             <a class="button" href="prism-telegram/index.html">Open PRISM Telegram 리포트</a>
           </div>
@@ -850,7 +849,7 @@ def _render_index_page(
         public_failed = len(public_tickers) - public_success
         portfolio_summary = _load_portfolio_summary(Path(manifest["_run_dir"]))
         portfolio_link = (
-            "<p><a href=\"mobile/private.html\">Encrypted private dashboard</a></p>"
+            "<p><a href=\"mobile/private.html\">통합 투자 전략</a></p>"
             if portfolio_summary.get("status_path")
             else ""
         )
@@ -992,8 +991,8 @@ def _render_run_page(
         <h2>개인 포트폴리오</h2>
       </div>
       <article class="run-card">
-        <p class="long-field"><strong>공개 정책</strong><span>보유종목, 계좌 금액, 포트폴리오 액션 및 원시 자료는 GitHub Pages에 게시하지 않습니다.</span></p>
-        <a class="button" href="../../mobile/private.html">암호화된 개인 액션표 열기</a>
+        <p class="long-field"><strong>게시 정책</strong><span>계좌번호와 고객 식별정보는 제외하고 종목별 투자 전략과 액션만 게시합니다.</span></p>
+        <a class="button" href="../../mobile/private.html">통합 투자 전략 열기</a>
       </article>
     </section>
         """
@@ -1044,7 +1043,7 @@ def _render_run_page(
     delta_html = ""
     live_delta_html = ""
     timeline_html = _render_session_timeline_section(manifest, manifests or [])
-    strategy_html = ""
+    strategy_html = _render_strategy_table_section(manifest)
     body = f"""
     <nav class="breadcrumbs"><a href="../../index.html">Home</a></nav>
     <section class="hero compact">
@@ -1362,19 +1361,19 @@ def _render_portfolio_page(
     </nav>
     <section class="hero compact">
       <div>
-        <p class="eyebrow">Private portfolio gateway</p>
-        <h1>개인 계좌 자료는 공개하지 않습니다</h1>
-        <p class="subtitle">보유종목, 금액, 수량, 계좌 액션과 원시 리포트는 AES-256-GCM 암호화 모바일 화면에서만 확인할 수 있습니다.</p>
+        <p class="eyebrow">Integrated strategy gateway</p>
+        <h1>통합 투자 전략</h1>
+        <p class="subtitle">계좌번호와 고객 식별정보는 제외하고, 보유·관심·신규 후보의 분석 결론과 실행 조건을 바로 확인합니다.</p>
       </div>
       <div class="hero-card">
-        <div class="status success">privacy protected</div>
+        <div class="status success">action data ready</div>
         <p><strong>Run</strong><span>{_escape(manifest.get('run_id') or '-')}</span></p>
-        <a class="button" href="../../mobile/private.html">암호화된 개인 액션표 열기</a>
+        <a class="button" href="../../mobile/private.html">통합 투자 전략 열기</a>
         <a class="button" href="../../mobile/index.html">공개 모바일 리서치 열기</a>
       </div>
     </section>
     """
-    return _page_template(f"Private portfolio gateway | {settings.title}", body, prefix="../../")
+    return _page_template(f"Integrated strategy | {settings.title}", body, prefix="../../")
 
 
 def _portfolio_has_etf_benchmark_page(portfolio_summary: dict[str, Any]) -> bool:
@@ -4357,7 +4356,7 @@ def _render_run_health_section(manifest: dict[str, Any], portfolio_summary: dict
 def _select_representative_run(manifests: list[dict[str, Any]]) -> dict[str, Any] | None:
     if not manifests:
         return None
-    target = manifests[0]
+    target = max(manifests, key=_manifest_recency_key)
     target_market = _manifest_market(target)
     target_family = _manifest_run_family(target)
     ranked_pool = [
@@ -4369,11 +4368,43 @@ def _select_representative_run(manifests: list[dict[str, Any]]) -> dict[str, Any
         ranked_pool = [manifest for manifest in manifests if _manifest_market(manifest) == target_market]
     if not ranked_pool:
         ranked_pool = list(manifests)
+    target_timestamp = _manifest_recency_key(target)[0]
+    if target_timestamp > 0:
+        recent_pool = [
+            manifest
+            for manifest in ranked_pool
+            if 0 <= target_timestamp - _manifest_recency_key(manifest)[0] <= 72 * 60 * 60
+        ]
+        if recent_pool:
+            ranked_pool = recent_pool
     qualified = [manifest for manifest in ranked_pool if _representative_run_quality_gate(manifest)]
     if qualified:
-        ranked_pool = qualified
+        return min(qualified, key=_representative_run_sort_key)
+    useful = [manifest for manifest in ranked_pool if _representative_run_usefulness_gate(manifest)]
+    if useful:
+        return min(useful, key=_representative_run_sort_key)
     ranked = sorted(ranked_pool, key=_representative_run_sort_key)
     return ranked[0] if ranked else manifests[0]
+
+
+def _manifest_recency_key(manifest: dict[str, Any]) -> tuple[float, str]:
+    value = str(manifest.get("started_at") or "").strip()
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.timestamp(), value
+    except (ValueError, OverflowError):
+        return 0.0, value
+
+
+def _representative_run_usefulness_gate(manifest: dict[str, Any]) -> bool:
+    total, successful, failed = _run_success_counts(manifest)
+    if total <= 0 or successful / total < 0.90:
+        return False
+    if failed and failed / total > 0.05:
+        return False
+    return _run_stale_ratio(manifest) < 0.50
 
 
 def _select_latest_daily_run(manifests: list[dict[str, Any]]) -> dict[str, Any] | None:
