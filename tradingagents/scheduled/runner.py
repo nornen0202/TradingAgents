@@ -2569,14 +2569,20 @@ def _run_performance_tracking(
                         "provider": price_result.provider,
                         "has_prices": price_result.has_prices,
                         "warnings": price_result.warnings,
+                        "due_recommendations": price_result.due_recommendation_count,
                     }
                 )
-                if price_result.has_prices:
+                if price_result.due_recommendation_count == 0:
+                    outcome_update["updated"] = True
+                    outcome_update["up_to_date"] = True
+                elif price_result.has_prices:
                     update_action_outcomes(
                         db_path,
                         asof_date=started_at.date().isoformat(),
                         horizons=config.performance.outcome_horizons,
                         price_history=price_result.price_history,
+                        refresh_window_days=config.performance.price_lookback_days,
+                        recommendation_ids=price_result.due_recommendation_ids,
                     )
                     outcome_update["updated"] = True
                 else:
