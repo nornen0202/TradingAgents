@@ -684,7 +684,7 @@ def _youtube_active_blocker(now_kst: datetime) -> WatchdogBlocker:
     return WatchdogBlocker(
         name="daily-youtube-publish",
         workflow_file="daily-youtube-reports.yml",
-        job_names=("build_youtube_pages", "deploy"),
+        job_names=("build_youtube_pages", "deploy", "youtube_coverage"),
         window_start_kst=_youtube_window_start(now_kst),
     )
 
@@ -702,7 +702,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
             WatchdogTarget(
                 name="youtube-daily",
                 workflow_file="daily-youtube-reports.yml",
-                job_names=("build_youtube_pages", "deploy"),
+                job_names=("build_youtube_pages", "deploy", "youtube_coverage"),
                 work_job_names=("build_youtube_pages",),
                 window_start_kst=youtube_window,
                 inputs={

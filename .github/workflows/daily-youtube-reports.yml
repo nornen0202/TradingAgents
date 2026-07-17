@@ -85,10 +85,10 @@ jobs:
           MANUAL_DEFAULT_PROFILE: ""
           SCHEDULE_GATE_TARGETS_JSON: >-
             {
-              "20 20 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "17:45", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
-              "55 20 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "17:45", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
-              "25 21 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "17:45", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
-              "55 21 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "17:45", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]}
+              "20 20 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "youtube_coverage"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "17:45", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
+              "55 20 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "youtube_coverage"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "17:45", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
+              "25 21 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "youtube_coverage"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "17:45", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
+              "55 21 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "youtube_coverage"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "17:45", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]}
             }
         run: python .github/scripts/scheduled_workflow_gate.py
 
@@ -98,6 +98,10 @@ jobs:
     runs-on: [self-hosted, Windows]
     outputs:
       pages_snapshot_generated_epoch_ms: ${{ steps.stamp_pages_snapshot.outputs.generated_epoch_ms }}
+      did_build: ${{ steps.runtime_gate.outputs.should_run }}
+    concurrency:
+      group: daily-youtube-reports-self-hosted-${{ github.ref }}
+      cancel-in-progress: false
     defaults:
       run:
         shell: python {0}
@@ -161,7 +165,28 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
+      - name: Recheck duplicate coverage after acquiring the self-hosted runner
+        id: runtime_gate
+        env:
+          GH_EVENT_NAME: ${{ github.event_name }}
+          GH_REPOSITORY: ${{ github.repository }}
+          GH_RUN_ID: ${{ github.run_id }}
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW_FILE: daily-youtube-reports.yml
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+          MANUAL_DEFAULT_PROFILE: ""
+          SCHEDULE_GATE_SKIP_BLOCKERS: "1"
+          SCHEDULE_GATE_TARGETS_JSON: >-
+            {
+              "20 20 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "youtube_coverage"]},
+              "55 20 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "youtube_coverage"]},
+              "25 21 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "youtube_coverage"]},
+              "55 21 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "youtube_coverage"]}
+            }
+        run: python .github/scripts/scheduled_workflow_gate.py
+
       - name: Prepare Codex workspace
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         run: |
           import os
           import shutil
@@ -179,6 +204,7 @@ jobs:
           print(f"Using Codex workspace: {workspace}")
 
       - name: Install TradingAgents
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         run: |
           import subprocess
           import sys
@@ -187,6 +213,7 @@ jobs:
           subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", "."])
 
       - name: Start bgutil PO token provider
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         run: |
           import os
           import shutil
@@ -271,6 +298,7 @@ jobs:
           print(f"::warning::bgutil provider did not become reachable; continuing with ASR fallback. log={log_path}")
 
       - name: Probe YouTube ASR and PO token runtime
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         run: |
           import os
           import subprocess
@@ -304,6 +332,7 @@ jobs:
           print("bgutil generate_once.js:", (server_home / "build" / "generate_once.js").exists())
 
       - name: Materialize runtime API keys
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         run: |
           import json
           import os
@@ -323,6 +352,7 @@ jobs:
               handle.write(f"TRADINGAGENTS_API_KEYS_PATH={runtime_path}\n")
 
       - name: Materialize optional YouTube cookies
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         run: |
           import base64
           import os
@@ -347,6 +377,7 @@ jobs:
           print("Materialized YouTube cookies for yt-dlp and caption requests.")
 
       - name: Resolve Codex runtime
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         run: |
           import os
           import subprocess
@@ -398,6 +429,7 @@ jobs:
           raise SystemExit("Could not find a usable Codex binary for GPT-5.6 role verification.")
 
       - name: Verify Codex login and model availability
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         run: |
           import os
           from pathlib import Path
@@ -458,6 +490,7 @@ jobs:
                   )
 
       - name: Rebuild base scheduled site
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         run: |
           import os
           import subprocess
@@ -480,6 +513,7 @@ jobs:
           subprocess.check_call(args)
 
       - name: Run YouTube verification reports
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         timeout-minutes: 180
         run: |
           import os
@@ -521,7 +555,7 @@ jobs:
           subprocess.check_call(args)
 
       - name: Rebuild merged site and Work context after YouTube collection
-        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false' }}
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
         run: |
           import os
           import subprocess
@@ -545,7 +579,7 @@ jobs:
 
       - name: Stamp rollback-resistant Pages snapshot
         id: stamp_pages_snapshot
-        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false' }}
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
         run: |
           import subprocess
           import sys
@@ -572,6 +606,7 @@ jobs:
           )
 
       - name: Add Git Bash to PATH for Pages packaging
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         run: |
           import os
           from pathlib import Path
@@ -586,12 +621,12 @@ jobs:
 
       - name: Configure GitHub Pages
         id: configure_pages
-        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false' }}
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
         continue-on-error: true
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
 
       - name: Upload GitHub Pages artifact
-        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false' }}
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-youtube
@@ -614,7 +649,7 @@ jobs:
 
   deploy:
     needs: build_youtube_pages
-    if: ${{ needs.build_youtube_pages.result == 'success' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
+    if: ${{ needs.build_youtube_pages.result == 'success' && needs.build_youtube_pages.outputs.did_build == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
     runs-on: ubuntu-latest
     concurrency:
       group: tradingagents-pages-deploy
@@ -645,3 +680,13 @@ jobs:
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
         with:
           artifact_name: github-pages-youtube
+
+  youtube_coverage:
+    needs:
+      - build_youtube_pages
+      - deploy
+    if: ${{ needs.build_youtube_pages.result == 'success' && needs.build_youtube_pages.outputs.did_build == 'true' && needs.deploy.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record end-to-end YouTube coverage
+        run: echo "YouTube build and rollback-safe Pages publish path completed."

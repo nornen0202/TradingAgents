@@ -56,6 +56,36 @@ def _run(**overrides):
 
 
 class WorkflowInspectionTests(unittest.TestCase):
+    def test_run_name_template_is_resolved_from_trusted_workflow_path(self):
+        result = inspect_workflow_run(
+            _run(
+                name=(
+                    "Intraday Overlay Refresh [profile=kr] [run_mode=overlay_only] "
+                    "[request_scope=default_universe] [recovery_source=native]"
+                ),
+                path=".github/workflows/intraday-overlay-refresh.yml",
+            ),
+            [
+                {"name": "overlay_refresh_kr", "conclusion": "success"},
+                {"name": "deploy_overlay", "conclusion": "success"},
+            ],
+            repository="nornen0202/TradingAgents",
+        )
+
+        self.assertEqual(result["workflow_name"], "Intraday Overlay Refresh")
+        self.assertTrue(result["should_notify"])
+
+    def test_unknown_workflow_path_cannot_spoof_supported_name(self):
+        with self.assertRaisesRegex(NotificationError, "Unsupported upstream workflow"):
+            inspect_workflow_run(
+                _run(
+                    name="Daily Codex Analysis",
+                    path=".github/workflows/untrusted.yml",
+                ),
+                [{"name": "deploy", "conclusion": "success"}],
+                repository="nornen0202/TradingAgents",
+            )
+
     def test_success_requires_a_real_terminal_job_and_infers_market(self):
         result = inspect_workflow_run(
             _run(),

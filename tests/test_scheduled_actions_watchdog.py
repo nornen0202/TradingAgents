@@ -50,7 +50,7 @@ def test_youtube_watchdog_is_due_after_backup_window():
     youtube = [target for target in targets if target.name == "youtube-daily"]
     assert len(youtube) == 1
     assert youtube[0].workflow_file == "daily-youtube-reports.yml"
-    assert youtube[0].job_names == ("build_youtube_pages", "deploy")
+    assert youtube[0].job_names == ("build_youtube_pages", "deploy", "youtube_coverage")
     assert youtube[0].work_job_names == ("build_youtube_pages",)
     assert youtube[0].inputs["recovery_source"] == "cloud_watchdog"
     assert youtube[0].window_start_kst == _kst("2026-06-02T05:00:00")
