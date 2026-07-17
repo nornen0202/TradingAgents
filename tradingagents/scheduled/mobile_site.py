@@ -1248,17 +1248,28 @@ _PRIVATE_JS = r"""
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (ch) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const fmt = (value) => Number.isFinite(Number(value)) ? Number(value).toLocaleString(undefined, {maximumFractionDigits: 2}) : '-';
   const actionLabels = {
-    NO_ACTION: '분석 결론 유지', HOLD: '보유 유지', WATCH: '관심 종목으로 관찰', WAIT: '조건 확인 전 대기',
+    NONE: '추가 행동 없음', NO_ACTION: '분석 결론 유지', HOLD: '보유 유지', WATCH: '관심 종목으로 관찰',
+    WATCH_TRIGGER: '조건 충족 여부 관찰', WATCH_RISK: '위험 조건 관찰', WAIT: '조건 확인 전 대기', AVOID: '신규 매수 회피',
+    BULLISH: '긍정적 관점', NEUTRAL: '중립적 관점', BEARISH: '보수적 관점',
     STARTER: '초기 분할매수', STARTER_NOW: '초기 분할매수 검토',
+    STARTER_IF_TRIGGERED: '조건 충족 시 신규 분할매수',
     ADD: '분할 추가매수', ADD_NOW: '분할 추가매수 검토', BUY: '매수 검토', BUY_NOW: '매수 검토',
+    ADD_IF_TRIGGERED: '조건 충족 시 추가 매수',
     REDUCE: '비중 축소', REDUCE_NOW: '비중 축소 검토', TRIM_NOW: '일부 축소 검토',
+    TRIM_TO_FUND: '강한 후보로 자금 이동을 위한 일부 축소',
     REDUCE_RISK: '리스크 축소', REDUCE_IF_TRIGGERED: '조건 충족 시 비중 축소',
     TAKE_PROFIT: '이익 실현', TAKE_PROFIT_NOW: '이익 실현 검토', TAKE_PROFIT_IF_TRIGGERED: '조건 충족 시 이익 실현',
     STOP_LOSS: '손절 검토', STOP_LOSS_NOW: '손절 검토', STOP_LOSS_IF_TRIGGERED: '조건 충족 시 손절',
     EXIT: '청산 검토', EXIT_NOW: '청산 검토', EXIT_IF_TRIGGERED: '조건 충족 시 청산', SELL: '매도 검토',
+    FULL_EXIT: '전량 정리', PARTIAL_20: '20% 분할 매도', PARTIAL_35: '35% 분할 매도',
     CUSTOM: '세부 실행 계획 확인'
   };
-  const actionLabel = (value) => actionLabels[String(value || '').toUpperCase()] || String(value || '-');
+  const internalCode = (value) => /^[A-Z][A-Z0-9_]*$/.test(String(value || '').trim());
+  const actionLabel = (value) => {
+    const text = String(value || '').trim();
+    if (!text) return '';
+    return actionLabels[text.toUpperCase()] || (internalCode(text) ? '세부 실행 계획 확인' : text);
+  };
   const won = (value) => {
     if (!Number.isFinite(Number(value))) return '-';
     return new Intl.NumberFormat('ko-KR', {style: 'currency', currency: 'KRW', maximumFractionDigits: 0, signDisplay: 'always'}).format(Number(value));
@@ -1316,7 +1327,11 @@ _PRIVATE_JS = r"""
   function fullConditions(...values) { return distinctConditions(...values).join(' · '); }
   function humanPlan(value) {
     if (value == null || value === '') return '';
-    if (typeof value === 'string') return /^CUSTOM$/i.test(value.trim()) ? '' : value.trim();
+    if (typeof value === 'string') {
+      const text = value.trim();
+      if (!text || /^CUSTOM$/i.test(text)) return '';
+      return internalCode(text) ? actionLabel(text) : text;
+    }
     if (Array.isArray(value)) return combineDistinct(...value.map(humanPlan));
     if (typeof value === 'object') {
       for (const field of ['text', 'summary', 'plan', 'description', 'action', 'label']) {
@@ -1532,9 +1547,16 @@ _PRIVATE_JS = r"""
     </article>`;
   }
   function workTopAction(item) {
-    if (typeof item === 'string') return `<div class="work-action"><strong>${esc(item)}</strong></div>`;
+    if (typeof item === 'string') return `<div class="work-action"><strong>${esc(internalCode(item) ? actionLabel(item) : item)}</strong></div>`;
     const title = combineDistinct(item.ticker, item.display_name, item.title) || '핵심 액션';
-    const detail = combineDistinct(item.action, item.action_now, item.action_if_triggered, item.summary, item.rationale, item.condition);
+    const detail = combineDistinct(
+      item.action ? actionLabel(item.action) : '',
+      item.action_now ? actionLabel(item.action_now) : '',
+      item.action_if_triggered ? actionLabel(item.action_if_triggered) : '',
+      item.summary,
+      item.rationale,
+      item.condition,
+    );
     return `<div class="work-action"><strong>${esc(title)}</strong>${detail ? `<span>${esc(detail)}</span>` : ''}</div>`;
   }
   function integratedReport(item, field = 'integrated_report') {

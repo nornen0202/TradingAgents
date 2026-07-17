@@ -482,6 +482,21 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "기본 분석·전체 조건 보기" in private_js
     assert "별도 단계 실행 계획 없음" not in private_js
     assert "CUSTOM: '세부 실행 계획 확인'" in private_js
+    for code, label in {
+        "NONE": "추가 행동 없음",
+        "ADD_IF_TRIGGERED": "조건 충족 시 추가 매수",
+        "STARTER_IF_TRIGGERED": "조건 충족 시 신규 분할매수",
+        "TRIM_TO_FUND": "강한 후보로 자금 이동을 위한 일부 축소",
+        "PARTIAL_20": "20% 분할 매도",
+        "PARTIAL_35": "35% 분할 매도",
+        "FULL_EXIT": "전량 정리",
+    }.items():
+        assert f"{code}: '{label}'" in private_js
+    assert "internalCode(text) ? '세부 실행 계획 확인' : text" in private_js
+    assert "return internalCode(text) ? actionLabel(text) : text" in private_js
+    assert "item.action ? actionLabel(item.action) : ''" in private_js
+    assert "item.action_if_triggered ? actionLabel(item.action_if_triggered) : ''" in private_js
+    assert "internalCode(item) ? actionLabel(item) : item" in private_js
     assert "sizingText(action.delta_krw_if_triggered, action.target_weight_if_triggered)" in private_js
     assert "text.split(/\\s+(?:\\/|\\||·)\\s+|\\n+/)" in private_js
     assert "const baseConclusion = action.action_now ? actionLabel(action.action_now)" in private_js
