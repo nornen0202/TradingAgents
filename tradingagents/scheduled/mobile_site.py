@@ -1570,7 +1570,7 @@ _PRIVATE_JS = r"""
     const topActions = Array.isArray(structured.top_actions) ? structured.top_actions : [];
     const contributions = sourceChips(structured.source_summary);
     return `<section class="integrated-report${isReference ? ' reference-report' : ''}">
-      <p class="eyebrow">${isReference ? 'CHATGPT WORK · PREVIOUS REFERENCE' : 'CHATGPT WORK · INTEGRATED'}</p>
+      <p class="eyebrow">${isReference ? 'CHATGPT WORK · 분석 시점 참고 전략' : 'CHATGPT WORK · 통합 전략'}</p>
       <h3>${esc(title)}</h3>
       ${isReference ? '<p class="expiry-warning">현재 분석 source와 lineage가 일치하지 않아 이전 분석 참고로만 표시합니다. 현재 카드 순위·실행 판단에는 반영하지 않았습니다.</p>' : ''}
       ${analysisOnly ? '<p class="readiness-note">Work 종합 전략 전문과 thesis·순위·출처를 유지했습니다. 핵심 액션은 분석 시점 참고이며, 카드의 실행 행동과 준비 상태는 현재 overlay를 사용합니다.</p>' : ''}
@@ -1598,7 +1598,7 @@ _PRIVATE_JS = r"""
       return {className: 'missing', label: '커버리지 불완전', empty: '필수 종목 분석이 불완전합니다. 누락 분석이 복구될 때까지 기다리세요.'};
     }
     if (sourceHealth !== 'OK' || expired) {
-      return {className: 'degraded', label: expired ? '데이터 만료 · 재확인' : '원천 상태 재확인', empty: ''};
+      return {className: 'degraded', label: expired ? '주문 전 실시간 확인' : '원천 상태 재확인', empty: ''};
     }
     if (immediateContractComplete(item)) return {className: 'ok', label: '실행 데이터 확인됨', empty: ''};
     return {className: 'degraded', label: '전략 제공 · 주문 전 확인', empty: ''};
@@ -1618,7 +1618,7 @@ _PRIVATE_JS = r"""
       const counts = item.role_counts || {};
       const sourceLabel = item.integrated_report
         ? item.integrated_report.analysis_only === true ? 'Work 분석 결합 · 현재 실행 우선' : '현재 Work 종합 완료'
-        : item.reference_report ? '기본 전략 · 이전 Work 참고' : '기본 전략';
+        : item.reference_report ? '기본 전략 · 분석 시점 Work 참고' : '기본 전략';
       const health = marketHealth(item, rows);
       const cards = ranked.map((row) => card(row, item, topTickers)).join('');
       const empty = health.empty || '현재 표시할 전략 데이터가 없습니다. 원천 상태와 분석 커버리지를 확인하세요.';

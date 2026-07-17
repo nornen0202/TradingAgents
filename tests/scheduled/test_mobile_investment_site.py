@@ -531,7 +531,12 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "알 수 없는 Work 준비 상태" in private_js
     assert "function marketHealth(item, rows)" in private_js
     assert "className: 'missing', label: '전략 행 없음'" in private_js
-    assert "className: 'degraded', label: expired ? '데이터 만료 · 재확인'" in private_js
+    assert "className: 'degraded', label: expired ? '주문 전 실시간 확인'" in private_js
+    assert "CHATGPT WORK · 분석 시점 참고 전략" in private_js
+    assert "CHATGPT WORK · 통합 전략" in private_js
+    assert "기본 전략 · 분석 시점 Work 참고" in private_js
+    assert "PREVIOUS REFERENCE" not in private_js
+    assert "데이터 만료 · 재확인" not in private_js
     assert "health health-neutral" in private_js
     assert "health health-${esc(health.className)}" in private_js
     assert '<meta name="robots" content="noindex,nofollow,noarchive">' in private_html
