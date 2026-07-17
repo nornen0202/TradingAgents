@@ -10,9 +10,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from tradingagents.scheduled.mobile_site import STRATEGY_SCHEMA, assert_strategy_payload_safe
-
-
 SNAPSHOT_SCHEMA = "tradingagents.pages-snapshot/v1"
 SNAPSHOT_FILENAME = "pages-snapshot.json"
 
@@ -110,6 +107,10 @@ def fetch_live_snapshot(
 
 
 def _validate_strategy_payload(site_dir: Path) -> None:
+    # Deploy guard jobs only check the live snapshot and intentionally do not
+    # install the project. Keep project imports on the stamp-only path.
+    from tradingagents.scheduled.mobile_site import STRATEGY_SCHEMA, assert_strategy_payload_safe
+
     mobile = site_dir / "mobile"
     for name in ("private.html", "private.js", "strategy.json"):
         if not (mobile / name).is_file():

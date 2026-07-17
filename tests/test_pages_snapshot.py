@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -13,6 +15,20 @@ SPEC = importlib.util.spec_from_file_location("pages_snapshot", SCRIPT)
 assert SPEC and SPEC.loader
 pages_snapshot = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(pages_snapshot)
+
+
+def test_guard_cli_loads_without_project_installation(tmp_path: Path) -> None:
+    standalone = tmp_path / "pages_snapshot.py"
+    standalone.write_text(SCRIPT.read_text(encoding="utf-8"), encoding="utf-8")
+
+    result = subprocess.run(
+        [sys.executable, "-I", "-S", str(standalone), "guard", "--help"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
 
 
 def _strategy_payload(site: Path) -> None:

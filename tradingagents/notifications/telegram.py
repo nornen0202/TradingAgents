@@ -52,6 +52,14 @@ WORKFLOW_SPECS: dict[str, WorkflowSpec] = {
     "Daily PRISM Telegram Reports": WorkflowSpec(terminal_jobs=("deploy",)),
 }
 
+WORKFLOW_PATH_NAMES: dict[str, str] = {
+    ".github/workflows/daily-codex-analysis.yml": "Daily Codex Analysis",
+    ".github/workflows/intraday-overlay-refresh.yml": "Intraday Overlay Refresh",
+    ".github/workflows/account-portfolio-report-verify.yml": "Account Portfolio Report Verify",
+    ".github/workflows/daily-youtube-reports.yml": "Daily YouTube Verified Reports",
+    ".github/workflows/daily-prism-telegram-reports.yml": "Daily PRISM Telegram Reports",
+}
+
 
 def inspect_workflow_run(
     run: dict[str, Any],
@@ -62,7 +70,12 @@ def inspect_workflow_run(
 ) -> dict[str, Any]:
     """Validate a workflow_run payload and decide whether it represents real work."""
 
-    workflow_name = str(run.get("name") or "")
+    workflow_path = str(run.get("path") or "").split("@", 1)[0]
+    workflow_name = (
+        WORKFLOW_PATH_NAMES.get(workflow_path, "")
+        if workflow_path
+        else str(run.get("name") or "")
+    )
     spec = WORKFLOW_SPECS.get(workflow_name)
     if spec is None:
         raise NotificationError(f"Unsupported upstream workflow: {workflow_name or '(missing)'}")

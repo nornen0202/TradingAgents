@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import sys
+import urllib.error
 from datetime import datetime
+from email.message import Message
 from pathlib import Path
+
+import pytest
 
 
 MODULE_PATH = Path(".github/scripts/scheduled_workflow_gate.py")
@@ -52,7 +57,7 @@ def _youtube_targets():
           "20 20 * * *": {
             "profile": "youtube",
             "window_start": "05:00",
-            "target_jobs": ["build_youtube_pages"],
+            "target_jobs": ["build_youtube_pages", "youtube_coverage"],
             "blockers": [
               {
                 "name": "daily-codex-us-pages",
@@ -122,7 +127,12 @@ def test_scheduled_codex_does_not_skip_for_other_profile_target_job():
 def test_scheduled_youtube_skips_when_prior_manual_pages_job_succeeded():
     client = FakeClient(
         runs=[{"id": 333, "event": "workflow_dispatch", "status": "completed", "conclusion": "success"}],
-        jobs={333: [{"name": "build_youtube_pages", "status": "completed", "conclusion": "success"}]},
+        jobs={
+            333: [
+                {"name": "build_youtube_pages", "status": "completed", "conclusion": "success"},
+                {"name": "youtube_coverage", "status": "completed", "conclusion": "success"},
+            ]
+        },
     )
 
     profile, should_run, reason = gate.decide_schedule_gate(
@@ -139,7 +149,51 @@ def test_scheduled_youtube_skips_when_prior_manual_pages_job_succeeded():
 
     assert profile == "youtube"
     assert should_run is False
-    assert "covers target job set: build_youtube_pages" in reason
+    assert "covers target job set: build_youtube_pages, youtube_coverage" in reason
+
+
+def test_scheduled_youtube_does_not_count_runtime_gate_noop_as_coverage():
+    client = FakeClient(
+        runs=[{"id": 334, "event": "schedule", "status": "completed", "conclusion": "success"}],
+        jobs={334: [{"name": "build_youtube_pages", "status": "completed", "conclusion": "success"}]},
+    )
+
+    _profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="20 20 * * *",
+        requested_profile="",
+        manual_default_profile="",
+        workflow_file="daily-youtube-reports.yml",
+        current_run_id=444,
+        client=client,
+        targets=_youtube_targets(),
+        now_kst=_kst("2026-06-03T20:17:00"),
+    )
+
+    assert should_run is True
+    assert "running now" in reason
+
+
+def test_scheduled_youtube_waits_for_active_build_before_coverage_marker():
+    client = FakeClient(
+        runs=[{"id": 335, "event": "schedule", "status": "in_progress", "conclusion": ""}],
+        jobs={335: [{"name": "build_youtube_pages", "status": "in_progress", "conclusion": ""}]},
+    )
+
+    _profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="20 20 * * *",
+        requested_profile="",
+        manual_default_profile="",
+        workflow_file="daily-youtube-reports.yml",
+        current_run_id=444,
+        client=client,
+        targets=_youtube_targets(),
+        now_kst=_kst("2026-06-03T20:17:00"),
+    )
+
+    assert should_run is False
+    assert "active target job(s): build_youtube_pages" in reason
 
 
 def test_scheduled_codex_retries_when_analysis_succeeded_but_pages_did_not():
@@ -386,3 +440,144 @@ def test_unrecognized_schedule_is_skipped_before_heavy_jobs():
     assert profile == ""
     assert should_run is False
     assert "Unrecognized scheduled cron" in reason
+
+
+class _JsonResponse:
+    def __init__(self, payload: str = '{"workflow_runs": []}') -> None:
+        self.payload = payload.encode("utf-8")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+    def read(self):
+        return self.payload
+
+
+def _http_error(code: int, *, headers: dict[str, str] | None = None, body: str = ""):
+    message = Message()
+    for key, value in (headers or {}).items():
+        message[key] = value
+    return urllib.error.HTTPError(
+        "https://api.github.com/test",
+        code,
+        "test",
+        message,
+        io.BytesIO(body.encode("utf-8")),
+    )
+
+
+def _retry_client(delays: list[float], *, clock: float = 100.0, max_attempts: int = 4):
+    return gate.GitHubActionsGateClient(
+        repository="owner/repo",
+        token="token",
+        max_attempts=max_attempts,
+        sleep=delays.append,
+        clock=lambda: clock,
+    )
+
+
+def _sequence_opener(calls):
+    def open_next(*_args, **_kwargs):
+        result = calls.pop(0)
+        if isinstance(result, BaseException):
+            raise result
+        return result
+
+    return open_next
+
+
+def test_github_api_retries_transient_503(monkeypatch):
+    calls = [_http_error(503), _JsonResponse()]
+    delays: list[float] = []
+    monkeypatch.setattr(gate.urllib.request, "urlopen", _sequence_opener(calls))
+
+    payload = _retry_client(delays)._request("GET", "/actions/runs")
+
+    assert payload == {"workflow_runs": []}
+    assert delays == [1.0]
+
+
+def test_github_api_honors_full_retry_after(monkeypatch):
+    calls = [_http_error(429, headers={"Retry-After": "60"}), _JsonResponse()]
+    delays: list[float] = []
+    monkeypatch.setattr(gate.urllib.request, "urlopen", _sequence_opener(calls))
+
+    _retry_client(delays)._request("GET", "/actions/runs")
+
+    assert delays == [60.0]
+
+
+def test_github_api_uses_primary_rate_limit_reset(monkeypatch):
+    calls = [
+        _http_error(403, headers={"X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "120"}),
+        _JsonResponse(),
+    ]
+    delays: list[float] = []
+    monkeypatch.setattr(gate.urllib.request, "urlopen", _sequence_opener(calls))
+
+    _retry_client(delays)._request("GET", "/actions/runs")
+
+    assert delays == [21.0]
+
+
+def test_github_api_does_not_retry_permission_403(monkeypatch):
+    calls = [_http_error(403, headers={"X-RateLimit-Remaining": "42"}, body="forbidden")]
+    delays: list[float] = []
+    monkeypatch.setattr(gate.urllib.request, "urlopen", _sequence_opener(calls))
+
+    with pytest.raises(urllib.error.HTTPError):
+        _retry_client(delays)._request("GET", "/actions/runs")
+
+    assert delays == []
+
+
+def test_github_api_retries_confirmed_secondary_rate_limit(monkeypatch):
+    calls = [_http_error(403, body='{"message":"You have exceeded a secondary rate limit."}'), _JsonResponse()]
+    delays: list[float] = []
+    monkeypatch.setattr(gate.urllib.request, "urlopen", _sequence_opener(calls))
+
+    _retry_client(delays)._request("GET", "/actions/runs")
+
+    assert delays == [60.0]
+
+
+def test_github_api_raises_after_retry_exhaustion(monkeypatch):
+    calls = [_http_error(503) for _ in range(4)]
+    delays: list[float] = []
+    monkeypatch.setattr(gate.urllib.request, "urlopen", _sequence_opener(calls))
+
+    with pytest.raises(urllib.error.HTTPError):
+        _retry_client(delays)._request("GET", "/actions/runs")
+
+    assert delays == [1.0, 3.0, 7.0]
+
+
+def test_runtime_gate_can_skip_external_blocker_checks():
+    client = FakeClient(
+        runs={
+            "daily-youtube-reports.yml": [],
+            "daily-codex-analysis.yml": [
+                {"id": 901, "event": "schedule", "status": "in_progress", "conclusion": ""}
+            ],
+        },
+        jobs={901: [{"name": "build_pages", "status": "queued", "conclusion": ""}]},
+    )
+
+    _profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="20 20 * * *",
+        requested_profile="",
+        manual_default_profile="",
+        workflow_file="daily-youtube-reports.yml",
+        current_run_id=902,
+        client=client,
+        targets=_youtube_targets(),
+        now_kst=_kst("2026-06-09T05:53:00"),
+        check_blockers=False,
+    )
+
+    assert should_run is True
+    assert "running now" in reason

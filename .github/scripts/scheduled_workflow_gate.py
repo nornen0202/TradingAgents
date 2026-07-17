@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import json
 import os
+import time as time_module
+import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from datetime import datetime, time, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -31,24 +34,84 @@ class ScheduleTarget:
 
 
 class GitHubActionsGateClient:
-    def __init__(self, *, repository: str, token: str, branch: str = "main") -> None:
+    def __init__(
+        self,
+        *,
+        repository: str,
+        token: str,
+        branch: str = "main",
+        max_attempts: int = 4,
+        sleep: Any = time_module.sleep,
+        clock: Any = time_module.time,
+    ) -> None:
         self.repository = repository
         self.token = token
         self.branch = branch
+        self.max_attempts = max(1, int(max_attempts))
+        self._sleep = sleep
+        self._clock = clock
+
+    def _retry_delay(self, exc: urllib.error.HTTPError, body: str, attempt: int) -> float | None:
+        headers = exc.headers or {}
+        retry_after = str(headers.get("Retry-After", "")).strip()
+        if retry_after:
+            try:
+                return max(0.0, float(retry_after))
+            except ValueError:
+                try:
+                    retry_at = parsedate_to_datetime(retry_after).timestamp()
+                    return max(0.0, retry_at - float(self._clock()))
+                except (TypeError, ValueError, OverflowError):
+                    pass
+
+        status = int(exc.code)
+        remaining = str(headers.get("X-RateLimit-Remaining", "")).strip()
+        message = body.lower()
+        secondary_limited = "secondary rate limit" in message or "abuse detection" in message
+        rate_limited = status == 429 or remaining == "0" or secondary_limited
+
+        if status == 403 and not rate_limited:
+            return None
+        if status in {500, 502, 503, 504}:
+            return float((1, 3, 7)[min(attempt, 2)])
+        if not rate_limited:
+            return None
+
+        reset = str(headers.get("X-RateLimit-Reset", "")).strip()
+        if remaining == "0" and reset:
+            try:
+                return max(1.0, float(reset) - float(self._clock()) + 1.0)
+            except ValueError:
+                pass
+        return 60.0
 
     def _request(self, method: str, path: str) -> Any:
         url = f"https://api.github.com/repos/{self.repository}{path}"
-        request = urllib.request.Request(
-            url,
-            headers={
-                "Accept": "application/vnd.github+json",
-                "Authorization": f"Bearer {self.token}",
-                "X-GitHub-Api-Version": "2022-11-28",
-            },
-            method=method,
-        )
-        with urllib.request.urlopen(request, timeout=30) as response:
-            return json.loads(response.read().decode("utf-8"))
+        for attempt in range(self.max_attempts):
+            request = urllib.request.Request(
+                url,
+                headers={
+                    "Accept": "application/vnd.github+json",
+                    "Authorization": f"Bearer {self.token}",
+                    "X-GitHub-Api-Version": "2022-11-28",
+                },
+                method=method,
+            )
+            try:
+                with urllib.request.urlopen(request, timeout=30) as response:
+                    return json.loads(response.read().decode("utf-8"))
+            except urllib.error.HTTPError as exc:
+                body = exc.read(64 * 1024).decode("utf-8", errors="replace")
+                delay = self._retry_delay(exc, body, attempt)
+                if delay is None or attempt + 1 >= self.max_attempts:
+                    raise
+                print(
+                    f"::warning::GitHub Actions API returned HTTP {exc.code}; "
+                    f"retrying in {delay:g}s ({attempt + 2}/{self.max_attempts})."
+                )
+                self._sleep(delay)
+
+        raise RuntimeError("GitHub Actions API retry loop ended unexpectedly.")
 
     def list_runs(self, workflow_file: str, *, created_since_utc: datetime) -> list[dict[str, Any]]:
         query = urllib.parse.urlencode(
@@ -205,6 +268,7 @@ def decide_schedule_gate(
     client: Any,
     targets: dict[str, ScheduleTarget],
     now_kst: datetime,
+    check_blockers: bool = True,
 ) -> tuple[str, bool, str]:
     if event_name != "schedule":
         profile = requested_profile.strip() or manual_default_profile
@@ -219,13 +283,14 @@ def decide_schedule_gate(
     target_job_names = set(target.target_jobs)
 
     try:
-        blockers_clear, blocker_reason = _active_blockers_clear(client=client, target=target, now_kst=now_kst)
-        if not blockers_clear:
-            return (
-                target.profile,
-                False,
-                f"Skipping {target.profile.upper() or workflow_file} scheduled run; {blocker_reason}",
-            )
+        if check_blockers:
+            blockers_clear, blocker_reason = _active_blockers_clear(client=client, target=target, now_kst=now_kst)
+            if not blockers_clear:
+                return (
+                    target.profile,
+                    False,
+                    f"Skipping {target.profile.upper() or workflow_file} scheduled run; {blocker_reason}",
+                )
 
         runs = client.list_runs(workflow_file, created_since_utc=window_start_utc)
         for run in runs:
@@ -279,6 +344,8 @@ def main() -> int:
         client=client,
         targets=load_schedule_targets(os.environ["SCHEDULE_GATE_TARGETS_JSON"]),
         now_kst=datetime.now(KST),
+        check_blockers=os.environ.get("SCHEDULE_GATE_SKIP_BLOCKERS", "").strip().lower()
+        not in {"1", "true", "yes", "on"},
     )
     write_outputs(profile=profile, should_run=should_run, reason=reason)
     return 0
