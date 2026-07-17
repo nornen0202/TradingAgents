@@ -941,6 +941,11 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn('"target_jobs": ["build_youtube_pages", "youtube_coverage"]', workflow)
         self.assertIn("daily-youtube-reports-self-hosted-${{ github.ref }}", workflow)
         self.assertIn("Recheck duplicate coverage after acquiring the self-hosted runner", workflow)
+        runtime_gate = workflow.split(
+            "- name: Recheck duplicate coverage after acquiring the self-hosted runner", 1
+        )[1].split("- name: Prepare Codex workspace", 1)[0]
+        self.assertIn("shell: pwsh", runtime_gate)
+        self.assertIn("run: python .github/scripts/scheduled_workflow_gate.py", runtime_gate)
         self.assertIn('SCHEDULE_GATE_SKIP_BLOCKERS: "1"', workflow)
         self.assertIn("did_build: ${{ steps.runtime_gate.outputs.should_run }}", workflow)
         self.assertIn("youtube_coverage:", workflow)

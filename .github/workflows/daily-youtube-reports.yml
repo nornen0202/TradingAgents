@@ -167,6 +167,7 @@ jobs:
 
       - name: Recheck duplicate coverage after acquiring the self-hosted runner
         id: runtime_gate
+        shell: pwsh
         env:
           GH_EVENT_NAME: ${{ github.event_name }}
           GH_REPOSITORY: ${{ github.repository }}
