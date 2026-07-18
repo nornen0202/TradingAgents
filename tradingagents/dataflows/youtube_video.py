@@ -134,16 +134,17 @@ def extract_youtube_video_id(value: str) -> str:
         return text
 
     parsed = urlparse(text)
-    if not parsed.netloc:
+    scheme = parsed.scheme.lower()
+    host = (parsed.hostname or "").lower().rstrip(".")
+    if scheme not in {"http", "https"} or not host:
         raise ValueError(f"Unsupported YouTube video reference: {value!r}")
 
-    host = parsed.netloc.lower().removeprefix("www.")
     if host == "youtu.be":
         candidate = parsed.path.strip("/").split("/", 1)[0]
         if _VIDEO_ID_RE.match(candidate):
             return candidate
 
-    if "youtube.com" in host:
+    if host in {"youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com"}:
         query_id = parse_qs(parsed.query).get("v", [""])[0]
         if _VIDEO_ID_RE.match(query_id):
             return query_id

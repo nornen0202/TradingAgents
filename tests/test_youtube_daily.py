@@ -31,7 +31,12 @@ from tradingagents.youtube.config import (
     YouTubeSiteSettings,
     load_youtube_config,
 )
-from tradingagents.youtube.research import collect_research_evidence, fallback_research_plan, public_evidence_summary
+from tradingagents.youtube.research import (
+    _unwrap_duckduckgo_url,
+    collect_research_evidence,
+    fallback_research_plan,
+    public_evidence_summary,
+)
 from tradingagents.youtube.runner import (
     _archived_verification_is_current,
     execute_youtube_run,
@@ -57,6 +62,23 @@ from tradingagents.youtube_report import build_youtube_video_report
 class FakeResponse:
     def __init__(self, content: str):
         self.content = content
+
+
+class YouTubeResearchUrlSafetyTests(unittest.TestCase):
+    def test_duckduckgo_redirect_unwrap_requires_exact_https_host(self):
+        target = "https://example.com/article?id=7"
+        encoded = "https%3A%2F%2Fexample.com%2Farticle%3Fid%3D7"
+        self.assertEqual(
+            _unwrap_duckduckgo_url(f"https://duckduckgo.com/l/?uddg={encoded}"),
+            target,
+        )
+        for value in (
+            f"https://duckduckgo.com.attacker.example/l/?uddg={encoded}",
+            f"https://attacker.example/duckduckgo.com/l/?uddg={encoded}",
+            f"ftp://duckduckgo.com/l/?uddg={encoded}",
+        ):
+            with self.subTest(value=value):
+                self.assertEqual(_unwrap_duckduckgo_url(value), value)
 
 
 class FakeLLM:

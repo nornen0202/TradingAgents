@@ -39,6 +39,15 @@ class YouTubeVideoReportTests(unittest.TestCase):
         self.assertEqual(extract_youtube_video_id("https://www.youtube.com/shorts/u2BEOgr8ze8"), "u2BEOgr8ze8")
         self.assertEqual(extract_youtube_video_id("u2BEOgr8ze8"), "u2BEOgr8ze8")
 
+    def test_extract_youtube_video_id_rejects_host_substring_spoofing(self):
+        for value in (
+            "https://youtube.com.attacker.example/watch?v=u2BEOgr8ze8",
+            "https://attacker.example/youtube.com/watch?v=u2BEOgr8ze8",
+            "ftp://www.youtube.com/watch?v=u2BEOgr8ze8",
+        ):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                extract_youtube_video_id(value)
+
     def test_parse_json3_segments_normalizes_caption_text(self):
         payload = {
             "events": [

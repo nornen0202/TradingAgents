@@ -631,7 +631,12 @@ def _unwrap_duckduckgo_url(url: str) -> str:
     if not url:
         return ""
     parsed = urlparse(url)
-    if "duckduckgo.com" in parsed.netloc and parsed.path.endswith("/l/"):
+    host = (parsed.hostname or "").lower().rstrip(".")
+    if (
+        parsed.scheme.lower() in {"http", "https"}
+        and host in {"duckduckgo.com", "www.duckduckgo.com"}
+        and parsed.path.endswith("/l/")
+    ):
         redirect = parse_qs(parsed.query).get("uddg")
         if redirect:
             return unquote(redirect[0])
