@@ -1,0 +1,233 @@
+name: Work Report Pages Refresh
+run-name: >-
+  Work Report Pages Refresh
+  [profile=${{ inputs.surface }}]
+  [run_mode=work_report_handoff]
+  [request_scope=exact_report]
+  [recovery_source=local_work]
+
+on:
+  workflow_dispatch:
+    inputs:
+      surface:
+        description: "Acknowledged market surface"
+        required: true
+        type: choice
+        options:
+          - kr
+          - us
+      event_id:
+        description: "Exact acknowledged Work event ID"
+        required: true
+        type: string
+      report_sha256:
+        description: "Exact acknowledged Work report SHA-256"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: work-report-pages-refresh-${{ inputs.surface }}-${{ inputs.report_sha256 }}
+  cancel-in-progress: false
+
+jobs:
+  build_work_report_pages:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: [self-hosted, Windows]
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    outputs:
+      pages_snapshot_generated_epoch_ms: ${{ steps.stamp_pages_snapshot.outputs.generated_epoch_ms }}
+    defaults:
+      run:
+        shell: python {0}
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      PYTHONUTF8: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_REPO_DIR: ${{ github.workspace }}\source-${{ github.run_id }}
+      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site-${{ github.run_id }}
+      TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
+      TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          path: source-${{ github.run_id }}
+          clean: false
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install TradingAgents
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", "."])
+
+      - name: Verify exact acknowledged Work report
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
+          if not archive_dir:
+              raise SystemExit("TRADINGAGENTS_ARCHIVE_DIR is required for an exact Work report handoff.")
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/verify_work_pages_handoff.py",
+                  "report",
+                  "--archive-dir",
+                  archive_dir,
+                  "--surface",
+                  "${{ inputs.surface }}",
+                  "--event-id",
+                  "${{ inputs.event_id }}",
+                  "--report-sha256",
+                  "${{ inputs.report_sha256 }}",
+              ]
+          )
+
+      - name: Rebuild Pages from canonical archives
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          args = [
+              sys.executable,
+              "-u",
+              "-m",
+              "tradingagents.scheduled",
+              "--config",
+              "config/scheduled_analysis.toml",
+              "--site-only",
+              "--site-dir",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
+              "--archive-dir",
+              os.environ["TRADINGAGENTS_ARCHIVE_DIR"],
+          ]
+          subprocess.check_call(args)
+
+      - name: Verify current Work lineage in built strategy site
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/verify_work_pages_handoff.py",
+                  "site",
+                  "--site-dir",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
+                  "--surface",
+                  "${{ inputs.surface }}",
+                  "--event-id",
+                  "${{ inputs.event_id }}",
+                  "--report-sha256",
+                  "${{ inputs.report_sha256 }}",
+              ]
+          )
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+
+      - name: Stamp rollback-resistant Pages snapshot
+        id: stamp_pages_snapshot
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import os
+          import subprocess
+          import sys
+
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/pages_snapshot.py",
+                  "stamp",
+                  "--site-dir",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
+                  "--repository",
+                  "${{ github.repository }}",
+                  "--workflow",
+                  "${{ github.workflow }}",
+                  "--run-id",
+                  "${{ github.run_id }}",
+                  "--run-attempt",
+                  "${{ github.run_attempt }}",
+                  "--commit-sha",
+                  "${{ github.sha }}",
+                  "--require-strategy-payload",
+              ]
+          )
+
+      - name: Add Git Bash to PATH for Pages packaging
+        run: |
+          import os
+          from pathlib import Path
+
+          for candidate in (Path("C:/Program Files/Git/bin"), Path("C:/Program Files/Git/usr/bin")):
+              if (candidate / "bash.exe").exists():
+                  with open(os.environ["GITHUB_PATH"], "a", encoding="utf-8") as handle:
+                      handle.write(f"{candidate}\n")
+                  raise SystemExit(0)
+          raise SystemExit("bash.exe was not found under the expected Git for Windows directories.")
+
+      - name: Upload Work report Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          name: github-pages-work-report
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
+
+  deploy:
+    needs: build_work_report_pages
+    if: ${{ needs.build_work_report_pages.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    concurrency:
+      group: tradingagents-pages-deploy
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out deployment guard
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Refuse stale Pages snapshot rollback
+        id: pages_guard
+        env:
+          PAGES_PUBLIC_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+        run: >-
+          python .github/scripts/pages_snapshot.py guard
+          --candidate-generated-epoch-ms "${{ needs.build_work_report_pages.outputs.pages_snapshot_generated_epoch_ms }}"
+          --candidate-run-id "${{ github.run_id }}"
+          --candidate-run-attempt "${{ github.run_attempt }}"
+          --public-base-url "$PAGES_PUBLIC_BASE_URL"
+
+      - name: Deploy current Work report site to GitHub Pages
+        id: deployment
+        if: ${{ steps.pages_guard.outputs.should_deploy == 'true' }}
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+        with:
+          artifact_name: github-pages-work-report

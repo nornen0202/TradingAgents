@@ -124,9 +124,9 @@ python -m tradingagents.work prepare --surface kr --archive-dir C:\TradingAgents
 
 로컬 packet이 없으면 public Pages로 개인 전략을 재구성하지 않고 `ERROR`로 끝낸다. `current`와 `last_ready`를 합치지 않고 응답 현재 시각에 source·시장 데이터·행별 유효시간을 다시 검사한다. stale/failed/missing data는 현재 주문 행동으로 표현하지 않는다.
 
-실행 순서는 `prepare → Markdown/structured JSON 작성 → publish → ACK`다. KR·US는 publish가 없으면 ACK가 실패한다. YouTube·PRISM publish는 선택 가능하다.
+실행 순서는 `prepare → Markdown/structured JSON 작성 → publish → ACK → KR/US Pages handoff`다. KR·US는 publish가 없으면 ACK가 실패한다. YouTube·PRISM publish는 선택 가능하다.
 
-구조화 보고서는 packet의 `surface`, `event_id`, `source_sha256`에 묶인다. KR·US `strategies`는 prepared packet의 전체 ticker를 canonical identity 기준으로 정확히 한 번씩 포함해야 하며 누락·중복·unknown ticker는 publish가 거부한다. 구조화 `coverage_receipt`는 packet의 `current.universe_coverage`와 정확히 일치해야 한다. Report execution은 packet readiness를 승격하거나 유효시간을 연장할 수 없고 packet blockers·required rechecks를 모두 보존한다. stale 시에는 `execution.readiness`만 `NEEDS_LIVE_RECHECK`로 낮추고 분석 시점 `thesis`와 조건·무효화·기간을 지우지 않는다.
+구조화 보고서는 packet의 `surface`, `event_id`, `source_sha256`에 묶인다. KR·US `strategies`는 prepared packet의 전체 ticker를 canonical identity 기준으로 정확히 한 번씩 포함해야 하며 누락·중복·unknown ticker는 publish가 거부한다. 구조화 `coverage_receipt`는 packet의 `current.universe_coverage`, `model_receipt`는 packet의 `model_provenance`와 정확히 일치해야 한다. 종목 분석은 실제 LLM usage가 있으면 관측 모델을 표시하지만 Work 종합은 호스트가 서명된 응답별 모델 receipt를 제공하지 않으므로 `CONFIGURED_NOT_RUNTIME_VERIFIED`를 유지한다. 이를 ChatGPT Chat/Pro 모드 실행으로 추정하지 않는다. Report execution은 packet readiness를 승격하거나 유효시간을 연장할 수 없고 packet blockers·required rechecks를 모두 보존한다. stale 시에는 `execution.readiness`만 `NEEDS_LIVE_RECHECK`로 낮추고 분석 시점 `thesis`와 조건·무효화·기간을 지우지 않는다.
 
 시장 packet의 supporting context는 보유→관심→탐색 종목 순서의 round-robin으로 YouTube 12건, PRISM 20건까지 고르고, 잘린 수와 실제 전송 수를 coverage에 기록한다. structured report는 `external_evidence_receipt`를 그대로 돌려주고 정상·관련 event의 정확한 `event_key`와 영향을 받은 필드를 종목별 `source_contributions`에 묶어야 한다. 따라서 모델이 외부 근거를 받았지만 조용히 무시하거나, 받지 않은 근거를 인용한 보고서는 publish되지 않는다.
 
@@ -141,6 +141,14 @@ python -m tradingagents.work ack --surface kr --event-id <event_id> --status ren
 ```
 
 ACK는 Work event 렌더링 receipt다. producer 신선도, Telegram 전송, Pages 배포 성공을 의미하지 않는다. ACK 실패 시 `PENDING_ACK`로 남겨 다음 run이 같은 event를 `RESUME`하게 한다. 공개 Pages event ID는 로컬 ACK·recover에 사용하지 않는다. State 복구는 canonical ACK ledger가 증명하는 receipt만 허용하며 KR·US는 exact `report_sha256`와 content-addressed latest report까지 일치해야 한다. 이미 state가 있는 동일 surface를 과거 receipt로 덮어쓰지 않는다.
+
+KR·US ACK 뒤에는 exact hash handoff를 수행한다.
+
+```powershell
+python -m tradingagents.work handoff --surface kr --event-id <event_id> --report-sha256 <report_sha256> --repository nornen0202/TradingAgents --ref main
+```
+
+`DISPATCH_ACCEPTED`는 GitHub 요청 접수만 증명하며 배포 성공은 아니다. 전용 workflow가 report/latest byte identity와 빌드 후 Work lineage를 검증한다. 정상 handoff 성공은 Telegram에 보내지 않고 실제 workflow 실패만 중복 incident cooldown 정책으로 알린다.
 
 ## YouTube·PRISM 안전 규칙
 
@@ -174,12 +182,13 @@ YouTube와 PRISM은 state lock 충돌을 줄이도록 실행 분을 엇갈린다
 2. 실제 최신 KR·US packet에서 `universe_coverage=COMPLETE`, 누락 0, 분석 실패 0인지 확인한다.
 3. 네 surface의 `prepare`가 NEW/RESUME/NOOP을 결정적으로 반환하고, KR·US는 publish 전 ACK가 거부되는지 확인한다.
 4. report event/source binding, 전체 ticker coverage, content-addressed event와 latest hash를 확인한다.
-5. `/mobile/`, `/mobile/public.json`, `/mobile/private.html`과 `/work/v1/<surface>/report/latest.json`을 확인한다.
-6. 공개 site 전체에 계좌 식별자, credential, token, session 경로, key가 없는지 확인한다.
-7. Telegram에 producer 성공과 실패 테스트 알림이 모두 도착하는지 확인한다.
-8. 360/390/430 px viewport에서 KR·US 액션 카드가 가로 overflow 없이 보이는지 확인한다.
-9. 과거 raw decision bundle·portfolio 공개 URL이 404인지 확인한다.
-10. 다음 정규 full run에서 보유·관심종목 전수 분석과 완료 알림을 다시 확인한다.
+5. exact-hash handoff의 report 사전 검증과 site 사후 lineage 검증을 확인한다.
+6. `/mobile/`, `/mobile/public.json`, `/mobile/private.html`과 `/work/v1/<surface>/report/latest.json`을 확인한다.
+7. 공개 site 전체에 계좌 식별자, credential, token, session 경로, key가 없는지 확인한다.
+8. Telegram에 producer 성공과 실패 테스트 알림이 모두 도착하는지 확인한다.
+9. 360/390/430 px viewport에서 KR·US 액션 카드가 가로 overflow 없이 보이는지 확인한다.
+10. 과거 raw decision bundle·portfolio 공개 URL이 404인지 확인한다.
+11. 다음 정규 full run에서 보유·관심종목 전수 분석과 완료 알림을 다시 확인한다.
 
 ## 장애와 롤백
 

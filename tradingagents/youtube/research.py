@@ -291,6 +291,7 @@ def public_evidence_summary(evidence: Mapping[str, Any], *, per_claim_limit: int
         by_claim[claim_id] = by_claim.get(claim_id, 0) + 1
         public_items.append(
             {
+                "evidence_id": str(item.get("evidence_id") or "") or None,
                 "claim_id": claim_id,
                 "title": _clean_text(item.get("title") or "", 160),
                 "source_url": str(item.get("source_url") or ""),

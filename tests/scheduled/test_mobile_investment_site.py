@@ -349,7 +349,39 @@ def _write_valid_work_report(
         ],
         "strategies": strategies,
         "coverage_receipt": {"status": "COMPLETE", "source_run_id": source_run_id},
-        "source_summary": {"youtube": "반영", "prism": "반영", market: "핵심"},
+        "model_receipt": {
+            "schema": "tradingagents.model-provenance/v1",
+            "market_analysis": {
+                "verification_status": "RUNTIME_USAGE_OBSERVED",
+                "observed_calls": 7,
+                "observed_models": {"gpt-5.6-sol": {"calls": 7}},
+            },
+            "work_synthesis": {
+                "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+                "requested_model": "gpt-5.6-sol",
+                "requested_reasoning_effort": "xhigh",
+            },
+        },
+        "source_summary": {
+            "youtube": "반영",
+            "prism": "반영",
+            market: "핵심",
+            "external_evidence_receipt": {
+                "schema": "tradingagents.external-evidence-receipt/v1",
+                "sources": {
+                    "youtube": {
+                        "source_health": "OK",
+                        "event_keys": ["video:1"],
+                        "coverage": {"window_events": 4, "transmitted_events": 1, "omitted_events": 3},
+                    },
+                    "prism": {
+                        "source_health": "OK",
+                        "event_keys": ["prism:1"],
+                        "coverage": {"window_events": 1, "transmitted_events": 1, "omitted_events": 0},
+                    },
+                },
+            },
+        },
         "next_checkpoint": "다음 시장 데이터 갱신 시점",
     }
     material = {
@@ -534,6 +566,9 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "className: 'degraded', label: expired ? '주문 전 실시간 확인'" in private_js
     assert "CHATGPT WORK · 분석 시점 참고 전략" in private_js
     assert "CHATGPT WORK · 통합 전략" in private_js
+    assert "외부 근거 포함·누락 영수증" in private_js
+    assert "모델 실행 영수증" in private_js
+    assert "Chat/Pro 모드 미증명" in private_js
     assert "기본 전략 · 분석 시점 Work 참고" in private_js
     assert "PREVIOUS REFERENCE" not in private_js
     assert "데이터 만료 · 재확인" not in private_js

@@ -33,6 +33,7 @@ class NotificationError(RuntimeError):
 class WorkflowSpec:
     terminal_jobs: tuple[str, ...]
     run_labels: tuple[str, ...] = ()
+    notify_success: bool = True
 
 
 WORKFLOW_SPECS: dict[str, WorkflowSpec] = {
@@ -50,6 +51,11 @@ WORKFLOW_SPECS: dict[str, WorkflowSpec] = {
     ),
     "Daily YouTube Verified Reports": WorkflowSpec(terminal_jobs=("deploy",)),
     "Daily PRISM Telegram Reports": WorkflowSpec(terminal_jobs=("deploy",)),
+    "Work Report Pages Refresh": WorkflowSpec(
+        terminal_jobs=("deploy",),
+        run_labels=("work-report-pages-refresh",),
+        notify_success=False,
+    ),
 }
 
 WORKFLOW_PATH_NAMES: dict[str, str] = {
@@ -58,6 +64,7 @@ WORKFLOW_PATH_NAMES: dict[str, str] = {
     ".github/workflows/account-portfolio-report-verify.yml": "Account Portfolio Report Verify",
     ".github/workflows/daily-youtube-reports.yml": "Daily YouTube Verified Reports",
     ".github/workflows/daily-prism-telegram-reports.yml": "Daily PRISM Telegram Reports",
+    ".github/workflows/work-report-pages-refresh.yml": "Work Report Pages Refresh",
 }
 
 
@@ -186,6 +193,9 @@ def inspect_workflow_run(
     elif successful_terminal_jobs and terminal_deploy_superseded:
         should_notify = False
         reason = "no_work_superseded"
+    elif successful_terminal_jobs and not spec.notify_success:
+        should_notify = False
+        reason = "successful_silent_handoff"
     elif successful_terminal_jobs:
         should_notify = True
         reason = "terminal_job_succeeded"
@@ -220,7 +230,7 @@ def inspect_workflow_run(
 
 def _workflow_recovery_source(*, event: str, display_title: str) -> str:
     match = re.search(
-        r"\[recovery_source=(native|manual|cloud_watchdog|local_watchdog)\]",
+        r"\[recovery_source=(native|manual|cloud_watchdog|local_watchdog|local_work)\]",
         str(display_title or ""),
         flags=re.IGNORECASE,
     )

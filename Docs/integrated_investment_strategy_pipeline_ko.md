@@ -38,7 +38,7 @@ flowchart LR
 3. 로컬 Work 자동화가 immutable event를 준비하고 강한 모델로 한국어 투자자 보고서를 작성한다.
 4. `publish` 단계가 event id와 source SHA-256을 대조한 뒤 보고서를 `archive/work-reports/<surface>/latest.json`과 content-addressed 이력에 저장한다.
 5. 시장 보고서는 publish가 성공해야 ACK할 수 있다. 따라서 “처리 완료” receipt가 있는데 본문이 없는 상태를 만들지 않는다.
-6. 다음 Pages build가 최신 보고서를 `mobile/strategy.json`과 웹 화면에 포함한다.
+6. ACK 직후 `tradingagents.work handoff`가 exact event/report hash를 `Work Report Pages Refresh`에 전달한다. 워크플로는 content-addressed latest를 빌드 전에 확인하고, 빌드 뒤 `CURRENT_PACKET|CURRENT_ANALYSIS_LINEAGE`와 report ID를 다시 확인한 다음에만 Pages를 배포한다.
 
 ## 전략과 실행 상태 분리
 
@@ -78,7 +78,7 @@ flowchart LR
 - 외부 신호 단독으로 KIS 시세·시장경보·포트폴리오 한도·손실 제한 gate를 우회할 수 없다.
 - 각 추천에는 가능한 경우 `MARKET`, `YOUTUBE`, `PRISM`의 기여와 충돌을 표시한다.
 
-향후에는 추천 시점의 신호와 1일·5일·20일 사후성과를 저장해 원천·채널·발신자별 가중치를 보정한다. “어느 정도 검증됐다고 가정”하는 현재 정책을 영구적인 무검증 고정값으로 만들지 않기 위함이다.
+추천 시점의 신호와 1일·5일·20일 가격 경로는 `performance.sqlite`에 저장해 원천·채널별 가중치 보정 근거로 사용한다. 이 값은 추천 후 가격을 되짚는 반사실적 사후평가이며 실제 체결·계좌 성과가 아니다. `execution_receipt`가 확인된 broker fill과 종료 거래 journal이 연결되기 전까지 모바일은 `COUNTERFACTUAL_ONLY`로 표시하고, 실제 계좌 성과와 분리한다.
 
 ## 모바일 정보 구조
 
@@ -89,8 +89,9 @@ flowchart LR
 3. 보유종목: 유지·추가·축소·매도
 4. 관심종목과 신규 매수 후보
 5. 각 카드의 `왜`, `진입 조건`, `조건 충족 시 행동`, `무효화/손절`, `금액·비중`, `기간`
-6. YouTube·PRISM 기여 요약
-7. 모델이 작성한 통합 종합 분석 전문
+6. YouTube·PRISM 기여와 전달/누락 coverage 영수증
+7. 종목 분석의 관측 모델과 Work 종합의 설정 모델/검증 한계
+8. 모델이 작성한 통합 종합 분석 전문
 
 “조건 충족 시”에는 행동명만 반복하지 않고 실제 가격·거래량·이벤트 조건을 표시한다. `trigger_conditions`와 `action_if_triggered`는 서로 다른 필드로 유지한다.
 
@@ -114,5 +115,8 @@ Telegram 즉시 알림은 사용자가 대응해야 할 사건에 한정한다.
 - 모델 최종 보고서가 source event와 결합되어 archive에 남는다.
 - 모바일에서 raw `BLOCKED_STALE`과 “현재 실행 가능 없음” 반복 문구가 보이지 않는다.
 - YouTube·PRISM 기여가 보고서에 명시된다.
+- 외부 근거의 검토창/전달/누락 건수와 모델 실행 영수증이 모바일에 표시된다.
+- 제안 금액을 실제 체결로 간주하지 않고 추천 사후평가와 계좌 실제 성과를 분리한다.
 - `mobile/private.html`은 키 없이 열리고, `private.enc.json`과 암호화 secret 의존성이 없다.
 - Pages snapshot 검증이 `mobile/strategy.json`의 schema와 계좌 식별자 부재를 확인한다.
+- 360/390/430 px 실제 Chrome 렌더링에서 가로 overflow와 필수 조건 필드 누락이 없어야 한다.

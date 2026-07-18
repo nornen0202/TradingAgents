@@ -3,12 +3,14 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
+import subprocess
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
 
 from tradingagents.work import packet as work_packet
+from tradingagents.work.handoff import WORK_HANDOFF_SCHEMA, dispatch_pages_handoff
 from tradingagents.work.packet import WORK_REPORT_SCHEMA, WORK_SCHEMA, build_surface_packet
 from tradingagents.work.runtime import WorkRuntime, WorkRuntimeError, validate_packet
 from tradingagents.work.site import _fit_packet_budget, build_work_site
@@ -278,6 +280,7 @@ def _structured_report(prepared: dict, *, ticker_override: list[str] | None = No
         "top_actions": [],
         "strategies": strategies,
         "coverage_receipt": packet.get("body", {}).get("current", {}).get("universe_coverage", {}),
+        "model_receipt": packet.get("body", {}).get("model_provenance", {}),
         "source_summary": {
             "policy": "balanced_external",
             "external_evidence_receipt": supporting_context.get("receipt_contract"),
@@ -344,6 +347,60 @@ def test_prompt_revision_changes_work_event_id(monkeypatch):
     # A packet prepared under the prior embedded contract remains verifiable
     # after the live prompt/skill/task files rotate.
     validate_packet(first)
+
+
+def test_market_packet_distinguishes_runtime_observed_analysis_from_configured_work_model(
+    tmp_path: Path,
+):
+    archive = tmp_path / "archive"
+    run_dir = _write_market_run(
+        archive,
+        run_id="model-receipt-us",
+        market="us",
+        started_at="2026-07-14T10:00:00-04:00",
+        row_mode="IMMEDIATE",
+    )
+    manifest_path = run_dir / "run.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["settings"].update(
+        {
+            "provider": "codex",
+            "quick_model": "gpt-5.6-terra",
+            "deep_model": "gpt-5.6-sol",
+            "output_model": "gpt-5.6-luna",
+            "codex_deep_reasoning_effort": "medium",
+        }
+    )
+    manifest["llm_usage"] = {
+        "available": True,
+        "calls": 9,
+        "by_model": {
+            "gpt-5.6-sol": {
+                "calls": 4,
+                "input_tokens": 1200,
+                "output_tokens": 300,
+                "total_tokens": 1500,
+            }
+        },
+    }
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    packet = build_surface_packet(
+        "us",
+        archive_dir=archive,
+        youtube_archive_dir=tmp_path / "youtube",
+        prism_archive_dir=tmp_path / "prism",
+        now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc),
+        public=False,
+    )
+    provenance = packet["body"]["model_provenance"]
+
+    assert provenance["market_analysis"]["verification_status"] == "RUNTIME_USAGE_OBSERVED"
+    assert provenance["market_analysis"]["observed_calls"] == 9
+    assert "gpt-5.6-sol" in provenance["market_analysis"]["observed_models"]
+    assert provenance["work_synthesis"]["requested_model"] == "gpt-5.6-sol"
+    assert provenance["work_synthesis"]["verification_status"] == "CONFIGURED_NOT_RUNTIME_VERIFIED"
+    assert provenance["work_synthesis"]["observed_model"] is None
 
 
 def test_packet_integrity_rejects_body_tampering_without_reseal():
@@ -790,6 +847,76 @@ def test_runtime_prepare_resume_ack_and_noop(tmp_path: Path):
     assert acknowledged["source_sha256"] == first["source_sha256"]
 
 
+def test_acknowledged_market_report_dispatches_exact_idempotent_pages_handoff(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    archive = tmp_path / "archive"
+    _write_market_run(
+        archive,
+        run_id="handoff-us",
+        market="us",
+        started_at="2026-07-14T10:00:00-04:00",
+        row_mode="CONDITIONAL",
+    )
+    runtime = WorkRuntime(tmp_path / "runtime")
+    prepared = runtime.prepare(
+        "us",
+        archive_dir=archive,
+        youtube_archive_dir=tmp_path / "youtube",
+        prism_archive_dir=tmp_path / "prism",
+        now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc),
+    )
+    published = _publish_market(runtime, prepared, archive=archive)
+    runtime.acknowledge("us", prepared["event_id"])
+    monkeypatch.setattr("tradingagents.work.handoff.shutil.which", lambda _name: "gh")
+    calls = []
+
+    def fake_runner(command, **kwargs):
+        calls.append((list(command), kwargs))
+        return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+    dispatched = dispatch_pages_handoff(
+        runtime,
+        surface="us",
+        event_id=prepared["event_id"],
+        report_sha256=published["report_sha256"],
+        repository="nornen0202/TradingAgents",
+        runner=fake_runner,
+    )
+    repeated = dispatch_pages_handoff(
+        runtime,
+        surface="us",
+        event_id=prepared["event_id"],
+        report_sha256=published["report_sha256"],
+        repository="nornen0202/TradingAgents",
+        runner=fake_runner,
+    )
+
+    assert dispatched["schema"] == WORK_HANDOFF_SCHEMA
+    assert dispatched["status"] == "DISPATCH_ACCEPTED"
+    assert dispatched["external_delivery_verified"] is False
+    assert repeated["status"] == "ALREADY_DISPATCHED"
+    assert len(calls) == 1
+    command = calls[0][0]
+    assert command[:4] == ["gh", "workflow", "run", "work-report-pages-refresh.yml"]
+    assert f"event_id={prepared['event_id']}" in command
+    assert f"report_sha256={published['report_sha256']}" in command
+
+
+def test_pages_handoff_rejects_report_that_is_not_latest_acknowledgement(tmp_path: Path):
+    runtime = WorkRuntime(tmp_path / "runtime")
+
+    with pytest.raises(WorkRuntimeError, match="latest canonical acknowledged event"):
+        dispatch_pages_handoff(
+            runtime,
+            surface="kr",
+            event_id="kr:" + "1" * 32,
+            report_sha256="2" * 64,
+            repository="nornen0202/TradingAgents",
+        )
+
+
 def test_market_publish_is_content_addressed_and_packet_bound(tmp_path: Path):
     archive = tmp_path / "archive"
     _write_market_run(
@@ -952,6 +1079,37 @@ def test_market_publish_rejects_unbound_coverage_receipt(tmp_path: Path):
             structured_report=draft,
             archive_dir=archive,
             now=datetime(2026, 7, 14, 14, 6, tzinfo=timezone.utc),
+        )
+
+
+def test_market_publish_rejects_tampered_model_receipt(tmp_path: Path):
+    archive = tmp_path / "archive"
+    _write_market_run(
+        archive,
+        run_id="publish-model-receipt-us",
+        market="us",
+        started_at="2026-07-14T10:00:00-04:00",
+        row_mode="CONDITIONAL",
+    )
+    runtime = WorkRuntime(tmp_path / "runtime")
+    prepared = runtime.prepare(
+        "us",
+        archive_dir=archive,
+        youtube_archive_dir=tmp_path / "youtube",
+        prism_archive_dir=tmp_path / "prism",
+        now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc),
+    )
+    draft = _structured_report(prepared)
+    draft["model_receipt"]["work_synthesis"]["verification_status"] = "RUNTIME_VERIFIED"
+
+    with pytest.raises(WorkRuntimeError, match="model_receipt does not exactly match"):
+        runtime.publish(
+            "us",
+            prepared["event_id"],
+            prepared["source_sha256"],
+            report_markdown="# 전략\n\n모델 영수증 변조 테스트",
+            structured_report=draft,
+            archive_dir=archive,
         )
 
 
@@ -2255,6 +2413,7 @@ def test_scheduled_work_task_manifest_uses_gpt56_local_mode_and_unique_surfaces(
     assert "plaintext_strategy_pages" in boundary["mobile_channels"]
     assert "aes_gcm_private_mobile_pages" not in boundary["mobile_channels"]
     assert boundary["task_must_not_claim_external_delivery"] is True
+    assert boundary["market_report_pages_handoff_workflow"] == "work-report-pages-refresh.yml"
     assert {task["surface"] for task in manifest["tasks"]} == {"kr", "us", "youtube", "prism"}
     assert all("Chrome" in task["prompt"] or "ChatGPT web" in task["prompt"] for task in manifest["tasks"])
     assert all("COVERAGE_RECEIPT" in task["prompt"] for task in manifest["tasks"])
@@ -2262,6 +2421,8 @@ def test_scheduled_work_task_manifest_uses_gpt56_local_mode_and_unique_surfaces(
     assert all("claim Telegram or Pages delivery completed" in task["prompt"] for task in manifest["tasks"])
     assert all("balanced_external" in task["prompt"] for task in manifest["tasks"])
     assert all("publish" in task["prompt"] for task in manifest["tasks"])
+    market_tasks = [task for task in manifest["tasks"] if task["surface"] in {"kr", "us"}]
+    assert all("tradingagents.work handoff" in task["prompt"] for task in market_tasks)
     youtube = next(task for task in manifest["tasks"] if task["surface"] == "youtube")
     prism = next(task for task in manifest["tasks"] if task["surface"] == "prism")
     assert "BYMINUTE=30" in youtube["rrule"]
@@ -2280,7 +2441,8 @@ def test_work_skill_and_operations_doc_state_local_and_mobile_delivery_boundarie
     assert "Never claim external delivery without its receipt" in skill
     assert "Strategy Pages are plaintext by user choice" in skill
     assert "account identifiers, credentials" in skill
-    assert "prepare → write Markdown and structured JSON → publish → acknowledge" in skill
+    assert "prepare → write Markdown and structured JSON → publish → acknowledge → KR/US Pages handoff" in skill
+    assert "python -m tradingagents.work handoff" in skill
     assert "work-reports/<surface>/latest.json" in skill
     assert "--report-sha256 <report_sha256>" in skill
     assert "canonical acknowledgement ledger" in skill

@@ -340,7 +340,125 @@ def build_surface_packet(
         body = _youtube_body(roots["youtube"], now=now)
     else:
         body = _prism_body(roots["prism"], now=now)
+    body["model_provenance"] = _model_provenance(
+        key,
+        body=body,
+        archive_dir=roots["market"],
+    )
     return _seal_packet(key, body=body)
+
+
+def _model_provenance(
+    surface: str,
+    *,
+    body: dict[str, Any],
+    archive_dir: Path,
+) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "schema": "tradingagents.model-provenance/v1",
+        "work_synthesis": _work_synthesis_model_contract(surface),
+    }
+    if surface in {"kr", "us"}:
+        result["market_analysis"] = _market_analysis_model_receipt(
+            body,
+            archive_dir=archive_dir,
+        )
+    return result
+
+
+def _work_synthesis_model_contract(surface: str) -> dict[str, Any]:
+    repo_root = Path(__file__).resolve().parents[2]
+    manifest = load_json(repo_root / "config" / "chatgpt_work_tasks.json")
+    task = next(
+        (
+            item
+            for item in (manifest.get("tasks") or [])
+            if isinstance(item, dict) and str(item.get("surface") or "").lower() == surface
+        ),
+        {},
+    )
+    return {
+        "execution_mode": manifest.get("execution_mode"),
+        "requested_model": manifest.get("model"),
+        "requested_reasoning_effort": manifest.get("reasoning_effort"),
+        "task_id": task.get("id"),
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": None,
+        "observed_reasoning_effort": None,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt.",
+    }
+
+
+def _market_analysis_model_receipt(
+    body: dict[str, Any],
+    *,
+    archive_dir: Path,
+) -> dict[str, Any]:
+    current = body.get("current") if isinstance(body.get("current"), dict) else {}
+    bundle = current.get("bundle") if isinstance(current.get("bundle"), dict) else {}
+    source_run_id = str(
+        bundle.get("analysis_source_run_id")
+        or bundle.get("run_id")
+        or current.get("run_id")
+        or ""
+    )
+    manifest = _manifest_for_run_id(archive_dir, source_run_id)
+    settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
+    usage = manifest.get("llm_usage") if isinstance(manifest.get("llm_usage"), dict) else {}
+    by_model = usage.get("by_model") if isinstance(usage.get("by_model"), dict) else {}
+    observed_models: dict[str, Any] = {}
+    for model, metrics in by_model.items():
+        if not str(model).strip() or not isinstance(metrics, dict):
+            continue
+        observed_models[str(model)] = {
+            key: metrics.get(key)
+            for key in ("calls", "input_tokens", "output_tokens", "total_tokens")
+            if metrics.get(key) is not None
+        }
+    calls = int(usage.get("calls") or 0)
+    runtime_observed = bool(calls > 0 and observed_models)
+    return {
+        "source_run_id": source_run_id or None,
+        "provider": settings.get("provider"),
+        "requested_models": {
+            role: settings.get(field)
+            for role, field in (
+                ("quick", "quick_model"),
+                ("deep", "deep_model"),
+                ("output", "output_model"),
+                ("writer", "writer_model"),
+                ("judge", "judge_model"),
+            )
+            if settings.get(field)
+        },
+        "requested_reasoning_effort": {
+            role: settings.get(field)
+            for role, field in (
+                ("default", "codex_reasoning_effort"),
+                ("quick", "codex_quick_reasoning_effort"),
+                ("deep", "codex_deep_reasoning_effort"),
+                ("output", "codex_output_reasoning_effort"),
+                ("writer", "codex_writer_reasoning_effort"),
+                ("judge", "codex_judge_reasoning_effort"),
+            )
+            if settings.get(field)
+        },
+        "verification_status": "RUNTIME_USAGE_OBSERVED" if runtime_observed else "CONFIGURED_ONLY",
+        "observed_calls": calls,
+        "observed_models": observed_models,
+        "usage_available": runtime_observed,
+    }
+
+
+def _manifest_for_run_id(archive_dir: Path, run_id: str) -> dict[str, Any]:
+    if not run_id:
+        return {}
+    runs_root = Path(archive_dir) / "runs"
+    for candidate in runs_root.glob(f"*/{run_id}/run.json"):
+        manifest = load_json(candidate)
+        if str(manifest.get("run_id") or candidate.parent.name) == run_id:
+            return manifest
+    return {}
 
 
 def resolve_archive_roots(

@@ -2546,7 +2546,11 @@ def _run_performance_tracking(
     db_path = config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")
     try:
         performance_market = _performance_market_filter(config)
-        record_run_recommendations(run_dir, db_path, run_market=performance_market)
+        recorded_this_run = record_run_recommendations(
+            run_dir,
+            db_path,
+            run_market=performance_market,
+        )
         outcome_update: dict[str, Any] = {
             "enabled": bool(config.performance.update_outcomes_on_run),
             "provider": config.performance.price_provider,
@@ -2609,10 +2613,11 @@ def _run_performance_tracking(
         payload = {
             "enabled": True,
             "status": status,
-            "store_path": db_path.as_posix(),
+            "store": {"backend": "sqlite", "location": "private_local_archive"},
             "outcome_update": outcome_update,
             "summary": summary_payload,
-            "recorded_recommendations": recommendations,
+            "recorded_recommendations": recorded_this_run,
+            "cumulative_recommendations": recommendations,
         }
         summary_path = run_dir / "performance" / "performance_summary.json"
         payload["artifacts"] = {"performance_summary_json": _relative_to_run(run_dir, summary_path)}
@@ -2621,7 +2626,7 @@ def _run_performance_tracking(
     except Exception as exc:
         return {
             "enabled": True,
-            "store_path": db_path.as_posix(),
+            "store": {"backend": "sqlite", "location": "private_local_archive"},
             "status": "failed",
             "warning": f"performance_tracking_failed:{exc}",
             "failure_reason": str(exc),

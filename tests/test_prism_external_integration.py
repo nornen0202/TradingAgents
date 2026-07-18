@@ -557,6 +557,7 @@ def test_site_renders_performance_tracking_section():
         }
     )
 
-    assert "추천 성과 추적" in html
+    assert "추천 사후평가 (실제 체결 성과 아님)" in html
+    assert "실제 주문·체결·계좌 수익률이 아닙니다" in html
     assert "STARTER_NOW" in html
     assert "confirmed_buy" in html

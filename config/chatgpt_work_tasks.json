@@ -14,7 +14,8 @@
       "public_sanitized_pages",
       "plaintext_strategy_pages"
     ],
-    "task_must_not_claim_external_delivery": true
+    "task_must_not_claim_external_delivery": true,
+    "market_report_pages_handoff_workflow": "work-report-pages-refresh.yml"
   },
   "tasks": [
     {
@@ -22,14 +23,14 @@
       "title": "TradingAgents KR Investment Briefing",
       "surface": "kr",
       "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=10,13,14;BYMINUTE=40;BYSECOND=0",
-      "prompt": "Use $tradingagents-daily-investment-work in kr mode from the local C:\\Projects\\TradingAgents project. Prepare the canonical local event, fail closed for current execution only when market data is stale or unavailable while preserving the analysis-time thesis, verify full holdings and watchlist production coverage, and apply balanced_external evidence to thesis ranking/confidence/risk-bounded sizing/research priority without bypassing execution gates. Compose the mobile-first Korean KR briefing and packet-bound structured report, preserve analysis-time thesis separately from execution readiness, publish both to the content-addressed local work-reports archive, then and only then acknowledge the exact event and emit COVERAGE_RECEIPT, MOBILE_HANDOFF, and receipt/state. Never use Chrome or the ChatGPT web composer, claim ChatGPT web/mobile read private local state, or claim Telegram or Pages delivery completed without an external delivery receipt."
+      "prompt": "Use $tradingagents-daily-investment-work in kr mode from the local C:\\Projects\\TradingAgents project. Prepare the canonical local event, fail closed for current execution only when market data is stale or unavailable while preserving the analysis-time thesis, verify full holdings and watchlist production coverage, and apply balanced_external evidence to thesis ranking/confidence/risk-bounded sizing/research priority without bypassing execution gates. Compose the mobile-first Korean KR briefing and packet-bound structured report, preserve analysis-time thesis separately from execution readiness, publish both to the content-addressed local work-reports archive, then and only then acknowledge the exact event and dispatch the exact ACK event/report hash through `python -m tradingagents.work handoff` for the dedicated Pages refresh. Emit COVERAGE_RECEIPT, MOBILE_HANDOFF, and receipt/state without treating dispatch acceptance as deployment completion. Never use Chrome or the ChatGPT web composer, claim ChatGPT web/mobile read private local state, or claim Telegram or Pages delivery completed without an external delivery receipt."
     },
     {
       "id": "tradingagents-work-us",
       "title": "TradingAgents US Investment Briefing",
       "surface": "us",
       "rrule": "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA;BYHOUR=1,3,23;BYMINUTE=10;BYSECOND=0",
-      "prompt": "Use $tradingagents-daily-investment-work in us mode from the local C:\\Projects\\TradingAgents project. Prepare the canonical local event, fail closed for current execution only when market data is stale or unavailable while preserving the analysis-time thesis, verify full holdings and watchlist production coverage, and apply balanced_external evidence to thesis ranking/confidence/risk-bounded sizing/research priority without bypassing execution gates. Compose the mobile-first Korean US briefing and packet-bound structured report, preserve analysis-time thesis separately from execution readiness, publish both to the content-addressed local work-reports archive, then and only then acknowledge the exact event and emit COVERAGE_RECEIPT, MOBILE_HANDOFF, and receipt/state. Never use Chrome or the ChatGPT web composer, claim ChatGPT web/mobile read private local state, or claim Telegram or Pages delivery completed without an external delivery receipt."
+      "prompt": "Use $tradingagents-daily-investment-work in us mode from the local C:\\Projects\\TradingAgents project. Prepare the canonical local event, fail closed for current execution only when market data is stale or unavailable while preserving the analysis-time thesis, verify full holdings and watchlist production coverage, and apply balanced_external evidence to thesis ranking/confidence/risk-bounded sizing/research priority without bypassing execution gates. Compose the mobile-first Korean US briefing and packet-bound structured report, preserve analysis-time thesis separately from execution readiness, publish both to the content-addressed local work-reports archive, then and only then acknowledge the exact event and dispatch the exact ACK event/report hash through `python -m tradingagents.work handoff` for the dedicated Pages refresh. Emit COVERAGE_RECEIPT, MOBILE_HANDOFF, and receipt/state without treating dispatch acceptance as deployment completion. Never use Chrome or the ChatGPT web composer, claim ChatGPT web/mobile read private local state, or claim Telegram or Pages delivery completed without an external delivery receipt."
     },
     {
       "id": "tradingagents-work-youtube",
