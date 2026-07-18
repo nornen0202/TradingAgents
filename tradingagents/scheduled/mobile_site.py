@@ -1179,7 +1179,9 @@ h2 { margin: 0; font-size: 1.25rem; }
 .market-tabs button { min-width: 0; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--muted); overflow-wrap: anywhere; font: inherit; font-weight: 800; }
 .market-tabs button[aria-pressed="true"] { border-color: var(--accent); background: rgba(89,214,199,.14); color: var(--text); }
 .market-panel, #private-root { min-width: 0; max-width: 100%; }
-.market-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 8px 0; }
+.market-head { display: flex; flex-direction: column; align-items: stretch; gap: 8px; margin: 8px 0; }
+.market-head > div:first-child { min-width: 0; }
+.market-head > div:last-child { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-start; }
 .health, .row-mode, .held-badge, .role-badge { display: inline-flex; align-items: center; flex: 0 0 auto; min-height: 28px; padding: 4px 8px; border-radius: 999px; background: var(--panel-2); color: var(--muted); font-size: .7rem; font-weight: 850; letter-spacing: .03em; }
 .health-ok, .mode-immediate { color: var(--ok); }
 .health-degraded, .mode-conditional { color: var(--warn); }
@@ -1238,6 +1240,9 @@ details { margin-top: 10px; }
 summary { min-height: 44px; padding: 11px 0; color: var(--muted); cursor: pointer; }
 @media (min-width: 660px) {
   main { padding-left: 20px; padding-right: 20px; }
+  .market-head { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .market-head > div:first-child { flex: 1 1 auto; }
+  .market-head > div:last-child { flex: 0 1 auto; justify-content: flex-end; }
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }

@@ -223,6 +223,12 @@ async def _probe_viewports(websocket_url: str, page_url: str) -> list[dict[str, 
                             const rect = element.getBoundingClientRect();
                             return rect.left < -1 || rect.right > window.innerWidth + 1;
                           }).map((element) => `${element.tagName}.${element.className}`.slice(0, 120));
+                          const heading = document.querySelector('.market-head h2');
+                          const headingRange = document.createRange();
+                          if (heading) headingRange.selectNodeContents(heading);
+                          const headingLineCount = heading
+                            ? [...headingRange.getClientRects()].filter((rect) => rect.width > 0).length
+                            : 0;
                           return {
                             ready: cards.length > 0,
                             innerWidth: window.innerWidth,
@@ -231,6 +237,7 @@ async def _probe_viewports(websocket_url: str, page_url: str) -> list[dict[str, 
                             bodyScrollWidth: document.body.scrollWidth,
                             cardCount: cards.length,
                             overflow: overflow.slice(0, 20),
+                            headingLineCount,
                             hasEntryCondition: document.body.innerText.includes('확인할 진입·축소 조건'),
                             hasTriggeredAction: document.body.innerText.includes('조건 충족 후 행동'),
                             hasInvalidation: document.body.innerText.includes('무효화·손실 제한 조건'),
@@ -308,6 +315,10 @@ def main() -> int:
             failures.append(f"{width}px body overflow: {result.get('bodyScrollWidth')}")
         if result.get("overflow"):
             failures.append(f"{width}px overflowing elements: {result['overflow']}")
+        if int(result.get("headingLineCount") or 0) != 1:
+            failures.append(
+                f"{width}px market heading wrapped to {result.get('headingLineCount')} lines"
+            )
         for field in (
             "hasEntryCondition",
             "hasTriggeredAction",
