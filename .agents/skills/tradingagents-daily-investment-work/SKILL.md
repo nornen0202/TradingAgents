@@ -11,7 +11,7 @@ Run this workflow from the local `C:\Projects\TradingAgents` project. Read only 
 
 - Require the local execution host, project, and archives. ChatGPT web Scheduled tasks can use uploaded or connected context, but they cannot directly read this computer's folder. Never claim the web or mobile app read private local state.
 - If a required local packet cannot be read, stop with `ERROR`. Never reconstruct a personal strategy from public Pages; its market packets deliberately omit portfolio membership and actions.
-- Persist a completed Work response only through the `publish` command. It writes a credential-free, packet-bound report under `archive/work-reports/<surface>` for Pages/mobile consumers. A separate GitHub notification pipeline still owns Telegram and Pages delivery. Never claim external delivery without its receipt.
+- Persist a completed Work response only through the `publish` command. It writes a credential-free, packet-bound report under `archive/work-reports/<surface>` for Pages/mobile consumers. For KR/US, the exact acknowledged report must then be handed to the dedicated Pages refresh workflow. A separate GitHub notification pipeline still owns Telegram and Pages delivery. Never claim external delivery without its receipt.
 - Strategy Pages are plaintext by user choice, but they must never contain account identifiers, credentials, API/bot tokens, session paths, or other secrets. Publish only the validated `tradingagents.work-report/v1` schema.
 
 ## Prepare
@@ -54,7 +54,7 @@ For `kr` and `us`, read `body.current.universe_coverage` and `body.current.bundl
 
 ## Render, publish, and acknowledge
 
-For `NEW` or `RESUME`, follow this order without skipping a step: **prepare → write Markdown and structured JSON → publish → acknowledge**. Compose and validate the complete Korean, mobile-first report. Put no more than three high-priority market cards (five advisory deltas) before detailed tables. Do not create empty execution category lists or print raw `BLOCKED_STALE` codes in investor Markdown. Emit the canonical `COVERAGE_RECEIPT` and this handoff without claiming delivery:
+For `NEW` or `RESUME`, follow this order without skipping a step: **prepare → write Markdown and structured JSON → publish → acknowledge → KR/US Pages handoff**. Compose and validate the complete Korean, mobile-first report. Put no more than three high-priority market cards (five advisory deltas) before detailed tables. Do not create empty execution category lists or print raw `BLOCKED_STALE` codes in investor Markdown. Emit the canonical `COVERAGE_RECEIPT` and this handoff without claiming delivery:
 
 ```text
 MOBILE_HANDOFF {"owner":"external_github_notification_pipeline","status":"PENDING_EXTERNAL_VERIFICATION","work_sent_notification":false}
@@ -62,7 +62,7 @@ MOBILE_HANDOFF {"owner":"external_github_notification_pipeline","status":"PENDIN
 
 Keep analysis-time `thesis` separate from live `execution`. Expired market data changes execution readiness to `NEEDS_LIVE_RECHECK`; it does not erase BUY/HOLD/REDUCE/SELL direction, conditions, invalidators, horizon, or rationale.
 
-The structured JSON must use the binding returned by prepare and the safe report contract in the surface prompt. For market surfaces, include every prepared packet ticker exactly once; publish rejects omissions, duplicates, and unknown tickers. Copy `body.current.universe_coverage` exactly into the structured `coverage_receipt` and `body.current.supporting_context.receipt_contract` into `source_summary.external_evidence_receipt`. Bind each healthy relevant YouTube/PRISM contribution to an exact transmitted event key and affected field; explain when no relevant evidence exists. Use positive unique ranks, known portfolio roles, 0–1 confidence, concrete observable entry/invalidation conditions, an explicit `invalidation_action`, horizon, and sizing. Bind every `top_actions` ticker, readiness, and action to its strategy. Never promote packet execution readiness, extend `valid_until`, or omit packet blockers/required rechecks. Never include account identifiers, order identifiers, credentials, local user paths, session paths, tokens, or dashboard keys.
+The structured JSON must use the binding returned by prepare and the safe report contract in the surface prompt. For market surfaces, include every prepared packet ticker exactly once; publish rejects omissions, duplicates, and unknown tickers. Copy `body.current.universe_coverage` exactly into the structured `coverage_receipt`, `body.model_provenance` into `model_receipt`, and `body.current.supporting_context.receipt_contract` into `source_summary.external_evidence_receipt`. A configured Work model is not a runtime-verified Chat/Pro mode receipt; preserve its verification status exactly. Bind each healthy relevant YouTube/PRISM contribution to an exact transmitted event key and affected field; explain when no relevant evidence exists. Use positive unique ranks, known portfolio roles, 0–1 confidence, concrete observable entry/invalidation conditions, an explicit `invalidation_action`, horizon, and sizing. Bind every `top_actions` ticker, readiness, and action to its strategy. Never promote packet execution readiness, extend `valid_until`, or omit packet blockers/required rechecks. Never include account identifiers, order identifiers, credentials, local user paths, session paths, tokens, or dashboard keys.
 
 Publish the completed files:
 
@@ -78,17 +78,25 @@ Only after the required publish succeeds, acknowledge the exact event:
 python -m tradingagents.work ack --surface <surface> --event-id <event_id> --status rendered
 ```
 
+For KR/US, dispatch the exact acknowledged report immediately after ACK. The handoff command rejects an event or report hash that is not the latest canonical acknowledgement and records an idempotent local dispatch receipt:
+
+```powershell
+python -m tradingagents.work handoff --surface <kr-or-us> --event-id <event_id> --report-sha256 <report_sha256> --repository nornen0202/TradingAgents --ref main
+```
+
+`DISPATCH_ACCEPTED` or `ALREADY_DISPATCHED` proves only that GitHub accepted the exact refresh request. The workflow independently verifies the content-addressed report before build and current Work lineage after build. It does not prove Pages deployment completed, so keep `external_delivery_verified=false` until an external workflow/deployment receipt is inspected. If handoff fails, return `PENDING_HANDOFF` with the exact safe error; do not repeat ACK or claim Pages delivery.
+
 Standalone Scheduled runs do not inherit the prior run's conversation, so publish and acknowledgement must finish in the current invocation. If publish fails, do not ACK or claim success: return `PENDING_PUBLISH` and the exact error. If acknowledgement fails, return `PENDING_ACK` so the next run safely returns `RESUME`. After successful acknowledgement, append the canonical receipt and recovery mirror below.
 
 Finish with exactly one recovery mirror:
 
 ```text
 BEGIN_TRADINGAGENTS_WORK_STATE
-{"schema":"tradingagents.work-state/v1","surface":"<surface>","event_id":"<event_id>","result":"PENDING_PUBLISH|PENDING_ACK|SUCCESS|NOOP|SOURCE_REGRESSION|ERROR","source_sha256":"<source_sha256>","report_sha256":"<report_sha256-or-null>","state_revision":<revision-or-null>}
+{"schema":"tradingagents.work-state/v1","surface":"<surface>","event_id":"<event_id>","result":"PENDING_PUBLISH|PENDING_ACK|PENDING_HANDOFF|SUCCESS|NOOP|SOURCE_REGRESSION|ERROR","source_sha256":"<source_sha256>","report_sha256":"<report_sha256-or-null>","state_revision":<revision-or-null>}
 END_TRADINGAGENTS_WORK_STATE
 ```
 
-Use `SUCCESS` only after acknowledgement succeeds. Use `PENDING_ACK` when the report was composed but acknowledgement failed. Keep the local JSON state and append-only ledger canonical. The conversation block is only a recovery mirror; if canonical state is corrupt, stop with `ERROR` instead of silently resetting it.
+For KR/US, use `SUCCESS` only after acknowledgement and a successful idempotent Pages handoff dispatch. For YouTube/PRISM, use it after acknowledgement. Use `PENDING_ACK` when the report was composed but acknowledgement failed, and `PENDING_HANDOFF` when ACK succeeded but GitHub did not accept the exact refresh request. Keep the local JSON state and append-only ledger canonical. The conversation block is only a recovery mirror; if canonical state is corrupt, stop with `ERROR` instead of silently resetting it.
 
 After reporting the corruption, recovery is permitted only from a successful ACK receipt that is already visible in this task, is present in the canonical acknowledgement ledger, and whose immutable local outbox packet still exists. Market recovery additionally requires the exact content-addressed report hash and refuses an older report when a newer report is canonical. Use its exact mirror values:
 

@@ -816,6 +816,7 @@ def _sanitize_work_report(payload: dict[str, Any], *, market: str) -> dict[str, 
             "top_actions",
             "strategies",
             "coverage_receipt",
+            "model_receipt",
             "source_summary",
             "next_checkpoint",
         )
@@ -1218,6 +1219,10 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .integrated-report { margin: 14px 0 18px; padding: 16px; border: 1px solid rgba(89,214,199,.3); border-radius: 17px; background: linear-gradient(145deg, rgba(13,46,61,.98), rgba(10,29,47,.98)); }
 .integrated-report h3 { margin: 0; font-size: 1.08rem; }
 .integrated-report .summary { margin: 9px 0; color: #dbeaf3; }
+.report-audit-grid { display: grid; gap: 7px; margin: 9px 0; }
+.report-audit-grid p { display: flex; justify-content: space-between; gap: 12px; margin: 0; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.055); }
+.report-audit-grid strong { color: #effcff; }
+.report-audit-grid span { color: #bcd1dc; text-align: right; }
 .work-top-actions { display: grid; gap: 8px; margin: 12px 0; }
 .work-action { padding: 10px 11px; border-left: 3px solid var(--accent); border-radius: 8px; background: rgba(89,214,199,.07); }
 .work-action strong { display: block; font-size: .86rem; }
@@ -1559,6 +1564,34 @@ _PRIVATE_JS = r"""
     );
     return `<div class="work-action"><strong>${esc(title)}</strong>${detail ? `<span>${esc(detail)}</span>` : ''}</div>`;
   }
+  function evidenceAudit(sourceSummary) {
+    const receipt = ((sourceSummary || {}).external_evidence_receipt || {});
+    const sources = receipt.sources || {};
+    const rows = ['youtube', 'prism'].map((source) => {
+      const payload = sources[source] || {};
+      const coverage = payload.coverage || {};
+      const transmitted = Number(coverage.transmitted_events ?? (payload.event_keys || []).length ?? 0);
+      const windowEvents = Number(coverage.window_events ?? transmitted);
+      const omitted = Number(coverage.omitted_events ?? Math.max(0, windowEvents - transmitted));
+      const health = String(payload.source_health || 'MISSING').toUpperCase();
+      return `<p><strong>${source === 'youtube' ? 'YouTube' : 'PRISM'} · ${esc(health)}</strong><span>전달 ${transmitted} / 검토창 ${windowEvents} · 미전달 ${omitted}</span></p>`;
+    }).join('');
+    if (!rows || !receipt.schema) return '';
+    return `<details class="evidence-audit"><summary>외부 근거 포함·누락 영수증</summary><div class="report-audit-grid">${rows}</div><p class="readiness-note">관련 근거는 순위·신뢰도·위험 한도 안의 비중·조사 우선순위에 반영하되 주문 실행 gate는 우회하지 않습니다.</p></details>`;
+  }
+  function modelAudit(receipt) {
+    if (!receipt || !receipt.schema) return '';
+    const analysis = receipt.market_analysis || {};
+    const work = receipt.work_synthesis || {};
+    const observed = Object.keys(analysis.observed_models || {});
+    const analysisModels = observed.length ? observed.join(', ') : Object.values(analysis.requested_models || {}).filter(Boolean).join(', ');
+    const analysisStatus = analysis.verification_status === 'RUNTIME_USAGE_OBSERVED' ? '실행 사용량 관측' : '설정만 확인';
+    const workStatus = work.verification_status === 'RUNTIME_VERIFIED' ? '런타임 검증' : '설정만 확인 · Chat/Pro 모드 미증명';
+    return `<details class="model-audit"><summary>모델 실행 영수증</summary><div class="report-audit-grid">
+      <p><strong>종목 분석 · ${esc(analysisStatus)}</strong><span>${esc(analysisModels || '-')} · 호출 ${Number(analysis.observed_calls || 0)}</span></p>
+      <p><strong>Work 종합 · ${esc(workStatus)}</strong><span>${esc(work.requested_model || '-')} · reasoning ${esc(work.requested_reasoning_effort || '-')}</span></p>
+    </div></details>`;
+  }
   function integratedReport(item, field = 'integrated_report') {
     const report = item[field] || {};
     const isReference = field === 'reference_report';
@@ -1580,6 +1613,8 @@ _PRIVATE_JS = r"""
       ${topActions.length ? `<div class="work-top-actions">${topActions.slice(0, 3).map(workTopAction).join('')}</div>` : ''}
       ${topActions.length > 3 ? `<details><summary>통합 핵심 액션 전체 보기</summary><div class="work-top-actions">${topActions.map(workTopAction).join('')}</div></details>` : ''}
       ${contributions ? `<div class="source-chips">${contributions}</div>` : ''}
+      ${evidenceAudit(structured.source_summary)}
+      ${modelAudit(structured.model_receipt)}
       ${structured.next_checkpoint ? `<p class="readiness-note"><strong>다음 확인:</strong> ${esc(valueText(structured.next_checkpoint))}</p>` : ''}
       ${report.report_markdown ? `<details><summary>통합 리포트 전체 보기</summary><pre class="markdown-report">${esc(report.report_markdown)}</pre></details>` : ''}
     </section>`;

@@ -37,7 +37,7 @@ Markdown 본문과 함께 prepare가 알려 준 structured JSON 파일을 작성
 
 각 `top_actions` 항목은 `ticker`, `readiness`, `action`을 사용하며 ticker는 `strategies`의 ticker와 정확히 일치해야 한다. readiness는 해당 strategy와 같고, action은 READY_NOW의 `action_now` 또는 WAIT_FOR_TRIGGER의 `action_if_triggered`와 정확히 같아야 한다. 실행 불가 readiness에는 action을 쓰지 않는다.
 
-`source_summary.external_evidence_receipt`에는 packet의 `supporting_context.receipt_contract`를 event key·coverage를 포함해 그대로 복사한다. `source_health=OK`인 YouTube·PRISM event의 `relevance.matched_tickers`에 해당하는 strategy는 `source_contributions`에 그 event를 적어도 하나 남기며, 각 외부 기여는 `source=youtube|prism`, 정확한 `event_key`, `affected_field=ranking|confidence|position_size_within_existing_risk_limits|research_priority`, 영향 방향과 이유를 포함한다. 다른 종목에 관련 있는 정상 외부 event는 있지만 현재 strategy와 일치하는 event가 없다면 `no_relevant_evidence_reason`에 그 이유를 명시한다. 관련 정상 event가 있는데 `source_summary` 또는 전체 `source_contributions`를 비워 두지 않는다.
+`model_receipt`에는 packet의 `model_provenance`를 그대로 복사한다. `CONFIGURED_NOT_RUNTIME_VERIFIED`를 실제 관측으로 바꾸거나 Chat/Pro 모드 실행을 추정하지 않는다. `source_summary.external_evidence_receipt`에는 packet의 `supporting_context.receipt_contract`를 event key·coverage를 포함해 그대로 복사한다. `source_health=OK`인 YouTube·PRISM event의 `relevance.matched_tickers`에 해당하는 strategy는 `source_contributions`에 그 event를 적어도 하나 남기며, 각 외부 기여는 `source=youtube|prism`, 정확한 `event_key`, `affected_field=ranking|confidence|position_size_within_existing_risk_limits|research_priority`, 영향 방향과 이유를 포함한다. 다른 종목에 관련 있는 정상 외부 event는 있지만 현재 strategy와 일치하는 event가 없다면 `no_relevant_evidence_reason`에 그 이유를 명시한다. 관련 정상 event가 있는데 `source_summary` 또는 전체 `source_contributions`를 비워 두지 않는다.
 
 완성한 두 파일을 ACK 전에 publish한다.
 

@@ -35,6 +35,7 @@ def initialize_action_tracker(db_path: Path) -> None:
             "opportunity_capture_score": "REAL",
             "pilot_allowed": "INTEGER",
             "full_size_allowed": "INTEGER",
+            "execution_evidence": "TEXT",
         })
         _ensure_columns(conn, "action_outcomes", {
             "return_60d": "REAL",
@@ -52,7 +53,7 @@ def initialize_action_tracker(db_path: Path) -> None:
         conn.commit()
 
 
-def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str | None = None) -> None:
+def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str | None = None) -> int:
     initialize_action_tracker(db_path)
     run_dir = Path(run_dir)
     manifest = _load_json(run_dir / "run.json")
@@ -70,6 +71,7 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
             run_market=market,
         )
     )
+    inserted = 0
     with sqlite3.connect(db_path) as conn:
         for row in rows:
             if _recommendation_exists(conn, row):
@@ -82,8 +84,8 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
                   prism_agreement, sell_intent, sell_trigger_status,
                   sell_size_plan, unrealized_return_pct, profit_protection_score,
                   profit_plan_json, lift_status, opportunity_cost_score, opportunity_capture_score,
-                  pilot_allowed, full_size_allowed, was_executed, skip_reason, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  pilot_allowed, full_size_allowed, was_executed, execution_evidence, skip_reason, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["run_id"],
@@ -111,11 +113,14 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
                     _bool_to_int(row.get("pilot_allowed")),
                     _bool_to_int(row.get("full_size_allowed")),
                     int(bool(row.get("was_executed"))),
+                    row.get("execution_evidence"),
                     row.get("skip_reason"),
                     row["created_at"],
                 ),
             )
+            inserted += 1
         conn.commit()
+    return inserted
 
 
 def update_action_outcomes(
@@ -259,6 +264,7 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         action_buckets = _aggregate_action_buckets(conn)
         profit_taking = _aggregate_profit_taking(conn)
         calibration = _aggregate_calibration(conn)
+        data_quality = _performance_data_quality(conn, closed_trades=closed_trades)
     return ActionPerformanceSummary(
         recommendations=recommendations,
         outcomes=outcomes,
@@ -270,6 +276,7 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         action_buckets=action_buckets,
         profit_taking=profit_taking,
         calibration=calibration,
+        data_quality=data_quality,
     )
 
 
@@ -303,6 +310,8 @@ def _portfolio_action_rows(
         profit_plan = action.get("profit_taking_plan") if isinstance(action.get("profit_taking_plan"), Mapping) else {}
         data_health = action.get("data_health") if isinstance(action.get("data_health"), Mapping) else {}
         lift = data_health.get("action_lift") if isinstance(data_health.get("action_lift"), Mapping) else {}
+        execution_evidence = _execution_evidence(action)
+        has_proposed_allocation = bool(int(action.get("delta_krw_now") or 0))
         rows.append(
             {
                 "run_id": run_id,
@@ -329,8 +338,17 @@ def _portfolio_action_rows(
                 "opportunity_capture_score": _float_or_none(lift.get("opportunity_capture_score") or data_health.get("opportunity_capture_score")),
                 "pilot_allowed": lift.get("pilot_allowed") if lift else data_health.get("pilot_allowed"),
                 "full_size_allowed": lift.get("full_size_allowed") if lift else data_health.get("full_size_allowed"),
-                "was_executed": bool(int(action.get("delta_krw_now") or 0)),
-                "skip_reason": None if int(action.get("delta_krw_now") or 0) else _skip_reason(action),
+                "was_executed": execution_evidence == "broker_fill",
+                "execution_evidence": execution_evidence,
+                "skip_reason": (
+                    None
+                    if execution_evidence == "broker_fill"
+                    else (
+                        "proposed_allocation_without_execution_receipt"
+                        if has_proposed_allocation
+                        else _skip_reason(action)
+                    )
+                ),
                 "created_at": created_at,
             }
         )
@@ -363,6 +381,7 @@ def _scanner_rows(run_dir: Path, *, run_id: str, created_at: str, run_market: st
                 "source": "scanner",
                 "prism_agreement": None,
                 "was_executed": False,
+                "execution_evidence": None,
                 "skip_reason": "scanner_discovery_only",
                 "created_at": created_at,
             }
@@ -402,6 +421,7 @@ def _prism_skipped_rows(
                 "source": "PRISM",
                 "prism_agreement": "external_only",
                 "was_executed": False,
+                "execution_evidence": None,
                 "skip_reason": "external_advisory_only",
                 "created_at": created_at,
             }
@@ -502,7 +522,10 @@ def _normalize_price_history(payload: Mapping[str, Any]) -> dict[str, list[tuple
 def _aggregate(conn: sqlite3.Connection, column: str) -> dict[str, dict[str, Any]]:
     rows = conn.execute(
         f"""
-        SELECT r.{column} AS bucket, COUNT(*) AS n, AVG(o.return_5d) AS avg_return_5d,
+        SELECT r.{column} AS bucket, COUNT(*) AS n,
+               COUNT(o.return_5d) AS outcome_count_5d,
+               COUNT(o.return_20d) AS outcome_count_20d,
+               AVG(o.return_5d) AS avg_return_5d,
                AVG(o.return_20d) AS avg_return_20d,
                AVG(o.benchmark_excess_20d) AS avg_benchmark_excess_20d
         FROM action_recommendations r
@@ -515,6 +538,8 @@ def _aggregate(conn: sqlite3.Connection, column: str) -> dict[str, dict[str, Any
         bucket = str(row["bucket"] or "UNKNOWN")
         result[bucket] = {
             "count": int(row["n"] or 0),
+            "outcome_count_5d": int(row["outcome_count_5d"] or 0),
+            "outcome_count_20d": int(row["outcome_count_20d"] or 0),
             "avg_return_5d": row["avg_return_5d"],
             "avg_return_20d": row["avg_return_20d"],
             "avg_benchmark_excess_20d": row["avg_benchmark_excess_20d"],
@@ -526,7 +551,10 @@ def _aggregate_action_buckets(conn: sqlite3.Connection) -> dict[str, dict[str, A
     rows = conn.execute(
         """
         SELECT r.source AS source, r.prism_agreement AS prism_agreement,
-               COUNT(*) AS n, AVG(o.return_5d) AS avg_return_5d,
+               COUNT(*) AS n,
+               COUNT(o.return_5d) AS outcome_count_5d,
+               COUNT(o.return_20d) AS outcome_count_20d,
+               AVG(o.return_5d) AS avg_return_5d,
                AVG(o.return_20d) AS avg_return_20d,
                AVG(o.benchmark_excess_20d) AS avg_benchmark_excess_20d
         FROM action_recommendations r
@@ -544,6 +572,8 @@ def _aggregate_action_buckets(conn: sqlite3.Connection) -> dict[str, dict[str, A
                 "avg_return_5d": None,
                 "avg_return_20d": None,
                 "avg_benchmark_excess_20d": None,
+                "outcome_count_5d": 0,
+                "outcome_count_20d": 0,
                 "_sum_5d": 0.0,
                 "_n_5d": 0,
                 "_sum_20d": 0.0,
@@ -554,15 +584,19 @@ def _aggregate_action_buckets(conn: sqlite3.Connection) -> dict[str, dict[str, A
         )
         count = int(row["n"] or 0)
         current["count"] += count
+        count_5d = int(row["outcome_count_5d"] or 0)
+        count_20d = int(row["outcome_count_20d"] or 0)
+        current["outcome_count_5d"] += count_5d
+        current["outcome_count_20d"] += count_20d
         if row["avg_return_5d"] is not None:
-            current["_sum_5d"] += float(row["avg_return_5d"]) * count
-            current["_n_5d"] += count
+            current["_sum_5d"] += float(row["avg_return_5d"]) * count_5d
+            current["_n_5d"] += count_5d
         if row["avg_return_20d"] is not None:
-            current["_sum_20d"] += float(row["avg_return_20d"]) * count
-            current["_n_20d"] += count
+            current["_sum_20d"] += float(row["avg_return_20d"]) * count_20d
+            current["_n_20d"] += count_20d
         if row["avg_benchmark_excess_20d"] is not None:
-            current["_sum_excess_20d"] += float(row["avg_benchmark_excess_20d"]) * count
-            current["_n_excess_20d"] += count
+            current["_sum_excess_20d"] += float(row["avg_benchmark_excess_20d"]) * count_20d
+            current["_n_excess_20d"] += count_20d
     for metrics in result.values():
         if metrics["_n_5d"]:
             metrics["avg_return_5d"] = metrics["_sum_5d"] / metrics["_n_5d"]
@@ -580,6 +614,8 @@ def _aggregate_profit_taking(conn: sqlite3.Connection) -> dict[str, dict[str, An
         """
         SELECT COALESCE(NULLIF(r.action, ''), 'TAKE_PROFIT') AS bucket,
                COUNT(*) AS n,
+               COUNT(o.return_5d) AS outcome_count_5d,
+               COUNT(o.return_20d) AS outcome_count_20d,
                AVG(o.return_5d) AS avg_return_5d,
                AVG(o.return_20d) AS avg_return_20d,
                AVG(o.avoided_drawdown_20d) AS avg_avoided_drawdown_20d,
@@ -597,6 +633,8 @@ def _aggregate_profit_taking(conn: sqlite3.Connection) -> dict[str, dict[str, An
         bucket = str(row["bucket"] or "TAKE_PROFIT")
         result[bucket] = {
             "count": int(row["n"] or 0),
+            "outcome_count_5d": int(row["outcome_count_5d"] or 0),
+            "outcome_count_20d": int(row["outcome_count_20d"] or 0),
             "avg_return_5d": row["avg_return_5d"],
             "avg_return_20d": row["avg_return_20d"],
             "avg_avoided_drawdown_20d": row["avg_avoided_drawdown_20d"],
@@ -658,6 +696,77 @@ def _aggregate_calibration(conn: sqlite3.Connection) -> dict[str, Any]:
         "prism_conflict_winner_rate": row["prism_conflict_winner_rate"] if row else None,
         "scanner_candidate_skipped_count": int(skipped["scanner_skipped"] or 0) if skipped else 0,
         "prism_candidate_skipped_count": int(skipped["prism_skipped"] or 0) if skipped else 0,
+    }
+
+
+def _performance_data_quality(
+    conn: sqlite3.Connection,
+    *,
+    closed_trades: int,
+) -> dict[str, Any]:
+    row = conn.execute(
+        """
+        SELECT
+          COUNT(*) AS recommendation_rows,
+          COUNT(DISTINCT run_id) AS distinct_runs,
+          COUNT(DISTINCT ticker) AS distinct_tickers,
+          SUM(CASE WHEN market IS NULL OR TRIM(market) = '' THEN 1 ELSE 0 END) AS missing_market_rows,
+          SUM(CASE WHEN source = 'TradingAgents' THEN 1 ELSE 0 END) AS portfolio_recommendation_rows,
+          SUM(CASE WHEN LOWER(COALESCE(source, '')) IN ('scanner', 'prism') THEN 1 ELSE 0 END) AS advisory_rows,
+          SUM(CASE WHEN execution_evidence = 'broker_fill' THEN 1 ELSE 0 END) AS broker_fill_linked_rows,
+          SUM(CASE WHEN COALESCE(was_executed, 0) = 1
+                    AND COALESCE(execution_evidence, '') = '' THEN 1 ELSE 0 END) AS legacy_unverified_execution_rows,
+          COUNT(o.return_5d) AS matured_5d_rows,
+          COUNT(o.return_20d) AS matured_20d_rows,
+          COUNT(o.return_60d) AS matured_60d_rows
+        FROM action_recommendations r
+        LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
+        """
+    ).fetchone()
+    market_rows = {
+        str(item["market"] or "UNKNOWN"): int(item["n"] or 0)
+        for item in conn.execute(
+            """
+            SELECT COALESCE(NULLIF(TRIM(market), ''), 'UNKNOWN') AS market, COUNT(*) AS n
+            FROM action_recommendations
+            GROUP BY COALESCE(NULLIF(TRIM(market), ''), 'UNKNOWN')
+            """
+        )
+    }
+    recommendations = int(row["recommendation_rows"] or 0) if row else 0
+    matured_5d = int(row["matured_5d_rows"] or 0) if row else 0
+    broker_fills = int(row["broker_fill_linked_rows"] or 0) if row else 0
+    legacy_unverified = int(row["legacy_unverified_execution_rows"] or 0) if row else 0
+    actual_feedback_available = broker_fills > 0 and int(closed_trades or 0) > 0
+    warnings = []
+    if not actual_feedback_available:
+        warnings.append("actual_trade_effectiveness_unavailable:no_linked_broker_fills_or_closed_trades")
+    if legacy_unverified:
+        warnings.append(
+            f"legacy_proposed_allocations_not_execution_receipts:{legacy_unverified}"
+        )
+    missing_market = int(row["missing_market_rows"] or 0) if row else 0
+    if missing_market:
+        warnings.append(f"recommendation_market_unclassified:{missing_market}")
+    return {
+        "measurement_scope": "counterfactual_recommendation_price_path",
+        "actual_trade_effectiveness_available": actual_feedback_available,
+        "feedback_loop_status": "ACTUAL_TRADE_LINKED" if actual_feedback_available else "COUNTERFACTUAL_ONLY",
+        "recommendation_rows": recommendations,
+        "distinct_runs": int(row["distinct_runs"] or 0) if row else 0,
+        "distinct_tickers": int(row["distinct_tickers"] or 0) if row else 0,
+        "portfolio_recommendation_rows": int(row["portfolio_recommendation_rows"] or 0) if row else 0,
+        "advisory_rows": int(row["advisory_rows"] or 0) if row else 0,
+        "market_rows": market_rows,
+        "missing_market_rows": missing_market,
+        "matured_5d_rows": matured_5d,
+        "matured_20d_rows": int(row["matured_20d_rows"] or 0) if row else 0,
+        "matured_60d_rows": int(row["matured_60d_rows"] or 0) if row else 0,
+        "matured_5d_coverage": matured_5d / recommendations if recommendations else 0.0,
+        "broker_fill_linked_rows": broker_fills,
+        "closed_trade_journal_rows": int(closed_trades or 0),
+        "legacy_unverified_execution_rows": legacy_unverified,
+        "warnings": warnings,
     }
 
 
@@ -748,6 +857,24 @@ def _skip_reason(action: Mapping[str, Any]) -> str | None:
     if gate_reasons:
         return ",".join(str(item) for item in gate_reasons)
     return "not_executed"
+
+
+def _execution_evidence(action: Mapping[str, Any]) -> str | None:
+    """Return broker-fill evidence only when the action carries a verified execution receipt."""
+
+    receipt = action.get("execution_receipt")
+    if not isinstance(receipt, Mapping):
+        return None
+    status = str(receipt.get("status") or "").strip().upper()
+    source = str(receipt.get("source") or "").strip().lower()
+    filled_quantity = _float_or_none(receipt.get("filled_quantity"))
+    if status not in {"FILLED", "PARTIALLY_FILLED"}:
+        return None
+    if source not in {"broker", "kis", "broker_api"}:
+        return None
+    if filled_quantity is None or filled_quantity <= 0:
+        return None
+    return "broker_fill"
 
 
 def _outcome_label(action: str, return_5d: float | None) -> str:

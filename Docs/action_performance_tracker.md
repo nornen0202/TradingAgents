@@ -1,6 +1,6 @@
 # Action Performance Tracker
 
-The performance tracker records recommendations, not only executed trades. This avoids selection bias and lets later reviews compare TradingAgents-only, PRISM-confirmed, PRISM-conflicted, PRISM-uncovered-current-market, scanner-discovered, and skipped candidates.
+The performance tracker records recommendations, not only executed trades. This avoids selection bias and lets later reviews compare TradingAgents-only, PRISM-confirmed, PRISM-conflicted, PRISM-uncovered-current-market, scanner-discovered, and skipped candidates. Its forward returns are counterfactual recommendation-price paths, not account returns or proof that an order was filled.
 
 ## Config
 
@@ -75,7 +75,7 @@ If performance tracking records recommendations but cannot update outcomes becau
 성과 추적: 기록은 저장됐지만 아직 성과 계산은 수행되지 않았습니다.
 ```
 
-The generated static portfolio page now includes a `추천 성과 추적` section when performance tracking is enabled. It shows recorded recommendations, updated outcomes, provider status, action-level average returns, profit-taking performance, PRISM agreement/conflict buckets, and action-level source buckets:
+The generated static portfolio page includes `추천 사후평가 (실제 체결 성과 아님)` when performance tracking is enabled. It shows recommendation rows separately from matured 5-day samples, distinct analysis runs, linked closed trades, action-level average returns, profit-taking performance, PRISM agreement/conflict buckets, and action-level source buckets:
 
 ```text
 TradingAgents-only
@@ -97,6 +97,8 @@ profit_plan_json
 ```
 
 Outcome updates compute `avoided_drawdown_20d`, `missed_upside_20d`, and `benchmark_excess_5d` so `TAKE_PROFIT` can be reviewed separately from generic risk reduction.
+
+`delta_krw_now > 0` is only a proposed allocation. It never sets `was_executed=1`. Execution is recognized only when a structured `execution_receipt` has a broker/KIS source, a filled or partially-filled status, and positive filled quantity. Historical rows that used proposed allocation as an execution proxy remain visible only as `legacy_unverified_execution_rows`; they are excluded from actual-trade claims. Until a broker fill and a closed `trade_journal` row are linked, `data_quality.feedback_loop_status=COUNTERFACTUAL_ONLY` and `actual_trade_effectiveness_available=false`.
 
 ## Action Lift Calibration
 

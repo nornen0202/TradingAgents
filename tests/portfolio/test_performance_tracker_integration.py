@@ -97,6 +97,48 @@ price_provider = "none"
     assert payload["summary"]["recommendations"] == 1
     assert payload["summary"]["outcomes"] == 0
     assert payload["outcome_update"]["unavailable_reason"] == "outcome_update_disabled"
+    assert payload["summary"]["data_quality"]["feedback_loop_status"] == "COUNTERFACTUAL_ONLY"
+    assert payload["summary"]["data_quality"]["actual_trade_effectiveness_available"] is False
+
+
+def test_proposed_allocation_is_not_mislabeled_as_actual_execution(tmp_path):
+    run_dir = tmp_path / "run"
+    private = run_dir / "portfolio-private"
+    private.mkdir(parents=True)
+    (run_dir / "run.json").write_text(
+        '{"run_id":"proposal-only","started_at":"2026-04-01T09:00:00+09:00","settings":{"market":"US"}}',
+        encoding="utf-8",
+    )
+    (private / "portfolio_report.json").write_text(
+        """
+        {
+          "actions": [
+            {
+              "canonical_ticker": "AAPL",
+              "action_now": "STARTER_NOW",
+              "portfolio_relative_action": "ADD",
+              "delta_krw_now": 1000000,
+              "confidence": 0.8
+            }
+          ]
+        }
+        """,
+        encoding="utf-8",
+    )
+    db_path = tmp_path / "performance.sqlite"
+
+    inserted = record_run_recommendations(run_dir, db_path, run_market="US")
+    summary = summarize_action_performance(db_path)
+    with sqlite3.connect(db_path) as conn:
+        row = conn.execute(
+            "SELECT was_executed, execution_evidence, skip_reason FROM action_recommendations"
+        ).fetchone()
+
+    assert inserted == 1
+    assert row == (0, None, "proposed_allocation_without_execution_receipt")
+    assert summary.data_quality["broker_fill_linked_rows"] == 0
+    assert summary.data_quality["actual_trade_effectiveness_available"] is False
+    assert summary.data_quality["measurement_scope"] == "counterfactual_recommendation_price_path"
 
 
 def test_outcome_update_failure_does_not_discard_recorded_recommendations(tmp_path):

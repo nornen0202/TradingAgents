@@ -36,6 +36,7 @@ ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
       pilot_allowed INTEGER,
       full_size_allowed INTEGER,
       was_executed INTEGER DEFAULT 0,
+      execution_evidence TEXT,
       skip_reason TEXT,
       created_at TEXT NOT NULL
     )
@@ -118,6 +119,7 @@ class ActionPerformanceSummary:
     action_buckets: dict[str, dict[str, Any]] = field(default_factory=dict)
     profit_taking: dict[str, dict[str, Any]] = field(default_factory=dict)
     calibration: dict[str, Any] = field(default_factory=dict)
+    data_quality: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -131,6 +133,7 @@ class ActionPerformanceSummary:
             "action_buckets": self.action_buckets,
             "profit_taking": self.profit_taking,
             "calibration": self.calibration,
+            "data_quality": self.data_quality,
         }
 
 

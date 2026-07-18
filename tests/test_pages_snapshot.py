@@ -156,6 +156,7 @@ def test_stamp_rejects_raw_account_identifier_in_strategy_payload(tmp_path: Path
         "account-portfolio-report-verify.yml",
         "daily-youtube-reports.yml",
         "daily-prism-telegram-reports.yml",
+        "work-report-pages-refresh.yml",
     ),
 )
 def test_pages_workflows_stamp_strategy_snapshot_and_guard_deploy(workflow_name: str) -> None:

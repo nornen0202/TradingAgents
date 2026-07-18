@@ -31,7 +31,7 @@ from tradingagents.youtube.config import (
     YouTubeSiteSettings,
     load_youtube_config,
 )
-from tradingagents.youtube.research import collect_research_evidence, fallback_research_plan
+from tradingagents.youtube.research import collect_research_evidence, fallback_research_plan, public_evidence_summary
 from tradingagents.youtube.runner import (
     _archived_verification_is_current,
     execute_youtube_run,
@@ -72,6 +72,25 @@ class FakeLLM:
 
 
 class YouTubeDailyTests(unittest.TestCase):
+    def test_public_evidence_summary_preserves_claim_mapping_id(self):
+        summary = public_evidence_summary(
+            {
+                "items": [
+                    {
+                        "evidence_id": "E1",
+                        "claim_id": "C1",
+                        "title": "Official filing",
+                        "source_url": "https://example.test/filing",
+                        "publisher": "Issuer",
+                        "source_tier": "official",
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(summary[0]["evidence_id"], "E1")
+        self.assertEqual(summary[0]["claim_id"], "C1")
+
     def test_channel_window_filter_dedupes_videos_and_shorts(self):
         now = datetime(2026, 5, 28, 22, 0, tzinfo=timezone.utc)
         refs = [

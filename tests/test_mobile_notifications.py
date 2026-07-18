@@ -109,6 +109,42 @@ class WorkflowInspectionTests(unittest.TestCase):
         self.assertFalse(result["should_notify"])
         self.assertEqual(result["reason"], "no_work_gate_skip")
 
+    def test_successful_work_report_handoff_is_silent_but_failure_is_actionable(self):
+        success = inspect_workflow_run(
+            _run(
+                name="Work Report Pages Refresh",
+                path=".github/workflows/work-report-pages-refresh.yml",
+                event="workflow_dispatch",
+                display_title=(
+                    "Work Report Pages Refresh [profile=kr] [run_mode=work_report_handoff] "
+                    "[request_scope=exact_report] [recovery_source=local_work]"
+                ),
+            ),
+            [{"name": "build_work_report_pages", "conclusion": "success"}, {"name": "deploy", "conclusion": "success"}],
+            repository="nornen0202/TradingAgents",
+        )
+        failure = inspect_workflow_run(
+            _run(
+                name="Work Report Pages Refresh",
+                path=".github/workflows/work-report-pages-refresh.yml",
+                event="workflow_dispatch",
+                conclusion="failure",
+                head_sha="b" * 40,
+                display_title=(
+                    "Work Report Pages Refresh [profile=kr] [run_mode=work_report_handoff] "
+                    "[request_scope=exact_report] [recovery_source=local_work]"
+                ),
+            ),
+            [{"name": "build_work_report_pages", "conclusion": "failure"}],
+            repository="nornen0202/TradingAgents",
+        )
+
+        self.assertFalse(success["should_notify"])
+        self.assertEqual(success["reason"], "successful_silent_handoff")
+        self.assertTrue(failure["should_notify"])
+        self.assertEqual(failure["reason"], "upstream_failed")
+        self.assertEqual(failure["recovery_source"], "local_work")
+
     def test_superseded_pages_guard_does_not_emit_completion_notification(self):
         result = inspect_workflow_run(
             _run(name="Intraday Overlay Refresh"),

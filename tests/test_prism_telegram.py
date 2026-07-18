@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 from tradingagents.external.prism_loader import PrismLoaderConfig, load_prism_signals
 from tradingagents.external.prism_models import PrismExternalSignal, PrismIngestionResult, PrismSignalAction, PrismSourceKind
+from tradingagents.external.prism_telegram_bot import _document
 from tradingagents.external.prism_telegram_common import (
     PrismTelegramCollection,
     PrismTelegramDocument,
@@ -154,6 +155,29 @@ def test_user_session_skips_non_pdf_media_without_filename():
     assert docs[0].mime_type == "image/jpeg"
     assert docs[0].local_path is None
     assert docs[0].text_summary is None
+
+
+def test_bot_api_pdf_detection_uses_document_mime_type_without_name_error():
+    raw = {
+        "message_id": 12111,
+        "document": {
+            "file_name": "image.jpg",
+            "mime_type": "image/jpeg",
+            "file_size": 1234,
+            "file_id": "fake-file-id",
+        },
+    }
+
+    document = _document(
+        raw,
+        PrismTelegramRuntimeConfig(download_pdfs=True),
+        token="fake-token",
+        channel="stock_ai_agent",
+    )
+
+    assert document is not None
+    assert document.mime_type == "image/jpeg"
+    assert document.local_path is None
 
 
 def test_prism_loader_keeps_dashboard_primary_and_merges_telegram_evidence():

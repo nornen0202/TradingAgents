@@ -1062,6 +1062,16 @@ def _validate_report_packet_coverage(
             "Structured market report coverage_receipt does not exactly match the prepared packet"
         )
 
+    model_provenance = (
+        body.get("model_provenance")
+        if isinstance(body.get("model_provenance"), dict)
+        else {}
+    )
+    if draft.get("model_receipt") != model_provenance:
+        raise WorkRuntimeError(
+            "Structured market report model_receipt does not exactly match the prepared packet"
+        )
+
     _validate_external_evidence_binding(draft, packet, strategies=strategies)
 
     packet_by_identity = {

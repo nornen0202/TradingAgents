@@ -2889,6 +2889,7 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
     action_bucket_rows = _performance_bucket_rows(summary.get("action_buckets") if isinstance(summary.get("action_buckets"), dict) else {})
     profit_rows = _performance_bucket_rows(summary.get("profit_taking") if isinstance(summary.get("profit_taking"), dict) else {})
     calibration = summary.get("calibration") if isinstance(summary.get("calibration"), dict) else {}
+    data_quality = summary.get("data_quality") if isinstance(summary.get("data_quality"), dict) else {}
     calibration_html = _performance_calibration_card(calibration)
     tables_html = "".join(
         table
@@ -2902,14 +2903,27 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
     )
     if not calibration_html and not tables_html:
         return ""
+    actual_feedback = bool(data_quality.get("actual_trade_effectiveness_available"))
+    feedback_label = "체결·종료거래 연계됨" if actual_feedback else "미연계 — 추천 후 가격 경로만 평가"
+    matured_5d = int(data_quality.get("matured_5d_rows") or summary.get("outcomes") or 0)
+    distinct_runs = int(data_quality.get("distinct_runs") or 0)
+    execution_warning = "" if actual_feedback else (
+        "<div class='warning-banner account-performance-note'>"
+        "아래 수익률은 추천일 이후 가격을 되짚은 반사실적 사후평가이며 실제 주문·체결·계좌 수익률이 아닙니다. "
+        "실제 계좌 성과는 별도의 ‘계좌 실제 성과’ 영역만 사용하세요."
+        "</div>"
+    )
     return f"""
     <section class="section">
       <div class="section-head">
-        <h2>추천 성과 추적</h2>
+        <h2>추천 사후평가 (실제 체결 성과 아님)</h2>
       </div>
+      {execution_warning}
       <article class="run-card">
-        <p><strong>기록된 추천</strong><span>{int(summary.get('recommendations') or 0)}</span></p>
-        <p><strong>업데이트된 outcome</strong><span>{int(summary.get('outcomes') or 0)}</span></p>
+        <p><strong>추천 행 / 분석 실행</strong><span>{int(summary.get('recommendations') or 0)} / {distinct_runs or '-'}</span></p>
+        <p><strong>5거래일 평가 표본</strong><span>{matured_5d}</span></p>
+        <p><strong>실제 체결 피드백</strong><span>{_escape(feedback_label)}</span></p>
+        <p><strong>연결된 종료 거래</strong><span>{int(data_quality.get('closed_trade_journal_rows') or summary.get('closed_trades') or 0)}</span></p>
         <div class="pill-row">{artifact_link}</div>
       </article>
       {calibration_html}
@@ -2953,7 +2967,8 @@ def _performance_bucket_rows(buckets: dict[str, Any]) -> list[dict[str, Any]]:
         rows.append(
             {
                 "bucket": str(bucket or "UNKNOWN"),
-                "count": int(metrics.get("count") or 0),
+                "recommendation_count": int(metrics.get("count") or 0),
+                "count": int(metrics.get("outcome_count_5d") or metrics.get("count") or 0),
                 "avg_return_5d": metrics.get("avg_return_5d"),
                 "avg_return_20d": metrics.get("avg_return_20d"),
             }
@@ -2968,14 +2983,14 @@ def _performance_table(title: str, rows: list[dict[str, Any]]) -> str:
     table_rows = "".join(
         "<tr>"
         f"<td>{_escape(row['bucket'])}</td>"
-        f"<td>{row['count']}</td>"
+        f"<td>{row['count']} / {row['recommendation_count']}</td>"
         f"<td>{_escape(_format_pct_value(row.get('avg_return_5d')))}</td>"
         f"<td>{_escape(_format_pct_value(row.get('avg_return_20d')))}</td>"
         "</tr>"
         for row in rows
     )
     body = (
-        "<table><thead><tr><th>구분</th><th>건수</th><th>평균 5일</th><th>평균 20일</th></tr></thead>"
+        "<table><thead><tr><th>구분</th><th>5일 표본 / 추천행</th><th>평균 5일</th><th>평균 20일</th></tr></thead>"
         f"<tbody>{table_rows}</tbody></table>"
     )
     return f"<article class='run-card'><h3>{_escape(title)}</h3>{body}</article>"

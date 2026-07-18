@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+from .handoff import dispatch_pages_handoff
 from .runtime import WorkRuntime, WorkRuntimeError
 
 
@@ -32,6 +33,15 @@ def main() -> int:
     acknowledge.add_argument("--surface", required=True, choices=("kr", "us", "youtube", "prism"))
     acknowledge.add_argument("--event-id", required=True)
     acknowledge.add_argument("--status", default="rendered")
+
+    handoff = subparsers.add_parser("handoff")
+    handoff.add_argument("--surface", required=True, choices=("kr", "us"))
+    handoff.add_argument("--event-id", required=True)
+    handoff.add_argument("--report-sha256", required=True)
+    handoff.add_argument("--repository", default="nornen0202/TradingAgents")
+    handoff.add_argument("--ref", default="main")
+    handoff.add_argument("--workflow", default="work-report-pages-refresh.yml")
+    handoff.add_argument("--force", action="store_true")
 
     recover = subparsers.add_parser("recover")
     recover.add_argument("--surface", required=True, choices=("kr", "us", "youtube", "prism"))
@@ -70,6 +80,17 @@ def main() -> int:
             )
         elif args.command == "ack":
             result = runtime.acknowledge(args.surface, args.event_id, status=args.status)
+        elif args.command == "handoff":
+            result = dispatch_pages_handoff(
+                runtime,
+                surface=args.surface,
+                event_id=args.event_id,
+                report_sha256=args.report_sha256,
+                repository=args.repository,
+                ref=args.ref,
+                workflow=args.workflow,
+                force=args.force,
+            )
         elif args.command == "recover":
             result = runtime.recover(
                 args.surface,
