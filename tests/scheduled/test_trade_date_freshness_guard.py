@@ -30,6 +30,13 @@ class _FixedDatetime(datetime):
         return value.replace(tzinfo=tz) if tz else value
 
 
+class _ConstitutionDayWeekendDatetime(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        value = datetime(2026, 7, 20, 6, 31)
+        return value.replace(tzinfo=tz) if tz else value
+
+
 def _config(market: str = "US"):
     with tempfile.TemporaryDirectory() as tmpdir:
         config_path = Path(tmpdir) / "scheduled.toml"
@@ -93,3 +100,13 @@ class TradeDateFreshnessGuardTests(unittest.TestCase):
             ),
         ):
             self.assertEqual(resolve_trade_date("AAPL", _config("US")), "2026-06-29")
+
+    def test_latest_available_accepts_vendor_date_before_restored_kr_constitution_day(self):
+        with (
+            patch("tradingagents.scheduled.runner.datetime", _ConstitutionDayWeekendDatetime),
+            patch(
+                "tradingagents.scheduled.runner._fetch_recent_trade_date_history",
+                return_value=_FakeHistory(date(2026, 7, 16)),
+            ),
+        ):
+            self.assertEqual(resolve_trade_date("000660.KS", _config("KR")), "2026-07-16")
