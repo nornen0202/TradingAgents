@@ -85,7 +85,7 @@ from .config import (
     with_overrides,
 )
 from .decision_bundle import build_and_write_decision_bundle
-from .market_calendar import default_calendar_name, market_session_state
+from .market_calendar import default_calendar_name, is_supplemental_market_holiday, market_session_state
 from .site import build_site
 
 
@@ -913,9 +913,14 @@ def _completed_daily_trade_date_from_exchange_calendar(
         eligible = schedule.loc[closes <= cutoff_utc]
         if eligible.empty:
             return None
-        session_label = eligible.index[-1]
-        session_date = getattr(session_label, "date", lambda: session_label)()
-        return session_date if isinstance(session_date, date) else None
+        for session_label in reversed(eligible.index):
+            session_date = getattr(session_label, "date", lambda: session_label)()
+            if not isinstance(session_date, date):
+                continue
+            if is_supplemental_market_holiday(market=market, session_date=session_date):
+                continue
+            return session_date
+        return None
     except Exception:
         return None
 
@@ -4159,12 +4164,23 @@ def _overlay_newer_session_count(
             pd.Timestamp(baseline_date),
             pd.Timestamp(current_date),
         )
-        return sum(1 for session in sessions if session.date() > baseline_date)
+        return sum(
+            1
+            for session in sessions
+            if session.date() > baseline_date
+            and not is_supplemental_market_holiday(
+                market=str(market or ""),
+                session_date=session.date(),
+            )
+        )
     except Exception:
         cursor = baseline_date + timedelta(days=1)
         count = 0
         while cursor <= current_date:
-            if cursor.weekday() < 5:
+            if cursor.weekday() < 5 and not is_supplemental_market_holiday(
+                market=str(market or ""),
+                session_date=cursor,
+            ):
                 count += 1
             cursor += timedelta(days=1)
         return count

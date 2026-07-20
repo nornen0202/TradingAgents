@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from tradingagents.scheduled.config import load_scheduled_config
-from tradingagents.scheduled.market_calendar import market_session_state
+from tradingagents.scheduled.market_calendar import is_supplemental_market_holiday, market_session_state
 from tradingagents.scheduled.runner import _effective_execution_checkpoints, _execution_checkpoint_timezone, _select_due_checkpoints
 
 
@@ -56,3 +56,21 @@ def test_market_session_fallback_handles_us_regular_session():
 
     assert state["is_open"] is True
     assert state["phase"] == "regular"
+
+
+def test_market_session_closes_for_restored_kr_constitution_day():
+    state = market_session_state(
+        market="KR",
+        now_local=datetime(2026, 7, 17, 10, 0, tzinfo=ZoneInfo("Asia/Seoul")),
+        calendar_name="XKRX",
+    )
+
+    assert state["is_open"] is False
+    assert state["phase"] == "closed"
+    assert state["source"] == "supplemental_market_holiday"
+
+
+def test_restored_kr_constitution_day_has_substitute_holiday():
+    assert is_supplemental_market_holiday(market="KR", session_date=date(2027, 7, 17))
+    assert is_supplemental_market_holiday(market="KR", session_date=date(2027, 7, 19))
+    assert not is_supplemental_market_holiday(market="KR", session_date=date(2027, 7, 20))

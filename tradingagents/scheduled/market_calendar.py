@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, time, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -16,6 +16,28 @@ def default_calendar_name(market: str) -> str:
     return normalized or "XNYS"
 
 
+def is_supplemental_market_holiday(*, market: str, session_date: date) -> bool:
+    """Return whether a recently enacted market holiday is missing upstream.
+
+    ``exchange_calendars`` 4.13.2 still treats Constitution Day 2026 as an
+    XKRX session even though the holiday was restored effective May 11, 2026.
+    Keep this small overlay until the upstream calendar includes the new
+    recurring holiday and its substitute day.
+    """
+
+    if str(market or "").strip().upper() != "KR" or session_date.year < 2026:
+        return False
+
+    constitution_day = date(session_date.year, 7, 17)
+    holidays = {constitution_day}
+    if constitution_day.weekday() >= 5:
+        substitute_day = constitution_day + timedelta(days=1)
+        while substitute_day.weekday() >= 5:
+            substitute_day += timedelta(days=1)
+        holidays.add(substitute_day)
+    return session_date in holidays
+
+
 def market_session_state(
     *,
     market: str,
@@ -26,6 +48,18 @@ def market_session_state(
     normalized_market = str(market or "").strip().upper()
     if now_local.tzinfo is None:
         raise ValueError("now_local must be timezone-aware")
+
+    market_date = now_local.astimezone(ZoneInfo("Asia/Seoul")).date()
+    if is_supplemental_market_holiday(market=normalized_market, session_date=market_date):
+        return {
+            "market": normalized_market,
+            "calendar": calendar_name,
+            "source": "supplemental_market_holiday",
+            "is_open": False,
+            "phase": "closed",
+            "now_local": now_local.isoformat(),
+            "holiday_date": market_date.isoformat(),
+        }
 
     exchange_state = _exchange_calendar_state(calendar_name=calendar_name, now_local=now_local)
     if exchange_state is not None:
