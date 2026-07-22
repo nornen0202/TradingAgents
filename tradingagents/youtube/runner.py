@@ -112,6 +112,16 @@ def execute_youtube_run(
         lookback_hours=config.channel.lookback_hours,
         include_unknown_dates=True,
     )
+    references.sort(
+        key=lambda reference: (
+            0
+            if _trusted_primary_source(
+                reference.source_url, config.channel.trusted_primary_urls
+            )
+            else 1,
+            -(reference.published_at.timestamp() if reference.published_at else 0),
+        )
+    )
 
     video_results = _run_video_workers(
         config=config,
@@ -143,6 +153,7 @@ def execute_youtube_run(
         "status": "success" if failed_count == 0 else "partial_failure",
         "channel_name": config.channel.name,
         "channel_urls": list(config.channel.urls),
+        "trusted_primary_urls": list(config.channel.trusted_primary_urls),
         "timezone": config.channel.timezone,
         "lookback_hours": config.channel.lookback_hours,
         "max_entries_per_url": config.channel.max_entries_per_url,
@@ -174,6 +185,8 @@ def execute_youtube_run(
             "raw_transcript_published": False,
             "research_pipeline_version": RESEARCH_PIPELINE_VERSION,
             "public_artifacts": ["html_report", "public_summary_json", "evidence_excerpts"],
+            "trusted_primary_strategy_policy": "USER_VERIFIED_PRIMARY",
+            "trusted_primary_channels": ["@kpunch", "@sosumonkey"],
         },
     }
     _write_json(run_dir / "youtube_run.json", manifest)
@@ -342,7 +355,15 @@ def _process_video_reference(
         _write_json(video_dir / "research_plan.json", verified.verification.get("research_plan") or {})
         _write_json(video_dir / "evidence.json", verified.verification.get("evidence") or {})
         _write_json(video_dir / "claim_verification.json", verified.verification.get("claim_verification") or {})
-        public_summary = _public_summary(bundle, verified, source_url=reference.source_url)
+        trusted_primary = _trusted_primary_source(
+            reference.source_url, config.channel.trusted_primary_urls
+        )
+        public_summary = _public_summary(
+            bundle,
+            verified,
+            source_url=reference.source_url,
+            trusted_primary=trusted_primary,
+        )
         _write_json(video_dir / "public_summary.json", public_summary)
         result["status"] = verified.status
         result["manifest_item"] = _manifest_video_item(
@@ -352,6 +373,7 @@ def _process_video_reference(
             run_dir=run_dir,
             error=None,
             source_url=reference.source_url,
+            trusted_primary=trusted_primary,
             reused_from_run=None,
         )
         return result
@@ -395,6 +417,9 @@ def _reuse_video_result_if_possible(
         video_dir=video_dir,
         run_dir=run_dir,
         reused_from_run=str(reused.get("run_id") or ""),
+        trusted_primary=_trusted_primary_source(
+            reference.source_url, config.channel.trusted_primary_urls
+        ),
     )
     return result
 
@@ -630,6 +655,7 @@ def _manifest_video_item(
     error: str | None,
     source_url: str | None = None,
     reused_from_run: str | None = None,
+    trusted_primary: bool = False,
 ) -> dict[str, Any]:
     metadata = bundle.metadata
     item = {
@@ -643,6 +669,8 @@ def _manifest_video_item(
         "view_count": metadata.view_count,
         "thumbnail_url": metadata.thumbnail_url,
         "status": status,
+        "strategy_trust_status": "USER_VERIFIED_PRIMARY" if trusted_primary else "STANDARD_VERIFICATION_WEIGHT",
+        "trusted_primary": trusted_primary,
         "transcript_status": bundle.transcript_status,
         "transcript_source": getattr(bundle.transcript, "source", None),
         "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
@@ -669,6 +697,7 @@ def _manifest_video_item_from_reused_artifacts(
     video_dir: Path,
     run_dir: Path,
     reused_from_run: str | None,
+    trusted_primary: bool = False,
 ) -> dict[str, Any]:
     summary = _read_json_if_exists(video_dir / "public_summary.json") or {}
     metadata_payload = _read_json_if_exists(video_dir / "metadata.json") or {}
@@ -686,6 +715,9 @@ def _manifest_video_item_from_reused_artifacts(
         "view_count": metadata.get("view_count"),
         "thumbnail_url": summary.get("thumbnail_url") or metadata.get("thumbnail_url"),
         "status": status,
+        "strategy_trust_status": summary.get("strategy_trust_status")
+        or ("USER_VERIFIED_PRIMARY" if trusted_primary else "STANDARD_VERIFICATION_WEIGHT"),
+        "trusted_primary": bool(summary.get("trusted_primary", trusted_primary)),
         "transcript_status": summary.get("transcript_status") or metadata_payload.get("transcript_status"),
         "transcript_source": summary.get("transcript_source") or metadata_payload.get("transcript_source"),
         "transcript_chars": summary.get("transcript_chars") or metadata_payload.get("transcript_chars") or 0,
@@ -824,7 +856,13 @@ def _metadata_payload(bundle: YouTubeVideoBundle) -> dict[str, Any]:
     }
 
 
-def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport, *, source_url: str | None = None) -> dict[str, Any]:
+def _public_summary(
+    bundle: YouTubeVideoBundle,
+    verified: VerifiedVideoReport,
+    *,
+    source_url: str | None = None,
+    trusted_primary: bool = False,
+) -> dict[str, Any]:
     verification = verified.verification
     claim_verification = verification.get("claim_verification") if isinstance(verification.get("claim_verification"), dict) else {}
     evidence = verification.get("evidence") if isinstance(verification.get("evidence"), dict) else {}
@@ -876,6 +914,9 @@ def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport, *
         "thumbnail_url": bundle.metadata.thumbnail_url,
         "published_at": bundle.metadata.published_at.isoformat() if bundle.metadata.published_at else bundle.metadata.upload_date,
         "status": verified.status,
+        "strategy_trust_status": "USER_VERIFIED_PRIMARY" if trusted_primary else "STANDARD_VERIFICATION_WEIGHT",
+        "trusted_primary": trusted_primary,
+        "assumed_verified_for_strategy": trusted_primary,
         "transcript_status": bundle.transcript_status,
         "transcript_source": getattr(bundle.transcript, "source", None),
         "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
@@ -939,6 +980,13 @@ def _claim_status_summary(claims: list[dict[str, Any]]) -> dict[str, int]:
         status = str(claim.get("status") or "unknown")
         counts[status] = counts.get(status, 0) + 1
     return counts
+
+
+def _trusted_primary_source(source_url: str | None, trusted_urls: tuple[str, ...]) -> bool:
+    normalized = str(source_url or "").strip().rstrip("/").lower()
+    return bool(normalized) and normalized in {
+        str(url or "").strip().rstrip("/").lower() for url in trusted_urls
+    }
 
 
 def _write_text(path: Path, text: str) -> None:

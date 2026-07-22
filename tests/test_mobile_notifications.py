@@ -684,10 +684,8 @@ class CompositionTests(unittest.TestCase):
         self.assertTrue(chunks)
         self.assertIn("kr", metadata["surfaces"])
         self.assertIn("https://example.test/TradingAgents/mobile/?market=kr", urls)
-        self.assertIn(
-            "https://example.test/TradingAgents/mobile/private.html?market=kr",
-            urls,
-        )
+        self.assertIn("https://example.test/TradingAgents/strategy.html?market=kr", urls)
+        self.assertIn("https://example.test/TradingAgents/mobile/strategy.html?market=kr", urls)
         self.assertFalse(any("#" in url for url in urls))
 
     def test_youtube_uses_existing_mobile_safe_report(self):
@@ -850,14 +848,14 @@ class CompositionTests(unittest.TestCase):
         self.assertIn("보유/즉시", "\n".join(chunks))
         self.assertEqual(buttons, [])
         self.assertEqual(metadata["run_ids"], [run_dir.name])
-        private_urls = [
+        strategy_urls = [
             button["url"]
             for row in full_buttons
             for button in row
-            if "private.html" in button["url"]
+            if "strategy.html" in button["url"]
         ]
-        self.assertEqual(len(private_urls), 1)
-        self.assertIn(f"&run={run_dir.name}", private_urls[0])
+        self.assertEqual(len(strategy_urls), 2)
+        self.assertTrue(all(f"&run={run_dir.name}" in url for url in strategy_urls))
         self.assertNotIn("005930.KS", "\n".join(blocked_chunks))
         self.assertIn("UNIVERSE_INCOMPLETE", "\n".join(blocked_chunks))
         self.assertNotIn("005930.KS", "\n".join(stale_chunks))
@@ -884,10 +882,8 @@ class CompositionTests(unittest.TestCase):
         text = "\n".join(chunks)
         urls = [button["url"] for row in buttons for button in row]
         self.assertIn("분석·배포 완료", text)
-        self.assertIn(
-            "https://example.test/TradingAgents/mobile/private.html?market=kr",
-            urls,
-        )
+        self.assertIn("https://example.test/TradingAgents/strategy.html?market=kr", urls)
+        self.assertIn("https://example.test/TradingAgents/mobile/strategy.html?market=kr", urls)
         self.assertFalse(any("#" in url for url in urls))
 
     def test_failure_message_contains_only_failure_context(self):

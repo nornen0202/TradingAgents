@@ -496,7 +496,7 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "리스크 축소" in private_js
     assert "currency: 'KRW'" in private_js
     assert "style: 'percent'" in private_js
-    assert "fetch('strategy.json'" in private_js
+    assert "document.body.dataset.strategyUrl || 'strategy.json'" in private_js
     assert "crypto.subtle" not in private_js
     assert "AES-GCM" not in private_js
     assert "private.enc.json" not in private_js
@@ -574,7 +574,13 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "데이터 만료 · 재확인" not in private_js
     assert "health health-neutral" in private_js
     assert "health health-${esc(health.className)}" in private_js
-    assert '<meta name="robots" content="noindex,nofollow,noarchive">' in private_html
+    assert '<meta name="robots" content="index,follow' in private_html
+    assert (mobile / "strategy.html").is_file()
+    assert (tmp_path / "site" / "strategy.html").is_file()
+    assert (tmp_path / "site" / "robots.txt").read_text(encoding="utf-8") == "User-agent: *\nAllow: /\n"
+    assert "기계 판독용 KR/US 종합 전략 JSON" in (tmp_path / "site" / "llms.txt").read_text(encoding="utf-8")
+    assert "이 전략이 만들어지는 과정" in private_html
+    assert "주요 뉴스·이슈와 강약 이유" in private_js
     assert "requestedRun" in private_js
 
 
@@ -726,8 +732,9 @@ def test_mobile_separates_unrelated_work_report_as_past_reference(
     assert market["reference_report"]["lineage"]["status"] == "PAST_REFERENCE"
     assert market["reference_report"]["lineage"]["current_action_cards_enriched"] is False
     private_js = (tmp_path / "site" / "mobile" / "private.js").read_text(encoding="utf-8")
-    assert "현재 카드 순위·실행 판단에는 반영하지 않았습니다" in private_js
-    assert "item.integrated_report || {}" in private_js
+    assert "카드의 thesis·근거에는 활용했으며" in private_js
+    assert "for (const field of ['integrated_report', 'reference_report'])" in private_js
+    assert "execution" not in market["reference_report"]["structured_report"]["strategies"][0]
 
 
 def test_mobile_accepts_report_bound_to_current_analysis_source_lineage(tmp_path: Path) -> None:

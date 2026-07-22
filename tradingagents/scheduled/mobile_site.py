@@ -8,6 +8,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from tradingagents.agents.utils.instrument_resolver import (
+    InstrumentResolutionError,
+    resolve_instrument,
+)
 from tradingagents.work.packet import build_surface_packet
 from tradingagents.work.runtime import WorkRuntimeError, validate_work_report
 
@@ -247,8 +251,22 @@ def build_mobile_site(
     _write_json(mobile_root / "strategy.json", strategy_payload)
     _write_text(mobile_root / "index.html", _public_html(public_payload, public_base_url=public_base_url))
     _write_text(mobile_root / "mobile.css", _MOBILE_CSS)
+    _write_text(mobile_root / "strategy.html", _private_html())
+    # Keep the old URL as a public, plaintext compatibility alias for existing
+    # Telegram messages and saved bookmarks.
     _write_text(mobile_root / "private.html", _private_html())
     _write_text(mobile_root / "private.js", _PRIVATE_JS)
+    _write_text(site_root / "strategy.html", _private_html(desktop=True))
+    _write_text(
+        site_root / "robots.txt",
+        "User-agent: *\nAllow: /\n",
+    )
+    _write_text(
+        site_root / "llms.txt",
+        _llms_text(public_base_url=public_base_url, generated_at=generated_at),
+    )
+    if str(public_base_url or "").strip():
+        _write_text(site_root / "sitemap.xml", _sitemap_xml(public_base_url))
     # Delete artifacts produced by the retired encryption implementation even
     # when callers build into an existing directory without clearing it first.
     (mobile_root / "private.enc.json").unlink(missing_ok=True)
@@ -258,7 +276,9 @@ def build_mobile_site(
         "schema": MOBILE_SCHEMA,
         "generated_at": generated_at,
         "public_url": _join_url(public_base_url, "mobile/"),
-        "strategy_url": _join_url(public_base_url, "mobile/private.html"),
+        "strategy_url": _join_url(public_base_url, "mobile/strategy.html"),
+        "desktop_strategy_url": _join_url(public_base_url, "strategy.html"),
+        "legacy_strategy_url": _join_url(public_base_url, "mobile/private.html"),
         "strategy_payload_url": _join_url(public_base_url, "mobile/strategy.json"),
         "private_dashboard": {
             "enabled": True,
@@ -305,6 +325,7 @@ def sanitize_public_decision_bundle(
         elif not identities.intersection(allowed):
             continue
         row = {key: source.get(key) for key in _PUBLIC_ROW_FIELDS if source.get(key) is not None}
+        row["display_name"] = _display_name_for(row.get("ticker"), row.get("display_name"))
         row["quality"] = _public_quality(source.get("quality"))
         rows.append(row)
     quality = bundle.get("quality") if isinstance(bundle.get("quality"), dict) else {}
@@ -445,6 +466,7 @@ def _public_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(source, dict) or source.get("is_held") is True:
             continue
         row = {key: source.get(key) for key in _PUBLIC_ROW_FIELDS if source.get(key) is not None}
+        row["display_name"] = _display_name_for(row.get("ticker"), row.get("display_name"))
         row["quality"] = _public_quality(source.get("quality"))
         rows.append(row)
     result = {
@@ -546,6 +568,7 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
             for key in _PRIVATE_ROW_FIELDS
             if row_source.get(key) is not None
         }
+        row["display_name"] = _display_name_for(row.get("ticker"), row.get("display_name"))
         row["quality"] = _public_quality(row_source.get("quality"))
         action = next(
             (action_by_ticker[key] for key in _ticker_identity_keys(row.get("ticker")) if key in action_by_ticker),
@@ -647,7 +670,7 @@ def _load_latest_work_report(
         if sanitized:
             lineage = _work_report_lineage(payload, current_packet)
             sanitized["lineage"] = lineage
-            if lineage.get("status") == "CURRENT_ANALYSIS_LINEAGE":
+            if lineage.get("status") != "CURRENT_PACKET":
                 sanitized = _analysis_only_work_report(sanitized)
             return sanitized
     return {}
@@ -822,6 +845,17 @@ def _sanitize_work_report(payload: dict[str, Any], *, market: str) -> dict[str, 
         )
         if structured.get(key) is not None
     }
+    strategies = []
+    for item in allowed_structured.get("strategies") or []:
+        if not isinstance(item, dict):
+            continue
+        strategy = dict(item)
+        strategy["display_name"] = _display_name_for(
+            strategy.get("ticker"), strategy.get("display_name")
+        )
+        strategies.append(strategy)
+    if strategies:
+        allowed_structured["strategies"] = strategies
     if not report_markdown and not allowed_structured:
         return {}
     result = {
@@ -1002,6 +1036,23 @@ def _ticker_identity_keys(value: Any) -> tuple[str, ...]:
     return tuple(dict.fromkeys(keys))
 
 
+def _display_name_for(ticker: Any, candidate: Any) -> str:
+    ticker_text = str(ticker or "").strip()
+    candidate_text = str(candidate or "").strip()
+    ticker_identities = {value.upper() for value in _ticker_identity_keys(ticker_text)}
+    candidate_identity = re.sub(r"\.(?:KS|KQ)$", "", candidate_text.upper())
+    candidate_is_ticker = not candidate_text or candidate_identity in ticker_identities
+    if not candidate_is_ticker:
+        return candidate_text
+    try:
+        resolved = resolve_instrument(ticker_text)
+    except InstrumentResolutionError:
+        return candidate_text or ticker_text
+    resolved_name = str(resolved.display_name or "").strip()
+    resolved_identity = re.sub(r"\.(?:KS|KQ)$", "", resolved_name.upper())
+    return resolved_name if resolved_identity not in ticker_identities else (candidate_text or ticker_text)
+
+
 def _public_html(payload: dict[str, Any], *, public_base_url: str) -> str:
     market_sections = []
     for market in MARKETS:
@@ -1026,7 +1077,7 @@ def _public_html(payload: dict[str, Any], *, public_base_url: str) -> str:
             </section>
             """
         )
-    private_url = _join_url(public_base_url, "mobile/private.html") or "private.html"
+    private_url = _join_url(public_base_url, "mobile/strategy.html") or "strategy.html"
     embedded = html.escape(json.dumps(payload, ensure_ascii=False), quote=False)
     return f"""<!doctype html>
 <html lang="ko">
@@ -1100,7 +1151,7 @@ def _public_card(row: dict[str, Any]) -> str:
     valid_until = str(quality.get("row_valid_until") or "")
     return f"""
     <article class="action-card" data-row-mode="{_escape(mode)}" data-valid-until="{_escape(valid_until)}">
-      <div class="card-title"><div><strong>{_escape(row.get('ticker') or '-')}</strong><span>{_escape(row.get('display_name') or '')}</span></div><span class="row-mode mode-{_css_token(mode)}">{_escape(mode_label)}</span></div>
+      <div class="card-title"><div><strong>{_escape(row.get('display_name') or row.get('ticker') or '-')}</strong><span class="ticker-code">{_escape(row.get('ticker') or '-')}</span></div><span class="row-mode mode-{_css_token(mode)}">{_escape(mode_label)}</span></div>
       <p class="expiry-warning" hidden>분석 시점 이후 데이터입니다. 주문 전 현재가와 조건을 다시 확인하세요.</p>
       <div class="price-line"><strong>{_fmt_price(row.get('last_price'))}</strong><span>{_escape(row.get('market_data_asof') or '-')}</span></div>
       <dl>
@@ -1113,33 +1164,53 @@ def _public_card(row: dict[str, Any]) -> str:
     """
 
 
-def _private_html() -> str:
-    return """<!doctype html>
+def _private_html(*, desktop: bool = False) -> str:
+    asset_prefix = "mobile/" if desktop else ""
+    report_prefix = "" if desktop else "../"
+    public_href = "index.html" if desktop else "../index.html"
+    body_class = "private-body desktop-body" if desktop else "private-body"
+    device_label = "PC 투자 전략" if desktop else "모바일 투자 전략"
+    return f"""<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#081a2b">
   <meta name="referrer" content="no-referrer">
-  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'">
   <title>TradingAgents 통합 투자 전략</title>
-  <link rel="stylesheet" href="mobile.css">
+  <link rel="stylesheet" href="{asset_prefix}mobile.css">
 </head>
-<body class="private-body">
-  <header class="topbar"><a href="index.html">공개 리서치</a><span>통합 투자 전략</span></header>
+<body class="{body_class}" data-strategy-url="{asset_prefix}strategy.json">
+  <header class="topbar"><a href="{public_href}">TradingAgents 홈</a><span>{device_label}</span></header>
   <main>
     <section class="hero-mobile">
       <p class="eyebrow">KR · US · YOUTUBE · PRISM · WORK</p>
       <h1>한눈에 보는 투자 전략</h1>
       <p>분석 시점의 전략과 주문 직전 실시간 확인 상태를 분리했습니다. 보유·관심·신규 후보별로 조건, 실행 행동, 무효화 기준을 확인하세요.</p>
       <div class="privacy-banner">링크에서 바로 열립니다 · 계좌번호와 고객 식별정보는 제외합니다.</div>
+      <nav class="report-nav" aria-label="전체 분석 리포트">
+        <a href="{report_prefix}youtube/">YouTube 분석</a>
+        <a href="{report_prefix}prism-telegram/">PRISM 분석</a>
+        <a href="{report_prefix}work/">Work 원문</a>
+      </nav>
     </section>
+    <details class="pipeline-explainer" open>
+      <summary><span class="eyebrow">HOW IT IS MADE</span><strong id="pipeline-title">이 전략이 만들어지는 과정</strong></summary>
+      <ol>
+        <li><strong>종목 분석</strong><span>KIS·시장 데이터로 보유/관심/신규 후보의 가격·거래량·수급·위험을 분석</span></li>
+        <li><strong>외부 관점</strong><span>YouTube·PRISM의 주장, 종목, 주요 이슈를 일일 단위로 구조화</span></li>
+        <li><strong>ChatGPT Work 종합</strong><span>KR/US별로 모든 근거를 다시 비교해 순위·매수/보유/축소 조건과 무효화 행동을 결정</span></li>
+        <li><strong>안전한 공개</strong><span>계좌 식별정보를 제거한 동일 전략을 PC·모바일·JSON으로 게시</span></li>
+      </ol>
+      <p class="trusted-note"><strong>우선 신뢰 채널:</strong> @kpunch와 @sosumonkey 영상은 사용자 검증 최우선 근거로 취급하되, 실제 주문 직전 시세·계좌·위험 확인은 별도로 유지합니다.</p>
+    </details>
     <div id="private-status" class="privacy-banner" role="status">통합 전략 데이터를 불러오는 중입니다.</div>
     <nav id="private-tabs" class="market-tabs" aria-label="시장 선택" hidden></nav>
     <div id="private-root"></div>
   </main>
-  <script src="private.js" defer></script>
+  <script src="{asset_prefix}private.js" defer></script>
 </body>
 </html>
 """
@@ -1175,6 +1246,17 @@ h2 { margin: 0; font-size: 1.25rem; }
 .privacy-banner { min-width: 0; max-width: 100%; margin: 14px 0; padding: 11px 13px; border: 1px solid rgba(89,214,199,.35); border-radius: 12px; background: rgba(89,214,199,.09); color: #c9fff8; overflow-wrap: anywhere; font-size: .9rem; }
 .privacy-banner.error { border-color: rgba(255,124,131,.45); background: rgba(255,124,131,.10); color: #ffd8da; }
 .private-link { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 15px; border-radius: 12px; background: var(--accent); color: #04201f; font-weight: 800; text-decoration: none; }
+.report-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.report-nav a { padding: 8px 11px; border: 1px solid var(--line); border-radius: 999px; color: #d9eef4; font-size: .78rem; font-weight: 760; text-decoration: none; }
+.pipeline-explainer { margin: 0 0 20px; padding: 16px; border: 1px solid var(--line); border-radius: 17px; background: rgba(12,32,51,.78); }
+.pipeline-explainer > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 34px; padding: 0; color: var(--text); }
+.pipeline-explainer > summary .eyebrow { margin: 0; }
+.pipeline-explainer > summary strong { font-size: 1rem; }
+.pipeline-explainer ol { display: grid; gap: 8px; margin: 13px 0 0; padding: 0; list-style: none; counter-reset: pipeline; }
+.pipeline-explainer li { display: grid; grid-template-columns: 1.1rem minmax(0,1fr); gap: 4px 9px; counter-increment: pipeline; }
+.pipeline-explainer li::before { grid-row: 1 / span 2; content: counter(pipeline); display: grid; width: 1.1rem; height: 1.1rem; place-items: center; margin-top: 3px; border-radius: 50%; background: var(--accent); color: #04201f; font-size: .68rem; font-weight: 900; }
+.pipeline-explainer li span, .trusted-note { color: var(--muted); font-size: .82rem; }
+.trusted-note { margin: 13px 0 0; padding-top: 11px; border-top: 1px solid var(--line); }
 .market-tabs { position: sticky; top: calc(53px + max(0px, env(safe-area-inset-top) - 10px)); z-index: 15; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; min-width: 0; max-width: 100%; margin: 0 -2px 18px; padding: 9px 2px; background: rgba(6,17,29,.94); backdrop-filter: blur(14px); }
 .market-tabs button { min-width: 0; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--muted); overflow-wrap: anywhere; font: inherit; font-weight: 800; }
 .market-tabs button[aria-pressed="true"] { border-color: var(--accent); background: rgba(89,214,199,.14); color: var(--text); }
@@ -1196,8 +1278,8 @@ h2 { margin: 0; font-size: 1.25rem; }
 .action-card[hidden] { display: none; }
 .card-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .card-title div { min-width: 0; }
-.card-title strong { display: block; font-size: 1.12rem; }
-.card-title div > span { display: block; color: var(--muted); font-size: .82rem; }
+.card-title strong { display: block; font-size: 1.2rem; }
+.card-title .ticker-code { display: block; margin-top: 2px; color: var(--muted); font-size: .76rem; font-weight: 720; letter-spacing: .04em; }
 .price-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 15px 0; }
 .price-line strong { font-size: 1.5rem; letter-spacing: -.025em; }
 .price-line span { color: var(--muted); font-size: .74rem; text-align: right; }
@@ -1214,6 +1296,13 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .condition-block strong { display: block; margin-bottom: 4px; color: var(--muted); font-size: .76rem; }
 .condition-block p { margin: 0; font-size: .9rem; }
 .condition-block.risk { border-color: rgba(255,124,131,.26); }
+.signal-strip { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; margin: 12px 0; }
+.signal { min-width: 0; padding: 8px; border-radius: 10px; background: rgba(255,255,255,.045); }
+.signal span, .signal strong { display: block; overflow-wrap: anywhere; }
+.signal span { color: var(--muted); font-size: .68rem; }
+.signal strong { margin-top: 2px; font-size: .82rem; }
+.confidence-track { height: 5px; margin-top: 6px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.1); }
+.confidence-track i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
 .role-badge { margin-left: 6px; color: var(--accent); }
 .strategy-filters { display: flex; flex-wrap: wrap; gap: 7px; max-width: 100%; margin: 10px 0 14px; padding-bottom: 3px; }
 .strategy-filters button { flex: 1 1 calc(33.333% - 7px); min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); font: inherit; font-size: .8rem; font-weight: 800; }
@@ -1231,6 +1320,16 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .work-action span { color: var(--muted); font-size: .8rem; }
 .source-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
 .source-chip { padding: 5px 8px; border-radius: 999px; background: rgba(255,255,255,.07); color: var(--muted); font-size: .72rem; }
+.evidence-list { display: grid; gap: 7px; margin: 10px 0 0; padding: 0; list-style: none; }
+.evidence-list li { padding: 9px 10px; border-left: 3px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.035); color: #dce8f0; font-size: .82rem; }
+.evidence-list li.bullish { border-left-color: var(--ok); }
+.evidence-list li.bearish { border-left-color: var(--danger); }
+.evidence-list li.mixed { border-left-color: var(--warn); }
+.evidence-list small { display: block; margin-top: 3px; color: var(--muted); }
+.market-overview { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 6px; margin: 12px 0 16px; }
+.overview-stat { padding: 11px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.03); }
+.overview-stat strong { display: block; font-size: 1.18rem; }
+.overview-stat span { color: var(--muted); font-size: .66rem; line-height: 1.25; }
 .markdown-report { max-height: 32rem; margin: 4px 0 0; padding: 12px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; background: rgba(0,0,0,.18); color: #dce8f0; white-space: pre-wrap; overflow-wrap: anywhere; font: .78rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .card-rationale { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
 .held-badge { margin-left: 6px; color: var(--accent); }
@@ -1245,6 +1344,17 @@ summary { min-height: 44px; padding: 11px 0; color: var(--muted); cursor: pointe
   .market-head > div:last-child { flex: 0 1 auto; justify-content: flex-end; }
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+@media (min-width: 1000px) {
+  .desktop-body main { max-width: 1480px; padding-left: 28px; padding-right: 28px; }
+  .desktop-body .hero-mobile { display: grid; grid-template-columns: 1.5fr 1fr; column-gap: 28px; }
+  .desktop-body .hero-mobile .eyebrow, .desktop-body .hero-mobile h1 { grid-column: 1; }
+  .desktop-body .hero-mobile > p { grid-column: 1; }
+  .desktop-body .hero-mobile .privacy-banner, .desktop-body .hero-mobile .report-nav { grid-column: 2; }
+  .desktop-body .pipeline-explainer ol { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .desktop-body .cards { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .desktop-body .integrated-report { padding: 22px; }
+  .desktop-body .market-overview { grid-template-columns: repeat(5,minmax(0,1fr)); }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
 """.strip()
 
@@ -1255,8 +1365,15 @@ _PRIVATE_JS = r"""
   const status = document.getElementById('private-status');
   const root = document.getElementById('private-root');
   const tabs = document.getElementById('private-tabs');
+  const pipelineExplainer = document.querySelector('.pipeline-explainer');
+  if (pipelineExplainer && matchMedia('(max-width: 659px)').matches) pipelineExplainer.open = false;
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (ch) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const fmt = (value) => Number.isFinite(Number(value)) ? Number(value).toLocaleString(undefined, {maximumFractionDigits: 2}) : '-';
+  const dateTime = (value) => {
+    const parsed = new Date(value || '');
+    if (!Number.isFinite(parsed.getTime())) return '-';
+    return new Intl.DateTimeFormat('ko-KR', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'}).format(parsed);
+  };
   const actionLabels = {
     NONE: '추가 행동 없음', NO_ACTION: '분석 결론 유지', HOLD: '보유 유지', WATCH: '관심 종목으로 관찰',
     WATCH_TRIGGER: '조건 충족 여부 관찰', WATCH_RISK: '위험 조건 관찰', WAIT: '조건 확인 전 대기', AVOID: '신규 매수 회피',
@@ -1363,9 +1480,13 @@ _PRIVATE_JS = r"""
     return result;
   }
   function workStrategy(item, ticker) {
-    const structured = ((item.integrated_report || {}).structured_report || {});
     const wanted = new Set(tickerKeys(ticker));
-    return (structured.strategies || []).find((strategy) => tickerKeys(strategy.ticker).some((value) => wanted.has(value))) || {};
+    for (const field of ['integrated_report', 'reference_report']) {
+      const structured = (((item || {})[field] || {}).structured_report || {});
+      const strategy = (structured.strategies || []).find((candidate) => tickerKeys(candidate.ticker).some((value) => wanted.has(value)));
+      if (strategy) return strategy;
+    }
+    return {};
   }
   function normalizeRole(value, held) {
     if (held) return 'HOLDING';
@@ -1474,6 +1595,59 @@ _PRIVATE_JS = r"""
       return `<span class="source-chip">${esc(source)} · ${esc(detail)}</span>`;
     }).join('');
   }
+  function companyName(row, strategy) {
+    const ticker = String(row.ticker || strategy.ticker || '').trim();
+    const identities = new Set(tickerKeys(ticker));
+    for (const candidate of [row.display_name, strategy.display_name]) {
+      const text = String(candidate || '').trim();
+      if (text && !identities.has(text.toUpperCase())) return text;
+    }
+    return ticker || '종목명 확인 필요';
+  }
+  function evidenceItems(thesis, strategy) {
+    const result = [];
+    const add = (value, impact = 'mixed', meta = '') => {
+      const text = valueText(value).trim();
+      if (!text || result.some((item) => item.text === text)) return;
+      result.push({text, impact: String(impact || 'mixed').toLowerCase(), meta});
+    };
+    for (const item of thesis.major_news_issues || []) {
+      if (typeof item === 'string') add(item);
+      else if (item && typeof item === 'object') add(
+        combineDistinct(item.title, item.reason, item.investor_implication),
+        item.impact,
+        combineDistinct(item.source, item.occurred_at ? dateTime(item.occurred_at) : ''),
+      );
+    }
+    for (const item of thesis.bullish_drivers || thesis.strength_drivers || []) add(item, 'bullish');
+    for (const item of thesis.bearish_drivers || thesis.weakness_drivers || []) add(item, 'bearish');
+    for (const item of strategy.source_contributions || []) {
+      if (!item || typeof item !== 'object') continue;
+      add(
+        combineDistinct(item.reason, item.summary, item.contribution),
+        item.direction || item.impact,
+        combineDistinct(item.source, item.event_key),
+      );
+    }
+    if (!result.length) for (const item of thesis.rationale || []) add(item, 'mixed');
+    return result.slice(0, 8);
+  }
+  function evidenceList(thesis, strategy) {
+    const items = evidenceItems(thesis, strategy);
+    if (!items.length) return '';
+    return `<div class="card-rationale"><strong>주요 뉴스·이슈와 강약 이유</strong><ul class="evidence-list">${items.map((item) => `<li class="${['bullish','bearish'].includes(item.impact) ? item.impact : 'mixed'}">${esc(item.text)}${item.meta ? `<small>${esc(item.meta)}</small>` : ''}</li>`).join('')}</ul></div>`;
+  }
+  function signalStrip(row, confidence) {
+    const numericConfidence = Number(confidence);
+    const confidenceWidth = Number.isFinite(numericConfidence) ? Math.max(0, Math.min(100, numericConfidence * 100)) : 0;
+    const change = Number(row.price_change_pct);
+    const changeText = Number.isFinite(change) ? `${change > 0 ? '+' : ''}${change.toFixed(2)}%` : '-';
+    return `<div class="signal-strip" aria-label="핵심 신호 요약">
+      <div class="signal"><span>분석 신뢰도</span><strong>${Number.isFinite(numericConfidence) ? percent(numericConfidence) : '-'}</strong><div class="confidence-track"><i style="width:${confidenceWidth}%"></i></div></div>
+      <div class="signal"><span>당일 등락</span><strong>${esc(changeText)}</strong></div>
+      <div class="signal"><span>상대 거래량</span><strong>${fmt(row.relative_volume)}배</strong></div>
+    </div>`;
+  }
   function rowPriority(row, strategy) {
     const action = row.portfolio_action || {};
     const code = `${action.action_now || ''} ${action.action_if_triggered || ''} ${(strategy.execution || {}).action_now || ''} ${(strategy.thesis || {}).stance || ''}`.toUpperCase();
@@ -1518,6 +1692,7 @@ _PRIVATE_JS = r"""
     const riskAction = (hasWork ? workRiskAction : baseRiskAction) || '무효화 시 행동 정보 없음';
     const confidence = hasWork ? thesis.confidence : action.confidence;
     const confidenceText = Number.isFinite(Number(confidence)) && Number(confidence) >= 0 && Number(confidence) <= 1 ? percent(confidence) : valueText(confidence);
+    const displayName = companyName(row, strategy);
     const tickerIdentity = tickerKeys(row.ticker)[0];
     const fullWorkEntry = fullConditions(thesis.entry_conditions);
     const fullWorkInvalidation = fullConditions(thesis.invalidation_conditions);
@@ -1532,9 +1707,10 @@ _PRIVATE_JS = r"""
       ${action.rationale ? `<p><strong>기본 분석 근거</strong><br>${esc(valueText(action.rationale))}</p>` : ''}
     </details>`;
     return `<article class="action-card" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
-      <div class="card-title"><div><strong>${esc(row.ticker || '-')} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span>${esc(row.display_name || strategy.display_name || '')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
-      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>${esc(row.market_data_asof || workExecution.as_of || '-')}</span></div>
+      <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
+      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}</span></div>
       <div class="private-action"><strong>분석 시점 결론</strong>${esc(analysisAction)}<p class="readiness-note">${esc(readiness.note)}</p></div>
+      ${signalStrip(row, confidence)}
       <div class="condition-grid">
         <div class="condition-block"><strong>확인할 진입·축소 조건</strong><p>${esc(entryCondition)}</p></div>
         <div class="condition-block"><strong>조건 충족 후 행동</strong><p>${esc(triggeredAction)}</p></div>
@@ -1546,7 +1722,8 @@ _PRIVATE_JS = r"""
         <div><dt>상대 거래량</dt><dd>${fmt(row.relative_volume)}배</dd></div>
         <div><dt>분석 신뢰도</dt><dd>${esc(confidenceText || '-')}</dd></div>
       </dl>
-      ${(hasWork ? thesis.rationale : action.rationale) ? `<p class="card-rationale"><strong>판단 근거</strong><br>${esc(valueText(hasWork ? thesis.rationale : action.rationale))}</p>` : ''}
+      ${evidenceList(thesis, strategy)}
+      ${(hasWork ? thesis.rationale : action.rationale) ? `<p class="card-rationale"><strong>종합 판단 근거</strong><br>${esc(valueText(hasWork ? thesis.rationale : action.rationale))}</p>` : ''}
       ${supportingDetail}
       <details><summary>금액·비중·출처 세부 보기</summary><dl>
         <div><dt>현재 증감</dt><dd>${esc(won(action.delta_krw_now))}</dd></div>
@@ -1568,6 +1745,22 @@ _PRIVATE_JS = r"""
       item.condition,
     );
     return `<div class="work-action"><strong>${esc(title)}</strong>${detail ? `<span>${esc(detail)}</span>` : ''}</div>`;
+  }
+  function marketOverview(rows, item) {
+    const buckets = {BUY: 0, HOLD: 0, REDUCE: 0, SELL: 0, RESEARCH: 0};
+    rows.forEach((row) => {
+      const strategy = workStrategy(item, row.ticker);
+      const stance = String(((strategy.thesis || {}).stance) || '').toUpperCase();
+      const action = String(((row.portfolio_action || {}).action_now) || row.strategy_code || '').toUpperCase();
+      const combined = `${stance} ${action}`;
+      if (/SELL|EXIT|STOP_LOSS/.test(combined)) buckets.SELL += 1;
+      else if (/REDUCE|TRIM|TAKE_PROFIT/.test(combined)) buckets.REDUCE += 1;
+      else if (/BUY|ADD|STARTER/.test(combined)) buckets.BUY += 1;
+      else if (/HOLD|WATCH|WAIT/.test(combined)) buckets.HOLD += 1;
+      else buckets.RESEARCH += 1;
+    });
+    const labels = {BUY: '매수·추가 검토', HOLD: '보유·관찰', REDUCE: '축소·익절', SELL: '매도·청산', RESEARCH: '추가 조사'};
+    return `<div class="market-overview" aria-label="전략 분포">${Object.entries(buckets).map(([key, count]) => `<div class="overview-stat"><strong>${count}</strong><span>${labels[key]}</span></div>`).join('')}</div>`;
   }
   function evidenceAudit(sourceSummary) {
     const receipt = ((sourceSummary || {}).external_evidence_receipt || {});
@@ -1610,9 +1803,9 @@ _PRIVATE_JS = r"""
     return `<section class="integrated-report${isReference ? ' reference-report' : ''}">
       <p class="eyebrow">${isReference ? 'CHATGPT WORK · 분석 시점 참고 전략' : 'CHATGPT WORK · 통합 전략'}</p>
       <h3>${esc(title)}</h3>
-      ${isReference ? '<p class="expiry-warning">현재 분석 source와 lineage가 일치하지 않아 이전 분석 참고로만 표시합니다. 현재 카드 순위·실행 판단에는 반영하지 않았습니다.</p>' : ''}
+      ${isReference ? '<p class="expiry-warning">이 Work 내용은 표시된 분석 시점의 전략입니다. 카드의 thesis·근거에는 활용했으며, 실제 실행 준비 상태는 현재 시세 기반 카드 안내를 우선합니다.</p>' : ''}
       ${analysisOnly ? '<p class="readiness-note">Work 종합 전략 전문과 thesis·순위·출처를 유지했습니다. 핵심 액션은 분석 시점 참고이며, 카드의 실행 행동과 준비 상태는 현재 overlay를 사용합니다.</p>' : ''}
-      ${structured.as_of || report.published_at ? `<p class="readiness-note">분석 기준 ${esc(structured.as_of || report.published_at)}</p>` : ''}
+      <div class="source-meta"><span>분석 기준 ${esc(dateTime(structured.as_of))}</span><span>Work 게시 ${esc(dateTime(report.published_at || structured.generated_at))}</span></div>
       ${summary ? `<p class="summary">${esc(summary)}</p>` : ''}
       ${analysisOnly && topActions.length ? '<p class="readiness-note"><strong>분석 시점 핵심 액션 참고:</strong> 현재 주문 가능 여부가 아니라 Work 분석 당시 제안입니다.</p>' : ''}
       ${topActions.length ? `<div class="work-top-actions">${topActions.slice(0, 3).map(workTopAction).join('')}</div>` : ''}
@@ -1662,7 +1855,7 @@ _PRIVATE_JS = r"""
       const health = marketHealth(item, rows);
       const cards = ranked.map((row) => card(row, item, topTickers)).join('');
       const empty = health.empty || '현재 표시할 전략 데이터가 없습니다. 원천 상태와 분석 커버리지를 확인하세요.';
-      return `<section class="market-panel" data-market="${market}"><div class="market-head"><div><p class="eyebrow">${market.toUpperCase()} STRATEGY</p><h2>${market.toUpperCase()} 투자 액션</h2></div><div><span class="health health-neutral">${esc(sourceLabel)}</span><span class="health health-${esc(health.className)}">${esc(health.label)}</span></div></div><div class="source-meta"><span>분석 run ${esc(item.run_id || '-')}</span><span>${rows.length}개 종목</span></div>${integratedReport(item)}${integratedReport(item, 'reference_report')}<nav class="strategy-filters" aria-label="종목 유형"><button type="button" data-group-target="TOP" aria-pressed="true">핵심 ${topTickers.size}</button><button type="button" data-group-target="HOLDING" aria-pressed="false">보유 ${counts.HOLDING || 0}</button><button type="button" data-group-target="WATCHLIST" aria-pressed="false">관심 ${counts.WATCHLIST || 0}</button><button type="button" data-group-target="NEW_CANDIDATE" aria-pressed="false">신규 ${counts.NEW_CANDIDATE || 0}</button><button type="button" data-group-target="ALL" aria-pressed="false">전체 ${rows.length}</button></nav><div class="cards">${cards || `<p class="empty">${esc(empty)}</p>`}</div></section>`;
+      return `<section class="market-panel" data-market="${market}"><div class="market-head"><div><p class="eyebrow">${market.toUpperCase()} STRATEGY</p><h2>${market.toUpperCase()} 투자 액션</h2></div><div><span class="health health-neutral">${esc(sourceLabel)}</span><span class="health health-${esc(health.className)}">${esc(health.label)}</span></div></div><div class="source-meta"><span>분석 시작 ${esc(dateTime(item.started_at))}</span><span>분석 run ${esc(item.run_id || '-')}</span><span>${rows.length}개 종목</span></div>${marketOverview(rows, item)}<nav class="strategy-filters" aria-label="종목 유형"><button type="button" data-group-target="TOP" aria-pressed="true">핵심 ${topTickers.size}</button><button type="button" data-group-target="HOLDING" aria-pressed="false">보유 ${counts.HOLDING || 0}</button><button type="button" data-group-target="WATCHLIST" aria-pressed="false">관심 ${counts.WATCHLIST || 0}</button><button type="button" data-group-target="NEW_CANDIDATE" aria-pressed="false">신규 ${counts.NEW_CANDIDATE || 0}</button><button type="button" data-group-target="ALL" aria-pressed="false">전체 ${rows.length}</button></nav><div class="cards">${cards || `<p class="empty">${esc(empty)}</p>`}</div>${integratedReport(item)}${integratedReport(item, 'reference_report')}</section>`;
     }).join('');
     const buttons = [...tabs.querySelectorAll('button')];
     const panels = [...root.querySelectorAll('[data-market]')];
@@ -1679,7 +1872,7 @@ _PRIVATE_JS = r"""
       selectGroup('TOP');
     });
     select(requestedMarket);
-    status.textContent = `전략 데이터 업데이트 · ${payload.generated_at || '-'} · 계좌 식별정보 제외`;
+    status.textContent = `페이지 생성 ${dateTime(payload.generated_at)} · 계좌 식별정보 제외 · PC/모바일/JSON 공개`;
     clearTimeout(expiryTimer);
     const now = Date.now();
     const deadlines = Object.values(markets).flatMap((item) => [
@@ -1689,7 +1882,7 @@ _PRIVATE_JS = r"""
     if (deadlines.length) expiryTimer = setTimeout(() => render(payload), Math.max(50, Math.min(...deadlines) - now + 50));
   }
   async function start() {
-    const response = await fetch('strategy.json', {cache: 'no-store', credentials: 'omit'});
+    const response = await fetch(document.body.dataset.strategyUrl || 'strategy.json', {cache: 'no-store', credentials: 'omit'});
     if (!response.ok) throw new Error('통합 투자 전략이 아직 게시되지 않았습니다.');
     const payload = await response.json();
     if (payload.schema !== 'tradingagents.mobile-strategy/v1') throw new Error('통합 전략 데이터 형식이 올바르지 않습니다.');
@@ -1712,6 +1905,55 @@ def _write_text(path: Path, value: str) -> None:
 def _join_url(base: str, suffix: str) -> str:
     root = str(base or "").strip().rstrip("/")
     return f"{root}/{suffix.lstrip('/')}" if root else suffix
+
+
+def _llms_text(*, public_base_url: str, generated_at: str) -> str:
+    base = str(public_base_url or "").strip().rstrip("/")
+    links = (
+        ("PC 종합 투자 전략", "strategy.html"),
+        ("모바일 종합 투자 전략", "mobile/strategy.html"),
+        ("기계 판독용 KR/US 종합 전략 JSON", "mobile/strategy.json"),
+        ("KR/US 공개 리서치 JSON", "mobile/public.json"),
+        ("YouTube 검증 리포트와 JSON feed", "youtube/"),
+        ("PRISM 리포트", "prism-telegram/"),
+        ("ChatGPT Work 공개 원문", "work/"),
+    )
+    rendered = "\n".join(
+        f"- {label}: {_join_url(base, path)}" for label, path in links
+    )
+    return (
+        "# TradingAgents public investment research\n\n"
+        "This site intentionally exposes account-identifier-free KR/US investment "
+        "research for browsers, search engines, ChatGPT, and other AI agents.\n"
+        f"Site build time: {generated_at}\n\n"
+        "The HTML is a human-readable view of the same public JSON. `as_of` is the "
+        "analysis time, while `generated_at`/`published_at` identify report publication. "
+        "Do not infer current order eligibility from an old analysis timestamp.\n\n"
+        f"{rendered}\n"
+    )
+
+
+def _sitemap_xml(public_base_url: str) -> str:
+    base = str(public_base_url or "").strip().rstrip("/")
+    urls = (
+        "",
+        "strategy.html",
+        "mobile/",
+        "mobile/strategy.html",
+        "youtube/",
+        "prism-telegram/",
+        "work/",
+    )
+    entries = "\n".join(
+        f"  <url><loc>{html.escape(_join_url(base, suffix))}</loc></url>"
+        for suffix in urls
+    )
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{entries}\n"
+        "</urlset>\n"
+    )
 
 
 def _escape(value: Any) -> str:

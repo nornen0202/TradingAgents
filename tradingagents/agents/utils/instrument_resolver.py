@@ -48,6 +48,27 @@ class InstrumentProfile:
 
 
 _KRX_COMPANIES = {
+    "004370": {
+        "display_name": "농심",
+        "display_name_kr": "농심",
+        "display_name_en": "Nongshim",
+        "symbol": "004370.KS",
+        "aliases": ("농심", "Nongshim", "004370", "004370.KS"),
+    },
+    "006340": {
+        "display_name": "대원전선",
+        "display_name_kr": "대원전선",
+        "display_name_en": "Daewon Cable",
+        "symbol": "006340.KS",
+        "aliases": ("대원전선", "Daewon Cable", "006340", "006340.KS"),
+    },
+    "007980": {
+        "display_name": "TP",
+        "display_name_kr": "티피",
+        "display_name_en": "TP Inc.",
+        "symbol": "007980.KS",
+        "aliases": ("TP", "티피", "태평양물산", "TP Inc.", "007980", "007980.KS"),
+    },
     "000150": {
         "display_name": "두산",
         "display_name_kr": "두산",
@@ -81,12 +102,33 @@ _KRX_COMPANIES = {
             "020150.KS",
         ),
     },
+    "033530": {
+        "display_name": "SJG세종",
+        "display_name_kr": "SJG세종",
+        "display_name_en": "SJG Sejong",
+        "symbol": "033530.KS",
+        "aliases": ("SJG세종", "에스제이지세종", "세종공업", "SJG Sejong", "033530", "033530.KS"),
+    },
     "036930": {
         "display_name": "주성엔지니어링",
         "display_name_kr": "주성엔지니어링",
         "display_name_en": "Jusung Engineering",
         "symbol": "036930.KQ",
         "aliases": ("주성엔지니어링", "Jusung Engineering", "036930", "036930.KQ"),
+    },
+    "060980": {
+        "display_name": "HL홀딩스",
+        "display_name_kr": "HL홀딩스",
+        "display_name_en": "HL Holdings",
+        "symbol": "060980.KS",
+        "aliases": ("HL홀딩스", "한라홀딩스", "HL Holdings", "060980", "060980.KS"),
+    },
+    "083450": {
+        "display_name": "GST",
+        "display_name_kr": "글로벌스탠다드테크놀로지",
+        "display_name_en": "Global Standard Technology",
+        "symbol": "083450.KQ",
+        "aliases": ("GST", "글로벌스탠다드테크놀로지", "Global Standard Technology", "083450", "083450.KQ"),
     },
     "090360": {
         "display_name": "로보스타",
@@ -326,6 +368,56 @@ _KRX_COMPANIES = {
         "symbol": "454910.KS",
         "aliases": ("두산로보틱스", "Doosan Robotics", "454910", "454910.KS"),
     },
+    "499790": {
+        "display_name": "GS피앤엘",
+        "display_name_kr": "GS피앤엘",
+        "display_name_en": "GS P&L",
+        "symbol": "499790.KS",
+        "aliases": ("GS피앤엘", "지에스피앤엘", "GS P&L", "499790", "499790.KS"),
+    },
+}
+
+_US_COMPANIES = {
+    "AAPL": "Apple",
+    "AMD": "Advanced Micro Devices",
+    "AMZN": "Amazon",
+    "ANET": "Arista Networks",
+    "AVGO": "Broadcom",
+    "CDNS": "Cadence Design Systems",
+    "COHR": "Coherent",
+    "COST": "Costco Wholesale",
+    "CRM": "Salesforce",
+    "DDOG": "Datadog",
+    "DELL": "Dell Technologies",
+    "ETN": "Eaton",
+    "GEV": "GE Vernova",
+    "GLDM": "SPDR Gold MiniShares Trust",
+    "GOOGL": "Alphabet",
+    "HPE": "Hewlett Packard Enterprise",
+    "IBM": "IBM",
+    "LHX": "L3Harris Technologies",
+    "LLY": "Eli Lilly",
+    "LRCX": "Lam Research",
+    "META": "Meta Platforms",
+    "MPWR": "Monolithic Power Systems",
+    "MRVL": "Marvell Technology",
+    "MSFT": "Microsoft",
+    "MU": "Micron Technology",
+    "NET": "Cloudflare",
+    "NTAP": "NetApp",
+    "NVDA": "NVIDIA",
+    "OKTA": "Okta",
+    "ORCL": "Oracle",
+    "QCOM": "Qualcomm",
+    "SGOV": "iShares 0-3 Month Treasury Bond ETF",
+    "SMCI": "Super Micro Computer",
+    "SNOW": "Snowflake",
+    "SNPS": "Synopsys",
+    "TSLA": "Tesla",
+    "TSM": "Taiwan Semiconductor Manufacturing",
+    "TXN": "Texas Instruments",
+    "URI": "United Rentals",
+    "VRT": "Vertiv",
 }
 
 _ALIAS_TO_KRX_CODE: dict[str, str] = {}
@@ -362,17 +454,18 @@ def resolve_instrument(user_input: str) -> InstrumentProfile:
         return _build_generic_krx_profile(raw_value, f"{raw_value}.KS", raw_value)
 
     if re.fullmatch(r"[A-Za-z][A-Za-z0-9.\-]{0,14}", raw_value):
+        display_name = _US_COMPANIES.get(upper, upper)
         return InstrumentProfile(
             input_symbol=raw_value,
             normalized_symbol=upper,
-            display_name=upper,
+            display_name=display_name,
             country="US",
             exchange="US",
             timezone="US/Eastern",
             currency="USD",
-            display_name_en=upper,
+            display_name_en=display_name,
             yahoo_symbol=upper,
-            aliases=(upper,),
+            aliases=tuple(dict.fromkeys((upper, display_name))),
         )
 
     raise InstrumentResolutionError(

@@ -755,7 +755,7 @@ def _render_index_page(
     if representative and _run_phase_label(representative) in {"delayed_analysis_only", "post_close"}:
         representative_badge = "<div class='warning-banner'>Not for live execution</div>"
     latest_portfolio_link = (
-        "<a class=\"button\" href=\"mobile/private.html\">Open 통합 투자 전략</a>"
+        "<a class=\"button\" href=\"strategy.html\">Open PC 통합 투자 전략</a>"
         if representative
         else ""
     )
@@ -834,7 +834,7 @@ def _render_index_page(
             <div class="status pending">no data yet</div>
             <p>The scheduled workflow has not produced an archived run yet.</p>
             <a class="button" href="mobile/index.html">Open 모바일 공개 리서치</a>
-            <a class="button" href="mobile/private.html">Open 통합 투자 전략</a>
+            <a class="button" href="strategy.html">Open PC 통합 투자 전략</a>
             <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
             <a class="button" href="prism-telegram/index.html">Open PRISM Telegram 리포트</a>
           </div>
@@ -849,7 +849,7 @@ def _render_index_page(
         public_failed = len(public_tickers) - public_success
         portfolio_summary = _load_portfolio_summary(Path(manifest["_run_dir"]))
         portfolio_link = (
-            "<p><a href=\"mobile/private.html\">통합 투자 전략</a></p>"
+            "<p><a href=\"strategy.html\">PC 통합 투자 전략</a> · <a href=\"mobile/strategy.html\">모바일 통합 투자 전략</a></p>"
             if portfolio_summary.get("status_path")
             else ""
         )
@@ -992,7 +992,8 @@ def _render_run_page(
       </div>
       <article class="run-card">
         <p class="long-field"><strong>게시 정책</strong><span>계좌번호와 고객 식별정보는 제외하고 종목별 투자 전략과 액션만 게시합니다.</span></p>
-        <a class="button" href="../../mobile/private.html">통합 투자 전략 열기</a>
+        <a class="button" href="../../strategy.html">PC 통합 투자 전략 열기</a>
+        <a class="button" href="../../mobile/strategy.html">모바일 통합 투자 전략 열기</a>
       </article>
     </section>
         """
@@ -1368,7 +1369,8 @@ def _render_portfolio_page(
       <div class="hero-card">
         <div class="status success">action data ready</div>
         <p><strong>Run</strong><span>{_escape(manifest.get('run_id') or '-')}</span></p>
-        <a class="button" href="../../mobile/private.html">통합 투자 전략 열기</a>
+        <a class="button" href="../../strategy.html">PC 통합 투자 전략 열기</a>
+        <a class="button" href="../../mobile/strategy.html">모바일 통합 투자 전략 열기</a>
         <a class="button" href="../../mobile/index.html">공개 모바일 리서치 열기</a>
       </div>
     </section>

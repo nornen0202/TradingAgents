@@ -965,7 +965,14 @@ def _youtube_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
             previous = events.get(str(event["event_key"]))
             if previous is None or str(event.get("occurred_at") or "") > str(previous.get("occurred_at") or ""):
                 events[str(event["event_key"])] = event
-    ordered = sorted(events.values(), key=lambda item: str(item.get("occurred_at") or ""), reverse=True)
+    ordered = sorted(
+        events.values(),
+        key=lambda item: (
+            bool(item.get("trusted_primary")),
+            str(item.get("occurred_at") or ""),
+        ),
+        reverse=True,
+    )
     cutoff = now.astimezone().timestamp() - 72 * 3600
     included = [item for item in ordered if (_timestamp(item.get("occurred_at")) or 0) >= cutoff]
     window_count = len(included)
@@ -989,6 +996,11 @@ def _youtube_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
         "events": included,
         "guardrails": {
             "untrusted_content": True,
+            "trusted_primary_override": {
+                "channels": ["@kpunch", "@sosumonkey"],
+                "strategy_status": "USER_VERIFIED_PRIMARY",
+                "preserve_execution_gates": True,
+            },
             "may_promote_market_execution": False,
             "allowed_actions": [
                 "UPGRADE_RESEARCH",
@@ -1015,6 +1027,15 @@ def _youtube_event(item: dict[str, Any], run_dir: Path) -> dict[str, Any]:
         "source_url": summary.get("url") or item.get("video_url"),
         "published_at": summary.get("published_at") or item.get("published_at"),
         "status": summary.get("status") or item.get("status"),
+        "strategy_trust_status": summary.get("strategy_trust_status")
+        or item.get("strategy_trust_status"),
+        "trusted_primary": bool(
+            summary.get("trusted_primary") or item.get("trusted_primary")
+        ),
+        "assumed_verified_for_strategy": bool(
+            summary.get("assumed_verified_for_strategy")
+            or item.get("trusted_primary")
+        ),
         "transcript_quality": summary.get("transcript_quality"),
         "claim_status_summary": summary.get("claim_status_summary"),
         "claims": [
@@ -1067,6 +1088,8 @@ def _youtube_event(item: dict[str, Any], run_dir: Path) -> dict[str, Any]:
         "content_sha256": content_sha,
         "occurred_at": compact.get("published_at"),
         "relevance": _youtube_relevance(compact),
+        "trusted_primary": compact["trusted_primary"],
+        "strategy_trust_status": compact["strategy_trust_status"],
         "summary": compact,
     }
 
@@ -1177,6 +1200,10 @@ def _balanced_external_policy() -> dict[str, Any]:
         "supported_evidence_weight": "MEDIUM",
         "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
         "unverified_evidence_weight": "LOW_LABELED",
+        "trusted_primary_channels": ["@kpunch", "@sosumonkey"],
+        "trusted_primary_strategy_status": "USER_VERIFIED_PRIMARY",
+        "trusted_primary_evidence_weight": "HIGH",
+        "trusted_primary_assumed_verified": True,
         "matching_multi_source_signal_may_raise_thesis_priority": True,
         "conflicting_signal_must_be_visible": True,
         "may_bypass_market_or_portfolio_execution_gate": False,

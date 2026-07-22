@@ -12,13 +12,18 @@ except ModuleNotFoundError:  # pragma: no cover - Python < 3.11
 
 
 DEFAULT_CHANNEL_URLS = (
+    "https://www.youtube.com/@kpunch/videos",
+    "https://www.youtube.com/@sosumonkey/videos",
     "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
     "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
-    "https://www.youtube.com/@sosumonkey/videos",
     "https://www.youtube.com/@815moneytalk/videos",
     "https://www.youtube.com/@supe-tv/videos",
     "https://www.youtube.com/@3protv/videos",
     "https://www.youtube.com/@plus_tv_official/videos",
+)
+DEFAULT_TRUSTED_PRIMARY_URLS = (
+    "https://www.youtube.com/@kpunch/videos",
+    "https://www.youtube.com/@sosumonkey/videos",
 )
 
 
@@ -31,6 +36,7 @@ class ChannelSettings:
     max_videos: int
     max_entries_per_url: int = 25
     max_parallel_videos: int = 4
+    trusted_primary_urls: tuple[str, ...] = DEFAULT_TRUSTED_PRIMARY_URLS
 
 
 @dataclass(frozen=True)
@@ -160,6 +166,14 @@ def load_youtube_config(
             ),
             max_parallel_videos=max(
                 1, int(channel_raw.get("max_parallel_videos") or 4)
+            ),
+            trusted_primary_urls=tuple(
+                str(item).strip()
+                for item in (
+                    channel_raw.get("trusted_primary_urls")
+                    or DEFAULT_TRUSTED_PRIMARY_URLS
+                )
+                if str(item).strip()
             ),
         ),
         llm=LLMSettings(
