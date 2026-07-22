@@ -1002,6 +1002,11 @@ class WorkflowDefinitionTests(unittest.TestCase):
         self.assertIn("$parsedRuns = $runsJson | ConvertFrom-Json", local_dispatcher)
         self.assertIn("$allRuns = @($parsedRuns)", local_dispatcher)
         self.assertNotIn("$allRuns = @($runsJson | ConvertFrom-Json)", local_dispatcher)
+        self.assertIn("function Get-RunCoverageUtc", local_dispatcher)
+        self.assertIn("Convert-ToUtcDateTime $Run.updatedAt", local_dispatcher)
+        self.assertIn("createdAt,updatedAt", local_dispatcher)
+        self.assertIn("$coverageUtc = Get-RunCoverageUtc -Run $_", local_dispatcher)
+        self.assertIn("recency=completion_or_creation", local_dispatcher)
         self.assertNotIn(
             'return (Get-RunRecoverySource -Run $Run) -ne "manual"',
             local_dispatcher,
