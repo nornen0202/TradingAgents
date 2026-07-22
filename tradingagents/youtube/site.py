@@ -343,7 +343,8 @@ def _manifest_videos(manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
 
 def _public_report_videos(manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
     run_dir = _manifest_run_dir(manifest)
-    return [video for video in _manifest_videos(manifest) if _is_public_report_video(video, run_dir)]
+    videos = [video for video in _manifest_videos(manifest) if _is_public_report_video(video, run_dir)]
+    return sorted(videos, key=_video_priority_key, reverse=True)
 
 
 def _is_public_report_video(video: Mapping[str, Any], run_dir: Path) -> bool:
@@ -408,11 +409,31 @@ def _public_summary_from_video(video: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _strategy_source_tier(*values: Mapping[str, Any]) -> str:
+    fallback = "STANDARD"
     for value in values:
         tier = str(value.get("strategy_source_tier") or "").strip().upper()
-        if tier:
+        if tier == "USER_PRIMARY":
             return tier
-    return "STANDARD"
+        if tier:
+            fallback = tier
+    if any(_is_user_primary_video(value) for value in values):
+        return "USER_PRIMARY"
+    return fallback
+
+
+def _is_user_primary_video(value: Mapping[str, Any]) -> bool:
+    source_url = unquote(str(value.get("source_url") or "")).casefold()
+    channel = str(value.get("channel") or value.get("channel_name") or "").strip().casefold()
+    if any(marker in f"{source_url.rstrip('/')}/" for marker in ("/@kpunch/", "/@경제사냥꾼/", "/@sosumonkey/")):
+        return True
+    return channel in {"경제사냥꾼", "소수몽키"}
+
+
+def _video_priority_key(video: Mapping[str, Any]) -> tuple[bool, str]:
+    return (
+        _strategy_source_tier(video) == "USER_PRIMARY",
+        str(video.get("published_at") or ""),
+    )
 
 
 def _first_text(*values: Any) -> str:

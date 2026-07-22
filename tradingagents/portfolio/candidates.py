@@ -1104,23 +1104,27 @@ def _position_metrics(
     if position is None:
         return {}
     entry_price = _safe_float(getattr(position, "avg_cost_krw", None))
-    market_price = current_price or _safe_float(getattr(position, "market_price_krw", None))
+    account_market_price = _safe_float(getattr(position, "market_price_krw", None))
+    # Intraday US prices are quoted in USD, while account prices and P/L are
+    # stored in KRW. Keep the execution price for technical-level distances,
+    # but calculate account return from internally consistent KRW fields.
+    execution_price = current_price or account_market_price
     market_value = _safe_float(getattr(position, "market_value_krw", None))
     unrealized_pnl = _safe_float(getattr(position, "unrealized_pnl_krw", None))
     unrealized_return_pct: float | None = None
-    if entry_price and entry_price > 0 and market_price and market_price > 0:
-        unrealized_return_pct = (market_price - entry_price) / entry_price * 100.0
-    elif market_value and unrealized_pnl is not None and market_value - unrealized_pnl > 0:
+    if market_value and unrealized_pnl is not None and market_value - unrealized_pnl > 0:
         unrealized_return_pct = unrealized_pnl / (market_value - unrealized_pnl) * 100.0
+    elif entry_price and entry_price > 0 and account_market_price and account_market_price > 0:
+        unrealized_return_pct = (account_market_price - entry_price) / entry_price * 100.0
 
     stage_1_price = _safe_float(profit_taking_plan.get("stage_1_price")) or (_level_price(risk_action_level) if _is_profit_level(risk_action_level) else None)
     trailing_stop_price = _safe_float(profit_taking_plan.get("trailing_stop_price"))
     distance_to_target_pct = None
-    if market_price and market_price > 0 and stage_1_price:
-        distance_to_target_pct = (stage_1_price - market_price) / market_price * 100.0
+    if execution_price and execution_price > 0 and stage_1_price:
+        distance_to_target_pct = (stage_1_price - execution_price) / execution_price * 100.0
     distance_to_trailing_stop_pct = None
-    if market_price and market_price > 0 and trailing_stop_price:
-        distance_to_trailing_stop_pct = (market_price - trailing_stop_price) / market_price * 100.0
+    if execution_price and execution_price > 0 and trailing_stop_price:
+        distance_to_trailing_stop_pct = (execution_price - trailing_stop_price) / execution_price * 100.0
 
     threshold = max(_profile_float(profile, "min_profit_take_return_pct", 8.0), 0.01)
     return_component = 0.0
@@ -1135,8 +1139,8 @@ def _position_metrics(
     return {
         "entry_price": entry_price,
         "avg_cost_krw": entry_price,
-        "current_price": market_price,
-        "market_price_krw": market_price,
+        "current_price": execution_price,
+        "market_price_krw": account_market_price,
         "market_value_krw": int(market_value or 0),
         "unrealized_pnl_krw": int(unrealized_pnl or 0),
         "unrealized_return_pct": rounded_return,

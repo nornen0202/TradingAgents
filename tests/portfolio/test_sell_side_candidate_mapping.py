@@ -216,6 +216,34 @@ class SellSideCandidateMappingTests(unittest.TestCase):
         self.assertEqual(candidate.thesis_after_sell, "MAINTAIN")
         self.assertAlmostEqual(candidate.position_metrics["unrealized_return_pct"], 20.0)
 
+    def test_us_execution_price_does_not_mix_usd_with_account_krw_return(self):
+        position = self._position(avg_cost=500000, market_price=560000, unrealized_pnl=600000)
+        candidate, _ = _build_single_candidate(
+            snapshot=AccountSnapshot(
+                **{
+                    **self._snapshot().__dict__,
+                    "positions": (position,),
+                }
+            ),
+            canonical_ticker="AVGO",
+            position=position,
+            analysis={
+                "decision": self._decision(),
+                "tool_telemetry": {},
+                "execution_update": {
+                    "decision_state": "WAIT",
+                    "last_price": 400.0,
+                    "source": {"market_session": "regular"},
+                },
+            },
+        )
+
+        metrics = candidate.position_metrics
+        self.assertEqual(metrics["current_price"], 400.0)
+        self.assertEqual(metrics["avg_cost_krw"], 500000.0)
+        self.assertEqual(metrics["market_price_krw"], 560000.0)
+        self.assertAlmostEqual(metrics["unrealized_return_pct"], 12.0)
+
     def test_damage_code_keeps_profit_level_reduce_risk_as_reduce_risk(self):
         position = self._position(avg_cost=70000, market_price=84000, unrealized_pnl=140000)
         candidate, _ = _build_single_candidate(

@@ -12,6 +12,7 @@ import re
 import shutil
 from time import perf_counter
 from typing import Any, Callable, Iterable
+from urllib.parse import unquote
 from zoneinfo import ZoneInfo
 
 from tradingagents.dataflows.youtube_video import YouTubeVideoBundle, assess_transcript_reliability, fetch_youtube_video
@@ -975,11 +976,11 @@ def _claim_status_summary(claims: list[dict[str, Any]]) -> dict[str, int]:
 
 
 def _user_primary_source(source_url: str | None) -> bool:
-    normalized = str(source_url or "").strip().rstrip("/").lower()
+    normalized = unquote(str(source_url or "")).strip().rstrip("/").casefold()
     normalized_with_slash = f"{normalized}/"
     return any(
         marker in normalized_with_slash
-        for marker in ("/@kpunch/", "/@sosumonkey/")
+        for marker in ("/@kpunch/", "/@경제사냥꾼/", "/@sosumonkey/")
     )
 
 

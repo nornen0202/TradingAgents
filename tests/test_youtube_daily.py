@@ -39,9 +39,10 @@ from tradingagents.youtube.research import (
 )
 from tradingagents.youtube.runner import (
     _archived_verification_is_current,
+    _user_primary_source,
     execute_youtube_run,
 )
-from tradingagents.youtube.site import build_youtube_site
+from tradingagents.youtube.site import _strategy_source_tier, _video_priority_key, build_youtube_site
 from tradingagents.youtube.verifier import (
     CONTRADICTED,
     LLM_FAILED,
@@ -94,6 +95,30 @@ class FakeLLM:
 
 
 class YouTubeDailyTests(unittest.TestCase):
+    def test_user_primary_aliases_are_recognized_and_sorted_first(self):
+        self.assertTrue(_user_primary_source("https://www.youtube.com/@kpunch/videos"))
+        self.assertTrue(
+            _user_primary_source(
+                "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos"
+            )
+        )
+        self.assertTrue(_user_primary_source("https://www.youtube.com/@sosumonkey/videos"))
+        legacy_primary = {
+            "strategy_source_tier": "STANDARD",
+            "channel": "경제사냥꾼",
+            "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
+            "published_at": "2026-07-20T00:00:00+00:00",
+        }
+        newer_standard = {
+            "strategy_source_tier": "STANDARD",
+            "channel": "다른 채널",
+            "published_at": "2026-07-21T00:00:00+00:00",
+        }
+
+        self.assertEqual(_strategy_source_tier(legacy_primary), "USER_PRIMARY")
+        ordered = sorted([newer_standard, legacy_primary], key=_video_priority_key, reverse=True)
+        self.assertIs(ordered[0], legacy_primary)
+
     def test_public_evidence_summary_preserves_claim_mapping_id(self):
         summary = public_evidence_summary(
             {

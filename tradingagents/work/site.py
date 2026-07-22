@@ -106,6 +106,7 @@ def build_work_site(
         index["streams"][surface] = status
 
     _write_json(root / "index.json", index)
+    _write_bytes(Path(site_dir) / "work" / "index.html", _work_report_index_html().encode("utf-8"))
     return index
 
 
@@ -325,3 +326,187 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
 def _write_bytes(path: Path, payload: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(payload)
+
+
+def _work_report_index_html() -> str:
+    """Return a responsive, dependency-free viewer for public Work reports."""
+
+    return r"""<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="index,follow">
+  <meta name="description" content="TradingAgents ChatGPT Work KR·US·YouTube·PRISM 종합 분석 리포트">
+  <title>ChatGPT Work 종합 분석 | TradingAgents</title>
+  <style>
+    :root { color-scheme: dark; --bg:#07111f; --panel:#0e1c2f; --line:#263a52; --text:#eef6ff; --muted:#a9bdd2; --accent:#62d6ff; --good:#6ee7b7; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:linear-gradient(145deg,#06101d,#0b1a2a 55%,#0b1324); color:var(--text); font:16px/1.58 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    a { color:var(--accent); }
+    header, main { width:min(1120px,calc(100% - 32px)); margin:auto; }
+    header { padding:42px 0 22px; }
+    .eyebrow { color:var(--good); font-size:.78rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    h1 { margin:.35rem 0 .45rem; font-size:clamp(1.85rem,5vw,3.2rem); line-height:1.08; }
+    .lede, .status, .meta { color:var(--muted); }
+    nav, .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-top:18px; }
+    nav a, button, .raw-link { border:1px solid var(--line); border-radius:999px; background:#102239; color:var(--text); padding:9px 14px; text-decoration:none; font:inherit; font-weight:700; cursor:pointer; }
+    button[aria-selected="true"] { color:#03111b; background:var(--accent); border-color:var(--accent); }
+    main { padding-bottom:56px; }
+    .panel { margin-top:18px; padding:clamp(18px,4vw,30px); border:1px solid var(--line); border-radius:20px; background:rgba(14,28,47,.94); box-shadow:0 18px 55px rgba(0,0,0,.22); }
+    .report-head { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; }
+    h2 { margin:0; font-size:clamp(1.35rem,3.5vw,2rem); }
+    .meta { margin:.45rem 0 0; font-size:.92rem; }
+    .summary { margin:20px 0; padding:16px; border-left:4px solid var(--accent); background:#0a1728; border-radius:0 12px 12px 0; }
+    .top-actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:10px; margin:14px 0 24px; padding:0; list-style:none; }
+    .top-actions li { border:1px solid var(--line); border-radius:14px; padding:13px; background:#0a1728; white-space:pre-wrap; }
+    details { border-top:1px solid var(--line); padding-top:18px; }
+    summary { cursor:pointer; font-weight:800; }
+    pre { margin:14px 0 0; padding:16px; overflow-wrap:anywhere; white-space:pre-wrap; border-radius:14px; background:#050c16; color:#d9e8f6; font:14px/1.62 ui-monospace,SFMono-Regular,Consolas,monospace; }
+    .error { color:#ffb4b4; }
+    [hidden] { display:none !important; }
+    @media (max-width:640px) {
+      header, main { width:min(100% - 20px,1120px); }
+      header { padding-top:26px; }
+      nav a, button, .raw-link { flex:1 1 auto; text-align:center; }
+      .report-head { display:block; }
+      .raw-link { display:inline-block; margin-top:14px; }
+      .panel { border-radius:16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Public · PC·모바일 공용</div>
+    <h1>ChatGPT Work 종합 분석</h1>
+    <p class="lede">KR·US 종목 분석과 YouTube·PRISM 근거를 Work가 다시 종합한 공개 리포트입니다. 보고서 시점과 현재 주문 가능성은 구분해서 확인하세요.</p>
+    <nav aria-label="주요 리포트">
+      <a href="../strategy.html?market=kr">PC 투자 전략</a>
+      <a href="../mobile/strategy.html?market=kr">모바일 투자 전략</a>
+      <a href="../youtube/">YouTube 분석</a>
+      <a href="../prism-telegram/">PRISM 분석</a>
+    </nav>
+  </header>
+  <main>
+    <div class="tabs" role="tablist" aria-label="Work 분석 종류">
+      <button type="button" data-surface="kr" role="tab">KR 종합 전략</button>
+      <button type="button" data-surface="us" role="tab">US 종합 전략</button>
+      <button type="button" data-surface="youtube" role="tab">YouTube 종합</button>
+      <button type="button" data-surface="prism" role="tab">PRISM 종합</button>
+    </div>
+    <p id="status" class="status" aria-live="polite">리포트를 불러오는 중입니다.</p>
+    <section id="report" class="panel" hidden>
+      <div class="report-head">
+        <div><h2 id="title"></h2><p id="meta" class="meta"></p></div>
+        <a id="raw" class="raw-link" href="#">AI·원문 JSON</a>
+      </div>
+      <div id="summary" class="summary" hidden></div>
+      <section id="actions-wrap" hidden><h3>핵심 제안</h3><ol id="actions" class="top-actions"></ol></section>
+      <details open><summary>전체 Work 리포트</summary><pre id="markdown"></pre></details>
+    </section>
+  </main>
+  <script>
+  (() => {
+    const surfaces = new Set(['kr','us','youtube','prism']);
+    const buttons = [...document.querySelectorAll('[data-surface]')];
+    const status = document.getElementById('status');
+    const report = document.getElementById('report');
+    const title = document.getElementById('title');
+    const meta = document.getElementById('meta');
+    const raw = document.getElementById('raw');
+    const summary = document.getElementById('summary');
+    const actionsWrap = document.getElementById('actions-wrap');
+    const actions = document.getElementById('actions');
+    const markdown = document.getElementById('markdown');
+    const labels = {kr:'KR 종합 전략',us:'US 종합 전략',youtube:'YouTube 종합',prism:'PRISM 종합'};
+
+    function localTime(value) {
+      if (!value) return '시각 정보 없음';
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? String(value) : new Intl.DateTimeFormat('ko-KR', {dateStyle:'full',timeStyle:'medium',timeZone:'Asia/Seoul'}).format(parsed);
+    }
+    function plain(value) {
+      if (value == null) return '';
+      if (typeof value === 'string' || typeof value === 'number') return humanize(String(value));
+      if (Array.isArray(value)) return value.map(plain).filter(Boolean).join(' · ');
+      if (typeof value === 'object') {
+        const keys = ['ticker','display_name','action','stance','readiness','summary','rationale','reason','thesis'];
+        const picked = keys.map((key) => value[key]).filter((item) => item != null).map(plain).filter(Boolean);
+        return picked.length ? picked.join(' · ') : humanize(JSON.stringify(value, null, 2));
+      }
+      return String(value);
+    }
+    function humanize(value) {
+      const replacements = new Map([
+        ['BLOCKED_STALE','주문 전 실시간 재확인'],['BLOCKED_INCOMPLETE','필수 데이터 재확인'],
+        ['NEEDS_LIVE_RECHECK','주문 전 실시간 재확인'],['WAIT_FOR_TRIGGER','조건 충족 대기'],
+        ['READY_NOW','현재 조건 확인됨'],['MARKET_CLOSED','개장 후 재확인'],
+        ['DATA_OUTAGE','데이터 복구 후 재확인'],['RESEARCH_ONLY','분석 참고 전용'],
+        ['NO_ENTRY','신규 진입 보류'],['IMMEDIATE','현재 조건 확인됨'],
+        ['COMPLETE','전체 분석 완료'],['DEGRADED','일부 데이터 재확인'],
+        ['RESEARCH','분석 참고'],['AVOID','매수 보류'],['WATCH','관찰'],['HOLD','보유'],
+        ['STALE','시세 만료'],['MIXED','현재·과거 자료 혼합'],['OK','정상'],
+        ['BUY','매수 검토'],['ADD','추가 매수 검토'],['SELL','매도 검토'],['REDUCE','비중 축소'],
+        ['confidence','신뢰도'],['sizing','비중 조절'],['execution','실행 판단'],['thesis','투자 논지'],
+        ['analysis','분석'],['current','현재'],['run','실행 회차'],['event','이벤트'],
+        ['live recheck','실시간 재확인'],['packet','분석 자료'],
+        ['RVOL','상대거래량(RVOL)'],['VWAP','거래량가중평균가격(VWAP)'],
+      ]);
+      let text = String(value || '');
+      for (const [machine, investor] of replacements) {
+        text = text.replace(new RegExp(`(^|[^A-Z0-9_])${machine}(?=$|[^A-Z0-9_])`, 'g'), (_, prefix) => `${prefix}${investor}`);
+      }
+      return text;
+    }
+    function topActionText(item, strategies) {
+      const ticker = String((item || {}).ticker || '').trim();
+      const strategy = strategies.find((candidate) => String(candidate.ticker || '').trim() === ticker) || {};
+      const thesis = strategy.thesis && typeof strategy.thesis === 'object' ? strategy.thesis : {};
+      const condition = Array.isArray(thesis.entry_conditions) ? thesis.entry_conditions[0] : thesis.entry_conditions;
+      return [ticker, thesis.stance, condition, (item || {}).readiness].map(plain).filter(Boolean).join(' · ');
+    }
+    async function load(surface) {
+      buttons.forEach((button) => button.setAttribute('aria-selected', String(button.dataset.surface === surface)));
+      status.classList.remove('error');
+      status.textContent = `${labels[surface]} 리포트를 불러오는 중입니다.`;
+      report.hidden = true;
+      const url = `v1/${surface}/report/latest.json`;
+      try {
+        const response = await fetch(url, {cache:'no-store', credentials:'omit'});
+        if (!response.ok) throw new Error('아직 공개된 Work 리포트가 없습니다.');
+        const payload = await response.json();
+        const structured = payload.structured_report && typeof payload.structured_report === 'object' ? payload.structured_report : {};
+        title.textContent = humanize(structured.title || labels[surface]);
+        const asOf = structured.as_of || structured.generated_at;
+        meta.textContent = `분석 기준 ${localTime(asOf)} · Work 게시 ${localTime(payload.published_at)}`;
+        raw.href = url;
+        const summaryText = plain(structured.summary);
+        summary.textContent = summaryText;
+        summary.hidden = !summaryText;
+        const topActions = Array.isArray(structured.top_actions) ? structured.top_actions : [];
+        const strategies = Array.isArray(structured.strategies) ? structured.strategies : [];
+        actions.replaceChildren(...topActions.map((item) => {
+          const li = document.createElement('li');
+          li.textContent = topActionText(item, strategies);
+          return li;
+        }));
+        actionsWrap.hidden = topActions.length === 0;
+        markdown.textContent = humanize(payload.report_markdown || JSON.stringify(structured, null, 2));
+        status.textContent = `${labels[surface]} · 공개 리포트 로드 완료`;
+        report.hidden = false;
+        const next = new URL(location.href);
+        next.searchParams.set('surface', surface);
+        history.replaceState(null, '', next);
+      } catch (error) {
+        status.classList.add('error');
+        status.textContent = error instanceof Error ? error.message : '리포트를 불러오지 못했습니다.';
+      }
+    }
+    buttons.forEach((button) => button.addEventListener('click', () => load(button.dataset.surface)));
+    const requested = new URLSearchParams(location.search).get('surface') || 'kr';
+    load(surfaces.has(requested) ? requested : 'kr');
+  })();
+  </script>
+</body>
+</html>
+"""

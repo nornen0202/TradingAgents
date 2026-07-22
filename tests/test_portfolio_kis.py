@@ -565,8 +565,8 @@ class PortfolioKisTests(unittest.TestCase):
                     "ovrs_item_name": "Apple Inc.",
                     "cblc_qty13": "2",
                     "ord_psbl_qty1": "1",
-                    "avg_unpr3": "100",
-                    "ovrs_now_pric1": "150",
+                    "avg_unpr3": "130000",
+                    "ovrs_now_pric1": "195000",
                     "bass_exrt": "1300",
                     "frcr_evlu_amt2": "390000",
                     "evlu_pfls_amt2": "90000",
@@ -602,6 +602,8 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(len(snapshot.positions), 1)
         self.assertEqual(snapshot.positions[0].canonical_ticker, "AAPL")
         self.assertEqual(snapshot.positions[0].display_name, "Apple Inc.")
+        self.assertEqual(snapshot.positions[0].avg_cost_krw, 130000)
+        self.assertEqual(snapshot.positions[0].market_price_krw, 195000)
         self.assertEqual(snapshot.positions[0].market_value_krw, 390000)
         self.assertEqual(snapshot.total_equity_krw, 490000)
 

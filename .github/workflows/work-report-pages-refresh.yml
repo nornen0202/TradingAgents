@@ -122,7 +122,7 @@ jobs:
           ]
           subprocess.check_call(args)
 
-      - name: Verify current Work lineage in built strategy site
+      - name: Verify exact Work publication and safe strategy lineage
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import os
