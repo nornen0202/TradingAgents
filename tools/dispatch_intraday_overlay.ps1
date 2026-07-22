@@ -137,7 +137,9 @@ function Test-RunMatchesModeAndScope {
     if ($requestScope -in @("custom_tickers", "custom_sources")) {
         return $false
     }
-    return (Get-RunRecoverySource -Run $Run) -ne "manual"
+    # A default-scope manual run is valid coverage for duplicate prevention.
+    # Manual failures are excluded separately from the automated retry budget.
+    return $true
 }
 
 function Get-FailureDiagnosticSignature {
@@ -297,7 +299,43 @@ if (-not $Force) {
         Write-DispatchLog "recent-run probe failed; attempting dispatch anyway: $runsJson"
     } else {
         $cutoffUtc = $nowUtc.AddMinutes(-1 * [Math]::Max($RecentRunWindowMinutes, 1))
-        $allRuns = @($runsJson | ConvertFrom-Json)
+        # Windows PowerShell 5.1 emits a top-level JSON array as one pipeline
+        # object when ConvertFrom-Json is wrapped directly in @(...). Assigning
+        # first and normalizing second preserves one run object per element on
+        # both Windows PowerShell 5.1 and PowerShell 7.
+        $parsedRuns = $runsJson | ConvertFrom-Json
+        $allRuns = @($parsedRuns)
+        # Never dispatch a second run for a profile that is already active,
+        # even when the first run is older than the short recent-run window.
+        # Full overlay + Pages publication can legitimately exceed 20 minutes.
+        $activeRuns = @($allRuns | Where-Object {
+            $candidateEvent = $_.event -eq "schedule" -or $_.event -eq "workflow_dispatch"
+            $candidateStatus = ([string] $_.status).ToLowerInvariant()
+            if (-not $candidateEvent -or $candidateStatus -eq "completed") {
+                return $false
+            }
+            return [bool](Test-RunMatchesModeAndScope -Run $_ -ExpectedRunMode $RunMode)
+        } | Sort-Object createdAt -Descending)
+        if ($Profile -eq "all") {
+            $eligibleProfiles = @($eligibleProfiles | Where-Object {
+                $profileToKeep = $_
+                @($activeRuns | Where-Object {
+                    (Test-RunMatchesProfile -Run $_ -ExpectedProfile $profileToKeep) -ne $false
+                }).Count -eq 0
+            })
+        } else {
+            $activeCoverage = @($activeRuns | Where-Object {
+                (Test-RunMatchesProfile -Run $_ -ExpectedProfile $Profile) -ne $false
+            }).Count -gt 0
+            if ($activeCoverage) {
+                $eligibleProfiles = @()
+            }
+        }
+        if ($eligibleProfiles.Count -eq 0) {
+            $latest = @($activeRuns | Select-Object -First 1)[0]
+            Write-DispatchLog "skip dispatch: active $Workflow coverage exists for profile=$Profile regardless_of_age=true latest_id=$($latest.databaseId) event=$($latest.event) status=$($latest.status) url=$($latest.url)"
+            exit 0
+        }
         $recentRuns = @($allRuns | Where-Object {
             $createdUtc = Convert-ToUtcDateTime $_.createdAt
             ($_.event -eq "schedule" -or $_.event -eq "workflow_dispatch") -and
@@ -338,6 +376,7 @@ if (-not $Force) {
                 $createdUtc -ge $failureCutoffUtc.UtcDateTime -and
                 ([string] $_.status).ToLowerInvariant() -eq "completed" -and
                 $profileMatch -eq $true -and
+                (Get-RunRecoverySource -Run $_) -ne "manual" -and
                 (Test-RunMatchesModeAndScope -Run $_ -ExpectedRunMode $RunMode)
             } | Sort-Object createdAt -Descending)
             $matchingFailures = @()
