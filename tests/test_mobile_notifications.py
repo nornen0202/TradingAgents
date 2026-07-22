@@ -996,6 +996,17 @@ class WorkflowDefinitionTests(unittest.TestCase):
         self.assertNotIn('"profile=$Profile",', local_dispatcher)
         self.assertIn("Get-FailureDiagnosticSignature", local_dispatcher)
         self.assertIn('"diagnostic=unavailable"', local_dispatcher)
+        self.assertIn("$activeRuns = @($allRuns | Where-Object", local_dispatcher)
+        self.assertIn("regardless_of_age=true", local_dispatcher)
+        self.assertIn("$activeCoverage", local_dispatcher)
+        self.assertIn("$parsedRuns = $runsJson | ConvertFrom-Json", local_dispatcher)
+        self.assertIn("$allRuns = @($parsedRuns)", local_dispatcher)
+        self.assertNotIn("$allRuns = @($runsJson | ConvertFrom-Json)", local_dispatcher)
+        self.assertNotIn(
+            'return (Get-RunRecoverySource -Run $Run) -ne "manual"',
+            local_dispatcher,
+        )
+        self.assertIn('(Get-RunRecoverySource -Run $_) -ne "manual"', local_dispatcher)
 
 
 if __name__ == "__main__":
