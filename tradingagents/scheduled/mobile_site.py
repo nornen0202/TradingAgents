@@ -892,9 +892,38 @@ def _sanitize_work_report_text(value: str) -> str:
         "BLOCKED_STALE": "주문 전 실시간 재확인",
         "BLOCKED_INCOMPLETE": "필수 데이터 재확인",
         "NEEDS_LIVE_RECHECK": "주문 전 실시간 재확인",
+        "WAIT_FOR_TRIGGER": "조건 충족 대기",
+        "READY_NOW": "현재 조건 확인됨",
+        "MARKET_CLOSED": "개장 후 재확인",
+        "DATA_OUTAGE": "데이터 복구 후 재확인",
+        "RESEARCH_ONLY": "분석 참고 전용",
+        "NO_ENTRY": "신규 진입 보류",
+        "IMMEDIATE": "현재 조건 확인됨",
+        "COMPLETE": "전체 분석 완료",
+        "DEGRADED": "일부 데이터 재확인",
+        "RESEARCH": "분석 참고",
+        "AVOID": "매수 보류",
+        "WATCH": "관찰",
+        "HOLD": "보유",
     }
     for machine_value, investor_value in replacements.items():
-        text = text.replace(machine_value, investor_value)
+        text = re.sub(
+            rf"(?<![A-Z0-9_]){re.escape(machine_value)}(?![A-Z0-9_])",
+            investor_value,
+            text,
+        )
+    investor_terms = {
+        "live recheck": "실시간 재확인",
+        "confidence": "신뢰도",
+        "execution": "실행 판단",
+        "sizing": "비중 조절",
+        "thesis": "투자 논지",
+        "packet": "분석 자료",
+        "RVOL": "상대거래량(RVOL)",
+        "VWAP": "거래량가중평균가격(VWAP)",
+    }
+    for source, target in investor_terms.items():
+        text = re.sub(rf"(?<![A-Za-z]){re.escape(source)}(?![A-Za-z])", target, text, flags=re.IGNORECASE)
     return re.sub(r"\n{3,}", "\n\n", text).strip()
 
 
@@ -1803,8 +1832,8 @@ _PRIVATE_JS = r"""
     return `<section class="integrated-report${isReference ? ' reference-report' : ''}">
       <p class="eyebrow">${isReference ? 'CHATGPT WORK · 분석 시점 참고 전략' : 'CHATGPT WORK · 통합 전략'}</p>
       <h3>${esc(title)}</h3>
-      ${isReference ? '<p class="expiry-warning">이 Work 내용은 표시된 분석 시점의 전략입니다. 카드의 thesis·근거에는 활용했으며, 실제 실행 준비 상태는 현재 시세 기반 카드 안내를 우선합니다.</p>' : ''}
-      ${analysisOnly ? '<p class="readiness-note">Work 종합 전략 전문과 thesis·순위·출처를 유지했습니다. 핵심 액션은 분석 시점 참고이며, 카드의 실행 행동과 준비 상태는 현재 overlay를 사용합니다.</p>' : ''}
+      ${isReference ? '<p class="expiry-warning">이 Work 내용은 표시된 분석 시점의 전략입니다. 카드의 투자 논지·근거에는 활용했으며, 실제 실행 준비 상태는 현재 시세 기반 카드 안내를 우선합니다.</p>' : ''}
+      ${analysisOnly ? '<p class="readiness-note">Work 종합 전략 전문과 투자 논지·순위·출처를 유지했습니다. 핵심 액션은 분석 시점 참고이며, 카드의 실행 행동과 준비 상태는 현재 장중 갱신 분석을 사용합니다.</p>' : ''}
       <div class="source-meta"><span>분석 기준 ${esc(dateTime(structured.as_of))}</span><span>Work 게시 ${esc(dateTime(report.published_at || structured.generated_at))}</span></div>
       ${summary ? `<p class="summary">${esc(summary)}</p>` : ''}
       ${analysisOnly && topActions.length ? '<p class="readiness-note"><strong>분석 시점 핵심 액션 참고:</strong> 현재 주문 가능 여부가 아니라 Work 분석 당시 제안입니다.</p>' : ''}

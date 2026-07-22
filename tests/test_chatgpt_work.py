@@ -2272,6 +2272,18 @@ def test_work_site_status_points_to_hash_verified_packet(tmp_path: Path):
     published_prompt = site / "work" / "v1" / "prompts" / "market_us.md"
     assert published_prompt.is_file()
     assert status["prompt_sha256"] == hashlib.sha256(published_prompt.read_bytes()).hexdigest()
+    viewer = (site / "work" / "index.html").read_text(encoding="utf-8")
+    assert "ChatGPT Work 종합 분석" in viewer
+    assert "PC·모바일 공용" in viewer
+    assert "v1/${surface}/report/latest.json" in viewer
+    assert 'data-surface="kr"' in viewer
+    assert 'data-surface="us"' in viewer
+    assert 'data-surface="youtube"' in viewer
+    assert 'data-surface="prism"' in viewer
+    assert "function humanize(value)" in viewer
+    assert "topActionText(item, strategies)" in viewer
+    assert "['STALE','시세 만료']" in viewer
+    assert "title.textContent = humanize" in viewer
 
 
 def test_work_site_exposes_validated_content_addressed_integrated_report(tmp_path: Path):

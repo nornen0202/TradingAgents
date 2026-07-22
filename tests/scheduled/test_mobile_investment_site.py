@@ -732,7 +732,9 @@ def test_mobile_separates_unrelated_work_report_as_past_reference(
     assert market["reference_report"]["lineage"]["status"] == "PAST_REFERENCE"
     assert market["reference_report"]["lineage"]["current_action_cards_enriched"] is False
     private_js = (tmp_path / "site" / "mobile" / "private.js").read_text(encoding="utf-8")
-    assert "카드의 thesis·근거에는 활용했으며" in private_js
+    assert "카드의 투자 논지·근거에는 활용했으며" in private_js
+    assert "현재 장중 갱신 분석을 사용합니다" in private_js
+    assert "카드의 thesis·근거에는 활용했으며" not in private_js
     assert "for (const field of ['integrated_report', 'reference_report'])" in private_js
     assert "execution" not in market["reference_report"]["structured_report"]["strategies"][0]
 
@@ -784,6 +786,26 @@ def test_mobile_does_not_enrich_current_cards_across_workflow_contract_change(tm
     assert report["lineage"]["status"] == "PAST_REFERENCE"
     assert report["lineage"]["reason"] == "workflow_contract_mismatch"
     assert report["lineage"]["current_action_cards_enriched"] is False
+
+
+def test_mobile_work_report_humanizes_engine_codes() -> None:
+    from tradingagents.scheduled.mobile_site import _sanitize_work_report_text
+
+    rendered = _sanitize_work_report_text(
+        "COMPLETE · RESEARCH 2개 · HOLD 1개 · AVOID 1개 · NEEDS_LIVE_RECHECK"
+    )
+
+    assert rendered == "전체 분석 완료 · 분석 참고 2개 · 보유 1개 · 매수 보류 1개 · 주문 전 실시간 재확인"
+    assert "COMPLETE" not in rendered
+    assert "NEEDS_LIVE_RECHECK" not in rendered
+
+    beginner_text = _sanitize_work_report_text(
+        "live recheck 뒤 packet의 thesis·confidence·sizing·execution과 RVOL·VWAP 확인"
+    )
+    assert beginner_text == (
+        "실시간 재확인 뒤 분석 자료의 투자 논지·신뢰도·비중 조절·실행 판단과 "
+        "상대거래량(RVOL)·거래량가중평균가격(VWAP) 확인"
+    )
 
 
 def test_mobile_build_needs_no_key_when_private_actions_exist(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

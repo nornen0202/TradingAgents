@@ -1343,9 +1343,11 @@ def _build_overseas_positions(
             warnings.append(f"Could not resolve overseas broker symbol '{broker_symbol}'.")
             continue
 
-        exchange_rate = _first_float(item, ("bass_exrt", "frst_bltn_exrt"))
-        avg_cost = _unit_price_krw(item, ("avg_unpr3", "pchs_avg_pric"), exchange_rate=exchange_rate)
-        market_price = _unit_price_krw(item, ("ovrs_now_pric1", "now_pric2", "prpr"), exchange_rate=exchange_rate)
+        # ``fetch_overseas_present_balance`` requests WCRC_FRCR_DVSN_CD=01,
+        # so these unit-price fields are already won-denominated. Multiplying
+        # them by ``bass_exrt`` again inflated US prices by roughly 1,400x.
+        avg_cost = _first_float(item, ("avg_unpr3", "pchs_avg_pric"))
+        market_price = _first_float(item, ("ovrs_now_pric1", "now_pric2", "prpr"))
         market_value = _first_int(
             item,
             (
@@ -1462,20 +1464,6 @@ def _first_int(payload: dict[str, Any], keys: tuple[str, ...]) -> int | None:
     if value is None:
         return None
     return int(round(value))
-
-
-def _unit_price_krw(
-    payload: dict[str, Any],
-    keys: tuple[str, ...],
-    *,
-    exchange_rate: float | None,
-) -> float | None:
-    value = _first_float(payload, keys)
-    if value is None:
-        return None
-    if exchange_rate and exchange_rate > 0:
-        return value * exchange_rate
-    return value
 
 
 def _parse_positive_int(value: object, *, default: int) -> int:
