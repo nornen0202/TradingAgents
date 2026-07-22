@@ -1006,12 +1006,22 @@ def compose_notification(
             {"text": f"{market.upper()} 모바일", "url": mobile_url},
         ]
         buttons.append(row)
-        private_url = (
-            f"{base}/mobile/private.html"
+        strategy_query = (
             f"?market={urllib.parse.quote(market)}"
             f"&run={urllib.parse.quote(str(item['run_id']), safe='')}"
         )
-        buttons.append([{"text": f"{market.upper()} 투자 전략", "url": private_url}])
+        buttons.append(
+            [
+                {
+                    "text": f"{market.upper()} PC 전략",
+                    "url": f"{base}/strategy.html{strategy_query}",
+                },
+                {
+                    "text": f"{market.upper()} 모바일 전략",
+                    "url": f"{base}/mobile/strategy.html{strategy_query}",
+                },
+            ]
+        )
     if not cards_only:
         represented = {str(item["market"]).lower() for item in market_runs}
         for surface in surfaces:
@@ -1025,11 +1035,19 @@ def compose_notification(
                 ]
             )
             if surface in {"kr", "us"}:
-                private_url = (
-                    f"{base}/mobile/private.html"
-                    f"?market={urllib.parse.quote(surface)}"
+                strategy_query = f"?market={urllib.parse.quote(surface)}"
+                buttons.append(
+                    [
+                        {
+                            "text": f"{surface.upper()} PC 전략",
+                            "url": f"{base}/strategy.html{strategy_query}",
+                        },
+                        {
+                            "text": f"{surface.upper()} 모바일 전략",
+                            "url": f"{base}/mobile/strategy.html{strategy_query}",
+                        },
+                    ]
                 )
-                buttons.append([{"text": f"{surface.upper()} 투자 전략", "url": private_url}])
     if not cards_only and not market_runs and not surfaces and base:
         buttons.append([{"text": "TradingAgents 리포트", "url": f"{base}/"}])
     if not cards_only and _is_https_url(actions_url):

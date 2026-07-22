@@ -112,6 +112,14 @@ def execute_youtube_run(
         lookback_hours=config.channel.lookback_hours,
         include_unknown_dates=True,
     )
+    references.sort(
+        key=lambda reference: (
+            0
+            if _user_primary_source(reference.source_url)
+            else 1,
+            -(reference.published_at.timestamp() if reference.published_at else 0),
+        )
+    )
 
     video_results = _run_video_workers(
         config=config,
@@ -174,6 +182,8 @@ def execute_youtube_run(
             "raw_transcript_published": False,
             "research_pipeline_version": RESEARCH_PIPELINE_VERSION,
             "public_artifacts": ["html_report", "public_summary_json", "evidence_excerpts"],
+            "user_primary_strategy_policy": "HIGH_EVIDENCE_WEIGHT",
+            "user_primary_channels": ["@kpunch", "@sosumonkey"],
         },
     }
     _write_json(run_dir / "youtube_run.json", manifest)
@@ -342,7 +352,13 @@ def _process_video_reference(
         _write_json(video_dir / "research_plan.json", verified.verification.get("research_plan") or {})
         _write_json(video_dir / "evidence.json", verified.verification.get("evidence") or {})
         _write_json(video_dir / "claim_verification.json", verified.verification.get("claim_verification") or {})
-        public_summary = _public_summary(bundle, verified, source_url=reference.source_url)
+        user_primary = _user_primary_source(reference.source_url)
+        public_summary = _public_summary(
+            bundle,
+            verified,
+            source_url=reference.source_url,
+            user_primary=user_primary,
+        )
         _write_json(video_dir / "public_summary.json", public_summary)
         result["status"] = verified.status
         result["manifest_item"] = _manifest_video_item(
@@ -352,6 +368,7 @@ def _process_video_reference(
             run_dir=run_dir,
             error=None,
             source_url=reference.source_url,
+            user_primary=user_primary,
             reused_from_run=None,
         )
         return result
@@ -395,6 +412,7 @@ def _reuse_video_result_if_possible(
         video_dir=video_dir,
         run_dir=run_dir,
         reused_from_run=str(reused.get("run_id") or ""),
+        user_primary=_user_primary_source(reference.source_url),
     )
     return result
 
@@ -630,6 +648,7 @@ def _manifest_video_item(
     error: str | None,
     source_url: str | None = None,
     reused_from_run: str | None = None,
+    user_primary: bool = False,
 ) -> dict[str, Any]:
     metadata = bundle.metadata
     item = {
@@ -643,6 +662,8 @@ def _manifest_video_item(
         "view_count": metadata.view_count,
         "thumbnail_url": metadata.thumbnail_url,
         "status": status,
+        "strategy_source_tier": "USER_PRIMARY" if user_primary else "STANDARD",
+        "strategy_evidence_weight": "HIGH" if user_primary else "STANDARD",
         "transcript_status": bundle.transcript_status,
         "transcript_source": getattr(bundle.transcript, "source", None),
         "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
@@ -669,6 +690,7 @@ def _manifest_video_item_from_reused_artifacts(
     video_dir: Path,
     run_dir: Path,
     reused_from_run: str | None,
+    user_primary: bool = False,
 ) -> dict[str, Any]:
     summary = _read_json_if_exists(video_dir / "public_summary.json") or {}
     metadata_payload = _read_json_if_exists(video_dir / "metadata.json") or {}
@@ -686,6 +708,8 @@ def _manifest_video_item_from_reused_artifacts(
         "view_count": metadata.get("view_count"),
         "thumbnail_url": summary.get("thumbnail_url") or metadata.get("thumbnail_url"),
         "status": status,
+        "strategy_source_tier": "USER_PRIMARY" if user_primary else "STANDARD",
+        "strategy_evidence_weight": "HIGH" if user_primary else "STANDARD",
         "transcript_status": summary.get("transcript_status") or metadata_payload.get("transcript_status"),
         "transcript_source": summary.get("transcript_source") or metadata_payload.get("transcript_source"),
         "transcript_chars": summary.get("transcript_chars") or metadata_payload.get("transcript_chars") or 0,
@@ -824,7 +848,13 @@ def _metadata_payload(bundle: YouTubeVideoBundle) -> dict[str, Any]:
     }
 
 
-def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport, *, source_url: str | None = None) -> dict[str, Any]:
+def _public_summary(
+    bundle: YouTubeVideoBundle,
+    verified: VerifiedVideoReport,
+    *,
+    source_url: str | None = None,
+    user_primary: bool = False,
+) -> dict[str, Any]:
     verification = verified.verification
     claim_verification = verification.get("claim_verification") if isinstance(verification.get("claim_verification"), dict) else {}
     evidence = verification.get("evidence") if isinstance(verification.get("evidence"), dict) else {}
@@ -876,6 +906,9 @@ def _public_summary(bundle: YouTubeVideoBundle, verified: VerifiedVideoReport, *
         "thumbnail_url": bundle.metadata.thumbnail_url,
         "published_at": bundle.metadata.published_at.isoformat() if bundle.metadata.published_at else bundle.metadata.upload_date,
         "status": verified.status,
+        "strategy_source_tier": "USER_PRIMARY" if user_primary else "STANDARD",
+        "strategy_evidence_weight": "HIGH" if user_primary else "STANDARD",
+        "strategy_validation_policy": "USER_ACCEPTED" if user_primary else "STANDARD_REVIEW",
         "transcript_status": bundle.transcript_status,
         "transcript_source": getattr(bundle.transcript, "source", None),
         "transcript_chars": len(bundle.transcript.raw_text) if bundle.transcript else 0,
@@ -939,6 +972,15 @@ def _claim_status_summary(claims: list[dict[str, Any]]) -> dict[str, int]:
         status = str(claim.get("status") or "unknown")
         counts[status] = counts.get(status, 0) + 1
     return counts
+
+
+def _user_primary_source(source_url: str | None) -> bool:
+    normalized = str(source_url or "").strip().rstrip("/").lower()
+    normalized_with_slash = f"{normalized}/"
+    return any(
+        marker in normalized_with_slash
+        for marker in ("/@kpunch/", "/@sosumonkey/")
+    )
 
 
 def _write_text(path: Path, text: str) -> None:

@@ -8,6 +8,7 @@ class InstrumentResolverTests(unittest.TestCase):
     def test_resolves_us_symbol(self):
         profile = resolve_instrument("AAPL")
         self.assertEqual(profile.primary_symbol, "AAPL")
+        self.assertEqual(profile.display_name, "Apple")
         self.assertEqual(profile.country, "US")
         self.assertIn("AAPL", profile.aliases)
 
@@ -31,6 +32,12 @@ class InstrumentResolverTests(unittest.TestCase):
     def test_resolves_known_krx_numeric_code(self):
         profile = resolve_instrument("035420")
         self.assertEqual(profile.primary_symbol, "035420.KS")
+
+    def test_resolves_sjg_sejong_without_repeating_ticker_as_name(self):
+        profile = resolve_instrument("033530.KS")
+        self.assertEqual(profile.primary_symbol, "033530.KS")
+        self.assertEqual(profile.display_name, "SJG세종")
+        self.assertEqual(profile.display_name_en, "SJG Sejong")
 
     def test_resolves_ai_pcb_krx_candidates(self):
         expected = {

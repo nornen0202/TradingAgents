@@ -2073,6 +2073,9 @@ def test_youtube_packet_preserves_evidence_ids_for_claim_mapping(tmp_path: Path)
             {
                 "video_id": "video-1",
                 "published_at": "2026-07-14T06:30:00+09:00",
+                "strategy_source_tier": "USER_PRIMARY",
+                "strategy_evidence_weight": "HIGH",
+                "strategy_validation_policy": "USER_ACCEPTED",
                 "entities": [{"ticker": "NVDA", "name": "NVIDIA", "status": "verified"}],
                 "claims": [{"claim_id": "C1", "supporting_evidence_ids": ["E1"]}],
                 "evidence": [
@@ -2102,6 +2105,8 @@ def test_youtube_packet_preserves_evidence_ids_for_claim_mapping(tmp_path: Path)
     assert event["summary"]["evidence"][0]["evidence_id"] == "E1"
     assert event["relevance"]["tickers"] == ["NVDA"]
     assert event["relevance"]["markets"] == ["US"]
+    assert event["strategy_source_tier"] == "USER_PRIMARY"
+    assert event["strategy_evidence_weight"] == "HIGH"
 
 
 def test_external_context_ranks_ticker_relevance_and_declares_balanced_policy():
@@ -2125,6 +2130,8 @@ def test_external_context_ranks_ticker_relevance_and_declares_balanced_policy():
     assert ranked[0]["relevance"]["matched_tickers"] == ["NVDA"]
     assert ranked[0]["relevance"]["score"] > ranked[1]["relevance"]["score"]
     assert policy["profile"] == "balanced_external"
+    assert policy["user_primary_evidence_weight"] == "HIGH"
+    assert policy["user_primary_validation_policy"] == "USER_ACCEPTED"
     assert "confidence" in policy["material_thesis_effects"]
     assert policy["may_bypass_market_or_portfolio_execution_gate"] is False
 

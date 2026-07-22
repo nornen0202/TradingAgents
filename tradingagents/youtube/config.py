@@ -12,16 +12,15 @@ except ModuleNotFoundError:  # pragma: no cover - Python < 3.11
 
 
 DEFAULT_CHANNEL_URLS = (
+    "https://www.youtube.com/@kpunch/videos",
+    "https://www.youtube.com/@sosumonkey/videos",
     "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
     "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
-    "https://www.youtube.com/@sosumonkey/videos",
     "https://www.youtube.com/@815moneytalk/videos",
     "https://www.youtube.com/@supe-tv/videos",
     "https://www.youtube.com/@3protv/videos",
     "https://www.youtube.com/@plus_tv_official/videos",
 )
-
-
 @dataclass(frozen=True)
 class ChannelSettings:
     name: str
