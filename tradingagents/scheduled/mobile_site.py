@@ -1440,6 +1440,22 @@ _PRIVATE_JS = r"""
   const requestedRun = query.get('run') || '';
   let expiryTimer;
 
+  function investorText(value) {
+    let text = String(value == null ? '' : value);
+    const replacements = [
+      [/\blive recheck\b/gi, '실시간 재확인'],
+      [/\bpacket\b/gi, '분석 자료'],
+      [/패킷/g, '분석 자료'],
+      [/파일럿/g, '시험 진입'],
+      [/\bthesis\b/gi, '투자 논지'],
+      [/\bconfidence\b/gi, '신뢰도'],
+      [/\bsizing\b/gi, '비중 조절'],
+      [/\bexecution\b/gi, '실행 판단'],
+      [/\bcurrent\b/gi, '최신'],
+    ];
+    for (const [source, target] of replacements) text = text.replace(source, target);
+    return text;
+  }
   function valueText(value) {
     if (value == null || value === '') return '';
     if (Array.isArray(value)) return value.map(valueText).filter(Boolean).join(' · ');
@@ -1449,7 +1465,7 @@ _PRIVATE_JS = r"""
       }
       return '';
     }
-    return String(value);
+    return investorText(value);
   }
   function combineDistinct(...values) {
     const parts = values.map(valueText).map((value) => value.trim()).filter(Boolean);
@@ -1464,7 +1480,7 @@ _PRIVATE_JS = r"""
       }
       return [];
     }
-    const text = String(value).trim();
+    const text = investorText(value).trim();
     if (!text || /^(?:none|n\/a|custom|unknown|-+)$/i.test(text)) return [];
     return text.split(/\s+(?:\/|\||·)\s+|\n+/).map((item) => item.trim()).filter(Boolean);
   }
@@ -1486,7 +1502,7 @@ _PRIVATE_JS = r"""
     if (typeof value === 'string') {
       const text = value.trim();
       if (!text || /^CUSTOM$/i.test(text)) return '';
-      return internalCode(text) ? actionLabel(text) : text;
+      return internalCode(text) ? actionLabel(text) : investorText(text);
     }
     if (Array.isArray(value)) return combineDistinct(...value.map(humanPlan));
     if (typeof value === 'object') {
@@ -1868,7 +1884,7 @@ _PRIVATE_JS = r"""
   function render(payload) {
     const markets = payload.markets || {};
     if (requestedRun && String((markets[requestedMarket] || {}).run_id || '') !== requestedRun) {
-      throw new Error('Telegram 링크의 분석 run과 현재 개인 대시보드 run이 일치하지 않습니다. 최신 알림을 사용하세요.');
+      throw new Error('Telegram 링크의 분석 실행 ID와 현재 투자 대시보드 실행 ID가 일치하지 않습니다. 최신 알림을 사용하세요.');
     }
     tabs.hidden = false;
     tabs.innerHTML = ['kr', 'us'].map((market, index) => `<button type="button" data-target="${market}" aria-pressed="${index === 0}">${market.toUpperCase()}</button>`).join('');
@@ -1884,7 +1900,7 @@ _PRIVATE_JS = r"""
       const health = marketHealth(item, rows);
       const cards = ranked.map((row) => card(row, item, topTickers)).join('');
       const empty = health.empty || '현재 표시할 전략 데이터가 없습니다. 원천 상태와 분석 커버리지를 확인하세요.';
-      return `<section class="market-panel" data-market="${market}"><div class="market-head"><div><p class="eyebrow">${market.toUpperCase()} STRATEGY</p><h2>${market.toUpperCase()} 투자 액션</h2></div><div><span class="health health-neutral">${esc(sourceLabel)}</span><span class="health health-${esc(health.className)}">${esc(health.label)}</span></div></div><div class="source-meta"><span>분석 시작 ${esc(dateTime(item.started_at))}</span><span>분석 run ${esc(item.run_id || '-')}</span><span>${rows.length}개 종목</span></div>${marketOverview(rows, item)}<nav class="strategy-filters" aria-label="종목 유형"><button type="button" data-group-target="TOP" aria-pressed="true">핵심 ${topTickers.size}</button><button type="button" data-group-target="HOLDING" aria-pressed="false">보유 ${counts.HOLDING || 0}</button><button type="button" data-group-target="WATCHLIST" aria-pressed="false">관심 ${counts.WATCHLIST || 0}</button><button type="button" data-group-target="NEW_CANDIDATE" aria-pressed="false">신규 ${counts.NEW_CANDIDATE || 0}</button><button type="button" data-group-target="ALL" aria-pressed="false">전체 ${rows.length}</button></nav><div class="cards">${cards || `<p class="empty">${esc(empty)}</p>`}</div>${integratedReport(item)}${integratedReport(item, 'reference_report')}</section>`;
+      return `<section class="market-panel" data-market="${market}"><div class="market-head"><div><p class="eyebrow">${market.toUpperCase()} STRATEGY</p><h2>${market.toUpperCase()} 투자 액션</h2></div><div><span class="health health-neutral">${esc(sourceLabel)}</span><span class="health health-${esc(health.className)}">${esc(health.label)}</span></div></div><div class="source-meta"><span>분석 시작 ${esc(dateTime(item.started_at))}</span><span>분석 실행 ID ${esc(item.run_id || '-')}</span><span>${rows.length}개 종목</span></div>${marketOverview(rows, item)}<nav class="strategy-filters" aria-label="종목 유형"><button type="button" data-group-target="TOP" aria-pressed="true">핵심 ${topTickers.size}</button><button type="button" data-group-target="HOLDING" aria-pressed="false">보유 ${counts.HOLDING || 0}</button><button type="button" data-group-target="WATCHLIST" aria-pressed="false">관심 ${counts.WATCHLIST || 0}</button><button type="button" data-group-target="NEW_CANDIDATE" aria-pressed="false">신규 ${counts.NEW_CANDIDATE || 0}</button><button type="button" data-group-target="ALL" aria-pressed="false">전체 ${rows.length}</button></nav><div class="cards">${cards || `<p class="empty">${esc(empty)}</p>`}</div>${integratedReport(item)}${integratedReport(item, 'reference_report')}</section>`;
     }).join('');
     const buttons = [...tabs.querySelectorAll('button')];
     const panels = [...root.querySelectorAll('[data-market]')];

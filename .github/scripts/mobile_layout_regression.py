@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import threading
 import time
+import urllib.error
 import urllib.request
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
@@ -257,7 +258,7 @@ async def _probe_viewports(websocket_url: str, page_url: str) -> list[dict[str, 
     return results
 
 
-def _run_probe(page_url: str, profile: Path) -> list[dict[str, Any]]:
+def _run_probe_once(page_url: str, profile: Path) -> list[dict[str, Any]]:
     chrome = _chrome_binary()
     process = subprocess.Popen(
         [
@@ -275,7 +276,7 @@ def _run_probe(page_url: str, profile: Path) -> list[dict[str, Any]]:
         stderr=subprocess.DEVNULL,
     )
     try:
-        port, browser_path = _devtools_endpoint(profile)
+        port, browser_path = _devtools_endpoint(profile, timeout_seconds=30.0)
         with urllib.request.urlopen(f"http://127.0.0.1:{port}/json/list", timeout=5) as response:
             targets = json.loads(response.read().decode("utf-8"))
         page = next((target for target in targets if target.get("type") == "page"), None)
@@ -289,6 +290,27 @@ def _run_probe(page_url: str, profile: Path) -> list[dict[str, Any]]:
         except subprocess.TimeoutExpired:
             process.kill()
             process.wait(timeout=5)
+
+
+def _run_probe(page_url: str, profile: Path) -> list[dict[str, Any]]:
+    """Run the browser probe with one clean-profile startup retry.
+
+    Hosted Windows runners occasionally launch Chrome too slowly to create
+    DevToolsActivePort on the first attempt. A separate profile prevents a
+    half-created first launch from poisoning the retry, while deterministic
+    layout failures still surface after the second attempt.
+    """
+
+    failures: list[str] = []
+    for attempt in range(1, 3):
+        attempt_profile = profile.parent / f"{profile.name}-attempt-{attempt}"
+        try:
+            return _run_probe_once(page_url, attempt_profile)
+        except (OSError, RuntimeError, TimeoutError, urllib.error.URLError) as exc:
+            failures.append(f"attempt {attempt}: {exc}")
+            if attempt < 2:
+                time.sleep(1.0)
+    raise RuntimeError("Chrome mobile layout probe failed after 2 attempts: " + "; ".join(failures))
 
 
 def main() -> int:
