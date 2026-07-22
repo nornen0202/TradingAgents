@@ -520,19 +520,12 @@ class YouTubeDailyTests(unittest.TestCase):
             archive_dir = root / "archive"
             site_dir = root / "site"
             config = _daily_config(archive_dir, site_dir)
-            config = replace(
-                config,
-                channel=replace(
-                    config.channel,
-                    trusted_primary_urls=("https://www.youtube.com/@fixture/videos",),
-                ),
-            )
             refs = tuple(
                 YouTubeVideoReference(
                     f"video00000{i}",
                     f"https://www.youtube.com/watch?v=video00000{i}",
                     f"Video {i}",
-                    "https://www.youtube.com/@fixture/videos",
+                    "https://www.youtube.com/@kpunch/videos",
                     datetime.now(timezone.utc) - timedelta(hours=i),
                 )
                 for i in range(1, 4)
@@ -564,12 +557,12 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertEqual(manifest["max_entries_per_url"], 25)
             self.assertEqual(manifest["parallel_video_execution"]["max_parallel_videos"], 1)
             self.assertEqual(manifest["videos"][0]["channel"], "경제사냥꾼")
-            self.assertEqual(manifest["videos"][0]["source_url"], "https://www.youtube.com/@fixture/videos")
-            self.assertTrue(manifest["videos"][0]["trusted_primary"])
+            self.assertEqual(manifest["videos"][0]["source_url"], "https://www.youtube.com/@kpunch/videos")
             self.assertEqual(
-                manifest["videos"][0]["strategy_trust_status"],
-                "USER_VERIFIED_PRIMARY",
+                manifest["videos"][0]["strategy_source_tier"],
+                "USER_PRIMARY",
             )
+            self.assertEqual(manifest["videos"][0]["strategy_evidence_weight"], "HIGH")
             self.assertIn("hqdefault.jpg", manifest["videos"][0]["thumbnail_url"])
             self.assertTrue(run_manifest.is_file())
             self.assertTrue((first_video_dir / "research_plan.json").is_file())
@@ -578,12 +571,12 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertTrue(site_index.is_file())
             site_html = site_index.read_text(encoding="utf-8")
             self.assertIn("Video", site_html)
-            self.assertIn("출처/채널: 경제사냥꾼 · @fixture / 동영상", site_html)
+            self.assertIn("출처/채널: 경제사냥꾼 · @kpunch / 동영상", site_html)
             self.assertIn("사용자 검증 최우선", site_html)
             self.assertIn("hqdefault.jpg", site_html)
             public_summary = json.loads((first_video_dir / "public_summary.json").read_text(encoding="utf-8"))
-            self.assertEqual(public_summary["source_url"], "https://www.youtube.com/@fixture/videos")
-            self.assertTrue(public_summary["assumed_verified_for_strategy"])
+            self.assertEqual(public_summary["source_url"], "https://www.youtube.com/@kpunch/videos")
+            self.assertEqual(public_summary["strategy_validation_policy"], "USER_ACCEPTED")
             self.assertIn("hqdefault.jpg", public_summary["thumbnail_url"])
 
     def test_runner_processes_videos_in_parallel_when_configured(self):
@@ -1110,13 +1103,6 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertEqual(config.channel.max_videos, 100)
         self.assertEqual(config.channel.max_entries_per_url, 25)
         self.assertEqual(config.channel.max_parallel_videos, 4)
-        self.assertEqual(
-            set(config.channel.trusted_primary_urls),
-            {
-                "https://www.youtube.com/@kpunch/videos",
-                "https://www.youtube.com/@sosumonkey/videos",
-            },
-        )
         self.assertEqual(set(DEFAULT_CHANNEL_URLS), expected_urls)
         self.assertEqual(config.asr.model, "auto")
         self.assertEqual(config.asr.device, "auto")

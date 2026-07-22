@@ -968,7 +968,7 @@ def _youtube_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
     ordered = sorted(
         events.values(),
         key=lambda item: (
-            bool(item.get("trusted_primary")),
+            item.get("strategy_source_tier") == "USER_PRIMARY",
             str(item.get("occurred_at") or ""),
         ),
         reverse=True,
@@ -996,9 +996,10 @@ def _youtube_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
         "events": included,
         "guardrails": {
             "untrusted_content": True,
-            "trusted_primary_override": {
+            "user_primary_override": {
                 "channels": ["@kpunch", "@sosumonkey"],
-                "strategy_status": "USER_VERIFIED_PRIMARY",
+                "strategy_source_tier": "USER_PRIMARY",
+                "strategy_evidence_weight": "HIGH",
                 "preserve_execution_gates": True,
             },
             "may_promote_market_execution": False,
@@ -1020,6 +1021,7 @@ def _youtube_event(item: dict[str, Any], run_dir: Path) -> dict[str, Any]:
     summary = load_json(_safe_artifact(run_dir, item.get("public_summary_path")))
     if not summary:
         summary = {key: item.get(key) for key in ("video_id", "title", "channel", "video_url", "published_at", "status")}
+    strategy_source_tier = _youtube_strategy_source_tier(summary, item)
     compact = {
         "video_id": summary.get("video_id") or item.get("video_id"),
         "title": summary.get("title") or item.get("title"),
@@ -1027,15 +1029,12 @@ def _youtube_event(item: dict[str, Any], run_dir: Path) -> dict[str, Any]:
         "source_url": summary.get("url") or item.get("video_url"),
         "published_at": summary.get("published_at") or item.get("published_at"),
         "status": summary.get("status") or item.get("status"),
-        "strategy_trust_status": summary.get("strategy_trust_status")
-        or item.get("strategy_trust_status"),
-        "trusted_primary": bool(
-            summary.get("trusted_primary") or item.get("trusted_primary")
-        ),
-        "assumed_verified_for_strategy": bool(
-            summary.get("assumed_verified_for_strategy")
-            or item.get("trusted_primary")
-        ),
+        "strategy_source_tier": strategy_source_tier,
+        "strategy_evidence_weight": summary.get("strategy_evidence_weight")
+        or item.get("strategy_evidence_weight")
+        or ("HIGH" if strategy_source_tier == "USER_PRIMARY" else "STANDARD"),
+        "strategy_validation_policy": summary.get("strategy_validation_policy")
+        or ("USER_ACCEPTED" if strategy_source_tier == "USER_PRIMARY" else "STANDARD_REVIEW"),
         "transcript_quality": summary.get("transcript_quality"),
         "claim_status_summary": summary.get("claim_status_summary"),
         "claims": [
@@ -1088,10 +1087,18 @@ def _youtube_event(item: dict[str, Any], run_dir: Path) -> dict[str, Any]:
         "content_sha256": content_sha,
         "occurred_at": compact.get("published_at"),
         "relevance": _youtube_relevance(compact),
-        "trusted_primary": compact["trusted_primary"],
-        "strategy_trust_status": compact["strategy_trust_status"],
+        "strategy_source_tier": compact["strategy_source_tier"],
+        "strategy_evidence_weight": compact["strategy_evidence_weight"],
         "summary": compact,
     }
+
+
+def _youtube_strategy_source_tier(*values: dict[str, Any]) -> str:
+    for value in values:
+        tier = str(value.get("strategy_source_tier") or "").strip().upper()
+        if tier:
+            return tier
+    return "STANDARD"
 
 
 def _prism_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
@@ -1200,10 +1207,10 @@ def _balanced_external_policy() -> dict[str, Any]:
         "supported_evidence_weight": "MEDIUM",
         "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
         "unverified_evidence_weight": "LOW_LABELED",
-        "trusted_primary_channels": ["@kpunch", "@sosumonkey"],
-        "trusted_primary_strategy_status": "USER_VERIFIED_PRIMARY",
-        "trusted_primary_evidence_weight": "HIGH",
-        "trusted_primary_assumed_verified": True,
+        "user_primary_channels": ["@kpunch", "@sosumonkey"],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
         "matching_multi_source_signal_may_raise_thesis_priority": True,
         "conflicting_signal_must_be_visible": True,
         "may_bypass_market_or_portfolio_execution_gate": False,

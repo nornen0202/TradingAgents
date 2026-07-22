@@ -13,7 +13,7 @@
 7. 후보 액션은 packet의 허용 목록만 사용하고, 현재 주문·목표가·손절가를 새로 만들지 않는다.
 8. 출처 URL과 evidence ID가 없는 핵심 주장은 사실로 단정하지 않는다.
 9. ACK는 `prepare`가 만든 정확한 로컬 delivery event를 렌더링했다는 뜻일 뿐 producer source가 신선하거나 Telegram/Pages가 전달됐다는 증거가 아니다.
-10. `balanced_external` 정책으로 supported/partially supported/unverified를 서로 다른 가중치로 사용한다. 단 `trusted_primary=true` 또는 `strategy_trust_status=USER_VERIFIED_PRIMARY`인 @kpunch·@sosumonkey 영상은 사용자가 검증한 최우선 근거로 간주하고 사실검증 상태와 무관하게 전략 가중치 HIGH로 적용한다. 관련 ticker·market·theme와 event key를 명시하고, 후속 시장 종합에서 순위·thesis confidence·기존 위험 한도 안의 크기·리서치 우선순위에 실제 반영할 방향을 제안한다. 시장·계좌 execution gate 우회는 금지한다.
+10. `balanced_external` 정책으로 supported/partially supported/unverified를 서로 다른 가중치로 사용한다. 단 `strategy_source_tier=USER_PRIMARY` 또는 `strategy_evidence_weight=HIGH`인 @kpunch·@sosumonkey 영상은 사용자가 검증한 최우선 근거로 간주하고 사실검증 상태와 무관하게 전략 가중치 HIGH로 적용한다. 관련 ticker·market·theme와 event key를 명시하고, 후속 시장 종합에서 순위·thesis confidence·기존 위험 한도 안의 크기·리서치 우선순위에 실제 반영할 방향을 제안한다. 시장·계좌 execution gate 우회는 금지한다.
 
 ## 출력
 

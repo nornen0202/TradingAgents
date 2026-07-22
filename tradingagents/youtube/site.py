@@ -185,12 +185,9 @@ def _render_feed(manifests: list[dict[str, Any]], settings: YouTubeSiteSettings)
                     "source_label": _source_label_from_url(source_url),
                     "thumbnail_url": thumbnail_url,
                     "status": video.get("status"),
-                    "strategy_trust_status": public_summary.get("strategy_trust_status")
-                    or video.get("strategy_trust_status"),
-                    "trusted_primary": bool(
-                        public_summary.get("trusted_primary")
-                        or video.get("trusted_primary")
-                    ),
+                    "strategy_source_tier": _strategy_source_tier(public_summary, video),
+                    "strategy_evidence_weight": public_summary.get("strategy_evidence_weight")
+                    or video.get("strategy_evidence_weight"),
                     "published_at": video.get("published_at"),
                     "video_url": video.get("video_url"),
                     "report_url": f"runs/{_safe_segment(run_id)}/{_safe_segment(video_id)}.html",
@@ -230,7 +227,7 @@ def _video_card(manifest: Mapping[str, Any], video: Mapping[str, Any]) -> str:
     video_id = _safe_segment(raw_video_id or "video")
     title = str(video.get("title") or video.get("video_id") or "YouTube report")
     status = str(video.get("status") or "unknown")
-    trusted_primary = bool(video.get("trusted_primary"))
+    user_primary = _strategy_source_tier(video) == "USER_PRIMARY"
     published = str(video.get("published_at") or "")
     channel = _first_text(video.get("channel"), video.get("channel_name"))
     source_url = _first_text(video.get("source_url"))
@@ -254,7 +251,7 @@ def _video_card(manifest: Mapping[str, Any], video: Mapping[str, Any]) -> str:
   {thumb}
   <span class="card-body">
     <span class="badge status-{escape(_safe_segment(status))}">{escape(status)}</span>
-    {('<span class="badge trusted-primary">사용자 검증 최우선</span>' if trusted_primary else '')}
+    {('<span class="badge user-primary">사용자 검증 최우선</span>' if user_primary else '')}
     <strong>{escape(title)}</strong>
     <small class="source-line">{escape(source_text)}</small>
     <small>{escape(published)}</small>
@@ -405,9 +402,17 @@ def _public_summary_from_video(video: Mapping[str, Any]) -> dict[str, Any]:
         "thumbnail_url": video.get("thumbnail_url"),
         "published_at": video.get("published_at"),
         "status": video.get("status"),
-        "strategy_trust_status": video.get("strategy_trust_status"),
-        "trusted_primary": bool(video.get("trusted_primary")),
+        "strategy_source_tier": _strategy_source_tier(video),
+        "strategy_evidence_weight": video.get("strategy_evidence_weight"),
     }
+
+
+def _strategy_source_tier(*values: Mapping[str, Any]) -> str:
+    for value in values:
+        tier = str(value.get("strategy_source_tier") or "").strip().upper()
+        if tier:
+            return tier
+    return "STANDARD"
 
 
 def _first_text(*values: Any) -> str:
