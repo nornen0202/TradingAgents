@@ -73,6 +73,22 @@ function Convert-ToUtcDateTime {
     return $null
 }
 
+function Get-RunCoverageUtc {
+    param([object] $Run)
+
+    # A full overlay can run longer than the short duplicate window. For a
+    # completed run, measure recency from its final GitHub update (normally the
+    # completion timestamp), otherwise a run that just finished after 20+
+    # minutes would immediately look stale and could be dispatched again.
+    if (([string] $Run.status).ToLowerInvariant() -eq "completed") {
+        $updatedUtc = Convert-ToUtcDateTime $Run.updatedAt
+        if ($updatedUtc -ne $null) {
+            return $updatedUtc
+        }
+    }
+    return Convert-ToUtcDateTime $Run.createdAt
+}
+
 function Test-RunMatchesProfile {
     param(
         [object] $Run,
@@ -294,7 +310,7 @@ if (-not $Force) {
         --repo $Repo `
         --workflow $Workflow `
         --limit 50 `
-        --json databaseId,event,status,conclusion,createdAt,url,headSha,displayTitle 2>&1
+        --json databaseId,event,status,conclusion,createdAt,updatedAt,url,headSha,displayTitle 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-DispatchLog "recent-run probe failed; attempting dispatch anyway: $runsJson"
     } else {
@@ -337,12 +353,12 @@ if (-not $Force) {
             exit 0
         }
         $recentRuns = @($allRuns | Where-Object {
-            $createdUtc = Convert-ToUtcDateTime $_.createdAt
+            $coverageUtc = Get-RunCoverageUtc -Run $_
             ($_.event -eq "schedule" -or $_.event -eq "workflow_dispatch") -and
-            $createdUtc -ne $null -and
-            $createdUtc -ge $cutoffUtc.UtcDateTime -and
+            $coverageUtc -ne $null -and
+            $coverageUtc -ge $cutoffUtc.UtcDateTime -and
             (Test-RunMatchesModeAndScope -Run $_ -ExpectedRunMode $RunMode)
-        })
+        } | Sort-Object { Get-RunCoverageUtc -Run $_ } -Descending)
         if ($Profile -eq "all") {
             $eligibleProfiles = @($eligibleProfiles | Where-Object {
                 $profileToKeep = $_
@@ -361,7 +377,7 @@ if (-not $Force) {
         }
         if ($eligibleProfiles.Count -eq 0) {
             $latest = $recentRuns | Select-Object -First 1
-            Write-DispatchLog "skip dispatch: recent $Workflow coverage exists for profile=$Profile latest_id=$($latest.databaseId) event=$($latest.event) status=$($latest.status) url=$($latest.url)"
+            Write-DispatchLog "skip dispatch: recent $Workflow coverage exists for profile=$Profile latest_id=$($latest.databaseId) event=$($latest.event) status=$($latest.status) recency=completion_or_creation url=$($latest.url)"
             exit 0
         }
 
