@@ -525,7 +525,7 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     }.items():
         assert f"{code}: '{label}'" in private_js
     assert "internalCode(text) ? '세부 실행 계획 확인' : text" in private_js
-    assert "return internalCode(text) ? actionLabel(text) : text" in private_js
+    assert "return internalCode(text) ? actionLabel(text) : investorText(text)" in private_js
     assert "item.action ? actionLabel(item.action) : ''" in private_js
     assert "item.action_if_triggered ? actionLabel(item.action_if_triggered) : ''" in private_js
     assert "internalCode(item) ? actionLabel(item) : item" in private_js
@@ -735,6 +735,11 @@ def test_mobile_separates_unrelated_work_report_as_past_reference(
     assert "카드의 투자 논지·근거에는 활용했으며" in private_js
     assert "현재 장중 갱신 분석을 사용합니다" in private_js
     assert "카드의 thesis·근거에는 활용했으며" not in private_js
+    assert "function investorText(value)" in private_js
+    assert "[/패킷/g, '분석 자료']" in private_js
+    assert "[/\\bcurrent\\b/gi, '최신']" in private_js
+    assert "분석 실행 ID" in private_js
+    assert "분석 run" not in private_js
     assert "for (const field of ['integrated_report', 'reference_report'])" in private_js
     assert "execution" not in market["reference_report"]["structured_report"]["strategies"][0]
 
