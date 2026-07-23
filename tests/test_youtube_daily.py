@@ -31,6 +31,7 @@ from tradingagents.youtube.config import (
     YouTubeSiteSettings,
     load_youtube_config,
 )
+from tradingagents.youtube.identity import canonical_youtube_channel_name
 from tradingagents.youtube.research import (
     _unwrap_duckduckgo_url,
     collect_research_evidence,
@@ -42,7 +43,12 @@ from tradingagents.youtube.runner import (
     _user_primary_source,
     execute_youtube_run,
 )
-from tradingagents.youtube.site import _strategy_source_tier, _video_priority_key, build_youtube_site
+from tradingagents.youtube.site import (
+    _canonicalize_public_summary,
+    _strategy_source_tier,
+    _video_priority_key,
+    build_youtube_site,
+)
 from tradingagents.youtube.verifier import (
     CONTRADICTED,
     LLM_FAILED,
@@ -95,9 +101,41 @@ class FakeLLM:
 
 
 class YouTubeDailyTests(unittest.TestCase):
+    def test_kpunch_identity_uses_correct_channel_name(self):
+        self.assertEqual(
+            canonical_youtube_channel_name(
+                "jisik-hanbang",
+                channel_id="UCOB62fKRT7b73X7tRxMuN2g",
+                source_url="https://www.youtube.com/@kpunch/videos",
+            ),
+            "박종훈의 지식한방",
+        )
+        self.assertEqual(
+            canonical_youtube_channel_name(
+                "경제사냥꾼",
+                source_url="https://www.youtube.com/@kpunch/videos",
+            ),
+            "박종훈의 지식한방",
+        )
+        self.assertEqual(
+            canonical_youtube_channel_name(
+                "경제사냥꾼",
+                source_url="https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
+            ),
+            "경제사냥꾼",
+        )
+        legacy_public = _canonicalize_public_summary(
+            {
+                "channel": "경제사냥꾼",
+                "source_url": "https://www.youtube.com/@kpunch/videos",
+            },
+            {},
+        )
+        self.assertEqual(legacy_public["channel"], "박종훈의 지식한방")
+
     def test_user_primary_aliases_are_recognized_and_sorted_first(self):
         self.assertTrue(_user_primary_source("https://www.youtube.com/@kpunch/videos"))
-        self.assertTrue(
+        self.assertFalse(
             _user_primary_source(
                 "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos"
             )
@@ -106,8 +144,15 @@ class YouTubeDailyTests(unittest.TestCase):
         legacy_primary = {
             "strategy_source_tier": "STANDARD",
             "channel": "경제사냥꾼",
-            "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
+            "source_url": "https://www.youtube.com/@kpunch/videos",
             "published_at": "2026-07-20T00:00:00+00:00",
+        }
+        economy_hunter = {
+            "strategy_source_tier": "USER_PRIMARY",
+            "strategy_evidence_weight": "HIGH",
+            "channel": "경제사냥꾼",
+            "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
+            "published_at": "2026-07-22T00:00:00+00:00",
         }
         newer_standard = {
             "strategy_source_tier": "STANDARD",
@@ -116,6 +161,10 @@ class YouTubeDailyTests(unittest.TestCase):
         }
 
         self.assertEqual(_strategy_source_tier(legacy_primary), "USER_PRIMARY")
+        self.assertEqual(_strategy_source_tier(economy_hunter), "STANDARD")
+        corrected_economy_hunter = _canonicalize_public_summary(economy_hunter, {})
+        self.assertEqual(corrected_economy_hunter["strategy_source_tier"], "STANDARD")
+        self.assertEqual(corrected_economy_hunter["strategy_evidence_weight"], "STANDARD")
         ordered = sorted([newer_standard, legacy_primary], key=_video_priority_key, reverse=True)
         self.assertIs(ordered[0], legacy_primary)
 
@@ -581,7 +630,7 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertEqual(manifest["source_policy"]["research_pipeline_version"], 4)
             self.assertEqual(manifest["max_entries_per_url"], 25)
             self.assertEqual(manifest["parallel_video_execution"]["max_parallel_videos"], 1)
-            self.assertEqual(manifest["videos"][0]["channel"], "경제사냥꾼")
+            self.assertEqual(manifest["videos"][0]["channel"], "박종훈의 지식한방")
             self.assertEqual(manifest["videos"][0]["source_url"], "https://www.youtube.com/@kpunch/videos")
             self.assertEqual(
                 manifest["videos"][0]["strategy_source_tier"],
@@ -596,10 +645,11 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertTrue(site_index.is_file())
             site_html = site_index.read_text(encoding="utf-8")
             self.assertIn("Video", site_html)
-            self.assertIn("출처/채널: 경제사냥꾼 · @kpunch / 동영상", site_html)
+            self.assertIn("출처/채널: 박종훈의 지식한방 · @kpunch / 동영상", site_html)
             self.assertIn("사용자 검증 최우선", site_html)
             self.assertIn("hqdefault.jpg", site_html)
             public_summary = json.loads((first_video_dir / "public_summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(public_summary["channel"], "박종훈의 지식한방")
             self.assertEqual(public_summary["source_url"], "https://www.youtube.com/@kpunch/videos")
             self.assertEqual(public_summary["strategy_validation_policy"], "USER_ACCEPTED")
             self.assertIn("hqdefault.jpg", public_summary["thumbnail_url"])

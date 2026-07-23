@@ -13,7 +13,7 @@
 7. 생산 커버리지와 응답 전송 범위를 구분한다. `current.universe_coverage`와 `bundle.transmission_scope`가 제공되면 보유·관심종목 기대/누락 수와 전체 ticker 성공/실패 수를 대조한다. 계좌 snapshot을 확인했고 보유·관심 누락과 ticker 실패가 모두 0일 때만 `COMPLETE`다. 필드가 없으면 추정하지 않고 `UNVERIFIED`, 하나라도 누락·실패면 `INCOMPLETE`다.
 8. 보유 종목과 설정/profile 관심종목은 모두 표시한다. 관심목록 밖 scanner/discovery 신규 후보만 최대 10개로 제한한다. `all_holdings_included=false`, `all_required_watchlist_included=false` 또는 보유·관심 누락이 있으면 종목 목록과 함께 최상단에 경고한다.
 9. confidence, 금액, 목표 비중, 가격선은 packet에 있는 값만 사용한다. 없으면 `산출 없음`으로 쓴다.
-10. `supporting_context.policy.profile=balanced_external`을 적용한다. 관련성·신선도·검증 상태가 충분한 YouTube·PRISM은 종목 순위, thesis confidence, 기존 위험 한도 안의 포지션 크기, 리서치 우선순위를 실질적으로 상향 또는 하향한다. 특히 `strategy_source_tier=USER_PRIMARY` 또는 `strategy_evidence_weight=HIGH`인 @kpunch·@sosumonkey 영상은 사용자가 검증한 최우선 근거로 간주해 HIGH 가중치로 thesis에 실제 반영한다. 각 영향을 `source_contributions`에 수치·이유·event key로 남긴다. 단 실제 주문의 시세·계좌·위험 execution gate는 절대 우회하지 않는다.
+10. `supporting_context.policy.profile=balanced_external`을 적용한다. 관련성·신선도·검증 상태가 충분한 YouTube·PRISM은 종목 순위, thesis confidence, 기존 위험 한도 안의 포지션 크기, 리서치 우선순위를 실질적으로 상향 또는 하향한다. 특히 `strategy_source_tier=USER_PRIMARY` 또는 `strategy_evidence_weight=HIGH`인 @kpunch(박종훈의 지식한방)·@sosumonkey(소수몽키) 영상은 사용자가 검증한 최우선 근거로 간주해 HIGH 가중치로 thesis에 실제 반영한다. 각 영향을 `source_contributions`에 수치·이유·event key로 남긴다. 단 실제 주문의 시세·계좌·위험 execution gate는 절대 우회하지 않는다.
 
 ## 모바일 우선 출력
 

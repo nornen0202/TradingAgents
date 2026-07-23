@@ -18,6 +18,8 @@ from urllib.parse import parse_qs, urlparse
 
 import requests
 
+from tradingagents.youtube.identity import canonical_youtube_channel_name
+
 
 YOUTUBE_VIDEO_URL = "https://www.youtube.com/watch?v={video_id}"
 _VIDEO_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
@@ -430,12 +432,18 @@ def _merge_extractor_args(
 
 def _metadata_from_info(info: dict[str, Any], *, video_id: str, fallback_url: str) -> YouTubeVideoMetadata:
     upload_date = _text_or_none(info.get("upload_date"))
+    channel_id = str(info.get("channel_id") or info.get("uploader_id") or "")
+    channel = canonical_youtube_channel_name(
+        info.get("channel") or info.get("uploader") or "",
+        channel_id=channel_id,
+        source_url=info.get("channel_url") or info.get("uploader_url") or "",
+    )
     return YouTubeVideoMetadata(
         video_id=str(info.get("id") or video_id),
         url=str(info.get("webpage_url") or fallback_url),
         title=str(info.get("title") or ""),
-        channel=str(info.get("channel") or info.get("uploader") or ""),
-        channel_id=str(info.get("channel_id") or info.get("uploader_id") or ""),
+        channel=channel,
+        channel_id=channel_id,
         upload_date=upload_date,
         published_at=_published_at_from_info(info, upload_date),
         duration_seconds=_optional_int(info.get("duration")),

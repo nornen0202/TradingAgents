@@ -1233,7 +1233,7 @@ def _private_html(*, desktop: bool = False) -> str:
         <li><strong>ChatGPT Work 종합</strong><span>KR/US별로 모든 근거를 다시 비교해 순위·매수/보유/축소 조건과 무효화 행동을 결정</span></li>
         <li><strong>안전한 공개</strong><span>계좌 식별정보를 제거한 동일 전략을 PC·모바일·JSON으로 게시</span></li>
       </ol>
-      <p class="trusted-note"><strong>우선 신뢰 채널:</strong> @kpunch와 @sosumonkey 영상은 사용자 검증 최우선 근거로 취급하되, 실제 주문 직전 시세·계좌·위험 확인은 별도로 유지합니다.</p>
+      <p class="trusted-note"><strong>우선 신뢰 채널:</strong> @kpunch(박종훈의 지식한방)와 @sosumonkey(소수몽키) 영상은 사용자 검증 최우선 근거로 취급하되, 실제 주문 직전 시세·계좌·위험 확인은 별도로 유지합니다.</p>
     </details>
     <div id="private-status" class="privacy-banner" role="status">통합 전략 데이터를 불러오는 중입니다.</div>
     <nav id="private-tabs" class="market-tabs" aria-label="시장 선택" hidden></nav>

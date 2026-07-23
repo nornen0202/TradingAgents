@@ -11,6 +11,11 @@ from typing import Any, Mapping
 from urllib.parse import unquote, urlparse
 
 from tradingagents.youtube.config import YouTubeSiteSettings
+from tradingagents.youtube.identity import (
+    canonical_youtube_channel_name,
+    is_user_primary_youtube_identity,
+    is_user_primary_youtube_source,
+)
 
 
 def build_youtube_site(
@@ -35,7 +40,10 @@ def build_youtube_site(
         _write_text(run_site_dir / "index.html", _render_run_page(manifest, settings))
         for video in _public_report_videos(manifest):
             final_report = _read_run_artifact(run_dir, video.get("final_report_path"))
-            public_summary = _read_json_run_artifact(run_dir, video.get("public_summary_path"))
+            public_summary = _canonicalize_public_summary(
+                _read_json_run_artifact(run_dir, video.get("public_summary_path")),
+                video,
+            )
             page = _render_video_page(manifest, video, final_report, public_summary, settings)
             _write_text(run_site_dir / f"{_safe_segment(str(video.get('video_id') or 'video'))}.html", page)
             summary_path = run_site_dir / f"{_safe_segment(str(video.get('video_id') or 'video'))}.json"
@@ -169,7 +177,10 @@ def _render_feed(manifests: list[dict[str, Any]], settings: YouTubeSiteSettings)
         run_dir = _manifest_run_dir(manifest)
         for video in _public_report_videos(manifest):
             video_id = str(video.get("video_id") or "")
-            public_summary = _read_json_run_artifact(run_dir, video.get("public_summary_path")) or _public_summary_from_video(video)
+            public_summary = _canonicalize_public_summary(
+                _read_json_run_artifact(run_dir, video.get("public_summary_path")),
+                video,
+            )
             content_sha256 = hashlib.sha256(
                 json.dumps(public_summary, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
             ).hexdigest()
@@ -180,7 +191,7 @@ def _render_feed(manifests: list[dict[str, Any]], settings: YouTubeSiteSettings)
                     "run_id": run_id,
                     "video_id": video_id,
                     "title": video.get("title"),
-                    "channel": video.get("channel"),
+                    "channel": _canonical_channel_from_video(video),
                     "source_url": source_url,
                     "source_label": _source_label_from_url(source_url),
                     "thumbnail_url": thumbnail_url,
@@ -229,7 +240,7 @@ def _video_card(manifest: Mapping[str, Any], video: Mapping[str, Any]) -> str:
     status = str(video.get("status") or "unknown")
     user_primary = _strategy_source_tier(video) == "USER_PRIMARY"
     published = str(video.get("published_at") or "")
-    channel = _first_text(video.get("channel"), video.get("channel_name"))
+    channel = _canonical_channel_from_video(video)
     source_url = _first_text(video.get("source_url"))
     source_label = _source_label_from_url(source_url)
     thumbnail_url = _first_text(video.get("thumbnail_url")) or _default_thumbnail_url(raw_video_id)
@@ -398,7 +409,7 @@ def _public_summary_from_video(video: Mapping[str, Any]) -> dict[str, Any]:
         "video_id": video.get("video_id"),
         "title": video.get("title"),
         "url": video.get("video_url"),
-        "channel": video.get("channel"),
+        "channel": _canonical_channel_from_video(video),
         "source_url": video.get("source_url"),
         "thumbnail_url": video.get("thumbnail_url"),
         "published_at": video.get("published_at"),
@@ -409,6 +420,20 @@ def _public_summary_from_video(video: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _strategy_source_tier(*values: Mapping[str, Any]) -> str:
+    source_urls = [value.get("source_url") for value in values if value.get("source_url")]
+    if source_urls:
+        if any(is_user_primary_youtube_source(source_url) for source_url in source_urls):
+            return "USER_PRIMARY"
+        # Source handles are more authoritative than legacy derived tiers. In
+        # particular, old archives incorrectly promoted @경제사냥꾼 because it
+        # had been treated as an alias of @kpunch.
+        fallback = "STANDARD"
+        for value in values:
+            tier = str(value.get("strategy_source_tier") or "").strip().upper()
+            if tier and tier != "USER_PRIMARY":
+                fallback = tier
+        return fallback
+
     fallback = "STANDARD"
     for value in values:
         tier = str(value.get("strategy_source_tier") or "").strip().upper()
@@ -422,11 +447,38 @@ def _strategy_source_tier(*values: Mapping[str, Any]) -> str:
 
 
 def _is_user_primary_video(value: Mapping[str, Any]) -> bool:
-    source_url = unquote(str(value.get("source_url") or "")).casefold()
-    channel = str(value.get("channel") or value.get("channel_name") or "").strip().casefold()
-    if any(marker in f"{source_url.rstrip('/')}/" for marker in ("/@kpunch/", "/@경제사냥꾼/", "/@sosumonkey/")):
-        return True
-    return channel in {"경제사냥꾼", "소수몽키"}
+    return is_user_primary_youtube_identity(
+        value.get("channel") or value.get("channel_name"),
+        channel_id=value.get("channel_id"),
+        source_url=value.get("source_url"),
+    )
+
+
+def _canonical_channel_from_video(video: Mapping[str, Any]) -> str:
+    return canonical_youtube_channel_name(
+        video.get("channel") or video.get("channel_name"),
+        channel_id=video.get("channel_id"),
+        source_url=video.get("source_url"),
+    )
+
+
+def _canonicalize_public_summary(
+    summary: Mapping[str, Any] | None,
+    video: Mapping[str, Any],
+) -> dict[str, Any]:
+    payload = dict(summary) if isinstance(summary, Mapping) else _public_summary_from_video(video)
+    payload["channel"] = canonical_youtube_channel_name(
+        payload.get("channel") or video.get("channel") or video.get("channel_name"),
+        channel_id=payload.get("channel_id") or video.get("channel_id"),
+        source_url=payload.get("source_url") or video.get("source_url"),
+    )
+    payload["strategy_source_tier"] = _strategy_source_tier(payload, video)
+    if (
+        payload["strategy_source_tier"] != "USER_PRIMARY"
+        and str(payload.get("strategy_evidence_weight") or "").strip().upper() == "HIGH"
+    ):
+        payload["strategy_evidence_weight"] = "STANDARD"
+    return payload
 
 
 def _video_priority_key(video: Mapping[str, Any]) -> tuple[bool, str]:
