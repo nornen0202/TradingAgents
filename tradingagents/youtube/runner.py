@@ -12,7 +12,6 @@ import re
 import shutil
 from time import perf_counter
 from typing import Any, Callable, Iterable
-from urllib.parse import unquote
 from zoneinfo import ZoneInfo
 
 from tradingagents.dataflows.youtube_video import YouTubeVideoBundle, assess_transcript_reliability, fetch_youtube_video
@@ -23,6 +22,7 @@ from tradingagents.youtube.channel import (
     list_channel_video_references,
 )
 from tradingagents.youtube.config import ASRSettings, YouTubeDailyConfig, load_youtube_config, with_youtube_overrides
+from tradingagents.youtube.identity import canonical_youtube_channel_name, is_user_primary_youtube_source
 from tradingagents.youtube.research import public_evidence_summary
 from tradingagents.youtube.site import build_youtube_site
 from tradingagents.youtube.verifier import RESEARCH_PIPELINE_VERSION, VerifiedVideoReport, verify_youtube_bundle
@@ -655,7 +655,11 @@ def _manifest_video_item(
     item = {
         "video_id": metadata.video_id,
         "title": metadata.title,
-        "channel": metadata.channel,
+        "channel": canonical_youtube_channel_name(
+            metadata.channel,
+            channel_id=metadata.channel_id,
+            source_url=source_url,
+        ),
         "source_url": source_url,
         "video_url": metadata.url,
         "published_at": metadata.published_at.isoformat() if metadata.published_at else metadata.upload_date,
@@ -699,7 +703,11 @@ def _manifest_video_item_from_reused_artifacts(
     item = {
         "video_id": summary.get("video_id") or metadata.get("video_id") or reference.video_id,
         "title": summary.get("title") or metadata.get("title") or reference.title,
-        "channel": summary.get("channel") or metadata.get("channel"),
+        "channel": canonical_youtube_channel_name(
+            summary.get("channel") or metadata.get("channel"),
+            channel_id=summary.get("channel_id") or metadata.get("channel_id"),
+            source_url=summary.get("source_url") or metadata.get("source_url") or reference.source_url,
+        ),
         "source_url": summary.get("source_url") or metadata.get("source_url") or reference.source_url,
         "video_url": summary.get("url") or metadata.get("url") or reference.url,
         "published_at": summary.get("published_at")
@@ -901,7 +909,11 @@ def _public_summary(
         "video_id": bundle.metadata.video_id,
         "title": bundle.metadata.title,
         "url": bundle.metadata.url,
-        "channel": bundle.metadata.channel,
+        "channel": canonical_youtube_channel_name(
+            bundle.metadata.channel,
+            channel_id=bundle.metadata.channel_id,
+            source_url=source_url,
+        ),
         "channel_id": bundle.metadata.channel_id,
         "source_url": source_url,
         "thumbnail_url": bundle.metadata.thumbnail_url,
@@ -976,12 +988,7 @@ def _claim_status_summary(claims: list[dict[str, Any]]) -> dict[str, int]:
 
 
 def _user_primary_source(source_url: str | None) -> bool:
-    normalized = unquote(str(source_url or "")).strip().rstrip("/").casefold()
-    normalized_with_slash = f"{normalized}/"
-    return any(
-        marker in normalized_with_slash
-        for marker in ("/@kpunch/", "/@경제사냥꾼/", "/@sosumonkey/")
-    )
+    return is_user_primary_youtube_source(source_url)
 
 
 def _write_text(path: Path, text: str) -> None:
