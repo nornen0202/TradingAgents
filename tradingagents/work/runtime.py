@@ -1085,6 +1085,11 @@ def _validate_report_packet_coverage(
         if _report_ticker_identity(item.get("ticker"))
     }
     for identity in sorted(expected):
+        _validate_report_thesis_direction(
+            strategy_by_identity[identity],
+            packet_by_identity[identity],
+            ticker=identity,
+        )
         _validate_report_execution_gate(
             strategy_by_identity[identity],
             packet_by_identity[identity],
@@ -1339,6 +1344,35 @@ def _report_actions_equal(left: Any, right: Any) -> bool:
     if isinstance(left, str) and isinstance(right, str):
         return " ".join(left.split()).casefold() == " ".join(right.split()).casefold()
     return canonical_json(left) == canonical_json(right)
+
+
+def _validate_report_thesis_direction(
+    strategy: dict[str, Any],
+    packet_row: dict[str, Any],
+    *,
+    ticker: str,
+) -> None:
+    """Keep analysis direction independent from execution-data freshness.
+
+    A blocked or expired execution gate can remove executable actions, but it
+    must not erase an already directional analysis thesis.  Work may still
+    change one actionable stance to another after synthesis; it may only emit
+    RESEARCH when the prepared packet itself was research-only.
+    """
+
+    report_thesis = (
+        strategy.get("thesis") if isinstance(strategy.get("thesis"), dict) else {}
+    )
+    packet_thesis = (
+        packet_row.get("thesis") if isinstance(packet_row.get("thesis"), dict) else {}
+    )
+    report_stance = str(report_thesis.get("stance") or "").strip().upper()
+    packet_stance = str(packet_thesis.get("stance") or "").strip().upper()
+    if packet_stance in _ACTIONABLE_REPORT_STANCES and report_stance == "RESEARCH":
+        raise WorkRuntimeError(
+            f"Structured market strategy {ticker} discards the packet analysis direction "
+            "as RESEARCH; execution freshness must be represented by execution.readiness"
+        )
 
 
 def _validate_report_execution_gate(

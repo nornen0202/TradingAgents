@@ -500,15 +500,20 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "crypto.subtle" not in private_js
     assert "AES-GCM" not in private_js
     assert "private.enc.json" not in private_js
-    assert "분석 시점 결론" in private_js
-    assert "확인할 진입·축소 조건" in private_js
-    assert "조건 충족 후 행동" in private_js
-    assert "무효화·손실 제한 조건" in private_js
-    assert "무효화 시 행동" in private_js
+    assert "분석 시점 전략 방향" in private_js
+    assert "현재 실행 상태" in private_js
+    assert "전략 발동 조건" in private_js
+    assert "발동 조건 충족 시 행동" in private_js
+    assert "악화·손실 제한 조건" in private_js
+    assert "악화 조건 충족 시 행동" in private_js
     assert "humanPlan(thesis.invalidation_action || workExecution.risk_action)" in private_js
     assert "row.execution_condition_ko" in private_js
     assert "action.trigger_conditions" in private_js
-    assert "const analysisAction = (hasWork ? workConclusion : baseConclusion)" in private_js
+    assert "const direction = analysisDirection(row, strategy)" in private_js
+    assert "const candidates = [" in private_js
+    assert "action.portfolio_relative_action" in private_js
+    assert "const selected = candidates.find(isDirectional)" in private_js
+    assert "조건 충족 시 신규·추가 매수 재검토" in private_js
     assert "const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions)" in private_js
     assert "distinctConditions(...values).slice(0, 3)" in private_js
     assert "기본 분석·전체 조건 보기" in private_js
@@ -533,7 +538,7 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "text.split(/\\s+(?:\\/|\\||·)\\s+|\\n+/)" in private_js
     assert "const baseConclusion = action.action_now ? actionLabel(action.action_now)" in private_js
     assert "조건 정보 없음" in private_js
-    assert "행동 계획 정보 없음" in private_js
+    assert "조건 확인 후 전략 방향 재분석" in private_js
     assert "slice(0, Math.min(3, ranked.length))" in private_js
     assert "topActions.slice(0, 3)" in private_js
     assert "(strategy.thesis || {}).stance" in private_js
@@ -666,7 +671,7 @@ def test_validated_work_conclusion_is_authoritative_over_conflicting_base_action
         "stance"
     ] == "REDUCE"
     private_js = (mobile / "private.js").read_text(encoding="utf-8")
-    assert "const analysisAction = (hasWork ? workConclusion : baseConclusion)" in private_js
+    assert "const direction = analysisDirection(row, strategy)" in private_js
     assert "const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions)" in private_js
     assert "기본 분석 결론" in private_js
 
@@ -737,7 +742,11 @@ def test_mobile_separates_unrelated_work_report_as_past_reference(
     assert "카드의 thesis·근거에는 활용했으며" not in private_js
     assert "function investorText(value)" in private_js
     assert "[/패킷/g, '분석 자료']" in private_js
+    assert "[/\\blive\\b/gi, '실시간']" in private_js
+    assert "[/\\bgate\\b/gi, '확인 절차']" in private_js
     assert "[/\\bcurrent\\b/gi, '최신']" in private_js
+    assert ".replace(/새 최신/g, '새로운 최신')" in private_js
+    assert ".replace(/분석 자료과/g, '분석 자료와')" in private_js
     assert "분석 실행 ID" in private_js
     assert "분석 run" not in private_js
     assert "for (const field of ['integrated_report', 'reference_report'])" in private_js

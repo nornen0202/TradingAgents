@@ -48,3 +48,18 @@ def test_mobile_layout_probe_preserves_both_startup_failures(tmp_path: Path, mon
 
     with pytest.raises(RuntimeError, match="attempt 1: failed chrome-profile-attempt-1.*attempt 2"):
         module._run_probe("http://127.0.0.1/", tmp_path / "chrome-profile")
+
+
+def test_mobile_layout_probe_checks_direction_and_separated_actions() -> None:
+    source = Path(".github/scripts/mobile_layout_regression.py").read_text(encoding="utf-8")
+
+    for label in (
+        "분석 시점 전략 방향",
+        "현재 실행 상태",
+        "전략 발동 조건",
+        "발동 조건 충족 시 행동",
+        "악화·손실 제한 조건",
+        "악화 조건 충족 시 행동",
+    ):
+        assert label in source
+    assert "확인할 진입·축소 조건" not in source

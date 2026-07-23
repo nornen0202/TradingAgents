@@ -181,10 +181,14 @@ def _structured_report(prepared: dict, *, ticker_override: list[str] | None = No
     packet_rows = packet.get("body", {}).get("current", {}).get("bundle", {}).get("strategy_table", [])
     supporting_context = packet.get("body", {}).get("supporting_context", {})
     tickers = ticker_override if ticker_override is not None else [row["ticker"] for row in packet_rows]
-    by_ticker = {str(row.get("ticker")): row for row in packet_rows}
+
+    def ticker_identity(value: object) -> str:
+        return str(value or "").upper().removesuffix(".KS").removesuffix(".KQ")
+
+    by_ticker = {ticker_identity(row.get("ticker")): row for row in packet_rows}
     strategies = []
     for index, ticker in enumerate(tickers, start=1):
-        row = by_ticker.get(ticker, {})
+        row = by_ticker.get(ticker_identity(ticker), {})
         thesis = row.get("thesis") if isinstance(row.get("thesis"), dict) else {}
         execution = row.get("execution") if isinstance(row.get("execution"), dict) else {}
         stance = thesis.get("stance") or "RESEARCH"
@@ -1290,6 +1294,12 @@ def test_market_report_schema_rejects_nonconcrete_strategy_fields(tmp_path: Path
                 {"invalidation_action": "없음"}
             ),
             "thesis requires invalidation_action",
+        ),
+        (
+            lambda report: report["strategies"][0]["thesis"].update(
+                {"stance": "RESEARCH"}
+            ),
+            "discards the packet analysis direction as RESEARCH",
         ),
         (
             lambda report: report["strategies"][0]["execution"].update(
