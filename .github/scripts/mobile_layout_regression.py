@@ -239,10 +239,12 @@ async def _probe_viewports(websocket_url: str, page_url: str) -> list[dict[str, 
                             cardCount: cards.length,
                             overflow: overflow.slice(0, 20),
                             headingLineCount,
-                            hasEntryCondition: document.body.innerText.includes('확인할 진입·축소 조건'),
-                            hasTriggeredAction: document.body.innerText.includes('조건 충족 후 행동'),
-                            hasInvalidation: document.body.innerText.includes('무효화·손실 제한 조건'),
-                            hasInvalidationAction: document.body.innerText.includes('무효화 시 행동'),
+                            hasStrategyDirection: document.body.innerText.includes('분석 시점 전략 방향'),
+                            hasExecutionStatus: document.body.innerText.includes('현재 실행 상태'),
+                            hasEntryCondition: document.body.innerText.includes('전략 발동 조건'),
+                            hasTriggeredAction: document.body.innerText.includes('발동 조건 충족 시 행동'),
+                            hasInvalidation: document.body.innerText.includes('악화·손실 제한 조건'),
+                            hasInvalidationAction: document.body.innerText.includes('악화 조건 충족 시 행동'),
                           };
                         })()
                         """,
@@ -342,6 +344,8 @@ def main() -> int:
                 f"{width}px market heading wrapped to {result.get('headingLineCount')} lines"
             )
         for field in (
+            "hasStrategyDirection",
+            "hasExecutionStatus",
             "hasEntryCondition",
             "hasTriggeredAction",
             "hasInvalidation",

@@ -1319,6 +1319,15 @@ dt { color: var(--muted); font-size: .8rem; }
 dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .private-action { margin: 12px 0; padding: 12px; border-radius: 12px; background: rgba(89,214,199,.08); }
 .private-action strong { display: block; margin-bottom: 4px; color: var(--accent); }
+.private-action[data-direction="buy"] { border-left: 4px solid var(--ok); }
+.private-action[data-direction="hold"] { border-left: 4px solid var(--accent); }
+.private-action[data-direction="reduce"], .private-action[data-direction="sell"] { border-left: 4px solid var(--danger); }
+.private-action[data-direction="avoid"], .private-action[data-direction="research"] { border-left: 4px solid var(--warn); }
+.strategy-direction { display: block; font-size: 1.08rem; font-weight: 850; }
+.execution-status { margin: -4px 0 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.025); }
+.execution-status > div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.execution-status strong { color: var(--muted); font-size: .76rem; }
+.execution-status .readiness-note { margin-top: 6px; }
 .readiness-note { margin: 10px 0 0; color: var(--muted); font-size: .8rem; }
 .condition-grid { display: grid; gap: 9px; margin: 12px 0; }
 .condition-block { padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.025); }
@@ -1426,6 +1435,16 @@ _PRIVATE_JS = r"""
     if (!text) return '';
     return actionLabels[text.toUpperCase()] || (internalCode(text) ? '세부 실행 계획 확인' : text);
   };
+  const actionKind = (value) => {
+    const text = String(value || '').trim().toUpperCase();
+    if (/SELL|EXIT|STOP_LOSS|청산|손절|매도/.test(text)) return 'sell';
+    if (/REDUCE|TRIM|TAKE_PROFIT|축소|익절|이익 실현/.test(text)) return 'reduce';
+    if (/BUY|ADD|STARTER|매수|진입/.test(text)) return 'buy';
+    if (/HOLD|WAIT|WATCH|보유|관찰|대기/.test(text)) return 'hold';
+    if (/AVOID|NO_ENTRY|회피|보류/.test(text)) return 'avoid';
+    return 'research';
+  };
+  const isDirectional = (value) => actionKind(value) !== 'research';
   const won = (value) => {
     if (!Number.isFinite(Number(value))) return '-';
     return new Intl.NumberFormat('ko-KR', {style: 'currency', currency: 'KRW', maximumFractionDigits: 0, signDisplay: 'always'}).format(Number(value));
@@ -1451,9 +1470,15 @@ _PRIVATE_JS = r"""
       [/\bconfidence\b/gi, '신뢰도'],
       [/\bsizing\b/gi, '비중 조절'],
       [/\bexecution\b/gi, '실행 판단'],
+      [/\blive\b/gi, '실시간'],
+      [/\bgate\b/gi, '확인 절차'],
       [/\bcurrent\b/gi, '최신'],
     ];
     for (const [source, target] of replacements) text = text.replace(source, target);
+    text = text
+      .replace(/새 최신/g, '새로운 최신')
+      .replace(/분석 자료이(?=\s)/g, '분석 자료가')
+      .replace(/분석 자료과/g, '분석 자료와');
     return text;
   }
   function valueText(value) {
@@ -1701,6 +1726,50 @@ _PRIVATE_JS = r"""
     if (Number.isFinite(rank)) score += Math.max(0, 20 - rank);
     return score;
   }
+  function analysisDirection(row, strategy) {
+    const thesis = strategy.thesis || {};
+    const workExecution = strategy.execution || {};
+    const action = row.portfolio_action || {};
+    const candidates = [
+      thesis.stance,
+      workExecution.action_now,
+      action.action_now,
+      action.portfolio_relative_action,
+      row.strategy_code,
+      row.strategy_ko,
+    ];
+    const selected = candidates.find(isDirectional);
+    return {
+      text: selected ? actionLabel(selected) : '추가 분석 후 방향 결정',
+      kind: actionKind(selected),
+    };
+  }
+  function strategyActivationAction(thesis, workExecution, action, hasWork) {
+    const workTriggered = workExecution.action_if_triggered
+      ? actionLabel(workExecution.action_if_triggered)
+      : '';
+    const sizing = humanPlan(thesis.position_sizing);
+    if (hasWork && workTriggered) return combineDistinct(workTriggered, sizing);
+    if (hasWork && sizing) {
+      const stanceKind = actionKind(thesis.stance);
+      const label = {
+        buy: '조건 충족 시 신규·추가 매수 검토',
+        hold: '조건 충족 시 보유 유지·추가 매수 재검토',
+        reduce: '조건 충족 시 비중 축소',
+        sell: '조건 충족 시 매도·청산',
+        avoid: '신규 매수 보류 유지',
+        research: /신규|시험|매수|진입|비중/.test(sizing)
+          ? '조건 충족 시 신규·추가 매수 재검토'
+          : '조건 확인 후 전략 방향 재분석',
+      }[stanceKind];
+      return combineDistinct(label, sizing);
+    }
+    return combineDistinct(
+      action.action_if_triggered ? actionLabel(action.action_if_triggered) : '',
+      sizingText(action.delta_krw_if_triggered, action.target_weight_if_triggered),
+      humanPlan(action.sell_size_plan),
+    ) || '조건 확인 후 전략 방향 재분석';
+  }
   function card(row, market, topTickers) {
     const strategy = workStrategy(market, row.ticker);
     const hasWork = Object.keys(strategy).length > 0;
@@ -1709,22 +1778,12 @@ _PRIVATE_JS = r"""
     const readiness = liveReadiness(row, market, strategy);
     const action = row.portfolio_action || {};
     const role = normalizeRole(strategy.portfolio_role || row.universe_role, row.is_held === true);
-    const workConclusion = combineDistinct(thesis.stance ? actionLabel(thesis.stance) : '', workExecution.action_now ? actionLabel(workExecution.action_now) : '');
     const baseConclusion = action.action_now ? actionLabel(action.action_now) : valueText(row.strategy_ko);
-    const analysisAction = (hasWork ? workConclusion : baseConclusion) || '결론 정보 없음';
+    const direction = analysisDirection(row, strategy);
     const workEntryConditions = conciseConditions(thesis.entry_conditions);
     const baseEntryConditions = conciseConditions(row.execution_condition_ko, action.trigger_conditions);
     const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions) || '조건 정보 없음';
-    const workTriggeredAction = combineDistinct(
-      workExecution.action_if_triggered ? actionLabel(workExecution.action_if_triggered) : '',
-      humanPlan(thesis.position_sizing),
-    );
-    const baseTriggeredAction = combineDistinct(
-      action.action_if_triggered ? actionLabel(action.action_if_triggered) : '',
-      sizingText(action.delta_krw_if_triggered, action.target_weight_if_triggered),
-      humanPlan(action.sell_size_plan),
-    );
-    const triggeredAction = (hasWork ? workTriggeredAction : baseTriggeredAction) || '행동 계획 정보 없음';
+    const triggeredAction = strategyActivationAction(thesis, workExecution, action, hasWork);
     const workInvalidation = conciseConditions(thesis.invalidation_conditions);
     const baseInvalidation = conciseConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
     const invalidation = (hasWork ? workInvalidation : baseInvalidation) || '무효화 조건 정보 없음';
@@ -1754,13 +1813,14 @@ _PRIVATE_JS = r"""
     return `<article class="action-card" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
       <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}</span></div>
-      <div class="private-action"><strong>분석 시점 결론</strong>${esc(analysisAction)}<p class="readiness-note">${esc(readiness.note)}</p></div>
+      <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
+      <div class="execution-status"><div><strong>현재 실행 상태</strong><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div><p class="readiness-note">${esc(readiness.note)}</p></div>
       ${signalStrip(row, confidence)}
       <div class="condition-grid">
-        <div class="condition-block"><strong>확인할 진입·축소 조건</strong><p>${esc(entryCondition)}</p></div>
-        <div class="condition-block"><strong>조건 충족 후 행동</strong><p>${esc(triggeredAction)}</p></div>
-        <div class="condition-block risk"><strong>무효화·손실 제한 조건</strong><p>${esc(invalidation)}</p></div>
-        <div class="condition-block risk"><strong>무효화 시 행동</strong><p>${esc(riskAction)}</p></div>
+        <div class="condition-block"><strong>전략 발동 조건</strong><p>${esc(entryCondition)}</p></div>
+        <div class="condition-block"><strong>발동 조건 충족 시 행동</strong><p>${esc(triggeredAction)}</p></div>
+        <div class="condition-block risk"><strong>악화·손실 제한 조건</strong><p>${esc(invalidation)}</p></div>
+        <div class="condition-block risk"><strong>악화 조건 충족 시 행동</strong><p>${esc(riskAction)}</p></div>
       </div>
       <dl>
         <div><dt>VWAP</dt><dd>${esc(row.vwap_position_ko || '-')}</dd></div>
