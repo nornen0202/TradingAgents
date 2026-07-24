@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -45,6 +46,7 @@ def _llm_settings() -> LLMSettings:
         codex_preflight_mode="workflow_once",
         synthesis_model="gpt-5.6-sol",
         codex_synthesis_reasoning_effort="high",
+        codex_synthesis_request_timeout=900.0,
     )
 
 
@@ -236,7 +238,7 @@ def test_synthesis_client_receives_quality_first_model_and_effort() -> None:
                 "codex_summary": "none",
                 "codex_personality": "none",
                 "codex_workspace_dir": None,
-                "codex_request_timeout": 30.0,
+                "codex_request_timeout": 900.0,
                 "codex_max_retries": 1,
                 "codex_cleanup_threads": True,
                 "codex_preflight_mode": "workflow_once",
@@ -244,6 +246,28 @@ def test_synthesis_client_receives_quality_first_model_and_effort() -> None:
             },
         )
     ]
+
+
+def test_synthesis_client_uses_isolated_workspace() -> None:
+    calls: list[dict] = []
+
+    def fake_create_llm_client(*, provider: str, model: str, **kwargs):
+        calls.append(kwargs)
+        return SimpleNamespace(get_llm=lambda: object())
+
+    settings = replace(
+        _llm_settings(),
+        codex_workspace_dir="C:/runner/work/youtube",
+    )
+    with patch(
+        "tradingagents.youtube.synthesis.create_llm_client",
+        side_effect=fake_create_llm_client,
+    ):
+        assert _create_synthesis_llm(settings) is not None
+
+    assert calls[0]["codex_workspace_dir"].replace("\\", "/").endswith(
+        "/youtube/youtube-synthesis"
+    )
 
 
 def test_site_publishes_synthesis_first_for_pc_and_mobile(tmp_path: Path) -> None:

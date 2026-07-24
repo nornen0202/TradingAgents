@@ -21,6 +21,7 @@ def test_youtube_config_routes_stages_across_gpt_5_6_family():
     assert settings.codex_deep_reasoning_effort == "medium"
     assert settings.codex_output_reasoning_effort == "low"
     assert settings.codex_synthesis_reasoning_effort == "high"
+    assert settings.codex_synthesis_request_timeout == 900.0
 
 
 def test_youtube_config_accepts_workflow_resolved_role_models(monkeypatch):

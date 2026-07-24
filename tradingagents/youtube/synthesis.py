@@ -164,6 +164,10 @@ def _create_synthesis_llm(llm_settings: LLMSettings) -> Any | None:
         return None
     kwargs: dict[str, Any] = {}
     if provider == "codex":
+        synthesis_timeout = (
+            llm_settings.codex_synthesis_request_timeout
+            or max(600.0, llm_settings.codex_request_timeout)
+        )
         kwargs = {
             "codex_binary": llm_settings.codex_binary,
             "codex_reasoning_effort": (
@@ -173,14 +177,23 @@ def _create_synthesis_llm(llm_settings: LLMSettings) -> Any | None:
             ),
             "codex_summary": llm_settings.codex_summary,
             "codex_personality": llm_settings.codex_personality,
-            "codex_workspace_dir": llm_settings.codex_workspace_dir,
-            "codex_request_timeout": llm_settings.codex_request_timeout,
+            "codex_workspace_dir": _synthesis_workspace_dir(
+                llm_settings.codex_workspace_dir
+            ),
+            "codex_request_timeout": synthesis_timeout,
             "codex_max_retries": llm_settings.codex_max_retries,
             "codex_cleanup_threads": llm_settings.codex_cleanup_threads,
             "codex_preflight_mode": llm_settings.codex_preflight_mode,
             "model_role": "youtube_synthesis",
         }
     return create_llm_client(provider=provider, model=model, **kwargs).get_llm()
+
+
+def _synthesis_workspace_dir(workspace_dir: str | None) -> str | None:
+    workspace = str(workspace_dir or "").strip()
+    if not workspace:
+        return None
+    return str(Path(workspace) / "youtube-synthesis")
 
 
 def _source_payloads(

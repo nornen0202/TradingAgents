@@ -52,6 +52,7 @@ class LLMSettings:
     codex_output_reasoning_effort: str | None = None
     synthesis_model: str | None = None
     codex_synthesis_reasoning_effort: str | None = None
+    codex_synthesis_request_timeout: float | None = None
 
 
 @dataclass(frozen=True)
@@ -245,6 +246,14 @@ def load_youtube_config(
                 os.getenv("TRADINGAGENTS_YOUTUBE_SYNTHESIS_REASONING_EFFORT"),
                 llm_raw.get("codex_synthesis_reasoning_effort"),
                 default="high",
+            ),
+            codex_synthesis_request_timeout=max(
+                60.0,
+                float(
+                    os.getenv("TRADINGAGENTS_YOUTUBE_SYNTHESIS_REQUEST_TIMEOUT")
+                    or llm_raw.get("codex_synthesis_request_timeout")
+                    or 900.0
+                ),
             ),
         ),
         verification=VerificationSettings(
