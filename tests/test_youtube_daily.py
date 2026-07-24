@@ -25,6 +25,7 @@ from tradingagents.youtube.config import (
     ChannelSettings,
     DEFAULT_CHANNEL_URLS,
     LLMSettings,
+    SynthesisSettings,
     StorageSettings,
     VerificationSettings,
     YouTubeDailyConfig,
@@ -49,6 +50,7 @@ from tradingagents.youtube.site import (
     _video_priority_key,
     build_youtube_site,
 )
+from tradingagents.youtube.synthesis import YouTubeSynthesisReport
 from tradingagents.youtube.verifier import (
     CONTRADICTED,
     LLM_FAILED,
@@ -654,6 +656,71 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertEqual(public_summary["strategy_validation_policy"], "USER_ACCEPTED")
             self.assertIn("hqdefault.jpg", public_summary["thumbnail_url"])
 
+    def test_runner_archives_and_publishes_required_cross_video_synthesis(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = _daily_config(root / "archive", root / "site")
+            config = replace(
+                config,
+                synthesis=SynthesisSettings(enabled=True, strict=True),
+            )
+            video_id = "video000001"
+            ref = YouTubeVideoReference(
+                video_id,
+                f"https://www.youtube.com/watch?v={video_id}",
+                "Video 1",
+                "https://www.youtube.com/@kpunch/videos",
+                datetime.now(timezone.utc) - timedelta(hours=1),
+            )
+
+            manifest = execute_youtube_run(
+                config,
+                reference_lister=lambda _urls, _limit: (ref,),
+                video_fetcher=lambda url: _fake_bundle(url[-11:]),
+                bundle_verifier=lambda bundle, _draft, _generated_at: VerifiedVideoReport(
+                    status=VERIFIED,
+                    final_report_markdown=f"# Final {bundle.metadata.video_id}\n",
+                    verification={
+                        "status": VERIFIED,
+                        "llm_status": "success",
+                        "generated_at": datetime.now(timezone.utc).isoformat(),
+                        "entity_results": [],
+                        "source_policy": {"raw_transcript_published": False},
+                    },
+                ),
+                synthesis_builder=lambda **_kwargs: YouTubeSynthesisReport(
+                    status="success",
+                    structured_report={
+                        "version": 1,
+                        "title": "YouTube 종합 투자 인사이트",
+                        "as_of": "2026-07-25T10:00:00+09:00",
+                        "status": "success",
+                        "executive_summary": "조건부 종합 판단입니다.",
+                        "source_video_ids": [video_id],
+                        "source_video_count": 1,
+                    },
+                    report_markdown=(
+                        "# YouTube 종합 투자 인사이트\n\n"
+                        "조건부 종합 판단입니다.\n"
+                    ),
+                    receipt={
+                        "model": "gpt-5.6-sol",
+                        "reasoning_effort": "high",
+                    },
+                ),
+            )
+
+            run_dir = next((root / "archive").glob("runs/*/youtube_*"))
+            self.assertEqual(manifest["version"], 2)
+            self.assertEqual(manifest["synthesis"]["status"], "success")
+            self.assertTrue((run_dir / "synthesis" / "report.md").is_file())
+            self.assertTrue((run_dir / "synthesis" / "report.json").is_file())
+            self.assertTrue((run_dir / "synthesis" / "receipt.json").is_file())
+            self.assertTrue((root / "site" / "youtube" / "insights.html").is_file())
+            self.assertTrue(
+                (root / "site" / "mobile" / "youtube-insights.html").is_file()
+            )
+
     def test_runner_processes_videos_in_parallel_when_configured(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -902,6 +969,10 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertEqual((site_dir / "index.html").read_text(encoding="utf-8"), "ROOT_SITE")
             self.assertNotIn("RAW_TRANSCRIPT_FULL_SHOULD_NOT_PUBLISH", public_text)
             self.assertTrue((site_dir / "youtube" / "feed.json").is_file())
+            self.assertTrue((site_dir / "youtube" / "insights.html").is_file())
+            self.assertTrue(
+                (site_dir / "mobile" / "youtube-insights.html").is_file()
+            )
             self.assertIn("출처/채널: Fixture channel", youtube_index)
             self.assertIn("https://i.ytimg.com/vi/u2BEOgr8ze8/hqdefault.jpg", youtube_index)
             self.assertEqual(feed["items"][0]["thumbnail_url"], "https://i.ytimg.com/vi/u2BEOgr8ze8/hqdefault.jpg")
@@ -1101,6 +1172,12 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("extended_transcript_chars_for_llm = 48000", config_text)
         self.assertIn("evidence_relevance_gate_enabled = true", config_text)
         self.assertIn("min_evidence_relevance_score = 0.12", config_text)
+        self.assertIn('synthesis_model = "gpt-5.6-sol"', config_text)
+        self.assertIn('codex_synthesis_reasoning_effort = "high"', config_text)
+        self.assertIn("[synthesis]", config_text)
+        self.assertIn("enabled = true", config_text)
+        self.assertIn("max_videos = 100", config_text)
+        self.assertIn("max_input_chars = 360000", config_text)
         self.assertIn("YOUTUBE_COOKIES_FILE", workflow)
         self.assertIn("YOUTUBE_PROXY", workflow)
         self.assertIn("YOUTUBE_VISITOR_DATA", workflow)

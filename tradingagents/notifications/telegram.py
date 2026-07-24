@@ -1028,10 +1028,16 @@ def compose_notification(
             if surface in represented:
                 continue
             public_url, mobile_url = _surface_urls(base, surface)
+            if surface == "youtube":
+                public_label = "YouTube 종합 인사이트"
+                mobile_label = "YouTube 모바일 인사이트"
+            else:
+                public_label = f"{surface.upper()} 공개 리포트"
+                mobile_label = f"{surface.upper()} 모바일"
             buttons.append(
                 [
-                    {"text": f"{surface.upper()} 공개 리포트", "url": public_url},
-                    {"text": f"{surface.upper()} 모바일", "url": mobile_url},
+                    {"text": public_label, "url": public_url},
+                    {"text": mobile_label, "url": mobile_url},
                 ]
             )
             if surface in {"kr", "us"}:
@@ -1065,7 +1071,10 @@ def compose_notification(
 def _surface_urls(base: str, surface: str) -> tuple[str, str]:
     key = str(surface).lower()
     if key == "youtube":
-        return f"{base}/youtube/", f"{base}/youtube/"
+        return (
+            f"{base}/youtube/insights.html",
+            f"{base}/mobile/youtube-insights.html",
+        )
     if key == "prism":
         return f"{base}/prism-telegram/", f"{base}/prism-telegram/"
     return f"{base}/", f"{base}/mobile/?market={urllib.parse.quote(key)}"

@@ -14,6 +14,7 @@ from tradingagents.scheduled.mobile_site import (
     build_mobile_site,
     sanitize_public_decision_bundle,
     _load_latest_work_report,
+    _normalize_private_action_semantics,
     _private_market_payload,
     _public_quality,
     _strip_strategy_identifiers,
@@ -501,7 +502,9 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "AES-GCM" not in private_js
     assert "private.enc.json" not in private_js
     assert "분석 시점 전략 방향" in private_js
-    assert "현재 실행 상태" in private_js
+    assert "현재 실행 상태·행동" in private_js
+    assert "현재 주문 없음 · 기존 보유 유지" in private_js
+    assert "계좌 운용 참고 · 현재 매도 지시와 별개" in private_js
     assert "전략 발동 조건" in private_js
     assert "발동 조건 충족 시 행동" in private_js
     assert "악화·손실 제한 조건" in private_js
@@ -510,9 +513,14 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "row.execution_condition_ko" in private_js
     assert "action.trigger_conditions" in private_js
     assert "const direction = analysisDirection(row, strategy)" in private_js
-    assert "const candidates = [" in private_js
+    assert "const workCandidates = [" in private_js
+    assert "const rowCandidates = [" in private_js
     assert "action.portfolio_relative_action" in private_js
-    assert "const selected = candidates.find(isDirectional)" in private_js
+    assert "weakRowConclusion" in private_js
+    assert "const selected = rowSelected || fallbackCandidates.find(isDirectional)" in private_js
+    assert "조건 확인 후 추가매수 검토" in private_js
+    assert "조건 확인 후 분할매수 검토" in private_js
+    assert "조건 확인 후 일부 축소 검토" in private_js
     assert "조건 충족 시 신규·추가 매수 재검토" in private_js
     assert "const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions)" in private_js
     assert "distinctConditions(...values).slice(0, 3)" in private_js
@@ -523,7 +531,7 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
         "NONE": "추가 행동 없음",
         "ADD_IF_TRIGGERED": "조건 충족 시 추가 매수",
         "STARTER_IF_TRIGGERED": "조건 충족 시 신규 분할매수",
-        "TRIM_TO_FUND": "강한 후보로 자금 이동을 위한 일부 축소",
+        "TRIM_TO_FUND": "현금이 꼭 필요할 때 자금 마련 후보",
         "PARTIAL_20": "20% 분할 매도",
         "PARTIAL_35": "35% 분할 매도",
         "FULL_EXIT": "전량 정리",
@@ -536,7 +544,9 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "internalCode(item) ? actionLabel(item) : item" in private_js
     assert "sizingText(action.delta_krw_if_triggered, action.target_weight_if_triggered)" in private_js
     assert "text.split(/\\s+(?:\\/|\\||·)\\s+|\\n+/)" in private_js
-    assert "const baseConclusion = action.action_now ? actionLabel(action.action_now)" in private_js
+    assert "const baseConclusion = valueText(row.strategy_ko)" in private_js
+    assert private_js.index("row.strategy_code,") < private_js.index("action.action_now,", private_js.index("function analysisDirection"))
+    assert "현재 매도 지시가 아닙니다" in private_js
     assert "조건 정보 없음" in private_js
     assert "조건 확인 후 전략 방향 재분석" in private_js
     assert "slice(0, Math.min(3, ranked.length))" in private_js
@@ -632,6 +642,36 @@ def test_expired_machine_state_is_normalized_out_of_every_mobile_artifact(
         ]
         == "RECHECK_REQUIRED_or_degraded_data"
     )
+
+
+def test_legacy_relative_trim_is_not_exposed_as_current_sell_action() -> None:
+    normalized = _normalize_private_action_semantics(
+        {
+            "action_now": "TRIM_TO_FUND",
+            "portfolio_relative_action": "TRIM_TO_FUND",
+            "delta_krw_now": 0,
+            "sell_intent": "NONE",
+            "target_weight_now": "31.58",
+            "relative_action_reason_codes": ["CONCENTRATION"],
+        }
+    )
+
+    assert normalized["action_now"] == "HOLD"
+    assert normalized["portfolio_relative_action"] == "TRIM_TO_FUND"
+
+
+def test_explicit_funded_trim_remains_a_current_sell_action() -> None:
+    normalized = _normalize_private_action_semantics(
+        {
+            "action_now": "TRIM_TO_FUND",
+            "portfolio_relative_action": "TRIM_TO_FUND",
+            "delta_krw_now": -1_000_000,
+            "sell_intent": "TRIM_TO_FUND",
+            "target_weight_now": "not-a-number",
+        }
+    )
+
+    assert normalized["action_now"] == "TRIM_TO_FUND"
 
 
 def test_validated_work_conclusion_is_authoritative_over_conflicting_base_action(

@@ -118,6 +118,8 @@ docker compose --profile ollama run --rm tradingagents-ollama
 
 스케줄 분석은 `writer_model=gpt-5.6-luna`, `judge_model=gpt-5.6-sol`을 추가로 분리합니다. 기본 reasoning effort는 quick/output/writer=`low`, deep/judge=`medium`입니다.
 
+YouTube 일일 파이프라인은 영상별 추출·검증·작성 뒤, 모든 공개 요약과 검증 리포트를 `gpt-5.6-sol`의 `high` reasoning으로 다시 교차 종합합니다. 종합 단계는 영상 간 공통점·상충점, 시장 환경, 종목별 조건부 행동과 무효화 조건을 구조화하며 YouTube 원문을 실시간 주문 지시로 승격하지 않습니다. 최신 결과는 PC `/youtube/insights.html`, 모바일 `/mobile/youtube-insights.html`에 게시되고 YouTube 완료 텔레그램 알림의 기본 링크로 제공됩니다.
+
 예시:
 
 ```python

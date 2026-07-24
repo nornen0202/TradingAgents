@@ -474,11 +474,13 @@ jobs:
               handle.write(f"TRADINGAGENTS_YOUTUBE_DEEP_MODEL={judge_result.resolved_model}\n")
               handle.write(f"TRADINGAGENTS_YOUTUBE_QUICK_MODEL={quick_result.resolved_model}\n")
               handle.write(f"TRADINGAGENTS_YOUTUBE_OUTPUT_MODEL={writer_result.resolved_model}\n")
+              handle.write(f"TRADINGAGENTS_YOUTUBE_SYNTHESIS_MODEL={judge_result.resolved_model}\n")
 
           print("Codex account:", judge_result.account)
           print("YouTube judge model:", judge_result.resolved_model)
           print("YouTube extraction/research model:", quick_result.resolved_model)
           print("YouTube writer model:", writer_result.resolved_model)
+          print("YouTube cross-video synthesis model:", judge_result.resolved_model)
           for role, result in (
               ("judge", judge_result),
               ("extraction/research", quick_result),

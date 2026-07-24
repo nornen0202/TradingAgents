@@ -143,7 +143,11 @@ def build_recommendation(
             profile=profile,
         )
         action_now = _normalize_now_action(candidate, delta_now)
-        action_now = _relative_action_now(candidate, action_now)
+        action_now = _relative_action_now(
+            candidate,
+            action_now,
+            delta_now=delta_now,
+        )
         actions.append(
             PortfolioAction(
                 canonical_ticker=candidate.instrument.canonical_ticker,
@@ -776,9 +780,30 @@ def _normalize_now_action(candidate: PortfolioCandidate, delta_now: int) -> str:
     return candidate.suggested_action_now
 
 
-def _relative_action_now(candidate: PortfolioCandidate, action_now: str) -> str:
+def _relative_action_now(
+    candidate: PortfolioCandidate,
+    action_now: str,
+    *,
+    delta_now: int,
+) -> str:
+    """Keep portfolio-relative funding candidates out of the current action.
+
+    ``portfolio_relative_action`` describes how a holding compares with other
+    candidates.  It is not an executable sell instruction unless the allocation
+    also produced a negative current delta and an explicit sell intent.  Keeping
+    this distinction prevents concentration/funding annotations from replacing
+    HOLD or conditional-buy strategies with a false immediate trim.
+    """
+
     relative_action = str(candidate.portfolio_relative_action or "").upper()
-    if action_now == "HOLD" and relative_action in {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}:
+    sell_intent = str(candidate.sell_intent or "").upper()
+    if (
+        action_now == "HOLD"
+        and delta_now < 0
+        and sell_intent == relative_action
+        and relative_action
+        in {"TRIM_TO_FUND", "REDUCE_RISK", "TAKE_PROFIT", "STOP_LOSS", "EXIT"}
+    ):
         return relative_action
     return action_now
 

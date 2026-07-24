@@ -18,6 +18,12 @@
 
 YouTube는 시장 포트폴리오 파이프라인에 직접 연결되지 않았고 PRISM은 낮은 advisory 보정에만 쓰였다. 시장 Work 패킷도 관련도와 무관한 소수의 최신 이벤트만 잘라 넣었다.
 
+## YouTube 교차 영상 종합
+
+영상별 파이프라인은 `gpt-5.6-terra/low`로 추출·리서치, `gpt-5.6-sol/medium`으로 주장 검증, `gpt-5.6-luna/low`로 독자용 리포트 작성을 수행한다. 그 다음 일일 실행에서 공개 가능한 영상 요약과 검증 리포트를 모두 모아 `gpt-5.6-sol/high`으로 한 번 더 교차 종합한다. 긴 입력에서 공통점·상충점·종목 조건·무효화 조건을 함께 판단해야 하므로 이 마지막 단계는 속도보다 판단 품질을 우선한다.
+
+종합 산출물은 `synthesis/report.md`, `synthesis/report.json`, `synthesis/receipt.json`으로 보존한다. PC는 `/youtube/insights.html`, 모바일은 `/mobile/youtube-insights.html`을 사용하며 YouTube 실행 완료 텔레그램 알림도 이 두 페이지로 연결한다. 원시 자막은 종합 입력이나 공개 사이트에 포함하지 않는다. 조건과 무효화가 없는 매수·축소·매도 제안은 게시 단계에서 `WATCH`로 보수적으로 강등한다.
+
 ## 정본 흐름
 
 ```mermaid

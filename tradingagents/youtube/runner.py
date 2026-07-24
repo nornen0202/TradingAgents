@@ -25,6 +25,10 @@ from tradingagents.youtube.config import ASRSettings, YouTubeDailyConfig, load_y
 from tradingagents.youtube.identity import canonical_youtube_channel_name, is_user_primary_youtube_source
 from tradingagents.youtube.research import public_evidence_summary
 from tradingagents.youtube.site import build_youtube_site
+from tradingagents.youtube.synthesis import (
+    YouTubeSynthesisReport,
+    synthesize_youtube_run,
+)
 from tradingagents.youtube.verifier import RESEARCH_PIPELINE_VERSION, VerifiedVideoReport, verify_youtube_bundle
 from tradingagents.youtube_report import build_youtube_video_report
 
@@ -32,6 +36,7 @@ from tradingagents.youtube_report import build_youtube_video_report
 ReferenceLister = Callable[[Iterable[str], int], tuple[YouTubeVideoReference, ...]]
 VideoFetcher = Callable[..., YouTubeVideoBundle]
 BundleVerifier = Callable[[YouTubeVideoBundle, str, datetime], VerifiedVideoReport]
+SynthesisBuilder = Callable[..., YouTubeSynthesisReport]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -91,6 +96,7 @@ def execute_youtube_run(
     reference_lister: ReferenceLister | None = None,
     video_fetcher: VideoFetcher | None = None,
     bundle_verifier: BundleVerifier | None = None,
+    synthesis_builder: SynthesisBuilder | None = None,
 ) -> dict[str, Any]:
     _apply_asr_environment(config.asr)
     tz = ZoneInfo(config.channel.timezone)
@@ -146,10 +152,53 @@ def execute_youtube_run(
     skipped_no_transcript = sum(int(result.get("skipped_no_transcript", 0)) for result in video_results.values())
 
     successful_count = sum(1 for item in video_summaries if item.get("status") not in {"failed"})
+    synthesis = (synthesis_builder or synthesize_youtube_run)(
+        run_id=run_id,
+        run_dir=run_dir,
+        videos=video_summaries,
+        llm_settings=config.llm,
+        synthesis_settings=config.synthesis,
+        generated_at=datetime.now(tz),
+    )
+    synthesis_dir = run_dir / "synthesis"
+    synthesis_manifest: dict[str, Any] = {
+        "status": synthesis.status,
+        "model_receipt": synthesis.receipt,
+        "source_video_count": int(
+            synthesis.structured_report.get("source_video_count") or 0
+        ),
+    }
+    if synthesis.report_markdown:
+        synthesis_report_path = synthesis_dir / "report.md"
+        synthesis_structured_path = synthesis_dir / "report.json"
+        synthesis_receipt_path = synthesis_dir / "receipt.json"
+        _write_text(synthesis_report_path, synthesis.report_markdown)
+        _write_json(synthesis_structured_path, synthesis.structured_report)
+        _write_json(synthesis_receipt_path, synthesis.receipt)
+        synthesis_manifest.update(
+            {
+                "report_path": _relative_artifact_path(
+                    synthesis_report_path, run_dir
+                ),
+                "structured_report_path": _relative_artifact_path(
+                    synthesis_structured_path, run_dir
+                ),
+                "receipt_path": _relative_artifact_path(
+                    synthesis_receipt_path, run_dir
+                ),
+            }
+        )
+    if synthesis.error:
+        synthesis_manifest["error"] = _short_text(synthesis.error, 500)
+    synthesis_failed = synthesis.status == "llm_failed"
     manifest = {
-        "version": 1,
+        "version": 2,
         "run_id": run_id,
-        "status": "success" if failed_count == 0 else "partial_failure",
+        "status": (
+            "success"
+            if failed_count == 0 and not synthesis_failed
+            else "partial_failure"
+        ),
         "channel_name": config.channel.name,
         "channel_urls": list(config.channel.urls),
         "timezone": config.channel.timezone,
@@ -178,11 +227,18 @@ def execute_youtube_run(
             "max_parallel_videos": max(1, int(config.channel.max_parallel_videos or 1)),
         },
         "videos": video_summaries,
+        "synthesis": synthesis_manifest,
         "source_policy": {
             "raw_transcript_archived": False,
             "raw_transcript_published": False,
             "research_pipeline_version": RESEARCH_PIPELINE_VERSION,
-            "public_artifacts": ["html_report", "public_summary_json", "evidence_excerpts"],
+            "public_artifacts": [
+                "html_report",
+                "public_summary_json",
+                "evidence_excerpts",
+                "youtube_synthesis_markdown",
+                "youtube_synthesis_json",
+            ],
             "user_primary_strategy_policy": "HIGH_EVIDENCE_WEIGHT",
             "user_primary_channels": ["@kpunch", "@sosumonkey"],
         },
@@ -191,6 +247,12 @@ def execute_youtube_run(
     _write_json(config.storage.archive_dir / "latest-youtube-run.json", manifest)
     if publish:
         build_youtube_site(config.storage.archive_dir, config.storage.site_dir, config.site)
+    if synthesis_failed and config.synthesis.strict:
+        raise RuntimeError(
+            "YouTube per-video verification completed, but the required "
+            f"{synthesis.receipt.get('model') or 'Codex'} cross-video synthesis failed: "
+            f"{synthesis.error or 'invalid structured response'}"
+        )
     return manifest
 
 
