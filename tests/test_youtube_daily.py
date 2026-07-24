@@ -927,6 +927,118 @@ class YouTubeDailyTests(unittest.TestCase):
                 "members_only",
             )
 
+    def test_runner_skips_youtube_bot_challenge_without_counting_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_dir = root / "archive"
+            config = _daily_config(archive_dir, root / "site")
+            challenged_id = "botcheck001"
+            public_id = "public00001"
+            refs = (
+                YouTubeVideoReference(
+                    challenged_id,
+                    f"https://www.youtube.com/watch?v={challenged_id}",
+                    "Temporarily challenged",
+                    "fixture",
+                    datetime.now(timezone.utc) - timedelta(hours=1),
+                ),
+                YouTubeVideoReference(
+                    public_id,
+                    f"https://www.youtube.com/watch?v={public_id}",
+                    "Public video",
+                    "fixture",
+                    datetime.now(timezone.utc) - timedelta(hours=2),
+                ),
+            )
+
+            def fetcher(url: str, *, fetch_transcript: bool = True):
+                video_id = url.rsplit("=", 1)[-1]
+                if video_id == challenged_id:
+                    raise RuntimeError(
+                        "Sign in to confirm you’re not a bot. "
+                        "Use --cookies-from-browser or --cookies for authentication."
+                    )
+                return _fake_bundle(video_id, transcript=fetch_transcript)
+
+            manifest = execute_youtube_run(
+                config,
+                reference_lister=lambda _urls, _limit: refs,
+                video_fetcher=fetcher,
+                bundle_verifier=lambda bundle, _draft, _generated_at: VerifiedVideoReport(
+                    status=VERIFIED,
+                    final_report_markdown=f"# Final {bundle.metadata.video_id}\n",
+                    verification={
+                        "version": 4,
+                        "status": VERIFIED,
+                        "llm_status": "success",
+                        "evidence": {"evidence_count": 1},
+                    },
+                ),
+            )
+
+            self.assertEqual(manifest["status"], "success")
+            self.assertEqual(manifest["summary"]["successful_videos"], 1)
+            self.assertEqual(manifest["summary"]["failed_videos"], 0)
+            self.assertEqual(manifest["summary"]["skipped_access_challenge"], 1)
+            self.assertEqual([item["video_id"] for item in manifest["videos"]], [public_id])
+
+    def test_runner_reuses_archived_out_of_window_metadata_without_fetch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_dir = root / "archive"
+            config = _daily_config(archive_dir, root / "site")
+            video_id = "oldcache001"
+            previous_video_dir = (
+                archive_dir
+                / "runs"
+                / "2026"
+                / "youtube_previous"
+                / "videos"
+                / video_id
+            )
+            previous_video_dir.mkdir(parents=True)
+            published_at = datetime.now(timezone.utc) - timedelta(days=3)
+            (previous_video_dir / "metadata.json").write_text(
+                json.dumps({"metadata": {"video_id": video_id}}, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            (previous_video_dir / "collection_status.json").write_text(
+                json.dumps(
+                    {
+                        "video_id": video_id,
+                        "status": "skipped_out_of_window",
+                        "actual_published_at": published_at.isoformat(),
+                    },
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            refs = (
+                YouTubeVideoReference(
+                    video_id,
+                    f"https://www.youtube.com/watch?v={video_id}",
+                    "Old cached video",
+                    "fixture",
+                    None,
+                ),
+            )
+
+            manifest = execute_youtube_run(
+                config,
+                reference_lister=lambda _urls, _limit: refs,
+                video_fetcher=lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                    RuntimeError("should use cached out-of-window decision")
+                ),
+                bundle_verifier=lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                    RuntimeError("should not verify")
+                ),
+            )
+
+            self.assertEqual(manifest["status"], "success")
+            self.assertEqual(manifest["summary"]["total_videos"], 0)
+            self.assertEqual(manifest["summary"]["skipped_out_of_window"], 1)
+            self.assertEqual(manifest["summary"]["reused_out_of_window"], 1)
+
     def test_runner_reuses_previous_successful_video_without_caption_fetch(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
