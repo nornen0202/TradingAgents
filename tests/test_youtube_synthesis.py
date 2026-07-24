@@ -375,3 +375,62 @@ def test_synthesis_includes_all_daily_eligible_videos_within_budget(
     assert result.structured_report["source_video_count"] == 30
     assert result.receipt["source_video_count"] == 30
     assert "video000029" in fake.prompts[0]
+
+
+def test_synthesis_excludes_failed_manifest_and_summary_artifacts(
+    tmp_path: Path,
+) -> None:
+    successful = _write_video_artifacts(
+        tmp_path,
+        "video_good01",
+        title="정상 분석",
+        claim="정상 분석만 종합 입력에 포함한다.",
+    )
+    failed_manifest = _write_video_artifacts(
+        tmp_path,
+        "video_fail01",
+        title="매니페스트 실패",
+        claim="이 내용은 포함되면 안 된다.",
+    )
+    failed_manifest["status"] = "llm_failed"
+    failed_summary = _write_video_artifacts(
+        tmp_path,
+        "video_fail02",
+        title="요약 실패",
+        claim="이 내용도 포함되면 안 된다.",
+    )
+    failed_summary_path = tmp_path / failed_summary["public_summary_path"]
+    failed_summary_payload = json.loads(failed_summary_path.read_text(encoding="utf-8"))
+    failed_summary_payload["status"] = "unverified"
+    failed_summary_payload["llm_status"] = "llm_failed"
+    failed_summary_path.write_text(
+        json.dumps(failed_summary_payload, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    fake = _FakeSynthesisLLM(
+        {
+            "executive_summary": "정상 영상만 검토했다.",
+            "market_regime": {},
+            "consensus_insights": [],
+            "contradictions": [],
+            "ticker_strategies": [],
+            "portfolio_strategy": {},
+            "checkpoints": [],
+            "risk_notes": [],
+        }
+    )
+
+    result = synthesize_youtube_run(
+        run_id="youtube_excludes_failed",
+        run_dir=tmp_path,
+        videos=[successful, failed_manifest, failed_summary],
+        llm_settings=_llm_settings(),
+        synthesis_settings=SynthesisSettings(enabled=True),
+        llm_factory=lambda _settings: fake,
+    )
+
+    assert result.status == "success"
+    assert result.structured_report["source_video_count"] == 1
+    assert "video_good01" in fake.prompts[0]
+    assert "video_fail01" not in fake.prompts[0]
+    assert "video_fail02" not in fake.prompts[0]

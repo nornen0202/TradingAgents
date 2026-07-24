@@ -917,6 +917,73 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertEqual(manifest["videos"][0]["reused_from_run"], "youtube_previous")
             self.assertIn("Reused final", next(archive_dir.glob("runs/*/youtube_*/videos/reuse000001/final_report.md")).read_text(encoding="utf-8"))
 
+    def test_runner_retries_previous_llm_failure_instead_of_reusing_it(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_dir = root / "archive"
+            config = _daily_config(archive_dir, root / "site")
+            video_id = "retry000001"
+            previous_video_dir = archive_dir / "runs" / "2026" / "youtube_previous" / "videos" / video_id
+            previous_video_dir.mkdir(parents=True)
+            for filename, text in {
+                "metadata.json": "{}",
+                "draft_report.md": "# Failed draft\n",
+                "verification.json": json.dumps(
+                    {"version": 4, "status": LLM_FAILED, "evidence": {"evidence_count": 0}},
+                    ensure_ascii=False,
+                ),
+                "research_plan.json": json.dumps({"version": 1, "claims": []}, ensure_ascii=False),
+                "evidence.json": json.dumps({"version": 1, "items": []}, ensure_ascii=False),
+                "claim_verification.json": json.dumps({"version": 1, "claims": []}, ensure_ascii=False),
+                "final_report.md": "# Failed final\n",
+                "public_summary.json": json.dumps(
+                    {
+                        "video_id": video_id,
+                        "status": LLM_FAILED,
+                        "llm_status": LLM_FAILED,
+                        "transcript_status": "available",
+                        "transcript_chars": 240,
+                    },
+                    ensure_ascii=False,
+                ),
+            }.items():
+                (previous_video_dir / filename).write_text(text, encoding="utf-8")
+            refs = (
+                YouTubeVideoReference(
+                    video_id,
+                    f"https://www.youtube.com/watch?v={video_id}",
+                    "Retry failed analysis",
+                    "fixture",
+                    datetime.now(timezone.utc) - timedelta(hours=1),
+                ),
+            )
+            calls: list[tuple[str, bool]] = []
+
+            def fetcher(url: str, *, fetch_transcript: bool = True):
+                calls.append((url[-11:], fetch_transcript))
+                return _fake_bundle(url[-11:], transcript=fetch_transcript)
+
+            manifest = execute_youtube_run(
+                config,
+                reference_lister=lambda _urls, _limit: refs,
+                video_fetcher=fetcher,
+                bundle_verifier=lambda bundle, _draft, _generated_at: VerifiedVideoReport(
+                    status=VERIFIED,
+                    final_report_markdown=f"# Retried {bundle.metadata.video_id}\n",
+                    verification={
+                        "version": 4,
+                        "status": VERIFIED,
+                        "llm_status": "success",
+                        "evidence": {"evidence_count": 1},
+                    },
+                ),
+            )
+
+            self.assertEqual(calls, [(video_id, True)])
+            self.assertEqual(manifest["summary"]["reused_videos"], 0)
+            self.assertEqual(manifest["videos"][0]["status"], VERIFIED)
+            self.assertNotIn("reused_from_run", manifest["videos"][0])
+
     def test_runner_invalidates_archived_reports_from_pre_role_routing_pipeline(self):
         self.assertFalse(_archived_verification_is_current({"version": 3, "evidence": {}}))
         self.assertTrue(_archived_verification_is_current({"version": 4, "evidence": {}}))
