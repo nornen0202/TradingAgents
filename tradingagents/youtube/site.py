@@ -49,6 +49,53 @@ def build_youtube_site(
             summary_path = run_site_dir / f"{_safe_segment(str(video.get('video_id') or 'video'))}.json"
             _write_json(summary_path, public_summary or _public_summary_from_video(video))
 
+    latest_synthesis = _latest_synthesis(manifests)
+    if latest_synthesis:
+        synthesis_manifest, synthesis_markdown, synthesis_structured = latest_synthesis
+    else:
+        synthesis_manifest = manifests[0] if manifests else {}
+        synthesis_structured = {
+            "version": 1,
+            "title": "YouTube 종합 투자 인사이트",
+            "as_of": str(synthesis_manifest.get("finished_at") or ""),
+            "status": "unavailable",
+            "executive_summary": (
+                "아직 공개 가능한 교차 영상 종합 리포트가 없습니다. "
+                "영상별 검증 리포트를 먼저 확인하세요."
+            ),
+            "source_video_ids": [],
+            "source_video_count": 0,
+        }
+        synthesis_markdown = (
+            "# YouTube 종합 투자 인사이트\n\n"
+            "## 종합 리포트 준비 중\n\n"
+            "아직 공개 가능한 교차 영상 종합 리포트가 없습니다. "
+            "영상별 검증 리포트를 먼저 확인하세요.\n"
+        )
+    _write_text(
+        youtube_dir / "insights.html",
+        _render_synthesis_page(
+            synthesis_manifest,
+            synthesis_markdown,
+            synthesis_structured,
+            settings,
+            mobile=False,
+        ),
+    )
+    _write_json(youtube_dir / "insights.json", synthesis_structured)
+    mobile_dir = site_dir / "mobile"
+    mobile_dir.mkdir(parents=True, exist_ok=True)
+    _write_text(
+        mobile_dir / "youtube-insights.html",
+        _render_synthesis_page(
+            synthesis_manifest,
+            synthesis_markdown,
+            synthesis_structured,
+            settings,
+            mobile=True,
+        ),
+    )
+
     _write_text(youtube_dir / "index.html", _render_index_page(manifests, settings))
     _write_json(youtube_dir / "feed.json", _render_feed(manifests, settings))
     return manifests
@@ -86,6 +133,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: YouTubeSiteSet
         run_cards = '<p class="muted">아직 공개 가능한 YouTube 리포트 실행 기록이 없습니다.</p>'
     if not video_cards:
         video_cards = '<p class="muted">최근 공개 리포트가 없습니다.</p>'
+    synthesis_feature = _synthesis_feature(manifests)
 
     return _page(
         title=settings.title,
@@ -95,6 +143,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: YouTubeSiteSet
   <h1>{escape(settings.title)}</h1>
   <p>최근 24시간 업로드 영상을 수집해 영상 주장과 공개 데이터 검증 결과를 분리한 투자자용 리포트입니다.</p>
 </header>
+{synthesis_feature}
 <section>
   <h2>최근 리포트</h2>
   <div class="grid">{video_cards}</div>
@@ -113,6 +162,16 @@ def _render_run_page(manifest: Mapping[str, Any], settings: YouTubeSiteSettings)
         videos = '<p class="muted">이 실행에서 공개할 영상 리포트가 없습니다.</p>'
     run_id = str(manifest.get("run_id") or "run")
     summary = manifest.get("summary") if isinstance(manifest.get("summary"), Mapping) else {}
+    synthesis_link = ""
+    if _read_manifest_synthesis(manifest):
+        synthesis_link = """
+<section class="synthesis-callout">
+  <p class="eyebrow">CODEX CROSS-VIDEO SYNTHESIS</p>
+  <h2>영상 전체를 다시 종합한 투자 인사이트</h2>
+  <p>개별 영상 주장과 검증 근거를 한 번 더 비교해 공통점·충돌·조건부 전략으로 정리했습니다.</p>
+  <a class="primary-link" href="../../insights.html">종합 인사이트 보기</a>
+</section>
+"""
     return _page(
         title=f"{settings.title} - {run_id}",
         body=f"""
@@ -122,6 +181,7 @@ def _render_run_page(manifest: Mapping[str, Any], settings: YouTubeSiteSettings)
   <h1>{escape(run_id)}</h1>
   <p>{escape(_format_window(manifest))}</p>
 </header>
+{synthesis_link}
 <section class="stats">
   <span>총 {escape(str(summary.get('total_videos', 0)))}개</span>
   <span>성공 {escape(str(summary.get('successful_videos', 0)))}개</span>
@@ -133,6 +193,138 @@ def _render_run_page(manifest: Mapping[str, Any], settings: YouTubeSiteSettings)
 </section>
 """,
     )
+
+
+def _render_synthesis_page(
+    manifest: Mapping[str, Any],
+    markdown: str,
+    structured: Mapping[str, Any],
+    settings: YouTubeSiteSettings,
+    *,
+    mobile: bool,
+) -> str:
+    run_id = str(manifest.get("run_id") or "")
+    source_count = int(structured.get("source_video_count") or 0)
+    status = str(structured.get("status") or "unknown")
+    synthesis = (
+        manifest.get("synthesis")
+        if isinstance(manifest.get("synthesis"), Mapping)
+        else {}
+    )
+    receipt = (
+        synthesis.get("model_receipt")
+        if isinstance(synthesis.get("model_receipt"), Mapping)
+        else {}
+    )
+    if mobile:
+        nav = (
+            '<nav class="topnav"><a href="../youtube/insights.html">PC 버전</a>'
+            '<a href="../youtube/index.html">영상별 리포트</a>'
+            '<a href="../index.html">TradingAgents 홈</a></nav>'
+        )
+        body_class = " mobile-report"
+    else:
+        nav = (
+            '<nav class="topnav"><a href="index.html">YouTube 홈</a>'
+            '<a href="../mobile/youtube-insights.html">모바일 버전</a>'
+            '<a href="../index.html">TradingAgents 홈</a></nav>'
+        )
+        body_class = ""
+    report_markdown = (
+        markdown
+        or "# YouTube 종합 투자 인사이트\n\n종합 리포트 본문을 찾지 못했습니다."
+    )
+    report_html = _markdown_to_html(
+        _strip_leading_markdown_heading(
+            report_markdown,
+            str(structured.get("title") or "YouTube 종합 투자 인사이트"),
+        )
+    )
+    return _page(
+        title=f"{settings.title} - YouTube 종합 투자 인사이트",
+        body=f"""
+{nav}
+<article class="report synthesis-report{body_class}">
+  <header class="report-head">
+    <p class="eyebrow">TRADINGAGENTS · CODEX SYNTHESIS</p>
+    <h1>{escape(str(structured.get('title') or 'YouTube 종합 투자 인사이트'))}</h1>
+    <div class="meta">
+      <span class="badge status-{escape(_safe_segment(status))}">{escape(status)}</span>
+      <span>{source_count}개 영상 종합</span>
+      <span>{escape(str(receipt.get('model') or '-'))} · reasoning {escape(str(receipt.get('reasoning_effort') or '-'))}</span>
+    </div>
+    <p class="scope-note">YouTube 분석을 종합한 연구 자료입니다. 실제 주문은 계좌·현재 시세·거래량·시장 상태를 다시 확인한 뒤 결정하세요.</p>
+  </header>
+  {report_html}
+  <details>
+    <summary>분석 실행 정보</summary>
+    <p>실행 ID: {escape(run_id)}</p>
+    <p>분석 기준: {escape(str(structured.get('as_of') or '-'))}</p>
+    <p>근거 영상 ID: {escape(', '.join(str(value) for value in (structured.get('source_video_ids') or [])))}</p>
+  </details>
+</article>
+""",
+    )
+
+
+def _synthesis_feature(manifests: list[dict[str, Any]]) -> str:
+    latest = _latest_synthesis(manifests)
+    if not latest:
+        return """
+<section class="synthesis-callout unavailable">
+  <p class="eyebrow">CODEX CROSS-VIDEO SYNTHESIS</p>
+  <h2>종합 투자 인사이트 준비 중</h2>
+  <p>다음 YouTube 분석 실행부터 여러 영상의 공통점·충돌·조건부 전략을 한 번 더 종합해 제공합니다.</p>
+</section>
+"""
+    manifest, _, structured = latest
+    summary = str(structured.get("executive_summary") or "").strip()
+    source_count = int(structured.get("source_video_count") or 0)
+    as_of = str(structured.get("as_of") or manifest.get("finished_at") or "")
+    return f"""
+<section class="synthesis-callout">
+  <p class="eyebrow">CODEX CROSS-VIDEO SYNTHESIS · 최우선 리포트</p>
+  <h2>{escape(str(structured.get('title') or 'YouTube 종합 투자 인사이트'))}</h2>
+  <p class="lead">{escape(summary or '여러 영상의 검증 결과를 종합했습니다.')}</p>
+  <div class="meta"><span>{source_count}개 영상 종합</span><span>분석 기준 {escape(as_of)}</span></div>
+  <div class="cta-row">
+    <a class="primary-link" href="insights.html">PC 종합 리포트</a>
+    <a class="secondary-link" href="../mobile/youtube-insights.html">모바일 종합 리포트</a>
+  </div>
+</section>
+"""
+
+
+def _latest_synthesis(
+    manifests: list[dict[str, Any]],
+) -> tuple[dict[str, Any], str, dict[str, Any]] | None:
+    for manifest in manifests:
+        synthesis = _read_manifest_synthesis(manifest)
+        if synthesis:
+            markdown, structured = synthesis
+            if str(structured.get("status") or "").lower() == "success":
+                return manifest, markdown, structured
+    return None
+
+
+def _read_manifest_synthesis(
+    manifest: Mapping[str, Any],
+) -> tuple[str, dict[str, Any]] | None:
+    synthesis = (
+        manifest.get("synthesis")
+        if isinstance(manifest.get("synthesis"), Mapping)
+        else {}
+    )
+    if str(synthesis.get("status") or "").lower() != "success":
+        return None
+    run_dir = _manifest_run_dir(manifest)
+    markdown = _read_run_artifact(run_dir, synthesis.get("report_path"))
+    structured = _read_json_run_artifact(
+        run_dir, synthesis.get("structured_report_path")
+    )
+    if not markdown or not isinstance(structured, dict):
+        return None
+    return markdown, structured
 
 
 def _render_video_page(
@@ -335,6 +527,19 @@ def _markdown_to_html(markdown: str) -> str:
     if in_code:
         html_parts.append(f"<pre><code>{escape(chr(10).join(code_lines))}</code></pre>")
     return "\n".join(html_parts)
+
+
+def _strip_leading_markdown_heading(markdown: str, title: str) -> str:
+    lines = str(markdown or "").splitlines()
+    if not lines:
+        return ""
+    heading = re.match(r"^#\s+(.+?)\s*$", lines[0])
+    if not heading or heading.group(1).strip() != str(title or "").strip():
+        return markdown
+    lines = lines[1:]
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    return "\n".join(lines)
 
 
 def _inline_markdown(text: str) -> str:
@@ -574,6 +779,15 @@ a:hover { text-decoration: underline; }
 .eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
 section { margin: 28px 0; }
 h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
 .card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
 .run { padding: 16px; }
@@ -596,11 +810,18 @@ small, .muted { color: var(--muted); }
 .report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
 .report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
 .meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
 pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
 code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
 details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
 @media (max-width: 640px) {
   main { width: min(100% - 20px, 1120px); padding-top: 18px; }
   .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
 }
 """

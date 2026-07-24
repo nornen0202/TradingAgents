@@ -50,6 +50,8 @@ class LLMSettings:
     codex_quick_reasoning_effort: str | None = None
     codex_deep_reasoning_effort: str | None = None
     codex_output_reasoning_effort: str | None = None
+    synthesis_model: str | None = None
+    codex_synthesis_reasoning_effort: str | None = None
 
 
 @dataclass(frozen=True)
@@ -113,6 +115,15 @@ class YouTubeSiteSettings:
 
 
 @dataclass(frozen=True)
+class SynthesisSettings:
+    enabled: bool = False
+    strict: bool = True
+    max_videos: int = 100
+    max_input_chars: int = 360000
+    report_title: str = "YouTube 종합 투자 인사이트"
+
+
+@dataclass(frozen=True)
 class YouTubeDailyConfig:
     channel: ChannelSettings
     llm: LLMSettings
@@ -120,6 +131,7 @@ class YouTubeDailyConfig:
     storage: StorageSettings
     site: YouTubeSiteSettings
     asr: ASRSettings = field(default_factory=ASRSettings)
+    synthesis: SynthesisSettings = field(default_factory=SynthesisSettings)
 
 
 def load_youtube_config(
@@ -136,6 +148,7 @@ def load_youtube_config(
     asr_raw = raw.get("asr") or {}
     storage_raw = raw.get("storage") or {}
     site_raw = raw.get("site") or {}
+    synthesis_raw = raw.get("synthesis") or {}
 
     archive_dir = _youtube_archive_path(storage_raw.get("archive_dir"))
     site_dir = _path_from_env(
@@ -221,6 +234,17 @@ def load_youtube_config(
                 os.getenv("TRADINGAGENTS_CODEX_OUTPUT_REASONING_EFFORT"),
                 llm_raw.get("codex_output_reasoning_effort"),
                 default="low",
+            ),
+            synthesis_model=_first_text(
+                os.getenv("TRADINGAGENTS_YOUTUBE_SYNTHESIS_MODEL"),
+                llm_raw.get("synthesis_model"),
+                llm_raw.get("deep_model"),
+                default="gpt-5.6-sol",
+            ),
+            codex_synthesis_reasoning_effort=_first_text(
+                os.getenv("TRADINGAGENTS_YOUTUBE_SYNTHESIS_REASONING_EFFORT"),
+                llm_raw.get("codex_synthesis_reasoning_effort"),
+                default="high",
             ),
         ),
         verification=VerificationSettings(
@@ -314,6 +338,18 @@ def load_youtube_config(
             max_runs=max(1, int(site_raw.get("max_runs") or 30)),
             max_videos_on_index=max(1, int(site_raw.get("max_videos_on_index") or 50)),
         ),
+        synthesis=SynthesisSettings(
+            enabled=bool(synthesis_raw.get("enabled", False)),
+            strict=bool(synthesis_raw.get("strict", True)),
+            max_videos=max(1, int(synthesis_raw.get("max_videos") or 100)),
+            max_input_chars=max(
+                12000, int(synthesis_raw.get("max_input_chars") or 360000)
+            ),
+            report_title=str(
+                synthesis_raw.get("report_title")
+                or "YouTube 종합 투자 인사이트"
+            ),
+        ),
     )
 
 
@@ -352,6 +388,7 @@ def with_youtube_overrides(
             site_dir=Path(site_dir) if site_dir else storage.site_dir,
         ),
         site=config.site,
+        synthesis=config.synthesis,
     )
 
 

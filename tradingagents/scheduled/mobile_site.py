@@ -88,6 +88,8 @@ _PRIVATE_ACTION_FIELDS = (
     "strategy_state",
     "execution_feasibility_now",
     "portfolio_relative_action",
+    "relative_action_reason",
+    "relative_action_reason_codes",
     "risk_action",
     "risk_action_level",
     "risk_condition",
@@ -549,11 +551,13 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
     for action_source in overlay.get("actions") or []:
         if isinstance(action_source, dict):
             actions.append(
-                {
-                    key: action_source.get(key)
-                    for key in _PRIVATE_ACTION_FIELDS
-                    if action_source.get(key) is not None
-                }
+                _normalize_private_action_semantics(
+                    {
+                        key: action_source.get(key)
+                        for key in _PRIVATE_ACTION_FIELDS
+                        if action_source.get(key) is not None
+                    }
+                )
             )
     action_by_ticker: dict[str, dict[str, Any]] = {}
     for item in actions:
@@ -605,6 +609,52 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
         "rows": rows,
         "coverage": safe_universe_coverage,
     }
+
+
+def _normalize_private_action_semantics(action: dict[str, Any]) -> dict[str, Any]:
+    """Repair legacy portfolio overlays that promoted a relative trim to now."""
+
+    normalized = dict(action)
+    action_now = str(normalized.get("action_now") or "").strip().upper()
+    relative = str(
+        normalized.get("portfolio_relative_action") or ""
+    ).strip().upper()
+    sell_intent = str(normalized.get("sell_intent") or "NONE").strip().upper()
+    try:
+        delta_now = int(normalized.get("delta_krw_now") or 0)
+    except (TypeError, ValueError):
+        delta_now = 0
+    relative_sell_actions = {
+        "TRIM_TO_FUND",
+        "REDUCE_RISK",
+        "TAKE_PROFIT",
+        "STOP_LOSS",
+        "EXIT",
+    }
+    if (
+        action_now in relative_sell_actions
+        and action_now == relative
+        and delta_now >= 0
+        and sell_intent in {"", "NONE"}
+    ):
+        position = (
+            normalized.get("position_metrics")
+            if isinstance(normalized.get("position_metrics"), dict)
+            else {}
+        )
+        is_held = bool(
+            _positive_number(position.get("market_value_krw"))
+            or _positive_number(normalized.get("target_weight_now"))
+        )
+        normalized["action_now"] = "HOLD" if is_held else "WATCH"
+    return normalized
+
+
+def _positive_number(value: Any) -> bool:
+    try:
+        return float(value or 0) > 0
+    except (TypeError, ValueError):
+        return False
 
 
 def _load_latest_work_report(
@@ -1327,7 +1377,11 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .execution-status { margin: -4px 0 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.025); }
 .execution-status > div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .execution-status strong { color: var(--muted); font-size: .76rem; }
+.execution-status .execution-action { display: block; margin-top: 8px; color: var(--text); font-weight: 800; line-height: 1.45; }
 .execution-status .readiness-note { margin-top: 6px; }
+.account-guidance { margin: 0 0 12px; padding: 11px 12px; border: 1px solid rgba(255,196,91,.30); border-radius: 12px; background: rgba(255,196,91,.07); color: #ffe1a4; font-size: .82rem; }
+.account-guidance strong { display: block; margin-bottom: 3px; color: var(--warn); }
+.account-guidance p { margin: 0; color: var(--muted); line-height: 1.55; }
 .readiness-note { margin: 10px 0 0; color: var(--muted); font-size: .8rem; }
 .condition-grid { display: grid; gap: 9px; margin: 12px 0; }
 .condition-block { padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.025); }
@@ -1421,7 +1475,7 @@ _PRIVATE_JS = r"""
     ADD: '분할 추가매수', ADD_NOW: '분할 추가매수 검토', BUY: '매수 검토', BUY_NOW: '매수 검토',
     ADD_IF_TRIGGERED: '조건 충족 시 추가 매수',
     REDUCE: '비중 축소', REDUCE_NOW: '비중 축소 검토', TRIM_NOW: '일부 축소 검토',
-    TRIM_TO_FUND: '강한 후보로 자금 이동을 위한 일부 축소',
+    TRIM_TO_FUND: '현금이 꼭 필요할 때 자금 마련 후보',
     REDUCE_RISK: '리스크 축소', REDUCE_IF_TRIGGERED: '조건 충족 시 비중 축소',
     TAKE_PROFIT: '이익 실현', TAKE_PROFIT_NOW: '이익 실현 검토', TAKE_PROFIT_IF_TRIGGERED: '조건 충족 시 이익 실현',
     STOP_LOSS: '손절 검토', STOP_LOSS_NOW: '손절 검토', STOP_LOSS_IF_TRIGGERED: '조건 충족 시 손절',
@@ -1439,9 +1493,9 @@ _PRIVATE_JS = r"""
     const text = String(value || '').trim().toUpperCase();
     if (/SELL|EXIT|STOP_LOSS|청산|손절|매도/.test(text)) return 'sell';
     if (/REDUCE|TRIM|TAKE_PROFIT|축소|익절|이익 실현/.test(text)) return 'reduce';
+    if (/AVOID|NO_ENTRY|회피|보류/.test(text)) return 'avoid';
     if (/BUY|ADD|STARTER|매수|진입/.test(text)) return 'buy';
     if (/HOLD|WAIT|WATCH|보유|관찰|대기/.test(text)) return 'hold';
-    if (/AVOID|NO_ENTRY|회피|보류/.test(text)) return 'avoid';
     return 'research';
   };
   const isDirectional = (value) => actionKind(value) !== 'research';
@@ -1730,19 +1784,88 @@ _PRIVATE_JS = r"""
     const thesis = strategy.thesis || {};
     const workExecution = strategy.execution || {};
     const action = row.portfolio_action || {};
-    const candidates = [
+    const workCandidates = [
       thesis.stance,
       workExecution.action_now,
-      action.action_now,
-      action.portfolio_relative_action,
+    ];
+    const workSelected = workCandidates.find(isDirectional);
+    if (workSelected) {
+      return {text: actionLabel(workSelected), kind: actionKind(workSelected)};
+    }
+    const rowCandidates = [
       row.strategy_code,
       row.strategy_ko,
     ];
-    const selected = candidates.find(isDirectional);
+    const rowSelected = rowCandidates.find(isDirectional);
+    const weakRowConclusion = /^(DATA_CHECK|RESEARCH|RESEARCH_ONLY|ANALYSIS_ONLY|CUSTOM)$/.test(String(row.strategy_code || '').trim().toUpperCase())
+      || /분석 참고|데이터 확인|추가 분석/.test(String(row.strategy_ko || ''));
+    const fallbackCandidates = [
+      action.action_now,
+      action.portfolio_relative_action,
+    ];
+    const conditional = [
+      workExecution.action_if_triggered,
+      action.action_if_triggered,
+    ].find((value) => {
+      const kind = actionKind(value);
+      return isDirectional(value) && ['buy', 'reduce', 'sell', 'avoid'].includes(kind);
+    });
+    if ((!rowSelected || weakRowConclusion) && conditional) {
+      const conditionalKind = actionKind(conditional);
+      const conditionalText = {
+        buy: row.is_held === true ? '조건 확인 후 추가매수 검토' : '조건 확인 후 분할매수 검토',
+        reduce: '조건 확인 후 일부 축소 검토',
+        sell: '조건 확인 후 매도·청산 검토',
+        avoid: '신규 매수 보류',
+      }[conditionalKind];
+      return {text: conditionalText, kind: conditionalKind};
+    }
+    const selected = rowSelected || fallbackCandidates.find(isDirectional);
+    const selectedKind = actionKind(selected);
     return {
       text: selected ? actionLabel(selected) : '추가 분석 후 방향 결정',
-      kind: actionKind(selected),
+      kind: selectedKind,
     };
+  }
+  function currentExecutionAction(row, action) {
+    const delta = Number(action.delta_krw_now);
+    const code = String(action.action_now || '').trim().toUpperCase();
+    if (Number.isFinite(delta) && delta < 0) {
+      return combineDistinct(actionLabel(code || 'REDUCE'), won(delta));
+    }
+    if (Number.isFinite(delta) && delta > 0) {
+      return combineDistinct(actionLabel(code || 'BUY'), won(delta));
+    }
+    if (row.is_held === true) return '현재 주문 없음 · 기존 보유 유지';
+    return '현재 주문 없음';
+  }
+  function accountGuidance(row, action) {
+    const relative = String(action.portfolio_relative_action || '').trim().toUpperCase();
+    const reasonCodes = new Set((action.relative_action_reason_codes || []).map((value) => String(value || '').trim().toUpperCase()));
+    if (relative === 'TRIM_TO_FUND') {
+      if (reasonCodes.has('CONCENTRATION')) {
+        return '계좌 내 비중이 높아 추가 매수는 제한합니다. 현재 매도 지시가 아니며, 현금이 꼭 필요한 경우에만 자금 마련 후보로 검토합니다.';
+      }
+      if (reasonCodes.has('OPPORTUNITY_COST')) {
+        return '현재 매도 지시가 아닙니다. 더 우선순위가 높은 조건부 후보가 실제 발동하고 현금이 부족할 때만 축소 후보로 재검토합니다.';
+      }
+      if (reasonCodes.has('NO_COVERAGE')) {
+        return '현재 매도 지시가 아닙니다. 최신 종목 분석이 확보되지 않은 상태이므로 추가 매수는 멈추고, 현금이 필요할 때만 보수적으로 축소를 재검토합니다.';
+      }
+      return '현재 매도 지시가 아닙니다. 다른 종목의 발동 조건과 계좌 현금을 함께 확인한 뒤에만 자금 마련 후보로 재검토합니다.';
+    }
+    if (['REDUCE_RISK', 'TAKE_PROFIT', 'STOP_LOSS', 'EXIT'].includes(relative)) {
+      const delta = Number(action.delta_krw_now);
+      if (!Number.isFinite(delta) || delta >= 0) {
+        return combineDistinct(
+          '현재 매도 지시가 아닙니다.',
+          `${actionLabel(relative)} 조건이 실시간으로 확인될 때만 축소·매도를 재검토합니다.`,
+          action.relative_action_reason,
+        );
+      }
+      return combineDistinct(actionLabel(relative), action.relative_action_reason);
+    }
+    return '';
   }
   function strategyActivationAction(thesis, workExecution, action, hasWork) {
     const workTriggered = workExecution.action_if_triggered
@@ -1778,8 +1901,10 @@ _PRIVATE_JS = r"""
     const readiness = liveReadiness(row, market, strategy);
     const action = row.portfolio_action || {};
     const role = normalizeRole(strategy.portfolio_role || row.universe_role, row.is_held === true);
-    const baseConclusion = action.action_now ? actionLabel(action.action_now) : valueText(row.strategy_ko);
+    const baseConclusion = valueText(row.strategy_ko) || (action.action_now ? actionLabel(action.action_now) : '');
     const direction = analysisDirection(row, strategy);
+    const executionAction = currentExecutionAction(row, action);
+    const guidance = accountGuidance(row, action);
     const workEntryConditions = conciseConditions(thesis.entry_conditions);
     const baseEntryConditions = conciseConditions(row.execution_condition_ko, action.trigger_conditions);
     const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions) || '조건 정보 없음';
@@ -1814,7 +1939,8 @@ _PRIVATE_JS = r"""
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
       <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}</span></div>
       <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
-      <div class="execution-status"><div><strong>현재 실행 상태</strong><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div><p class="readiness-note">${esc(readiness.note)}</p></div>
+      <div class="execution-status"><div><strong>현재 실행 행동</strong><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div><span class="execution-action">${esc(executionAction)}</span><p class="readiness-note">${esc(readiness.note)}</p></div>
+      ${guidance ? `<div class="account-guidance"><strong>계좌 운용 참고 · 현재 매도 지시와 별개</strong><p>${esc(guidance)}</p></div>` : ''}
       ${signalStrip(row, confidence)}
       <div class="condition-grid">
         <div class="condition-block"><strong>전략 발동 조건</strong><p>${esc(entryCondition)}</p></div>

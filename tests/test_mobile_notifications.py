@@ -688,7 +688,7 @@ class CompositionTests(unittest.TestCase):
         self.assertIn("https://example.test/TradingAgents/mobile/strategy.html?market=kr", urls)
         self.assertFalse(any("#" in url for url in urls))
 
-    def test_youtube_uses_existing_mobile_safe_report(self):
+    def test_youtube_notification_opens_cross_video_insights(self):
         context = inspect_workflow_run(
             _run(name="Daily YouTube Verified Reports"),
             [{"name": "deploy", "conclusion": "success"}],
@@ -701,7 +701,17 @@ class CompositionTests(unittest.TestCase):
                 public_base_url="https://example.test/TradingAgents",
             )
         urls = [button["url"] for row in buttons for button in row]
-        self.assertIn("https://example.test/TradingAgents/youtube/", urls)
+        labels = [button["text"] for row in buttons for button in row]
+        self.assertIn(
+            "https://example.test/TradingAgents/youtube/insights.html",
+            urls,
+        )
+        self.assertIn(
+            "https://example.test/TradingAgents/mobile/youtube-insights.html",
+            urls,
+        )
+        self.assertIn("YouTube 종합 인사이트", labels)
+        self.assertIn("YouTube 모바일 인사이트", labels)
         self.assertFalse(any("#" in url for url in urls))
 
     def test_private_cards_are_loaded_only_from_matching_archive_window(self):

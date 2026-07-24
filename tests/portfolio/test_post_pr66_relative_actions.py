@@ -180,7 +180,9 @@ def test_trim_to_fund_promoted_to_main_action_table():
     markdown = render_portfolio_report_markdown(snapshot=snapshot, recommendation=recommendation, candidates=scored)
 
     assert trim_action.portfolio_relative_action == "TRIM_TO_FUND"
-    assert trim_action.action_now == "TRIM_TO_FUND"
+    assert trim_action.action_now == "HOLD"
+    assert trim_action.delta_krw_now == 0
+    assert trim_action.sell_intent == "NONE"
     assert "줄여서 강한 후보로 자금 이동" in markdown
     assert recommendation.funding_plan["trim_first_candidates"][0]["canonical_ticker"] == "GLDM"
 

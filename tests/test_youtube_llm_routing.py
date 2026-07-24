@@ -16,21 +16,25 @@ def test_youtube_config_routes_stages_across_gpt_5_6_family():
     assert settings.quick_model == "gpt-5.6-terra"
     assert settings.deep_model == "gpt-5.6-sol"
     assert settings.output_model == "gpt-5.6-luna"
+    assert settings.synthesis_model == "gpt-5.6-sol"
     assert settings.codex_quick_reasoning_effort == "low"
     assert settings.codex_deep_reasoning_effort == "medium"
     assert settings.codex_output_reasoning_effort == "low"
+    assert settings.codex_synthesis_reasoning_effort == "high"
 
 
 def test_youtube_config_accepts_workflow_resolved_role_models(monkeypatch):
     monkeypatch.setenv("TRADINGAGENTS_YOUTUBE_QUICK_MODEL", "gpt-5.4-mini")
     monkeypatch.setenv("TRADINGAGENTS_YOUTUBE_DEEP_MODEL", "gpt-5.5")
     monkeypatch.setenv("TRADINGAGENTS_YOUTUBE_OUTPUT_MODEL", "gpt-5.4-mini")
+    monkeypatch.setenv("TRADINGAGENTS_YOUTUBE_SYNTHESIS_MODEL", "gpt-5.5")
 
     settings = load_youtube_config("config/youtube_daily.toml").llm
 
     assert settings.quick_model == "gpt-5.4-mini"
     assert settings.deep_model == "gpt-5.5"
     assert settings.output_model == "gpt-5.4-mini"
+    assert settings.synthesis_model == "gpt-5.5"
 
 
 def test_youtube_role_clients_receive_stage_model_effort_and_telemetry_role():
@@ -95,3 +99,4 @@ def test_youtube_workflow_preflights_and_exports_every_role_model():
     assert "TRADINGAGENTS_YOUTUBE_DEEP_MODEL=" in workflow
     assert "TRADINGAGENTS_YOUTUBE_QUICK_MODEL=" in workflow
     assert "TRADINGAGENTS_YOUTUBE_OUTPUT_MODEL=" in workflow
+    assert "TRADINGAGENTS_YOUTUBE_SYNTHESIS_MODEL=" in workflow
