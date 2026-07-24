@@ -151,6 +151,14 @@ def execute_youtube_run(
     transcript_fetch_failures = sum(int(result.get("transcript_fetch_failures", 0)) for result in video_results.values())
     skipped_no_transcript = sum(int(result.get("skipped_no_transcript", 0)) for result in video_results.values())
     skipped_inaccessible = sum(int(result.get("skipped_inaccessible", 0)) for result in video_results.values())
+    skipped_access_challenge = sum(
+        int(result.get("skipped_access_challenge", 0))
+        for result in video_results.values()
+    )
+    reused_out_of_window = sum(
+        int(result.get("reused_out_of_window", 0))
+        for result in video_results.values()
+    )
 
     successful_count = sum(
         1
@@ -227,6 +235,8 @@ def execute_youtube_run(
             "transcript_fetch_failures": transcript_fetch_failures,
             "skipped_no_transcript": skipped_no_transcript,
             "skipped_inaccessible": skipped_inaccessible,
+            "skipped_access_challenge": skipped_access_challenge,
+            "reused_out_of_window": reused_out_of_window,
         },
         "parallel_video_execution": {
             "enabled": config.channel.max_parallel_videos > 1,
@@ -358,10 +368,27 @@ def _process_video_reference(
             if reused_result is not None:
                 return reused_result
         else:
+            cached_out_of_window = _reuse_out_of_window_result_if_possible(
+                result=result,
+                config=config,
+                reference=reference,
+                run_dir=run_dir,
+                video_dir=video_dir,
+                window_start=window_start,
+            )
+            if cached_out_of_window is not None:
+                return cached_out_of_window
             metadata_bundle = _call_video_fetcher(fetcher, reference.url, fetch_transcript=False)
             if not _bundle_in_window(metadata_bundle, window_start=window_start, window_end=window_end):
                 result["skipped_out_of_window"] = 1
                 result["status"] = "skipped_out_of_window"
+                _write_out_of_window_artifacts(
+                    video_dir=video_dir,
+                    reference=reference,
+                    bundle=metadata_bundle,
+                    window_start=window_start,
+                    window_end=window_end,
+                )
                 return result
             result["selected"] = 1
             reused_result = _reuse_video_result_if_possible(
@@ -384,6 +411,13 @@ def _process_video_reference(
             result["selected"] = 0
             result["skipped_out_of_window"] = 1
             result["status"] = "skipped_out_of_window"
+            _write_out_of_window_artifacts(
+                video_dir=video_dir,
+                reference=reference,
+                bundle=metadata_bundle,
+                window_start=window_start,
+                window_end=window_end,
+            )
             return result
         try:
             bundle = (
@@ -466,6 +500,31 @@ def _process_video_reference(
                 },
             )
             return result
+        access_challenge_reason = _expected_access_challenge_reason(str(exc))
+        if access_challenge_reason:
+            result["selected"] = 0
+            result["failed"] = 0
+            result["metadata_fetch_failures"] = 0
+            result["skipped_access_challenge"] = 1
+            result["status"] = "skipped_access_challenge"
+            _write_json(
+                video_dir / "collection_status.json",
+                {
+                    "video_id": reference.video_id,
+                    "title": reference.title,
+                    "video_url": reference.url,
+                    "source_url": reference.source_url,
+                    "published_at": (
+                        reference.published_at.isoformat()
+                        if reference.published_at
+                        else None
+                    ),
+                    "checked_at": datetime.now(timezone.utc).isoformat(),
+                    "status": "skipped_access_challenge",
+                    "reason": access_challenge_reason,
+                },
+            )
+            return result
         if metadata_bundle is None:
             result["metadata_fetch_failures"] = 1
         result["selected"] = 1
@@ -520,6 +579,8 @@ def _empty_video_worker_result() -> dict[str, Any]:
         "transcript_fetch_failures": 0,
         "skipped_no_transcript": 0,
         "skipped_inaccessible": 0,
+        "skipped_access_challenge": 0,
+        "reused_out_of_window": 0,
         "status": "",
         "manifest_item": None,
     }
@@ -888,6 +949,89 @@ def _video_analysis_failed(summary: dict[str, Any]) -> bool:
     )
 
 
+def _reuse_out_of_window_result_if_possible(
+    *,
+    result: dict[str, Any],
+    config: YouTubeDailyConfig,
+    reference: YouTubeVideoReference,
+    run_dir: Path,
+    video_dir: Path,
+    window_start: datetime,
+) -> dict[str, Any] | None:
+    candidates = sorted(
+        Path(config.storage.archive_dir).glob(
+            f"runs/*/*/videos/{reference.video_id}/collection_status.json"
+        ),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    for status_path in candidates:
+        source_video_dir = status_path.parent
+        if _is_relative_to(source_video_dir.resolve(), run_dir.resolve()):
+            continue
+        payload = _read_json_if_exists(status_path)
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("status") != "skipped_out_of_window":
+            continue
+        published_at = _parse_cached_datetime(payload.get("actual_published_at"))
+        if published_at is None:
+            continue
+        if _to_timezone(published_at, window_start.tzinfo) >= window_start:
+            continue
+        metadata_path = source_video_dir / "metadata.json"
+        if metadata_path.is_file():
+            shutil.copy2(metadata_path, video_dir / "metadata.json")
+        cached_payload = dict(payload)
+        cached_payload["reused_from_run"] = _run_id_from_video_dir(source_video_dir)
+        cached_payload["reused_at"] = datetime.now(timezone.utc).isoformat()
+        _write_json(video_dir / "collection_status.json", cached_payload)
+        result["skipped_out_of_window"] = 1
+        result["reused_out_of_window"] = 1
+        result["status"] = "skipped_out_of_window_cached"
+        return result
+    return None
+
+
+def _write_out_of_window_artifacts(
+    *,
+    video_dir: Path,
+    reference: YouTubeVideoReference,
+    bundle: YouTubeVideoBundle,
+    window_start: datetime,
+    window_end: datetime,
+) -> None:
+    _write_json(video_dir / "metadata.json", _metadata_payload(bundle))
+    actual_published_at = bundle.metadata.published_at
+    _write_json(
+        video_dir / "collection_status.json",
+        {
+            "video_id": bundle.metadata.video_id or reference.video_id,
+            "title": bundle.metadata.title or reference.title,
+            "video_url": bundle.metadata.url or reference.url,
+            "source_url": reference.source_url,
+            "status": "skipped_out_of_window",
+            "reason": "published_outside_daily_window",
+            "actual_published_at": (
+                actual_published_at.isoformat() if actual_published_at else None
+            ),
+            "window_start": window_start.isoformat(),
+            "window_end": window_end.isoformat(),
+            "checked_at": datetime.now(timezone.utc).isoformat(),
+        },
+    )
+
+
+def _parse_cached_datetime(value: Any) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        return datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
 def _expected_inaccessible_video_reason(error: str) -> str | None:
     normalized = " ".join(str(error or "").lower().split())
     classifications = (
@@ -926,6 +1070,20 @@ def _expected_inaccessible_video_reason(error: str) -> str | None:
     for reason, markers in classifications:
         if any(marker in normalized for marker in markers):
             return reason
+    return None
+
+
+def _expected_access_challenge_reason(error: str) -> str | None:
+    normalized = (
+        " ".join(str(error or "").lower().split())
+        .replace("’", "'")
+        .replace("`", "'")
+    )
+    if (
+        "sign in to confirm you're not a bot" in normalized
+        or "use --cookies-from-browser or --cookies" in normalized
+    ):
+        return "youtube_bot_challenge"
     return None
 
 
