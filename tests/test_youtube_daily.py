@@ -864,6 +864,69 @@ class YouTubeDailyTests(unittest.TestCase):
             self.assertEqual(manifest["summary"]["skipped_no_transcript"], 1)
             self.assertFalse((root / "site" / "youtube" / "feed.json").read_text(encoding="utf-8").count("No transcript"))
 
+    def test_runner_skips_members_only_video_without_counting_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_dir = root / "archive"
+            config = _daily_config(archive_dir, root / "site")
+            member_id = "member00001"
+            public_id = "public00001"
+            refs = (
+                YouTubeVideoReference(
+                    member_id,
+                    f"https://www.youtube.com/watch?v={member_id}",
+                    "Members only",
+                    "fixture",
+                    datetime.now(timezone.utc) - timedelta(hours=1),
+                ),
+                YouTubeVideoReference(
+                    public_id,
+                    f"https://www.youtube.com/watch?v={public_id}",
+                    "Public video",
+                    "fixture",
+                    datetime.now(timezone.utc) - timedelta(hours=2),
+                ),
+            )
+
+            def fetcher(url: str, *, fetch_transcript: bool = True):
+                video_id = url.rsplit("=", 1)[-1]
+                if video_id == member_id:
+                    raise RuntimeError(
+                        "Join this channel to get access to members-only content"
+                    )
+                return _fake_bundle(video_id, transcript=fetch_transcript)
+
+            manifest = execute_youtube_run(
+                config,
+                reference_lister=lambda _urls, _limit: refs,
+                video_fetcher=fetcher,
+                bundle_verifier=lambda bundle, _draft, _generated_at: VerifiedVideoReport(
+                    status=VERIFIED,
+                    final_report_markdown=f"# Final {bundle.metadata.video_id}\n",
+                    verification={
+                        "version": 4,
+                        "status": VERIFIED,
+                        "llm_status": "success",
+                        "evidence": {"evidence_count": 1},
+                    },
+                ),
+            )
+
+            self.assertEqual(manifest["status"], "success")
+            self.assertEqual(manifest["summary"]["successful_videos"], 1)
+            self.assertEqual(manifest["summary"]["failed_videos"], 0)
+            self.assertEqual(manifest["summary"]["skipped_inaccessible"], 1)
+            self.assertEqual([item["video_id"] for item in manifest["videos"]], [public_id])
+            collection_status = next(
+                archive_dir.glob(
+                    f"runs/*/youtube_*/videos/{member_id}/collection_status.json"
+                )
+            )
+            self.assertEqual(
+                json.loads(collection_status.read_text(encoding="utf-8"))["reason"],
+                "members_only",
+            )
+
     def test_runner_reuses_previous_successful_video_without_caption_fetch(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

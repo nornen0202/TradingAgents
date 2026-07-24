@@ -150,8 +150,13 @@ def execute_youtube_run(
     metadata_fetch_failures = sum(int(result.get("metadata_fetch_failures", 0)) for result in video_results.values())
     transcript_fetch_failures = sum(int(result.get("transcript_fetch_failures", 0)) for result in video_results.values())
     skipped_no_transcript = sum(int(result.get("skipped_no_transcript", 0)) for result in video_results.values())
+    skipped_inaccessible = sum(int(result.get("skipped_inaccessible", 0)) for result in video_results.values())
 
-    successful_count = sum(1 for item in video_summaries if item.get("status") not in {"failed"})
+    successful_count = sum(
+        1
+        for item in video_summaries
+        if str(item.get("status") or "").lower() not in {"failed", "llm_failed"}
+    )
     synthesis = (synthesis_builder or synthesize_youtube_run)(
         run_id=run_id,
         run_dir=run_dir,
@@ -221,6 +226,7 @@ def execute_youtube_run(
             "metadata_fetch_failures": metadata_fetch_failures,
             "transcript_fetch_failures": transcript_fetch_failures,
             "skipped_no_transcript": skipped_no_transcript,
+            "skipped_inaccessible": skipped_inaccessible,
         },
         "parallel_video_execution": {
             "enabled": config.channel.max_parallel_videos > 1,
@@ -436,6 +442,30 @@ def _process_video_reference(
         )
         return result
     except Exception as exc:
+        inaccessible_reason = _expected_inaccessible_video_reason(str(exc))
+        if inaccessible_reason:
+            result["selected"] = 0
+            result["failed"] = 0
+            result["metadata_fetch_failures"] = 0
+            result["skipped_inaccessible"] = 1
+            result["status"] = "skipped_inaccessible"
+            _write_json(
+                video_dir / "collection_status.json",
+                {
+                    "video_id": reference.video_id,
+                    "title": reference.title,
+                    "video_url": reference.url,
+                    "source_url": reference.source_url,
+                    "published_at": (
+                        reference.published_at.isoformat()
+                        if reference.published_at
+                        else None
+                    ),
+                    "status": "skipped_inaccessible",
+                    "reason": inaccessible_reason,
+                },
+            )
+            return result
         if metadata_bundle is None:
             result["metadata_fetch_failures"] = 1
         result["selected"] = 1
@@ -489,6 +519,7 @@ def _empty_video_worker_result() -> dict[str, Any]:
         "metadata_fetch_failures": 0,
         "transcript_fetch_failures": 0,
         "skipped_no_transcript": 0,
+        "skipped_inaccessible": 0,
         "status": "",
         "manifest_item": None,
     }
@@ -855,6 +886,47 @@ def _video_analysis_failed(summary: dict[str, Any]) -> bool:
         str(summary.get(field) or "").strip().lower() in failure_statuses
         for field in ("status", "llm_status")
     )
+
+
+def _expected_inaccessible_video_reason(error: str) -> str | None:
+    normalized = " ".join(str(error or "").lower().split())
+    classifications = (
+        (
+            "members_only",
+            (
+                "members-only",
+                "join this channel to get access",
+                "membership required",
+            ),
+        ),
+        (
+            "private",
+            (
+                "this video is private",
+                "private video",
+            ),
+        ),
+        (
+            "removed",
+            (
+                "has been removed by the uploader",
+                "video has been removed",
+                "account associated with this video has been terminated",
+            ),
+        ),
+        (
+            "rights_restricted",
+            (
+                "copyright grounds",
+                "blocked in your country",
+                "not available in your country",
+            ),
+        ),
+    )
+    for reason, markers in classifications:
+        if any(marker in normalized for marker in markers):
+            return reason
+    return None
 
 
 def _archived_summary_has_usable_transcript(video_dir: Path, summary: dict[str, Any]) -> bool:
