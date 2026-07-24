@@ -196,10 +196,16 @@ def _source_payloads(
         video
         for video in videos
         if str(video.get("status") or "").lower()
-        not in {"failed", "skipped_no_transcript"}
+        not in {"failed", "llm_failed", "skipped_no_transcript"}
     ][: max(1, max_videos)]
     for index, video in enumerate(eligible):
         summary = _read_json_artifact(run_dir, video.get("public_summary_path"))
+        if any(
+            str(summary.get(field) or "").strip().lower()
+            in {"failed", "llm_failed"}
+            for field in ("status", "llm_status")
+        ):
+            continue
         if str(summary.get("transcript_status") or "available") != "available":
             continue
         report = _read_text_artifact(run_dir, video.get("final_report_path"))

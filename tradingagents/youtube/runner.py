@@ -820,7 +820,7 @@ def _copy_reusable_video_artifacts(
             summary = json.loads(summary_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
-        if not isinstance(summary, dict) or summary.get("status") == "failed":
+        if not isinstance(summary, dict) or _video_analysis_failed(summary):
             continue
         if not _archived_summary_has_usable_transcript(source_video_dir, summary):
             continue
@@ -847,6 +847,14 @@ def _copy_reusable_video_artifacts(
             "run_id": _run_id_from_video_dir(source_video_dir),
         }
     return None
+
+
+def _video_analysis_failed(summary: dict[str, Any]) -> bool:
+    failure_statuses = {"failed", "llm_failed"}
+    return any(
+        str(summary.get(field) or "").strip().lower() in failure_statuses
+        for field in ("status", "llm_status")
+    )
 
 
 def _archived_summary_has_usable_transcript(video_dir: Path, summary: dict[str, Any]) -> bool:
