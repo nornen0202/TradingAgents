@@ -1939,7 +1939,7 @@ _PRIVATE_JS = r"""
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
       <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}</span></div>
       <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
-      <div class="execution-status"><div><strong>현재 실행 행동</strong><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div><span class="execution-action">${esc(executionAction)}</span><p class="readiness-note">${esc(readiness.note)}</p></div>
+      <div class="execution-status"><div><strong>현재 실행 상태·행동</strong><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div><span class="execution-action">${esc(executionAction)}</span><p class="readiness-note">${esc(readiness.note)}</p></div>
       ${guidance ? `<div class="account-guidance"><strong>계좌 운용 참고 · 현재 매도 지시와 별개</strong><p>${esc(guidance)}</p></div>` : ''}
       ${signalStrip(row, confidence)}
       <div class="condition-grid">

@@ -502,7 +502,7 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "AES-GCM" not in private_js
     assert "private.enc.json" not in private_js
     assert "분석 시점 전략 방향" in private_js
-    assert "현재 실행 행동" in private_js
+    assert "현재 실행 상태·행동" in private_js
     assert "현재 주문 없음 · 기존 보유 유지" in private_js
     assert "계좌 운용 참고 · 현재 매도 지시와 별개" in private_js
     assert "전략 발동 조건" in private_js
