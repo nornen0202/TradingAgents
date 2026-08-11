@@ -796,14 +796,60 @@ def resolve_trade_date(
     if not isinstance(last_date, date):
         raise RuntimeError(f"Unexpected trade date index value for {ticker}: {last_index!r}")
     if expected_completed_date is not None:
+        market = _trade_date_market(ticker=normalized_symbol, config=config)
+        wait_seconds = max(0.0, config.run.latest_market_data_wait_minutes * 60.0)
+        retry_interval = max(1.0, config.run.latest_market_data_retry_interval_seconds)
+        waited_seconds = 0.0
+        while last_date < expected_completed_date and waited_seconds < wait_seconds:
+            delay = min(retry_interval, wait_seconds - waited_seconds)
+            print(
+                "::warning::"
+                f"Vendor daily bar for {ticker} ({normalized_symbol}) is not ready: "
+                f"latest={last_date.isoformat()}, expected={expected_completed_date.isoformat()}. "
+                f"Retrying in {delay:g}s."
+            )
+            sleep(delay)
+            waited_seconds += delay
+            try:
+                refreshed_history = _fetch_recent_trade_date_history(
+                    normalized_symbol,
+                    lookback_days=config.run.latest_market_data_lookback_days,
+                )
+            except Exception as exc:
+                if not is_retryable_yfinance_error(exc):
+                    raise
+                print(
+                    "::warning::"
+                    f"Yahoo Finance retry failed for {ticker} ({normalized_symbol}); "
+                    f"continuing freshness wait. reason={_summarize_exception(exc)}"
+                )
+                continue
+            if refreshed_history is None or refreshed_history.empty:
+                print(
+                    "::warning::"
+                    f"Yahoo Finance retry returned no rows for {ticker} ({normalized_symbol}); "
+                    "continuing freshness wait."
+                )
+                continue
+            refreshed_index = refreshed_history.index[-1]
+            refreshed_value = getattr(refreshed_index, "to_pydatetime", lambda: refreshed_index)()
+            refreshed_date = refreshed_value.date() if hasattr(refreshed_value, "date") else refreshed_value
+            if not isinstance(refreshed_date, date):
+                raise RuntimeError(f"Unexpected trade date index value for {ticker}: {refreshed_index!r}")
+            last_date = max(last_date, refreshed_date)
         if last_date > expected_completed_date:
             return expected_completed_date.isoformat()
         if last_date < expected_completed_date:
-            market = _trade_date_market(ticker=normalized_symbol, config=config)
+            wait_detail = (
+                f" after waiting {waited_seconds:g}s for vendor catch-up"
+                if waited_seconds
+                else ""
+            )
             raise RuntimeError(
                 f"Refusing stale latest_available trade date for {ticker} ({normalized_symbol}): "
                 f"vendor latest row is {last_date.isoformat()} but {market} calendar expects "
-                f"completed daily bar {expected_completed_date.isoformat()} as of {now.isoformat()}."
+                f"completed daily bar {expected_completed_date.isoformat()} as of {now.isoformat()}"
+                f"{wait_detail}."
             )
     return last_date.isoformat()
 

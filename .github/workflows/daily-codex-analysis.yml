@@ -1,7 +1,7 @@
 name: Daily Codex Analysis
 run-name: >-
   Daily Codex Analysis
-  [profile=${{ inputs.profile || ((github.event.schedule == '35 19 * * 0-4' || github.event.schedule == '5 20 * * 0-4' || github.event.schedule == '35 20 * * 0-4') && 'kr') || (github.event_name == 'schedule' && 'us') || 'all' }}]
+  [profile=${{ inputs.profile || ((github.event.schedule == '35 19 * * 0-4' || github.event.schedule == '5 20 * * 0-4' || github.event.schedule == '35 20 * * 0-4' || github.event.schedule == '5 22 * * 0-4' || github.event.schedule == '35 22 * * 0-4') && 'kr') || (github.event_name == 'schedule' && 'us') || 'all' }}]
   [run_mode=${{ (inputs.site_only && 'site_only') || inputs.analysis_mode || 'full' }}]
   [request_scope=${{ inputs.tickers && 'custom_tickers' || 'default_universe' }}]
   [recovery_source=${{ inputs.recovery_source || (github.event_name == 'schedule' && 'native') || 'manual' }}]
@@ -10,10 +10,13 @@ on:
   schedule:
     # KR target: deploy the main report by about 10:00 KST while still leaving
     # room for three useful same-day KR overlay publishes before 14:30 KST.
-    # Probes are 04:35, 05:05, and 05:35 KST weekdays; the gate skips duplicates.
+    # Primary probes are 04:35, 05:05, and 05:35 KST weekdays. Late vendor
+    # recovery probes are 07:05 and 07:35 KST; the gate skips duplicates.
     - cron: '35 19 * * 0-4'
     - cron: '5 20 * * 0-4'
     - cron: '35 20 * * 0-4'
+    - cron: '5 22 * * 0-4'
+    - cron: '35 22 * * 0-4'
     # US target: deploy the main report by about 22:30 KST, near the regular
     # session open in US daylight time, with backup probes before the first
     # useful US overlay window.
@@ -118,7 +121,9 @@ jobs:
               "50 9 * * 1-5": {"profile": "us", "window_start": "17:45", "target_jobs": ["analyze_us", "build_pages"], "blockers": [{"name": "intraday-overlay-kr-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "09:30", "target_jobs": ["overlay_refresh_kr", "publish_overlay_site", "deploy_overlay"]}]},
               "35 19 * * 0-4": {"profile": "kr", "window_start": "04:30", "target_jobs": ["analyze_kr", "build_pages"], "blockers": [{"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
               "5 20 * * 0-4": {"profile": "kr", "window_start": "04:30", "target_jobs": ["analyze_kr", "build_pages"], "blockers": [{"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
-              "35 20 * * 0-4": {"profile": "kr", "window_start": "04:30", "target_jobs": ["analyze_kr", "build_pages"], "blockers": [{"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]}
+              "35 20 * * 0-4": {"profile": "kr", "window_start": "04:30", "target_jobs": ["analyze_kr", "build_pages"], "blockers": [{"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
+              "5 22 * * 0-4": {"profile": "kr", "window_start": "04:30", "target_jobs": ["analyze_kr", "build_pages"], "blockers": [{"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
+              "35 22 * * 0-4": {"profile": "kr", "window_start": "04:30", "target_jobs": ["analyze_kr", "build_pages"], "blockers": [{"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]}
             }
         run: python .github/scripts/scheduled_workflow_gate.py
 

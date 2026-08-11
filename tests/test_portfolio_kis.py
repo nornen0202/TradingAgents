@@ -1,5 +1,5 @@
 import unittest
-from datetime import date
+from datetime import date, datetime
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
@@ -15,6 +15,13 @@ from tradingagents.portfolio.kis import (
     validate_kis_credentials,
 )
 from tradingagents.portfolio.pipeline import _derive_watchlist_reason, load_snapshot_for_profile
+
+
+class _FixedDatetime(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        value = datetime(2026, 6, 1, 12, 0)
+        return value.replace(tzinfo=tz) if tz else value
 
 
 class PortfolioKisTests(unittest.TestCase):
@@ -206,6 +213,7 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(client.request_json.call_args_list[0].kwargs["tr_cont"], "")
         self.assertEqual(client.request_json.call_args_list[1].kwargs["tr_cont"], "N")
 
+    @patch("tradingagents.portfolio.kis.datetime", _FixedDatetime)
     def test_fetch_domestic_order_fills_uses_daily_ccld_and_paginates(self):
         client = KisClient(
             app_key="app-key",
