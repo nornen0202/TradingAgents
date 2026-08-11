@@ -84,6 +84,8 @@ def test_daily_workflow_runs_us_and_kr_at_revised_kst_targets():
     assert "35 19 * * 0-4" in workflow
     assert "5 20 * * 0-4" in workflow
     assert "35 20 * * 0-4" in workflow
+    assert "5 22 * * 0-4" in workflow
+    assert "35 22 * * 0-4" in workflow
     assert "50 8 * * 1-5" in workflow
     assert "20 9 * * 1-5" in workflow
     assert "50 9 * * 1-5" in workflow
@@ -107,7 +109,13 @@ def test_daily_workflow_runs_us_and_kr_at_revised_kst_targets():
     match = re.search(r"SCHEDULE_GATE_TARGETS_JSON:\s*>-\s*\n(?P<body>(?: {12}.*\n)+)", workflow)
     assert match is not None
     targets = json.loads("\n".join(line[12:] for line in match.group("body").splitlines()))
-    for cron in ("35 19 * * 0-4", "5 20 * * 0-4", "35 20 * * 0-4"):
+    for cron in (
+        "35 19 * * 0-4",
+        "5 20 * * 0-4",
+        "35 20 * * 0-4",
+        "5 22 * * 0-4",
+        "35 22 * * 0-4",
+    ):
         assert targets[cron]["profile"] == "kr"
         assert targets[cron]["window_start"] == "04:30"
         assert targets[cron]["target_jobs"] == ["analyze_kr", "build_pages"]

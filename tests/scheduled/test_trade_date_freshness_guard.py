@@ -37,7 +37,12 @@ class _ConstitutionDayWeekendDatetime(datetime):
         return value.replace(tzinfo=tz) if tz else value
 
 
-def _config(market: str = "US"):
+def _config(
+    market: str = "US",
+    *,
+    wait_minutes: float = 0,
+    retry_interval_seconds: float = 300,
+):
     with tempfile.TemporaryDirectory() as tmpdir:
         config_path = Path(tmpdir) / "scheduled.toml"
         config_path.write_text(
@@ -47,6 +52,8 @@ tickers = ["AAPL"]
 market = "{market}"
 trade_date_mode = "latest_available"
 timezone = "Asia/Seoul"
+latest_market_data_wait_minutes = {wait_minutes}
+latest_market_data_retry_interval_seconds = {retry_interval_seconds}
 
 [storage]
 archive_dir = "./archive"
@@ -72,6 +79,53 @@ class TradeDateFreshnessGuardTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(RuntimeError, "Refusing stale latest_available trade date"):
                 resolve_trade_date("AAPL", _config("US"))
+
+    def test_latest_available_waits_for_delayed_vendor_bar(self):
+        with (
+            patch("tradingagents.scheduled.runner.datetime", _FixedDatetime),
+            patch(
+                "tradingagents.scheduled.runner._completed_daily_trade_date_from_exchange_calendar",
+                return_value=date(2026, 6, 29),
+            ),
+            patch(
+                "tradingagents.scheduled.runner._fetch_recent_trade_date_history",
+                side_effect=[
+                    _FakeHistory(date(2026, 6, 26)),
+                    _FakeHistory(date(2026, 6, 29)),
+                ],
+            ) as fetch_history,
+            patch("tradingagents.scheduled.runner.sleep") as wait,
+        ):
+            trade_date = resolve_trade_date(
+                "000660.KS",
+                _config("KR", wait_minutes=2, retry_interval_seconds=60),
+            )
+
+        self.assertEqual(trade_date, "2026-06-29")
+        self.assertEqual(fetch_history.call_count, 2)
+        wait.assert_called_once_with(60.0)
+
+    def test_latest_available_fails_closed_after_vendor_wait_expires(self):
+        with (
+            patch("tradingagents.scheduled.runner.datetime", _FixedDatetime),
+            patch(
+                "tradingagents.scheduled.runner._completed_daily_trade_date_from_exchange_calendar",
+                return_value=date(2026, 6, 29),
+            ),
+            patch(
+                "tradingagents.scheduled.runner._fetch_recent_trade_date_history",
+                return_value=_FakeHistory(date(2026, 6, 26)),
+            ) as fetch_history,
+            patch("tradingagents.scheduled.runner.sleep") as wait,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "after waiting 120s"):
+                resolve_trade_date(
+                    "000660.KS",
+                    _config("KR", wait_minutes=2, retry_interval_seconds=60),
+                )
+
+        self.assertEqual(fetch_history.call_count, 3)
+        self.assertEqual(wait.call_count, 2)
 
     def test_latest_available_caps_future_or_partial_vendor_date_to_completed_market_session(self):
         with (

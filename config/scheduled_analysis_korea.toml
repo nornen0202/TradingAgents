@@ -9,6 +9,11 @@ timezone = "Asia/Seoul"
 max_debate_rounds = 1
 max_risk_discuss_rounds = 1
 latest_market_data_lookback_days = 14
+# Yahoo Finance can publish the completed KRX daily bar several hours late.
+# Keep the first scheduled job active and recheck instead of exhausting all
+# backup runs before the data vendor catches up.
+latest_market_data_wait_minutes = 150
+latest_market_data_retry_interval_seconds = 600
 continue_on_ticker_error = true
 report_polisher_enabled = true
 max_runtime_minutes = 0

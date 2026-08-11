@@ -41,6 +41,8 @@ class RunSettings:
     max_debate_rounds: int = 2
     max_risk_discuss_rounds: int = 2
     latest_market_data_lookback_days: int = 14
+    latest_market_data_wait_minutes: float = 0.0
+    latest_market_data_retry_interval_seconds: float = 300.0
     continue_on_ticker_error: bool = True
     report_polisher_enabled: bool = True
     ticker_name_overrides: dict[str, str] = field(default_factory=dict)
@@ -401,6 +403,14 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             max_debate_rounds=int(run_raw.get("max_debate_rounds", 2)),
             max_risk_discuss_rounds=int(run_raw.get("max_risk_discuss_rounds", 2)),
             latest_market_data_lookback_days=int(run_raw.get("latest_market_data_lookback_days", 14)),
+            latest_market_data_wait_minutes=max(
+                0.0,
+                float(run_raw.get("latest_market_data_wait_minutes", 0.0) or 0.0),
+            ),
+            latest_market_data_retry_interval_seconds=max(
+                1.0,
+                float(run_raw.get("latest_market_data_retry_interval_seconds", 300.0) or 300.0),
+            ),
             continue_on_ticker_error=bool(run_raw.get("continue_on_ticker_error", True)),
             report_polisher_enabled=bool(run_raw.get("report_polisher_enabled", True)),
             ticker_name_overrides=_normalize_ticker_name_overrides(raw.get("ticker_names") or {}),
