@@ -83,6 +83,14 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
     )
     _build_youtube_site_addon(archive_dir=archive_dir, site_dir=site_dir)
     _build_prism_telegram_site_addon(archive_dir=archive_dir, site_dir=site_dir)
+    if getattr(settings, "publish_account_snapshot", False):
+        from tradingagents.scheduled.account_site import build_public_account_site
+
+        build_public_account_site(
+            site_dir=site_dir,
+            manifests=manifests,
+            public_base_url=getattr(settings, "public_base_url", ""),
+        )
     from tradingagents.work.site import build_work_site
 
     build_work_site(
@@ -759,6 +767,11 @@ def _render_index_page(
         if representative
         else ""
     )
+    account_snapshot_link = (
+        '<a class="button" href="account/index.html">Open 공개 계좌 현황</a>'
+        if getattr(settings, "publish_account_snapshot", False)
+        else ""
+    )
     latest_technical_html = ""
     latest_technical_run = latest if latest and representative and latest["run_id"] != representative["run_id"] else None
     latest_daily_run = _select_latest_daily_run(manifests)
@@ -816,6 +829,7 @@ def _render_index_page(
             <a class="button" href="mobile/index.html">Open 모바일 공개 리서치</a>
             <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
             <a class="button" href="prism-telegram/index.html">Open PRISM Telegram 리포트</a>
+            {account_snapshot_link}
             {latest_portfolio_link}
             {latest_daily_html}
             {latest_technical_html}
@@ -837,6 +851,7 @@ def _render_index_page(
             <a class="button" href="strategy.html">Open PC 통합 투자 전략</a>
             <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
             <a class="button" href="prism-telegram/index.html">Open PRISM Telegram 리포트</a>
+            {account_snapshot_link}
           </div>
         </section>
         """
@@ -5313,5 +5328,72 @@ a { color: inherit; }
     grid-column: 1 / -1;
     text-align: left;
   }
+}
+
+.account-snapshot-shell { max-width: 1240px; }
+.account-snapshot-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+  padding: 24px 2px 18px;
+}
+.account-snapshot-hero h1, .account-market-panel h2 { margin: 0; letter-spacing: -0.04em; }
+.account-snapshot-hero h1 { font-size: clamp(2rem, 5vw, 3.4rem); }
+.account-generated { color: var(--muted); text-align: right; }
+.account-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 360px;
+  margin: 10px auto 20px;
+  padding: 4px;
+  border-radius: 16px;
+  background: rgba(19, 34, 56, 0.08);
+}
+.account-tabs button {
+  border: 0;
+  border-radius: 12px;
+  padding: 11px 18px;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.account-tabs button[aria-selected="true"] { color: var(--ink); background: white; box-shadow: 0 4px 16px rgba(17,34,51,.12); }
+.account-market-panel, .account-disclosure {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.account-panel-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; padding: 22px 24px; }
+.account-panel-head p { margin: 0; color: var(--muted); text-align: right; }
+.account-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border-block: 1px solid var(--line); }
+.account-kpis article { padding: 18px 20px; background: white; }
+.account-kpis span, .account-kpis strong { display: block; }
+.account-kpis span { color: var(--muted); font-size: .86rem; }
+.account-kpis strong { margin-top: 6px; font-size: 1.22rem; }
+.account-holdings-table { overflow-x: auto; }
+.account-holdings-table table { width: 100%; min-width: 860px; border-collapse: collapse; }
+.account-holdings-table th, .account-holdings-table td { padding: 15px 18px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: middle; }
+.account-holdings-table thead th { color: var(--ink); background: rgba(19,34,56,.025); font-size: .92rem; }
+.account-holdings-table thead span, .account-holdings-table tbody span { display: block; margin-top: 4px; color: var(--muted); font-weight: 400; }
+.account-holdings-table th:first-child { width: 26%; text-align: left; }
+.account-holdings-table tbody tr:last-child > * { border-bottom: 0; }
+.account-positive { color: #c7364f !important; }
+.account-negative { color: #2e68c7 !important; }
+.account-neutral { color: var(--muted) !important; }
+.account-empty { padding: 48px 24px; color: var(--muted); text-align: center; }
+.account-disclosure { margin-top: 18px; padding: 20px 24px; }
+.account-disclosure p { margin: 8px 0 0; color: var(--muted); line-height: 1.6; }
+
+@media (max-width: 720px) {
+  .account-snapshot-hero { align-items: start; flex-direction: column; }
+  .account-generated, .account-panel-head p { text-align: left; }
+  .account-panel-head { align-items: start; flex-direction: column; }
+  .account-kpis { grid-template-columns: repeat(2, 1fr); }
+  .account-holdings-table th, .account-holdings-table td { padding: 13px 14px; }
 }
 """

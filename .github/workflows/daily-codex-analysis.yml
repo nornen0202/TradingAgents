@@ -1507,6 +1507,22 @@ jobs:
               args += ["--archive-dir", archive_dir]
           subprocess.check_call(args)
 
+      - name: Verify public account snapshot page
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/verify_public_account_site.py",
+                  "--site-dir",
+                  "site",
+                  "--require-markets",
+                  "${{ needs.schedule_gate.outputs.profile }}",
+              ]
+          )
+
       - name: Stamp rollback-resistant Pages snapshot
         id: stamp_pages_snapshot
         run: |

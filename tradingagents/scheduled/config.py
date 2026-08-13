@@ -111,6 +111,7 @@ class SiteSettings:
     max_runs_on_homepage: int = 30
     max_published_runs: int = 120
     public_base_url: str = ""
+    publish_account_snapshot: bool = False
 
 
 @dataclass(frozen=True)
@@ -517,6 +518,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             max_runs_on_homepage=int(site_raw.get("max_runs_on_homepage", 30)),
             max_published_runs=int(site_raw.get("max_published_runs", 120)),
             public_base_url=str(site_raw.get("public_base_url", "")).strip(),
+            publish_account_snapshot=bool(site_raw.get("publish_account_snapshot", False)),
         ),
         portfolio=PortfolioSettings(
             enabled=bool(portfolio_raw.get("enabled", False)),
