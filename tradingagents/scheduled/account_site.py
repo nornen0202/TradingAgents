@@ -227,6 +227,7 @@ def _render_account_page(payload: dict[str, Any]) -> str:
             "contentUrl": payload["json_url"],
         },
     }
+    dataset_json = json.dumps(dataset, ensure_ascii=False).replace("</", "<\\/")
     return f"""<!doctype html>
 <html lang="ko">
 <head>
@@ -237,7 +238,7 @@ def _render_account_page(payload: dict[str, Any]) -> str:
   <link rel="alternate" type="application/json" href="public.json" title="Public account snapshot JSON">
   <link rel="stylesheet" href="../assets/style.css">
   <title>공개 주식 계좌 현황 · TradingAgents</title>
-  <script type="application/ld+json">{json.dumps(dataset, ensure_ascii=False).replace('</', '<\\/')}</script>
+  <script type="application/ld+json">{dataset_json}</script>
 </head>
 <body>
   <main class="shell account-snapshot-shell">
