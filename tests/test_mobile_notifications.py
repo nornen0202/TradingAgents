@@ -952,14 +952,25 @@ class WorkflowDefinitionTests(unittest.TestCase):
         self.assertIn("runs-on: ubuntu-latest", text)
         self.assertIn("head_repository.full_name == github.repository", text)
         self.assertIn("head_branch == 'main'", text)
-        self.assertIn("TELEGRAM_NOTIFICATION_CHAT_ID", text)
+        self.assertIn(
+            "TELEGRAM_BOT_TOKEN: ${{ secrets.DEPLOYMENT_TELEGRAM_BOT_TOKEN }}",
+            text,
+        )
+        self.assertIn(
+            "TELEGRAM_NOTIFICATION_CHAT_ID: "
+            "${{ secrets.DEPLOYMENT_TELEGRAM_NOTIFICATION_CHAT_ID }}",
+            text,
+        )
+        self.assertNotIn("secrets.TELEGRAM_BOT_TOKEN", text)
+        self.assertNotIn("secrets.TELEGRAM_NOTIFICATION_CHAT_ID", text)
         self.assertNotIn("MOBILE_DASHBOARD_KEY", text)
         self.assertIn("--cards-only", text)
         self.assertIn("group: tradingagents-mobile-notification-ledger", text)
         self.assertIn("actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9", text)
         self.assertIn("actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9", text)
         self.assertIn("if: ${{ always() }}", text)
-        self.assertIn("telegram-notification-ledger-v1-", text)
+        self.assertIn("deployment-telegram-notification-ledger-v1-", text)
+        self.assertIn("notifications\\deployment-telegram-ledger.json", text)
         private_job = text.split("  notify_private_cards:", 1)[1]
         setup = private_job.index("      - name: Set up Python")
         send = private_job.index(
