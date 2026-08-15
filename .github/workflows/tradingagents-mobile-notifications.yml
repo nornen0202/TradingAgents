@@ -91,18 +91,18 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Restore persistent Telegram incident ledger
+      - name: Restore deployment Telegram incident ledger
         id: restore_telegram_ledger
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ${{ runner.temp }}/telegram-notification-ledger.json
-          key: telegram-notification-ledger-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/deployment-telegram-notification-ledger.json
+          key: deployment-telegram-notification-ledger-v1-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
-            telegram-notification-ledger-v1-
+            deployment-telegram-notification-ledger-v1-
 
       - name: Initialize Telegram incident ledger on cache miss
         env:
-          TELEGRAM_LEDGER_PATH: ${{ runner.temp }}/telegram-notification-ledger.json
+          TELEGRAM_LEDGER_PATH: ${{ runner.temp }}/deployment-telegram-notification-ledger.json
         run: |
           python - <<'PY'
           import json
@@ -126,14 +126,14 @@ jobs:
               )
           PY
 
-      - name: Send Telegram completion or failure notification
+      - name: Send deployment Telegram completion or failure notification
         id: notify_telegram
         env:
           GH_TOKEN: ${{ github.token }}
           UPSTREAM_RUN_ID: ${{ github.event.workflow_run.id || inputs.upstream_run_id }}
           NOTIFICATION_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.TELEGRAM_NOTIFICATION_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.DEPLOYMENT_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.DEPLOYMENT_TELEGRAM_NOTIFICATION_CHAT_ID }}
         run: |
           set -euo pipefail
           archive_dir="$RUNNER_TEMP/no-local-archive"
@@ -143,7 +143,7 @@ jobs:
             --repository "$GITHUB_REPOSITORY"
             --upstream-run-id "$UPSTREAM_RUN_ID"
             --archive-dir "$archive_dir"
-            --ledger-path "$RUNNER_TEMP/telegram-notification-ledger.json"
+            --ledger-path "$RUNNER_TEMP/deployment-telegram-notification-ledger.json"
             --public-base-url "https://nornen0202.github.io/TradingAgents"
           )
           if [[ "$NOTIFICATION_DRY_RUN" == "true" ]]; then
@@ -155,8 +155,8 @@ jobs:
         if: ${{ always() }}
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ${{ runner.temp }}/telegram-notification-ledger.json
-          key: telegram-notification-ledger-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/deployment-telegram-notification-ledger.json
+          key: deployment-telegram-notification-ledger-v1-${{ github.run_id }}-${{ github.run_attempt }}
 
   notify_private_cards:
     name: Add private archive action cards
@@ -197,14 +197,14 @@ jobs:
           UPSTREAM_RUN_ID: ${{ github.event.workflow_run.id || inputs.upstream_run_id }}
           NOTIFICATION_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
           TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.TELEGRAM_NOTIFICATION_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.DEPLOYMENT_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.DEPLOYMENT_TELEGRAM_NOTIFICATION_CHAT_ID }}
         run: |
           $archiveDir = $env:TRADINGAGENTS_ARCHIVE_DIR
           if ([string]::IsNullOrWhiteSpace($archiveDir)) {
             $archiveDir = "C:\TradingAgentsData\archive"
           }
-          $ledgerPath = Join-Path $archiveDir "notifications\telegram-ledger.json"
+          $ledgerPath = Join-Path $archiveDir "notifications\deployment-telegram-ledger.json"
           $arguments = @(
             "-m", "tradingagents.notifications", "notify",
             "--repository", $env:GITHUB_REPOSITORY,
