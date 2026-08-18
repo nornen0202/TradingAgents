@@ -176,6 +176,8 @@ function Get-FailureDiagnosticSignature {
                 $line = $_.ToLowerInvariant()
                 $line = $line -replace '^\d{4}-\d{2}-\d{2}t\d{2}:\d{2}:\d{2}(\.\d+)?z\s+', ''
                 $line = $line -replace 'https?://\S+', '<url>'
+                $line = $line -replace '(?i)\b([0-9a-f]{2,}:){2,}[0-9a-f]{2,}\b', '<request-id>'
+                $line = $line -replace '(?i)\b(request|trace|correlation)[_-]?id\s*[:=]\s*[^\s,;]+', 'request-id=<request-id>'
                 $line = $line -replace '\b[0-9a-f]{12,}\b', '<hex>'
                 ($line -replace '\s+', ' ').Trim()
             } |
