@@ -12,6 +12,10 @@ from email.utils import parsedate_to_datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from tradingagents.scheduled.automation_calendar import (
+    automated_market_session_status,
+)
+
 
 KST = ZoneInfo("Asia/Seoul")
 UTC = timezone.utc
@@ -269,6 +273,7 @@ def decide_schedule_gate(
     targets: dict[str, ScheduleTarget],
     now_kst: datetime,
     check_blockers: bool = True,
+    market_status_resolver=automated_market_session_status,
 ) -> tuple[str, bool, str]:
     if event_name != "schedule":
         profile = requested_profile.strip() or manual_default_profile
@@ -277,6 +282,23 @@ def decide_schedule_gate(
     target = targets.get(schedule)
     if target is None:
         return "", False, f"Unrecognized scheduled cron: {schedule}"
+
+    if target.profile in {"kr", "us"}:
+        try:
+            market_status = market_status_resolver(target.profile, now_kst)
+        except Exception as exc:
+            return (
+                target.profile,
+                False,
+                f"Holding {target.profile.upper()} scheduled run; market calendar check failed: {type(exc).__name__}.",
+            )
+        if market_status.is_session is not True:
+            state = "closed" if market_status.is_session is False else "unavailable"
+            return (
+                target.profile,
+                False,
+                f"Holding {target.profile.upper()} scheduled run; market is {state} for {market_status.session_date} ({market_status.source}).",
+            )
 
     window_start_kst = _window_start(now_kst, target.window_start_time)
     window_start_utc = window_start_kst.astimezone(UTC)
