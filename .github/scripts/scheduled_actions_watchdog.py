@@ -14,6 +14,10 @@ from datetime import datetime, time, timedelta, timezone
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from tradingagents.scheduled.automation_calendar import (
+    automated_market_session_status,
+)
+
 
 KST = ZoneInfo("Asia/Seoul")
 UTC = timezone.utc
@@ -438,6 +442,18 @@ def _sanitize_diagnostic_line(line: str) -> str:
     value = re.sub(r"^\d{4}-\d{2}-\d{2}t\d{2}:\d{2}:\d{2}(?:\.\d+)?z\s+", "", value)
     value = re.sub(r"https?://\S+", "<url>", value)
     value = re.sub(r"(?:[a-z]:)?[/\\][^\s:]+(?:[/\\][^\s:]+)+", "<path>", value)
+    value = re.sub(
+        r"\b(?:[0-9a-f]{2,}:){2,}[0-9a-f]{2,}\b",
+        "<request-id>",
+        value,
+        flags=re.IGNORECASE,
+    )
+    value = re.sub(
+        r"\b(?:request|trace|correlation)[_-]?id\s*[:=]\s*[^\s,;]+",
+        "request-id=<request-id>",
+        value,
+        flags=re.IGNORECASE,
+    )
     value = re.sub(r"\b[0-9a-f]{12,}\b", "<hex>", value)
     value = re.sub(r"\s+", " ", value)
     return value[:1000]
@@ -806,9 +822,30 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
     return targets
 
 
-def run_watchdog(*, client: GitHubActionsClient, now_kst: datetime, dry_run: bool = False) -> list[str]:
+def run_watchdog(
+    *,
+    client: GitHubActionsClient,
+    now_kst: datetime,
+    dry_run: bool = False,
+    market_status_resolver=automated_market_session_status,
+) -> list[str]:
     messages: list[str] = []
     for target in due_targets(now_kst):
+        profile = str(target.inputs.get("profile") or "").lower()
+        if profile in {"kr", "us"}:
+            try:
+                market_status = market_status_resolver(profile, now_kst)
+            except Exception as exc:
+                messages.append(
+                    f"{target.name}: held; market calendar check failed: {type(exc).__name__}."
+                )
+                continue
+            if market_status.is_session is not True:
+                state = "closed" if market_status.is_session is False else "unavailable"
+                messages.append(
+                    f"{target.name}: held; market is {state} for {market_status.session_date} ({market_status.source})."
+                )
+                continue
         blockers_clear, blocker_reason = blockers_are_clear(client=client, target=target)
         if not blockers_clear:
             messages.append(f"{target.name}: waiting; {blocker_reason}")
@@ -827,7 +864,18 @@ def run_watchdog(*, client: GitHubActionsClient, now_kst: datetime, dry_run: boo
         if dry_run:
             messages.append(f"{target.name}: would dispatch; {reason}")
             continue
-        client.dispatch(target.workflow_file, target.inputs)
+        try:
+            client.dispatch(target.workflow_file, target.inputs)
+        except urllib.error.HTTPError as exc:
+            messages.append(
+                f"{target.name}: dispatch deferred; GitHub Actions API unavailable HTTP {exc.code}."
+            )
+            continue
+        except (urllib.error.URLError, TimeoutError):
+            messages.append(
+                f"{target.name}: dispatch deferred; GitHub Actions API unavailable."
+            )
+            continue
         messages.append(f"{target.name}: dispatched {target.workflow_file}; {reason}")
     if not messages:
         messages.append(f"No watchdog targets due at {now_kst.isoformat()}.")
