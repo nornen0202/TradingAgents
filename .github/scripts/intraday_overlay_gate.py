@@ -9,6 +9,10 @@ from datetime import datetime, time, timedelta, timezone
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from tradingagents.scheduled.automation_calendar import (
+    automated_market_session_status,
+)
+
 
 KST = ZoneInfo("Asia/Seoul")
 UTC = timezone.utc
@@ -290,12 +294,27 @@ def decide_intraday_gate(
     now_kst: datetime,
     current_run_id: int = 0,
     max_schedule_delay_minutes: int = DEFAULT_MAX_SCHEDULE_DELAY_MINUTES,
+    market_status_resolver=automated_market_session_status,
 ) -> tuple[dict[str, bool], list[str]]:
     decisions = {"us": False, "kr": False}
     messages: list[str] = []
 
     for profile in requested_profiles(event_name=event_name, schedule=schedule, requested_profile=requested_profile):
         if event_name == "schedule":
+            try:
+                market_status = market_status_resolver(profile, now_kst)
+            except Exception as exc:
+                messages.append(
+                    f"intraday-overlay-{profile}: held; market calendar check failed: {type(exc).__name__}."
+                )
+                continue
+            if market_status.is_session is not True:
+                state = "closed" if market_status.is_session is False else "unavailable"
+                messages.append(
+                    f"intraday-overlay-{profile}: held; market is {state} for {market_status.session_date} ({market_status.source})."
+                )
+                continue
+
             fresh, freshness_reason = _schedule_fresh_enough(
                 schedule=schedule,
                 now_kst=now_kst,
