@@ -1334,6 +1334,18 @@ def _diagnostic_signature(log_text: str) -> str:
         # paths and long tokens while preserving stable error codes/messages.
         line = re.sub(r"https?://\S+", "<url>", line)
         line = re.sub(r"[A-Za-z]:\\[^\s]+", "<path>", line)
+        line = re.sub(
+            r"\b(?:[0-9a-f]{2,}:){2,}[0-9a-f]{2,}\b",
+            "<request-id>",
+            line,
+            flags=re.IGNORECASE,
+        )
+        line = re.sub(
+            r"\b(?:request|trace|correlation)[_-]?id\s*[:=]\s*[^\s,;]+",
+            "request-id=<request-id>",
+            line,
+            flags=re.IGNORECASE,
+        )
         line = re.sub(r"\b[0-9a-f]{32,}\b", "<hex>", line, flags=re.IGNORECASE)
         line = re.sub(r"\s+", " ", line).strip()[:500]
         if line:
