@@ -95,6 +95,9 @@ permissions:
 jobs:
   schedule_gate:
     runs-on: ubuntu-latest
+    concurrency:
+      group: tradingagents-official-market-calendar
+      cancel-in-progress: false
     outputs:
       profile: ${{ steps.gate.outputs.profile }}
       should_run: ${{ steps.gate.outputs.should_run }}
@@ -103,6 +106,22 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
+      - name: Resolve KST market date
+        id: market_date
+        run: echo "date=$(TZ=Asia/Seoul date +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore official market calendar cache
+        id: restore_market_calendar
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .runtime/market-calendar/kis-open-days.json
+          key: official-market-calendar-v1-${{ steps.market_date.outputs.date }}
+          restore-keys: |
+            official-market-calendar-v1-
+
+      - name: Install market calendar dependency
+        run: python -m pip install "exchange-calendars>=4.13.2"
+
       - name: Decide scheduled execution
         id: gate
         env:
@@ -110,6 +129,11 @@ jobs:
           GH_REPOSITORY: ${{ github.repository }}
           GH_RUN_ID: ${{ github.run_id }}
           GH_TOKEN: ${{ github.token }}
+          TRADINGAGENTS_KIS_MARKET_CALENDAR_ENABLED: "1"
+          TRADINGAGENTS_KIS_MARKET_CALENDAR_CACHE: .runtime/market-calendar/kis-open-days.json
+          TRADINGAGENTS_KIS_MARKET_CALENDAR_TIMEOUT_SECONDS: "15"
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
           WORKFLOW_FILE: daily-codex-analysis.yml
           EVENT_SCHEDULE: ${{ github.event.schedule }}
           REQUESTED_PROFILE: ${{ github.event.inputs.profile }}
@@ -126,6 +150,13 @@ jobs:
               "35 22 * * 0-4": {"profile": "kr", "window_start": "04:30", "target_jobs": ["analyze_kr", "build_pages"], "blockers": [{"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]}
             }
         run: python .github/scripts/scheduled_workflow_gate.py
+
+      - name: Save official market calendar cache
+        if: ${{ always() && steps.restore_market_calendar.outputs.cache-hit != 'true' && hashFiles('.runtime/market-calendar/kis-open-days.json') != '' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .runtime/market-calendar/kis-open-days.json
+          key: official-market-calendar-v1-${{ steps.market_date.outputs.date }}
 
   analyze_us:
     needs:
