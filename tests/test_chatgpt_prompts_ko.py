@@ -37,6 +37,14 @@ def test_prompts_stay_compact_and_korean_action_first() -> None:
         assert "모바일용 핵심 전략표" in text, name
         assert "종목별 상세 전략표" in text, name
         assert "| 종목 | 현재 행동 | 단기 조건 | 중장기 판단 | 위험/재확인 |" in text, name
+        assert "추가 현금 투입 시나리오" in text, name
+        assert "다른 계좌" in text, name
+        assert "최소 4개" in text, name
+        assert "최소 6개월" in text, name
+        assert "현재 충족 여부·판정시각" in text, name
+        assert "취소·재평가 조건" in text, name
+        assert "같은 문구를 조건 없이 단독으로 쓰지 마라" in text, name
+        assert "미완성 답변" in text, name
         assert "계좌 식별정보가 제거됐는가" in text, name
         assert "AVOID_OR_EXCLUDE" not in text, name
         assert "WAIT_CLOSE" not in text, name
@@ -50,6 +58,7 @@ def test_prompts_stay_compact_and_korean_action_first() -> None:
     assert "SEC EDGAR" in us
     assert "정규장, pre-market, after-hours" in us
     assert "USD/KRW" in us
+    assert "최소 4개 시나리오를 USD와 KRW로" in us
 
 
 def test_youtube_previous_day_fallback_is_explicitly_non_actionable() -> None:
