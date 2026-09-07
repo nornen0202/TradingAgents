@@ -232,6 +232,33 @@ jobs:
               ]
           )
 
+      - name: Add Git Bash to PATH for Pages packaging
+        if: runner.os == 'Windows'
+        shell: python {0}
+        run: |
+          import os
+          from pathlib import Path
+
+          for candidate in (
+              Path("C:/Program Files/Git/bin"),
+              Path("C:/Program Files/Git/usr/bin"),
+          ):
+              if (candidate / "bash.exe").is_file():
+                  with open(os.environ["GITHUB_PATH"], "a", encoding="utf-8") as handle:
+                      handle.write(f"{candidate}\n")
+                  break
+          else:
+              raise SystemExit(
+                  "Git Bash not found in expected Git for Windows directories."
+              )
+
+      - name: Verify Pages packaging tools
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          bash --version
+          tar --version
+
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:

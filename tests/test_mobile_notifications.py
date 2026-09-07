@@ -714,7 +714,7 @@ class CompositionTests(unittest.TestCase):
         self.assertIn("YouTube 모바일 인사이트", labels)
         self.assertFalse(any("#" in url for url in urls))
 
-    def test_private_cards_are_loaded_only_from_matching_archive_window(self):
+    def test_private_action_cards_are_retired_even_when_archive_matches(self):
         with tempfile.TemporaryDirectory() as temp:
             archive = Path(temp)
             run_dir = archive / "runs" / "2026" / "20260715T010000_github-actions-kr"
@@ -854,10 +854,9 @@ class CompositionTests(unittest.TestCase):
                 public_base_url="https://example.test/TradingAgents",
                 cards_only=True,
             )
-        self.assertIn("005930.KS", "\n".join(chunks))
-        self.assertIn("보유/즉시", "\n".join(chunks))
+        self.assertEqual(chunks, [])
         self.assertEqual(buttons, [])
-        self.assertEqual(metadata["run_ids"], [run_dir.name])
+        self.assertEqual(metadata["run_ids"], [])
         strategy_urls = [
             button["url"]
             for row in full_buttons
@@ -865,11 +864,12 @@ class CompositionTests(unittest.TestCase):
             if "strategy.html" in button["url"]
         ]
         self.assertEqual(len(strategy_urls), 2)
-        self.assertTrue(all(f"&run={run_dir.name}" in url for url in strategy_urls))
-        self.assertNotIn("005930.KS", "\n".join(blocked_chunks))
-        self.assertIn("UNIVERSE_INCOMPLETE", "\n".join(blocked_chunks))
-        self.assertNotIn("005930.KS", "\n".join(stale_chunks))
-        self.assertIn("ROW_NOT_FRESH_IMMEDIATE", "\n".join(stale_chunks))
+        self.assertTrue(all("&run=" not in url for url in strategy_urls))
+        self.assertNotIn("005930.KS", "\n".join(_full_chunks))
+        self.assertNotIn("개인 종목 액션 카드", "\n".join(_full_chunks))
+        self.assertNotIn("실행 차단·재확인 필요", "\n".join(_full_chunks))
+        self.assertEqual(blocked_chunks, [])
+        self.assertEqual(stale_chunks, [])
         self.assertEqual(unmatched_chunks, [])
         self.assertEqual(unmatched_metadata["run_ids"], [])
 
@@ -964,23 +964,15 @@ class WorkflowDefinitionTests(unittest.TestCase):
         self.assertNotIn("secrets.TELEGRAM_BOT_TOKEN", text)
         self.assertNotIn("secrets.TELEGRAM_NOTIFICATION_CHAT_ID", text)
         self.assertNotIn("MOBILE_DASHBOARD_KEY", text)
-        self.assertIn("--cards-only", text)
+        self.assertNotIn("--cards-only", text)
+        self.assertNotIn("notify_private_cards:", text)
+        self.assertNotIn("Add private archive action cards", text)
+        self.assertNotIn("runs-on: [self-hosted, Windows]", text)
         self.assertIn("group: tradingagents-mobile-notification-ledger", text)
         self.assertIn("actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9", text)
         self.assertIn("actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9", text)
         self.assertIn("if: ${{ always() }}", text)
         self.assertIn("deployment-telegram-notification-ledger-v1-", text)
-        self.assertIn("notifications\\deployment-telegram-ledger.json", text)
-        private_job = text.split("  notify_private_cards:", 1)[1]
-        setup = private_job.index("      - name: Set up Python")
-        send = private_job.index(
-            "      - name: Send private action-card continuation when available"
-        )
-        self.assertLess(setup, send)
-        self.assertIn(
-            "uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
-            private_job[setup:send],
-        )
 
     def test_intraday_and_notification_workflows_use_direct_strategy_payload(self):
         root = Path(__file__).parents[1] / ".github" / "workflows"
