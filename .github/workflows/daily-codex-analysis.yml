@@ -36,7 +36,7 @@ on:
           - us
           - kr
       tickers:
-        description: "Optional comma-separated tickers override"
+        description: "Optional research seed tickers; account holdings remain mandatory"
         required: false
         type: string
       ticker_universe_mode:
@@ -79,7 +79,7 @@ on:
         default: "4"
         type: string
       daily_active_ticker_limit:
-        description: "Optional limit for full analysis; leave blank for no cap. Smoke defaults to 3"
+        description: "Optional smaller research limit; adaptive runs never exceed 30 including holdings"
         required: false
         type: string
       per_ticker_timeout_minutes:

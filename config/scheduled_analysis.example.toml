@@ -26,6 +26,17 @@ fatal_error_patterns = ["usage limit", "model unavailable"]
 daily_active_ticker_limit = 0
 analysis_mode = "full"
 
+[universe]
+# Enable only after configuring a working account profile and [run].market.
+# Production US/KR configs enable this: holdings + adaptive research, <=30 total.
+enabled = false
+max_tickers = 30
+max_candidates = 160
+history_days = 30
+exploration_slots = 3
+max_new_nonholdings = 6
+max_per_sector = 8
+
 [llm]
 provider = "codex"
 quick_model = "gpt-5.6-sol"
