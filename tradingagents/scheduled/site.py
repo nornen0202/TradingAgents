@@ -1107,7 +1107,7 @@ def _render_universe_selection_section(manifest: dict[str, Any]) -> str:
         "evidence_rank_and_continuity": "이전 분석·최신 자료·연속성 평가",
         "failed_data_or_liquidity_gate": "최신 가격 또는 유동성 확인 부족",
         "sector_research_limit": "같은 업종의 분석 편중 방지",
-        "daily_replacement_limit": "일일 교체 수 제한",
+        "run_replacement_limit": "이번 실행의 교체 수 제한",
         "below_research_capacity_cutoff": "오늘 분석 우선순위 밖",
     }
     # Apply the existing publication policy before exposing per-ticker reasons.

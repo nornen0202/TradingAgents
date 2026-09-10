@@ -381,7 +381,7 @@ def select_adaptive_universe(*, config, universe, tickers, asof, requested_limit
         elif row["sector"] != "UNKNOWN" and sectors[row["sector"]] >= settings.max_per_sector:
             row["selection_reason"] = "sector_research_limit"
         elif previous and key not in previous_keys and new_count >= settings.max_new_nonholdings:
-            row["selection_reason"] = "daily_replacement_limit"
+            row["selection_reason"] = "run_replacement_limit"
         else:
             row["selection_reason"] = "below_research_capacity_cutoff"
     watch = [t for t in selected if identity(t) not in holding_keys]
@@ -419,7 +419,7 @@ def render_selection_report(receipt):
         "evidence_rank_and_continuity": "분석 근거·연속성 우선순위",
         "failed_data_or_liquidity_gate": "가격·유동성 자료 확인 부족",
         "sector_research_limit": "업종 편중 제한",
-        "daily_replacement_limit": "일일 신규 편입 제한",
+        "run_replacement_limit": "이번 실행의 신규 편입 제한",
         "below_research_capacity_cutoff": "오늘의 분석 상한 밖"}
     lines = ["# 오늘의 분석 종목 선정", "",
         f"시장: {receipt['market']} / 선정 기준시각: {receipt['asof']}", "",
