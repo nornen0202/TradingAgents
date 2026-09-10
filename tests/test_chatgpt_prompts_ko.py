@@ -67,3 +67,22 @@ def test_youtube_previous_day_fallback_is_explicitly_non_actionable() -> None:
     )
     assert "직전 KST 날짜" in text
     assert "실행 판단 상향 근거로 사용하지 않는다" in text
+
+
+def test_scheduled_quality_contract_is_embedded_in_both_prompts() -> None:
+    for market in ("kr", "us"):
+        text = (ROOT / "Docs" / f"prompts_{market}_for_chatgpt.md").read_text(encoding="utf-8")
+        assert text.count("## 프롬프트 시작") == 1
+        assert text.count("## 프롬프트 끝") == 1
+        body = text.split("## 프롬프트 시작", 1)[1].split("## 프롬프트 끝", 1)[0]
+        for requirement in (
+            "2026-09-11 v2",
+            "조회 실패를 자료 부재나 악재로 단정하지 않는다",
+            "이전 추천은 체결 사실이 아니다",
+            "A 바로 다음에 E-1 모바일표",
+            "0원+4개 양수 시나리오",
+            "조건 완결 행 수/대상 행 수",
+            "안전 제한·인증 요구는 우회하지 않는다",
+            "예약·알림·모델 설정은 변경하지 않는다",
+        ):
+            assert requirement in body
