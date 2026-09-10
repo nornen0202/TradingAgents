@@ -305,6 +305,20 @@ class AlertSettings:
 
 
 @dataclass(frozen=True)
+class UniverseSettings:
+    enabled: bool = False
+    max_tickers: int = 30
+    max_candidates: int = 160
+    history_days: int = 30
+    exploration_slots: int = 3
+    max_new_nonholdings: int = 6
+    max_per_sector: int = 8
+    quote_max_age_days: int = 7
+    min_daily_value_usd: float = 10_000_000
+    min_daily_value_krw: float = 2_000_000_000
+
+
+@dataclass(frozen=True)
 class ScheduledAnalysisConfig:
     run: RunSettings
     llm: LLMSettings
@@ -320,6 +334,7 @@ class ScheduledAnalysisConfig:
     performance: PerformanceSettings
     alerts: AlertSettings
     config_path: Path
+    universe: UniverseSettings = field(default_factory=UniverseSettings)
 
 
 def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
@@ -582,7 +597,27 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         performance=_load_performance_settings(performance_raw, base_dir=base_dir),
         alerts=_load_alert_settings(alerts_raw, base_dir=base_dir),
         config_path=config_path,
+        universe=_load_universe_settings(raw.get("universe") or {}),
     )
+
+
+def _load_universe_settings(raw: dict) -> UniverseSettings:
+    values = {name: raw.get(name, getattr(UniverseSettings(), name)) for name in UniverseSettings.__dataclass_fields__}
+    for name in ("max_tickers", "max_candidates", "history_days", "exploration_slots", "max_new_nonholdings", "max_per_sector", "quote_max_age_days"):
+        values[name] = int(values[name])
+    for name in ("min_daily_value_usd", "min_daily_value_krw"):
+        values[name] = float(values[name])
+        if not 0 < values[name] < float("inf"):
+            raise ValueError(f"universe.{name} must be positive and finite")
+    if not 1 <= values["max_tickers"] <= 30:
+        raise ValueError("universe.max_tickers must be between 1 and 30")
+    if not values["max_tickers"] <= values["max_candidates"] <= 250:
+        raise ValueError("universe.max_candidates must cover max_tickers and be <= 250")
+    if not 1 <= values["history_days"] <= 90 or not 1 <= values["quote_max_age_days"] <= 7:
+        raise ValueError("Invalid universe history/quote age bounds")
+    if not 0 <= values["exploration_slots"] <= values["max_new_nonholdings"] <= 30 or not 1 <= values["max_per_sector"] <= 30:
+        raise ValueError("Invalid universe exploration, turnover or sector limits")
+    return UniverseSettings(**values)
 
 
 def _infer_market_code(timezone_name: str) -> str:

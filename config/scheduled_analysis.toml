@@ -19,8 +19,21 @@ per_ticker_timeout_minutes = 60
 codex_circuit_breaker_enabled = true
 max_consecutive_codex_failures = 3
 fatal_error_patterns = ["usage limit", "model unavailable"]
-daily_active_ticker_limit = 0
+daily_active_ticker_limit = 30
 analysis_mode = "full"
+
+[universe]
+# Fixed tickers are research seeds, not a mandatory daily watchlist.
+enabled = true
+max_tickers = 30
+max_candidates = 160
+history_days = 30
+exploration_slots = 3
+max_new_nonholdings = 6
+max_per_sector = 8
+quote_max_age_days = 7
+min_daily_value_usd = 10000000
+min_daily_value_krw = 2000000000
 
 [llm]
 provider = "codex"

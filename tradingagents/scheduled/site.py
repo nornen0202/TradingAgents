@@ -1076,6 +1076,7 @@ def _render_run_page(
       </div>
     </section>
     {warning_html}
+    {_render_universe_selection_section(manifest)}
     {delta_html}
     {timeline_html}
     {strategy_html}
@@ -1094,6 +1095,36 @@ def _render_run_page(
     {live_delta_html}
     """
     return _page_template(f"{manifest['run_id']} | {settings.title}", body, prefix="../../")
+
+
+def _render_universe_selection_section(manifest: dict[str, Any]) -> str:
+    active = manifest.get("active_universe") or {}
+    if active.get("mode") != "adaptive_required_coverage":
+        return ""
+    labels = {
+        "mandatory_account_holding": "기존 분석 대상의 필수 점검",
+        "fresh_candidate_exploration": "새로운 기회 조사",
+        "evidence_rank_and_continuity": "이전 분석·최신 자료·연속성 평가",
+        "failed_data_or_liquidity_gate": "최신 가격 또는 유동성 확인 부족",
+        "sector_research_limit": "같은 업종의 분석 편중 방지",
+        "daily_replacement_limit": "일일 교체 수 제한",
+        "below_research_capacity_cutoff": "오늘 분석 우선순위 밖",
+    }
+    # Apply the existing publication policy before exposing per-ticker reasons.
+    visible = {str(row.get("ticker")) for row in _public_ticker_summaries(manifest)}
+    rows = [row for row in active.get("candidates", []) if row.get("selected") and str(row.get("ticker")) in visible]
+    items = "".join(f"<li><strong>{_escape(row.get('ticker'))}</strong> — {_escape(labels.get(row.get('selection_reason'), '근거 확인'))}</li>" for row in rows)
+    note = "자료·업종·교체 제한을 지켜 상한보다 적게 선정했습니다. " if active.get("underfilled") else ""
+    if active.get("research_warnings"):
+        note += "일부 조사 자료가 없어 제한된 근거로 선정했습니다. "
+    return f"""<section class="section prose">
+      <h2>오늘 분석 종목을 고른 이유</h2>
+      <p>후보 {_escape(active.get('candidate_pool_count', 0))}개를 비교해 최대 {_escape(active.get('hard_limit', 30))}개 안에서
+      보유 종목과 우선 조사 대상을 선정합니다. 분석 우선순위는 매수 추천이나 수익 확률이 아닙니다.</p>
+      <p>{_escape(note)}가격·유동성, 최근 분석, 업종 분산과 새로운 후보 조사 기회를 함께 고려했습니다.</p>
+      <ul>{items}</ul>
+      <p>장중에는 이 목록을 유지합니다. 제외는 매도 지시가 아니며, 상세 선정·제외 기록은 실행 아카이브에 보관합니다.</p>
+    </section>"""
 
 
 def _render_strategy_table_section(manifest: dict[str, Any]) -> str:

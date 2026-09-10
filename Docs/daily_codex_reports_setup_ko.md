@@ -6,7 +6,7 @@
 - `https://github.com/nornen0202/TradingAgents`
 
 기본 분석 설정:
-- 티커: `GOOGL`, `NVDA`
+- 티커: 보유 종목 필수 포함 + 매일 선정하는 관심·신규 후보, 한국/미국 각각 최대 30개. [선정 규칙과 검증](adaptive_analysis_universe_ko.md)
 - provider: `codex`
 - model: `gpt-5.6-sol`
 - analyst: `market`, `social`, `news`, `fundamentals`
