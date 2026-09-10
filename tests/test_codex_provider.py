@@ -1095,6 +1095,7 @@ class CodexProviderTests(unittest.TestCase):
 
         self.assertEqual(captured["codex_binary"], "C:/resolved/codex.exe")
 
+    @patch.dict(os.environ, {"TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK": "1"})
     def test_codex_chat_model_uses_resolved_fallback_for_invocation(self):
         session = FakeCodexSession(
             responses=['{"answer":"Fallback ok"}'],

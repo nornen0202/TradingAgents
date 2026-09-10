@@ -110,7 +110,7 @@ jobs:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
-      TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "1"
+      TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
@@ -448,7 +448,7 @@ jobs:
               )
               quick_result = run_codex_preflight(
                   codex_binary=os.environ.get("CODEX_BINARY") or None,
-                  model="gpt-5.6-terra",
+                  model="gpt-5.6-sol",
                   request_timeout=30.0,
                   workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
                   cleanup_threads=True,
@@ -456,7 +456,7 @@ jobs:
               )
               writer_result = run_codex_preflight(
                   codex_binary=os.environ.get("CODEX_BINARY") or None,
-                  model="gpt-5.6-luna",
+                  model="gpt-5.6-sol",
                   request_timeout=30.0,
                   workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
                   cleanup_threads=True,

@@ -851,15 +851,17 @@ def format_tool_args(args, max_length=80) -> str:
         return result[:max_length - 3] + "..."
     return result
 
-def run_analysis():
+def run_analysis(checkpoint: bool = False):
     # First get all user selections
     selections = get_user_selections()
 
     # Create config with selected research depth
     config = DEFAULT_CONFIG.copy()
+    config["checkpoint_enabled"] = checkpoint
     config["max_debate_rounds"] = selections["research_depth"]
     config["max_risk_discuss_rounds"] = selections["research_depth"]
     config["quick_think_llm"] = selections["shallow_thinker"]
+    config["output_think_llm"] = selections["shallow_thinker"]
     config["deep_think_llm"] = selections["deep_thinker"]
     config["backend_url"] = selections["backend_url"]
     config["llm_provider"] = selections["llm_provider"].lower()
@@ -942,7 +944,7 @@ def run_analysis():
     # Now start the display layout
     layout = create_layout()
 
-    with Live(layout, refresh_per_second=4) as live:
+    with graph, Live(layout, refresh_per_second=4) as live:
         # Initial display
         update_display(layout, stats_handler=stats_handler, start_time=start_time)
 
@@ -969,12 +971,9 @@ def run_analysis():
         update_display(layout, spinner_text, stats_handler=stats_handler, start_time=start_time)
 
         # Initialize state and get graph args with callbacks
-        init_agent_state = graph.propagator.create_initial_state(
-            selections["ticker"], selections["analysis_date"]
+        init_agent_state, args = graph.prepare_run(
+            selections["ticker"], selections["analysis_date"], callbacks=[stats_handler]
         )
-        # Pass callbacks to graph config for tool execution tracking
-        # (LLM tracking is handled separately via LLM constructor)
-        args = graph.propagator.get_graph_args(callbacks=[stats_handler])
 
         # Stream the analysis
         trace = []
@@ -1082,7 +1081,7 @@ def run_analysis():
             trace.append(chunk)
 
         # Get final state and decision
-        final_state = trace[-1]
+        final_state = trace[-1] if trace else graph.graph.get_state(args["config"]).values
         decision = graph.process_signal(final_state["final_trade_decision"])
 
         # Update all agent statuses to completed
@@ -1176,8 +1175,8 @@ def youtube_report(
 
 
 @app.command()
-def analyze():
-    run_analysis()
+def analyze(checkpoint: bool = typer.Option(False, "--checkpoint/--no-checkpoint", help="Resume an interrupted analysis with the same date and settings.")):
+    run_analysis(checkpoint=checkpoint)
 
 
 if __name__ == "__main__":

@@ -1741,6 +1741,7 @@ def _run_single_ticker(
     timer_start = perf_counter()
     analysis_date = ticker_started.date().isoformat()
     reset_llm_usage()
+    graph = None
 
     try:
         reset_tool_telemetry()
@@ -1812,6 +1813,9 @@ def _run_single_ticker(
             effective_tool_calls=effective_tool_calls,
             tokens_available=bool(metrics.get("tokens_available", False) or llm_usage.get("available")),
         )
+        if decision == "REVIEW":
+            quality_flags.append("decision_unvalidated")
+            print(f"::warning::{ticker} has no validated final decision; rerun before using the report.")
         if "no_tool_calls_detected" in quality_flags:
             print(f"::warning::No tool calls were recorded for {ticker}; report quality may be degraded.")
         if "intraday_snapshot_missing_same_day" in quality_flags:
@@ -2004,6 +2008,15 @@ def _run_single_ticker(
                 "error_json": _relative_to_run(run_dir, error_path),
             },
         }
+
+
+    finally:
+        close = getattr(graph, "close", None)
+        if callable(close):
+            try:
+                close()
+            except Exception:
+                print("::warning::Could not fully close the completed analysis session.")
 
 
 def _max_runtime_seconds(config: ScheduledAnalysisConfig) -> float | None:

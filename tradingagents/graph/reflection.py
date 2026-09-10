@@ -1,6 +1,7 @@
 # TradingAgents/graph/reflection.py
 
 from typing import Any, Dict
+from datetime import datetime, timezone
 
 from tradingagents.schemas import parse_structured_decision
 
@@ -56,6 +57,14 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
 
         return f"{curr_market_report}\n\n{curr_sentiment_report}\n\n{curr_news_report}\n\n{curr_fundamentals_report}"
 
+    @staticmethod
+    def _outcome_metadata(state):
+        return {
+            "symbol": state.get("company_of_interest"),
+            "trade_date": state.get("trade_date"),
+            "outcome_known_at": state.get("outcome_known_at") or datetime.now(timezone.utc).date().isoformat(),
+        }
+
     def _reflect_on_component(
         self, component_type: str, report: str, situation: str, returns_losses
     ) -> str:
@@ -79,7 +88,7 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
         result = self._reflect_on_component(
             "BULL", bull_debate_history, situation, returns_losses
         )
-        bull_memory.add_situations([(situation, result)])
+        bull_memory.add_situations([(situation, result, self._outcome_metadata(current_state))])
 
     def reflect_bear_researcher(self, current_state, returns_losses, bear_memory):
         """Reflect on bear researcher's analysis and update memory."""
@@ -89,13 +98,13 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
         result = self._reflect_on_component(
             "BEAR", bear_debate_history, situation, returns_losses
         )
-        bear_memory.add_situations([(situation, result)])
+        bear_memory.add_situations([(situation, result, self._outcome_metadata(current_state))])
 
     def reflect_trader(self, current_state, returns_losses, trader_memory):
         """Reflect on trader's decision and update memory."""
         situation = self._extract_current_situation(current_state)
         trader_decision = current_state["trader_investment_plan"]
-        metadata = {"returns_losses": returns_losses, "component": "trader"}
+        metadata = {**self._outcome_metadata(current_state), "returns_losses": returns_losses, "component": "trader"}
         try:
             metadata["rating"] = parse_structured_decision(trader_decision).rating.value
         except Exception:
@@ -110,7 +119,7 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
         """Reflect on investment judge's decision and update memory."""
         situation = self._extract_current_situation(current_state)
         judge_decision = current_state["investment_debate_state"]["judge_decision"]
-        metadata = {"returns_losses": returns_losses, "component": "research_manager"}
+        metadata = {**self._outcome_metadata(current_state), "returns_losses": returns_losses, "component": "research_manager"}
         try:
             metadata["rating"] = parse_structured_decision(judge_decision).rating.value
         except Exception:
@@ -125,7 +134,7 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
         """Reflect on portfolio manager's decision and update memory."""
         situation = self._extract_current_situation(current_state)
         judge_decision = current_state["risk_debate_state"]["judge_decision"]
-        metadata = {"returns_losses": returns_losses, "component": "portfolio_manager"}
+        metadata = {**self._outcome_metadata(current_state), "returns_losses": returns_losses, "component": "portfolio_manager"}
         try:
             metadata["rating"] = parse_structured_decision(judge_decision).rating.value
         except Exception:

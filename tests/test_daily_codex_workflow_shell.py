@@ -131,12 +131,12 @@ def test_daily_analysis_does_not_delete_runner_owned_pages_diagnostics():
         assert "remove_pages_diagnostic_logs" not in job_before_checkout
 
 
-def test_daily_analysis_preflight_can_select_compatibility_models_while_runtime_stays_fail_fast():
+def test_daily_analysis_preflight_and_runtime_both_preserve_requested_quality():
     workflow = _workflow_text()
 
     assert workflow.count('TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"') == 2
     assert (
-        workflow.count('TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "1"') == 2
+        workflow.count('TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"') == 2
     )
     assert workflow.count('codex_preflight_fallback_models("deep")') == 2
     assert workflow.count('codex_preflight_fallback_models("quick")') == 2

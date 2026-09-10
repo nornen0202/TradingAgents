@@ -1,4 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from tradingagents.agents.utils.macro_data_tools import get_macro_data
 
 from tradingagents.agents.utils.agent_utils import (
     bind_tools_for_analyst,
@@ -20,6 +21,7 @@ def create_news_analyst(llm):
         )
 
         tools = [
+            get_macro_data,
             get_company_news,
             get_macro_news,
             get_disclosures,
@@ -27,6 +29,8 @@ def create_news_analyst(llm):
 
         system_message = (
             "You are a news and event analyst. "
+            "Use get_macro_data(indicator, curr_date, look_back_days) for FRED macro facts at the analysis vintage. "
+            "If FRED is unavailable, disclose that gap and continue with available company, macro news and disclosures. "
             "Build the report from three evidence blocks: company news, macro news, and disclosures. "
             "Use `get_company_news(symbol, start_date, end_date)` for company-specific coverage, "
             "`get_macro_news(curr_date, look_back_days, limit, region, language)` for broader market context, "

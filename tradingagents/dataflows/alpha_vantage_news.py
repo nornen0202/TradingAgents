@@ -4,7 +4,8 @@ import json
 from datetime import datetime, timedelta
 
 from .alpha_vantage_common import _make_api_request, format_datetime_for_api
-from .news_models import NewsItem, dedupe_news_items, format_news_items_report, normalize_datetime
+from .news_models import NewsItem, dedupe_news_items, filter_news_items_by_date, format_news_items_report, normalize_datetime
+from .integrity import utc_window
 from .vendor_exceptions import VendorMalformedResponseError
 
 
@@ -62,16 +63,18 @@ def normalize_alpha_vantage_article(article: dict, *, fallback_symbol: str | Non
 
 
 def fetch_company_news_alpha_vantage(ticker: str, start_date: str, end_date: str) -> list[NewsItem]:
+    lower, upper = utc_window(start_date, end_date)
     params = {
         "tickers": ticker,
         "time_from": format_datetime_for_api(start_date),
-        "time_to": format_datetime_for_api(end_date),
+        "time_to": upper.strftime("%Y%m%dT%H%M"),
         "limit": "50",
     }
     response_text = _make_api_request("NEWS_SENTIMENT", params)
-    return dedupe_news_items(
+    items = dedupe_news_items(
         [normalize_alpha_vantage_article(article, fallback_symbol=ticker) for article in _parse_news_sentiment_response(response_text)]
     )
+    return filter_news_items_by_date(items, start_date=lower, end_date=upper)
 
 
 def get_company_news_alpha_vantage(ticker: str, start_date: str, end_date: str) -> str:
@@ -102,7 +105,7 @@ def fetch_macro_news_alpha_vantage(
     params = {
         "topics": topics,
         "time_from": format_datetime_for_api(start_dt.strftime("%Y-%m-%d")),
-        "time_to": format_datetime_for_api(curr_date),
+        "time_to": (curr_dt + timedelta(days=1)).strftime("%Y%m%dT%H%M"),
         "limit": str(limit),
     }
     if language:
@@ -113,7 +116,8 @@ def fetch_macro_news_alpha_vantage(
         normalize_alpha_vantage_article(article)
         for article in _parse_news_sentiment_response(response_text)
     ]
-    return dedupe_news_items(items)[:limit]
+    lower, upper = utc_window(start_dt.strftime("%Y-%m-%d"), curr_date)
+    return filter_news_items_by_date(dedupe_news_items(items), start_date=lower, end_date=upper)[:limit]
 
 
 def get_macro_news_alpha_vantage(

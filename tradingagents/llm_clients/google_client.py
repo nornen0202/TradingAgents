@@ -27,6 +27,8 @@ class GoogleClient(BaseLLMClient):
         """Return configured ChatGoogleGenerativeAI instance."""
         self.warn_if_unknown_model()
         llm_kwargs = {"model": self.model}
+        if self.kwargs.get("max_tokens") is not None:
+            llm_kwargs["max_output_tokens"] = self.kwargs["max_tokens"]
 
         if self.base_url:
             llm_kwargs["base_url"] = self.base_url

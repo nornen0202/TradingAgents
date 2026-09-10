@@ -2,6 +2,8 @@
 
 영문 문서: [README.en.md](README.en.md)
 
+2026-09-11 개선: [기준 프로젝트 비교·Sol 품질 정책·초보자 투자 안내·검증 기록](docs/baseline_upgrade_20260911_ko.md). 과거 데이터 누출 방지, 중단 재개, 비용 반영 손익비와 수량 계산을 포함합니다.
+
 ## 소개
 
 TradingAgents는 실제 트레이딩 조직의 협업 구조를 반영한 멀티 에이전트 분석 프레임워크입니다. 펀더멘털, 뉴스, 센티먼트, 시장 분석가가 각각 리포트를 만들고, 리서처와 트레이더, 리스크 관리 팀, 포트폴리오 매니저가 이를 종합해 최종 투자 판단을 만듭니다.
@@ -112,11 +114,11 @@ docker compose --profile ollama run --rm tradingagents-ollama
 
 최신 `main` 기준 기본 모델 역할은 아래와 같습니다.
 
-- `quick_think_llm`: `gpt-5.6-terra`
+- `quick_think_llm`: `gpt-5.6-sol`
 - `deep_think_llm`: `gpt-5.6-sol`
-- `output_think_llm`: `gpt-5.6-luna`
+- `output_think_llm`: `gpt-5.6-sol`
 
-스케줄 분석은 `writer_model=gpt-5.6-luna`, `judge_model=gpt-5.6-sol`을 추가로 분리합니다. 기본 reasoning effort는 quick/output/writer=`low`, deep/judge=`medium`입니다.
+스케줄 분석은 `writer_model=gpt-5.6-sol`, `judge_model=gpt-5.6-sol`을 추가로 분리합니다. 기본 reasoning effort는 quick/writer=`high`, deep/judge=`xhigh`, output=`medium`입니다.
 
 YouTube 일일 파이프라인은 영상별 추출·검증·작성 뒤, 모든 공개 요약과 검증 리포트를 `gpt-5.6-sol`의 `high` reasoning으로 다시 교차 종합합니다. 종합 단계는 영상 간 공통점·상충점, 시장 환경, 종목별 조건부 행동과 무효화 조건을 구조화하며 YouTube 원문을 실시간 주문 지시로 승격하지 않습니다. 최신 결과는 PC `/youtube/insights.html`, 모바일 `/mobile/youtube-insights.html`에 게시되고 YouTube 완료 텔레그램 알림의 기본 링크로 제공됩니다.
 
@@ -128,9 +130,9 @@ from tradingagents.default_config import DEFAULT_CONFIG
 
 config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
-config["quick_think_llm"] = "gpt-5.6-terra"
+config["quick_think_llm"] = "gpt-5.6-sol"
 config["deep_think_llm"] = "gpt-5.6-sol"
-config["output_think_llm"] = "gpt-5.6-luna"
+config["output_think_llm"] = "gpt-5.6-sol"
 
 graph = TradingAgentsGraph(debug=True, config=config)
 final_state, decision = graph.propagate("NVDA", "2026-01-15")

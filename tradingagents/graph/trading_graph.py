@@ -6,6 +6,8 @@ from pathlib import Path
 import json
 from datetime import date
 import re
+import hashlib
+import sqlite3
 from typing import Dict, Any, Tuple, List, Optional
 
 from langgraph.prebuilt import ToolNode
@@ -48,6 +50,7 @@ from .setup import GraphSetup
 from .propagation import Propagator
 from .reflection import Reflector
 from .signal_processing import SignalProcessor
+from tradingagents.agents.utils.macro_data_tools import get_macro_data
 
 
 class TradingAgentsGraph:
@@ -77,7 +80,7 @@ class TradingAgentsGraph:
 
         # Create necessary directories
         os.makedirs(
-            os.path.join(self.config["project_dir"], "dataflows/data_cache"),
+            self.config["data_cache_dir"],
             exist_ok=True,
         )
 
@@ -148,7 +151,7 @@ class TradingAgentsGraph:
         )
 
         self.propagator = Propagator(self.config["max_recur_limit"])
-        self.reflector = Reflector(self.quick_thinking_llm)
+        self.reflector = Reflector(self.deep_thinking_llm)
         self.signal_processor = SignalProcessor()
 
         # State tracking
@@ -157,12 +160,74 @@ class TradingAgentsGraph:
         self.log_states_dict = {}  # date to full state dict
 
         # Set up the graph
-        self.graph = self.graph_setup.setup_graph(selected_analysts or ["market", "social", "news", "fundamentals"])
+        self.selected_analysts = selected_analysts or ["market", "social", "news", "fundamentals"]
+        self._checkpoint_connection = None
+        checkpointer = None
+        if self.config.get("checkpoint_enabled"):
+            from langgraph.checkpoint.sqlite import SqliteSaver
+            directory = Path(self.config["checkpoint_dir"])
+            directory.mkdir(parents=True, exist_ok=True)
+            self._checkpoint_connection = sqlite3.connect(directory / "runs.sqlite3", check_same_thread=False)
+            checkpointer = SqliteSaver(self._checkpoint_connection)
+        self.graph = self.graph_setup.setup_graph(self.selected_analysts, checkpointer=checkpointer)
+
+    def prepare_run(self, company_name, trade_date, analysis_date=None, callbacks=None):
+        """Shared CLI/API lifecycle: resume with None to avoid duplicating messages."""
+        state = self.propagator.create_initial_state(company_name, trade_date, analysis_date=analysis_date)
+        from tradingagents.dataflows.integrity import safe_symbol
+        safe_symbol(state["company_of_interest"])
+        self.ticker = state["company_of_interest"]
+        set_config({**self.config, "analysis_as_of": analysis_date or trade_date})
+        for memory in (self.bull_memory, self.bear_memory, self.trader_memory, self.invest_judge_memory, self.portfolio_manager_memory):
+            memory.as_of = analysis_date or trade_date
+        args = self.propagator.get_graph_args(callbacks=callbacks)
+        if self._checkpoint_connection is not None:
+            identity = {
+                "version": 1, "ticker": self.ticker, "trade_date": trade_date,
+                "analysis_date": analysis_date or trade_date, "analysts": self.selected_analysts,
+                "config": {key: value for key, value in self.config.items() if key not in {"api_keys_path", "results_dir", "project_dir", "data_cache_dir", "checkpoint_dir", "memory_dir"}},
+            }
+            thread_id = hashlib.sha256(json.dumps(identity, sort_keys=True, default=str).encode()).hexdigest()
+            args["config"]["configurable"] = {"thread_id": thread_id}
+            previous = self.graph.get_state(args["config"])
+            if previous.values:
+                state = None
+        return state, args
+
+    def close(self):
+        for llm in (self.deep_thinking_llm, self.quick_thinking_llm, self.output_thinking_llm):
+            close = getattr(llm, "close", None)
+            if callable(close):
+                close()
+        if self._checkpoint_connection is not None:
+            self._checkpoint_connection.close()
+            self._checkpoint_connection = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def save_reports(self, final_state=None, *, save_path=None):
+        from tradingagents.reporting import save_report_bundle
+        state = final_state or self.curr_state
+        if not state:
+            raise ValueError("Run an analysis before saving reports")
+        ticker = state["company_of_interest"]
+        from tradingagents.dataflows.integrity import safe_symbol
+        ticker = safe_symbol(ticker)
+        path = save_path or Path(self.config["results_dir"]) / ticker / state["trade_date"] / "reports"
+        return save_report_bundle(state, ticker, path, language=self.config.get("output_language", "English"))
 
     def _get_provider_kwargs(self, role: str) -> Dict[str, Any]:
         """Get provider-specific kwargs for LLM client creation."""
         kwargs = {}
         provider = self.config.get("llm_provider", "").lower()
+        if provider != "codex":
+            kwargs["max_retries"] = int(self.config.get("llm_max_retries", 2))
+            if self.config.get("max_tokens") is not None:
+                kwargs["max_tokens"] = int(self.config["max_tokens"])
 
         if provider == "google":
             thinking_level = self.config.get("google_thinking_level")
@@ -203,6 +268,7 @@ class TradingAgentsGraph:
             ),
             "news": ToolNode(
                 [
+                    get_macro_data,
                     # News, macro, and disclosure information
                     get_company_news,
                     get_macro_news,
@@ -226,11 +292,9 @@ class TradingAgentsGraph:
         """Run the trading agents graph for a company on a specific date."""
 
         # Initialize state
-        init_agent_state = self.propagator.create_initial_state(
+        init_agent_state, args = self.prepare_run(
             company_name, trade_date, analysis_date=analysis_date
         )
-        self.ticker = init_agent_state["company_of_interest"]
-        args = self.propagator.get_graph_args()
 
         if self.debug:
             # Debug mode with tracing
@@ -242,7 +306,7 @@ class TradingAgentsGraph:
                     chunk["messages"][-1].pretty_print()
                     trace.append(chunk)
 
-            final_state = trace[-1]
+            final_state = trace[-1] if trace else self.graph.get_state(args["config"]).values
         else:
             # Standard mode without tracing
             final_state = self.graph.invoke(init_agent_state, **args)
@@ -302,22 +366,29 @@ class TradingAgentsGraph:
         with open(log_path, "w", encoding="utf-8") as f:
             json.dump(self.log_states_dict[str(trade_date)], f, indent=4)
 
-    def reflect_and_remember(self, returns_losses):
+    def reflect_and_remember(self, returns_losses, *, state=None, outcome_known_at=None):
         """Reflect on decisions and update memory based on returns."""
+        current = dict(state or self.curr_state or {})
+        if not current:
+            raise ValueError("No completed decision to reflect on")
+        if outcome_known_at:
+            if date.fromisoformat(outcome_known_at) <= date.fromisoformat(current["trade_date"]):
+                raise ValueError("Outcome must become known after the decision date")
+            current["outcome_known_at"] = outcome_known_at
         self.reflector.reflect_bull_researcher(
-            self.curr_state, returns_losses, self.bull_memory
+            current, returns_losses, self.bull_memory
         )
         self.reflector.reflect_bear_researcher(
-            self.curr_state, returns_losses, self.bear_memory
+            current, returns_losses, self.bear_memory
         )
         self.reflector.reflect_trader(
-            self.curr_state, returns_losses, self.trader_memory
+            current, returns_losses, self.trader_memory
         )
         self.reflector.reflect_invest_judge(
-            self.curr_state, returns_losses, self.invest_judge_memory
+            current, returns_losses, self.invest_judge_memory
         )
         self.reflector.reflect_portfolio_manager(
-            self.curr_state, returns_losses, self.portfolio_manager_memory
+            current, returns_losses, self.portfolio_manager_memory
         )
 
     def process_signal(self, full_signal):
