@@ -18,19 +18,19 @@ max_parallel_videos = 4
 
 [llm]
 provider = "codex"
-quick_model = "gpt-5.6-terra"
+quick_model = "gpt-5.6-sol"
 deep_model = "gpt-5.6-sol"
-output_model = "gpt-5.6-luna"
+output_model = "gpt-5.6-sol"
 synthesis_model = "gpt-5.6-sol"
 codex_reasoning_effort = "medium"
-codex_quick_reasoning_effort = "low"
-codex_deep_reasoning_effort = "medium"
-codex_output_reasoning_effort = "low"
+codex_quick_reasoning_effort = "high"
+codex_deep_reasoning_effort = "xhigh"
+codex_output_reasoning_effort = "medium"
 codex_synthesis_reasoning_effort = "high"
 codex_synthesis_request_timeout = 900.0
 codex_summary = "none"
 codex_personality = "none"
-codex_request_timeout = 180.0
+codex_request_timeout = 600.0
 codex_max_retries = 2
 codex_cleanup_threads = true
 codex_preflight_mode = "workflow_once"

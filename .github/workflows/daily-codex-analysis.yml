@@ -145,7 +145,7 @@ jobs:
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
-      TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "1"
+      TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       PRISM_TELEGRAM_MODE: ${{ vars.PRISM_TELEGRAM_MODE || 'user_session' }}
@@ -415,8 +415,8 @@ jobs:
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
           preferred_deep_model = "gpt-5.6-sol"
-          preferred_quick_model = "gpt-5.6-terra"
-          preferred_output_model = "gpt-5.6-luna"
+          preferred_quick_model = "gpt-5.6-sol"
+          preferred_output_model = "gpt-5.6-sol"
           deep_fallback_models = codex_preflight_fallback_models("deep")
           efficient_fallback_models = codex_preflight_fallback_models("quick")
 
@@ -713,7 +713,7 @@ jobs:
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
-      TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "1"
+      TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       PRISM_TELEGRAM_MODE: ${{ vars.PRISM_TELEGRAM_MODE || 'user_session' }}
@@ -1025,8 +1025,8 @@ jobs:
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
           preferred_deep_model = "gpt-5.6-sol"
-          preferred_quick_model = "gpt-5.6-terra"
-          preferred_output_model = "gpt-5.6-luna"
+          preferred_quick_model = "gpt-5.6-sol"
+          preferred_output_model = "gpt-5.6-sol"
           deep_fallback_models = codex_preflight_fallback_models("deep")
           efficient_fallback_models = codex_preflight_fallback_models("quick")
 

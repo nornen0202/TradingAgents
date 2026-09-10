@@ -37,9 +37,18 @@ class _FakeGraphRunner:
 
 
 class _FakeTradingAgentsGraph:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        pass
+
     def __init__(self, *args, **kwargs):
         self.propagator = _FakePropagator()
         self.graph = _FakeGraphRunner()
+
+    def prepare_run(self, ticker, trade_date, callbacks=None):
+        return self.propagator.create_initial_state(ticker, trade_date), self.propagator.get_graph_args(callbacks)
 
     def process_signal(self, signal):
         return signal

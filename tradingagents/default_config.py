@@ -1,35 +1,42 @@
 import os
 from pathlib import Path
 
+
+def _optional_positive_int(name: str, default=None):
+    value = os.getenv(name)
+    if value is None or not value.strip():
+        return default
+    parsed = int(value)
+    if parsed <= 0:
+        raise ValueError(f"{name} must be a positive integer")
+    return parsed
+
 DEFAULT_CONFIG = {
     "project_dir": os.path.abspath(os.path.join(os.path.dirname(__file__), ".")),
     "results_dir": os.getenv("TRADINGAGENTS_RESULTS_DIR", "./results"),
-    "data_cache_dir": os.path.join(
-        os.path.abspath(os.path.join(os.path.dirname(__file__), ".")),
-        "dataflows/data_cache",
-    ),
+    "data_cache_dir": os.getenv("TRADINGAGENTS_DATA_CACHE_DIR", str(Path.home() / ".tradingagents" / "cache")),
     # LLM settings
-    "llm_provider": "openai",
+    "llm_provider": "codex",
     "deep_think_llm": "gpt-5.6-sol",
-    "quick_think_llm": "gpt-5.6-terra",
-    "output_think_llm": "gpt-5.6-luna",
-    "backend_url": "https://api.openai.com/v1",
+    "quick_think_llm": "gpt-5.6-sol",
+    "output_think_llm": "gpt-5.6-sol",
+    "backend_url": None,
     # Provider-specific thinking configuration
     "google_thinking_level": None,      # "high", "minimal", etc.
     "openai_reasoning_effort": None,    # "medium", "high", "low"
     "anthropic_effort": None,           # "high", "medium", "low"
     "codex_binary": os.getenv("CODEX_BINARY"),
     "codex_reasoning_effort": "medium",
-    "codex_quick_reasoning_effort": "low",
-    "codex_deep_reasoning_effort": "medium",
-    "codex_output_reasoning_effort": "low",
+    "codex_quick_reasoning_effort": "high",
+    "codex_deep_reasoning_effort": "xhigh",
+    "codex_output_reasoning_effort": "medium",
     "codex_summary": "none",
     "codex_personality": "none",
     "codex_workspace_dir": os.getenv(
         "TRADINGAGENTS_CODEX_WORKSPACE_DIR",
         str(Path.home() / ".codex" / "tradingagents-workspace"),
     ),
-    "codex_request_timeout": 120.0,
+    "codex_request_timeout": 600.0,
     "codex_max_retries": 2,
     "codex_cleanup_threads": True,
     "codex_preflight_mode": "per_client",
@@ -66,6 +73,13 @@ DEFAULT_CONFIG = {
     "vendor_timeout": 15,
     "empty_result_fallback": True,
     "memory_n_matches": 3,
+    "memory_max_entries": 500,
+    "memory_dir": str(Path.home() / ".tradingagents" / "memory"),
+    "point_in_time_strict": False,
+    "checkpoint_enabled": False,
+    "checkpoint_dir": str(Path.home() / ".tradingagents" / "checkpoints"),
+    "llm_max_retries": 2,
+    "max_tokens": _optional_positive_int("TRADINGAGENTS_MAX_TOKENS"),
     "institutional_data_dir": os.getenv(
         "TRADINGAGENTS_INSTITUTIONAL_DATA_DIR",
         str(Path(__file__).resolve().parents[1] / "data" / "institutional"),
@@ -85,6 +99,7 @@ DEFAULT_CONFIG = {
     },
     # Tool-level configuration (takes precedence over category-level)
     "tool_vendors": {
+        "get_macro_indicators": "fred",
         # Example: "get_company_news": "naver,yfinance",  # Override category default
         # Example: "get_macro_news": "ecos,alpha_vantage,yfinance",
         # Example: "get_stock_data": "alpha_vantage",

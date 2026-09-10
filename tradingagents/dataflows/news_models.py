@@ -50,7 +50,8 @@ def normalize_datetime(value: datetime | str | int | float | None) -> datetime |
         if not text:
             return None
         try:
-            return datetime.fromisoformat(text.replace("Z", "+00:00"))
+            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+            return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed
         except ValueError:
             try:
                 return datetime.strptime(text, "%Y%m%dT%H%M").replace(tzinfo=timezone.utc)
@@ -92,16 +93,19 @@ def filter_news_items_by_date(
     start_date: datetime | None = None,
     end_date: datetime | None = None,
 ) -> list[NewsItem]:
+    start_date = normalize_datetime(start_date)
+    end_date = normalize_datetime(end_date)
     filtered: list[NewsItem] = []
     for item in items:
         published_at = item.published_at
         if published_at is None:
-            filtered.append(item)
+            if start_date is None and end_date is None:
+                filtered.append(item)
             continue
-        naive_published = published_at.astimezone(timezone.utc).replace(tzinfo=None)
-        if start_date and naive_published < start_date:
+        published = normalize_datetime(published_at).astimezone(timezone.utc)
+        if start_date and published < start_date:
             continue
-        if end_date and naive_published > end_date:
+        if end_date and published >= end_date:
             continue
         filtered.append(item)
     return filtered

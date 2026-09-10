@@ -8,7 +8,7 @@
 기본 분석 설정:
 - 티커: `GOOGL`, `NVDA`
 - provider: `codex`
-- model: `gpt-5.4`
+- model: `gpt-5.6-sol`
 - analyst: `market`, `social`, `news`, `fundamentals`
 - 출력 언어: `Korean`
 
@@ -56,7 +56,7 @@
 
 1. GitHub Actions가 매일 `09:13 KST`에 `daily-codex-analysis.yml`을 실행합니다.
 2. self-hosted Windows runner가 잡을 받아 TradingAgents를 실행합니다.
-3. Codex `gpt-5.4`로 4개 analyst 조합 분석을 수행합니다.
+3. Codex `gpt-5.6-sol`로 4개 analyst 조합 분석을 수행합니다.
 4. 결과를 `TRADINGAGENTS_ARCHIVE_DIR` 아래에 누적 저장합니다.
 5. 정적 사이트를 생성합니다.
 6. GitHub Pages로 배포합니다.

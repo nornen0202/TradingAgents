@@ -66,11 +66,11 @@ The base config lives in [tradingagents/default_config.py](tradingagents/default
 
 Current default model roles on `main` are:
 
-- `quick_think_llm`: `gpt-5.6-terra`
+- `quick_think_llm`: `gpt-5.6-sol`
 - `deep_think_llm`: `gpt-5.6-sol`
-- `output_think_llm`: `gpt-5.6-luna`
+- `output_think_llm`: `gpt-5.6-sol`
 
-Scheduled analysis further separates `writer_model=gpt-5.6-luna` and `judge_model=gpt-5.6-sol`. Default reasoning effort is quick/output/writer=`low` and deep/judge=`medium`.
+Scheduled analysis further separates `writer_model=gpt-5.6-sol` and `judge_model=gpt-5.6-sol`. Default reasoning effort is quick/writer=`high`, deep/judge=`xhigh`, output=`medium`.
 
 Example:
 
@@ -80,9 +80,9 @@ from tradingagents.default_config import DEFAULT_CONFIG
 
 config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
-config["quick_think_llm"] = "gpt-5.6-terra"
+config["quick_think_llm"] = "gpt-5.6-sol"
 config["deep_think_llm"] = "gpt-5.6-sol"
-config["output_think_llm"] = "gpt-5.6-luna"
+config["output_think_llm"] = "gpt-5.6-sol"
 
 graph = TradingAgentsGraph(debug=True, config=config)
 final_state, decision = graph.propagate("NVDA", "2026-01-15")

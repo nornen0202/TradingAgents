@@ -1,4 +1,9 @@
 from .alpha_vantage_common import _make_api_request
+import json
+from copy import deepcopy
+from .config import get_config
+from .integrity import is_historical
+from .vendor_exceptions import VendorMalformedResponseError
 
 
 def _filter_reports_by_date(result, curr_date: str):
@@ -7,15 +12,32 @@ def _filter_reports_by_date(result, curr_date: str):
     Prevents look-ahead bias by removing fiscal periods that end after
     the simulation's current date.
     """
-    if not curr_date or not isinstance(result, dict):
+    if not curr_date:
         return result
+    was_text = isinstance(result, str)
+    if was_text:
+        try:
+            result = json.loads(result)
+        except (ValueError, TypeError) as exc:
+            raise VendorMalformedResponseError("Invalid financial statement JSON") from exc
+    if not isinstance(result, dict):
+        raise VendorMalformedResponseError("Financial statement must be an object")
+    result = deepcopy(result)
+    strict = get_config().get("point_in_time_strict", False)
     for key in ("annualReports", "quarterlyReports"):
         if key in result:
             result[key] = [
                 r for r in result[key]
-                if r.get("fiscalDateEnding", "") <= curr_date
+                if isinstance(r, dict)
+                and r.get("fiscalDateEnding")
+                and r["fiscalDateEnding"] <= curr_date
+                and (r.get("reportedDate") or r.get("filingDate") or ("9999-12-31" if strict else r["fiscalDateEnding"])) <= curr_date
             ]
-    return result
+    result["_data_quality"] = (
+        "Publication-date filtered. Historical revisions are not guaranteed point-in-time."
+        if strict else "Fiscal-period filtered; publication dates/revisions may be unavailable. Not verified point-in-time."
+    )
+    return json.dumps(result, ensure_ascii=False) if was_text else result
 
 
 def get_fundamentals(ticker: str, curr_date: str = None) -> str:
@@ -33,6 +55,8 @@ def get_fundamentals(ticker: str, curr_date: str = None) -> str:
         "symbol": ticker,
     }
 
+    if get_config().get("point_in_time_strict", False) and is_historical(curr_date):
+        return "No fundamentals data: Alpha Vantage OVERVIEW is a current snapshot, not a historical vintage."
     return _make_api_request("OVERVIEW", params)
 
 

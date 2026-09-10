@@ -28,9 +28,9 @@ MODEL_OPTIONS: ProviderModeOptions = {
     },
     "codex": {
         "quick": [
+            ("GPT-5.6 Sol - Quality-first investment analysis", "gpt-5.6-sol"),
             ("GPT-5.6 Terra - Balanced Codex model", "gpt-5.6-terra"),
             ("GPT-5.6 Luna - Efficient Codex model", "gpt-5.6-luna"),
-            ("GPT-5.6 Sol - Frontier Codex model", "gpt-5.6-sol"),
             ("GPT-5.5 - Frontier Codex model", "gpt-5.5"),
             ("GPT-5.4 Mini - Lightweight Codex model", "gpt-5.4-mini"),
             ("GPT-5.3 Codex - Coding-optimized fallback", "gpt-5.3-codex"),

@@ -7,6 +7,8 @@ import pandas as pd
 import yfinance as yf
 import os
 from .stockstats_utils import StockstatsUtils, _clean_dataframe, yf_retry, load_ohlcv, filter_financials_by_date
+from .config import get_config
+from .integrity import safe_symbol, validate_daily_bars, is_historical
 
 
 def _build_yfinance_symbol_candidates(raw_ticker: str) -> list[str]:
@@ -65,7 +67,8 @@ def get_YFin_data_online(
     datetime.strptime(end_date, "%Y-%m-%d")
 
     # Create ticker object
-    ticker = yf.Ticker(symbol.upper())
+    symbol = safe_symbol(symbol)
+    ticker = yf.Ticker(symbol)
 
     # yfinance treats ``end`` as exclusive while TradingAgents tool callers
     # document end_date as inclusive. Add one calendar day so the requested
@@ -81,11 +84,9 @@ def get_YFin_data_online(
             f"No data found for symbol '{symbol}' between {start_date} and {end_date}"
         )
 
-    # Remove timezone info from index for cleaner output
-    if data.index.tz is not None:
-        data.index = data.index.tz_localize(None)
-
-    data = data[data.index <= pd.Timestamp(end_date)]
+    data.index.name = "Date"
+    data = validate_daily_bars(data.reset_index(), end_date).set_index("Date")
+    data = data.loc[data.index >= pd.Timestamp(start_date)]
 
     # Round numerical values to 2 decimal places for cleaner display
     numeric_columns = ["Open", "High", "Low", "Close", "Adj Close"]
@@ -303,9 +304,11 @@ def get_stockstats_indicator(
 
 def get_fundamentals(
     ticker: Annotated[str, "ticker symbol of the company"],
-    curr_date: Annotated[str, "current date (not used for yfinance)"] = None
+    curr_date: Annotated[str, "analysis as-of date; historical snapshots are unavailable"] = None
 ):
     """Get company fundamentals overview from yfinance."""
+    if get_config().get("point_in_time_strict", False) and is_historical(curr_date):
+        return "No fundamentals data: Yahoo overview is a current snapshot, not a historical vintage."
     try:
         resolved_ticker, info, attempts = _resolve_info_with_symbol_fallback(ticker)
 
@@ -353,6 +356,7 @@ def get_fundamentals(
                 lines.append(f"{label}: {value}")
 
         header = f"# Company Fundamentals for {resolved_ticker or ticker.upper()}\n"
+        header += "# Current vendor snapshot; not verified point-in-time.\n"
         header += f"# Data retrieved on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
 
         return header + "\n".join(lines)

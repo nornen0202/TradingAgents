@@ -11,4 +11,6 @@ class SignalProcessor:
 
     def process_signal(self, full_signal: str) -> str:
         decision = parse_structured_decision(full_signal)
+        if "CODEX_PROVIDER_UNAVAILABLE" in decision.risk_action_reason_codes:
+            return "REVIEW"
         return decision.rating.value
