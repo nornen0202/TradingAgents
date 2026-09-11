@@ -1582,6 +1582,7 @@ jobs:
 
       - name: Verify public account snapshot page
         run: |
+          import os
           import subprocess
           import sys
 
@@ -1599,6 +1600,7 @@ jobs:
       - name: Stamp rollback-resistant Pages snapshot
         id: stamp_pages_snapshot
         run: |
+          import os
           import subprocess
           import sys
 

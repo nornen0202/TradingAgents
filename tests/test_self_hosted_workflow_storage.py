@@ -1,4 +1,7 @@
+import ast
 from pathlib import Path
+
+import yaml
 
 
 WORKFLOW_DIR = Path(".github/workflows")
@@ -46,3 +49,34 @@ def test_disk_recovery_jobs_do_not_download_actions_before_cleanup() -> None:
         "  build_work_report_pages:", 1
     )[0]
     assert "uses:" not in work_prepare
+
+
+def test_python_workflow_steps_import_os_before_using_os_environ() -> None:
+    for workflow_path in WORKFLOW_DIR.glob("*.yml"):
+        workflow = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+        for job_name, job in (workflow.get("jobs") or {}).items():
+            default_shell = (
+                ((job.get("defaults") or {}).get("run") or {}).get("shell", "")
+            )
+            for step in job.get("steps") or []:
+                script = step.get("run")
+                shell = step.get("shell", default_shell)
+                if (
+                    not isinstance(script, str)
+                    or "python" not in shell
+                    or "os.environ" not in script
+                ):
+                    continue
+                tree = ast.parse(script)
+                imports_os = any(
+                    isinstance(node, ast.Import)
+                    and any(alias.name == "os" for alias in node.names)
+                    for node in ast.walk(tree)
+                ) or any(
+                    isinstance(node, ast.ImportFrom) and node.module == "os"
+                    for node in ast.walk(tree)
+                )
+                assert imports_os, (
+                    f"{workflow_path.name}:{job_name}:{step.get('name')} uses "
+                    "os.environ without importing os"
+                )
