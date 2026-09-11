@@ -38,7 +38,6 @@ jobs:
     env:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
-      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
@@ -51,6 +50,11 @@ jobs:
       KIS_Developers_ACCOUNT_NO: ${{ secrets.KIS_Developers_ACCOUNT_NO }}
       KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
     steps:
+      - name: Initialize KR account run-scoped temporary path
+        shell: pwsh
+        run: |
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-account-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
@@ -148,6 +152,7 @@ jobs:
 
       - name: Verify KR public account performance report
         run: |
+          import os
           import subprocess
           import sys
 
@@ -156,7 +161,7 @@ jobs:
                   sys.executable,
                   ".github/scripts/verify_account_performance_site.py",
                   "--site-dir",
-                  "site",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
                   "--market",
                   "kr",
                   "--run-label",
@@ -167,6 +172,7 @@ jobs:
       - name: Stamp KR rollback-resistant Pages snapshot
         id: stamp_pages_snapshot
         run: |
+          import os
           import subprocess
           import sys
 
@@ -176,7 +182,7 @@ jobs:
                   ".github/scripts/pages_snapshot.py",
                   "stamp",
                   "--site-dir",
-                  "site",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
                   "--repository",
                   "${{ github.repository }}",
                   "--workflow",
@@ -197,13 +203,13 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: account-performance-kr-site-${{ github.run_id }}
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
       - name: Upload KR GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: account-performance-pages-kr
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
   verify_us:
     needs:
@@ -219,7 +225,6 @@ jobs:
     env:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
-      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
@@ -232,6 +237,11 @@ jobs:
       KIS_Developers_ACCOUNT_NO: ${{ secrets.KIS_Developers_ACCOUNT_NO }}
       KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
     steps:
+      - name: Initialize US account run-scoped temporary path
+        shell: pwsh
+        run: |
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-account-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
@@ -332,6 +342,7 @@ jobs:
 
       - name: Verify US public account performance report
         run: |
+          import os
           import subprocess
           import sys
 
@@ -340,7 +351,7 @@ jobs:
                   sys.executable,
                   ".github/scripts/verify_account_performance_site.py",
                   "--site-dir",
-                  "site",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
                   "--market",
                   "us",
                   "--run-label",
@@ -351,6 +362,7 @@ jobs:
       - name: Stamp US rollback-resistant Pages snapshot
         id: stamp_pages_snapshot
         run: |
+          import os
           import subprocess
           import sys
 
@@ -360,7 +372,7 @@ jobs:
                   ".github/scripts/pages_snapshot.py",
                   "stamp",
                   "--site-dir",
-                  "site",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
                   "--repository",
                   "${{ github.repository }}",
                   "--workflow",
@@ -381,13 +393,13 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: account-performance-us-site-${{ github.run_id }}
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
       - name: Upload US GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: account-performance-pages-us
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
   deploy:
     needs:

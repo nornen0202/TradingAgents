@@ -96,7 +96,6 @@ jobs:
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
-      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       CODEX_BINARY: ${{ vars.CODEX_BINARY }}
       CODEX_HOME: ${{ vars.CODEX_HOME }}
       ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
@@ -122,6 +121,11 @@ jobs:
       TRADINGAGENTS_OVERLAY_TICKER_TIMEOUT_SECONDS: "45"
 
     steps:
+      - name: Initialize overlay-us run-scoped temporary path
+        shell: pwsh
+        run: |
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-overlay-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
@@ -159,7 +163,7 @@ jobs:
               "--run-mode",
               run_mode,
               "--site-dir",
-              "site",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
               "--label",
               "github-actions-overlay-us",
               "--skip-site-build",
@@ -204,7 +208,6 @@ jobs:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
-      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       CODEX_BINARY: ${{ vars.CODEX_BINARY }}
       CODEX_HOME: ${{ vars.CODEX_HOME }}
       ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
@@ -230,6 +233,11 @@ jobs:
       TRADINGAGENTS_OVERLAY_TICKER_TIMEOUT_SECONDS: "45"
 
     steps:
+      - name: Initialize overlay-kr run-scoped temporary path
+        shell: pwsh
+        run: |
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-overlay-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
@@ -267,7 +275,7 @@ jobs:
               "--run-mode",
               run_mode,
               "--site-dir",
-              "site",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
               "--label",
               "github-actions-overlay-kr",
               "--skip-site-build",
@@ -321,6 +329,11 @@ jobs:
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
     steps:
+      - name: Initialize overlay-pages run-scoped temporary path
+        shell: pwsh
+        run: |
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-overlay-pages"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
@@ -360,7 +373,7 @@ jobs:
               config_path,
               "--site-only",
               "--site-dir",
-              "site",
+              os.environ["TRADINGAGENTS_SITE_DIR"],
           ]
           archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
           if archive_dir:
@@ -387,13 +400,16 @@ jobs:
 
       - name: Verify final site output directory exists
         run: |
+          import os
           from pathlib import Path
 
-          if not Path("site").exists():
-              raise SystemExit("Expected site output directory 'site' was not created.")
+          site_dir = Path(os.environ["TRADINGAGENTS_SITE_DIR"])
+          if not site_dir.exists():
+              raise SystemExit(f"Expected site output directory was not created: {site_dir}")
 
       - name: Verify stable decision bundle Pages paths
         run: |
+          import os
           import subprocess
           import sys
 
@@ -409,7 +425,7 @@ jobs:
                   sys.executable,
                   ".github/scripts/verify_decision_bundle.py",
                   "--site-dir",
-                  "site",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
                   "--market",
                   market,
               ])
@@ -417,6 +433,7 @@ jobs:
       - name: Stamp rollback-resistant Pages snapshot
         id: stamp_pages_snapshot
         run: |
+          import os
           import subprocess
           import sys
 
@@ -426,7 +443,7 @@ jobs:
                   ".github/scripts/pages_snapshot.py",
                   "stamp",
                   "--site-dir",
-                  "site",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
                   "--repository",
                   "${{ github.repository }}",
                   "--workflow",
@@ -448,14 +465,14 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-overlay
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
       - name: Retry final GitHub Pages artifact upload after transient network failure
         if: ${{ steps.upload_pages_final.outcome == 'failure' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-overlay
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
   deploy_overlay:
     needs:

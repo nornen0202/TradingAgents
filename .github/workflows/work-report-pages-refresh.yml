@@ -33,7 +33,50 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  prepare_self_hosted_runner:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: [self-hosted, Windows]
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Reclaim stale self-hosted runner outputs before action setup
+        run: |
+          $workspace = [System.IO.Path]::GetFullPath($env:GITHUB_WORKSPACE).TrimEnd('\')
+          $prefix = $workspace + [System.IO.Path]::DirectorySeparatorChar
+          $staleNamePatterns = @(
+            '^portfolio-artifacts$',
+            '^analysis-diagnostics(?:-[a-z]+)?$',
+            '^source-[0-9]+$',
+            '^site(?:-[0-9]+)?$'
+          )
+
+          $removed = @()
+          Get-ChildItem -LiteralPath $workspace -Force -ErrorAction SilentlyContinue |
+            Where-Object {
+              $name = $_.Name
+              @($staleNamePatterns | Where-Object { $name -match $_ }).Count -gt 0
+            } |
+            ForEach-Object {
+              $candidate = [System.IO.Path]::GetFullPath($_.FullName)
+              if (-not $candidate.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+                throw "Refusing to clean unsafe runner path: $candidate"
+              }
+              Remove-Item -LiteralPath $candidate -Recurse -Force -ErrorAction Stop
+              $removed += $_.Name
+            }
+
+          $freeBytes = (Get-PSDrive -Name C).Free
+          Write-Output "Removed stale runner outputs: $(if ($removed) { $removed -join ', ' } else { 'none' })"
+          Write-Output ("C: free space after stale-output cleanup: {0:N2} GB" -f ($freeBytes / 1GB))
+          if ($freeBytes -lt 2GB) {
+            throw "C: free space is below 2GB after stale-output cleanup; refusing to prepare Pages actions."
+          }
+
   build_work_report_pages:
+    needs: prepare_self_hosted_runner
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: [self-hosted, Windows]
     timeout-minutes: 60
@@ -49,11 +92,15 @@ jobs:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_REPO_DIR: ${{ github.workspace }}\source-${{ github.run_id }}
-      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site-${{ github.run_id }}
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
     steps:
+      - name: Initialize Work report run-scoped temporary path
+        shell: pwsh
+        run: |
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-work-report"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
@@ -194,6 +241,27 @@ jobs:
         with:
           name: github-pages-work-report
           path: ${{ env.TRADINGAGENTS_SITE_DIR }}
+
+      - name: Clean run-scoped Work report files
+        if: ${{ always() }}
+        continue-on-error: true
+        run: |
+          import os
+          import shutil
+          from pathlib import Path
+
+          roots_and_targets = (
+              (Path(os.environ["GITHUB_WORKSPACE"]), Path(os.environ["TRADINGAGENTS_REPO_DIR"])),
+              (Path(os.environ["RUNNER_TEMP"]), Path(os.environ["TRADINGAGENTS_SITE_DIR"])),
+          )
+          for allowed_root, target in roots_and_targets:
+              allowed_root = allowed_root.resolve()
+              target = target.resolve()
+              if target == allowed_root or os.path.commonpath([str(target), str(allowed_root)]) != str(allowed_root):
+                  raise SystemExit(f"Refusing to clean unsafe run-scoped path: {target}")
+              if target.exists():
+                  shutil.rmtree(target)
+                  print(f"Removed run-scoped path: {target}")
 
   deploy:
     needs: build_work_report_pages

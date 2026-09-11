@@ -181,3 +181,15 @@ def test_work_report_refresh_workflow_enforces_exact_pre_and_post_build_checks()
     assert "--require-strategy-payload" in workflow
     assert "Refuse stale Pages snapshot rollback" in workflow
     assert "cancel-in-progress: false" in workflow
+    prepare = workflow.split("  prepare_self_hosted_runner:", 1)[1].split(
+        "  build_work_report_pages:", 1
+    )[0]
+    build = workflow.split("  build_work_report_pages:", 1)[1].split(
+        "  deploy:", 1
+    )[0]
+    assert "uses:" not in prepare
+    assert "Reclaim stale self-hosted runner outputs before action setup" in prepare
+    assert "free space is below 2GB" in prepare
+    assert "needs: prepare_self_hosted_runner" in build
+    assert "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP" in build
+    assert "Clean run-scoped Work report files" in build

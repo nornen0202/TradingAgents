@@ -127,10 +127,60 @@ jobs:
             }
         run: python .github/scripts/scheduled_workflow_gate.py
 
+  prepare_analysis_runner:
+    needs:
+      - schedule_gate
+    if: ${{ github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' }}
+    runs-on: [self-hosted, Windows]
+    concurrency:
+      group: daily-codex-analysis-self-hosted-${{ github.ref }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Reclaim stale self-hosted runner outputs before action setup
+        run: |
+          $workspace = [System.IO.Path]::GetFullPath($env:GITHUB_WORKSPACE).TrimEnd('\')
+          $prefix = $workspace + [System.IO.Path]::DirectorySeparatorChar
+          $staleNamePatterns = @(
+            '^portfolio-artifacts$',
+            '^analysis-diagnostics(?:-[a-z]+)?$',
+            '^source-[0-9]+$',
+            '^site(?:-[0-9]+)?$',
+            '^\.codex-preflight$'
+          )
+
+          $removed = @()
+          Get-ChildItem -LiteralPath $workspace -Force -ErrorAction SilentlyContinue |
+            Where-Object {
+              $name = $_.Name
+              @($staleNamePatterns | Where-Object { $name -match $_ }).Count -gt 0
+            } |
+            ForEach-Object {
+              $candidate = [System.IO.Path]::GetFullPath($_.FullName)
+              if (-not $candidate.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+                throw "Refusing to clean unsafe runner path: $candidate"
+              }
+              Remove-Item -LiteralPath $candidate -Recurse -Force -ErrorAction Stop
+              $removed += $_.Name
+            }
+
+          $freeBytes = (Get-PSDrive -Name C).Free
+          $freeGB = $freeBytes / 1GB
+          Write-Output "Removed stale runner outputs: $(if ($removed) { $removed -join ', ' } else { 'none' })"
+          Write-Output ("C: free space after stale-output cleanup: {0:N2} GB" -f $freeGB)
+          if ($freeBytes -lt 5GB) {
+            throw "C: free space is below 5GB after stale-output cleanup; refusing to prepare analysis actions."
+          }
+
   analyze_us:
     needs:
       - schedule_gate
-    if: ${{ github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' && (needs.schedule_gate.outputs.profile == 'all' || needs.schedule_gate.outputs.profile == 'us') }}
+      - prepare_analysis_runner
+    if: ${{ github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' && needs.prepare_analysis_runner.result == 'success' && (needs.schedule_gate.outputs.profile == 'all' || needs.schedule_gate.outputs.profile == 'us') }}
     runs-on: [self-hosted, Windows]
     concurrency:
       group: daily-codex-analysis-self-hosted-${{ github.ref }}
@@ -146,7 +196,6 @@ jobs:
       TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"
-      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       PRISM_TELEGRAM_MODE: ${{ vars.PRISM_TELEGRAM_MODE || 'user_session' }}
       PRISM_TELEGRAM_DOWNLOAD_PDFS: ${{ vars.PRISM_TELEGRAM_DOWNLOAD_PDFS || 'true' }}
@@ -181,6 +230,12 @@ jobs:
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
+      - name: Initialize US run-scoped temporary paths
+        shell: pwsh
+        run: |
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "TRADINGAGENTS_DIAGNOSTICS_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "analysis-diagnostics-$env:GITHUB_RUN_ID-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -636,7 +691,9 @@ jobs:
               archive_root = str(Path(os.environ["GITHUB_WORKSPACE"]) / ".runtime" / "tradingagents-archive")
 
           runs_root = Path(archive_root) / "runs"
-          destination = Path(os.environ["GITHUB_WORKSPACE"]) / "analysis-diagnostics-us"
+          destination = Path(os.environ["TRADINGAGENTS_DIAGNOSTICS_DIR"])
+          if destination.exists():
+              shutil.rmtree(destination)
           destination.mkdir(parents=True, exist_ok=True)
           if not runs_root.exists():
               raise SystemExit(0)
@@ -658,7 +715,7 @@ jobs:
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
           name: us-analysis-diagnostics-${{ github.run_id }}
-          path: analysis-diagnostics-us
+          path: ${{ env.TRADINGAGENTS_DIAGNOSTICS_DIR }}
           if-no-files-found: warn
           retention-days: 7
 
@@ -698,7 +755,8 @@ jobs:
   analyze_kr:
     needs:
       - schedule_gate
-    if: ${{ github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' && (needs.schedule_gate.outputs.profile == 'all' || needs.schedule_gate.outputs.profile == 'kr') }}
+      - prepare_analysis_runner
+    if: ${{ github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' && needs.prepare_analysis_runner.result == 'success' && (needs.schedule_gate.outputs.profile == 'all' || needs.schedule_gate.outputs.profile == 'kr') }}
     runs-on: [self-hosted, Windows]
     concurrency:
       group: daily-codex-analysis-self-hosted-${{ github.ref }}
@@ -714,7 +772,6 @@ jobs:
       TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"
-      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       PRISM_TELEGRAM_MODE: ${{ vars.PRISM_TELEGRAM_MODE || 'user_session' }}
       PRISM_TELEGRAM_DOWNLOAD_PDFS: ${{ vars.PRISM_TELEGRAM_DOWNLOAD_PDFS || 'true' }}
@@ -745,6 +802,13 @@ jobs:
       OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
+      - name: Initialize KR run-scoped temporary paths
+        shell: pwsh
+        run: |
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "TRADINGAGENTS_DIAGNOSTICS_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "analysis-diagnostics-$env:GITHUB_RUN_ID-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "TRADINGAGENTS_PORTFOLIO_ARTIFACT_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "portfolio-artifacts-$env:GITHUB_RUN_ID-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -1287,7 +1351,9 @@ jobs:
               archive_root = str(Path(os.environ["GITHUB_WORKSPACE"]) / ".runtime" / "tradingagents-archive")
 
           runs_root = Path(archive_root) / "runs"
-          destination = Path(os.environ["GITHUB_WORKSPACE"]) / "analysis-diagnostics-kr"
+          destination = Path(os.environ["TRADINGAGENTS_DIAGNOSTICS_DIR"])
+          if destination.exists():
+              shutil.rmtree(destination)
           destination.mkdir(parents=True, exist_ok=True)
           if not runs_root.exists():
               raise SystemExit(0)
@@ -1309,7 +1375,7 @@ jobs:
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
           name: kr-analysis-diagnostics-${{ github.run_id }}
-          path: analysis-diagnostics-kr
+          path: ${{ env.TRADINGAGENTS_DIAGNOSTICS_DIR }}
           if-no-files-found: warn
           retention-days: 7
 
@@ -1317,40 +1383,43 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           import os
-          import shutil
+          import subprocess
+          import sys
           from pathlib import Path
 
           archive_root = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
           if not archive_root:
-              archive_root = str(Path(os.environ["GITHUB_WORKSPACE"]) / ".runtime" / "tradingagents-archive")
+              archive_root = str(
+                  Path(os.environ["GITHUB_WORKSPACE"])
+                  / ".runtime"
+                  / "tradingagents-archive"
+              )
 
-          destination = Path(os.environ["GITHUB_WORKSPACE"]) / "portfolio-artifacts"
-          destination.mkdir(parents=True, exist_ok=True)
-
-          archive_path = Path(archive_root)
-          if not archive_path.exists():
-              raise SystemExit(0)
-
-          for private_dir in archive_path.rglob("portfolio-private"):
-              if not private_dir.is_dir():
-                  continue
-              run_id = private_dir.parent.name
-              target = destination / run_id
-              target.mkdir(parents=True, exist_ok=True)
-              for item in private_dir.iterdir():
-                  item_target = target / item.name
-                  if item.is_dir():
-                      shutil.copytree(item, item_target, dirs_exist_ok=True)
-                  elif item.is_file():
-                      shutil.copy2(item, item_target)
+          subprocess.check_call(
+              [
+                  sys.executable,
+                  ".github/scripts/collect_private_account_artifact.py",
+                  "--archive-dir",
+                  archive_root,
+                  "--destination",
+                  os.environ["TRADINGAGENTS_PORTFOLIO_ARTIFACT_DIR"],
+                  "--allowed-destination-root",
+                  os.environ["RUNNER_TEMP"],
+                  "--expected-label",
+                  "github-actions-kr",
+                  "--github-run-id",
+                  "${{ github.run_id }}",
+              ]
+          )
 
       - name: Upload private account artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
           name: kr-portfolio-private-${{ github.run_id }}
-          path: portfolio-artifacts
+          path: ${{ env.TRADINGAGENTS_PORTFOLIO_ARTIFACT_DIR }}
           if-no-files-found: warn
+          retention-days: 7
 
       - name: Clean Codex runtime workspace
         if: ${{ always() }}
@@ -1456,11 +1525,15 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
-      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
     steps:
+      - name: Initialize Pages run-scoped temporary path
+        shell: pwsh
+        run: |
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-pages"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -1517,7 +1590,7 @@ jobs:
                   sys.executable,
                   ".github/scripts/verify_public_account_site.py",
                   "--site-dir",
-                  "site",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
                   "--require-markets",
                   "${{ needs.schedule_gate.outputs.profile }}",
               ]
@@ -1535,7 +1608,7 @@ jobs:
                   ".github/scripts/pages_snapshot.py",
                   "stamp",
                   "--site-dir",
-                  "site",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
                   "--repository",
                   "${{ github.repository }}",
                   "--workflow",
@@ -1571,14 +1644,14 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-final
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
       - name: Retry final GitHub Pages artifact upload after transient network failure
         if: ${{ steps.upload_pages_final.outcome == 'failure' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-final
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
   deploy:
     needs:
