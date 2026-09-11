@@ -8,16 +8,21 @@ def _workflow_text() -> str:
     return WORKFLOW.read_text(encoding="utf-8")
 
 
-def test_daily_analysis_jobs_do_not_depend_on_windows_powershell():
+def test_daily_analysis_jobs_use_python_after_a_builtin_cleanup_job():
     workflow = _workflow_text()
 
     assert "shell: python {0}" in workflow
-    assert "powershell" not in workflow.lower()
-    assert "pwsh" not in workflow.lower()
     assert "$LASTEXITCODE" not in workflow
+    prepare = workflow.split("  prepare_analysis_runner:", 1)[1].split(
+        "  analyze_us:", 1
+    )[0]
+    assert "shell: pwsh" in prepare
+    assert "uses:" not in prepare
+    assert "Reclaim stale self-hosted runner outputs before action setup" in prepare
+    assert "free space is below 5GB" in prepare
 
 
-def test_daily_analysis_sets_up_python_before_first_script_step():
+def test_daily_analysis_sets_up_python_before_python_script_steps():
     workflow = _workflow_text()
 
     for job_name in (
@@ -28,8 +33,10 @@ def test_daily_analysis_sets_up_python_before_first_script_step():
     ):
         job_start = workflow.index(f"  {job_name}")
         setup_python = workflow.index("      - name: Set up Python", job_start)
-        first_python_run = workflow.index("        run: |", job_start)
-        assert setup_python < first_python_run
+        pre_setup = workflow[job_start:setup_python]
+        assert pre_setup.count("        run: |") == pre_setup.count(
+            "        shell: pwsh"
+        )
 
 
 def test_daily_analysis_uses_python_shell_for_all_windows_jobs():
@@ -102,6 +109,18 @@ def test_daily_analysis_uploads_diagnostics_even_on_failure():
     assert "Upload KR analysis diagnostics" in workflow
 
 
+def test_daily_analysis_keeps_large_transient_outputs_in_runner_temp():
+    workflow = _workflow_text()
+
+    assert workflow.count("TRADINGAGENTS_DIAGNOSTICS_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP") == 2
+    assert "TRADINGAGENTS_PORTFOLIO_ARTIFACT_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP" in workflow
+    assert workflow.count("TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP") == 3
+    assert "${{ runner.temp }}" not in workflow
+    assert 'archive_path.rglob("portfolio-private")' not in workflow
+    assert "collect_private_account_artifact.py" in workflow
+    assert "retention-days: 7" in workflow
+
+
 def test_daily_analysis_schedule_gate_requires_pages_build_for_daily_coverage():
     workflow = _workflow_text()
 
@@ -118,6 +137,20 @@ def test_daily_analysis_self_hosted_jobs_serialize_workspace_checkout():
         assert "concurrency:" in job_block
         assert "group: daily-codex-analysis-self-hosted-${{ github.ref }}" in job_block
         assert "cancel-in-progress: false" in job_block
+
+
+def test_daily_analysis_jobs_require_successful_runner_cleanup():
+    workflow = _workflow_text()
+
+    for job_name, next_job_name in (
+        ("analyze_us", "analyze_kr"),
+        ("analyze_kr", "prepare_pages_runner"),
+    ):
+        job_start = workflow.index(f"  {job_name}:")
+        next_job = workflow.index(f"\n  {next_job_name}:", job_start)
+        job_block = workflow[job_start:next_job]
+        assert "- prepare_analysis_runner" in job_block
+        assert "needs.prepare_analysis_runner.result == 'success'" in job_block
 
 
 def test_daily_analysis_does_not_delete_runner_owned_pages_diagnostics():
