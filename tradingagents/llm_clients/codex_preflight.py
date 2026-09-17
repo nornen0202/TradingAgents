@@ -59,7 +59,7 @@ def codex_preflight_fallback_models(
 
         allow_fallback = os.getenv(
             "TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK",
-            "1",
+            "0",
         )
     if isinstance(allow_fallback, str):
         enabled = allow_fallback.strip().lower() not in _FALSE_VALUES

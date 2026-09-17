@@ -5,6 +5,10 @@ from __future__ import annotations
 from rank_bm25 import BM25Okapi
 from typing import Any, List, Tuple
 import re
+import json
+import sqlite3
+from pathlib import Path
+from datetime import date
 
 
 class FinancialSituationMemory:
@@ -18,6 +22,21 @@ class FinancialSituationMemory:
         self.metadata: List[dict[str, Any]] = []
         self.bm25 = None
         self.default_n_matches = int(self.config.get("memory_n_matches", 2))
+        self.max_entries = max(1, int(self.config.get("memory_max_entries", 500)))
+        self.as_of: str | None = None
+        self.store_path = None
+        if self.config.get("memory_dir"):
+            if not re.fullmatch(r"[A-Za-z0-9_-]+", name):
+                raise ValueError("Invalid memory name")
+            self.store_path = Path(self.config["memory_dir"]) / f"{name}.sqlite3"
+            if self.store_path.exists():
+                with sqlite3.connect(self.store_path) as connection:
+                    rows = connection.execute("SELECT situation, advice, metadata FROM memories ORDER BY id DESC LIMIT ?", (self.max_entries,)).fetchall()[::-1]
+                for situation, advice, metadata in rows:
+                    self.documents.append(situation)
+                    self.recommendations.append(advice)
+                    self.metadata.append(json.loads(metadata))
+                self._rebuild_index()
 
     def _tokenize(self, text: str) -> List[str]:
         return re.findall(r"\b\w+\b", text.lower())
@@ -45,7 +64,7 @@ class FinancialSituationMemory:
 
     def _rebuild_index(self):
         if self.documents:
-            tokenized_docs = [self._tokenize(doc) for doc in self.documents]
+            tokenized_docs = [self._tokenize(doc) or ["_empty_"] for doc in self.documents]
             self.bm25 = BM25Okapi(tokenized_docs)
         else:
             self.bm25 = None
@@ -65,7 +84,17 @@ class FinancialSituationMemory:
             self.documents.append(str(situation))
             self.recommendations.append(str(recommendation))
             self.metadata.append(combined_metadata)
+            if self.store_path:
+                self.store_path.parent.mkdir(parents=True, exist_ok=True)
+                with sqlite3.connect(self.store_path) as connection:
+                    connection.execute("CREATE TABLE IF NOT EXISTS memories (id INTEGER PRIMARY KEY, situation TEXT, advice TEXT, metadata TEXT)")
+                    connection.execute("INSERT INTO memories (situation, advice, metadata) VALUES (?, ?, ?)",
+                                       (str(situation), str(recommendation), json.dumps(combined_metadata, ensure_ascii=False)))
+                    connection.execute("DELETE FROM memories WHERE id NOT IN (SELECT id FROM memories ORDER BY id DESC LIMIT ?)", (self.max_entries,))
 
+        self.documents = self.documents[-self.max_entries:]
+        self.recommendations = self.recommendations[-self.max_entries:]
+        self.metadata = self.metadata[-self.max_entries:]
         self._rebuild_index()
 
     def get_memories(
@@ -73,11 +102,17 @@ class FinancialSituationMemory:
         current_situation: str,
         n_matches: int | None = None,
         metadata_filters: dict[str, Any] | None = None,
+        as_of: str | None = None,
     ) -> List[dict]:
         if not self.documents or self.bm25 is None:
             return []
 
         limit = n_matches if n_matches is not None else self.default_n_matches
+        if limit <= 0:
+            return []
+        cutoff = as_of or self.as_of
+        if cutoff:
+            date.fromisoformat(cutoff)
         query_tokens = self._tokenize(current_situation)
         query_tags = self._extract_regime_tags(current_situation)
         scores = self.bm25.get_scores(query_tokens)
@@ -86,6 +121,14 @@ class FinancialSituationMemory:
         ranked_results = []
         for idx, score in enumerate(scores):
             metadata = self.metadata[idx] if idx < len(self.metadata) else {}
+            if cutoff:
+                known = metadata.get("outcome_known_at")
+                try:
+                    known_date = date.fromisoformat(str(known))
+                except ValueError:
+                    continue
+                if known_date > date.fromisoformat(cutoff):
+                    continue
             if metadata_filters:
                 if any(metadata.get(key) != value for key, value in metadata_filters.items()):
                     continue
@@ -114,6 +157,9 @@ class FinancialSituationMemory:
         return results
 
     def clear(self):
+        if self.store_path and self.store_path.exists():
+            with sqlite3.connect(self.store_path) as connection:
+                connection.execute("DELETE FROM memories")
         self.documents = []
         self.recommendations = []
         self.metadata = []

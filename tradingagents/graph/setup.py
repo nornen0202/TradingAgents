@@ -37,7 +37,7 @@ class GraphSetup:
         self.conditional_logic = conditional_logic
 
     def setup_graph(
-        self, selected_analysts=None
+        self, selected_analysts=None, *, checkpointer=None
     ):
         """Set up and compile the agent workflow graph.
 
@@ -95,7 +95,7 @@ class GraphSetup:
         research_manager_node = create_research_manager(
             self.deep_thinking_llm, self.invest_judge_memory
         )
-        trader_node = create_trader(self.quick_thinking_llm, self.trader_memory)
+        trader_node = create_trader(self.deep_thinking_llm, self.trader_memory)
 
         # Create risk analysis nodes
         aggressive_analyst = create_aggressive_debator(self.quick_thinking_llm)
@@ -157,6 +157,7 @@ class GraphSetup:
             "Bull Researcher",
             self.conditional_logic.should_continue_debate,
             {
+                "Bull Researcher": "Bull Researcher",
                 "Bear Researcher": "Bear Researcher",
                 "Research Manager": "Research Manager",
             },
@@ -166,6 +167,7 @@ class GraphSetup:
             self.conditional_logic.should_continue_debate,
             {
                 "Bull Researcher": "Bull Researcher",
+                "Bear Researcher": "Bear Researcher",
                 "Research Manager": "Research Manager",
             },
         )
@@ -175,7 +177,9 @@ class GraphSetup:
             "Aggressive Analyst",
             self.conditional_logic.should_continue_risk_analysis,
             {
+                "Aggressive Analyst": "Aggressive Analyst",
                 "Conservative Analyst": "Conservative Analyst",
+                "Neutral Analyst": "Neutral Analyst",
                 "Portfolio Manager": "Portfolio Manager",
             },
         )
@@ -183,6 +187,8 @@ class GraphSetup:
             "Conservative Analyst",
             self.conditional_logic.should_continue_risk_analysis,
             {
+                "Aggressive Analyst": "Aggressive Analyst",
+                "Conservative Analyst": "Conservative Analyst",
                 "Neutral Analyst": "Neutral Analyst",
                 "Portfolio Manager": "Portfolio Manager",
             },
@@ -192,6 +198,8 @@ class GraphSetup:
             self.conditional_logic.should_continue_risk_analysis,
             {
                 "Aggressive Analyst": "Aggressive Analyst",
+                "Conservative Analyst": "Conservative Analyst",
+                "Neutral Analyst": "Neutral Analyst",
                 "Portfolio Manager": "Portfolio Manager",
             },
         )
@@ -199,4 +207,4 @@ class GraphSetup:
         workflow.add_edge("Portfolio Manager", END)
 
         # Compile and return
-        return workflow.compile()
+        return workflow.compile(checkpointer=checkpointer)

@@ -79,6 +79,50 @@ def _write_market_run(
     return run_dir
 
 
+def test_private_overlay_compacts_external_signals_without_losing_decision_inputs(tmp_path: Path):
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    (run_dir / "portfolio.json").write_text(
+        json.dumps(
+            {
+                "actions": [
+                    {
+                        "canonical_ticker": "005930.KS",
+                        "confidence": 0.7,
+                        "external_signals": [
+                            {
+                                "canonical_ticker": "005930.KS",
+                                "source_kind": "prism",
+                                "signal_action": "RESEARCH",
+                                "confidence": 0.6,
+                                "rationale": "반도체 수요 확인",
+                                "source_path_or_url": str(tmp_path / "private.json"),
+                                "raw": {"large_duplicate_payload": "x" * 10_000},
+                                "quantity": 12,
+                            }
+                        ],
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    overlay = work_packet._local_private_overlay(
+        run_dir,
+        {"portfolio": {"artifacts": {"portfolio_report_json": "portfolio.json"}}},
+        {"strategy_table": [{"ticker": "005930.KS"}]},
+    )
+
+    signal = overlay["actions"][0]["external_signals"][0]
+    assert signal == {
+        "canonical_ticker": "005930.KS",
+        "source_kind": "prism",
+        "signal_action": "RESEARCH",
+        "confidence": 0.6,
+        "rationale": "반도체 수요 확인",
+    }
+
+
 def _write_universe_contract(
     run_dir: Path,
     *,

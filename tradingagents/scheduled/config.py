@@ -41,6 +41,8 @@ class RunSettings:
     max_debate_rounds: int = 2
     max_risk_discuss_rounds: int = 2
     latest_market_data_lookback_days: int = 14
+    latest_market_data_wait_minutes: float = 0.0
+    latest_market_data_retry_interval_seconds: float = 300.0
     continue_on_ticker_error: bool = True
     report_polisher_enabled: bool = True
     ticker_name_overrides: dict[str, str] = field(default_factory=dict)
@@ -61,17 +63,17 @@ class RunSettings:
 class LLMSettings:
     provider: str = "codex"
     deep_model: str = "gpt-5.6-sol"
-    quick_model: str = "gpt-5.6-terra"
-    output_model: str = "gpt-5.6-luna"
-    writer_model: str = "gpt-5.6-luna"
+    quick_model: str = "gpt-5.6-sol"
+    output_model: str = "gpt-5.6-sol"
+    writer_model: str = "gpt-5.6-sol"
     judge_model: str = "gpt-5.6-sol"
     codex_reasoning_effort: str = "medium"
-    codex_quick_reasoning_effort: str = "low"
-    codex_deep_reasoning_effort: str = "medium"
-    codex_output_reasoning_effort: str = "low"
-    codex_writer_reasoning_effort: str = "low"
-    codex_judge_reasoning_effort: str = "medium"
-    codex_execution_summary_reasoning_effort: str = "low"
+    codex_quick_reasoning_effort: str = "high"
+    codex_deep_reasoning_effort: str = "xhigh"
+    codex_output_reasoning_effort: str = "medium"
+    codex_writer_reasoning_effort: str = "high"
+    codex_judge_reasoning_effort: str = "xhigh"
+    codex_execution_summary_reasoning_effort: str = "medium"
     codex_summary: str = "none"
     codex_personality: str = "none"
     codex_request_timeout: float = 600.0
@@ -109,6 +111,7 @@ class SiteSettings:
     max_runs_on_homepage: int = 30
     max_published_runs: int = 120
     public_base_url: str = ""
+    publish_account_snapshot: bool = False
 
 
 @dataclass(frozen=True)
@@ -302,6 +305,20 @@ class AlertSettings:
 
 
 @dataclass(frozen=True)
+class UniverseSettings:
+    enabled: bool = False
+    max_tickers: int = 30
+    max_candidates: int = 160
+    history_days: int = 30
+    exploration_slots: int = 3
+    max_new_nonholdings: int = 6
+    max_per_sector: int = 8
+    quote_max_age_days: int = 7
+    min_daily_value_usd: float = 10_000_000
+    min_daily_value_krw: float = 2_000_000_000
+
+
+@dataclass(frozen=True)
 class ScheduledAnalysisConfig:
     run: RunSettings
     llm: LLMSettings
@@ -317,6 +334,7 @@ class ScheduledAnalysisConfig:
     performance: PerformanceSettings
     alerts: AlertSettings
     config_path: Path
+    universe: UniverseSettings = field(default_factory=UniverseSettings)
 
 
 def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
@@ -401,6 +419,14 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             max_debate_rounds=int(run_raw.get("max_debate_rounds", 2)),
             max_risk_discuss_rounds=int(run_raw.get("max_risk_discuss_rounds", 2)),
             latest_market_data_lookback_days=int(run_raw.get("latest_market_data_lookback_days", 14)),
+            latest_market_data_wait_minutes=max(
+                0.0,
+                float(run_raw.get("latest_market_data_wait_minutes", 0.0) or 0.0),
+            ),
+            latest_market_data_retry_interval_seconds=max(
+                1.0,
+                float(run_raw.get("latest_market_data_retry_interval_seconds", 300.0) or 300.0),
+            ),
             continue_on_ticker_error=bool(run_raw.get("continue_on_ticker_error", True)),
             report_polisher_enabled=bool(run_raw.get("report_polisher_enabled", True)),
             ticker_name_overrides=_normalize_ticker_name_overrides(raw.get("ticker_names") or {}),
@@ -428,42 +454,42 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             or str(llm_raw.get("deep_model", "gpt-5.6-sol")).strip()
             or "gpt-5.6-sol",
             quick_model=quick_model_override
-            or str(llm_raw.get("quick_model", "gpt-5.6-terra")).strip()
-            or "gpt-5.6-terra",
+            or str(llm_raw.get("quick_model", "gpt-5.6-sol")).strip()
+            or "gpt-5.6-sol",
             output_model=output_model_override
-            or str(llm_raw.get("output_model", "gpt-5.6-luna")).strip()
-            or "gpt-5.6-luna",
+            or str(llm_raw.get("output_model", "gpt-5.6-sol")).strip()
+            or "gpt-5.6-sol",
             writer_model=writer_model_override
-            or str(llm_raw.get("writer_model", "gpt-5.6-luna")).strip()
-            or "gpt-5.6-luna",
+            or str(llm_raw.get("writer_model", "gpt-5.6-sol")).strip()
+            or "gpt-5.6-sol",
             judge_model=judge_model_override
             or str(llm_raw.get("judge_model", "gpt-5.6-sol")).strip()
             or "gpt-5.6-sol",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_quick_reasoning_effort=str(
-                llm_raw.get("codex_quick_reasoning_effort", "low")
+                llm_raw.get("codex_quick_reasoning_effort", "high")
             ).strip()
-            or "low",
+            or "high",
             codex_deep_reasoning_effort=str(
-                llm_raw.get("codex_deep_reasoning_effort", "medium")
+                llm_raw.get("codex_deep_reasoning_effort", "xhigh")
             ).strip()
-            or "medium",
+            or "xhigh",
             codex_output_reasoning_effort=str(
-                llm_raw.get("codex_output_reasoning_effort", "low")
-            ).strip()
-            or "low",
-            codex_writer_reasoning_effort=str(
-                llm_raw.get("codex_writer_reasoning_effort", "low")
-            ).strip()
-            or "low",
-            codex_judge_reasoning_effort=str(
-                llm_raw.get("codex_judge_reasoning_effort", "medium")
+                llm_raw.get("codex_output_reasoning_effort", "medium")
             ).strip()
             or "medium",
-            codex_execution_summary_reasoning_effort=str(
-                llm_raw.get("codex_execution_summary_reasoning_effort", "low")
+            codex_writer_reasoning_effort=str(
+                llm_raw.get("codex_writer_reasoning_effort", "high")
             ).strip()
-            or "low",
+            or "high",
+            codex_judge_reasoning_effort=str(
+                llm_raw.get("codex_judge_reasoning_effort", "xhigh")
+            ).strip()
+            or "xhigh",
+            codex_execution_summary_reasoning_effort=str(
+                llm_raw.get("codex_execution_summary_reasoning_effort", "medium")
+            ).strip()
+            or "medium",
             codex_summary=str(llm_raw.get("codex_summary", "none")).strip() or "none",
             codex_personality=str(llm_raw.get("codex_personality", "none")).strip() or "none",
             codex_request_timeout=float(llm_raw.get("codex_request_timeout", 600.0)),
@@ -507,6 +533,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             max_runs_on_homepage=int(site_raw.get("max_runs_on_homepage", 30)),
             max_published_runs=int(site_raw.get("max_published_runs", 120)),
             public_base_url=str(site_raw.get("public_base_url", "")).strip(),
+            publish_account_snapshot=bool(site_raw.get("publish_account_snapshot", False)),
         ),
         portfolio=PortfolioSettings(
             enabled=bool(portfolio_raw.get("enabled", False)),
@@ -570,7 +597,27 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         performance=_load_performance_settings(performance_raw, base_dir=base_dir),
         alerts=_load_alert_settings(alerts_raw, base_dir=base_dir),
         config_path=config_path,
+        universe=_load_universe_settings(raw.get("universe") or {}),
     )
+
+
+def _load_universe_settings(raw: dict) -> UniverseSettings:
+    values = {name: raw.get(name, getattr(UniverseSettings(), name)) for name in UniverseSettings.__dataclass_fields__}
+    for name in ("max_tickers", "max_candidates", "history_days", "exploration_slots", "max_new_nonholdings", "max_per_sector", "quote_max_age_days"):
+        values[name] = int(values[name])
+    for name in ("min_daily_value_usd", "min_daily_value_krw"):
+        values[name] = float(values[name])
+        if not 0 < values[name] < float("inf"):
+            raise ValueError(f"universe.{name} must be positive and finite")
+    if not 1 <= values["max_tickers"] <= 30:
+        raise ValueError("universe.max_tickers must be between 1 and 30")
+    if not values["max_tickers"] <= values["max_candidates"] <= 250:
+        raise ValueError("universe.max_candidates must cover max_tickers and be <= 250")
+    if not 1 <= values["history_days"] <= 90 or not 1 <= values["quote_max_age_days"] <= 7:
+        raise ValueError("Invalid universe history/quote age bounds")
+    if not 0 <= values["exploration_slots"] <= values["max_new_nonholdings"] <= 30 or not 1 <= values["max_per_sector"] <= 30:
+        raise ValueError("Invalid universe exploration, turnover or sector limits")
+    return UniverseSettings(**values)
 
 
 def _infer_market_code(timezone_name: str) -> str:

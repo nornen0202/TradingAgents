@@ -198,7 +198,7 @@ def load_youtube_config(
                 os.getenv("TRADINGAGENTS_CODEX_WORKSPACE_DIR")
                 or llm_raw.get("codex_workspace_dir")
             ),
-            codex_request_timeout=float(llm_raw.get("codex_request_timeout") or 180.0),
+            codex_request_timeout=float(llm_raw.get("codex_request_timeout") or 600.0),
             codex_max_retries=int(llm_raw.get("codex_max_retries") or 2),
             codex_cleanup_threads=bool(llm_raw.get("codex_cleanup_threads", True)),
             codex_preflight_mode=str(
@@ -208,33 +208,33 @@ def load_youtube_config(
                 os.getenv("TRADINGAGENTS_YOUTUBE_QUICK_MODEL"),
                 os.getenv("TRADINGAGENTS_CODEX_QUICK_MODEL"),
                 llm_raw.get("quick_model"),
-                default="gpt-5.6-terra",
+                default="gpt-5.6-sol",
             ),
             output_model=_first_text(
                 os.getenv("TRADINGAGENTS_YOUTUBE_OUTPUT_MODEL"),
                 os.getenv("TRADINGAGENTS_CODEX_WRITER_MODEL"),
                 os.getenv("TRADINGAGENTS_CODEX_OUTPUT_MODEL"),
                 llm_raw.get("output_model"),
-                default="gpt-5.6-luna",
+                default="gpt-5.6-sol",
             ),
             codex_quick_reasoning_effort=_first_text(
                 os.getenv("TRADINGAGENTS_YOUTUBE_QUICK_REASONING_EFFORT"),
                 os.getenv("TRADINGAGENTS_CODEX_QUICK_REASONING_EFFORT"),
                 llm_raw.get("codex_quick_reasoning_effort"),
-                default="low",
+                default="high",
             ),
             codex_deep_reasoning_effort=_first_text(
                 os.getenv("TRADINGAGENTS_YOUTUBE_DEEP_REASONING_EFFORT"),
                 os.getenv("TRADINGAGENTS_CODEX_DEEP_REASONING_EFFORT"),
                 llm_raw.get("codex_deep_reasoning_effort"),
                 llm_raw.get("codex_reasoning_effort"),
-                default="medium",
+                default="xhigh",
             ),
             codex_output_reasoning_effort=_first_text(
                 os.getenv("TRADINGAGENTS_YOUTUBE_OUTPUT_REASONING_EFFORT"),
                 os.getenv("TRADINGAGENTS_CODEX_OUTPUT_REASONING_EFFORT"),
                 llm_raw.get("codex_output_reasoning_effort"),
-                default="low",
+                default="medium",
             ),
             synthesis_model=_first_text(
                 os.getenv("TRADINGAGENTS_YOUTUBE_SYNTHESIS_MODEL"),

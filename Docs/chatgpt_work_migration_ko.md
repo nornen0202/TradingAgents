@@ -15,7 +15,7 @@ self-hosted producer
   │                              ├─ Scheduled inbox
   │                              └─ archive/work-reports/<surface>/latest.json
   └─ GitHub workflow completion
-       ├─ Telegram completion/failure alert
+       ├─ dedicated deployment Telegram bot completion/failure alert
        ├─ /mobile/ public sanitized research
        └─ /mobile/private.html + plaintext strategy report
 ```
@@ -73,15 +73,17 @@ Work 보고서에 읽거나 기록하면 안 되는 자료:
 처리 순서는 다음과 같다.
 
 1. main branch의 신뢰된 notifier code로 upstream run ID·workflow·결론을 검증한다.
-2. GitHub-hosted runner가 성공/실패 공통 Telegram 알림과 Pages 링크를 보낸다. 숫자형 양의 개인 chat ID만 허용하며, 개인 액션 카드 전송 전에는 Telegram `getChat` 응답의 chat ID와 `type=private`까지 검증한다. credential이나 session 정보는 어떤 chat에도 보내지 않는다.
+2. GitHub-hosted runner가 `tennis_yangjae`와 분리된 배포 알림 전용 Telegram 봇으로 성공/실패 공통 알림과 Pages 링크를 보낸다. 숫자형 양의 개인 chat ID만 허용하며, 개인 액션 카드 전송 전에는 Telegram `getChat` 응답의 chat ID와 `type=private`까지 검증한다. credential이나 session 정보는 어떤 chat에도 보내지 않는다.
 3. 성공 run이면 self-hosted Windows runner가 로컬 archive에서 개인 액션 카드가 있는지 확인하고 별도 continuation을 보낸다.
 4. 동일 upstream run과 hosted incident ledger 갱신은 workflow concurrency로 직렬화한다. self-hosted 개인 액션 카드는 archive ledger를 사용하고, GitHub-hosted 기본 알림은 `actions/cache`에 보존한 ledger와 부분 전송 cursor를 사용한다. 최초 실패는 알리되 동일 원인 fingerprint는 마지막 실제 발송부터 6시간 동안 억제한다. 억제된 사건은 cooldown을 연장하지 않는다.
 5. Telegram API 오류는 성공처럼 삼키지 않고 재시도 후 job 실패로 남겨 관제할 수 있게 한다.
 
-필수 GitHub secret:
+배포 알림 전용 필수 GitHub secret:
 
-- `TELEGRAM_BOT_TOKEN`
-- `TELEGRAM_NOTIFICATION_CHAT_ID` (양의 정수인 본인 1:1 private chat ID; group/supergroup/channel은 거부)
+- `DEPLOYMENT_TELEGRAM_BOT_TOKEN` (배포 알림 전용 봇의 BotFather token)
+- `DEPLOYMENT_TELEGRAM_NOTIFICATION_CHAT_ID` (양의 정수인 본인 1:1 private chat ID; group/supergroup/channel은 거부)
+
+기존 `TELEGRAM_BOT_TOKEN`은 PRISM Telegram 수집 등 배포 알림 외 기능의 자격증명으로 유지한다. 배포 알림 workflow는 이 기존 secret을 참조하지 않으며, 전용 cache/local ledger도 사용해 기존 봇의 전송 이력과 cooldown을 공유하지 않는다. 새 봇을 만든 뒤 해당 봇과의 1:1 대화에서 `/start`를 먼저 보내야 Bot API가 알림을 전달할 수 있다.
 
 Work 응답 자체에는 다음 handoff만 남긴다. 이것은 알림 성공 receipt가 아니다.
 

@@ -169,6 +169,20 @@ def test_pages_workflows_stamp_strategy_snapshot_and_guard_deploy(workflow_name:
     assert "actions/deploy-pages@v5" not in text
 
 
+def test_prism_pages_packaging_prepares_and_verifies_git_bash() -> None:
+    text = (WORKFLOWS / "daily-prism-telegram-reports.yml").read_text(encoding="utf-8")
+
+    prepare = text.index("- name: Add Git Bash to PATH for Pages packaging")
+    verify = text.index("- name: Verify Pages packaging tools")
+    upload = text.index("- name: Upload GitHub Pages artifact")
+    assert prepare < verify < upload
+    assert 'Path("C:/Program Files/Git/bin")' in text[prepare:verify]
+    assert 'Path("C:/Program Files/Git/usr/bin")' in text[prepare:verify]
+    assert "shell: bash" in text[verify:upload]
+    assert "bash --version" in text[verify:upload]
+    assert "tar --version" in text[verify:upload]
+
+
 def test_account_all_explicitly_selects_final_us_merged_snapshot() -> None:
     text = (WORKFLOWS / "account-portfolio-report-verify.yml").read_text(encoding="utf-8")
 

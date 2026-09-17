@@ -13,7 +13,7 @@ def _load_toml(path: Path) -> dict:
     return tomllib.loads(path.read_text(encoding="utf-8"))
 
 
-def test_daily_configs_analyze_full_watchlist_and_account_universe_without_runtime_caps():
+def test_daily_configs_keep_full_depth_while_production_universe_is_capped():
     for path in DAILY_CONFIGS:
         payload = _load_toml(path)
         run = payload["run"]
@@ -22,7 +22,12 @@ def test_daily_configs_analyze_full_watchlist_and_account_universe_without_runti
         summary_image = payload["summary_image"]
 
         assert run["ticker_universe_mode"] == "config_plus_account", path
-        assert run["daily_active_ticker_limit"] == 0, path
+        if path.name == "scheduled_analysis.example.toml":
+            assert run["daily_active_ticker_limit"] == 0, path
+        else:
+            assert run["daily_active_ticker_limit"] == 30, path
+            assert payload["universe"]["enabled"] is True, path
+            assert payload["universe"]["max_tickers"] == 30, path
         assert run["max_runtime_minutes"] == 0, path
         assert run["min_remaining_minutes_for_next_ticker"] == 0, path
         assert run["max_parallel_tickers"] >= 4, path

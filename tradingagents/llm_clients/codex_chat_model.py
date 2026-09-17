@@ -114,7 +114,7 @@ class CodexChatModel(BaseChatModel):
                 self._preflight_done = True
                 return
             runner = self.preflight_runner or run_codex_preflight
-            fallback_flag = os.environ.get("TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK", "1")
+            fallback_flag = os.environ.get("TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK", "0")
             fallback_models = (
                 ()
                 if fallback_flag.strip().lower() in _FALSE_MODEL_FALLBACK_VALUES
