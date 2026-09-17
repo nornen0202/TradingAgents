@@ -51,7 +51,7 @@ jobs:
       KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
     steps:
       - name: Initialize KR account run-scoped temporary path
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
           "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-account-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -238,7 +238,7 @@ jobs:
       KIS_Developers_PRODUCT_CODE: ${{ secrets.KIS_Developers_PRODUCT_CODE }}
     steps:
       - name: Initialize US account run-scoped temporary path
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
           "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-account-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 

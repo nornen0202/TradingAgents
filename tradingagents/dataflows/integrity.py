@@ -60,10 +60,20 @@ def validate_daily_bars(data: pd.DataFrame, as_of: str) -> pd.DataFrame:
         if pd.isna(close) or close <= 0 or close == float("inf"):
             raise VendorMalformedResponseError("Latest requested OHLCV bar has no valid close; do not use an older price")
         for column in ("Open", "High", "Low", "Volume"):
-            if column in latest and (not math.isfinite(latest[column]) or latest[column] < 0):
+            if column in latest and (
+                not math.isfinite(latest[column])
+                or latest[column] < 0
+                or (column != "Volume" and latest[column] == 0)
+            ):
                 raise VendorMalformedResponseError(f"Latest OHLCV bar has invalid {column}")
         if "High" in latest and "Low" in latest and latest["High"] < latest["Low"]:
             raise VendorMalformedResponseError("OHLCV high is below low")
+        for column in ("Open", "Close"):
+            if column in latest and (
+                ("High" in latest and latest[column] > latest["High"])
+                or ("Low" in latest and latest[column] < latest["Low"])
+            ):
+                raise VendorMalformedResponseError(f"Latest OHLCV {column} is outside the daily range")
         if (pd.Timestamp(as_of) - latest["Date"]).days > 7:
             raise VendorMalformedResponseError("Stale OHLCV: last available bar is over seven calendar days before the requested date")
     return frame.reset_index(drop=True)

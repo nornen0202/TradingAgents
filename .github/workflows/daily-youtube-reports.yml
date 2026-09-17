@@ -152,7 +152,7 @@ jobs:
       HF_HUB_DISABLE_SYMLINKS_WARNING: "1"
     steps:
       - name: Initialize YouTube run-scoped temporary path
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
           "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-youtube"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -171,7 +171,7 @@ jobs:
 
       - name: Recheck duplicate coverage after acquiring the self-hosted runner
         id: runtime_gate
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         env:
           GH_EVENT_NAME: ${{ github.event_name }}
           GH_REPOSITORY: ${{ github.repository }}

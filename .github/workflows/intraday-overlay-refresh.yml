@@ -122,7 +122,7 @@ jobs:
 
     steps:
       - name: Initialize overlay-us run-scoped temporary path
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
           "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-overlay-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -234,7 +234,7 @@ jobs:
 
     steps:
       - name: Initialize overlay-kr run-scoped temporary path
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
           "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-overlay-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -330,7 +330,7 @@ jobs:
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
     steps:
       - name: Initialize overlay-pages run-scoped temporary path
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
           "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-overlay-pages"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 

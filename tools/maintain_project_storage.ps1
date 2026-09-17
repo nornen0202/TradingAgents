@@ -89,6 +89,29 @@ function Get-TreeBytes {
     return $total
 }
 
+function Assert-NoReparseTree {
+    param([Parameter(Mandatory = $true)][string]$Path)
+
+    # Never follow junctions while measuring, clearing attributes, or deleting.
+    $pending = [Collections.Generic.Stack[string]]::new()
+    $pending.Push($Path)
+    while ($pending.Count -gt 0) {
+        $current = $pending.Pop()
+        if ([IO.File]::GetAttributes($current) -band [IO.FileAttributes]::ReparsePoint) {
+            throw "Refusing maintenance through reparse point: $current"
+        }
+        foreach ($entry in [IO.Directory]::EnumerateFileSystemEntries($current)) {
+            $attributes = [IO.File]::GetAttributes($entry)
+            if ($attributes -band [IO.FileAttributes]::ReparsePoint) {
+                throw "Refusing maintenance through reparse point: $entry"
+            }
+            if ($attributes -band [IO.FileAttributes]::Directory) {
+                $pending.Push($entry)
+            }
+        }
+    }
+}
+
 function Remove-ValidatedTree {
     param(
         [Parameter(Mandatory = $true)][string]$Path,
@@ -100,6 +123,7 @@ function Remove-ValidatedTree {
     if (-not (Test-Path -LiteralPath $target -PathType Container)) {
         return
     }
+    Assert-NoReparseTree $target
     $bytes = Get-TreeBytes $target
     $script:plannedBytes += $bytes
     $script:plannedItems++

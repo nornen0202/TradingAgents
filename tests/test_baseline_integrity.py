@@ -61,6 +61,23 @@ def test_latest_missing_close_is_not_replaced_by_previous_day():
     assert len(validate_daily_bars(frame, "2026-03-01")) == 1
 
 
+@pytest.mark.parametrize('column,value', [
+    ('Open', 0), ('High', 0), ('Low', 0), ('Open', 120), ('Close', 80),
+    ('Close', 120), ('Open', 80),
+])
+def test_invalid_latest_daily_range_cannot_enter_analysis(column, value):
+    bar = {'Date': '2026-03-02', 'Open': 100, 'High': 110, 'Low': 90,
+           'Close': 105, 'Volume': 0}
+    assert len(validate_daily_bars(pd.DataFrame([bar]), '2026-03-02')) == 1
+    bar[column] = value
+    with pytest.raises(VendorMalformedResponseError):
+        validate_daily_bars(pd.DataFrame([bar]), '2026-03-02')
+    # Future malformed bars must not contaminate historical analysis.
+    prior = {'Date': '2026-03-01', 'Open': 100, 'High': 110, 'Low': 90,
+             'Close': 105, 'Volume': 0}
+    assert len(validate_daily_bars(pd.DataFrame([prior, bar]), '2026-03-01')) == 1
+
+
 def test_active_price_cache_is_shared_but_refreshed_when_old(tmp_path):
     today = pd.Timestamp.today().normalize()
     frame = pd.DataFrame({"Close": [100]}, index=pd.DatetimeIndex([today], name="Date"))
