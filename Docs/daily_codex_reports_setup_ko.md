@@ -246,6 +246,33 @@ Set-Location C:\actions-runner
 - `services.msc`에서 runner 서비스 확인
 - `gh api repos/nornen0202/TradingAgents/actions/runners`
 
+### 7-4. Windows 애플리케이션 제어가 서비스를 차단하는 경우
+
+Windows 애플리케이션 제어 정책이 서명되지 않은 `RunnerService.exe`를 차단하면,
+서비스 시작 유형이 `Automatic`이어도 GitHub에는 runner가 `offline`으로 표시될 수
+있습니다. 관리자 정책을 즉시 바꿀 수 없는 PC에서는 로그인 사용자 권한 keepalive를
+설치합니다.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\install_actions_runner_keepalive.ps1
+```
+
+이 작업은 로그인 30초 뒤와 이후 5분 간격으로 runner를 확인합니다. 서비스 시작을 먼저
+시도하고, 서비스가 정책 또는 권한 문제로 시작되지 않으면 `C:\actions-runner\run.cmd`를
+현재 사용자 권한으로 숨김 실행합니다. 실제 runner가 이미 실행 중이면 아무 작업도 하지
+않으므로 중복 listener를 만들지 않습니다.
+
+확인:
+
+```powershell
+Get-ScheduledTask -TaskPath \TradingAgents\ -TaskName GitHubActionsRunnerKeepAlive
+gh api repos/nornen0202/TradingAgents/actions/runners
+```
+
+이 fallback은 Windows 사용자가 로그인한 상태를 전제로 합니다. 로그아웃 상태에서도
+항상 실행해야 하면 관리자 정책에서 GitHub Actions runner 바이너리를 허용한 뒤 서비스
+모드를 복구해야 합니다.
+
 ## 8. 운영 체크리스트
 
 ### 매일 자동 실행 전제 조건
