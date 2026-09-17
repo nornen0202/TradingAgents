@@ -915,10 +915,9 @@ def _local_private_overlay(run_dir: Path, manifest: dict[str, Any], bundle: dict
         ticker = str(action.get("canonical_ticker") or action.get("ticker") or "").upper()
         if ticker not in selected:
             continue
-        actions.append(
-            {
-                key: action.get(key)
-                for key in (
+        compact_action = {
+            key: action.get(key)
+            for key in (
                     "canonical_ticker",
                     "confidence",
                     "action_now",
@@ -939,17 +938,53 @@ def _local_private_overlay(run_dir: Path, manifest: dict[str, Any], bundle: dict
                     "trigger_conditions",
                     "rationale",
                     "invalidators",
-                    "external_signals",
                     "reason_codes",
                     "gate_reasons",
-                )
-                if action.get(key) is not None
-            }
-        )
+            )
+            if action.get(key) is not None
+        }
+        external_signals = [
+            _compact_private_external_signal(signal)
+            for signal in (action.get("external_signals") or [])
+            if isinstance(signal, dict)
+        ]
+        if external_signals:
+            compact_action["external_signals"] = external_signals
+        actions.append(compact_action)
     return {
         "privacy": "LOCAL_ONLY_DO_NOT_PUBLISH",
         "actions": actions,
     } if actions else {}
+
+
+def _compact_private_external_signal(signal: dict[str, Any]) -> dict[str, Any]:
+    """Keep decision inputs while dropping duplicated raw payloads and local paths."""
+
+    return {
+        key: signal.get(key)
+        for key in (
+            "canonical_ticker",
+            "display_name",
+            "market",
+            "source_kind",
+            "source_asof",
+            "ingested_at",
+            "signal_action",
+            "trigger_type",
+            "trigger_score",
+            "composite_score",
+            "agent_fit_score",
+            "risk_reward_ratio",
+            "stop_loss_price",
+            "target_price",
+            "confidence",
+            "rationale",
+            "tags",
+            "current_price",
+            "warnings",
+        )
+        if signal.get(key) is not None
+    }
 
 
 def _youtube_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:

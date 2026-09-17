@@ -14,6 +14,8 @@ def test_prism_telegram_workflow_keeps_pages_permission_off_self_hosted_build_jo
     deploy_job = workflow.split("  deploy:", 1)[1]
 
     assert "Clear stale runner diagnostic logs" in preflight_job
+    assert "Reclaim stale self-hosted runner outputs" in preflight_job
+    assert "free space is below 2GB" in preflight_job
     assert "_diag\\pages" in preflight_job
     assert "_diag\\blocks" in preflight_job
     assert "permissions:\n      contents: read" in build_job
@@ -21,8 +23,10 @@ def test_prism_telegram_workflow_keeps_pages_permission_off_self_hosted_build_jo
     assert "pages: write" not in build_job
     assert "id-token: write" not in build_job
     assert "path: source-${{ github.run_id }}" in build_job
-    assert "TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\\site-${{ github.run_id }}" in build_job
+    assert "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP" in build_job
+    assert "tradingagents-site-$env:GITHUB_RUN_ID-prism" in build_job
     assert "working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}" in build_job
+    assert "Clean run-scoped PRISM files" in build_job
     assert "Prepare runner diagnostics" not in build_job
 
     assert "permissions:" in deploy_job

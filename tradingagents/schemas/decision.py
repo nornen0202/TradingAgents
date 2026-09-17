@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 from dataclasses import dataclass
 from enum import Enum
@@ -411,8 +412,12 @@ def _optional_float(value: Any) -> float | None:
     if isinstance(value, bool):
         return None
     if isinstance(value, int | float):
+        if not math.isfinite(value):
+            raise StructuredDecisionValidationError("Numeric decision fields must be finite.")
         return float(value)
     numbers = _numbers_from_text(value)
+    if any(not math.isfinite(number) for number in numbers):
+        raise StructuredDecisionValidationError("Numeric decision fields must be finite.")
     return numbers[0] if numbers else None
 
 
@@ -420,6 +425,8 @@ def _optional_metric_float(value: Any) -> float | None:
     if value in (None, "") or isinstance(value, bool):
         return None
     if isinstance(value, int | float):
+        if not math.isfinite(value):
+            raise StructuredDecisionValidationError("Numeric decision fields must be finite.")
         return float(value)
     text = str(value)
     text = re.sub(r"\b20\d{2}[-./]\d{1,2}[-./]\d{1,2}\b", " ", text)

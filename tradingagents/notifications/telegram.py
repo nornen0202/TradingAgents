@@ -67,6 +67,18 @@ WORKFLOW_PATH_NAMES: dict[str, str] = {
     ".github/workflows/work-report-pages-refresh.yml": "Work Report Pages Refresh",
 }
 
+# These jobs only decide or prepare whether business work may run. A queued
+# self-hosted job can be cancelled by GitHub without ever receiving a runner;
+# successful cloud gates must not make that queue-only cancellation look like
+# attempted analysis or publication work.
+CONTROL_PLANE_JOB_NAMES = {
+    "schedule_gate",
+    "overlay_gate",
+    "prepare_analysis_runner",
+    "prepare_pages_runner",
+    "prepare_self_hosted_runner",
+}
+
 
 def inspect_workflow_run(
     run: dict[str, Any],
@@ -132,6 +144,11 @@ def inspect_workflow_run(
         if str(job.get("name") or "").strip()
         and str(job.get("conclusion") or "").lower() not in {"", "skipped"}
     ]
+    attempted_work_job_names = [
+        str(job.get("name") or "")
+        for job in jobs
+        if _job_attempted_business_work(job)
+    ]
     successful_job_names = {
         str(job.get("name") or "")
         for job in jobs
@@ -184,7 +201,7 @@ def inspect_workflow_run(
     if conclusion == "skipped":
         should_notify = False
         reason = "no_work_workflow_skipped"
-    elif conclusion in {"cancelled", "neutral"} and not attempted_job_names:
+    elif conclusion in {"cancelled", "neutral"} and not attempted_work_job_names:
         should_notify = False
         reason = "no_work_unattempted"
     elif conclusion != "success":
@@ -219,6 +236,7 @@ def inspect_workflow_run(
         "attempted_terminal_jobs": attempted_terminal_jobs,
         "terminal_deploy_superseded": terminal_deploy_superseded,
         "attempted_job_names": attempted_job_names,
+        "attempted_work_job_names": attempted_work_job_names,
         "run_labels": list(spec.run_labels),
         "surfaces": surfaces,
         "display_title": display_title,
@@ -226,6 +244,22 @@ def inspect_workflow_run(
         "failure_context": failure_context,
         "failure_fingerprint": failure_fingerprint,
     }
+
+
+def _job_attempted_business_work(job: dict[str, Any]) -> bool:
+    name = str(job.get("name") or "").strip()
+    conclusion = str(job.get("conclusion") or "").strip().lower()
+    if not name or conclusion in {"", "skipped", "neutral"}:
+        return False
+    if name in CONTROL_PLANE_JOB_NAMES:
+        return False
+
+    # Jobs cancelled while still waiting for a self-hosted runner have no
+    # steps. Once a runner really starts a job, GitHub records at least the
+    # setup step, so a cancelled job with steps remains actionable.
+    if conclusion == "cancelled" and not list(job.get("steps") or []):
+        return False
+    return True
 
 
 def _workflow_recovery_source(*, event: str, display_title: str) -> str:
@@ -923,6 +957,18 @@ def compose_notification(
     public_base_url: str,
     cards_only: bool = False,
 ) -> tuple[list[str], list[list[dict[str, str]]], dict[str, Any]]:
+    surfaces = list(
+        dict.fromkeys(str(value).lower() for value in (context.get("surfaces") or []))
+    )
+    if cards_only:
+        # Ticker-level private action cards were intentionally retired. Keep
+        # the legacy option as a fail-closed no-op so older/manual callers
+        # cannot send the long card or its blocked/recheck fallback.
+        return [], [], {"markets": [], "run_ids": [], "surfaces": surfaces}
+
+    # Retained in the public API for caller compatibility. Notifications no
+    # longer read private archives or include ticker-level content.
+    _ = archive_dir
     workflow_name = str(context["workflow_name"])
     conclusion = str(context["conclusion"])
     run_id = int(context["upstream_run_id"])
@@ -931,8 +977,6 @@ def compose_notification(
     completed = _format_kst(str(context.get("updated_at") or ""))
 
     if conclusion != "success":
-        if cards_only:
-            return [], [], {"markets": [], "run_ids": [], "surfaces": []}
         failure_fingerprint = str(context.get("failure_fingerprint") or "").lower()
         text = "\n".join(
             [
@@ -952,117 +996,51 @@ def compose_notification(
             "failure_fingerprint": failure_fingerprint,
         }
 
-    market_runs = find_market_runs(
-        archive_dir=archive_dir,
-        labels=list(context.get("run_labels") or []),
-        created_at=str(context.get("created_at") or ""),
-        updated_at=str(context.get("updated_at") or ""),
-        upstream_run_id=int(context.get("upstream_run_id") or 0),
-        repository=str(context.get("repository") or ""),
-        workflow_name=workflow_name,
-        head_sha=str(context.get("head_sha") or ""),
-    )
-    surfaces = [str(value).lower() for value in (context.get("surfaces") or [])]
-    expected_markets = {surface.upper() for surface in surfaces if surface in {"kr", "us"}}
-    if expected_markets:
-        market_runs = [item for item in market_runs if str(item.get("market") or "").upper() in expected_markets]
-    lines = (
-        ["TradingAgents 개인 종목 액션 카드"]
-        if cards_only
-        else [
-            "✅ TradingAgents 분석·배포 완료",
-            f"워크플로: {workflow_name}",
-            f"완료 시각: {completed}",
-            f"GitHub 실행 ID: {run_id}",
-        ]
-    )
-    if not market_runs:
-        if cards_only:
-            return [], [], {"markets": [], "run_ids": [], "surfaces": surfaces}
-        lines.extend(
-            [
-                "시장 archive와 직접 연결된 신규 run은 없습니다.",
-                "사이트 재배포·YouTube·PRISM 작업이면 아래 공개 페이지에서 최신 결과를 확인하세요.",
-            ]
-        )
-    if market_runs:
-        for item in market_runs:
-            lines.extend(
-                _market_action_card_lines(
-                    item,
-                    workflow_created_at=str(context.get("created_at") or ""),
-                    workflow_updated_at=str(context.get("updated_at") or ""),
-                )
-            )
-    lines.append("모든 전략은 참고용이며, 주문 전 가격·시각·데이터 상태를 다시 확인하세요.")
+    lines = [
+        "✅ TradingAgents 분석·배포 완료",
+        f"워크플로: {workflow_name}",
+        f"완료 시각: {completed}",
+        f"GitHub 실행 ID: {run_id}",
+    ]
 
     buttons: list[list[dict[str, str]]] = []
-    for item in ([] if cards_only else market_runs):
-        market = str(item["market"]).lower()
-        run_public_url = f"{base}/runs/{urllib.parse.quote(str(item['run_id']))}/index.html"
-        mobile_url = f"{base}/mobile/?market={urllib.parse.quote(market)}"
-        row = [
-            {"text": f"{market.upper()} 공개 리포트", "url": run_public_url},
-            {"text": f"{market.upper()} 모바일", "url": mobile_url},
-        ]
-        buttons.append(row)
-        strategy_query = (
-            f"?market={urllib.parse.quote(market)}"
-            f"&run={urllib.parse.quote(str(item['run_id']), safe='')}"
-        )
+    for surface in surfaces:
+        public_url, mobile_url = _surface_urls(base, surface)
+        if surface == "youtube":
+            public_label = "YouTube 종합 인사이트"
+            mobile_label = "YouTube 모바일 인사이트"
+        else:
+            public_label = f"{surface.upper()} 공개 리포트"
+            mobile_label = f"{surface.upper()} 모바일"
         buttons.append(
             [
-                {
-                    "text": f"{market.upper()} PC 전략",
-                    "url": f"{base}/strategy.html{strategy_query}",
-                },
-                {
-                    "text": f"{market.upper()} 모바일 전략",
-                    "url": f"{base}/mobile/strategy.html{strategy_query}",
-                },
+                {"text": public_label, "url": public_url},
+                {"text": mobile_label, "url": mobile_url},
             ]
         )
-    if not cards_only:
-        represented = {str(item["market"]).lower() for item in market_runs}
-        for surface in surfaces:
-            if surface in represented:
-                continue
-            public_url, mobile_url = _surface_urls(base, surface)
-            if surface == "youtube":
-                public_label = "YouTube 종합 인사이트"
-                mobile_label = "YouTube 모바일 인사이트"
-            else:
-                public_label = f"{surface.upper()} 공개 리포트"
-                mobile_label = f"{surface.upper()} 모바일"
+        if surface in {"kr", "us"}:
+            strategy_query = f"?market={urllib.parse.quote(surface)}"
             buttons.append(
                 [
-                    {"text": public_label, "url": public_url},
-                    {"text": mobile_label, "url": mobile_url},
+                    {
+                        "text": f"{surface.upper()} PC 전략",
+                        "url": f"{base}/strategy.html{strategy_query}",
+                    },
+                    {
+                        "text": f"{surface.upper()} 모바일 전략",
+                        "url": f"{base}/mobile/strategy.html{strategy_query}",
+                    },
                 ]
             )
-            if surface in {"kr", "us"}:
-                strategy_query = f"?market={urllib.parse.quote(surface)}"
-                buttons.append(
-                    [
-                        {
-                            "text": f"{surface.upper()} PC 전략",
-                            "url": f"{base}/strategy.html{strategy_query}",
-                        },
-                        {
-                            "text": f"{surface.upper()} 모바일 전략",
-                            "url": f"{base}/mobile/strategy.html{strategy_query}",
-                        },
-                    ]
-                )
-    if not cards_only and not market_runs and not surfaces and base:
+    if not surfaces and base:
         buttons.append([{"text": "TradingAgents 리포트", "url": f"{base}/"}])
-    if not cards_only and _is_https_url(actions_url):
+    if _is_https_url(actions_url):
         buttons.append([{"text": "GitHub 실행 로그", "url": actions_url}])
 
     text = "\n".join(lines)
     metadata = {
-        "markets": [item["market"] for item in market_runs],
-        "run_ids": [item["run_id"] for item in market_runs],
+        "markets": [],
+        "run_ids": [],
         "surfaces": surfaces,
     }
     return chunk_text(text), buttons, metadata

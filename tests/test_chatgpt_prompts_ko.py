@@ -20,11 +20,45 @@ def test_prompts_stay_compact_and_korean_action_first() -> None:
 
     for name in ("prompts_kr_for_chatgpt.md", "prompts_us_for_chatgpt.md"):
         text = (ROOT / "Docs" / name).read_text(encoding="utf-8")
-        assert "종목별 투자 전략표" in text, name
         assert "보유 유지" in text, name
         assert "종가 확인 후 판단" in text, name
+        assert "웹 검색/심층 조사" in text, name
+        assert "https://nornen0202.github.io/TradingAgents/index.html" in text, name
+        assert "https://nornen0202.github.io/TradingAgents/llms.txt" in text, name
+        assert "mobile/strategy.json" in text, name
+        assert "mobile/public.json" in text, name
+        assert "account/public.json" in text, name
+        assert "파일을 직접 첨부하지 않고" in text, name
+        assert "404" in text, name
+        assert "프로젝트 원안" in text, name
+        assert "최신 웹 검증" in text, name
+        assert "`단기`" in text and "`중기`" in text and "`장기`" in text, name
+        assert "모든 보유 종목" in text, name
+        assert "모바일용 핵심 전략표" in text, name
+        assert "종목별 상세 전략표" in text, name
+        assert "| 종목 | 현재 행동 | 단기 조건 | 중장기 판단 | 위험/재확인 |" in text, name
+        assert "추가 현금 투입 시나리오" in text, name
+        assert "다른 계좌" in text, name
+        assert "최소 4개" in text, name
+        assert "최소 6개월" in text, name
+        assert "현재 충족 여부·판정시각" in text, name
+        assert "취소·재평가 조건" in text, name
+        assert "같은 문구를 조건 없이 단독으로 쓰지 마라" in text, name
+        assert "미완성 답변" in text, name
+        assert "계좌 식별정보가 제거됐는가" in text, name
         assert "AVOID_OR_EXCLUDE" not in text, name
         assert "WAIT_CLOSE" not in text, name
+
+    kr = (ROOT / "Docs" / "prompts_kr_for_chatgpt.md").read_text(encoding="utf-8")
+    assert "DART" in kr
+    assert "한국거래소/KIND" in kr
+    assert "KOSPI/KOSDAQ" in kr
+
+    us = (ROOT / "Docs" / "prompts_us_for_chatgpt.md").read_text(encoding="utf-8")
+    assert "SEC EDGAR" in us
+    assert "정규장, pre-market, after-hours" in us
+    assert "USD/KRW" in us
+    assert "최소 4개 시나리오를 USD와 KRW로" in us
 
 
 def test_youtube_previous_day_fallback_is_explicitly_non_actionable() -> None:
@@ -33,3 +67,22 @@ def test_youtube_previous_day_fallback_is_explicitly_non_actionable() -> None:
     )
     assert "직전 KST 날짜" in text
     assert "실행 판단 상향 근거로 사용하지 않는다" in text
+
+
+def test_scheduled_quality_contract_is_embedded_in_both_prompts() -> None:
+    for market in ("kr", "us"):
+        text = (ROOT / "Docs" / f"prompts_{market}_for_chatgpt.md").read_text(encoding="utf-8")
+        assert text.count("## 프롬프트 시작") == 1
+        assert text.count("## 프롬프트 끝") == 1
+        body = text.split("## 프롬프트 시작", 1)[1].split("## 프롬프트 끝", 1)[0]
+        for requirement in (
+            "2026-09-11 v2",
+            "조회 실패를 자료 부재나 악재로 단정하지 않는다",
+            "이전 추천은 체결 사실이 아니다",
+            "A 바로 다음에 E-1 모바일표",
+            "0원+4개 양수 시나리오",
+            "조건 완결 행 수/대상 행 수",
+            "안전 제한·인증 요구는 우회하지 않는다",
+            "예약·알림·모델 설정은 변경하지 않는다",
+        ):
+            assert requirement in body

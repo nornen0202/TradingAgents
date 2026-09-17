@@ -743,6 +743,7 @@ def due_targets(now_kst: datetime) -> list[WatchdogTarget]:
                     window_start_kst=codex_kr_window,
                     inputs={"profile": "kr", "recovery_source": "cloud_watchdog"},
                     blockers=(_intraday_overlay_active_blocker("us", now_kst),),
+                    max_failed_attempts=4,
                 )
             )
 

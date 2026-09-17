@@ -88,7 +88,9 @@ def test_daily_codex_us_watchdog_yields_after_late_recovery_window():
 def test_daily_codex_kr_watchdog_stays_due_before_ten_kst_target():
     targets = watchdog.due_targets(_kst("2026-06-01T09:37:00"))
 
-    assert [target for target in targets if target.name == "daily-codex-kr"]
+    codex_kr = [target for target in targets if target.name == "daily-codex-kr"]
+    assert codex_kr
+    assert codex_kr[0].max_failed_attempts == 4
 
 
 def test_daily_codex_kr_watchdog_yields_after_recovery_window():

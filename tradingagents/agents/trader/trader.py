@@ -31,7 +31,15 @@ def create_trader(llm, memory):
                 f"Based on a comprehensive analysis by a team of analysts, here is an investment plan tailored for {company_name}. "
                 f"{instrument_context} This plan incorporates insights from market trends, macro context, sentiment, news, and fundamentals. "
                 f"Use this plan as a foundation for your execution decision.\n\nProposed Investment Plan JSON: {investment_plan}\n\n"
-                "Leverage these insights to make an informed and strategic decision."
+                f"Technical market report (price/volume source): {market_research_report}\n\n"
+                f"Fundamentals and valuation: {fundamentals_report}\n\n"
+                f"News and event risks: {news_report}\n\n"
+                f"Sentiment and coverage limits: {sentiment_report}\n\n"
+                f"Analysis as-of date: {state.get('trade_date', 'unknown')}. "
+                "Anchor all entry, stop and target prices to dated evidence in these reports. "
+                "Do not manufacture missing prices, upcoming earnings dates, or a calibrated win probability. "
+                "Compare the opportunity with a diversified regional ETF and holding cash, including fees, spread and slippage. "
+                "If price evidence is missing or contradictory, keep entry_action=WAIT and say what must be verified."
             ),
         }
 
@@ -46,6 +54,7 @@ def create_trader(llm, memory):
                     "When the thesis is constructive but the setup is not actionable yet, keep entry_action=WAIT and provide explicit triggers instead of flattening the legacy rating to NO_TRADE. "
                     "Use NO_TRADE only when there is no favorable setup to monitor, the risk/reward is clearly unfavorable, or the evidence quality is too weak for an investable view. "
                     "When setup quality is compelling and timing is confirmed, allow BUY or OVERWEIGHT rather than defaulting to NO_TRADE or HOLD. "
+                    "Confidence describes strength of evidence, not the probability of profit. Position sizing must respect a defined loss budget, existing concentration and cash. "
                     f"Apply lessons from similar situations: {past_memory_str} "
                     f"{build_decision_output_instructions('trader execution plan')}"
                 ),

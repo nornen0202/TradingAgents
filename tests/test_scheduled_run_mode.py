@@ -13,12 +13,27 @@ from tradingagents.scheduled.runner import (
     _manifest_has_bootstrap_ready_ticker,
     _manifest_production_priority,
     _resolve_latest_overlay_source_manifest,
+    _resolve_latest_full_overlay_baseline_manifest,
     execute_scheduled_run,
 )
 
 
 def _recent_started_at(*, hours_ago: float = 1.0) -> str:
     return (datetime.now(timezone.utc) - timedelta(hours=hours_ago)).isoformat()
+
+
+def test_new_adaptive_cohort_wins_over_larger_previous_watchlist(tmp_path):
+    now = datetime(2026, 9, 10, 22, tzinfo=timezone.utc)
+    _write_full_overlay_baseline(tmp_path, tickers=["NVDA", "AAPL", "AMD"],
+        run_id="20260910T180000_old", started_at=(now-timedelta(hours=4)).isoformat(), set_latest=False)
+    current = _write_full_overlay_baseline(tmp_path, tickers=["NVDA", "NEW"],
+        run_id="20260910T200000_adaptive", started_at=(now-timedelta(hours=2)).isoformat())
+    current["active_universe"] = {"mode": "adaptive_required_coverage", "coverage": {"complete": True}}
+    current["summary"] = {"configured_ticker_count": 2, "failed_tickers": 0}
+    (tmp_path / "latest-run.json").write_text(json.dumps(current), encoding="utf-8")
+    selected = _resolve_latest_full_overlay_baseline_manifest(tmp_path, market="US",
+        requested_tickers=["NVDA", "AAPL", "AMD"], required_holding_tickers=["NVDA"], now=now)
+    assert selected["run_id"] == current["run_id"]
 
 
 def test_overlay_production_label_token_matching_does_not_reject_latest() -> None:

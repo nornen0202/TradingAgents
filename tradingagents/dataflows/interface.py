@@ -19,6 +19,7 @@ from .alpha_vantage import (
 from .alpha_vantage_common import AlphaVantageRateLimitError
 from .config import get_config
 from .ecos import get_macro_news_ecos
+from .fred import get_macro_data
 from .naver_news import get_company_news_naver, get_social_sentiment_naver
 from .opendart import get_disclosures_opendart
 from .vendor_exceptions import (
@@ -68,7 +69,7 @@ TOOLS_CATEGORIES = {
     },
     "macro_data": {
         "description": "Macro and market context feeds",
-        "tools": ["get_global_news", "get_macro_news"],
+        "tools": ["get_global_news", "get_macro_news", "get_macro_indicators"],
     },
     "disclosure_data": {
         "description": "Corporate disclosures and filings",
@@ -81,6 +82,7 @@ TOOLS_CATEGORIES = {
 }
 
 VENDOR_LIST = [
+    "fred",
     "alpha_vantage",
     "yfinance",
     "naver",
@@ -89,6 +91,7 @@ VENDOR_LIST = [
 ]
 
 VENDOR_METHODS = {
+    "get_macro_indicators": {"fred": get_macro_data},
     "get_stock_data": {
         "alpha_vantage": get_alpha_vantage_stock,
         "yfinance": get_YFin_data_online,
@@ -356,6 +359,15 @@ def route_to_vendor(method: str, *args, **kwargs):
         raise ValueError(f"Method '{method}' not supported")
 
     _validate_input_for_method(method, args, kwargs)
+    config = get_config()
+    cutoff = config.get("analysis_as_of")
+    if config.get("point_in_time_strict") and cutoff:
+        # Guard tool arguments independently of the model's compliance with prompts.
+        dates = [str(v) for v in (*args, *kwargs.values()) if isinstance(v, str) and len(v) == 10 and v[4:5] == "-" and v[7:8] == "-"]
+        if any(value > cutoff for value in dates):
+            raise VendorInputError("Requested data date exceeds the analysis as-of date")
+        if method == "get_insider_transactions":
+            return "No insider data: historical publication timestamps are not verified."
 
     category = get_category_for_method(method)
     vendor_chain = _normalize_vendor_chain(method, get_vendor(category, method))
@@ -423,6 +435,8 @@ def route_to_vendor(method: str, *args, **kwargs):
             )
             raise
 
+    if method == "get_macro_indicators":
+        return "DATA_UNAVAILABLE: No macro data from the configured FRED provider."
     if last_result is not None:
         return last_result
 

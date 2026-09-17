@@ -320,9 +320,16 @@ def execute_scheduled_run(
             active_ticker_limit=selection_limit,
             resolved_universe=selection_universe,
         )
+        if active_universe_metadata.get("mode") == "adaptive_required_coverage":
+            # The seed pool is not today's required analysis set.
+            configured_ticker_count = len(run_tickers)
+            _write_json(run_dir / "universe_selection.json", active_universe_metadata)
+            from .adaptive_universe import render_selection_report
+            (run_dir / "universe_selection.md").write_text(render_selection_report(active_universe_metadata), encoding="utf-8")
+            run_warnings.extend(active_universe_metadata.get("research_warnings") or [])
         if overlay_universe_metadata:
             active_universe_metadata["overlay_baseline"] = overlay_universe_metadata
-        if run_mode == "full" and active_ticker_limit and omitted:
+        if run_mode == "full" and active_ticker_limit and omitted and active_universe_metadata.get("mode") != "adaptive_required_coverage":
             warning = (
                 "daily_active_ticker_limit_applied:"
                 f"limit={active_ticker_limit}:omitted_tickers={','.join(omitted)}"
@@ -796,14 +803,60 @@ def resolve_trade_date(
     if not isinstance(last_date, date):
         raise RuntimeError(f"Unexpected trade date index value for {ticker}: {last_index!r}")
     if expected_completed_date is not None:
+        market = _trade_date_market(ticker=normalized_symbol, config=config)
+        wait_seconds = max(0.0, config.run.latest_market_data_wait_minutes * 60.0)
+        retry_interval = max(1.0, config.run.latest_market_data_retry_interval_seconds)
+        waited_seconds = 0.0
+        while last_date < expected_completed_date and waited_seconds < wait_seconds:
+            delay = min(retry_interval, wait_seconds - waited_seconds)
+            print(
+                "::warning::"
+                f"Vendor daily bar for {ticker} ({normalized_symbol}) is not ready: "
+                f"latest={last_date.isoformat()}, expected={expected_completed_date.isoformat()}. "
+                f"Retrying in {delay:g}s."
+            )
+            sleep(delay)
+            waited_seconds += delay
+            try:
+                refreshed_history = _fetch_recent_trade_date_history(
+                    normalized_symbol,
+                    lookback_days=config.run.latest_market_data_lookback_days,
+                )
+            except Exception as exc:
+                if not is_retryable_yfinance_error(exc):
+                    raise
+                print(
+                    "::warning::"
+                    f"Yahoo Finance retry failed for {ticker} ({normalized_symbol}); "
+                    f"continuing freshness wait. reason={_summarize_exception(exc)}"
+                )
+                continue
+            if refreshed_history is None or refreshed_history.empty:
+                print(
+                    "::warning::"
+                    f"Yahoo Finance retry returned no rows for {ticker} ({normalized_symbol}); "
+                    "continuing freshness wait."
+                )
+                continue
+            refreshed_index = refreshed_history.index[-1]
+            refreshed_value = getattr(refreshed_index, "to_pydatetime", lambda: refreshed_index)()
+            refreshed_date = refreshed_value.date() if hasattr(refreshed_value, "date") else refreshed_value
+            if not isinstance(refreshed_date, date):
+                raise RuntimeError(f"Unexpected trade date index value for {ticker}: {refreshed_index!r}")
+            last_date = max(last_date, refreshed_date)
         if last_date > expected_completed_date:
             return expected_completed_date.isoformat()
         if last_date < expected_completed_date:
-            market = _trade_date_market(ticker=normalized_symbol, config=config)
+            wait_detail = (
+                f" after waiting {waited_seconds:g}s for vendor catch-up"
+                if waited_seconds
+                else ""
+            )
             raise RuntimeError(
                 f"Refusing stale latest_available trade date for {ticker} ({normalized_symbol}): "
                 f"vendor latest row is {last_date.isoformat()} but {market} calendar expects "
-                f"completed daily bar {expected_completed_date.isoformat()} as of {now.isoformat()}."
+                f"completed daily bar {expected_completed_date.isoformat()} as of {now.isoformat()}"
+                f"{wait_detail}."
             )
     return last_date.isoformat()
 
@@ -1695,6 +1748,7 @@ def _run_single_ticker(
     timer_start = perf_counter()
     analysis_date = ticker_started.date().isoformat()
     reset_llm_usage()
+    graph = None
 
     try:
         reset_tool_telemetry()
@@ -1766,6 +1820,9 @@ def _run_single_ticker(
             effective_tool_calls=effective_tool_calls,
             tokens_available=bool(metrics.get("tokens_available", False) or llm_usage.get("available")),
         )
+        if decision == "REVIEW":
+            quality_flags.append("decision_unvalidated")
+            print(f"::warning::{ticker} has no validated final decision; rerun before using the report.")
         if "no_tool_calls_detected" in quality_flags:
             print(f"::warning::No tool calls were recorded for {ticker}; report quality may be degraded.")
         if "intraday_snapshot_missing_same_day" in quality_flags:
@@ -1960,6 +2017,15 @@ def _run_single_ticker(
         }
 
 
+    finally:
+        close = getattr(graph, "close", None)
+        if callable(close):
+            try:
+                close()
+            except Exception:
+                print("::warning::Could not fully close the completed analysis session.")
+
+
 def _max_runtime_seconds(config: ScheduledAnalysisConfig) -> float | None:
     minutes = float(getattr(config.run, "max_runtime_minutes", 0.0) or 0.0)
     if minutes <= 0:
@@ -2150,6 +2216,8 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "max_consecutive_codex_failures": config.run.max_consecutive_codex_failures,
         "fatal_error_patterns": list(config.run.fatal_error_patterns),
         "daily_active_ticker_limit": config.run.daily_active_ticker_limit,
+        "adaptive_universe_enabled": bool(getattr(getattr(config, "universe", None), "enabled", False)),
+        "portfolio_profile_name": config.portfolio.profile_name,
         "analysis_mode": config.run.analysis_mode,
         "max_debate_rounds": config.run.max_debate_rounds,
         "max_risk_discuss_rounds": config.run.max_risk_discuss_rounds,
@@ -2753,6 +2821,11 @@ def _select_daily_active_tickers(
 ) -> tuple[list[str], list[str], dict[str, Any]]:
     normalized = _unique_tickers(tickers)
     universe = resolved_universe or _resolve_run_ticker_universe(config)
+    if (getattr(getattr(config, "universe", None), "enabled", False)
+            and getattr(config.run, "run_mode", "full") == "full"):
+        from .adaptive_universe import select_adaptive_universe
+        return select_adaptive_universe(config=config, universe=universe, tickers=normalized,
+                                        asof=started_at, requested_limit=active_ticker_limit)
     holding_identity = {_ticker_identity_key(ticker) for ticker in universe.holding_tickers}
     holdings = [ticker for ticker in normalized if _ticker_identity_key(ticker) in holding_identity]
 
@@ -3074,7 +3147,7 @@ def _strict_required_coverage_failed(manifest: dict[str, Any]) -> bool:
     """Fail strict full-coverage runs without breaking intentional smoke caps."""
 
     active = manifest.get("active_universe")
-    if not isinstance(active, dict) or active.get("mode") != "full_required_coverage":
+    if not isinstance(active, dict) or active.get("mode") not in {"full_required_coverage", "adaptive_required_coverage"}:
         return False
     coverage = active.get("coverage")
     return not isinstance(coverage, dict) or coverage.get("complete") is not True
@@ -4028,6 +4101,14 @@ def _resolve_latest_full_overlay_baseline_manifest(
         eligible.append(candidate)
     if not eligible:
         return None
+    if any((item.get("active_universe") or {}).get("mode") == "adaptive_required_coverage" for item in eligible):
+        # A deliberate smaller cohort must not lose to yesterday's larger seed
+        # list merely because the latter overlaps more configured tickers.
+        eligible.sort(key=lambda item: (
+            _manifest_production_priority(item),
+            _manifest_started_at_for_sort(item, market=market),
+        ), reverse=True)
+        return eligible[0]
     eligible.sort(
         key=lambda manifest: (
             _manifest_requested_coverage_count(manifest, requested_tickers),

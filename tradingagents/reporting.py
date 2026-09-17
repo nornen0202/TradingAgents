@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 import re
+import json
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -27,6 +28,15 @@ def save_report_bundle(
     trade_date = _coerce_text(final_state.get("trade_date"))
 
     sections: list[str] = []
+    if final_state.get("final_trade_decision") or (final_state.get("risk_debate_state") or {}).get("judge_decision"):
+        from tradingagents.investor import build_investor_playbook, render_investor_playbook
+        playbook = build_investor_playbook(final_state)
+        summary_dir = save_path / "0_summary"
+        summary_dir.mkdir(exist_ok=True)
+        rendered = render_investor_playbook(playbook, language=language)
+        _write_text(summary_dir / "investor_playbook.md", rendered)
+        _write_text(summary_dir / "investor_playbook.json", json.dumps(playbook, ensure_ascii=False, indent=2, allow_nan=False))
+        sections.append(rendered)
 
     investor_summary = _coerce_text(final_state.get("investor_summary_report"))
     if investor_summary:
