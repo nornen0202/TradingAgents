@@ -32,3 +32,10 @@
 ## 작업 트리 보존
 
 기존 `C:/Projects/TradingAgents`에는 과거 main 기반의 미커밋 작업이 있었다. 최신 `fork/main`에서 별도 worktree를 만들어 기존 파일을 덮어쓰지 않았다. 이미 main에 반영된 Work/알림 수정과 미반영된 달력 변경은 구분했으며 달력 변경 전체를 검증 없이 덮어씌우지 않았다.
+
+## 실환경 후속 확인
+
+- PR #279와 보안 의존성 PR #258/#259/#267을 main에 병합했다. main CI 및 CodeQL 성공, Windows CI 1,044 테스트 통과, 열린 Dependabot 경고 0건을 확인했다.
+- 전용 Pages 러너 최초 설정 중 `actions/setup-python`의 Windows MSI/레지스트리 권한 문제가 드러났다. 레지스트리를 사용하지 않는 Python 3.13.12 배포본으로 독립 Actions 도구 캐시를 구성하고 기존 분석 러너의 Python 및 의존성도 재검증했다. 두 러너는 같은 Python 설치 디렉터리를 공유하지 않는다.
+- Work Pages 실행 `35246761580`의 3차 시도에서 원본 검증·사이트 생성·계보 검증·배포가 성공했다. 실제 공개 보고서 해시 `a72e3b794ba05f3c55bd1122e44750624bf2238c3d688baa944a3a7e21da2481`와 배포 마커를 HTTP로 확인했다.
+- 성공 로그를 추가 검토해 Python `shutil.rmtree`가 읽기 전용 Git pack/index 파일을 제거하지 못하고 중첩 checkout을 남기는 문제를 발견했다. Work와 PRISM의 최종 정리를 Windows 네이티브 `Remove-Item -LiteralPath -Recurse -Force`로 바꾸고 5분 제한·경로 검증을 유지했다. 한 대상의 정리가 실패해도 다른 임시 폴더는 정리한다. 읽기 전용 파일 제거 및 경계 밖 삭제 거부를 실제 PowerShell 회귀 테스트로 검증한다.
