@@ -111,7 +111,6 @@ jobs:
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"
-      TRADINGAGENTS_SITE_DIR: ${{ github.workspace }}\site
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
@@ -152,6 +151,11 @@ jobs:
       TRADINGAGENTS_YOUTUBE_BGUTIL_VERSION: ${{ vars.YOUTUBE_BGUTIL_VERSION }}
       HF_HUB_DISABLE_SYMLINKS_WARNING: "1"
     steps:
+      - name: Initialize YouTube run-scoped temporary path
+        shell: pwsh
+        run: |
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-youtube"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -584,6 +588,7 @@ jobs:
         id: stamp_pages_snapshot
         if: ${{ steps.runtime_gate.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
         run: |
+          import os
           import subprocess
           import sys
 
@@ -593,7 +598,7 @@ jobs:
                   ".github/scripts/pages_snapshot.py",
                   "stamp",
                   "--site-dir",
-                  "site",
+                  os.environ["TRADINGAGENTS_SITE_DIR"],
                   "--repository",
                   "${{ github.repository }}",
                   "--workflow",
@@ -633,7 +638,7 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-youtube
-          path: site
+          path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
       - name: Clean Codex workspace
         if: ${{ always() }}

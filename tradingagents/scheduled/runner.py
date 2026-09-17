@@ -320,9 +320,16 @@ def execute_scheduled_run(
             active_ticker_limit=selection_limit,
             resolved_universe=selection_universe,
         )
+        if active_universe_metadata.get("mode") == "adaptive_required_coverage":
+            # The seed pool is not today's required analysis set.
+            configured_ticker_count = len(run_tickers)
+            _write_json(run_dir / "universe_selection.json", active_universe_metadata)
+            from .adaptive_universe import render_selection_report
+            (run_dir / "universe_selection.md").write_text(render_selection_report(active_universe_metadata), encoding="utf-8")
+            run_warnings.extend(active_universe_metadata.get("research_warnings") or [])
         if overlay_universe_metadata:
             active_universe_metadata["overlay_baseline"] = overlay_universe_metadata
-        if run_mode == "full" and active_ticker_limit and omitted:
+        if run_mode == "full" and active_ticker_limit and omitted and active_universe_metadata.get("mode") != "adaptive_required_coverage":
             warning = (
                 "daily_active_ticker_limit_applied:"
                 f"limit={active_ticker_limit}:omitted_tickers={','.join(omitted)}"
@@ -2209,6 +2216,8 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "max_consecutive_codex_failures": config.run.max_consecutive_codex_failures,
         "fatal_error_patterns": list(config.run.fatal_error_patterns),
         "daily_active_ticker_limit": config.run.daily_active_ticker_limit,
+        "adaptive_universe_enabled": bool(getattr(getattr(config, "universe", None), "enabled", False)),
+        "portfolio_profile_name": config.portfolio.profile_name,
         "analysis_mode": config.run.analysis_mode,
         "max_debate_rounds": config.run.max_debate_rounds,
         "max_risk_discuss_rounds": config.run.max_risk_discuss_rounds,
@@ -2812,6 +2821,11 @@ def _select_daily_active_tickers(
 ) -> tuple[list[str], list[str], dict[str, Any]]:
     normalized = _unique_tickers(tickers)
     universe = resolved_universe or _resolve_run_ticker_universe(config)
+    if (getattr(getattr(config, "universe", None), "enabled", False)
+            and getattr(config.run, "run_mode", "full") == "full"):
+        from .adaptive_universe import select_adaptive_universe
+        return select_adaptive_universe(config=config, universe=universe, tickers=normalized,
+                                        asof=started_at, requested_limit=active_ticker_limit)
     holding_identity = {_ticker_identity_key(ticker) for ticker in universe.holding_tickers}
     holdings = [ticker for ticker in normalized if _ticker_identity_key(ticker) in holding_identity]
 
@@ -3133,7 +3147,7 @@ def _strict_required_coverage_failed(manifest: dict[str, Any]) -> bool:
     """Fail strict full-coverage runs without breaking intentional smoke caps."""
 
     active = manifest.get("active_universe")
-    if not isinstance(active, dict) or active.get("mode") != "full_required_coverage":
+    if not isinstance(active, dict) or active.get("mode") not in {"full_required_coverage", "adaptive_required_coverage"}:
         return False
     coverage = active.get("coverage")
     return not isinstance(coverage, dict) or coverage.get("complete") is not True
@@ -4087,6 +4101,14 @@ def _resolve_latest_full_overlay_baseline_manifest(
         eligible.append(candidate)
     if not eligible:
         return None
+    if any((item.get("active_universe") or {}).get("mode") == "adaptive_required_coverage" for item in eligible):
+        # A deliberate smaller cohort must not lose to yesterday's larger seed
+        # list merely because the latter overlaps more configured tickers.
+        eligible.sort(key=lambda item: (
+            _manifest_production_priority(item),
+            _manifest_started_at_for_sort(item, market=market),
+        ), reverse=True)
+        return eligible[0]
     eligible.sort(
         key=lambda manifest: (
             _manifest_requested_coverage_count(manifest, requested_tickers),

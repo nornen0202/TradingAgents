@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time as time_module
 import urllib.error
 import urllib.parse
@@ -184,6 +185,7 @@ def _run_covers_target(
     run: dict[str, Any],
     current_run_id: int,
     target_job_names: set[str],
+    target_profile: str,
 ) -> tuple[bool, str]:
     run_id = int(run.get("id", 0))
     if run_id == current_run_id:
@@ -192,6 +194,19 @@ def _run_covers_target(
     status = str(run.get("status") or "").lower()
     conclusion = str(run.get("conclusion") or "").lower()
     if status == "completed" and conclusion != "success":
+        return False, ""
+
+    profile_match = re.search(
+        r"\[profile=(kr|us|all)\]",
+        str(run.get("display_title") or ""),
+        flags=re.IGNORECASE,
+    )
+    run_profile = profile_match.group(1).lower() if profile_match else ""
+    if (
+        target_profile in {"kr", "us"}
+        and run_profile in {"kr", "us"}
+        and run_profile != target_profile
+    ):
         return False, ""
 
     jobs = client.list_jobs(run_id)
@@ -299,6 +314,7 @@ def decide_schedule_gate(
                 run=run,
                 current_run_id=current_run_id,
                 target_job_names=target_job_names,
+                target_profile=target.profile,
             )
             if covered:
                 return (
