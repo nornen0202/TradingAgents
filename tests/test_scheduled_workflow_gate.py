@@ -124,6 +124,122 @@ def test_scheduled_codex_does_not_skip_for_other_profile_target_job():
     assert "running now" in reason
 
 
+def test_daily_codex_workflow_treats_queued_runner_preparation_as_coverage():
+    workflow = (
+        Path(__file__).parents[1]
+        / ".github"
+        / "workflows"
+        / "daily-codex-analysis.yml"
+    ).read_text(encoding="utf-8")
+
+    assert workflow.count(
+        '"target_jobs": ["prepare_analysis_runner", "analyze_us", "build_pages"]'
+    ) == 3
+    assert workflow.count(
+        '"target_jobs": ["prepare_analysis_runner", "analyze_kr", "build_pages"]'
+    ) == 5
+
+
+def test_scheduled_codex_skips_when_same_profile_runner_preparation_is_pending():
+    targets = gate.load_schedule_targets(
+        """
+        {
+          "50 8 * * 1-5": {
+            "profile": "us",
+            "window_start": "17:45",
+            "target_jobs": ["prepare_analysis_runner", "analyze_us", "build_pages"]
+          }
+        }
+        """
+    )
+    client = FakeClient(
+        runs=[
+            {
+                "id": 111,
+                "event": "schedule",
+                "status": "pending",
+                "conclusion": "",
+                "display_title": "Daily Codex Analysis [profile=us]",
+            }
+        ],
+        jobs={
+            111: [
+                {
+                    "name": "prepare_analysis_runner",
+                    "status": "pending",
+                    "conclusion": "",
+                }
+            ]
+        },
+    )
+
+    profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="50 8 * * 1-5",
+        requested_profile="",
+        manual_default_profile="all",
+        workflow_file="daily-codex-analysis.yml",
+        current_run_id=222,
+        client=client,
+        targets=targets,
+        now_kst=_kst("2026-06-03T18:40:00"),
+    )
+
+    assert profile == "us"
+    assert should_run is False
+    assert "prepare_analysis_runner: pending" in reason
+
+
+def test_scheduled_codex_ignores_other_profile_runner_preparation():
+    targets = gate.load_schedule_targets(
+        """
+        {
+          "50 8 * * 1-5": {
+            "profile": "us",
+            "window_start": "17:45",
+            "target_jobs": ["prepare_analysis_runner", "analyze_us", "build_pages"]
+          }
+        }
+        """
+    )
+    client = FakeClient(
+        runs=[
+            {
+                "id": 111,
+                "event": "workflow_dispatch",
+                "status": "pending",
+                "conclusion": "",
+                "display_title": "Daily Codex Analysis [profile=kr]",
+            }
+        ],
+        jobs={
+            111: [
+                {
+                    "name": "prepare_analysis_runner",
+                    "status": "pending",
+                    "conclusion": "",
+                }
+            ]
+        },
+    )
+
+    profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="50 8 * * 1-5",
+        requested_profile="",
+        manual_default_profile="all",
+        workflow_file="daily-codex-analysis.yml",
+        current_run_id=222,
+        client=client,
+        targets=targets,
+        now_kst=_kst("2026-06-03T18:40:00"),
+    )
+
+    assert profile == "us"
+    assert should_run is True
+    assert "running now" in reason
+
+
 def test_scheduled_youtube_skips_when_prior_manual_pages_job_succeeded():
     client = FakeClient(
         runs=[{"id": 333, "event": "workflow_dispatch", "status": "completed", "conclusion": "success"}],

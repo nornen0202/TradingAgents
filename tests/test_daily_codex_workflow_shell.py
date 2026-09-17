@@ -124,8 +124,14 @@ def test_daily_analysis_keeps_large_transient_outputs_in_runner_temp():
 def test_daily_analysis_schedule_gate_requires_pages_build_for_daily_coverage():
     workflow = _workflow_text()
 
-    assert '"target_jobs": ["analyze_us", "build_pages"]' in workflow
-    assert '"target_jobs": ["analyze_kr", "build_pages"]' in workflow
+    assert (
+        '"target_jobs": ["prepare_analysis_runner", "analyze_us", "build_pages"]'
+        in workflow
+    )
+    assert (
+        '"target_jobs": ["prepare_analysis_runner", "analyze_kr", "build_pages"]'
+        in workflow
+    )
 
 
 def test_daily_analysis_self_hosted_jobs_serialize_workspace_checkout():

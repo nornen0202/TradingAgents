@@ -67,6 +67,18 @@ WORKFLOW_PATH_NAMES: dict[str, str] = {
     ".github/workflows/work-report-pages-refresh.yml": "Work Report Pages Refresh",
 }
 
+# These jobs only decide or prepare whether business work may run. A queued
+# self-hosted job can be cancelled by GitHub without ever receiving a runner;
+# successful cloud gates must not make that queue-only cancellation look like
+# attempted analysis or publication work.
+CONTROL_PLANE_JOB_NAMES = {
+    "schedule_gate",
+    "overlay_gate",
+    "prepare_analysis_runner",
+    "prepare_pages_runner",
+    "prepare_self_hosted_runner",
+}
+
 
 def inspect_workflow_run(
     run: dict[str, Any],
@@ -132,6 +144,11 @@ def inspect_workflow_run(
         if str(job.get("name") or "").strip()
         and str(job.get("conclusion") or "").lower() not in {"", "skipped"}
     ]
+    attempted_work_job_names = [
+        str(job.get("name") or "")
+        for job in jobs
+        if _job_attempted_business_work(job)
+    ]
     successful_job_names = {
         str(job.get("name") or "")
         for job in jobs
@@ -184,7 +201,7 @@ def inspect_workflow_run(
     if conclusion == "skipped":
         should_notify = False
         reason = "no_work_workflow_skipped"
-    elif conclusion in {"cancelled", "neutral"} and not attempted_job_names:
+    elif conclusion in {"cancelled", "neutral"} and not attempted_work_job_names:
         should_notify = False
         reason = "no_work_unattempted"
     elif conclusion != "success":
@@ -219,6 +236,7 @@ def inspect_workflow_run(
         "attempted_terminal_jobs": attempted_terminal_jobs,
         "terminal_deploy_superseded": terminal_deploy_superseded,
         "attempted_job_names": attempted_job_names,
+        "attempted_work_job_names": attempted_work_job_names,
         "run_labels": list(spec.run_labels),
         "surfaces": surfaces,
         "display_title": display_title,
@@ -226,6 +244,22 @@ def inspect_workflow_run(
         "failure_context": failure_context,
         "failure_fingerprint": failure_fingerprint,
     }
+
+
+def _job_attempted_business_work(job: dict[str, Any]) -> bool:
+    name = str(job.get("name") or "").strip()
+    conclusion = str(job.get("conclusion") or "").strip().lower()
+    if not name or conclusion in {"", "skipped", "neutral"}:
+        return False
+    if name in CONTROL_PLANE_JOB_NAMES:
+        return False
+
+    # Jobs cancelled while still waiting for a self-hosted runner have no
+    # steps. Once a runner really starts a job, GitHub records at least the
+    # setup step, so a cancelled job with steps remains actionable.
+    if conclusion == "cancelled" and not list(job.get("steps") or []):
+        return False
+    return True
 
 
 def _workflow_recovery_source(*, event: str, display_title: str) -> str:

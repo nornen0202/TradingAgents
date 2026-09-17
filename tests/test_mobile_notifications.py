@@ -351,12 +351,55 @@ class WorkflowInspectionTests(unittest.TestCase):
     def test_unattempted_cancelled_probe_is_no_work(self):
         result = inspect_workflow_run(
             _run(conclusion="cancelled"),
-            [{"name": "deploy", "conclusion": "skipped"}],
+            [
+                {
+                    "name": "schedule_gate",
+                    "conclusion": "success",
+                    "steps": [
+                        {
+                            "name": "Decide scheduled execution",
+                            "conclusion": "success",
+                        }
+                    ],
+                },
+                {
+                    "name": "prepare_analysis_runner",
+                    "conclusion": "cancelled",
+                    "steps": [],
+                },
+                {"name": "analyze_kr", "conclusion": "skipped", "steps": []},
+                {"name": "deploy", "conclusion": "skipped", "steps": []},
+            ],
             repository="nornen0202/TradingAgents",
         )
 
         self.assertFalse(result["should_notify"])
         self.assertEqual(result["reason"], "no_work_unattempted")
+        self.assertEqual(result["attempted_work_job_names"], [])
+
+    def test_cancelled_analysis_that_reached_runner_still_notifies(self):
+        result = inspect_workflow_run(
+            _run(conclusion="cancelled"),
+            [
+                {"name": "schedule_gate", "conclusion": "success"},
+                {
+                    "name": "analyze_kr",
+                    "conclusion": "cancelled",
+                    "steps": [
+                        {"name": "Set up job", "conclusion": "success"},
+                        {
+                            "name": "Run scheduled analysis",
+                            "conclusion": "cancelled",
+                        },
+                    ],
+                },
+            ],
+            repository="nornen0202/TradingAgents",
+        )
+
+        self.assertTrue(result["should_notify"])
+        self.assertEqual(result["reason"], "upstream_failed")
+        self.assertEqual(result["attempted_work_job_names"], ["analyze_kr"])
 
     def test_success_requires_commit_provenance(self):
         with self.assertRaises(NotificationError):
