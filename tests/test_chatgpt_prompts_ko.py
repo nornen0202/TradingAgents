@@ -15,7 +15,7 @@ PROMPTS = (
 def test_prompts_stay_compact_and_korean_action_first() -> None:
     for name in PROMPTS:
         text = (ROOT / "Docs" / name).read_text(encoding="utf-8")
-        # v3 embeds evidence/risk checks so unattended runs need no extra attachment.
+        # Full scheduled prompts stay self-contained without an extra attachment.
         assert len(text) < 14_000, name
         assert "한국어" in text, name
 
@@ -77,7 +77,7 @@ def test_scheduled_quality_contract_is_embedded_in_both_prompts() -> None:
         assert text.count("## 프롬프트 끝") == 1
         body = text.split("## 프롬프트 시작", 1)[1].split("## 프롬프트 끝", 1)[0]
         for requirement in (
-            "2026-09-18 v3",
+            "2026-09-18 v4",
             "조회 실패를 자료 부재나 악재로 단정하지 않는다",
             "이전 추천은 체결 사실이 아니다",
             "A 바로 다음에 E-1 모바일표",
@@ -104,3 +104,36 @@ def test_evidence_risk_and_review_requirements() -> None:
     us = (ROOT / "Docs" / "prompts_us_for_chatgpt.md").read_text(encoding="utf-8")
     assert "13F는 분기말 보유공시" in us
     assert "당일 기관 순매수·실시간 자금 유입으로 해석하지 않는다" in us
+
+
+def test_package_audit_controls_are_shared_and_self_contained() -> None:
+    sections = []
+    for market in ("kr", "us"):
+        text = (ROOT / "Docs" / f"prompts_{market}_for_chatgpt.md").read_text(encoding="utf-8")
+        body = text.split("## 프롬프트 시작", 1)[1].split("## 프롬프트 끝", 1)[0]
+        sections.append(body.split("### 5-1.", 1)[1].split("### 6.", 1)[0])
+        for requirement in (
+            "가중치는 결과를 보기 전에 고정",
+            "잔여 항목을 100점으로 재환산하지 않는다",
+            "데이터 충족률", "별도 허용 없는 신용·공매도·레버리지·인버스·파생상품",
+            "기존 보유의 위험·축소 검토는 생략하지 않는다",
+            "정보 부족은 0주가 아니라 수량 산출 보류",
+            "1회 주문한도 / 분할 전체 아이디어 투입한도 / 기존 보유 포함 종목한도",
+            "예약액을 이중 차감하지 않는다", "나눠 주문해 한도를 우회하지 않는다",
+            "낙폭한도를 거래별 손실예산으로 대체하지 않는다",
+            "진입구간 상단 기준 수량·손익비", "확률 가중 기대수익이 아니다",
+            "부분 익절 뒤 잔량 실패 경로", "독립 증거로 중복 계산하지 않는다",
+            "컨센서스 확인 없이는 서프라이즈를 단정하지 않으며",
+            "종가 신호의 같은 종가 체결", "배당 이중 계산을 금지한다",
+            "R배수는 미산출", "일별 평가자산·입출금",
+            "중대 오류가 해결되지 않으면 해당 행동을 보류",
+            "추가입금 0원 기본안+서로 다른 양수 가상 예산 4개, 총 5개 이상",
+            "확률(근거 없으면 미산출)", "신규 후보는 적격 0~5개",
+            "(1+현지수익률)×(1+기준통화/외화 환율수익률)−1",
+        ):
+            assert requirement in body, (market, requirement)
+        assert "소액·중간·확대의 가상 예산 4개" not in body
+        assert "신규 후보는 상위 5개만" not in body
+        assert "비용 차감 기대이익/계획손실" not in body
+        assert "프롬프트 패키지를 첨부" not in body
+    assert sections[0] == sections[1]
