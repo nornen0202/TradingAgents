@@ -267,23 +267,39 @@ jobs:
         timeout-minutes: 5
         if: ${{ always() }}
         continue-on-error: true
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
-          import os
-          import shutil
-          from pathlib import Path
-
-          roots_and_targets = (
-              (Path(os.environ["GITHUB_WORKSPACE"]), Path(os.environ["TRADINGAGENTS_REPO_DIR"])),
-              (Path(os.environ["RUNNER_TEMP"]), Path(os.environ["TRADINGAGENTS_SITE_DIR"])),
+          $ErrorActionPreference = "Stop"
+          $targets = @(
+            @{ Root = $env:GITHUB_WORKSPACE; Target = $env:TRADINGAGENTS_REPO_DIR },
+            @{ Root = $env:RUNNER_TEMP; Target = $env:TRADINGAGENTS_SITE_DIR }
           )
-          for allowed_root, target in roots_and_targets:
-              allowed_root = allowed_root.resolve()
-              target = target.resolve()
-              if target == allowed_root or os.path.commonpath([str(target), str(allowed_root)]) != str(allowed_root):
-                  raise SystemExit(f"Refusing to clean unsafe run-scoped path: {target}")
-              if target.exists():
-                  shutil.rmtree(target)
-                  print(f"Removed run-scoped path: {target}")
+          $failures = @()
+          foreach ($entry in $targets) {
+            try {
+              if (-not $entry.Root -or -not $entry.Target) {
+                throw "Missing run-scoped cleanup root or target"
+              }
+              $root = [IO.Path]::GetFullPath($entry.Root).TrimEnd('\')
+              $target = [IO.Path]::GetFullPath($entry.Target).TrimEnd('\')
+              $prefix = $root + [IO.Path]::DirectorySeparatorChar
+              if (-not $target.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
+                throw "Refusing to clean unsafe run-scoped path: $target"
+              }
+              if (Test-Path -LiteralPath $target) {
+                if ((Get-Item -LiteralPath $target -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                  throw "Refusing to clean reparse point: $target"
+                }
+                # Git pack/index files are read-only on Windows.
+                Remove-Item -LiteralPath $target -Recurse -Force -ErrorAction Stop
+                Write-Output "Removed run-scoped path: $target"
+              }
+            } catch {
+              $failures += $_.Exception.Message
+              Write-Warning $_.Exception.Message
+            }
+          }
+          if ($failures.Count) { throw ($failures -join '; ') }
 
   deploy:
     needs: build_work_report_pages

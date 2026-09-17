@@ -6,6 +6,7 @@ import yaml
 import os
 import shutil
 import subprocess
+import stat
 
 import pytest
 
@@ -128,3 +129,47 @@ def test_work_report_inputs_are_passed_as_data():
     for step in job['steps']:
         script = step.get('run', '')
         assert '${{ inputs.' not in script
+
+
+@pytest.mark.parametrize('filename,job_name', [
+    ('work-report-pages-refresh.yml', 'build_work_report_pages'),
+    ('daily-prism-telegram-reports.yml', 'build_prism_telegram_pages'),
+])
+@pytest.mark.parametrize('unsafe_target', [False, True])
+def test_final_cleanup_handles_readonly_git_files_and_checks_boundaries(tmp_path, filename, job_name, unsafe_target):
+    if os.name != 'nt' or not shutil.which('pwsh'):
+        pytest.skip('Windows PowerShell required for cleanup execution')
+    workflow = yaml.safe_load((WORKFLOW_DIR / filename).read_text(encoding='utf-8'))
+    cleanup = next(step for step in workflow['jobs'][job_name]['steps']
+                   if step.get('name', '').startswith('Clean run-scoped'))
+    assert cleanup['timeout-minutes'] <= 5
+    assert '-NoProfile -NonInteractive' in cleanup['shell']
+    workspace, runner_temp = tmp_path / 'workspace', tmp_path / 'temp'
+    source, site = workspace / 'source-123', runner_temp / 'site-123'
+    pack = source / '.git' / 'objects' / 'pack' / 'example.idx'
+    pack.parent.mkdir(parents=True)
+    pack.write_text('read-only Git index')
+    pack.chmod(stat.S_IREAD)
+    site.mkdir(parents=True)
+    (site / 'index.html').write_text('generated site')
+    keep = workspace / 'keep.txt'
+    keep.write_text('unrelated data')
+    script = tmp_path / 'cleanup.ps1'
+    script.write_text(cleanup['run'])
+    result = subprocess.run(
+        ['pwsh', '-NoProfile', '-NonInteractive', '-File', str(script)],
+        env={**os.environ, 'GITHUB_WORKSPACE': str(workspace), 'RUNNER_TEMP': str(runner_temp),
+             'TRADINGAGENTS_REPO_DIR': str(workspace if unsafe_target else source),
+             'TRADINGAGENTS_SITE_DIR': str(site)},
+        capture_output=True, text=True, encoding='utf-8', timeout=30,
+    )
+    assert not site.exists(), result.stderr
+    assert keep.read_text() == 'unrelated data'
+    if unsafe_target:
+        assert result.returncode != 0
+        assert 'unsafe run-scoped path' in result.stderr
+        assert pack.exists()
+        pack.chmod(stat.S_IWRITE)
+    else:
+        assert result.returncode == 0, result.stderr
+        assert not source.exists()
