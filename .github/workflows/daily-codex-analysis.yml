@@ -132,6 +132,7 @@ jobs:
       - schedule_gate
     if: ${{ github.ref == 'refs/heads/main' && needs.schedule_gate.outputs.should_run == 'true' }}
     runs-on: [self-hosted, Windows]
+    timeout-minutes: 10
     concurrency:
       group: daily-codex-analysis-self-hosted-${{ github.ref }}
       cancel-in-progress: false
@@ -139,10 +140,13 @@ jobs:
       contents: read
     defaults:
       run:
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
     steps:
       - name: Reclaim stale self-hosted runner outputs before action setup
+        timeout-minutes: 5
         run: |
+          $ErrorActionPreference = "Stop"
+          Write-Output "Runner preflight started at $([DateTimeOffset]::UtcNow.ToString('o'))"
           $workspace = [System.IO.Path]::GetFullPath($env:GITHUB_WORKSPACE).TrimEnd('\')
           $prefix = $workspace + [System.IO.Path]::DirectorySeparatorChar
           $staleNamePatterns = @(
@@ -164,6 +168,10 @@ jobs:
               if (-not $candidate.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
                 throw "Refusing to clean unsafe runner path: $candidate"
               }
+              if ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                throw "Refusing to clean reparse point: $candidate"
+              }
+              Write-Output "Removing stale runner output: $candidate"
               Remove-Item -LiteralPath $candidate -Recurse -Force -ErrorAction Stop
               $removed += $_.Name
             }
@@ -231,7 +239,7 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Initialize US run-scoped temporary paths
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
           "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "TRADINGAGENTS_DIAGNOSTICS_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "analysis-diagnostics-$env:GITHUB_RUN_ID-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -316,6 +324,14 @@ jobs:
 
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Wait for safe Windows resource headroom
+        timeout-minutes: 16
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, ".github/scripts/windows_resource_guard.py"])
 
       - name: Install TradingAgents
         run: |
@@ -803,7 +819,7 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Initialize KR run-scoped temporary paths
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
           "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "TRADINGAGENTS_DIAGNOSTICS_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "analysis-diagnostics-$env:GITHUB_RUN_ID-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -889,6 +905,14 @@ jobs:
 
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Wait for safe Windows resource headroom
+        timeout-minutes: 16
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, ".github/scripts/windows_resource_guard.py"])
 
       - name: Install TradingAgents
         run: |
@@ -1530,7 +1554,7 @@ jobs:
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
     steps:
       - name: Initialize Pages run-scoped temporary path
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
           "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-pages"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -1544,6 +1568,14 @@ jobs:
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+
+      - name: Wait for safe Windows resource headroom
+        timeout-minutes: 16
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, ".github/scripts/windows_resource_guard.py"])
 
       - name: Install TradingAgents for site rebuild
         run: |

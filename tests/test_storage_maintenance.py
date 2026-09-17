@@ -14,6 +14,23 @@ PWSH = shutil.which("pwsh") or shutil.which("pwsh.exe")
 SCRIPT = Path(__file__).parents[1] / "tools" / "maintain_project_storage.ps1"
 
 
+@pytest.mark.skipif(os.name != 'nt' or PWSH is None, reason='Windows PowerShell required')
+def test_maintenance_refuses_nested_junction_without_touching_external_data(tmp_path):
+    outside = _directory(tmp_path / 'external')
+    stale = _directory(tmp_path / 'runner' / '_work' / 'TradingAgents' / 'TradingAgents' / 'site-123')
+    result = subprocess.run(
+        [PWSH, '-NoProfile', '-NonInteractive', '-Command',
+         'New-Item -ItemType Junction -Path $env:TEST_LINK -Target $env:TEST_TARGET | Out-Null'],
+        env={**os.environ, 'TEST_LINK': str(stale / 'linked'), 'TEST_TARGET': str(outside)},
+        capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
+    result = _run_maintenance(tmp_path, apply=True)
+    assert result.returncode != 0
+    assert 'reparse point' in result.stderr
+    assert (outside / 'payload.txt').read_text() == 'generated'
+
+
 def _directory(path: Path, *, modified: datetime | None = None) -> Path:
     path.mkdir(parents=True, exist_ok=True)
     (path / "payload.txt").write_text("generated", encoding="utf-8")

@@ -36,14 +36,18 @@ jobs:
   prepare_self_hosted_runner:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: [self-hosted, Windows]
+    timeout-minutes: 10
     permissions:
       contents: read
     defaults:
       run:
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
     steps:
       - name: Reclaim stale self-hosted runner outputs before action setup
+        timeout-minutes: 5
         run: |
+          $ErrorActionPreference = "Stop"
+          Write-Output "Runner preflight started at $([DateTimeOffset]::UtcNow.ToString('o'))"
           $workspace = [System.IO.Path]::GetFullPath($env:GITHUB_WORKSPACE).TrimEnd('\')
           $prefix = $workspace + [System.IO.Path]::DirectorySeparatorChar
           $staleNamePatterns = @(
@@ -64,6 +68,10 @@ jobs:
               if (-not $candidate.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
                 throw "Refusing to clean unsafe runner path: $candidate"
               }
+              if ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                throw "Refusing to clean reparse point: $candidate"
+              }
+              Write-Output "Removing stale runner output: $candidate"
               Remove-Item -LiteralPath $candidate -Recurse -Force -ErrorAction Stop
               $removed += $_.Name
             }
@@ -90,6 +98,9 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       PYTHONUTF8: "1"
+      WORK_SURFACE: ${{ inputs.surface }}
+      WORK_EVENT_ID: ${{ inputs.event_id }}
+      WORK_REPORT_SHA256: ${{ inputs.report_sha256 }}
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_REPO_DIR: ${{ github.workspace }}\source-${{ github.run_id }}
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
@@ -97,7 +108,7 @@ jobs:
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
     steps:
       - name: Initialize Work report run-scoped temporary path
-        shell: pwsh
+        shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
           "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-work-report"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -113,7 +124,17 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Wait for safe Windows resource headroom
+        timeout-minutes: 16
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import subprocess
+          import sys
+
+          subprocess.check_call([sys.executable, ".github/scripts/windows_resource_guard.py"])
+
       - name: Install TradingAgents
+        timeout-minutes: 15
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import subprocess
@@ -139,11 +160,11 @@ jobs:
                   "--archive-dir",
                   archive_dir,
                   "--surface",
-                  "${{ inputs.surface }}",
+                  os.environ["WORK_SURFACE"],
                   "--event-id",
-                  "${{ inputs.event_id }}",
+                  os.environ["WORK_EVENT_ID"],
                   "--report-sha256",
-                  "${{ inputs.report_sha256 }}",
+                  os.environ["WORK_REPORT_SHA256"],
               ]
           )
 
@@ -184,11 +205,11 @@ jobs:
                   "--site-dir",
                   os.environ["TRADINGAGENTS_SITE_DIR"],
                   "--surface",
-                  "${{ inputs.surface }}",
+                  os.environ["WORK_SURFACE"],
                   "--event-id",
-                  "${{ inputs.event_id }}",
+                  os.environ["WORK_EVENT_ID"],
                   "--report-sha256",
-                  "${{ inputs.report_sha256 }}",
+                  os.environ["WORK_REPORT_SHA256"],
               ]
           )
 
@@ -243,6 +264,7 @@ jobs:
           path: ${{ env.TRADINGAGENTS_SITE_DIR }}
 
       - name: Clean run-scoped Work report files
+        timeout-minutes: 5
         if: ${{ always() }}
         continue-on-error: true
         run: |

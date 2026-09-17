@@ -5,6 +5,7 @@ import json
 import os
 import re
 import shutil
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -35,10 +36,12 @@ _MARKDOWN = (
 
 
 def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> list[dict[str, Any]]:
+    build_started = time.monotonic()
     archive_dir = Path(archive_dir)
     site_dir = Path(site_dir)
     manifests = _load_run_manifests(archive_dir)
     published_manifests = _select_published_manifests(manifests, settings)
+    print(f"Pages build: publishing {len(published_manifests)} of {len(manifests)} archived runs", flush=True)
     published_run_ids = {str(manifest.get("run_id") or "") for manifest in published_manifests}
 
     if site_dir.exists():
@@ -46,7 +49,8 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
     (site_dir / "assets").mkdir(parents=True, exist_ok=True)
     _write_text(site_dir / "assets" / "style.css", _STYLE_CSS)
 
-    for manifest in published_manifests:
+    for index, manifest in enumerate(published_manifests, 1):
+        print(f"Pages build: run {index}/{len(published_manifests)} {manifest['run_id']}", flush=True)
         run_dir = Path(manifest["_run_dir"])
         portfolio_summary = _load_portfolio_summary(run_dir)
         _copy_artifacts(site_dir, run_dir, manifest, portfolio_summary)
@@ -81,6 +85,7 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
             ],
         },
     )
+    print("Pages build: publishing report addons and account/Work/mobile surfaces", flush=True)
     _build_youtube_site_addon(archive_dir=archive_dir, site_dir=site_dir)
     _build_prism_telegram_site_addon(archive_dir=archive_dir, site_dir=site_dir)
     if getattr(settings, "publish_account_snapshot", False):
@@ -105,6 +110,7 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
         archive_dir=archive_dir,
         public_base_url=getattr(settings, "public_base_url", ""),
     )
+    print(f"Pages build completed in {time.monotonic() - build_started:.1f}s", flush=True)
     return manifests
 
 

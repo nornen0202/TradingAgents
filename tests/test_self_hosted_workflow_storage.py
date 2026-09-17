@@ -3,6 +3,12 @@ from pathlib import Path
 
 import yaml
 
+import os
+import shutil
+import subprocess
+
+import pytest
+
 
 WORKFLOW_DIR = Path(".github/workflows")
 SELF_HOSTED_WORKFLOWS = {
@@ -80,3 +86,45 @@ def test_python_workflow_steps_import_os_before_using_os_environ() -> None:
                     f"{workflow_path.name}:{job_name}:{step.get('name')} uses "
                     "os.environ without importing os"
                 )
+
+
+@pytest.mark.parametrize('filename,job_name', [
+    ('work-report-pages-refresh.yml', 'prepare_self_hosted_runner'),
+    ('daily-codex-analysis.yml', 'prepare_analysis_runner'),
+])
+def test_preflight_is_bounded_and_preserves_unrelated_files(tmp_path, filename, job_name):
+    workflow = yaml.safe_load((WORKFLOW_DIR / filename).read_text(encoding='utf-8'))
+    job = workflow['jobs'][job_name]
+    assert job['timeout-minutes'] <= 10
+    assert '-NoProfile -NonInteractive' in job['defaults']['run']['shell']
+    step = job['steps'][0]
+    assert step['timeout-minutes'] <= 5
+    if os.name != 'nt' or not shutil.which('pwsh'):
+        pytest.skip('Windows PowerShell required for cleanup execution')
+    workspace = tmp_path / 'workspace'
+    workspace.mkdir()
+    stale = workspace / 'source-123'
+    stale.mkdir()
+    (stale / 'output.txt').write_text('stale')
+    notes = workspace / 'user-notes'
+    notes.mkdir()
+    (notes / 'keep.txt').write_text('keep')
+    script = tmp_path / 'preflight.ps1'
+    # Isolate free-space checks from the CI host's current disk utilization.
+    script.write_text('function Get-PSDrive { param($Name) @{Free=20GB} }\n' + step['run'])
+    result = subprocess.run(['pwsh', '-NoProfile', '-NonInteractive', '-File', str(script)],
+                            env={**os.environ, 'GITHUB_WORKSPACE': str(workspace)},
+                            capture_output=True, text=True, timeout=30)
+    assert result.returncode == 0, result.stderr
+    assert not stale.exists()
+    assert (notes / 'keep.txt').read_text() == 'keep'
+    assert 'Removing stale runner output:' in result.stdout
+
+
+def test_work_report_inputs_are_passed_as_data():
+    workflow = yaml.safe_load((WORKFLOW_DIR / 'work-report-pages-refresh.yml').read_text(encoding='utf-8'))
+    job = workflow['jobs']['build_work_report_pages']
+    assert job['env']['WORK_EVENT_ID'] == '${{ inputs.event_id }}'
+    for step in job['steps']:
+        script = step.get('run', '')
+        assert '${{ inputs.' not in script
