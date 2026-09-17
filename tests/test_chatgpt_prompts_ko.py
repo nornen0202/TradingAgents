@@ -15,7 +15,8 @@ PROMPTS = (
 def test_prompts_stay_compact_and_korean_action_first() -> None:
     for name in PROMPTS:
         text = (ROOT / "Docs" / name).read_text(encoding="utf-8")
-        assert len(text) < 12_000, name
+        # v3 embeds evidence/risk checks so unattended runs need no extra attachment.
+        assert len(text) < 14_000, name
         assert "한국어" in text, name
 
     for name in ("prompts_kr_for_chatgpt.md", "prompts_us_for_chatgpt.md"):
@@ -76,7 +77,7 @@ def test_scheduled_quality_contract_is_embedded_in_both_prompts() -> None:
         assert text.count("## 프롬프트 끝") == 1
         body = text.split("## 프롬프트 시작", 1)[1].split("## 프롬프트 끝", 1)[0]
         for requirement in (
-            "2026-09-11 v2",
+            "2026-09-18 v3",
             "조회 실패를 자료 부재나 악재로 단정하지 않는다",
             "이전 추천은 체결 사실이 아니다",
             "A 바로 다음에 E-1 모바일표",
@@ -86,3 +87,20 @@ def test_scheduled_quality_contract_is_embedded_in_both_prompts() -> None:
             "예약·알림·모델 설정은 변경하지 않는다",
         ):
             assert requirement in body
+
+
+def test_evidence_risk_and_review_requirements() -> None:
+    for market in ("kr", "us"):
+        text = (ROOT / "Docs" / f"prompts_{market}_for_chatgpt.md").read_text(encoding="utf-8")
+        for requirement in (
+            "적격 후보 0개", "부분 스크리닝", "순위 점수는 상승확률이 아니다",
+            "완료된 봉과 진행 중인 봉", "현금흐름 → 기업가치",
+            "가정을 표시한 조건부 수량", "실제 최대손실이나 체결 보장이 아니다",
+            "백테스트 성과는 미산출", "생존편향", "시간순 검증",
+            "실제 체결 기록이 있을 때만", "문제 위치 → 확인 근거 → 판단 영향 → 수정안",
+            "최근 5회 완료 보고서", "기록이 없으면 미실시",
+        ):
+            assert requirement in text, (market, requirement)
+    us = (ROOT / "Docs" / "prompts_us_for_chatgpt.md").read_text(encoding="utf-8")
+    assert "13F는 분기말 보유공시" in us
+    assert "당일 기관 순매수·실시간 자금 유입으로 해석하지 않는다" in us
