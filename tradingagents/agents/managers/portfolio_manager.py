@@ -48,6 +48,7 @@ For regular-session investors, split execution_levels into intraday_pilot_rule, 
 Always provide machine-actionable execution_levels.levels with numeric price or range fields whenever the thesis contains a concrete trigger, support, invalidation, trim, or resistance area.
 Intraday pilot means a small starter only; full-size add/entry belongs in close_confirm_rule or next_day_followthrough_rule.
 If the thesis is constructive but timing is incomplete, keep stance constructive, set entry_action=WAIT, and choose HOLD or OVERWEIGHT as the legacy rating when the view remains investable.
+When WAIT means a genuine conditional buy, explicitly supply conditional_entry_action=STARTER or ADD and conditional_entry_valid_until as a timezone-aware timestamp. Require numeric execution_levels.levels, BULLISH stance, and no conflicting sell-side risk action. Use NONE when there is no justified entry plan or expiry; never convert bullishness alone into a buy.
 Reserve NO_TRADE for weak, contradictory, or insufficient evidence, no favorable setup to monitor, or data quality gaps that make the view non-investable.
 If the thesis is constructive and timing is confirmed today, allow BUY or OVERWEIGHT rather than defaulting to HOLD/NO_TRADE.
 

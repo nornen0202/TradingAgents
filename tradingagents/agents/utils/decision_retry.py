@@ -76,6 +76,8 @@ def _required_decision_skeleton() -> str:
         '  "rating": "HOLD",\n'
         '  "portfolio_stance": "NEUTRAL",\n'
         '  "entry_action": "WAIT",\n'
+        '  "conditional_entry_action": "NONE",\n'
+        '  "conditional_entry_valid_until": null,\n'
         '  "setup_quality": "DEVELOPING",\n'
         '  "confidence": 0.50,\n'
         '  "time_horizon": "medium",\n'

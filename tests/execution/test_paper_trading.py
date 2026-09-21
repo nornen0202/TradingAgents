@@ -104,6 +104,44 @@ def test_cash_and_whole_share_limits(broker):
     assert r["orders"][0]["reason"] == "whole_share_budget_or_holdings"
 
 
+@pytest.mark.parametrize(
+    "side,exception,expected",
+    [
+        ("SELL", 0, "FILLED"),
+        ("BUY", 0, "REJECTED"),
+        ("BUY", 0.05, "FILLED"),
+    ],
+)
+def test_whole_share_policy_survives_queue_and_fill(
+    tmp_path, side, exception, expected
+):
+    at = "2026-09-21T10:00:00+09:00"
+    b = PaperBroker(
+        tmp_path / "sizing.sqlite", PaperLimits(one_share_nav_ceiling=exception)
+    )
+    try:
+        b.seed(
+            {
+                "as_of": at,
+                "account_value_krw": 25000000,
+                "available_cash_krw": 24200000,
+                "positions": [
+                    {"canonical_ticker": "A", "quantity": 1, "market_price_krw": 800000}
+                ],
+            }
+        )
+        b.step(
+            now=at,
+            quotes=quote(at, price_krw=800000),
+            signals=[signal(action=side, quantity=1)],
+        )
+        later = "2026-09-21T10:01:00+09:00"
+        result = b.step(now=later, quotes=quote(later, price_krw=800000), signals=[])
+        assert result["orders"][0]["status"] == expected
+    finally:
+        b.close()
+
+
 def test_kill_switch_cancels_pending(broker):
     at = "2026-09-21T10:00:00+09:00"
     broker.step(now=at, quotes=quote(at), signals=[signal()])

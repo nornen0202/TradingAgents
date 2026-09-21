@@ -42,6 +42,15 @@ def evaluate_execution_state(
     execution_eligibility = str(getattr(market, "execution_eligibility", "") or "").upper()
     freshness_class = str(getattr(market, "freshness_class", "") or "").upper()
 
+    if datetime.fromisoformat(market.asof) > now:
+        return _build_update(
+            contract, market, now, staleness_seconds=0,
+            decision_state=DecisionState.DEGRADED, decision_now=DecisionNow.NONE,
+            reason_codes=("future_market_data",), trigger_status=trigger_status,
+            data_health="STALE", refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=ExecutionTimingState.DEGRADED,
+        )
+
     if (
         getattr(market, "generated_in_current_run", None) is False
         or freshness_class in {"PRIOR_SESSION_BACKFILL", "STALE"}
@@ -176,6 +185,39 @@ def evaluate_execution_state(
             execution_timing_state=ExecutionTimingState.INVALIDATED,
         )
 
+    if contract.entry_valid_until:
+        try:
+            expires = datetime.fromisoformat(contract.entry_valid_until)
+            available = datetime.fromisoformat(contract.analysis_asof)
+            invalid_time = expires.tzinfo is None or available.tzinfo is None or now >= expires or now < available
+        except (TypeError, ValueError):
+            invalid_time = True
+        if invalid_time:
+            return _build_update(
+                contract, market, now, staleness_seconds=staleness_seconds,
+                decision_state=DecisionState.WAIT, decision_now=DecisionNow.NONE,
+                reason_codes=("conditional_entry_expired_or_unavailable",), trigger_status=trigger_status,
+                data_health="OK", refresh_checkpoint=refresh_checkpoint,
+                execution_timing_state=ExecutionTimingState.WAITING,
+            )
+        entry_levels = [
+            level for level in contract.structured_levels
+            if str(getattr(level.level_type, "value", level.level_type)).upper()
+            in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}
+        ]
+        # A single snapshot cannot prove close/two-bar/next-session confirmation.
+        # In particular, an overlapping support zone must not bypass that proof.
+        if market_session != "regular" or not entry_levels or any(
+            level.confirmation != "intraday" for level in entry_levels
+        ):
+            return _build_update(
+                contract, market, now, staleness_seconds=staleness_seconds,
+                decision_state=DecisionState.WAIT, decision_now=DecisionNow.NONE,
+                reason_codes=("conditional_entry_confirmation_unavailable",), trigger_status=trigger_status,
+                data_health="OK", refresh_checkpoint=refresh_checkpoint,
+                execution_timing_state=ExecutionTimingState.CLOSE_CONFIRM_PENDING,
+            )
+
     breakout_hit = contract.breakout_level is not None and intraday_high >= contract.breakout_level
     rvol_confirmed = contract.min_relative_volume is None or (
         market.relative_volume is not None and market.relative_volume >= contract.min_relative_volume
@@ -247,7 +289,9 @@ def evaluate_execution_state(
             execution_timing_state = ExecutionTimingState.PILOT_READY
             reason_codes.append("pilot_ready")
 
-    if contract.pullback_buy_zone is not None:
+    if contract.pullback_buy_zone is not None and not (
+        contract.entry_valid_until and trigger_status["failed_breakout"]
+    ):
         if market.last_price < contract.pullback_buy_zone.low and intraday_low < contract.pullback_buy_zone.low:
             trigger_status["support_fail"] = True
             if decision_state not in {DecisionState.INVALIDATED, DecisionState.ACTIONABLE_NOW}:
@@ -260,7 +304,7 @@ def evaluate_execution_state(
         if in_zone:
             trigger_status["pullback_zone_active"] = True
             trigger_status["support_hold"] = True
-            if vwap_confirmed and not microstructure_block_reasons:
+            if vwap_confirmed and rvol_confirmed and pilot_window_open and not microstructure_block_reasons:
                 decision_state = DecisionState.ACTIONABLE_NOW
                 decision_now = _decision_now_from_action(contract.action_if_triggered)
                 execution_timing_state = ExecutionTimingState.SUPPORT_HOLD
@@ -273,6 +317,10 @@ def evaluate_execution_state(
                     reason_codes.append("data_missing_blocked_pilot")
                 if not vwap_confirmed:
                     reason_codes.append("vwap_unconfirmed")
+                if not rvol_confirmed:
+                    reason_codes.append("relative_volume_unconfirmed")
+                if not pilot_window_open:
+                    reason_codes.append("pilot_window_not_open")
                 reason_codes.extend(microstructure_block_reasons)
 
     if market_session == "post_close" and execution_timing_state == ExecutionTimingState.WAITING and contract.breakout_level is not None:

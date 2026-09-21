@@ -36,8 +36,8 @@ def _contract(**kwargs):
     return ExecutionContract(**base)
 
 
-def _market(*, price: float, rvol: float, age_seconds: int = 0):
-    asof = datetime.now(timezone.utc) - timedelta(seconds=age_seconds)
+def _market(*, price: float, rvol: float, age_seconds: int = 0, now=None):
+    asof = (now or datetime.now(timezone.utc)) - timedelta(seconds=age_seconds)
     return IntradayMarketSnapshot(
         ticker="TSM",
         asof=asof.isoformat(),
@@ -55,14 +55,14 @@ def _market(*, price: float, rvol: float, age_seconds: int = 0):
 
 def test_breakout_close_confirmation_state():
     now = datetime.now(timezone.utc)
-    update = evaluate_execution_state(_contract(), _market(price=101.0, rvol=1.4), now=now, max_data_age_seconds=180)
+    update = evaluate_execution_state(_contract(), _market(price=101.0, rvol=1.4, now=now), now=now, max_data_age_seconds=180)
     assert update.decision_state == DecisionState.TRIGGERED_PENDING_CLOSE
 
 
 def test_intraday_breakout_actionable_now():
     now = datetime.now(timezone.utc)
     contract = _contract(breakout_confirmation=BreakoutConfirmation.INTRADAY_ABOVE)
-    update = evaluate_execution_state(contract, _market(price=101.0, rvol=1.4), now=now, max_data_age_seconds=180)
+    update = evaluate_execution_state(contract, _market(price=101.0, rvol=1.4, now=now), now=now, max_data_age_seconds=180)
     assert update.decision_state == DecisionState.ACTIONABLE_NOW
 
 

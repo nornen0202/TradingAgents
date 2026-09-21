@@ -158,6 +158,7 @@ class ExecutionContract:
     risk_action_reason: str = ""
     risk_action_reason_codes: tuple[str, ...] = field(default_factory=tuple)
     risk_action_level: PriceLevel | None = None
+    entry_valid_until: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         payload: dict[str, Any] = {
@@ -172,6 +173,7 @@ class ExecutionContract:
             "setup_quality": self.setup_quality,
             "confidence": self.confidence,
             "action_if_triggered": self.action_if_triggered.value,
+            "entry_valid_until": self.entry_valid_until,
             "starter_fraction_of_target": self.starter_fraction_of_target,
             "breakout_level": self.breakout_level,
             "breakout_confirmation": self.breakout_confirmation.value if self.breakout_confirmation else None,
