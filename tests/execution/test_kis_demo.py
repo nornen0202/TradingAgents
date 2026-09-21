@@ -219,6 +219,7 @@ def test_expired_intent_never_reaches_auth_or_order_endpoint(tmp_path):
     [
         ({"rt_cd": "1", "msg1": "private reason"}, "REJECTED"),
         ({"rt_cd": "0"}, "UNKNOWN"),
+        ({"rt_cd": ""}, "UNKNOWN"),
         ({"rt_cd": "0", "output": ["malformed"]}, "UNKNOWN"),
     ],
 )

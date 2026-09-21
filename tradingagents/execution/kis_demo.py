@@ -313,7 +313,7 @@ class DemoOrderJournal:
                         or ""
                     ),
                 }
-            elif str(payload.get("rt_cd")) not in {"0", "None"}:
+            elif str(payload.get("rt_cd")) == "1":
                 status = "REJECTED"
         except DemoError:
             pass
