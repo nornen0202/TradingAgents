@@ -204,7 +204,10 @@ def test_overlay_never_reranks_the_frozen_daily_universe(tmp_path):
 
 def test_runner_dispatches_full_runs_to_adaptive_selection(tmp_path):
     config, universe = setup(tmp_path)
-    with patch.object(au, "research_quotes", return_value=({"AAA": quote("AAA")}, [])), patch.object(au, "read_history", return_value=({}, [], {})):
+    # The provider completion clock must match the fixed quote fixture. Otherwise
+    # this test starts failing when today's date passes its freshness window.
+    with patch.object(au, "datetime", wraps=datetime) as clock, patch.object(au, "research_quotes", return_value=({"AAA": quote("AAA")}, [])), patch.object(au, "read_history", return_value=({}, [], {})):
+        clock.now.return_value = NOW
         selected, _, receipt = _select_daily_active_tickers(config=config, tickers=["AAA"],
             started_at=NOW, active_ticker_limit=30, resolved_universe=universe)
     assert selected == ["HOLD", "AAA"]
