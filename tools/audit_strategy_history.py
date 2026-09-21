@@ -14,6 +14,15 @@ def read(path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
+def available_after_run(analysis_asof, run_finished_at):
+    if not analysis_asof or not run_finished_at:
+        return None
+    times = [datetime.fromisoformat(v) for v in (analysis_asof, run_finished_at)]
+    if any(t.tzinfo is None for t in times):
+        raise ValueError("Timezone-aware analysis and publication timestamps required")
+    return max(times).isoformat()
+
+
 def audit(archive: Path, output: Path, chats: Path | None = None):
     output.mkdir(parents=True, exist_ok=True)
     totals = {}
@@ -66,7 +75,10 @@ def audit(archive: Path, output: Path, chats: Path | None = None):
                         {
                             "market": market,
                             "ticker": t["ticker"],
-                            "available_at": t.get("analysis_asof"),
+                            "analysis_asof": t.get("analysis_asof"),
+                            "available_at": available_after_run(
+                                t.get("analysis_asof"), j.get("finished_at")
+                            ),
                             "trade_date": t.get("daily_thesis_trade_date"),
                             "entry_action": t.get("entry_action_base"),
                             "stance": t.get("portfolio_stance"),

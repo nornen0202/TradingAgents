@@ -32,7 +32,9 @@ python tools/paper_from_archive.py --run <완료된-run-디렉터리> --ledger .
 
 가격 캐시는 로컬에서 직접 생성한 신뢰 가능한 pandas 피클만 허용한다. 외부에서 받은 피클을 열지 않는다.
 ETF 캐시는 yfinance의 `download(..., auto_adjust=True)` 결과로 Open/Close 컬럼 수준과 ticker 컬럼 수준을 가진다.
-원본 분석 날짜를 기준으로 가격을 추정하지 않고 `analysis_asof` 또는 Work `published_at`을 사용한다.
+원본 분석은 `analysis_asof`와 최초 보관 실행의 `finished_at` 중 늦은 시각, Work는 `published_at`을 사용한다.
+장전 분석이어도 실행이 장중에 끝났다면 이미 지난 당일 시가로 진입하지 않는다.
+이벤트 평가는 저장된 `source_manifest.json`의 Work 파일 목록을 적용해 이후 추가 보고서를 섞지 않는다.
 
 ## 모의 입력 계약
 

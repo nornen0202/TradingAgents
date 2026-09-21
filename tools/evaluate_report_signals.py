@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-from datetime import datetime, time
+from datetime import datetime, time, timezone
 import hashlib
 import json
 from pathlib import Path
@@ -12,6 +12,16 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
+
+
+def publication_key(row):
+    value = row.get("available_at")
+    if not value:
+        return datetime.min.replace(tzinfo=timezone.utc)
+    at = datetime.fromisoformat(value)
+    if at.tzinfo is None:
+        raise ValueError("Publication timestamps must be timezone aware")
+    return at.astimezone(timezone.utc)
 
 
 def next_open_index(dates, available_at, market):
@@ -34,10 +44,23 @@ def run(archive, directory):
     raw = pd.read_pickle(directory / "signal_prices.pkl")
     etf = pd.read_pickle(directory / "etf_prices.pkl")
     rows = json.loads((directory / "thesis_signals.json").read_text(encoding="utf-8"))
+    manifest_path = directory / "source_manifest.json"
+    approved_work = None
+    if manifest_path.exists():
+        approved_work = {
+            Path(r["path"]).as_posix()
+            for r in json.loads(manifest_path.read_text(encoding="utf-8"))
+            if Path(r["path"]).parts[0] == "work-reports"
+        }
     for r in rows:
         r["source_kind"] = "project_thesis"
         r["group"] = r["stance"]
     for p in archive.glob("work-reports/*/events/*.json"):
+        if (
+            approved_work is not None
+            and p.relative_to(archive).as_posix() not in approved_work
+        ):
+            continue
         w = json.loads(p.read_text(encoding="utf-8"))
         if w.get("surface") not in ("kr", "us"):
             continue
@@ -54,7 +77,7 @@ def run(archive, directory):
                 }
             )
     dedup, observations, exclusions = set(), [], Counter()
-    for r in sorted(rows, key=lambda x: x.get("available_at") or ""):
+    for r in sorted(rows, key=publication_key):
         if not r.get("available_at"):
             exclusions["missing_publication_time"] += 1
             continue
