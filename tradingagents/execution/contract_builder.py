@@ -38,12 +38,12 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
 
             used_regex_fallback = False
             breakout_level = _price_from_level(breakout_structured)
-            if breakout_level is None:
+            if breakout_level is None and decision.conditional_entry_action.value == "NONE":
                 breakout_level = _extract_level((*decision.watchlist_triggers, *decision.catalysts), ("breakout", "above"))
                 used_regex_fallback = used_regex_fallback or breakout_level is not None
 
             pullback_low, pullback_high = _zone_from_level(pullback_structured)
-            if pullback_low is None or pullback_high is None:
+            if (pullback_low is None or pullback_high is None) and decision.conditional_entry_action.value == "NONE":
                 fallback_low, fallback_high = _extract_zone(
                     (*decision.watchlist_triggers, *decision.catalysts),
                     keywords=("pullback", "buy zone", "retest"),
@@ -97,6 +97,9 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                 invalid_intraday=invalid_intraday,
             )
             action_if_triggered = _action_if_triggered(decision.entry_action.value)
+            if decision.conditional_entry_action.value != "NONE":
+                action_if_triggered = _action_if_triggered(decision.conditional_entry_action.value)
+                reason_codes.append("explicit_conditional_entry")
             if (
                 (
                     action_if_triggered != ActionIfTriggered.NONE
@@ -117,13 +120,16 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                 market_data_asof=market_data_asof,
                 level_basis=LevelBasis.DAILY_CLOSE,
                 thesis_state=_thesis_from_stance(decision.portfolio_stance.value),
-                primary_setup=_setup_from_entry_action(decision.entry_action.value),
+                primary_setup=(PrimarySetup.BREAKOUT_CONFIRMATION if breakout_level is not None else PrimarySetup.PULLBACK_BUY)
+                if decision.conditional_entry_action.value != "NONE"
+                else _setup_from_entry_action(decision.entry_action.value),
                 portfolio_stance=decision.portfolio_stance.value,
                 entry_action_base=decision.entry_action.value,
                 setup_quality=decision.setup_quality.value,
                 confidence=decision.confidence,
                 action_if_triggered=action_if_triggered,
-                starter_fraction_of_target=(0.25 if decision.entry_action.value == "STARTER" else None),
+                starter_fraction_of_target=(0.25 if action_if_triggered == ActionIfTriggered.STARTER else None),
+                entry_valid_until=decision.conditional_entry_valid_until,
                 breakout_level=breakout_level,
                 breakout_confirmation=breakout_confirmation,
                 pullback_buy_zone=(

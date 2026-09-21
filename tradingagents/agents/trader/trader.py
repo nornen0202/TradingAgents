@@ -52,6 +52,7 @@ def create_trader(llm, memory):
                     "Keep entry_action and risk_action separate: entry_action is the buy-side/new-entry decision, while risk_action captures held-position trimming, profit-taking, stop-loss, or exit risk. "
                     "Do not use TRIM_TO_FUND for thesis damage, support breaks, failed breakouts, or stop-loss events; use REDUCE_RISK, STOP_LOSS, TAKE_PROFIT, or EXIT with reason codes and numeric levels when applicable. "
                     "When the thesis is constructive but the setup is not actionable yet, keep entry_action=WAIT and provide explicit triggers instead of flattening the legacy rating to NO_TRADE. "
+                    "For a justified conditional entry, provide conditional_entry_action=STARTER or ADD plus timezone-aware conditional_entry_valid_until and numeric execution_levels.levels. Require BULLISH stance and no conflicting sell risk. Otherwise conditional_entry_action must be NONE; do not invent a deadline or buy intent. "
                     "Use NO_TRADE only when there is no favorable setup to monitor, the risk/reward is clearly unfavorable, or the evidence quality is too weak for an investable view. "
                     "When setup quality is compelling and timing is confirmed, allow BUY or OVERWEIGHT rather than defaulting to NO_TRADE or HOLD. "
                     "Confidence describes strength of evidence, not the probability of profit. Position sizing must respect a defined loss budget, existing concentration and cash. "

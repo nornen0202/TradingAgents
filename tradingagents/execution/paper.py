@@ -19,6 +19,10 @@ import sqlite3
 class PaperLimits:
     cash_floor: float = 2_500_000
     max_order_nav: float = 0.01
+    max_sell_order_nav: float = 0.20
+    one_share_nav_ceiling: float = (
+        0.0  # Optional, separately configured paper experiment.
+    )
     max_single_name: float = 0.35
     max_daily_turnover: float = 0.10
     max_daily_orders: int = 5
@@ -35,6 +39,11 @@ class PaperLimits:
             raise ValueError("Limits must be finite and nonnegative")
         if not 0 < self.max_order_nav <= 1 or not 0 < self.max_single_name <= 1:
             raise ValueError("Invalid position limits")
+        if (
+            not 0 < self.max_sell_order_nav <= 1
+            or not 0 <= self.one_share_nav_ceiling <= self.max_single_name
+        ):
+            raise ValueError("Invalid sell/whole-share limits")
         if not 0 < self.max_daily_turnover <= 1 or not 0 < self.max_daily_loss <= 1:
             raise ValueError("Invalid daily limits")
         if type(self.max_daily_orders) is not int or self.max_daily_orders <= 0:
@@ -266,7 +275,8 @@ class PaperBroker:
                 if (
                     self._get("turnover") + qty * fill
                     > self._get("day_start_nav") * self.limits.max_daily_turnover
-                    or qty * fill > nav * self.limits.max_order_nav
+                    or qty * fill
+                    > nav * order_nav_limit(self.limits, order["side"], qty)
                 ):
                     continue
                 cash -= sign * qty * fill + fees
@@ -335,9 +345,11 @@ class PaperBroker:
                 requested = s.get("quantity")
                 qty = requested if type(requested) is int and requested > 0 else 0
                 if not reason and not qty:
-                    reason = "missing_integer_quantity"
+                    reason = s.get("sizing_reason") or "missing_integer_quantity"
                 if not reason:
-                    cap = math.floor(nav * self.limits.max_order_nav / price)
+                    cap = math.floor(
+                        nav * order_nav_limit(self.limits, side, qty) / price
+                    )
                     qty = min(qty, cap, math.floor(held) if side == "SELL" else qty)
                     if qty <= 0:
                         reason = "whole_share_budget_or_holdings"
@@ -415,6 +427,14 @@ class PaperBroker:
         except Exception:
             self.db.execute("ROLLBACK")
             raise
+
+
+def order_nav_limit(limits: PaperLimits, side: str, quantity: int):
+    if side == "SELL":
+        return limits.max_sell_order_nav
+    if quantity == 1:
+        return max(limits.max_order_nav, limits.one_share_nav_ceiling)
+    return limits.max_order_nav
 
 
 def kis_demo_order_preview(*, ticker: str, side: str, quantity: int, limit_price: int):

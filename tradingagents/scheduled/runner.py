@@ -5772,6 +5772,7 @@ class _ExecutionContractShim:
             setup_quality=str(self.payload.get("setup_quality") or "DEVELOPING"),
             confidence=float(self.payload.get("confidence") or 0.4),
             action_if_triggered=ActionIfTriggered(str(self.payload.get("action_if_triggered") or "NONE")),
+            entry_valid_until=self.payload.get("entry_valid_until"),
             starter_fraction_of_target=self.payload.get("starter_fraction_of_target"),
             breakout_level=self.payload.get("breakout_level"),
             breakout_confirmation=(

@@ -39,10 +39,10 @@ def _contract(**kwargs):
     return ExecutionContract(**base)
 
 
-def _market(*, last_price: float, day_high: float, day_low: float):
+def _market(*, last_price: float, day_high: float, day_low: float, now=None):
     return IntradayMarketSnapshot(
         ticker="TSM",
-        asof=datetime.now(timezone.utc).isoformat(),
+        asof=(now or datetime.now(timezone.utc)).isoformat(),
         provider="yfinance_intraday",
         interval="5m",
         last_price=last_price,
@@ -65,7 +65,7 @@ def test_breakout_hit_by_day_high_marks_actionable():
     now = datetime.now(timezone.utc)
     update = evaluate_execution_state(
         _contract(),
-        _market(last_price=99.5, day_high=101.0, day_low=98.0),
+        _market(last_price=99.5, day_high=101.0, day_low=98.0, now=now),
         now=now,
         max_data_age_seconds=180,
     )
@@ -76,7 +76,7 @@ def test_intraday_breakout_exposes_live_breakout_timing_state():
     now = datetime.now(timezone.utc)
     update = evaluate_execution_state(
         _contract(breakout_confirmation=BreakoutConfirmation.INTRADAY_ABOVE),
-        _market(last_price=101.0, day_high=101.5, day_low=98.0),
+        _market(last_price=101.0, day_high=101.5, day_low=98.0, now=now),
         now=now,
         max_data_age_seconds=180,
     )
@@ -90,7 +90,7 @@ def test_close_confirmation_exposes_close_confirm_timing_state():
     now = datetime.now(timezone.utc)
     update = evaluate_execution_state(
         _contract(breakout_confirmation=BreakoutConfirmation.CLOSE_ABOVE),
-        _market(last_price=101.0, day_high=101.5, day_low=98.0),
+        _market(last_price=101.0, day_high=101.5, day_low=98.0, now=now),
         now=now,
         max_data_age_seconds=180,
     )

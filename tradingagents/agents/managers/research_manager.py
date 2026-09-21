@@ -30,6 +30,7 @@ def create_research_manager(llm, memory):
 Your job:
 - weigh the strongest bullish and bearish evidence
 - separate directional stance (portfolio_stance) from immediate action (entry_action)
+- preserve conditional entry intent separately: a BULLISH WAIT may include conditional_entry_action STARTER/ADD only with explicit numeric entry levels and timezone-aware conditional_entry_valid_until; otherwise use NONE
 - evaluate sell-side/downside-risk explicitly with risk_action separate from entry_action
 - use REDUCE_RISK, TAKE_PROFIT, STOP_LOSS, or EXIT when support, invalidation, failed breakout, thesis damage, weak earnings/guidance, regime headwind, or deteriorated reward/risk justifies reducing held exposure
 - use TRIM_TO_FUND only for funding/rotation when the thesis remains valid and the trim is not a risk event

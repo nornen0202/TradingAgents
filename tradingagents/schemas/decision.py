@@ -4,6 +4,7 @@ import json
 import math
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 from json import JSONDecodeError
 from typing import Any, Literal, Mapping, cast
@@ -245,12 +246,16 @@ class StructuredDecision:
     risk_action_confidence: float | None = None
     risk_action_level: PriceLevel | None = None
     profit_taking_plan: ProfitTakingPlan = ProfitTakingPlan()
+    conditional_entry_action: EntryAction = EntryAction.NONE
+    conditional_entry_valid_until: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "rating": self.rating.value,
             "portfolio_stance": self.portfolio_stance.value,
             "entry_action": self.entry_action.value,
+            "conditional_entry_action": self.conditional_entry_action.value,
+            "conditional_entry_valid_until": self.conditional_entry_valid_until,
             "setup_quality": self.setup_quality.value,
             "confidence": self.confidence,
             "time_horizon": self.time_horizon.value,
@@ -1041,6 +1046,52 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
             f"Unsupported social source: {raw_coverage.get('social_source')!r}."
         ) from exc
 
+    execution_levels = _parse_execution_levels(data)
+    try:
+        conditional_entry = EntryAction(str(data.get("conditional_entry_action") or "NONE").upper())
+    except ValueError as exc:
+        raise StructuredDecisionValidationError("Unsupported conditional_entry_action") from exc
+    valid_until = data.get("conditional_entry_valid_until") or None
+    if conditional_entry not in {EntryAction.NONE, EntryAction.STARTER, EntryAction.ADD}:
+        raise StructuredDecisionValidationError("Conditional entry must be NONE, STARTER or ADD")
+    if conditional_entry != EntryAction.NONE:
+        if entry_action != EntryAction.WAIT or portfolio_stance != PortfolioStance.BULLISH:
+            raise StructuredDecisionValidationError("Conditional buying requires BULLISH stance and current WAIT")
+        if risk_action not in {RiskAction.NONE, RiskAction.HOLD}:
+            raise StructuredDecisionValidationError("Conditional buying conflicts with a sell-side risk action")
+        raw_execution = data.get("execution_levels")
+        raw_levels = raw_execution.get("levels") if isinstance(raw_execution, Mapping) else None
+        if not isinstance(raw_levels, list):
+            raise StructuredDecisionValidationError("Conditional buying requires a levels array")
+        # Do not promote numeric prose extracted by legacy parsers into an order.
+        numeric_entry = any(
+            isinstance(level, Mapping)
+            and str(level.get("level_type", "")).upper() in {"BREAKOUT", "PULLBACK", "SUPPORT"}
+            and any(isinstance(level.get(k), (int, float)) and not isinstance(level.get(k), bool)
+                    and math.isfinite(level[k]) and level[k] > 0 for k in ("price", "low"))
+            for level in raw_levels
+        )
+        if not numeric_entry:
+            raise StructuredDecisionValidationError("Conditional buying requires explicit numeric entry levels")
+        for level in raw_levels:
+            if not isinstance(level, Mapping) or str(level.get("level_type", "")).upper() not in {
+                "BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"
+            }:
+                continue
+            values = [level[k] for k in ("price", "low", "high") if level.get(k) is not None]
+            if not values or any(
+                not isinstance(v, (int, float)) or isinstance(v, bool) or not math.isfinite(v) or v <= 0
+                for v in values
+            ):
+                raise StructuredDecisionValidationError("Every conditional entry level must be explicit numeric data")
+        try:
+            expires = datetime.fromisoformat(valid_until)
+            if expires.tzinfo is None:
+                raise ValueError("missing timezone")
+        except (TypeError, ValueError) as exc:
+            raise StructuredDecisionValidationError("Conditional buying requires timezone-aware valid_until") from exc
+        valid_until = expires.isoformat()
+
     return StructuredDecision(
         rating=rating,
         portfolio_stance=portfolio_stance,
@@ -1061,7 +1112,9 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
             social_source=social_source,
             macro_items_count=max(0, int(raw_coverage.get("macro_items_count", 0) or 0)),
         ),
-        execution_levels=_parse_execution_levels(data),
+        execution_levels=execution_levels,
+        conditional_entry_action=conditional_entry,
+        conditional_entry_valid_until=valid_until if conditional_entry != EntryAction.NONE else None,
         risk_action=risk_action,
         risk_action_reason=risk_action_reason,
         risk_action_reason_codes=risk_action_reason_codes,
