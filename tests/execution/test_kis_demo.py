@@ -104,10 +104,10 @@ def test_ledger_ack_is_not_fill_and_restart_cannot_duplicate(tmp_path):
     journal = DemoOrderJournal(path, c)
     assert journal.submit(**args())["status"] == "ACKNOWLEDGED"
     assert len(s.calls) == 2
-    assert all(
-        url.startswith("https://openapivts.koreainvestment.com:29443/")
-        for _, url, _ in s.calls
-    )
+    assert [url for _, url, _ in s.calls] == [
+        "https://openapivts.koreainvestment.com:29443/oauth2/tokenP",
+        "https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/order-cash",
+    ]
     assert s.calls[-1][2]["headers"]["tr_id"] == "VTTC0012U"
     assert s.calls[-1][2]["json"]["ORD_QTY"] == "2"
     assert all(not kw["allow_redirects"] for _, _, kw in s.calls)
