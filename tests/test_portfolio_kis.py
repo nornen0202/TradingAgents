@@ -33,6 +33,7 @@ class PortfolioKisTests(unittest.TestCase):
             "KIS_APP_SECRET": "app-secret",
         }.get(name)
         response = Mock()
+        response.status_code = 200
         response.raise_for_status.return_value = None
         response.json.return_value = {"access_token": "token-value"}
         mock_post.return_value = response
@@ -50,6 +51,7 @@ class PortfolioKisTests(unittest.TestCase):
     def test_ensure_access_token_refreshes_when_expired(self):
         session = Mock()
         token_response = Mock()
+        token_response.status_code = 200
         token_response.raise_for_status.return_value = None
         token_response.json.return_value = {"access_token": "fresh-token", "expires_in": 86400}
         session.post.return_value = token_response
@@ -73,10 +75,12 @@ class PortfolioKisTests(unittest.TestCase):
         session = Mock()
 
         first_token = Mock()
+        first_token.status_code = 200
         first_token.raise_for_status.return_value = None
         first_token.json.return_value = {"access_token": "old-token", "expires_in": 86400}
 
         second_token = Mock()
+        second_token.status_code = 200
         second_token.raise_for_status.return_value = None
         second_token.json.return_value = {"access_token": "new-token", "expires_in": 86400}
         session.post.side_effect = [first_token, second_token]
@@ -114,6 +118,7 @@ class PortfolioKisTests(unittest.TestCase):
         session = Mock()
 
         token_response = Mock()
+        token_response.status_code = 200
         token_response.raise_for_status.return_value = None
         token_response.json.return_value = {"access_token": "token", "expires_in": 86400}
         session.post.return_value = token_response
