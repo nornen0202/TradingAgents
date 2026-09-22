@@ -540,6 +540,51 @@ def test_manual_dispatch_always_runs_requested_profile():
     assert "Manual dispatch runs profile=kr" in reason
 
 
+def test_scheduled_kr_run_is_skipped_on_official_market_holiday():
+    class ClosedStatus:
+        is_session = False
+        source = "kis_official_cache"
+        reason = "KIS marks 2026-08-17 as a domestic market closed day."
+
+    profile, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule",
+        schedule="35 19 * * 0-4",
+        requested_profile="",
+        manual_default_profile="all",
+        workflow_file="daily-codex-analysis.yml",
+        current_run_id=777,
+        client=FakeClient(),
+        targets=_codex_targets(),
+        now_kst=_kst("2026-08-17T04:35:00"),
+        market_status_resolver=lambda **_kwargs: ClosedStatus(),
+    )
+
+    assert profile == "kr"
+    assert should_run is False
+    assert "market closed day" in reason
+    assert "kis_official_cache" in reason
+
+
+def test_manual_dispatch_bypasses_market_holiday_gate():
+    profile, should_run, _reason = gate.decide_schedule_gate(
+        event_name="workflow_dispatch",
+        schedule="",
+        requested_profile="kr",
+        manual_default_profile="all",
+        workflow_file="daily-codex-analysis.yml",
+        current_run_id=777,
+        client=FakeClient(),
+        targets=_codex_targets(),
+        now_kst=_kst("2026-08-17T04:35:00"),
+        market_status_resolver=lambda **_kwargs: (_ for _ in ()).throw(
+            AssertionError("manual runs must not resolve the market calendar")
+        ),
+    )
+
+    assert profile == "kr"
+    assert should_run is True
+
+
 def test_unrecognized_schedule_is_skipped_before_heavy_jobs():
     profile, should_run, reason = gate.decide_schedule_gate(
         event_name="schedule",

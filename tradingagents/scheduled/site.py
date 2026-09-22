@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import time
+import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -159,7 +160,18 @@ def _load_run_manifests(archive_dir: Path) -> list[dict[str, Any]]:
         return manifests
 
     for path in runs_root.rglob("run.json"):
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(payload, dict) or not all(
+                isinstance(payload.get(key), str) and payload[key].strip()
+                for key in ("run_id", "started_at", "status")
+            ) or not isinstance(payload.get("settings"), dict):
+                raise ValueError("invalid run manifest")
+            if payload["run_id"] != path.parent.name:
+                raise ValueError("run ID must match its archive directory")
+        except (OSError, ValueError):
+            warnings.warn("Skipping an unreadable or invalid archived run manifest", RuntimeWarning, stacklevel=2)
+            continue
         payload["_run_dir"] = str(path.parent)
         manifests.append(payload)
 
@@ -830,8 +842,7 @@ def _render_index_page(
             {representative_badge}
             {latest_health_badges}
             {latest_health_compact}
-            <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open 대표 투자 run</a>
-            <a class="button" href="runs/{_escape(representative['run_id'])}/index.html">Open representative investment run</a>
+            <a class="button" href="runs/{_escape(representative['run_id'])}/index.html" aria-label="Open representative investment run">Open 대표 투자 run</a>
             <a class="button" href="mobile/index.html">Open 모바일 공개 리서치</a>
             <a class="button" href="youtube/index.html">Open YouTube 검증 리포트</a>
             <a class="button" href="prism-telegram/index.html">Open PRISM Telegram 리포트</a>
@@ -868,10 +879,12 @@ def _render_index_page(
         public_tickers = _public_ticker_summaries(manifest)
         public_success = sum(item.get("status") == "success" for item in public_tickers)
         public_failed = len(public_tickers) - public_success
-        portfolio_summary = _load_portfolio_summary(Path(manifest["_run_dir"]))
+        # The homepage only needs existence, not private holdings/actions or
+        # performance JSON parsing for every card.
+        has_portfolio = (Path(manifest["_run_dir"]) / "portfolio-private" / "status.json").is_file()
         portfolio_link = (
             "<p><a href=\"strategy.html\">PC 통합 투자 전략</a> · <a href=\"mobile/strategy.html\">모바일 통합 투자 전략</a></p>"
-            if portfolio_summary.get("status_path")
+            if has_portfolio
             else ""
         )
         cards.append(
@@ -3311,7 +3324,7 @@ def _render_ticker_institutional_section(*, run_dir: Path, ticker_summary: dict[
 
 def _page_template(title: str, body: str, *, prefix: str) -> str:
     return f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -3319,7 +3332,15 @@ def _page_template(title: str, body: str, *, prefix: str) -> str:
   <link rel="stylesheet" href="{prefix}assets/style.css" />
 </head>
 <body>
-  <main class="shell">
+  <a class="skip-link" href="#main-content">본문으로 바로가기</a>
+  <nav class="site-nav" aria-label="주요 메뉴">
+    <a href="{prefix}index.html">홈</a>
+    <a href="{prefix}strategy.html?market=kr">국내 전략</a>
+    <a href="{prefix}strategy.html?market=us">미국 전략</a>
+    <a href="{prefix}youtube/index.html">YouTube</a>
+    <a href="{prefix}prism-telegram/index.html">PRISM</a>
+  </nav>
+  <main class="shell" id="main-content" tabindex="-1">
     {body}
   </main>
 </body>
@@ -4269,7 +4290,13 @@ def _load_portfolio_summary(run_dir: Path) -> dict[str, Any]:
     if not status_path.exists():
         return {}
 
-    payload = json.loads(status_path.read_text(encoding="utf-8"))
+    try:
+        payload = json.loads(status_path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise ValueError("invalid portfolio status")
+    except (OSError, ValueError):
+        warnings.warn("Skipping an unreadable portfolio status", RuntimeWarning, stacklevel=2)
+        return {}
     report_md = private_dir / "portfolio_report.md"
     report_json = private_dir / "portfolio_report.json"
     candidates_json = private_dir / "portfolio_candidates.json"
@@ -4885,6 +4912,14 @@ def _escape(value: object) -> str:
 
 
 _STYLE_CSS = """
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid #00756d; outline-offset: 4px; }
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 100; padding: 12px; color: #132238; background: #fff; transform: translateY(-160%); }
+.skip-link:focus { transform: translateY(0); }
+.site-nav { display: flex; flex-wrap: wrap; gap: 8px; max-width: 1440px; margin: auto; padding: 12px 24px; }
+.site-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; border-radius: 10px; color: #132238; background: #fff8; text-decoration: none; }
+.site-nav a:hover { background: #fff; }
+
 :root {
   --bg: #f4efe7;
   --paper: rgba(255, 255, 255, 0.84);

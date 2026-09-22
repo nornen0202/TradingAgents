@@ -311,6 +311,18 @@ class WorkflowInspectionTests(unittest.TestCase):
         self.assertEqual(first["failure_fingerprint"], same["failure_fingerprint"])
         self.assertNotEqual(first["failure_fingerprint"], different["failure_fingerprint"])
 
+    def test_log_signature_ignores_volatile_github_correlation_ids(self):
+        first = _diagnostic_signature(
+            "2026-08-17T13:56:43Z ##[error]Response status code does not indicate success: "
+            "429 (Too Many Requests). 06CA:C276A:1261:191C8:6A8312F6"
+        )
+        second = _diagnostic_signature(
+            "2026-08-17T14:04:47Z ##[error]Response status code does not indicate success: "
+            "429 (Too Many Requests). 3125:1C2169:29B4:1DD30:6A8314DF"
+        )
+
+        self.assertEqual(first, second)
+
     def test_missing_log_signature_fails_open_per_run(self):
         title = (
             "Intraday Overlay Refresh [profile=us] [run_mode=overlay_only] "
@@ -1052,6 +1064,7 @@ class WorkflowDefinitionTests(unittest.TestCase):
         self.assertNotIn('"profile=$Profile",', local_dispatcher)
         self.assertIn("Get-FailureDiagnosticSignature", local_dispatcher)
         self.assertIn('"diagnostic=unavailable"', local_dispatcher)
+        self.assertIn("<request-id>", local_dispatcher)
         self.assertIn("$activeRuns = @($allRuns | Where-Object", local_dispatcher)
         self.assertIn("regardless_of_age=true", local_dispatcher)
         self.assertIn("$activeCoverage", local_dispatcher)
