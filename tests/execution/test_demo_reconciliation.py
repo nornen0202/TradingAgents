@@ -117,8 +117,37 @@ def test_throttle_spacing_and_expiry_rechecked_before_network(tmp_path):
     c.utcnow = lambda: datetime.fromisoformat(args()["valid_until"])
     j = DemoOrderJournal(tmp_path / "journal.sqlite", c)
     try:
-        assert j.submit(**args())["status"] == "UNKNOWN"
+        assert j.submit(**args())["status"] == "NOT_SENT"
         assert len(s.calls) == 1  # Authentication only, no order POST after expiry.
+    finally:
+        j.close()
+
+
+def test_authentication_failure_does_not_create_false_ambiguous_order(tmp_path):
+    from test_kis_demo import Session, credentials
+    from tradingagents.execution.kis_demo import KisDemoClient
+    from datetime import datetime
+
+    session = Session(
+        requests.Timeout(),
+        Response({"access_token": "test-token", "expires_in": 86400}),
+        ack(),
+    )
+    c = KisDemoClient(
+        credentials(),
+        session=session,
+        pacer=RequestPacer(interval=0),
+        utcnow=lambda: datetime.fromisoformat(args()["now"]),
+    )
+    j = DemoOrderJournal(tmp_path / "journal.sqlite", c)
+    try:
+        assert j.submit(**args())["status"] == "NOT_SENT"
+        assert j.submit(**args())["status"] == "NOT_SENT"
+        assert len(session.calls) == 1
+        assert (
+            j.submit(**{**args(), "intent_id": "fresh-intent"})["status"]
+            == "ACKNOWLEDGED"
+        )
     finally:
         j.close()
 

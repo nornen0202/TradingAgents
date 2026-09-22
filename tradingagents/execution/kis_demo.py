@@ -36,6 +36,10 @@ class DemoError(RuntimeError):
     """Sanitized error: never include broker bodies, URLs, account IDs or keys."""
 
 
+class DemoNotSentError(DemoError):
+    """Local validation/authentication failed before the order request was sent."""
+
+
 def configuration_status():
     return {key: bool(value) for key, value in _settings().items()}
 
@@ -122,7 +126,7 @@ class KisDemoClient:
     def _http(self, method, path, *, deadline=None, **kwargs):
         self.pacer.wait()
         if deadline is not None and self.utcnow() >= stamp(deadline):
-            raise DemoError("VTS request deadline elapsed before sending")
+            raise DemoNotSentError("VTS request deadline elapsed before sending")
         try:
             response = self.session.request(
                 method,
@@ -188,11 +192,16 @@ class KisDemoClient:
             ("POST", "order-rvsecncl", "VTTC0013U"),
         }
         if (method, endpoint, tr_id) not in allowed:
-            raise DemoError("Request is outside the VTS allowlist")
+            raise DemoNotSentError("Request is outside the VTS allowlist")
         supplied = body if body is not None else params or {}
         if any(supplied.get(k) != v for k, v in self._account().items()):
-            raise DemoError("VTS account scope mismatch")
-        self.authenticate()
+            raise DemoNotSentError("VTS account scope mismatch")
+        try:
+            self.authenticate()
+        except DemoError:
+            raise DemoNotSentError(
+                "VTS authentication failed before sending the request"
+            ) from None
         headers = {
             "authorization": f"Bearer {self._token}",
             "appkey": self.credentials.app_key,
@@ -404,6 +413,8 @@ class DemoOrderJournal:
                 }
             elif str(payload.get("rt_cd")) == "1":
                 status = "REJECTED"
+        except DemoNotSentError:
+            status = "NOT_SENT"
         except DemoError:
             pass
         self.db.execute(
