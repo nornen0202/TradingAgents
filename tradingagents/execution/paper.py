@@ -27,12 +27,15 @@ class PaperLimits:
     max_daily_turnover: float = 0.10
     max_daily_orders: int = 5
     max_daily_loss: float = 0.02
+    daily_loss_reduce_only: bool = True
     max_quote_age_seconds: int = 120
     slippage_bps: float = 10
     fee_bps: float = 5
     sell_tax_bps: float = 20  # Conservative research assumption, not a tax quote.
 
     def __post_init__(self):
+        if type(self.daily_loss_reduce_only) is not bool:
+            raise ValueError("daily_loss_reduce_only must be boolean")
         if any(
             not math.isfinite(float(v)) or float(v) < 0 for v in asdict(self).values()
         ):
@@ -229,8 +232,14 @@ class PaperBroker:
             ).fetchall():
                 if (
                     halted
-                    or risk_stop
-                    or at > stamp(order["expires_at"])
+                    or (
+                        risk_stop
+                        and (
+                            order["side"] == "BUY"
+                            or not self.limits.daily_loss_reduce_only
+                        )
+                    )
+                    or at >= stamp(order["expires_at"])
                     or stamp(order["created_at"]).date() != at.date()
                 ):
                     self.db.execute(
@@ -311,7 +320,10 @@ class PaperBroker:
                 q = valid.get(s["ticker"])
                 action = s["action"]
                 reason = None
-                if halted or risk_stop:
+                if halted or (
+                    risk_stop
+                    and (action == "BUY" or not self.limits.daily_loss_reduce_only)
+                ):
                     reason = "kill_or_daily_stop"
                 elif (
                     action not in {"BUY", "REDUCE", "SELL"}
@@ -320,7 +332,7 @@ class PaperBroker:
                     reason = "no_explicit_executable_action"
                 elif (
                     not s.get("valid_until")
-                    or at > stamp(s["valid_until"])
+                    or at >= stamp(s["valid_until"])
                     or at < stamp(s["available_at"])
                 ):
                     reason = "signal_expired_or_future"
@@ -417,6 +429,11 @@ class PaperBroker:
                 "nav_krw": nav,
                 "cash_krw": cash,
                 "marks_complete": not missing_marks,
+                "trading_state": "HALTED"
+                if halted or (risk_stop and not self.limits.daily_loss_reduce_only)
+                else "REDUCING"
+                if risk_stop
+                else "ACTIVE",
                 "orders": [
                     dict(r)
                     for r in self.db.execute(

@@ -12,10 +12,19 @@ from tradingagents.execution.kis_demo import (
     KisDemoClient,
     configuration_status,
 )
+from tradingagents.execution.demo_secrets import SecretStoreError
 
 
 def check(*, connect=False):
-    configured = configuration_status()
+    try:
+        configured = configuration_status()
+    except SecretStoreError:
+        return {
+            "mode": "KIS_DEMO",
+            "status": "CONFIGURATION_UNREADABLE",
+            "orders_submitted": 0,
+            "real_account_access": False,
+        }
     result = {
         "mode": "KIS_DEMO",
         "configured": configured,
@@ -37,7 +46,7 @@ def check(*, connect=False):
             position_rows=len(positions),
             order_rows=len(orders),
         )
-    except (DemoError, ValueError):
+    except (DemoError, ValueError, SecretStoreError):
         result.update(
             status="CONNECTION_UNVERIFIED",
             reason="VTS authentication, scope or response validation failed",
