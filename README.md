@@ -364,6 +364,8 @@ $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 
 ### 통합 투자 전략과 모바일 화면
 
+모의투자를 선행 조건으로 두지 않는 [실계좌 전략 재설계·432개 비교 결과](Docs/live_account_strategy_design_ko.md)와 [비용·유료 서비스·최소 사용자 작업](Docs/live_account_costs_sources_ko.md)을 제공합니다. 계좌 리포트 생성 시 비공개 `account_review.md/json`에 보유 노출·현금 출처·자료 누락을 함께 기록합니다. 기존 KIS 클라이언트는 허용된 읽기 조회만 수행하며, 최종 실계좌 주문은 사용자가 HTS/MTS에서 직접 실행합니다.
+
 KR/US Work 자동화는 계좌·관심종목 분석과 관련 YouTube·PRISM context를 다시 종합하고, 최종 보고서를 archive의 `work-reports/<surface>/latest.json`에 영속화합니다. ACK 뒤 exact event/report hash handoff가 전용 Pages workflow를 호출하며, 이 workflow는 빌드 전 content-addressed report와 빌드 후 current lineage를 모두 검증한 다음 구조화된 종목 조건을 `mobile/strategy.json`에 결합합니다. `/mobile/private.html`은 별도 암호화 키 없이 바로 열립니다. 계좌번호·토큰·주문번호 같은 원시 식별자는 계속 게시하지 않습니다.
 
 투자 논리와 주문 가능 상태는 분리됩니다. 시세 유효기간이 지나도 분석 시점의 BUY/HOLD/REDUCE/SELL 논리는 보존하고, 주문 상태만 `NEEDS_LIVE_RECHECK`로 낮춥니다. 상세 설계와 완료 기준은 [통합 투자 전략 파이프라인](Docs/integrated_investment_strategy_pipeline_ko.md), 데이터 획득 정책과 HTS 미채택 결정은 [한국투자 HTS 연동 미채택 결정](Docs/kis_hts_readonly_integration_ko.md)을 참고하세요. 반복 실패 사건은 [Intraday Overlay Refresh run 29523335052 분석](Docs/intraday_overlay_failure_29523335052_ko.md)에 기록했습니다.

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from .account_models import AccountSnapshot, PortfolioCandidate, PortfolioRecommendation
+from .account_review import review_market_views, render_account_review
 
 
 def save_portfolio_outputs(
@@ -28,6 +30,8 @@ def save_portfolio_outputs(
     private_dir.mkdir(parents=True, exist_ok=True)
 
     account_snapshot_path = private_dir / "account_snapshot.json"
+    account_review_path = private_dir / "account_review.json"
+    account_review_markdown_path = private_dir / "account_review.md"
     candidates_path = private_dir / "portfolio_candidates.json"
     semantic_verdicts_path = private_dir / "portfolio_semantic_verdicts.json"
     report_path = private_dir / "portfolio_report.json"
@@ -45,6 +49,11 @@ def save_portfolio_outputs(
     risk_action_delta_path = private_dir / "risk_action_delta.md"
 
     _write_json(account_snapshot_path, snapshot.to_dict())
+    account_review = review_market_views(
+        {"현재 조회 범위": snapshot.to_dict()}, now=datetime.now(timezone.utc)
+    )
+    _write_json(account_review_path, account_review)
+    account_review_markdown_path.write_text(render_account_review(account_review), encoding="utf-8")
     _write_json(candidates_path, {"candidates": [candidate.to_dict() for candidate in candidates]})
     _write_json(semantic_verdicts_path, {"verdicts": semantic_verdicts})
     _write_json(report_path, recommendation.to_dict())
@@ -93,6 +102,8 @@ def save_portfolio_outputs(
     )
     artifacts = {
         "account_snapshot_json": account_snapshot_path.as_posix(),
+        "account_review_json": account_review_path.as_posix(),
+        "account_review_md": account_review_markdown_path.as_posix(),
         "portfolio_candidates_json": candidates_path.as_posix(),
         "portfolio_semantic_verdicts_json": semantic_verdicts_path.as_posix(),
         "portfolio_report_json": report_path.as_posix(),

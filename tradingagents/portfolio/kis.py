@@ -20,6 +20,51 @@ REAL_BASE_URL = "https://openapi.koreainvestment.com:9443"
 DEMO_BASE_URL = "https://openapivts.koreainvestment.com:29443"
 _TRANSIENT_HTTP_STATUS_CODES = {429, 500, 502, 503, 504}
 
+# Exact GET path/TR pairs used by the quote, account and performance readers.
+# New broker APIs require an explicit review here; this client cannot send orders.
+_MARKET_READS = frozenset({
+    ("/uapi/domestic-stock/v1/quotations/inquire-price", "FHKST01010100"),
+    ("/uapi/domestic-stock/v1/quotations/inquire-time-itemchartprice", "FHKST03010200"),
+    ("/uapi/domestic-stock/v1/quotations/inquire-time-itemconclusion", "FHPST01060000"),
+    ("/uapi/domestic-stock/v1/quotations/inquire-asking-price-exp-ccn", "FHKST01010200"),
+    ("/uapi/domestic-stock/v1/quotations/investor-trend-estimate", "HHPTJ04160200"),
+    ("/uapi/domestic-stock/v1/quotations/program-trade-by-stock", "FHPPG04650101"),
+    ("/uapi/domestic-stock/v1/quotations/comp-program-trade-today", "FHPPG04600101"),
+    ("/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice", "FHKST03010100"),
+    ("/uapi/domestic-stock/v1/quotations/inquire-index-daily-price", "FHPUP02120000"),
+    ("/uapi/overseas-price/v1/quotations/price", "HHDFS00000300"),
+    ("/uapi/overseas-price/v1/quotations/price-detail", "HHDFS76200200"),
+    ("/uapi/overseas-price/v1/quotations/inquire-time-itemchartprice", "HHDFS76950200"),
+    ("/uapi/overseas-price/v1/quotations/inquire-asking-price", "HHDFS76200100"),
+    ("/uapi/overseas-price/v1/quotations/inquire-ccnl", "HHDFS76200300"),
+    ("/uapi/overseas-price/v1/quotations/dailyprice", "HHDFS76240000"),
+    ("/uapi/overseas-stock/v1/ranking/volume-power", "HHDFS76280000"),
+    ("/uapi/overseas-stock/v1/ranking/trade-vol", "HHDFS76310010"),
+    ("/uapi/overseas-stock/v1/quotations/countries-holiday", "CTOS5011R"),
+})
+_ACCOUNT_READS = {
+    "real": frozenset({
+        ("/uapi/domestic-stock/v1/trading/inquire-balance", "TTTC8434R"),
+        ("/uapi/domestic-stock/v1/trading/inquire-daily-ccld", "TTTC0081R"),
+        ("/uapi/domestic-stock/v1/trading/inquire-daily-ccld", "CTSC9215R"),
+        ("/uapi/domestic-stock/v1/trading/inquire-period-profit", "TTTC8708R"),
+        ("/uapi/domestic-stock/v1/trading/inquire-period-trade-profit", "TTTC8715R"),
+        ("/uapi/domestic-stock/v1/trading/period-rights", "CTRGA011R"),
+        ("/uapi/overseas-stock/v1/trading/inquire-present-balance", "CTRP6504R"),
+        ("/uapi/overseas-stock/v1/trading/inquire-nccs", "TTTS3018R"),
+        ("/uapi/overseas-stock/v1/trading/inquire-ccnl", "TTTS3035R"),
+        ("/uapi/overseas-stock/v1/trading/inquire-period-trans", "CTOS4001R"),
+        ("/uapi/overseas-stock/v1/trading/inquire-period-profit", "TTTS3039R"),
+    }),
+    "demo": frozenset({
+        ("/uapi/domestic-stock/v1/trading/inquire-balance", "VTTC8434R"),
+        ("/uapi/domestic-stock/v1/trading/inquire-daily-ccld", "VTTC0081R"),
+        ("/uapi/domestic-stock/v1/trading/inquire-daily-ccld", "VTSC9215R"),
+        ("/uapi/overseas-stock/v1/trading/inquire-present-balance", "VTRP6504R"),
+        ("/uapi/overseas-stock/v1/trading/inquire-ccnl", "VTTS3035R"),
+    }),
+}
+
 
 class PortfolioConfigurationError(ValueError):
     """Raised when account portfolio configuration is incomplete."""
@@ -27,6 +72,12 @@ class PortfolioConfigurationError(ValueError):
 
 class KisApiError(RuntimeError):
     """Raised when KIS returns an API error."""
+
+
+def _kis_base_url(environment: str) -> str:
+    if environment not in {"real", "demo"}:
+        raise PortfolioConfigurationError("KIS environment must be exactly 'real' or 'demo'.")
+    return DEMO_BASE_URL if environment == "demo" else REAL_BASE_URL
 
 
 class KisClient:
@@ -45,8 +96,8 @@ class KisClient:
     ) -> None:
         self.app_key = app_key
         self.app_secret = app_secret
-        self.environment = "demo" if environment == "demo" else "real"
-        self.base_url = DEMO_BASE_URL if self.environment == "demo" else REAL_BASE_URL
+        self.base_url = _kis_base_url(environment)
+        self.environment = environment
         self.session = session or requests.Session()
         self.timeout_seconds = timeout_seconds
         self._access_token: str | None = None
@@ -72,12 +123,13 @@ class KisClient:
 
     @classmethod
     def from_api_keys(cls, *, environment: str = "real") -> "KisClient":
-        app_key = get_api_key("KIS_APP_KEY")
-        app_secret = get_api_key("KIS_APP_SECRET")
+        _kis_base_url(environment)
+        prefix = "KIS_DEMO" if environment == "demo" else "KIS"
+        app_key = get_api_key(f"{prefix}_APP_KEY")
+        app_secret = get_api_key(f"{prefix}_APP_SECRET")
         if not app_key or not app_secret:
             raise PortfolioConfigurationError(
-                "KIS app credentials are missing. Configure KIS_APP_KEY/KIS_APP_SECRET "
-                "or KIS_Developers_APP_KEY/KIS_Developers_APP_SECRET."
+                f"KIS app credentials are missing. Configure {prefix}_APP_KEY/{prefix}_APP_SECRET."
             )
         timeout_seconds = float(os.getenv("KIS_HTTP_TIMEOUT_SECONDS", "15") or 15)
         return cls(
@@ -88,13 +140,14 @@ class KisClient:
         )
 
     def issue_access_token(self, *, force: bool = False) -> str:
+        base_url = self._validated_base_url()
         if not force:
             cached = self._load_cached_token()
             if cached:
                 return cached
 
         response = self.session.post(
-            f"{self.base_url}/oauth2/tokenP",
+            f"{base_url}/oauth2/tokenP",
             headers={"content-type": "application/json"},
             data=json.dumps(
                 {
@@ -104,12 +157,17 @@ class KisClient:
                 }
             ),
             timeout=self.timeout_seconds,
+            allow_redirects=False,
         )
         response.raise_for_status()
+        if 300 <= response.status_code < 400:
+            raise KisApiError("KIS authentication redirect rejected.")
         payload = response.json()
+        if not isinstance(payload, dict):
+            raise KisApiError("KIS token response is invalid.")
         token = str(payload.get("access_token") or "").strip()
         if not token:
-            raise KisApiError(f"KIS token response did not include access_token: {payload}")
+            raise KisApiError("KIS token response did not include access_token.")
         expires_in = _parse_positive_int(payload.get("expires_in"), default=self._token_ttl_seconds_default)
         now = datetime.now(timezone.utc)
         self._access_token = token
@@ -131,6 +189,12 @@ class KisClient:
         self._access_token = None
         self._token_expires_at = None
 
+    def _validated_base_url(self) -> str:
+        expected = _kis_base_url(self.environment)
+        if self.base_url != expected:
+            raise PortfolioConfigurationError("KIS host does not match the selected environment.")
+        return expected
+
     def request_json(
         self,
         *,
@@ -141,7 +205,14 @@ class KisClient:
         body: dict[str, Any] | None = None,
         tr_cont: str = "",
     ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
-        url = f"{self.base_url}{path}"
+        base_url = self._validated_base_url()
+        if (
+            method.upper() != "GET"
+            or body is not None
+            or (path, tr_id) not in _MARKET_READS | _ACCOUNT_READS[self.environment]
+        ):
+            raise PortfolioConfigurationError("KisClient permits only allowlisted read-only requests.")
+        url = f"{base_url}{path}"
         max_attempts = _kis_request_max_attempts()
         auth_refreshed = False
         last_error: Exception | None = None
@@ -163,6 +234,7 @@ class KisClient:
                     params=params,
                     json=body,
                     timeout=self.timeout_seconds,
+                    allow_redirects=False,
                 )
             except requests.RequestException as exc:
                 last_error = exc
@@ -185,6 +257,8 @@ class KisClient:
             except requests.HTTPError as exc:
                 last_error = exc
                 raise
+            if 300 <= response.status_code < 400:
+                raise KisApiError("KIS API redirect rejected.")
             payload = response.json()
             rt_cd = str(payload.get("rt_cd", "0"))
             if rt_cd not in {"0", ""}:
@@ -1574,10 +1648,11 @@ def _extract_cash_snapshot(
             "pchs_amt_smtl_amt",
         },
     )
-    settled_cash = (
-        _first_numeric(summary_payload, ("dnca_tot_amt", "dncl_amt", "tot_dncl_amt", "ord_psbl_cash", "ord_psbl_amt"))
-        or 0
+    settled_cash = _first_numeric(
+        summary_payload, ("dnca_tot_amt", "dncl_amt", "tot_dncl_amt", "ord_psbl_cash", "ord_psbl_amt")
     )
+    if settled_cash is None:
+        settled_cash = 0
     available_cash = _first_numeric(
         summary_payload,
         (
@@ -1591,7 +1666,9 @@ def _extract_cash_snapshot(
             "dncl_amt",
             "tot_dncl_amt",
         ),
-    ) or settled_cash
+    )
+    if available_cash is None:
+        available_cash = settled_cash
     buying_power = _first_numeric(
         summary_payload,
         (
@@ -1604,13 +1681,18 @@ def _extract_cash_snapshot(
             "buy_mgn_amt",
             "dnca_tot_amt",
         ),
-    ) or available_cash
+    )
+    if buying_power is None:
+        buying_power = available_cash
     equity_selection = _select_total_equity_candidate(summary_payload, profile=profile)
     reported_equity = equity_selection.get("value")
     selected_equity_field = str(equity_selection.get("field") or "") or None
-    total_equity = max(
-        int(reported_equity or 0),
-        int(positions_market_value + max(settled_cash, available_cash, buying_power, 0)),
+    # Buying power can include credit or unsettled proceeds; it is not net assets.
+    # A reported zero (or lower equity due to liabilities) is authoritative too.
+    total_equity = (
+        int(reported_equity)
+        if reported_equity is not None
+        else int(positions_market_value + max(settled_cash, 0))
     )
 
     snapshot_health = "VALID"
@@ -1700,10 +1782,12 @@ def _parse_numeric_fields(payload: dict[str, Any], allowed_keys: set[str]) -> di
 
 def _select_total_equity_candidate(payload: dict[str, Any], *, profile: PortfolioProfile) -> dict[str, Any]:
     market_scope = str(getattr(profile, "market_scope", "kr") or "kr").strip().lower()
+    # Stock valuation and foreign-currency valuation are components, not total
+    # account equity. In particular, do not relabel a foreign amount as KRW NAV.
     if market_scope in {"us", "overseas"}:
-        priority = ("tot_asst_amt", "frcr_evlu_tota", "nass_amt", "tot_evlu_amt", "evlu_amt_smtl_amt")
+        priority = ("tot_asst_amt", "nass_amt", "tot_evlu_amt")
     else:
-        priority = ("nass_amt", "tot_asst_amt", "evlu_amt_smtl_amt", "tot_evlu_amt", "frcr_evlu_tota")
+        priority = ("nass_amt", "tot_asst_amt", "tot_evlu_amt")
     candidates = {
         key: numeric
         for key in priority
@@ -1731,9 +1815,9 @@ def _first_numeric(payload: dict[str, Any], keys: tuple[str, ...]) -> int | None
 
 
 def _maybe_int(value: object) -> int | None:
-    if value in (None, ""):
+    if isinstance(value, bool) or value in (None, ""):
         return None
     try:
         return int(float(value))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None

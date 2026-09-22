@@ -100,7 +100,7 @@ class AccountSnapshot:
 
     @property
     def account_value_krw(self) -> int:
-        if self.total_equity_krw is not None and int(self.total_equity_krw) > 0:
+        if self.total_equity_krw is not None:
             return int(self.total_equity_krw)
         return int(max(self.available_cash_krw, 0) + sum(position.market_value_krw for position in self.positions))
 
