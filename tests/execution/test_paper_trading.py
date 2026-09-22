@@ -252,14 +252,14 @@ def test_first_observation_loss_is_measured_from_seed(tmp_path):
     )
     at = "2026-09-21T10:01:00+09:00"
     result = b.step(
-        now=at, quotes=quote(at, price_krw=95), signals=[signal(action="SELL")]
+        now=at, quotes=quote(at, price_krw=95), signals=[signal(action="BUY")]
     )
     assert result["orders"][0]["reason"] == "kill_or_daily_stop"
     later = "2026-09-21T10:01:30+09:00"
     recovered = b.step(
         now=later,
         quotes=quote(later),
-        signals=[signal(signal_id="recovered", action="SELL")],
+        signals=[signal(signal_id="recovered", action="BUY")],
     )
     assert all(o["reason"] == "kill_or_daily_stop" for o in recovered["orders"])
     b.close()

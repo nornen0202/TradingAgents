@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 import pytest
 import requests
@@ -8,6 +9,7 @@ from tradingagents.execution.kis_demo import (
     DemoError,
     DemoOrderJournal,
     KisDemoClient,
+    RequestPacer,
 )
 from tools.check_kis_demo import check
 
@@ -43,7 +45,12 @@ def client(*responses):
     s = Session(
         Response({"access_token": "token-test", "expires_in": 86400}), *responses
     )
-    return KisDemoClient(credentials(), session=s), s
+    return KisDemoClient(
+        credentials(),
+        session=s,
+        pacer=RequestPacer(interval=0),
+        utcnow=lambda: datetime.fromisoformat("2026-09-21T10:01:00+09:00"),
+    ), s
 
 
 def args(**changes):
@@ -68,6 +75,8 @@ def ack():
 
 def test_only_dedicated_demo_credentials_are_loaded(monkeypatch, tmp_path):
     from tradingagents.dataflows import api_keys
+
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
 
     p = tmp_path / "keys.json"
     p.write_text(json.dumps({"KIS_APP_KEY": "real", "KIS_APP_SECRET": "real"}))
@@ -145,6 +154,9 @@ def test_reconcile_partial_fill_then_cancel_is_not_assumed_filled(tmp_path):
                     "tot_ccld_qty": "1",
                     "rmn_qty": "1",
                     "cncl_yn": "N",
+                    "pdno": "005930",
+                    "sll_buy_dvsn_cd": "02",
+                    "ord_unpr": "70000",
                 }
             ],
         }
