@@ -249,7 +249,7 @@ def _create_action_llm(llm_settings: Any | None) -> Any | None:
         or ""
     ).strip()
     if provider == "codex" and not model:
-        model = "gpt-5.6-sol"
+        model = "gpt-6-sol"
     if not provider or not model:
         return None
 

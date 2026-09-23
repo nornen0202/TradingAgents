@@ -68,3 +68,8 @@ class ModelValidationTests(unittest.TestCase):
             for model in ("gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"):
                 with self.subTest(provider=provider, model=model):
                     self.assertTrue(validate_model(provider, model))
+
+    def test_gpt_6_sol_is_available_for_openai_and_codex(self):
+        for provider in ("openai", "codex"):
+            with self.subTest(provider=provider):
+                self.assertTrue(validate_model(provider, "gpt-6-sol"))

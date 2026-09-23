@@ -10,13 +10,13 @@ from tradingagents.youtube.verifier import (
 )
 
 
-def test_youtube_config_routes_stages_across_gpt_5_6_family():
+def test_youtube_config_routes_stages_to_gpt_6_sol():
     settings = load_youtube_config("config/youtube_daily.toml").llm
 
-    assert settings.quick_model == "gpt-5.6-sol"
-    assert settings.deep_model == "gpt-5.6-sol"
-    assert settings.output_model == "gpt-5.6-sol"
-    assert settings.synthesis_model == "gpt-5.6-sol"
+    assert settings.quick_model == "gpt-6-sol"
+    assert settings.deep_model == "gpt-6-sol"
+    assert settings.output_model == "gpt-6-sol"
+    assert settings.synthesis_model == "gpt-6-sol"
     assert settings.codex_quick_reasoning_effort == "high"
     assert settings.codex_deep_reasoning_effort == "xhigh"
     assert settings.codex_output_reasoning_effort == "medium"
@@ -59,9 +59,9 @@ def test_youtube_role_clients_receive_stage_model_effort_and_telemetry_role():
         (model, kwargs["codex_reasoning_effort"], kwargs["model_role"])
         for _, model, kwargs in calls
     ] == [
-        ("gpt-5.6-sol", "high", "quick"),
-        ("gpt-5.6-sol", "xhigh", "judge"),
-        ("gpt-5.6-sol", "medium", "writer"),
+        ("gpt-6-sol", "high", "quick"),
+        ("gpt-6-sol", "xhigh", "judge"),
+        ("gpt-6-sol", "medium", "writer"),
     ]
 
 
@@ -90,9 +90,9 @@ def test_youtube_workflow_preflights_and_exports_every_role_model():
 
     assert 'TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"' in workflow
     assert 'TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"' in workflow
-    assert 'model="gpt-5.6-sol"' in workflow
-    assert 'model="gpt-5.6-sol"' in workflow
-    assert 'model="gpt-5.6-sol"' in workflow
+    assert 'model="gpt-6-sol"' in workflow
+    assert 'model="gpt-6-sol"' in workflow
+    assert 'model="gpt-6-sol"' in workflow
     assert 'codex_preflight_fallback_models("judge")' in workflow
     assert 'codex_preflight_fallback_models("quick")' in workflow
     assert 'codex_preflight_fallback_models("writer")' in workflow

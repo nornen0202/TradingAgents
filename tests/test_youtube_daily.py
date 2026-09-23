@@ -1414,7 +1414,7 @@ class YouTubeDailyTests(unittest.TestCase):
         self.assertIn("extended_transcript_chars_for_llm = 48000", config_text)
         self.assertIn("evidence_relevance_gate_enabled = true", config_text)
         self.assertIn("min_evidence_relevance_score = 0.12", config_text)
-        self.assertIn('synthesis_model = "gpt-5.6-sol"', config_text)
+        self.assertIn('synthesis_model = "gpt-6-sol"', config_text)
         self.assertIn('codex_synthesis_reasoning_effort = "high"', config_text)
         self.assertIn("[synthesis]", config_text)
         self.assertIn("enabled = true", config_text)

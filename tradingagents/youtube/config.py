@@ -182,7 +182,7 @@ def load_youtube_config(
                 os.getenv("TRADINGAGENTS_CODEX_JUDGE_MODEL"),
                 os.getenv("TRADINGAGENTS_CODEX_DEEP_MODEL"),
                 llm_raw.get("deep_model"),
-                default="gpt-5.6-sol",
+                default="gpt-6-sol",
             ),
             codex_binary=_optional_text(
                 os.getenv("CODEX_BINARY") or llm_raw.get("codex_binary")
@@ -208,14 +208,14 @@ def load_youtube_config(
                 os.getenv("TRADINGAGENTS_YOUTUBE_QUICK_MODEL"),
                 os.getenv("TRADINGAGENTS_CODEX_QUICK_MODEL"),
                 llm_raw.get("quick_model"),
-                default="gpt-5.6-sol",
+                default="gpt-6-sol",
             ),
             output_model=_first_text(
                 os.getenv("TRADINGAGENTS_YOUTUBE_OUTPUT_MODEL"),
                 os.getenv("TRADINGAGENTS_CODEX_WRITER_MODEL"),
                 os.getenv("TRADINGAGENTS_CODEX_OUTPUT_MODEL"),
                 llm_raw.get("output_model"),
-                default="gpt-5.6-sol",
+                default="gpt-6-sol",
             ),
             codex_quick_reasoning_effort=_first_text(
                 os.getenv("TRADINGAGENTS_YOUTUBE_QUICK_REASONING_EFFORT"),
@@ -240,7 +240,7 @@ def load_youtube_config(
                 os.getenv("TRADINGAGENTS_YOUTUBE_SYNTHESIS_MODEL"),
                 llm_raw.get("synthesis_model"),
                 llm_raw.get("deep_model"),
-                default="gpt-5.6-sol",
+                default="gpt-6-sol",
             ),
             codex_synthesis_reasoning_effort=_first_text(
                 os.getenv("TRADINGAGENTS_YOUTUBE_SYNTHESIS_REASONING_EFFORT"),

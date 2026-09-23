@@ -17,9 +17,9 @@ DEFAULT_CONFIG = {
     "data_cache_dir": os.getenv("TRADINGAGENTS_DATA_CACHE_DIR", str(Path.home() / ".tradingagents" / "cache")),
     # LLM settings
     "llm_provider": "codex",
-    "deep_think_llm": "gpt-5.6-sol",
-    "quick_think_llm": "gpt-5.6-sol",
-    "output_think_llm": "gpt-5.6-sol",
+    "deep_think_llm": "gpt-6-sol",
+    "quick_think_llm": "gpt-6-sol",
+    "output_think_llm": "gpt-6-sol",
     "backend_url": None,
     # Provider-specific thinking configuration
     "google_thinking_level": None,      # "high", "minimal", etc.
