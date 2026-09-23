@@ -1,5 +1,3 @@
-from .config import ScheduledAnalysisConfig, load_scheduled_config
-
 __all__ = [
     "ScheduledAnalysisConfig",
     "build_site",
@@ -10,6 +8,11 @@ __all__ = [
 
 
 def __getattr__(name: str):
+    # Calendar-only CI gates must not import the interactive CLI/LLM stack.
+    if name in {"ScheduledAnalysisConfig", "load_scheduled_config"}:
+        from .config import ScheduledAnalysisConfig, load_scheduled_config
+
+        return {"ScheduledAnalysisConfig": ScheduledAnalysisConfig, "load_scheduled_config": load_scheduled_config}[name]
     if name in {"execute_scheduled_run", "main"}:
         from .runner import execute_scheduled_run, main
 

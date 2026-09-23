@@ -1262,20 +1262,25 @@ def _private_html(*, desktop: bool = False) -> str:
   <link rel="stylesheet" href="{asset_prefix}mobile.css">
 </head>
 <body class="{body_class}" data-strategy-url="{asset_prefix}strategy.json">
+  <a class="skip-link" href="#strategy-content">투자 전략으로 바로가기</a>
   <header class="topbar"><a href="{public_href}">TradingAgents 홈</a><span>{device_label}</span></header>
   <main>
     <section class="hero-mobile">
       <p class="eyebrow">KR · US · YOUTUBE · PRISM · WORK</p>
       <h1>한눈에 보는 투자 전략</h1>
-      <p>분석 시점의 전략과 주문 직전 실시간 확인 상태를 분리했습니다. 보유·관심·신규 후보별로 조건, 실행 행동, 무효화 기준을 확인하세요.</p>
-      <div class="privacy-banner">링크에서 바로 열립니다 · 계좌번호와 고객 식별정보는 제외합니다.</div>
+      <p>종목별 전략·발동 조건·위험을 확인하세요. 주문 전 최신 시세와 실행 상태를 다시 확인하세요.</p>
+      <div class="privacy-banner">계좌번호·고객 식별정보는 공개하지 않습니다.</div>
       <nav class="report-nav" aria-label="전체 분석 리포트">
         <a href="{report_prefix}youtube/">YouTube 분석</a>
         <a href="{report_prefix}prism-telegram/">PRISM 분석</a>
         <a href="{report_prefix}work/">Work 원문</a>
       </nav>
     </section>
-    <details class="pipeline-explainer" open>
+    <div class="refresh-bar"><div id="private-status" class="privacy-banner" role="status" aria-live="polite">통합 전략 데이터를 불러오는 중입니다.</div><button id="strategy-refresh" type="button">새로고침</button></div>
+    <noscript><p class="privacy-banner">전략 검색은 JavaScript가 필요합니다. <a href="{asset_prefix}strategy.json">전략 데이터 보기</a></p></noscript>
+    <nav id="private-tabs" class="market-tabs" aria-label="시장 선택" hidden></nav>
+    <div id="strategy-content" tabindex="-1"><div id="private-root" aria-busy="true"></div></div>
+    <details class="pipeline-explainer">
       <summary><span class="eyebrow">HOW IT IS MADE</span><strong id="pipeline-title">이 전략이 만들어지는 과정</strong></summary>
       <ol>
         <li><strong>종목 분석</strong><span>KIS·시장 데이터로 보유/관심/신규 후보의 가격·거래량·수급·위험을 분석</span></li>
@@ -1285,9 +1290,6 @@ def _private_html(*, desktop: bool = False) -> str:
       </ol>
       <p class="trusted-note"><strong>우선 신뢰 채널:</strong> @kpunch(박종훈의 지식한방)와 @sosumonkey(소수몽키) 영상은 사용자 검증 최우선 근거로 취급하되, 실제 주문 직전 시세·계좌·위험 확인은 별도로 유지합니다.</p>
     </details>
-    <div id="private-status" class="privacy-banner" role="status">통합 전략 데이터를 불러오는 중입니다.</div>
-    <nav id="private-tabs" class="market-tabs" aria-label="시장 선택" hidden></nav>
-    <div id="private-root"></div>
   </main>
   <script src="{asset_prefix}private.js" defer></script>
 </body>
@@ -1418,7 +1420,7 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .evidence-list li.bearish { border-left-color: var(--danger); }
 .evidence-list li.mixed { border-left-color: var(--warn); }
 .evidence-list small { display: block; margin-top: 3px; color: var(--muted); }
-.market-overview { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 6px; margin: 12px 0 16px; }
+.market-overview { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; margin: 12px 0 16px; }
 .overview-stat { padding: 11px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.03); }
 .overview-stat strong { display: block; font-size: 1.18rem; }
 .overview-stat span { color: var(--muted); font-size: .66rem; line-height: 1.25; }
@@ -1430,6 +1432,7 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 details { margin-top: 10px; }
 summary { min-height: 44px; padding: 11px 0; color: var(--muted); cursor: pointer; }
 @media (min-width: 660px) {
+  .market-overview { grid-template-columns: repeat(5,minmax(0,1fr)); }
   main { padding-left: 20px; padding-right: 20px; }
   .market-head { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 12px; }
   .market-head > div:first-child { flex: 1 1 auto; }
@@ -1447,6 +1450,25 @@ summary { min-height: 44px; padding: 11px 0; color: var(--muted); cursor: pointe
   .desktop-body .integrated-report { padding: 22px; }
   .desktop-body .market-overview { grid-template-columns: repeat(5,minmax(0,1fr)); }
 }
+
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 100; padding: 12px; background: var(--panel); transform: translateY(-160%); }
+.skip-link:focus { transform: translateY(0); }
+#strategy-content { scroll-margin-top: 72px; }
+.refresh-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.refresh-bar .privacy-banner { flex: 1 1 260px; }
+.refresh-bar button, .reset-filters { min-height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; color: var(--text); background: var(--panel-2); font: inherit; cursor: pointer; }
+button:disabled { opacity: .55; cursor: wait; }
+.strategy-toolbar { display: grid; grid-template-columns: minmax(0,3fr) minmax(0,2fr); gap: 12px; }
+.strategy-toolbar label { display: grid; gap: 6px; min-width: 0; color: var(--muted); font-size: .82rem; }
+.strategy-toolbar input, .strategy-toolbar select { width: 100%; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--text); font: inherit; font-size: 1rem; }
+.strategy-filters button { min-height: 44px; cursor: pointer; }
+.result-count { color: var(--muted); font-size: .82rem; }
+.filter-empty { padding: 24px 16px; border: 1px dashed var(--line); border-radius: 14px; text-align: center; }
+meter.confidence-track { width: 100%; border: 0; }
+meter::-webkit-meter-optimum-value { background: var(--accent); }
+@media (max-width: 379px) { .strategy-toolbar { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
 """.strip()
 
@@ -1460,7 +1482,8 @@ _PRIVATE_JS = r"""
   const pipelineExplainer = document.querySelector('.pipeline-explainer');
   if (pipelineExplainer && matchMedia('(max-width: 659px)').matches) pipelineExplainer.open = false;
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (ch) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-  const fmt = (value) => Number.isFinite(Number(value)) ? Number(value).toLocaleString(undefined, {maximumFractionDigits: 2}) : '-';
+  const numeric = (value) => (typeof value === 'number' || (typeof value === 'string' && value.trim() !== '')) && Number.isFinite(Number(value)) ? Number(value) : NaN;
+  const fmt = (value) => Number.isFinite(numeric(value)) ? Number(value).toLocaleString(undefined, {maximumFractionDigits: 2}) : '-';
   const dateTime = (value) => {
     const parsed = new Date(value || '');
     if (!Number.isFinite(parsed.getTime())) return '-';
@@ -1500,13 +1523,13 @@ _PRIVATE_JS = r"""
   };
   const isDirectional = (value) => actionKind(value) !== 'research';
   const won = (value) => {
-    if (!Number.isFinite(Number(value))) return '-';
+    if (!Number.isFinite(numeric(value))) return '-';
     return new Intl.NumberFormat('ko-KR', {style: 'currency', currency: 'KRW', maximumFractionDigits: 0, signDisplay: 'always'}).format(Number(value));
   };
-  const percent = (value) => Number.isFinite(Number(value)) ? new Intl.NumberFormat('ko-KR', {style: 'percent', maximumFractionDigits: 1}).format(Number(value)) : '-';
+  const percent = (value) => Number.isFinite(numeric(value)) ? new Intl.NumberFormat('ko-KR', {style: 'percent', maximumFractionDigits: 1}).format(Number(value)) : '-';
   const sizingText = (delta, target) => combineDistinct(
-    Number.isFinite(Number(delta)) && Number(delta) !== 0 ? `조정 금액 ${won(delta)}` : '',
-    Number.isFinite(Number(target)) && Number(target) >= 0 && Number(target) <= 1 ? `목표 비중 ${percent(target)}` : '',
+    Number.isFinite(numeric(delta)) && Number(delta) !== 0 ? `조정 금액 ${won(delta)}` : '',
+    Number.isFinite(numeric(target)) && Number(target) >= 0 && Number(target) <= 1 ? `목표 비중 ${percent(target)}` : '',
   );
   const query = new URLSearchParams(location.search);
   const requestedMarket = query.get('market') === 'us' ? 'us' : 'kr';
@@ -1603,14 +1626,20 @@ _PRIVATE_JS = r"""
     if (ticker.endsWith('.KS') || ticker.endsWith('.KQ')) result.push(ticker.slice(0, -3));
     return result;
   }
+  const strategyIndexes = new WeakMap();
   function workStrategy(item, ticker) {
-    const wanted = new Set(tickerKeys(ticker));
-    for (const field of ['integrated_report', 'reference_report']) {
-      const structured = (((item || {})[field] || {}).structured_report || {});
-      const strategy = (structured.strategies || []).find((candidate) => tickerKeys(candidate.ticker).some((value) => wanted.has(value)));
-      if (strategy) return strategy;
+    if (!strategyIndexes.has(item)) {
+      const index = new Map();
+      for (const field of ['integrated_report', 'reference_report']) {
+        const structured = ((item[field] || {}).structured_report || {});
+        for (const strategy of structured.strategies || []) {
+          for (const key of tickerKeys(strategy.ticker)) if (!index.has(key)) index.set(key, strategy);
+        }
+      }
+      strategyIndexes.set(item, index);
     }
-    return {};
+    const index = strategyIndexes.get(item);
+    return tickerKeys(ticker).map((key) => index.get(key)).find(Boolean) || {};
   }
   function normalizeRole(value, held) {
     if (held) return 'HOLDING';
@@ -1627,15 +1656,15 @@ _PRIVATE_JS = r"""
     const source = (market || {}).source || {};
     const quality = (market || {}).quality || {};
     const guardrails = (market || {}).guardrails || {};
-    const expected = Number(coverage.expected_analysis_count);
-    const total = Number(coverage.analysis_total_count);
-    const successful = Number(coverage.analysis_successful_count);
+    const expected = numeric(coverage.expected_analysis_count);
+    const total = numeric(coverage.analysis_total_count);
+    const successful = numeric(coverage.analysis_successful_count);
     const zeroCounts = [
       coverage.missing_holding_count,
       coverage.missing_watchlist_count,
       coverage.missing_analysis_count,
       coverage.analysis_failed_count,
-    ].every((value) => Number.isInteger(Number(value)) && Number(value) === 0);
+    ].every((value) => Number.isInteger(numeric(value)) && numeric(value) === 0);
     const runId = String((market || {}).run_id || '');
     const universeMode = String(coverage.ticker_universe_mode || '').toLowerCase();
     const accountReady = !['config_plus_account', 'account_only'].includes(universeMode)
@@ -1762,12 +1791,12 @@ _PRIVATE_JS = r"""
     return `<div class="card-rationale"><strong>주요 뉴스·이슈와 강약 이유</strong><ul class="evidence-list">${items.map((item) => `<li class="${['bullish','bearish'].includes(item.impact) ? item.impact : 'mixed'}">${esc(item.text)}${item.meta ? `<small>${esc(item.meta)}</small>` : ''}</li>`).join('')}</ul></div>`;
   }
   function signalStrip(row, confidence) {
-    const numericConfidence = Number(confidence);
+    const numericConfidence = numeric(confidence);
     const confidenceWidth = Number.isFinite(numericConfidence) ? Math.max(0, Math.min(100, numericConfidence * 100)) : 0;
-    const change = Number(row.price_change_pct);
+    const change = numeric(row.price_change_pct);
     const changeText = Number.isFinite(change) ? `${change > 0 ? '+' : ''}${change.toFixed(2)}%` : '-';
     return `<div class="signal-strip" aria-label="핵심 신호 요약">
-      <div class="signal"><span>분석 신뢰도</span><strong>${Number.isFinite(numericConfidence) ? percent(numericConfidence) : '-'}</strong><div class="confidence-track"><i style="width:${confidenceWidth}%"></i></div></div>
+      <div class="signal"><span>분석 신뢰도</span><strong>${Number.isFinite(numericConfidence) ? percent(numericConfidence) : '-'}</strong><meter class="confidence-track" min="0" max="100" value="${confidenceWidth}" aria-label="분석 신뢰도">${confidenceWidth}%</meter></div>
       <div class="signal"><span>당일 등락</span><strong>${esc(changeText)}</strong></div>
       <div class="signal"><span>상대 거래량</span><strong>${fmt(row.relative_volume)}배</strong></div>
     </div>`;
@@ -1920,7 +1949,7 @@ _PRIVATE_JS = r"""
     const workRiskAction = humanPlan(thesis.invalidation_action || workExecution.risk_action);
     const riskAction = (hasWork ? workRiskAction : baseRiskAction) || '무효화 시 행동 정보 없음';
     const confidence = hasWork ? thesis.confidence : action.confidence;
-    const confidenceText = Number.isFinite(Number(confidence)) && Number(confidence) >= 0 && Number(confidence) <= 1 ? percent(confidence) : valueText(confidence);
+    const confidenceText = Number.isFinite(numeric(confidence)) && Number(confidence) >= 0 && Number(confidence) <= 1 ? percent(confidence) : valueText(confidence);
     const displayName = companyName(row, strategy);
     const tickerIdentity = tickerKeys(row.ticker)[0];
     const fullWorkEntry = fullConditions(thesis.entry_conditions);
@@ -1935,7 +1964,7 @@ _PRIVATE_JS = r"""
       ${fullBaseInvalidation ? `<p><strong>기본 분석 전체 무효화 조건</strong><br>${esc(fullBaseInvalidation)}</p>` : ''}
       ${action.rationale ? `<p><strong>기본 분석 근거</strong><br>${esc(valueText(action.rationale))}</p>` : ''}
     </details>`;
-    return `<article class="action-card" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
+    return `<article class="action-card" data-ticker="${esc(tickerIdentity)}" data-search="${esc(`${displayName} ${row.ticker || ''} ${row.sector || ''}`.toLocaleLowerCase())}" data-change="${numeric(row.price_change_pct)}" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
       <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}</span></div>
       <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
@@ -2067,59 +2096,195 @@ _PRIVATE_JS = r"""
     if (immediateContractComplete(item)) return {className: 'ok', label: '실행 데이터 확인됨', empty: ''};
     return {className: 'degraded', label: '전략 제공 · 주문 전 확인', empty: ''};
   }
-  function render(payload) {
-    const markets = payload.markets || {};
-    if (requestedRun && String((markets[requestedMarket] || {}).run_id || '') !== requestedRun) {
-      throw new Error('Telegram 링크의 분석 실행 ID와 현재 투자 대시보드 실행 ID가 일치하지 않습니다. 최신 알림을 사용하세요.');
+const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
+  const sorts = ['priority', 'name', 'change'];
+  let selectedMarket = requestedMarket;
+  let currentPayload;
+  let loading = false;
+  const refreshButton = document.getElementById('strategy-refresh');
+  const views = Object.fromEntries(['kr', 'us'].map((market) => [market, {
+    group: market === requestedMarket && groups.includes(query.get('group')) ? query.get('group') : 'TOP',
+    search: market === requestedMarket ? (query.get('q') || '').slice(0, 100) : '',
+    sort: market === requestedMarket && sorts.includes(query.get('sort')) ? query.get('sort') : 'priority',
+  }]));
+  function syncUrl() {
+    const url = new URL(location.href);
+    const view = views[selectedMarket];
+    url.searchParams.set('market', selectedMarket);
+    for (const [key, value, fallback] of [['group', view.group, 'TOP'], ['q', view.search, ''], ['sort', view.sort, 'priority']]) {
+      if (value === fallback) url.searchParams.delete(key); else url.searchParams.set(key, value);
     }
-    tabs.hidden = false;
-    tabs.innerHTML = ['kr', 'us'].map((market, index) => `<button type="button" data-target="${market}" aria-pressed="${index === 0}">${market.toUpperCase()}</button>`).join('');
-    root.innerHTML = ['kr', 'us'].map((market) => {
-      const item = markets[market] || {};
-      const rows = Array.isArray(item.rows) ? item.rows : [];
-      const ranked = [...rows].sort((left, right) => rowPriority(right, workStrategy(item, right.ticker)) - rowPriority(left, workStrategy(item, left.ticker)));
-      const topTickers = new Set(ranked.slice(0, Math.min(3, ranked.length)).map((row) => tickerKeys(row.ticker)[0]));
-      const counts = item.role_counts || {};
-      const sourceLabel = item.integrated_report
-        ? item.integrated_report.analysis_only === true ? 'Work 분석 결합 · 현재 실행 우선' : '현재 Work 종합 완료'
-        : item.reference_report ? '기본 전략 · 분석 시점 Work 참고' : '기본 전략';
-      const health = marketHealth(item, rows);
-      const cards = ranked.map((row) => card(row, item, topTickers)).join('');
-      const empty = health.empty || '현재 표시할 전략 데이터가 없습니다. 원천 상태와 분석 커버리지를 확인하세요.';
-      return `<section class="market-panel" data-market="${market}"><div class="market-head"><div><p class="eyebrow">${market.toUpperCase()} STRATEGY</p><h2>${market.toUpperCase()} 투자 액션</h2></div><div><span class="health health-neutral">${esc(sourceLabel)}</span><span class="health health-${esc(health.className)}">${esc(health.label)}</span></div></div><div class="source-meta"><span>분석 시작 ${esc(dateTime(item.started_at))}</span><span>분석 실행 ID ${esc(item.run_id || '-')}</span><span>${rows.length}개 종목</span></div>${marketOverview(rows, item)}<nav class="strategy-filters" aria-label="종목 유형"><button type="button" data-group-target="TOP" aria-pressed="true">핵심 ${topTickers.size}</button><button type="button" data-group-target="HOLDING" aria-pressed="false">보유 ${counts.HOLDING || 0}</button><button type="button" data-group-target="WATCHLIST" aria-pressed="false">관심 ${counts.WATCHLIST || 0}</button><button type="button" data-group-target="NEW_CANDIDATE" aria-pressed="false">신규 ${counts.NEW_CANDIDATE || 0}</button><button type="button" data-group-target="ALL" aria-pressed="false">전체 ${rows.length}</button></nav><div class="cards">${cards || `<p class="empty">${esc(empty)}</p>`}</div>${integratedReport(item)}${integratedReport(item, 'reference_report')}</section>`;
-    }).join('');
-    const buttons = [...tabs.querySelectorAll('button')];
-    const panels = [...root.querySelectorAll('[data-market]')];
-    const select = (market) => { buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.target === market))); panels.forEach((panel) => panel.hidden = panel.dataset.market !== market); };
-    buttons.forEach((button) => button.addEventListener('click', () => select(button.dataset.target)));
-    panels.forEach((panel) => {
-      const filters = [...panel.querySelectorAll('[data-group-target]')];
-      const cards = [...panel.querySelectorAll('.action-card')];
-      const selectGroup = (group) => {
-        filters.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.groupTarget === group)));
-        cards.forEach((entry) => { entry.hidden = group === 'TOP' ? entry.dataset.top !== 'true' : group !== 'ALL' && entry.dataset.group !== group; });
-      };
-      filters.forEach((button) => button.addEventListener('click', () => selectGroup(button.dataset.groupTarget)));
-      selectGroup('TOP');
+    history.replaceState(null, '', url);
+  }
+  function applyView(panel) {
+    const view = views[panel.dataset.market];
+    const entries = [...panel.querySelectorAll('.action-card')];
+    const ordered = [...entries].sort((a, b) => {
+      if (view.sort === 'name') return a.dataset.search.localeCompare(b.dataset.search, 'ko');
+      if (view.sort === 'change') {
+        const left = numeric(a.dataset.change), right = numeric(b.dataset.change);
+        if (!Number.isFinite(left)) return Number.isFinite(right) ? 1 : 0;
+        if (!Number.isFinite(right)) return -1;
+        return right - left;
+      }
+      return Number(a.dataset.order) - Number(b.dataset.order);
     });
-    select(requestedMarket);
-    status.textContent = `페이지 생성 ${dateTime(payload.generated_at)} · 계좌 식별정보 제외 · PC/모바일/JSON 공개`;
+    const container = panel.querySelector('.cards');
+    if (ordered.some((entry, index) => entry !== entries[index])) container.append(...ordered);
+    const terms = view.search.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+    let visible = 0;
+    for (const entry of entries) {
+      const inGroup = view.group === 'ALL' || (view.group === 'TOP' ? entry.dataset.top === 'true' : entry.dataset.group === view.group);
+      entry.hidden = !inGroup || !terms.every((term) => entry.dataset.search.includes(term));
+      if (!entry.hidden) visible += 1;
+    }
+    panel.querySelectorAll('[data-group-target]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.groupTarget === view.group)));
+    panel.querySelector('.result-count').textContent = entries.length + '개 중 ' + visible + '개 표시';
+    panel.querySelector('.filter-empty').hidden = visible > 0 || entries.length === 0;
+  }
+  function updateCards(panel, item) {
+    const rows = Array.isArray(item.rows) ? item.rows : [];
+    const ranked = [...rows].sort((a, b) => rowPriority(b, workStrategy(item, b.ticker)) - rowPriority(a, workStrategy(item, a.ticker)));
+    const topTickers = new Set(ranked.slice(0, Math.min(3, ranked.length)).map((row) => tickerKeys(row.ticker)[0]));
+    const opened = new Set();
+    panel.querySelectorAll('.action-card').forEach((entry) => entry.querySelectorAll('details').forEach((detail, index) => {
+      if (detail.open) opened.add(entry.dataset.ticker + ':' + index);
+    }));
+    const active = document.activeElement;
+    const focusedCard = active && active.closest('.action-card');
+    const focusedIndex = focusedCard ? [...focusedCard.querySelectorAll('summary, a, button')].indexOf(active) : -1;
+    const focusedTicker = focusedCard && focusedCard.dataset.ticker;
+    const health = marketHealth(item, rows);
+    panel.querySelector('.market-health').className = 'health market-health health-' + health.className;
+    panel.querySelector('.market-health').textContent = health.label;
+    panel.querySelector('.overview-container').innerHTML = marketOverview(rows, item);
+    panel.querySelector('.cards').innerHTML = ranked.map((row) => card(row, item, topTickers)).join('') || '<p class="empty">' + esc(health.empty || '현재 표시할 전략 데이터가 없습니다.') + '</p>';
+    const counts = {TOP: topTickers.size, ALL: rows.length};
+    panel.querySelectorAll('.action-card').forEach((entry, index) => {
+      entry.dataset.order = String(index);
+      counts[entry.dataset.group] = (counts[entry.dataset.group] || 0) + 1;
+      entry.querySelectorAll('details').forEach((detail, detailIndex) => { detail.open = opened.has(entry.dataset.ticker + ':' + detailIndex); });
+    });
+    panel.querySelectorAll('[data-group-target]').forEach((button) => {
+      button.textContent = button.dataset.label + ' ' + (counts[button.dataset.groupTarget] || 0);
+    });
+    applyView(panel);
+    if (focusedTicker && focusedIndex >= 0) {
+      const entry = [...panel.querySelectorAll('.action-card')].find((node) => node.dataset.ticker === focusedTicker);
+      if (entry && !entry.hidden) entry.querySelectorAll('summary, a, button')[focusedIndex]?.focus({preventScroll: true});
+    }
+  }
+  function mountMarket(panel) {
+    if (panel.dataset.mounted) return;
+    const market = panel.dataset.market;
+    const item = currentPayload.markets[market] || {};
+    const view = views[market];
+    const sourceLabel = item.integrated_report
+      ? item.integrated_report.analysis_only === true ? 'Work 분석 결합 · 현재 실행 우선' : '현재 Work 종합 완료'
+      : item.reference_report ? '기본 전략 · 분석 시점 Work 참고' : '기본 전략';
+    panel.innerHTML = '<div class="market-head"><div><p class="eyebrow">' + market.toUpperCase() + ' STRATEGY</p><h2>' + market.toUpperCase() + ' 투자 액션</h2></div><div><span class="health health-neutral">' + sourceLabel + '</span><span class="health market-health"></span></div></div>'
+      + '<div class="source-meta"><span>분석 시작 ' + esc(dateTime(item.started_at)) + '</span><span>분석 실행 ID ' + esc(item.run_id || '-') + '</span></div><div class="overview-container"></div>'
+      + '<div class="strategy-toolbar"><label for="search-' + market + '">종목 검색<input id="search-' + market + '" type="search" maxlength="100" placeholder="종목명 · 티커 · 업종" value="' + esc(view.search) + '" autocomplete="off" aria-controls="cards-' + market + '"></label>'
+      + '<label for="sort-' + market + '">정렬<select id="sort-' + market + '"><option value="priority">우선순위</option><option value="name">종목명순</option><option value="change">등락률순 ↓</option></select></label></div>'
+      + '<nav class="strategy-filters" aria-label="종목 유형">' + groups.map((group, index) => '<button type="button" data-group-target="' + group + '" data-label="' + ['핵심','보유','관심','신규','전체'][index] + '" aria-pressed="false"></button>').join('') + '</nav>'
+      + '<p class="result-count" role="status" aria-live="polite" aria-atomic="true"></p><div class="filter-empty" hidden><p>검색 조건에 맞는 종목이 없습니다.</p><button type="button" class="reset-filters">검색·필터 초기화</button></div>'
+      + '<div class="cards" id="cards-' + market + '"></div>' + integratedReport(item) + integratedReport(item, 'reference_report');
+    const search = panel.querySelector('input');
+    const sort = panel.querySelector('select');
+    sort.value = view.sort;
+    const update = () => { applyView(panel); syncUrl(); };
+    search.addEventListener('input', () => {
+      view.search = search.value;
+      if (view.search.trim() && view.group === 'TOP') view.group = 'ALL';
+      update();
+    });
+    sort.addEventListener('change', () => { view.sort = sort.value; update(); });
+    panel.querySelectorAll('[data-group-target]').forEach((button) => button.addEventListener('click', () => { view.group = button.dataset.groupTarget; update(); }));
+    panel.querySelector('.reset-filters').addEventListener('click', () => {
+      view.group = 'ALL'; view.search = ''; view.sort = 'priority'; search.value = ''; sort.value = 'priority'; update(); search.focus();
+    });
+    if (view.search.trim() && view.group === 'TOP') view.group = 'ALL';
+    panel.dataset.mounted = 'true';
+    updateCards(panel, item);
+  }
+  function selectMarket(market) {
+    selectedMarket = market;
+    tabs.querySelectorAll('button').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.target === market)));
+    root.querySelectorAll('[data-market]').forEach((panel) => {
+      panel.hidden = panel.dataset.market !== market;
+      if (!panel.hidden) mountMarket(panel);
+    });
+    syncUrl();
+  }
+  function scheduleExpiry() {
     clearTimeout(expiryTimer);
     const now = Date.now();
-    const deadlines = Object.values(markets).flatMap((item) => [
+    const deadlines = Object.values(currentPayload.markets).flatMap((item) => [
       Date.parse((item.guardrails || {}).valid_until || ''),
       ...(item.rows || []).map((row) => Date.parse((row.quality || {}).row_valid_until || '')),
     ]).filter((deadline) => Number.isFinite(deadline) && deadline > now);
-    if (deadlines.length) expiryTimer = setTimeout(() => render(payload), Math.max(50, Math.min(...deadlines) - now + 50));
+    if (deadlines.length) expiryTimer = setTimeout(refreshExpiry, Math.min(2147483647, Math.max(50, Math.min(...deadlines) - now + 50)));
+  }
+  function refreshExpiry() {
+    if (!currentPayload) return;
+    root.querySelectorAll('[data-mounted]').forEach((panel) => updateCards(panel, currentPayload.markets[panel.dataset.market] || {}));
+    scheduleExpiry();
+  }
+  function render(payload) {
+    if (requestedRun && String((payload.markets[requestedMarket] || {}).run_id || '') !== requestedRun) {
+      throw new Error('Telegram 링크의 분석 실행 ID와 현재 투자 대시보드 실행 ID가 일치하지 않습니다. 최신 알림을 사용하세요.');
+    }
+    currentPayload = payload;
+    tabs.hidden = false;
+    tabs.innerHTML = ['kr', 'us'].map((market) => '<button type="button" data-target="' + market + '" aria-pressed="false">' + market.toUpperCase() + '</button>').join('');
+    root.innerHTML = ['kr', 'us'].map((market) => '<section class="market-panel" data-market="' + market + '" hidden></section>').join('');
+    tabs.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => selectMarket(button.dataset.target)));
+    selectMarket(selectedMarket);
+    status.textContent = '페이지 생성 ' + dateTime(payload.generated_at) + ' · 주문 전 시세와 조건을 확인하세요.';
+    scheduleExpiry();
   }
   async function start() {
-    const response = await fetch(document.body.dataset.strategyUrl || 'strategy.json', {cache: 'no-store', credentials: 'omit'});
-    if (!response.ok) throw new Error('통합 투자 전략이 아직 게시되지 않았습니다.');
-    const payload = await response.json();
-    if (payload.schema !== 'tradingagents.mobile-strategy/v1') throw new Error('통합 전략 데이터 형식이 올바르지 않습니다.');
-    render(payload);
+    if (loading) return;
+    loading = true;
+    refreshButton.disabled = true;
+    root.setAttribute('aria-busy', 'true');
+    status.classList.remove('error');
+    status.textContent = '최신 전략 데이터를 확인하고 있습니다.';
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(document.body.dataset.strategyUrl || 'strategy.json', {cache: 'no-store', credentials: 'omit', signal: controller.signal});
+      if (!response.ok) throw new Error('통합 투자 전략이 아직 게시되지 않았습니다.');
+      const payload = await response.json();
+      if (payload.schema !== 'tradingagents.mobile-strategy/v1' || !payload.markets || typeof payload.markets !== 'object' || Array.isArray(payload.markets)
+          || Object.values(payload.markets).some((item) => !item || typeof item !== 'object' || Array.isArray(item)
+            || (item.rows != null && (!Array.isArray(item.rows) || item.rows.some((row) => !row || typeof row !== 'object' || Array.isArray(row)))))) {
+        throw new Error('통합 전략 데이터 형식이 올바르지 않습니다.');
+      }
+      const previousPayload = currentPayload;
+      try {
+        render(payload);
+      } catch (error) {
+        // Keep the last known snapshot if nested report data cannot render.
+        if (previousPayload) render(previousPayload);
+        else { currentPayload = undefined; tabs.hidden = true; root.replaceChildren(); }
+        throw error;
+      }
+    } catch (error) {
+      status.classList.add('error');
+      status.textContent = (error.name === 'AbortError' ? '데이터 연결 시간이 초과되었습니다.' : error.message || '통합 투자 전략을 열 수 없습니다.')
+        + (currentPayload ? ' 이전에 받은 데이터를 표시 중입니다.' : '') + ' 새로고침으로 다시 시도하세요.';
+    } finally {
+      clearTimeout(timeout);
+      loading = false;
+      refreshButton.disabled = false;
+      root.setAttribute('aria-busy', 'false');
+    }
   }
-  start().catch((error) => { status.classList.add('error'); status.textContent = error.message || '통합 투자 전략을 열 수 없습니다.'; root.replaceChildren(); });
+  refreshButton.addEventListener('click', start);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshExpiry(); });
+  window.addEventListener('pageshow', refreshExpiry);
+  start();
 })();
 """.strip()
 

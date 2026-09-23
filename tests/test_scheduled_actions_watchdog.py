@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+
+
 from datetime import datetime
 from pathlib import Path
 
@@ -97,6 +99,19 @@ def test_daily_codex_kr_watchdog_yields_after_recovery_window():
     targets = watchdog.due_targets(_kst("2026-06-01T10:17:00"))
 
     assert not [target for target in targets if target.name == "daily-codex-kr"]
+
+
+def test_watchdog_filters_market_targets_on_exchange_holiday():
+    class Status:
+        def __init__(self, is_session):
+            self.is_session = is_session
+
+    targets = watchdog.due_targets(
+        _kst("2026-08-17T10:07:00"),
+        market_status_resolver=lambda *, market, now: Status(market != "kr"),
+    )
+
+    assert not [target for target in targets if target.name.startswith("intraday-overlay-kr-")]
 
 
 def test_daily_codex_kr_watchdog_does_not_wait_for_youtube_publish():
@@ -470,6 +485,19 @@ def test_watchdog_repeated_log_unavailable_failure_has_bounded_budget():
     assert "Retry budget exhausted" in reason
 
 
+def test_watchdog_log_signature_ignores_volatile_github_correlation_ids():
+    first = watchdog._log_text_diagnostic_signature(
+        "2026-08-17T13:56:43Z ##[error]Response status code does not indicate success: "
+        "429 (Too Many Requests). 06CA:C276A:1261:191C8:6A8312F6"
+    )
+    second = watchdog._log_text_diagnostic_signature(
+        "2026-08-17T14:04:47Z ##[error]Response status code does not indicate success: "
+        "429 (Too Many Requests). 3125:1C2169:29B4:1DD30:6A8314DF"
+    )
+
+    assert first == second
+
+
 def test_watchdog_repeated_missing_publish_and_deploy_consumes_budget():
     required = ("overlay_gate", "overlay_refresh_kr", "publish_overlay_site", "deploy_overlay")
     target = watchdog.WatchdogTarget(
@@ -516,6 +544,33 @@ def test_watchdog_dispatches_when_due_target_is_uncovered():
         },
     ) in client.dispatches
     assert any("youtube-daily: dispatched" in message for message in messages)
+
+
+def test_watchdog_defers_transient_dispatch_failure_without_failing_run():
+    class DispatchUnavailableClient(FakeClient):
+        def dispatch(self, workflow_file, inputs):
+            import urllib.error
+
+            raise urllib.error.HTTPError(
+                "https://api.github.test/dispatches",
+                503,
+                "Service Unavailable",
+                {},
+                None,
+            )
+
+    client = DispatchUnavailableClient(runs=[])
+
+    messages = watchdog.run_watchdog(
+        client=client,
+        now_kst=_kst("2026-06-02T06:57:00"),
+    )
+
+    assert any(
+        "youtube-daily: dispatch deferred; GitHub Actions API unavailable HTTP 503"
+        in message
+        for message in messages
+    )
 
 
 def test_watchdog_waits_to_dispatch_youtube_until_daily_pages_build_finishes():
@@ -654,3 +709,26 @@ def test_watchdog_reuses_fixed_checkpoint_window_between_poll_cycles():
 
     assert first.name == later.name == "intraday-overlay-kr-1005"
     assert first.window_start_kst == later.window_start_kst == _kst("2026-06-01T10:05:00")
+
+def test_watchdog_does_not_hide_permanent_dispatch_errors():
+    import urllib.error
+    import pytest
+
+    class UnauthorizedClient(FakeClient):
+        def dispatch(self, *_args):
+            raise urllib.error.HTTPError("https://api.github.test", 401, "Unauthorized", {}, None)
+
+    with pytest.raises(urllib.error.HTTPError):
+        watchdog.run_watchdog(client=UnauthorizedClient(), now_kst=_kst("2026-06-02T06:57:00"))
+
+
+def test_watchdog_reports_calendar_hold_without_querying_market_workflows():
+    from datetime import date
+    from tradingagents.scheduled.automation_calendar import MarketSessionStatus
+
+    messages = watchdog.run_watchdog(
+        client=FakeClient(), now_kst=_kst("2026-06-02T18:07:00"),
+        market_status_resolver=lambda **_kw: MarketSessionStatus("us", date(2026, 6, 2), None, "test"),
+        dry_run=True,
+    )
+    assert any("held;" in message and "unavailable" in message for message in messages)

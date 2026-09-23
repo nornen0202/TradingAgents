@@ -156,6 +156,27 @@ def test_kr_overlay_holds_stale_delayed_schedule_event():
     assert any("Scheduled event is stale" in message for message in messages)
 
 
+def test_kr_overlay_holds_official_market_holiday_before_dependency_lookup():
+    class ClosedStatus:
+        is_session = False
+        source = "kis_official_cache"
+        reason = "KIS marks 2026-08-17 as a domestic market closed day."
+
+    client = FakeClient()
+    decisions, messages = gate.decide_intraday_gate(
+        event_name="schedule",
+        schedule="5 1 * * 1-5",
+        requested_profile="",
+        client=client,
+        now_kst=_kst("2026-08-17T10:05:00"),
+        market_status_resolver=lambda **_kwargs: ClosedStatus(),
+    )
+
+    assert decisions["kr"] is False
+    assert any("market closed day" in message for message in messages)
+    assert not hasattr(client, "last_workflow_file")
+
+
 def test_schedule_freshness_respects_cron_weekday_field():
     expected = gate._last_scheduled_fire_utc(
         "20 4 * * 1-5",

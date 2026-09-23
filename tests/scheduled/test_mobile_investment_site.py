@@ -588,7 +588,7 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "PREVIOUS REFERENCE" not in private_js
     assert "데이터 만료 · 재확인" not in private_js
     assert "health health-neutral" in private_js
-    assert "health health-${esc(health.className)}" in private_js
+    assert "'health market-health health-' + health.className" in private_js
     assert '<meta name="robots" content="index,follow' in private_html
     assert (mobile / "strategy.html").is_file()
     assert (tmp_path / "site" / "strategy.html").is_file()

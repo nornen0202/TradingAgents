@@ -13,6 +13,16 @@ from email.utils import parsedate_to_datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
+import sys
+from pathlib import Path
+
+# These gates also run directly before the package is installed.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from tradingagents.scheduled.automation_calendar import (
+    automated_market_session_status,
+)
+
 
 KST = ZoneInfo("Asia/Seoul")
 UTC = timezone.utc
@@ -284,6 +294,7 @@ def decide_schedule_gate(
     targets: dict[str, ScheduleTarget],
     now_kst: datetime,
     check_blockers: bool = True,
+    market_status_resolver: Any | None = None,
 ) -> tuple[str, bool, str]:
     if event_name != "schedule":
         profile = requested_profile.strip() or manual_default_profile
@@ -292,6 +303,27 @@ def decide_schedule_gate(
     target = targets.get(schedule)
     if target is None:
         return "", False, f"Unrecognized scheduled cron: {schedule}"
+
+    if market_status_resolver is not None and target.profile in {"kr", "us"}:
+        try:
+            market_status = market_status_resolver(
+                market=target.profile,
+                now=now_kst,
+            )
+        except Exception as exc:
+            return (
+                target.profile,
+                False,
+                f"Holding {target.profile.upper()} scheduled run fail-closed; "
+                f"market calendar resolution failed ({type(exc).__name__}).",
+            )
+        if market_status.is_session is not True:
+            return (
+                target.profile,
+                False,
+                f"Skipping {target.profile.upper()} scheduled run; "
+                f"{market_status.reason} source={market_status.source}",
+            )
 
     window_start_kst = _window_start(now_kst, target.window_start_time)
     window_start_utc = window_start_kst.astimezone(UTC)
@@ -362,6 +394,7 @@ def main() -> int:
         now_kst=datetime.now(KST),
         check_blockers=os.environ.get("SCHEDULE_GATE_SKIP_BLOCKERS", "").strip().lower()
         not in {"1", "true", "yes", "on"},
+        market_status_resolver=automated_market_session_status,
     )
     write_outputs(profile=profile, should_run=should_run, reason=reason)
     return 0
