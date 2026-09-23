@@ -9,6 +9,16 @@ from datetime import datetime, time, timedelta, timezone
 from typing import Any
 from zoneinfo import ZoneInfo
 
+import sys
+from pathlib import Path
+
+# These gates also run directly before the package is installed.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from tradingagents.scheduled.automation_calendar import (
+    automated_market_session_status,
+)
+
 
 KST = ZoneInfo("Asia/Seoul")
 UTC = timezone.utc
@@ -290,12 +300,31 @@ def decide_intraday_gate(
     now_kst: datetime,
     current_run_id: int = 0,
     max_schedule_delay_minutes: int = DEFAULT_MAX_SCHEDULE_DELAY_MINUTES,
+    market_status_resolver: Any | None = None,
 ) -> tuple[dict[str, bool], list[str]]:
     decisions = {"us": False, "kr": False}
     messages: list[str] = []
 
     for profile in requested_profiles(event_name=event_name, schedule=schedule, requested_profile=requested_profile):
         if event_name == "schedule":
+            if market_status_resolver is not None:
+                try:
+                    market_status = market_status_resolver(
+                        market=profile,
+                        now=now_kst,
+                    )
+                except Exception as exc:
+                    messages.append(
+                        f"intraday-overlay-{profile}: held fail-closed; market "
+                        f"calendar resolution failed ({type(exc).__name__})."
+                    )
+                    continue
+                if market_status.is_session is not True:
+                    messages.append(
+                        f"intraday-overlay-{profile}: held; "
+                        f"{market_status.reason} source={market_status.source}"
+                    )
+                    continue
             fresh, freshness_reason = _schedule_fresh_enough(
                 schedule=schedule,
                 now_kst=now_kst,
@@ -371,6 +400,7 @@ def main() -> int:
             os.environ.get("INTRADAY_OVERLAY_MAX_SCHEDULE_DELAY_MINUTES")
             or DEFAULT_MAX_SCHEDULE_DELAY_MINUTES
         ),
+        market_status_resolver=automated_market_session_status,
     )
     write_outputs(decisions, messages)
     return 0

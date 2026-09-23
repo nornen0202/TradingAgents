@@ -41,3 +41,6 @@ jobs:
 
       - name: Verify mobile layout at 360, 390, and 430px
         run: python .github/scripts/mobile_layout_regression.py
+
+      - name: Verify strategy interactions on mobile and desktop
+        run: python .github/scripts/strategy_interaction_regression.py

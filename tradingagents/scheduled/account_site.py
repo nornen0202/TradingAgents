@@ -241,7 +241,8 @@ def _render_account_page(payload: dict[str, Any]) -> str:
   <script type="application/ld+json">{dataset_json}</script>
 </head>
 <body>
-  <main class="shell account-snapshot-shell">
+  <a class="skip-link" href="#account-content">계좌 현황으로 바로가기</a>
+  <main class="shell account-snapshot-shell" id="account-content" tabindex="-1">
     <nav class="breadcrumbs"><a href="../index.html">Home</a><a href="public.json">JSON</a><a href="llms.txt">AI 안내</a></nav>
     <section class="account-snapshot-hero">
       <div>
@@ -252,8 +253,8 @@ def _render_account_page(payload: dict[str, Any]) -> str:
       <p class="account-generated">페이지 생성<br><strong>{_escape(_format_as_of(payload['generated_at']))}</strong></p>
     </section>
     <div class="account-tabs" role="tablist" aria-label="시장 선택">
-      <button type="button" role="tab" data-market="kr" aria-selected="{'true' if initial == 'kr' else 'false'}">국내</button>
-      <button type="button" role="tab" data-market="us" aria-selected="{'true' if initial == 'us' else 'false'}">해외</button>
+      <button type="button" role="tab" id="tab-kr" aria-controls="panel-kr" data-market="kr" tabindex="{'0' if initial == 'kr' else '-1'}" aria-selected="{'true' if initial == 'kr' else 'false'}">국내</button>
+      <button type="button" role="tab" id="tab-us" aria-controls="panel-us" data-market="us" tabindex="{'0' if initial == 'us' else '-1'}" aria-selected="{'true' if initial == 'us' else 'false'}">해외</button>
     </div>
     {panels}
     <section class="account-disclosure">
@@ -267,11 +268,23 @@ def _render_account_page(payload: dict[str, Any]) -> str:
       const buttons = [...document.querySelectorAll('[data-market]')];
       const panels = [...document.querySelectorAll('[data-market-panel]')];
       const select = (market) => {{
-        buttons.forEach((button) => button.setAttribute('aria-selected', String(button.dataset.market === market)));
+        buttons.forEach((button) => {{
+          const selected = button.dataset.market === market;
+          button.setAttribute('aria-selected', String(selected));
+          button.tabIndex = selected ? 0 : -1;
+        }});
         panels.forEach((panel) => panel.hidden = panel.dataset.marketPanel !== market);
         history.replaceState(null, '', `#${{market}}`);
       }};
       buttons.forEach((button) => button.addEventListener('click', () => select(button.dataset.market)));
+      buttons.forEach((button, index) => button.addEventListener('keydown', (event) => {{
+        const offsets = {{ArrowRight: 1, ArrowLeft: -1, Home: -index, End: buttons.length - 1 - index}};
+        if (!(event.key in offsets)) return;
+        event.preventDefault();
+        const next = buttons[(index + offsets[event.key] + buttons.length) % buttons.length];
+        select(next.dataset.market);
+        next.focus();
+      }}));
       const requested = location.hash.slice(1).toLowerCase();
       if (requested === 'kr' || requested === 'us') select(requested);
     }})();
@@ -288,7 +301,7 @@ def _render_market_panel(market: str, value: dict[str, Any], *, initial: str) ->
     else:
         content = _render_summary(value["summary"]) + _render_positions(value["positions"])
     return f"""
-    <section class="account-market-panel" data-market-panel="{market}"{hidden}>
+    <section class="account-market-panel" id="panel-{market}" role="tabpanel" aria-labelledby="tab-{market}" tabindex="0" data-market-panel="{market}"{hidden}>
       <div class="account-panel-head">
         <div><p class="eyebrow">{_escape(value['label_en'])}</p><h2>{_escape(value['label_ko'])} 주식</h2></div>
         <p>기준 시각<br><strong>{_escape(_format_as_of(value.get('as_of')))}</strong></p>
