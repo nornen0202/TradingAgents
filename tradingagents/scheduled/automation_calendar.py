@@ -253,6 +253,7 @@ def _fetch_kis_calendar(
             "appkey": app_key,
             "appsecret": app_secret,
             "tr_id": "CTCA0903R",
+            "custtype": "P",
             "content-type": "application/json; charset=utf-8",
         },
         method="GET",

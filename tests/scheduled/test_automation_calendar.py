@@ -168,6 +168,7 @@ def test_kis_response_is_cached_without_storing_credentials(
         calls.append(request.full_url)
         if request.full_url.endswith("/oauth2/tokenP"):
             return _Response({"access_token": "sensitive-token"})
+        assert request.get_header("Custtype") == "P"
         return _Response(
             {
                 "rt_cd": "0",
