@@ -20,11 +20,11 @@ site_dir = "./site"
     config = load_scheduled_config(config_path)
     assert config.run.max_debate_rounds == 2
     assert config.run.max_risk_discuss_rounds == 2
-    assert config.llm.deep_model == "gpt-5.6-sol"
-    assert config.llm.quick_model == "gpt-5.6-sol"
-    assert config.llm.output_model == "gpt-5.6-sol"
-    assert config.llm.writer_model == "gpt-5.6-sol"
-    assert config.llm.judge_model == "gpt-5.6-sol"
+    assert config.llm.deep_model == "gpt-6-sol"
+    assert config.llm.quick_model == "gpt-6-sol"
+    assert config.llm.output_model == "gpt-6-sol"
+    assert config.llm.writer_model == "gpt-6-sol"
+    assert config.llm.judge_model == "gpt-6-sol"
     assert config.llm.codex_quick_reasoning_effort == "high"
     assert config.llm.codex_deep_reasoning_effort == "xhigh"
     assert config.llm.codex_output_reasoning_effort == "medium"

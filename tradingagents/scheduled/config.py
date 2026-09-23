@@ -62,11 +62,11 @@ class RunSettings:
 @dataclass(frozen=True)
 class LLMSettings:
     provider: str = "codex"
-    deep_model: str = "gpt-5.6-sol"
-    quick_model: str = "gpt-5.6-sol"
-    output_model: str = "gpt-5.6-sol"
-    writer_model: str = "gpt-5.6-sol"
-    judge_model: str = "gpt-5.6-sol"
+    deep_model: str = "gpt-6-sol"
+    quick_model: str = "gpt-6-sol"
+    output_model: str = "gpt-6-sol"
+    writer_model: str = "gpt-6-sol"
+    judge_model: str = "gpt-6-sol"
     codex_reasoning_effort: str = "medium"
     codex_quick_reasoning_effort: str = "high"
     codex_deep_reasoning_effort: str = "xhigh"
@@ -451,20 +451,20 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         llm=LLMSettings(
             provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
             deep_model=deep_model_override
-            or str(llm_raw.get("deep_model", "gpt-5.6-sol")).strip()
-            or "gpt-5.6-sol",
+            or str(llm_raw.get("deep_model", "gpt-6-sol")).strip()
+            or "gpt-6-sol",
             quick_model=quick_model_override
-            or str(llm_raw.get("quick_model", "gpt-5.6-sol")).strip()
-            or "gpt-5.6-sol",
+            or str(llm_raw.get("quick_model", "gpt-6-sol")).strip()
+            or "gpt-6-sol",
             output_model=output_model_override
-            or str(llm_raw.get("output_model", "gpt-5.6-sol")).strip()
-            or "gpt-5.6-sol",
+            or str(llm_raw.get("output_model", "gpt-6-sol")).strip()
+            or "gpt-6-sol",
             writer_model=writer_model_override
-            or str(llm_raw.get("writer_model", "gpt-5.6-sol")).strip()
-            or "gpt-5.6-sol",
+            or str(llm_raw.get("writer_model", "gpt-6-sol")).strip()
+            or "gpt-6-sol",
             judge_model=judge_model_override
-            or str(llm_raw.get("judge_model", "gpt-5.6-sol")).strip()
-            or "gpt-5.6-sol",
+            or str(llm_raw.get("judge_model", "gpt-6-sol")).strip()
+            or "gpt-6-sol",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_quick_reasoning_effort=str(
                 llm_raw.get("codex_quick_reasoning_effort", "high")

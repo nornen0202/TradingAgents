@@ -25,7 +25,7 @@ self-hosted producer
 - 데스크톱 Work는 사용자가 허용한 로컬 폴더를 읽을 수 있지만, 그 스레드와 로컬 파일은 해당 컴퓨터에 남고 web/mobile Work 대화로 동기화되지 않는다. 따라서 로컬 파일이 필요한 새 분석에는 컴퓨터와 ChatGPT 앱이 실행 중이어야 한다. [ChatGPT Work and Codex](https://help.openai.com/en/articles/20001275/)
 - ChatGPT web/mobile Work는 클라우드에서 실행되며 이 PC의 로컬 폴더나 worktree를 직접 읽지 않는다. Cloud Scheduled task를 프로젝트에서 만들더라도 프로젝트 파일은 task에 전달되지 않는다. [Scheduled Tasks in ChatGPT](https://help.openai.com/en/articles/10291617-scheduled-tasks-in-chatgpt)
 - Scheduled 화면은 실행 결과와 다음 실행을 모아 보여 주는 inbox이며, ChatGPT push/email 알림은 계정 설정과 플랫폼 권한에 따른다. 이 저장소는 별도로 Telegram 전달 receipt를 검증한다. [Scheduled Tasks in ChatGPT](https://help.openai.com/en/articles/10291617-scheduled-tasks-in-chatgpt)
-- ChatGPT Scheduled Tasks는 공식적으로 Pro 모델을 지원하지 않는다. 그러므로 `GPT-5.6 Pro`를 웹 예약 작업에 강제로 선택하는 방식 대신, 로컬 Work/Codex 실행 모델을 `gpt-5.6-sol`/`xhigh`로 고정하고 모바일 전달을 검증 가능한 외부 파이프라인으로 분리한다. [Scheduled Tasks in ChatGPT](https://help.openai.com/en/articles/10291617-scheduled-tasks-in-chatgpt)
+- ChatGPT Scheduled Tasks는 공식적으로 Pro 모델을 지원하지 않는다. 그러므로 `GPT-5.6 Pro`를 웹 예약 작업에 강제로 선택하는 방식 대신, 로컬 Work/Codex 실행 모델을 `gpt-6-sol`/`xhigh`로 고정하고 모바일 전달을 검증 가능한 외부 파이프라인으로 분리한다. [Scheduled Tasks in ChatGPT](https://help.openai.com/en/articles/10291617-scheduled-tasks-in-chatgpt)
 - 모바일 Remote는 연결된 host의 환경을 사용한다. host가 sleep 상태가 되거나 네트워크를 잃거나 앱이 종료되면 연결이 중단된다. [Remote connections](https://learn.chatgpt.com/docs/remote-connections)
 
 공식 문서는 기존 chat에서 실행되는 Scheduled task는 설명하지만, 외부 GitHub workflow가 임의의 개인 ChatGPT 대화에 결과를 주입하는 공개 전달 계약은 설명하지 않는다. 따라서 이 저장소는 “ChatGPT 대화 전송 완료”를 주장하지 않는다. 스마트폰의 확정 전달 채널은 Telegram과 Pages이며, ChatGPT Work는 로컬 분석·상세 대화 경로로 유지한다.
@@ -168,7 +168,7 @@ python -m tradingagents.work handoff --surface kr --event-id <event_id> --report
 
 ## 예약 정의
 
-`config/chatgpt_work_tasks.json`의 네 task는 local mode, GPT-5.6 Sol, `xhigh`, Asia/Seoul을 사용한다. 각 prompt는 다음을 명시한다.
+`config/chatgpt_work_tasks.json`의 네 task는 local mode, GPT-6 Sol, `xhigh`, Asia/Seoul을 사용한다. 각 prompt는 다음을 명시한다.
 
 - stale/unavailable local data fail-closed
 - KR·US 보유/관심종목 coverage receipt
