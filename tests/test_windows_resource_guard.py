@@ -41,3 +41,30 @@ def test_recovered_resources_allow_job(guard, monkeypatch):
     monkeypatch.setattr(guard, 'read_snapshot', lambda: next(snapshots))
     monkeypatch.setattr(guard.time, 'sleep', lambda _: None)
     assert guard.main() == 0
+
+
+def test_default_disk_reserve_allows_actual_runner_headroom(guard, monkeypatch):
+    """The Windows runners' normal 6-8 GiB C: free must not time out."""
+    monkeypatch.setattr(sys, 'argv', ['guard', '--wait-seconds', '0'])
+    monkeypatch.setattr(
+        guard,
+        'read_snapshot',
+        lambda: guard.ResourceSnapshot(
+            40 * guard.GIB, 16 * guard.GIB, 56 * guard.GIB,
+            4 * guard.GIB, 6 * guard.GIB, 350,
+        ),
+    )
+    assert guard.main() == 0
+
+
+def test_default_disk_reserve_blocks_unsafe_headroom(guard, monkeypatch):
+    monkeypatch.setattr(sys, 'argv', ['guard', '--wait-seconds', '0'])
+    monkeypatch.setattr(
+        guard,
+        'read_snapshot',
+        lambda: guard.ResourceSnapshot(
+            40 * guard.GIB, 16 * guard.GIB, 56 * guard.GIB,
+            4 * guard.GIB, 3 * guard.GIB, 350,
+        ),
+    )
+    assert guard.main() == 1

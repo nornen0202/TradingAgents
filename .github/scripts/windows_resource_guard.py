@@ -11,6 +11,10 @@ from dataclasses import dataclass
 
 
 GIB = 1024**3
+# The self-hosted runners normally have 6-8 GiB free on C:. Requiring 12 GiB
+# made every analysis and Pages run time out even with ample memory. Keep a
+# 4 GiB reserve for job output; the runner preflight also refuses work below 2 GiB.
+DEFAULT_MIN_C_FREE_GIB = 4.0
 
 
 class PerformanceInformation(ctypes.Structure):
@@ -90,7 +94,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--min-commit-free-gib", type=float, default=8.0)
     parser.add_argument("--min-physical-free-gib", type=float, default=2.0)
-    parser.add_argument("--min-c-free-gib", type=float, default=12.0)
+    parser.add_argument("--min-c-free-gib", type=float, default=DEFAULT_MIN_C_FREE_GIB)
     parser.add_argument("--wait-seconds", type=int, default=900)
     parser.add_argument("--poll-seconds", type=int, default=15)
     args = parser.parse_args()
