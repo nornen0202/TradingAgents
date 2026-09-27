@@ -589,6 +589,7 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
         "run_id": current.get("run_id"),
         "started_at": current.get("started_at"),
         "manifest_status": source_metadata.get("status"),
+        "freshness_receipt": current.get("freshness_receipt") or {},
         "decision_ready": quality.get("decision_ready"),
         "source": _safe_mapping(source_metadata, ("run_id", "last_run_at", "status")),
         "guardrails": _safe_mapping(
@@ -2183,7 +2184,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
       ? item.integrated_report.analysis_only === true ? 'Work 분석 결합 · 현재 실행 우선' : '현재 Work 종합 완료'
       : item.reference_report ? '기본 전략 · 분석 시점 Work 참고' : '기본 전략';
     panel.innerHTML = '<div class="market-head"><div><p class="eyebrow">' + market.toUpperCase() + ' STRATEGY</p><h2>' + market.toUpperCase() + ' 투자 액션</h2></div><div><span class="health health-neutral">' + sourceLabel + '</span><span class="health market-health"></span></div></div>'
-      + '<div class="source-meta"><span>분석 시작 ' + esc(dateTime(item.started_at)) + '</span><span>분석 실행 ID ' + esc(item.run_id || '-') + '</span></div><div class="overview-container"></div>'
+      + '<div class="source-meta"><span>원분석 기준일 ' + esc((item.freshness_receipt || {}).analysis_trade_date_oldest || '미확인') + '</span><span>시세 기준 ' + esc(dateTime((item.freshness_receipt || {}).market_data_oldest_at)) + '</span><span>계좌 기준 ' + esc(dateTime((item.freshness_receipt || {}).account_as_of)) + '</span><span>자료 갱신 실행 ' + esc(dateTime(item.started_at)) + '</span><span>실행 ID ' + esc(item.run_id || '-') + '</span></div><div class="overview-container"></div>'
       + '<div class="strategy-toolbar"><label for="search-' + market + '">종목 검색<input id="search-' + market + '" type="search" maxlength="100" placeholder="종목명 · 티커 · 업종" value="' + esc(view.search) + '" autocomplete="off" aria-controls="cards-' + market + '"></label>'
       + '<label for="sort-' + market + '">정렬<select id="sort-' + market + '"><option value="priority">우선순위</option><option value="name">종목명순</option><option value="change">등락률순 ↓</option></select></label></div>'
       + '<nav class="strategy-filters" aria-label="종목 유형">' + groups.map((group, index) => '<button type="button" data-group-target="' + group + '" data-label="' + ['핵심','보유','관심','신규','전체'][index] + '" aria-pressed="false"></button>').join('') + '</nav>'
@@ -2240,7 +2241,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     root.innerHTML = ['kr', 'us'].map((market) => '<section class="market-panel" data-market="' + market + '" hidden></section>').join('');
     tabs.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => selectMarket(button.dataset.target)));
     selectMarket(selectedMarket);
-    status.textContent = '페이지 생성 ' + dateTime(payload.generated_at) + ' · 주문 전 시세와 조건을 확인하세요.';
+    status.textContent = '페이지 생성 ' + dateTime(payload.generated_at) + ' · 게시 시각은 원분석·시세·계좌의 갱신 시각이 아닙니다.';
     scheduleExpiry();
   }
   async function start() {
@@ -2306,6 +2307,8 @@ def _join_url(base: str, suffix: str) -> str:
 def _llms_text(*, public_base_url: str, generated_at: str) -> str:
     base = str(public_base_url or "").strip().rstrip("/")
     links = (
+        ("미국 입력 신선도 감사 (JavaScript 불필요)", "work/v1/us/status.html"),
+        ("국내 입력 신선도 감사 (JavaScript 불필요)", "work/v1/kr/status.html"),
         ("PC 종합 투자 전략", "strategy.html"),
         ("모바일 종합 투자 전략", "mobile/strategy.html"),
         ("기계 판독용 KR/US 종합 전략 JSON", "mobile/strategy.json"),
@@ -2323,7 +2326,7 @@ def _llms_text(*, public_base_url: str, generated_at: str) -> str:
         "research for browsers, search engines, ChatGPT, and other AI agents.\n"
         f"Site build time: {generated_at}\n\n"
         "The HTML is a human-readable view of the same public JSON. `as_of` is the "
-        "analysis time, while `generated_at`/`published_at` identify report publication. "
+        "oldest input quote time in Work reports; the freshness receipt separately records the original research trade date, quote range and account snapshot. `generated_at`/`published_at` identify report publication. "
         "Do not infer current order eligibility from an old analysis timestamp.\n\n"
         f"{rendered}\n"
     )

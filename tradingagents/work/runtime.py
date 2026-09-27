@@ -1023,6 +1023,14 @@ def _validate_report_packet_coverage(
     current = body.get("current") if isinstance(body.get("current"), dict) else {}
     bundle = current.get("bundle") if isinstance(current.get("bundle"), dict) else {}
     packet_rows = [row for row in (bundle.get("strategy_table") or []) if isinstance(row, dict)]
+    freshness = current.get("freshness_receipt")
+    if isinstance(freshness, dict):
+        if (draft.get("source_summary") or {}).get("freshness_receipt") != freshness:
+            raise WorkRuntimeError("Structured market report freshness_receipt does not exactly match the prepared packet")
+        # One top-level as_of means the oldest transmitted observation. It
+        # cannot silently mean the report publication or the newest row.
+        if draft.get("as_of") != freshness.get("market_data_oldest_at"):
+            raise WorkRuntimeError("Structured market report as_of must match market_data_oldest_at")
     expected = {
         _report_ticker_identity(row.get("ticker"))
         for row in packet_rows

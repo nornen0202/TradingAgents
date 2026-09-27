@@ -15,6 +15,13 @@
 9. confidence, 금액, 목표 비중, 가격선은 packet에 있는 값만 사용한다. 없으면 `산출 없음`으로 쓴다.
 10. `supporting_context.policy.profile=balanced_external`을 적용한다. 관련성·신선도·검증 상태가 충분한 YouTube·PRISM은 종목 순위, thesis confidence, 기존 위험 한도 안의 포지션 크기, 리서치 우선순위를 실질적으로 상향 또는 하향한다. 특히 `strategy_source_tier=USER_PRIMARY` 또는 `strategy_evidence_weight=HIGH`인 @kpunch(박종훈의 지식한방)·@sosumonkey(소수몽키) 영상은 사용자가 검증한 최우선 근거로 간주해 HIGH 가중치로 thesis에 실제 반영한다. 각 영향을 `source_contributions`에 수치·이유·event key로 남긴다. 단 실제 주문의 시세·계좌·위험 execution gate는 절대 우회하지 않는다.
 
+## 입력 시각 계약
+
+- `current.freshness_receipt`를 `source_summary.freshness_receipt`에 그대로 복사한다. 최상위 `as_of`는 `market_data_oldest_at`과 정확히 일치시킨다(null이면 null). 게시·작성 시각으로 대체하지 않는다.
+- 첫 요약에 작성 시각, 원분석 기준 거래일 범위, 시세 관측시각 범위, 계좌 기준시각을 각각 표시한다. 현재 시각에서 경과시간을 계산한다. `producer_run_id`는 자료 갱신 실행이며 `analysis_run_id`와 다를 수 있다. 거래일·휴장과 시세 만료를 구분하며 오래된 시세로 최신 분석이 완료됐다고 쓰지 않는다.
+- 현재 manifest의 원결정에서 전달된 `thesis`를 보존한다. 시세와 원분석의 시각·조건이 다르면 각각 표시하고, 단순 overlay 갱신을 기업분석 재수행으로 세지 않는다. 생산 커버리지 COMPLETE는 신선도나 주문 가능성의 증명이 아니다.
+- 시세·계좌 미확인 상태의 수량은 확정 제안 대신 명시적인 가상 예시로만 표시한다. 서로 다른 시점의 총자산에서 재평가 증권액을 빼 현금으로 만들지 않는다. 조건표·요약·수량·취소 조건이 충돌하면 발행 전에 수정한다.
+
 ## 모바일 우선 출력
 
 1. 세션, 현재 시각, 유효시간, 모드, event ID, source health와 가장 중요한 제한

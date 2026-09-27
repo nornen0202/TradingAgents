@@ -393,13 +393,19 @@ jobs:
                   handle.write(f"{name}={value}\n")
 
           def usable(path):
-              if not path or not Path(path).exists():
-                  return False
               try:
-                  result = subprocess.run([str(path), "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, check=False)
-              except OSError:
+                  if not path or not Path(path).is_file():
+                      return False
+                  result = subprocess.run([str(path), "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, check=False, timeout=10)
+              except (OSError, subprocess.SubprocessError):
                   return False
               return result.returncode == 0
+
+          def modified(path):
+              try:
+                  return path.stat().st_mtime
+              except OSError:
+                  return 0
 
           candidates = []
           if os.environ.get("CODEX_BINARY", "").strip():
@@ -409,8 +415,9 @@ jobs:
           for pattern in (
               "C:/Users/*/.codex/.sandbox-bin/codex.exe",
               "C:/Users/*/.vscode/extensions/openai.chatgpt-*/bin/windows-x86_64/codex.exe",
+              "C:/Users/*/AppData/Local/OpenAI/Codex/bin/*/codex.exe",
           ):
-              candidates.extend(sorted(Path("C:/").glob(pattern.removeprefix("C:/")), key=lambda p: p.stat().st_mtime, reverse=True))
+              candidates.extend(sorted(Path("C:/").glob(pattern.removeprefix("C:/")), key=modified, reverse=True))
 
           seen = set()
           for candidate in candidates:
@@ -428,10 +435,11 @@ jobs:
                       capture_output=True,
                       text=True,
                       check=False,
+                      timeout=10,
                   )
                   print(f"Resolved Codex version: {(version.stdout or version.stderr).strip() or 'unknown'}")
                   raise SystemExit(0)
-          raise SystemExit("Could not find a usable Codex binary for GPT-5.6 role verification.")
+          raise SystemExit("Could not find a usable Codex binary for configured model verification.")
 
       - name: Verify Codex login and model availability
         if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}

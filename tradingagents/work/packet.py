@@ -8,14 +8,16 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from .freshness import aware_datetime, source_freshness_receipt
+
 
 WORK_SCHEMA = "tradingagents.work-context/v1"
 WORK_STATE_SCHEMA = "tradingagents.work-state/v1"
 WORK_REPORT_SCHEMA = "tradingagents.work-report/v1"
 SURFACES = ("kr", "us", "youtube", "prism")
 PROMPT_CONTRACTS = {
-    "kr": "market-work-v9-kr",
-    "us": "market-work-v9-us",
+    "kr": "market-work-v10-kr",
+    "us": "market-work-v10-us",
     "youtube": "youtube-work-v5",
     "prism": "prism-work-v5",
 }
@@ -239,7 +241,7 @@ def _compact_market_row(row: dict[str, Any], display_priority: int) -> dict[str,
             quality["row_mode"] = "MISSING"
     compact["quality"] = quality
     compact["display_priority"] = display_priority
-    compact["thesis"] = _market_row_thesis(compact)
+    compact["thesis"] = dict(row["thesis"]) if isinstance(row.get("thesis"), dict) else _market_row_thesis(compact)
     execution = _market_row_execution(compact)
     if isinstance(row.get("execution"), dict):
         # Row-level validity is applied before packet compaction.  Preserve its
@@ -258,8 +260,11 @@ def _market_row_thesis(row: dict[str, Any]) -> dict[str, Any]:
         "STARTER": "BUY",
         "ADD": "BUY",
         "BUY": "BUY",
+        "BUY_NOW": "BUY",
+        "BUY_ON_CONFIRMATION": "BUY",
         "HOLD": "HOLD",
         "WAIT": "HOLD",
+        "WAIT_CLOSE": "HOLD",
         "WATCH": "RESEARCH",
         "REDUCE": "REDUCE",
         "TRIM": "REDUCE",
@@ -451,7 +456,7 @@ def _market_analysis_model_receipt(
 
 
 def _manifest_for_run_id(archive_dir: Path, run_id: str) -> dict[str, Any]:
-    if not run_id:
+    if not run_id or Path(run_id).name != run_id or any(char in run_id for char in "/*?[]\\"):
         return {}
     runs_root = Path(archive_dir) / "runs"
     for candidate in runs_root.glob(f"*/{run_id}/run.json"):
@@ -459,6 +464,66 @@ def _manifest_for_run_id(archive_dir: Path, run_id: str) -> dict[str, Any]:
         if str(manifest.get("run_id") or candidate.parent.name) == run_id:
             return manifest
     return {}
+
+
+def _analysis_manifest(archive_dir: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+    """Follow the explicit overlay ancestry, never a last-ready substitute."""
+    current = manifest
+    visited: set[str] = set()
+    market = str((manifest.get("settings") or {}).get("market") or "").lower()
+    for _ in range(100):
+        run_id = str(current.get("run_id") or "")
+        if not run_id or run_id in visited:
+            return {}
+        visited.add(run_id)
+        if str((current.get("settings") or {}).get("market") or "").lower() != market:
+            return {}
+        parent = str(current.get("overlay_source_run_id") or "")
+        if not parent:
+            return current if (current.get("settings") or {}).get("run_mode", "full") == "full" else {}
+        current = _manifest_for_run_id(archive_dir, parent)
+    return {}
+
+
+def _attach_analysis_theses(
+    bundle: dict[str, Any], manifest: dict[str, Any], analysis_manifest: dict[str, Any],
+) -> None:
+    """Recover research only from decisions carried by this exact producer."""
+    summaries = {_market_ticker_identity(item.get("ticker")): item
+                 for item in manifest.get("tickers", []) if isinstance(item, dict)}
+    originals = {_market_ticker_identity(item.get("ticker")): item
+                 for item in analysis_manifest.get("tickers", []) if isinstance(item, dict)}
+    for row in bundle.get("strategy_table", []):
+        if isinstance(row.get("thesis"), dict) or str(row.get("strategy_code") or "DATA_CHECK") != "DATA_CHECK":
+            continue
+        summary = summaries.get(_market_ticker_identity(row.get("ticker")), {})
+        original = originals.get(_market_ticker_identity(row.get("ticker")), {})
+        decision = summary.get("decision")
+        if isinstance(decision, str):
+            try:
+                decision = json.loads(decision)
+            except ValueError:
+                continue
+        if not isinstance(decision, dict):
+            continue
+        stance = str(decision.get("rating") or "").upper()
+        if stance not in {"BUY", "HOLD", "REDUCE", "SELL", "AVOID", "RESEARCH"}:
+            continue
+        row["thesis"] = {
+            "stance": stance,
+            "confidence": decision.get("confidence"),
+            # Overlay summaries rewrite their own finish time. Only the
+            # matching original decision can supply a research timestamp.
+            "analysis_asof": original.get("finished_at") if original.get("decision") == summary.get("decision") else None,
+            "analysis_trade_date": summary.get("trade_date"),
+            "source": "current_manifest_decision",
+            "rationale": [decision["entry_logic"]] if decision.get("entry_logic") else [],
+            "entry_conditions": list(decision.get("watchlist_triggers") or []),
+            "invalidation_conditions": list(decision.get("invalidators") or []),
+            "invalidation_action": decision.get("exit_logic"),
+            "horizon": decision.get("time_horizon"),
+            "position_sizing": decision.get("position_sizing"),
+        }
 
 
 def resolve_archive_roots(
@@ -512,6 +577,12 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
             "guardrails": _market_guardrails(surface, {}, now=now),
         }
     current = sources[0]
+    analysis_manifest = _analysis_manifest(roots["market"], current["manifest"])
+    freshness_receipt = source_freshness_receipt(
+        current["manifest"], current["bundle"], now=now,
+        analysis_manifest=analysis_manifest, public=public,
+    )
+    _attach_analysis_theses(current["bundle"], current["manifest"], analysis_manifest)
     ready = next(
         (
             item
@@ -554,6 +625,7 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
         "run_id": current["manifest"].get("run_id"),
         "started_at": current["manifest"].get("started_at"),
         "run_mode": ((current["manifest"].get("settings") or {}).get("run_mode")),
+        "freshness_receipt": freshness_receipt,
         "bundle": bundle,
         "universe_coverage": _market_universe_coverage(
             current["manifest"],
@@ -582,7 +654,9 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
         if isinstance(row, dict) and row.get("ticker")
     ]
     manifest_status = str(current["manifest"].get("status") or "unknown").strip().lower()
-    if guardrails.get("expired_at_build") is True:
+    if freshness_receipt["market_data_status"] in {"MISSING", "INVALID"}:
+        source_health = "UNVERIFIED"
+    elif guardrails.get("expired_at_build") is True or freshness_receipt["market_data_status"] == "STALE":
         source_health = "STALE"
     elif manifest_status == "success":
         source_health = "OK"
@@ -831,9 +905,10 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
         if not isinstance(row, dict):
             continue
         quality = row.get("quality") if isinstance(row.get("quality"), dict) else {}
-        parsed = _datetime(row.get("market_data_asof"))
+        parsed = aware_datetime(row.get("market_data_asof"))
         valid_until = parsed + timedelta(minutes=30) if parsed else None
-        expired = bool(valid_until and valid_until < current_now.astimezone(valid_until.tzinfo))
+        invalid = parsed is None or parsed > current_now
+        expired = bool(valid_until and valid_until <= current_now.astimezone(valid_until.tzinfo))
         quality["row_valid_until"] = valid_until.isoformat() if valid_until else None
         quality["expired_at_build"] = expired
         execution = (
@@ -843,19 +918,20 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
         )
         execution["as_of"] = row.get("market_data_asof")
         execution["valid_until"] = quality["row_valid_until"]
-        if expired and quality.get("row_mode") in {"IMMEDIATE", "CONDITIONAL"}:
+        if invalid or expired:
             quality["source_row_mode"] = quality.get("row_mode")
             quality["row_mode"] = "BLOCKED_STALE"
             quality["execution_ready"] = False
             quality["conditional_strategy_ready"] = False
             blockers = [str(item) for item in (quality.get("provider_blockers") or []) if str(item)]
-            quality["provider_blockers"] = list(dict.fromkeys([*blockers, "work_packet_row_expired"]))
+            reason = "work_packet_row_invalid_timestamp" if invalid else "work_packet_row_expired"
+            quality["provider_blockers"] = list(dict.fromkeys([*blockers, reason]))
             execution["source_readiness"] = execution.get("readiness")
             execution["readiness"] = "NEEDS_LIVE_RECHECK"
             execution["action_now"] = None
             execution["action_if_triggered"] = None
             execution["blockers"] = list(
-                dict.fromkeys([*(execution.get("blockers") or []), "work_packet_row_expired"])
+                dict.fromkeys([*(execution.get("blockers") or []), reason])
             )
             execution["required_rechecks"] = list(
                 dict.fromkeys(
@@ -867,6 +943,13 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
             )
         row["quality"] = quality
         row["execution"] = execution
+    rows = [row for row in bundle.get("strategy_table", []) if isinstance(row, dict)]
+    bundle_quality = bundle.get("quality") or {}
+    if any((row.get("quality") or {}).get("expired_at_build") or "work_packet_row_invalid_timestamp" in ((row.get("quality") or {}).get("provider_blockers") or []) for row in rows):
+        bundle_quality["decision_ready"] = False
+        bundle_quality["conditional_strategy_ready"] = False
+        bundle_quality["report_mode"] = _market_report_mode(bundle)
+        bundle["quality"] = bundle_quality
 
 
 def _market_sources(archive_dir: Path, market: str) -> list[dict[str, Any]]:
@@ -877,9 +960,11 @@ def _market_sources(archive_dir: Path, market: str) -> list[dict[str, Any]]:
     candidates = list(runs_root.glob("*/*/run.json"))
     if not candidates:
         candidates = list(runs_root.rglob("run.json"))
-    candidates.sort(key=_manifest_path_recency, reverse=True)
-    for manifest_path in candidates[:240]:
-        manifest = load_json(manifest_path)
+    # File modification time changes on restore/republish. Select by producer
+    # clock before looking for the first ready bundle, across both markets.
+    manifests = [(path, load_json(path)) for path in candidates]
+    manifests.sort(key=lambda item: _timestamp(item[1].get("started_at")) or 0, reverse=True)
+    for manifest_path, manifest in manifests:
         configured_market = str(((manifest.get("settings") or {}).get("market") or manifest.get("market") or "")).lower()
         if configured_market != market:
             continue
@@ -892,16 +977,7 @@ def _market_sources(archive_dir: Path, market: str) -> list[dict[str, Any]]:
         sources.append({"manifest": manifest, "bundle": bundle, "run_dir": run_dir})
         if bool((bundle.get("quality") or {}).get("decision_ready")):
             break
-    sources.sort(key=lambda item: str(item["manifest"].get("started_at") or item["manifest"].get("run_id") or ""), reverse=True)
     return sources
-
-
-def _manifest_path_recency(path: Path) -> tuple[int, str]:
-    try:
-        modified = path.stat().st_mtime_ns
-    except OSError:
-        modified = 0
-    return modified, path.parent.name
 
 
 def _local_private_overlay(run_dir: Path, manifest: dict[str, Any], bundle: dict[str, Any]) -> dict[str, Any]:
@@ -1567,15 +1643,16 @@ def _compact_support_event(event: dict[str, Any], *, kind: str) -> dict[str, Any
 def _market_guardrails(surface: str, bundle: dict[str, Any], *, now: datetime) -> dict[str, Any]:
     rows = bundle.get("strategy_table") or []
     quality = bundle.get("quality") if isinstance(bundle.get("quality"), dict) else {}
-    asofs = [str(row.get("market_data_asof")) for row in rows if isinstance(row, dict) and row.get("market_data_asof")]
-    latest_asof = max(asofs) if asofs else None
+    asofs = [aware_datetime(row.get("market_data_asof")) for row in rows if isinstance(row, dict)]
+    asofs = [value for value in asofs if value is not None]
+    latest_asof = max(asofs).isoformat() if asofs else None
     actionable_validities = [
         _datetime((row.get("quality") or {}).get("row_valid_until"))
         for row in rows
         if isinstance(row, dict) and (row.get("quality") or {}).get("row_mode") == "IMMEDIATE"
     ]
     actionable_validities = [value for value in actionable_validities if value is not None]
-    fallback = _datetime(latest_asof) or _datetime(bundle.get("generated_at"))
+    fallback = min(asofs) if asofs else None
     valid_datetime = min(actionable_validities) if actionable_validities else (fallback + timedelta(minutes=30) if fallback else None)
     valid_until = valid_datetime.isoformat() if valid_datetime else None
     required = ["실시간 호가와 주문 가능 상태 재확인", "계좌 현금·미체결 주문 재확인"]
