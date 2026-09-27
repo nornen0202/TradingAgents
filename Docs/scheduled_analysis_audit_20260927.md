@@ -4,7 +4,7 @@
 
 예약 실행·답변 발행은 진행됐지만, 이것을 최신 입력을 사용한 분석 성공으로 볼 수 없었다. **9월 25일 23:16 KST 미국 Work 보고서는 9월 22일 11:10 EDT 시세를 사용했다.** 사용자가 발견한 날짜 차이는 실제 archive에서도 확인된다.
 
-- ChatGPT 웹 대화 `미국 주식 투자 전략`, `주식 투자 전략`: 9월 14~25일 시장별 답변 10개, 총 20개 검토. 미국 9월 15·16일 답변은 도구의 20,000자 제한 때문에 끝부분이 잘려 있어 전수 원문 검토로 주장하지 않는다.
+- ChatGPT 웹 대화 `미국 주식 투자 전략`, `주식 투자 전략 제안`: 9월 14~25일 시장별 답변 10개, 총 20개 검토. 미국 9월 15·16일 답변은 도구의 20,000자 제한 때문에 끝부분이 잘려 있어 전수 원문 검토로 주장하지 않는다.
 - 로컬 Work: KR·US 최근 6개씩 총 12개 정본, immutable packet, producer manifest·decision bundle 및 공개 Pages 대조.
 - GitHub Actions의 작업별 성공·실패·건너뜀과 실제 시작·완료 시각 확인. Workflow 전체의 녹색 `success`만으로 분석 성공을 판정하지 않았다.
 - 금융사실은 Fed 9월 성명과 NVIDIA FY27 Q2 원문을 표본 검증했다. 모든 기업 공시·가격을 다시 수집한 투자보고서는 아니다.
@@ -50,4 +50,4 @@ python .github/scripts/strategy_interaction_regression.py
 
 감사 명령은 자료를 읽기만 하며 prepare·publish·ACK·주문을 실행하지 않는다. 과거 보고서를 소급 수정하지 않는다. 다음 예약은 v10 입력 계약을 적용하고, 기존 보고서는 발행 당시 참고자료로 보존한다. 공개 source receipt에는 계좌 식별자·보유집합·계좌 시각을 넣지 않으며, 개인 전략 화면은 기존 공개 범위 내에서 계좌 기준시각만 별도로 표시한다.
 
-로컬 Scheduled task와 공개 웹 재분석 대화는 다른 실행 경로다. 로컬 prompt를 고쳐도 이미 저장된 별도 클라우드 예약 prompt가 자동 변경되는 것은 아니다. 이번 작업에서 실제 적용이 검증되는 범위를 로컬 KR·US 예약과 저장소·Pages로 구분해 보고한다. [공식 Scheduled tasks 안내](https://learn.chatgpt.com/docs/automations)
+로컬 Scheduled task와 공개 웹 재분석 대화는 다른 실행 경로다. 로컬 prompt를 고쳐도 이미 저장된 별도 클라우드 예약 prompt가 자동 변경되는 것은 아니다. 따라서 로컬 KR·US 예약을 정본과 동기화한 뒤, ChatGPT 예약 UI의 `TradingAgents 미국 투자전략 23시30분`과 `TradingAgents 국내 투자전략 13시`에도 신선도·계산 검증 절을 직접 저장하고 재조회해 일치를 확인했다. 제목·반복 일정·활성 상태는 유지했다. 다음 실제 예약 답변의 품질까지 관측한 것은 아니므로 설정 적용·코드 검증과 향후 모델 출력의 정확성을 구분한다. [공식 Scheduled tasks 안내](https://learn.chatgpt.com/docs/automations)
