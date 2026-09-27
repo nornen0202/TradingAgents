@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import html
 import json
 import shutil
 from pathlib import Path
@@ -93,6 +94,8 @@ def build_work_site(
             "prompt_url": f"{prefix}/prompts/{source_prompt.name}",
             "source_health": (packet.get("body") or {}).get("source_health"),
             "report_mode": (packet.get("body") or {}).get("report_mode"),
+            "freshness_receipt": ((packet.get("body") or {}).get("current") or {}).get("freshness_receipt"),
+            "readable_url": f"{prefix}/{surface}/status.html",
         }
         report_status = _publish_latest_report(
             root=root,
@@ -103,6 +106,7 @@ def build_work_site(
         if report_status:
             status["integrated_report"] = report_status
         _write_json(root / surface / "status.json", status)
+        _write_bytes(root / surface / "status.html", _status_html(status).encode("utf-8"))
         index["streams"][surface] = status
 
     _write_json(root / "index.json", index)
@@ -136,6 +140,16 @@ def _publish_latest_report(
     target_root = root / surface / "report"
     _write_bytes(target_root / "events" / f"{report_sha}.json", content_source.read_bytes())
     _write_bytes(target_root / "latest.json", latest_source.read_bytes())
+    markdown = str(report.get("report_markdown") or "")
+    _write_bytes(target_root / "latest.md", markdown.encode("utf-8"))
+    structured = report.get("structured_report") or {}
+    _write_bytes(target_root / "latest.html", _readable_html(
+        f"{surface.upper()} Work 보고서",
+        f"<p>보고서 게시: {html.escape(str(report.get('published_at') or '미확인'))}</p>"
+        f"<p>입력 시세 기준: {html.escape(str(structured.get('as_of') or '미확인'))}</p>"
+        '<p>게시 시각은 입력 갱신 시각이 아닙니다. 아래 내용은 발행 당시 보고서이며 현재 주문 전에 다시 검증해야 합니다.</p>'
+        f"<pre>{html.escape(markdown)}</pre>",
+    ).encode("utf-8"))
     return {
         "schema": WORK_REPORT_SCHEMA,
         "report_id": report.get("report_id"),
@@ -143,9 +157,43 @@ def _publish_latest_report(
         "event_id": report.get("event_id"),
         "source_sha256": report.get("source_sha256"),
         "published_at": report.get("published_at"),
+        "as_of": structured.get("as_of"),
+        "readable_url": f"{url_prefix}/{surface}/report/latest.html",
+        "markdown_url": f"{url_prefix}/{surface}/report/latest.md",
         "latest_url": f"{url_prefix}/{surface}/report/latest.json",
         "event_url": f"{url_prefix}/{surface}/report/events/{report_sha}.json",
     }
+
+
+def _readable_html(title: str, content: str) -> str:
+    return ('<!doctype html><html lang="ko"><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width, initial-scale=1">'
+            f'<title>{html.escape(title)}</title><style>'
+            'body{font:16px/1.65 system-ui;max-width:960px;margin:auto;padding:24px;overflow-wrap:anywhere}'
+            'pre{white-space:pre-wrap;font:inherit}dt{font-weight:bold}dd{margin:0 0 14px}'
+            f'</style><h1>{html.escape(title)}</h1>{content}</html>')
+
+
+def _status_html(status: dict[str, Any]) -> str:
+    receipt = status.get("freshness_receipt") or {}
+    labels = {
+        "producer_run_id": "자료 갱신 실행 ID", "producer_finished_at": "자료 갱신 완료",
+        "analysis_run_id": "원분석 실행 ID", "analysis_lineage_status": "원분석 추적 상태",
+        "analysis_trade_date_oldest": "원분석 기준 거래일 (가장 오래된 값)",
+        "analysis_trade_date_latest": "원분석 기준 거래일 (가장 최근 값)",
+        "market_data_oldest_at": "입력 시세 시각 (가장 오래된 값)",
+        "market_data_latest_at": "입력 시세 시각 (가장 최근 값)",
+        "market_data_status": "빌드 당시 시세 상태",
+    }
+    content = '<p>게시·페이지 생성만으로 입력 자료가 갱신되지 않습니다. 시세 유효시간은 최대 30분이며 현재 시각에 다시 판정해야 합니다.</p><dl>'
+    content += ''.join(f'<dt>{label}</dt><dd>{html.escape(str(receipt.get(key) or "미확인"))}</dd>' for key, label in labels.items()) + '</dl>'
+    content += f'<p>생산 상태: {html.escape(str(status.get("source_health")))}</p>'
+    report = status.get("integrated_report") or {}
+    if report:
+        content += f'<p>Work 보고서 게시: {html.escape(str(report.get("published_at")))} · 보고서 입력: {html.escape(str(report.get("as_of") or "미확인"))}</p>'
+        content += '<p><a href="report/latest.html">발행 당시 Work 보고서 읽기</a> · <a href="report/latest.md">Markdown</a></p>'
+    content += '<p><a href="latest.json">현재 공개 입력 JSON</a> · <a href="status.json">상태 JSON</a></p>'
+    return _readable_html(f'{str(status["surface"]).upper()} 입력 신선도 감사', content)
 
 
 def _fit_packet_budget(packet: dict[str, Any], *, max_chars: int) -> dict[str, Any]:

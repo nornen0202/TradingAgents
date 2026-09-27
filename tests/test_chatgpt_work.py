@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 from datetime import datetime, timedelta, timezone
@@ -14,6 +15,98 @@ from tradingagents.work.handoff import WORK_HANDOFF_SCHEMA, dispatch_pages_hando
 from tradingagents.work.packet import WORK_REPORT_SCHEMA, WORK_SCHEMA, build_surface_packet
 from tradingagents.work.runtime import WorkRuntime, WorkRuntimeError, validate_packet
 from tradingagents.work.site import _fit_packet_budget, build_work_site
+
+
+def test_market_selection_uses_producer_clock_not_touched_ready_file(tmp_path: Path):
+    old = _write_market_run(tmp_path, run_id="old", market="us", started_at="2026-07-14T13:00:00Z", row_mode="IMMEDIATE")
+    _write_market_run(tmp_path, run_id="new", market="us", started_at="2026-07-14T14:00:00Z")
+    os.utime(old / "run.json", (2_000_000_000, 2_000_000_000))
+    packet = build_surface_packet("us", archive_dir=tmp_path, now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc))
+    assert packet["body"]["current"]["run_id"] == "new"
+
+
+@pytest.mark.parametrize("asof", [None, "invalid", "2026-07-14T14:00:00", "2026-07-15T14:00:00Z"])
+def test_invalid_quote_clock_cannot_be_renewed_by_publication(tmp_path: Path, asof):
+    run = _write_market_run(tmp_path, run_id="current", market="us", started_at="2026-07-14T14:00:00Z", row_mode="IMMEDIATE")
+    bundle = json.loads((run / "decision_bundle_v2.json").read_text())
+    bundle["strategy_table"][0]["market_data_asof"] = asof
+    (run / "decision_bundle_v2.json").write_text(json.dumps(bundle))
+    packet = build_surface_packet("us", archive_dir=tmp_path, now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc))
+    assert packet["body"]["source_health"] == "UNVERIFIED"
+    row = packet["body"]["current"]["bundle"]["strategy_table"][0]
+    assert row["thesis"]["stance"] == "HOLD"
+    assert row["execution"]["readiness"] == "NEEDS_LIVE_RECHECK"
+    assert row["execution"]["action_now"] is None
+
+
+def test_original_decision_and_clocks_survive_expired_overlay(tmp_path: Path):
+    full = _write_market_run(tmp_path, run_id="full", market="us", started_at="2026-07-13T12:00:00Z")
+    manifest = json.loads((full / "run.json").read_text())
+    manifest["settings"]["run_mode"] = "full"
+    (full / "run.json").write_text(json.dumps(manifest))
+    for run_id, parent, hour in (("overlay1", "full", 13), ("overlay2", "overlay1", 14)):
+        run = _write_market_run(tmp_path, run_id=run_id, market="us", started_at=f"2026-07-14T{hour}:00:00Z")
+        manifest = json.loads((run / "run.json").read_text())
+        manifest["overlay_source_run_id"] = parent
+        manifest["tickers"] = [{"ticker": "NVDA", "trade_date": "2026-07-10", "finished_at": "2026-07-13T12:30:00Z", "decision": json.dumps({"rating": "BUY", "confidence": 0.7, "watchlist_triggers": ["close above 100"], "invalidators": ["close below 90"], "exit_logic": "reduce on invalidation"})}]
+        manifest["portfolio"] = {"private_coverage_snapshot": {"as_of": "2026-07-14T14:00:00Z", "snapshot_id": "never-publish", "snapshot_health": "VALID"}}
+        (run / "run.json").write_text(json.dumps(manifest))
+    now = datetime(2026, 7, 15, tzinfo=timezone.utc)
+    packet = build_surface_packet("us", archive_dir=tmp_path, now=now)
+    current = packet["body"]["current"]
+    receipt = current["freshness_receipt"]
+    assert receipt["analysis_run_id"] == "full"
+    assert receipt["producer_run_id"] == "overlay2"
+    assert receipt["analysis_trade_date_oldest"] == "2026-07-10"
+    assert receipt["market_data_status"] == "STALE"
+    assert "never-publish" not in json.dumps(receipt)
+    row = current["bundle"]["strategy_table"][0]
+    assert row["thesis"]["stance"] == "BUY"
+    assert row["thesis"]["entry_conditions"] == ["close above 100"]
+    assert row["execution"]["readiness"] == "NEEDS_LIVE_RECHECK"
+    public = build_surface_packet("us", archive_dir=tmp_path, now=now, public=True)
+    assert "account_as_of" not in public["body"]["current"]["freshness_receipt"]
+
+
+@pytest.mark.parametrize("code", ["BUY_NOW", "BUY_ON_CONFIRMATION"])
+def test_conditional_buy_does_not_turn_into_research(code):
+    row = work_packet._compact_market_row({"strategy_code": code, "quality": {"row_mode": "BLOCKED_STALE"}}, 1)
+    assert row["thesis"]["stance"] == "BUY"
+    assert row["execution"]["readiness"] == "NEEDS_LIVE_RECHECK"
+
+
+def test_static_work_readers_expose_clocks_and_escape_report(tmp_path: Path):
+    from tradingagents.work.site import _publish_latest_report, _status_html
+    archive = tmp_path / "archive"
+    _write_market_run(archive, run_id="readable", market="us", started_at="2026-07-14T14:00:00Z")
+    runtime = WorkRuntime(tmp_path / "state")
+    prepared = runtime.prepare("us", archive_dir=archive, now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc))
+    _publish_market(runtime, prepared, archive=archive)
+    source = json.loads((archive / "work-reports/us/latest.json").read_text(encoding="utf-8"))
+    status = _publish_latest_report(root=tmp_path / "site", archive_dir=archive, surface="us", url_prefix="/work/v1")
+    assert (tmp_path / "site/us/report/latest.md").read_text(encoding="utf-8") == source["report_markdown"]
+    assert "입력 시세 기준" in (tmp_path / "site/us/report/latest.html").read_text(encoding="utf-8")
+    assert status["as_of"] == source["structured_report"]["as_of"]
+    page = _status_html({"surface": "us", "source_health": "STALE", "freshness_receipt": {"producer_run_id": "<script>alert(1)</script>"}, "integrated_report": status})
+    assert "&lt;script&gt;" in page and "<script>" not in page
+    assert "report/latest.html" in page
+
+
+def test_report_cannot_relabel_old_inputs_with_publication_time(tmp_path: Path):
+    from tradingagents.work.runtime import _validate_report_packet_coverage
+    _write_market_run(tmp_path / "archive", run_id="source", market="us", started_at="2026-07-14T14:00:00Z")
+    now = datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc)
+    runtime = WorkRuntime(tmp_path / "state")
+    prepared = runtime.prepare("us", archive_dir=tmp_path / "archive", now=now)
+    packet = json.loads(Path(prepared["packet_path"]).read_text(encoding="utf-8"))
+    draft = _structured_report(prepared)
+    draft["as_of"] = "2026-07-14T14:05:00Z"
+    with pytest.raises(WorkRuntimeError, match="market_data_oldest_at"):
+        _validate_report_packet_coverage(draft, packet, now=now)
+    draft["as_of"] = packet["body"]["current"]["freshness_receipt"]["market_data_oldest_at"]
+    draft["source_summary"]["freshness_receipt"]["analysis_trade_date_oldest"] = "2099-01-01"
+    with pytest.raises(WorkRuntimeError, match="freshness_receipt"):
+        _validate_report_packet_coverage(draft, packet, now=now)
 
 
 def _write_market_run(
@@ -321,7 +414,7 @@ def _structured_report(prepared: dict, *, ticker_override: list[str] | None = No
         },
         "title": "테스트 통합 투자 전략",
         "generated_at": "2026-07-14T14:06:00+00:00",
-        "as_of": "2026-07-14T14:05:00+00:00",
+        "as_of": packet.get("body", {}).get("current", {}).get("freshness_receipt", {}).get("market_data_oldest_at"),
         "source_health": packet.get("body", {}).get("source_health"),
         "report_mode": packet.get("body", {}).get("report_mode"),
         "summary": "분석 시점 전략과 실행 준비도를 분리한다.",
@@ -331,6 +424,7 @@ def _structured_report(prepared: dict, *, ticker_override: list[str] | None = No
         "model_receipt": packet.get("body", {}).get("model_provenance", {}),
         "source_summary": {
             "policy": "balanced_external",
+            "freshness_receipt": packet.get("body", {}).get("current", {}).get("freshness_receipt"),
             "external_evidence_receipt": supporting_context.get("receipt_contract"),
         },
         "next_checkpoint": "다음 시장 데이터 갱신 시점",
@@ -1195,7 +1289,7 @@ def test_market_publish_binds_healthy_external_evidence_and_requires_explicit_no
     assert contract["sources"]["youtube"]["event_keys"] == ["nvda-evidence"]
 
     empty_summary = _structured_report(prepared)
-    empty_summary["source_summary"] = {}
+    empty_summary["source_summary"].pop("external_evidence_receipt")
     with pytest.raises(WorkRuntimeError, match="external-evidence receipt does not exactly match"):
         runtime.publish(
             "us",
