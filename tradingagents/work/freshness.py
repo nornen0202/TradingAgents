@@ -24,7 +24,7 @@ def source_freshness_receipt(
     future = sum(value > now for value in valid)
     expired = sum(value + timedelta(minutes=30) <= now for value in valid)
     state = "MISSING" if not rows or invalid else "INVALID" if future else "STALE" if expired else "FRESH"
-    summaries = [item for item in manifest.get("tickers", []) if isinstance(item, dict)]
+    summaries = [item for item in analysis_manifest.get("tickers", []) if isinstance(item, dict)]
     dates = sorted({str(item["trade_date"]) for item in summaries if item.get("trade_date")})
     analysis_times = [aware_datetime(item.get("finished_at")) for item in analysis_manifest.get("tickers", []) if isinstance(item, dict)]
     analysis_times = [value for value in analysis_times if value is not None]

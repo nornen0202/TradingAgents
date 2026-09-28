@@ -111,6 +111,9 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
         archive_dir=archive_dir,
         public_base_url=getattr(settings, "public_base_url", ""),
     )
+    from tradingagents.scheduled.ai_context import build_ai_context
+
+    build_ai_context(site_dir)
     print(f"Pages build completed in {time.monotonic() - build_started:.1f}s", flush=True)
     return manifests
 

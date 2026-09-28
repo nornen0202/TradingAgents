@@ -72,6 +72,7 @@ def _latest_public_market_snapshot(
     market: str,
 ) -> dict[str, Any]:
     meta = _MARKET_META[market]
+    candidates = []
     for manifest in manifests:
         if _manifest_market(manifest) != meta["code"]:
             continue
@@ -87,9 +88,16 @@ def _latest_public_market_snapshot(
             continue
         if not isinstance(snapshot, dict):
             continue
-        health = str(snapshot.get("snapshot_health") or "VALID").strip().upper()
-        if health in {"INVALID", "INVALID_SNAPSHOT", "WATCHLIST_ONLY"}:
+        health = str(snapshot.get("snapshot_health") or "").strip().upper()
+        try:
+            observed = datetime.fromisoformat(str(snapshot.get("as_of")).replace("Z", "+00:00"))
+        except (ValueError, TypeError):
             continue
+        if health != "VALID" or observed.tzinfo is None or observed > datetime.now(timezone.utc):
+            continue
+        candidates.append((observed, snapshot, manifest))
+    if candidates:
+        _, snapshot, manifest = max(candidates, key=lambda item: item[0])
         return _public_market_snapshot(snapshot, manifest=manifest, market=market)
 
     return {
@@ -156,7 +164,8 @@ def _public_market_snapshot(
     if positions and total_market_value - total_purchase != total_pnl:
         total_pnl = total_market_value - total_purchase
     total_return = (total_pnl / total_purchase * 100.0) if total_purchase > 0 else None
-    account_value = _integer(snapshot.get("account_value_krw") or snapshot.get("total_equity_krw"))
+    equity = snapshot.get("account_value_krw")
+    account_value = _optional_integer(equity if equity is not None else snapshot.get("total_equity_krw"))
     meta = _MARKET_META[market]
     return {
         **meta,
@@ -171,9 +180,9 @@ def _public_market_snapshot(
             "total_market_value_krw": total_market_value,
             "total_unrealized_pnl_krw": total_pnl,
             "total_unrealized_return_pct": round(total_return, 4) if total_return is not None else None,
-            "settled_cash_krw": _integer(snapshot.get("settled_cash_krw")),
-            "available_cash_krw": _integer(snapshot.get("available_cash_krw")),
-            "buying_power_krw": _integer(snapshot.get("buying_power_krw")),
+            "settled_cash_krw": _optional_integer(snapshot.get("settled_cash_krw")),
+            "available_cash_krw": _optional_integer(snapshot.get("available_cash_krw")),
+            "buying_power_krw": _optional_integer(snapshot.get("buying_power_krw")),
             "total_equity_krw": account_value,
         },
         "positions": positions,
@@ -187,10 +196,10 @@ def _empty_summary() -> dict[str, Any]:
         "total_market_value_krw": 0,
         "total_unrealized_pnl_krw": 0,
         "total_unrealized_return_pct": None,
-        "settled_cash_krw": 0,
-        "available_cash_krw": 0,
-        "buying_power_krw": 0,
-        "total_equity_krw": 0,
+        "settled_cash_krw": None,
+        "available_cash_krw": None,
+        "buying_power_krw": None,
+        "total_equity_krw": None,
     }
 
 
@@ -204,6 +213,14 @@ def _number(value: Any) -> float:
 
 def _integer(value: Any) -> int:
     return int(round(_number(value)))
+
+
+def _optional_integer(value: Any) -> int | None:
+    try:
+        number = float(value)
+        return int(round(number)) if math.isfinite(number) else None
+    except (TypeError, ValueError):
+        return None
 
 
 def _text(value: Any) -> str:
@@ -387,6 +404,8 @@ def _format_as_of(value: Any) -> str:
 
 
 def _won(value: Any) -> str:
+    if value is None:
+        return "미확인"
     return f"₩{_integer(value):,}"
 
 

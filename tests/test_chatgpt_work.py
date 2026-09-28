@@ -43,6 +43,7 @@ def test_original_decision_and_clocks_survive_expired_overlay(tmp_path: Path):
     full = _write_market_run(tmp_path, run_id="full", market="us", started_at="2026-07-13T12:00:00Z")
     manifest = json.loads((full / "run.json").read_text())
     manifest["settings"]["run_mode"] = "full"
+    manifest["tickers"] = [{"ticker": "NVDA", "trade_date": "2026-07-09", "finished_at": "2026-07-13T12:30:00Z"}]
     (full / "run.json").write_text(json.dumps(manifest))
     for run_id, parent, hour in (("overlay1", "full", 13), ("overlay2", "overlay1", 14)):
         run = _write_market_run(tmp_path, run_id=run_id, market="us", started_at=f"2026-07-14T{hour}:00:00Z")
@@ -57,7 +58,7 @@ def test_original_decision_and_clocks_survive_expired_overlay(tmp_path: Path):
     receipt = current["freshness_receipt"]
     assert receipt["analysis_run_id"] == "full"
     assert receipt["producer_run_id"] == "overlay2"
-    assert receipt["analysis_trade_date_oldest"] == "2026-07-10"
+    assert receipt["analysis_trade_date_oldest"] == "2026-07-09"
     assert receipt["market_data_status"] == "STALE"
     assert "never-publish" not in json.dumps(receipt)
     row = current["bundle"]["strategy_table"][0]
