@@ -388,7 +388,7 @@ def _build_strategy_row(
         "sector_sync": sector_sync,
         "index_sync": index_sync,
         "sync_summary_ko": _sync_summary(sector_sync, index_sync),
-        "execution_condition_ko": _execution_condition(context=context, candidate=candidate, action=action),
+        "execution_condition_ko": _execution_condition(context=context, candidate=candidate, action=action, strategy_code=strategy_code),
         "risk_condition_ko": _risk_condition(context=context, candidate=candidate, action=action),
         "data_status_ko": data_status,
         "decision_state_ko": present_execution_state(context.get("decision_state")),
@@ -565,7 +565,14 @@ def _row_mode(*, context: dict[str, Any], execution_ready: bool, conditional_rea
     return "MISSING"
 
 
-def _execution_condition(*, context: dict[str, Any], candidate: dict[str, Any], action: dict[str, Any]) -> str:
+def _execution_condition(*, context: dict[str, Any], candidate: dict[str, Any], action: dict[str, Any], strategy_code: str = "") -> str:
+    # trigger_conditions can retain a superseded bullish entry plan after a risk
+    # overlay invalidates it. Never display those entry conditions as a sell gate.
+    if strategy_code in {"SELL", "REDUCE", "AVOID"}:
+        risk = _risk_condition(context=context, candidate=candidate, action=action)
+        if risk == "현재 명시된 위험 행동 없음":
+            return "매수 발동 조건 적용 금지; 매도·축소 근거와 수량 재확인 필요"
+        return f"위험 대응 조건: {risk} (매수 돌파·거래량 조건과 별도 판정)"
     conditions = action.get("trigger_conditions") or candidate.get("trigger_conditions") or []
     readable = [sanitize_investor_text(item, language="Korean") for item in conditions if str(item).strip()]
     if readable:

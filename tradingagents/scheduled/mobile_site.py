@@ -580,6 +580,10 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
         )
         if action:
             row["portfolio_action"] = action
+        if row.get("strategy_code") in {"SELL", "REDUCE", "AVOID"}:
+            # Existing archived bundles also need action-specific display repair.
+            risk = row.get("risk_condition_ko") or "매도·축소 근거와 수량 재확인 필요"
+            row["execution_condition_ko"] = f"위험 대응 조건: {risk} (매수 돌파·거래량 조건과 별도 판정)"
         rows.append(row)
     return {
         "market": str(body.get("market") or packet.get("surface") or "").upper(),
@@ -1936,7 +1940,8 @@ _PRIVATE_JS = r"""
     const executionAction = currentExecutionAction(row, action);
     const guidance = accountGuidance(row, action);
     const workEntryConditions = conciseConditions(thesis.entry_conditions);
-    const baseEntryConditions = conciseConditions(row.execution_condition_ko, action.trigger_conditions);
+    const riskDirected = ['SELL', 'REDUCE', 'AVOID'].includes(row.strategy_code);
+    const baseEntryConditions = conciseConditions(row.execution_condition_ko, riskDirected ? null : action.trigger_conditions);
     const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions) || '조건 정보 없음';
     const triggeredAction = strategyActivationAction(thesis, workExecution, action, hasWork);
     const workInvalidation = conciseConditions(thesis.invalidation_conditions);
@@ -1955,7 +1960,7 @@ _PRIVATE_JS = r"""
     const tickerIdentity = tickerKeys(row.ticker)[0];
     const fullWorkEntry = fullConditions(thesis.entry_conditions);
     const fullWorkInvalidation = fullConditions(thesis.invalidation_conditions);
-    const fullBaseEntry = fullConditions(row.execution_condition_ko, action.trigger_conditions);
+    const fullBaseEntry = fullConditions(row.execution_condition_ko, riskDirected ? null : action.trigger_conditions);
     const fullBaseInvalidation = fullConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
     const supportingDetail = `<details><summary>${hasWork ? '기본 분석·전체 조건 보기' : '전체 조건 보기'}</summary>
       ${hasWork ? `<p><strong>기본 분석 결론</strong><br>${esc(baseConclusion || '정보 없음')}</p>` : ''}
@@ -2307,6 +2312,9 @@ def _join_url(base: str, suffix: str) -> str:
 def _llms_text(*, public_base_url: str, generated_at: str) -> str:
     base = str(public_base_url or "").strip().rstrip("/")
     links = (
+        ("국내 최신 계좌·전략 통합 텍스트", "ai/kr/latest.md"),
+        ("미국 최신 계좌·전략 통합 텍스트", "ai/us/latest.md"),
+        ("공개 계좌 원문", "account/public.json"),
         ("미국 입력 신선도 감사 (JavaScript 불필요)", "work/v1/us/status.html"),
         ("국내 입력 신선도 감사 (JavaScript 불필요)", "work/v1/kr/status.html"),
         ("PC 종합 투자 전략", "strategy.html"),
@@ -2328,7 +2336,10 @@ def _llms_text(*, public_base_url: str, generated_at: str) -> str:
         "The HTML is a human-readable view of the same public JSON. `as_of` is the "
         "oldest input quote time in Work reports; the freshness receipt separately records the original research trade date, quote range and account snapshot. `generated_at`/`published_at` identify report publication. "
         "Do not infer current order eligibility from an old analysis timestamp.\n\n"
-        f"{rendered}\n"
+        f"{rendered}\n\n"
+        "Public text mirror (same data, check original timestamps):\n"
+        "https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/kr/latest.md\n"
+        "https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/us/latest.md\n"
     )
 
 

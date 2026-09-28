@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 from tradingagents.scheduled.account_site import PUBLIC_ACCOUNT_SCHEMA, build_public_account_site
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.site import _render_index_page
@@ -128,3 +130,34 @@ def test_homepage_links_to_public_account_page_when_enabled() -> None:
     html = _render_index_page([], SiteSettings(publish_account_snapshot=True))
 
     assert 'href="account/index.html"' in html
+
+
+def test_snapshot_selection_uses_observation_not_manifest_order(tmp_path):
+    old = _manifest(tmp_path, market="KR", run_id="later-producer", account_id="SECRET")
+    new = _manifest(tmp_path, market="KR", run_id="earlier-producer", account_id="SECRET")
+    path = Path(new["_run_dir"]) / "portfolio-private/account_snapshot.json"
+    snapshot = json.loads(path.read_text(encoding="utf-8"))
+    snapshot["as_of"] = "2026-08-13T09:30:00+09:00"
+    snapshot.pop("available_cash_krw")
+    snapshot["account_value_krw"] = 0
+    path.write_text(json.dumps(snapshot))
+    result = build_public_account_site(site_dir=tmp_path / "site", manifests=[old, new])
+    selected = result["markets"]["kr"]
+    assert selected["run_id"] == "earlier-producer"
+    assert selected["summary"]["available_cash_krw"] is None
+    assert selected["summary"]["total_equity_krw"] == 0
+
+
+@pytest.mark.parametrize("asof,health", [
+    ("2099-01-01T00:00:00Z", "VALID"), ("2026-08-13T09:00:00", "VALID"),
+    (None, "VALID"), ("bad", "VALID"), ("2026-08-13T00:00:00Z", None),
+])
+def test_unverified_account_clock_or_health_fails_closed(tmp_path, asof, health):
+    manifest = _manifest(tmp_path, market="KR", run_id="test", account_id="SECRET")
+    path = Path(manifest["_run_dir"]) / "portfolio-private/account_snapshot.json"
+    snapshot = json.loads(path.read_text(encoding="utf-8"))
+    snapshot.update(as_of=asof, snapshot_health=health)
+    path.write_text(json.dumps(snapshot))
+    result = build_public_account_site(site_dir=tmp_path / "site", manifests=[manifest])
+    assert result["markets"]["kr"]["status"] == "unavailable"
+    assert result["markets"]["kr"]["summary"]["available_cash_krw"] is None

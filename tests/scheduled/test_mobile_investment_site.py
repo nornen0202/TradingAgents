@@ -290,6 +290,17 @@ def test_private_action_matches_kr_broker_and_canonical_ticker_aliases() -> None
     assert market["rows"][0]["portfolio_action"]["action_now"] == "REDUCE_RISK"
 
 
+def test_archived_sell_display_does_not_reuse_bullish_trigger() -> None:
+    packet = _packet("kr", public=False)
+    row = packet["body"]["current"]["bundle"]["strategy_table"][0]
+    row.update(strategy_code="SELL", execution_condition_ko="1935000 돌파 RVOL 1.2",
+               risk_condition_ko="1832000 이탈 시 손절")
+    displayed = _private_market_payload(packet)["rows"][0]
+    assert "1832000" in displayed["execution_condition_ko"]
+    assert "1935000" not in displayed["execution_condition_ko"]
+    assert row["execution_condition_ko"] == "1935000 돌파 RVOL 1.2"
+
+
 def _write_valid_work_report(
     archive: Path,
     *,
