@@ -14,7 +14,7 @@
 
 한 번의 답변에서 현재 계좌 전략, 다른 계좌의 추가 현금 시나리오, 발동·취소 조건까지 완성하라. 추가 설명을 다시 물어야 한다면 미완성 답변이다.
 
-### 0. 예약 실행 품질 규약 (2026-09-29 v6)
+### 0. 예약 실행 품질 규약 (2026-09-29 v7)
 
 - 계획만 답하지 말고 이 실행에서 조사와 최종 답변까지 완료한다. 예약·알림·모델 설정은 변경하지 않는다. 웹 검색이나 계산 도구가 없으면 그 한계를 밝히며 사용했다고 주장하지 않는다.
 - 매번 자료 수집 → 계좌·배분 계산 → 반대 근거 검토 → 최종 품질 점검 순으로 수행한다. 긴 사고과정 대신 검증 가능한 근거·산식·결론만 출력한다.
@@ -37,12 +37,14 @@
 
 고정 latest URL은 캐시 때문에 어제 내용일 수 있다. HTTP 성공만으로 최신이라 하지 말고 다음 절차를 매 실행 새로 수행한다. 인증·안전 제한은 우회하지 않는다.
 
-1. https://api.github.com/repos/nornen0202/TradingAgents/git/ref/heads/public-context 에 `?request_id=현재UTC초_이번실행고유값`을 붙여 연다. 이전 응답·SHA를 재사용하지 말고 실제 object.sha 40자리와 ref를 확인한다.
-2. `https://raw.githubusercontent.com/nornen0202/TradingAgents/<확인한SHA>/manifest.json` 및 같은 SHA의 `us/latest.txt`, `us/latest.json`을 연다. .txt는 일반 텍스트다. SHA는 추측하지 않는다.
-3. 계산 도구로 원시 파일 바이트 길이·SHA-256을 manifest와 비교하고 JSON·본문의 시장·생성시각을 대조한다. 검증 도구가 없으면 `기계검증 미실시`로 표시하며 성공 영수증을 만들어내지 않는다. 같은 API를 새 request_id로 다시 조회해 SHA가 바뀌면 1회 재시도한다.
+1. 일반 텍스트 안내문 https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/discovery.txt 에 `?request_id=현재UTC초_이번실행고유값`을 붙여 연다. 이번 원문에 있는 generated_at과 snapshot_commit 40자리, manifest 및 us txt/json 전체 URL을 읽는다. 안내문에도 캐시가 있을 수 있으므로 생성시각이 미래·누락·30분 이상이면 과거 참고다. 이전 응답·SHA를 재사용하거나 SHA를 추측하지 않는다.
+2. 안내문에 실제 적힌 동일 SHA의 manifest.json, `us/latest.txt`, `us/latest.json`을 연다. .txt는 일반 텍스트다. 안내문 자체를 계좌나 최신 시세의 증거로 쓰지 않는다.
+3. 계산 도구로 manifest의 원시 바이트 길이·SHA-256을 안내문과, txt/json의 길이·해시를 manifest와 비교한다. JSON·본문의 시장·생성시각을 대조한다. 원시 바이트를 확보하지 못하고 렌더링 텍스트만 있으면 `기계검증 미실시`다. 새 request_id로 안내문을 재조회해 snapshot_commit이 바뀌면 1회 다시 수집한다. 해시 일치는 진본/투자 적합성/최신 HEAD를 보증하지 않는다.
 4. 문서·계좌·모든 대상 시세는 미래가 아니며 각각 30분 미만, 원분석 완료는 36시간 미만, 계좌 VALID, 행 valid_until 미경과, 보유 전수 일치여야 현재 개인화 판단의 입력으로 인정한다. 휴장·주말 입력은 장애로 단정하지 않되 과거 참고로 분리한다.
 5. 검증 실패·누락이면 현재 개인화 매매수량/확정 비중은 산출 보류한다. 독립 시장·기업 분석과 가상 추가자금 5개안은 계속한다. 과거 대화나 고정 latest 경로로 검증을 대체하지 않는다.
-6. 첫머리에 `입력 검증: PASS/REFERENCE_ONLY/UNVERIFIED, 조회시각, SHA, 해시 검증 여부, 원분석·시세·계좌 시각, 차단 사유`를 표시한다. PASS도 주문 승인이 아니다. 로컬 `python -m tradingagents.work verify-public --surface us` 영수증이 제공되면 시각·해시를 대조하되 클라우드가 이 명령을 실행했다고 꾸미지 않는다.
+6. 첫머리에 `입력 검증: PASS/REFERENCE_ONLY/UNVERIFIED, 조회시각, SHA, 해시 검증 여부, 최신 HEAD 확인 여부, 원분석·시세·계좌 시각, 차단 사유`를 표시한다. PASS는 위 무결성·신선도 검사를 모두 통과한 입력이라는 뜻이지 주문 승인이나 최종 답변 승인, 가장 최신 HEAD 확인이 아니다. 기계검증 미실시면 PASS를 쓰지 않는다. 로컬 `python -m tradingagents.work verify-public --surface us` 영수증은 시각·해시를 대조하되 클라우드가 실행했다고 꾸미지 않는다.
+
+최신 HEAD의 별도 확인이 가능하면 https://api.github.com/repos/nornen0202/TradingAgents/git/ref/heads/public-context 에 새 request_id를 붙여 조회하고, 확인된 HEAD SHA의 discovery.txt가 같은 snapshot_commit인지 검사한다. HEAD 커밋은 안내문을 추가한 커밋이고 snapshot_commit은 그 부모 데이터 커밋이므로 두 SHA 자체가 다를 수 있다. API 도구 미지원이면 `최신 HEAD 미확인`을 명시한다. API 없이 받은 원문도 시각을 붙인 참고 리서치에는 사용할 수 있지만, 원시 바이트 검증까지 없으면 개인화 수량·확정 비중은 보류한다. DisabledError·인증·명시적 안전 제한은 우회하지 않는다.
 
 참고 경로(최신 검증 대체 불가): https://nornen0202.github.io/TradingAgents/ai/us/latest.txt 및 https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/us/latest.txt
 

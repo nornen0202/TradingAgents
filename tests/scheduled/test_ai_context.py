@@ -121,17 +121,63 @@ def test_mirror_commits_only_allowlisted_files_without_force(monkeypatch, tmp_pa
     def api(path, method="GET", payload=None):
         calls.append((path, method, payload))
         if path.startswith("/git/ref/heads/"):
-            return {"object": {"sha": "new" if any(m == "PATCH" for _, m, _ in calls) else "old"}}
+            return {"object": {"sha": "b" * 40 if any(m == "PATCH" for _, m, _ in calls) else "old"}}
         if path.startswith("/contents/"):
             return {"content": base64.b64encode(json.dumps({**manifest, "generated_at": "2026-07-10T00:00:00Z"}).encode())}
         if path == "/git/trees":
-            assert set(item["path"] for item in payload["tree"]) == mirror.FILES | {"manifest.json"}
-            assert "base_tree" not in payload
-            return {"sha": "tree"}
+            if "base_tree" not in payload:
+                assert set(item["path"] for item in payload["tree"]) == mirror.FILES | {"manifest.json"}
+                return {"sha": "tree"}
+            assert payload["base_tree"] == "tree"
+            assert [item["path"] for item in payload["tree"]] == ["discovery.txt"]
+            text = payload["tree"][0]["content"]
+            assert f"snapshot_commit: {'a' * 40}" in text
+            assert manifest["generated_at"] in text
+            assert "/public-context/" not in text
+            return {"sha": "discovery-tree"}
         if path == "/git/commits":
-            assert payload["parents"] == ["old"]
-            return {"sha": "new"}
+            if payload["tree"] == "tree":
+                assert payload["parents"] == ["old"]
+                return {"sha": "a" * 40}
+            assert payload["parents"] == ["a" * 40]
+            return {"sha": "b" * 40}
         assert path == "/git/refs/heads/public-context" and payload["force"] is False
+        assert payload["sha"] == "b" * 40
         return {}
     monkeypatch.setattr(mirror, "api", api)
     mirror.publish()
+
+
+def test_discovery_contains_no_account_values_and_rejects_bad_sha():
+    manifest = {"generated_at": "2026-07-11T00:00:00Z", "private": "SECRET"}
+    raw = json.dumps(manifest).encode()
+    text = mirror.render_discovery("a" * 40, manifest, raw)
+    assert "SECRET" not in text
+    assert "manifest_sha256:" in text and f"manifest_bytes: {len(raw)}" in text
+    assert "not proof of current branch HEAD" in text
+    for value in ("old", "../main", "a" * 41):
+        with pytest.raises(ValueError, match="Invalid immutable"):
+            mirror.render_discovery(value, manifest, raw)
+
+
+def test_discovery_failure_never_advances_public_ref(monkeypatch, tmp_path):
+    manifest = build_ai_context(tmp_path, now=datetime(2026, 7, 11, tzinfo=timezone.utc))
+    files = {name: (tmp_path / "ai" / name).read_bytes() for name in mirror.FILES}
+    files["manifest.json"] = json.dumps(manifest).encode()
+    monkeypatch.setattr(mirror, "download_snapshot", lambda: (manifest, files))
+    def api(path, method="GET", payload=None):
+        assert method != "PATCH", "Partial discovery publication must not advance the ref"
+        if path.startswith("/git/ref/heads/"):
+            return {"object": {"sha": "old"}}
+        if path.startswith("/contents/"):
+            return {"content": base64.b64encode(json.dumps({**manifest, "generated_at": "2026-07-10T00:00:00Z"}).encode())}
+        if path == "/git/trees":
+            if "base_tree" in payload:
+                raise OSError("Discovery write failed")
+            return {"sha": "tree"}
+        if path == "/git/commits":
+            return {"sha": "a" * 40}
+        pytest.fail(f"Unexpected API mutation: {path}")
+    monkeypatch.setattr(mirror, "api", api)
+    with pytest.raises(OSError, match="Discovery write failed"):
+        mirror.publish()

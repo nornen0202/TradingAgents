@@ -77,7 +77,10 @@ def test_scheduled_quality_contract_is_embedded_in_both_prompts() -> None:
         assert text.count("## 프롬프트 끝") == 1
         body = text.split("## 프롬프트 시작", 1)[1].split("## 프롬프트 끝", 1)[0]
         for requirement in (
-            "2026-09-29 v6",
+            "2026-09-29 v7",
+            "/public-context/discovery.txt",
+            "최신 HEAD 미확인",
+            "기계검증 미실시면 PASS를 쓰지 않는다",
             "조회 실패를 자료 부재나 악재로 단정하지 않는다",
             "이전 추천은 체결 사실이 아니다",
             "A 바로 다음에 E-1 모바일표",
