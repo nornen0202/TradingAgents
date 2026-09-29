@@ -14,7 +14,7 @@
 
 한 번의 답변에서 현재 계좌 전략, 다른 계좌의 추가 현금 시나리오, 구체적 발동·취소 조건까지 완성하라. 추가 설명을 다시 물어야 한다면 미완성 답변이다.
 
-### 0. 예약 실행 품질 규약 (2026-09-28 v5)
+### 0. 예약 실행 품질 규약 (2026-09-29 v6)
 
 - 계획만 답하지 말고 이 실행에서 조사와 최종 답변까지 완료한다. 예약·알림·모델 설정은 변경하지 않는다. 웹 검색이나 계산 도구가 없으면 그 한계를 밝히며 사용했다고 주장하지 않는다.
 - 매번 자료 수집 → 계좌·배분 계산 → 반대 근거 검토 → 최종 품질 점검 순으로 수행한다. 긴 사고과정 대신 검증 가능한 근거·산식·결론만 출력한다.
@@ -35,19 +35,25 @@
 
 ### 2. 배포 사이트 탐색과 자료 감사
 
-첨부 없이 먼저 아래 경량 원문을 읽는다. 첫 경로의 일반 통신·렌더링 실패 시 동일 공개 자료의 대체 경로를 1회 조회한다. 인증·안전상 접근금지를 우회하지 않는다.
+고정 latest URL은 캐시 때문에 어제 내용일 수 있다. HTTP 성공만으로 최신이라 하지 말고 다음 절차를 매 실행 새로 수행한다. 인증·안전 제한은 우회하지 않는다.
 
-- https://nornen0202.github.io/TradingAgents/ai/kr/latest.md
-- https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/kr/latest.md
+1. https://api.github.com/repos/nornen0202/TradingAgents/git/ref/heads/public-context 에 `?request_id=현재UTC초_이번실행고유값`을 붙여 연다. 이전 응답·SHA를 재사용하지 말고 실제 object.sha 40자리와 ref를 확인한다.
+2. `https://raw.githubusercontent.com/nornen0202/TradingAgents/<확인한SHA>/manifest.json` 및 같은 SHA의 `kr/latest.txt`, `kr/latest.json`을 연다. .txt는 일반 텍스트다. SHA는 추측하지 않는다.
+3. 계산 도구로 원시 파일 바이트 길이·SHA-256을 manifest와 비교하고 JSON·본문의 시장·생성시각을 대조한다. 검증 도구가 없으면 `기계검증 미실시`로 표시하며 성공 영수증을 만들어내지 않는다. 같은 API를 새 request_id로 다시 조회해 SHA가 바뀌면 1회 재시도한다.
+4. 문서·계좌·모든 대상 시세는 미래가 아니며 각각 30분 미만, 원분석 완료는 36시간 미만, 계좌 VALID, 행 valid_until 미경과, 보유 전수 일치여야 현재 개인화 판단의 입력으로 인정한다. 휴장·주말 입력은 장애로 단정하지 않되 과거 참고로 분리한다.
+5. 검증 실패·누락이면 현재 개인화 매매수량/확정 비중은 산출 보류한다. 독립 시장·기업 분석과 가상 추가자금 5개안은 계속한다. 과거 대화나 고정 latest 경로로 검증을 대체하지 않는다.
+6. 첫머리에 `입력 검증: PASS/REFERENCE_ONLY/UNVERIFIED, 조회시각, SHA, 해시 검증 여부, 원분석·시세·계좌 시각, 차단 사유`를 표시한다. PASS도 주문 승인이 아니다. 로컬 `python -m tradingagents.work verify-public --surface kr` 영수증이 제공되면 시각·해시를 대조하되 클라우드가 이 명령을 실행했다고 꾸미지 않는다.
 
-원문에 시각·공개 계좌·전략이 포함돼 있다. 나머지 근거는 다음 인덱스와 실제 게시 링크에서 찾는다.
+참고 경로(최신 검증 대체 불가): https://nornen0202.github.io/TradingAgents/ai/kr/latest.txt 및 https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/kr/latest.txt
+
+나머지 근거는 실제 게시 링크에서 찾는다.
 
 - https://nornen0202.github.io/TradingAgents/index.html
 - https://nornen0202.github.io/TradingAgents/llms.txt
 
 다음 순서로 탐색하고 정합성을 검사하라.
 
-1. 위 명시된 경량 경로는 인덱스 조회 실패와 무관하게 확인한다. 추가 경로는 `llms.txt`와 인덱스의 링크로 발견하며 존재를 추측하지 않는다.
+1. 위 커밋 고정 입력은 인덱스 실패와 무관하게 확인한다. 추가 경로는 `llms.txt`와 인덱스의 링크로 발견한다.
 2. JSON/Markdown을 우선한다. `mobile/strategy.json`, `mobile/public.json`, `account/public.json` 링크로 누락·불일치를 대조한다.
 3. 인덱스가 가리키는 국내 최신 성공 run, 시장 상태, run별 전략·보고서·근거 링크를 따라간다. `work/`, `youtube/`, `prism-telegram/`은 보조 맥락으로만 사용한다.
 4. 확인한 URL마다 HTTP/접근 상태, 시장, run ID, `as_of`, `generated_at`/`published_at`, 거래일, 성공/실패, `valid_until`을 감사표에 기록한다.

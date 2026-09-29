@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 BASE = "https://nornen0202.github.io/TradingAgents/ai"
 API = "https://api.github.com/repos/nornen0202/TradingAgents"
 BRANCH = "public-context"
-FILES = {"kr/latest.md", "us/latest.md"}
+FILES = {f"{market}/latest.{extension}" for market in ("kr", "us") for extension in ("md", "txt", "json")}
 
 
 def fetch(url: str) -> bytes:
@@ -34,7 +34,8 @@ def validate_snapshot(manifest: dict, files: dict[str, bytes]) -> None:
         entry = manifest["files"][name]
         if len(content) > 250_000 or len(content) != entry["bytes"] or hashlib.sha256(content).hexdigest() != entry["sha256"]:
             raise ValueError(f"Public snapshot integrity failure: {name}")
-        if f"문서 생성: {manifest['generated_at']}" not in content.decode("utf-8"):
+        stamp = json.loads(content)["generated_at"] if name.endswith(".json") else manifest["generated_at"] if f"문서 생성: {manifest['generated_at']}" in content.decode("utf-8") else None
+        if stamp != manifest["generated_at"]:
             raise ValueError("Mixed public snapshot generation")
 
 

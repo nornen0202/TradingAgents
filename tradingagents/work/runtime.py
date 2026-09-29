@@ -1104,6 +1104,7 @@ def _validate_report_packet_coverage(
             ticker=identity,
             now=now,
         )
+    validate_account_execution(strategies, freshness, now=now)
 
 
 def _validate_external_evidence_binding(
@@ -1381,6 +1382,18 @@ def _validate_report_thesis_direction(
             f"Structured market strategy {ticker} discards the packet analysis direction "
             "as RESEARCH; execution freshness must be represented by execution.readiness"
         )
+
+
+def validate_account_execution(strategies: list[dict], freshness: Any, *, now: datetime) -> None:
+    if not any(str((row.get("execution") or {}).get("readiness") or "").strip().upper() in {"READY_NOW", "WAIT_FOR_TRIGGER"} for row in strategies):
+        return
+    from .freshness import aware_datetime
+    receipt = freshness if isinstance(freshness, dict) else {}
+    observed = aware_datetime(receipt.get("account_as_of"))
+    if (now.tzinfo is None or observed is None or observed > now
+            or now - observed >= timedelta(minutes=30)
+            or receipt.get("account_snapshot_health") != "VALID"):
+        raise WorkRuntimeError("Executable market report requires a VALID account observation less than 30 minutes old")
 
 
 def _validate_report_execution_gate(

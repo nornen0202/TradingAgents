@@ -69,6 +69,25 @@ def test_original_decision_and_clocks_survive_expired_overlay(tmp_path: Path):
     assert "account_as_of" not in public["body"]["current"]["freshness_receipt"]
 
 
+def test_publish_does_not_archive_executable_report_with_stale_account(tmp_path: Path):
+    archive = tmp_path / "archive"
+    run = _write_market_run(archive, run_id="stale-account", market="us",
+                            started_at="2026-07-14T14:00:00Z", row_mode="CONDITIONAL")
+    manifest = json.loads((run / "run.json").read_text(encoding="utf-8"))
+    manifest["portfolio"]["private_coverage_snapshot"]["as_of"] = "2026-07-13T14:00:00Z"
+    (run / "run.json").write_text(json.dumps(manifest), encoding="utf-8")
+    runtime = WorkRuntime(tmp_path / "runtime")
+    prepared = runtime.prepare("us", archive_dir=archive,
+                               now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc))
+    draft = _structured_report(prepared)
+    with pytest.raises(WorkRuntimeError, match="VALID account"):
+        runtime.publish("us", prepared["event_id"], prepared["source_sha256"],
+                        report_markdown="# Test\n\nStale account must not be executable.",
+                        structured_report=draft, archive_dir=archive,
+                        now=datetime(2026, 7, 14, 14, 6, tzinfo=timezone.utc))
+    assert not (archive / "work-reports/us/latest.json").exists()
+
+
 @pytest.mark.parametrize("code", ["BUY_NOW", "BUY_ON_CONFIRMATION"])
 def test_conditional_buy_does_not_turn_into_research(code):
     row = work_packet._compact_market_row({"strategy_code": code, "quality": {"row_mode": "BLOCKED_STALE"}}, 1)
@@ -126,6 +145,7 @@ def _write_market_run(
         "run_id": run_id,
         "started_at": started_at,
         "settings": {"market": market.upper(), "run_mode": "overlay_only"},
+        "portfolio": {"private_coverage_snapshot": {"as_of": started_at, "snapshot_health": "VALID"}},
         "decision_bundle": {
             "decision_ready": ready,
             "conditional_strategy_ready": conditional,
