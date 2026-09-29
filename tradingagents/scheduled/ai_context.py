@@ -31,6 +31,10 @@ def project(value: Any, fields: tuple[str, ...]) -> dict:
 
 
 def render_context(market: str, strategy: dict, account: dict, status: dict, *, generated_at: str) -> str:
+    return render_payload(public_context(market, strategy, account, status, generated_at=generated_at))
+
+
+def public_context(market: str, strategy: dict, account: dict, status: dict, *, generated_at: str) -> dict:
     rows = strategy.get("rows") or []
     account_view = project(account, ("status", "as_of", "snapshot_health", "currency"))
     account_view["summary"] = project(account.get("summary"), SUMMARY_FIELDS)
@@ -44,6 +48,14 @@ def render_context(market: str, strategy: dict, account: dict, status: dict, *, 
         selected["quality_at_build"] = project(row.get("quality"), QUALITY_FIELDS)
         selected_rows.append(selected)
     report = project(status.get("integrated_report"), ("published_at", "as_of", "markdown_url", "readable_url"))
+    return {"schema": SCHEMA, "market": market, "generated_at": generated_at,
+            "freshness_receipt": project(strategy.get("freshness_receipt"), CLOCK_FIELDS),
+            "account": account_view, "rows": selected_rows, "report": report}
+
+
+def render_payload(payload: dict) -> str:
+    market, generated_at = payload["market"], payload["generated_at"]
+    account_view, selected_rows, report = payload["account"], payload["rows"], payload["report"]
     parts = [
         f"# TradingAgents {market.upper()} 최신 공개 입력",
         f"schema: {SCHEMA}\n문서 생성: {generated_at}",
@@ -57,7 +69,7 @@ def render_context(market: str, strategy: dict, account: dict, status: dict, *, 
         "## 원본 링크",
         "\n".join(f"- https://nornen0202.github.io/TradingAgents/{path}" for path in
                   ("account/public.json", "mobile/strategy.json", f"work/v1/{market}/status.json")),
-        "## 원분석·시세 시각\n```json\n" + json.dumps(project(strategy.get("freshness_receipt"), CLOCK_FIELDS), ensure_ascii=False, indent=2) + "\n```",
+        "## 원분석·시세 시각\n```json\n" + json.dumps(payload["freshness_receipt"], ensure_ascii=False, indent=2) + "\n```",
         "## 계좌 관측값 — 계좌번호·주문·인증정보 제외\n```json\n" + json.dumps(account_view, ensure_ascii=False, indent=2) + "\n```",
         "## 종목별 원안과 조건 — 현재 재검증 필요",
     ]
@@ -78,8 +90,9 @@ def build_ai_context(site_dir: Path, *, now: datetime | None = None) -> dict:
     manifest: dict = {"schema": SCHEMA, "generated_at": stamp, "files": {}, "mirror_base": MIRROR_BASE}
     for market in ("kr", "us"):
         market_strategy = (strategy.get("markets") or {}).get(market) or {}
-        body = render_context(market, market_strategy, (account.get("markets") or {}).get(market) or {},
-                              read(f"work/v1/{market}/status.json"), generated_at=stamp)
+        payload = public_context(market, market_strategy, (account.get("markets") or {}).get(market) or {},
+                                 read(f"work/v1/{market}/status.json"), generated_at=stamp)
+        body = render_payload(payload)
         content = body.encode("utf-8")
         if len(content) > 250_000:
             raise ValueError(f"AI reader exceeds safe budget: {market}")
@@ -88,5 +101,9 @@ def build_ai_context(site_dir: Path, *, now: datetime | None = None) -> dict:
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(content)
         manifest["files"][relative] = {"sha256": hashlib.sha256(content).hexdigest(), "bytes": len(content)}
+        for extension, data in (("txt", content), ("json", (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))):
+            relative = f"{market}/latest.{extension}"
+            (site_dir / "ai" / relative).write_bytes(data)
+            manifest["files"][relative] = {"sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)}
     (site_dir / "ai" / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest

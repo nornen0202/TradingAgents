@@ -17,6 +17,9 @@
 
 ## 입력 시각 계약
 
+- 현재 실행으로 분류하는 READY_NOW/WAIT_FOR_TRIGGER는 게시 시점에 VALID 계좌 관측이 30분 미만이어야 한다. 계좌 시각 누락·미래·만료면 NEEDS_LIVE_RECHECK로 낮추고 action_now/action_if_triggered를 비운다. 이 조건은 publish 코드가 검사한다. 분석 시점 thesis는 별도 참고로 보존한다.
+- 공개 웹 복구 입력이 필요할 경우 `python -m tradingagents.work verify-public --surface us`로만 최신 커밋·해시·입력 시각을 검증한다. REFERENCE_ONLY/UNVERIFIED는 개인화 입력이 아니며 로컬 정본 packet을 대체하지 않는다. 검증 성공도 주문 승인이 아니다.
+
 - `current.freshness_receipt`를 `source_summary.freshness_receipt`에 그대로 복사한다. 최상위 `as_of`는 `market_data_oldest_at`과 정확히 일치시킨다(null이면 null). 게시·작성 시각으로 대체하지 않는다.
 - 첫 요약에 작성 시각, 원분석 기준 거래일 범위, 시세 관측시각 범위, 계좌 기준시각을 각각 표시한다. 현재 시각에서 경과시간을 계산한다. `producer_run_id`는 자료 갱신 실행이며 `analysis_run_id`와 다를 수 있다. 거래일·휴장과 시세 만료를 구분하며 오래된 시세로 최신 분석이 완료됐다고 쓰지 않는다.
 - 현재 manifest의 원결정에서 전달된 `thesis`를 보존한다. 시세와 원분석의 시각·조건이 다르면 각각 표시하고, 단순 overlay 갱신을 기업분석 재수행으로 세지 않는다. 생산 커버리지 COMPLETE는 신선도나 주문 가능성의 증명이 아니다.

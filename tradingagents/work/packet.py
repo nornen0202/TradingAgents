@@ -16,8 +16,8 @@ WORK_STATE_SCHEMA = "tradingagents.work-state/v1"
 WORK_REPORT_SCHEMA = "tradingagents.work-report/v1"
 SURFACES = ("kr", "us", "youtube", "prism")
 PROMPT_CONTRACTS = {
-    "kr": "market-work-v10-kr",
-    "us": "market-work-v10-us",
+    "kr": "market-work-v11-kr",
+    "us": "market-work-v11-us",
     "youtube": "youtube-work-v5",
     "prism": "prism-work-v5",
 }

@@ -54,7 +54,19 @@ def main() -> int:
     status = subparsers.add_parser("status")
     status.add_argument("--surface", choices=("kr", "us", "youtube", "prism"))
 
+    verify_public = subparsers.add_parser("verify-public")
+    verify_public.add_argument("--surface", required=True, choices=("kr", "us"))
+
     args = parser.parse_args()
+    if args.command == "verify-public":
+        from .public_delivery import prepare_public_delivery
+        try:
+            result = prepare_public_delivery(args.surface)
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            print(json.dumps({"status": "UNVERIFIED", "error": str(exc), "personalized_input": None}))
+            return 2
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if result["status"] == "VERIFIED_CURRENT_INPUT" else 2
     runtime = WorkRuntime(args.runtime_dir)
     try:
         if args.command == "prepare":

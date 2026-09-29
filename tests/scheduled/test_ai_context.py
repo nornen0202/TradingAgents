@@ -58,12 +58,12 @@ def test_mirror_retries_mixed_deployment_but_never_publishes_it(monkeypatch, tmp
     def fetch(url):
         calls.append(url)
         if url.endswith("manifest.json"):
-            return encoded if len(calls) % 4 == 1 else encoded + b" "
+            return encoded if len(calls) % (len(mirror.FILES) + 2) == 1 else encoded + b" "
         return (tmp_path / "ai" / url.split("/ai/")[1]).read_bytes()
     monkeypatch.setattr(mirror, "fetch", fetch)
     with pytest.raises(ValueError, match="changed"):
         mirror.download_snapshot()
-    assert len(calls) == 8
+    assert len(calls) == 2 * (len(mirror.FILES) + 2)
 
 
 def test_sell_condition_cannot_inherit_buy_trigger():
@@ -80,7 +80,7 @@ def test_sell_condition_cannot_inherit_buy_trigger():
 def test_both_prompts_require_current_evidence_and_recovery():
     for market in ("kr", "us"):
         text = (ROOT / "Docs" / f"prompts_{market}_for_chatgpt.md").read_text(encoding="utf-8")
-        for fragment in (f"/ai/{market}/latest.md", f"/public-context/{market}/latest.md",
+        for fragment in (f"/ai/{market}/latest.txt", f"/public-context/{market}/latest.txt",
                          "현재 개인화 전략에 재사용하지", "계좌 최대낙폭이 아니며",
                          "조회 실패를 생산 중단으로 단정하지", "AND/OR", "가상 추가자금 5개안"):
             assert fragment in text

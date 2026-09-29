@@ -2312,8 +2312,8 @@ def _join_url(base: str, suffix: str) -> str:
 def _llms_text(*, public_base_url: str, generated_at: str) -> str:
     base = str(public_base_url or "").strip().rstrip("/")
     links = (
-        ("국내 최신 계좌·전략 통합 텍스트", "ai/kr/latest.md"),
-        ("미국 최신 계좌·전략 통합 텍스트", "ai/us/latest.md"),
+        ("국내 계좌·전략 일반 텍스트 (시각 재검증)", "ai/kr/latest.txt"),
+        ("미국 계좌·전략 일반 텍스트 (시각 재검증)", "ai/us/latest.txt"),
         ("공개 계좌 원문", "account/public.json"),
         ("미국 입력 신선도 감사 (JavaScript 불필요)", "work/v1/us/status.html"),
         ("국내 입력 신선도 감사 (JavaScript 불필요)", "work/v1/kr/status.html"),
@@ -2337,9 +2337,10 @@ def _llms_text(*, public_base_url: str, generated_at: str) -> str:
         "oldest input quote time in Work reports; the freshness receipt separately records the original research trade date, quote range and account snapshot. `generated_at`/`published_at` identify report publication. "
         "Do not infer current order eligibility from an old analysis timestamp.\n\n"
         f"{rendered}\n\n"
-        "Public text mirror (same data, check original timestamps):\n"
-        "https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/kr/latest.md\n"
-        "https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/us/latest.md\n"
+        "Mutable latest URLs may be cached. Resolve the public-context Git ref with a new request_id for every execution, then read manifest.json and market/latest.txt + latest.json at that immutable commit. Verify hashes and all original timestamps.\n"
+        "https://api.github.com/repos/nornen0202/TradingAgents/git/ref/heads/public-context\n"
+        "https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/kr/latest.txt\n"
+        "https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/us/latest.txt\n"
     )
 
 

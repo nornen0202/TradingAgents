@@ -16,7 +16,7 @@ def test_prompts_stay_compact_and_korean_action_first() -> None:
     for name in PROMPTS:
         text = (ROOT / "Docs" / name).read_text(encoding="utf-8")
         # Full scheduled prompts stay self-contained without an extra attachment.
-        assert len(text) < 14_000, name
+        assert len(text) < 16_000, name
         assert "한국어" in text, name
 
     for name in ("prompts_kr_for_chatgpt.md", "prompts_us_for_chatgpt.md"):
@@ -77,7 +77,7 @@ def test_scheduled_quality_contract_is_embedded_in_both_prompts() -> None:
         assert text.count("## 프롬프트 끝") == 1
         body = text.split("## 프롬프트 시작", 1)[1].split("## 프롬프트 끝", 1)[0]
         for requirement in (
-            "2026-09-28 v5",
+            "2026-09-29 v6",
             "조회 실패를 자료 부재나 악재로 단정하지 않는다",
             "이전 추천은 체결 사실이 아니다",
             "A 바로 다음에 E-1 모바일표",
