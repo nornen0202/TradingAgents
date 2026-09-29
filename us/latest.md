@@ -1,7 +1,7 @@
 # TradingAgents US 최신 공개 입력
 
 schema: tradingagents.ai-context/v1
-문서 생성: 2026-09-29T17:02:20.128578+00:00
+문서 생성: 2026-09-29T18:19:42.409954+00:00
 
 이 문서는 이미 공개된 자료의 축약 전사이며 새 분석·주문 승인이 아닙니다. 원분석 거래일(완료 일봉), 분석 완료, 장중 시세, 계좌 관측, 문서 생성은 서로 다른 시각입니다. 휴장·주말의 마지막 완료 거래일을 장애로 단정하지 마세요. null은 미확인이지 0이 아닙니다. 빌드 당시 실행 상태는 현재 상태가 아니며 row_valid_until과 현재 세션을 다시 확인해야 합니다. 현재 문서를 읽지 못하면 과거 대화의 계좌·한도를 최신 사실로 재사용하지 마세요.
 
@@ -16,15 +16,15 @@ schema: tradingagents.ai-context/v1
 ## 원분석·시세 시각
 ```json
 {
-  "producer_run_id": "20260930T015245_github-actions-overlay-us",
-  "producer_finished_at": "2026-09-30T01:59:47.384434+09:00",
+  "producer_run_id": "20260930T031107_github-actions-overlay-us",
+  "producer_finished_at": "2026-09-30T03:17:25.168271+09:00",
   "analysis_run_id": "20260929T020356_github-actions-us",
   "analysis_completed_at": "2026-09-29T04:33:13.882368+09:00",
   "analysis_trade_date_oldest": "2026-09-25",
   "analysis_trade_date_latest": "2026-09-25",
   "analysis_lineage_status": "RESOLVED",
-  "market_data_oldest_at": "2026-09-29T12:50:00-04:00",
-  "market_data_latest_at": "2026-09-29T12:50:00-04:00",
+  "market_data_oldest_at": "2026-09-29T14:10:00-04:00",
+  "market_data_latest_at": "2026-09-29T14:10:00-04:00",
   "market_data_status": "FRESH"
 }
 ```
@@ -33,18 +33,18 @@ schema: tradingagents.ai-context/v1
 ```json
 {
   "status": "available",
-  "as_of": "2026-09-30T02:00:26.970683+09:00",
+  "as_of": "2026-09-30T03:18:00.844628+09:00",
   "snapshot_health": "VALID",
   "currency": "KRW",
   "summary": {
     "position_count": 14,
     "total_purchase_amount_krw": 23999416,
-    "total_market_value_krw": 24956338,
-    "total_unrealized_pnl_krw": 956922,
+    "total_market_value_krw": 25010182,
+    "total_unrealized_pnl_krw": 1010766,
     "settled_cash_krw": 0,
     "available_cash_krw": 975902,
     "buying_power_krw": 86360,
-    "total_equity_krw": 26018723
+    "total_equity_krw": 26072363
   },
   "positions": [
     {
@@ -53,9 +53,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 12.0,
       "sellable_quantity": 12.0,
       "average_cost_krw": 554431,
-      "current_price_krw": 621506,
-      "market_value_krw": 7458076,
-      "unrealized_pnl_krw": 804902
+      "current_price_krw": 623777,
+      "market_value_krw": 7485331,
+      "unrealized_pnl_krw": 832157
     },
     {
       "ticker": "RSP",
@@ -63,9 +63,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 11.0,
       "sellable_quantity": 11.0,
       "average_cost_krw": 297167,
-      "current_price_krw": 283696,
-      "market_value_krw": 3120656,
-      "unrealized_pnl_krw": -148184
+      "current_price_krw": 284172,
+      "market_value_krw": 3125892,
+      "unrealized_pnl_krw": -142948
     },
     {
       "ticker": "GOOGL",
@@ -73,9 +73,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 6.0,
       "sellable_quantity": 6.0,
       "average_cost_krw": 431023,
-      "current_price_krw": 461699,
-      "market_value_krw": 2770197,
-      "unrealized_pnl_krw": 184058
+      "current_price_krw": 461751,
+      "market_value_krw": 2770506,
+      "unrealized_pnl_krw": 184367
     },
     {
       "ticker": "NVDA",
@@ -83,9 +83,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 6.0,
       "sellable_quantity": 6.0,
       "average_cost_krw": 271573,
-      "current_price_krw": 312065,
-      "market_value_krw": 1872390,
-      "unrealized_pnl_krw": 242948
+      "current_price_krw": 310324,
+      "market_value_krw": 1861948,
+      "unrealized_pnl_krw": 232506
     },
     {
       "ticker": "MPWR",
@@ -93,9 +93,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 1910446,
-      "current_price_krw": 1836040,
-      "market_value_krw": 1836040,
-      "unrealized_pnl_krw": -74406
+      "current_price_krw": 1851694,
+      "market_value_krw": 1851694,
+      "unrealized_pnl_krw": -58752
     },
     {
       "ticker": "ETN",
@@ -103,9 +103,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 3.0,
       "sellable_quantity": 3.0,
       "average_cost_krw": 564940,
-      "current_price_krw": 587683,
-      "market_value_krw": 1763049,
-      "unrealized_pnl_krw": 68227
+      "current_price_krw": 589179,
+      "market_value_krw": 1767537,
+      "unrealized_pnl_krw": 72715
     },
     {
       "ticker": "GEV",
@@ -113,9 +113,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 1496734,
-      "current_price_krw": 1301669,
-      "market_value_krw": 1301669,
-      "unrealized_pnl_krw": -195065
+      "current_price_krw": 1305776,
+      "market_value_krw": 1305776,
+      "unrealized_pnl_krw": -190958
     },
     {
       "ticker": "SGOV",
@@ -123,9 +123,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 9.0,
       "sellable_quantity": 9.0,
       "average_cost_krw": 136695,
-      "current_price_krw": 136911,
-      "market_value_krw": 1232202,
-      "unrealized_pnl_krw": 1942
+      "current_price_krw": 136918,
+      "market_value_krw": 1232262,
+      "unrealized_pnl_krw": 2002
     },
     {
       "ticker": "AAPL",
@@ -133,9 +133,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 2.0,
       "sellable_quantity": 2.0,
       "average_cost_krw": 370482,
-      "current_price_krw": 450309,
-      "market_value_krw": 900619,
-      "unrealized_pnl_krw": 159655
+      "current_price_krw": 450697,
+      "market_value_krw": 901394,
+      "unrealized_pnl_krw": 160430
     },
     {
       "ticker": "DELL",
@@ -143,9 +143,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 673478,
-      "current_price_krw": 735324,
-      "market_value_krw": 735324,
-      "unrealized_pnl_krw": 61846
+      "current_price_krw": 735970,
+      "market_value_krw": 735970,
+      "unrealized_pnl_krw": 62492
     },
     {
       "ticker": "LLY",
@@ -153,9 +153,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 0.436065,
       "sellable_quantity": 0.436065,
       "average_cost_krw": 1442975,
-      "current_price_krw": 1605602,
-      "market_value_krw": 700147,
-      "unrealized_pnl_krw": 70916
+      "current_price_krw": 1613925,
+      "market_value_krw": 703776,
+      "unrealized_pnl_krw": 74545
     },
     {
       "ticker": "AVGO",
@@ -163,9 +163,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 578849,
-      "current_price_krw": 483629,
-      "market_value_krw": 483629,
-      "unrealized_pnl_krw": -95220
+      "current_price_krw": 483622,
+      "market_value_krw": 483622,
+      "unrealized_pnl_krw": -95227
     },
     {
       "ticker": "GLDM",
@@ -173,9 +173,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 4.0,
       "sellable_quantity": 4.0,
       "average_cost_krw": 138418,
-      "current_price_krw": 111520,
-      "market_value_krw": 446080,
-      "unrealized_pnl_krw": -107594
+      "current_price_krw": 112091,
+      "market_value_krw": 448364,
+      "unrealized_pnl_krw": -105310
     },
     {
       "ticker": "AMZN",
@@ -183,9 +183,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 353382,
-      "current_price_krw": 336260,
-      "market_value_krw": 336260,
-      "unrealized_pnl_krw": -17122
+      "current_price_krw": 336110,
+      "market_value_krw": 336110,
+      "unrealized_pnl_krw": -17272
     }
   ]
 }
@@ -194,107 +194,107 @@ schema: tradingagents.ai-context/v1
 ## 종목별 원안과 조건 — 현재 재검증 필요
 
 ```json
-{"ticker":"MPWR","display_name":"Monolithic Power Systems","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":1351.5399,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":1357.579191401497,"relative_volume":0.22153173097710993,"spread_bps":13.836529176949368,"day_high":1374.32,"day_low":1347.85,"execution_condition_ko":"1387.46 위 종가, 거래량 643920 이상, 확인된 상대거래량 1.2 이상 / 1329.47 지지 또는 재탈환","risk_condition_ko":"1,303.82 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"MPWR","display_name":"Monolithic Power Systems","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":1361.1,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":1357.6327562398849,"relative_volume":0.19850441820744869,"spread_bps":13.486971806332445,"day_high":1374.32,"day_low":1347.85,"execution_condition_ko":"1387.46 위 종가, 거래량 643920 이상, 확인된 상대거래량 1.2 이상 / 1329.47 지지 또는 재탈환","risk_condition_ko":"1,303.82 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"TSM","display_name":"Taiwan Semiconductor Manufacturing","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":456.735,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":454.2151100082744,"relative_volume":0.27025732430254695,"spread_bps":1.093075367546841,"day_high":458.1,"day_low":447.07,"execution_condition_ko":"현재 TSM 가격·거래량·당일 거래량 가중평균가격·이동평균·이전 고점 갱신 / 457.68 상향 돌파와 상대거래량 1.2 이상, 이후 종가 확인 및 다음 거래일 455.03 유지","risk_condition_ko":"440.53 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"TSM","display_name":"Taiwan Semiconductor Manufacturing","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":458.01,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":454.90961579694124,"relative_volume":0.24508692411201066,"spread_bps":2.843052563667876,"day_high":458.69,"day_low":447.07,"execution_condition_ko":"현재 TSM 가격·거래량·당일 거래량 가중평균가격·이동평균·이전 고점 갱신 / 457.68 상향 돌파와 상대거래량 1.2 이상, 이후 종가 확인 및 다음 거래일 455.03 유지","risk_condition_ko":"440.53 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"AMZN","display_name":"Amazon","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":247.305,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":247.09824426399345,"relative_volume":0.47103659327464326,"spread_bps":2.0236770211467348,"day_high":247.5399,"day_low":245.14,"execution_condition_ko":"252.37 신규 돌파와 실시간 거래량가중평균가격 상회 및 시간 보정 상대 거래량 1.2 이상 / 256.18 위 일일 종가와 거래량 41059560주 이상, 이어지는 다음 거래일 지지","risk_condition_ko":"244.3 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"AMZN","display_name":"Amazon","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":246.8201,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":247.04992142105698,"relative_volume":0.4199410573003439,"spread_bps":2.43062588616578,"day_high":247.5399,"day_low":245.14,"execution_condition_ko":"252.37 신규 돌파와 실시간 거래량가중평균가격 상회 및 시간 보정 상대 거래량 1.2 이상 / 256.18 위 일일 종가와 거래량 41059560주 이상, 이어지는 다음 거래일 지지","risk_condition_ko":"244.3 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"AVGO","display_name":"Broadcom","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":356.285,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":358.8486034285127,"relative_volume":0.4865850426275166,"spread_bps":2.5214674940824473,"day_high":361.86,"day_low":355.79,"execution_condition_ko":"최신 AVGO 가격으로 349.43 지지 여부 확인 / 362.90을 거래량 25.66백만 주 초과로 종가 돌파한 뒤 다음 정규장 지지 확인","risk_condition_ko":"349.43 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"AVGO","display_name":"Broadcom","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":354.73,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":358.3931392202027,"relative_volume":0.40260257350549933,"spread_bps":1.9763124832364423,"day_high":361.86,"day_low":354.0,"execution_condition_ko":"최신 AVGO 가격으로 349.43 지지 여부 확인 / 362.90을 거래량 25.66백만 주 초과로 종가 돌파한 뒤 다음 정규장 지지 확인","risk_condition_ko":"349.43 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"RSP","display_name":"RSP","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":208.54,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":209.151596326809,"relative_volume":0.5053878278479882,"spread_bps":0.4791681640667436,"day_high":210.11,"day_low":208.49,"execution_condition_ko":"RSP의 최신 가격과 당일 거래량·가격 가중 평균을 확인 / RSP가 상대 거래량 1.2 이상으로 212.83 위에서 마감하고 다음 거래일에도 유지","risk_condition_ko":"209.81 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"RSP","display_name":"RSP","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":208.815,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":209.09703558031262,"relative_volume":0.4234005003889392,"spread_bps":0.479122248041152,"day_high":210.11,"day_low":208.47,"execution_condition_ko":"RSP의 최신 가격과 당일 거래량·가격 가중 평균을 확인 / RSP가 상대 거래량 1.2 이상으로 212.83 위에서 마감하고 다음 거래일에도 유지","risk_condition_ko":"209.81 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"ETN","display_name":"Eaton","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":432.13,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":433.72904473127284,"relative_volume":0.4489311544789324,"spread_bps":11.776251226692626,"day_high":437.0159,"day_low":430.5601,"execution_condition_ko":"428.39~436.10 되돌림에서 지지와 매수 거래량 회복 확인 / 450.73 상향 돌파, 거래량가중평균가 유지, 상대 거래량 1.2 이상 확인","risk_condition_ko":"428.39 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"ETN","display_name":"Eaton","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":433.125,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":433.6260161006702,"relative_volume":0.36929739458503164,"spread_bps":8.783487044356505,"day_high":437.0159,"day_low":430.5601,"execution_condition_ko":"428.39~436.10 되돌림에서 지지와 매수 거래량 회복 확인 / 450.73 상향 돌파, 거래량가중평균가 유지, 상대 거래량 1.2 이상 확인","risk_condition_ko":"428.39 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"GEV","display_name":"GE Vernova","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":957.15,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":963.4589551129777,"relative_volume":0.283046605296531,"spread_bps":9.171825818689632,"day_high":973.41,"day_low":954.45,"execution_condition_ko":"GEV의 최신 가격·거래량·당일 거래량가중평균가격·중요 뉴스를 확보하고 기준 가격대를 재검증 / 974.20 위 종가와 거래량 2426520주 이상 확인","risk_condition_ko":"943.39 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"GEV","display_name":"GE Vernova","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":959.845,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":962.4149385421864,"relative_volume":0.26484222068378327,"spread_bps":8.967768172765238,"day_high":973.41,"day_low":954.45,"execution_condition_ko":"GEV의 최신 가격·거래량·당일 거래량가중평균가격·중요 뉴스를 확보하고 기준 가격대를 재검증 / 974.20 위 종가와 거래량 2426520주 이상 확인","risk_condition_ko":"943.39 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"GLDM","display_name":"SPDR Gold MiniShares Trust","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":82.045,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":82.23353517448925,"relative_volume":1.4044321324126956,"spread_bps":1.2172113687530772,"day_high":82.58,"day_low":81.98,"execution_condition_ko":"GLDM 최신 시세와 순자산가치 괴리·호가 차이·고유 자금 흐름 확인 / 10:30 이후 85.67 상회, 장중 거래량가중평균가격 상회, 동시간대 상대거래량 1.2 이상","risk_condition_ko":"83.77 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"GLDM","display_name":"SPDR Gold MiniShares Trust","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":82.3297,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":82.20263952425661,"relative_volume":1.2180920037728826,"spread_bps":1.2201818070881467,"day_high":82.58,"day_low":81.9499,"execution_condition_ko":"GLDM 최신 시세와 순자산가치 괴리·호가 차이·고유 자금 흐름 확인 / 10:30 이후 85.67 상회, 장중 거래량가중평균가격 상회, 동시간대 상대거래량 1.2 이상","risk_condition_ko":"83.77 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"SGOV","display_name":"iShares 0-3 Month Treasury Bond ETF","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":100.6799,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":100.67406394203219,"relative_volume":0.9786269599246444,"spread_bps":0.9932952570156558,"day_high":100.68,"day_low":100.67,"execution_condition_ko":"SGOV의 최신 순자산가치·호가·보유채권·보수·분배금 및 세후 비교수익 확보 / 기존 SGOV와 현금성 자산의 합산 비중 확인","risk_condition_ko":"100.59 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"SGOV","display_name":"iShares 0-3 Month Treasury Bond ETF","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":100.675,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":100.6741035117062,"relative_volume":0.8876953128179714,"spread_bps":0.9932952570156558,"day_high":100.68,"day_low":100.67,"execution_condition_ko":"SGOV의 최신 순자산가치·호가·보유채권·보수·분배금 및 세후 비교수익 확보 / 기존 SGOV와 현금성 자산의 합산 비중 확인","risk_condition_ko":"100.59 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"NVDA","display_name":"NVIDIA","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":229.66,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":230.55026889372215,"relative_volume":0.48671093859662906,"spread_bps":0.4342445230905576,"day_high":232.82,"day_low":229.22,"execution_condition_ko":"실시간 가격·거래량·거래량가중평균가격을 갱신하고 $234.50 돌파 및 상대 거래량 1.2 이상 확인 / $234.50 위 종가 뒤 다음 거래일 첫 30~60분 지지 또는 신속한 재돌파 확인","risk_condition_ko":"221.05 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"NVDA","display_name":"NVIDIA","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":227.905,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":230.2057035521694,"relative_volume":0.4330963140975522,"spread_bps":0.4387215653581462,"day_high":232.82,"day_low":227.692,"execution_condition_ko":"실시간 가격·거래량·거래량가중평균가격을 갱신하고 $234.50 돌파 및 상대 거래량 1.2 이상 확인 / $234.50 위 종가 뒤 다음 거래일 첫 30~60분 지지 또는 신속한 재돌파 확인","risk_condition_ko":"221.05 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"DELL","display_name":"Dell Technologies","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":541.31,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":545.3198761373618,"relative_volume":0.3265910587228625,"spread_bps":9.206407659731171,"day_high":551.39,"day_low":539.54,"execution_condition_ko":"2026-09-28 종가와 현재 DELL 시세 확인 / $550.19~$554.64 재시험 후 10:30 이후 $554.64 재돌파, 당일 거래량가중평균가격 상회 및 상대거래량 1.2 이상","risk_condition_ko":"530.45 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"DELL","display_name":"Dell Technologies","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":540.995,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":544.5511345547478,"relative_volume":0.27791540266366616,"spread_bps":6.310085000557364,"day_high":551.39,"day_low":538.0569,"execution_condition_ko":"2026-09-28 종가와 현재 DELL 시세 확인 / $550.19~$554.64 재시험 후 10:30 이후 $554.64 재돌파, 당일 거래량가중평균가격 상회 및 상대거래량 1.2 이상","risk_condition_ko":"530.45 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"AAPL","display_name":"Apple","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":331.23,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":332.5526093905258,"relative_volume":0.4870189025025434,"spread_bps":0.6037735849051112,"day_high":337.06,"day_low":330.55,"execution_condition_ko":"평결 이후 AAPL의 정규장 가격 범위·당일 거래량가중평균가격·거래량 확인 / 재검증된 345.34 위 종가와 상대 거래량 1.2 이상 및 다음 거래일 지지","risk_condition_ko":"334.3 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"AAPL","display_name":"Apple","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":331.04,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":332.38624006665754,"relative_volume":0.4184765532138895,"spread_bps":1.5081363958559844,"day_high":337.06,"day_low":330.55,"execution_condition_ko":"평결 이후 AAPL의 정규장 가격 범위·당일 거래량가중평균가격·거래량 확인 / 재검증된 345.34 위 종가와 상대 거래량 1.2 이상 및 다음 거래일 지지","risk_condition_ko":"334.3 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"LLY","display_name":"Eli Lilly","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":1179.37,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":1177.3717193305818,"relative_volume":0.319305874577867,"spread_bps":5.264498598963155,"day_high":1192.94,"day_low":1168.471,"execution_condition_ko":"마지막 제공 거래일인 2026-09-25 이후의 LLY 시세와 거래량 갱신 / 1197.79 위 거래량 동반 종가 및 다음 거래일 지지 확인","risk_condition_ko":"1,176.74 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"LLY","display_name":"Eli Lilly","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":1183.685,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":1178.141792250936,"relative_volume":0.2900565188117949,"spread_bps":5.669102124221642,"day_high":1192.94,"day_low":1168.471,"execution_condition_ko":"마지막 제공 거래일인 2026-09-25 이후의 LLY 시세와 거래량 갱신 / 1197.79 위 거래량 동반 종가 및 다음 거래일 지지 확인","risk_condition_ko":"1,176.74 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"GOOGL","display_name":"Alphabet","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":339.49,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":339.6877962052837,"relative_volume":0.4171786657421354,"spread_bps":0.8841081558969341,"day_high":342.84,"day_low":338.02,"execution_condition_ko":"344.45 회복 유지와 거래량가중평균가격 상회 및 상대거래량 1.2 이상 확인 / 349.50 첫 저항 시험에서 상승세 유지 여부","risk_condition_ko":"337.45 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"GOOGL","display_name":"Alphabet","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":338.97,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":339.600760980288,"relative_volume":0.3653929505910914,"spread_bps":1.1808815280613014,"day_high":342.84,"day_low":338.02,"execution_condition_ko":"344.45 회복 유지와 거래량가중평균가격 상회 및 상대거래량 1.2 이상 확인 / 349.50 첫 저항 시험에서 상승세 유지 여부","risk_condition_ko":"337.45 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"DDOG","display_name":"Datadog","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":265.58,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":264.7195450565197,"relative_volume":0.4858838919576177,"spread_bps":21.553761509519315,"day_high":269.44,"day_low":259.26,"execution_condition_ko":"2026-09-28 하락의 실제 종가와 현재 DDOG 가격 확인 / 263.69 및 261.00 지지 여부 확인","risk_condition_ko":"261 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"DDOG","display_name":"Datadog","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":266.12,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":264.9401010590616,"relative_volume":0.42549428521583993,"spread_bps":9.389142395733575,"day_high":269.44,"day_low":259.26,"execution_condition_ko":"2026-09-28 하락의 실제 종가와 현재 DDOG 가격 확인 / 263.69 및 261.00 지지 여부 확인","risk_condition_ko":"261 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"AMD","display_name":"Advanced Micro Devices","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":611.11,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":615.7226205219954,"relative_volume":0.4950991004434398,"spread_bps":5.219632342147717,"day_high":624.13,"day_low":607.695,"execution_condition_ko":"639.00 위 종가와 25,318,900주 이상 거래량이 확인되면 매도 측 계획을 먼저 정리한 뒤 진입 재평가 / 653.17 부근의 안착 또는 거부","risk_condition_ko":"653.17 이탈 시 이익실현성 축소","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"AMD","display_name":"Advanced Micro Devices","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":610.8,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":615.1096593820122,"relative_volume":0.40959073217850744,"spread_bps":5.58448171082292,"day_high":624.13,"day_low":607.695,"execution_condition_ko":"639.00 위 종가와 25,318,900주 이상 거래량이 확인되면 매도 측 계획을 먼저 정리한 뒤 진입 재평가 / 653.17 부근의 안착 또는 거부","risk_condition_ko":"653.17 이탈 시 이익실현성 축소","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"PM","display_name":"PM","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":192.67,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":191.85731420602477,"relative_volume":0.3776231345927005,"spread_bps":2.594774124913016,"day_high":193.07,"day_low":191.0001,"execution_condition_ko":"10:30 이후 195.49 상향 돌파, 상대거래량 1.2배 이상 및 장중 거래량가중평균가 상회 시 시험 매수 검토 / 195.49 위 거래량 확인 종가와 다음 거래일 유지 또는 재돌파 시 확대 검토","risk_condition_ko":"189.77 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"PM","display_name":"PM","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":192.815,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":191.9685205055089,"relative_volume":0.3122204146714775,"spread_bps":6.222775357809819,"day_high":193.2,"day_low":191.0001,"execution_condition_ko":"10:30 이후 195.49 상향 돌파, 상대거래량 1.2배 이상 및 장중 거래량가중평균가 상회 시 시험 매수 검토 / 195.49 위 거래량 확인 종가와 다음 거래일 유지 또는 재돌파 시 확대 검토","risk_condition_ko":"189.77 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"CVX","display_name":"CVX","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":205.175,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":204.6696782097506,"relative_volume":0.29867515025277286,"spread_bps":3.410890486051562,"day_high":205.47,"day_low":202.7,"execution_condition_ko":"CVX의 최신 시세에서 208.10 돌파, 장중 거래량가중평균가격 유지, 동시간대 상대거래량 1.2 이상 / 208.10 위 종가와 갱신된 5일 평균 대비 거래량 1.2배 이상; 이후 209.86 회복","risk_condition_ko":"200.31 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"CVX","display_name":"CVX","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":203.99,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":204.6060934939717,"relative_volume":0.30704343542493356,"spread_bps":2.9336984158029664,"day_high":205.47,"day_low":202.7,"execution_condition_ko":"CVX의 최신 시세에서 208.10 돌파, 장중 거래량가중평균가격 유지, 동시간대 상대거래량 1.2 이상 / 208.10 위 종가와 갱신된 5일 평균 대비 거래량 1.2배 이상; 이후 209.86 회복","risk_condition_ko":"200.31 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"BRK-B","display_name":"BRK-B","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":501.135009765625,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":501.6018694194535,"relative_volume":0.633644404077098,"spread_bps":null,"day_high":503.8599853515625,"day_low":500.2300109863281,"execution_condition_ko":"2026-09-25 이후의 BRK-B 가격·거래량과 기존 보유 규모 확인 / 511.28 상향 돌파 시 실시간 거래량가중평균가격 및 상대 거래량 1.2 이상 확인","risk_condition_ko":"501.41 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"BRK-B","display_name":"BRK-B","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":501.83538818359375,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":501.5843824048132,"relative_volume":0.542641879128572,"spread_bps":null,"day_high":503.8599853515625,"day_low":500.2300109863281,"execution_condition_ko":"2026-09-25 이후의 BRK-B 가격·거래량과 기존 보유 규모 확인 / 511.28 상향 돌파 시 실시간 거래량가중평균가격 및 상대 거래량 1.2 이상 확인","risk_condition_ko":"501.41 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"SHEL","display_name":"SHEL","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":95.24,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":95.45971008872839,"relative_volume":1.0063556652556296,"spread_bps":1.0495932826035284,"day_high":95.78,"day_low":94.72,"execution_condition_ko":"95.17~95.28 재시험 지지, 당일 거래량가중평균가격 상회, 상대거래량 1.2 이상 / 상대거래량 1.2 이상을 동반한 96.76 초과 종가","risk_condition_ko":"93.19 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"SHEL","display_name":"SHEL","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":95.105,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":95.43655052362897,"relative_volume":0.7830638421406504,"spread_bps":1.0508064939846704,"day_high":95.78,"day_low":94.72,"execution_condition_ko":"95.17~95.28 재시험 지지, 당일 거래량가중평균가격 상회, 상대거래량 1.2 이상 / 상대거래량 1.2 이상을 동반한 96.76 초과 종가","risk_condition_ko":"93.19 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"ABBV","display_name":"ABBV","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":263.145,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":263.85952126105565,"relative_volume":0.24107156789574866,"spread_bps":10.63304598792502,"day_high":268.93,"day_low":261.5213,"execution_condition_ko":"ABBV의 현재 가격·당일 거래량가중평균가격·거래량 확보 / 269.91 초과 일일 종가와 401만 주 초과 거래량","risk_condition_ko":"257.05 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"ABBV","display_name":"ABBV","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":263.67,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":263.76481523986774,"relative_volume":0.21948317389146704,"spread_bps":3.796363084164075,"day_high":268.93,"day_low":261.5213,"execution_condition_ko":"ABBV의 현재 가격·당일 거래량가중평균가격·거래량 확보 / 269.91 초과 일일 종가와 401만 주 초과 거래량","risk_condition_ko":"257.05 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"PG","display_name":"PG","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":148.12,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":147.97421600705425,"relative_volume":0.2825819462875671,"spread_bps":1.3479813978554835,"day_high":148.7469,"day_low":146.84,"execution_condition_ko":"PG가 149.20달러 위에서 마감하고 일일 거래량이 7428400주를 초과하며 상대거래량이 1.2 이상임 / PG가 145.76~146.02달러 균형 구간을 잃은 뒤 145.33달러 아래에서 마감함","risk_condition_ko":"145.33 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"PG","display_name":"PG","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":148.46,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":148.1571514725098,"relative_volume":0.32113315069451165,"spread_bps":1.3451708366969486,"day_high":148.835,"day_low":146.84,"execution_condition_ko":"PG가 149.20달러 위에서 마감하고 일일 거래량이 7428400주를 초과하며 상대거래량이 1.2 이상임 / PG가 145.76~146.02달러 균형 구간을 잃은 뒤 145.33달러 아래에서 마감함","risk_condition_ko":"145.33 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"SPYM","display_name":"SPYM","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":89.805,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":89.91230770094577,"relative_volume":0.6508223742219321,"spread_bps":1.1131518895759018,"day_high":90.27,"day_low":89.72,"execution_condition_ko":"91.49 상향 돌파 시 당일 거래량가중평균가격과 상대거래량 1.2 이상 확인 / 91.49 위 마감 후 다음 거래일 91.34~91.49 지지 또는 재돌파 확인","risk_condition_ko":"89.43 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"SPYM","display_name":"SPYM","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":89.8059,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":89.87282592962472,"relative_volume":0.725546303669658,"spread_bps":1.1141440588273763,"day_high":90.27,"day_low":89.72,"execution_condition_ko":"91.49 상향 돌파 시 당일 거래량가중평균가격과 상대거래량 1.2 이상 확인 / 91.49 위 마감 후 다음 거래일 91.34~91.49 지지 또는 재돌파 확인","risk_condition_ko":"89.43 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"XOM","display_name":"XOM","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":161.79,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":161.1645305100975,"relative_volume":0.2559937983781956,"spread_bps":1.2369348753776865,"day_high":161.96,"day_low":159.27,"execution_condition_ko":"갱신된 정규장 자료로 159.78~159.01 지지 방어, 당일 거래량가중평균가격 회복, 상대거래량 1.2 이상 및 비용 반영 보상 대비 위험을 확인한다. / 164.91 위 종가와 상대거래량 1.2 이상, 다음 거래일 유지 또는 재돌파를 확인하되 168.48~169.64 저항까지의 여력을 재평가한다.","risk_condition_ko":"159.01 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"XOM","display_name":"XOM","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":161.33,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":161.20586945963015,"relative_volume":0.23496633424921964,"spread_bps":0.6196362735068877,"day_high":161.96,"day_low":159.27,"execution_condition_ko":"갱신된 정규장 자료로 159.78~159.01 지지 방어, 당일 거래량가중평균가격 회복, 상대거래량 1.2 이상 및 비용 반영 보상 대비 위험을 확인한다. / 164.91 위 종가와 상대거래량 1.2 이상, 다음 거래일 유지 또는 재돌파를 확인하되 168.48~169.64 저항까지의 여력을 재평가한다.","risk_condition_ko":"159.01 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"JNJ","display_name":"JNJ","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":266.772,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":267.4413092724863,"relative_volume":0.2564853155709212,"spread_bps":2.6233440140908493,"day_high":271.894,"day_low":265.5883,"execution_condition_ko":"2026-09-25 이후 JNJ 가격·거래량·공시 확인 / 275.23 위 종가와 상대 거래량 1.2 이상 확인 후 276.45 및 281.07 저항, 비용 차감 후 손익비 재평가","risk_condition_ko":"269 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"JNJ","display_name":"JNJ","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":267.085,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":267.3008175493139,"relative_volume":0.24657115741277472,"spread_bps":5.244624260132853,"day_high":271.894,"day_low":265.5883,"execution_condition_ko":"2026-09-25 이후 JNJ 가격·거래량·공시 확인 / 275.23 위 종가와 상대 거래량 1.2 이상 확인 후 276.45 및 281.07 저항, 비용 차감 후 손익비 재평가","risk_condition_ko":"269 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ```json
-{"ticker":"V","display_name":"V","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":366.355,"market_data_asof":"2026-09-29T12:50:00-04:00","session_vwap":366.45320512145,"relative_volume":0.23040112459109918,"spread_bps":1.6416317819913615,"day_high":368.26,"day_low":365.0,"execution_condition_ko":"368.81 회복과 372 위 거래량 동반 종가 / 375–376 저항 돌파 후 382.55 및 385.57 접근","risk_condition_ko":"359.8 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T13:20:00-04:00"}}
+{"ticker":"V","display_name":"V","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":366.55,"market_data_asof":"2026-09-29T14:10:00-04:00","session_vwap":366.5109405678507,"relative_volume":0.21018025963064452,"spread_bps":1.3631592578964102,"day_high":368.26,"day_low":365.0,"execution_condition_ko":"368.81 회복과 372 위 거래량 동반 종가 / 375–376 저항 돌파 후 382.55 및 385.57 접근","risk_condition_ko":"359.8 이탈 시 전략 재평가","decision_state_ko":"데이터 확인 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"RECHECK_REQUIRED","generated_in_current_run":true,"row_valid_until":"2026-09-29T14:40:00-04:00"}}
 ```
 
 ## 별도로 발행된 Work 보고서 — 현재 입력과 시각이 다를 수 있음
