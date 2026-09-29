@@ -85,6 +85,17 @@ def publish() -> None:
         "message": f"Public research snapshot {manifest['generated_at']}",
         "tree": tree["sha"], "parents": [head] if head else [],
     })
+    # A second commit can name the immutable data commit without a self-hash
+    # cycle. Advance the public ref only after BOTH commits exist atomically.
+    snapshot_sha = commit["sha"]
+    discovery = render_discovery(snapshot_sha, manifest, files["manifest.json"])
+    discovery_tree = api("/git/trees", "POST", {"base_tree": tree["sha"], "tree": [
+        {"path": "discovery.txt", "mode": "100644", "type": "blob", "content": discovery},
+    ]})
+    commit = api("/git/commits", "POST", {
+        "message": f"Public snapshot discovery {manifest['generated_at']}",
+        "tree": discovery_tree["sha"], "parents": [snapshot_sha],
+    })
     if head:
         # No force: a concurrent advance cannot be silently overwritten.
         api(f"/git/refs/heads/{BRANCH}", "PATCH", {"sha": commit["sha"], "force": False})
@@ -93,6 +104,26 @@ def publish() -> None:
     if api(f"/git/ref/heads/{BRANCH}")["object"]["sha"] != commit["sha"]:
         raise ValueError("Mirror ref verification failed")
     print(f"Verified public mirror commit {commit['sha']}")
+
+
+def render_discovery(snapshot_sha: str, manifest: dict, manifest_bytes: bytes) -> str:
+    import re
+    if not re.fullmatch(r"[0-9a-f]{40}", snapshot_sha):
+        raise ValueError("Invalid immutable snapshot commit")
+    root = f"https://raw.githubusercontent.com/nornen0202/TradingAgents/{snapshot_sha}"
+    return "\n".join([
+        "TradingAgents public input discovery v1",
+        f"generated_at: {manifest['generated_at']}",
+        f"snapshot_commit: {snapshot_sha}",
+        "This is a cacheable pointer, not proof of current branch HEAD or current account/quotes.",
+        "Reject future/missing timestamps; check age and all source clocks independently.",
+        f"manifest_sha256: {hashlib.sha256(manifest_bytes).hexdigest()}",
+        f"manifest_bytes: {len(manifest_bytes)}",
+        f"manifest_url: {root}/manifest.json",
+        *[f"{market}_{ext}_url: {root}/{market}/latest.{ext}"
+          for market in ("kr", "us") for ext in ("txt", "json")],
+        "",
+    ])
 
 
 if __name__ == "__main__":
