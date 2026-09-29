@@ -1,0 +1,57 @@
+{
+  "schema": "tradingagents.account-cost-scenario/v1",
+  "evidence_as_of": "2026-09-29",
+  "purpose": "Current-cost retrospective sensitivity; not historical fees or executable orders",
+  "evidence": {
+    "commission": "User supplied KIS general fee screens: KR dated 2025-10-27; overseas dated 2026-04-02. Adopted as user-provided scenario; account-specific/API entitlement not independently verified.",
+    "fx_discount": "User explicitly supplied 60%; expiry not supplied. No expiry assumed.",
+    "kr_tax_conflict": "Screenshot shows 0.15%; current KIS public schedule shows 0.20% for KOSPI common shares. Use 0.20% for current stock-cost illustrations, zero transaction tax for domestic equity ETF.",
+    "fx_base_spread": "1% reference from KIS public USD explanation; actual account bid/ask quote not supplied. Effective 0.40% each direction is a scenario.",
+    "commission_minimum_and_rounding": "Unknown; proportional fees only. The screenshot's minimum USD0.01 execution amount is not evidence of a minimum commission."
+  },
+  "sources": {
+    "kis_fees": "https://www.truefriend.com/main/customer/guide/_static/TF04ae010000.jsp",
+    "sec_transaction_fee": "https://www.sec.gov/rules-regulations/fee-rate-advisories/2026-2",
+    "kis_fx_reference": "https://mini.truefriend.com/stock/event/index1.html",
+    "kis_basic_fx_discount": "https://m.truefriend.com/main/customer/guide/_static/TF04ae040100.shtm",
+    "annual_tax_allowance": "https://i.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=8800&mi=12274"
+  },
+  "markets": {
+    "KR": {
+      "ticker": "069500.KS",
+      "asset_type": "domestic_equity_etf",
+      "commission_rate": 0.00147,
+      "sell_levy_rate": 0.0,
+      "fx_base_spread": 0.0,
+      "fx_discount": 0.0,
+      "dividend_withholding": 0.154,
+      "capital_gains_rate": 0.0,
+      "annual_allowances_krw": [0]
+    },
+    "US": {
+      "ticker": "SPY",
+      "asset_type": "us_listed_equity_etf",
+      "commission_rate": 0.0025,
+      "sell_levy_rate": 0.0000206,
+      "fx_base_spread": 0.01,
+      "fx_discount": 0.6,
+      "dividend_withholding": 0.15,
+      "capital_gains_rate": 0.22,
+      "annual_allowances_krw": [0, 2500000]
+    }
+  },
+  "stock_cost_illustrations": {
+    "kr_krx_commission": 0.00147,
+    "kr_nxt_commission": 0.00146,
+    "kr_common_stock_sell_tax": 0.002,
+    "kr_screenshot_sell_tax": 0.0015
+  },
+  "slippage_bps_per_side": [0, 5, 15],
+  "additional_execution_delays": [0, 1],
+  "periods": [
+    {"id": "2020_2023", "start": "2020-01-01", "end": "2023-12-31"},
+    {"id": "2024_2026", "start": "2024-01-01", "end": "2026-09-18"},
+    {"id": "2022", "start": "2022-01-01", "end": "2022-12-31"},
+    {"id": "2026", "start": "2026-01-01", "end": "2026-09-18"}
+  ]
+}
