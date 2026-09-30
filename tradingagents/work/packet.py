@@ -560,7 +560,11 @@ def _attach_analysis_theses(
             "analysis_trade_date": summary.get("trade_date"),
             "source": "current_manifest_decision",
             "rationale": [decision["entry_logic"]] if decision.get("entry_logic") else [],
-            "entry_conditions": list(decision.get("watchlist_triggers") or []),
+            # Watchlist triggers also contain downside exits and data checks.
+            # The trader's complete entry logic is the actual entry contract.
+            "entry_conditions": ([decision["entry_logic"]] if decision.get("entry_logic")
+                                 else list(decision.get("watchlist_triggers") or [])),
+            "observation_conditions": list(decision.get("watchlist_triggers") or []),
             "invalidation_conditions": list(decision.get("invalidators") or []),
             "invalidation_action": decision.get("exit_logic"),
             "horizon": decision.get("time_horizon"),

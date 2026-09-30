@@ -117,6 +117,18 @@ def test_fresh_stale_fresh_keeps_all_analysis_axes(tmp_path):
     assert theses[0]['risk_action_level']['price'] == 90
 
 
+def test_downside_watchlist_trigger_is_not_a_buy_entry_condition(tmp_path):
+    manifest, bundle = _run(tmp_path, 'full', '2026-09-29T12:00:00+00:00')
+    decision = manifest['tickers'][0]['decision']
+    decision['entry_logic'] = 'Buy only after close above 100 and relative volume at least 1.2.'
+    decision['watchlist_triggers'].append('Close below 90 means reduce the existing position.')
+    packet._attach_analysis_theses(bundle, manifest, manifest)
+    thesis = bundle['strategy_table'][0]['thesis']
+    assert thesis['entry_conditions'] == [decision['entry_logic']]
+    assert thesis['observation_conditions'] == decision['watchlist_triggers']
+    assert thesis['invalidation_conditions'] == ['Close below 90']
+
+
 @pytest.mark.parametrize(('rating', 'expected'), [('OVERWEIGHT', 'BUY'), ('UNDERWEIGHT', 'REDUCE'), ('NO_TRADE', 'AVOID')])
 def test_legacy_ratings_are_explicitly_mapped(tmp_path, rating, expected):
     manifest, bundle = _run(tmp_path, 'full', '2026-09-29T12:00:00+00:00')

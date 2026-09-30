@@ -2030,6 +2030,7 @@ _PRIVATE_JS = r"""
     const supportingDetail = `<details><summary>${hasWork ? '기본 분석·전체 조건 보기' : '전체 조건 보기'}</summary>
       ${hasWork ? `<p><strong>기본 분석 결론</strong><br>${esc(baseConclusion || '정보 없음')}</p>` : ''}
       ${fullWorkEntry ? `<p><strong>${hasWork ? 'Work' : '원분석'} 전체 진입·축소 조건</strong><br>${esc(fullWorkEntry)}</p>` : ''}
+      ${fullConditions(original.observation_conditions) ? `<p><strong>원분석 관찰 목록 · 진입 신호와 구별</strong><br>${esc(fullConditions(original.observation_conditions))}</p>` : ''}
       ${fullWorkInvalidation ? `<p><strong>${hasWork ? 'Work' : '원분석'} 전체 무효화 조건</strong><br>${esc(fullWorkInvalidation)}</p>` : ''}
       ${fullBaseEntry ? `<p><strong>기본 분석 전체 조건</strong><br>${esc(fullBaseEntry)}</p>` : ''}
       ${fullBaseInvalidation ? `<p><strong>기본 분석 전체 무효화 조건</strong><br>${esc(fullBaseInvalidation)}</p>` : ''}
