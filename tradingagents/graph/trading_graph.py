@@ -43,6 +43,7 @@ from tradingagents.agents.utils.agent_utils import (
     get_social_sentiment,
     get_output_language,
     rewrite_in_output_language,
+    rewrite_fields_in_output_language,
 )
 
 from .conditional_logic import ConditionalLogic
@@ -442,20 +443,24 @@ class TradingAgentsGraph:
                 return localize_text(content, text_content_type=content_type)
 
             payload = structured.to_dict()
+            fields = {}
             for field_name in ("entry_logic", "exit_logic", "position_sizing", "risk_limits"):
-                payload[field_name] = localize_text(
-                    str(payload.get(field_name) or ""),
-                    text_content_type=f"{content_type} {field_name.replace('_', ' ')}",
-                )
+                fields[field_name] = str(payload.get(field_name) or "")
             for field_name in ("catalysts", "invalidators", "watchlist_triggers"):
-                payload[field_name] = [
-                    localize_text(
-                        str(item),
-                        text_content_type=f"{content_type} {field_name.replace('_', ' ')} item",
-                    )
-                    for item in (payload.get(field_name) or [])
-                    if str(item).strip()
-                ]
+                for index, item in enumerate(payload.get(field_name) or []):
+                    fields[f"{field_name}.{index}"] = str(item)
+            translated = rewrite_fields_in_output_language(
+                localization_llm, fields, content_type=content_type, force_llm_backend=force_llm_backend,
+            )
+            for key, original in fields.items():
+                value = translated.get(key, original)
+                if _contains_unexpected_script_noise(value, language):
+                    value = original
+                if "." in key:
+                    field_name, index = key.split(".")
+                    payload[field_name][int(index)] = value
+                else:
+                    payload[key] = value
             return json.dumps(payload, indent=2, ensure_ascii=False)
 
         for field_name, content_type in (
