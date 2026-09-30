@@ -14,8 +14,10 @@ from tradingagents.scheduled.runner import (
     _manifest_production_priority,
     _resolve_latest_overlay_source_manifest,
     _resolve_latest_full_overlay_baseline_manifest,
+    _select_daily_active_tickers,
     execute_scheduled_run,
 )
+from tradingagents.work.packet import compact_decision_bundle
 
 
 def _recent_started_at(*, hours_ago: float = 1.0) -> str:
@@ -105,6 +107,104 @@ def _write_full_overlay_baseline(
     if set_latest:
         (archive_dir / "latest-run.json").write_text(json.dumps(manifest), encoding="utf-8")
     return manifest
+
+
+def _overlay_watchlist_config(tmp_path):
+    path = tmp_path / "watchlist.toml"
+    path.write_text(
+        '[run]\ntickers = ["PUBLIC"]\nmarket = "US"\nrun_mode = "overlay_only"\n'
+        f'[storage]\narchive_dir = "{tmp_path.as_posix()}"\n'
+        f'site_dir = "{(tmp_path / "site").as_posix()}"\n',
+        encoding="utf-8",
+    )
+    return load_scheduled_config(path)
+
+
+@pytest.mark.parametrize("mode", ["config_plus_account", "config_only"])
+def test_overlay_preserves_full_required_watchlist_through_work_transmission(tmp_path, mode):
+    now = datetime.now(timezone.utc)
+    required = ["PUBLIC", *(f"WATCH{i}" for i in range(14))]
+    tickers = ["PRIVATE", *required, "SCAN"]
+    baseline = _write_full_overlay_baseline(tmp_path, tickers=tickers)
+    baseline["active_universe"] = {"expected_watchlist_tickers": required}
+    config = _overlay_watchlist_config(tmp_path)
+    universe = _ResolvedRunTickerUniverse(
+        tickers=tuple(tickers), configured_tickers=("PUBLIC", "WATCH0"),
+        profile_watch_tickers=("SCAN", "NEW"), holding_tickers=("PRIVATE", "PUBLIC"),
+        mode=mode, account_snapshot_status="loaded", account_snapshot_health="VALID",
+    )
+    with patch("tradingagents.scheduled.runner._resolve_latest_full_overlay_baseline_manifest", return_value=baseline):
+        frozen, selection, _, metadata, _ = _freeze_overlay_universe_to_latest_full_baseline(
+            config=config, resolved_universe=universe, requested_base_tickers=[*tickers, "NEW"],
+            discovered_tickers=tickers, scanner_status=None, now=now,
+        )
+    selected, omitted, active = _select_daily_active_tickers(
+        config=config, tickers=frozen, resolved_universe=selection,
+        started_at=now, active_ticker_limit=0,
+    )
+    assert set(selected) == set(tickers)
+    assert omitted == []
+    assert active["expected_watchlist_tickers"] == required
+    assert active["watchlist_tickers"] == required[1:]
+    assert active["scanner_candidates"] == ["SCAN"]
+    assert "PRIVATE" not in active["expected_watchlist_tickers"]
+    assert metadata["required_watchlist_source"] == "full_baseline_contract"
+    assert metadata["deferred_nonholding_tickers"] == ["NEW"]
+    packet = compact_decision_bundle(
+        {"strategy_table": [{"ticker": ticker, "is_held": ticker in universe.holding_tickers}
+                            for ticker in selected]},
+        required_watchlist_tickers=active["expected_watchlist_tickers"],
+    )
+    assert {row["ticker"] for row in packet["strategy_table"]} == set(tickers)
+    assert sum(row["portfolio_role"] == "watchlist" for row in packet["strategy_table"]) == 14
+    assert packet["transmission_scope"]["all_required_watchlist_included"] is True
+    assert packet["transmission_scope"]["omitted_nonheld_ticker_count"] == 0
+
+
+@pytest.mark.parametrize("required, mode, expected, source", [
+    (None, "config_plus_account", ("PUBLIC",), "legacy_current_configuration"),
+    ([], "config_plus_account", (), "full_baseline_contract"),
+    (["PUBLIC"], "account_only", (), "account_only"),
+])
+def test_overlay_watchlist_legacy_empty_and_account_only_contracts(tmp_path, required, mode, expected, source):
+    baseline = _write_full_overlay_baseline(tmp_path, tickers=["PRIVATE", "PUBLIC"])
+    if required is not None:
+        baseline["active_universe"] = {"expected_watchlist_tickers": required}
+    universe = _ResolvedRunTickerUniverse(
+        tickers=("PRIVATE", "PUBLIC"), configured_tickers=("PUBLIC",),
+        profile_watch_tickers=(), holding_tickers=("PRIVATE",), mode=mode,
+        account_snapshot_status="loaded",
+    )
+    with patch("tradingagents.scheduled.runner._resolve_latest_full_overlay_baseline_manifest", return_value=baseline):
+        _, selection, _, metadata, _ = _freeze_overlay_universe_to_latest_full_baseline(
+            config=_overlay_watchlist_config(tmp_path), resolved_universe=universe,
+            requested_base_tickers=list(universe.tickers), discovered_tickers=list(universe.tickers),
+            scanner_status=None,
+        )
+    assert selection.configured_tickers == expected
+    assert metadata["required_watchlist_source"] == source
+
+
+@pytest.mark.parametrize("required, error", [
+    (["MISSING"], "OVERLAY_BASELINE_WATCHLIST_COVERAGE_GAP"),
+    ("PUBLIC", "OVERLAY_BASELINE_WATCHLIST_INVALID"),
+    (None, "OVERLAY_BASELINE_WATCHLIST_INVALID"),
+    ([""], "OVERLAY_BASELINE_WATCHLIST_INVALID"),
+    ([42], "OVERLAY_BASELINE_WATCHLIST_INVALID"),
+])
+def test_overlay_rejects_invalid_required_watchlist_baseline(tmp_path, required, error):
+    baseline = _write_full_overlay_baseline(tmp_path, tickers=["PUBLIC"])
+    baseline["active_universe"] = {"expected_watchlist_tickers": required}
+    universe = _ResolvedRunTickerUniverse(
+        tickers=("PUBLIC",), configured_tickers=("PUBLIC",), profile_watch_tickers=(),
+        holding_tickers=(), mode="config_only", account_snapshot_status="disabled",
+    )
+    with patch("tradingagents.scheduled.runner._resolve_latest_full_overlay_baseline_manifest", return_value=baseline):
+        with pytest.raises(RuntimeError, match=error):
+            _freeze_overlay_universe_to_latest_full_baseline(
+                config=_overlay_watchlist_config(tmp_path), resolved_universe=universe,
+                requested_base_tickers=["PUBLIC"], discovered_tickers=["PUBLIC"], scanner_status=None,
+            )
 
 
 def test_overlay_only_mode_uses_latest_run_without_full_research(tmp_path: Path):
