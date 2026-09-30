@@ -116,7 +116,7 @@ class FakeCodexSession:
 class CodexProviderTests(unittest.TestCase):
     def test_report_control_markers_retry_and_never_become_final_evidence(self):
         for tool_mode in (False, True):
-            for marker in ("CHATGPT_FINAL_JSON_OUTPUT_PLACEHOLDER", "<|im_start|>", "[eot_id]"):
+            for marker in ("CHATGPT_FINAL_JSON_OUTPUT_PLACEHOLDER", "<|im_start|>", "[eot_id]", "|通 finals?"):
                 with self.subTest(tool_mode=tool_mode, marker=marker):
                     def payload(content):
                         return json.dumps({"mode": "final", "content": content, "tool_calls": []} if tool_mode else {"answer": content})

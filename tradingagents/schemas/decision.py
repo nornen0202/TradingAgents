@@ -701,9 +701,12 @@ def _has_multiple_numbers(value: Any) -> bool:
 
 def _strip_non_price_numeric_context(text: str) -> str:
     cleaned = str(text or "")
-    cleaned = re.sub(r"\b20\d{2}[-./]\d{1,2}[-./]\d{1,2}\b", " ", cleaned)
-    cleaned = re.sub(r"\b\d{1,2}\s*월\s*\d{1,2}\s*일\b", " ", cleaned)
-    cleaned = re.sub(r"\b\d{1,2}:\d{2}\b", " ", cleaned)
+    # Unicode word boundaries do not separate digits from Korean particles
+    # (e.g. 2026-09-29의). Dates and clocks must never become price ranges.
+    cleaned = re.sub(r"(?<!\d)[12]\d{3}[-./]\d{1,2}[-./]\d{1,2}(?!\d)", " ", cleaned)
+    cleaned = re.sub(r"(?<!\d)(?:[12]\d{3}\s*년\s*)?\d{1,2}\s*월\s*\d{1,2}\s*일(?!\d)", " ", cleaned)
+    cleaned = re.sub(r"(?<!\d)\d{1,2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?!\d)", " ", cleaned)
+    cleaned = re.sub(r"(?<!\d)\d{1,2}\s*시(?:\s*\d{1,2}\s*분)?(?:\s*\d{1,2}\s*초)?", " ", cleaned)
     cleaned = re.sub(r"[-+]?\d+(?:\.\d+)?\s*%", " ", cleaned)
     cleaned = re.sub(
         r"\b(?:rvol|rsi)\s*(?:>=|<=|>|<|=|:)?\s*[-+]?\d+(?:\.\d+)?\b",
