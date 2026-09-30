@@ -1350,6 +1350,9 @@ def _prism_event(channel: str, message: dict[str, Any], run_dir: Path) -> dict[s
     simulation = "시뮬" in preview or "simulation" in preview.lower()
     signals = []
     source_signals = [item for item in (signals_payload.get("signals") or []) if isinstance(item, dict)]
+    source_signals, normalization = _normalize_archived_prism_signals(
+        channel, message, run_dir, source_signals
+    )
     for signal in source_signals[:16]:
         if not isinstance(signal, dict):
             continue
@@ -1386,6 +1389,7 @@ def _prism_event(channel: str, message: dict[str, Any], run_dir: Path) -> dict[s
         "signals_truncated": len(signals) < len(source_signals),
         "simulation_only": simulation,
         "actionability": "research_only",
+        "normalization": normalization,
     }
     return {
         "event_key": f"{channel}:{message.get('message_id')}",
@@ -1393,6 +1397,62 @@ def _prism_event(channel: str, message: dict[str, Any], run_dir: Path) -> dict[s
         "occurred_at": message.get("posted_at"),
         "relevance": _prism_relevance(compact),
         "summary": compact,
+    }
+
+
+def _normalize_archived_prism_signals(
+    channel: str, message: dict[str, Any], run_dir: Path, signals: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    from tradingagents.external.prism_telegram_common import (
+        TELEGRAM_NORMALIZATION_VERSION, PrismTelegramDocument,
+        PrismTelegramMessage, _infer_action, _infer_trigger_type, message_to_signals,
+    )
+
+    # Read only the sanitized public metadata, never private sessions/raw logs.
+    # Historical signals and acknowledged packets remain immutable.
+    metadata = load_json(_safe_artifact(run_dir, message.get("metadata_path")))
+    text = str(metadata.get("text") or message.get("text_preview") or "")[:1200]
+    if not text:
+        return signals, {"version": TELEGRAM_NORMALIZATION_VERSION, "status": "NO_ARCHIVED_TEXT"}
+    archived = PrismTelegramMessage(
+        message_id=str(message.get("message_id") or ""), channel=channel,
+        posted_at=_datetime(message.get("posted_at")), url=message.get("url"), text=text,
+        documents=tuple(
+            PrismTelegramDocument(filename=item.get("filename"))
+            for item in (metadata.get("documents") or message.get("documents") or [])
+            if isinstance(item, dict)
+        ),
+    )
+    action = _infer_action(archived).value
+    trigger = _infer_trigger_type(archived)
+    revised = []
+    changes = []
+    for signal in signals:
+        row = dict(signal)
+        if row.get("signal_action") != action:
+            changes.append({"ticker": row.get("canonical_ticker"),
+                            "before": row.get("signal_action"), "after": action})
+            row["warnings"] = list(dict.fromkeys([
+                *(row.get("warnings") or []), "telegram_action_reclassified_from_archived_text"
+            ]))
+        row.update(signal_action=action, trigger_type=trigger)
+        revised.append(row)
+    identities = {_market_ticker_identity(row.get("canonical_ticker")) for row in revised}
+    added = []
+    for signal in message_to_signals(archived):
+        if _market_ticker_identity(signal.canonical_ticker) not in identities:
+            row = signal.to_dict()
+            row["warnings"] = list(dict.fromkeys([
+                *(row.get("warnings") or []), "telegram_ticker_recovered_from_archived_text"
+            ]))
+            revised.append(row)
+            identities.add(_market_ticker_identity(signal.canonical_ticker))
+            added.append(signal.canonical_ticker)
+    return revised, {
+        "version": TELEGRAM_NORMALIZATION_VERSION,
+        "status": "ARCHIVED_TEXT_RECHECKED", "text_chars": len(text),
+        "text_source": "public_metadata" if metadata.get("text") else "manifest_preview",
+        "action_changes": changes, "recovered_tickers": added,
     }
 
 

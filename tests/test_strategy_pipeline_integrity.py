@@ -16,6 +16,41 @@ from tradingagents.execution.risk_trigger import risk_condition_text, risk_trigg
 from tradingagents.scheduled.attempts import RunAttempt, latest_full_attempt
 
 
+@pytest.mark.parametrize("text,old_action,expected", [
+    ("📈 신규 매수: RF머트리얼즈(327260)\n손절가: 48,750원", "STOP_LOSS", "BUY"),
+    ("📊 실시간 포트폴리오\nRF머트리얼즈(327260)\n손절가: 48,750원", "STOP_LOSS", "HOLD"),
+    ("⚠️ [KR] 매수 후보 분석 실패\n대상: 한온시스템(018880): 실패 / RF머트리얼즈(327260): 실패", "BUY", "UNKNOWN"),
+])
+def test_archived_prism_actions_rechecked_without_mutating_history(tmp_path, text, old_action, expected):
+    signals_path = tmp_path / "signals.json"
+    historical = json.dumps({"signals": [{"canonical_ticker": "327260", "market": "KR",
+                                         "signal_action": old_action, "confidence": .7}]})
+    signals_path.write_text(historical, encoding="utf-8")
+    (tmp_path / "metadata.json").write_text(json.dumps({"text": text}), encoding="utf-8")
+    event = packet._prism_event("channel", {"message_id": "42", "signals_path": "signals.json",
+                                          "metadata_path": "metadata.json"}, tmp_path)
+    summary = event["summary"]
+    assert summary["signals"][0]["signal_action"] == expected
+    assert summary["signals"][0]["confidence"] == .7
+    assert summary["normalization"]["action_changes"] == [
+        {"ticker": "327260", "before": old_action, "after": expected}
+    ]
+    if expected == "UNKNOWN":
+        assert set(event["relevance"]["tickers"]) == {"327260", "018880.KS"}
+        assert summary["normalization"]["recovered_tickers"] == ["018880.KS"]
+    assert signals_path.read_text(encoding="utf-8") == historical
+
+
+def test_archived_prism_missing_text_keeps_normalized_signals(tmp_path):
+    (tmp_path / "signals.json").write_text(json.dumps({"signals": [
+        {"canonical_ticker": "ABC", "signal_action": "WATCH"}
+    ]}), encoding="utf-8")
+    event = packet._prism_event("channel", {"message_id": "42", "signals_path": "signals.json",
+                                          "metadata_path": "../private.json"}, tmp_path)
+    assert event["summary"]["signals"][0]["signal_action"] == "WATCH"
+    assert event["summary"]["normalization"]["status"] == "NO_ARCHIVED_TEXT"
+
+
 def test_present_hold_does_not_mean_hold_after_support_failure():
     text = risk_condition_text('HOLD', {'price': 70700, 'level_type': 'SUPPORT', 'confirmation': 'close'}, '보유 유지')
     assert '70,700 이하 하락' in text
