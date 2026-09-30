@@ -1968,7 +1968,7 @@ _PRIVATE_JS = r"""
       const stanceKind = actionKind(thesis.stance);
       const label = {
         buy: '조건 충족 시 신규·추가 매수 검토',
-        hold: '조건 충족 시 보유 유지·추가 매수 재검토',
+        hold: '관찰 조건 충족 시 투자 논지 재평가',
         reduce: '조건 충족 시 비중 축소',
         sell: '조건 충족 시 매도·청산',
         avoid: '신규 매수 보류 유지',
@@ -2022,7 +2022,7 @@ _PRIVATE_JS = r"""
     const fullBaseInvalidation = fullConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
     const original = row.thesis || {};
     const axisLabels = {HOLD: '보유', WAIT: '관찰', NONE: '없음', BULLISH: '긍정', BEARISH: '부정', NEUTRAL: '중립', STARTER: '신규 분할 진입', ADD: '추가매수'};
-    const axes = original.rating ? `<p class="readiness-note analysis-axes">원등급 ${esc(axisLabels[original.rating] || actionLabel(original.rating))} · 방향 관점 ${esc(axisLabels[original.portfolio_stance] || original.portfolio_stance || '-')} · 분석 당시 진입 ${esc(axisLabels[original.entry_action] || original.entry_action || '-')} · 조건부 계획 ${esc(axisLabels[original.conditional_entry_action] || original.conditional_entry_action || '-')}<br>판단 기준 ${esc(original.decision_asof || '-')} · 일봉 가격 기준 ${esc(original.price_reference_date || '-')} · 조건부 계획 만료 ${esc(dateTime(original.conditional_entry_valid_until))}</p>` : '';
+    const axes = original.rating ? `<p class="readiness-note analysis-axes">원등급 ${esc(axisLabels[original.rating] || actionLabel(original.rating))} · 방향 관점 ${esc(axisLabels[original.portfolio_stance] || original.portfolio_stance || '-')} · 분석 당시 진입 ${esc(axisLabels[original.entry_action] || original.entry_action || '-')} · 조건부 계획 ${esc(axisLabels[original.conditional_entry_action] || original.conditional_entry_action || '-')} · 보유 위험 계획 ${esc(actionLabel(original.risk_action || 'NONE'))}<br>판단 기준 ${esc(original.decision_asof || '-')} · 일봉 가격 기준 ${esc(original.price_reference_date || '-')} · 조건부 계획 만료 ${esc(dateTime(original.conditional_entry_valid_until))}</p>` : '';
     const sourceCoverage = original.source_coverage || {};
     const sourceLabels = {get_disclosures: '공시', get_macro_indicators: '거시 지표', get_social_sentiment: '감성'};
     const coverageLabels = {OBSERVED: '수집 관측', UNAVAILABLE: '수집 불가', NOT_COLLECTED: '미수집', VERIFIED_ZERO: '조회 구간 0건 확인', UNMAPPED_INSTRUMENT: '종목 매핑·적용 대상 미확인', PARTIAL_WINDOW: '조회 기간 일부만 확인'};
