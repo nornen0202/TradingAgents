@@ -81,8 +81,8 @@ def test_daily_codex_us_watchdog_stays_due_during_late_recovery_window():
     assert [target for target in targets if target.name == "daily-codex-us"]
 
 
-def test_daily_codex_us_watchdog_yields_after_late_recovery_window():
-    targets = watchdog.due_targets(_kst("2026-06-01T23:17:00"))
+def test_daily_codex_us_watchdog_yields_after_overnight_recovery_window():
+    targets = watchdog.due_targets(_kst("2026-06-02T08:17:00"))
 
     assert not [target for target in targets if target.name == "daily-codex-us"]
 
@@ -93,6 +93,14 @@ def test_daily_codex_kr_watchdog_stays_due_before_ten_kst_target():
     codex_kr = [target for target in targets if target.name == "daily-codex-kr"]
     assert codex_kr
     assert codex_kr[0].max_failed_attempts == 4
+
+
+def test_us_recovery_after_midnight_preserves_session_and_retry_budget():
+    for when, expected in (("2026-09-30T02:15:00", "2026-09-29T17:45:00"),
+                           ("2026-10-03T07:15:00", "2026-10-02T17:45:00")):
+        target = next(item for item in watchdog.due_targets(_kst(when)) if item.name == "daily-codex-us")
+        assert target.window_start_kst == _kst(expected)
+        assert target.max_failed_attempts == 4
 
 
 def test_daily_codex_kr_watchdog_yields_after_recovery_window():

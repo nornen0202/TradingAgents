@@ -250,6 +250,8 @@ jobs:
       TRADINGAGENTS_TRANSLATION_TOKENIZER_PATH: ${{ vars.TRADINGAGENTS_TRANSLATION_TOKENIZER_PATH }}
       TRADINGAGENTS_TRANSLATION_DEVICE: ${{ vars.TRADINGAGENTS_TRANSLATION_DEVICE }}
       TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL: ${{ vars.TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL }}
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT }}
       ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
       MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
       POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
@@ -383,6 +385,8 @@ jobs:
           runtime_path = Path(os.environ["RUNNER_TEMP"]) / "tradingagents-api-keys.json"
           payload = {}
           alias_groups = {
+              "FRED_API_KEY": ("FRED_API_KEY",),
+              "SEC_USER_AGENT": ("SEC_USER_AGENT",),
               "ALPHA_VANTAGE_API_KEY": ("ALPHA_VANTAGE_API_KEY",),
               "MASSIVE_API_KEY": ("MASSIVE_API_KEY", "POLYGON_API_KEY", "POLY_API_KEY"),
               "ALPACA_ENDPOINT": ("ALPACA_ENDPOINT", "APCA_API_BASE_URL"),
@@ -836,6 +840,8 @@ jobs:
       TRADINGAGENTS_TRANSLATION_TOKENIZER_PATH: ${{ vars.TRADINGAGENTS_TRANSLATION_TOKENIZER_PATH }}
       TRADINGAGENTS_TRANSLATION_DEVICE: ${{ vars.TRADINGAGENTS_TRANSLATION_DEVICE }}
       TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL: ${{ vars.TRADINGAGENTS_ALLOW_LARGE_TRANSLATION_MODEL }}
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT }}
       ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
       MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
       POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
@@ -966,6 +972,8 @@ jobs:
           runtime_path = Path(os.environ["RUNNER_TEMP"]) / "tradingagents-api-keys.json"
           payload = {}
           alias_groups = {
+              "FRED_API_KEY": ("FRED_API_KEY",),
+              "SEC_USER_AGENT": ("SEC_USER_AGENT",),
               "ALPHA_VANTAGE_API_KEY": ("ALPHA_VANTAGE_API_KEY",),
               "MASSIVE_API_KEY": ("MASSIVE_API_KEY", "POLYGON_API_KEY", "POLY_API_KEY"),
               "ALPACA_ENDPOINT": ("ALPACA_ENDPOINT", "APCA_API_BASE_URL"),

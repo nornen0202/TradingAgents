@@ -7,6 +7,7 @@ from pathlib import Path
 
 
 _DOC_ENV_MAP = {
+    "FRED_API_KEY": "FRED API Key",
     "ALPHA_VANTAGE_API_KEY": "Alpha Vantage",
     "ALPACA_API_KEY_ID": "Alpaca API Key ID",
     "ALPACA_DATA_FEED": "Alpaca market data feed",
@@ -39,6 +40,7 @@ _DOC_ENV_MAP = {
 }
 
 _ENV_ALIASES = {
+    "FRED_API_KEY": ("FRED_API_KEY",),
     "KIS_DEMO_APP_KEY": ("KIS_DEMO_APP_KEY", "KIS_VTS_APP_KEY"),
     "KIS_DEMO_APP_SECRET": ("KIS_DEMO_APP_SECRET", "KIS_VTS_APP_SECRET"),
     "KIS_DEMO_ACCOUNT_NO": ("KIS_DEMO_ACCOUNT_NO", "KIS_VTS_ACCOUNT_NO"),

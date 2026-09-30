@@ -1,0 +1,48 @@
+"""Shared price condition semantics for evaluation and investor wording."""
+from __future__ import annotations
+
+from math import isfinite
+from typing import Any
+
+
+def risk_direction(action: str, level: dict[str, Any]) -> str:
+    action = str(action or "").upper()
+    explicit = str(level.get("direction") or "").lower()
+    if explicit in {"upside", "downside"}:
+        return explicit
+    if action == "TAKE_PROFIT":
+        return "upside"
+    if action in {"STOP_LOSS", "EXIT"}:
+        return "downside"
+    kind = str(level.get("level_type") or "").upper().replace(" ", "_")
+    if kind in {"TAKE_PROFIT", "RESISTANCE"}:
+        return "upside"
+    if kind in {"SUPPORT", "INVALIDATION", "STOP_LOSS"}:
+        return "downside"
+    text = " ".join(str(level.get(key) or "") for key in ("label", "source_text", "reason_code")).lower()
+    return "upside" if any(word in text for word in ("profit", "target", "resistance", "ceiling", "이익", "익절", "저항", "고점")) else "downside"
+
+
+def risk_trigger(action: str, level: dict[str, Any]) -> dict[str, Any]:
+    direction = risk_direction(action, level)
+    price = None
+    for key in ("price", "high", "low") if direction == "upside" else ("price", "low", "high"):
+        try:
+            candidate = float(level.get(key))
+            if isfinite(candidate) and candidate > 0:
+                price = candidate
+                break
+        except (TypeError, ValueError):
+            continue
+    return {"price": price, "direction": direction,
+            "comparator": ">=" if direction == "upside" else "<=",
+            "confirmation": str(level.get("confirmation") or "intraday").lower()}
+
+
+def risk_condition_text(action: str, level: dict[str, Any], response: str) -> str | None:
+    condition = risk_trigger(action, level)
+    if condition["price"] is None:
+        return None
+    side = "이상 도달" if condition["direction"] == "upside" else "이하 하락"
+    confirmation = {"close": "종가 확인 후", "two_bar": "2개 봉 확인 후", "next_day": "다음 거래일 확인 후"}.get(condition["confirmation"], "장중 확인 시")
+    return f"{condition['price']:,.2f}".rstrip("0").rstrip(".") + f" {side}, {confirmation} {response}"

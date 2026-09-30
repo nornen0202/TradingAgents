@@ -518,8 +518,8 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "계좌 운용 참고 · 현재 매도 지시와 별개" in private_js
     assert "전략 발동 조건" in private_js
     assert "발동 조건 충족 시 행동" in private_js
-    assert "악화·손실 제한 조건" in private_js
-    assert "악화 조건 충족 시 행동" in private_js
+    assert "위험 대응·무효화 조건" in private_js
+    assert "위험 대응 조건 충족 시 행동" in private_js
     assert "humanPlan(thesis.invalidation_action || workExecution.risk_action)" in private_js
     assert "row.execution_condition_ko" in private_js
     assert "action.trigger_conditions" in private_js
@@ -533,7 +533,7 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "조건 확인 후 분할매수 검토" in private_js
     assert "조건 확인 후 일부 축소 검토" in private_js
     assert "조건 충족 시 신규·추가 매수 재검토" in private_js
-    assert "const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions)" in private_js
+    assert "const entryCondition = (hasThesis ? workEntryConditions : baseEntryConditions)" in private_js
     assert "distinctConditions(...values).slice(0, 3)" in private_js
     assert "기본 분석·전체 조건 보기" in private_js
     assert "별도 단계 실행 계획 없음" not in private_js
@@ -723,7 +723,7 @@ def test_validated_work_conclusion_is_authoritative_over_conflicting_base_action
     ] == "REDUCE"
     private_js = (mobile / "private.js").read_text(encoding="utf-8")
     assert "const direction = analysisDirection(row, strategy)" in private_js
-    assert "const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions)" in private_js
+    assert "const entryCondition = (hasThesis ? workEntryConditions : baseEntryConditions)" in private_js
     assert "기본 분석 결론" in private_js
 
 
@@ -788,7 +788,7 @@ def test_mobile_separates_unrelated_work_report_as_past_reference(
     assert market["reference_report"]["lineage"]["status"] == "PAST_REFERENCE"
     assert market["reference_report"]["lineage"]["current_action_cards_enriched"] is False
     private_js = (tmp_path / "site" / "mobile" / "private.js").read_text(encoding="utf-8")
-    assert "카드의 투자 논지·근거에는 활용했으며" in private_js
+    assert "현재 카드의 방향·순위·분류에는 적용하지 않습니다" in private_js
     assert "현재 장중 갱신 분석을 사용합니다" in private_js
     assert "카드의 thesis·근거에는 활용했으며" not in private_js
     assert "function investorText(value)" in private_js
@@ -800,7 +800,7 @@ def test_mobile_separates_unrelated_work_report_as_past_reference(
     assert ".replace(/분석 자료과/g, '분석 자료와')" in private_js
     assert "분석 실행 ID" in private_js
     assert "분석 run" not in private_js
-    assert "for (const field of ['integrated_report', 'reference_report'])" in private_js
+    assert "for (const field of ['integrated_report'])" in private_js
     assert "execution" not in market["reference_report"]["structured_report"]["strategies"][0]
 
 

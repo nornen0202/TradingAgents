@@ -23,7 +23,7 @@ from tradingagents.agents.utils.agent_utils import (
 
 def create_fundamentals_analyst(llm):
     def fundamentals_analyst_node(state):
-        current_date = state["trade_date"]
+        current_date = state.get("analysis_date") or state["trade_date"]
         instrument_context = build_instrument_context(
             state["company_of_interest"],
             state.get("instrument_profile"),
@@ -51,6 +51,7 @@ def create_fundamentals_analyst(llm):
             "Use `get_fundamentals(ticker, curr_date)` for the overview, `get_balance_sheet`, `get_cashflow`, and `get_income_statement` for statement detail, and `get_insider_transactions(ticker)` for insider activity. "
             "Use the institutional tools to strengthen reliability: `get_source_linked_financials`, `get_earnings_event_pack`, `get_estimates_consensus`, `get_transcript_evidence`, `get_peer_comps`, `get_credit_risk_context`, `get_diligence_context`, and `get_public_equity_intelligence_summary`. "
             "Tag important numbers and claims with the provider or source type that supports them. Explicitly state when transcript, consensus, credit, or diligence data is unavailable instead of inferring it. "
+            "Distinguish the price reference date from the decision date. Report publication and retrieval times separately. A fiscal period end does not prove when a filing became available; do not claim point-in-time verification without filing acceptance evidence. "
             "Separate company-thesis evidence from security-thesis readiness, and call out whether new evidence strengthens, weakens, or leaves the thesis unchanged. "
             "Do not frame this as only a past-week exercise; emphasize the latest reported fundamentals and the most recent event-driven changes that matter for traders."
             " End with a Markdown table summarizing the main fundamental strengths, weaknesses, watch items, source status, and missing-data limitations."

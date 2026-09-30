@@ -95,6 +95,18 @@ def test_conditional_buy_does_not_turn_into_research(code):
     assert row["execution"]["readiness"] == "NEEDS_LIVE_RECHECK"
 
 
+def test_publish_rejects_valid_but_wrong_producer_membership(tmp_path):
+    from tradingagents.work.runtime import _validate_report_packet_coverage
+    _write_market_run(tmp_path / "archive", run_id="membership", market="us", started_at="2026-07-14T14:00:00Z")
+    runtime = WorkRuntime(tmp_path / "runtime")
+    prepared = runtime.prepare("us", archive_dir=tmp_path / "archive", now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc))
+    source = json.loads(Path(prepared["packet_path"]).read_text(encoding="utf-8"))
+    draft = _structured_report(prepared)
+    draft["strategies"][0]["portfolio_role"] = "discovery"
+    with pytest.raises(WorkRuntimeError, match="producer portfolio_role"):
+        _validate_report_packet_coverage(draft, source, now=datetime(2026, 7, 14, 14, 6, tzinfo=timezone.utc))
+
+
 def test_static_work_readers_expose_clocks_and_escape_report(tmp_path: Path):
     from tradingagents.work.site import _publish_latest_report, _status_html
     archive = tmp_path / "archive"
@@ -363,7 +375,7 @@ def _structured_report(prepared: dict, *, ticker_override: list[str] | None = No
                 "ticker": ticker,
                 "display_name": row.get("display_name"),
                 "rank": index,
-                "portfolio_role": "holding" if row.get("is_held") else "watchlist",
+                "portfolio_role": row.get("portfolio_role") or ("holding" if row.get("is_held") else "watchlist"),
                 "thesis": {
                     "stance": stance,
                     "horizon": "daily",
@@ -444,6 +456,7 @@ def _structured_report(prepared: dict, *, ticker_override: list[str] | None = No
         "coverage_receipt": packet.get("body", {}).get("current", {}).get("universe_coverage", {}),
         "model_receipt": packet.get("body", {}).get("model_provenance", {}),
         "source_summary": {
+            "analysis_receipt": packet.get("body", {}).get("current", {}).get("analysis_receipt"),
             "policy": "balanced_external",
             "freshness_receipt": packet.get("body", {}).get("current", {}).get("freshness_receipt"),
             "external_evidence_receipt": supporting_context.get("receipt_contract"),
@@ -527,6 +540,7 @@ def test_market_packet_distinguishes_runtime_observed_analysis_from_configured_w
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["settings"].update(
         {
+            "run_mode": "full",
             "provider": "codex",
             "quick_model": "gpt-5.6-terra",
             "deep_model": "gpt-5.6-sol",

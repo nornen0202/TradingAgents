@@ -109,7 +109,7 @@ def fetch_live_snapshot(
 def _validate_strategy_payload(site_dir: Path) -> None:
     # Deploy guard jobs only check the live snapshot and intentionally do not
     # install the project. Keep project imports on the stamp-only path.
-    from tradingagents.scheduled.mobile_site import STRATEGY_SCHEMA, assert_strategy_payload_safe
+    from tradingagents.scheduled.mobile_site import STRATEGY_SCHEMA, assert_strategy_payload_safe, assert_strategy_semantics
 
     mobile = site_dir / "mobile"
     for name in ("private.html", "private.js", "strategy.json"):
@@ -129,6 +129,7 @@ def _validate_strategy_payload(site_dir: Path) -> None:
     if not isinstance(payload.get("markets"), dict):
         raise ValueError("Mobile strategy payload is missing markets.")
     assert_strategy_payload_safe(payload)
+    assert_strategy_semantics(payload)
 
 
 def _site_generation_epoch_ms(site_dir: Path) -> int:

@@ -90,7 +90,8 @@ class FredNotConfiguredError(VendorNotConfiguredError):
 
 def get_api_key() -> str:
     """Retrieve the FRED API key from the environment."""
-    api_key = os.getenv("FRED_API_KEY")
+    from .api_keys import get_api_key as resolve_api_key
+    api_key = resolve_api_key("FRED_API_KEY")
     if not api_key:
         raise FredNotConfiguredError(
             "FRED_API_KEY environment variable is not set. Get a free key at "

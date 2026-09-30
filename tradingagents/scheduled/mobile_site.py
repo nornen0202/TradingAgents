@@ -41,6 +41,9 @@ _PUBLIC_ROW_FIELDS = (
 )
 
 _PRIVATE_ROW_FIELDS = (
+    "thesis",
+    "execution",
+    "portfolio_role",
     "ticker",
     "display_name",
     "is_held",
@@ -177,7 +180,7 @@ _STRATEGY_SENSITIVE_TEXT_PATTERNS = (
         r"(?:\s*[:=#]\s*|\s+)[A-Z0-9._-]{3,}"
     ),
     re.compile(
-        r"(?i)(?:[A-Z]:[\\/]+[^\r\n<>|\"']+|\\\\[^\\/\s]+[\\/]+[^\r\n<>|\"']+|"
+        r"(?i)(?<![A-Z0-9_/:])(?:[A-Z]:[\\/]+[^\r\n<>|\"']+|\\\\[^\\/\s]+[^\r\n<>|\"']+|"
         r"/(?:Users|home|var|tmp|opt|etc|mnt)/[^\s<>\"']+)"
     ),
 )
@@ -249,6 +252,7 @@ def build_mobile_site(
     )
     assert_public_payload_safe(public_payload)
     assert_strategy_payload_safe(strategy_payload)
+    assert_strategy_semantics(strategy_payload)
     _write_json(mobile_root / "public.json", public_payload)
     _write_json(mobile_root / "strategy.json", strategy_payload)
     _write_text(mobile_root / "index.html", _public_html(public_payload, public_base_url=public_base_url))
@@ -402,6 +406,32 @@ def assert_strategy_payload_safe(value: Any, *, path: str = "$") -> None:
         raise ValueError(f"Forbidden identifier value in mobile strategy payload at {path}")
 
 
+def assert_strategy_semantics(payload: dict[str, Any]) -> None:
+    """Deployment invariants independent of how the dashboard renders."""
+    stances = {"BUY", "HOLD", "REDUCE", "SELL", "AVOID", "RESEARCH"}
+    readiness = {"READY_NOW", "WAIT_FOR_TRIGGER", "NEEDS_LIVE_RECHECK", "MARKET_CLOSED", "DATA_OUTAGE", "RESEARCH_ONLY"}
+    for market in (payload.get("markets") or {}).values():
+        rows = market.get("rows") or []
+        identities = [str(row.get("ticker") or "") for row in rows]
+        if len(identities) != len(set(identities)):
+            raise ValueError("Duplicate strategy ticker")
+        for row in rows:
+            thesis = row.get("thesis") or {}
+            execution = row.get("execution") or {}
+            if thesis.get("stance") is not None and thesis["stance"] not in stances:
+                raise ValueError("Strategy thesis stance is not a canonical enum")
+            if execution.get("readiness") is not None and execution["readiness"] not in readiness:
+                raise ValueError("Strategy readiness is not a canonical enum")
+            if row.get("is_held") is True and row.get("universe_role") not in (None, "HOLDING"):
+                raise ValueError("Strategy membership contradicts producer holding")
+        report = market.get("integrated_report") or {}
+        if (report.get("lineage") or {}).get("current_action_cards_enriched") is False:
+            raise ValueError("Unverified reference cannot be integrated into current strategy")
+        for strategy in (report.get("structured_report") or {}).get("strategies", []):
+            if (strategy.get("thesis") or {}).get("stance") not in stances:
+                raise ValueError("Work thesis stance is not a canonical enum")
+
+
 def _strip_strategy_identifiers(value: Any) -> Any:
     if isinstance(value, dict):
         return {
@@ -434,7 +464,8 @@ def _find_sensitive_strategy_text(value: str) -> str | None:
 
 def _normalize_mobile_machine_values(value: Any) -> Any:
     if isinstance(value, dict):
-        return {key: _normalize_mobile_machine_values(item) for key, item in value.items()}
+        return {key: item if key in {"thesis", "execution", "integrated_report", "reference_report"}
+                else _normalize_mobile_machine_values(item) for key, item in value.items()}
     if isinstance(value, list):
         return [_normalize_mobile_machine_values(item) for item in value]
     if isinstance(value, str):
@@ -580,6 +611,14 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
         )
         if action:
             row["portfolio_action"] = action
+            level = action.get("risk_action_level") or (row.get("thesis") or {}).get("risk_action_level")
+            if isinstance(level, dict):
+                from tradingagents.execution.risk_trigger import risk_condition_text
+                from tradingagents.presentation import present_account_action
+                risk_action = str(action.get("risk_action") or (row.get("thesis") or {}).get("risk_action") or "")
+                condition = risk_condition_text(risk_action, level, present_account_action(risk_action))
+                if condition:
+                    row["risk_condition_ko"] = condition
         if row.get("strategy_code") in {"SELL", "REDUCE", "AVOID"}:
             # Existing archived bundles also need action-specific display repair.
             risk = row.get("risk_condition_ko") or "매도·축소 근거와 수량 재확인 필요"
@@ -594,6 +633,8 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
         "started_at": current.get("started_at"),
         "manifest_status": source_metadata.get("status"),
         "freshness_receipt": current.get("freshness_receipt") or {},
+        "latest_attempt": current.get("latest_attempt") or {},
+        "latest_completed_analysis": current.get("latest_completed_analysis") or {},
         "decision_ready": quality.get("decision_ready"),
         "source": _safe_mapping(source_metadata, ("run_id", "last_run_at", "status")),
         "guardrails": _safe_mapping(
@@ -620,6 +661,18 @@ def _normalize_private_action_semantics(action: dict[str, Any]) -> dict[str, Any
     """Repair legacy portfolio overlays that promoted a relative trim to now."""
 
     normalized = dict(action)
+    position = normalized.get("position_metrics") or {}
+    try:
+        nonprofitable = float(position["unrealized_return_pct"]) <= 0
+    except (KeyError, TypeError, ValueError):
+        nonprofitable = False
+    if nonprofitable:
+        for field in ("risk_action", "sell_intent", "portfolio_relative_action", "action_now", "action_if_triggered"):
+            value = str(normalized.get(field) or "")
+            if value.startswith("TAKE_PROFIT"):
+                normalized[field] = value.replace("TAKE_PROFIT", "REDUCE" if field.startswith("action_") else "REDUCE_RISK", 1)
+        if (normalized.get("profit_taking_plan") or {}).get("enabled"):
+            normalized["profit_taking_plan"] = {"enabled": False, "reason_codes": ["NONPROFIT_RISK_REDUCTION"]}
     action_now = str(normalized.get("action_now") or "").strip().upper()
     relative = str(
         normalized.get("portfolio_relative_action") or ""
@@ -809,6 +862,16 @@ def _work_report_lineage(
     analysis_lineage_matches = bool(
         report_source_run_id and report_source_run_id in current_lineage_ids
     )
+    current_receipt = current.get("analysis_receipt") or {}
+    report_receipt = (structured.get("source_summary") or {}).get("analysis_receipt") or {}
+    # Contract v12 requires immutable full-analysis identity plus every decision
+    # hash; overlay depth and an unchanged row count are not proof of identity.
+    if current_receipt:
+        analysis_lineage_matches = bool(
+            current_receipt.get("analysis_run_id")
+            and current_receipt.get("decisions")
+            and report_receipt == current_receipt
+        )
 
     if exact_packet and contract_matches and ticker_coverage_matches:
         status = "CURRENT_PACKET"
@@ -932,7 +995,9 @@ def _sanitize_work_report_value(value: Any) -> Any:
     if isinstance(value, list):
         return [_sanitize_work_report_value(item) for item in value]
     if isinstance(value, str):
-        return _sanitize_work_report_text(value)
+        # Structured strings include enums, URLs and receipt fields. Translate
+        # prose only at explicit presentation boundaries, never recursively.
+        return _redact_account_identifiers(value)
     return value
 
 
@@ -993,35 +1058,18 @@ def _annotate_market_roles(
     holding_ids = _identity_set(active_universe.get("expected_holding_tickers"))
     watchlist_ids = _identity_set(active_universe.get("expected_watchlist_tickers"))
     scanner_ids = _identity_set(active_universe.get("scanner_candidates"))
-    work_roles: dict[str, str] = {}
-    structured = (
-        integrated_report.get("structured_report")
-        if isinstance(integrated_report.get("structured_report"), dict)
-        else {}
-    )
-    for strategy in structured.get("strategies") or []:
-        if not isinstance(strategy, dict):
-            continue
-        role = _normalize_universe_role(strategy.get("portfolio_role"))
-        for identity in _ticker_identity_keys(strategy.get("ticker")):
-            if role:
-                work_roles[identity] = role
-
     counts = {"HOLDING": 0, "WATCHLIST": 0, "NEW_CANDIDATE": 0}
     for index, row in enumerate(rows, start=1):
         if not isinstance(row, dict):
             continue
         identities = set(_ticker_identity_keys(row.get("ticker")))
-        explicit = _normalize_universe_role(row.get("universe_role") or row.get("candidate_source"))
-        work_role = next((work_roles[key] for key in identities if key in work_roles), "")
+        explicit = _normalize_universe_role(row.get("universe_role") or row.get("portfolio_role") or row.get("candidate_source"))
         if row.get("is_held") is True or identities.intersection(holding_ids):
             role = "HOLDING"
-        elif work_role:
-            role = work_role
-        elif row.get("is_scanner_candidate") is True or identities.intersection(scanner_ids):
-            role = "NEW_CANDIDATE"
         elif row.get("is_watchlist") is True or identities.intersection(watchlist_ids):
             role = "WATCHLIST"
+        elif row.get("is_scanner_candidate") is True or identities.intersection(scanner_ids):
+            role = "NEW_CANDIDATE"
         elif explicit:
             role = explicit
         else:
@@ -1089,6 +1137,8 @@ def _public_quality(value: Any) -> dict[str, Any]:
             "execution_eligibility",
             "data_status",
             "provider_status",
+            "provider_limitations",
+            "provider_blockers",
             "row_valid_until",
             "expired_at_build",
         ),
@@ -1633,9 +1683,10 @@ _PRIVATE_JS = r"""
   }
   const strategyIndexes = new WeakMap();
   function workStrategy(item, ticker) {
+    if (((item.integrated_report || {}).lineage || {}).current_action_cards_enriched === false) return {};
     if (!strategyIndexes.has(item)) {
       const index = new Map();
-      for (const field of ['integrated_report', 'reference_report']) {
+      for (const field of ['integrated_report']) {
         const structured = ((item[field] || {}).structured_report || {});
         for (const strategy of structured.strategies || []) {
           for (const key of tickerKeys(strategy.ticker)) if (!index.has(key)) index.set(key, strategy);
@@ -1815,7 +1866,7 @@ _PRIVATE_JS = r"""
     return score;
   }
   function analysisDirection(row, strategy) {
-    const thesis = strategy.thesis || {};
+    const thesis = strategy.thesis || row.thesis || {};
     const workExecution = strategy.execution || {};
     const action = row.portfolio_action || {};
     const workCandidates = [
@@ -1824,6 +1875,9 @@ _PRIVATE_JS = r"""
     ];
     const workSelected = workCandidates.find(isDirectional);
     if (workSelected) {
+      if (actionKind(workSelected) === 'buy' && (thesis.stance_basis || (row.thesis || {}).stance_basis) === 'CONDITIONAL_ENTRY') {
+        return {text: row.is_held ? '조건 확인 후 추가매수 검토' : '조건 확인 후 분할매수 검토', kind: 'buy'};
+      }
       return {text: actionLabel(workSelected), kind: actionKind(workSelected)};
     }
     const rowCandidates = [
@@ -1930,11 +1984,12 @@ _PRIVATE_JS = r"""
   function card(row, market, topTickers) {
     const strategy = workStrategy(market, row.ticker);
     const hasWork = Object.keys(strategy).length > 0;
-    const thesis = strategy.thesis || {};
+    const hasThesis = hasWork || Boolean(row.thesis);
+    const thesis = strategy.thesis || row.thesis || {};
     const workExecution = strategy.execution || {};
     const readiness = liveReadiness(row, market, strategy);
     const action = row.portfolio_action || {};
-    const role = normalizeRole(strategy.portfolio_role || row.universe_role, row.is_held === true);
+    const role = normalizeRole(row.universe_role || row.portfolio_role, row.is_held === true);
     const baseConclusion = valueText(row.strategy_ko) || (action.action_now ? actionLabel(action.action_now) : '');
     const direction = analysisDirection(row, strategy);
     const executionAction = currentExecutionAction(row, action);
@@ -1942,11 +1997,11 @@ _PRIVATE_JS = r"""
     const workEntryConditions = conciseConditions(thesis.entry_conditions);
     const riskDirected = ['SELL', 'REDUCE', 'AVOID'].includes(row.strategy_code);
     const baseEntryConditions = conciseConditions(row.execution_condition_ko, riskDirected ? null : action.trigger_conditions);
-    const entryCondition = (hasWork ? workEntryConditions : baseEntryConditions) || '조건 정보 없음';
-    const triggeredAction = strategyActivationAction(thesis, workExecution, action, hasWork);
+    const entryCondition = (hasThesis ? workEntryConditions : baseEntryConditions) || '조건 정보 없음';
+    const triggeredAction = strategyActivationAction(thesis, workExecution, action, hasThesis);
     const workInvalidation = conciseConditions(thesis.invalidation_conditions);
     const baseInvalidation = conciseConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
-    const invalidation = (hasWork ? workInvalidation : baseInvalidation) || '무효화 조건 정보 없음';
+    const invalidation = conciseConditions(row.risk_condition_ko, hasThesis ? workInvalidation : baseInvalidation) || '무효화 조건 정보 없음';
     const baseRiskAction = combineDistinct(
       action.risk_action ? actionLabel(action.risk_action) : '',
       humanPlan(action.risk_action_level),
@@ -1954,7 +2009,7 @@ _PRIVATE_JS = r"""
     );
     const workRiskAction = humanPlan(thesis.invalidation_action || workExecution.risk_action);
     const riskAction = (hasWork ? workRiskAction : baseRiskAction) || '무효화 시 행동 정보 없음';
-    const confidence = hasWork ? thesis.confidence : action.confidence;
+    const confidence = hasThesis ? thesis.confidence : action.confidence;
     const confidenceText = Number.isFinite(numeric(confidence)) && Number(confidence) >= 0 && Number(confidence) <= 1 ? percent(confidence) : valueText(confidence);
     const displayName = companyName(row, strategy);
     const tickerIdentity = tickerKeys(row.ticker)[0];
@@ -1962,6 +2017,13 @@ _PRIVATE_JS = r"""
     const fullWorkInvalidation = fullConditions(thesis.invalidation_conditions);
     const fullBaseEntry = fullConditions(row.execution_condition_ko, riskDirected ? null : action.trigger_conditions);
     const fullBaseInvalidation = fullConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
+    const original = row.thesis || {};
+    const axisLabels = {HOLD: '보유', WAIT: '관찰', NONE: '없음', BULLISH: '긍정', BEARISH: '부정', NEUTRAL: '중립', STARTER: '신규 분할 진입', ADD: '추가매수'};
+    const axes = original.rating ? `<p class="readiness-note analysis-axes">원등급 ${esc(axisLabels[original.rating] || actionLabel(original.rating))} · 방향 관점 ${esc(axisLabels[original.portfolio_stance] || original.portfolio_stance || '-')} · 분석 당시 진입 ${esc(axisLabels[original.entry_action] || original.entry_action || '-')} · 조건부 계획 ${esc(axisLabels[original.conditional_entry_action] || original.conditional_entry_action || '-')}<br>판단 기준 ${esc(original.decision_asof || '-')} · 일봉 가격 기준 ${esc(original.price_reference_date || '-')} · 조건부 계획 만료 ${esc(dateTime(original.conditional_entry_valid_until))}</p>` : '';
+    const sourceCoverage = original.source_coverage || {};
+    const sourceLabels = {get_disclosures: '공시', get_macro_indicators: '거시 지표', get_social_sentiment: '감성'};
+    const coverageLabels = {OBSERVED: '수집 관측', UNAVAILABLE: '수집 불가', NOT_COLLECTED: '미수집', VERIFIED_ZERO: '조회 구간 0건 확인', UNMAPPED_INSTRUMENT: '종목 매핑·적용 대상 미확인', PARTIAL_WINDOW: '조회 기간 일부만 확인'};
+    const sources = Object.entries(sourceCoverage).map(([key, value]) => `${sourceLabels[key] || key}: ${coverageLabels[value.status] || value.status}${value.missing_configuration ? ' (구성 누락)' : ''}${value.source_type === 'NEWS_DERIVED' ? ' (뉴스 기반 대체 자료)' : ''}`).join(' · ');
     const supportingDetail = `<details><summary>${hasWork ? '기본 분석·전체 조건 보기' : '전체 조건 보기'}</summary>
       ${hasWork ? `<p><strong>기본 분석 결론</strong><br>${esc(baseConclusion || '정보 없음')}</p>` : ''}
       ${fullWorkEntry ? `<p><strong>Work 전체 진입·축소 조건</strong><br>${esc(fullWorkEntry)}</p>` : ''}
@@ -1974,14 +2036,15 @@ _PRIVATE_JS = r"""
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
       <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}</span></div>
       <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
+      ${axes}
       <div class="execution-status"><div><strong>현재 실행 상태·행동</strong><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div><span class="execution-action">${esc(executionAction)}</span><p class="readiness-note">${esc(readiness.note)}</p></div>
       ${guidance ? `<div class="account-guidance"><strong>계좌 운용 참고 · 현재 매도 지시와 별개</strong><p>${esc(guidance)}</p></div>` : ''}
       ${signalStrip(row, confidence)}
       <div class="condition-grid">
         <div class="condition-block"><strong>전략 발동 조건</strong><p>${esc(entryCondition)}</p></div>
         <div class="condition-block"><strong>발동 조건 충족 시 행동</strong><p>${esc(triggeredAction)}</p></div>
-        <div class="condition-block risk"><strong>악화·손실 제한 조건</strong><p>${esc(invalidation)}</p></div>
-        <div class="condition-block risk"><strong>악화 조건 충족 시 행동</strong><p>${esc(riskAction)}</p></div>
+        <div class="condition-block risk"><strong>위험 대응·무효화 조건</strong><p>${esc(invalidation)}</p></div>
+        <div class="condition-block risk"><strong>위험 대응 조건 충족 시 행동</strong><p>${esc(riskAction)}</p></div>
       </div>
       <dl>
         <div><dt>VWAP</dt><dd>${esc(row.vwap_position_ko || '-')}</dd></div>
@@ -1992,6 +2055,8 @@ _PRIVATE_JS = r"""
       ${(hasWork ? thesis.rationale : action.rationale) ? `<p class="card-rationale"><strong>종합 판단 근거</strong><br>${esc(valueText(hasWork ? thesis.rationale : action.rationale))}</p>` : ''}
       ${supportingDetail}
       <details><summary>금액·비중·출처 세부 보기</summary><dl>
+        <div><dt>근거 수집 상태</dt><dd>${esc(sources || '미확인')}</dd></div>
+        <div><dt>시세 공급자 제한</dt><dd>${esc(valueText((row.quality || {}).provider_limitations) || '제공 정보 없음')}</dd></div>
         <div><dt>현재 증감</dt><dd>${esc(won(action.delta_krw_now))}</dd></div>
         <div><dt>조건부 증감</dt><dd>${esc(won(action.delta_krw_if_triggered))}</dd></div>
         <div><dt>목표 비중</dt><dd>${esc(percent(action.target_weight_now ?? action.target_weight_if_triggered))}</dd></div>
@@ -2013,20 +2078,22 @@ _PRIVATE_JS = r"""
     return `<div class="work-action"><strong>${esc(title)}</strong>${detail ? `<span>${esc(detail)}</span>` : ''}</div>`;
   }
   function marketOverview(rows, item) {
-    const buckets = {BUY: 0, HOLD: 0, REDUCE: 0, SELL: 0, RESEARCH: 0};
+    const buckets = {BUY: 0, HOLD: 0, REDUCE: 0, SELL: 0, AVOID: 0, RESEARCH: 0};
     rows.forEach((row) => {
       const strategy = workStrategy(item, row.ticker);
-      const stance = String(((strategy.thesis || {}).stance) || '').toUpperCase();
-      const action = String(((row.portfolio_action || {}).action_now) || row.strategy_code || '').toUpperCase();
-      const combined = `${stance} ${action}`;
-      if (/SELL|EXIT|STOP_LOSS/.test(combined)) buckets.SELL += 1;
-      else if (/REDUCE|TRIM|TAKE_PROFIT/.test(combined)) buckets.REDUCE += 1;
-      else if (/BUY|ADD|STARTER/.test(combined)) buckets.BUY += 1;
-      else if (/HOLD|WATCH|WAIT/.test(combined)) buckets.HOLD += 1;
-      else buckets.RESEARCH += 1;
+      const kind = analysisDirection(row, strategy).kind.toUpperCase();
+      buckets[Object.hasOwn(buckets, kind) ? kind : 'RESEARCH'] += 1;
     });
-    const labels = {BUY: '매수·추가 검토', HOLD: '보유·관찰', REDUCE: '축소·익절', SELL: '매도·청산', RESEARCH: '추가 조사'};
-    return `<div class="market-overview" aria-label="전략 분포">${Object.entries(buckets).map(([key, count]) => `<div class="overview-stat"><strong>${count}</strong><span>${labels[key]}</span></div>`).join('')}</div>`;
+    const labels = {BUY: '매수·추가 검토', HOLD: '보유·관찰', REDUCE: '축소 검토', SELL: '매도·청산', AVOID: '신규 매수 보류', RESEARCH: '추가 조사'};
+    return `<div class="market-overview" aria-label="전략 분포">${Object.entries(buckets).map(([key, count]) => `<div class="overview-stat" data-direction="${key.toLowerCase()}"><strong>${count}</strong><span>${labels[key]}</span></div>`).join('')}</div>`;
+  }
+  function attemptStatus(item) {
+    const attempt = item.latest_attempt || {};
+    if (!attempt.run_id) return '';
+    const labels = {SUCCESS: '완료', FAILED: '실패', FAILURE: '실패', INTERRUPTED: '연결 중단·심박 만료', RUNNING: '진행 중', PARTIAL_FAILURE: '일부 실패', UNVERIFIED: '확인 필요'};
+    const complete = item.latest_completed_analysis || {};
+    const status = String(attempt.status || 'UNVERIFIED').toUpperCase();
+    return `<p class="analysis-attempt ${status === 'SUCCESS' ? 'readiness-note' : 'expiry-warning'}">최근 전체 분석 시도: ${esc(labels[status] || status)} · ${esc(dateTime(attempt.started_at))}<br>현재 참조하는 전체 분석: ${esc(complete.run_id || '미확인')} · ${esc(dateTime(complete.finished_at))}</p>`;
   }
   function evidenceAudit(sourceSummary) {
     const receipt = ((sourceSummary || {}).external_evidence_receipt || {});
@@ -2069,7 +2136,7 @@ _PRIVATE_JS = r"""
     return `<section class="integrated-report${isReference ? ' reference-report' : ''}">
       <p class="eyebrow">${isReference ? 'CHATGPT WORK · 분석 시점 참고 전략' : 'CHATGPT WORK · 통합 전략'}</p>
       <h3>${esc(title)}</h3>
-      ${isReference ? '<p class="expiry-warning">이 Work 내용은 표시된 분석 시점의 전략입니다. 카드의 투자 논지·근거에는 활용했으며, 실제 실행 준비 상태는 현재 시세 기반 카드 안내를 우선합니다.</p>' : ''}
+      ${isReference ? '<p class="expiry-warning">이 Work 내용은 과거 분석 시점의 참고 보고서입니다. 현재 카드의 방향·순위·분류에는 적용하지 않습니다.</p>' : ''}
       ${analysisOnly ? '<p class="readiness-note">Work 종합 전략 전문과 투자 논지·순위·출처를 유지했습니다. 핵심 액션은 분석 시점 참고이며, 카드의 실행 행동과 준비 상태는 현재 장중 갱신 분석을 사용합니다.</p>' : ''}
       <div class="source-meta"><span>분석 기준 ${esc(dateTime(structured.as_of))}</span><span>Work 게시 ${esc(dateTime(report.published_at || structured.generated_at))}</span></div>
       ${summary ? `<p class="summary">${esc(summary)}</p>` : ''}
@@ -2188,7 +2255,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     const sourceLabel = item.integrated_report
       ? item.integrated_report.analysis_only === true ? 'Work 분석 결합 · 현재 실행 우선' : '현재 Work 종합 완료'
       : item.reference_report ? '기본 전략 · 분석 시점 Work 참고' : '기본 전략';
-    panel.innerHTML = '<div class="market-head"><div><p class="eyebrow">' + market.toUpperCase() + ' STRATEGY</p><h2>' + market.toUpperCase() + ' 투자 액션</h2></div><div><span class="health health-neutral">' + sourceLabel + '</span><span class="health market-health"></span></div></div>'
+    panel.innerHTML = '<div class="market-head"><div><p class="eyebrow">' + market.toUpperCase() + ' STRATEGY</p><h2>' + market.toUpperCase() + ' 투자 액션</h2></div><div><span class="health health-neutral">' + sourceLabel + '</span><span class="health market-health"></span></div></div>' + attemptStatus(item)
       + '<div class="source-meta"><span>원분석 기준일 ' + esc((item.freshness_receipt || {}).analysis_trade_date_oldest || '미확인') + '</span><span>시세 기준 ' + esc(dateTime((item.freshness_receipt || {}).market_data_oldest_at)) + '</span><span>계좌 기준 ' + esc(dateTime((item.freshness_receipt || {}).account_as_of)) + '</span><span>자료 갱신 실행 ' + esc(dateTime(item.started_at)) + '</span><span>실행 ID ' + esc(item.run_id || '-') + '</span></div><div class="overview-container"></div>'
       + '<div class="strategy-toolbar"><label for="search-' + market + '">종목 검색<input id="search-' + market + '" type="search" maxlength="100" placeholder="종목명 · 티커 · 업종" value="' + esc(view.search) + '" autocomplete="off" aria-controls="cards-' + market + '"></label>'
       + '<label for="sort-' + market + '">정렬<select id="sort-' + market + '"><option value="priority">우선순위</option><option value="name">종목명순</option><option value="change">등락률순 ↓</option></select></label></div>'

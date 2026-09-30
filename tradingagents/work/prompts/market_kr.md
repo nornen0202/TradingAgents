@@ -62,3 +62,13 @@ ChatGPT Work는 이 보고서 작성·로컬 archive publish·ACK만 담당한�
 답변은 자동 주문 지시가 아니다. 본문과 구조화 보고서를 publish한 뒤에만 Skill 절차로 ACK하고, 성공했을 때만 다음 receipt 한 개를 출력한다. 그 다음 줄부터 `BEGIN_TRADINGAGENTS_WORK_STATE` 복구 mirror를 출력하며 result는 `SUCCESS`다. publish 실패 시 ACK하지 않고 `PENDING_PUBLISH`, ACK 실패 시 `PENDING_ACK`로 둔다.
 
 `WORK_RECEIPT {"event_id":"<event_id>","source_sha256":"<source_sha256>","report_sha256":"<report_sha256>","prompt_contract_version":"<version>","status":"rendered"}`
+
+
+## v12 전략·출처 불변식
+
+- 정본은 현재 packet의 `row.thesis`다. 원분석의 legacy `rating=HOLD`로 `thesis.stance=BUY`를 덮어쓰지 않는다. `stance_basis=CONDITIONAL_ENTRY`는 조건부 매수 검토이며 현재 주문 승인이 아니다. rating, portfolio_stance, entry_action, conditional_entry_action, risk_action 및 원래의 가격·위험 계획을 별도 축으로 설명한다.
+- `current.analysis_receipt`를 `source_summary.analysis_receipt`에 그대로 복사한다. `portfolio_role`도 해당 packet row 값을 그대로 복사한다. 조사 우선순위 변경은 membership 변경 권한이 아니다.
+- packet과 다른 stance를 선택할 때 `thesis.stance_change={from,to,reason,evidence:[{source,event_key,finding}]}`를 반드시 작성한다. evidence는 실제 전달된 외부 근거의 `source_contributions`와 정확히 연결한다. 시세 만료, 계좌 만료, legacy rating 복사는 새로운 방향 변경 근거가 아니다. 변화를 정당화할 근거가 없으면 packet stance를 유지한다.
+- `current.latest_attempt`와 `current.latest_completed_analysis`를 각각 표시한다. 실패·중단된 최신 전체 분석을 이전 30/30 성공으로 숨기지 않는다. `thesis.source_coverage`의 NOT_COLLECTED·UNAVAILABLE·설정 누락·뉴스 유래 감성을 구별한다. 생산 완료와 근거 충족은 다른 지표다.
+- 판단 기준일(`decision_asof`), 일봉 가격 기준일(`price_reference_date`), 공시 발표/접수일, 조회 시각을 구별한다. 공시 기간 종료일만으로 과거 시점 검증을 주장하지 않는다.
+- 게시가 오래 걸려도 입력 시각이나 TTL을 갱신하지 않는다. Pages는 동일 전체 분석·결정 해시가 검증된 Work 논지와 최신 overlay의 실행 상태를 독립 결합한다. 새로운 전체 분석이면 새 packet으로 다시 종합한다.

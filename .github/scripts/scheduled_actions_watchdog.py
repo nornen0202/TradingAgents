@@ -744,21 +744,24 @@ def due_targets(
             )
         )
 
-    if kst_weekday < 5:
-        codex_us_window = datetime.combine(kst_date, time(17, 45), tzinfo=KST)
-        if _time_between(kst_time, time(17, 50), time(22, 45)):
-            targets.append(
-                WatchdogTarget(
-                    name="daily-codex-us",
-                    workflow_file="daily-codex-analysis.yml",
-                    job_names=("analyze_us", "build_pages", "deploy"),
-                    work_job_names=("analyze_us",),
-                    window_start_kst=codex_us_window,
-                    inputs={"profile": "us", "recovery_source": "cloud_watchdog"},
-                    blockers=(_intraday_overlay_active_blocker("kr", now_kst),),
-                )
+    # One US session spans two Korean dates. Keep the same deduplication and
+    # retry budget after midnight, including Saturday after Friday's US run.
+    us_session_date = kst_date if kst_time >= time(17, 45) else kst_date - timedelta(days=1)
+    if us_session_date.weekday() < 5 and (kst_time >= time(17, 50) or kst_time <= time(8, 0)):
+        targets.append(
+            WatchdogTarget(
+                name="daily-codex-us",
+                workflow_file="daily-codex-analysis.yml",
+                job_names=("analyze_us", "build_pages", "deploy"),
+                work_job_names=("analyze_us",),
+                window_start_kst=datetime.combine(us_session_date, time(17, 45), tzinfo=KST),
+                inputs={"profile": "us", "recovery_source": "cloud_watchdog"},
+                blockers=(_intraday_overlay_active_blocker("kr", now_kst),),
+                max_failed_attempts=4,
             )
+        )
 
+    if kst_weekday < 5:
         codex_kr_window = datetime.combine(kst_date, time(4, 30), tzinfo=KST)
         if _time_between(kst_time, time(4, 45), time(10, 15)):
             targets.append(
