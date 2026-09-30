@@ -74,7 +74,7 @@ def risk_condition_text(action: str, level: dict[str, Any], response: str) -> st
     side = "이상 도달" if condition["direction"] == "upside" else "이하 하락"
     confirmation = {"close": "종가 확인 후", "two_bar": "2개 봉 확인 후", "next_day": "다음 거래일 확인 후",
                     "volume_confirmed": "거래량 조건 확인 후"}.get(condition["confirmation"], "장중 확인 시")
-    if condition["confirmation"] == "volume_confirmed" and level.get("volume_rule"):
+    if level.get("volume_rule"):
         confirmation += f" ({level['volume_rule']})"
     text = f"{condition['price']:,.2f}".rstrip("0").rstrip(".") + f" {side}, {confirmation} {response}"
     qualifiers = risk_non_price_conditions(level)
