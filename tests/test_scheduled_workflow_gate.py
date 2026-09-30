@@ -50,6 +50,20 @@ def _codex_targets():
     )
 
 
+@pytest.mark.parametrize('status,expected', [('in_progress',False),('completed',True)])
+def test_full_run_started_before_schedule_boundary_only_blocks_while_active(status, expected):
+    client = FakeClient(
+        runs=[{'id':111,'created_at':'2026-09-30T07:35:00Z','status':status,'conclusion':'success' if status=='completed' else '',
+               'display_title':'Daily [profile=us]','event':'workflow_dispatch'}],
+        jobs={111:[{'name':'analyze_us','status':status,'conclusion':'success' if status=='completed' else ''}]},
+    )
+    _, should_run, _ = gate.decide_schedule_gate(event_name='schedule',schedule='50 8 * * 1-5',requested_profile='',
+        manual_default_profile='all',workflow_file='daily-codex-analysis.yml',current_run_id=222,client=client,
+        targets=_codex_targets(),now_kst=_kst('2026-09-30T18:00:00'))
+    assert should_run is expected
+    assert client.last_created_since_utc <= datetime.fromisoformat('2026-09-30T07:35:00+00:00')
+
+
 def _youtube_targets():
     return gate.load_schedule_targets(
         """

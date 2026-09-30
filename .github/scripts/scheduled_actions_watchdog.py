@@ -137,14 +137,17 @@ def target_is_covered(
     failure_since_utc = (
         target.failure_window_start_kst or target.window_start_kst
     ).astimezone(UTC)
-    query_since_utc = min(since_utc, failure_since_utc)
+    query_since_utc = min(since_utc, failure_since_utc) - timedelta(days=1)
     target_job_names = set(target.job_names)
     runs = client.list_runs(target.workflow_file, created_since_utc=query_since_utc)
     if not runs:
         return False, f"No runs since {target.window_start_kst.isoformat()}."
     runs = sorted(
         runs,
-        key=lambda run: _workflow_run_created_at(run) or datetime.min.replace(tzinfo=UTC),
+        key=lambda run: (
+            str(run.get("status") or "").lower() != "completed",
+            _workflow_run_created_at(run) or datetime.min.replace(tzinfo=UTC),
+        ),
         reverse=True,
     )
 
@@ -188,9 +191,9 @@ def target_is_covered(
                         )
                 else:
                     failed_matches.append(f"{job_name}:{job_conclusion}")
-        if in_target_window and active_matches:
+        if active_matches:
             return True, f"Run {run_id} has active target job(s): {', '.join(active_matches)}."
-        if in_target_window and status != "completed":
+        if status != "completed":
             return True, f"Run {run_id} is active before all target jobs are available."
         if in_target_window and target_job_names <= successful_matches:
             covered = ", ".join(sorted(successful_matches))

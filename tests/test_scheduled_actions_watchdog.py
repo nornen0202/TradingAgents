@@ -46,6 +46,17 @@ def _kst(value: str):
     return datetime.fromisoformat(value).replace(tzinfo=watchdog.KST)
 
 
+def test_watchdog_keeps_pre_boundary_manual_full_active_without_counting_old_success():
+    target = next(t for t in watchdog.due_targets(_kst('2026-09-30T18:00:00')) if t.name=='daily-codex-us')
+    for status, expected in [('in_progress',True),('completed',False)]:
+        client=FakeClient(runs=[{'id':111,'created_at':'2026-09-30T07:35:00Z','status':status,
+            'conclusion':'success' if status=='completed' else '', 'display_title':'Daily [profile=us] [run_mode=full]'}],
+            jobs={111:[{'name':name,'status':status,'conclusion':'success' if status=='completed' else ''} for name in target.job_names]})
+        covered,_=watchdog.target_is_covered(client=client,target=target)
+        assert covered is expected
+        assert client.last_created_since_utc <= datetime.fromisoformat('2026-09-30T07:35:00+00:00')
+
+
 def test_youtube_watchdog_is_due_after_backup_window():
     targets = watchdog.due_targets(_kst("2026-06-02T06:57:00"))
 
