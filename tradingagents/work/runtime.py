@@ -61,9 +61,14 @@ class WorkRuntime:
             validate_packet(packet)
             event_id = str(packet["event_id"])
             event_path = self.outbox_dir / key / f"{_safe_name(event_id)}.json"
-            event_bytes = (json.dumps(packet, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+            # Keep the context limit tied to the bytes the consumer actually
+            # reads. Pretty-print whitespace can exceed the limit while the
+            # same complete packet fits comfortably in compact JSON.
+            event_bytes = (_packet_json(packet) + "\n").encode("utf-8")
             if event_path.exists():
-                if event_path.read_bytes() != event_bytes:
+                # Older immutable packets were pretty-printed. Formatting is
+                # not an event collision when their parsed content is equal.
+                if _load_json_object(event_path, label="immutable Work packet") != packet:
                     raise WorkRuntimeError(f"Immutable event collision: {event_id}")
             else:
                 _atomic_write_bytes(event_path, event_bytes)
@@ -155,7 +160,7 @@ class WorkRuntime:
             return {
                 **latest,
                 "prompt_path": str((Path(__file__).with_name("prompts") / _prompt_filename(key)).resolve()),
-                "packet_chars": len(event_bytes.decode("utf-8")),
+                "packet_chars": len(event_path.read_text(encoding="utf-8")),
                 "publish_required": key in {"kr", "us"},
                 "report_markdown_path": str(
                     (self.drafts_dir / key / f"{_safe_name(event_id)}.md").resolve()
@@ -694,9 +699,14 @@ def validate_packet(packet: dict[str, Any], *, max_chars: int = 600_000) -> None
         raise WorkRuntimeError("Work packet event ID does not match its sealed content")
     if body.get("kind") in {"youtube", "prism"} and body.get("execution_eligible") is not False:
         raise WorkRuntimeError("Advisory source packet must set execution_eligible=false")
-    size = len(json.dumps(packet, ensure_ascii=False, indent=2))
+    size = len(_packet_json(packet))
     if size > max_chars:
         raise WorkRuntimeError(f"Work packet is too large: {size} chars > {max_chars}")
+
+
+def _packet_json(packet: dict[str, Any]) -> str:
+    """Serialize the complete packet without non-semantic layout overhead."""
+    return json.dumps(packet, ensure_ascii=False, separators=(",", ":"))
 
 
 _REPORT_STANCES = {"BUY", "HOLD", "REDUCE", "SELL", "AVOID", "RESEARCH"}
