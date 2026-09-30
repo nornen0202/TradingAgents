@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import hashlib
 import json
 import re
 from collections.abc import Iterable
@@ -1304,6 +1305,8 @@ def _private_html(*, desktop: bool = False) -> str:
     public_href = "index.html" if desktop else "../index.html"
     body_class = "private-body desktop-body" if desktop else "private-body"
     device_label = "PC 투자 전략" if desktop else "모바일 투자 전략"
+    script_version = hashlib.sha256(_PRIVATE_JS.encode("utf-8")).hexdigest()[:16]
+    style_version = hashlib.sha256(_MOBILE_CSS.encode("utf-8")).hexdigest()[:16]
     return f"""<!doctype html>
 <html lang="ko">
 <head>
@@ -1314,7 +1317,7 @@ def _private_html(*, desktop: bool = False) -> str:
   <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'">
   <title>TradingAgents 통합 투자 전략</title>
-  <link rel="stylesheet" href="{asset_prefix}mobile.css">
+  <link rel="stylesheet" href="{asset_prefix}mobile.css?v={style_version}">
 </head>
 <body class="{body_class}" data-strategy-url="{asset_prefix}strategy.json">
   <a class="skip-link" href="#strategy-content">투자 전략으로 바로가기</a>
@@ -1346,7 +1349,7 @@ def _private_html(*, desktop: bool = False) -> str:
       <p class="trusted-note"><strong>우선 신뢰 채널:</strong> @kpunch(박종훈의 지식한방)와 @sosumonkey(소수몽키) 영상은 사용자 검증 최우선 근거로 취급하되, 실제 주문 직전 시세·계좌·위험 확인은 별도로 유지합니다.</p>
     </details>
   </main>
-  <script src="{asset_prefix}private.js" defer></script>
+  <script src="{asset_prefix}private.js?v={script_version}" defer></script>
 </body>
 </html>
 """

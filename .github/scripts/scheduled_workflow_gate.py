@@ -339,8 +339,15 @@ def decide_schedule_gate(
                     f"Skipping {target.profile.upper() or workflow_file} scheduled run; {blocker_reason}",
                 )
 
-        runs = client.list_runs(workflow_file, created_since_utc=window_start_utc)
+        # A manually started full analysis may cross the schedule boundary.
+        # Older completed runs must not cover today, but an active one must
+        # still prevent a duplicate from entering the runner queue.
+        runs = client.list_runs(workflow_file, created_since_utc=window_start_utc - timedelta(days=1))
         for run in runs:
+            created_at = run.get("created_at")
+            if str(run.get("status") or "").lower() == "completed" and created_at:
+                if datetime.fromisoformat(str(created_at).replace("Z", "+00:00")) < window_start_utc:
+                    continue
             covered, reason = _run_covers_target(
                 client=client,
                 run=run,
