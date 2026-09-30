@@ -77,6 +77,10 @@ def test_us_bulk_hold_overwrite_is_rejected_but_bound_revision_is_allowed():
         _validate_report_thesis_direction(strategy, source, ticker='ABC')
     strategy['source_contributions'] = [{'source': 'prism', 'event_key': 'e1'}]
     _validate_report_thesis_direction(strategy, source, ticker='ABC')
+    strategy['source_contributions'] = [{'source': 'tradingagents', 'event_key': 'e1'}]
+    strategy['thesis']['stance_change']['evidence'][0]['source'] = 'tradingagents'
+    with pytest.raises(WorkRuntimeError, match='stance_change'):
+        _validate_report_thesis_direction(strategy, source, ticker='ABC')
 
 
 def test_multi_hop_analysis_receipt_and_model_usage(tmp_path):

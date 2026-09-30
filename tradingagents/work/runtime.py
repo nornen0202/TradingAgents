@@ -1192,6 +1192,11 @@ def _validate_external_evidence_binding(
                 qualifying_pairs.add(pair)
 
         required_pairs = matched_by_ticker.get(identity, set())
+        change = (strategy.get("thesis") or {}).get("stance_change") or {}
+        for item in change.get("evidence", []) if isinstance(change, dict) else []:
+            pair = (str(item.get("source") or "").strip().lower(), str(item.get("event_key") or "")) if isinstance(item, dict) else ("", "")
+            if pair not in required_pairs:
+                raise WorkRuntimeError(f"Structured market strategy {identity} stance_change requires matched healthy evidence")
         if required_pairs and not (required_pairs & qualifying_pairs):
             raise WorkRuntimeError(
                 f"Structured market strategy {identity} omits a matched healthy external-evidence contribution"
@@ -1392,7 +1397,8 @@ def _validate_report_thesis_direction(
         change = report_thesis.get("stance_change") or {}
         contributions = {
             (str(item.get("source")), str(item.get("event_key")))
-            for item in strategy.get("source_contributions", []) if isinstance(item, dict)
+            for item in strategy.get("source_contributions", [])
+            if isinstance(item, dict) and item.get("source") in _EXTERNAL_EVIDENCE_SOURCES
         }
         evidence = change.get("evidence") if isinstance(change, dict) else None
         if (not isinstance(change, dict) or change.get("from") != packet_stance

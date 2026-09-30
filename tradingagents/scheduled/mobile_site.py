@@ -2001,7 +2001,7 @@ _PRIVATE_JS = r"""
     const triggeredAction = strategyActivationAction(thesis, workExecution, action, hasThesis);
     const workInvalidation = conciseConditions(thesis.invalidation_conditions);
     const baseInvalidation = conciseConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
-    const invalidation = (hasThesis ? workInvalidation : baseInvalidation) || '무효화 조건 정보 없음';
+    const invalidation = conciseConditions(row.risk_condition_ko, hasThesis ? workInvalidation : baseInvalidation) || '무효화 조건 정보 없음';
     const baseRiskAction = combineDistinct(
       action.risk_action ? actionLabel(action.risk_action) : '',
       humanPlan(action.risk_action_level),
