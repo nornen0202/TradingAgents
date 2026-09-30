@@ -9,6 +9,11 @@
   };
   const active = () => document.querySelector('.market-panel:not([hidden])');
   const visible = () => [...active().querySelectorAll('.action-card:not([hidden])')];
+  const checkDistribution = () => {
+    const directions = {};
+    active().querySelectorAll('.action-card .private-action').forEach((node) => { directions[node.dataset.direction] = (directions[node.dataset.direction] || 0) + 1; });
+    active().querySelectorAll('.overview-stat').forEach((node) => check(Number(node.querySelector('strong').textContent) === (directions[node.dataset.direction] || 0), 'Overview matches actual card direction: ' + node.dataset.direction));
+  };
   const search = (text) => {
     const input = active().querySelector('input');
     input.value = text; input.dispatchEvent(new Event('input', {bubbles: true}));
@@ -16,6 +21,7 @@
   check(window.__auditOffset === 0, 'Test clock initialized');
   check(document.querySelectorAll('.action-card').length === 4, 'Inactive market rendered eagerly');
   check(visible().length === 3, 'Default top three');
+  checkDistribution();
   search('alpha');
   check(visible().length === 1 && visible()[0].dataset.ticker === 'ALPHA', 'Search must include non-top rows');
   check(new URL(location.href).searchParams.get('q') === 'alpha', 'Search URL restoration');
@@ -74,6 +80,14 @@
   document.getElementById('strategy-refresh').click();
   await tick();
   check(visible()[0].dataset.readiness === 'READY', 'Complete ready contract remains supported');
+  const beforeDirection = visible()[0].querySelector('.private-action').dataset.direction;
+  const beforeRole = visible()[0].dataset.group;
+  market.reference_report = {lineage: {current_action_cards_enriched: false}, structured_report: {strategies: [{ticker: 'NVDA', portfolio_role: 'discovery', rank: 1, thesis: {stance: 'SELL'}}]}};
+  document.getElementById('strategy-refresh').click();
+  await tick();
+  check(visible()[0].querySelector('.private-action').dataset.direction === beforeDirection, 'Reference report cannot overwrite current direction');
+  check(visible()[0].dataset.group === beforeRole, 'Reference report cannot overwrite membership');
+  checkDistribution();
   const malformed = structuredClone(payload);
   malformed.markets.us.integrated_report = {structured_report: {strategies: {}}};
   window.fetch = async () => ({ok: true, json: async () => malformed});

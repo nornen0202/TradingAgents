@@ -58,8 +58,8 @@ def test_mobile_layout_probe_checks_direction_and_separated_actions() -> None:
         "현재 실행 상태",
         "전략 발동 조건",
         "발동 조건 충족 시 행동",
-        "악화·손실 제한 조건",
-        "악화 조건 충족 시 행동",
+        "위험 대응·무효화 조건",
+        "위험 대응 조건 충족 시 행동",
     ):
         assert label in source
     assert "확인할 진입·축소 조건" not in source

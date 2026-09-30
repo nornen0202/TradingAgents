@@ -243,8 +243,8 @@ async def _probe_viewports(websocket_url: str, page_url: str) -> list[dict[str, 
                             hasExecutionStatus: document.body.innerText.includes('현재 실행 상태'),
                             hasEntryCondition: document.body.innerText.includes('전략 발동 조건'),
                             hasTriggeredAction: document.body.innerText.includes('발동 조건 충족 시 행동'),
-                            hasInvalidation: document.body.innerText.includes('악화·손실 제한 조건'),
-                            hasInvalidationAction: document.body.innerText.includes('악화 조건 충족 시 행동'),
+                            hasInvalidation: document.body.innerText.includes('위험 대응·무효화 조건'),
+                            hasInvalidationAction: document.body.innerText.includes('위험 대응 조건 충족 시 행동'),
                           };
                         })()
                         """,

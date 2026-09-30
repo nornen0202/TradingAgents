@@ -475,45 +475,15 @@ def _market_session_is_post_close(market: IntradayMarketSnapshot) -> bool:
 
 
 def _risk_action_trigger_price(contract: ExecutionContract) -> float | None:
+    from .risk_trigger import risk_trigger
     level = contract.risk_action_level
-    if level is None:
-        return None
-    if level.price is not None:
-        return float(level.price)
-    direction = _risk_action_direction(contract)
-    if direction == "upside":
-        if level.high is not None:
-            return float(level.high)
-        if level.low is not None:
-            return float(level.low)
-    else:
-        if level.low is not None:
-            return float(level.low)
-        if level.high is not None:
-            return float(level.high)
-    return None
+    return risk_trigger(contract.risk_action, level.to_dict() if level else {})["price"]
 
 
 def _risk_action_direction(contract: ExecutionContract) -> str:
-    risk_action = str(contract.risk_action or "").upper()
+    from .risk_trigger import risk_direction
     level = contract.risk_action_level
-    if risk_action == "TAKE_PROFIT":
-        return "upside"
-    if risk_action in {"STOP_LOSS", "EXIT"}:
-        return "downside"
-    raw_level_type = getattr(level, "level_type", "") if level is not None else ""
-    level_type = str(getattr(raw_level_type, "value", raw_level_type) or "").upper().replace(" ", "_")
-    if level_type in {"TAKE_PROFIT", "RESISTANCE"}:
-        return "upside"
-    if level_type in {"SUPPORT", "INVALIDATION", "STOP_LOSS"}:
-        return "downside"
-    text = " ".join(
-        str(getattr(level, attr, "") or "")
-        for attr in ("label", "source_text", "reason_code", "level_type")
-    ).lower()
-    if any(token in text for token in ("profit", "target", "resistance", "ceiling", "이익", "익절", "저항", "고점")):
-        return "upside"
-    return "downside"
+    return risk_direction(contract.risk_action, level.to_dict() if level else {})
 
 
 def _pilot_window_open(*, market_asof: str, earliest_pilot_time_local: str | None) -> bool:

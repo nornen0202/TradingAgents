@@ -16,8 +16,8 @@ WORK_STATE_SCHEMA = "tradingagents.work-state/v1"
 WORK_REPORT_SCHEMA = "tradingagents.work-report/v1"
 SURFACES = ("kr", "us", "youtube", "prism")
 PROMPT_CONTRACTS = {
-    "kr": "market-work-v11-kr",
-    "us": "market-work-v11-us",
+    "kr": "market-work-v12-kr",
+    "us": "market-work-v12-us",
     "youtube": "youtube-work-v5",
     "prism": "prism-work-v5",
 }
@@ -108,6 +108,12 @@ def compact_decision_bundle(
         *discovery_candidates[: max(0, int(max_new_candidates))],
     ]
     compact_rows = [_compact_market_row(row, index) for index, row in enumerate(selected, start=1)]
+    for row in compact_rows:
+        row["portfolio_role"] = (
+            "holding" if row.get("is_held") is True else
+            "watchlist" if _market_ticker_identity(row.get("ticker")) in required_identities else
+            "discovery"
+        )
     selected_benchmarks = {
         str(sync.get("benchmark") or "")
         for row in compact_rows
@@ -368,6 +374,7 @@ def _model_provenance(
             body,
             archive_dir=archive_dir,
         )
+        result["overlay"] = _market_analysis_model_receipt(body, archive_dir=archive_dir, resolve_full=False)
     return result
 
 
@@ -398,16 +405,26 @@ def _market_analysis_model_receipt(
     body: dict[str, Any],
     *,
     archive_dir: Path,
+    resolve_full: bool = True,
 ) -> dict[str, Any]:
     current = body.get("current") if isinstance(body.get("current"), dict) else {}
     bundle = current.get("bundle") if isinstance(current.get("bundle"), dict) else {}
     source_run_id = str(
-        bundle.get("analysis_source_run_id")
+        (current.get("freshness_receipt") or {}).get("analysis_run_id")
+        or bundle.get("analysis_source_run_id")
         or bundle.get("run_id")
         or current.get("run_id")
         or ""
     )
     manifest = _manifest_for_run_id(archive_dir, source_run_id)
+    if resolve_full:
+        manifest = _analysis_manifest(archive_dir, manifest)
+    else:
+        source_run_id = str(current.get("run_id") or "")
+        manifest = _manifest_for_run_id(archive_dir, source_run_id)
+        if (manifest.get("settings") or {}).get("run_mode") != "overlay_only":
+            manifest = {}
+    source_run_id = str(manifest.get("run_id") or source_run_id)
     settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
     usage = manifest.get("llm_usage") if isinstance(manifest.get("llm_usage"), dict) else {}
     by_model = usage.get("by_model") if isinstance(usage.get("by_model"), dict) else {}
@@ -494,8 +511,6 @@ def _attach_analysis_theses(
     originals = {_market_ticker_identity(item.get("ticker")): item
                  for item in analysis_manifest.get("tickers", []) if isinstance(item, dict)}
     for row in bundle.get("strategy_table", []):
-        if isinstance(row.get("thesis"), dict) or str(row.get("strategy_code") or "DATA_CHECK") != "DATA_CHECK":
-            continue
         summary = summaries.get(_market_ticker_identity(row.get("ticker")), {})
         original = originals.get(_market_ticker_identity(row.get("ticker")), {})
         decision = summary.get("decision")
@@ -506,11 +521,35 @@ def _attach_analysis_theses(
                 continue
         if not isinstance(decision, dict):
             continue
-        stance = str(decision.get("rating") or "").upper()
+        rating = str(decision.get("rating") or "").upper()
+        stance = {"OVERWEIGHT": "BUY", "UNDERWEIGHT": "REDUCE", "NO_TRADE": "AVOID"}.get(rating, rating)
         if stance not in {"BUY", "HOLD", "REDUCE", "SELL", "AVOID", "RESEARCH"}:
             continue
+        conditional = str(decision.get("conditional_entry_action") or "NONE").upper()
+        # A conditional entry is a research plan, never a live order approval.
+        # Do not let DATA_CHECK or a legacy WAIT/HOLD erase that plan.
+        if stance == "HOLD" and conditional in {"STARTER", "ADD"}:
+            stance = "BUY"
+        decision_hash = sha256_text(canonical_json(decision))
         row["thesis"] = {
             "stance": stance,
+            "rating": rating,
+            "portfolio_stance": decision.get("portfolio_stance"),
+            "entry_action": decision.get("entry_action"),
+            "conditional_entry_action": conditional,
+            "conditional_entry_valid_until": decision.get("conditional_entry_valid_until"),
+            "execution_levels": decision.get("execution_levels"),
+            "risk_action": decision.get("risk_action"),
+            "risk_action_level": decision.get("risk_action_level"),
+            "profit_taking_plan": decision.get("profit_taking_plan"),
+            "data_coverage": decision.get("data_coverage"),
+            "source_coverage": _source_coverage(original or summary),
+            "decision_asof": original.get("analysis_date") or summary.get("analysis_date"),
+            "price_reference_date": summary.get("trade_date"),
+            "point_in_time_verified": False,
+            "stance_basis": "CONDITIONAL_ENTRY" if stance == "BUY" and rating == "HOLD" else "ANALYSIS_RATING",
+            "decision_sha256": decision_hash,
+            "analysis_run_id": analysis_manifest.get("run_id"),
             "confidence": decision.get("confidence"),
             # Overlay summaries rewrite their own finish time. Only the
             # matching original decision can supply a research timestamp.
@@ -524,6 +563,37 @@ def _attach_analysis_theses(
             "horizon": decision.get("time_horizon"),
             "position_sizing": decision.get("position_sizing"),
         }
+        # Repair legacy wording from structured levels before it reaches Work.
+        from tradingagents.execution.risk_trigger import risk_condition_text
+        from tradingagents.presentation import present_account_action
+        level = decision.get("risk_action_level")
+        if isinstance(level, dict):
+            text = risk_condition_text(str(decision.get("risk_action") or ""), level,
+                                       present_account_action(str(decision.get("risk_action") or "")))
+            if text:
+                row["risk_condition_ko"] = text
+
+
+def _source_coverage(summary: dict[str, Any]) -> dict[str, Any]:
+    """Expose collection quality separately from successful model completion."""
+    events = (summary.get("tool_telemetry") or {}).get("events") or []
+    result = {}
+    for method in ("get_disclosures", "get_macro_indicators", "get_social_sentiment"):
+        calls = [item for item in events if item.get("method") == method]
+        statuses = sorted({str(item.get("status") or "unverified").upper() for item in calls})
+        result[method] = {
+            "status": ("NOT_COLLECTED" if not calls else "OBSERVED" if "SUCCESS" in statuses
+                       else "VERIFIED_ZERO" if "VERIFIED_ZERO" in statuses
+                       else "UNMAPPED_INSTRUMENT" if "UNMAPPED" in statuses
+                       else "PARTIAL_WINDOW" if "PARTIAL_WINDOW" in statuses else "UNAVAILABLE"),
+            "vendor_statuses": statuses,
+            "vendors": sorted({str(item.get("vendor") or "") for item in calls}),
+            "fallback_calls": sum(bool(item.get("fallback")) for item in calls),
+            "missing_configuration": any("not set" in str(item.get("note") or "") for item in calls),
+        }
+        if method == "get_social_sentiment" and calls:
+            result[method]["source_type"] = "NEWS_DERIVED" if all(item.get("vendor") in {"naver", "yfinance"} for item in calls) else "PROVIDER_REPORTED"
+    return result
 
 
 def resolve_archive_roots(
@@ -578,6 +648,8 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
         }
     current = sources[0]
     analysis_manifest = _analysis_manifest(roots["market"], current["manifest"])
+    from tradingagents.scheduled.attempts import latest_full_attempt
+    latest_attempt = latest_full_attempt(roots["market"], surface, now=now)
     freshness_receipt = source_freshness_receipt(
         current["manifest"], current["bundle"], now=now,
         analysis_manifest=analysis_manifest, public=public,
@@ -626,6 +698,20 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
         "started_at": current["manifest"].get("started_at"),
         "run_mode": ((current["manifest"].get("settings") or {}).get("run_mode")),
         "freshness_receipt": freshness_receipt,
+        "latest_attempt": latest_attempt,
+        "latest_completed_analysis": {
+            "run_id": analysis_manifest.get("run_id"),
+            "status": analysis_manifest.get("status"),
+            "finished_at": analysis_manifest.get("finished_at"),
+        },
+        "analysis_receipt": {
+            "analysis_run_id": analysis_manifest.get("run_id"),
+            "decisions": {
+                str(row.get("ticker")): (row.get("thesis") or {}).get("decision_sha256")
+                for row in bundle.get("strategy_table", [])
+                if (row.get("thesis") or {}).get("decision_sha256")
+            },
+        },
         "bundle": bundle,
         "universe_coverage": _market_universe_coverage(
             current["manifest"],
@@ -1006,6 +1092,7 @@ def _local_private_overlay(run_dir: Path, manifest: dict[str, Any], bundle: dict
                     "execution_feasibility_now",
                     "portfolio_relative_action",
                     "risk_action",
+                    "risk_action_level",
                     "sell_side_category",
                     "sell_intent",
                     "sell_size_plan",

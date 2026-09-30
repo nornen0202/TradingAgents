@@ -258,6 +258,16 @@ def execute_scheduled_run(
     run_id = _build_run_id(started_at, run_label)
     run_dir = config.storage.archive_dir / "runs" / started_at.strftime("%Y") / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
+    from .attempts import RunAttempt
+    with RunAttempt(run_dir, market=config.run.market,
+                    run_mode=str(config.run.run_mode or "full"), started_at=started_at):
+        return _execute_run_body(config, run_label=run_label, skip_site_build=skip_site_build,
+                                 tz=tz, started_at=started_at, run_timer_start=run_timer_start,
+                                 run_id=run_id, run_dir=run_dir)
+
+
+def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
+                      run_timer_start, run_id, run_dir):
     reset_llm_usage()
 
     run_mode = str(config.run.run_mode or "full").strip().lower()

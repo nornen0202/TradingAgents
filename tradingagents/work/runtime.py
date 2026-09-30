@@ -1080,6 +1080,9 @@ def _validate_report_packet_coverage(
             "Structured market report model_receipt does not exactly match the prepared packet"
         )
 
+    analysis_receipt = current.get("analysis_receipt")
+    if analysis_receipt is not None and (draft.get("source_summary") or {}).get("analysis_receipt") != analysis_receipt:
+        raise WorkRuntimeError("Structured market report analysis_receipt does not match the prepared packet")
     _validate_external_evidence_binding(draft, packet, strategies=strategies)
 
     packet_by_identity = {
@@ -1093,6 +1096,9 @@ def _validate_report_packet_coverage(
         if _report_ticker_identity(item.get("ticker"))
     }
     for identity in sorted(expected):
+        expected_role = packet_by_identity[identity].get("portfolio_role")
+        if expected_role and strategy_by_identity[identity].get("portfolio_role") != expected_role:
+            raise WorkRuntimeError(f"Structured market strategy {identity} changes producer portfolio_role")
         _validate_report_thesis_direction(
             strategy_by_identity[identity],
             packet_by_identity[identity],
@@ -1382,6 +1388,22 @@ def _validate_report_thesis_direction(
             f"Structured market strategy {ticker} discards the packet analysis direction "
             "as RESEARCH; execution freshness must be represented by execution.readiness"
         )
+    if packet_stance and report_stance != packet_stance:
+        change = report_thesis.get("stance_change") or {}
+        contributions = {
+            (str(item.get("source")), str(item.get("event_key")))
+            for item in strategy.get("source_contributions", []) if isinstance(item, dict)
+        }
+        evidence = change.get("evidence") if isinstance(change, dict) else None
+        if (not isinstance(change, dict) or change.get("from") != packet_stance
+                or change.get("to") != report_stance or not str(change.get("reason") or "").strip()
+                or not isinstance(evidence, list) or not evidence
+                or any(not isinstance(item, dict) or not str(item.get("finding") or "").strip()
+                       or (str(item.get("source")), str(item.get("event_key"))) not in contributions
+                       for item in evidence)):
+            raise WorkRuntimeError(
+                f"Structured market strategy {ticker} changes thesis stance without a bound stance_change evidence receipt"
+            )
 
 
 def validate_account_execution(strategies: list[dict], freshness: Any, *, now: datetime) -> None:

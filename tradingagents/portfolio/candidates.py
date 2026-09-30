@@ -274,6 +274,12 @@ def _build_single_candidate(
         risk_action_reason_codes=risk_action_reason_codes,
         profile=profile,
     )
+    unrealized_return = _safe_float(position_metrics.get("unrealized_return_pct"))
+    if (risk_action == RiskAction.TAKE_PROFIT.value or
+            risk_action == RiskAction.REDUCE_RISK.value and _is_profit_level(risk_action_level)) and unrealized_return is not None and unrealized_return <= 0:
+        risk_action = RiskAction.REDUCE_RISK.value
+        risk_action_reason_codes = (*risk_action_reason_codes, "NONPROFIT_RISK_REDUCTION")
+        profit_taking_plan = {"enabled": False, "reason_codes": ["NONPROFIT_RISK_REDUCTION"]}
     if _take_profit_lacks_evidence(
         risk_action=risk_action,
         risk_action_level=risk_action_level,
@@ -716,23 +722,8 @@ def _risk_action_trigger_price(risk_action_level: dict[str, Any], *, direction: 
 
 
 def _risk_action_level_direction(*, risk_action: str, risk_action_level: dict[str, Any]) -> str:
-    normalized_action = str(risk_action or "").upper()
-    level_type = str(risk_action_level.get("level_type") or "").upper().replace(" ", "_")
-    text = " ".join(
-        str(risk_action_level.get(key) or "")
-        for key in ("label", "source_text", "reason_code", "level_type")
-    ).lower()
-    if normalized_action == RiskAction.TAKE_PROFIT.value:
-        return "upside"
-    if normalized_action in {RiskAction.STOP_LOSS.value, RiskAction.EXIT.value}:
-        return "downside"
-    if level_type in {"TAKE_PROFIT", "RESISTANCE"}:
-        return "upside"
-    if level_type in {"SUPPORT", "INVALIDATION", "STOP_LOSS"}:
-        return "downside"
-    if any(token in text for token in ("profit", "target", "resistance", "ceiling", "이익", "익절", "저항", "고점")):
-        return "upside"
-    return "downside"
+    from tradingagents.execution.risk_trigger import risk_direction
+    return risk_direction(risk_action, risk_action_level)
 
 
 def _build_rationale(*, stance: str, entry_action: str, is_held: bool, analysis_present: bool) -> str:
@@ -1191,6 +1182,8 @@ def _sell_intent(
         return relative
     if normalized in {RiskAction.STOP_LOSS.value, RiskAction.EXIT.value, RiskAction.TRIM_TO_FUND.value}:
         return normalized
+    if "NONPROFIT_RISK_REDUCTION" in reason_codes:
+        return RiskAction.REDUCE_RISK.value
     if normalized == RiskAction.REDUCE_RISK.value and _is_profit_level(risk_action_level) and not _has_thesis_damage(reason_codes):
         return RiskAction.TAKE_PROFIT.value
     if action_now == "TAKE_PROFIT_NOW" or action_if_triggered == "TAKE_PROFIT_IF_TRIGGERED" or relative == "TAKE_PROFIT":

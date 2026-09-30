@@ -22,6 +22,7 @@ from .ecos import get_macro_news_ecos
 from .fred import get_macro_data
 from .naver_news import get_company_news_naver, get_social_sentiment_naver
 from .opendart import get_disclosures_opendart
+from .sec_edgar import get_disclosures_sec_edgar
 from .vendor_exceptions import (
     VendorConfigurationError,
     VendorInputError,
@@ -87,6 +88,7 @@ VENDOR_LIST = [
     "yfinance",
     "naver",
     "opendart",
+    "sec_edgar",
     "ecos",
 ]
 
@@ -138,6 +140,7 @@ VENDOR_METHODS = {
     },
     "get_disclosures": {
         "opendart": get_disclosures_opendart,
+        "sec_edgar": get_disclosures_sec_edgar,
     },
     "get_insider_transactions": {
         "alpha_vantage": get_alpha_vantage_insider_transactions,
@@ -253,11 +256,13 @@ def _prioritize_market_specific_vendors(method: str, vendor_chain: list[str], ar
                         promote("naver")
                     if method == "get_disclosures":
                         promote("opendart")
+                        remove("sec_edgar")
                 else:
                     if method in {"get_news", "get_company_news", "get_social_sentiment"}:
                         remove("naver")
                     if method == "get_disclosures":
                         remove("opendart")
+                        promote("sec_edgar")
         if method in {"get_global_news", "get_macro_news"}:
             region = kwargs.get("region") or (args[3] if len(args) > 3 else None)
             if isinstance(region, str) and region.upper() == "KR":
@@ -400,7 +405,10 @@ def route_to_vendor(method: str, *args, **kwargs):
             _record_tool_telemetry(
                 method=method,
                 vendor=vendor,
-                status="success",
+                status=("unmapped" if str(result).startswith("SEC disclosure coverage: UNMAPPED")
+                        else "verified_zero" if str(result).startswith("SEC disclosure coverage: VERIFIED_ZERO")
+                        else "partial_window" if str(result).startswith("SEC disclosure coverage: PARTIAL_WINDOW")
+                        else "success"),
                 fallback=False,
             )
             return result

@@ -244,6 +244,23 @@ class SellSideCandidateMappingTests(unittest.TestCase):
         self.assertEqual(metrics["market_price_krw"], 560000.0)
         self.assertAlmostEqual(metrics["unrealized_return_pct"], 12.0)
 
+    def test_losing_position_relabels_profit_plan_as_risk_reduction(self):
+        for intent in ("TAKE_PROFIT", "REDUCE_RISK"):
+            with self.subTest(intent=intent):
+                position = self._position(avg_cost=100000, market_price=84000, unrealized_pnl=-160000)
+                candidate, _ = _build_single_candidate(
+                    snapshot=AccountSnapshot(**{**self._snapshot().__dict__, "positions": (position,)}),
+                    canonical_ticker="005930.KS", position=position,
+                    analysis={"decision": self._decision(
+                        risk_action=intent, risk_action_reason_codes=["EXTENDED_MOVE"],
+                        risk_action_level={"label": "resistance", "level_type": "TAKE_PROFIT", "price": 85000, "confirmation": "intraday"}),
+                        "tool_telemetry": {}, "execution_update": {"decision_state": "WAIT", "last_price": 84000,
+                            "trigger_status": {}, "source": {"market_session": "regular"}}},
+                )
+                self.assertEqual(candidate.risk_action, "REDUCE_RISK")
+                self.assertEqual(candidate.sell_intent, "REDUCE_RISK")
+                self.assertFalse(candidate.profit_taking_plan.get("enabled"))
+
     def test_damage_code_keeps_profit_level_reduce_risk_as_reduce_risk(self):
         position = self._position(avg_cost=70000, market_price=84000, unrealized_pnl=140000)
         candidate, _ = _build_single_candidate(

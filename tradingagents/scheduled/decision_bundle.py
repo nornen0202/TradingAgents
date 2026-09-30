@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
+from tradingagents.execution.risk_trigger import risk_condition_text, risk_trigger
 
 from tradingagents.presentation import (
     present_account_action,
@@ -588,12 +589,10 @@ def _risk_condition(*, context: dict[str, Any], candidate: dict[str, Any], actio
         for item in invalidation_conditions
         if str(item).strip()
     ]
-    if readable_invalidation:
-        return " / ".join(readable_invalidation[:2])
     risk_action = str(action.get("risk_action") or candidate.get("risk_action") or "").upper()
     risk_level = action.get("risk_action_level") or candidate.get("risk_action_level") or {}
     if isinstance(risk_level, dict):
-        level = risk_level.get("price") or risk_level.get("level") or risk_level.get("value")
+        level = risk_trigger(risk_action, risk_level)["price"]
         if level not in (None, ""):
             explicit_risk_actions = {
                 "REDUCE_NOW",
@@ -612,7 +611,9 @@ def _risk_condition(*, context: dict[str, Any], candidate: dict[str, Any], actio
                 if risk_action in explicit_risk_actions
                 else "전략 재평가"
             )
-            return f"{_fmt_number(level)} 이탈 시 {response}"
+            return risk_condition_text(risk_action, risk_level, response) or "위험 가격 조건 재확인 필요"
+    if readable_invalidation:
+        return " / ".join(readable_invalidation[:2])
     timing = str(context.get("execution_timing_state") or "").upper()
     if timing == "SUPPORT_FAIL":
         return "지지선 이탈 상태, 비중 축소 우선 검토"
