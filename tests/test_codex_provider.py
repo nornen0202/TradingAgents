@@ -1,4 +1,5 @@
 import re
+import json
 import os
 import tempfile
 import unittest
@@ -113,6 +114,32 @@ class FakeCodexSession:
 
 
 class CodexProviderTests(unittest.TestCase):
+    def test_report_control_markers_retry_and_never_become_final_evidence(self):
+        for tool_mode in (False, True):
+            for marker in ("CHATGPT_FINAL_JSON_OUTPUT_PLACEHOLDER", "<|im_start|>", "[eot_id]"):
+                with self.subTest(tool_mode=tool_mode, marker=marker):
+                    def payload(content):
+                        return json.dumps({"mode": "final", "content": content, "tool_calls": []} if tool_mode else {"answer": content})
+
+                    session = FakeCodexSession(responses=[payload("Report. " + marker), payload("Clean report")])
+                    model = create_llm_client(
+                        "codex", "gpt-5.5", codex_binary="C:/fake/codex",
+                        codex_workspace_dir="C:/tmp/codex-workspace", codex_max_retries=1,
+                        session_factory=lambda **kwargs: session, preflight_runner=lambda **kwargs: None,
+                    ).get_llm()
+                    bound = model.bind_tools([lookup_price]) if tool_mode else model
+                    self.assertEqual(bound.invoke("Write the report").content, "Clean report")
+                    self.assertEqual(len(session.invocations), 2)
+                    self.assertIn("serialization/control markers", session.invocations[1]["prompt"])
+
+                    session.responses.extend([payload(marker), payload(marker)])
+                    with self.assertRaises(CodexStructuredOutputError):
+                        bound.invoke("Reject repeated contaminated text")
+
+    def test_normal_report_and_numeric_comparisons_are_not_control_markers(self):
+        from tradingagents.llm_clients.codex_chat_model import CodexChatModel
+        CodexChatModel._validate_final_content("Final analysis: buy only if close >= 101.25; assistant coverage unavailable.")
+
     def test_resolve_codex_binary_uses_windows_vscode_fallback(self):
         fake_home = Path("C:/Users/tester")
         candidate = (

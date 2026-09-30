@@ -251,43 +251,8 @@ class TradingAgentsGraph:
 
     def _create_tool_nodes(self) -> Dict[str, ToolNode]:
         """Create tool nodes for different data sources using abstract methods."""
-        return {
-            "market": ToolNode(
-                [
-                    # Core stock data tools
-                    get_stock_data,
-                    # Technical indicators
-                    get_indicators,
-                ]
-            ),
-            "social": ToolNode(
-                [
-                    # Dedicated or news-derived sentiment tools
-                    get_social_sentiment,
-                    get_company_news,
-                ]
-            ),
-            "news": ToolNode(
-                [
-                    get_macro_data,
-                    # News, macro, and disclosure information
-                    get_company_news,
-                    get_macro_news,
-                    get_disclosures,
-                    get_insider_transactions,
-                ]
-            ),
-            "fundamentals": ToolNode(
-                [
-                    # Fundamental analysis tools
-                    get_fundamentals,
-                    get_balance_sheet,
-                    get_cashflow,
-                    get_income_statement,
-                    get_insider_transactions,
-                ]
-            ),
-        }
+        from tradingagents.agents.utils.analyst_tools import ANALYST_TOOLS
+        return {kind: ToolNode(list(tools)) for kind, tools in ANALYST_TOOLS.items()}
 
     def propagate(self, company_name, trade_date, analysis_date=None):
         """Run the trading agents graph for a company on a specific date."""

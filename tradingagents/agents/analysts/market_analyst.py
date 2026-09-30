@@ -1,3 +1,4 @@
+from tradingagents.agents.utils.analyst_tools import analyst_tools
 from datetime import date, timedelta
 from uuid import uuid4
 
@@ -6,30 +7,23 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from tradingagents.agents.utils.agent_utils import (
     bind_tools_for_analyst,
     build_instrument_context,
-    get_intraday_snapshot,
-    get_indicators,
     get_language_instruction,
     needs_initial_tool_call,
-    get_stock_data,
 )
-from tradingagents.dataflows.config import get_config
 
 
 def create_market_analyst(llm):
 
     def market_analyst_node(state):
         current_date = state["trade_date"]
+        analysis_date = state.get("analysis_date") or current_date
         company = state["company_of_interest"]
         instrument_context = build_instrument_context(
             company,
             state.get("instrument_profile"),
         )
 
-        tools = [
-            get_stock_data,
-            get_indicators,
-            get_intraday_snapshot,
-        ]
+        tools = analyst_tools("market")
 
         if needs_initial_tool_call(state["messages"]):
             return {
@@ -82,7 +76,8 @@ Volume-Based Indicators:
                     " will help where you left off. Execute what you can to make progress."
                     " Return the completed market report directly once you have enough evidence."
                     " You have access to the following tools: {tool_names}.\n{system_message}"
-                    "For your reference, the current date is {current_date}. {instrument_context}",
+                    "The decision date is {analysis_date}; daily prices are referenced to {current_date}. "
+                    "Use the price reference date for historical indicator queries. Check the intraday snapshot's own timestamp and session before using it for decision-date timing; stale or closed-session quotes do not confirm a current entry. {instrument_context}",
                 ),
                 MessagesPlaceholder(variable_name="messages"),
             ]
@@ -91,6 +86,7 @@ Volume-Based Indicators:
         prompt = prompt.partial(system_message=system_message)
         prompt = prompt.partial(tool_names=", ".join([tool.name for tool in tools]))
         prompt = prompt.partial(current_date=current_date)
+        prompt = prompt.partial(analysis_date=analysis_date)
         prompt = prompt.partial(instrument_context=instrument_context)
 
         chain = prompt | bind_tools_for_analyst(

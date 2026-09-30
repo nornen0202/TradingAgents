@@ -1,12 +1,11 @@
+from tradingagents.agents.utils.analyst_tools import analyst_tools
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from tradingagents.agents.utils.agent_utils import (
     bind_tools_for_analyst,
     build_instrument_context,
-    get_company_news,
     get_language_instruction,
     needs_initial_tool_call,
-    get_social_sentiment,
 )
 
 
@@ -18,10 +17,7 @@ def create_social_media_analyst(llm):
             state.get("instrument_profile"),
         )
 
-        tools = [
-            get_social_sentiment,
-            get_company_news,
-        ]
+        tools = analyst_tools("social")
 
         system_message = (
             "You are a Public Narrative & Sentiment Analyst. "
