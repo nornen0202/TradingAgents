@@ -29,7 +29,7 @@ def test_dates_with_korean_particles_are_not_price_ranges(context):
     assert level.low is None and level.high is None
 
 
-@pytest.mark.parametrize("context", ["2026-09-29의 10:30이후", "2026년9월29일의 10시30분 이후", "2026-09-29T10:30:00-04:00 기준"])
+@pytest.mark.parametrize("context", ["2026-09-29의 10:30이후", "2026년9월29일의 10시30분 이후", "2026-09-29T10:30:00-04:00 기준", "52-week high and 50-day moving average, support"])
 def test_real_price_range_survives_neighboring_date_and_clock(context):
     level = _parse_price_level({"level_type": "SUPPORT", "source_text": context + " 320~325 구간"})
     assert (level.low, level.high) == (320, 325)

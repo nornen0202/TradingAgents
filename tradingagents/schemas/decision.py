@@ -684,12 +684,16 @@ def _range_from_context(*values: Any) -> tuple[float | None, float | None]:
         text = str(value or "")
         sanitized = _strip_non_price_numeric_context(text)
         lowered = text.lower()
+        pair = re.search(r"(?<![\w.])(\d[\d,]*(?:\.\d+)?)\s*[-\u2013\u2014~]\s*(\d[\d,]*(?:\.\d+)?)(?![\w.])", sanitized)
+        if pair:
+            first, second = (float(value.replace(",", "")) for value in pair.groups())
+            return min(first, second), max(first, second)
         has_explicit_range = bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*[-\u2013\u2014~]\s*\d", sanitized))
         has_range_words = any(token in lowered for token in ("zone", "range", "between", "from ", "구간", "~"))
         if not has_explicit_range and not has_range_words:
             continue
         numbers = _numbers_from_text(text)
-        if len(numbers) >= 2:
+        if len(numbers) == 2:
             first, second = numbers[0], numbers[1]
             return (min(first, second), max(first, second))
     return (None, None)
