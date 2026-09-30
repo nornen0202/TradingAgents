@@ -198,3 +198,4 @@ gh api repos/nornen0202/TradingAgents/check-runs/109473045505/annotations
 - 새 US full [36684552324](https://github.com/nornen0202/TradingAgents/actions/runs/36684552324), 실행 `20260930T163627_github-actions-us`를 실제 시작했고 RUNNING 심박이 갱신됨을 확인했다. 이 기록은 완료 증명이 아니며, 최종 완료·새 Work·배포 검증 결과는 별도로 기록한다.
 - **예약 경계 중복 방지:** 16:35 수동 시작한 full이 17:45 예약 창을 넘기면 기존 gate의 생성시각 필터에서 사라져 두 번째 실행을 대기열에 넣을 수 있었다. gate와 watchdog은 하루 더 이전의 활성 실행도 검사하되 이전 창의 완료 성공은 당일 완료로 세지 않게 했다. 경계 전 RUNNING과 SUCCESS를 각각 검증한 관련 67개 테스트가 통과했다.
 - **분석 범위 검증:** daily full의 실행 job 이름이 같다는 이유만으로 smoke·site-only·일부 지정 종목 실행을 전체 분석 완료로 인정하지 않도록 gate와 watchdog의 범위 검사를 맞췄다. 해당 실행의 성공 후에도 필요한 full 분석은 진행된다. 관련 71개 테스트 통과.
+- **Work 공백 시 원분석 표시:** 캐시 수정 배포 뒤 실제 US 화면의 BUY 23/HOLD 3과 최신 full 진행 상태를 확인했다. 다만 현재 Work가 없는 카드에서 원분석 무효화 행동 대신 현재 계좌 HOLD가 표시되는 추가 경로가 발견됐다. 원분석 thesis의 위험 대응·판단 근거를 사용하고 출처도 Work가 아닌 원분석으로 표시하도록 고쳤다. 실제 DOM 회귀에도 Work 공백 사례를 추가했다.

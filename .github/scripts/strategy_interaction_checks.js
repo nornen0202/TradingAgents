@@ -88,6 +88,15 @@
   check(visible()[0].querySelector('.private-action').dataset.direction === beforeDirection, 'Reference report cannot overwrite current direction');
   check(visible()[0].dataset.group === beforeRole, 'Reference report cannot overwrite membership');
   checkDistribution();
+  const canonical = market.rows.find((row) => row.ticker === 'NVDA');
+  canonical.thesis = {stance: 'HOLD', confidence: 0.6, entry_conditions: ['Close above 100'],
+    invalidation_conditions: ['Close below 90'], invalidation_action: 'Close below 90: reduce half the position',
+    rationale: ['Cash conversion remains unverified; await the next filing.']};
+  document.getElementById('strategy-refresh').click();
+  await tick();
+  check(visible()[0].querySelectorAll('.condition-block.risk p')[1].textContent.includes('reduce half the position'), 'Canonical risk response survives without current Work');
+  check(visible()[0].querySelector('.card-rationale').textContent.includes('Cash conversion remains unverified'), 'Canonical rationale survives without current Work');
+  check(!visible()[0].querySelector('details').textContent.includes('Work 전체'), 'Raw analysis is not mislabeled as Work');
   const malformed = structuredClone(payload);
   malformed.markets.us.integrated_report = {structured_report: {strategies: {}}};
   window.fetch = async () => ({ok: true, json: async () => malformed});

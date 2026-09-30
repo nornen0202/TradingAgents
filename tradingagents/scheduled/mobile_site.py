@@ -2011,7 +2011,7 @@ _PRIVATE_JS = r"""
       humanPlan(action.profit_taking_plan),
     );
     const workRiskAction = humanPlan(thesis.invalidation_action || workExecution.risk_action);
-    const riskAction = (hasWork ? workRiskAction : baseRiskAction) || '무효화 시 행동 정보 없음';
+    const riskAction = (hasThesis ? workRiskAction : baseRiskAction) || '무효화 시 행동 정보 없음';
     const confidence = hasThesis ? thesis.confidence : action.confidence;
     const confidenceText = Number.isFinite(numeric(confidence)) && Number(confidence) >= 0 && Number(confidence) <= 1 ? percent(confidence) : valueText(confidence);
     const displayName = companyName(row, strategy);
@@ -2029,8 +2029,8 @@ _PRIVATE_JS = r"""
     const sources = Object.entries(sourceCoverage).map(([key, value]) => `${sourceLabels[key] || key}: ${coverageLabels[value.status] || value.status}${value.missing_configuration ? ' (구성 누락)' : ''}${value.source_type === 'NEWS_DERIVED' ? ' (뉴스 기반 대체 자료)' : ''}`).join(' · ');
     const supportingDetail = `<details><summary>${hasWork ? '기본 분석·전체 조건 보기' : '전체 조건 보기'}</summary>
       ${hasWork ? `<p><strong>기본 분석 결론</strong><br>${esc(baseConclusion || '정보 없음')}</p>` : ''}
-      ${fullWorkEntry ? `<p><strong>Work 전체 진입·축소 조건</strong><br>${esc(fullWorkEntry)}</p>` : ''}
-      ${fullWorkInvalidation ? `<p><strong>Work 전체 무효화 조건</strong><br>${esc(fullWorkInvalidation)}</p>` : ''}
+      ${fullWorkEntry ? `<p><strong>${hasWork ? 'Work' : '원분석'} 전체 진입·축소 조건</strong><br>${esc(fullWorkEntry)}</p>` : ''}
+      ${fullWorkInvalidation ? `<p><strong>${hasWork ? 'Work' : '원분석'} 전체 무효화 조건</strong><br>${esc(fullWorkInvalidation)}</p>` : ''}
       ${fullBaseEntry ? `<p><strong>기본 분석 전체 조건</strong><br>${esc(fullBaseEntry)}</p>` : ''}
       ${fullBaseInvalidation ? `<p><strong>기본 분석 전체 무효화 조건</strong><br>${esc(fullBaseInvalidation)}</p>` : ''}
       ${action.rationale ? `<p><strong>기본 분석 근거</strong><br>${esc(valueText(action.rationale))}</p>` : ''}
@@ -2055,7 +2055,7 @@ _PRIVATE_JS = r"""
         <div><dt>분석 신뢰도</dt><dd>${esc(confidenceText || '-')}</dd></div>
       </dl>
       ${evidenceList(thesis, strategy)}
-      ${(hasWork ? thesis.rationale : action.rationale) ? `<p class="card-rationale"><strong>종합 판단 근거</strong><br>${esc(valueText(hasWork ? thesis.rationale : action.rationale))}</p>` : ''}
+      ${(hasThesis ? thesis.rationale : action.rationale) ? `<p class="card-rationale"><strong>종합 판단 근거</strong><br>${esc(valueText(hasThesis ? thesis.rationale : action.rationale))}</p>` : ''}
       ${supportingDetail}
       <details><summary>금액·비중·출처 세부 보기</summary><dl>
         <div><dt>근거 수집 상태</dt><dd>${esc(sources || '미확인')}</dd></div>
