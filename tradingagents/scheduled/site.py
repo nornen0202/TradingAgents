@@ -3308,7 +3308,8 @@ def _render_ticker_institutional_section(*, run_dir: Path, ticker_summary: dict[
       </div>
       <div class="ticker-grid">
         <article class="ticker-card">
-          <p><strong>원천 품질</strong><span>{_escape(payload.get('source_quality_score', '-'))}</span></p>
+          <p><strong>근거 확보 점수</strong><span>{_escape(payload.get('source_quality_score', '-'))}</span></p>
+          <p>확보된 출처·근거 범위의 참고 점수입니다. 사실 검증률이나 예측 정확도, 주문 승인을 뜻하지 않습니다.</p>
           <p><strong>데이터군</strong><span>{_escape(payload.get('source_cohort') or '-')}</span></p>
           <p><strong>공개 provider</strong><span>{_escape(', '.join(str(item) for item in providers) or '-')}</span></p>
           <p><strong>기관 import</strong><span>{_escape(', '.join(str(item) for item in institutional) or '-')}</span></p>

@@ -2139,7 +2139,7 @@ _PRIVATE_JS = r"""
       <h3>${esc(title)}</h3>
       ${isReference ? '<p class="expiry-warning">이 Work 내용은 과거 분석 시점의 참고 보고서입니다. 현재 카드의 방향·순위·분류에는 적용하지 않습니다.</p>' : ''}
       ${analysisOnly ? '<p class="readiness-note">Work 종합 전략 전문과 투자 논지·순위·출처를 유지했습니다. 핵심 액션은 분석 시점 참고이며, 카드의 실행 행동과 준비 상태는 현재 장중 갱신 분석을 사용합니다.</p>' : ''}
-      <div class="source-meta"><span>분석 기준 ${esc(dateTime(structured.as_of))}</span><span>Work 게시 ${esc(dateTime(report.published_at || structured.generated_at))}</span></div>
+      <div class="source-meta"><span>입력 시세 기준 ${esc(dateTime(structured.as_of))}</span><span>Work 게시 ${esc(dateTime(report.published_at || structured.generated_at))}</span></div>
       ${summary ? `<p class="summary">${esc(summary)}</p>` : ''}
       ${analysisOnly && topActions.length ? '<p class="readiness-note"><strong>분석 시점 핵심 액션 참고:</strong> 현재 주문 가능 여부가 아니라 Work 분석 당시 제안입니다.</p>' : ''}
       ${topActions.length ? `<div class="work-top-actions">${topActions.slice(0, 3).map(workTopAction).join('')}</div>` : ''}
