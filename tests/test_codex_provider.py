@@ -116,7 +116,10 @@ class FakeCodexSession:
 class CodexProviderTests(unittest.TestCase):
     def test_report_control_markers_retry_and_never_become_final_evidence(self):
         for tool_mode in (False, True):
-            for marker in ("CHATGPT_FINAL_JSON_OUTPUT_PLACEHOLDER", "<|im_start|>", "[eot_id]", "|通 finals?"):
+            for marker in (
+                "CHATGPT_FINAL_JSON_OUTPUT_PLACEHOLDER", "<|im_start|>", "[eot_id]", "|通 finals?",
+                "אַfinal қисjson_output_schemaავალ{", "TIM|>", "IM_END|>",
+            ):
                 with self.subTest(tool_mode=tool_mode, marker=marker):
                     def payload(content):
                         return json.dumps({"mode": "final", "content": content, "tool_calls": []} if tool_mode else {"answer": content})
@@ -139,6 +142,7 @@ class CodexProviderTests(unittest.TestCase):
     def test_normal_report_and_numeric_comparisons_are_not_control_markers(self):
         from tradingagents.llm_clients.codex_chat_model import CodexChatModel
         CodexChatModel._validate_final_content("Final analysis: buy only if close >= 101.25; assistant coverage unavailable.")
+        CodexChatModel._validate_final_content("| 종목 | 조건 |\n| TIM | 종가 > 101.25이면 검토 |\n최종 판단: 보유.")
 
     def test_resolve_codex_binary_uses_windows_vscode_fallback(self):
         fake_home = Path("C:/Users/tester")
