@@ -1821,7 +1821,7 @@ def _run_single_ticker(
             "tool_calls": effective_tool_calls,
             "codex_usage": llm_usage,
         }
-        called_tools = _collect_called_tool_names(final_state)
+        called_tools = _collect_called_tool_names(final_state, metrics=metrics)
         quality_flags = _build_analysis_quality_flags(
             config=config,
             trade_date=trade_date,
@@ -3269,8 +3269,11 @@ def _execution_checkpoint_timezone(config: ScheduledAnalysisConfig) -> str:
     return "Asia/Seoul"
 
 
-def _collect_called_tool_names(final_state: dict[str, Any]) -> set[str]:
-    names: set[str] = set()
+def _collect_called_tool_names(final_state: dict[str, Any], *, metrics: dict[str, Any] | None = None) -> set[str]:
+    # Analyst message-clear nodes remove prior tool messages. Callback counts
+    # survive that cleanup and describe calls, not successful data retrieval.
+    counts = (metrics or {}).get("tool_call_counts") or {}
+    names: set[str] = {str(name) for name, count in counts.items() if count > 0}
     for message in (final_state.get("messages") or []):
         tool_calls = message.get("tool_calls") if isinstance(message, dict) else getattr(message, "tool_calls", None)
         if not tool_calls:

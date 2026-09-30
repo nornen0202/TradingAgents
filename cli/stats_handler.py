@@ -14,6 +14,7 @@ class StatsCallbackHandler(BaseCallbackHandler):
         self._lock = threading.Lock()
         self.llm_calls = 0
         self.tool_calls = 0
+        self.tool_call_counts: Dict[str, int] = {}
         self.tokens_in = 0
         self.tokens_out = 0
         self.tokens_available = False
@@ -84,6 +85,9 @@ class StatsCallbackHandler(BaseCallbackHandler):
         """Increment tool call counter when a tool starts."""
         with self._lock:
             self.tool_calls += 1
+            name = (serialized or {}).get("name")
+            if name:
+                self.tool_call_counts[str(name)] = self.tool_call_counts.get(str(name), 0) + 1
 
     def get_stats(self) -> Dict[str, Any]:
         """Return current statistics."""
@@ -91,6 +95,7 @@ class StatsCallbackHandler(BaseCallbackHandler):
             return {
                 "llm_calls": self.llm_calls,
                 "tool_calls": self.tool_calls,
+                "tool_call_counts": dict(self.tool_call_counts),
                 "tokens_in": self.tokens_in,
                 "tokens_out": self.tokens_out,
                 "tokens_available": self.tokens_available,

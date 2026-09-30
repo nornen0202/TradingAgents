@@ -229,6 +229,7 @@ def test_failed_and_interrupted_attempt_do_not_replace_completed_cohort(tmp_path
     assert current['latest_attempt']['run_id'] == 'failing'
     assert current['latest_completed_analysis']['run_id'] == 'full'
     state = json.loads((path / 'attempt.json').read_text())
+    assert state['completed_tickers'] is None
     state.update(status='RUNNING', heartbeat_at=(now - timedelta(minutes=6)).isoformat())
     (path / 'attempt.json').write_text(json.dumps(state))
     assert latest_full_attempt(tmp_path, 'us', now=now)['status'] == 'INTERRUPTED'
