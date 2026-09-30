@@ -17,6 +17,32 @@ from tradingagents.work.runtime import WorkRuntime, WorkRuntimeError, validate_p
 from tradingagents.work.site import _fit_packet_budget, build_work_site
 
 
+def test_packet_budget_counts_serialized_content_without_layout_whitespace():
+    packet = work_packet.seal_packet("us", body={"kind": "market", "items": ["x"] * 20_000})
+    compact_chars = len(json.dumps(packet, ensure_ascii=False, separators=(",", ":")))
+    pretty_chars = len(json.dumps(packet, ensure_ascii=False, indent=2))
+    assert compact_chars < pretty_chars
+    validate_packet(packet, max_chars=compact_chars)
+    with pytest.raises(WorkRuntimeError, match="Work packet is too large"):
+        validate_packet(packet, max_chars=compact_chars - 1)
+
+
+def test_prepare_accepts_same_immutable_packet_with_legacy_pretty_format(tmp_path: Path):
+    archive = tmp_path / "archive"
+    _write_market_run(archive, run_id="legacy-layout", market="us",
+                      started_at="2026-07-14T14:00:00Z")
+    runtime = WorkRuntime(tmp_path / "runtime")
+    now = datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc)
+    first = runtime.prepare("us", archive_dir=archive, now=now)
+    packet_path = Path(first["packet_path"])
+    packet = json.loads(packet_path.read_text(encoding="utf-8"))
+    packet_path.write_text(json.dumps(packet, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    second = runtime.prepare("us", archive_dir=archive, now=now)
+    assert second["result"] == "RESUME"
+    assert second["event_id"] == first["event_id"]
+    assert second["packet_chars"] == len(packet_path.read_text(encoding="utf-8"))
+
+
 def test_market_selection_uses_producer_clock_not_touched_ready_file(tmp_path: Path):
     old = _write_market_run(tmp_path, run_id="old", market="us", started_at="2026-07-14T13:00:00Z", row_mode="IMMEDIATE")
     _write_market_run(tmp_path, run_id="new", market="us", started_at="2026-07-14T14:00:00Z")
