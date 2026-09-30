@@ -433,7 +433,9 @@ def _evaluate_risk_action_level(
         "risk_action_triggered": False,
         "risk_action_close_pending": False,
     }
-    if confirmation in {"two_bar", "next_day"}:
+    # A spot quote/RVOL does not establish the level's free-text volume rule
+    # (which can also require a regular-session close or a volume comparison).
+    if confirmation in {"two_bar", "next_day", "volume_confirmed"}:
         flags["risk_action_close_pending"] = True
         return (
             DecisionState.TRIGGERED_PENDING_CLOSE,

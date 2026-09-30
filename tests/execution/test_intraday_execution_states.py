@@ -1,4 +1,7 @@
 from datetime import datetime, timedelta, timezone
+from dataclasses import replace
+
+import pytest
 
 from tradingagents.execution.overlay import evaluate_execution_state
 from tradingagents.schemas import (
@@ -137,3 +140,58 @@ def test_close_confirmation_risk_action_waits_for_close_intraday():
     assert update.decision_state == DecisionState.TRIGGERED_PENDING_CLOSE
     assert update.decision_now.value == "NONE"
     assert update.execution_timing_state == ExecutionTimingState.CLOSE_CONFIRM_PENDING
+
+
+@pytest.mark.parametrize("session", ["regular", "post_close"])
+@pytest.mark.parametrize("rvol", [None, 0.5, 5.0])
+def test_volume_risk_plan_requires_its_actual_confirmation(session, rvol):
+    from tradingagents.portfolio.candidates import _risk_action_level_triggered_now
+    from tradingagents.execution.risk_trigger import risk_condition_text
+
+    # Based on the AMZN plan observed in the live audit: volume expansion AND
+    # a regular-session close below support. Even high current RVOL alone is
+    # insufficient to establish that historical close-and-volume condition.
+    level = PriceLevel(
+        label="보유 위험 감축선", level_type=PriceLevelType.SUPPORT,
+        price=244.24, confirmation="volume_confirmed",
+        volume_rule="거래량 증가를 동반한 정규장 종가 이탈",
+    )
+    now = datetime.now(timezone.utc)
+    market = replace(
+        _market(last_price=244.0, day_high=247.0, day_low=243.0,
+                market_session=session, asof=now), relative_volume=rvol,
+    )
+    contract = _contract(action_if_triggered=ActionIfTriggered.NONE,
+                         breakout_level=None, risk_action="REDUCE_RISK",
+                         risk_action_level=level)
+    update = evaluate_execution_state(contract, market, now=now, max_data_age_seconds=180)
+    assert update.decision_now.value == "NONE"
+    assert update.trigger_status["risk_action_triggered"] is False
+    assert "risk_action_confirmation_required" in update.reason_codes
+    assert not _risk_action_level_triggered_now(
+        risk_action="REDUCE_RISK", risk_action_level=level.to_dict(),
+        execution_update=update.to_dict(), current_price=market.last_price,
+    )
+    text = risk_condition_text("REDUCE_RISK", level.to_dict(), "위험 축소")
+    assert "거래량 조건 확인 후" in text
+    assert level.volume_rule in text
+    assert "장중 확인 시" not in text
+
+
+def test_explicit_intraday_risk_plan_still_acts_on_current_price():
+    from tradingagents.portfolio.candidates import _risk_action_level_triggered_now
+
+    level = PriceLevel(label="intraday stop", level_type=PriceLevelType.STOP_LOSS,
+                       price=95.0, confirmation="intraday")
+    now = datetime.now(timezone.utc)
+    update = evaluate_execution_state(
+        _contract(action_if_triggered=ActionIfTriggered.NONE, breakout_level=None,
+                  risk_action="STOP_LOSS", risk_action_level=level),
+        _market(last_price=94.0, day_high=101.0, day_low=93.0, asof=now),
+        now=now, max_data_age_seconds=180,
+    )
+    assert update.decision_now.value == "EXIT_NOW"
+    assert _risk_action_level_triggered_now(
+        risk_action="STOP_LOSS", risk_action_level=level.to_dict(),
+        execution_update=update.to_dict(), current_price=94.0,
+    )
