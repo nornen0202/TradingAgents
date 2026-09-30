@@ -104,6 +104,33 @@ Score: 6/10""",
     assert by_ticker["BBB"].confidence == 0.6
 
 
+def test_telegram_price_fields_do_not_reverse_the_announced_event():
+    for text, expected in [
+        ('📈 신규 매수: RF머트리얼즈(327260)\n매수가: 51,500원\n목표가: 56,426원\n손절가: 48,750원', PrismSignalAction.BUY),
+        ('📊 실시간 포트폴리오\n✅ 최고 수익: 샘씨엔에스(252990)\n매수가: 15,780원 / 손절가: 18,136원', PrismSignalAction.HOLD),
+        ('⚠️ 매수 보류: 한온시스템(018880)\n손절가: 3,000원', PrismSignalAction.NO_ENTRY),
+        ('⚠️ [KR] 매수 후보 분석 실패\n한온시스템(018880): 매매 시나리오 생성 실패', PrismSignalAction.UNKNOWN),
+        ('한온시스템(018880) 관찰 보고서\n매수하면 손절가를 확인해야 합니다.', PrismSignalAction.UNKNOWN),
+    ]:
+        signal=message_to_signals(PrismTelegramMessage(message_id='regression',text=text),default_market='KR')[0]
+        assert signal.signal_action == expected
+        assert '최고 수익' not in signal.display_name and '신규 매수' not in signal.display_name
+
+
+def test_inline_tickers_are_all_kept_without_cross_assigned_prices():
+    message = PrismTelegramMessage(
+        message_id="failure",
+        text=("⚠️ [KR] 매수 후보 분석 실패\n"
+              "대상: 한온시스템(018880): 분석 실패 / RF머트리얼즈(327260): 손절가: 48,750원"),
+    )
+    signals = message_to_signals(message, default_market="KR")
+    assert [signal.canonical_ticker for signal in signals] == ["018880.KS", "327260.KS"]
+    assert [signal.display_name for signal in signals] == ["한온시스템", "RF머트리얼즈"]
+    assert all(signal.signal_action == PrismSignalAction.UNKNOWN for signal in signals)
+    assert all(signal.trigger_type == "telegram_analysis_failure" for signal in signals)
+    assert all(signal.stop_loss_price is None for signal in signals)
+
+
 def test_document_filename_yields_watch_signal_without_publishing_private_path():
     message = PrismTelegramMessage(
         message_id="3",

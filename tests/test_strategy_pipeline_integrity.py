@@ -16,6 +16,41 @@ from tradingagents.execution.risk_trigger import risk_condition_text, risk_trigg
 from tradingagents.scheduled.attempts import RunAttempt, latest_full_attempt
 
 
+@pytest.mark.parametrize("text,old_action,expected", [
+    ("📈 신규 매수: RF머트리얼즈(327260)\n손절가: 48,750원", "STOP_LOSS", "BUY"),
+    ("📊 실시간 포트폴리오\nRF머트리얼즈(327260)\n손절가: 48,750원", "STOP_LOSS", "HOLD"),
+    ("⚠️ [KR] 매수 후보 분석 실패\n대상: 한온시스템(018880): 실패 / RF머트리얼즈(327260): 실패", "BUY", "UNKNOWN"),
+])
+def test_archived_prism_actions_rechecked_without_mutating_history(tmp_path, text, old_action, expected):
+    signals_path = tmp_path / "signals.json"
+    historical = json.dumps({"signals": [{"canonical_ticker": "327260", "market": "KR",
+                                         "signal_action": old_action, "confidence": .7}]})
+    signals_path.write_text(historical, encoding="utf-8")
+    (tmp_path / "metadata.json").write_text(json.dumps({"text": text}), encoding="utf-8")
+    event = packet._prism_event("channel", {"message_id": "42", "signals_path": "signals.json",
+                                          "metadata_path": "metadata.json"}, tmp_path)
+    summary = event["summary"]
+    assert summary["signals"][0]["signal_action"] == expected
+    assert summary["signals"][0]["confidence"] == .7
+    assert summary["normalization"]["action_changes"] == [
+        {"ticker": "327260", "before": old_action, "after": expected}
+    ]
+    if expected == "UNKNOWN":
+        assert set(event["relevance"]["tickers"]) == {"327260", "018880.KS"}
+        assert summary["normalization"]["recovered_tickers"] == ["018880.KS"]
+    assert signals_path.read_text(encoding="utf-8") == historical
+
+
+def test_archived_prism_missing_text_keeps_normalized_signals(tmp_path):
+    (tmp_path / "signals.json").write_text(json.dumps({"signals": [
+        {"canonical_ticker": "ABC", "signal_action": "WATCH"}
+    ]}), encoding="utf-8")
+    event = packet._prism_event("channel", {"message_id": "42", "signals_path": "signals.json",
+                                          "metadata_path": "../private.json"}, tmp_path)
+    assert event["summary"]["signals"][0]["signal_action"] == "WATCH"
+    assert event["summary"]["normalization"]["status"] == "NO_ARCHIVED_TEXT"
+
+
 def test_present_hold_does_not_mean_hold_after_support_failure():
     text = risk_condition_text('HOLD', {'price': 70700, 'level_type': 'SUPPORT', 'confirmation': 'close'}, '보유 유지')
     assert '70,700 이하 하락' in text
@@ -80,6 +115,18 @@ def test_fresh_stale_fresh_keeps_all_analysis_axes(tmp_path):
     assert theses[0]['entry_action'] == 'WAIT'
     assert theses[0]['risk_action'] == 'REDUCE_RISK'
     assert theses[0]['risk_action_level']['price'] == 90
+
+
+def test_downside_watchlist_trigger_is_not_a_buy_entry_condition(tmp_path):
+    manifest, bundle = _run(tmp_path, 'full', '2026-09-29T12:00:00+00:00')
+    decision = manifest['tickers'][0]['decision']
+    decision['entry_logic'] = 'Buy only after close above 100 and relative volume at least 1.2.'
+    decision['watchlist_triggers'].append('Close below 90 means reduce the existing position.')
+    packet._attach_analysis_theses(bundle, manifest, manifest)
+    thesis = bundle['strategy_table'][0]['thesis']
+    assert thesis['entry_conditions'] == [decision['entry_logic']]
+    assert thesis['observation_conditions'] == decision['watchlist_triggers']
+    assert thesis['invalidation_conditions'] == ['Close below 90']
 
 
 @pytest.mark.parametrize(('rating', 'expected'), [('OVERWEIGHT', 'BUY'), ('UNDERWEIGHT', 'REDUCE'), ('NO_TRADE', 'AVOID')])

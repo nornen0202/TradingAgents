@@ -20,6 +20,7 @@ from .prism_normalize import (
 DEFAULT_TELEGRAM_CHANNEL = "stock_ai_agent"
 DEFAULT_PUBLIC_PREVIEW_URL = "https://t.me/s/stock_ai_agent"
 TELEGRAM_SOURCE_TAG = "telegram_stock_ai_agent"
+TELEGRAM_NORMALIZATION_VERSION = "prism-telegram/v2"
 
 
 @dataclass(frozen=True)
@@ -360,9 +361,7 @@ def public_message_payload(message: PrismTelegramMessage) -> dict[str, Any]:
 def _ticker_mentions(message: PrismTelegramMessage) -> tuple[_TickerMention, ...]:
     mentions: list[_TickerMention] = []
     for line in _message_lines(message.text):
-        mention = _ticker_mention_from_line(line)
-        if mention is not None:
-            mentions.append(mention)
+        mentions.extend(_ticker_mentions_from_line(line))
     for document in message.documents:
         mention = _ticker_mention_from_document(document)
         if mention is not None:
@@ -370,9 +369,7 @@ def _ticker_mentions(message: PrismTelegramMessage) -> tuple[_TickerMention, ...
         summary = document.text_summary or {}
         excerpt = summary.get("excerpt") if isinstance(summary, dict) else ""
         for line in _message_lines(str(excerpt or "")):
-            mention = _ticker_mention_from_line(line)
-            if mention is not None:
-                mentions.append(mention)
+            mentions.extend(_ticker_mentions_from_line(line))
     deduped: list[_TickerMention] = []
     seen: set[tuple[str, str | None]] = set()
     for mention in mentions:
@@ -384,25 +381,33 @@ def _ticker_mentions(message: PrismTelegramMessage) -> tuple[_TickerMention, ...
     return tuple(deduped)
 
 
-def _ticker_mention_from_line(line: str) -> _TickerMention | None:
+def _ticker_mentions_from_line(line: str) -> list[_TickerMention]:
     text = _collapse_ws(line)
     if not text:
-        return None
+        return []
     matches = list(re.finditer(r"\((?P<ticker>[A-Z][A-Z0-9.\-]{0,9}|\d{6})\)", text))
-    if not matches:
-        return None
-    match = matches[-1]
-    ticker = match.group("ticker").strip().upper()
-    prefix = text[: match.start()].strip()
-    prefix = re.sub(r"^[\-·•*\s🔸🚀🔨📊⚠️✅]+", "", prefix).strip()
-    if ":" in prefix:
-        left, right = prefix.split(":", 1)
-        if any(marker in left.lower() for marker in ("portfolio adjustment", "매수 보류", "관심종목", "후보")):
-            prefix = right.strip()
-    display_name = prefix.rstrip("-:|").strip() or None
-    if display_name and len(display_name) > 120:
-        display_name = display_name[-120:].strip()
-    return _TickerMention(ticker=ticker, display_name=display_name, context=text)
+    mentions = []
+    previous_end = 0
+    for match in matches:
+        ticker = match.group("ticker").strip().upper()
+        prefix = text[previous_end:match.start()].strip()
+        if previous_end:
+            # Inline summaries commonly separate each company with slash/pipe.
+            # Do not carry the preceding company's reason into the next name.
+            prefix = re.split(r"\s[/|;]\s", prefix)[-1].strip()
+        prefix = re.sub(r"^[\-·•*\s/|;,🔸🚀🔨📊📈📉⚠️✅]+", "", prefix).strip()
+        if ":" in prefix:
+            left, right = prefix.split(":", 1)
+            if any(marker in left.lower() for marker in (
+                "portfolio adjustment", "매수", "관심종목", "후보", "최고 수익", "최저 수익", "대상"
+            )):
+                prefix = right.strip()
+        display_name = prefix.rstrip("-:|").strip() or None
+        if display_name and len(display_name) > 120:
+            display_name = display_name[-120:].strip()
+        mentions.append(_TickerMention(ticker=ticker, display_name=display_name, context=text))
+        previous_end = match.end()
+    return mentions
 
 
 def _ticker_mention_from_document(document: PrismTelegramDocument) -> _TickerMention | None:
@@ -420,18 +425,25 @@ def _ticker_mention_from_document(document: PrismTelegramDocument) -> _TickerMen
 
 def _infer_action(message: PrismTelegramMessage) -> PrismSignalAction:
     text = message.text.lower()
-    if "portfolio adjustment" in text or "stop loss" in text or "손절가" in text:
-        return PrismSignalAction.STOP_LOSS
+    headline = next(iter(_message_lines(text)), "")
+    if re.search(r"분석\s*실패|analysis\s+fail", headline):
+        return PrismSignalAction.UNKNOWN
     if "매수 보류" in text or "결정: skip" in text or "decision: skip" in text:
         return PrismSignalAction.NO_ENTRY
     if "실시간 포트폴리오" in text or "current holdings" in text or "holdings list" in text:
         return PrismSignalAction.HOLD
-    if "take profit" in text or "익절" in text or "이익실현" in text:
+    # A stop-loss price is a plan field, not a stop execution. Classify the
+    # announced event before inspecting supporting price/valuation prose.
+    if re.search(r"신규\s*매수|new\s+buy|매수\s*:", headline):
+        return PrismSignalAction.BUY
+    if ("portfolio adjustment" in headline and "stop loss" in text) or re.search(
+        r"손절(?!가)|stop[ -]loss\s+(?:activated|triggered|executed)", headline
+    ):
+        return PrismSignalAction.STOP_LOSS
+    if re.search(r"take[ -]profit|익절(?!가)|이익실현", headline):
         return PrismSignalAction.TAKE_PROFIT
     if "시그널 얼럿" in text or "관심종목" in text or "o'neil" in text or "인사이트" in text:
         return PrismSignalAction.WATCH
-    if "매수" in text and "보류" not in text:
-        return PrismSignalAction.BUY
     if any(document.filename and document.filename.lower().endswith(".pdf") for document in message.documents):
         return PrismSignalAction.WATCH
     return PrismSignalAction.UNKNOWN
@@ -439,6 +451,8 @@ def _infer_action(message: PrismTelegramMessage) -> PrismSignalAction:
 
 def _infer_trigger_type(message: PrismTelegramMessage) -> str:
     text = message.text.lower()
+    if re.search(r"분석\s*실패|analysis\s+fail", next(iter(_message_lines(text)), "")):
+        return "telegram_analysis_failure"
     if "portfolio adjustment" in text:
         return "telegram_portfolio_adjustment"
     if "매수 보류" in text or "decision: skip" in text:
@@ -484,6 +498,10 @@ def _mention_scoped_text(text: str, ticker: str, *, multi_ticker: bool) -> str:
     any_ticker_pattern = re.compile(r"\((?:[A-Z][A-Z0-9.\-]{0,9}|\d{6})\)")
     start = next((index for index, line in enumerate(lines) if ticker_pattern.search(line)), None)
     if start is None:
+        return ""
+    if len(any_ticker_pattern.findall(lines[start])) > 1:
+        # Inline prices cannot be assigned safely by the block-based parser.
+        # Keep every ticker, but do not copy one company's price to the others.
         return ""
     selected = [lines[start]]
     for line in lines[start + 1 :]:
