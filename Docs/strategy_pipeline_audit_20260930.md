@@ -189,3 +189,10 @@ gh api repos/nornen0202/TradingAgents/check-runs/109473045505/annotations
 | F12 | 의미 불변식, 원등급 HOLD 덮어쓰기 거부, 다단계 계보·모델 사용량, 위험 조건, 손실 포지션, URL/enum, 장애 기록, 실제 DOM 분포·분류 회귀 검증을 추가한다. Pages stamp에도 의미 검증을 적용한다. |
 
 운영 외부 조건: 2026-09-30 수정 검증 시 로컬 및 GitHub에 FRED 키가 없었고 SEC 공식 endpoint는 HTTP 403을 반환했다. 코드 연결과 명시적 실패 표시는 구현했지만 이 관측을 실제 공시·FRED 수집 성공으로 해석하면 안 된다. 공급자 제한을 근거 없이 해제하거나 주문 가능 상태를 승격하지 않는다. 예약 Work의 KR·US 문구도 v12 정본·변경 근거 계약에 맞추되 시간표와 모델 설정은 유지했다.
+
+### 실제 배포 검증에서 추가 발견한 사항
+
+- **조건부 위험 대응 문구:** 현재 `risk_action=HOLD`여도 지지선 실패 후 행동을 HOLD로 표시하면 안 된다. 70,700원 아래 종가에서 절반 축소하는 리노공업 계획을 재검토하다 발견했다. 현재 보유 판단과 조건 발동 후 위험 계획을 분리했다. [PR #297](https://github.com/nornen0202/TradingAgents/pull/297), 전체 **1,355 passed, 1 skipped, 84 subtests passed**, 360/390/430/1440px 상호작용 검증 성공.
+- **화면 코드 캐시:** KR Work의 정확한 report hash를 검증한 [배포 36685131152](https://github.com/nornen0202/TradingAgents/actions/runs/36685131152)가 성공한 뒤에도 기존 브라우저는 이전 `private.js`를 재사용했다. 새 데이터의 페이지 생성 시각은 16:43으로 바뀌었지만 US 요약은 여전히 HOLD 26이었다. 서버의 새 JS에는 수정 문구가 있었고 응답 `Cache-Control: max-age=600`을 확인했다. 전략 JS·CSS URL에 각각 내용 해시를 붙여 새 HTML이 이전 코드를 재사용하지 않게 한다. 단순 새로고침 성공이나 배포 job 성공만을 의미 수정의 증명으로 사용하지 않는다.
+- KR v12 보고서 `8519e87a3ab2da84b7c576930069a71671271352893eaf15e9b192b94d071e25`는 원분석 조건부 BUY 20/HOLD 7과 보유 13/비보유 관심 4/탐색 10을 보존했다. 전 종목 실행은 입력 만료에 따라 재확인 상태이며, 영상의 미검증 숫자를 확인된 투자 근거로 승격하지 않았다.
+- 새 US full [36684552324](https://github.com/nornen0202/TradingAgents/actions/runs/36684552324), 실행 `20260930T163627_github-actions-us`를 실제 시작했고 RUNNING 심박이 갱신됨을 확인했다. 이 기록은 완료 증명이 아니며, 최종 완료·새 Work·배포 검증 결과는 별도로 기록한다.

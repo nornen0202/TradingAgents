@@ -23,6 +23,23 @@ def test_present_hold_does_not_mean_hold_after_support_failure():
     assert '위험 대응 계획 재확인' in text
 
 
+def test_changed_strategy_assets_get_new_urls_for_cached_browsers(monkeypatch):
+    import re
+    from tradingagents.scheduled import mobile_site
+    def assets(desktop=False):
+        html = mobile_site._private_html(desktop=desktop)
+        return re.findall(r'(?:src|href)="([^"]+\.(?:js|css)\?v=[^"]+)"', html)
+    original = assets()
+    assert len(original) == 2
+    assert assets() == original
+    monkeypatch.setattr(mobile_site, '_PRIVATE_JS', mobile_site._PRIVATE_JS + '\n// changed')
+    assert assets()[0] == original[0]
+    assert assets()[1] != original[1]
+    monkeypatch.setattr(mobile_site, '_MOBILE_CSS', mobile_site._MOBILE_CSS + '\n/* changed */')
+    assert assets()[0] != original[0]
+    assert assets(desktop=True) == ['mobile/' + url for url in assets()]
+
+
 def _run(root, run_id, when, *, parent=None, calls=0):
     directory = root / 'runs/2026' / run_id
     directory.mkdir(parents=True)
