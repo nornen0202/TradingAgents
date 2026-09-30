@@ -2518,11 +2518,43 @@ def _freeze_overlay_universe_to_latest_full_baseline(
             if _ticker_identity_key(ticker) in baseline_identity
         )
 
+    # Freezing only ticker membership is insufficient: adaptive full research
+    # promotes selected candidates to required watchlist coverage. Rebuilding
+    # those roles from today's seed configuration demotes them to discovery,
+    # where the Work packet's discovery limit can silently drop analyzed names.
+    baseline_active = baseline.get("active_universe") or {}
+    configured = covered(resolved_universe.configured_tickers)
+    profile_watch = covered(resolved_universe.profile_watch_tickers)
+    watchlist_source = "legacy_current_configuration"
+    if resolved_universe.mode == "account_only":
+        configured, profile_watch = (), ()
+        watchlist_source = "account_only"
+    elif "expected_watchlist_tickers" in baseline_active:
+        raw_watchlist = baseline_active["expected_watchlist_tickers"]
+        if not isinstance(raw_watchlist, list) or any(
+            not isinstance(ticker, str) or not ticker.strip() for ticker in raw_watchlist
+        ):
+            raise RuntimeError("OVERLAY_BASELINE_WATCHLIST_INVALID: expected a ticker list")
+        required_watchlist = _unique_tickers(raw_watchlist)
+        missing_watchlist = [
+            ticker for ticker in required_watchlist
+            if _ticker_identity_key(ticker) not in baseline_identity
+        ]
+        if missing_watchlist:
+            raise RuntimeError(
+                "OVERLAY_BASELINE_WATCHLIST_COVERAGE_GAP: required watchlist tickers "
+                "must have successful full analysis artifacts; "
+                f"baseline_run_id={baseline.get('run_id')}; "
+                f"missing_watchlist_tickers={','.join(missing_watchlist)}"
+            )
+        configured, profile_watch = tuple(required_watchlist), ()
+        watchlist_source = "full_baseline_contract"
+
     selection_universe = replace(
         resolved_universe,
         tickers=tuple(baseline_tickers),
-        configured_tickers=covered(resolved_universe.configured_tickers),
-        profile_watch_tickers=covered(resolved_universe.profile_watch_tickers),
+        configured_tickers=configured,
+        profile_watch_tickers=profile_watch,
     )
     scanner_receipt = dict(scanner_status) if scanner_status else None
     if scanner_receipt is not None:
@@ -2548,6 +2580,8 @@ def _freeze_overlay_universe_to_latest_full_baseline(
         "baseline_started_at": str(baseline.get("started_at") or ""),
         "baseline_tickers": baseline_tickers,
         "baseline_ticker_count": len(baseline_tickers),
+        "required_watchlist_source": watchlist_source,
+        "required_watchlist_count": len(_unique_tickers((*configured, *profile_watch))),
         "live_discovered_tickers": _unique_tickers(discovered_tickers),
         "deferred_new_candidates": deferred_dynamic,
         "deferred_nonholding_tickers": deferred_requested,
