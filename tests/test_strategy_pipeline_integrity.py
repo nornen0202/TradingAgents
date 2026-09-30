@@ -16,6 +16,13 @@ from tradingagents.execution.risk_trigger import risk_condition_text, risk_trigg
 from tradingagents.scheduled.attempts import RunAttempt, latest_full_attempt
 
 
+def test_present_hold_does_not_mean_hold_after_support_failure():
+    text = risk_condition_text('HOLD', {'price': 70700, 'level_type': 'SUPPORT', 'confirmation': 'close'}, '보유 유지')
+    assert '70,700 이하 하락' in text
+    assert '보유 유지' not in text
+    assert '위험 대응 계획 재확인' in text
+
+
 def _run(root, run_id, when, *, parent=None, calls=0):
     directory = root / 'runs/2026' / run_id
     directory.mkdir(parents=True)

@@ -389,4 +389,4 @@ def test_hold_action_does_not_create_contradictory_risk_wording():
         benchmark_loader=lambda _symbols: {},
     )
 
-    assert bundle["strategy_table"][0]["risk_condition_ko"] == "199 이하 하락, 장중 확인 시 전략 재평가"
+    assert bundle["strategy_table"][0]["risk_condition_ko"] == "199 이하 하락, 장중 확인 시 신규 진입 보류·보유 위험 대응 계획 재확인"
