@@ -28,6 +28,7 @@ def create_fundamentals_analyst(llm):
             "For ETFs, funds, and trusts, assess the underlying exposure, holdings, NAV premium/discount, fees, flows, tracking, and relevant duration/credit or commodity risks. "
             "Missing corporate revenue, EPS, operating margins, cash-flow statements, dividends, or insider trades are not automatically weaknesses of such vehicles; distinguish not applicable from unavailable. "
             "Distinguish the price reference date from the decision date. Report publication and retrieval times separately. A fiscal period end does not prove when a filing became available; do not claim point-in-time verification without filing acceptance evidence. "
+            "Treat statement dates as provider period labels unless checked against original filings; standardized quarter-end labels can differ from an issuer's actual fiscal period end. "
             "Separate company-thesis evidence from security-thesis readiness, and call out whether new evidence strengthens, weakens, or leaves the thesis unchanged. "
             "Do not frame this as only a past-week exercise; emphasize the latest reported fundamentals and the most recent event-driven changes that matter for traders."
             " End with a Markdown table summarizing the main fundamental strengths, weaknesses, watch items, source status, and missing-data limitations."

@@ -684,12 +684,16 @@ def _range_from_context(*values: Any) -> tuple[float | None, float | None]:
         text = str(value or "")
         sanitized = _strip_non_price_numeric_context(text)
         lowered = text.lower()
+        pair = re.search(r"(?<![\w.])(\d[\d,]*(?:\.\d+)?)\s*[-\u2013\u2014~]\s*(\d[\d,]*(?:\.\d+)?)(?![\w.])", sanitized)
+        if pair:
+            first, second = (float(value.replace(",", "")) for value in pair.groups())
+            return min(first, second), max(first, second)
         has_explicit_range = bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*[-\u2013\u2014~]\s*\d", sanitized))
         has_range_words = any(token in lowered for token in ("zone", "range", "between", "from ", "구간", "~"))
         if not has_explicit_range and not has_range_words:
             continue
         numbers = _numbers_from_text(text)
-        if len(numbers) >= 2:
+        if len(numbers) == 2:
             first, second = numbers[0], numbers[1]
             return (min(first, second), max(first, second))
     return (None, None)
@@ -701,9 +705,12 @@ def _has_multiple_numbers(value: Any) -> bool:
 
 def _strip_non_price_numeric_context(text: str) -> str:
     cleaned = str(text or "")
-    cleaned = re.sub(r"\b20\d{2}[-./]\d{1,2}[-./]\d{1,2}\b", " ", cleaned)
-    cleaned = re.sub(r"\b\d{1,2}\s*월\s*\d{1,2}\s*일\b", " ", cleaned)
-    cleaned = re.sub(r"\b\d{1,2}:\d{2}\b", " ", cleaned)
+    # Unicode word boundaries do not separate digits from Korean particles
+    # (e.g. 2026-09-29의). Dates and clocks must never become price ranges.
+    cleaned = re.sub(r"(?<!\d)[12]\d{3}[-./]\d{1,2}[-./]\d{1,2}(?!\d)", " ", cleaned)
+    cleaned = re.sub(r"(?<!\d)(?:[12]\d{3}\s*년\s*)?\d{1,2}\s*월\s*\d{1,2}\s*일(?!\d)", " ", cleaned)
+    cleaned = re.sub(r"(?<!\d)\d{1,2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?!\d)", " ", cleaned)
+    cleaned = re.sub(r"(?<!\d)\d{1,2}\s*시(?:\s*\d{1,2}\s*분)?(?:\s*\d{1,2}\s*초)?", " ", cleaned)
     cleaned = re.sub(r"[-+]?\d+(?:\.\d+)?\s*%", " ", cleaned)
     cleaned = re.sub(
         r"\b(?:rvol|rsi)\s*(?:>=|<=|>|<|=|:)?\s*[-+]?\d+(?:\.\d+)?\b",

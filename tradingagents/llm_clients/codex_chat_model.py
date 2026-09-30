@@ -298,7 +298,7 @@ class CodexChatModel(BaseChatModel):
         if any(marker in content for marker in (
             "CHATGPT_FINAL_JSON_OUTPUT_PLACEHOLDER", "[im_start]", "[im_end]",
             "[start_header_id]", "[end_header_id]", "[eot_id]",
-        )) or re.search(r"<(?:\|im_start\||\|im_end\||\|(?:assistant|analysis|final)\|)>|[｜](?:assistant|analysis|final)[｜]", content):
+        )) or re.search(r"<(?:\|im_start\||\|im_end\||\|(?:assistant|analysis|final)\|)>|[｜](?:assistant|analysis|final)[｜]", content) or re.search(r"\|\s*[\u4e00-\u9fff]\s+finals?\?\s*$", content):
             raise CodexStructuredOutputError(
                 "Final content contains serialization/control markers. Return clean report text only, "
                 "without response-format commentary or self-correction notes."

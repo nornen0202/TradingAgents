@@ -287,6 +287,7 @@ def render_intelligence_markdown(payload: dict[str, Any]) -> str:
     lines = [
         "## Public Equity Intelligence",
         f"- Source quality: {summary.get('source_quality_score', 0):.2f}",
+        "- Score meaning: heuristic coverage index, not a calibrated probability, factual verification, or order approval.",
         f"- Source cohort: {summary.get('source_cohort') or 'unknown'}",
         f"- Thesis status: {summary.get('thesis_status') or 'unknown'}",
         f"- Security readiness: {summary.get('security_readiness') or 'unknown'}",
@@ -569,12 +570,20 @@ def _source_quality_score(
     imported_payloads: list[dict[str, Any]],
     tool_events: list[dict[str, Any]],
 ) -> float:
-    successful_tools = sum(1 for event in tool_events if event.get("status") == "success")
-    imported_bonus = min(len(imported_payloads) * 0.08, 0.24)
+    # Repeated queries and failed providers are not additional evidence.
+    successful_pairs = {(str(event.get("vendor") or ""), str(event.get("method") or ""))
+                        for event in tool_events if event.get("status") == "success"}
+    distinct_refs = {(source.provider, source.title, source.document_type, source.section, source.url, source.date)
+                     for source in source_refs
+                     if source.document_type != "tool_result" or (source.provider, source.section) in successful_pairs}
+    distinct_evidence = {(item.ticker, item.claim, tuple((ref.provider, ref.title, ref.url) for ref in item.source_refs))
+                         for item in evidence_items}
+    imported_providers = {str(payload.get("_import_provider") or payload.get("provider") or "unknown") for payload in imported_payloads}
+    imported_bonus = min(len(imported_providers) * 0.08, 0.24)
     score = 0.0
-    score += min(len(source_refs), 12) / 12 * 0.35
-    score += min(len(evidence_items), 12) / 12 * 0.25
-    score += min(successful_tools, 6) / 6 * 0.16
+    score += min(len(distinct_refs), 12) / 12 * 0.35
+    score += min(len(distinct_evidence), 12) / 12 * 0.25
+    score += min(len(successful_pairs), 6) / 6 * 0.16
     score += imported_bonus
     if any(item.quality >= 0.8 for item in evidence_items):
         score += 0.05

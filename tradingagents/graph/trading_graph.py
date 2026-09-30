@@ -181,7 +181,7 @@ class TradingAgentsGraph:
         set_config({**self.config, "analysis_as_of": analysis_date or trade_date})
         for memory in (self.bull_memory, self.bear_memory, self.trader_memory, self.invest_judge_memory, self.portfolio_manager_memory):
             memory.as_of = analysis_date or trade_date
-        args = self.propagator.get_graph_args(callbacks=callbacks)
+        args = self.propagator.get_graph_args(callbacks=self.callbacks if callbacks is None else callbacks)
         if self._checkpoint_connection is not None:
             identity = {
                 "version": 1, "ticker": self.ticker, "trade_date": trade_date,

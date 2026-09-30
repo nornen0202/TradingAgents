@@ -4,6 +4,8 @@ import json
 from typing import Annotated
 
 from langchain_core.tools import tool
+from langgraph.prebuilt import InjectedState
+from tradingagents.dataflows.interface import snapshot_tool_telemetry
 
 from tradingagents.dataflows.institutional import (
     CAP_CREDIT,
@@ -106,9 +108,16 @@ def get_diligence_context(
 def get_public_equity_intelligence_summary(
     ticker: Annotated[str, "ticker symbol"],
     curr_date: Annotated[str, "current date you are trading at, yyyy-mm-dd"],
+    state: Annotated[dict | None, InjectedState] = None,
 ) -> str:
     """
     Summarize source quality, evidence coverage, earnings availability, and thesis readiness.
     """
-    payload = build_public_equity_intelligence_artifacts(ticker=ticker, curr_date=curr_date)
-    return render_intelligence_markdown(payload)
+    matching_state = state if state and str(state.get("company_of_interest", "")).upper() == ticker.upper() else {}
+    payload = build_public_equity_intelligence_artifacts(
+        ticker=ticker, curr_date=curr_date, final_state=matching_state,
+        tool_events=snapshot_tool_telemetry() if matching_state else [],
+    )
+    scope = ("Current analyst-state and observed-provider snapshot; concurrently running tools may not have completed. "
+             if matching_state else "Imported-context preview only; preceding analyst/provider outputs are not included. ")
+    return "Coverage scope: " + scope + "This is not a final investment decision or execution approval.\n" + render_intelligence_markdown(payload)
