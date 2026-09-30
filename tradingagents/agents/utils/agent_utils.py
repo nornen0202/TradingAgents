@@ -276,7 +276,9 @@ def build_instrument_context(
     currency = profile.get("currency") or "unknown currency"
     return (
         f"The instrument to analyze is `{primary_symbol}` ({display_name}). "
-        f"It trades on {exchange} in {country}, with market timezone {timezone} and reporting currency {currency}. "
+        f"It trades on {exchange} in {country}, with market timezone {timezone} and trading currency {currency}. "
+        "Trading currency does not establish the issuer's financial-statement currency or share basis. "
+        "Verify statement currency, units, and ADR-to-ordinary-share ratios from the source before comparing financial amounts or EPS. "
         "Use the normalized primary symbol in every tool call, report, and recommendation, "
         "preserving any exchange suffix."
     )
