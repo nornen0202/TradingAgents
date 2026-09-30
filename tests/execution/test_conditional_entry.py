@@ -68,6 +68,7 @@ def market(at):
         avg20_daily_volume=100,
         relative_volume=1.2,
         market_session="regular",
+        market="KR",
     )
 
 
