@@ -70,7 +70,7 @@ def test_fallback_callback_survives_localized_text_and_cleared_messages(tmp_path
     graph = SimpleNamespace(propagate=lambda *args, **kwargs: ({"messages": []}, "HOLD"), close=lambda: None)
     monkeypatch.setattr(runner, "TradingAgentsGraph", lambda *args, **kwargs: graph)
     monkeypatch.setattr(runner, "StatsCallbackHandler", lambda: stats)
-    monkeypatch.setattr(runner, "resolve_instrument", lambda ticker: SimpleNamespace(display_name="Apple"))
+    monkeypatch.setattr(runner, "resolve_instrument", lambda ticker: SimpleNamespace(display_name="Apple", timezone="America/New_York"))
     result = runner._run_single_ticker(config=config, ticker="AAPL", run_dir=tmp_path / "run",
                                        engine_results_dir=tmp_path / "engine", trade_date_override="2026-09-29")
     assert result["status"] == "failed" and result["decision"] is None
