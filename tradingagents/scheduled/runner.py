@@ -558,6 +558,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         "status": status,
         "started_at": started_at.isoformat(),
         "finished_at": finished_at.isoformat(),
+        "ticker_phase_finished_at": finished_at.isoformat(),
         "timezone": config.run.timezone,
         "settings": _settings_snapshot(config),
         "summary": {
@@ -782,6 +783,13 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         parent_usages=[pre_ticker_parent_usage, snapshot_llm_usage()],
     )
 
+    # Portfolio judges, account reconciliation and report/performance artifacts
+    # can take substantial time after ticker workers finish. The final archive
+    # must not label their start as the completion of the whole analysis.
+    completed_at = datetime.now(tz)
+    manifest["finished_at"] = completed_at.isoformat()
+    manifest["duration_seconds"] = round((completed_at - started_at).total_seconds(), 2)
+    manifest["postprocessing_duration_seconds"] = round((completed_at - finished_at).total_seconds(), 2)
     _write_json(run_dir / "run.json", manifest)
     _write_json(config.storage.archive_dir / "latest-run.json", manifest)
     if skip_site_build:
