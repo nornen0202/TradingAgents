@@ -2,6 +2,7 @@ import functools
 
 from tradingagents.agents.utils.agent_utils import build_instrument_context, get_memory_matches
 from tradingagents.agents.utils.decision_retry import invoke_structured_decision_with_retry
+from tradingagents.agents.utils.decision_clock import build_decision_clock_context
 from tradingagents.schemas import build_decision_output_instructions
 
 
@@ -30,6 +31,7 @@ def create_trader(llm, memory):
             "content": (
                 f"Based on a comprehensive analysis by a team of analysts, here is an investment plan tailored for {company_name}. "
                 f"{instrument_context} This plan incorporates insights from market trends, macro context, sentiment, news, and fundamentals. "
+                f"\n{build_decision_clock_context(state)}\n"
                 f"Use this plan as a foundation for your execution decision.\n\nProposed Investment Plan JSON: {investment_plan}\n\n"
                 f"Technical market report (price/volume source): {market_research_report}\n\n"
                 f"Fundamentals and valuation: {fundamentals_report}\n\n"

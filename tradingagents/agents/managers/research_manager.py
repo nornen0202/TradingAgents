@@ -1,5 +1,6 @@
 from tradingagents.agents.utils.agent_utils import build_instrument_context, get_memory_matches
 from tradingagents.agents.utils.decision_retry import invoke_structured_decision_with_retry
+from tradingagents.agents.utils.decision_clock import build_decision_clock_context
 from tradingagents.schemas import build_decision_output_instructions
 
 
@@ -26,6 +27,8 @@ def create_research_manager(llm, memory):
         prompt = f"""As the research manager and evidence arbiter, critically evaluate the bull and bear debate and produce a structured investment view for the trader.
 
 {instrument_context}
+
+{build_decision_clock_context(state)}
 
 Your job:
 - weigh the strongest bullish and bearish evidence
