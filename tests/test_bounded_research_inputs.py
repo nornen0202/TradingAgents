@@ -75,6 +75,7 @@ def test_fallback_callback_survives_localized_text_and_cleared_messages(tmp_path
                                        engine_results_dir=tmp_path / "engine", trade_date_override="2026-09-29")
     assert result["status"] == "failed" and result["decision"] is None
     assert "full analysis is incomplete" in result["error"]
+    assert result["metrics"]["llm_fallback_calls"] == 1
     assert not (tmp_path / "run/tickers/AAPL/analysis.json").exists()
 
 
