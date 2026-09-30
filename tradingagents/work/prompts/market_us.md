@@ -71,4 +71,5 @@ ChatGPT Work는 이 보고서 작성·로컬 archive publish·ACK만 담당한�
 - packet과 다른 stance를 선택할 때 `thesis.stance_change={from,to,reason,evidence:[{source,event_key,finding}]}`를 반드시 작성한다. evidence는 실제 전달된 외부 근거의 `source_contributions`와 정확히 연결한다. 시세 만료, 계좌 만료, legacy rating 복사는 새로운 방향 변경 근거가 아니다. 변화를 정당화할 근거가 없으면 packet stance를 유지한다.
 - `current.latest_attempt`와 `current.latest_completed_analysis`를 각각 표시한다. 실패·중단된 최신 전체 분석을 이전 30/30 성공으로 숨기지 않는다. `thesis.source_coverage`의 NOT_COLLECTED·UNAVAILABLE·설정 누락·뉴스 유래 감성을 구별한다. 생산 완료와 근거 충족은 다른 지표다.
 - 판단 기준일(`decision_asof`), 일봉 가격 기준일(`price_reference_date`), 공시 발표/접수일, 조회 시각을 구별한다. 공시 기간 종료일만으로 과거 시점 검증을 주장하지 않는다.
+- 조건의 확인 방법을 설명하면서 원문에 없는 날짜·기간·발표 일정을 추가하지 않는다. 특히 정성적 반증 조건에 임의로 `다음 분기`를 붙여 대응을 늦추지 않는다. 원공시·실적과 대조할 필요는 설명할 수 있지만 확인 시점이 미정이면 그대로 미정으로 둔다.
 - 게시가 오래 걸려도 입력 시각이나 TTL을 갱신하지 않는다. Pages는 동일 전체 분석·결정 해시가 검증된 Work 논지와 최신 overlay의 실행 상태를 독립 결합한다. 새로운 전체 분석이면 새 packet으로 다시 종합한다.
