@@ -1,7 +1,7 @@
 {
   "schema": "tradingagents.ai-context/v1",
   "market": "kr",
-  "generated_at": "2026-09-30T06:09:19.289743+00:00",
+  "generated_at": "2026-09-30T07:43:04.889566+00:00",
   "freshness_receipt": {
     "producer_run_id": "20260930T145600_github-actions-overlay-kr",
     "producer_finished_at": "2026-09-30T15:07:03.700807+09:00",
@@ -12,7 +12,7 @@
     "analysis_lineage_status": "RESOLVED",
     "market_data_oldest_at": "2026-09-30T14:56:00+09:00",
     "market_data_latest_at": "2026-09-30T14:56:00+09:00",
-    "market_data_status": "FRESH"
+    "market_data_status": "STALE"
   },
   "account": {
     "status": "available",
@@ -177,7 +177,7 @@
       "day_high": 75500.0,
       "day_low": 72600.0,
       "execution_condition_ko": "058470.KQ의 현재 정규장 시세·거래량·거래량가중평균가격 및 보유 위험 확인 / 75,000~77,500원 저항 구간의 거래량 반응",
-      "risk_condition_ko": "70,700 이탈 시 전략 재평가",
+      "risk_condition_ko": "70,700 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -200,7 +200,7 @@
       "day_high": 53400.0,
       "day_low": 50600.0,
       "execution_condition_ko": "2026-09-30 장중 가격·거래량가중평균가격·상대거래량 검증 / 상대거래량 1.2 이상을 동반한 53,400원 위 종가",
-      "risk_condition_ko": "50,400 이탈 시 전략 재평가",
+      "risk_condition_ko": "50,400 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -223,10 +223,10 @@
       "day_high": 209500.0,
       "day_low": 203500.0,
       "execution_condition_ko": "219500원 상향 종가와 거래량 379200주 이상, 이후 다음 거래일 지지 여부 / 201500원부터 199600원까지의 지지 구간 시험",
-      "risk_condition_ko": "199,600 이탈 시 전략 재평가",
+      "risk_condition_ko": "199,600 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "조건 충족 전 대기",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-09-30T15:26:00+09:00"
@@ -246,7 +246,7 @@
       "day_high": 373000.0,
       "day_low": 359000.0,
       "execution_condition_ko": "365066원·367292원 회복 후 372500원 시험 / 379049원 초과 종가와 거래량 약 194000주 이상, 다음 거래일 지지",
-      "risk_condition_ko": "358,000 이탈 시 전략 재평가",
+      "risk_condition_ko": "358,000 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -269,10 +269,10 @@
       "day_high": 276000.0,
       "day_low": 267500.0,
       "execution_condition_ko": "285,500원 초과 종가와 20,864,376주 초과 거래량 / 266,000~268,700원 지지 구간의 실제 반등",
-      "risk_condition_ko": "266,000 이탈 시 전략 재평가",
+      "risk_condition_ko": "266,000 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "조건 충족 전 대기",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-09-30T15:26:00+09:00"
@@ -292,7 +292,7 @@
       "day_high": 693000.0,
       "day_low": 658000.0,
       "execution_condition_ko": "693,000원 위 일봉 종가 회복 / 709,000원 위 일봉 종가와 상대거래량 1.2 이상",
-      "risk_condition_ko": "670,000 이탈 시 리스크 축소",
+      "risk_condition_ko": "670,000 이하 하락, 종가 확인 후 리스크 축소",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -315,10 +315,10 @@
       "day_high": 20200.0,
       "day_low": 19650.0,
       "execution_condition_ko": "상대 거래량 1.2배 이상을 동반한 20,250원 위 일일 종가 / 20,435원 위 일일 종가 이후 다음 거래일 20,250원 지지",
-      "risk_condition_ko": "19,160 이탈 시 리스크 축소",
+      "risk_condition_ko": "19,160 이하 하락, 종가 확인 후 리스크 축소",
       "decision_state_ko": "실행 조건 감시 중",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-09-30T15:26:00+09:00"
@@ -338,7 +338,7 @@
       "day_high": 133550.0,
       "day_low": 128000.0,
       "execution_condition_ko": "130300원 초과 종가와 일간 거래량 1523919주 이상, 이어지는 거래일의 가격 지지 / 123300원 또는 121400~121500원에서 지지 확인",
-      "risk_condition_ko": "130,300 이탈 시 이익실현성 축소",
+      "risk_condition_ko": "130,300 이상 도달, 장중 확인 시 리스크 축소",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -361,7 +361,7 @@
       "day_high": 66000.0,
       "day_low": 60100.0,
       "execution_condition_ko": "상대거래량 1.2 이상을 동반한 61,500원 초과 일간 종가 / 60,300원 재시험 후 일간 종가 지지와 다음 거래일 유지",
-      "risk_condition_ko": "60,300 이탈 시 전략 재평가",
+      "risk_condition_ko": "60,300 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -384,7 +384,7 @@
       "day_high": 82200.0,
       "day_low": 80300.0,
       "execution_condition_ko": "034020.KS가 82,000원 위에서 당일 거래량 가중 평균가격을 웃돌고 동시간대 상대 거래량이 1.2배 이상인지 확인 / 82,000원 위 종가와 일 거래량 2,146,662주 초과 여부, 다음 거래일 첫 30~60분 지지 또는 재돌파 확인",
-      "risk_condition_ko": "78,408 이탈 시 전략 재평가",
+      "risk_condition_ko": "78,408 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -407,10 +407,10 @@
       "day_high": 1824000.0,
       "day_low": 1773000.0,
       "execution_condition_ko": "000660.KS의 1,804,000원 초과 종가와 3,238,000주 초과 거래량 / 다음 거래일 1,804,000원과 당일 거래량가중평균가격 지지",
-      "risk_condition_ko": "1,690,000 이탈 시 전략 재평가",
+      "risk_condition_ko": "1,690,000 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "조건 충족 전 대기",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-09-30T15:26:00+09:00"
@@ -430,10 +430,10 @@
       "day_high": 196500.0,
       "day_low": 192800.0,
       "execution_condition_ko": "200500원 위 종가와 697389주 초과 거래량은 자동 매수가 아닌 재평가 신호 / 202357원 회복과 다음 거래일 200500원 지지",
-      "risk_condition_ko": "193,200 이탈 시 리스크 축소",
+      "risk_condition_ko": "193,200 이하 하락, 종가 확인 후 리스크 축소",
       "decision_state_ko": "조건 충족, 종가 확인 대기",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-09-30T15:26:00+09:00"
@@ -453,10 +453,10 @@
       "day_high": 256500.0,
       "day_low": 247000.0,
       "execution_condition_ko": "042700.KS의 최신 정규장 가격과 거래량 확인 / 258000원 초과 종가와 744200주 이상 거래량, 다음 거래일 지지 여부",
-      "risk_condition_ko": "240,000 이탈 시 전략 재평가",
+      "risk_condition_ko": "240,000 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "조건 충족, 종가 확인 대기",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-09-30T15:26:00+09:00"
@@ -476,7 +476,7 @@
       "day_high": 118900.0,
       "day_low": 114100.0,
       "execution_condition_ko": "119,800원 초과 종가와 일일 거래량 929,301주 초과 여부 / 확인된 돌파 다음 거래일 첫 30~60분의 119,800원 및 당일 거래량가중평균가 유지 여부",
-      "risk_condition_ko": "112,300 이탈 시 전략 재평가",
+      "risk_condition_ko": "112,300 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -499,7 +499,7 @@
       "day_high": 1404000.0,
       "day_low": 1364000.0,
       "execution_condition_ko": "1,361,000원 지지 여부 / 1,399,000원 회복 뒤 1,413,000원 상향 돌파, 상대 거래량 1.2배 이상 및 당일 거래량가중평균가격 상회 여부",
-      "risk_condition_ko": "1,361,000 이탈 시 전략 재평가",
+      "risk_condition_ko": "1,361,000 이하 하락, 2개 봉 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -522,7 +522,7 @@
       "day_high": 1579000.0,
       "day_low": 1508000.0,
       "execution_condition_ko": "1,587,000원 초과 일봉 마감과 거래량 908,255주 이상 / 다음 거래일 1,587,000원 유지 또는 재돌파와 당일 거래량가중평균가격 회복",
-      "risk_condition_ko": "1,493,000 이탈 시 전략 재평가",
+      "risk_condition_ko": "1,493,000 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -545,7 +545,7 @@
       "day_high": 525000.0,
       "day_low": 510000.0,
       "execution_condition_ko": "006400.KS의 505,000원 종가 지지 여부 / 521,000원 회복은 관찰하되 단독 매수 신호로 사용하지 않음",
-      "risk_condition_ko": "505,000 이탈 시 전략 재평가",
+      "risk_condition_ko": "505,000 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -568,7 +568,7 @@
       "day_high": 151500.0,
       "day_low": 146000.0,
       "execution_condition_ko": "144100~144570원 지지 및 146705원 회복을 당일 거래량가중평균가격·상대거래량과 함께 확인 / 149200원 위 거래량 동반 종가와 다음 거래일 유지 여부",
-      "risk_condition_ko": "144,100 이탈 시 전략 재평가",
+      "risk_condition_ko": "144,100 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -591,7 +591,7 @@
       "day_high": 143700.0,
       "day_low": 135700.0,
       "execution_condition_ko": "149400원 위 종가와 250000주 이상 거래, 이후 다음 거래일 지지 또는 재돌파 / 140200~141100원 구간에서 지지와 거래량 동반 반등 확인",
-      "risk_condition_ko": "140,200 이탈 시 전략 재평가",
+      "risk_condition_ko": "140,200 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -614,7 +614,7 @@
       "day_high": 517000.0,
       "day_low": 486000.0,
       "execution_condition_ko": "2026-09-29 이후 가격·거래량을 확인하고 520000원 초과 종가와 126975주 초과 거래량 감시 / 다음 거래일 520000원 유지, 525125원 확인 및 528000~534000원 저항 돌파 여부",
-      "risk_condition_ko": "490,000 이탈 시 전략 재평가",
+      "risk_condition_ko": "490,000 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -637,7 +637,7 @@
       "day_high": 179700.0,
       "day_low": 175700.0,
       "execution_condition_ko": "179000원 초과 종가와 277200주 초과 거래량 / 다음 거래일 첫 30~60분에 178800~179000원 유지 또는 회복",
-      "risk_condition_ko": "175,300 이탈 시 전략 재평가",
+      "risk_condition_ko": "175,300 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -660,7 +660,7 @@
       "day_high": 215000.0,
       "day_low": 208000.0,
       "execution_condition_ko": "10:30 이후 215,000원 초과·당일 거래량가중평균가 상회·예상 상대거래량 1.0 이상 여부 / 215,000원 위 종가와 거래량 272,056주 이상, 다음 거래일 첫 30~60분 안착 또는 재돌파",
-      "risk_condition_ko": "199,800 이탈 시 전략 재평가",
+      "risk_condition_ko": "199,800 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -683,7 +683,7 @@
       "day_high": 135700.0,
       "day_low": 128600.0,
       "execution_condition_ko": "135,500~136,700원 회복 구간과 거래량 증가 / 136,700원 위 종가 및 다음 거래일 지지",
-      "risk_condition_ko": "132,000 이탈 시 전략 재평가",
+      "risk_condition_ko": "132,000 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -706,7 +706,7 @@
       "day_high": 110800.0,
       "day_low": 105500.0,
       "execution_condition_ko": "111800원 회복 후 112200원 돌파 여부 / 113300원 위 종가와 거래량 1110000주 이상, 이후 지지 재확인",
-      "risk_condition_ko": "108,800 이탈 시 전략 재평가",
+      "risk_condition_ko": "108,800 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -729,7 +729,7 @@
       "day_high": 15500.0,
       "day_low": 14140.0,
       "execution_condition_ko": "14,520원 위 종가와 거래량 2,931,423주 이상 / 13,950~13,968원 지지와 회복 여부",
-      "risk_condition_ko": "13,610 이탈 시 전략 재평가",
+      "risk_condition_ko": "13,610 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -752,7 +752,7 @@
       "day_high": 660000.0,
       "day_low": 626000.0,
       "execution_condition_ko": "000810.KS의 642,000~646,000원 지지와 거래량 동반 반등 종가 / 000810.KS의 668,000원 상회 종가, 상대거래량 1.2배 이상 및 다음 거래일 지지",
-      "risk_condition_ko": "642,000 이탈 시 전략 재평가",
+      "risk_condition_ko": "642,000 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -775,7 +775,7 @@
       "day_high": 173600.0,
       "day_low": 167800.0,
       "execution_condition_ko": "174935원 회복 후 175702원 거래량 동반 돌파 여부 / 다음 거래일 첫 30~60분 동안 175702원 유지 여부",
-      "risk_condition_ko": "170,200 이탈 시 전략 재평가",
+      "risk_condition_ko": "170,200 이하 하락, 종가 확인 후 보유 유지",
       "decision_state_ko": "데이터 확인 전 대기",
       "quality_at_build": {
         "execution_ready": false,
@@ -786,8 +786,8 @@
     }
   ],
   "report": {
-    "published_at": "2026-09-30T14:51:47.999449+09:00",
-    "as_of": "2026-09-30T13:56:00+09:00",
+    "published_at": "2026-09-30T16:40:59.093911+09:00",
+    "as_of": "2026-09-30T14:56:00+09:00",
     "markdown_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/latest.md",
     "readable_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/latest.html"
   }
