@@ -197,3 +197,4 @@ gh api repos/nornen0202/TradingAgents/check-runs/109473045505/annotations
 - KR v12 보고서 `8519e87a3ab2da84b7c576930069a71671271352893eaf15e9b192b94d071e25`는 원분석 조건부 BUY 20/HOLD 7과 보유 13/비보유 관심 4/탐색 10을 보존했다. 전 종목 실행은 입력 만료에 따라 재확인 상태이며, 영상의 미검증 숫자를 확인된 투자 근거로 승격하지 않았다.
 - 새 US full [36684552324](https://github.com/nornen0202/TradingAgents/actions/runs/36684552324), 실행 `20260930T163627_github-actions-us`를 실제 시작했고 RUNNING 심박이 갱신됨을 확인했다. 이 기록은 완료 증명이 아니며, 최종 완료·새 Work·배포 검증 결과는 별도로 기록한다.
 - **예약 경계 중복 방지:** 16:35 수동 시작한 full이 17:45 예약 창을 넘기면 기존 gate의 생성시각 필터에서 사라져 두 번째 실행을 대기열에 넣을 수 있었다. gate와 watchdog은 하루 더 이전의 활성 실행도 검사하되 이전 창의 완료 성공은 당일 완료로 세지 않게 했다. 경계 전 RUNNING과 SUCCESS를 각각 검증한 관련 67개 테스트가 통과했다.
+- **분석 범위 검증:** daily full의 실행 job 이름이 같다는 이유만으로 smoke·site-only·일부 지정 종목 실행을 전체 분석 완료로 인정하지 않도록 gate와 watchdog의 범위 검사를 맞췄다. 해당 실행의 성공 후에도 필요한 full 분석은 진행된다. 관련 71개 테스트 통과.

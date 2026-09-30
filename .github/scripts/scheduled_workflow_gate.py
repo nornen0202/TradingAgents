@@ -219,6 +219,15 @@ def _run_covers_target(
     ):
         return False, ""
 
+    title = str(run.get("display_title") or "")
+    scope = re.search(r"\[request_scope=(custom_tickers|custom_sources)\]", title, re.IGNORECASE)
+    if scope:
+        return False, ""
+    mode = re.search(r"\[run_mode=([^\]]+)\]", title, re.IGNORECASE)
+    if any(name.startswith("analyze_") for name in target_job_names) and mode:
+        if mode.group(1).lower() != "full":
+            return False, ""
+
     jobs = client.list_jobs(run_id)
     active_matches: list[str] = []
     successful_matches: set[str] = set()

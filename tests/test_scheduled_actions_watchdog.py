@@ -57,6 +57,15 @@ def test_watchdog_keeps_pre_boundary_manual_full_active_without_counting_old_suc
         assert client.last_created_since_utc <= datetime.fromisoformat('2026-09-30T07:35:00+00:00')
 
 
+def test_smoke_or_site_rebuild_does_not_satisfy_daily_full_analysis():
+    target=next(t for t in watchdog.due_targets(_kst('2026-09-30T18:00:00')) if t.name=='daily-codex-us')
+    for mode in ['smoke','site_only']:
+        client=FakeClient(runs=[{'id':111,'created_at':'2026-09-30T08:50:00Z','status':'completed','conclusion':'success',
+            'display_title':f'Daily [profile=us] [run_mode={mode}] [request_scope=default_universe]'}],
+            jobs={111:[{'name':name,'status':'completed','conclusion':'success'} for name in target.job_names]})
+        assert not watchdog.target_is_covered(client=client,target=target)[0]
+
+
 def test_youtube_watchdog_is_due_after_backup_window():
     targets = watchdog.due_targets(_kst("2026-06-02T06:57:00"))
 
