@@ -678,9 +678,7 @@ def _risk_action_level_triggered_now(
     confirmation = str(risk_action_level.get("confirmation") or "").strip().lower()
     # Keep the account-action mapping as strict as the execution overlay: a
     # current price alone cannot confirm a multi-bar or volume-qualified plan.
-    if confirmation in {"two_bar", "next_day", "volume_confirmed"}:
-        return False
-    if confirmation == "close" and not _is_close_confirmed_execution(execution_update):
+    if confirmation in {"close", "two_bar", "next_day", "volume_confirmed"}:
         return False
 
     direction = _risk_action_level_direction(risk_action=risk_action, risk_action_level=risk_action_level)
@@ -690,15 +688,6 @@ def _risk_action_level_triggered_now(
     if direction == "upside":
         return float(current_price) >= float(trigger_level)
     return float(current_price) <= float(trigger_level)
-
-
-def _is_close_confirmed_execution(execution_update: dict[str, Any] | None) -> bool:
-    if not execution_update:
-        return False
-    source = execution_update.get("source") if isinstance(execution_update.get("source"), dict) else {}
-    market_session = str(source.get("market_session") or "").strip().lower()
-    timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
-    return market_session in {"post_close", "closed", "after_hours"} or timing_state in {"CLOSE_CONFIRMED", "CLOSE_CONFIRM"}
 
 
 def _risk_action_trigger_price(risk_action_level: dict[str, Any], *, direction: str) -> float | None:

@@ -195,3 +195,81 @@ def test_explicit_intraday_risk_plan_still_acts_on_current_price():
         risk_action="STOP_LOSS", risk_action_level=level.to_dict(),
         execution_update=update.to_dict(), current_price=94.0,
     )
+
+
+@pytest.mark.parametrize("session", ["post_close", "closed", "after_hours"])
+def test_after_hours_last_price_is_not_regular_close_evidence(session):
+    from tradingagents.portfolio.candidates import _risk_action_level_triggered_now
+
+    now = datetime.now(timezone.utc)
+    market = _market(last_price=94.0, day_high=101.0, day_low=93.0,
+                     asof=now, market_session=session)
+    level = PriceLevel(label="regular close stop", level_type=PriceLevelType.STOP_LOSS,
+                       price=95.0, confirmation="close")
+    update = evaluate_execution_state(
+        _contract(action_if_triggered=ActionIfTriggered.NONE, breakout_level=None,
+                  risk_action="STOP_LOSS", risk_action_level=level),
+        market, now=now, max_data_age_seconds=180,
+    )
+    assert update.decision_now.value == "NONE"
+    assert "risk_action_close_confirmation_required" in update.reason_codes
+    # Legacy inferred labels are not independent closing-price evidence either.
+    assert not _risk_action_level_triggered_now(
+        risk_action="STOP_LOSS", risk_action_level=level.to_dict(),
+        execution_update={"source":{"market_session":session},
+                          "execution_timing_state":"CLOSE_CONFIRMED"},
+        current_price=94.0,
+    )
+    entry = evaluate_execution_state(
+        _contract(breakout_confirmation=BreakoutConfirmation.CLOSE_ABOVE),
+        replace(market, last_price=101.0), now=now, max_data_age_seconds=180,
+    )
+    assert entry.execution_timing_state == ExecutionTimingState.CLOSE_CONFIRM_PENDING
+    assert "close_confirmed" not in entry.reason_codes
+
+
+@pytest.mark.parametrize("asof,market_code,ticker,expected", [
+    ("2026-09-30T14:29:00+00:00", "US", "AAPL", False),
+    ("2026-09-30T23:29:00+09:00", "US", "AAPL", False),
+    ("2026-09-30T10:29:00-04:00", "US", "AAPL", False),
+    ("2026-09-30T14:30:00+00:00", "US", "AAPL", True),
+    ("2026-01-30T15:29:00+00:00", "US", "AAPL", False),
+    ("2026-01-31T00:30:00+09:00", "US", "AAPL", True),
+    ("2026-09-30T01:29:00+00:00", "KR", "005930.KS", False),
+    ("2026-09-30T01:30:00+00:00", "KR", "005930.KS", True),
+    ("2026-09-30T01:30:00+00:00", None, "005930.KS", True),
+    ("2026-09-30T14:29:00+00:00", None, "AAPL", False),
+])
+def test_pilot_window_uses_exchange_time_including_dst(asof, market_code, ticker, expected):
+    from tradingagents.execution.overlay import _pilot_window_open
+
+    assert _pilot_window_open(market_asof=asof, earliest_pilot_time_local="10:30",
+                              market_code=market_code, ticker=ticker) is expected
+
+
+@pytest.mark.parametrize("asof,gate,market_code", [
+    ("invalid", "10:30", "US"),
+    ("2026-09-30T14:31:00", "10:30", "US"),
+    ("2026-09-30T14:31:00+00:00", "invalid", "US"),
+    ("2026-09-30T14:31:00+00:00", "25:99", "US"),
+    ("2026-09-30T14:31:00+00:00", "10:30", "UNKNOWN"),
+])
+def test_unverifiable_pilot_time_does_not_open_window(asof, gate, market_code):
+    from tradingagents.execution.overlay import _pilot_window_open
+
+    assert not _pilot_window_open(market_asof=asof, earliest_pilot_time_local=gate,
+                                  market_code=market_code, ticker="AAPL")
+
+
+def test_us_order_cannot_start_at_1029_when_snapshot_is_utc():
+    now = datetime.fromisoformat("2026-09-30T14:29:00+00:00")
+    market = replace(_market(last_price=101, day_high=102, day_low=99, asof=now),
+                     market="US", ticker="AAPL")
+    contract = _contract(ticker="AAPL", earliest_pilot_time_local="10:30")
+    early = evaluate_execution_state(contract, market, now=now, max_data_age_seconds=180)
+    assert early.decision_now.value == "NONE"
+    assert "pilot_window_not_open" in early.reason_codes
+    later_at = now + timedelta(minutes=1)
+    later = evaluate_execution_state(contract, replace(market, asof=later_at.isoformat()),
+                                     now=later_at, max_data_age_seconds=180)
+    assert later.decision_now.value == "STARTER_NOW"

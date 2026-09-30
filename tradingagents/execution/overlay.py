@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, time
+from zoneinfo import ZoneInfo
 
 from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION
 from tradingagents.schemas import (
@@ -231,6 +232,8 @@ def evaluate_execution_state(
     pilot_window_open = _pilot_window_open(
         market_asof=market.asof,
         earliest_pilot_time_local=contract.earliest_pilot_time_local,
+        ticker=contract.ticker,
+        market_code=market.market,
     )
 
     if breakout_hit:
@@ -249,20 +252,13 @@ def evaluate_execution_state(
             reason_codes.append("failed_breakout")
         elif contract.breakout_confirmation in {BreakoutConfirmation.CLOSE_ABOVE, BreakoutConfirmation.END_OF_DAY_ONLY}:
             trigger_status["close_confirmation_pending"] = True
-            if market_session == "post_close":
-                decision_state = DecisionState.WAIT
-                decision_now = DecisionNow.NONE
-                execution_timing_state = (
-                    ExecutionTimingState.CLOSE_CONFIRMED
-                    if rvol_confirmed and vwap_confirmed
-                    else ExecutionTimingState.CLOSE_CONFIRM_PENDING
-                )
-                reason_codes.append("close_confirmed" if execution_timing_state == ExecutionTimingState.CLOSE_CONFIRMED else "close_confirmation_required")
-            else:
-                decision_state = DecisionState.TRIGGERED_PENDING_CLOSE
-                decision_now = DecisionNow.NONE
-                execution_timing_state = ExecutionTimingState.CLOSE_CONFIRM_PENDING
-                reason_codes.append("close_confirmation_required")
+            # Post-close is a clock/session label, not proof that last_price
+            # is the official regular-session close. Current snapshots have
+            # no verified closing-bar receipt, so retain the pending plan.
+            decision_state = DecisionState.TRIGGERED_PENDING_CLOSE
+            decision_now = DecisionNow.NONE
+            execution_timing_state = ExecutionTimingState.CLOSE_CONFIRM_PENDING
+            reason_codes.append("close_confirmation_required")
         elif not pilot_window_open:
             decision_state = DecisionState.ARMED
             decision_now = DecisionNow.NONE
@@ -444,7 +440,9 @@ def _evaluate_risk_action_level(
             ("risk_action_confirmation_required",),
             flags,
         )
-    if confirmation == "close" and not _market_session_is_post_close(market):
+    if confirmation == "close":
+        # An after-hours last trade must not stand in for the regular close.
+        # Keep the plan pending until a closing-price evidence contract exists.
         flags["risk_action_close_pending"] = True
         return (
             DecisionState.TRIGGERED_PENDING_CLOSE,
@@ -472,10 +470,6 @@ def _evaluate_risk_action_level(
     )
 
 
-def _market_session_is_post_close(market: IntradayMarketSnapshot) -> bool:
-    return str(market.market_session or "").strip().lower() in {"post_close", "closed", "after_hours"}
-
-
 def _risk_action_trigger_price(contract: ExecutionContract) -> float | None:
     from .risk_trigger import risk_trigger
     level = contract.risk_action_level
@@ -488,15 +482,29 @@ def _risk_action_direction(contract: ExecutionContract) -> str:
     return risk_direction(contract.risk_action, level.to_dict() if level else {})
 
 
-def _pilot_window_open(*, market_asof: str, earliest_pilot_time_local: str | None) -> bool:
+def _pilot_window_open(
+    *, market_asof: str, earliest_pilot_time_local: str | None,
+    ticker: str, market_code: str | None = None,
+) -> bool:
     if not earliest_pilot_time_local:
         return True
     try:
         parsed = datetime.fromisoformat(str(market_asof))
+        if parsed.tzinfo is None:
+            return False
+        if market_code:
+            timezone_name = {"KR": "Asia/Seoul", "US": "America/New_York"}.get(str(market_code).upper())
+            if timezone_name is None:
+                return False
+        else:
+            from tradingagents.dataflows.intraday_market import _default_market_timezone
+            timezone_name = _default_market_timezone(ticker)
+        local = parsed.astimezone(ZoneInfo(timezone_name))
         hour_text, minute_text = str(earliest_pilot_time_local).split(":", 1)
-        return (parsed.hour, parsed.minute) >= (int(hour_text), int(minute_text))
-    except Exception:
-        return True
+        earliest = time(hour=int(hour_text), minute=int(minute_text))
+        return local.time().replace(tzinfo=None) >= earliest
+    except (TypeError, ValueError, KeyError):
+        return False
 
 
 def _build_update(
