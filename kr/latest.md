@@ -1,7 +1,7 @@
 # TradingAgents KR 최신 공개 입력
 
 schema: tradingagents.ai-context/v1
-문서 생성: 2026-09-30T05:04:24.794647+00:00
+문서 생성: 2026-09-30T05:54:14.533328+00:00
 
 이 문서는 이미 공개된 자료의 축약 전사이며 새 분석·주문 승인이 아닙니다. 원분석 거래일(완료 일봉), 분석 완료, 장중 시세, 계좌 관측, 문서 생성은 서로 다른 시각입니다. 휴장·주말의 마지막 완료 거래일을 장애로 단정하지 마세요. null은 미확인이지 0이 아닙니다. 빌드 당시 실행 상태는 현재 상태가 아니며 row_valid_until과 현재 세션을 다시 확인해야 합니다. 현재 문서를 읽지 못하면 과거 대화의 계좌·한도를 최신 사실로 재사용하지 마세요.
 
@@ -25,7 +25,7 @@ schema: tradingagents.ai-context/v1
   "analysis_lineage_status": "RESOLVED",
   "market_data_oldest_at": "2026-09-30T13:56:00+09:00",
   "market_data_latest_at": "2026-09-30T13:56:00+09:00",
-  "market_data_status": "FRESH"
+  "market_data_status": "STALE"
 }
 ```
 
@@ -184,59 +184,59 @@ schema: tradingagents.ai-context/v1
 ## 종목별 원안과 조건 — 현재 재검증 필요
 
 ```json
-{"ticker":"353200.KS","display_name":"대덕전자","is_held":true,"strategy_code":"REDUCE","strategy_ko":"비중 축소 검토","last_price":132700.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":131063.3664160594,"relative_volume":0.8515883819785456,"spread_bps":7.532956685499058,"day_high":133550.0,"day_low":128000.0,"execution_condition_ko":"위험 대응 조건: 130,300 이탈 시 이익실현성 축소 (매수 돌파·거래량 조건과 별도 판정)","risk_condition_ko":"130,300 이탈 시 이익실현성 축소","decision_state_ko":"지금 실행 검토 가능","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"353200.KS","display_name":"대덕전자","is_held":true,"strategy_code":"REDUCE","strategy_ko":"비중 축소 검토","last_price":132700.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":131063.3664160594,"relative_volume":0.8515883819785456,"spread_bps":7.532956685499058,"day_high":133550.0,"day_low":128000.0,"execution_condition_ko":"위험 대응 조건: 130,300 이탈 시 이익실현성 축소 (매수 돌파·거래량 조건과 별도 판정)","risk_condition_ko":"130,300 이탈 시 이익실현성 축소","decision_state_ko":"지금 실행 검토 가능","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"058470.KQ","display_name":"리노공업","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":73500.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":74101.71758940633,"relative_volume":0.650185958262721,"spread_bps":13.596193065941536,"day_high":75500.0,"day_low":73200.0,"execution_condition_ko":"058470.KQ의 현재 정규장 시세·거래량·거래량가중평균가격 및 보유 위험 확인 / 75,000~77,500원 저항 구간의 거래량 반응","risk_condition_ko":"70,700 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"058470.KQ","display_name":"리노공업","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":73500.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":74101.71758940633,"relative_volume":0.650185958262721,"spread_bps":13.596193065941536,"day_high":75500.0,"day_low":73200.0,"execution_condition_ko":"058470.KQ의 현재 정규장 시세·거래량·거래량가중평균가격 및 보유 위험 확인 / 75,000~77,500원 저항 구간의 거래량 반응","risk_condition_ko":"70,700 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"083450.KQ","display_name":"GST","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":50900.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":51931.31029600017,"relative_volume":1.584431050667401,"spread_bps":19.62708537782139,"day_high":53400.0,"day_low":50800.0,"execution_condition_ko":"2026-09-30 장중 가격·거래량가중평균가격·상대거래량 검증 / 상대거래량 1.2 이상을 동반한 53,400원 위 종가","risk_condition_ko":"50,400 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"083450.KQ","display_name":"GST","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":50900.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":51931.31029600017,"relative_volume":1.584431050667401,"spread_bps":19.62708537782139,"day_high":53400.0,"day_low":50800.0,"execution_condition_ko":"2026-09-30 장중 가격·거래량가중평균가격·상대거래량 검증 / 상대거래량 1.2 이상을 동반한 53,400원 위 종가","risk_condition_ko":"50,400 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"010120.KS","display_name":"LS ELECTRIC","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":204500.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":206403.30276821228,"relative_volume":0.5133127525357338,"spread_bps":24.42002442002442,"day_high":209500.0,"day_low":204000.0,"execution_condition_ko":"219500원 상향 종가와 거래량 379200주 이상, 이후 다음 거래일 지지 여부 / 201500원부터 199600원까지의 지지 구간 시험","risk_condition_ko":"199,600 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"010120.KS","display_name":"LS ELECTRIC","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":204500.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":206403.30276821228,"relative_volume":0.5133127525357338,"spread_bps":24.42002442002442,"day_high":209500.0,"day_low":204000.0,"execution_condition_ko":"219500원 상향 종가와 거래량 379200주 이상, 이후 다음 거래일 지지 여부 / 201500원부터 199600원까지의 지지 구간 시험","risk_condition_ko":"199,600 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"278470.KS","display_name":"에이피알","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":360000.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":364783.2955689829,"relative_volume":0.6273300011816487,"spread_bps":13.879250520471894,"day_high":373000.0,"day_low":359000.0,"execution_condition_ko":"365066원·367292원 회복 후 372500원 시험 / 379049원 초과 종가와 거래량 약 194000주 이상, 다음 거래일 지지","risk_condition_ko":"358,000 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"278470.KS","display_name":"에이피알","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":360000.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":364783.2955689829,"relative_volume":0.6273300011816487,"spread_bps":13.879250520471894,"day_high":373000.0,"day_low":359000.0,"execution_condition_ko":"365066원·367292원 회복 후 372500원 시험 / 379049원 초과 종가와 거래량 약 194000주 이상, 다음 거래일 지지","risk_condition_ko":"358,000 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"005930.KS","display_name":"삼성전자","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":269250.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":271477.66937237995,"relative_volume":0.782085867509887,"spread_bps":18.570102135561747,"day_high":276000.0,"day_low":268000.0,"execution_condition_ko":"285,500원 초과 종가와 20,864,376주 초과 거래량 / 266,000~268,700원 지지 구간의 실제 반등","risk_condition_ko":"266,000 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"005930.KS","display_name":"삼성전자","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":269250.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":271477.66937237995,"relative_volume":0.782085867509887,"spread_bps":18.570102135561747,"day_high":276000.0,"day_low":268000.0,"execution_condition_ko":"285,500원 초과 종가와 20,864,376주 초과 거래량 / 266,000~268,700원 지지 구간의 실제 반등","risk_condition_ko":"266,000 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"403870.KQ","display_name":"HPSP","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":63400.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":63617.11519377598,"relative_volume":1.7963241531533474,"spread_bps":15.785319652722968,"day_high":66000.0,"day_low":60100.0,"execution_condition_ko":"상대거래량 1.2 이상을 동반한 61,500원 초과 일간 종가 / 60,300원 재시험 후 일간 종가 지지와 다음 거래일 유지","risk_condition_ko":"60,300 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"403870.KQ","display_name":"HPSP","is_held":true,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":63400.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":63617.11519377598,"relative_volume":1.7963241531533474,"spread_bps":15.785319652722968,"day_high":66000.0,"day_low":60100.0,"execution_condition_ko":"상대거래량 1.2 이상을 동반한 61,500원 초과 일간 종가 / 60,300원 재시험 후 일간 종가 지지와 다음 거래일 유지","risk_condition_ko":"60,300 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"010140.KS","display_name":"삼성중공업","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":19775.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":19931.7854393054,"relative_volume":1.0133975034344893,"spread_bps":5.056890012642225,"day_high":20200.0,"day_low":19700.0,"execution_condition_ko":"상대 거래량 1.2배 이상을 동반한 20,250원 위 일일 종가 / 20,435원 위 일일 종가 이후 다음 거래일 20,250원 지지","risk_condition_ko":"19,160 이탈 시 리스크 축소","decision_state_ko":"실행 조건 감시 중","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"010140.KS","display_name":"삼성중공업","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":19775.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":19931.7854393054,"relative_volume":1.0133975034344893,"spread_bps":5.056890012642225,"day_high":20200.0,"day_low":19700.0,"execution_condition_ko":"상대 거래량 1.2배 이상을 동반한 20,250원 위 일일 종가 / 20,435원 위 일일 종가 이후 다음 거래일 20,250원 지지","risk_condition_ko":"19,160 이탈 시 리스크 축소","decision_state_ko":"실행 조건 감시 중","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"042700.KS","display_name":"한미반도체","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":254250.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":252827.51287610817,"relative_volume":0.5655586627915454,"spread_bps":19.665683382497544,"day_high":255000.0,"day_low":247000.0,"execution_condition_ko":"042700.KS의 최신 정규장 가격과 거래량 확인 / 258000원 초과 종가와 744200주 이상 거래량, 다음 거래일 지지 여부","risk_condition_ko":"240,000 이탈 시 리스크 축소","decision_state_ko":"실행 조건 감시 중","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"042700.KS","display_name":"한미반도체","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":254250.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":252827.51287610817,"relative_volume":0.5655586627915454,"spread_bps":19.665683382497544,"day_high":255000.0,"day_low":247000.0,"execution_condition_ko":"042700.KS의 최신 정규장 가격과 거래량 확인 / 258000원 초과 종가와 744200주 이상 거래량, 다음 거래일 지지 여부","risk_condition_ko":"240,000 이탈 시 리스크 축소","decision_state_ko":"실행 조건 감시 중","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"035420.KS","display_name":"NAVER","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":193700.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":194636.23275003556,"relative_volume":0.5952512607561606,"spread_bps":5.163955589981926,"day_high":196500.0,"day_low":193400.0,"execution_condition_ko":"200500원 위 종가와 697389주 초과 거래량은 자동 매수가 아닌 재평가 신호 / 202357원 회복과 다음 거래일 200500원 지지","risk_condition_ko":"193,200 이탈 시 리스크 축소","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"035420.KS","display_name":"NAVER","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":193700.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":194636.23275003556,"relative_volume":0.5952512607561606,"spread_bps":5.163955589981926,"day_high":196500.0,"day_low":193400.0,"execution_condition_ko":"200500원 위 종가와 697389주 초과 거래량은 자동 매수가 아닌 재평가 신호 / 202357원 회복과 다음 거래일 200500원 지지","risk_condition_ko":"193,200 이탈 시 리스크 축소","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"034020.KS","display_name":"두산에너빌리티","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":81200.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":81368.1472469017,"relative_volume":0.4654471868306276,"spread_bps":12.307692307692308,"day_high":82200.0,"day_low":80300.0,"execution_condition_ko":"034020.KS가 82,000원 위에서 당일 거래량 가중 평균가격을 웃돌고 동시간대 상대 거래량이 1.2배 이상인지 확인 / 82,000원 위 종가와 일 거래량 2,146,662주 초과 여부, 다음 거래일 첫 30~60분 지지 또는 재돌파 확인","risk_condition_ko":"78,408 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"034020.KS","display_name":"두산에너빌리티","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":81200.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":81368.1472469017,"relative_volume":0.4654471868306276,"spread_bps":12.307692307692308,"day_high":82200.0,"day_low":80300.0,"execution_condition_ko":"034020.KS가 82,000원 위에서 당일 거래량 가중 평균가격을 웃돌고 동시간대 상대 거래량이 1.2배 이상인지 확인 / 82,000원 위 종가와 일 거래량 2,146,662주 초과 여부, 다음 거래일 첫 30~60분 지지 또는 재돌파 확인","risk_condition_ko":"78,408 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"000660.KS","display_name":"SK하이닉스","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":1789000.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":1796772.9058938343,"relative_volume":0.8153019426476583,"spread_bps":5.591277606933184,"day_high":1824000.0,"day_low":1773000.0,"execution_condition_ko":"000660.KS의 1,804,000원 초과 종가와 3,238,000주 초과 거래량 / 다음 거래일 1,804,000원과 당일 거래량가중평균가격 지지","risk_condition_ko":"1,690,000 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"000660.KS","display_name":"SK하이닉스","is_held":true,"strategy_code":"HOLD","strategy_ko":"보유 유지","last_price":1789000.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":1796772.9058938343,"relative_volume":0.8153019426476583,"spread_bps":5.591277606933184,"day_high":1824000.0,"day_low":1773000.0,"execution_condition_ko":"000660.KS의 1,804,000원 초과 종가와 3,238,000주 초과 거래량 / 다음 거래일 1,804,000원과 당일 거래량가중평균가격 지지","risk_condition_ko":"1,690,000 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"267260.KS","display_name":"HD현대일렉트릭","is_held":true,"strategy_code":"WAIT_CLOSE","strategy_ko":"종가 확인 후 판단","last_price":664000.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":680541.7684010357,"relative_volume":2.5797763593853356,"spread_bps":15.048908954100828,"day_high":693000.0,"day_low":664000.0,"execution_condition_ko":"693,000원 위 일봉 종가 회복 / 709,000원 위 일봉 종가와 상대거래량 1.2 이상","risk_condition_ko":"670,000 이탈 시 리스크 축소","decision_state_ko":"조건 충족, 종가 확인 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"267260.KS","display_name":"HD현대일렉트릭","is_held":true,"strategy_code":"WAIT_CLOSE","strategy_ko":"종가 확인 후 판단","last_price":664000.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":680541.7684010357,"relative_volume":2.5797763593853356,"spread_bps":15.048908954100828,"day_high":693000.0,"day_low":664000.0,"execution_condition_ko":"693,000원 위 일봉 종가 회복 / 709,000원 위 일봉 종가와 상대거래량 1.2 이상","risk_condition_ko":"670,000 이탈 시 리스크 축소","decision_state_ko":"조건 충족, 종가 확인 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
-{"ticker":"007660.KS","display_name":"이수페타시스","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":115000.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":116525.87359367221,"relative_volume":0.7931162858068095,"spread_bps":8.69187309865276,"day_high":118900.0,"day_low":114400.0,"execution_condition_ko":"119,800원 초과 종가와 일일 거래량 929,301주 초과 여부 / 확인된 돌파 다음 거래일 첫 30~60분의 119,800원 및 당일 거래량가중평균가 유지 여부","risk_condition_ko":"112,300 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"007660.KS","display_name":"이수페타시스","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":115000.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":116525.87359367221,"relative_volume":0.7931162858068095,"spread_bps":8.69187309865276,"day_high":118900.0,"day_low":114400.0,"execution_condition_ko":"119,800원 초과 종가와 일일 거래량 929,301주 초과 여부 / 확인된 돌파 다음 거래일 첫 30~60분의 119,800원 및 당일 거래량가중평균가 유지 여부","risk_condition_ko":"112,300 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
@@ -244,7 +244,7 @@ schema: tradingagents.ai-context/v1
 ```
 
 ```json
-{"ticker":"009150.KS","display_name":"삼성전기","is_held":false,"strategy_code":"WAIT","strategy_ko":"조건 충족 전 대기","last_price":1519000.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":1532290.6416709626,"relative_volume":0.8076307595326437,"spread_bps":6.581112207963145,"day_high":1579000.0,"day_low":1508000.0,"execution_condition_ko":"1,587,000원 초과 일봉 마감과 거래량 908,255주 이상 / 다음 거래일 1,587,000원 유지 또는 재돌파와 당일 거래량가중평균가격 회복","risk_condition_ko":"1,493,000 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"009150.KS","display_name":"삼성전기","is_held":false,"strategy_code":"WAIT","strategy_ko":"조건 충족 전 대기","last_price":1519000.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":1532290.6416709626,"relative_volume":0.8076307595326437,"spread_bps":6.581112207963145,"day_high":1579000.0,"day_low":1508000.0,"execution_condition_ko":"1,587,000원 초과 일봉 마감과 거래량 908,255주 이상 / 다음 거래일 1,587,000원 유지 또는 재돌파와 당일 거래량가중평균가격 회복","risk_condition_ko":"1,493,000 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
@@ -264,7 +264,7 @@ schema: tradingagents.ai-context/v1
 ```
 
 ```json
-{"ticker":"033780.KS","display_name":"033780","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":175900.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":177182.15739718467,"relative_volume":0.8827404834248685,"spread_bps":5.686664771111743,"day_high":179700.0,"day_low":175800.0,"execution_condition_ko":"179000원 초과 종가와 277200주 초과 거래량 / 다음 거래일 첫 30~60분에 178800~179000원 유지 또는 회복","risk_condition_ko":"175,300 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":true,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
+{"ticker":"033780.KS","display_name":"033780","is_held":false,"strategy_code":"BUY_ON_CONFIRMATION","strategy_ko":"조건 확인 후 분할매수 검토","last_price":175900.0,"market_data_asof":"2026-09-30T13:56:00+09:00","session_vwap":177182.15739718467,"relative_volume":0.8827404834248685,"spread_bps":5.686664771111743,"day_high":179700.0,"day_low":175800.0,"execution_condition_ko":"179000원 초과 종가와 277200주 초과 거래량 / 다음 거래일 첫 30~60분에 178800~179000원 유지 또는 회복","risk_condition_ko":"175,300 이탈 시 전략 재평가","decision_state_ko":"조건 충족 전 대기","quality_at_build":{"execution_ready":false,"current_execution_promotion":"POSSIBLE","generated_in_current_run":true,"row_valid_until":"2026-09-30T14:26:00+09:00"}}
 ```
 
 ```json
@@ -294,8 +294,8 @@ schema: tradingagents.ai-context/v1
 ## 별도로 발행된 Work 보고서 — 현재 입력과 시각이 다를 수 있음
 ```json
 {
-  "published_at": "2026-09-30T13:46:46.195151+09:00",
-  "as_of": "2026-09-30T12:56:00+09:00",
+  "published_at": "2026-09-30T14:51:47.999449+09:00",
+  "as_of": "2026-09-30T13:56:00+09:00",
   "markdown_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/latest.md",
   "readable_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/latest.html"
 }
