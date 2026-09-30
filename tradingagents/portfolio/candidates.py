@@ -676,7 +676,9 @@ def _risk_action_level_triggered_now(
     if current_price is None or current_price <= 0:
         return False
     confirmation = str(risk_action_level.get("confirmation") or "").strip().lower()
-    if confirmation in {"two_bar", "next_day"}:
+    # Keep the account-action mapping as strict as the execution overlay: a
+    # current price alone cannot confirm a multi-bar or volume-qualified plan.
+    if confirmation in {"two_bar", "next_day", "volume_confirmed"}:
         return False
     if confirmation == "close" and not _is_close_confirmed_execution(execution_update):
         return False
