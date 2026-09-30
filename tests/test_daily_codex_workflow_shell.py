@@ -75,6 +75,14 @@ def test_daily_analysis_default_ticker_timeout_is_sixty_minutes():
     assert 'default: "60"' in input_block
 
 
+def test_recovery_input_is_passed_as_data_to_both_market_commands():
+    workflow = _workflow_text()
+    assert "      resume_from_run:" in workflow
+    assert "TRADINGAGENTS_RESUME_FROM_RUN: ${{ inputs.resume_from_run || '' }}" in workflow
+    assert workflow.count('args += ["--resume-from-run", resume_from_run]') == 2
+    assert workflow.count('os.environ.get("TRADINGAGENTS_RESUME_FROM_RUN", "")') == 2
+
+
 def test_daily_analysis_job_timeout_bounds_scheduled_runs():
     workflow = _workflow_text()
 

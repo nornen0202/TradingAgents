@@ -5,6 +5,7 @@ run-name: >-
   [run_mode=${{ (inputs.site_only && 'site_only') || inputs.analysis_mode || 'full' }}]
   [request_scope=${{ inputs.tickers && 'custom_tickers' || 'default_universe' }}]
   [recovery_source=${{ inputs.recovery_source || (github.event_name == 'schedule' && 'native') || 'manual' }}]
+  [research_recovery=${{ inputs.resume_from_run && 'failed_only' || 'none' }}]
 
 on:
   schedule:
@@ -87,6 +88,13 @@ on:
         required: false
         default: "60"
         type: string
+      resume_from_run:
+        description: "Optional completed failed full run ID; reuse verified research and retry failed tickers (select one market)"
+        required: false
+        type: string
+
+env:
+  TRADINGAGENTS_RESUME_FROM_RUN: ${{ inputs.resume_from_run || '' }}
 
 permissions:
   actions: read
@@ -697,6 +705,10 @@ jobs:
               args += ["--archive-dir", archive_dir]
           else:
               print("TRADINGAGENTS_ARCHIVE_DIR is not set. Run history will live under the repository checkout unless the config overrides it.")
+
+          resume_from_run = os.environ.get("TRADINGAGENTS_RESUME_FROM_RUN", "").strip()
+          if resume_from_run:
+              args += ["--resume-from-run", resume_from_run]
 
           manual_tickers = "${{ github.event.inputs.tickers }}".strip()
           if manual_tickers:
@@ -1371,6 +1383,10 @@ jobs:
               args += ["--archive-dir", archive_dir]
           else:
               print("TRADINGAGENTS_ARCHIVE_DIR is not set. Run history will live under the repository checkout unless the config overrides it.")
+
+          resume_from_run = os.environ.get("TRADINGAGENTS_RESUME_FROM_RUN", "").strip()
+          if resume_from_run:
+              args += ["--resume-from-run", resume_from_run]
 
           manual_tickers = "${{ github.event.inputs.tickers }}".strip()
           if manual_tickers:

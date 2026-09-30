@@ -725,6 +725,13 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
             public=public,
         ),
     }
+    if analysis_manifest.get("research_recovery"):
+        recovery = analysis_manifest["research_recovery"]
+        # Public recovery packets must not reveal account-only ticker membership.
+        current_payload["analysis_receipt"]["research_recovery"] = (
+            {key: recovery.get(key) for key in ("schema", "source_run_id", "source_manifest_sha256", "source_status", "usage_scope")}
+            if public else recovery
+        )
     if not public:
         private_overlay = _local_private_overlay(current["run_dir"], current["manifest"], bundle)
         if private_overlay:
