@@ -2,6 +2,7 @@ import unittest
 
 from cli.utils import normalize_ticker_symbol
 from tradingagents.agents.utils.agent_utils import build_instrument_context
+from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 
 
 class TickerSymbolHandlingTests(unittest.TestCase):
@@ -12,6 +13,15 @@ class TickerSymbolHandlingTests(unittest.TestCase):
         context = build_instrument_context("7203.T")
         self.assertIn("7203.T", context)
         self.assertIn("exchange suffix", context)
+
+    def test_us_adr_profile_does_not_claim_usd_financial_statements(self):
+        profile = resolve_instrument("TSM")
+        self.assertEqual(profile.currency, "USD")
+        context = build_instrument_context("TSM", profile)
+        self.assertIn("trading currency USD", context)
+        self.assertNotIn("reporting currency USD", context)
+        self.assertIn("financial-statement currency", context)
+        self.assertIn("ADR-to-ordinary-share ratios", context)
 
 
 if __name__ == "__main__":
