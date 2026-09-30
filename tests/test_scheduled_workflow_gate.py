@@ -64,6 +64,14 @@ def test_full_run_started_before_schedule_boundary_only_blocks_while_active(stat
     assert client.last_created_since_utc <= datetime.fromisoformat('2026-09-30T07:35:00+00:00')
 
 
+@pytest.mark.parametrize('marker', ['[run_mode=smoke]', '[run_mode=site_only]', '[request_scope=custom_tickers]'])
+def test_narrow_run_cannot_satisfy_full_analysis_schedule(marker):
+    client=FakeClient(jobs={111:[{'name':'analyze_us','status':'completed','conclusion':'success'}]})
+    covered,_=gate._run_covers_target(client=client,run={'id':111,'status':'completed','conclusion':'success',
+        'display_title':'Daily [profile=us] '+marker},current_run_id=222,target_job_names={'analyze_us'},target_profile='us')
+    assert not covered
+
+
 def _youtube_targets():
     return gate.load_schedule_targets(
         """

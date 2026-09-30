@@ -276,7 +276,10 @@ def _run_applies_to_target(
         "run_mode",
         {"overlay_only", "selective_rerun_only", "full", "smoke", "site_only"},
     )
-    requested_run_mode = str(target.inputs.get("run_mode") or "").strip().lower()
+    requested_run_mode = str(
+        target.inputs.get("run_mode")
+        or ("full" if target.workflow_file == "daily-codex-analysis.yml" else "")
+    ).strip().lower()
     if marked_run_mode and requested_run_mode and marked_run_mode != requested_run_mode:
         return False
 
