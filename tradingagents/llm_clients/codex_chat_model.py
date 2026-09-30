@@ -201,6 +201,12 @@ class CodexChatModel(BaseChatModel):
                 tool_choice=effective_tool_choice,
                 retry_message=retry_message,
             )
+            prompt_bytes = len(prompt.encode("utf-8"))
+            if prompt_bytes > 1_000_000:
+                raise CodexStructuredOutputError(
+                    f"Codex prompt exceeds the 1000000-byte input budget ({prompt_bytes} bytes). "
+                    "Bound the underlying source records with explicit coverage before retrying."
+                )
             try:
                 result = self._session_or_create().invoke(
                     prompt=prompt,
@@ -270,7 +276,7 @@ class CodexChatModel(BaseChatModel):
     def _fallback_chat_result(self, error: Exception) -> ChatResult:
         content = (
             "TRADINGAGENTS_CODEX_FALLBACK_RESPONSE\n"
-            "Codex app-server did not return a response before the configured timeout. "
+            "Codex app-server did not return a valid response. "
             "No additional LLM synthesis is available for this step. "
             "Use only previously collected market data, tool outputs, and deterministic safety rules. "
             f"Provider error: {_truncate_fallback_error(error)}"

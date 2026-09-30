@@ -1759,6 +1759,7 @@ def _run_single_ticker(
     analysis_date = ticker_started.date().isoformat()
     reset_llm_usage()
     graph = None
+    stats_handler = None
 
     try:
         reset_tool_telemetry()
@@ -1775,6 +1776,8 @@ def _run_single_ticker(
             trade_date,
             analysis_date=analysis_date,
         )
+        if stats_handler.get_stats().get("llm_fallback_calls", 0):
+            raise RuntimeError("Research graph returned an LLM fallback response; full analysis is incomplete.")
         structured_decision = _select_public_decision(final_state, decision)
         final_state, report_writer_payload = polish_ticker_report(
             final_state,
@@ -1998,6 +2001,9 @@ def _run_single_ticker(
             "finished_at": datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
             "duration_seconds": round(perf_counter() - timer_start, 2),
             "llm_usage": snapshot_llm_usage(),
+            "metrics": stats_handler.get_stats() if stats_handler is not None else {
+                "llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0,
+            },
         }
         error_path = ticker_dir / "error.json"
         _write_json(error_path, error_payload)
@@ -2014,10 +2020,7 @@ def _run_single_ticker(
             "finished_at": error_payload["finished_at"],
             "duration_seconds": error_payload["duration_seconds"],
             "metrics": {
-                "llm_calls": 0,
-                "tool_calls": 0,
-                "tokens_in": 0,
-                "tokens_out": 0,
+                **error_payload["metrics"],
                 "codex_usage": error_payload["llm_usage"],
             },
             "llm_usage": error_payload["llm_usage"],

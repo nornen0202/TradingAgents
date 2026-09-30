@@ -13,6 +13,7 @@ class StatsCallbackHandler(BaseCallbackHandler):
         super().__init__()
         self._lock = threading.Lock()
         self.llm_calls = 0
+        self.llm_fallback_calls = 0
         self.tool_calls = 0
         self.tool_call_counts: Dict[str, int] = {}
         self.tokens_in = 0
@@ -64,6 +65,9 @@ class StatsCallbackHandler(BaseCallbackHandler):
         usage_metadata = None
         if hasattr(generation, "message"):
             message = generation.message
+            if isinstance(message, AIMessage) and (message.response_metadata or {}).get("codex_fallback"):
+                with self._lock:
+                    self.llm_fallback_calls += 1
             if isinstance(message, AIMessage) and hasattr(message, "usage_metadata"):
                 usage_metadata = message.usage_metadata
             if not usage_metadata and isinstance(message, AIMessage):
@@ -94,6 +98,7 @@ class StatsCallbackHandler(BaseCallbackHandler):
         with self._lock:
             return {
                 "llm_calls": self.llm_calls,
+                "llm_fallback_calls": self.llm_fallback_calls,
                 "tool_calls": self.tool_calls,
                 "tool_call_counts": dict(self.tool_call_counts),
                 "tokens_in": self.tokens_in,
