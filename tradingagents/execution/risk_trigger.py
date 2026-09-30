@@ -43,6 +43,10 @@ def risk_condition_text(action: str, level: dict[str, Any], response: str) -> st
     condition = risk_trigger(action, level)
     if condition["price"] is None:
         return None
+    # HOLD describes the current position, not the response after a support
+    # failure. Keep that present-tense decision out of conditional risk wording.
+    if str(action or "").upper() in {"HOLD", "WATCH", "NONE", "NO_ACTION"}:
+        response = "신규 진입 보류·보유 위험 대응 계획 재확인"
     side = "이상 도달" if condition["direction"] == "upside" else "이하 하락"
     confirmation = {"close": "종가 확인 후", "two_bar": "2개 봉 확인 후", "next_day": "다음 거래일 확인 후"}.get(condition["confirmation"], "장중 확인 시")
     return f"{condition['price']:,.2f}".rstrip("0").rstrip(".") + f" {side}, {confirmation} {response}"
