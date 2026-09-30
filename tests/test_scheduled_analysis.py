@@ -1,7 +1,8 @@
 ﻿import json
 import tempfile
 import unittest
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -228,7 +229,8 @@ NVDA = "NVIDIA Override"
             self.assertEqual(manifest["settings"]["quick_model"], "gpt-5.5")
             self.assertEqual(manifest["settings"]["translation_backend"], "nllb_ct2")
             self.assertEqual(manifest["settings"]["translation_model"], "nllb-200-distilled-600m")
-            self.assertEqual(manifest["tickers"][0]["analysis_date"], manifest["started_at"][:10])
+            expected_date = datetime.fromisoformat(manifest["tickers"][0]["started_at"]).astimezone(ZoneInfo("America/New_York")).date().isoformat()
+            self.assertEqual(manifest["tickers"][0]["analysis_date"], expected_date)
 
             run_dir = archive_dir / "runs" / manifest["started_at"][:4] / manifest["run_id"]
             self.assertTrue((run_dir / "run.json").exists())

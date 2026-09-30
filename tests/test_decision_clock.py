@@ -51,6 +51,36 @@ def test_naive_runtime_clock_is_rejected():
         build_decision_clock_context({}, now=datetime(2026, 9, 30, 22, 20))
 
 
+@pytest.mark.parametrize("ticker,instant,expected", [
+    ("XOM", "2026-10-01T00:10:00+09:00", "2026-09-30"),
+    ("XOM", "2026-01-16T00:10:00+09:00", "2026-01-15"),
+    ("XOM", "2026-10-01T13:10:00+09:00", "2026-10-01"),
+    ("005930.KS", "2026-10-01T00:10:00+09:00", "2026-10-01"),
+])
+def test_scheduled_research_uses_exchange_date_without_changing_archive_clock(
+    monkeypatch, tmp_path, ticker, instant, expected,
+):
+    from tradingagents.scheduled import runner
+    from tradingagents.scheduled.config import load_scheduled_config
+
+    config_path = tmp_path / "scheduled.toml"
+    config_path.write_text('[run]\ntickers = ["XOM"]\ntimezone = "Asia/Seoul"\n', encoding="utf-8")
+    config = load_scheduled_config(config_path)
+    graph = Mock()
+    graph.propagate.side_effect = RuntimeError("intentional stop after capturing analysis date")
+    monkeypatch.setattr(runner, "TradingAgentsGraph", Mock(return_value=graph))
+    monkeypatch.setattr(runner, "datetime", Mock(now=Mock(return_value=datetime.fromisoformat(instant))))
+    summary = runner._run_single_ticker(
+        config=config, ticker=ticker, run_dir=tmp_path / "run",
+        engine_results_dir=tmp_path / "engine", trade_date_override="2026-09-29",
+    )
+    graph.propagate.assert_called_once_with(ticker, "2026-09-29", analysis_date=expected)
+    assert summary["analysis_date"] == expected
+    assert summary["started_at"] == instant
+    # The preserved price reference date is separate from today's exchange date.
+    assert "intentional stop" in summary["error"]
+
+
 @pytest.mark.parametrize("module_name,factory,structured", [
     ("managers.research_manager", "create_research_manager", True),
     ("trader.trader", "create_trader", True),

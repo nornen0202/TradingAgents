@@ -1804,6 +1804,10 @@ def _run_single_ticker(
 
     try:
         reset_tool_telemetry()
+        # Archive/run timestamps use the operator timezone. Research cutoffs
+        # use the instrument's calendar date: KST midnight is still the prior
+        # US regular session and must not advance its information cutoff.
+        analysis_date = ticker_started.astimezone(ZoneInfo(resolve_instrument(ticker).timezone)).date().isoformat()
         trade_date = trade_date_override or resolve_trade_date(ticker, config)
         stats_handler = StatsCallbackHandler()
         graph = TradingAgentsGraph(
