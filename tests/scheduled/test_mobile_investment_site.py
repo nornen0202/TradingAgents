@@ -534,7 +534,6 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "조건 확인 후 일부 축소 검토" in private_js
     assert "조건 충족 시 신규·추가 매수 재검토" in private_js
     assert "const entryCondition = (hasThesis ? workEntryConditions : baseEntryConditions)" in private_js
-    assert "distinctConditions(...values).slice(0, 3)" in private_js
     assert "기본 분석·전체 조건 보기" in private_js
     assert "별도 단계 실행 계획 없음" not in private_js
     assert "CUSTOM: '세부 실행 계획 확인'" in private_js

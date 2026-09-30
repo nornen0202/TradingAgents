@@ -1653,9 +1653,6 @@ _PRIVATE_JS = r"""
     });
     return result;
   }
-  function conciseConditions(...values) {
-    return distinctConditions(...values).slice(0, 3).map((item) => item.length > 180 ? `${item.slice(0, 177)}…` : item).join(' · ');
-  }
   function fullConditions(...values) { return distinctConditions(...values).join(' · '); }
   function humanPlan(value) {
     if (value == null || value === '') return '';
@@ -1997,14 +1994,14 @@ _PRIVATE_JS = r"""
     const direction = analysisDirection(row, strategy);
     const executionAction = currentExecutionAction(row, action);
     const guidance = accountGuidance(row, action);
-    const workEntryConditions = conciseConditions(thesis.entry_conditions);
+    const workEntryConditions = fullConditions(thesis.entry_conditions);
     const riskDirected = ['SELL', 'REDUCE', 'AVOID'].includes(row.strategy_code);
-    const baseEntryConditions = conciseConditions(row.execution_condition_ko, riskDirected ? null : action.trigger_conditions);
+    const baseEntryConditions = fullConditions(row.execution_condition_ko, riskDirected ? null : action.trigger_conditions);
     const entryCondition = (hasThesis ? workEntryConditions : baseEntryConditions) || '조건 정보 없음';
     const triggeredAction = strategyActivationAction(thesis, workExecution, action, hasThesis);
-    const workInvalidation = conciseConditions(thesis.invalidation_conditions);
-    const baseInvalidation = conciseConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
-    const invalidation = conciseConditions(row.risk_condition_ko, hasThesis ? workInvalidation : baseInvalidation) || '무효화 조건 정보 없음';
+    const workInvalidation = fullConditions(thesis.invalidation_conditions);
+    const baseInvalidation = fullConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
+    const invalidation = fullConditions(row.risk_condition_ko, hasThesis ? workInvalidation : baseInvalidation) || '무효화 조건 정보 없음';
     const baseRiskAction = combineDistinct(
       action.risk_action ? actionLabel(action.risk_action) : '',
       humanPlan(action.risk_action_level),

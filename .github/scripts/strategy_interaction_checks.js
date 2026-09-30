@@ -89,9 +89,10 @@
   check(visible()[0].dataset.group === beforeRole, 'Reference report cannot overwrite membership');
   checkDistribution();
   const canonical = market.rows.find((row) => row.ticker === 'NVDA');
-  canonical.thesis = {stance: 'HOLD', confidence: 0.6, entry_conditions: ['Close above 100'],
+  canonical.thesis = {stance: 'HOLD', confidence: 0.6,
+    entry_conditions: ['Review source evidence. '.repeat(12) + 'Mandatory reward/risk >= 1.5.', 'Close above 100', 'Relative volume >= 1.2', 'Official filing must confirm guidance.'],
     observation_conditions: ['Close below 90: reduce half the position'],
-    invalidation_conditions: ['Close below 90'], invalidation_action: 'Close below 90: reduce half the position',
+    invalidation_conditions: ['Close below 90', 'Volume collapse', 'Guidance cut', 'Cancel unfilled orders after expiry.'], invalidation_action: 'Close below 90: reduce half the position',
     rationale: ['Cash conversion remains unverified; await the next filing.']};
   document.getElementById('strategy-refresh').click();
   await tick();
@@ -99,6 +100,9 @@
   check(visible()[0].querySelector('.card-rationale').textContent.includes('Cash conversion remains unverified'), 'Canonical rationale survives without current Work');
   check(!visible()[0].querySelector('details').textContent.includes('Work 전체'), 'Raw analysis is not mislabeled as Work');
   check(visible()[0].querySelector('details').textContent.includes('원분석 관찰 목록 · 진입 신호와 구별'), 'Mixed observations have a separate label');
+  const entryText = visible()[0].querySelector('.condition-block p').textContent;
+  check(entryText.includes('Mandatory reward/risk >= 1.5.') && entryText.includes('Official filing must confirm guidance.'), 'Long and fourth entry conditions are not silently omitted');
+  check(visible()[0].querySelector('.condition-block.risk p').textContent.includes('Cancel unfilled orders after expiry.'), 'Fourth invalidation condition remains visible');
   const malformed = structuredClone(payload);
   malformed.markets.us.integrated_report = {structured_report: {strategies: {}}};
   window.fetch = async () => ({ok: true, json: async () => malformed});
