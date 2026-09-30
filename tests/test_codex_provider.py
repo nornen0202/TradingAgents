@@ -120,6 +120,7 @@ class CodexProviderTests(unittest.TestCase):
                 "CHATGPT_FINAL_JSON_OUTPUT_PLACEHOLDER", "<|im_start|>", "[eot_id]", "|通 finals?",
                 "אַfinal қисjson_output_schemaავალ{", "TIM|>", "IM_END|>",
                 "]}-singaw/incorrect_output? Wait weird generated end", "_error_fix",
+                "ئ}-singawقيfinal (codex_output_schema) empath? No, response valid. Need perhaps no English",
             ):
                 with self.subTest(tool_mode=tool_mode, marker=marker):
                     def payload(content):
