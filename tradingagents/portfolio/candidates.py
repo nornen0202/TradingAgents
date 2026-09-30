@@ -675,6 +675,10 @@ def _risk_action_level_triggered_now(
 ) -> bool:
     if current_price is None or current_price <= 0:
         return False
+    from tradingagents.execution.risk_trigger import risk_non_price_conditions
+
+    if risk_non_price_conditions(risk_action_level):
+        return False
     confirmation = str(risk_action_level.get("confirmation") or "").strip().lower()
     # Keep the account-action mapping as strict as the execution overlay: a
     # current price alone cannot confirm a multi-bar or volume-qualified plan.

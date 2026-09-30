@@ -711,7 +711,15 @@ def _strip_non_price_numeric_context(text: str) -> str:
     cleaned = re.sub(r"(?<!\d)(?:[12]\d{3}\s*년\s*)?\d{1,2}\s*월\s*\d{1,2}\s*일(?!\d)", " ", cleaned)
     cleaned = re.sub(r"(?<!\d)\d{1,2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?!\d)", " ", cleaned)
     cleaned = re.sub(r"(?<!\d)\d{1,2}\s*시(?:\s*\d{1,2}\s*분)?(?:\s*\d{1,2}\s*초)?", " ", cleaned)
-    cleaned = re.sub(r"[-+]?\d+(?:\.\d+)?\s*%", " ", cleaned)
+    # Remove the entire percentage range before individual percentages. Taking
+    # only '50%' out of '25~50%' leaves 25 behind and can pair it with $94.72.
+    percent_number = r"[-+]?\d[\d,]*(?:\.\d+)?"
+    percent_unit = r"(?:%|percent\b|퍼센트)"
+    cleaned = re.sub(
+        rf"{percent_number}\s*(?:{percent_unit})?\s*(?:[-\u2013\u2014~]|\bto\b)\s*{percent_number}\s*{percent_unit}",
+        " ", cleaned, flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(rf"{percent_number}\s*{percent_unit}", " ", cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(
         r"\b(?:rvol|rsi)\s*(?:>=|<=|>|<|=|:)?\s*[-+]?\d+(?:\.\d+)?\b",
         " ",
