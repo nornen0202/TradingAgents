@@ -1775,6 +1775,8 @@ def _run_single_ticker(
             trade_date,
             analysis_date=analysis_date,
         )
+        if stats_handler.get_stats().get("llm_fallback_calls", 0):
+            raise RuntimeError("Research graph returned an LLM fallback response; full analysis is incomplete.")
         structured_decision = _select_public_decision(final_state, decision)
         final_state, report_writer_payload = polish_ticker_report(
             final_state,

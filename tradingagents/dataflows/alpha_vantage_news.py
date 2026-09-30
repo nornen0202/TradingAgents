@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from .alpha_vantage_common import _make_api_request, format_datetime_for_api
 from .news_models import NewsItem, dedupe_news_items, filter_news_items_by_date, format_news_items_report, normalize_datetime
@@ -146,7 +146,7 @@ def get_macro_news_alpha_vantage(
 
 
 def get_insider_transactions(symbol: str) -> dict[str, str] | str:
-    """Returns latest and historical insider transactions by key stakeholders.
+    """Return a bounded recent sample of insider transactions by key stakeholders.
 
     Covers transactions by founders, executives, board members, etc.
 
@@ -161,7 +161,46 @@ def get_insider_transactions(symbol: str) -> dict[str, str] | str:
         "symbol": symbol,
     }
 
-    return _make_api_request("INSIDER_TRANSACTIONS", params)
+    return _bounded_insider_response(_make_api_request("INSIDER_TRANSACTIONS", params))
+
+
+def _bounded_insider_response(raw: str | dict, *, max_records: int = 100, max_chars: int = 120_000) -> str:
+    """Keep whole recent records and disclose omitted history, never silently clip JSON."""
+    try:
+        payload = json.loads(raw) if isinstance(raw, str) else raw
+    except (TypeError, ValueError) as exc:
+        raise VendorMalformedResponseError("Invalid Alpha Vantage insider JSON") from exc
+    if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
+        raise VendorMalformedResponseError("Alpha Vantage insider response has no data array")
+    if not payload["data"]:
+        return "No insider transactions data found from Alpha Vantage."
+    dated = []
+    for row in payload["data"]:
+        try:
+            datetime.strptime(row["transaction_date"], "%Y-%m-%d")
+        except (KeyError, TypeError, ValueError):
+            continue
+        dated.append(row)
+    dated.sort(key=lambda row: row["transaction_date"], reverse=True)
+    if not dated:
+        raise VendorMalformedResponseError("Alpha Vantage insider response has no valid dated records")
+    selected = dated[:max(1, max_records)]
+    while selected:
+        coverage = {
+            "provider": "alpha_vantage", "retrieved_at": datetime.now(timezone.utc).isoformat(),
+            "available_row_count": len(payload["data"]), "returned_row_count": len(selected),
+            "omitted_row_count": len(payload["data"]) - len(selected),
+            "invalid_date_row_count": len(payload["data"]) - len(dated),
+            "newest_returned_transaction_date": selected[0]["transaction_date"],
+            "oldest_returned_transaction_date": selected[-1]["transaction_date"],
+            "truncated": len(selected) < len(payload["data"]), "point_in_time_verified": False,
+            "scope": "Recent transaction sample, not complete historical activity. Do not infer full-period totals or absence of older trades from omitted rows. Transaction dates do not prove filing availability.",
+        }
+        rendered = json.dumps({"data": selected, "_coverage": coverage}, ensure_ascii=False)
+        if len(rendered) <= max_chars:
+            return rendered
+        selected.pop()
+    raise VendorMalformedResponseError("An insider record exceeds the bounded response budget")
 
 
 # Backward-compatible aliases
