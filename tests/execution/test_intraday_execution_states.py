@@ -197,6 +197,62 @@ def test_explicit_intraday_risk_plan_still_acts_on_current_price():
     )
 
 
+@pytest.mark.parametrize("field", ["source_text", "volume_rule"])
+@pytest.mark.parametrize("condition", [
+    "30.90~30.92달러 저항 재시험에서 거부가 확인되거나 보유 비중이 높을 때",
+    "저항에서 재차 밀리는 모습 확인 후 일부 익절",
+    "보유 비중이 목표를 초과할 때",
+    "A confirmed rejection at resistance or an overweight position is required",
+    "Take profit only if position size is above the limit",
+    "Requires high portfolio concentration",
+])
+def test_quote_cannot_prove_rejection_or_concentration_condition(field, condition):
+    from tradingagents.portfolio.candidates import _risk_action_level_triggered_now
+    from tradingagents.execution.risk_trigger import risk_condition_text
+
+    level = PriceLevel(label="첫 부분 이익 실현 구간", level_type=PriceLevelType.TAKE_PROFIT,
+                       price=30.90, confirmation="intraday", **{field: condition})
+    now = datetime.now(timezone.utc)
+    update = evaluate_execution_state(
+        _contract(action_if_triggered=ActionIfTriggered.NONE, breakout_level=None,
+                  risk_action="TAKE_PROFIT", risk_action_level=level),
+        _market(last_price=30.91, day_high=30.92, day_low=30.8, asof=now),
+        now=now, max_data_age_seconds=180,
+    )
+    assert update.decision_state == DecisionState.ARMED
+    assert update.decision_now.value == "NONE"
+    assert update.execution_timing_state == ExecutionTimingState.WAITING
+    assert update.trigger_status["risk_action_triggered"] is False
+    assert update.trigger_status["risk_action_qualifier_pending"] is True
+    assert not _risk_action_level_triggered_now(
+        risk_action="TAKE_PROFIT", risk_action_level=level.to_dict(),
+        execution_update={"decision_now": "REDUCE_NOW"}, current_price=30.91,
+    )
+    text = risk_condition_text("TAKE_PROFIT", level.to_dict(), "부분 익절")
+    assert condition in text
+    assert "추가 조건 확인 필요" in text
+
+
+def test_price_only_intraday_profit_plan_remains_actionable():
+    from tradingagents.portfolio.candidates import _risk_action_level_triggered_now
+
+    level = PriceLevel(label="부분 익절", level_type=PriceLevelType.TAKE_PROFIT,
+                       price=30.9, confirmation="intraday", volume_rule="실시간 가격 확인",
+                       source_text="30.90 이상 도달 시 보유 비중 축소")
+    now = datetime.now(timezone.utc)
+    update = evaluate_execution_state(
+        _contract(action_if_triggered=ActionIfTriggered.NONE, breakout_level=None,
+                  risk_action="TAKE_PROFIT", risk_action_level=level),
+        _market(last_price=30.91, day_high=30.92, day_low=30.8, asof=now),
+        now=now, max_data_age_seconds=180,
+    )
+    assert update.decision_now.value == "REDUCE_NOW"
+    assert _risk_action_level_triggered_now(
+        risk_action="TAKE_PROFIT", risk_action_level=level.to_dict(),
+        execution_update=update.to_dict(), current_price=30.91,
+    )
+
+
 @pytest.mark.parametrize("session", ["post_close", "closed", "after_hours"])
 def test_after_hours_last_price_is_not_regular_close_evidence(session):
     from tradingagents.portfolio.candidates import _risk_action_level_triggered_now

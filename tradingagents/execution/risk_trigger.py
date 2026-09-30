@@ -2,7 +2,31 @@
 from __future__ import annotations
 
 from math import isfinite
+import re
 from typing import Any
+
+
+_NON_PRICE_QUALIFIER = re.compile(
+    r"저항.{0,40}(?:거부|밀리|밀림)|재차\s*밀(?:리|림)"
+    r"|(?:보유\s*)?비중.{0,15}(?:높|초과|과도)"
+    r"|\breject(?:ion|ed|s)\b|\bover(?:weight|concentrat\w*)\b"
+    r"|(?:weight|position size|concentration).{0,30}(?:high|excess|above)"
+    r"|(?:high|excessive).{0,20}(?:weight|position size|concentration)",
+    re.IGNORECASE,
+)
+
+
+def risk_non_price_conditions(level: dict[str, Any]) -> tuple[str, ...]:
+    """Preserve known rejection/concentration conditions requiring other evidence.
+
+    This detects explicit qualifiers; it is not a general natural-language
+    condition evaluator. A quote cannot prove either a resistance rejection or
+    a portfolio concentration condition, even when confirmation is 'intraday'.
+    """
+    return tuple(dict.fromkeys(
+        str(level[key]).strip() for key in ("source_text", "volume_rule")
+        if level.get(key) and _NON_PRICE_QUALIFIER.search(str(level[key]))
+    ))
 
 
 def risk_direction(action: str, level: dict[str, Any]) -> str:
@@ -52,4 +76,8 @@ def risk_condition_text(action: str, level: dict[str, Any], response: str) -> st
                     "volume_confirmed": "거래량 조건 확인 후"}.get(condition["confirmation"], "장중 확인 시")
     if condition["confirmation"] == "volume_confirmed" and level.get("volume_rule"):
         confirmation += f" ({level['volume_rule']})"
-    return f"{condition['price']:,.2f}".rstrip("0").rstrip(".") + f" {side}, {confirmation} {response}"
+    text = f"{condition['price']:,.2f}".rstrip("0").rstrip(".") + f" {side}, {confirmation} {response}"
+    qualifiers = risk_non_price_conditions(level)
+    if qualifiers:
+        text += " · 추가 조건 확인 필요: " + " / ".join(qualifiers)
+    return text

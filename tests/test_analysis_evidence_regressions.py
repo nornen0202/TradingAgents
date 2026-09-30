@@ -35,6 +35,21 @@ def test_real_price_range_survives_neighboring_date_and_clock(context):
     assert (level.low, level.high) == (320, 325)
 
 
+@pytest.mark.parametrize("fraction", ["25~50%", "25–50%", "25%–50%", "25 to 50 percent", "25~50퍼센트", "12.5~25.5%"])
+def test_sale_fraction_is_not_an_inferred_price_range(fraction):
+    level = _parse_price_level({
+        "level_type": "SUPPORT", "price": 94.72,
+        "source_text": f"정규장 종가가 $94.72 아래로 내려가면 보유분의 {fraction}를 위험 축소 목적으로 매도",
+    })
+    assert level.price == 94.72
+    assert level.low is None and level.high is None
+    genuine_range = _parse_price_level({
+        "level_type": "SUPPORT",
+        "source_text": f"Reduce {fraction} in the 92.47~94.72 price zone",
+    })
+    assert (genuine_range.low, genuine_range.high) == (92.47, 94.72)
+
+
 def test_constructor_callbacks_reach_real_tool_execution(tmp_path):
     @tool
     def sample_price(symbol: str) -> str:

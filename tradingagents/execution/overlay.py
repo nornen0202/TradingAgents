@@ -429,6 +429,16 @@ def _evaluate_risk_action_level(
         "risk_action_triggered": False,
         "risk_action_close_pending": False,
     }
+    from .risk_trigger import risk_non_price_conditions
+
+    if risk_non_price_conditions(contract.risk_action_level.to_dict()):
+        return (
+            DecisionState.ARMED,
+            DecisionNow.NONE,
+            ExecutionTimingState.WAITING,
+            ("risk_action_confirmation_required", "risk_action_qualifier_pending"),
+            {**flags, "risk_action_qualifier_pending": True},
+        )
     # A spot quote/RVOL does not establish the level's free-text volume rule
     # (which can also require a regular-session close or a volume comparison).
     if confirmation in {"two_bar", "next_day", "volume_confirmed"}:
