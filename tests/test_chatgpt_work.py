@@ -672,6 +672,32 @@ def test_public_market_packet_omits_portfolio_membership(tmp_path: Path):
     assert "held_ticker_count" not in serialized
 
 
+@pytest.mark.parametrize("public", [False, True])
+def test_recovery_provenance_is_bound_without_public_private_ticker_leak(tmp_path: Path, public):
+    archive = tmp_path / "archive"
+    run_dir = _write_market_run(archive, run_id="recovered-us", market="us",
+        started_at="2026-07-14T14:00:00+00:00", row_mode="IMMEDIATE")
+    path = run_dir / "run.json"
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    receipt = {"schema": "tradingagents.research-recovery/v1", "source_run_id": "prior-full",
+        "source_manifest_sha256": "a" * 64, "source_status": "partial_failure",
+        "reused_tickers": ["PRIVATE_ONLY"], "retry_tickers": ["XOM"],
+        "reused_research": {"PRIVATE_ONLY": {"analysis_finished_at": "2026-07-14T13:00:00+00:00"}},
+        "usage_scope": "Current calls only"}
+    manifest["research_recovery"] = receipt
+    manifest["settings"]["run_mode"] = "full"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    packet = build_surface_packet("us", archive_dir=archive,
+        now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc), public=public)
+    actual = packet["body"]["current"]["analysis_receipt"]["research_recovery"]
+    assert actual["source_manifest_sha256"] == "a" * 64
+    if public:
+        assert "PRIVATE_ONLY" not in json.dumps(packet)
+        assert "retry_tickers" not in actual
+    else:
+        assert actual == receipt
+
+
 def test_public_market_packet_keeps_allowlisted_research_row_without_membership(tmp_path: Path):
     archive = tmp_path / "archive"
     run_dir = _write_market_run(

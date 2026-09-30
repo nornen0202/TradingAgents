@@ -206,7 +206,10 @@ def main(argv: list[str] | None = None) -> int:
         help="Return non-zero when a ticker fails or required full-universe coverage is incomplete.",
     )
     parser.add_argument("--label", default="github-actions", help="Run label for archived metadata.")
+    parser.add_argument("--resume-from-run", help="Recover failed tickers from a completed full run into a new cohort, preserving successful research provenance.")
     args = parser.parse_args(argv)
+    if args.resume_from_run and (args.site_only or args.tickers or args.trade_date):
+        parser.error("--resume-from-run cannot be combined with site-only, ticker or trade-date overrides")
 
     config = with_overrides(
         load_scheduled_config(args.config),
@@ -230,7 +233,8 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
-    manifest = execute_scheduled_run(config, run_label=args.label, skip_site_build=args.skip_site_build)
+    recovery_args = {"resume_from_run": args.resume_from_run} if args.resume_from_run else {}
+    manifest = execute_scheduled_run(config, run_label=args.label, skip_site_build=args.skip_site_build, **recovery_args)
     print(
         f"Completed run {manifest['run_id']} with status {manifest['status']} "
         f"({manifest['summary']['successful_tickers']} success / {manifest['summary']['failed_tickers']} failed)."
@@ -251,6 +255,7 @@ def execute_scheduled_run(
     *,
     run_label: str = "manual",
     skip_site_build: bool = False,
+    resume_from_run: str | None = None,
 ) -> dict[str, Any]:
     tz = ZoneInfo(config.run.timezone)
     started_at = datetime.now(tz)
@@ -263,11 +268,11 @@ def execute_scheduled_run(
                     run_mode=str(config.run.run_mode or "full"), started_at=started_at):
         return _execute_run_body(config, run_label=run_label, skip_site_build=skip_site_build,
                                  tz=tz, started_at=started_at, run_timer_start=run_timer_start,
-                                 run_id=run_id, run_dir=run_dir)
+                                 run_id=run_id, run_dir=run_dir, resume_from_run=resume_from_run)
 
 
 def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
-                      run_timer_start, run_id, run_dir):
+                      run_timer_start, run_id, run_dir, resume_from_run=None):
     reset_llm_usage()
 
     run_mode = str(config.run.run_mode or "full").strip().lower()
@@ -281,6 +286,10 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     selection_universe: _ResolvedRunTickerUniverse | None = None
     overlay_universe_metadata: dict[str, Any] | None = None
     overlay_universe_warnings: list[str] = []
+    recovery_plan = None
+    recovery_receipt = None
+    if resume_from_run and run_mode != "full":
+        raise ValueError("Research recovery requires run_mode=full")
     if portfolio_only:
         run_tickers: list[str] = []
         scanner_status = None
@@ -288,13 +297,24 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         resolved_universe = _resolve_run_ticker_universe(config)
         selection_universe = resolved_universe
         base_run_tickers = list(resolved_universe.tickers)
-        run_tickers, scanner_status = _augment_run_tickers_with_scanner(
-            config=config,
-            base_tickers=base_run_tickers,
-            run_dir=run_dir,
-            run_id=run_id,
-            asof=started_at.isoformat(),
-        )
+        if resume_from_run:
+            from .research_recovery import load_recovery_source
+            recovery_plan = load_recovery_source(
+                archive_dir=config.storage.archive_dir, source_run_id=resume_from_run,
+                settings=_settings_snapshot(config), now=started_at,
+                holding_tickers=list(resolved_universe.holding_tickers),
+                account_status=resolved_universe.account_snapshot_status,
+            )
+            run_tickers = recovery_plan["tickers"]
+            scanner_status = deepcopy(recovery_plan["source"].get("scanner"))
+        else:
+            run_tickers, scanner_status = _augment_run_tickers_with_scanner(
+                config=config,
+                base_tickers=base_run_tickers,
+                run_dir=run_dir,
+                run_id=run_id,
+                asof=started_at.isoformat(),
+            )
         if run_mode == "overlay_only":
             (
                 run_tickers,
@@ -321,7 +341,11 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         "active_count": configured_ticker_count,
         "omitted_count": 0,
     }
-    if run_mode in {"full", "overlay_only"}:
+    if recovery_plan:
+        active_universe_metadata = recovery_plan["active_universe"]
+        _write_json(run_dir / "universe_selection.json", active_universe_metadata)
+        run_warnings.append(f"research_recovery:{resume_from_run}:successful_research_reused_without_clock_or_usage_refresh")
+    elif run_mode in {"full", "overlay_only"}:
         selection_limit = active_ticker_limit if run_mode == "full" else 0
         run_tickers, omitted, active_universe_metadata = _select_daily_active_tickers(
             config=config,
@@ -348,7 +372,8 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             run_warnings.append(warning)
     ticker_summaries: list[dict[str, Any]] = []
     engine_results_dir = run_dir / "engine-results"
-    run_trade_date = _resolve_run_trade_date(config=config, tickers=run_tickers) if run_mode == "full" else None
+    run_trade_date = (recovery_plan["trade_date"] if recovery_plan else
+                      _resolve_run_trade_date(config=config, tickers=run_tickers) if run_mode == "full" else None)
     parallel_execution_summary = _parallel_ticker_execution_summary(config, enabled=False)
     circuit_breaker_summary = _initial_circuit_breaker_summary(config)
     max_runtime_seconds = _max_runtime_seconds(config)
@@ -367,11 +392,18 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     reset_llm_usage()
 
     if run_mode == "full":
-        if _should_run_tickers_in_parallel(config=config, ticker_count=len(run_tickers)):
+        reused_summaries = []
+        research_tickers = run_tickers
+        if recovery_plan:
+            from .research_recovery import copy_recovered_research
+            reused_summaries, recovery_receipt = copy_recovered_research(recovery_plan, run_dir=run_dir)
+            research_tickers = recovery_plan["retry_tickers"]
+            _write_json(run_dir / "research_recovery.json", recovery_receipt)
+        if _should_run_tickers_in_parallel(config=config, ticker_count=len(research_tickers)):
             ticker_summaries, parallel_execution_summary, circuit_breaker_summary, parallel_warnings = (
                 _run_parallel_tickers(
                     config=config,
-                    run_tickers=run_tickers,
+                    run_tickers=research_tickers,
                     run_dir=run_dir,
                     engine_results_dir=engine_results_dir,
                     trade_date_override=run_trade_date,
@@ -384,7 +416,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         else:
             ticker_summaries = _run_sequential_tickers(
                 config=config,
-                run_tickers=run_tickers,
+                run_tickers=research_tickers,
                 run_dir=run_dir,
                 engine_results_dir=engine_results_dir,
                 trade_date_override=run_trade_date,
@@ -393,6 +425,13 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
                 min_remaining_seconds=min_remaining_seconds,
                 run_warnings=run_warnings,
             )
+        if recovery_plan:
+            order = {ticker: index for index, ticker in enumerate(run_tickers)}
+            # Keep unexpected/duplicate worker rows visible to the final coverage validator.
+            ticker_summaries = sorted([*reused_summaries, *ticker_summaries],
+                                      key=lambda row: order.get(row.get("ticker"), len(order)))
+            parallel_execution_summary["reused_research_count"] = len(reused_summaries)
+            parallel_execution_summary["requested_new_research_count"] = len(research_tickers)
     elif portfolio_only:
         # KIS account/report verification path: leave ticker research empty and
         # run the account portfolio pipeline below.
@@ -542,6 +581,8 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     github_actions_receipt = _github_actions_source_receipt()
     if github_actions_receipt:
         manifest["github_actions"] = github_actions_receipt
+    if recovery_receipt:
+        manifest["research_recovery"] = recovery_receipt
     if scanner_status:
         manifest["scanner"] = scanner_status
     if overlay_universe_metadata:
