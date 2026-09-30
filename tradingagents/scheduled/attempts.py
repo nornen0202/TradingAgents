@@ -38,7 +38,9 @@ class RunAttempt:
         manifest = _read(self.path.parent / "run.json")
         self.state["status"] = "FAILED" if exc_type else str(manifest.get("status") or "FAILED").upper()
         self.state["finished_at"] = datetime.now(timezone.utc).isoformat()
-        self.state["completed_tickers"] = (manifest.get("summary") or {}).get("successful_tickers", 0)
+        # An interrupted batch may have completed workers without a final
+        # aggregate manifest. Unknown aggregate progress must not become zero.
+        self.state["completed_tickers"] = (manifest.get("summary") or {}).get("successful_tickers")
         self.state["error_type"] = exc_type.__name__ if exc_type else None
         self._write()
 
