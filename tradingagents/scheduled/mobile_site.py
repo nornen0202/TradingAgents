@@ -2094,7 +2094,7 @@ _PRIVATE_JS = r"""
     const labels = {SUCCESS: '완료', FAILED: '실패', FAILURE: '실패', INTERRUPTED: '연결 중단·심박 만료', RUNNING: '진행 중', PARTIAL_FAILURE: '일부 실패', UNVERIFIED: '확인 필요'};
     const complete = item.latest_completed_analysis || {};
     const status = String(attempt.status || 'UNVERIFIED').toUpperCase();
-    return `<p class="analysis-attempt ${status === 'SUCCESS' ? 'readiness-note' : 'expiry-warning'}">최근 전체 분석 시도: ${esc(labels[status] || status)} · ${esc(dateTime(attempt.started_at))}<br>현재 참조하는 전체 분석: ${esc(complete.run_id || '미확인')} · ${esc(dateTime(complete.finished_at))}</p>`;
+    return `<p class="analysis-attempt ${status === 'SUCCESS' ? 'readiness-note' : 'expiry-warning'}">최근 전체 분석 시도(사이트 생성 시점): ${esc(labels[status] || status)} · 시작 ${esc(dateTime(attempt.started_at))}<br>현재 참조하는 전체 분석: ${esc(complete.run_id || '미확인')} · 완료 ${esc(dateTime(complete.finished_at))}</p>`;
   }
   function evidenceAudit(sourceSummary) {
     const receipt = ((sourceSummary || {}).external_evidence_receipt || {});
