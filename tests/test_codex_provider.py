@@ -119,6 +119,7 @@ class CodexProviderTests(unittest.TestCase):
             for marker in (
                 "CHATGPT_FINAL_JSON_OUTPUT_PLACEHOLDER", "<|im_start|>", "[eot_id]", "|通 finals?",
                 "אַfinal қисjson_output_schemaავალ{", "TIM|>", "IM_END|>",
+                "]}-singaw/incorrect_output? Wait weird generated end", "_error_fix",
             ):
                 with self.subTest(tool_mode=tool_mode, marker=marker):
                     def payload(content):

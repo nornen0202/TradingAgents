@@ -304,7 +304,7 @@ class CodexChatModel(BaseChatModel):
         has_control_marker = any(marker in content for marker in (
             "CHATGPT_FINAL_JSON_OUTPUT_PLACEHOLDER", "[im_start]", "[im_end]",
             "[start_header_id]", "[end_header_id]", "[eot_id]",
-            "json_output_schema",
+            "json_output_schema", "incorrect_output", "_error_fix",
         ))
         # Observed outputs also contain truncated delimiters (TIM|>) or a
         # schema marker surrounded by corrupted Unicode. Reject and retry;

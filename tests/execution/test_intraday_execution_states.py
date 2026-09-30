@@ -253,6 +253,19 @@ def test_price_only_intraday_profit_plan_remains_actionable():
     )
 
 
+@pytest.mark.parametrize("confirmation", ["close", "two_bar", "intraday"])
+def test_risk_wording_keeps_volume_rule_alongside_other_confirmation(confirmation):
+    from tradingagents.execution.risk_trigger import risk_condition_text
+
+    text = risk_condition_text("REDUCE_RISK", {
+        "price": 553.12, "confirmation": confirmation,
+        "volume_rule": "거래량 증가 확인",
+    }, "보유 위험 축소")
+    assert "거래량 증가 확인" in text
+    if confirmation == "close":
+        assert "종가 확인 후" in text
+
+
 @pytest.mark.parametrize("session", ["post_close", "closed", "after_hours"])
 def test_after_hours_last_price_is_not_regular_close_evidence(session):
     from tradingagents.portfolio.candidates import _risk_action_level_triggered_now
