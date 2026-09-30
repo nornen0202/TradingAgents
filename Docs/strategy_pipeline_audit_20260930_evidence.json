@@ -566,5 +566,3259 @@
     "assignment": "stance = original[\"rating\"]",
     "previous_overlay_stance_retained_in": "thesis.overlay_stance_at_quote_time",
     "raw_script_published": false
+  },
+  "remediation": {
+    "verified_at": "2026-09-30T16:41:27.506780+00:00",
+    "code_commit": "30e8256b4145e7f9f95a8f15ad9a6d49c573a8fd",
+    "full_us_workflow": {
+      "conclusion": "success",
+      "databaseId": 36733855448,
+      "headSha": "f7b898859c11995c2765428877ef944a1270c153",
+      "status": "completed",
+      "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36733855448"
+    },
+    "full_us_run_id": "20261001T000500_github-actions-us",
+    "full_us_summary": {
+      "total_tickers": 30,
+      "successful_tickers": 30,
+      "failed_tickers": 0,
+      "partial_failure_rate": 0.0,
+      "configured_ticker_count": 30,
+      "skipped_tickers": 0
+    },
+    "full_us_completion_checks": {
+      "run_id": "20261001T000500_github-actions-us",
+      "status": "success",
+      "started_at": "2026-10-01T00:05:00.633453+09:00",
+      "ticker_phase_finished_at": "2026-10-01T00:32:22.208249+09:00",
+      "finished_at": "2026-10-01T00:59:41.784906+09:00",
+      "duration_seconds": 3281.15,
+      "postprocessing_duration_seconds": 1639.58,
+      "summary": {
+        "total_tickers": 30,
+        "successful_tickers": 30,
+        "failed_tickers": 0,
+        "partial_failure_rate": 0.0,
+        "configured_ticker_count": 30,
+        "skipped_tickers": 0
+      },
+      "quality_gate": {
+        "partial_failure_rate": 0.0,
+        "partial_failure_warning": false,
+        "failed_tickers": []
+      },
+      "warnings": [
+        "Wait-heavy constructive batch: WAIT 30/30 with BULLISH 29/30; review entry-action calibration.",
+        "bullish_wait_concentration",
+        "Constructive batch produced no BUY/OVERWEIGHT ratings; review rating calibration against stance and entry_action outputs.",
+        "research_recovery:20260930T193547_github-actions-us:successful_research_reused_without_clock_or_usage_refresh"
+      ],
+      "attempt": {
+        "schema": "tradingagents.analysis-attempt/v1",
+        "run_id": "20261001T000500_github-actions-us",
+        "market": "US",
+        "run_mode": "full",
+        "started_at": "2026-10-01T00:05:00.633453+09:00",
+        "status": "SUCCESS",
+        "heartbeat_at": "2026-09-30T15:59:41.829647+00:00",
+        "finished_at": "2026-09-30T15:59:41.829636+00:00",
+        "completed_tickers": 30,
+        "error_type": null
+      },
+      "coverage": {
+        "complete": true,
+        "holding_expected_count": 14,
+        "holding_selected_count": 14,
+        "holding_missing_count": 0,
+        "watchlist_expected_count": 27,
+        "watchlist_selected_count": 27,
+        "watchlist_missing_count": 0,
+        "selection_complete": true,
+        "analysis_complete": true,
+        "analysis_expected_count": 30,
+        "analysis_successful_count": 30,
+        "analysis_failed_count": 0,
+        "analysis_missing_count": 0,
+        "analysis_unexpected_count": 0,
+        "analysis_duplicate_count": 0,
+        "fresh_snapshot_complete": true
+      },
+      "portfolio": {
+        "status": "success",
+        "semantic_health": {
+          "total_candidates": 30,
+          "rule_only_fallback_count": 0,
+          "review_required_count": 30,
+          "rule_only_fallback_ratio": 0.0,
+          "judge_unavailable": false
+        },
+        "report_writer": {
+          "status": "success",
+          "scope": "portfolio",
+          "provider": "codex",
+          "model": "gpt-6-sol",
+          "model_role": "writer_model"
+        }
+      },
+      "llm_usage": {
+        "available": true,
+        "calls": 55,
+        "by_role": {
+          "quick": {
+            "calls": 13,
+            "input_tokens": 330215,
+            "output_tokens": 13463,
+            "total_tokens": 343678
+          },
+          "deep": {
+            "calls": 3,
+            "input_tokens": 75167,
+            "output_tokens": 9783,
+            "total_tokens": 84950
+          },
+          "output": {
+            "calls": 6,
+            "input_tokens": 114282,
+            "output_tokens": 6620,
+            "total_tokens": 120902
+          },
+          "writer": {
+            "calls": 2,
+            "input_tokens": 43867,
+            "output_tokens": 3030,
+            "total_tokens": 46897
+          },
+          "judge": {
+            "calls": 31,
+            "input_tokens": 1149230,
+            "output_tokens": 29023,
+            "total_tokens": 1178253
+          }
+        }
+      },
+      "reused_source_calls": 693
+    },
+    "full_us_timing": {
+      "started_at": "2026-10-01T00:05:00.633453+09:00",
+      "ticker_phase_finished_at": "2026-10-01T00:32:22.208249+09:00",
+      "finished_at": "2026-10-01T00:59:41.784906+09:00",
+      "duration_seconds": 3281.15,
+      "postprocessing_duration_seconds": 1639.58
+    },
+    "strategy_snapshot": {
+      "url": "https://nornen0202.github.io/TradingAgents/mobile/strategy.json",
+      "sha256": "9d01bb3c825f63c2da26ef6f88a32b41ff0fe049c079caceda8da31859a56f09",
+      "generated_at": "2026-10-01T01:31:49.150381+09:00"
+    },
+    "markets": {
+      "kr": {
+        "event_id": "kr:bc177891d31cabfeecf90dda7a82135e",
+        "source_sha256": "b89407aea6e401f7fcf1228504395b08d501635b23d20f0c6e49da4b87c11270",
+        "report_sha256": "eae50e83124d160b9e1f579a4c38aa0c8dd9b4df79797cef99272f24a41f5610",
+        "public_report_file_sha256": "d1f343fdf36769f6cb6bb5ca7c026b395bced1613a925f022ec125053ec3eca7",
+        "published_at": "2026-09-30T18:21:50.160711+09:00",
+        "immutable_report_equals_verified_public_snapshot_bytes": true,
+        "verified_public_snapshot_file": ".runtime/strategy-audit-20260930/public-report-kr-final.json",
+        "current_public_equals_verified_snapshot": true,
+        "current_public_equals_its_immutable_local_source": true,
+        "current_public_report": {
+          "event_id": "kr:bc177891d31cabfeecf90dda7a82135e",
+          "source_sha256": "b89407aea6e401f7fcf1228504395b08d501635b23d20f0c6e49da4b87c11270",
+          "report_sha256": "eae50e83124d160b9e1f579a4c38aa0c8dd9b4df79797cef99272f24a41f5610",
+          "published_at": "2026-09-30T18:21:50.160711+09:00"
+        },
+        "local_latest_report_at_evidence_capture": {
+          "event_id": "kr:bc177891d31cabfeecf90dda7a82135e",
+          "source_sha256": "b89407aea6e401f7fcf1228504395b08d501635b23d20f0c6e49da4b87c11270",
+          "report_sha256": "eae50e83124d160b9e1f579a4c38aa0c8dd9b4df79797cef99272f24a41f5610",
+          "published_at": "2026-09-30T18:21:50.160711+09:00"
+        },
+        "all_transmitted_tickers_rendered_once": true,
+        "thesis_directions_and_membership_preserved": true,
+        "input_thesis_counts": {
+          "BUY": 20,
+          "HOLD": 7
+        },
+        "output_thesis_counts": {
+          "HOLD": 7,
+          "BUY": 20
+        },
+        "execution_readiness_counts": {
+          "NEEDS_LIVE_RECHECK": 27
+        },
+        "role_counts": {
+          "holding": 13,
+          "watchlist": 4,
+          "discovery": 10
+        },
+        "coverage_receipt": {
+          "status": "COMPLETE",
+          "complete": true,
+          "source_run_id": "20260930T145600_github-actions-overlay-kr",
+          "ticker_universe_mode": "config_plus_account",
+          "account_snapshot_status": "loaded",
+          "expected_holding_count": 13,
+          "missing_holding_count": 0,
+          "expected_watchlist_count": 14,
+          "missing_watchlist_count": 0,
+          "expected_analysis_count": 30,
+          "missing_analysis_count": 0,
+          "analysis_total_count": 30,
+          "analysis_successful_count": 30,
+          "analysis_failed_count": 0,
+          "missing_holding_tickers": [],
+          "missing_watchlist_tickers": [],
+          "missing_analysis_tickers": [],
+          "failed_tickers": []
+        },
+        "full_analysis_run_ids": [
+          "20260930T081017_github-actions-kr"
+        ],
+        "current_run_id": "20260930T145600_github-actions-overlay-kr",
+        "report_lineage": {
+          "status": "PAST_REFERENCE",
+          "current_action_cards_enriched": false,
+          "reason": "workflow_contract_mismatch",
+          "workflow_contract_matches": false,
+          "ticker_coverage_matches": true,
+          "report_ticker_count": 27,
+          "current_ticker_count": 27,
+          "report_source_run_id": "20260930T145600_github-actions-overlay-kr",
+          "current_analysis_source_run_id": "20260930T135559_github-actions-overlay-kr"
+        }
+      },
+      "us": {
+        "event_id": "us:244ad81678a8878e74c58b06119ea057",
+        "source_sha256": "3e208177b355296966719aaeca222425836da063e030f48c691df27ddb2b3923",
+        "report_sha256": "662dd674a7169f21710d2da4896d5982150130de3341c741a3677c5e9a2c4b63",
+        "public_report_file_sha256": "d871230db7151e1352fd704c8d805315aa05f9c89198372c2fd9fd6ee58f1a48",
+        "published_at": "2026-10-01T01:25:33.066019+09:00",
+        "immutable_report_equals_verified_public_snapshot_bytes": true,
+        "verified_public_snapshot_file": ".runtime/strategy-audit-20260930/public-report-us-final.json",
+        "current_public_equals_verified_snapshot": true,
+        "current_public_equals_its_immutable_local_source": true,
+        "current_public_report": {
+          "event_id": "us:244ad81678a8878e74c58b06119ea057",
+          "source_sha256": "3e208177b355296966719aaeca222425836da063e030f48c691df27ddb2b3923",
+          "report_sha256": "662dd674a7169f21710d2da4896d5982150130de3341c741a3677c5e9a2c4b63",
+          "published_at": "2026-10-01T01:25:33.066019+09:00"
+        },
+        "local_latest_report_at_evidence_capture": {
+          "event_id": "us:3e7b1da131c4758b41966acc884f83cb",
+          "source_sha256": "d27bfb76d34f95dede563460fe1728cb09c7b4dcecee0be7aa37e2c11f000545",
+          "report_sha256": "775a46c06975fe92262383623b0e51fcd7e10c8a5064b21185338117b25b7ffa",
+          "published_at": "2026-10-01T01:38:35.224691+09:00"
+        },
+        "all_transmitted_tickers_rendered_once": true,
+        "thesis_directions_and_membership_preserved": true,
+        "input_thesis_counts": {
+          "BUY": 25,
+          "HOLD": 5
+        },
+        "output_thesis_counts": {
+          "BUY": 25,
+          "HOLD": 5
+        },
+        "execution_readiness_counts": {
+          "NEEDS_LIVE_RECHECK": 30
+        },
+        "role_counts": {
+          "holding": 14,
+          "watchlist": 16
+        },
+        "coverage_receipt": {
+          "status": "COMPLETE",
+          "complete": true,
+          "source_run_id": "20261001T010505_github-actions-overlay-us",
+          "ticker_universe_mode": "config_plus_account",
+          "account_snapshot_status": "loaded",
+          "expected_holding_count": 14,
+          "missing_holding_count": 0,
+          "expected_watchlist_count": 27,
+          "missing_watchlist_count": 0,
+          "expected_analysis_count": 30,
+          "missing_analysis_count": 0,
+          "analysis_total_count": 30,
+          "analysis_successful_count": 30,
+          "analysis_failed_count": 0,
+          "missing_holding_tickers": [],
+          "missing_watchlist_tickers": [],
+          "missing_analysis_tickers": [],
+          "failed_tickers": []
+        },
+        "full_analysis_run_ids": [
+          "20261001T000500_github-actions-us"
+        ],
+        "current_run_id": "20261001T010505_github-actions-overlay-us",
+        "report_lineage": {
+          "status": "CURRENT_PACKET",
+          "current_action_cards_enriched": true,
+          "reason": "event_source_and_ticker_coverage_match",
+          "workflow_contract_matches": true,
+          "ticker_coverage_matches": true,
+          "report_ticker_count": 30,
+          "current_ticker_count": 30,
+          "report_source_run_id": "20261001T010505_github-actions-overlay-us",
+          "current_analysis_source_run_id": "20261001T000500_github-actions-us"
+        }
+      }
+    },
+    "us_overlay_workflow": {
+      "conclusion": "success",
+      "databaseId": 36741477709,
+      "headSha": "30e8256b4145e7f9f95a8f15ad9a6d49c573a8fd",
+      "status": "completed",
+      "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36741477709"
+    },
+    "us_work_pages_workflow": {
+      "conclusion": "success",
+      "databaseId": 36744159826,
+      "headSha": "30e8256b4145e7f9f95a8f15ad9a6d49c573a8fd",
+      "status": "completed",
+      "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36744159826"
+    },
+    "us_work_delivery": {
+      "publish": {
+        "schema": "tradingagents.work-report/v1",
+        "surface": "us",
+        "event_id": "us:244ad81678a8878e74c58b06119ea057",
+        "source_sha256": "3e208177b355296966719aaeca222425836da063e030f48c691df27ddb2b3923",
+        "report_id": "us:662dd674a7169f21710d2da4896d5982",
+        "report_sha256": "662dd674a7169f21710d2da4896d5982150130de3341c741a3677c5e9a2c4b63",
+        "published_at": "2026-10-01T01:25:33.066019+09:00",
+        "status": "PUBLISHED"
+      },
+      "ack": {
+        "schema": "tradingagents.work-state/v1",
+        "surface": "us",
+        "event_id": "us:244ad81678a8878e74c58b06119ea057",
+        "status": "rendered",
+        "state_revision": 498,
+        "acknowledged_at": "2026-10-01T01:25:48.348158+09:00",
+        "report_id": "us:662dd674a7169f21710d2da4896d5982",
+        "report_sha256": "662dd674a7169f21710d2da4896d5982150130de3341c741a3677c5e9a2c4b63"
+      },
+      "handoff": {
+        "schema": "tradingagents.work-pages-handoff/v1",
+        "surface": "us",
+        "event_id": "us:244ad81678a8878e74c58b06119ea057",
+        "report_sha256": "662dd674a7169f21710d2da4896d5982150130de3341c741a3677c5e9a2c4b63",
+        "repository": "nornen0202/TradingAgents",
+        "ref": "main",
+        "workflow": "work-report-pages-refresh.yml",
+        "status": "DISPATCH_ACCEPTED",
+        "dispatched_at": "2026-10-01T01:26:04.151658+09:00",
+        "external_delivery_verified": false
+      }
+    },
+    "us_overlay_validation": {
+      "run_id": "20261001T010505_github-actions-overlay-us",
+      "status": "success",
+      "started_at": "2026-10-01T01:05:05.248432+09:00",
+      "finished_at": "2026-10-01T01:15:18.942072+09:00",
+      "summary": {
+        "total_tickers": 30,
+        "successful_tickers": 30,
+        "failed_tickers": 0,
+        "partial_failure_rate": 0.0,
+        "configured_ticker_count": 30,
+        "skipped_tickers": 0
+      },
+      "analysis_source_run_id": "20261001T000500_github-actions-us",
+      "execution_source_run_id": "20261001T010505_github-actions-overlay-us",
+      "coverage": {
+        "complete": true,
+        "holding_expected_count": 14,
+        "holding_selected_count": 14,
+        "holding_missing_count": 0,
+        "watchlist_expected_count": 27,
+        "watchlist_selected_count": 27,
+        "watchlist_missing_count": 0,
+        "selection_complete": true,
+        "analysis_complete": true,
+        "analysis_expected_count": 30,
+        "analysis_successful_count": 30,
+        "analysis_failed_count": 0,
+        "analysis_missing_count": 0,
+        "analysis_unexpected_count": 0,
+        "analysis_duplicate_count": 0,
+        "fresh_snapshot_complete": true
+      },
+      "portfolio_status": "success",
+      "llm_usage": {
+        "calls": 30,
+        "by_role": {
+          "execution_summary": {
+            "calls": 30,
+            "input_tokens": 542136,
+            "output_tokens": 6882,
+            "total_tokens": 549018
+          }
+        }
+      },
+      "quote_range": [
+        "2026-09-30T12:05:00-04:00",
+        "2026-09-30T12:05:00-04:00"
+      ],
+      "row_modes": {
+        "CONDITIONAL": 30
+      },
+      "strategy_rows": 30
+    },
+    "automatic_notification_receipts": [
+      {
+        "workflow": {
+          "conclusion": "success",
+          "databaseId": 36741323521,
+          "status": "completed",
+          "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36741323521"
+        },
+        "records": [
+          {
+            "status": "SENT",
+            "chunk_count": 1,
+            "markets": [],
+            "run_ids": [],
+            "surfaces": [
+              "us"
+            ],
+            "telegram_accepted_message_count": 1
+          },
+          {
+            "workflow_name": "Daily Codex Analysis",
+            "upstream_run_id": 36733855448,
+            "upstream_run_attempt": 1,
+            "head_sha": "f7b898859c11995c2765428877ef944a1270c153",
+            "conclusion": "success",
+            "should_notify": true,
+            "reason": "terminal_job_succeeded",
+            "surfaces": [
+              "us"
+            ]
+          }
+        ],
+        "scope": "Read-only audit of the existing notification workflow; chat identifiers, message identifiers, credentials and message text excluded. SENT proves Telegram API acceptance, not that a user read it."
+      },
+      {
+        "workflow": {
+          "conclusion": "success",
+          "databaseId": 36743262880,
+          "status": "completed",
+          "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36743262880"
+        },
+        "records": [
+          {
+            "status": "SENT",
+            "chunk_count": 1,
+            "markets": [],
+            "run_ids": [],
+            "surfaces": [
+              "us"
+            ],
+            "telegram_accepted_message_count": 1
+          },
+          {
+            "workflow_name": "Intraday Overlay Refresh",
+            "upstream_run_id": 36741477709,
+            "upstream_run_attempt": 1,
+            "head_sha": "30e8256b4145e7f9f95a8f15ad9a6d49c573a8fd",
+            "conclusion": "success",
+            "should_notify": true,
+            "reason": "terminal_job_succeeded",
+            "surfaces": [
+              "us"
+            ]
+          }
+        ],
+        "scope": "Read-only audit of the existing notification workflow; chat identifiers, message identifiers, credentials and message text excluded. SENT proves Telegram API acceptance, not that a user read it."
+      }
+    ],
+    "full_us_decision_distributions": {
+      "rating": {
+        "HOLD": 30
+      },
+      "portfolio_stance": {
+        "BULLISH": 29,
+        "NEUTRAL": 1
+      },
+      "entry_action": {
+        "WAIT": 30
+      },
+      "conditional_entry_action": {
+        "STARTER": 25,
+        "NONE": 5
+      },
+      "risk_action": {
+        "HOLD": 28,
+        "REDUCE_RISK": 1,
+        "TAKE_PROFIT": 1
+      }
+    },
+    "full_us_named_tool_calls": {
+      "get_stock_data": 30,
+      "get_indicators": 236,
+      "get_intraday_snapshot": 30,
+      "get_social_sentiment": 32,
+      "get_company_news": 62,
+      "get_macro_news": 30,
+      "get_disclosures": 30,
+      "get_macro_data": 57,
+      "get_fundamentals": 30,
+      "get_balance_sheet": 32,
+      "get_cashflow": 32,
+      "get_income_statement": 32,
+      "get_insider_transactions": 30,
+      "get_source_linked_financials": 30,
+      "get_estimates_consensus": 30,
+      "get_earnings_event_pack": 30,
+      "get_transcript_evidence": 30,
+      "get_peer_comps": 30,
+      "get_credit_risk_context": 30,
+      "get_diligence_context": 30,
+      "get_public_equity_intelligence_summary": 30
+    },
+    "research_corpus_metrics_scope": "Per-analysis tool/provider metrics cover the entire research corpus, including preserved source calls for reused tickers. Current-run model usage is accounted for separately below.",
+    "full_us_provider_statuses": {
+      "yfinance:get_stock_data:success": 30,
+      "yfinance:get_indicators:success": 236,
+      "alpha_vantage:get_company_news:success": 54,
+      "yfinance:get_social_sentiment:fallback": 32,
+      "fred:get_macro_indicators:fallback": 57,
+      "sec_edgar:get_disclosures:fallback": 30,
+      "alpha_vantage:get_macro_news:success": 30,
+      "yfinance:get_income_statement:success": 32,
+      "yfinance:get_balance_sheet:success": 32,
+      "yfinance:get_cashflow:success": 32,
+      "yfinance:get_insider_transactions:success": 23,
+      "yfinance:get_fundamentals:success": 60,
+      "yfinance:get_insider_transactions:fallback": 7,
+      "alpha_vantage:get_insider_transactions:success": 3,
+      "alpha_vantage:get_company_news:fallback": 8,
+      "yfinance:get_company_news:success": 8,
+      "alpha_vantage:get_insider_transactions:fallback": 4
+    },
+    "full_us_llm_usage": {
+      "available": true,
+      "calls": 55,
+      "by_model": {
+        "gpt-6-sol": {
+          "calls": 55,
+          "input_tokens": 1712761,
+          "output_tokens": 61919,
+          "total_tokens": 1774680
+        }
+      },
+      "by_role": {
+        "quick": {
+          "calls": 13,
+          "input_tokens": 330215,
+          "output_tokens": 13463,
+          "total_tokens": 343678
+        },
+        "deep": {
+          "calls": 3,
+          "input_tokens": 75167,
+          "output_tokens": 9783,
+          "total_tokens": 84950
+        },
+        "output": {
+          "calls": 6,
+          "input_tokens": 114282,
+          "output_tokens": 6620,
+          "total_tokens": 120902
+        },
+        "writer": {
+          "calls": 2,
+          "input_tokens": 43867,
+          "output_tokens": 3030,
+          "total_tokens": 46897
+        },
+        "judge": {
+          "calls": 31,
+          "input_tokens": 1149230,
+          "output_tokens": 29023,
+          "total_tokens": 1178253
+        }
+      },
+      "ticker_observed_calls": 23,
+      "non_ticker_observed_calls": 32,
+      "reused_source_observed_calls": 693,
+      "usage_scope": "This run's LLM usage excludes reused source calls; original per-ticker artifacts and source_llm_usage preserve them."
+    },
+    "research_recovery": {
+      "schema": "tradingagents.research-recovery/v1",
+      "source_run_id": "20260930T193547_github-actions-us",
+      "source_manifest_sha256": "91b01846520d71721b4e06312dd89e3028bc47b730cd115ae19f703014484ef9",
+      "source_status": "partial_failure",
+      "reused_tickers": [
+        "AAPL",
+        "AMZN",
+        "AVGO",
+        "DELL",
+        "ETN",
+        "GEV",
+        "GLDM",
+        "GOOGL",
+        "LLY",
+        "MPWR",
+        "NVDA",
+        "RSP",
+        "SGOV",
+        "TSM",
+        "INTC",
+        "LRCX",
+        "MRVL",
+        "PG",
+        "SPYM",
+        "JNJ",
+        "CVX",
+        "ABBV",
+        "MRK",
+        "PM",
+        "WBD",
+        "SHEL",
+        "SCCO",
+        "BRK-B",
+        "MA"
+      ],
+      "retry_tickers": [
+        "XOM"
+      ],
+      "reused_research": {
+        "AAPL": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T19:36:13.088257+09:00",
+          "analysis_finished_at": "2026-09-30T20:02:49.279823+09:00",
+          "artifact_sha256": {
+            "analysis_json": "2094c789e375165a5b4b6df6c5120a70e4506142f7377f2c5fec5a52c56811b7",
+            "report_markdown": "2c72f7cb66da089880d4c6b44874b209893127327d648f9412c3c94ee4711b1b",
+            "final_state_json": "d0b02ecb6a0c44b2fb68a1f1b21792384a339c308f2b7a74e8ccde264d87d9d9",
+            "graph_log_json": "5e7de67e243013a9aa78688bdc74d643f1ff3f87ec2513c74904b5687b5be2a5",
+            "public_equity_intelligence_json": "05c72cc0c3be83b6b1bf6bf4ec9a1d3a660001b256c2be6e4dc0f07ead405e2e",
+            "source_quality_json": "9d680174fa2496bce226f51de1157caccb96c64e383794d767cda60d6f398e26",
+            "evidence_ledger_json": "fa8fc397b4d42ff85c07f7d284562d615a8be7d7dbe4ae5b52f99a943c160f34",
+            "earnings_event_pack_json": "5fff4b29261ec20f0336053d18470e2558dc33b800b8989bced3035c56b2655e",
+            "thesis_tracker_json": "19c28f8041bd8d28ed5f1c0aebffa667070e1de925f6dd1732b9b235edddb224",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "b4a67be4cddf3cdf8c110e8e0406a22da1419fc0d6bcf8d0369c9ba89cd51350",
+            "daily_thesis_json": "99136076b3112c6f98d84707f5ab2be5614d24a87e37c5f290519b92582d8b0e",
+            "close_plan_json": "fc48e7e29884b3f5b9dece3f41212af512f15f69a5ea1ecb65e4e46cda2bae4e",
+            "intraday_execution_json": "7590537995437cf0c2c52a27fe18d1a089692306a419af4f4a668941df69cfa3"
+          }
+        },
+        "AMZN": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T19:36:13.088167+09:00",
+          "analysis_finished_at": "2026-09-30T20:05:56.417414+09:00",
+          "artifact_sha256": {
+            "analysis_json": "3776067e9ebd712d5383933e7fac4d45021904375bca8b9b4b2736c43b4a49ae",
+            "report_markdown": "1c1614d6b249d0bde176b4e03588c753a5946d6a4a98b93861b789db606f4ffb",
+            "final_state_json": "5ce8457e6efaee195ff550fac800cf5c5c29f5f8459ea09128aebe2dce28f716",
+            "graph_log_json": "b7feb926d6e9cc494a00bd458178a44a1153a25df6e5c00fdbfb78f6f036fce2",
+            "public_equity_intelligence_json": "39452c1df8c838514c93cbcdd00545e04625bc8e2fcdd852d5b20929adca271d",
+            "source_quality_json": "97951b13b307b92b84a5b7db2029001e5bf5fc7114681f60ce0e11a1246fa03b",
+            "evidence_ledger_json": "cc329d463206e4bbb1cd4438c0e93e4bcc686a3a261927c6ba44af7d6a2ec73e",
+            "earnings_event_pack_json": "ef4630143d92e4ec367fb62537c40744ff12f8e7472616370d1f12c7181dc28c",
+            "thesis_tracker_json": "38519950311140cc309a207e5f6aab052b9b0c0c7f2104cdb0d63a484a3377cf",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "559fb263fce6eed41e1157caefa93cb45147b0651af9b69caadaad30856c1013",
+            "daily_thesis_json": "c9c58937e6035a411048efe4afdcf0a1e1056f43122032bb2f26e3ebe240b2d3",
+            "close_plan_json": "14a7e6621be60227edfd752d751e1762f9bcd5d222e3c3c2f6156bd539f06926",
+            "intraday_execution_json": "8e7c1e062f5b45e6b4dabad4fbe46cb4d5e7417439ec41dc37c747d5ca791771"
+          }
+        },
+        "AVGO": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T19:36:13.093226+09:00",
+          "analysis_finished_at": "2026-09-30T20:04:36.824348+09:00",
+          "artifact_sha256": {
+            "analysis_json": "9c17f2a9855d9529c5ae54fc282492b11924c630c37532f66f1475f844cc811d",
+            "report_markdown": "3436dd05f9e13792d0cfb1582970d9b4adc3bbc6420c87b8e678ac6774bf0362",
+            "final_state_json": "bf8d7adaf01ab78fdbe7c8a24e10cdef31635996cbc585717b7b4b822a5e574b",
+            "graph_log_json": "d27bbe1afb03b888997533dda70d297f3900b2bf12b50dccdd0c144a6b507627",
+            "public_equity_intelligence_json": "a0ffa83ad3f639bfd008edb618042ff2e61622efd557397d4364224aae522304",
+            "source_quality_json": "9a9389c1ff2fb0f7be57abfd37cd7a75601aa86092b93bcbaad5f9642d4ed501",
+            "evidence_ledger_json": "27884b2b7d18a3492a502e94e258c735c1264ebb71830b67580f112d98326ef5",
+            "earnings_event_pack_json": "4809de43a4611f98518be447b42c827f0870994db59bd380cf1374ecc75bcdb2",
+            "thesis_tracker_json": "001dc0b1ac9f20d8b1108413583357ecb988411f07b44ebde69f2dba09b5df58",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "761a083c75dacbc790675c3966c092aec1ad09a76e4f80077ced287e9ede3df8",
+            "daily_thesis_json": "8da9574bf98fe5cda0e64ea4730203f9c3a9bc7a16f2945a379523d1090fa45f",
+            "close_plan_json": "a8b36e642295be4aa298be5412896f026a342aefa895ad9bc57f2744c02d113a",
+            "intraday_execution_json": "b4eb5c2386d096af4a7263c62cf282ab6aa2bf9526cbe18040a4c9883ba342e3"
+          }
+        },
+        "DELL": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T19:36:13.088066+09:00",
+          "analysis_finished_at": "2026-09-30T20:04:32.916707+09:00",
+          "artifact_sha256": {
+            "analysis_json": "ff37272033b9454ce58c1d0d8078eb7e9704c35bbe92327e8e16196b877499e2",
+            "report_markdown": "1e48e4e5033055048e297f3a7c49143de38bc684361f0f29ef15d864f424c9f6",
+            "final_state_json": "e8fc8bd847d966260893cedf0f0e988249316fd8e1343c8fd5015656101f0661",
+            "graph_log_json": "f346bd97eb0b3c3ba563b666c97af97e1a41320d8282f374a3aae3f0233046dc",
+            "public_equity_intelligence_json": "6e6161a2bb40aac17952a9433c690430de5fada8738a65eead35a880e722264a",
+            "source_quality_json": "93682f92922fc4c741ad2e796890c93e5ac70fd6743f84d8717796bda1ae1bcc",
+            "evidence_ledger_json": "4e11d40e7fe03c73f8368281cafb263f3d43f788f251426bf4f41bc3cfa9e272",
+            "earnings_event_pack_json": "db14fad620b0a2b480c1d793716eb913795856e517a55964a1468b4f5fcb72ee",
+            "thesis_tracker_json": "297a6f75da4465a429a26a009fc1454847b40207445454bdfbc26ec465e1c94a",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "2c135eb3fd93eea8d705f14fcbf3d8ca6a68e7e0fd32f84b4790156f95a7f935",
+            "daily_thesis_json": "0d749802c3de0ea3a8808577e1a574827288b08f1135fba2d7d56b65f592b707",
+            "close_plan_json": "8a4125c1b8fe89760d346e46014486e80491ff85fe6f19f887e7a51bc1f1f635",
+            "intraday_execution_json": "2bb2237a59cd5d8d1fdab4f75c4097ce79e77035500676be16152143106824f9"
+          }
+        },
+        "ETN": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T20:02:57.377591+09:00",
+          "analysis_finished_at": "2026-09-30T20:32:35.633189+09:00",
+          "artifact_sha256": {
+            "analysis_json": "7a624c5577e2447f919882ca5f90a07595b461bcdbdb18a4f211eb637e7fe56c",
+            "report_markdown": "e5433ce0f50c9184abeb76e8448552afba044308b5cc8b37874e1d2bfd4c2d5c",
+            "final_state_json": "3b96462c80bf99c9fac436d508e87a066153a0f6fe35305551ca2248a768852d",
+            "graph_log_json": "c80ea745c5d3cd27ef84df5704a9f5f300412cb398f50d5db4cab04b99fba236",
+            "public_equity_intelligence_json": "4f8f5f3cedd7b1821f02678edceb2a51f36ca23a93e371cba3e509fd37d7a123",
+            "source_quality_json": "e2a964d741a6af739a89aa91270d485634af471f07ddec454d7e0614d39da895",
+            "evidence_ledger_json": "901d00bfd22a9c9dac9df2c348f84409d5ec87a01f3c4c258a0139a2c9551431",
+            "earnings_event_pack_json": "e59bdf4ab4a5de17faf2538d1c4057762a12a5963f4372258984eb2e57e78022",
+            "thesis_tracker_json": "7123deac4c70ef71495490494fcfef3b11da911e077b53d0d9289796274a5890",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "a7aa0da155f4a32327302ae6b5f8d9615e3a2401cac8725cc5a294c5fd34b832",
+            "daily_thesis_json": "7dbec8213d41458e2ecc3e7eaf9ed8cccb4e3eecab9174143ccdd8c2b6cdbb2e",
+            "close_plan_json": "bd40f4675b083866d796d84be6fc22f95e6026c4059dfeddd18af235e0d8cd77",
+            "intraday_execution_json": "7f0a6a0af9dd93f6002afa166e8e6919b800c921bac83455b63cf7b9a9051970"
+          }
+        },
+        "GEV": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T20:04:39.184173+09:00",
+          "analysis_finished_at": "2026-09-30T20:31:52.157615+09:00",
+          "artifact_sha256": {
+            "analysis_json": "a01144d4d84eb26ae8b7c030732fe7783a244203403781658bf258461a5ffcda",
+            "report_markdown": "ecef2f2b8dc8994b6e695fef38977c9dc7fe7617e736e11e64dc364291213754",
+            "final_state_json": "6607fc14fa9fb8db2028bf24096d01aa27d6dee30fadbf62fe6919fada389fcc",
+            "graph_log_json": "ab1616867fdafa98daef6f7c5334590ed8d9581e97d7d22bd8e8796bd6df8a04",
+            "public_equity_intelligence_json": "c12c926f6b219d7d327c4b7640b4119f677822a9a69d4ba7e061828f70231fb0",
+            "source_quality_json": "a8b349df809b7eb5540371ed8bf4c6f379dc6ca0e275e9399ef719d52523c3b7",
+            "evidence_ledger_json": "17f7d0eb2e93530bd92509142a2881b2ca97d55d4daef2b5891ad0309339d786",
+            "earnings_event_pack_json": "219f0b65e78e3c6021bdb3f5d23a43da7509c82b5c8124a590ff8887a989d06f",
+            "thesis_tracker_json": "3dea2374844418ec37d5a80d0359f1d2ecd813de0de4cbd9152b6ebb0e6eac55",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "1836344a99ef55c7c8be8e13411ffa4c379e1dc20642260230591e3023a62b8b",
+            "daily_thesis_json": "591b1fadbb996d7ec9b87c880bcfb95250249a097a0179766c442ed15c23ab5b",
+            "close_plan_json": "0be6e5d9e85f4ac49d578a7cb0ebb44015247da9ab9ee29d9acfbd89dab7e2a2",
+            "intraday_execution_json": "3ab1dd90eb852611fec68b056bef23ba423e4b9a184c3cee4c7b019ccf33d786"
+          }
+        },
+        "GLDM": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T20:04:41.637294+09:00",
+          "analysis_finished_at": "2026-09-30T20:39:07.039251+09:00",
+          "artifact_sha256": {
+            "analysis_json": "53b3bc955560f9e6059bed964a59895ae600aa0a86ee5a62b7a559f193fac685",
+            "report_markdown": "4b59a0bebaee6b6cfea6a2467bde710316cbe231e18d7a41c7cd59774314d26c",
+            "final_state_json": "4f34b335e9c23ddb74db91896c221437c74b8b203573e8d362243a8d763f1192",
+            "graph_log_json": "0c3d79459e662c55c975e8a4b7fceb4aa8b7c33d93b47849a8636022af87a2f6",
+            "public_equity_intelligence_json": "eeab8759a412c2017ca6c9921740da87c5697e5d0deccf00a853acc3560da2c1",
+            "source_quality_json": "b449e2bec41fec8ac4481ca9b56f5b949876a75d931f162fa01e64cc91c9acb5",
+            "evidence_ledger_json": "8b2f48d3485f3785f7f7e85a870826726a298484d209d1cb0596671b6c4f87e6",
+            "earnings_event_pack_json": "b7a952c1607735bd723b5baa9d1378f52be9146a8ae8c43a633905530af8e1f9",
+            "thesis_tracker_json": "d3b8657042d97e42aa9b237b52311b7ac9fc132c2cc358ffd5148cb46812cc3b",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "bffc8648a87987dfa396f16dd8f25e7be6a1ad1c00458451f96e053eb4766728",
+            "daily_thesis_json": "75bd49209c190e6d5aa4849314308c6f3f419086b2467c37515d27f640b5763c",
+            "close_plan_json": "bb3e9ff7bf125933a430df8ac4d55dba1c0a2bc3eed2632475813e35fbb2b49c",
+            "intraday_execution_json": "9540302ffbc3743f95fd86b6e83cf1ebfd856d6ad2ee4dde98ceb1db6e2250f3"
+          }
+        },
+        "GOOGL": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T20:06:01.768711+09:00",
+          "analysis_finished_at": "2026-09-30T20:33:49.429940+09:00",
+          "artifact_sha256": {
+            "analysis_json": "6b15f0e4a40d81e576f8f760cb8b1c0fe2b63c167839c39cc75cf16c52fc69f6",
+            "report_markdown": "0fe9231c09a5e03a7272e7dffa0be5f4a4c0a999d56784f0fdee9aef74b40174",
+            "final_state_json": "8a4a3acbc8ec63e314da64bcc067fe039a36b9be89dd12ef09b4ac3411ba0107",
+            "graph_log_json": "7681a7dbee93f65c5679a4724177a43340b3227d72709efe70f802cb808a1fe7",
+            "public_equity_intelligence_json": "eb5426d4be56f2a79109d8dedfc73c4cfa9653fec3dc2b80f98820dfd479a76b",
+            "source_quality_json": "ff528d4e925b381b82d45ea30d83d3633f60a72b471b7a24337288aea3f287c7",
+            "evidence_ledger_json": "b475af2ecc229e40c6363aa7257d422f88063ec3dc84ec21da708096f86a7a61",
+            "earnings_event_pack_json": "8a9b0f9f76d96d577cbc891f146b1d8e977ffac578282e14a3c13174fb999e73",
+            "thesis_tracker_json": "1db9dd3a76fef2a80d07739ca19d496a2c67bca750a925ba1066a66cc3d2bf2f",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "ca2650a88d45c53033444e1b6771404ada9f528cd28363aae54ca7ddcfcebf74",
+            "daily_thesis_json": "54405f25f77633f8311f56225af115420409219dbacfcad46da8b712247f917b",
+            "close_plan_json": "005e31ed361a30c50393f8c247807ab525d62765f47788972aaa09d645cd0404",
+            "intraday_execution_json": "86e56e5eb5f6395be19de78ad865a4f56586f7219c7d063ece35d4270805f583"
+          }
+        },
+        "LLY": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T20:31:59.980832+09:00",
+          "analysis_finished_at": "2026-09-30T20:58:08.904039+09:00",
+          "artifact_sha256": {
+            "analysis_json": "11e3a56f0000b1b675cf1e1eeef64dab7db9ffdc6e8f506de194f05b2e3d2a98",
+            "report_markdown": "16e6a54b33e9df29204d574521717b6963569383a3fafb954b4f5bb72271d65d",
+            "final_state_json": "c406ded0e11cfb67612b6ba925f11d928adf320911251df9918623e3ab234ab6",
+            "graph_log_json": "b59165bfea53b45521ab50982d763a73d2c8874a48fe2beb80f19c9bc89c9b33",
+            "public_equity_intelligence_json": "1212292a9d5d38805aa4ccb6e9ef54425e8be2da1a5add5bd635424c79f77cee",
+            "source_quality_json": "a13db18ab562baf22fa25c16e7e567120fe6aeab87e274549b8139d2f712a61e",
+            "evidence_ledger_json": "b2f1c37371768c047f57d8bae5e68ae6882fd1a4495b24dab9825ffac5b13bdc",
+            "earnings_event_pack_json": "a4102bbfe0a8d8ef7d41aa6e0ce54f771215332941b0f33ed23999615ab41150",
+            "thesis_tracker_json": "2e5753aa5a2adbcf1b7e934fbe74996377652c10c31ea408e3d70a1710c360cb",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "fd8338dd28a4c9f0f8f209da0f83fd92abda3171b7b466ce0d755bf3099fec4d",
+            "daily_thesis_json": "d1809fba105bbc81e4d5b34d15e5e4698715a2fa5b545f1ec298c41bb07ec5cd",
+            "close_plan_json": "dc8e5c00ad9d0f9017f7db3d2744b51dad7b165823ff3440b55f843a75079fc3",
+            "intraday_execution_json": "3a1681380edbf05d60f93cd95538007b2cf05fa32bbd861a34b1f3543475840e"
+          }
+        },
+        "MPWR": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T20:32:41.527219+09:00",
+          "analysis_finished_at": "2026-09-30T20:58:07.656809+09:00",
+          "artifact_sha256": {
+            "analysis_json": "c8aa1b9cf982bfb765197f73fdb7b3d8f7069e6b7f398bb4d0cbd10ad4057983",
+            "report_markdown": "89a17bc123a12cc05962614a2e725e7344f107395e86a52fd55ba7321517d04f",
+            "final_state_json": "c11b4b4bf858c0012b018792316b0bd494eff9c34fe377e2a5d56b1e99bc22be",
+            "graph_log_json": "04361f54701090ef70ed0834b3f04c4fde7dc8cb0933f80c16e80191b9814f61",
+            "public_equity_intelligence_json": "841287aab1a6aa96ad94ccc09557edc18b865cef958f554e2723b943c6052c04",
+            "source_quality_json": "b9fb2f6e3c4320aeb0fcc0c1fb7cb6b3e3585090403bc26a47b107786cedbe99",
+            "evidence_ledger_json": "5afa0da1235f702ba60aaafd7a8ea9c1f0367600567bceb717de6419d79c4353",
+            "earnings_event_pack_json": "eab114bacc3c95b504b0ab387ad3b2c53e8e7dc3838afe0406c66a00b700ec7d",
+            "thesis_tracker_json": "4d47918228eb9b5796cda3e181f80489d7a65f9775ebf4c872043405081e9efc",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "a6670c65b61f7566e90ece6a8f2e6a2935473ea069d4e9f3c9e8cad0c1d8614d",
+            "daily_thesis_json": "8c0d93ad9c11520925f1c1a4babae043e6b60704b20be78f760081a90ac7ef4d",
+            "close_plan_json": "0748e4119f1d49557713174545d873112f5ffc7f3856fa5fdb94cdcbb0d44862",
+            "intraday_execution_json": "afc4a61b96cdb149b272b34b5096a1d2d83f31e9836234e822582ce357189298"
+          }
+        },
+        "NVDA": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T20:33:54.982577+09:00",
+          "analysis_finished_at": "2026-09-30T21:23:25.341209+09:00",
+          "artifact_sha256": {
+            "analysis_json": "0bee6bbb106d9831fc9376efe74ebf0562cf634b1dba7ad9554a813af47d1a15",
+            "report_markdown": "b8a8edec549e1946535cbe1804e256167f52f12222e7c2b2989099d2f35e4384",
+            "final_state_json": "b3e1f87eb119527c915843ae5c61568ef38ef2e0db743c28a5a7d30f32df982c",
+            "graph_log_json": "6529c4669290795424c6215bd4fb3e10b21b9e961c2e2e583b967c1e87023df9",
+            "public_equity_intelligence_json": "d354c1df8c3a8c8869ad881d0aa7bf40c0cdaa23549370c7949961c78805facc",
+            "source_quality_json": "b0c66ed4ffc0cd95bb01eccdb0e2d13d38ca87dfed3d995d722c9725e0f850ba",
+            "evidence_ledger_json": "60b1b3dd7ee8008da4c9b62d111e8dc2cbd2738ddb06d09adb9abee9f8d8cdd3",
+            "earnings_event_pack_json": "93cd44cf6eb89f1dd669e7a489d98bd1231c70be818383f034935955f35f01b4",
+            "thesis_tracker_json": "cdea6d621a3a4f912c44d4b7a6be7892f7e804314d5d93d1070e4e746cb3582f",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "71e4fa9afbea63530da79c62190d25ad338c7f7d7261637a5cb22105e027a9e2",
+            "daily_thesis_json": "2bc75a7b3b672c19a7869a5d39b5c446d5747a18b87c094257f1d13132328397",
+            "close_plan_json": "74722022ab598522c84c208510925b874070dbb33761052c4a25c3e6ebf2d7d4",
+            "intraday_execution_json": "1c6b3d1e1a5810db7d31fd7a5215818abf3cc505cb4ee416b70f378fd1fc2cce"
+          }
+        },
+        "RSP": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T20:39:13.857841+09:00",
+          "analysis_finished_at": "2026-09-30T21:03:12.298119+09:00",
+          "artifact_sha256": {
+            "analysis_json": "386d33ceda03dd801626653e10654df0dbd133d299ddf16c5f939d091b71a954",
+            "report_markdown": "3047215a2f8d5d4f79aa0f3bc5a13b4ccc939741d45186f58b5486f4eaabaa84",
+            "final_state_json": "0d9c432dec616c25c0c978cbcde13f7170a9139229316e0d6d1e32808b0aa06e",
+            "graph_log_json": "2fd9eb72333aa6f96047341c344f60ff1cb015908af44b03f43ea9b7288f0ae1",
+            "public_equity_intelligence_json": "b60b29d6f20cb9b0a3701cf418fbf91fc66c0416f85cee3081d0a772ae69deca",
+            "source_quality_json": "22b8eceebfd829e18948c1a354a2cb939fd4a90a72c7566bf6260189612b1d47",
+            "evidence_ledger_json": "85b79f95f81db34bce21404468d5fc1ccc6863d13a08aa4934460c169fd0cc45",
+            "earnings_event_pack_json": "af4675a881cd779eb9678980cf6e91c3263caa67bb20d340d8650f23306337b3",
+            "thesis_tracker_json": "bdbd835f0ca60888f53eb5d0f6def3ccdf0d64aae03f5eeec7d9428562289ad5",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "0fd821566176b7ddaa2cc66d6dd7d25f869451eda2661958d74e23ec5eda2fe6",
+            "daily_thesis_json": "4bb8b79f5af9363fd1b1f1d93fa148a288eb7975e44f576ab531230abc6d896b",
+            "close_plan_json": "e083814fde0a143b3bbb0945c7736a97ab973ebfaf6422b3006e2405d2a96027",
+            "intraday_execution_json": "f9035242e4c1e6b71fb57efa4ba5f2ee6ecca8faf33f536eb536bf91a36993ac"
+          }
+        },
+        "SGOV": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T20:58:17.547926+09:00",
+          "analysis_finished_at": "2026-09-30T21:22:07.784003+09:00",
+          "artifact_sha256": {
+            "analysis_json": "c7ae6e721db780c04c69d79759b2782fc55ba63b51cce7c3e20b31f2a27861fe",
+            "report_markdown": "72e2672de7e8c68e299a03f6c351c36e4231318613a2fd6bd15b066a9ce023c6",
+            "final_state_json": "e0ad5d094de32decafb3d578feaf7c6f9ed47a46bab07a50e1382954245fc6a5",
+            "graph_log_json": "25dbf979f9319d45231d37151cb26e33dc1940e80db10674151a90968645adee",
+            "public_equity_intelligence_json": "56cf4d81a53f53f7eebce0f86fbf6269a826507c5e74c1dc544344f9d08689d0",
+            "source_quality_json": "93bba491d4fc0ee58fc6306a5ef40d64c9fc3d8d684b045675b9e51a4d24c8da",
+            "evidence_ledger_json": "b43d99712e3d1e08fc6d054ff141716136fd02c2284add5d1fb434e30c2f9616",
+            "earnings_event_pack_json": "b31fb86537e97f6dc704e09595d11e23499450411d6895378fbb50829f817d27",
+            "thesis_tracker_json": "37cb6576dbce1d462142d8531b6645b8a66dfb24b9e24e8db3954505289fe924",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "b9d94d01f3121059aaaa6a755a33997903bef6fa96a5887b263eb386775d6669",
+            "daily_thesis_json": "6413892dadc9a06b153c839824516dd1bbc1d724647ac17bb04debafae5dbd11",
+            "close_plan_json": "bc16f4cc9fdb53eff7ace3f8aa02892eb28e893efac8ea083e36710e25f57d2a",
+            "intraday_execution_json": "e1e8a6ea0d58010866dd56fcd38ac656e5666f89183e0b773bf2aad6abdbbc0b"
+          }
+        },
+        "TSM": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T20:58:17.547802+09:00",
+          "analysis_finished_at": "2026-09-30T21:36:25.776753+09:00",
+          "artifact_sha256": {
+            "analysis_json": "251a6d896e98fd5f53d392d9fc859060abbadcc09fc32f83425f763b7afbcadb",
+            "report_markdown": "31852db3fe0e58b376fd0ced6a1ef4deb7ae8d00f5b76701e97d6719ea5918b2",
+            "final_state_json": "c9437ccfa7cb23205587ab7ecc31944caa98e32d982bf76fb8ad3e7534077b31",
+            "graph_log_json": "1d6379833028bc4961b6163d96fb25ec6ad9fc5f9b1e32b241fd1c690c5f29ac",
+            "public_equity_intelligence_json": "1c86fccbaff3bb3735cec91d186365584ba5f27bb37afa61c7d8b7261e587935",
+            "source_quality_json": "541a9cd86d826609650e44bcc389f8093f1fa4a873f9897e0fcd43e40ef1a085",
+            "evidence_ledger_json": "23ef301c13312980db52067a39d46a90366c2890a0d3d00eb9adb7b0356836f8",
+            "earnings_event_pack_json": "5480fc4c1aab8aa3793527a03851fd543ae92c33d010359315860bc562ea9069",
+            "thesis_tracker_json": "e7c620730b726e37c759ed2f617bddd9ce9b0a0eca7747935a0d21cb5b6652b9",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "ec5a05e670a73aef91ff13c202c7beb45c27b8e1807e78dfdf6e654daff36a22",
+            "daily_thesis_json": "53bf52dc838e5cd6f805d333995f609b29e9a64a2902ca84f14429fa2f335f2d",
+            "close_plan_json": "6b9f9ae2e6f54981c49b2dfa119636766ff715af8f62205713707d65660a904a",
+            "intraday_execution_json": "721eb79f893c7b5af7c1458fbbf0ff975f07fb227e774feb860678569079c39b"
+          }
+        },
+        "INTC": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T21:03:20.421416+09:00",
+          "analysis_finished_at": "2026-09-30T21:33:12.320120+09:00",
+          "artifact_sha256": {
+            "analysis_json": "02406df3382a09f9e323f1dd887dcb6518e41277ad4a53f3f294e755941de2ce",
+            "report_markdown": "9c237e8e6bf91eacf50fe554aaba55e139a9d29cad49d609504de55ded296c06",
+            "final_state_json": "202a341b0e6ac724b8c644a33f1e5e09ace20ac73a6fa9a93d55bbedbbe0f6e8",
+            "graph_log_json": "01cb4e1a5e2794827adbc2b93bac15a6380d47722d3ed264e8bd5a134652e24a",
+            "public_equity_intelligence_json": "de1b33a939a5f455b38f8b67bc3394cc88cdf8c2517d18ba6e4a8238cc59ca8f",
+            "source_quality_json": "d9875b5c7671ed8657614d694b4210098e13df980e3b588ddd19a65648519329",
+            "evidence_ledger_json": "51405847774a9743159382a4e9eee06da6db53d0d68c17ac379a1e141307b44d",
+            "earnings_event_pack_json": "17521f7c45b9c7c1e8659d6ddba2aaa912cc5f657ad9ae648d792704d7d973c8",
+            "thesis_tracker_json": "57808f02de257388ddc1352878fbf875347c2072bb7550e6dd467b8b0a37df16",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "185ef901a0cb140b20c294cb15d5e25f0dc7700e97e3676b24804db499a09bd3",
+            "daily_thesis_json": "ff1eb9bf16be55021bf440256655ca79fa4f4dd6ec9542e08da9b5d0efb48db4",
+            "close_plan_json": "b3b96796283f956cee410c044f05b124a8b59202f6129169fc3ee74cbe4f5351",
+            "intraday_execution_json": "c0f3928afc30e2ccc5108afdd24bd7e861f6f8d723bf9b560512edc070b4261d"
+          }
+        },
+        "LRCX": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T21:22:15.666172+09:00",
+          "analysis_finished_at": "2026-09-30T21:49:19.215626+09:00",
+          "artifact_sha256": {
+            "analysis_json": "22a46350588895a12effe1866a7f4d0415780606cabc8a3f3b35772d3225ae14",
+            "report_markdown": "1d18d98ccf0d3a4c73252e7d3c96ea0273af84218b6ab2501b2466426bccea3a",
+            "final_state_json": "4c35d81ab536e9e3ef0d24551c3c924171fcbeec86ee74d5d76569ff7ad88477",
+            "graph_log_json": "4115e7ed402b2c163395645ad6ebc16d410c609f83e736f3462522345067a166",
+            "public_equity_intelligence_json": "0dd01399722a0a2aeb5d3ace894571c01f5dd9da95ebfe13c1f700b88f03c23f",
+            "source_quality_json": "149ad014d1f0bb5a99b113a0e81a575300bca188f25c575d10e624df7743957a",
+            "evidence_ledger_json": "f25d80282c80776773d4ab8b025561aca78325fd97bc3bc06bd0c14b73f1cbc2",
+            "earnings_event_pack_json": "4b5a851628e96f240e1b7b1ccab7d7f5493577bc99602b0a2c488503a832fccd",
+            "thesis_tracker_json": "75c68b2c3e1754ce95f4afc2f82fc5dcfaac397332ca9b607717294e7dba5ba6",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "8349e16312a1709f6006d1853b10f7160c5ee4ca594a9a74ea82ba780e0619fe",
+            "daily_thesis_json": "6905f483fcb0104ab5ce9d68a0ceabd8c69843fe03ca14b1cfc33fd6c248155e",
+            "close_plan_json": "489fc4112e77a0f9efe5ad8e9636e1d6cb030a9032ebe49c78bd86658ce2449e",
+            "intraday_execution_json": "12fe1ed06c5480158daa9e7e8cfb1a1f9f4773d2e40e1662c35cca10735403dd"
+          }
+        },
+        "MRVL": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T21:23:29.715889+09:00",
+          "analysis_finished_at": "2026-09-30T22:01:44.118414+09:00",
+          "artifact_sha256": {
+            "analysis_json": "3500478946e13dabb7f87aaf6a90111f5645db9f56d0543833e5c38c8482fa23",
+            "report_markdown": "512ec6a41c8a3bb08fd9a688c761bd977e7141a2ed27913e0c8a335f10d2fe42",
+            "final_state_json": "2bc184855c4c73a15a87f167f7d7296a87b696591af7bf2f88073779c139b4c8",
+            "graph_log_json": "abeb706503eb20362cb5616c5795f9d5ec36e4fd5d5ae9a094481d289988c3ab",
+            "public_equity_intelligence_json": "9d1e3d9315dcd7d6df0a617878d17c973594df658f0bbdf983c80f9409219f5c",
+            "source_quality_json": "8d5c2c2983362852ee6337eb7e7515f72de4e66da6656eae396e277b9c416d57",
+            "evidence_ledger_json": "3e37343fe80ecfc5da76b5e5c1928dae29f86b142131b6f2fc5b9702468a8e63",
+            "earnings_event_pack_json": "cf480707266f520c11baa0866ae167fc2a35e7b3fa356ecde24f399c637b56cb",
+            "thesis_tracker_json": "9ef9051bfecc9c0e564bc725946284b0b42d18c370378510810c30208e36f5d0",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "7dd8ac2b5a051599849f69734e60742a234ed7ccbb85474c4aced14e848cfc40",
+            "daily_thesis_json": "9ccfdb23e4b0ed05ab01fd7308cb0ce535875f9f9387cce158081a21e1472fa5",
+            "close_plan_json": "e2e277d0cf50b11c73ce9e6c4431bd623911d290789245269dbf3b4fdf47e1d9",
+            "intraday_execution_json": "b6584249f40006dcfcbbc59956d5ed794db5f47789943764db970d410116f2b2"
+          }
+        },
+        "PG": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T21:33:20.764210+09:00",
+          "analysis_finished_at": "2026-09-30T22:00:19.021625+09:00",
+          "artifact_sha256": {
+            "analysis_json": "d03759590bb3e3a93af725618403edeeebe7640476477e83a4d76921f5bcbafe",
+            "report_markdown": "9c6eaf27eea2a2ac5e4977d5216d57459b952aed33de8edeb1ae597c63e36b86",
+            "final_state_json": "606d8ac0b46a6b6482d44791b146a875f43d025336d46aeeecb1a9a376a24685",
+            "graph_log_json": "dd148d266e6ee25402ae0e79530576db9bb57d3f6ed69f0cd557234b70ec19f9",
+            "public_equity_intelligence_json": "cdf387beb7fe141e750eae142ef6f23db4a480637fc37f055185f3e178623294",
+            "source_quality_json": "8bca229c8fea46fca87a25cc31701d1a407a9d81623e41928dd69005bdae2d5a",
+            "evidence_ledger_json": "d2e02015a5fc0552bcdf99e41233504cc97b4aa702c6b403ac077bc5e61689b6",
+            "earnings_event_pack_json": "d4f48bb5e5802997a3c112dd306a745d041e4f03d9a30d0fc2eb9b2ce2df6d9b",
+            "thesis_tracker_json": "efe0cd761be1d95db9b9dc583766efbd39453a7874c33acb96e2bbe29356528d",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "5cc1d4228aa22ea8917995fde7f815649626e984d5b5317188b5f120b80e9375",
+            "daily_thesis_json": "97ae024b57a0dbf5304d4136d16e86f698a50d48f2ae138717fbb272b8799efa",
+            "close_plan_json": "a303378098b4ae2e9960e8299a955a0d7c7ba61654eb376fccce997b8fb9d90f",
+            "intraday_execution_json": "b53e8b10fe678af69d17710cfe90fb056c53f69c8f394b02733aebf74a40e8d1"
+          }
+        },
+        "SPYM": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T21:36:31.539233+09:00",
+          "analysis_finished_at": "2026-09-30T22:12:14.489468+09:00",
+          "artifact_sha256": {
+            "analysis_json": "0d615c019617451d829ff4e34625d599c50f0b1d2d9913fef7f2dc4b39719ed7",
+            "report_markdown": "e6842612586dfdbf229a955021146acfd29364fa421b72c3663f56de52b91d54",
+            "final_state_json": "c7f544df3495c63db59ae3e3dab1b3be681fc8cc74a7e25802bb51db17a027a0",
+            "graph_log_json": "8304c3401251258d6079a70b34ecbca611512ba1b303b41ebbfd6af7e2922d49",
+            "public_equity_intelligence_json": "7447cd7796ac7a2c3f4408760a11c968179596b702901934e191c407e4f30387",
+            "source_quality_json": "6bf4aab81049def0244623e0864de3691cf1b547a3b7aecb2816b7af774a80ae",
+            "evidence_ledger_json": "5fbb1e886c468a96ff458aa839ba55a6e3f663a343715ed4fd808a2d30c8935e",
+            "earnings_event_pack_json": "aba79b6c2631c938ab8b5c56500461522e683356c9dcc068e3bb0052739b8721",
+            "thesis_tracker_json": "99e1961e1c59c812f8f4e229a764c229699176f5fb58c54d53ac5c2be10fbb19",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "0811119c1a1578d3fdc312fb38ced4f1f75777c55840c39cd3c33503ba1e77a3",
+            "daily_thesis_json": "a1579a8da305da62fbec71245cec51eedc9bf1649a6b6a6daa4f37ac4bac2342",
+            "close_plan_json": "a12a52acfe8cca088e133dc6ff74cc73db2e1bdde5c2a20772904c625397dc2f",
+            "intraday_execution_json": "ada63410cea19916464fcf5372d6eb26aef77525c06f66a55f4ccc6def7654f1"
+          }
+        },
+        "JNJ": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T21:49:27.047666+09:00",
+          "analysis_finished_at": "2026-09-30T22:20:48.480972+09:00",
+          "artifact_sha256": {
+            "analysis_json": "ba445995deb5cda82acc1466c55f0cbd5505faf3d96ae0b4f214a55714346cde",
+            "report_markdown": "c0e7860eb250a2a6164d34ce72b5eee4422d6a00957897c814a198c92de54701",
+            "final_state_json": "44e4b78d4838b28e632c599fd372b81a742f1861762050ae52357114c3ba56ef",
+            "graph_log_json": "1950f0863ed3fc483780997341fbcebd5cb34cc7522bfde192f4a45dc45d9dbc",
+            "public_equity_intelligence_json": "42bab1c9b86dfc09df026d4231aab572e96df6362844f1a8d487af981ada4533",
+            "source_quality_json": "56dceb41af92d8c7a131b4c969b4d43ce6f93ba2ba17ec2626601cbf871dd2c5",
+            "evidence_ledger_json": "bb75cd851a23d9dd7bb4c36b8758bc49d34d96fd20f0f91d38514bd48a14e215",
+            "earnings_event_pack_json": "d9df0c0b4c1831d883dcf8d2ec56df7b6ae184f7c82017011cfc213a4350912a",
+            "thesis_tracker_json": "253a86d92b1bf33f80394048589553d67ee786a69d12facbf345e3fe905dc193",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "cdaeec6e3702a1350663375991237d009f173d6915c1663802d4901381113d36",
+            "daily_thesis_json": "203be91f12fbc24002530f334dd63e48d326ce0401a69dca7caccd2e44698f19",
+            "close_plan_json": "056fe87ee704a155d53911237f15ca1246fbd846edfcab98a56b839323156877",
+            "intraday_execution_json": "6dc268507529312eba052190eac3b24206f9108a8fc263218fe1fbb48cb1a181"
+          }
+        },
+        "CVX": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T22:00:27.109454+09:00",
+          "analysis_finished_at": "2026-09-30T22:28:29.977296+09:00",
+          "artifact_sha256": {
+            "analysis_json": "0b068833b58ad9f9616ca3d47351c205473386499141c77062bef74b4c821f4a",
+            "report_markdown": "7b9144eeb826b866c8703b276806ec4bf730f50c7e4b21b2a7b29e80657e7ce3",
+            "final_state_json": "eb93ecedfc65b147bd21b381bd65f6c91e49e593d4fe623d052fffda878a653a",
+            "graph_log_json": "2132fa34ba212dd58f4e3cbd9c3adb25d2c769ca5a8e2210bf4d35c6ffa6e757",
+            "public_equity_intelligence_json": "3c6ce6d9215f58797c1aa949a86cadbff9c5f8bea078c46bccfd8032aeee4145",
+            "source_quality_json": "58d40c91c6cbcba589525c338a434bf20ad0c85082ade42992ea9e0782e6506f",
+            "evidence_ledger_json": "e2be005f00c4982c2dd7865cf9787a2a957a695450e576dca78017bca9c1a95e",
+            "earnings_event_pack_json": "90c9e57cfeae9bb115dabffdf9f51999bec71ce8df91a95fcff0a350882d0d33",
+            "thesis_tracker_json": "62858a380f5180bdb506500b45616c8eb086f1083635ad61cbe3166c3db066a4",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "6358e66946d9449352aaee98f403b184ec61cc2e49ab65b869e0cb6ee7800b3a",
+            "daily_thesis_json": "cb0c8a0c856a4c91d29a6b538aac7f181bb9bd59a1eb84f257c29d71ef622f2e",
+            "close_plan_json": "b427be690d52f2e26bad862b188e327184248408f2e03c678d9483e45461f9d3",
+            "intraday_execution_json": "c916f6a7ba85e0bff94e584aa2fc95dfe5cdbbbb36e6033fdae913c2c3016f81"
+          }
+        },
+        "ABBV": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T22:01:49.772366+09:00",
+          "analysis_finished_at": "2026-09-30T22:30:40.352225+09:00",
+          "artifact_sha256": {
+            "analysis_json": "3aef9a94bd99e06892abfbfebdebe4d1aa60241fceac3c36112b997d32764bbc",
+            "report_markdown": "400048e3dd1d5313b0e8627d508556d5ffe7b522a385503bd294fcfb0ea222a7",
+            "final_state_json": "53a9d98111c4ec3782b4e2b962971ee7e6dcdf2bfe61055865d073f2d2b65c88",
+            "graph_log_json": "a7fa1c1a2616cc0141dc70a1ee4f300ef5dbcb4011b14f551316694c796f4d12",
+            "public_equity_intelligence_json": "bc6f5058f6747b5647cf495cf27fd68f9db7bed17a0bee446d75ad453bfcd148",
+            "source_quality_json": "aba2963d3a1fa9fc4823bfa12f9a5de0103bca8273ec8d4a450807c4d523b528",
+            "evidence_ledger_json": "e425fadc575161d3fafed4c56e507ae969ba3b33176ddebf178484dcaf65208a",
+            "earnings_event_pack_json": "39d6effd8d953cb54ac1dde0c3cb364714a9f31cd90d56a2d25a725e20a631e9",
+            "thesis_tracker_json": "30e1a4ce33b7e39aab5d9252f3d818191e5c711067430e86ca07cfb861df6ece",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "ca408ce6b48f7b921d7950415c941f7540fbe44d0207de9787bdd3bb42e5850a",
+            "daily_thesis_json": "1913f73030f52189d9afbadcd02a75903a11164bc14b7998a181134323de402a",
+            "close_plan_json": "b9abb983979afdfb83c7dda864804f150b6bbfde6bbe78f449342f893013577b",
+            "intraday_execution_json": "69d9f1bb6174c4c9f9e38e8b1c46a344c1ca2a53d75480da6a29780fdfbede33"
+          }
+        },
+        "MRK": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T22:20:56.601910+09:00",
+          "analysis_finished_at": "2026-09-30T23:01:54.866366+09:00",
+          "artifact_sha256": {
+            "analysis_json": "9a2fc40c0408b695c2049491a637db0aa8348dae73061a1b62251f70aa321630",
+            "report_markdown": "f250b1f2d69ec94fb6c669616353919ad93d3c0dccf14fc6facbd92bd05b106c",
+            "final_state_json": "93089a6d972c1849e6fc7a7af101ec3ab10178e0704f19a1f8f1dd1bb9310dac",
+            "graph_log_json": "a298085661ad41382dd2d7d5d0840c2b3778f1d34217e2c952e1af128d3fd12d",
+            "public_equity_intelligence_json": "a11c1d38c4376eee40d9b73a369141c7e856de322985bdc20afadd238096622b",
+            "source_quality_json": "dacc59e0c706e8bc40c90cb2275ba4da1f06482dfade406e98f75ace6d493079",
+            "evidence_ledger_json": "2841a1977fc5e7e53f23388e1a4f2a47eb72a2a3ed34acb289884a90b4d6a5c8",
+            "earnings_event_pack_json": "5dfb5f31e4c37b82d96f68d7057eafb241f88faf4209fb662b700fb3c51475a2",
+            "thesis_tracker_json": "729bc3ddcf5cc186ec6a54328ae525783e68f581ed5161bd8e8a32e869913fc0",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "3f15daa6a3c086257a742f6d77d25ec5e3acb505f694d90698246df5956799f7",
+            "daily_thesis_json": "93bfc23a2bad89e5f98aad18a862d4909b518d2b439354efc5e5cc635301ab4b",
+            "close_plan_json": "3eb562188c779449ac9fddf9bdbfcaffc86b16f65d4750808bb267ef7f436770",
+            "intraday_execution_json": "5a48b93c191479e300f22d41f5016da44c102dad5d352d7991148d90abd2e17b"
+          }
+        },
+        "PM": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T22:28:37.361809+09:00",
+          "analysis_finished_at": "2026-09-30T22:55:24.820395+09:00",
+          "artifact_sha256": {
+            "analysis_json": "0ae26edab591b0f43d2a04ae03ba0e35dca8cac47346d12e77d102305b90b950",
+            "report_markdown": "4292dcaaa9547656b8d530801dd3ceb12414a16742c62f03580d2f19ab76a787",
+            "final_state_json": "bf05b6b844cfdf7c201c00a7c3850b99fde97310fee02dc1c69f967488f01365",
+            "graph_log_json": "9c90c26e8fb8c59fe247f7f8a8d2864bbd682afaa577de65bfe92f29a9f5ed86",
+            "public_equity_intelligence_json": "b78e05084894e53bedf9f0e9d2fd65c69df86736cc6309dfbb46ac8eedd19bc4",
+            "source_quality_json": "087c668263bd9868df1819110ea3f2c5865e466d77fd25b333b701341f356f44",
+            "evidence_ledger_json": "bb9e412a5e3f9431e5274116c533e5c791668d52ce1f60db8a843bfcf1c7db21",
+            "earnings_event_pack_json": "6bbd6ddc9b4657406f78563669641f533144e87e0ef971db9e3b68cec1931faf",
+            "thesis_tracker_json": "a839452514ebcf682c02041b77b4b29f8b66d6c0b473a60f1ba19e973ad8ca8c",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "423511a5aa172b664d2cf43544661b9cc7fcd2331accd2d0f0cbd283e3c7e953",
+            "daily_thesis_json": "7bd929f7061e530bda2ca8728a41bf9115970b493ad159cb2c06f6895751eceb",
+            "close_plan_json": "85c576b219f1528fd2b02642dbb9e12d0c2121bc13bedeecb0921bae8e9d461c",
+            "intraday_execution_json": "ea1f9de09017151ddb23820224cb8a07c1c9a2d664904d6f8aa8473a7f121e5b"
+          }
+        },
+        "WBD": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T22:30:45.843894+09:00",
+          "analysis_finished_at": "2026-09-30T23:00:31.449872+09:00",
+          "artifact_sha256": {
+            "analysis_json": "a6eafd162624afb922034f1842624848e7fd6a19fc8e6ebec560eec9fac0ffbf",
+            "report_markdown": "3cec6634448df97a6b59298b7e46f7fa8362f466a20770e70ba2c51002fe0c0b",
+            "final_state_json": "a39fe0f336eeade3bdefe737e455bca28b9f9b686a3804b858be5fbc53ce657c",
+            "graph_log_json": "54f1cc7d4a5206b2d02ec839e00970e89b1c1cbd6538d6a03aa4ae0cd05adfa4",
+            "public_equity_intelligence_json": "c7042589d2c713acc5da66c0b2a36ddb950bb187b7c6ae01e4dca0787e8d2b6c",
+            "source_quality_json": "ec111c148c153db5cd3fa4d68d9117abf7f97b7f44caac620c09bdd86c473953",
+            "evidence_ledger_json": "aabc0f5087f5af8a5d570f18a2e452b90ef488609cf4a4ea2bf6d8c221c5dda3",
+            "earnings_event_pack_json": "151ffead0a91a8332b5cde47bd05062fab8b74147b29370325a18f260baacfc9",
+            "thesis_tracker_json": "b01d1207e01702c07adcb8e21387f8caa17b3e8f65b0f2a0b195d5f48715a49a",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "970c5b442014629d6ce585504cde255fd0338bd2cb6768e4d5573c9234cfb5d3",
+            "daily_thesis_json": "ec145adf9627bfffa6eda30b4745c9b10c11d589d01231a18456ba9213f9b533",
+            "close_plan_json": "824035f1068c7ac34a7a088355f92b217b7401bae66e054f81d1322c6ad2b206",
+            "intraday_execution_json": "17610cc27db0eff59c57373cb9fc8b390d62b1fa5cf2df91e697d17a3cb9b08f"
+          }
+        },
+        "SHEL": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T22:33:34.137050+09:00",
+          "analysis_finished_at": "2026-09-30T23:04:04.683687+09:00",
+          "artifact_sha256": {
+            "analysis_json": "cae6f72e105b7a6509639663dc7ece8259f74fdb4c6dd1efb4b44cda697f5b63",
+            "report_markdown": "0d8add42a55275827fd0cd62ec6d18be86f7ad96f3489ba12f631fc65772cd18",
+            "final_state_json": "acefc741feafd3eb4195a81b4266fb536b647b72f4562a950b5314d47b8e7050",
+            "graph_log_json": "571fc4fe70472acd3bdf5472390448a3088598005391ad0a904df42cbde44bec",
+            "public_equity_intelligence_json": "c934f0613e133b9d35ae467507075c80c00a624bff5c35053c8ecc8a5d57dd41",
+            "source_quality_json": "0d2fdd35b697187a2750f476d44f4c4a29326dee6c1c58885949ab19b36a4a72",
+            "evidence_ledger_json": "bafc8f1fca8463f06425e755eaff279e2ae0c85f2446cbc7788d796985203450",
+            "earnings_event_pack_json": "ed3923e463f3eac4e50d1233866ced046ce76c8158d09febdd07f42b5de096b1",
+            "thesis_tracker_json": "be9baf6f23bd8fbdcf26665ad6ca805e56151693fc13f547eb88ee51cfc3e67c",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "f28db11794463513805a98729b1c281648ede5d1cc66a838f48633a900177563",
+            "daily_thesis_json": "7cd4164340e2f95524e347976ac3af42ac84fb90b24ba2c93835bb2dfdb9c8b0",
+            "close_plan_json": "9dbb38e063a19e200aa704667f292dfc97baffe05829ecca09db0b30353f9491",
+            "intraday_execution_json": "791675cf4d6aba359a68675f70d8d85501b3df95ff66ccf69d3343c34095e32d"
+          }
+        },
+        "SCCO": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T22:55:33.784858+09:00",
+          "analysis_finished_at": "2026-09-30T23:25:08.035124+09:00",
+          "artifact_sha256": {
+            "analysis_json": "f4366907eea2e39de84dfe6809c196d6bdaf0f0486f77e3577adf7562d757bbc",
+            "report_markdown": "b3489a236e90bb3f2ce6fd2584a1f3395bfcdc2657bdf7e15819576df83b4728",
+            "final_state_json": "967345ee92a93e15effc59abe49c9b5984ec293fda678eade4a706816af47783",
+            "graph_log_json": "ce6e3ef6c8e2c26d0f9542bb5353dda247a3c4c470be770315aded1583dff76c",
+            "public_equity_intelligence_json": "2574fa48fc14426890f32779ecd6881ce7242814ecb907f6cf8bdbd9e9c69209",
+            "source_quality_json": "d09416b03588ad3cebf4458f7acb8b3ed03abc34cc5de59b953649b95bcfdd1c",
+            "evidence_ledger_json": "efbd7a0b274f249e22564c0a93d4a7b3c25a8db68701835cb0fc0edd513fe87e",
+            "earnings_event_pack_json": "7569e402e5ac121b71605db798c1ce72f8069c88a2b0461d4ff91e1ff0ee177d",
+            "thesis_tracker_json": "0b7d5488f9f24dcaad863bf851ca20a9c181f31ef533f96192f40187e6207d87",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "5e4adffdf5eb8989c7bb63a41a14836c7c2fcd75d62c6da482df13da8aecb8ff",
+            "daily_thesis_json": "5fa8830befc4b5c41029946a65bb49f7c1e7eb86906f413c4030314f9dc38586",
+            "close_plan_json": "e7449a0a00a93adecd9f7893f1119612939c30f150f26e054f2d28893e159ad1",
+            "intraday_execution_json": "e298839254b6dc431b6557de6cf978d20bd649eb2a47d42db1b60bc94457179c"
+          }
+        },
+        "BRK-B": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T23:00:39.323890+09:00",
+          "analysis_finished_at": "2026-09-30T23:28:28.113430+09:00",
+          "artifact_sha256": {
+            "analysis_json": "f36884b2e9786d9612be9e50a5033975514a1b7ba03ac816bd35ba2256b56867",
+            "report_markdown": "eb167bdc298fc32f28d913a2fd9ca83f8f267e26d91804311f551501e2a726f4",
+            "final_state_json": "ffd823b0f576512f7f46bf3e2e2116180533e331d97fc84750d70e587ce9e890",
+            "graph_log_json": "80a4d2c718ecf662003e5c99ba1ab4345f150f6be1b46d9a80e1dd75412ab509",
+            "public_equity_intelligence_json": "d310ddbc76f788946f2d3c1c70a8e573c769496ac8fe1c603027f84ef7f3497a",
+            "source_quality_json": "bf1a8ff5388bafa3de9fb6ba50eac3ed3f97678fc482b62faac898f87034d7da",
+            "evidence_ledger_json": "88b161559e8f2b9e63f0271f54472e77abf1e0c444272f930b803de9620ece6a",
+            "earnings_event_pack_json": "7d6e94190e2122039369683fc590f8f6f7f437ce4e8a3c7f4fce798d5c019108",
+            "thesis_tracker_json": "18386db584fded958ec0cfa64e6f50370121ee280662f39653b74899991030cc",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "5d76c97b61253fd750d9e33630a87eb50b63cd433b6b942cb08cbaefc9381230",
+            "daily_thesis_json": "081e4d1fbd2c2db3421b0f86a21afa61780dca419dbf2ecd4a6ac3fdf8b8c7cd",
+            "close_plan_json": "5eec63fcaa0d786608224dc5f0b20ba1eba3ee19c886dd1e8cf57c419fb685f2",
+            "intraday_execution_json": "814931436e6fdba8a02397849dc1e1aa76366774e3975e702fd5ee58f1db5902"
+          }
+        },
+        "MA": {
+          "source_run_id": "20260930T193547_github-actions-us",
+          "source_code_sha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "analysis_started_at": "2026-09-30T23:02:01.064365+09:00",
+          "analysis_finished_at": "2026-09-30T23:31:54.476232+09:00",
+          "artifact_sha256": {
+            "analysis_json": "5ad17d9a8a10e2b78b21a4f6131cb9c3887eb5da4f173ff88083f4dfde82e8a0",
+            "report_markdown": "92d69d301709ddca3b15818dd2d648475be973a5b29c42f9901176178da8c21f",
+            "final_state_json": "4298b6419ba9313815e1e4190478492574fc90e847815a373bf65cf99977ed83",
+            "graph_log_json": "0375ba43b5cb9fea2860c1f244386bb006b527c5ba5ce3d2c82a7fc9ccdb2033",
+            "public_equity_intelligence_json": "7f53442ab834272bd40d91d5ce9fd50928218bc26a72ae1a10fd3c98cce0bd88",
+            "source_quality_json": "1e2a3373add6873ada8e16caf8845b5cf7f54461924b87a8c950296685eaa579",
+            "evidence_ledger_json": "a4fe9044d83f97013e8c2e1be1b9aab62f986975dfbeb296a59d748130ed866c",
+            "earnings_event_pack_json": "d50a9cdaa766d890dbf55a10e847962d06f1d9ef0d3b01074d709b17b00e8790",
+            "thesis_tracker_json": "b61a7d21e2f96b4e79e9955dc1790a1a186a77767b0ba0e646847a98b2145a92",
+            "public_equity_intelligence_markdown": "17b0863de7fe69532e4c02e4b912646725793dcc6893bbb5082e3f9722e0a007",
+            "execution_contract_json": "e6966db224fc3caa7f5fafad3d0b0b7c00d53b64932c3fd8aee4749b8b3f2b2c",
+            "daily_thesis_json": "dd675d0d3eb789d3289f66f03e0e05b3b9c6e760ea97889a8bedec50063e7c6a",
+            "close_plan_json": "5d6d39650dc26ac545e82e1b987635c258ac4010c070d8f18e64feb20a1f39e8",
+            "intraday_execution_json": "34d630b69fba8dc60a1b21c8be9c606ea8840fe55ad5da676bb5ca265033bcce"
+          }
+        }
+      },
+      "universe_scope": "Frozen source selection; research settings and configured ticker count matched. This is not a fresh scanner selection.",
+      "usage_scope": "This run's LLM usage excludes reused source calls; original per-ticker artifacts and source_llm_usage preserve them.",
+      "source_summary": {
+        "total_tickers": 30,
+        "successful_tickers": 29,
+        "failed_tickers": 1,
+        "partial_failure_rate": 0.0333,
+        "configured_ticker_count": 30,
+        "skipped_tickers": 0
+      },
+      "source_workflow": {
+        "conclusion": "failure",
+        "databaseId": 36703268999,
+        "headSha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+        "status": "completed",
+        "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36703268999"
+      },
+      "source_timing": {
+        "started_at": "2026-09-30T19:35:47.118393+09:00",
+        "legacy_manifest_finished_at": "2026-09-30T23:32:07.181390+09:00",
+        "attempt_finished_at": "2026-09-30T14:56:17.224534+00:00",
+        "last_worker_finished_at": "2026-09-30T23:31:54.476232+09:00",
+        "post_worker_minutes": 24.38,
+        "timing_scope": "Original source predates the completion-clock correction. Its manifest finish was captured before portfolio postprocessing; the final attempt and workflow are the completion receipts.",
+        "checkpoint": {
+          "scope": "Research-worker completion checkpoint; aggregate portfolio processing was still active when sampled. Not a full workflow completion receipt.",
+          "checked_at": "2026-09-30T14:47:53.553933+00:00",
+          "first_worker_started_at": "2026-09-30T19:36:13.088066+09:00",
+          "last_worker_finished_at": "2026-09-30T23:31:54.476232+09:00",
+          "worker_wall_span_minutes": 235.69,
+          "successful_ticker_duration_minutes": {
+            "minimum": 23.84,
+            "median": 28.84,
+            "maximum": 49.51
+          },
+          "success_count": 29,
+          "failed_tickers": [
+            "XOM"
+          ],
+          "observed_post_worker_minutes": 15.98,
+          "postprocessing_design_observation": "Portfolio semantic judge iterates eligible candidates sequentially; WAIT candidates are eligible. Per-stage in-flight runtime breakdown was not recorded, so this is a design bottleneck candidate, not proof that all post-worker delay came from that stage."
+        }
+      },
+      "preflight": {
+        "checked_at": "2026-09-30T14:58:29.078623+00:00",
+        "source_run_id": "20260930T193547_github-actions-us",
+        "source_workflow": {
+          "conclusion": "failure",
+          "headSha": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61",
+          "status": "completed",
+          "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36703268999"
+        },
+        "source_manifest_sha256": "91b01846520d71721b4e06312dd89e3028bc47b730cd115ae19f703014484ef9",
+        "total": 30,
+        "reused": 29,
+        "retry_tickers": [
+          "XOM"
+        ],
+        "current_account_status": "loaded",
+        "current_holdings_covered": true,
+        "all_reused_artifacts_validated": true,
+        "source_unchanged": true
+      }
+    },
+    "issuer_spot_checks": {
+      "checked_date_kst": "2026-09-30",
+      "scope": "Independent issuer spot checks for audit; not injected into Work source packets or used to alter investment directions.",
+      "AAPL": {
+        "source": "https://www.apple.com/newsroom/2026/07/apple-reports-third-quarter-results/",
+        "published_on": "2026-07-30",
+        "fiscal_period_end": "2026-06-27",
+        "vendor_period_label": "2026-06-30",
+        "revenue_billions_usd_rounded": 109.4,
+        "diluted_eps_usd": 2.02,
+        "checks": "Revenue and EPS align with the sampled report, but the provider quarter-end label is not the issuer fiscal period end. The fundamental prompt now preserves that distinction. This is a limited source check, not verification of every reported number or quality adjustment."
+      },
+      "GLDM": {
+        "source": "https://www.ssga.com/us/en/individual/etfs/spdr-gold-minishares-gldm",
+        "objective": "Gold bullion price exposure less fund expenses",
+        "nav": 82.35,
+        "official_close": 82.64,
+        "price_date": "2026-09-29",
+        "expense_ratio_percent": 0.1,
+        "expense_info_date": "2026-09-30",
+        "archived_market_report_close_matches": true,
+        "interpretation": "Corporate operating EPS and dividend absence are not sufficient reasons to call a bullion trust weak. NAV and exchange price are distinct. The site's reported premium references indicative NAV, so do not recompute it from a differently timed NAV."
+      },
+      "SGOV": {
+        "source": "https://www.ishares.com/us/products/314116/ishares-0-3-month-treasury-bond-etf",
+        "objective": "US Treasury securities with remaining maturities of up to three months",
+        "archived_analysis_check": "The earlier decision distinguishes interest/distributions from price appreciation and requires distribution-adjusted price and NAV/return deterioration together before reducing risk. No dividend-only stop is inferred."
+      },
+      "RSP": {
+        "source": "https://www.invesco.com/us/financial-products/etfs/product-detail?productId=RSP",
+        "objective": "S&P 500 Equal Weight Index exposure",
+        "verification_limit": "Official search excerpt was available; a fresh direct open failed. No current price or fee claim was verified."
+      },
+      "NVDA": {
+        "source": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2027",
+        "published_on": "2026-08-26",
+        "fiscal_period_end": "2026-07-26",
+        "vendor_period_label": "2026-07-31",
+        "revenue_billions_usd": 96.221,
+        "gaap_diluted_eps_usd": 2.46,
+        "non_gaap_net_income_billions_usd": 53.954,
+        "prior_quarter_non_gaap_net_income_billions_usd": 45.548,
+        "checks": "Core revenue and GAAP EPS match. The raw provider-normalized income comparison 53.199B versus 58.321B is not the issuer non-GAAP series and cannot establish a decline in company-adjusted earnings. Official non-GAAP income increased. Fiscal period labels also differ. This is a limited independent audit check, not evidence of automated issuer retrieval or a replacement for the bound Work packet."
+      },
+      "LLY": {
+        "source": "https://investor.lilly.com/news-releases/news-release-details/lillys-triple-agonist-retatrutide-delivered-substantial-weight",
+        "published_on": "2026-09-29",
+        "conference_source": "https://investor.lilly.com/news-releases/news-release-details/lilly-present-new-data-foundayo-retatrutide-and-eloratzp-easd",
+        "conference_time": "2026-09-30 08:30 CEST",
+        "checks": "The issuer confirms detailed TRIUMPH-2 Phase 3 results. The company release date is September 29, whereas its EASD symposium is September 30; the raw catalyst's September 30 wording must not be assumed to be the original release date without timezone/event clarification. This audit does not validate all efficacy, safety, financial, or valuation claims and does not alter Work's bound evidence."
+      },
+      "GOOGL": {
+        "source": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000066/googexhibit991q22026.htm",
+        "published_on": "2026-07-22",
+        "fiscal_period_end": "2026-06-30",
+        "revenue_billions_usd": 119.796,
+        "operating_income_billions_usd": 40.77,
+        "net_income_billions_usd": 112.193,
+        "net_income_to_common_billions_usd": 112.107,
+        "diluted_eps_usd": 9.11,
+        "quarter_fcf_billions_usd": -5.855,
+        "ttm_fcf_billions_usd": 53.273,
+        "checks": "Core income and detailed-quarter FCF agree with the filing. Total net income differs from income to common by preferred dividends. The filing describes large securities gains as primarily unrealized; the provider label must not imply realized cash proceeds. The overview FCF 22.665B is not the filing TTM 53.273B. Independent web audit access does not establish that the scheduled SEC provider succeeded."
+      }
+    },
+    "date_as_price_regression": {
+      "old_commit": "e13f2dd6c1ff24a401d1b362f7c65e2ded743232",
+      "reproductions": [
+        {
+          "context": "2026-09-29의 333.99는 당일 실시간 기준이 아니다.",
+          "old_range": [
+            9.0,
+            2026.0
+          ],
+          "fixed_range": [
+            null,
+            null
+          ]
+        },
+        {
+          "context": "2026-09-29의 10일 이동평균 334.77",
+          "old_range": [
+            9.0,
+            2026.0
+          ],
+          "fixed_range": [
+            null,
+            null
+          ]
+        },
+        {
+          "context": "2026년9월29일의 10시30분 이후 320~325 구간",
+          "old_range": [
+            9.0,
+            2026.0
+          ],
+          "fixed_range": [
+            320.0,
+            325.0
+          ]
+        }
+      ]
+    },
+    "oversized_insider_source": {
+      "response_chars": 2542945,
+      "rows": 7154,
+      "keys": [
+        "data"
+      ],
+      "row_keys": [
+        "transaction_date",
+        "ticker",
+        "executive",
+        "executive_title",
+        "security_type",
+        "acquisition_or_disposal",
+        "shares",
+        "share_price"
+      ],
+      "first_date": "2026-09-22",
+      "last_date": "2004-03-24"
+    },
+    "historical_fallback_report_scan": {
+      "checked_at": "2026-09-30T10:45:36.064439+00:00",
+      "scope": "Known fallback report prefixes in four required analyst fields; not a general claim of fact verification.",
+      "runs": [
+        {
+          "run_id": "20260930T081017_github-actions-kr",
+          "checked_tickers": 30,
+          "fallback_reports": []
+        },
+        {
+          "run_id": "20260929T020356_github-actions-us",
+          "checked_tickers": 30,
+          "fallback_reports": [
+            {
+              "ticker": "SCCO",
+              "field": "fundamentals_report"
+            }
+          ]
+        },
+        {
+          "run_id": "20260925T212622_github-actions-us",
+          "checked_tickers": 30,
+          "fallback_reports": [
+            {
+              "ticker": "BRK-B",
+              "field": "fundamentals_report"
+            }
+          ]
+        },
+        {
+          "run_id": "20260930T185222_github-actions-us",
+          "checked_tickers": 3,
+          "fallback_reports": [
+            {
+              "ticker": "AAPL",
+              "field": "fundamentals_report"
+            }
+          ]
+        }
+      ]
+    },
+    "manual_research_output_review": {
+      "scope": "Human-readable research output and structured decision consistency review. Not a full issuer-source fact check or investment-performance validation.",
+      "tickers": {
+        "AAPL": {
+          "reviewed_at": "2026-09-30T12:38:08.541251+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.761473+00:00",
+          "research_payload_sha256": "ba0f4e777dd57eaa925da9d613bfca4bb4e8b6b0cd63474b48c08c7279410b61",
+          "artifact_sha256": {
+            "analysis.json": "2094c789e375165a5b4b6df6c5120a70e4506142f7377f2c5fec5a52c56811b7",
+            "final_state.json": "d0b02ecb6a0c44b2fb68a1f1b21792384a339c308f2b7a74e8ccde264d87d9d9"
+          },
+          "observations": [
+            "All four required research reports are substantive; zero observed model fallbacks. Fundamentals explicitly separates provider quarter labels from verified issuer fiscal dates.",
+            "Fundamentals preserves the trailing FCF discrepancy (136.683B from quarters versus 107.722B overview), inventory growth, leverage and missing original filings/consensus/transcripts.",
+            "HOLD/BULLISH/conditional STARTER is not a present buy order. Entry requires 334.77 plus VWAP/volume; reduction below 328.70 close and tactical exit below 321.90 close are distinct.",
+            "The full-size breakout reward/risk example 337.09 to 345.34 versus 321.90 is unfavorable and acknowledged. The smaller starter remains a discretionary plan requiring live risk-budget verification; no profitability claim was validated.",
+            "All six structured price levels retain null ranges; no date-as-price 9–2026 contamination."
+          ]
+        },
+        "AMZN": {
+          "reviewed_at": "2026-09-30T12:38:08.543036+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.763255+00:00",
+          "research_payload_sha256": "9e4be63cd4574982ee9ff06ef3a29af06a3582442d026203211854d78ca846f3",
+          "artifact_sha256": {
+            "analysis.json": "3776067e9ebd712d5383933e7fac4d45021904375bca8b9b4b2736c43b4a49ae",
+            "final_state.json": "5ce8457e6efaee195ff550fac800cf5c5c29f5f8459ea09128aebe2dce28f716"
+          },
+          "observations": [
+            "Substantive fundamentals identifies operating improvement but negative FCF, lease/debt-definition differences, non-recurring securities gains and incomplete latest quarter fields.",
+            "HOLD/BULLISH/conditional NONE: recovery of 251.34 is an observation signal, not an authorized entry. Reward to 256.09 is 4.75 versus 7.10 risk to 244.24.",
+            "Raw risk_action HOLD remains current. The future support reduction requires both increased volume and regular-session close, with a further tactical exit below 241.01.",
+            "The volume-qualified level prompted a separate synthetic executable-action reproduction; fixed downstream evaluator now waits for proof rather than firing from price alone."
+          ]
+        },
+        "AVGO": {
+          "reviewed_at": "2026-09-30T12:38:08.544731+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.764953+00:00",
+          "research_payload_sha256": "a766a50857243e234c6db9495f551b604004e32d5e275836fd762c923ff19ffa",
+          "artifact_sha256": {
+            "analysis.json": "9c17f2a9855d9529c5ae54fc282492b11924c630c37532f66f1475f844cc811d",
+            "final_state.json": "bf8d7adaf01ab78fdbe7c8a24e10cdef31635996cbc585717b7b4b822a5e574b"
+          },
+          "observations": [
+            "Substantive fundamentals distinguishes strong vendor-reported revenue/earnings from unverified issuer filings/consensus and explains the FCF discrepancy (39.403B versus 30.596B).",
+            "Goodwill/intangibles, stock compensation, receivables/inventory and unavailable sales motives are preserved as limitations.",
+            "HOLD/BULLISH/conditional NONE: 366.55 entry to 375.15 resistance offers 8.60 versus 19.23 risk to 347.32, so no new trade is approved. Reduce below 349.43 close and tactical exit below 347.32 are conditional plans."
+          ]
+        },
+        "DELL": {
+          "reviewed_at": "2026-09-30T12:38:08.546385+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.766736+00:00",
+          "research_payload_sha256": "140656f0f7221039bd6d62e820b690893d7b246c0efbc6a5d8c9f85ed8217536",
+          "artifact_sha256": {
+            "analysis.json": "ff37272033b9454ce58c1d0d8078eb7e9704c35bbe92327e8e16196b877499e2",
+            "final_state.json": "e8fc8bd847d966260893cedf0f0e988249316fd8e1343c8fd5015656101f0661"
+          },
+          "observations": [
+            "Substantive fundamentals preserves strong reported revenue/EPS alongside cash conversion weakness, inventory cash outflow, negative equity and shareholder distributions above quarterly FCF.",
+            "The 8.560B four-quarter FCF versus 6.033B overview discrepancy and missing original filings/transcripts/consensus are explicit.",
+            "HOLD/BULLISH/conditional STARTER requires 555.54 recovery after 10:30 ET, VWAP, same-time RVOL 1.2 and net reward/risk at least 1.5. Raw pre-cost ratio around 1.59 and capped entry 556.47 are conditional, not current approvals.",
+            "Starter and total exposure/NAV loss caps remain distinct; failed breakout and holding reduction below 530.45 close are preserved. Expiry in KST is equivalent to the stated US close."
+          ]
+        },
+        "GEV": {
+          "reviewed_at": "2026-09-30T12:38:08.539353+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.757816+00:00",
+          "research_payload_sha256": "dedc76f5ea706d6ac9c320e63908f82f1c134742364b765c18341dcebb3869f5",
+          "artifact_sha256": {
+            "analysis.json": "a01144d4d84eb26ae8b7c030732fe7783a244203403781658bf258461a5ffcda",
+            "final_state.json": "6607fc14fa9fb8db2028bf24096d01aa27d6dee30fadbf62fe6919fada389fcc"
+          },
+          "observations": [
+            "Substantive fundamentals distinguishes vendor-reported revenue/margin improvement from special items, tax benefits and working-capital-driven operating cash flow; overview FCF is not reconciled to the detailed quarters.",
+            "Negative working capital is not automatically called a liquidity crisis because customer advances/deferred revenue can explain it; contract execution costs and acquisition/intangibles effects remain unverified.",
+            "HOLD/BULLISH/conditional STARTER requires 988.48, session VWAP and same-time RVOL 1.2 after 10:30 ET. Full sizing also requires close, concentration and primary-source cash-flow/delivery checks.",
+            "Below 944.85 regular close the plan reduces 50%; below 921.53 close it exits remaining tactical exposure. New size max 25% of target, total 3% NAV, planned starter loss 0.25% NAV remain distinct. Gap risk and missing current account are explicit.",
+            "Expiry is 2026-10-01T16:00-04:00 as supplied by the raw decision; Work must preserve it rather than substituting another session. Source score 0.37 is explicitly not a probability or execution approval."
+          ]
+        },
+        "ETN": {
+          "reviewed_at": "2026-09-30T12:38:08.535362+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.754163+00:00",
+          "research_payload_sha256": "c5ec8247230dfa1cd38da70efef5cd31b0e65231f9e17ea3af446a86530acac1",
+          "artifact_sha256": {
+            "analysis.json": "7a624c5577e2447f919882ca5f90a07595b461bcdbdb18a4f211eb637e7fe56c",
+            "final_state.json": "3b96462c80bf99c9fac436d508e87a066153a0f6fe35305551ca2248a768852d"
+          },
+          "observations": [
+            "Substantive fundamentals distinguishes revenue/FCF growth from falling gross/operating margins and EPS, increased acquisition-related debt/interest and unknown integration economics.",
+            "FCF overview 3.106B versus detailed four quarters 3.934B is explicitly unreconciled; insider purchases/sales are mixed and original filings/consensus are unavailable.",
+            "HOLD/BULLISH/conditional STARTER requires 437.05 recovery then 447.33 after 10:30 with VWAP and RVOL 1.2. Starter max 20% of target, loss budget 0.5% NAV, account/fees missing and gap risk remain explicit.",
+            "The 443.64 and VWAP failed-starter conjunction is consistent across exit and failed-breakout rules. Holding risk reduction uses 420.10 close, distinct from 430.56/423.83 observation levels. ATR 13.92 versus tight 3.69 starter stop distance is explicitly warned."
+          ]
+        },
+        "GOOGL": {
+          "reviewed_at": "2026-09-30T12:38:08.537166+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.756018+00:00",
+          "research_payload_sha256": "4be3cbb4e0829bbdf73b512c282f316215cc3e996101b0f6265d097682ff843b",
+          "artifact_sha256": {
+            "analysis.json": "6b15f0e4a40d81e576f8f760cb8b1c0fe2b63c167839c39cc75cf16c52fc69f6",
+            "final_state.json": "8a4a3acbc8ec63e314da64bcc067fe039a36b9be89dd12ef09b4ac3411ba0107"
+          },
+          "observations": [
+            "Substantive fundamentals qualifies large vendor-classified securities gains, negative latest-quarter FCF, overview/detail FCF discrepancy and unusual financing/balance-sheet categories pending original-filing checks.",
+            "Insider gift and possible duplicate rows are not treated as cumulative market sales. Source score 0.37 is coverage-only and missing disclosures/consensus are explicit.",
+            "HOLD/BULLISH/conditional STARTER requires original financial figures and account/risk checks, 345.42 recovery then 349.91 with VWAP/RVOL 1.2 after 10:30 ET. 354.66 closing breakout alone does not authorize adding.",
+            "Holding reductions below 337.45 close and tactical exit below 327.74 close remain distinct. Position limits include 25% target starter, 5% total NAV, 0.10% starter loss budget and 0.5% total risk.",
+            "Manual review found a wording conflict: exit_logic says sustained loss of 345.42 AND VWAP, while execution_levels.failed_breakout_rule says OR. Preserve both source fields and explicitly require resolution before new entry in Work; do not silently choose a Boolean rule or claim all decision semantics were proven consistent.",
+            "The localized final_state and full_states_log both contain the conflict; no pre-localization evidence was available in these artifacts, so attribution to translation versus original synthesis is unproven."
+          ]
+        },
+        "GLDM": {
+          "reviewed_at": "2026-09-30T12:38:08.533739+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.752523+00:00",
+          "research_payload_sha256": "e01615d0ae7b8fc76c50e9c0d6e28b434fcb6a43057705e25fa532c414dd1313",
+          "artifact_sha256": {
+            "analysis.json": "53b3bc955560f9e6059bed964a59895ae600aa0a86ee5a62b7a559f193fac685",
+            "final_state.json": "4f34b335e9c23ddb74db91896c221437c74b8b203573e8d362243a8d763f1192"
+          },
+          "observations": [
+            "Substantive fundamentals now uses the gold trust/ETF framework rather than missing corporate EPS as evidence of business weakness. NAV, holdings, creation/redemption, expense and tracking data remain unavailable; no issuer-source collection success is asserted.",
+            "HOLD/NEUTRAL/conditional NONE with REDUCE_RISK is a conditional holding-risk plan: reduce only weight/risk-cap excess or subsequently confirmed failures. The POSITION_LIMIT_EXCEEDED reason code is not evidence that the actual account already exceeded 3% weight or 0.5% planned loss.",
+            "82.64 prior close remains below major moving averages. 84.39/85.40 recovery is observation and requires fresh risk approval; no automatic starter is currently authorized. Further risk review uses 81.32 regular close, not an arbitrary dividend/EPS stop.",
+            "A short stray mixed-script suffix remains at the end of the fundamental table. This is a cosmetic generation defect, not a fallback or proof that all generated prose is flawless. Do not carry the suffix into the final investor synthesis.",
+            "The raw report mentions zero dividends in a weakness table but explicitly calls this normal for the trust and not corporate deterioration. Final synthesis must frame it as a product characteristic, not an issuer earnings warning."
+          ]
+        },
+        "LLY": {
+          "reviewed_at": "2026-09-30T12:38:08.528805+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.747668+00:00",
+          "research_payload_sha256": "99fdd78e070ce905e7d0e1f7e22a8d06de0afbe14b2998288cc9b2dc3503712f",
+          "artifact_sha256": {
+            "analysis.json": "11e3a56f0000b1b675cf1e1eeef64dab7db9ffdc6e8f506de194f05b2e3d2a98",
+            "final_state.json": "c406ded0e11cfb67612b6ba925f11d928adf320911251df9918623e3ab234ab6"
+          },
+          "observations": [
+            "Substantive fundamentals separates 54.2% adjusted/vendor operating margin from 39.1% reported margin and 3.479B special expense; source filings remain unreconciled.",
+            "Revenue 22.974B and FCF 4.475B improve, while capex 6.215B, acquisition/intangible spending and debt 54.908B require review. Four-quarter FCF 13.560B differs from overview 11.066B.",
+            "HOLD/BULLISH/conditional STARTER requires 1197.79 after 10:30 with VWAP/RVOL 1.2, net reward/risk >=1.5 and account checks; pre-cost maximum entry about 1200.15. The nearer 1230.18 resistance provides only about 1.1x reward/risk and is explicitly distinguished from 1247.66.",
+            "Starter capped at 1% NAV and planned loss .25% NAV, with cash/concentration checks. Failed starter conjunction is consistent; holding reduction 1168.47 close and tactical exit 1155.37 remain distinct. Expiry 9/30 US close must not roll over.",
+            "The clinical catalyst is a claim from supplied news, not an independently verified issuer statement. Final Work must retain that source limitation.",
+            "The fundamental table has a malformed trailing serialization/schema fragment. It is not a fallback and the substantive report is present, but raw prose is not perfectly clean. Do not reproduce it in the investor synthesis; broaden future provider output validation."
+          ]
+        },
+        "MPWR": {
+          "reviewed_at": "2026-09-30T12:38:08.530489+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.749343+00:00",
+          "research_payload_sha256": "42e5517a035eec2fc794f32a1a0b50be74179eb3fb29669940f5e1ccc823b6df",
+          "artifact_sha256": {
+            "analysis.json": "c8aa1b9cf982bfb765197f73fdb7b3d8f7069e6b7f398bb4d0cbd10ad4057983",
+            "final_state.json": "c11b4b4bf858c0012b018792316b0bd494eff9c34fe377e2a5d56b1e99bc22be"
+          },
+          "observations": [
+            "Substantive fundamentals identifies revenue 980.64M, operating margin 31.0% and EPS 5.22 improvement, but weaker FCF/cash conversion, inventory/receivables increases and 2.6% share dilution.",
+            "Debt/equity 0.486 provider value is not silently read as 48.6%; balance-sheet ratio is about .00486. Four-quarter FCF 583M differs from overview 444M, and original filings/consensus remain unavailable.",
+            "HOLD/BULLISH/conditional STARTER requires 1387.46 recovery after 10:30 with VWAP/RVOL 1.2 and verified account. Starter <=25% target and planned loss to 1320.80 <=.4% NAV, without a gap guarantee.",
+            "Failed-starter OR rule is consistent across exit and failed-breakout fields. Holding reduction 1320.80 close and tactical exit 1305.15 close are distinct; 1409.71 is breakout confirmation rather than an automatic profit target. Manufacturing catalyst remains subject to primary-source verification."
+          ]
+        },
+        "RSP": {
+          "reviewed_at": "2026-09-30T12:38:08.532092+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.750997+00:00",
+          "research_payload_sha256": "a9a6ee8e984022e5ff830f00a4d2a09c8a8bcabebc934e78bff5f71ee6f7fcd6",
+          "artifact_sha256": {
+            "analysis.json": "386d33ceda03dd801626653e10654df0dbd133d299ddf16c5f939d091b71a954",
+            "final_state.json": "0d9c432dec616c25c0c978cbcde13f7170a9139229316e0d6d1e32808b0aa06e"
+          },
+          "observations": [
+            "Substantive fundamentals correctly treats equal-weight US equity ETF exposure rather than absent corporate EPS as business weakness. Holdings, flows, fee, NAV deviation and tracking data remain unverified.",
+            "Different vendor overview moving averages and actual market-report levels are explicitly flagged for reconciliation; fundamentals has no current price while the separate market report supplies prior close 209.50.",
+            "HOLD/BULLISH/conditional STARTER requires 211.39 plus VWAP/RVOL 1.2 after 10:30, spread/liquidity checks; expiry 10/2 US close is preserved. Starter <=25% planned addition and .25% NAV modeled loss to 208.47.",
+            "Holding risk requires increased volume AND regular close below 208.47, followed by 207.74 and 203.96 closing thresholds. Structured level confirmation close does not encode volume separately, but source_text and exit/trim rules retain it; no present executable sale is inferred.",
+            "The fundamental table ends with malformed TIM|> text. Do not carry it into the final synthesis; broader serialization-fragment rejection is needed for future outputs."
+          ]
+        },
+        "SGOV": {
+          "reviewed_at": "2026-09-30T12:38:08.527176+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.746037+00:00",
+          "research_payload_sha256": "42a2ca824d2c5e1f4cabd246cb186622947060eb7dda99e056f53c4aaf9b7251",
+          "artifact_sha256": {
+            "analysis.json": "c7ae6e721db780c04c69d79759b2782fc55ba63b51cce7c3e20b31f2a27861fe",
+            "final_state.json": "e0ad5d094de32decafb3d578feaf7c6f9ed47a46bab07a50e1382954245fc6a5"
+          },
+          "observations": [
+            "Substantive fundamentals correctly evaluates a 0–3 month Treasury ETF rather than treating absent corporate financial statements or insider transactions as business weakness. NAV, duration, fee, holdings and distribution-yield methodology remain unverified.",
+            "HOLD/BULLISH/conditional STARTER requires 100.68–100.69 after 10:30 ET with VWAP and same-time RVOL >=1.0 plus live spread/NAV/issuer/net-yield/account checks. 100.713 is observation, not a profit target or a price to chase.",
+            "Starter capped at 25% of planned cash allocation, remaining cash/concentration capacity and .10% NAV execution-loss budget using a documented adverse-execution estimate. No approved share count exists without those inputs.",
+            "No fixed price stop is invented. Reduce/exit requires verified NAV, tracking, liquidity or relative net-yield deterioration; distribution-driven price adjustment alone is not a sell trigger. Group-level short-Treasury flows are not called SGOV-specific.",
+            "A short amt table suffix remains in raw fundamentals. Preserve source evidence but do not carry this cosmetic fragment into the investor synthesis."
+          ]
+        },
+        "NVDA": {
+          "reviewed_at": "2026-09-30T12:38:08.525676+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.744448+00:00",
+          "research_payload_sha256": "ab27ca6db8adead7ccbbe66bbec5ec0774171d2ef0653b02aec24475afc1e359",
+          "artifact_sha256": {
+            "analysis.json": "0bee6bbb106d9831fc9376efe74ebf0562cf634b1dba7ad9554a813af47d1a15",
+            "final_state.json": "b3e1f87eb119527c915843ae5c61568ef38ef2e0db743c28a5a7d30f32df982c"
+          },
+          "observations": [
+            "Independent issuer spot-check found a material definition issue: provider-normalized 53.199B versus 58.321B is not the issuer non-GAAP series. Do not conclude that company-adjusted earnings fell; require comparable metric and issuer reconciliation. Final Work must flag provider-metric comparability as unverified rather than importing independent audit figures into its bound packet.",
+            "Substantive fundamentals distinguishes revenue 96.221B and operating margin 66.2% strength from weak latest cash conversion: CFO 24.077B versus net income 59.688B, FCF 21.400B and large receivables-driven working-capital outflow.",
+            "Vendor securities-gain label, restricted cash 36.900B, debt 38.351B, financing bridge and dividend outflow 6.047B versus prior .243B require original-filing verification. Missing issuer filings/consensus/price provenance are stated rather than declared verified.",
+            "HOLD/BULLISH/conditional STARTER requires two five-minute bars above 234.50 after 10:30 ET plus VWAP/RVOL1.2; structured breakout confirmation is two_bar, so a single overlay quote cannot prove it. Expiry is 15:55 ET, not the usual 16:00.",
+            "Starter <=25% target, modeled additional loss <=.5% NAV, including 12.79 stop distance plus 6.01 volatility allowance and actual costs. Account concentration must be checked before any share count.",
+            "Failed-starter OR rule is consistent. Holding reduction below 221.71 close and major invalidation below 216.80 close remain separate; 227.03 is observation and not an automatic stop. Partnerships need disclosed order/revenue conversion and unverified buyback claims are excluded from entry rationale."
+          ]
+        },
+        "INTC": {
+          "reviewed_at": "2026-09-30T12:38:08.523963+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.742668+00:00",
+          "research_payload_sha256": "3caa0aa436d33485df4edacf68718a51248d19b4709cd4f50b331e99c93154bd",
+          "artifact_sha256": {
+            "analysis.json": "02406df3382a09f9e323f1dd887dcb6518e41277ad4a53f3f294e755941de2ce",
+            "final_state.json": "202a341b0e6ac724b8c644a33f1e5e09ace20ac73a6fa9a93d55bbedbbe0f6e8"
+          },
+          "observations": [
+            "Substantive fundamentals separates revenue/margin/CFO improvement from net loss 11.033B, large special losses, debt increase, equity decline and 15.2% year-over-year share dilution. Cash-flow improvement includes working-capital and noncash effects rather than proven recurring profitability.",
+            "Provider net debt excludes short-term investments and is explicitly distinguished from debt less cash-plus-investments. CEO purchase and some executive sales are mixed signals with unavailable original filing links; normalized metrics remain provider-defined.",
+            "HOLD/BULLISH/conditional STARTER requires 118.75 recovery then 121.71 after 10:30 ET with VWAP/RVOL1.2, acceptable costs, account and adverse-disclosure checks. Starter <=one-third target, total <=2% NAV, starter loss budget .25% NAV and total .50%, with 6.29 ATR allowance.",
+            "113.97 break prompts reassessment, while holding reduction requires close below112.27 AND failure to recover the next trading day. Structured risk confirmation next_day correctly prevents a single quote from firing the reduction. Failed starter first stops buying and further reduction waits for confirmed downside.",
+            "A short Arabic/bracket suffix remains after the final fundamental table delimiter; no substantive fact is inferred from it and the investor synthesis excludes it."
+          ]
+        },
+        "TSM": {
+          "reviewed_at": "2026-09-30T12:38:08.522222+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.740932+00:00",
+          "research_payload_sha256": "19f18f1d7c60c2c4f71b32b6cbd5db8c822da77b25b02dbb187cda646f149841",
+          "artifact_sha256": {
+            "analysis.json": "251a6d896e98fd5f53d392d9fc859060abbadcc09fc32f83425f763b7afbcadb",
+            "final_state.json": "c9437ccfa7cb23205587ab7ecc31944caa98e32d982bf76fb8ad3e7534077b31"
+          },
+          "observations": [
+            "Substantive fundamentals reports strong revenue/margin and net cash but explicitly refuses to interpret trillion-scale statement values as USD because reporting currency and ADR share basis were not verified. It does not directly compare incompatible EPS values.",
+            "Audit identified the common instrument-context wrapper incorrectly calling its exchange trading currency a reporting currency. Correct the wrapper for future runs; keep the raw TSM report and its explicit unit limitation intact.",
+            "Capex growth, working capital and vendor-labeled disposal gains qualify earnings/FCF improvement. No independent issuer reconciliation or verified guidance is claimed.",
+            "HOLD/BULLISH/conditional STARTER requires459.43 after10:30 with VWAP/RVOL1.2 and acceptable fees/gap risk. Near resistance463.72 offers4.29 versus16.32 downside to443.11; the unfavorable reward/risk is explicitly acknowledged and remains a live discretionary recheck, not proven profitable entry.",
+            "Starter <=25% target and modeled loss <=.5% NAV with costs/account concentration; reduce25–50% below447.07 close and exit remaining tactical exposure below443.11 close. Failed-starter OR rule is consistent. Original currency/ADR units/guidance/FCF must be checked before larger exposure."
+          ]
+        },
+        "LRCX": {
+          "reviewed_at": "2026-09-30T12:50:03.685974+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.738951+00:00",
+          "research_payload_sha256": "7bbd44516caf40e5037813251de44129ad96b2a6f8ab0ada88528d81997c9c87",
+          "artifact_sha256": {
+            "analysis.json": "22a46350588895a12effe1866a7f4d0415780606cabc8a3f3b35772d3225ae14",
+            "final_state.json": "4c35d81ab536e9e3ef0d24551c3c924171fcbeec86ee74d5d76569ff7ad88477"
+          },
+          "observations": [
+            "Substantive fundamentals distinguishes roughly30% revenue growth and37.4% operating margin from43% CFO decline,47% FCF decline and29% sequential receivables increase; growth drivers and repeatability remain unverified.",
+            "Overview FCF3.090B versus detailed four-quarter4.891B is not treated as comparable without period/definition reconciliation. Insider exercise and sale pairing is acknowledged rather than assuming motives; issuer filings/consensus/guidance are unavailable.",
+            "HOLD/BULLISH/conditional STARTER requires328.32 after10:30 with VWAP/RVOL1.2 and no chase above332.93. Starter<=25% target,total<=5% NAV,modeled loss<=.5% NAV to304.66 plus gap/slippage allowances; close-based exits do not guarantee that loss cap.",
+            "Holding reduction below319.15 close is aboutone-third; below314.47 close halves the remainder; below304.66 close exits all. Full expansion needs332.93 close and next-session follow-through. Failed-starter OR conditions are consistent and industrial opportunity is not asserted to be a confirmed order."
+          ]
+        },
+        "PG": {
+          "reviewed_at": "2026-09-30T13:01:20.913580+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.737050+00:00",
+          "research_payload_sha256": "5001f13db1f1addbdd12c207c3b8bab79b0d1aeef61add7b3a79fd7867f02d78",
+          "artifact_sha256": {
+            "analysis.json": "d03759590bb3e3a93af725618403edeeebe7640476477e83a4d76921f5bcbafe",
+            "final_state.json": "606d8ac0b46a6b6482d44791b146a875f43d025336d46aeeecb1a9a376a24685"
+          },
+          "observations": [
+            "Substantive fundamentals identifies modest1.5% revenue growth but9.3% operating-income and14.9% EPS decline, against improving CFO/FCF and lower net debt. Annual dividends plus buybacks slightly exceed detailed four-quarter FCF; negative working capital and inventory growth are explicit.",
+            "Insider awards/options are not called voluntary market buys. The recent100-row insider sample is explicitly bounded rather than described as complete history, confirming the input-size fix is reflected in this report.",
+            "HOLD/BULLISH/conditional STARTER requires149.57 after10:30 with VWAP/RVOL1.2 and actual costs. Starter .5–1% NAV, total<=4% NAV, modeled risk<=.5% NAV based on7.23 distance to142.34, with gap/cost caveat.",
+            "Breakout failure first stops buying; failure unrecovered by close reduces tactical exposure. Close below145.87 reduces, below142.34 exits tactical exposure. The reported10/22 earnings date is explicitly unconfirmed and must not become a verified official schedule in Work."
+          ]
+        },
+        "MRVL": {
+          "reviewed_at": "2026-09-30T13:03:02.341654+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.735435+00:00",
+          "research_payload_sha256": "541aefab7e85c20b1bb04e0dafae2eda6b2b7ffcc7332db5761981b911adaf5f",
+          "artifact_sha256": {
+            "analysis.json": "3500478946e13dabb7f87aaf6a90111f5645db9f56d0543833e5c38c8482fa23",
+            "final_state.json": "2bc184855c4c73a15a87f167f7d7296a87b696591af7bf2f88073779c139b4c8"
+          },
+          "observations": [
+            "Substantive fundamentals identifies36.6% revenue growth and16.7% operating margin but receivables outflow, stock compensation around54% of CFO,2.6% sequential share growth and acquisition/intangible exposure.",
+            "Net-debt difference matches lease liabilities and debt definitions are qualified. Provider2B preferred issuance versus zero balance and prior large nonoperating income/disposal flows require issuer reconciliation rather than an invented transaction explanation.",
+            "Insider sample explicitly contains100 of2213 source rows and excludes2113; zero-price awards and possible duplicates are not used to infer cumulative net selling.",
+            "HOLD/BULLISH/conditional STARTER requires two five-minute bars above267.48 after10:30 plus VWAP/RVOL>=1.0. Starter<=25% planned weight and<=.5% NAV,total<=2% NAV,risk budget<=.25% NAV including19.34 distance to248.14 and costs.",
+            "Breakout failure stops buys;264.40 close prompts reassessment,256.88 close reduces and248.14 close exits tactical exposure.276.12 is profit-taking reassessment, not an enabled automatic target. Reported10/6 event and commercial/analyst expectations remain verification tasks."
+          ]
+        },
+        "SPYM": {
+          "reviewed_at": "2026-09-30T13:13:37.652853+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.733655+00:00",
+          "research_payload_sha256": "c886ba65ff56a3f5de57a383cf3080b9f186c69c80750c997e6331ad9d6fe8e8",
+          "artifact_sha256": {
+            "analysis.json": "0d615c019617451d829ff4e34625d599c50f0b1d2d9913fef7f2dc4b39719ed7",
+            "final_state.json": "c7f544df3495c63db59ae3e3dab1b3be681fc8cc74a7e25802bb51db17a027a0"
+          },
+          "observations": [
+            "Substantive fundamentals correctly treats an S&P500 ETF and does not turn absent corporate statements or unprovided distributions into business deterioration. Holdings, fund fee, NAV, flows, tracking and valuation methodology remain unverified.",
+            "Vendor overview averages differ from the market-report averages; raw risk limits explicitly require reconciliation. Prior down-day volume1.48x is not confused with the new-entry RVOL requirement1.2.",
+            "HOLD/BULLISH/conditional STARTER requires90.15 and90.41 recovery after10:30 with VWAP/RVOL1.2 and spread/NAV/fund checks. Starter<=25% target and .25% NAV modeled loss to89.55 plus costs, with correlated exposure and gaps qualified.",
+            "Meaningful expansion requires91.22 volume-confirmed close and next-session persistence, with91.31 near resistance. Holding reduction requires89.55 close plus failure to recover, not price alone;88.49 prompts reassessment and88.00 close exits.",
+            "The meaning of prompt/rapid recovery is not quantitatively specified. Final Work should require confirmation of that observation rule before action, without inventing a duration; current close-dependent evaluator already cannot confirm it from one quote."
+          ]
+        },
+        "JNJ": {
+          "reviewed_at": "2026-09-30T13:31:19.788284+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.730048+00:00",
+          "research_payload_sha256": "0f8c90e406848df075be0e553e001be00df9f078464fdd59662b8bd2fc65ff52",
+          "artifact_sha256": {
+            "analysis.json": "ba445995deb5cda82acc1466c55f0cbd5505faf3d96ae0b4f214a55714346cde",
+            "final_state.json": "44e4b78d4838b28e632c599fd372b81a742f1861762050ae52357114c3ba56ef"
+          },
+          "observations": [
+            "Substantive fundamentals distinguishes revenue growth6.6% and operating margin28.3% from flat net income and EPS2.27 versus2.29. CFO8.616B/FCF7.295B partly reflects working-capital reversal; debt49.036B/net28.614B, and four-quarter FCF22.228B versus overview16.885B remain qualified.",
+            "Insider exercise and same-size sale are not double-counted. Quote267.57 versus news267.66 needs reconciliation. Original filings, guidance/consensus and legal/regulatory status are unverified.",
+            "HOLD/BULLISH/conditional STARTER preserves269.92 pilot and275.23 closing expansion, VWAP/RVOL1.2 after10:30, <=one-third target and .5% NAV loss budget plus costs/gap risk. Nearby reward5.31 versus risk6.66 is explicitly unfavorable. Reduce263.26 close and exit260.68 close remain conditional.",
+            "Timing defect: result completed2026-09-30T22:20:48+09:00 (=09:20:48 US Eastern), yet entry_logic says the Sep30 deadline expired in debate and shifts pilot to the next regular session, with expiryOct1 16:00ET. Preserve raw timing, block new entry pending clarification, and do not retroactively renew or rewrite expiry. Missing authoritative exchange clock is an input gap; exact model-error attribution is unproven.",
+            "The decision contains a close-confirmed entry level, so the conservative current overlay cannot confirm the conditional entry from a single quote. This is not evidence that a current trade actually fired."
+          ]
+        },
+        "CVX": {
+          "reviewed_at": "2026-09-30T13:31:19.790504+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.731852+00:00",
+          "research_payload_sha256": "c9e77e5c789691927e76e102e1cf206267208446e233b1dbd07117754b7e4fab",
+          "artifact_sha256": {
+            "analysis.json": "0b068833b58ad9f9616ca3d47351c205473386499141c77062bef74b4c821f4a",
+            "final_state.json": "eb93ecedfc65b147bd21b381bd65f6c91e49e593d4fe623d052fffda878a653a"
+          },
+          "observations": [
+            "Substantive fundamentals reports revenue67.199B, operating income14.276B, net income12.072B/EPS6.11 but explicitly leaves the cause and repeatability of the sharp increase unverified. CFO22.633B/FCF18.095B includes working-capital inflow3.106B and received dividends2.999B; prior FCF was negative1.549B.",
+            "Net debt28.548B versus40.105B improves. Four-quarter revenue208.711B versus overview209.384B and FCF27.012B versus21.934B remain unreconciled; insider exercise/sale pairing does not prove pure bearish selling. Refining expectations and commercial projects are verification tasks, not confirmed results.",
+            "HOLD/BULLISH/conditional STARTER requires support200.78–201.17 then202.70 recovery after10:30, VWAP/RVOL1.2 and price<=204.38 untilSep30 16:00ET. Starter<=25% target,total<=5% NAV,energy<=15%,risk<=.5% NAV using max(ATR4.27,entry-minus200.78)+cost/gap allowance.",
+            "Reduction requires200.78 regular close, not a present sell. Full expansion209.19 close and next-day208.25–209.19 persistence; failed expansion OR rule is consistent. Source calendar/price dates are separated.",
+            "Raw fundamental table ends with a stray mixed-script/error_fix serialization fragment. Preserve original evidence and do not carry the cosmetic tail into investor synthesis; substantive content and zero fallbacks do not imply flawless raw prose."
+          ]
+        },
+        "ABBV": {
+          "reviewed_at": "2026-09-30T13:32:39.972701+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.728321+00:00",
+          "research_payload_sha256": "d68ab11f5de93ae2dda45773c3a23756c221b60e19b966530ff1c17cb12ee119",
+          "artifact_sha256": {
+            "analysis.json": "3aef9a94bd99e06892abfbfebdebe4d1aa60241fceac3c36112b997d32764bbc",
+            "final_state.json": "53a9d98111c4ec3782b4e2b962971ee7e6dcdf2bfe61055865d073f2d2b65c88"
+          },
+          "observations": [
+            "Substantive fundamentals separates operating-income definitions6.723B versus reported6.432B, revenue growth10.2% and gross margin74.7% from net-income special-item effects. CFO3.436B and FCF3.114B decline33.3%/36.2%, leaving only44M above quarterly dividends without asserting immediate dividend failure.",
+            "Net debt64.253B, negative equity5.935B and goodwill/intangibles62.7% of assets require review. Debt versus total liabilities must remain definition-qualified. Four-quarter FCF18.210B versus overview16.870B is unreconciled. Insider100/1978 rows is a sample, not full-history net flow.",
+            "HOLD/BULLISH/conditional STARTER requires269.39 after10:30 with VWAP/RVOL1.2; third-party289 target is expressly excluded from expected-return calculation. Starter<=25% target and modeled risk<=.5% NAV,totalABBVrisk<=1%,with fees/gap/account checks.",
+            "Close261.52 reduces holding risk;257.48 closes tactical exposure;material bad news/gap must be independently confirmed. Expansion270.78 close plus next-session269.39/VWAP preservation; failed-starter OR rule is consistent. Product-launch/clinical/sales catalysts are source claims requiring primary verification; expiryOct2 16:00ET preserved."
+          ]
+        },
+        "PM": {
+          "reviewed_at": "2026-09-30T13:56:05.121272+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.726601+00:00",
+          "research_payload_sha256": "59c4a81ea3cdab464cffff5415a0c6e61b8cdf09ac0e91a4de1da5f3128e15c4",
+          "artifact_sha256": {
+            "analysis.json": "0ae26edab591b0f43d2a04ae03ba0e35dca8cac47346d12e77d102305b90b950",
+            "final_state.json": "bf05b6b844cfdf7c201c00a7c3850b99fde97310fee02dc1c69f967488f01365"
+          },
+          "observations": [
+            "Substantive fundamentals distinguishes revenue10.4%/operating income22% growth and margin40.5% from EPS1.80 versus1.95 and unverified special items. CFO5.492B/FCF5.112B benefits from working-capital reversal; two-quarter FCF4.360B remains below dividends4.604B.",
+            "Four-quarter FCF12.722B versus overview9.714B is unreconciled. Net debt43.114B improves but common equity is negative8.583B; negative P/B is not treated as a cheap valuation. Stock awards are not insider market buys, and original filings/consensus are unavailable.",
+            "HOLD/BULLISH/conditional STARTER requires195.49 after10:30ET, VWAP/RVOL1.2, cap196.34 and account/cost checks beforeSep30 16:00ET. Delayed premarket194.35 based on939 shares is explicitly insufficient. Starter<=1% NAV, modeled risk<=.25%NAV to190.12, with ATR4.35 and gaps qualified.",
+            "Failed-starter OR rule is consistent. Confirmed failure or190.12 close reduces tactical exposure,188.62–187.31 prompts reassessment,182.97 close or confirmed business impairment exits relevant exposure. Full expansion requires196.34 close plus next-session195.49 persistence and cash-flow checks; no automatic add is asserted."
+          ]
+        },
+        "WBD": {
+          "reviewed_at": "2026-09-30T14:13:22.844666+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.720783+00:00",
+          "research_payload_sha256": "d8aecc66e21012b35cc709de95cafea9791303d7a0201a8d58559942fd359950",
+          "artifact_sha256": {
+            "analysis.json": "a6eafd162624afb922034f1842624848e7fd6a19fc8e6ebec560eec9fac0ffbf",
+            "final_state.json": "a39fe0f336eeade3bdefe737e455bca28b9f9b686a3804b858be5fbc53ce657c"
+          },
+          "observations": [
+            "Revenue8.717B declined11.2%; gross margin47% improved, while provider standardized adjusted EBITDA4.076B versus5.083B must not be equated with issuer adjusted earnings. Common NI149M includes433M tax benefit despite271M pretax loss; prior restructuring/acquisition costs3.004B distort recovery comparisons.",
+            "FCF572M improved sequentially but remains below702M year earlier. Net debt28.654B, cash3.369B, current ratio.777 and intangible/goodwill73% create constraints. Four-quarter FCF2.180B versus overview16.167B is unreconciled and raw analysis rejects overview valuation use; operating income373M versus reported237M also differs.",
+            "Insider exercises and sales do not prove discretionary liquidation. Acquisition terms, funding and approvals remain unverified. HOLD/BULLISH/conditional NONE:30.92 volume close and next-session support require a new assessment, not an approved entry.",
+            "30.90–30.92 rejection OR actual high position weight is required before20% profit taking. A spot quote alone does not establish either; synthetic reproduction exposed both overlay/candidate promotion and wording loss, now guarded. No actual holding or trade is asserted.",
+            "31.73 second20% after confirmed breakout is a volatility reference, not a price target.30.68 close reduces25% of original position;30.17 reassessment;29.65 close or material acquisition impairment exits. Future .5%NAV risk sizing remains unapproved and actual quantities unavailable."
+          ]
+        },
+        "MRK": {
+          "reviewed_at": "2026-09-30T14:13:22.846499+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.722661+00:00",
+          "research_payload_sha256": "1b9222d029c25860eda33028db1d5fbd00f838d94d8b8e8a0a6df9fde96a05fe",
+          "artifact_sha256": {
+            "analysis.json": "9a2fc40c0408b695c2049491a637db0aa8348dae73061a1b62251f70aa321630",
+            "final_state.json": "93089a6d972c1849e6fc7a7af101ec3ab10178e0704f19a1f8f1dd1bb9310dac"
+          },
+          "observations": [
+            "Revenue16.607B grew5.1%, but R&D9.741B versus4.048B and preceding12.592B drive operating/NI losses. Cost nature and repeatability are explicitly unavailable. CFO5.370B/FCF4.477B exceed quarterly dividends/buybacks, with5.190B other noncash reconciliation requiring original filings.",
+            "Four-quarter FCF16.063B versus overview15.172B differs. Net debt47.057B versus27.395B, acquisition payments14.621B and increased interest525M versus305M constrain the recovery thesis. Insider228238 shares sold alongside derivative exercise do not establish motives.",
+            "HOLD/BULLISH/conditional STARTER requires147.07 retest, cap147.25, regular10:30ET, VWAP and same-time RVOL1.2 throughOct2 16:00ET, plus publication-time and after-cost reward/risk verification.147.07 is a moving average, not proven intraday support.",
+            "Starter risk<=.25%NAV uses147.25–142.54 plus slippage, not a guaranteed stop-loss limit.146.09 close or confirmed failed breakout reduces;142.54 close exits. Expansion requires155.53 volume close, next-session persistence and financial review; no present order."
+          ]
+        },
+        "SHEL": {
+          "reviewed_at": "2026-09-30T14:13:22.848298+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.724851+00:00",
+          "research_payload_sha256": "4bcd072535ccb5d3cbd469207af07e21aa3432c54a9be352a6b55c9fc503e129",
+          "artifact_sha256": {
+            "analysis.json": "cae6f72e105b7a6509639663dc7ece8259f74fdb4c6dd1efb4b44cda697f5b63",
+            "final_state.json": "acefc741feafd3eb4195a81b4266fb536b647b72f4562a950b5314d47b8e7050"
+          },
+          "observations": [
+            "Revenue94.664B grew44.7%, NI10.821B versus3.601B and margin16% improved without issuer explanation. CFO21.432B/FCF17.401B benefit from working-capital swing -11.178B to3.445B; prior-quarter shareholder returns5.282B exceeded FCF2.305B.",
+            "Debt73.076B and cash31.374B imply41.702B arithmetic difference, explicitly not issuer net debt because provider definition is unavailable. Four-quarter FCF31.545B versus overview21.458B is unreconciled. Small22-share insider purchase and unconfirmed Kazakhstan/LNG reports are not confirmed catalysts.",
+            "HOLD/BULLISH/conditional STARTER after10:30ET needs96.47, VWAP, RVOL1.2, no verified bad news and sufficient cost-adjusted reward/risk beforeSep30 close.96.47 to99.15 offers2.68 against4.00 to92.47; if99.15 is the only justified target the raw decision explicitly prohibits the buy.",
+            "Starter<=one third target and1%NAV; totalSHEL3%, energy10%, planned risk.5%NAV.94.72 close or failed breakout reduces25–50%;93.19 close or92.47 intraday exits. Exit versus breakout rules differ in VWAP versus price-and-VWAP wording and require clarification.",
+            "Stored risk level price94.72 incorrectly contains low25/high94.72 from sale fraction25–50%. Normalizer regression fixes future parsing; stored research remains byte-preserved. Reconfirm the raw single-price condition rather than treating25 as a valid support boundary. SHEL ADR trading currency does not prove financial-statement/share units."
+          ]
+        },
+        "SCCO": {
+          "reviewed_at": "2026-09-30T14:26:28.623969+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.719110+00:00",
+          "research_payload_sha256": "4d00a3f24c2537c4c754268f601f60b721b7bb530c1f792ea779498059483e72",
+          "artifact_sha256": {
+            "analysis.json": "f4366907eea2e39de84dfe6809c196d6bdaf0f0486f77e3577adf7562d757bbc",
+            "final_state.json": "967345ee92a93e15effc59abe49c9b5984ec293fda678eade4a706816af47783"
+          },
+          "observations": [
+            "Revenue4.289B grew40.6%, NI1.670B grew71.6%, operating margin61.2% versus52%, CFO1.9885B/FCF1.5657B support reported improvement. Copper-price versus production contributions and original filings remain unavailable; this run contains substantive fundamentals, unlike the older timeout fallback.",
+            "Two-quarter FCF2.8183B exceeds dividends1.6454B without guaranteeing future payouts. Debt8.6244B versus7.4017B includes new borrowing1.2475B; net debt2.3294B differs from subtracting cash plus short-term investments7.3299B, requiring definition checks. Issued/treasury share presentation changes are not inferred to prove buybacks/issuance.",
+            "Insider900-share sales are a small sample;400-share awards are not purchases. Valuation multiples have no verified price/as-of or consensus. Tia Maria progress and guidance are confirmation tasks, not established outcomes.",
+            "HOLD/BULLISH/conditional STARTER throughOct2 16:00ET needs199.44–200.00 support recovery after10:30ET plus VWAP/RVOL1.2/spread/source checks.206.14 breakout to209.26 gives3.12 versus10.39 to195.75, so chasing is disfavored. Starter<=2%NAV with modeled risk.25%NAV sized using max(stop distance, ATR7.68).",
+            "195.75 daily close reduces risk; gap below without first30–60min recovery prompts earlier reassessment. Sustained205.41 OR VWAP breakout failure reduces pilot exposure, but persistence duration is unspecified. Expansion requires200 support close or higher209.26/211.51 breakout evidence and next-session support, not an immediate order."
+          ]
+        },
+        "BRK-B": {
+          "reviewed_at": "2026-09-30T14:32:16.346940+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.717340+00:00",
+          "research_payload_sha256": "c3d8fb4de2bece00b8916a8e708dc2c8aa5bc38b37687590da9d59ef89052a9a",
+          "artifact_sha256": {
+            "analysis.json": "f36884b2e9786d9612be9e50a5033975514a1b7ba03ac816bd35ba2256b56867",
+            "final_state.json": "ffd823b0f576512f7f46bf3e2e2116180533e331d97fc84750d70e587ce9e890"
+          },
+          "observations": [
+            "Revenue117.885B grew19.2% and common NI25.667B grew107.5%, while CFO11.215B/FCF5.570B grew11.2%/6.6%; unrealized investment adjustment -16.052B prevents equating GAAP growth with operating-business improvement. Insurance and segment evidence is unavailable.",
+            "Cash/cash equivalents/short-term investments365.514B fell31.869B sequentially; debt128.599B stayed nearly flat, equity747.910B rose20.729B. Provider net debt87.990B omits short-term investments and does not imply overall liquidity shortage. Buybacks4.209B versus.235B and net securities purchases18.257B do not fully reconcile cash change.",
+            "BRK-B P/B .0009568656 and book value per share522225.9 appear inconsistent with class B units and raw analysis rejects their valuation use. Insider39700-share sale and488-share purchase lack original filings; Buffett gifts are not counted as market sales. Substantive fundamentals replaces the historic oversized-input fallback.",
+            "Raw final table contains incorrect_output self-repair junk. It is absent from rendered HTML, but this is not proof the source was clean. Future validator now rejects/retries the exact marker; source bytes remain preserved.",
+            "HOLD/BULLISH/conditional STARTER throughOct2 close requires500.23 recovery then502.35, VWAP, same-time RVOL1.2 after10:30ET and costs/account checks. Starter<=25–33% target, modeled loss.25%NAV, totalposition5%NAV.497.83 close AND next-day recovery failure reduces25–50%;492.77 close prompts residual exit; gap down calls immediate reassessment.",
+            "Expansion needs506.76 volume close and next-session first30–60min502.35 support plus506.76 hold/reclaim. No verified present order or investment-return claim is inferred from large cash resources."
+          ]
+        },
+        "MA": {
+          "reviewed_at": "2026-09-30T14:35:02.974035+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.715601+00:00",
+          "research_payload_sha256": "e53ad98d4bda046ea836dd40960e6fe66e7f8ba1749678fd225400f95c770f2f",
+          "artifact_sha256": {
+            "analysis.json": "5ad17d9a8a10e2b78b21a4f6131cb9c3887eb5da4f173ff88083f4dfde82e8a0",
+            "final_state.json": "4298b6419ba9313815e1e4190478492574fc90e847815a373bf65cf99977ed83"
+          },
+          "observations": [
+            "Revenue9.277B grew14.1%, operating income5.728B grew16.6%, NI4.388B grew18.6%, margin61.7% versus60.4%. EPS4.97 lacks year-earlier comparable and growth is not invented. CFO3.773B fell18%, FCF3.295B fell25%, working-capital -1.790B includes prepaid asset -1.774B; buybacks4.898B exceed FCF1.603B.",
+            "Debt24.643B versus18.960B and net debt13.352B versus11.054B rose despite cash11.291B; equity5.611B fell partly with buybacks. Debt/equity alone is not a credit rating. Insider sales alongside derivative exercise are not motive proof; filings, consensus, management guidance and credit terms unavailable.",
+            "HOLD/BULLISH/conditional STARTER throughOct1 16:00ET requires553.12–553.84 support then561.30/VWAP recovery and RVOL1.2 after10:30ET plus account/spread checks. Starter<=25% target; modeled risk.25%NAV based on entry minus553.12 plus2.67 cushion (=10.85 at561.30), not guaranteed gap protection.",
+            "561.30 OR VWAP failure reduces pilot;553.12 regular close AND volume reduces existing exposure. The short risk wording previously dropped volume_rule when confirmation=close; now both are retained and execution still awaits independent close evidence. Expansion requires569.64 volume close then next-session first30–60min persistence and cash/debt source review.",
+            "Kroger partnership and new-channel monetization are confirmation tasks, not verified realized volumes.586.42 is resistance/reward-risk reassessment rather than automatic profit or price target."
+          ]
+        },
+        "XOM": {
+          "reviewed_at": "2026-09-30T15:34:54.184902+00:00",
+          "last_core_hash_checked_at": "2026-09-30T15:45:35.759776+00:00",
+          "research_payload_sha256": "85ad8b4d0b182111b9299ece2158b9d1c3d494d767e7d658a808ef8415ee7e73",
+          "artifact_sha256": {
+            "analysis.json": "0e5d79612bb46fa22f23a58882154d331f471a9a2aff7a3a105732b200eb7047",
+            "final_state.json": "9860fa97e1092036e7256770632333aede391911729af8dd51d2818d29d17539"
+          },
+          "observations": [
+            "The failed-only retry produced all four substantive required reports in 27.04 minutes with zero model fallbacks and 23 observed successful model calls. The exchange-local research date is 2026-09-30 while the daily price date is 2026-09-29.",
+            "Fundamentals now explicitly labels currency, units, provider fiscal periods and filing availability as unverified. Provider revenue 114.529B, operating income 18.195B and common net income 14.525B must not be asserted as verified issuer comparisons. CFO 23.555B minus capex 6.527B equals FCF 17.028B; dividends plus repurchases total 9.438B. Lease/debt comparability and a negative debt-issuance field remain unresolved.",
+            "News and sentiment distinguish secondary reports and news-derived tone from official disclosures or actual social positioning. Mozambique/Vietnam contract economics, reported oil price and macro event timing require original-source checks; headline confirmation is not independent issuer verification.",
+            "The news report ends with a codex_output_schema repair marker. The archive is preserved; the new validator rejects this exact observed source text. Markdown renderer visibility is separately recorded and does not prove the raw text is clean.",
+            "HOLD/BULLISH/conditional NONE is preserved: possible future pilot above 163.32 and VWAP with RVOL 1.2 is an observation plan, not a valid conditional order because no verified expiry is supplied.",
+            "The quote at 11:05 ET is delayed; the runtime clock alone does not prove market state or current triggers. Reduce below 159.27 regular-session close; tactical exit below 157.47 close or material thesis impairment. A 164.91 breakout to 168.12 offers only 3.21 versus 7.44 downside to 157.47, so no automatic full expansion.",
+            "Prospective pilot is at most 25% of intended new exposure, with 0.25% NAV planned risk, XOM 5% and energy 10% limits, actual holdings/cash/cost checks and no guaranteed loss ceiling. No current position size or order is inferred."
+          ]
+        }
+      },
+      "verified_cohort_run_id": "20261001T000500_github-actions-us",
+      "initial_review_run_id": "20260930T193547_github-actions-us"
+    },
+    "volume_risk_confirmation_regression": {
+      "scope": "Synthetic executable risk action using the observed AMZN volume/close level; actual AMZN raw risk_action remains HOLD. No orders sent.",
+      "level": {
+        "label": "보유 위험 감축선",
+        "level_type": "SUPPORT",
+        "price": 244.24,
+        "low": null,
+        "high": null,
+        "currency": null,
+        "confirmation": "volume_confirmed",
+        "volume_rule": "거래량 증가를 동반한 정규장 종가 이탈",
+        "source_text": "",
+        "reason_code": ""
+      },
+      "relative_volume": null,
+      "before": {
+        "overlay_action": "REDUCE_NOW",
+        "portfolio_trigger": true
+      },
+      "after": {
+        "overlay_action": "NONE",
+        "portfolio_trigger": false,
+        "wording": "244.24 이하 하락, 거래량 조건 확인 후 (거래량 증가를 동반한 정규장 종가 이탈) 위험 축소"
+      }
+    },
+    "execution_time_regression": {
+      "scope": "Synthetic snapshot reproductions; no orders or actual issuer actions.",
+      "time_gate": {
+        "asof": "2026-09-30T14:29:00+00:00",
+        "exchange_local_time": "2026-09-30T10:29:00-04:00",
+        "earliest": "10:30",
+        "before_open": true,
+        "after_open": false
+      },
+      "closing_evidence": {
+        "market_session": "after_hours",
+        "price": 94,
+        "stop_level": 95,
+        "verified_regular_close": null,
+        "before_overlay_action": "EXIT_NOW",
+        "after_overlay_action": "NONE",
+        "before_portfolio_trigger": true,
+        "after_portfolio_trigger": false
+      },
+      "limitation": "Current intraday snapshot does not supply a verified regular-session closing-bar receipt; close-dependent automatic confirmation therefore remains pending. A session label or old CLOSE_CONFIRMED state is not accepted as proof."
+    },
+    "qualified_risk_regression": {
+      "scope": "Observed WBD conditional risk level replayed against a synthetic fresh spot quote. Not an actual holding or trade.",
+      "level": {
+        "label": "첫 부분 이익 실현 구간",
+        "level_type": "TAKE_PROFIT",
+        "price": 30.9,
+        "low": 30.9,
+        "high": 30.92,
+        "currency": "USD",
+        "confirmation": "intraday",
+        "volume_rule": "실시간 가격 확인",
+        "source_text": "30.90~30.92달러 저항 재시험에서 거부가 확인되거나 보유 비중이 높을 때",
+        "reason_code": "EXTENDED_MOVE"
+      },
+      "last_price": 30.91,
+      "before": {
+        "overlay_action": "REDUCE_NOW",
+        "portfolio_trigger": true,
+        "wording": "30.9 이상 도달, 장중 확인 시 부분 익절"
+      },
+      "after": {
+        "overlay_action": "NONE",
+        "portfolio_trigger": false,
+        "wording": "30.9 이상 도달, 장중 확인 시 부분 익절 · 추가 조건 확인 필요: 30.90~30.92달러 저항 재시험에서 거부가 확인되거나 보유 비중이 높을 때"
+      }
+    },
+    "sale_fraction_regression": {
+      "scope": "Stored SHEL price-range contamination versus re-parsing its source text with optional range fields absent. Original archived decision is not rewritten.",
+      "stored": {
+        "label": "첫 지지선 이탈",
+        "level_type": "SUPPORT",
+        "price": 94.72,
+        "low": 25.0,
+        "high": 94.72,
+        "currency": null,
+        "confirmation": "close",
+        "volume_rule": "",
+        "source_text": "정규장 종가가 $94.72 아래로 내려가면 보유분의 25~50%를 위험 축소 목적으로 매도",
+        "reason_code": "SUPPORT_BROKEN"
+      },
+      "parser_input": {
+        "label": "첫 지지선 이탈",
+        "level_type": "SUPPORT",
+        "price": 94.72,
+        "low": null,
+        "high": null,
+        "currency": null,
+        "confirmation": "close",
+        "volume_rule": "",
+        "source_text": "정규장 종가가 $94.72 아래로 내려가면 보유분의 25~50%를 위험 축소 목적으로 매도",
+        "reason_code": "SUPPORT_BROKEN"
+      },
+      "corrected_parse": {
+        "label": "첫 지지선 이탈",
+        "level_type": "SUPPORT",
+        "price": 94.72,
+        "low": null,
+        "high": null,
+        "currency": null,
+        "confirmation": "close",
+        "volume_rule": "",
+        "source_text": "정규장 종가가 $94.72 아래로 내려가면 보유분의 25~50%를 위험 축소 목적으로 매도",
+        "reason_code": "SUPPORT_BROKEN"
+      }
+    },
+    "original_xom_failure": {
+      "ticker": "XOM",
+      "status": "failed",
+      "analysis_date": "2026-09-30",
+      "started_at": "2026-09-30T22:12:22.361020+09:00",
+      "finished_at": "2026-09-30T22:33:28.069079+09:00",
+      "duration_seconds": 1265.71,
+      "metrics": {
+        "llm_calls": 2,
+        "llm_fallback_calls": 0,
+        "tool_calls": 10,
+        "tool_call_counts": {
+          "get_stock_data": 1,
+          "get_indicators": 8,
+          "get_intraday_snapshot": 1
+        },
+        "tokens_in": 24655,
+        "tokens_out": 520,
+        "tokens_available": true,
+        "calls_by_model": {
+          "gpt-6-sol": 2
+        }
+      },
+      "llm_usage": {
+        "available": true,
+        "calls": 1,
+        "input_tokens": 24655,
+        "output_tokens": 520,
+        "total_tokens": 25175,
+        "by_model": {
+          "gpt-6-sol": {
+            "calls": 1,
+            "input_tokens": 24655,
+            "output_tokens": 520,
+            "total_tokens": 25175
+          }
+        },
+        "by_role": {
+          "quick": {
+            "calls": 1,
+            "input_tokens": 24655,
+            "output_tokens": 520,
+            "total_tokens": 25175
+          }
+        },
+        "events": [
+          {
+            "provider": "codex",
+            "model": "gpt-6-sol",
+            "role": "quick",
+            "input_tokens": 24655,
+            "output_tokens": 520,
+            "total_tokens": 25175
+          }
+        ]
+      },
+      "error_class": "Codex app-server model response timeout after transport retries; terminal read timeout reports remaining subsecond budget, not total elapsed time.",
+      "provider_timeout_message": "Timed out waiting for Codex app-server after 0.01887939999869559s. stderr_tail="
+    },
+    "overlay_watchlist_regression": {
+      "scope": "Read-only replay of archived full and overlay membership through selection and Work compaction; no archive mutation or new analysis.",
+      "full_run_id": "20260929T020356_github-actions-us",
+      "overlay_run_id": "20260930T060107_github-actions-overlay-us",
+      "baseline_required_watchlist_count": 27,
+      "before": {
+        "required_watchlist_count": 13,
+        "nonholding_required_count": 2,
+        "transmission_scope": {
+          "source_ticker_count": 30,
+          "transmitted_ticker_count": 26,
+          "held_ticker_count": 14,
+          "required_watchlist_ticker_count": 13,
+          "transmitted_required_watchlist_count": 13,
+          "scanner_candidate_limit": 10,
+          "omitted_nonheld_ticker_count": 4,
+          "all_holdings_included": true,
+          "all_required_watchlist_included": true,
+          "raw_codes_omitted": true
+        },
+        "transmitted_tickers": [
+          "AAPL",
+          "AMZN",
+          "AVGO",
+          "DELL",
+          "ETN",
+          "GEV",
+          "GLDM",
+          "GOOGL",
+          "LLY",
+          "MPWR",
+          "NVDA",
+          "RSP",
+          "SGOV",
+          "TSM",
+          "AMD",
+          "DDOG",
+          "SCCO",
+          "MRK",
+          "XOM",
+          "ABBV",
+          "CVX",
+          "JNJ",
+          "SPYM",
+          "V",
+          "PM",
+          "WBD"
+        ]
+      },
+      "after": {
+        "required_watchlist_count": 27,
+        "nonholding_required_count": 16,
+        "transmission_scope": {
+          "source_ticker_count": 30,
+          "transmitted_ticker_count": 30,
+          "held_ticker_count": 14,
+          "required_watchlist_ticker_count": 27,
+          "transmitted_required_watchlist_count": 27,
+          "scanner_candidate_limit": 10,
+          "omitted_nonheld_ticker_count": 0,
+          "all_holdings_included": true,
+          "all_required_watchlist_included": true,
+          "raw_codes_omitted": true
+        },
+        "transmitted_tickers": [
+          "AAPL",
+          "AMZN",
+          "AVGO",
+          "DELL",
+          "ETN",
+          "GEV",
+          "GLDM",
+          "GOOGL",
+          "LLY",
+          "MPWR",
+          "NVDA",
+          "RSP",
+          "SGOV",
+          "TSM",
+          "AMD",
+          "DDOG",
+          "SCCO",
+          "MRK",
+          "XOM",
+          "ABBV",
+          "CVX",
+          "JNJ",
+          "SPYM",
+          "V",
+          "PM",
+          "WBD",
+          "SHEL",
+          "PG",
+          "MA",
+          "BRK-B"
+        ]
+      }
+    },
+    "report_marker_regression": {
+      "scope": "Read-only replay of observed malformed report text; no archive rewrite or model rerun.",
+      "results": [
+        {
+          "ticker": "LLY",
+          "report_field": "fundamentals_report",
+          "run_id": "20260930T193547_github-actions-us",
+          "report_sha256": "eb9e361040494d190c79b99ae9fec3add00e67cdf65e32fa57e1658128a3e24f",
+          "new_validator_rejects": true
+        },
+        {
+          "ticker": "RSP",
+          "report_field": "fundamentals_report",
+          "run_id": "20260930T193547_github-actions-us",
+          "report_sha256": "f26211e600ebe724f375de59ba21baafd8834e9d320dd3fb378b75e7f28b3e6c",
+          "new_validator_rejects": true
+        },
+        {
+          "ticker": "CVX",
+          "report_field": "fundamentals_report",
+          "run_id": "20260930T193547_github-actions-us",
+          "report_sha256": "191089be45a74173da3ecf689f08bbb1ba6a0fd940486db87e4defab5b5e2eaa",
+          "new_validator_rejects": true
+        },
+        {
+          "ticker": "BRK-B",
+          "report_field": "fundamentals_report",
+          "run_id": "20260930T193547_github-actions-us",
+          "report_sha256": "2a2a3c08815a01090c1a34a4af15b8bed9f1f072007f7c16d4b485ce74e1dbd8",
+          "new_validator_rejects": true
+        },
+        {
+          "ticker": "XOM",
+          "report_field": "news_report",
+          "run_id": "20261001T000500_github-actions-us",
+          "report_sha256": "5b22b7c5b7770dc82823e373f7e174466ee9f6f70e6d2823fe618b2740f33181",
+          "new_validator_rejects": true
+        }
+      ]
+    },
+    "report_rendering_spot_checks": [
+      {
+        "ticker": "LLY",
+        "report_field": "fundamentals_report",
+        "marker_present_in_raw": true,
+        "marker_present_in_rendered_html": false,
+        "html_end": ">자료 한계</td>\n<td>발표·공시 접수 시각 및 기간 표기의 원 공시 검증 불가; 잉여현금흐름 산식 불일치</td>\n<td>제공업체 자료 회수 시각만 확인됨</td>\n</tr>\n</tbody>\n</table>\n"
+      },
+      {
+        "ticker": "RSP",
+        "report_field": "fundamentals_report",
+        "marker_present_in_raw": true,
+        "marker_present_in_rendered_html": false,
+        "html_end": "td>매매 준비도</td>\n<td>RSP는 현재 관찰 대상이며 가격 판단 보류</td>\n<td>현재가와 가격 기준일 없음; 공개 주식 정보 요약도 ‘관찰만’ 표시</td>\n</tr>\n</tbody>\n</table>\n"
+      },
+      {
+        "ticker": "SGOV",
+        "report_field": "fundamentals_report",
+        "marker_present_in_raw": true,
+        "marker_present_in_rendered_html": false,
+        "html_end": "가 근거</td>\n<td>발언 기록·시장 전망치·비교 펀드·신용 분석·실사·실적 발표 자료</td>\n<td>제공되지 않음; 최근 사건에 따른 가설 변경 확인 불가</td>\n</tr>\n</tbody>\n</table>\n"
+      },
+      {
+        "ticker": "INTC",
+        "report_field": "fundamentals_report",
+        "marker_present_in_raw": true,
+        "marker_present_in_rendered_html": false,
+        "html_end": " 기준일 2026-09-30; 자료 조회 2026-09-30 21:09:20~21:09:21</td>\n<td>주가 기준일·보고서 발표 시각·공시 접수 시각 미제공</td>\n</tr>\n</tbody>\n</table>\n"
+      },
+      {
+        "ticker": "GLDM",
+        "report_field": "fundamentals_report",
+        "marker_present_in_raw": true,
+        "marker_present_in_rendered_html": false,
+        "html_end": "화·약화 확인 불가; 거래 준비도 관찰 전용</td>\n<td>실적 행사·발언 기록·시장 예상·비교상품·신용·실사 자료 이용 불가; 원문 발표일과 접수 시각 미확인</td>\n</tr>\n</tbody>\n</table>\n"
+      },
+      {
+        "ticker": "CVX",
+        "report_field": "fundamentals_report",
+        "marker_present_in_raw": true,
+        "marker_present_in_rendered_html": false,
+        "html_end": "<td>매매 판단 제약</td>\n<td>현재 주가와 독립적인 시장 전망치 부재</td>\n<td>가격 기준일 확인 불가; 설명 기록·신용·실사·동종기업 자료 미제공</td>\n</tr>\n</tbody>\n</table>\n"
+      },
+      {
+        "ticker": "BRK-B",
+        "report_field": "fundamentals_report",
+        "marker_present_in_raw": true,
+        "marker_present_in_rendered_html": false,
+        "html_end": "시장 전망치, 동종기업 비교, 신용위험 자료, 추가 실사 자료가 없음</td>\n<td>해당 항목은 이용 불가; 예상치 변화·신용도·최근 전망 변경은 추정하지 않음</td>\n</tr>\n</tbody>\n</table>\n"
+      },
+      {
+        "ticker": "XOM",
+        "report_field": "news_report",
+        "marker_present_in_raw": true,
+        "marker_present_in_rendered_html": false,
+        "html_end": "tr>\n<tr>\n<td>공시·거시 수치</td>\n<td>제공 기관 자료 없음</td>\n<td>판단 불가</td>\n<td>교차 검증 제한</td>\n<td>확인 불가</td>\n</tr>\n</tbody>\n</table>\n"
+      }
+    ],
+    "bounded_source_live_analyst_probe": {
+      "prompt_chars": 48734,
+      "elapsed_seconds": 115.55,
+      "scope": "Audit-only replay of captured Alpha Vantage source in a real analyst continuation; not a published cohort.",
+      "llm_calls": 1,
+      "report_sha256": "192ba24855bcdbc52bf3e70a6a0e2585101e8801aae4ff904a3b238555991ec3"
+    },
+    "merged_pull_requests": [
+      {
+        "mergeCommit": {
+          "oid": "28fc2103e187846056542bb2a22d84aff947e3f5"
+        },
+        "mergedAt": "2026-09-30T05:47:01Z",
+        "number": 295,
+        "title": "docs: KR·US 전략 생성·배포 전 구간 감사와 개선 과제",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/295"
+      },
+      {
+        "mergeCommit": {
+          "oid": "81e09522b5d57b07f44d75b4a337f310912162eb"
+        },
+        "mergedAt": "2026-09-30T07:35:10Z",
+        "number": 296,
+        "title": "Fix KR/US strategy integrity and overnight analysis recovery",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/296"
+      },
+      {
+        "mergeCommit": {
+          "oid": "529795c5c946b3c3ebc4525d6e0c95b883216c6d"
+        },
+        "mergedAt": "2026-09-30T07:42:23Z",
+        "number": 297,
+        "title": "Keep present HOLD separate from conditional risk response",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/297"
+      },
+      {
+        "mergeCommit": {
+          "oid": "bd4a353525512036417ae2d7d7e83e7c324ae50f"
+        },
+        "mergedAt": "2026-09-30T07:52:06Z",
+        "number": 298,
+        "title": "Refresh cached strategy assets and deduplicate active full runs",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/298"
+      },
+      {
+        "mergeCommit": {
+          "oid": "124d03f381bafc79ca0c1c14fb9f1cfb8969aadf"
+        },
+        "mergedAt": "2026-09-30T08:02:36Z",
+        "number": 299,
+        "title": "Preserve raw strategy risk plans and require full analysis coverage",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/299"
+      },
+      {
+        "mergeCommit": {
+          "oid": "3bb5d9fd75817f7ca7951d43ec66483851b5bfc2"
+        },
+        "mergedAt": "2026-09-30T08:26:03Z",
+        "number": 300,
+        "title": "Preserve PRISM event meaning and separate entry conditions from observations",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/300"
+      },
+      {
+        "mergeCommit": {
+          "oid": "48003c2fd5af401226118616eba24d6b7cb536c7"
+        },
+        "mergedAt": "2026-09-30T08:43:28Z",
+        "number": 301,
+        "title": "Reduce translation calls and preserve complete strategy conditions",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/301"
+      },
+      {
+        "mergeCommit": {
+          "oid": "e13f2dd6c1ff24a401d1b362f7c65e2ded743232"
+        },
+        "mergedAt": "2026-09-30T09:02:02Z",
+        "number": 302,
+        "title": "fix: restore executable analyst tools and reject contaminated report output",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/302"
+      },
+      {
+        "mergeCommit": {
+          "oid": "f203606d09fa2a8af1d62239aa68d54d13dda333"
+        },
+        "mergedAt": "2026-09-30T09:11:38Z",
+        "number": 303,
+        "title": "fix: retain tool invocation telemetry after message cleanup",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/303"
+      },
+      {
+        "mergeCommit": {
+          "oid": "fa064ee1bd11c136de47c9c6e4776277766af78e"
+        },
+        "mergedAt": "2026-09-30T09:20:47Z",
+        "number": 304,
+        "title": "docs: prohibit invented timing in Work investment conditions",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/304"
+      },
+      {
+        "mergeCommit": {
+          "oid": "22da00e873894cbbc2357719921fca8375e503d6"
+        },
+        "mergedAt": "2026-09-30T09:50:22Z",
+        "number": 305,
+        "title": "fix: preserve price and evidence context through the analysis graph",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/305"
+      },
+      {
+        "mergeCommit": {
+          "oid": "048cfe466ec0260384b4031d1ad6b7b543b851fe"
+        },
+        "mergedAt": "2026-09-30T10:01:21Z",
+        "number": 306,
+        "title": "Clarify quote timestamps and evidence coverage labels",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/306"
+      },
+      {
+        "mergeCommit": {
+          "oid": "d0e020396a92f569249409436d12cd6846a120a9"
+        },
+        "mergedAt": "2026-09-30T10:22:06Z",
+        "number": 307,
+        "title": "Label static analysis attempt observations accurately",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/307"
+      },
+      {
+        "mergeCommit": {
+          "oid": "5efca5d2a3b3ef1c4dedd7375e3c34a72b26eb61"
+        },
+        "mergedAt": "2026-09-30T10:34:36Z",
+        "number": 308,
+        "title": "Bound insider histories and reject incomplete model research",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/308"
+      },
+      {
+        "headRefOid": "ac0f3fb7d086884e8a257f2de008875b7fce7c8f",
+        "mergeCommit": {
+          "oid": "877f53b230251801d7cd344c0f8049177e34747a"
+        },
+        "mergedAt": "2026-09-30T11:18:24Z",
+        "number": 309,
+        "title": "fix: 거래량 확인 없는 위험 조건 즉시 발동 방지",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/309"
+      },
+      {
+        "headRefOid": "69a83898d0e9468a9127f7f1849efd5a92e3bd5b",
+        "mergeCommit": {
+          "oid": "1e0ed5757e82b28717bc96c4d018f1f2194f95cb"
+        },
+        "mergedAt": "2026-09-30T11:32:36Z",
+        "number": 310,
+        "title": "fix: 거래소 시간대와 종가 확인 근거를 엄격히 구분",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/310"
+      },
+      {
+        "headRefOid": "6e8747689d4d7f23fbdca62aeeae07600d7f6623",
+        "mergeCommit": {
+          "oid": "355982126287787661acbcd90871cc46f8cbcb67"
+        },
+        "mergedAt": "2026-09-30T12:16:11Z",
+        "number": 311,
+        "title": "fix: 장중 갱신에서 전체 분석의 필수 관심종목 보존",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/311"
+      },
+      {
+        "headRefOid": "957e4976e4a8a93cb8114c0a4d1283a471553d97",
+        "mergeCommit": {
+          "oid": "0376ea642ee1f8a91cf570f8fe9009ed94dcb11c"
+        },
+        "mergedAt": "2026-09-30T12:24:05Z",
+        "number": 312,
+        "title": "fix: 실제 보고서에서 관측된 깨진 출력 형식 거부",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/312"
+      },
+      {
+        "headRefOid": "a4b8071dce1c6ce2290e8f1efe99322ce33b9f14",
+        "mergeCommit": {
+          "oid": "48eb597af49dc6d2b15877c267dd5673ae616075"
+        },
+        "mergedAt": "2026-09-30T12:30:59Z",
+        "number": 313,
+        "title": "fix: 공급자 조정 재무지표와 발행사 공시의 비교 기준 명확화",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/313"
+      },
+      {
+        "headRefOid": "b49d851e7a314b0c3ac6ccecdf322588ad528b88",
+        "mergeCommit": {
+          "oid": "f3e1ed52f5c2fc7bda6ad8104ccd7f653b2f1932"
+        },
+        "mergedAt": "2026-09-30T12:44:17Z",
+        "number": 314,
+        "title": "fix: ADR 거래 통화를 재무 보고 통화로 잘못 전달하지 않기",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/314"
+      },
+      {
+        "headRefOid": "7bf6360123935e3cb8f4475305e750dbb172516a",
+        "mergeCommit": {
+          "oid": "96160fc2b8a3b85748782a18e5c6e238af24038b"
+        },
+        "mergedAt": "2026-09-30T13:37:10Z",
+        "number": 315,
+        "state": "MERGED",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/315"
+      },
+      {
+        "headRefOid": "759d8f0655f75000a19576f7d565d7352b26386e",
+        "mergeCommit": {
+          "oid": "46ecd00ec0a27063f5f5285f2e74d54b74c9531b"
+        },
+        "mergedAt": "2026-09-30T13:55:13Z",
+        "number": 316,
+        "state": "MERGED",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/316"
+      },
+      {
+        "headRefOid": "472ac275fdf6d63dae4dfe5990a18f75d19b14fa",
+        "mergeCommit": {
+          "oid": "4afa7f3d401a5823cbf50d2d7d12fe7c97f6bfac"
+        },
+        "mergedAt": "2026-09-30T14:18:14Z",
+        "number": 317,
+        "state": "MERGED",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/317"
+      },
+      {
+        "headRefOid": "10eddd5600dea6cd55e07dea29cab2ad35f58be2",
+        "mergeCommit": {
+          "oid": "2e539f23847f9d64cb00be83044727d31c79b0bf"
+        },
+        "mergedAt": "2026-09-30T14:30:30Z",
+        "number": 318,
+        "state": "MERGED",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/318"
+      },
+      {
+        "headRefOid": "60a9d57560594568a84d94c72551fda60f24c591",
+        "mergeCommit": {
+          "oid": "5ecc2cb288e76a5fd2b390b622684f5da0442cbf"
+        },
+        "mergedAt": "2026-09-30T14:39:13Z",
+        "number": 319,
+        "state": "MERGED",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/319"
+      },
+      {
+        "headRefOid": "ad95d3b7441d6cbc0f9a972cfc69091004c27c02",
+        "mergeCommit": {
+          "oid": "f7b898859c11995c2765428877ef944a1270c153"
+        },
+        "mergedAt": "2026-09-30T15:03:43Z",
+        "number": 320,
+        "state": "MERGED",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/320"
+      },
+      {
+        "headRefOid": "4c67b010c53fdb6b20726fb02fd9872181aacc4d",
+        "mergeCommit": {
+          "oid": "30e8256b4145e7f9f95a8f15ad9a6d49c573a8fd"
+        },
+        "mergedAt": "2026-09-30T15:41:27Z",
+        "number": 321,
+        "state": "MERGED",
+        "url": "https://github.com/nornen0202/TradingAgents/pull/321"
+      }
+    ],
+    "aborted_validation_probes": [
+      {
+        "workflow_id": 36684552324,
+        "run_id": "20260930T163627_github-actions-us",
+        "reason": "Missing graph tools and ETF/control-marker weaknesses found; cancelled after corrective merge; partial rows never promoted."
+      },
+      {
+        "workflow_id": 36693608968,
+        "run_id": "20260930T180418_github-actions-us",
+        "reason": "Date-as-price range and missing graph callback/context evidence found; cancelled after corrective merge; partial rows never promoted."
+      },
+      {
+        "workflow_id": 36698720442,
+        "run_id": "20260930T185222_github-actions-us",
+        "reason": "Oversized insider history caused a model fallback inside a supposedly successful AAPL report; cancelled for bounded-source and strict full-model correction; partial rows never promoted."
+      }
+    ],
+    "browser_observations": {
+      "observed_at": "2026-10-01T01:38:00+09:00",
+      "method": "Read-only live browser DOM after the final Work Pages deployment; clicked all, holding, and watchlist filters. Counts describe the visible cards, not an invented trade recommendation.",
+      "site_generation_label": "2026. 10. 01. 오전 01:31 GMT+9",
+      "markets": {
+        "us": {
+          "url": "https://nornen0202.github.io/TradingAgents/mobile/strategy.html?market=us",
+          "visible_rows": 30,
+          "directions": {
+            "buy": 25,
+            "hold": 5
+          },
+          "roles": {
+            "HOLDING": 14,
+            "WATCHLIST": 16
+          },
+          "readiness": {
+            "RECHECK": 30
+          },
+          "all_filter_status": "30개 중 30개 표시",
+          "holding_filter_status": "30개 중 14개 표시",
+          "watchlist_filter_status": "30개 중 16개 표시",
+          "summary_counts_equal_card_counts": true,
+          "input_price_evidence_score_and_site_generation_labels_visible": true,
+          "full_run_id": "20261001T000500_github-actions-us",
+          "overlay_run_id": "20261001T010505_github-actions-overlay-us",
+          "tickers": [
+            "GLDM",
+            "NVDA",
+            "GOOGL",
+            "AMZN",
+            "TSM",
+            "MPWR",
+            "AVGO",
+            "ETN",
+            "RSP",
+            "GEV",
+            "SGOV",
+            "JNJ",
+            "SCCO",
+            "LRCX",
+            "PM",
+            "BRK-B",
+            "ABBV",
+            "PG",
+            "WBD",
+            "XOM",
+            "LLY",
+            "AAPL",
+            "DELL",
+            "CVX",
+            "SHEL",
+            "SPYM",
+            "MRK",
+            "INTC",
+            "MA",
+            "MRVL"
+          ],
+          "risk_condition_checks": {
+            "RSP": "208.47 regular-session close AND increased volume; subsequent 207.74/203.96 close conditions; premarket price alone is not a sell trigger.",
+            "WBD": "30.90–30.92 rejection OR high actual position weight is visibly required. A price touch alone is insufficient.",
+            "MA": "553.12 close AND volume is preserved separately from the first-pilot 561.30/VWAP condition.",
+            "SHEL": "94.72 close and 25–50% reduction are separate; 25 is not rendered as a price; 93.19 close / 92.47 intraday conditions remain visible.",
+            "XOM": "159.27 close risk reduction and 157.47 close exit remain visible; no valid conditional-entry expiry is invented."
+          }
+        },
+        "kr": {
+          "url": "https://nornen0202.github.io/TradingAgents/mobile/strategy.html?market=kr",
+          "visible_rows": 27,
+          "directions": {
+            "buy": 20,
+            "hold": 7
+          },
+          "roles": {
+            "HOLDING": 13,
+            "WATCHLIST": 4,
+            "NEW_CANDIDATE": 10
+          },
+          "readiness": {
+            "RECHECK": 27
+          },
+          "all_filter_status": "27개 중 27개 표시",
+          "summary_counts_equal_card_counts": true,
+          "full_run_id": "20260930T081017_github-actions-kr",
+          "overlay_run_id": "20260930T145600_github-actions-overlay-kr",
+          "tickers": [
+            "267260.KS",
+            "010140.KS",
+            "035420.KS",
+            "058470.KQ",
+            "042700.KS",
+            "083450.KQ",
+            "010120.KS",
+            "278470.KS",
+            "005930.KS",
+            "096770.KS",
+            "090430.KS",
+            "007660.KS",
+            "128940.KS",
+            "033780.KS",
+            "062040.KS",
+            "000150.KS",
+            "086790.KS",
+            "055550.KS",
+            "093370.KS",
+            "000810.KS",
+            "105560.KS",
+            "353200.KS",
+            "403870.KQ",
+            "034020.KS",
+            "000660.KS",
+            "009150.KS",
+            "006400.KS"
+          ]
+        }
+      }
+    },
+    "verification_runs": {
+      "verified_at": "2026-09-30T15:41:30.659759+00:00",
+      "code_ci": [
+        {
+          "pull_request": 309,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36707297530,
+            "headSha": "ac0f3fb7d086884e8a257f2de008875b7fce7c8f",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36707297530"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36707297555,
+            "headSha": "ac0f3fb7d086884e8a257f2de008875b7fce7c8f",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36707297555"
+          }
+        },
+        {
+          "pull_request": 310,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36708580106,
+            "headSha": "69a83898d0e9468a9127f7f1849efd5a92e3bd5b",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36708580106"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36708580067,
+            "headSha": "69a83898d0e9468a9127f7f1849efd5a92e3bd5b",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36708580067"
+          }
+        },
+        {
+          "pull_request": 311,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36713170087,
+            "headSha": "6e8747689d4d7f23fbdca62aeeae07600d7f6623",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36713170087"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36713170083,
+            "headSha": "6e8747689d4d7f23fbdca62aeeae07600d7f6623",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36713170083"
+          }
+        },
+        {
+          "pull_request": 312,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36713876877,
+            "headSha": "957e4976e4a8a93cb8114c0a4d1283a471553d97",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36713876877"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36713876806,
+            "headSha": "957e4976e4a8a93cb8114c0a4d1283a471553d97",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36713876806"
+          }
+        },
+        {
+          "pull_request": 313,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36714786468,
+            "headSha": "a4b8071dce1c6ce2290e8f1efe99322ce33b9f14",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36714786468"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36714786485,
+            "headSha": "a4b8071dce1c6ce2290e8f1efe99322ce33b9f14",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36714786485"
+          }
+        },
+        {
+          "pull_request": 314,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36716106899,
+            "headSha": "b49d851e7a314b0c3ac6ccecdf322588ad528b88",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36716106899"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36716106907,
+            "headSha": "b49d851e7a314b0c3ac6ccecdf322588ad528b88",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36716106907"
+          }
+        },
+        {
+          "pull_request": 315,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36722464281,
+            "headSha": "7bf6360123935e3cb8f4475305e750dbb172516a",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36722464281"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36722464278,
+            "headSha": "7bf6360123935e3cb8f4475305e750dbb172516a",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36722464278"
+          }
+        },
+        {
+          "pull_request": 316,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36724525768,
+            "headSha": "759d8f0655f75000a19576f7d565d7352b26386e",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36724525768"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36724526946,
+            "headSha": "759d8f0655f75000a19576f7d565d7352b26386e",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36724526946"
+          }
+        },
+        {
+          "pull_request": 317,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36727578150,
+            "headSha": "472ac275fdf6d63dae4dfe5990a18f75d19b14fa",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36727578150"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36727578205,
+            "headSha": "472ac275fdf6d63dae4dfe5990a18f75d19b14fa",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36727578205"
+          }
+        },
+        {
+          "pull_request": 318,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36729044447,
+            "headSha": "10eddd5600dea6cd55e07dea29cab2ad35f58be2",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36729044447"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36729044438,
+            "headSha": "10eddd5600dea6cd55e07dea29cab2ad35f58be2",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36729044438"
+          }
+        },
+        {
+          "pull_request": 319,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36730232172,
+            "headSha": "60a9d57560594568a84d94c72551fda60f24c591",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36730232172"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36730232604,
+            "headSha": "60a9d57560594568a84d94c72551fda60f24c591",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36730232604"
+          }
+        },
+        {
+          "pull_request": 320,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36732906212,
+            "headSha": "ad95d3b7441d6cbc0f9a972cfc69091004c27c02",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36732906212"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36732906307,
+            "headSha": "ad95d3b7441d6cbc0f9a972cfc69091004c27c02",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36732906307"
+          }
+        },
+        {
+          "pull_request": 321,
+          "ci": {
+            "conclusion": "success",
+            "databaseId": 36738068086,
+            "headSha": "4c67b010c53fdb6b20726fb02fd9872181aacc4d",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36738068086"
+          },
+          "verified_steps": [
+            {
+              "name": "Run high-signal static checks",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run unit tests",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify mobile layout at 360, 390, and 430px",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify strategy interactions on mobile and desktop",
+              "conclusion": "success"
+            }
+          ],
+          "codeql": {
+            "conclusion": "success",
+            "databaseId": 36738068455,
+            "headSha": "4c67b010c53fdb6b20726fb02fd9872181aacc4d",
+            "status": "completed",
+            "url": "https://github.com/nornen0202/TradingAgents/actions/runs/36738068455"
+          }
+        }
+      ],
+      "latest_ci_test_summary": "1530 passed, 1 skipped, 104 subtests passed in 52.56s",
+      "skipped_test": {
+        "name": "tests/test_prism_live_opt_in.py::test_live_prism_dashboard_opt_in_smoke",
+        "reason": "Live PRISM HTTP dashboard smoke is explicitly opt-in. Archive parsing and canonical evidence checks are separate; a unit-test pass is not live provider success."
+      },
+      "local_full_suite": {
+        "code_change": "PR #312",
+        "result": "1447 passed, 1 skipped, 98 subtests passed in 55.93s",
+        "warning": "One google.genai deprecation warning about a future Python 3.17 removal."
+      },
+      "final_prompt_change_local_tests": {
+        "pull_request": 313,
+        "result": "35 passed in 1.36s; high-signal static checks and git diff --check passed."
+      },
+      "trading_currency_local_tests": {
+        "pull_request": 314,
+        "result": "5 passed in 1.18s; high-signal static checks and git diff --check passed."
+      },
+      "decision_clock_local_tests": {
+        "pull_request": 315,
+        "result": "1464 passed, 1 skipped, 98 subtests passed in 54.52s; 42 focused tests; high-signal static checks and git diff --check passed."
+      },
+      "research_recovery_local_tests": {
+        "pull_request": 316,
+        "result": "1503 passed, 1 skipped, 98 subtests passed in 54.61s; 153 focused tests; 36 final recovery tests; high-signal static checks and git diff --check passed."
+      },
+      "qualified_risk_local_tests": {
+        "pull_request": 317,
+        "result": "1522 passed, 1 skipped, 98 subtests passed in 57.63s; 79 focused tests and 2 subtests; high-signal static checks and git diff --check passed."
+      },
+      "exchange_research_date_local_tests": {
+        "pull_request": 318,
+        "result": "1526 passed, 1 skipped, 98 subtests passed in 55.71s; 44 focused tests; high-signal static checks and git diff --check passed."
+      },
+      "repair_markers_and_volume_wording_local_tests": {
+        "pull_request": 319,
+        "result": "85 focused tests and 18 subtests; high-signal static checks and git diff --check passed. Full suite and mobile/desktop checks verified in CI."
+      },
+      "completion_clock_local_tests": {
+        "pull_request": 320,
+        "result": "1530 passed, 1 skipped, 102 subtests passed in 54.85s; 61 focused tests; high-signal static checks and git diff --check passed. Full suite and mobile/desktop checks verified in CI."
+      },
+      "xom_schema_marker_local_tests": {
+        "pull_request": 321,
+        "result": "1530 passed, 1 skipped, 104 subtests passed in 53.62s; exact archived XOM news replay rejected, raw archive unchanged; high-signal static checks and git diff --check passed."
+      },
+      "scope": "Code/test verification receipts. Full research, Work report binding and live Pages deployment are verified separately in the final evidence document."
+    },
+    "concurrent_followup_report": {
+      "event_id": "us:3e7b1da131c4758b41966acc884f83cb",
+      "source_sha256": "d27bfb76d34f95dede563460fe1728cb09c7b4dcecee0be7aa37e2c11f000545",
+      "report_sha256": "775a46c06975fe92262383623b0e51fcd7e10c8a5064b21185338117b25b7ffa",
+      "published_at": "2026-10-01T01:38:35.224691+09:00",
+      "scope": "A concurrently produced follow-up report, not the original audited publication. Input bindings, coverage, membership, direction and immutable bytes checked read-only.",
+      "direction_counts": {
+        "BUY": 25,
+        "HOLD": 5
+      },
+      "readiness_counts": {
+        "NEEDS_LIVE_RECHECK": 30
+      },
+      "bindings_verified": true
+    }
   }
 }
