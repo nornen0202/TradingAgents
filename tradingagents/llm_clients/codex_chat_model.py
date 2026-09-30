@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import threading
 import time
 import uuid
@@ -289,7 +290,19 @@ class CodexChatModel(BaseChatModel):
             raise CodexStructuredOutputError(
                 f"Expected plain response JSON with string `answer`, got: {payload!r}"
             )
+        self._validate_final_content(payload["answer"])
         return AIMessage(content=payload["answer"])
+
+    @staticmethod
+    def _validate_final_content(content: str) -> None:
+        if any(marker in content for marker in (
+            "CHATGPT_FINAL_JSON_OUTPUT_PLACEHOLDER", "[im_start]", "[im_end]",
+            "[start_header_id]", "[end_header_id]", "[eot_id]",
+        )) or re.search(r"<(?:\|im_start\||\|im_end\||\|(?:assistant|analysis|final)\|)>|[｜](?:assistant|analysis|final)[｜]", content):
+            raise CodexStructuredOutputError(
+                "Final content contains serialization/control markers. Return clean report text only, "
+                "without response-format commentary or self-correction notes."
+            )
 
     @staticmethod
     def _codex_retry_delay(attempt: int) -> float:
@@ -310,6 +323,7 @@ class CodexChatModel(BaseChatModel):
             raise CodexStructuredOutputError("Structured response `content` must be a string.")
 
         if mode == "final":
+            self._validate_final_content(content)
             tool_calls = payload.get("tool_calls", [])
             if tool_calls not in ([], None):
                 if not content.strip():

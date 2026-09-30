@@ -1,13 +1,10 @@
+from tradingagents.agents.utils.analyst_tools import analyst_tools
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from tradingagents.agents.utils.macro_data_tools import get_macro_data
 
 from tradingagents.agents.utils.agent_utils import (
     bind_tools_for_analyst,
     build_instrument_context,
-    get_company_news,
-    get_disclosures,
     get_language_instruction,
-    get_macro_news,
     needs_initial_tool_call,
 )
 
@@ -20,12 +17,7 @@ def create_news_analyst(llm):
             state.get("instrument_profile"),
         )
 
-        tools = [
-            get_macro_data,
-            get_company_news,
-            get_macro_news,
-            get_disclosures,
-        ]
+        tools = analyst_tools("news")
 
         system_message = (
             "You are a news and event analyst. "

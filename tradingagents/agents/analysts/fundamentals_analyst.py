@@ -1,23 +1,11 @@
+from tradingagents.agents.utils.analyst_tools import analyst_tools
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from tradingagents.agents.utils.agent_utils import (
     bind_tools_for_analyst,
     build_instrument_context,
-    get_balance_sheet,
-    get_cashflow,
-    get_credit_risk_context,
-    get_diligence_context,
-    get_earnings_event_pack,
-    get_estimates_consensus,
-    get_fundamentals,
-    get_income_statement,
-    get_insider_transactions,
     get_language_instruction,
     needs_initial_tool_call,
-    get_peer_comps,
-    get_public_equity_intelligence_summary,
-    get_source_linked_financials,
-    get_transcript_evidence,
 )
 
 
@@ -29,21 +17,7 @@ def create_fundamentals_analyst(llm):
             state.get("instrument_profile"),
         )
 
-        tools = [
-            get_fundamentals,
-            get_balance_sheet,
-            get_cashflow,
-            get_income_statement,
-            get_insider_transactions,
-            get_source_linked_financials,
-            get_estimates_consensus,
-            get_earnings_event_pack,
-            get_transcript_evidence,
-            get_peer_comps,
-            get_credit_risk_context,
-            get_diligence_context,
-            get_public_equity_intelligence_summary,
-        ]
+        tools = analyst_tools("fundamentals")
 
         system_message = (
             "You are a fundamentals analyst focused on medium-term business quality and event risk. "
@@ -51,6 +25,8 @@ def create_fundamentals_analyst(llm):
             "Use `get_fundamentals(ticker, curr_date)` for the overview, `get_balance_sheet`, `get_cashflow`, and `get_income_statement` for statement detail, and `get_insider_transactions(ticker)` for insider activity. "
             "Use the institutional tools to strengthen reliability: `get_source_linked_financials`, `get_earnings_event_pack`, `get_estimates_consensus`, `get_transcript_evidence`, `get_peer_comps`, `get_credit_risk_context`, `get_diligence_context`, and `get_public_equity_intelligence_summary`. "
             "Tag important numbers and claims with the provider or source type that supports them. Explicitly state when transcript, consensus, credit, or diligence data is unavailable instead of inferring it. "
+            "For ETFs, funds, and trusts, assess the underlying exposure, holdings, NAV premium/discount, fees, flows, tracking, and relevant duration/credit or commodity risks. "
+            "Missing corporate revenue, EPS, operating margins, cash-flow statements, dividends, or insider trades are not automatically weaknesses of such vehicles; distinguish not applicable from unavailable. "
             "Distinguish the price reference date from the decision date. Report publication and retrieval times separately. A fiscal period end does not prove when a filing became available; do not claim point-in-time verification without filing acceptance evidence. "
             "Separate company-thesis evidence from security-thesis readiness, and call out whether new evidence strengthens, weakens, or leaves the thesis unchanged. "
             "Do not frame this as only a past-week exercise; emphasize the latest reported fundamentals and the most recent event-driven changes that matter for traders."
