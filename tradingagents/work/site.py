@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from tradingagents.report_reader import reader_assets
+
 import hashlib
 import html
 import json
@@ -148,7 +150,8 @@ def _publish_latest_report(
         f"<p>보고서 게시: {html.escape(str(report.get('published_at') or '미확인'))}</p>"
         f"<p>입력 시세 기준: {html.escape(str(structured.get('as_of') or '미확인'))}</p>"
         '<p>게시 시각은 입력 갱신 시각이 아닙니다. 아래 내용은 발행 당시 보고서이며 현재 주문 전에 다시 검증해야 합니다.</p>'
-        f"<pre>{html.escape(markdown)}</pre>",
+        f"<pre data-report-markdown>{html.escape(markdown)}</pre>",
+        enhance=True,
     ).encode("utf-8"))
     return {
         "schema": WORK_REPORT_SCHEMA,
@@ -165,13 +168,13 @@ def _publish_latest_report(
     }
 
 
-def _readable_html(title: str, content: str) -> str:
+def _readable_html(title: str, content: str, *, enhance: bool = False) -> str:
     return ('<!doctype html><html lang="ko"><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<title>{html.escape(title)}</title><style>'
             'body{font:16px/1.65 system-ui;max-width:960px;margin:auto;padding:24px;overflow-wrap:anywhere}'
             'pre{white-space:pre-wrap;font:inherit}dt{font-weight:bold}dd{margin:0 0 14px}'
-            f'</style><h1>{html.escape(title)}</h1>{content}</html>')
+            f'</style><body><main><h1>{html.escape(title)}</h1>{content}</main>{reader_assets() if enhance else ""}</body></html>')
 
 
 def _status_html(status: dict[str, Any]) -> str:
@@ -435,22 +438,23 @@ def _work_report_index_html() -> str:
       <a href="../prism-telegram/">PRISM 분석</a>
     </nav>
   </header>
-  <main>
+  <main data-reader-dynamic>
     <div class="tabs" role="tablist" aria-label="Work 분석 종류">
-      <button type="button" data-surface="kr" role="tab">KR 종합 전략</button>
-      <button type="button" data-surface="us" role="tab">US 종합 전략</button>
-      <button type="button" data-surface="youtube" role="tab">YouTube 종합</button>
-      <button type="button" data-surface="prism" role="tab">PRISM 종합</button>
+      <button type="button" id="work-tab-kr" data-surface="kr" role="tab" aria-controls="report">KR 종합 전략</button>
+      <button type="button" id="work-tab-us" data-surface="us" role="tab" aria-controls="report">US 종합 전략</button>
+      <button type="button" id="work-tab-youtube" data-surface="youtube" role="tab" aria-controls="report">YouTube 종합</button>
+      <button type="button" id="work-tab-prism" data-surface="prism" role="tab" aria-controls="report">PRISM 종합</button>
     </div>
     <p id="status" class="status" aria-live="polite">리포트를 불러오는 중입니다.</p>
-    <section id="report" class="panel" hidden>
+    <button type="button" id="retry-report" hidden>다시 불러오기</button>
+    <section id="report" class="panel" role="tabpanel" hidden>
       <div class="report-head">
         <div><h2 id="title"></h2><p id="meta" class="meta"></p></div>
         <a id="raw" class="raw-link" href="#">AI·원문 JSON</a>
       </div>
       <div id="summary" class="summary" hidden></div>
       <section id="actions-wrap" hidden><h3>핵심 제안</h3><ol id="actions" class="top-actions"></ol></section>
-      <details open><summary>전체 Work 리포트</summary><pre id="markdown"></pre></details>
+      <section aria-label="전체 Work 리포트"><pre id="markdown" data-report-markdown></pre></section>
     </section>
   </main>
   <script>
@@ -466,6 +470,8 @@ def _work_report_index_html() -> str:
     const actionsWrap = document.getElementById('actions-wrap');
     const actions = document.getElementById('actions');
     const markdown = document.getElementById('markdown');
+    const retry = document.getElementById('retry-report');
+    let requestId = 0, controller, selectedSurface = 'kr';
     const labels = {kr:'KR 종합 전략',us:'US 종합 전략',youtube:'YouTube 종합',prism:'PRISM 종합'};
 
     function localTime(value) {
@@ -514,19 +520,28 @@ def _work_report_index_html() -> str:
       return [ticker, thesis.stance, condition, (item || {}).readiness].map(plain).filter(Boolean).join(' · ');
     }
     async function load(surface) {
-      buttons.forEach((button) => button.setAttribute('aria-selected', String(button.dataset.surface === surface)));
+      const request = ++requestId;
+      selectedSurface = surface;
+      if (controller) controller.abort();
+      controller = new AbortController();
+      const activeController = controller;
+      const timer = setTimeout(() => activeController.abort(), 15000);
+      buttons.forEach((button) => { const selected = button.dataset.surface === surface; button.setAttribute('aria-selected', String(selected)); button.tabIndex = selected ? 0 : -1; });
+      report.setAttribute('aria-labelledby', 'work-tab-' + surface);
+      retry.hidden = true;
       status.classList.remove('error');
       status.textContent = `${labels[surface]} 리포트를 불러오는 중입니다.`;
       report.hidden = true;
       const url = `v1/${surface}/report/latest.json`;
       try {
-        const response = await fetch(url, {cache:'no-store', credentials:'omit'});
+        const response = await fetch(url, {cache:'no-store', credentials:'omit', signal: activeController.signal});
         if (!response.ok) throw new Error('아직 공개된 Work 리포트가 없습니다.');
         const payload = await response.json();
+        if (request !== requestId) return;
         const structured = payload.structured_report && typeof payload.structured_report === 'object' ? payload.structured_report : {};
         title.textContent = humanize(structured.title || labels[surface]);
         const asOf = structured.as_of || structured.generated_at;
-        meta.textContent = `분석 기준 ${localTime(asOf)} · Work 게시 ${localTime(payload.published_at)}`;
+        meta.textContent = `입력 기준 ${localTime(asOf)} · Work 게시 ${localTime(payload.published_at)}`;
         raw.href = url;
         const summaryText = plain(structured.summary);
         summary.textContent = summaryText;
@@ -539,22 +554,35 @@ def _work_report_index_html() -> str:
           return li;
         }));
         actionsWrap.hidden = topActions.length === 0;
-        markdown.textContent = humanize(payload.report_markdown || JSON.stringify(structured, null, 2));
+        markdown.textContent = payload.report_markdown || JSON.stringify(structured, null, 2);
         status.textContent = `${labels[surface]} · 공개 리포트 로드 완료`;
         report.hidden = false;
+        window.TradingAgentsReader?.enhance(report);
         const next = new URL(location.href);
         next.searchParams.set('surface', surface);
         history.replaceState(null, '', next);
       } catch (error) {
+        if (request !== requestId) return;
         status.classList.add('error');
-        status.textContent = error instanceof Error ? error.message : '리포트를 불러오지 못했습니다.';
+        status.textContent = error.name === 'AbortError' ? '연결 시간이 초과되었습니다. 다시 불러오세요.' : error instanceof Error ? error.message : '리포트를 불러오지 못했습니다.';
+        retry.hidden = false;
+      } finally {
+        clearTimeout(timer);
       }
     }
-    buttons.forEach((button) => button.addEventListener('click', () => load(button.dataset.surface)));
+    retry.addEventListener('click', () => load(selectedSurface));
+    buttons.forEach((button, index) => {
+      button.addEventListener('click', () => load(button.dataset.surface));
+      button.addEventListener('keydown', event => {
+        const next = {ArrowRight: (index + 1) % buttons.length, ArrowLeft: (index + buttons.length - 1) % buttons.length, Home: 0, End: buttons.length - 1}[event.key];
+        if (next == null) return;
+        event.preventDefault(); buttons[next].focus(); load(buttons[next].dataset.surface);
+      });
+    });
     const requested = new URLSearchParams(location.search).get('surface') || 'kr';
     load(surfaces.has(requested) ? requested : 'kr');
   })();
   </script>
 </body>
 </html>
-"""
+""".replace('  <script>', reader_assets() + '  <script>', 1)

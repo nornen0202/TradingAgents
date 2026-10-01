@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from tradingagents.report_reader import reader_assets
+
 from datetime import datetime, timezone
 from html import escape
 import hashlib
@@ -89,6 +91,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: PrismTelegramS
 <header class="hero">
   <p class="eyebrow">TradingAgents PRISM Telegram</p>
   <h1>{escape(settings.title)}</h1>
+  <nav class="topnav" aria-label="다른 리포트"><a href="../mobile/strategy.html?market=kr">투자 전략</a><a href="../work/">Work 종합</a><a href="../youtube/">YouTube</a></nav>
   <p>텔레그램 PRISM 메시지를 보조 신호로 수집해 ticker-level 근거와 공개 가능한 요약만 보여줍니다.</p>
 </header>
 <section>
@@ -344,6 +347,7 @@ def _page(*, title: str, body: str) -> str:
 </head>
 <body>
   <main>{body}</main>
+  {reader_assets()}
 </body>
 </html>
 """

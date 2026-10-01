@@ -9,6 +9,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from tradingagents.report_reader import READER_CSS, READER_JS
+
 from tradingagents.agents.utils.instrument_resolver import (
     InstrumentResolutionError,
     resolve_instrument,
@@ -1326,8 +1328,8 @@ def _private_html(*, desktop: bool = False) -> str:
     <section class="hero-mobile">
       <p class="eyebrow">KR · US · YOUTUBE · PRISM · WORK</p>
       <h1>한눈에 보는 투자 전략</h1>
-      <p>종목별 전략·발동 조건·위험을 확인하세요. 주문 전 최신 시세와 실행 상태를 다시 확인하세요.</p>
-      <div class="privacy-banner">계좌번호·고객 식별정보는 공개하지 않습니다.</div>
+      <p>전체 전략을 비교하고 종목별 진입 조건·위험 대응을 확인하세요.</p>
+      <p class="privacy-note">계좌번호·고객 식별정보는 공개하지 않습니다.</p>
       <nav class="report-nav" aria-label="전체 분석 리포트">
         <a href="{report_prefix}youtube/">YouTube 분석</a>
         <a href="{report_prefix}prism-telegram/">PRISM 분석</a>
@@ -1355,7 +1357,7 @@ def _private_html(*, desktop: bool = False) -> str:
 """
 
 
-_MOBILE_CSS = r"""
+_MOBILE_CSS = READER_CSS + r"""
 :root {
   color-scheme: dark;
   --bg: #06111d;
@@ -1481,7 +1483,46 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .market-overview { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; margin: 12px 0 16px; }
 .overview-stat { padding: 11px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.03); }
 .overview-stat strong { display: block; font-size: 1.18rem; }
-.overview-stat span { color: var(--muted); font-size: .66rem; line-height: 1.25; }
+.overview-stat span { color: var(--muted); font-size: .78rem; line-height: 1.4; }
+.overview-stat { color: var(--text); font: inherit; text-align: left; cursor: pointer; min-height: 72px; }
+.overview-stat[aria-pressed="true"] { border-color: var(--accent); background: rgba(89,214,199,.16); box-shadow: inset 0 0 0 1px var(--accent); }
+.overview-stat:hover { border-color: var(--accent); }
+.overview-help { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--muted); font-size: .8rem; }
+.clear-direction, .summary-detail, .back-to-overview { min-height: 44px; padding: 7px 8px; border: 0; background: transparent; color: var(--accent); font: inherit; cursor: pointer; }
+.strategy-summary { margin: 12px 0 24px; scroll-margin-top: 130px; }
+.strategy-summary h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.summary-scroll { max-height: 520px; max-height: min(65vh, 520px); overflow: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.strategy-summary table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: .83rem; }
+.strategy-summary th { position: sticky; top: 0; z-index: 2; background: var(--panel-2); text-align: left; padding: 12px 10px; }
+.strategy-summary th:nth-child(1) { width: 35%; }
+.strategy-summary th:nth-child(2) { width: 40%; }
+.strategy-summary th:nth-child(3) { width: 25%; text-align: right; }
+.strategy-summary td { border-top: 1px solid var(--line); padding: 8px 10px; vertical-align: top; overflow-wrap: anywhere; }
+.strategy-summary td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.strategy-summary tbody tr:nth-child(even) { background: rgba(255,255,255,.025); }
+.strategy-summary .summary-detail { display: block; text-align: left; font-weight: 800; padding: 0; }
+.strategy-summary small { display: block; color: var(--muted); font-size: .72rem; margin-top: 4px; }
+.summary-direction { display: block; font-weight: 800; }
+.summary-direction[data-direction="buy"] { color: var(--accent); }
+.summary-direction[data-direction="sell"], .summary-direction[data-direction="reduce"] { color: #ffbaae; }
+.summary-direction[data-direction="avoid"], .summary-direction[data-direction="research"] { color: #ffd080; }
+.summary-price { display: block; font-weight: 700; padding-top: 8px; }
+.back-to-overview { display: block; margin: -5px 0 5px auto; font-size: .8rem; }
+.action-card { scroll-margin-top: 130px; }
+.source-disclosure { margin: 8px 0 12px; }
+.source-disclosure > summary { min-height: 44px; padding: 10px 0; cursor: pointer; color: var(--muted); font-size: .82rem; }
+.source-disclosure .source-meta { margin-top: 8px; }
+.snapshot-clock { color: var(--muted); font-size: .76rem; margin: 6px 0; }
+.private-body .hero-mobile { padding: 4px 2px 10px; }
+.private-body .hero-mobile .eyebrow { display: none; }
+.private-body .hero-mobile h1 { font-size: clamp(1.45rem, 6vw, 2.4rem); line-height: 1.2; }
+.private-body .hero-mobile > p { font-size: .85rem; margin: 8px 0; }
+.private-body .hero-mobile .privacy-note { font-size: .72rem; }
+.private-body .report-nav a { min-height: 44px; display: inline-flex; align-items: center; }
+.private-body #private-status { flex: 1 1 0; min-width: 0; padding: 0; border: 0; background: transparent; font-size: .73rem; margin: 6px 0; }
+.private-body .strategy-filters { flex-wrap: nowrap; gap: 4px; }
+.private-body .strategy-filters button { flex: 1 1 0; min-width: 0; padding: 8px 4px; white-space: nowrap; font-size: .75rem; }
+@media (min-width: 960px) { .strategy-summary table { font-size: .95rem; } .strategy-summary td { padding: 10px 16px; } }
 .markdown-report { max-height: 32rem; margin: 4px 0 0; padding: 12px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; background: rgba(0,0,0,.18); color: #dce8f0; white-space: pre-wrap; overflow-wrap: anywhere; font: .78rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }
 .card-rationale { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
 .held-badge { margin-left: 6px; color: var(--accent); }
@@ -1506,7 +1547,7 @@ summary { min-height: 44px; padding: 11px 0; color: var(--muted); cursor: pointe
   .desktop-body .pipeline-explainer ol { grid-template-columns: repeat(4,minmax(0,1fr)); }
   .desktop-body .cards { grid-template-columns: repeat(3,minmax(0,1fr)); }
   .desktop-body .integrated-report { padding: 22px; }
-  .desktop-body .market-overview { grid-template-columns: repeat(5,minmax(0,1fr)); }
+  .desktop-body .market-overview { grid-template-columns: repeat(6,minmax(0,1fr)); }
 }
 
 [hidden] { display: none !important; }
@@ -1526,12 +1567,12 @@ button:disabled { opacity: .55; cursor: wait; }
 .filter-empty { padding: 24px 16px; border: 1px dashed var(--line); border-radius: 14px; text-align: center; }
 meter.confidence-track { width: 100%; border: 0; }
 meter::-webkit-meter-optimum-value { background: var(--accent); }
-@media (max-width: 379px) { .strategy-toolbar { grid-template-columns: 1fr; } }
+@media (max-width: 379px) { .strategy-toolbar { gap: 8px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
 """.strip()
 
 
-_PRIVATE_JS = r"""
+_PRIVATE_JS = READER_JS + r"""
 (() => {
   'use strict';
   const status = document.getElementById('private-status');
@@ -1981,7 +2022,7 @@ _PRIVATE_JS = r"""
       humanPlan(action.sell_size_plan),
     ) || '조건 확인 후 전략 방향 재분석';
   }
-  function card(row, market, topTickers) {
+  function card(row, market, topTickers, marketId) {
     const strategy = workStrategy(market, row.ticker);
     const hasWork = Object.keys(strategy).length > 0;
     const hasThesis = hasWork || Boolean(row.thesis);
@@ -2033,7 +2074,8 @@ _PRIVATE_JS = r"""
       ${fullBaseInvalidation ? `<p><strong>기본 분석 전체 무효화 조건</strong><br>${esc(fullBaseInvalidation)}</p>` : ''}
       ${action.rationale ? `<p><strong>기본 분석 근거</strong><br>${esc(valueText(action.rationale))}</p>` : ''}
     </details>`;
-    return `<article class="action-card" data-ticker="${esc(tickerIdentity)}" data-search="${esc(`${displayName} ${row.ticker || ''} ${row.sector || ''}`.toLocaleLowerCase())}" data-change="${numeric(row.price_change_pct)}" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
+    return `<article class="action-card" id="strategy-${esc(marketId)}-${esc(encodeURIComponent(tickerIdentity))}" tabindex="-1" data-ticker="${esc(tickerIdentity)}" data-name="${esc(displayName)}" data-direction="${esc(direction.kind)}" data-search="${esc(`${displayName} ${row.ticker || ''} ${row.sector || ''}`.toLocaleLowerCase())}" data-change="${numeric(row.price_change_pct)}" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
+      <button type="button" class="back-to-overview">↑ 전략 요약표로</button>
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
       <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}</span></div>
       <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
@@ -2086,7 +2128,7 @@ _PRIVATE_JS = r"""
       buckets[Object.hasOwn(buckets, kind) ? kind : 'RESEARCH'] += 1;
     });
     const labels = {BUY: '매수·추가 검토', HOLD: '보유·관찰', REDUCE: '축소 검토', SELL: '매도·청산', AVOID: '신규 매수 보류', RESEARCH: '추가 조사'};
-    return `<div class="market-overview" aria-label="전략 분포">${Object.entries(buckets).map(([key, count]) => `<div class="overview-stat" data-direction="${key.toLowerCase()}"><strong>${count}</strong><span>${labels[key]}</span></div>`).join('')}</div>`;
+    return `<div class="overview-help"><span>분석 방향을 누르면 해당 종목만 표시합니다.</span><button type="button" class="clear-direction" data-direction-target="all">전체 방향</button></div><div class="market-overview" role="group" aria-label="전략 방향 필터">${Object.entries(buckets).map(([key, count]) => `<button type="button" class="overview-stat" data-direction="${key.toLowerCase()}" data-direction-target="${key.toLowerCase()}" aria-pressed="false" aria-label="${labels[key]} ${count}종목 보기"><strong>${count}</strong><span>${labels[key]}</span></button>`).join('')}</div>`;
   }
   function attemptStatus(item) {
     const attempt = item.latest_attempt || {};
@@ -2144,11 +2186,11 @@ _PRIVATE_JS = r"""
       ${analysisOnly && topActions.length ? '<p class="readiness-note"><strong>분석 시점 핵심 액션 참고:</strong> 현재 주문 가능 여부가 아니라 Work 분석 당시 제안입니다.</p>' : ''}
       ${topActions.length ? `<div class="work-top-actions">${topActions.slice(0, 3).map(workTopAction).join('')}</div>` : ''}
       ${topActions.length > 3 ? `<details><summary>통합 핵심 액션 전체 보기</summary><div class="work-top-actions">${topActions.map(workTopAction).join('')}</div></details>` : ''}
-      ${contributions ? `<div class="source-chips">${contributions}</div>` : ''}
+      ${contributions ? `<details><summary>자료·출처 상세</summary><div class="source-chips">${contributions}</div></details>` : ''}
       ${evidenceAudit(structured.source_summary)}
       ${modelAudit(structured.model_receipt)}
       ${structured.next_checkpoint ? `<p class="readiness-note"><strong>다음 확인:</strong> ${esc(valueText(structured.next_checkpoint))}</p>` : ''}
-      ${report.report_markdown ? `<details><summary>통합 리포트 전체 보기</summary><pre class="markdown-report">${esc(report.report_markdown)}</pre></details>` : ''}
+      ${report.report_markdown ? `<details><summary>통합 리포트 전체 보기</summary><pre class="markdown-report" data-report-markdown>${esc(report.report_markdown)}</pre></details>` : ''}
     </section>`;
   }
   function marketHealth(item, rows) {
@@ -2171,13 +2213,16 @@ _PRIVATE_JS = r"""
     return {className: 'degraded', label: '전략 제공 · 주문 전 확인', empty: ''};
   }
 const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
+  const directions = ['all', 'buy', 'hold', 'reduce', 'sell', 'avoid', 'research'];
+  const directionLabels = {all: '전체 방향', buy: '매수·추가 검토', hold: '보유·관찰', reduce: '축소 검토', sell: '매도·청산', avoid: '신규 매수 보류', research: '추가 조사'};
   const sorts = ['priority', 'name', 'change'];
   let selectedMarket = requestedMarket;
   let currentPayload;
   let loading = false;
   const refreshButton = document.getElementById('strategy-refresh');
   const views = Object.fromEntries(['kr', 'us'].map((market) => [market, {
-    group: market === requestedMarket && groups.includes(query.get('group')) ? query.get('group') : 'TOP',
+    group: market === requestedMarket && groups.includes(query.get('group')) ? query.get('group') : 'ALL',
+    direction: market === requestedMarket && directions.includes(query.get('direction')) ? query.get('direction') : 'all',
     search: market === requestedMarket ? (query.get('q') || '').slice(0, 100) : '',
     sort: market === requestedMarket && sorts.includes(query.get('sort')) ? query.get('sort') : 'priority',
   }]));
@@ -2185,7 +2230,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     const url = new URL(location.href);
     const view = views[selectedMarket];
     url.searchParams.set('market', selectedMarket);
-    for (const [key, value, fallback] of [['group', view.group, 'TOP'], ['q', view.search, ''], ['sort', view.sort, 'priority']]) {
+    for (const [key, value, fallback] of [['group', view.group, 'ALL'], ['direction', view.direction, 'all'], ['q', view.search, ''], ['sort', view.sort, 'priority']]) {
       if (value === fallback) url.searchParams.delete(key); else url.searchParams.set(key, value);
     }
     history.replaceState(null, '', url);
@@ -2209,12 +2254,24 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     let visible = 0;
     for (const entry of entries) {
       const inGroup = view.group === 'ALL' || (view.group === 'TOP' ? entry.dataset.top === 'true' : entry.dataset.group === view.group);
-      entry.hidden = !inGroup || !terms.every((term) => entry.dataset.search.includes(term));
+      entry.hidden = !inGroup || (view.direction !== 'all' && entry.dataset.direction !== view.direction) || !terms.every((term) => entry.dataset.search.includes(term));
       if (!entry.hidden) visible += 1;
     }
     panel.querySelectorAll('[data-group-target]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.groupTarget === view.group)));
-    panel.querySelector('.result-count').textContent = entries.length + '개 중 ' + visible + '개 표시';
+    panel.querySelectorAll('[data-direction-target]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.directionTarget === view.direction)));
+    panel.querySelector('.result-count').textContent = entries.length + '개 중 ' + visible + '개 표시 · ' + directionLabels[view.direction];
+    panel.querySelector('.strategy-summary h3').textContent = view.direction === 'all' && view.group === 'ALL' && !view.search ? '전체 전략 한눈에' : directionLabels[view.direction] + ' · ' + visible + '종목';
     panel.querySelector('.filter-empty').hidden = visible > 0 || entries.length === 0;
+    const scroll = panel.querySelector('.summary-scroll');
+    const scrollTop = scroll.scrollTop;
+    panel.querySelector('.strategy-summary tbody').innerHTML = ordered.filter((entry) => !entry.hidden).map((entry) => {
+      const direction = entry.querySelector('.strategy-direction').textContent;
+      const readiness = entry.querySelector('.card-title .row-mode').textContent;
+      const price = entry.querySelector('.price-line strong').textContent;
+      return `<tr data-ticker="${esc(entry.dataset.ticker)}"><td><button type="button" class="summary-detail" data-detail-target="${esc(entry.id)}" aria-label="${esc(entry.dataset.name)} 전략 조건·위험 상세 보기">${esc(entry.dataset.name)}</button><small>${esc(entry.dataset.ticker)} · ${esc(roleLabel(entry.dataset.group))}</small></td><td><span class="summary-direction" data-direction="${esc(entry.dataset.direction)}">${esc(direction)}</span><small>${esc(readiness)}</small></td><td><span class="summary-price">${esc(price)}</span><small>입력 시세</small></td></tr>`;
+    }).join('');
+    scroll.scrollTop = scrollTop;
+    scroll.hidden = visible === 0;
   }
   function updateCards(panel, item) {
     const rows = Array.isArray(item.rows) ? item.rows : [];
@@ -2225,6 +2282,8 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
       if (detail.open) opened.add(entry.dataset.ticker + ':' + index);
     }));
     const active = document.activeElement;
+    const focusedDirection = active && active.dataset.directionTarget;
+    const focusedDetail = active && active.dataset.detailTarget;
     const focusedCard = active && active.closest('.action-card');
     const focusedIndex = focusedCard ? [...focusedCard.querySelectorAll('summary, a, button')].indexOf(active) : -1;
     const focusedTicker = focusedCard && focusedCard.dataset.ticker;
@@ -2232,7 +2291,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     panel.querySelector('.market-health').className = 'health market-health health-' + health.className;
     panel.querySelector('.market-health').textContent = health.label;
     panel.querySelector('.overview-container').innerHTML = marketOverview(rows, item);
-    panel.querySelector('.cards').innerHTML = ranked.map((row) => card(row, item, topTickers)).join('') || '<p class="empty">' + esc(health.empty || '현재 표시할 전략 데이터가 없습니다.') + '</p>';
+    panel.querySelector('.cards').innerHTML = ranked.map((row) => card(row, item, topTickers, panel.dataset.market)).join('') || '<p class="empty">' + esc(health.empty || '현재 표시할 전략 데이터가 없습니다.') + '</p>';
     const counts = {TOP: topTickers.size, ALL: rows.length};
     panel.querySelectorAll('.action-card').forEach((entry, index) => {
       entry.dataset.order = String(index);
@@ -2243,6 +2302,8 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
       button.textContent = button.dataset.label + ' ' + (counts[button.dataset.groupTarget] || 0);
     });
     applyView(panel);
+    if (focusedDirection) [...panel.querySelectorAll('[data-direction-target]')].find((node) => node.dataset.directionTarget === focusedDirection)?.focus({preventScroll: true});
+    if (focusedDetail) [...panel.querySelectorAll('[data-detail-target]')].find((node) => node.dataset.detailTarget === focusedDetail)?.focus({preventScroll: true});
     if (focusedTicker && focusedIndex >= 0) {
       const entry = [...panel.querySelectorAll('.action-card')].find((node) => node.dataset.ticker === focusedTicker);
       if (entry && !entry.hidden) entry.querySelectorAll('summary, a, button')[focusedIndex]?.focus({preventScroll: true});
@@ -2256,17 +2317,36 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     const sourceLabel = item.integrated_report
       ? item.integrated_report.analysis_only === true ? 'Work 분석 결합 · 현재 실행 우선' : '현재 Work 종합 완료'
       : item.reference_report ? '기본 전략 · 분석 시점 Work 참고' : '기본 전략';
-    panel.innerHTML = '<div class="market-head"><div><p class="eyebrow">' + market.toUpperCase() + ' STRATEGY</p><h2>' + market.toUpperCase() + ' 투자 액션</h2></div><div><span class="health health-neutral">' + sourceLabel + '</span><span class="health market-health"></span></div></div>' + attemptStatus(item)
-      + '<div class="source-meta"><span>일봉 가격 기준일 ' + esc((item.freshness_receipt || {}).analysis_trade_date_oldest || '미확인') + '</span><span>시세 기준 ' + esc(dateTime((item.freshness_receipt || {}).market_data_oldest_at)) + '</span><span>계좌 기준 ' + esc(dateTime((item.freshness_receipt || {}).account_as_of)) + '</span><span>자료 갱신 실행 ' + esc(dateTime(item.started_at)) + '</span><span>실행 ID ' + esc(item.run_id || '-') + '</span></div><div class="overview-container"></div>'
+    panel.innerHTML = '<div class="market-head"><div><p class="eyebrow">' + market.toUpperCase() + ' STRATEGY</p><h2>' + market.toUpperCase() + ' 투자 액션</h2></div><div><span class="health health-neutral">' + sourceLabel + '</span><span class="health market-health"></span></div></div><p class="snapshot-clock">입력 시세 ' + esc(dateTime((item.freshness_receipt || {}).market_data_oldest_at)) + '</p><details class="source-disclosure"><summary>자료 시점·분석 상태 확인</summary>' + attemptStatus(item)
+      + '<div class="source-meta"><span>일봉 가격 기준일 ' + esc((item.freshness_receipt || {}).analysis_trade_date_oldest || '미확인') + '</span><span>시세 기준 ' + esc(dateTime((item.freshness_receipt || {}).market_data_oldest_at)) + '</span><span>계좌 기준 ' + esc(dateTime((item.freshness_receipt || {}).account_as_of)) + '</span><span>자료 갱신 실행 ' + esc(dateTime(item.started_at)) + '</span><span>실행 ID ' + esc(item.run_id || '-') + '</span></div></details><div class="overview-container"></div>'
       + '<div class="strategy-toolbar"><label for="search-' + market + '">종목 검색<input id="search-' + market + '" type="search" maxlength="100" placeholder="종목명 · 티커 · 업종" value="' + esc(view.search) + '" autocomplete="off" aria-controls="cards-' + market + '"></label>'
       + '<label for="sort-' + market + '">정렬<select id="sort-' + market + '"><option value="priority">우선순위</option><option value="name">종목명순</option><option value="change">등락률순 ↓</option></select></label></div>'
       + '<nav class="strategy-filters" aria-label="종목 유형">' + groups.map((group, index) => '<button type="button" data-group-target="' + group + '" data-label="' + ['핵심','보유','관심','신규','전체'][index] + '" aria-pressed="false"></button>').join('') + '</nav>'
-      + '<p class="result-count" role="status" aria-live="polite" aria-atomic="true"></p><div class="filter-empty" hidden><p>검색 조건에 맞는 종목이 없습니다.</p><button type="button" class="reset-filters">검색·필터 초기화</button></div>'
+      + '<p class="result-count" role="status" aria-live="polite" aria-atomic="true"></p>'
+      + '<section class="strategy-summary" id="summary-' + market + '" tabindex="-1"><h3>전체 전략 한눈에</h3><p class="readiness-note">종목명 선택 → 진입 조건·위험 대응 전문</p><div class="filter-empty" hidden><p>검색 조건에 맞는 종목이 없습니다.</p><button type="button" class="reset-filters">검색·필터 초기화</button></div><div class="summary-scroll" role="region" aria-label="종목별 전략 요약표 · 스크롤하여 전체 보기" tabindex="0"><table><thead><tr><th scope="col">종목</th><th scope="col">전략·현재 상태</th><th scope="col">시세</th></tr></thead><tbody></tbody></table></div></section>'
       + '<div class="cards" id="cards-' + market + '"></div>' + integratedReport(item) + integratedReport(item, 'reference_report');
     const search = panel.querySelector('input');
     const sort = panel.querySelector('select');
     sort.value = view.sort;
     const update = () => { applyView(panel); syncUrl(); };
+    panel.addEventListener('click', (event) => {
+      const direction = event.target.closest('[data-direction-target]');
+      if (direction) {
+        view.direction = direction.dataset.directionTarget === view.direction ? 'all' : direction.dataset.directionTarget;
+        view.group = 'ALL'; view.search = ''; search.value = ''; update();
+        const summary = panel.querySelector('.strategy-summary');
+        summary.scrollIntoView({block: 'start'}); summary.focus({preventScroll: true});
+      }
+      const detail = event.target.closest('[data-detail-target]');
+      if (detail) {
+        const card = document.getElementById(detail.dataset.detailTarget);
+        if (card && !card.hidden) { card.scrollIntoView({block: 'start'}); card.focus({preventScroll: true}); }
+      }
+      if (event.target.closest('.back-to-overview')) {
+        const summary = panel.querySelector('.strategy-summary');
+        summary.scrollIntoView({block: 'start'}); summary.focus({preventScroll: true});
+      }
+    });
     search.addEventListener('input', () => {
       view.search = search.value;
       if (view.search.trim() && view.group === 'TOP') view.group = 'ALL';
@@ -2275,11 +2355,12 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     sort.addEventListener('change', () => { view.sort = sort.value; update(); });
     panel.querySelectorAll('[data-group-target]').forEach((button) => button.addEventListener('click', () => { view.group = button.dataset.groupTarget; update(); }));
     panel.querySelector('.reset-filters').addEventListener('click', () => {
-      view.group = 'ALL'; view.search = ''; view.sort = 'priority'; search.value = ''; sort.value = 'priority'; update(); search.focus();
+      view.group = 'ALL'; view.direction = 'all'; view.search = ''; view.sort = 'priority'; search.value = ''; sort.value = 'priority'; update(); search.focus();
     });
     if (view.search.trim() && view.group === 'TOP') view.group = 'ALL';
     panel.dataset.mounted = 'true';
     updateCards(panel, item);
+    panel.querySelectorAll('.integrated-report').forEach(report => window.TradingAgentsReader?.enhance(report));
   }
   function selectMarket(market) {
     selectedMarket = market;

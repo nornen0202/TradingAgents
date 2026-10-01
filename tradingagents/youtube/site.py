@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from tradingagents.report_reader import reader_assets
+
 from datetime import datetime, timezone
 from html import escape
 import hashlib
@@ -141,6 +143,7 @@ def _render_index_page(manifests: list[dict[str, Any]], settings: YouTubeSiteSet
 <header class="hero">
   <p class="eyebrow">TradingAgents YouTube</p>
   <h1>{escape(settings.title)}</h1>
+  <nav class="topnav" aria-label="다른 리포트"><a href="../mobile/strategy.html?market=kr">투자 전략</a><a href="../work/">Work 종합</a><a href="../prism-telegram/">PRISM</a></nav>
   <p>최근 24시간 업로드 영상을 수집해 영상 주장과 공개 데이터 검증 결과를 분리한 투자자용 리포트입니다.</p>
 </header>
 {synthesis_feature}
@@ -474,6 +477,7 @@ def _page(*, title: str, body: str) -> str:
 </head>
 <body>
   <main>{body}</main>
+  {reader_assets()}
 </body>
 </html>
 """

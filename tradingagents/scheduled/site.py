@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from tradingagents.report_reader import reader_assets
+
 import html
 import json
 import os
@@ -3347,6 +3349,7 @@ def _page_template(title: str, body: str, *, prefix: str) -> str:
   <main class="shell" id="main-content" tabindex="-1">
     {body}
   </main>
+  {reader_assets()}
 </body>
 </html>
 """
@@ -4968,6 +4971,8 @@ a { color: inherit; }
   box-shadow: var(--shadow);
 }
 
+.hero > * { min-width: 0; overflow-wrap: anywhere; }
+
 .hero h1, .section h2 {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
@@ -5012,6 +5017,8 @@ a { color: inherit; }
   overflow-wrap: anywhere;
   text-align: right;
 }
+
+.hero-card p strong { flex: 0 0 auto; }
 
 .ticker-card p.long-field {
   align-items: flex-start;
@@ -5396,7 +5403,7 @@ a { color: inherit; }
 }
 
 @media (max-width: 840px) {
-  .hero { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: minmax(0, 1fr); }
   .shell { width: min(100% - 20px, 1180px); }
   .profit-calendar-grid { grid-template-columns: 1fr; }
   .profit-month-row { grid-template-columns: 64px minmax(90px, 1fr); }

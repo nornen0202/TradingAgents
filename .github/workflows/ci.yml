@@ -44,3 +44,6 @@ jobs:
 
       - name: Verify strategy interactions on mobile and desktop
         run: python .github/scripts/strategy_interaction_regression.py
+
+      - name: Verify report reading and navigation on mobile and desktop
+        run: python .github/scripts/report_reading_regression.py
