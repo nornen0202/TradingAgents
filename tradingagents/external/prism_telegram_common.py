@@ -20,7 +20,8 @@ from .prism_normalize import (
 DEFAULT_TELEGRAM_CHANNEL = "stock_ai_agent"
 DEFAULT_PUBLIC_PREVIEW_URL = "https://t.me/s/stock_ai_agent"
 TELEGRAM_SOURCE_TAG = "telegram_stock_ai_agent"
-TELEGRAM_NORMALIZATION_VERSION = "prism-telegram/v2"
+TELEGRAM_NORMALIZATION_VERSION = "prism-telegram/v3"
+_PARENTHESIZED_TICKER = re.compile(r"\((?P<ticker>[A-Z][A-Z0-9.\-]{0,9}|\d{6})\)")
 
 
 @dataclass(frozen=True)
@@ -126,6 +127,7 @@ class _TickerMention:
     ticker: str
     display_name: str | None
     context: str
+    parenthetical_offset: int | None = None
 
 
 def runtime_config_from_any(value: Any, *, default_market: str | None = None) -> PrismTelegramRuntimeConfig:
@@ -385,7 +387,8 @@ def _ticker_mentions_from_line(line: str) -> list[_TickerMention]:
     text = _collapse_ws(line)
     if not text:
         return []
-    matches = list(re.finditer(r"\((?P<ticker>[A-Z][A-Z0-9.\-]{0,9}|\d{6})\)", text))
+    matches = list(_PARENTHESIZED_TICKER.finditer(text))
+    explicit_ticker_list = bool(matches and _has_explicit_ticker_label(text[:matches[0].start()]))
     mentions = []
     previous_end = 0
     for match in matches:
@@ -396,6 +399,11 @@ def _ticker_mentions_from_line(line: str) -> list[_TickerMention]:
             # Do not carry the preceding company's reason into the next name.
             prefix = re.split(r"\s[/|;]\s", prefix)[-1].strip()
         prefix = re.sub(r"^[\-·•*\s/|;,🔸🚀🔨📊📈📉⚠️✅]+", "", prefix).strip()
+        # Advance even for an explanatory abbreviation so its description cannot
+        # become the next company's name. Never blacklist the symbol itself.
+        previous_end = match.end()
+        if not explicit_ticker_list and _is_explanatory_abbreviation(ticker, prefix):
+            continue
         if ":" in prefix:
             left, right = prefix.split(":", 1)
             if any(marker in left.lower() for marker in (
@@ -405,9 +413,39 @@ def _ticker_mentions_from_line(line: str) -> list[_TickerMention]:
         display_name = prefix.rstrip("-:|").strip() or None
         if display_name and len(display_name) > 120:
             display_name = display_name[-120:].strip()
-        mentions.append(_TickerMention(ticker=ticker, display_name=display_name, context=text))
-        previous_end = match.end()
+        mentions.append(_TickerMention(ticker=ticker, display_name=display_name, context=text, parenthetical_offset=match.start()))
     return mentions
+
+
+def _has_explicit_ticker_label(prefix: str) -> bool:
+    return re.search(r"(?:^|[\s|;/])(?:tickers?|symbols?|티커(?:\s*목록)?|종목\s*(?:코드|목록))\s*[:：=]", prefix, re.IGNORECASE) is not None
+
+
+def _is_explanatory_abbreviation(ticker: str, prefix: str) -> bool:
+    """Reject only a few explicit term/abbreviation pairs, not possible tickers.
+
+    A company name, a bare symbol list, or an explicit ticker label remains a
+    candidate even if its symbol also names a technical concept. This is not a
+    security-master validation or a cleanup of previously recorded signals.
+    """
+    if _has_explicit_ticker_label(prefix):
+        return False
+    boundary = r"(?:^|[\s:：,;/|])"
+    average = re.fullmatch(r"SMA([0-9]{1,3})", ticker)
+    if average:
+        period = average.group(1)
+        description = (
+            rf"(?:{period}\s*일\s*(?:단순\s*)?이동\s*평균(?:선)?"
+            rf"|{period}\s*[- ]\s*(?:day|period)\s+(?:simple\s+)?moving\s+average)"
+        )
+        return re.search(boundary + description + r"\s*$", prefix, re.IGNORECASE) is not None
+    if ticker == "UTC":
+        description = r"(?:기준\s*(?:시각|시간)|시간대|협정\s*세계\s*시|coordinated\s+universal\s+time|time\s*zone|timestamp)"
+        return re.search(boundary + description + r"\s*$", prefix, re.IGNORECASE) is not None
+    if ticker == "NAND":
+        description = r"(?:낸드(?:\s*플래시(?:\s*메모리)?)?|nand\s+flash(?:\s+memory)?|not[-\s]+and)"
+        return re.search(boundary + description + r"\s*$", prefix, re.IGNORECASE) is not None
+    return False
 
 
 def _ticker_mention_from_document(document: PrismTelegramDocument) -> _TickerMention | None:
@@ -491,21 +529,33 @@ def _infer_confidence_text(text: str) -> float | None:
 
 
 def _mention_scoped_text(text: str, ticker: str, *, multi_ticker: bool) -> str:
-    if not multi_ticker:
-        return text
     lines = _message_lines(text)
-    ticker_pattern = re.compile(rf"\({re.escape(str(ticker).upper())}\)", flags=re.IGNORECASE)
-    any_ticker_pattern = re.compile(r"\((?:[A-Z][A-Z0-9.\-]{0,9}|\d{6})\)")
-    start = next((index for index, line in enumerate(lines) if ticker_pattern.search(line)), None)
+    mentions_by_line = [_ticker_mentions_from_line(line) for line in lines]
+    ignored_abbreviation = any(
+        len(_PARENTHESIZED_TICKER.findall(line)) > len(mentions)
+        for line, mentions in zip(lines, mentions_by_line)
+    )
+    if not multi_ticker and not ignored_abbreviation:
+        return text
+    normalized_ticker = str(ticker).upper()
+    start = next((index for index, mentions in enumerate(mentions_by_line)
+                  if any(mention.ticker == normalized_ticker for mention in mentions)), None)
     if start is None:
+        # Plain single filename-only text returned above. If an abbreviation was
+        # ignored, do not assign its unscoped prices to a filename-only company.
         return ""
-    if len(any_ticker_pattern.findall(lines[start])) > 1:
+    if len(mentions_by_line[start]) > 1:
         # Inline prices cannot be assigned safely by the block-based parser.
         # Keep every ticker, but do not copy one company's price to the others.
         return ""
+    start_mention = mentions_by_line[start][0]
+    if _PARENTHESIZED_TICKER.search(start_mention.context[:start_mention.parenthetical_offset]):
+        # An ignored header earlier on this same line may own its Current/Stop
+        # fields. Keep the company identity, but do not guess inline attribution.
+        return ""
     selected = [lines[start]]
-    for line in lines[start + 1 :]:
-        if any_ticker_pattern.search(line):
+    for line, mentions in zip(lines[start + 1 :], mentions_by_line[start + 1 :]):
+        if mentions:
             break
         selected.append(line)
     return "\n".join(selected)
