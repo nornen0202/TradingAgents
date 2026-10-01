@@ -1,7 +1,7 @@
 {
   "schema": "tradingagents.ai-context/v1",
   "market": "kr",
-  "generated_at": "2026-10-01T05:07:41.069767+00:00",
+  "generated_at": "2026-10-01T05:44:58.568894+00:00",
   "freshness_receipt": {
     "producer_run_id": "20261001T135600_github-actions-overlay-kr",
     "producer_finished_at": "2026-10-01T14:05:52.182682+09:00",
@@ -12,7 +12,7 @@
     "analysis_lineage_status": "RESOLVED",
     "market_data_oldest_at": "2026-10-01T13:56:00+09:00",
     "market_data_latest_at": "2026-10-01T13:56:30.560607+09:00",
-    "market_data_status": "FRESH"
+    "market_data_status": "STALE"
   },
   "account": {
     "status": "available",
@@ -226,7 +226,7 @@
       "risk_condition_ko": "199,864 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
       "decision_state_ko": "실행 조건 감시 중",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-01T14:26:00+09:00"
@@ -249,7 +249,7 @@
       "risk_condition_ko": "266,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
       "decision_state_ko": "조건 충족 전 대기",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-01T14:26:00+09:00"
@@ -341,7 +341,7 @@
       "risk_condition_ko": "19,650 이하 하락, 종가 확인 후 리스크 축소",
       "decision_state_ko": "조건 충족 전 대기",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-01T14:26:00+09:00"
@@ -364,7 +364,7 @@
       "risk_condition_ko": "78,646 이하 하락, 종가 확인 후 리스크 축소",
       "decision_state_ko": "실행 조건 감시 중",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-01T14:26:00+09:00"
@@ -433,7 +433,7 @@
       "risk_condition_ko": "1,671,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
       "decision_state_ko": "조건 충족 전 대기",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-01T14:26:00+09:00"
@@ -456,7 +456,7 @@
       "risk_condition_ko": "192,800 이하 하락, 종가 확인 후 리스크 축소",
       "decision_state_ko": "조건 충족, 종가 확인 대기",
       "quality_at_build": {
-        "execution_ready": true,
+        "execution_ready": false,
         "current_execution_promotion": "POSSIBLE",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-01T14:26:00+09:00"
@@ -855,8 +855,8 @@
     }
   ],
   "report": {
-    "published_at": "2026-10-01T13:43:20.836962+09:00",
-    "as_of": "2026-10-01T12:56:00+09:00",
+    "published_at": "2026-10-01T14:42:29.801356+09:00",
+    "as_of": "2026-10-01T13:56:00+09:00",
     "markdown_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/latest.md",
     "readable_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/latest.html"
   }
