@@ -38,6 +38,16 @@ def validate_input(payload: dict, *, market: str, now: datetime) -> list[str]:
     """All executable-account gates fail closed; reference research may continue."""
     if now.tzinfo is None:
         raise PublicDeliveryError("Verification time must be timezone-aware")
+    if not isinstance(payload, dict):
+        return ["PAYLOAD_INVALID"]
+    for key in ("freshness_receipt", "account"):
+        if not isinstance(payload.get(key), dict):
+            return ["PAYLOAD_INVALID"]
+    account = payload["account"]
+    if (not isinstance(account.get("summary"), dict)
+            or not isinstance(account.get("positions"), list)
+            or not isinstance(payload.get("rows"), list)):
+        return ["PAYLOAD_INVALID"]
     reasons = []
     if payload.get("schema") != "tradingagents.ai-context/v1" or payload.get("market") != market:
         reasons.append("SCHEMA_OR_MARKET_MISMATCH")
@@ -83,11 +93,69 @@ def validate_input(payload: dict, *, market: str, now: datetime) -> list[str]:
             reasons.append("ROW_INVALID")
             continue
         observed = clock(row.get("market_data_asof"), "ROW_QUOTE_EXPIRED_OR_INVALID")
-        valid_until = aware_datetime((row.get("quality_at_build") or {}).get("row_valid_until"))
+        quality = row.get("quality_at_build")
+        if not isinstance(quality, dict):
+            reasons.append("ROW_QUALITY_INVALID")
+            quality = {}
+        valid_until = aware_datetime(quality.get("row_valid_until"))
         if (observed is None or valid_until is None or valid_until <= now
                 or valid_until > observed + MAX_AGE):
             reasons.append("ROW_VALIDITY_EXPIRED_OR_INVALID")
+        price = row.get("last_price")
+        if isinstance(price, bool) or not isinstance(price, (int, float)) or not 0 < price < float("inf"):
+            reasons.append("ROW_PRICE_INVALID")
+        # A session VWAP cannot lie outside that same session's high/low.
+        # Do not guess which provider/session is wrong; require reconciliation.
+        low, high, vwap = (row.get(k) for k in ("day_low", "day_high", "session_vwap"))
+        if all(isinstance(v, (int, float)) and not isinstance(v, bool) and 0 < v < float("inf")
+               for v in (low, high, vwap)):
+            epsilon = max(high, vwap) * 1e-6
+            if low > high or vwap < low - epsilon or vwap > high + epsilon:
+                reasons.append("ROW_SESSION_RANGE_INCONSISTENT")
+        if quality.get("execution_ready") is not True and row.get("strategy_code") == "BUY_NOW":
+            reasons.append("ROW_EXECUTION_LABEL_CONFLICT")
     return sorted(set(reasons))
+
+
+def source_diagnostics(payload: dict, *, now: datetime) -> dict:
+    """Non-sensitive clocks and counts, including when personalization is blocked."""
+    freshness = payload.get("freshness_receipt")
+    freshness = freshness if isinstance(freshness, dict) else {}
+    account = payload.get("account")
+    account = account if isinstance(account, dict) else {}
+    def age(value):
+        parsed = aware_datetime(value)
+        return (now - parsed).total_seconds() if parsed else None
+    positions = account.get("positions")
+    rows = payload.get("rows")
+    return {
+        "age_seconds": {
+            "publication": age(payload.get("generated_at")),
+            "analysis": age(freshness.get("analysis_completed_at")),
+            "oldest_quote": age(freshness.get("market_data_oldest_at")),
+            "account": age(account.get("as_of")),
+        },
+        "holding_count": len(positions) if isinstance(positions, list) else None,
+        "row_count": len(rows) if isinstance(rows, list) else None,
+        "publication_does_not_refresh_inputs": True,
+    }
+
+
+def parse_discovery(data: bytes) -> dict:
+    lines = data.decode("utf-8").splitlines()
+    if not lines or lines[0] != "TradingAgents public input discovery v1":
+        raise PublicDeliveryError("Unexpected discovery schema")
+    values = {}
+    for line in lines[1:]:
+        if ": " not in line:
+            continue
+        key, value = line.split(": ", 1)
+        if key in values:
+            raise PublicDeliveryError("Duplicate discovery key")
+        values[key] = value
+    if not re.fullmatch(r"[0-9a-f]{40}", values.get("snapshot_commit", "")):
+        raise PublicDeliveryError("Invalid discovery snapshot commit")
+    return values
 
 
 def _head(fetcher) -> str:
@@ -104,11 +172,24 @@ def prepare_public_delivery(market: str, *, fetcher=fetch, now: datetime | None 
     if market not in ("kr", "us"):
         raise PublicDeliveryError("Unsupported market")
     for _ in range(2):
-        sha = _head(fetcher)
+        head = _head(fetcher)
+        discovery = parse_discovery(fetcher(f"{RAW}/{head}/discovery.txt"))
+        sha = discovery["snapshot_commit"]
         base = f"{RAW}/{sha}"
-        manifest = json.loads(fetcher(f"{base}/manifest.json"))
+        for field, path in (("manifest_url", "manifest.json"),
+                            (f"{market}_json_url", f"{market}/latest.json"),
+                            (f"{market}_txt_url", f"{market}/latest.txt")):
+            if discovery.get(field) != f"{base}/{path}":
+                raise PublicDeliveryError("Discovery URL is outside the pinned snapshot")
+        manifest_bytes = fetcher(f"{base}/manifest.json")
+        if (str(len(manifest_bytes)) != discovery.get("manifest_bytes")
+                or hashlib.sha256(manifest_bytes).hexdigest() != discovery.get("manifest_sha256")):
+            raise PublicDeliveryError("Manifest hash/size mismatch")
+        manifest = json.loads(manifest_bytes)
         if manifest.get("schema") != "tradingagents.ai-context/v1":
             raise PublicDeliveryError("Unexpected manifest schema")
+        if manifest.get("generated_at") != discovery.get("generated_at"):
+            raise PublicDeliveryError("Discovery and manifest generations disagree")
         contents = {}
         for ext in ("json", "txt"):
             path = f"{market}/latest.{ext}"
@@ -117,19 +198,25 @@ def prepare_public_delivery(market: str, *, fetcher=fetch, now: datetime | None 
             if len(data) != expected.get("bytes") or hashlib.sha256(data).hexdigest() != expected.get("sha256"):
                 raise PublicDeliveryError("Public input hash/size mismatch")
             contents[ext] = data
-        if _head(fetcher) != sha:
+        if _head(fetcher) != head:
             continue
         payload = json.loads(contents["json"])
+        if not isinstance(payload, dict):
+            raise PublicDeliveryError("Public input must be an object")
         if payload.get("generated_at") != manifest.get("generated_at"):
             raise PublicDeliveryError("Mixed publication generation")
+        checked = now or datetime.now(timezone.utc)
+        reasons = validate_input(payload, market=market, now=checked)
+        if "PAYLOAD_INVALID" in reasons:
+            raise PublicDeliveryError("Invalid public input container types")
         from tradingagents.scheduled.ai_context import render_payload
         if render_payload(payload).encode("utf-8") != contents["txt"]:
             raise PublicDeliveryError("Text and structured inputs disagree")
-        checked = now or datetime.now(timezone.utc)
-        reasons = validate_input(payload, market=market, now=checked)
         return {
             "schema": "tradingagents.verified-public-delivery/v1", "market": market,
             "checked_at": checked.isoformat(), "commit": sha,
+            "head_commit": head, "latest_head_checked": True,
+            "byte_integrity_verified": True,
             "source_url": f"{base}/{market}/latest.json",
             "text_url": f"{base}/{market}/latest.txt",
             "source_sha256": hashlib.sha256(contents["json"]).hexdigest(),
@@ -137,6 +224,7 @@ def prepare_public_delivery(market: str, *, fetcher=fetch, now: datetime | None 
             "blockers": reasons, "publication_at": payload.get("generated_at"),
             "freshness_receipt": payload.get("freshness_receipt"),
             "account_as_of": (payload.get("account") or {}).get("as_of"),
+            "diagnostics": source_diagnostics(payload, now=checked),
             "personalized_input": None if reasons else payload,
             "context_text": None if reasons else contents["txt"].decode("utf-8"),
             "not_order_authorization": True,

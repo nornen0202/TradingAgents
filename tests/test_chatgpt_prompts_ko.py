@@ -77,7 +77,11 @@ def test_scheduled_quality_contract_is_embedded_in_both_prompts() -> None:
         assert text.count("## 프롬프트 끝") == 1
         body = text.split("## 프롬프트 시작", 1)[1].split("## 프롬프트 끝", 1)[0]
         for requirement in (
-            "2026-09-29 v7",
+            "2026-10-01 v8",
+            "GitHub fetch_file",
+            "encoding=base64",
+            "전략명·execution_ready 충돌",
+            "비용 미확인은 비용 후 검산 완료가 아니다",
             "/public-context/discovery.txt",
             "최신 HEAD 미확인",
             "기계검증 미실시면 PASS를 쓰지 않는다",

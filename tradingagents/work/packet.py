@@ -183,6 +183,7 @@ def _market_ticker_identity(value: Any) -> str:
 
 def _compact_market_row(row: dict[str, Any], display_priority: int) -> dict[str, Any]:
     fields = (
+        "reference_strategy",
         "table_priority",
         "portfolio_priority",
         "ticker",
@@ -1019,10 +1020,24 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
         execution["as_of"] = row.get("market_data_asof")
         execution["valid_until"] = quality["row_valid_until"]
         if invalid or expired:
-            quality["source_row_mode"] = quality.get("row_mode")
+            if not isinstance(row.get("thesis"), dict):
+                row["thesis"] = _market_row_thesis(row)
+            quality.setdefault("source_row_mode", quality.get("row_mode"))
+            quality.setdefault("source_execution_promotion", quality.get("current_execution_promotion"))
             quality["row_mode"] = "BLOCKED_STALE"
             quality["execution_ready"] = False
             quality["conditional_strategy_ready"] = False
+            quality["current_execution_promotion"] = "BLOCKED"
+            # Keep the research thesis above intact, but do not leave a stale
+            # BUY_NOW/READY label next to execution_ready=false in JSON readers.
+            row.setdefault("reference_strategy", {
+                key: row.get(key) for key in
+                ("strategy_code", "strategy_ko", "decision_state_ko", "market_data_asof")
+            })
+            row["strategy_code"] = "DATA_CHECK"
+            row["strategy_ko"] = "데이터 확인 전 대기"
+            row["decision_state_ko"] = "데이터 확인 전 대기"
+            row["data_status_ko"] = "시세 시각 확인 필요" if invalid else "시세 유효기간 만료"
             blockers = [str(item) for item in (quality.get("provider_blockers") or []) if str(item)]
             reason = "work_packet_row_invalid_timestamp" if invalid else "work_packet_row_expired"
             quality["provider_blockers"] = list(dict.fromkeys([*blockers, reason]))

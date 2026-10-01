@@ -26,13 +26,13 @@ def payload():
                     "as_of": "2026-07-11T10:00:00Z",
                     "summary": {"position_count": 1, "available_cash_krw": 0, "total_equity_krw": 100},
                     "positions": [{"ticker": "TEST", "quantity": 1, "sellable_quantity": 1}]},
-        "rows": [{"ticker": "TEST", "market_data_asof": "2026-07-11T10:00:00Z",
+        "rows": [{"ticker": "TEST", "last_price": 100, "market_data_asof": "2026-07-11T10:00:00Z",
                   "quality_at_build": {"row_valid_until": "2026-07-11T10:30:00Z"}}],
         "report": {},
     }
 
 
-def transport(value, *, corrupt=False, move=False, inconsistent_text=False):
+def transport(value, *, corrupt=False, move=False, inconsistent_text=False, corrupt_manifest=False):
     data = {"json": json.dumps(value).encode(), "txt": render_payload(value).encode()}
     if inconsistent_text:
         data["txt"] += b" extra"
@@ -40,6 +40,16 @@ def transport(value, *, corrupt=False, move=False, inconsistent_text=False):
         f"kr/latest.{ext}": {"bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
         for ext, raw in data.items()
     }}
+    manifest_bytes = json.dumps(manifest).encode()
+    discovery = "\n".join([
+        "TradingAgents public input discovery v1",
+        f"generated_at: {value['generated_at']}", f"snapshot_commit: {SHA}",
+        f"manifest_bytes: {len(manifest_bytes)}",
+        f"manifest_sha256: {hashlib.sha256(manifest_bytes).hexdigest()}",
+        f"manifest_url: https://raw.githubusercontent.com/nornen0202/TradingAgents/{SHA}/manifest.json",
+        *[f"kr_{ext}_url: https://raw.githubusercontent.com/nornen0202/TradingAgents/{SHA}/kr/latest.{ext}"
+          for ext in ("json", "txt")],
+    ]).encode()
     urls = []
     count = 0
     def fetch(url):
@@ -48,10 +58,13 @@ def transport(value, *, corrupt=False, move=False, inconsistent_text=False):
         if "/git/ref/" in url:
             count += 1
             return json.dumps({"ref": "refs/heads/public-context", "object": {
-                "sha": ("b" if move and count % 2 == 0 else "a") * 40, "type": "commit"}}).encode()
+                "sha": ("b" if move and count % 2 == 0 else "c") * 40, "type": "commit"}}).encode()
+        if url.endswith("/discovery.txt"):
+            assert f"/{'c' * 40}/" in url
+            return discovery
         assert f"/{SHA}/" in url, "Mutable data URL used"
         if url.endswith("/manifest.json"):
-            return json.dumps(manifest).encode()
+            return manifest_bytes + (b" " if corrupt_manifest else b"")
         return data[url.rsplit(".", 1)[1]] + (b"bad" if corrupt else b"")
     return fetch, urls
 
@@ -62,6 +75,9 @@ def test_nonce_discovery_pins_all_files_and_verifies_bytes():
     assert result["status"] == "VERIFIED_CURRENT_INPUT"
     assert result["personalized_input"]["account"]["positions"][0]["quantity"] == 1
     assert result["not_order_authorization"] is True
+    assert result["head_commit"] != result["commit"]
+    assert result["byte_integrity_verified"] is True
+    assert result["diagnostics"]["age_seconds"]["account"] == 600
     refs = [url for url in urls if "/git/ref/" in url]
     assert len(refs) == 2 and refs[0] != refs[1]
     assert all("request_id=" in url for url in refs)
@@ -80,6 +96,35 @@ def test_stale_successful_http_response_never_returns_personalized_input():
     assert result["status"] == "REFERENCE_ONLY"
     assert result["personalized_input"] is None and result["context_text"] is None
     assert "ACCOUNT_EXPIRED_OR_INVALID" in result["blockers"]
+
+
+def test_manifest_tampering_is_not_hidden_by_valid_payload_hashes():
+    fetch, _ = transport(payload(), corrupt_manifest=True)
+    with pytest.raises(PublicDeliveryError, match="Manifest hash/size"):
+        prepare_public_delivery("kr", fetcher=fetch, now=NOW)
+
+
+@pytest.mark.parametrize("value", [None, 0, True, float("nan"), float("inf")])
+def test_missing_or_invalid_price_is_not_current_input(value):
+    data = payload()
+    data["rows"][0]["last_price"] = value
+    assert "ROW_PRICE_INVALID" in validate_input(data, market="kr", now=NOW)
+
+
+def test_impossible_session_vwap_and_ready_label_conflict_are_blocked():
+    data = payload()
+    data["rows"][0].update(day_low=100.68, day_high=100.69, session_vwap=100.9966,
+                          strategy_code="BUY_NOW")
+    failures = validate_input(data, market="kr", now=NOW)
+    assert "ROW_SESSION_RANGE_INCONSISTENT" in failures
+    assert "ROW_EXECUTION_LABEL_CONFLICT" in failures
+
+
+@pytest.mark.parametrize("field,value", [("account", []), ("rows", {}), ("freshness_receipt", None)])
+def test_invalid_container_types_fail_closed(field, value):
+    data = payload()
+    data[field] = value
+    assert "PAYLOAD_INVALID" in validate_input(data, market="kr", now=NOW)
 
 
 @pytest.mark.parametrize("field,value,reason", [

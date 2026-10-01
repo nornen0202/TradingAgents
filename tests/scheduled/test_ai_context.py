@@ -94,6 +94,18 @@ def test_held_rows_require_explicitly_published_account_membership():
     assert "PUBLIC" in text
 
 
+def test_reference_strategy_is_allowlisted_and_blockers_are_not_erased():
+    strategy = {"rows": [{"ticker": "PUBLIC", "reference_strategy": {
+        "strategy_code": "BUY_NOW", "account_no": "SECRET"},
+        "quality": {"execution_ready": False, "current_execution_promotion": "BLOCKED",
+                    "expired_at_build": True, "provider_blockers": ["work_packet_row_expired"]}}]}
+    text = render_context("kr", strategy, {}, {}, generated_at="x")
+    assert "SECRET" not in text
+    assert '"reference_strategy"' in text and '"BUY_NOW"' in text
+    assert "work_packet_row_expired" in text
+    assert '"expired_at_build":true' in text
+
+
 def test_mirror_never_rolls_back_or_writes_unapproved_paths(monkeypatch, tmp_path):
     manifest = build_ai_context(tmp_path, now=datetime(2026, 7, 11, tzinfo=timezone.utc))
     files = {name: (tmp_path / "ai" / name).read_bytes() for name in mirror.FILES}

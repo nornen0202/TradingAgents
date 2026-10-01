@@ -44,6 +44,7 @@ _PUBLIC_ROW_FIELDS = (
 )
 
 _PRIVATE_ROW_FIELDS = (
+    "reference_strategy",
     "thesis",
     "execution",
     "portfolio_role",

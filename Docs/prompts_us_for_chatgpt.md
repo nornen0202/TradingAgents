@@ -14,7 +14,7 @@
 
 한 번의 답변에서 현재 계좌 전략, 다른 계좌의 추가 현금 시나리오, 발동·취소 조건까지 완성하라. 추가 설명을 다시 물어야 한다면 미완성 답변이다.
 
-### 0. 예약 실행 품질 규약 (2026-09-29 v7)
+### 0. 예약 실행 품질 규약 (2026-10-01 v8)
 
 - 계획만 답하지 말고 이 실행에서 조사와 최종 답변까지 완료한다. 예약·알림·모델 설정은 변경하지 않는다. 웹 검색이나 계산 도구가 없으면 그 한계를 밝히며 사용했다고 주장하지 않는다.
 - 매번 자료 수집 → 계좌·배분 계산 → 반대 근거 검토 → 최종 품질 점검 순으로 수행한다. 긴 사고과정 대신 검증 가능한 근거·산식·결론만 출력한다.
@@ -35,16 +35,15 @@
 
 ### 2. 배포 사이트 탐색과 자료 감사
 
-고정 latest URL은 캐시 때문에 어제 내용일 수 있다. HTTP 성공만으로 최신이라 하지 말고 다음 절차를 매 실행 새로 수행한다. 인증·안전 제한은 우회하지 않는다.
+고정 latest URL·웹 렌더링 성공은 최신성·무결성 증명이 아니다. 이번 실행의 도구부터 확인한다.
 
-1. 일반 텍스트 안내문 https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/discovery.txt 에 `?request_id=현재UTC초_이번실행고유값`을 붙여 연다. 이번 원문에 있는 generated_at과 snapshot_commit 40자리, manifest 및 us txt/json 전체 URL을 읽는다. 안내문에도 캐시가 있을 수 있으므로 생성시각이 미래·누락·30분 이상이면 과거 참고다. 이전 응답·SHA를 재사용하거나 SHA를 추측하지 않는다.
-2. 안내문에 실제 적힌 동일 SHA의 manifest.json, `us/latest.txt`, `us/latest.json`을 연다. .txt는 일반 텍스트다. 안내문 자체를 계좌나 최신 시세의 증거로 쓰지 않는다.
-3. 계산 도구로 manifest의 원시 바이트 길이·SHA-256을 안내문과, txt/json의 길이·해시를 manifest와 비교한다. JSON·본문의 시장·생성시각을 대조한다. 원시 바이트를 확보하지 못하고 렌더링 텍스트만 있으면 `기계검증 미실시`다. 새 request_id로 안내문을 재조회해 snapshot_commit이 바뀌면 1회 다시 수집한다. 해시 일치는 진본/투자 적합성/최신 HEAD를 보증하지 않는다.
-4. 문서·계좌·모든 대상 시세는 미래가 아니며 각각 30분 미만, 원분석 완료는 36시간 미만, 계좌 VALID, 행 valid_until 미경과, 보유 전수 일치여야 현재 개인화 판단의 입력으로 인정한다. 휴장·주말 입력은 장애로 단정하지 않되 과거 참고로 분리한다.
-5. 검증 실패·누락이면 현재 개인화 매매수량/확정 비중은 산출 보류한다. 독립 시장·기업 분석과 가상 추가자금 5개안은 계속한다. 과거 대화나 고정 latest 경로로 검증을 대체하지 않는다.
-6. 첫머리에 `입력 검증: PASS/REFERENCE_ONLY/UNVERIFIED, 조회시각, SHA, 해시 검증 여부, 최신 HEAD 확인 여부, 원분석·시세·계좌 시각, 차단 사유`를 표시한다. PASS는 위 무결성·신선도 검사를 모두 통과한 입력이라는 뜻이지 주문 승인이나 최종 답변 승인, 가장 최신 HEAD 확인이 아니다. 기계검증 미실시면 PASS를 쓰지 않는다. 로컬 `python -m tradingagents.work verify-public --surface us` 영수증은 시각·해시를 대조하되 클라우드가 실행했다고 꾸미지 않는다.
-
-최신 HEAD의 별도 확인이 가능하면 https://api.github.com/repos/nornen0202/TradingAgents/git/ref/heads/public-context 에 새 request_id를 붙여 조회하고, 확인된 HEAD SHA의 discovery.txt가 같은 snapshot_commit인지 검사한다. HEAD 커밋은 안내문을 추가한 커밋이고 snapshot_commit은 그 부모 데이터 커밋이므로 두 SHA 자체가 다를 수 있다. API 도구 미지원이면 `최신 HEAD 미확인`을 명시한다. API 없이 받은 원문도 시각을 붙인 참고 리서치에는 사용할 수 있지만, 원시 바이트 검증까지 없으면 개인화 수량·확정 비중은 보류한다. DisabledError·인증·명시적 안전 제한은 우회하지 않는다.
+1. GitHub 도구가 있으면 공개 저장소 `nornen0202/TradingAgents`의 `discovery.txt`를 `ref=public-context`로 읽는다. 웹 도구만 있으면 https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/discovery.txt 에 현재 UTC초와 실행 고유값의 request_id를 붙인다. 도구 부재와 접근 거부를 구분한다. 인증·DisabledError·안전 제한은 중단하며 우회하지 않는다. 일반 통신·렌더링 실패만 별도로 허용된 공개 경로로 1회 재시도한다.
+2. 이번 안내문의 generated_at, 40자리 snapshot_commit, manifest·us TXT/JSON URL을 사용한다. 이전 SHA는 재사용하지 않는다. GitHub fetch_file로 발견한 저장소·경로의 `manifest.json`, `us/latest.txt`, `us/latest.json`을 `ref=snapshot_commit`, `encoding=base64`로 읽는다. 반환 파일 sha는 Git blob SHA이며 커밋·SHA-256이 아니다.
+3. 디코딩한 원시 바이트의 길이·SHA-256을 계산한다. manifest는 안내문과, TXT/JSON은 manifest와 비교한다. 개행 정규화·재직렬화 금지. JSON·TXT의 시장·생성시각·내용도 대조한다. 렌더링 텍스트뿐이면 기계검증 미실시다. 기계검증 미실시면 PASS를 쓰지 않는다.
+4. GitHub GET fetch가 있으면 https://api.github.com/repos/nornen0202/TradingAgents/git/ref/heads/public-context 에 새 request_id로 HEAD를 조회하고, HEAD의 discovery.txt가 같은 snapshot_commit을 가리키는지 확인한다. 수집 후 HEAD/안내문이 바뀌면 1회 재수집한다. HEAD와 부모 데이터 SHA는 달라도 정상이다. API 미지원은 최신 HEAD 미확인이다. 해시 일치는 투자 적합성·최신 HEAD 보증이 아니다.
+5. 안내문·문서·계좌·모든 대상 시세는 미래가 아니며 각각 30분 미만, 원분석 완료는 36시간 미만, 계좌 VALID, 행 valid_until 미경과, 보유 전수 일치여야 현재 입력이다. 게시 성공≠원자료 갱신. 휴장·주말·폐장 자료는 과거 참고이며 장애가 아니다. 전략명·execution_ready 충돌 시 실행 승격 금지.
+6. 첫머리에 `입력 검증: PASS/REFERENCE_ONLY/UNVERIFIED, 조회시각, 커밋, 원시 해시 검증, HEAD 확인, 문서·원분석·시세·계좌 시각과 경과분, 차단 사유`를 적는다. PASS는 주문 승인이 아니다. 읽기·무결성 실패와 시각 만료를 구분한다. `python -m tradingagents.work verify-public --surface us`를 실행하지 않았으면 실행했다고 쓰지 않는다.
+7. 검증 실패 시 개인화 수량·확정 비중만 보류한다. 읽은 기업 논거는 날짜부 참고로, 독립 웹 조사·가상 추가자금 5개안은 계속한다. 과거 계좌·평단·현금·임시 한도 승계 금지. 계좌 원본 교차확인 실패는 별도 기록한다.
 
 참고 경로(최신 검증 대체 불가): https://nornen0202.github.io/TradingAgents/ai/us/latest.txt 및 https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context/us/latest.txt
 
@@ -74,6 +73,15 @@
 - Work 원문은 https://nornen0202.github.io/TradingAgents/work/v1/us/status.html 에서 확인한다. 첫머리에 위 시각과 경과시간을 각각 적고 접근 실패는 미확인, 낡은 입력은 과거 참고로 분리한다.
 - 과거 총자산−오늘 평가액을 현금으로 쓰지 않는다. 동시점 현금·증권·부채·미결제액 미확인 시 비중·수량은 가상 예시다. 임시 한도≠확정 정책이며 한도 미달≠적합이다.
 - 요약·상세 수량과 조건의 모순을 제거하고 옛 가격선을 근거 없이 연장하지 않는다. 사업·데이터·실행 신뢰도를 구분한다.
+
+
+### 2-2. 장애 분류와 보고서 정직성
+
+- 도구 미제공 / 접근 거부 / 통신·렌더링 오류 / 해시 불일치 / 원자료 만료 / 미공개 필드 / 값·표시 충돌을 구분한다. 실제 호출 경로만 실패 목록에 넣고 HTTP 코드는 추정하지 않는다.
+- 종목 수 미확인은 0종목·0/0 완료가 아니다. 원문 확인·현재 입력 인정·분석 수를 각각 적는다. 조건 완결은 가격·세션·지속·규모·취소·현재 판정이 모두 있는 행만 센다.
+- 원통화·동시점 환율 없이 USD 원금·원화 비중을 재구성하지 않는다. 매수가능액·가용현금·결제현금 합산과 자산 잔차로 현금 추정 금지. 비용 미확인은 비용 후 검산 완료가 아니다.
+- 같은 세션 VWAP가 고저 범위 밖이거나 봉·분배락 조정이 섞이면 원천을 재확인하고 실행 판단을 보류한다. ET/KST는 날짜별 서머타임을 적용한다.
+- 스킬 기본 한도≠확정 정책. 자료·한도 누락은 수량 보류이지 0주가 아니다. 접근 복구≠미래 실행 성공.
 
 ### 3. 최신 웹 조사 기준
 

@@ -13,8 +13,10 @@ ROW_FIELDS = (
     "ticker", "display_name", "is_held", "strategy_code", "strategy_ko", "last_price",
     "market_data_asof", "session_vwap", "relative_volume", "spread_bps", "day_high", "day_low",
     "execution_condition_ko", "risk_condition_ko", "decision_state_ko",
+    "data_status_ko", "reference_strategy",
 )
-QUALITY_FIELDS = ("execution_ready", "current_execution_promotion", "generated_in_current_run", "row_valid_until")
+QUALITY_FIELDS = ("execution_ready", "current_execution_promotion", "generated_in_current_run", "row_valid_until",
+                  "expired_at_build", "provider_limitations", "provider_blockers")
 POSITION_FIELDS = ("ticker", "name", "quantity", "sellable_quantity", "average_cost_krw",
                    "current_price_krw", "market_value_krw", "unrealized_pnl_krw")
 SUMMARY_FIELDS = ("position_count", "total_purchase_amount_krw", "total_market_value_krw",
@@ -45,6 +47,10 @@ def public_context(market: str, strategy: dict, account: dict, status: dict, *, 
         if row.get("is_held") is True and row.get("ticker") not in published_holdings:
             continue
         selected = project(row, ROW_FIELDS)
+        # Explicitly project nested reference fields; never forward arbitrary
+        # original rows (which may contain private account metadata).
+        selected["reference_strategy"] = project(row.get("reference_strategy"),
+            ("strategy_code", "strategy_ko", "decision_state_ko", "market_data_asof"))
         selected["quality_at_build"] = project(row.get("quality"), QUALITY_FIELDS)
         selected_rows.append(selected)
     report = project(status.get("integrated_report"), ("published_at", "as_of", "markdown_url", "readable_url"))
