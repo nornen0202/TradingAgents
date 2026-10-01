@@ -16,6 +16,15 @@ from typing import Any
 from tradingagents.execution.risk_trigger import risk_trigger
 
 
+_ACCOUNT_SOURCE_MESSAGES = {
+    "SOURCE_RUN_PARTIAL_FAILURE": "원분석 실행에서 일부 종목 분석이 실패하여 동일 실행 계좌를 이용한 수량 산정을 보류했습니다.",
+    "SOURCE_RUN_INCOMPLETE": "원분석 실행이 정상 완료되지 않아 동일 실행 계좌를 이용한 수량 산정을 보류했습니다.",
+    "PORTFOLIO_RUN_INCOMPLETE": "같은 실행의 계좌 분석이 정상 완료되지 않아 수량 산정을 보류했습니다.",
+    "PENDING_ORDERS_UNVERIFIED": "동일 실행 계좌의 미체결 주문 확인이 완료되지 않아 수량 산정을 보류했습니다.",
+    "EXACT_RUN_ACCOUNT_NOT_VERIFIED": "동일 실행 계좌를 확인할 수 없어 수량 산정을 보류했습니다.",
+}
+
+
 def _mapping(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
@@ -245,6 +254,7 @@ def build_trade_plan(
     market_payload: dict[str, Any],
     *,
     account_snapshot: dict[str, Any] | None = None,
+    account_source_reason: str | None = None,
     fee_config: dict[str, Any] | None = None,
     fx_krw_per_usd: float | None = None,
     fx_asof: str | None = None,
@@ -399,6 +409,17 @@ def build_trade_plan(
             quantity = 0
             reasons.append(
                 "매도 가능한 정수 수량이 0주입니다. 소수점 보유분은 별도 확인합니다."
+            )
+        elif not snapshot:
+            # No account input does not establish a failed pending-order lookup.
+            # Only known source codes select text; raw errors never reach HTML.
+            reasons.append(
+                _ACCOUNT_SOURCE_MESSAGES.get(
+                    account_source_reason
+                    if isinstance(account_source_reason, str)
+                    else "",
+                    _ACCOUNT_SOURCE_MESSAGES["EXACT_RUN_ACCOUNT_NOT_VERIFIED"],
+                )
             )
         elif pending_unknown:
             reasons.append(

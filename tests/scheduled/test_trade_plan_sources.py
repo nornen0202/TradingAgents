@@ -2,6 +2,7 @@ import json
 import pytest
 
 from tradingagents.scheduled.trade_plan_sources import load_trade_plan_sources
+from tradingagents.scheduled.trade_plan import build_trade_plan
 
 
 @pytest.fixture
@@ -108,7 +109,71 @@ def test_unverified_pending_orders_cannot_masquerade_as_available_cash(source, s
     else:
         snapshot.pop("pending_orders")
     save()
-    assert load_trade_plan_sources(root, market)["account_snapshot"] is None
+    result = load_trade_plan_sources(root, market)
+    assert result["account_snapshot"] is None
+    assert result["reason"] == "PENDING_ORDERS_UNVERIFIED"
+
+
+@pytest.mark.parametrize(
+    "manifest_status,portfolio_status,reason",
+    [
+        ("partial_failure", "success", "SOURCE_RUN_PARTIAL_FAILURE"),
+        ("failed", "success", "SOURCE_RUN_INCOMPLETE"),
+        ("success", "failed", "PORTFOLIO_RUN_INCOMPLETE"),
+    ],
+)
+def test_analysis_failure_is_not_mislabeled_pending_order_failure(
+    source, manifest_status, portfolio_status, reason
+):
+    root, _, snapshot, manifest, market, save = source
+    snapshot["pending_orders"] = []
+    snapshot["warnings"] = []
+    manifest["status"] = manifest_status
+    manifest["portfolio"]["status"] = portfolio_status
+    save()
+    inputs = load_trade_plan_sources(root, market)
+    assert inputs["account_snapshot"] is None
+    assert inputs["reason"] == reason
+    market["rows"] = [
+        {
+            "ticker": "LLY",
+            "is_held": True,
+            "portfolio_action": {
+                "action_now": "HOLD",
+                "delta_krw_now": 0,
+                "action_if_triggered": "REDUCE_IF_TRIGGERED",
+                "delta_krw_if_triggered": -1000,
+            },
+        }
+    ]
+    plan = build_trade_plan(
+        market,
+        account_snapshot=inputs["account_snapshot"],
+        account_source_reason=inputs["reason"],
+    )
+    assert plan["account_asof"] is None
+    row = plan["rows"][0]
+    assert row["quantity"] is None
+    assert row["order_ready"] is False
+    assert (
+        "정상 완료" in row["reasons"][0] or "일부 종목 분석이 실패" in row["reasons"][0]
+    )
+    assert all("미체결" not in message for message in row["reasons"])
+
+
+def test_loader_never_returns_raw_exception_text(source, monkeypatch):
+    import tradingagents.scheduled.trade_plan_sources as sources
+
+    root, _, _, _, market, _ = source
+
+    def fail(path):
+        raise ValueError("PRIVATE-ACCOUNT C:/private/account_snapshot.json")
+
+    monkeypatch.setattr(sources, "_object", fail)
+    result = load_trade_plan_sources(root, market)
+    assert result["reason"] == "EXACT_RUN_ACCOUNT_NOT_VERIFIED"
+    assert "PRIVATE-ACCOUNT" not in json.dumps(result)
+    assert "C:/private" not in json.dumps(result)
 
 
 @pytest.mark.parametrize(

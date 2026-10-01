@@ -324,6 +324,53 @@ def test_pending_buy_blocks_new_buy_without_double_counting_reserved_cash():
     assert "미체결 주문" in " ".join(result["reasons"])
 
 
+@pytest.mark.parametrize(
+    "source_reason", [None, "PRIVATE-ERROR C:/private/path", {"raw": "PRIVATE-ERROR"}]
+)
+def test_missing_account_has_generic_reason_without_false_pending_failure(
+    source_reason,
+):
+    result = build_trade_plan(
+        {"market": "KR", "rows": [row()]},
+        account_source_reason=source_reason,
+        now=NOW,
+    )["rows"][0]
+    assert result["quantity"] is None
+    assert (
+        result["reasons"][0]
+        == "동일 실행 계좌를 확인할 수 없어 수량 산정을 보류했습니다."
+    )
+    assert all("미체결" not in message for message in result["reasons"])
+    assert "PRIVATE-ERROR" not in json.dumps(result)
+
+
+def test_actual_pending_failure_source_keeps_its_own_block_reason():
+    result = build_trade_plan(
+        {"market": "KR", "rows": [row()]},
+        account_source_reason="PENDING_ORDERS_UNVERIFIED",
+        now=NOW,
+    )["rows"][0]
+    assert result["quantity"] is None
+    assert "미체결 주문 확인" in result["reasons"][0]
+    assert result["order_ready"] is False
+
+
+def test_missing_account_does_not_change_explicit_zero_allocation_or_hold():
+    result = build_trade_plan(
+        {
+            "market": "KR",
+            "rows": [
+                row(delta=0),
+                row("BBB", held=True, delta=0, action="WATCH_TRIGGER"),
+            ],
+        },
+        account_source_reason="SOURCE_RUN_PARTIAL_FAILURE",
+        now=NOW,
+    )
+    assert [r["quantity"] for r in result["rows"]] == [0, 0]
+    assert [r["status"] for r in result["rows"]] == ["NO_QUANTITY", "OBSERVE"]
+
+
 def test_same_ticker_pending_order_blocks_additional_sell_not_unrelated_buy():
     account = snapshot(
         positions=[{"canonical_ticker": "AAA", "quantity": 10, "available_qty": 6}]

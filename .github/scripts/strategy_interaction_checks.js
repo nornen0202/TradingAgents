@@ -208,6 +208,23 @@
   await tick();
   check(document.getElementById('private-status').classList.contains('error'), 'Malformed nested report feedback');
   check(visible()[0].dataset.readiness === 'READY', 'Malformed refresh restores the previous snapshot');
+  const sizingAccountTimestamp = market.trade_plan.account_asof;
+  const sizingAccountNote = active().querySelector('.plan-source-note').textContent;
+  const originalReceipt = market.freshness_receipt;
+  market.trade_plan.account_asof = null;
+  market.freshness_receipt = {...(originalReceipt || {}), account_as_of: '2001-02-03T04:05:00+09:00'};
+  window.fetch = async () => ({ok: true, json: async () => payload});
+  document.getElementById('strategy-refresh').click();
+  await tick();
+  check(active().querySelector('.plan-source-note').textContent.includes('수량 기준 계좌 확인 불가'), 'A plan without its own account timestamp is explicitly unverified');
+  check(!active().querySelector('.plan-source-note').textContent.includes('2001'), 'A receipt timestamp cannot substitute for a missing plan account timestamp');
+  market.trade_plan.account_asof = sizingAccountTimestamp;
+  document.getElementById('strategy-refresh').click();
+  await tick();
+  check(active().querySelector('.plan-source-note').textContent === sizingAccountNote, 'Restoring the plan account timestamp restores its original source note');
+  check(!active().querySelector('.plan-source-note').textContent.includes('확인 불가') && !active().querySelector('.plan-source-note').textContent.includes('2001'), 'Verified sizing source remains distinct from the unrelated receipt');
+  if (originalReceipt === undefined) delete market.freshness_receipt;
+  else market.freshness_receipt = originalReceipt;
   const legacy = structuredClone(payload);
   delete legacy.markets.us.trade_plan;
   window.fetch = async () => ({ok: true, json: async () => legacy});
@@ -217,6 +234,11 @@
   check(planRow('NVDA').querySelector('.plan-quantity').textContent.includes('산출 보류'), 'Legacy quantity is unavailable rather than fabricated');
   check(planRow('NVDA').querySelector('.plan-price').textContent.includes('범위 미확정'), 'Legacy data cannot invent an entry price');
   check(planRow('NVDA').querySelector('.plan-amount').textContent.includes('미확정'), 'Legacy data cannot invent a trade amount');
+  legacy.markets.us.freshness_receipt = {account_as_of: '2026-10-01T00:08:00+09:00'};
+  document.getElementById('strategy-refresh').click();
+  await tick();
+  check(active().querySelector('.plan-source-note').textContent.includes('수량 기준 계좌 확인 불가'), 'Unverified quantity account does not fall back to a different account receipt');
+  check(!active().querySelector('.plan-source-note').textContent.includes('00:08'), 'Receipt account timestamp is not advertised as the sizing input');
   window.fetch = originalFetch;
   return {status: 'PASSED', width: innerWidth, checks: checkCount, url: location.search};
 })()

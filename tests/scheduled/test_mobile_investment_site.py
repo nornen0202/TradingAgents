@@ -1094,3 +1094,23 @@ def test_trade_plan_is_built_for_both_views_without_leaking_account_inputs(tmp_p
     assert 'SECRET.HOLD' not in json.dumps(public)
     for page in ['strategy.html', 'mobile/strategy.html']:
         assert 'private.js?v=' in (tmp_path / 'site' / page).read_text(encoding='utf-8')
+
+
+def test_trade_plan_retains_verified_source_failure_reason_in_public_payload(tmp_path, monkeypatch):
+    import tradingagents.scheduled.mobile_site as mobile
+
+    monkeypatch.setattr(mobile, 'build_surface_packet',
+                        lambda market, **kwargs: _packet(market, public=kwargs.get('public', False)))
+    monkeypatch.setattr(mobile, 'load_trade_plan_sources', lambda archive, payload: {
+        'account_snapshot': None, 'status': 'UNAVAILABLE',
+        'reason': 'SOURCE_RUN_PARTIAL_FAILURE',
+    })
+    build_mobile_site(site_dir=tmp_path / 'site', archive_dir=tmp_path / 'archive')
+    strategy = json.loads((tmp_path / 'site/mobile/strategy.json').read_text(encoding='utf-8'))
+    for market in strategy['markets'].values():
+        plan = market['trade_plan']
+        held = next(row for row in plan['rows'] if row['ticker'] == 'SECRET.HOLD')
+        assert held['quantity'] is None
+        assert plan['account_asof'] is None
+        assert '일부 종목 분석이 실패' in held['reasons'][0]
+        assert all('미체결' not in text for text in held['reasons'])
