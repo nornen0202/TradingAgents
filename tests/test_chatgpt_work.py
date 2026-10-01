@@ -27,6 +27,22 @@ def test_packet_budget_counts_serialized_content_without_layout_whitespace():
         validate_packet(packet, max_chars=compact_chars - 1)
 
 
+def test_expiry_downgrades_all_current_labels_but_preserves_research_thesis():
+    row = {"ticker": "TEST", "market_data_asof": "2026-10-01T06:26:00Z",
+           "strategy_code": "BUY_NOW", "strategy_ko": "지금 분할매수 검토",
+           "decision_state_ko": "지금 실행 검토 가능", "thesis": {"stance": "BUY"},
+           "quality": {"execution_ready": True, "current_execution_promotion": "POSSIBLE"}}
+    bundle = {"strategy_table": [row]}
+    now = datetime(2026, 10, 1, 14, 19, tzinfo=timezone.utc)
+    work_packet._apply_market_row_validity(bundle, now=now)
+    work_packet._apply_market_row_validity(bundle, now=now)
+    assert row["strategy_code"] == "DATA_CHECK"
+    assert row["decision_state_ko"] == "데이터 확인 전 대기"
+    assert row["quality"]["current_execution_promotion"] == "BLOCKED"
+    assert row["reference_strategy"]["strategy_code"] == "BUY_NOW"
+    assert row["thesis"] == {"stance": "BUY"}
+
+
 def test_prepare_accepts_same_immutable_packet_with_legacy_pretty_format(tmp_path: Path):
     archive = tmp_path / "archive"
     _write_market_run(archive, run_id="legacy-layout", market="us",
