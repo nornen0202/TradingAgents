@@ -4971,6 +4971,8 @@ a { color: inherit; }
   box-shadow: var(--shadow);
 }
 
+.hero > * { min-width: 0; overflow-wrap: anywhere; }
+
 .hero h1, .section h2 {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
@@ -5015,6 +5017,8 @@ a { color: inherit; }
   overflow-wrap: anywhere;
   text-align: right;
 }
+
+.hero-card p strong { flex: 0 0 auto; }
 
 .ticker-card p.long-field {
   align-items: flex-start;
@@ -5399,7 +5403,7 @@ a { color: inherit; }
 }
 
 @media (max-width: 840px) {
-  .hero { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: minmax(0, 1fr); }
   .shell { width: min(100% - 20px, 1180px); }
   .profit-calendar-grid { grid-template-columns: 1fr; }
   .profit-month-row { grid-template-columns: 64px minmax(90px, 1fr); }

@@ -87,7 +87,11 @@ def main() -> int:
         pages = {
             'youtube': youtube_page(title='YouTube', body=body),
             'prism': prism_page(title='PRISM', body=body),
-            'research': _page_template('Research', body, prefix='../'),
+            'research': _page_template('Research',
+                '<section class="hero"><div><h1>20261001T115557_github-actions-overlay-kr</h1>'
+                '<p class="subtitle">2026-10-01T11:55:57.723994+09:00</p></div>'
+                '<div class="hero-card"><p><strong>Started</strong><span>2026-10-01T11:55:57.723994+09:00</span></p></div></section>'
+                + body, prefix='../'),
             'static': _readable_html('Work', body, enhance=True),
             'work': _work_report_index_html(),
         }
