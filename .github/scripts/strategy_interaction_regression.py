@@ -25,6 +25,8 @@ def fixture() -> dict[str, Any]:
             if ticker == "MISSING":
                 row.update(display_name='<img src=x onerror="alert(1)">', last_price=None, relative_volume=None)
                 row["portfolio_action"]["confidence"] = None
+            if ticker in {"ALPHA", "BETA"}:
+                row["thesis"] = {"stance": "BUY" if ticker == "ALPHA" else "SELL", "entry_conditions": ["Close AND volume must confirm"], "invalidation_conditions": ["Risk below 90 after close"]}
             item["rows"].append(row)
     return payload
 
@@ -63,6 +65,18 @@ async def probe(websocket_url: str, page_url: str) -> list[dict[str, Any]]:
             if value.get("exceptionDetails"):
                 raise RuntimeError(json.dumps(value["exceptionDetails"], ensure_ascii=False))
             results.append(value["result"]["value"])
+            await call("Page.navigate", {"url": page_url + "&direction=sell"})
+            for _ in range(100):
+                await asyncio.sleep(.05)
+                value = await call("Runtime.evaluate", {
+                    "expression": "(() => { const panel = document.querySelector('.market-panel:not([hidden])'); if (!panel || !panel.querySelector('.action-card')) return false; const rows = panel.querySelectorAll('.action-card:not([hidden])'); return rows.length === 1 && rows[0].dataset.ticker === 'BETA' && panel.querySelector('[data-direction-target=sell]').getAttribute('aria-pressed') === 'true' && panel.querySelectorAll('.strategy-summary tbody tr').length === 1; })()",
+                    "returnByValue": True,
+                })
+                if value.get("result", {}).get("value") is True:
+                    break
+            else:
+                raise RuntimeError("Reloaded direction deep link did not restore its filtered table")
+            results[-1]["direction_deep_link_restored"] = True
     return results
 
 

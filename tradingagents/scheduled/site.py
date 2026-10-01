@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from tradingagents.report_reader import reader_assets
+
 import html
 import json
 import os
@@ -3347,6 +3349,7 @@ def _page_template(title: str, body: str, *, prefix: str) -> str:
   <main class="shell" id="main-content" tabindex="-1">
     {body}
   </main>
+  {reader_assets()}
 </body>
 </html>
 """
