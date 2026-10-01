@@ -17,6 +17,25 @@ from typing import Any
 _RUN_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,159}")
 _TICKER = re.compile(r"[A-Z0-9][A-Z0-9.^=-]{0,23}")
 _MAX_JSON_BYTES = 2 * 1024 * 1024
+_SOURCE_REASON_CODES = frozenset(
+    {
+        "SOURCE_RUN_PARTIAL_FAILURE",
+        "SOURCE_RUN_INCOMPLETE",
+        "PORTFOLIO_RUN_INCOMPLETE",
+        "PENDING_ORDERS_UNVERIFIED",
+        "EXACT_RUN_ACCOUNT_NOT_VERIFIED",
+    }
+)
+
+
+class _SourceUnavailable(ValueError):
+    """Only allowlisted internal codes may reach the presentation layer."""
+
+    def __init__(self, code: str):
+        self.code = (
+            code if code in _SOURCE_REASON_CODES else "EXACT_RUN_ACCOUNT_NOT_VERIFIED"
+        )
+        super().__init__(self.code)
 
 
 def _object(path: Path) -> dict[str, Any]:
@@ -112,20 +131,23 @@ def _sizing_snapshot(snapshot: dict[str, Any]) -> dict[str, Any]:
             for warning in warnings
         )
     ):
-        raise ValueError("pending_orders_unverified")
+        raise _SourceUnavailable("PENDING_ORDERS_UNVERIFIED")
     safe_pending = []
     for order in pending:
         if not isinstance(order, dict):
-            raise ValueError("invalid_pending_order")
+            raise _SourceUnavailable("PENDING_ORDERS_UNVERIFIED")
         ticker, side = order.get("canonical_ticker"), order.get("side")
-        remaining = _number(order.get("remaining_qty"))
+        try:
+            remaining = _number(order.get("remaining_qty"))
+        except ValueError as exc:
+            raise _SourceUnavailable("PENDING_ORDERS_UNVERIFIED") from exc
         if (
             not isinstance(ticker, str)
             or not _TICKER.fullmatch(ticker)
             or side not in {"buy", "sell"}
             or remaining < 0
         ):
-            raise ValueError("invalid_pending_order")
+            raise _SourceUnavailable("PENDING_ORDERS_UNVERIFIED")
         safe_pending.append(
             {"canonical_ticker": ticker, "side": side, "remaining_qty": remaining}
         )
@@ -180,8 +202,12 @@ def load_trade_plan_sources(
         if manifest.get("run_id") != run_id or str(manifest_market).upper() != market:
             raise ValueError("manifest_identity_mismatch")
         portfolio = manifest.get("portfolio") or {}
-        if manifest.get("status") != "success" or portfolio.get("status") != "success":
-            raise ValueError("source_run_incomplete")
+        if manifest.get("status") == "partial_failure":
+            raise _SourceUnavailable("SOURCE_RUN_PARTIAL_FAILURE")
+        if manifest.get("status") != "success":
+            raise _SourceUnavailable("SOURCE_RUN_INCOMPLETE")
+        if portfolio.get("status") != "success":
+            raise _SourceUnavailable("PORTFOLIO_RUN_INCOMPLETE")
         artifact = (portfolio.get("artifacts") or {}).get("account_snapshot_json")
         if not isinstance(artifact, str) or not artifact.strip():
             raise ValueError("account_artifact_not_declared")
@@ -247,6 +273,8 @@ def load_trade_plan_sources(
                     fx_status="BROKER_REFERENCE_RATE",
                     fx_source=quote["source"],
                 )
+    except _SourceUnavailable as exc:
+        result.update(account_snapshot=None, status="UNAVAILABLE", reason=exc.code)
     except (OSError, ValueError, TypeError, KeyError, AttributeError, OverflowError):
         # Do not emit exception strings: a malformed artifact could contain an
         # account identifier or a private filesystem path in the error message.
