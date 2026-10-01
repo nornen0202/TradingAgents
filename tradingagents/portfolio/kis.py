@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 from datetime import date, datetime, timedelta, timezone
@@ -673,6 +674,8 @@ class KisClient:
         }
         positions: list[dict[str, Any]] = []
         summary: dict[str, Any] = {}
+        usd_reference_rates: set[float] = set()
+        invalid_usd_reference = False
         tr_cont = ""
 
         while True:
@@ -684,6 +687,16 @@ class KisClient:
                 tr_cont=tr_cont,
             )
             positions.extend(_coerce_records(payload.get("output1")))
+            # Keep the documented USD reference rate; never infer FX from
+            # stock prices, which this endpoint already normalizes to KRW.
+            for currency_row in _coerce_records(payload.get("output2")):
+                if str(currency_row.get("crcy_cd") or "").strip().upper() != "USD":
+                    continue
+                rate = _first_float(currency_row, ("frst_bltn_exrt",))
+                if rate is None or not math.isfinite(rate) or rate <= 0:
+                    invalid_usd_reference = True
+                else:
+                    usd_reference_rates.add(rate)
             summary_records = _coerce_records(payload.get("output3")) or _coerce_records(payload.get("output2"))
             if summary_records:
                 summary = summary_records[0]
@@ -692,6 +705,16 @@ class KisClient:
                 break
             tr_cont = "N"
 
+        if not invalid_usd_reference and len(usd_reference_rates) == 1:
+            summary = dict(summary)
+            summary["fx_quote"] = {
+                "base_currency": "USD",
+                "quote_currency": "KRW",
+                "rate": next(iter(usd_reference_rates)),
+                "observed_at": datetime.now(timezone.utc).isoformat(),
+                "source": "kis.inquire_present_balance.output2.frst_bltn_exrt",
+                "kind": "BROKER_REFERENCE_RATE",
+            }
         return positions, summary
 
     def fetch_overseas_pending_orders(
@@ -1389,7 +1412,7 @@ def _build_domestic_positions(
                 display_name=identity.display_name,
                 sector=None,
                 quantity=holding_qty,
-                available_qty=_first_float(item, ("ord_psbl_qty",)) or holding_qty,
+                available_qty=_sellable_quantity(item, ("ord_psbl_qty",), holding_qty, warnings),
                 avg_cost_krw=int(_first_float(item, ("pchs_avg_pric",)) or 0),
                 market_price_krw=int(_first_float(item, ("prpr",)) or 0),
                 market_value_krw=int(_first_float(item, ("evlu_amt",)) or 0),
@@ -1441,7 +1464,7 @@ def _build_overseas_positions(
                 display_name=display_name or identity.display_name,
                 sector=None,
                 quantity=holding_qty,
-                available_qty=_first_float(item, ("ord_psbl_qty1", "ord_psbl_qty")) or holding_qty,
+                available_qty=_sellable_quantity(item, ("ord_psbl_qty1", "ord_psbl_qty"), holding_qty, warnings),
                 avg_cost_krw=int(avg_cost or 0),
                 market_price_krw=int(market_price or 0),
                 market_value_krw=int(market_value or 0),
@@ -1451,6 +1474,16 @@ def _build_overseas_positions(
             )
         )
     return positions
+
+
+def _sellable_quantity(
+    item: dict[str, Any], keys: tuple[str, ...], holding_qty: float, warnings: list[str]
+) -> float:
+    value = _first_float(item, keys)
+    if value is None or not math.isfinite(value) or value < 0 or value > holding_qty:
+        warnings.append("KIS sellable quantity was missing or invalid; available quantity set to zero pending broker recheck.")
+        return 0.0
+    return value
 
 
 def _coerce_records(value: Any) -> list[dict[str, Any]]:
@@ -1723,6 +1756,9 @@ def _extract_cash_snapshot(
         "snapshot_health": snapshot_health,
         "warnings": warnings,
         "cash_diagnostics": {
+            **({"fx_quote": {key: summary_payload["fx_quote"].get(key) for key in (
+                "base_currency", "quote_currency", "rate", "observed_at", "source", "kind"
+            )}} if isinstance(summary_payload.get("fx_quote"), dict) else {}),
             "summary_fields_present": sorted(summary_payload.keys()),
             "parsed_numeric_fields": cash_fields,
             "positions_market_value_krw": int(positions_market_value),
