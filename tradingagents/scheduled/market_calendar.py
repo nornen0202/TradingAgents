@@ -70,13 +70,16 @@ def market_session_state(
             **exchange_state,
         }
 
-    is_open = _fallback_is_open(normalized_market, now_local)
     return {
         "market": normalized_market,
         "calendar": calendar_name,
         "source": "weekday_clock_fallback",
-        "is_open": is_open,
-        "phase": "regular" if is_open else _fallback_phase(normalized_market, now_local),
+        # A weekday clock cannot establish holidays or early closes. Keep it
+        # diagnostic-only; an unavailable exchange calendar cannot open a gate.
+        "is_open": False,
+        "phase": "unknown",
+        "estimated_is_open": _fallback_is_open(normalized_market, now_local),
+        "reason": "exchange_calendar_unavailable",
         "now_local": now_local.isoformat(),
     }
 
@@ -89,16 +92,21 @@ def _exchange_calendar_state(*, calendar_name: str, now_local: datetime) -> dict
 
     try:
         calendar = xcals.get_calendar(calendar_name)
-        minute = pd.Timestamp(now_local.astimezone(timezone.utc))
+        minute = pd.Timestamp(now_local.astimezone(timezone.utc)).floor("min")
         is_open = bool(calendar.is_open_on_minute(minute))
-        session_label = calendar.minute_to_session_label(minute, direction="previous")
+        session_label = calendar.minute_to_session(minute, direction="previous")
         schedule = calendar.schedule
         open_at = None
         close_at = None
         if session_label in schedule.index:
             row = schedule.loc[session_label]
-            open_at = pd.Timestamp(row["open"]).tz_localize("UTC").tz_convert(now_local.tzinfo).isoformat()
-            close_at = pd.Timestamp(row["close"]).tz_localize("UTC").tz_convert(now_local.tzinfo).isoformat()
+            open_stamp, close_stamp = pd.Timestamp(row["open"]), pd.Timestamp(row["close"])
+            if open_stamp.tzinfo is None:
+                open_stamp = open_stamp.tz_localize("UTC")
+            if close_stamp.tzinfo is None:
+                close_stamp = close_stamp.tz_localize("UTC")
+            open_at = open_stamp.tz_convert(now_local.tzinfo).isoformat()
+            close_at = close_stamp.tz_convert(now_local.tzinfo).isoformat()
         return {
             "is_open": is_open,
             "phase": "regular" if is_open else "closed",

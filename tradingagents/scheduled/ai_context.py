@@ -39,6 +39,12 @@ def render_context(market: str, strategy: dict, account: dict, status: dict, *, 
 def public_context(market: str, strategy: dict, account: dict, status: dict, *, generated_at: str) -> dict:
     rows = strategy.get("rows") or []
     account_view = project(account, ("status", "as_of", "snapshot_health", "currency"))
+    # Diagnostic only: retain the chosen VALID account and its original clock.
+    # Never forward arbitrary latest-attempt fields (errors may contain IDs).
+    if isinstance(account.get("latest_attempt"), dict):
+        account_view["latest_attempt"] = project(account["latest_attempt"], (
+            "status", "account_as_of", "run_started_at", "run_finished_at", "selected_for_public_account",
+        ))
     account_view["summary"] = project(account.get("summary"), SUMMARY_FIELDS)
     account_view["positions"] = [project(row, POSITION_FIELDS) for row in account.get("positions", [])]
     selected_rows = []

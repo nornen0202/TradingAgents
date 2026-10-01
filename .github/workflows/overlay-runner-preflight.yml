@@ -1,0 +1,62 @@
+name: Overlay Runner Preflight
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/overlay-runner-preflight.yml
+      - .github/scripts/overlay_runner_preflight.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: overlay-runner-preflight
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    # Only trusted main code runs on the existing auxiliary Windows runner.
+    # This probe does not start a broker/market-data producer or change routing.
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ${{ fromJSON(vars.TRADINGAGENTS_PAGES_RUNNER_LABELS || '["self-hosted", "Windows"]') }}
+    timeout-minutes: 5
+    env:
+      PYTHONUTF8: "1"
+      TRADINGAGENTS_REPO_DIR: ${{ github.workspace }}\source-${{ github.run_id }}-preflight
+      TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
+      CODEX_BINARY: ${{ vars.CODEX_BINARY }}
+      KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+      KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+      KIS_Developers_APP_KEY: ${{ secrets.KIS_Developers_APP_KEY }}
+      KIS_Developers_APP_SECRET: ${{ secrets.KIS_Developers_APP_SECRET }}
+    defaults:
+      run:
+        shell: python {0}
+    steps:
+      - name: Check out trusted source into an isolated path
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          path: source-${{ github.run_id }}-preflight
+          clean: false
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+      - name: Check current Windows resource headroom without waiting
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import subprocess
+          import sys
+          subprocess.check_call([
+              sys.executable, ".github/scripts/windows_resource_guard.py",
+              "--wait-seconds", "0",
+          ])
+      - name: Probe isolated archive IO and report capability booleans
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import subprocess
+          import sys
+          subprocess.check_call([sys.executable, ".github/scripts/overlay_runner_preflight.py"])
