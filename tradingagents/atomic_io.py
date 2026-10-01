@@ -10,7 +10,6 @@ from __future__ import annotations
 import errno
 import json
 import os
-import stat
 import tempfile
 import threading
 import time
@@ -32,18 +31,15 @@ def atomic_write_json(
 ) -> None:
     """Publish complete UTF-8 JSON using a unique temporary sibling and replace.
 
-The old file is retained if serialization, writing, or replacement fails. Explicit
-``mode=0o600`` is required for secrets; otherwise an existing mode is preserved,
-or 0644 is used for a new public document. Windows ACLs remain OS-managed.
+The old file is retained if serialization, writing, or replacement fails. Local
+producer state can include account/error data, so every replacement is owner-only
+even if the previous file had broader permissions. Windows ACLs remain OS-managed.
 """
+    if mode not in (None, 0o600):
+        raise ValueError("Shared producer JSON must use owner-only permissions.")
     content = (json.dumps(payload, ensure_ascii=False, indent=indent) + "\n").encode("utf-8")
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    if mode is None:
-        try:
-            mode = stat.S_IMODE(destination.stat().st_mode)
-        except FileNotFoundError:
-            mode = 0o644
     fd, temporary_name = tempfile.mkstemp(prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent)
     temporary = Path(temporary_name)
     try:
@@ -51,7 +47,7 @@ or 0644 is used for a new public document. Windows ACLs remain OS-managed.
             stream.write(content)
             stream.flush()
             os.fsync(stream.fileno())
-        os.chmod(temporary, mode)
+        os.chmod(temporary, 0o600)
         os.replace(temporary, destination)
     finally:
         temporary.unlink(missing_ok=True)

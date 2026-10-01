@@ -13,6 +13,45 @@ _MARKET_META = {
     "kr": {"code": "KR", "label_ko": "국내", "label_en": "Korea"},
     "us": {"code": "US", "label_ko": "해외", "label_en": "Overseas"},
 }
+_ACCOUNT_HEALTH_CODES = {"VALID", "CAPITAL_CONSTRAINED", "INVALID_SNAPSHOT", "WATCHLIST_ONLY"}
+
+
+def _account_diagnostic_timestamp(value: Any) -> datetime | None:
+    try:
+        parsed = datetime.fromisoformat(str(value or "").replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed.tzinfo is not None else None
+
+
+def _account_attempt_diagnostic(
+    manifest: dict[str, Any], snapshot: dict[str, Any] | None, *, read_status: str, now: datetime,
+) -> dict[str, Any]:
+    """Only status enums and actual source clocks; never errors or identifiers."""
+    observed = _account_diagnostic_timestamp((snapshot or {}).get("as_of"))
+    if snapshot is not None:
+        raw_health = str(snapshot.get("snapshot_health") or "").strip().upper()
+        status = raw_health if raw_health in _ACCOUNT_HEALTH_CODES else "UNVERIFIED_HEALTH"
+        if observed is None:
+            status = "UNVERIFIED_ACCOUNT_CLOCK"
+        elif observed > now:
+            status = "FUTURE_ACCOUNT_CLOCK"
+    elif read_status == "SNAPSHOT_UNREADABLE":
+        status = read_status
+    else:
+        portfolio = manifest.get("portfolio") if isinstance(manifest.get("portfolio"), dict) else {}
+        status = {"failed": "PIPELINE_FAILED", "skipped": "PIPELINE_SKIPPED", "disabled": "PIPELINE_DISABLED"}.get(
+            str(portfolio.get("status") or "").lower(), "SNAPSHOT_NOT_PUBLISHED",
+        )
+    started = _account_diagnostic_timestamp(manifest.get("started_at"))
+    finished = _account_diagnostic_timestamp(manifest.get("finished_at"))
+    return {
+        "status": status,
+        "account_as_of": observed.isoformat() if observed else None,
+        "run_started_at": started.isoformat() if started else None,
+        "run_finished_at": finished.isoformat() if finished else None,
+        "selected_for_public_account": False,
+    }
 
 
 def build_public_account_site(
@@ -73,20 +112,33 @@ def _latest_public_market_snapshot(
 ) -> dict[str, Any]:
     meta = _MARKET_META[market]
     candidates = []
+    attempts = []
+    now = datetime.now(timezone.utc)
     for manifest in manifests:
         if _manifest_market(manifest) != meta["code"]:
             continue
         run_dir_value = manifest.get("_run_dir")
-        if not run_dir_value:
-            continue
-        snapshot_path = Path(str(run_dir_value)) / "portfolio-private" / "account_snapshot.json"
-        if not snapshot_path.is_file():
-            continue
-        try:
-            snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        if not isinstance(snapshot, dict):
+        snapshot = None
+        read_status = "SNAPSHOT_NOT_PUBLISHED"
+        if run_dir_value:
+            snapshot_path = Path(str(run_dir_value)) / "portfolio-private" / "account_snapshot.json"
+            if snapshot_path.is_file():
+                try:
+                    value = json.loads(snapshot_path.read_text(encoding="utf-8"))
+                    if isinstance(value, dict):
+                        snapshot = value
+                    else:
+                        read_status = "SNAPSHOT_UNREADABLE"
+                except (OSError, json.JSONDecodeError):
+                    read_status = "SNAPSHOT_UNREADABLE"
+        diagnostic = _account_attempt_diagnostic(manifest, snapshot, read_status=read_status, now=now)
+        # This clock orders completed pipeline attempts, not account freshness.
+        # Account selection below remains strictly VALID and observation-based.
+        attempt_clock = next((clock for field in ("run_finished_at", "run_started_at", "account_as_of")
+                              if (clock := _account_diagnostic_timestamp(diagnostic[field])) is not None and clock <= now),
+                             datetime.min.replace(tzinfo=timezone.utc))
+        attempts.append((attempt_clock, diagnostic, manifest))
+        if snapshot is None:
             continue
         health = str(snapshot.get("snapshot_health") or "").strip().upper()
         try:
@@ -98,9 +150,14 @@ def _latest_public_market_snapshot(
         candidates.append((observed, snapshot, manifest))
     if candidates:
         _, snapshot, manifest = max(candidates, key=lambda item: item[0])
-        return _public_market_snapshot(snapshot, manifest=manifest, market=market)
+        result = _public_market_snapshot(snapshot, manifest=manifest, market=market)
+        if attempts:
+            _, diagnostic, attempted_manifest = max(attempts, key=lambda item: item[0])
+            diagnostic["selected_for_public_account"] = attempted_manifest is manifest
+            result["latest_attempt"] = diagnostic
+        return result
 
-    return {
+    result = {
         **meta,
         "status": "unavailable",
         "as_of": None,
@@ -110,6 +167,9 @@ def _latest_public_market_snapshot(
         "summary": _empty_summary(),
         "positions": [],
     }
+    if attempts:
+        result["latest_attempt"] = max(attempts, key=lambda item: item[0])[1]
+    return result
 
 
 def _manifest_market(manifest: dict[str, Any]) -> str:

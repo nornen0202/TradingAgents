@@ -105,6 +105,23 @@ def test_atomic_write_private_permissions_are_set_before_replace(tmp_path):
     assert json.loads(path.read_text(encoding="utf-8")) == {"synthetic": True}
 
 
+def test_default_producer_state_is_owner_only_after_replacement(tmp_path):
+    path = tmp_path / "run.json"
+    path.write_text('{"old": true}', encoding="utf-8")
+    atomic_write_json(path, {"new": True})
+    if os.name != "nt":
+        assert stat.S_IMODE(path.stat().st_mode) == 0o600
+
+
+@pytest.mark.parametrize("mode", [0o644, 0o666, 0o777])
+def test_atomic_write_rejects_permissive_modes_without_touching_old_file(tmp_path, mode):
+    path = tmp_path / "run.json"
+    path.write_text('{"old": true}', encoding="utf-8")
+    with pytest.raises(ValueError, match="owner-only"):
+        atomic_write_json(path, {"new": True}, mode=mode)
+    assert json.loads(path.read_text(encoding="utf-8")) == {"old": True}
+
+
 def test_multiprocess_atomic_locked_updates_have_no_lost_writes(tmp_path):
     ctx = multiprocessing.get_context("spawn")
     path = tmp_path / "manifest.json"
