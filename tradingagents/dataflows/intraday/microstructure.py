@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import date, datetime, time, timedelta, timezone
+from math import isfinite
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -290,7 +291,7 @@ class KISMicrostructureProvider:
                 symbol,
                 exchange=exchange,
                 nmin=str(max(1, _interval_minutes(interval))),
-                include_previous="1",
+                include_previous="0",
                 nrec="120",
             ),
             missing,
@@ -300,6 +301,11 @@ class KISMicrostructureProvider:
             raw_source_names.append("kis.overseas_time_itemchartprice")
             chart_payload = chart_result[0] if isinstance(chart_result, tuple) else chart_result
             bars = _records(chart_payload, "output2")
+
+        # KIS can return previous-day or extended-hours bars. Keep their original
+        # timestamp for staleness reporting, but never mix them into session data.
+        session_bounds = _us_session_bounds(now_local)
+        session_bars = _us_regular_session_bars(bars, now_local=now_local, bounds=session_bounds, missing=missing)
 
         orderbook = _call_optional(lambda: self._kis.overseas_asking_price(symbol, exchange=exchange), missing, "orderbook")
         orderbook_row = {}
@@ -369,18 +375,26 @@ class KISMicrostructureProvider:
             "ovrs_nmix_prpr",
             "stck_prpr",
             "base",
-            default=_last_bar_price(bars),
+            default=_last_bar_price(session_bars),
         )
         if last_price is None:
             raise RuntimeError(f"KIS overseas microstructure response did not include price for {ticker}.")
-        volume = int(_find_float(combined_price, "tvol", "TVOL", "acml_vol", "evol", "EVOL", default=_sum_volume(bars)) or 0)
+        volume = int(_find_float(combined_price, "tvol", "TVOL", "acml_vol", "evol", "EVOL", default=_sum_volume(session_bars)) or 0)
         trading_value = _find_float(combined_price, "tamt", "TAMT", "acml_tr_pbmn", "amount")
         if trading_value is None and volume > 0:
             trading_value = float(last_price * volume)
         price_change_pct = _find_float(combined_price, "rate", "RATE", "prdy_ctrt", "change_rate")
-        day_high = _find_float(combined_price, "high", "HIGH", "ovrs_nmix_hgpr", default=_max_value(bars, ("high", "HIGH", "hprc"))) or last_price
-        day_low = _find_float(combined_price, "low", "LOW", "ovrs_nmix_lwpr", default=_min_value(bars, ("low", "LOW", "lprc"))) or last_price
-        session_vwap = _vwap_from_cumulative(combined_price) or _vwap_from_bars(bars)
+        day_high = _find_float(combined_price, "high", "HIGH", "ovrs_nmix_hgpr", default=_max_value(session_bars, ("high", "HIGH", "hprc"))) or last_price
+        day_low = _find_float(combined_price, "low", "LOW", "ovrs_nmix_lwpr", default=_min_value(session_bars, ("low", "LOW", "lprc"))) or last_price
+        session_vwap = _us_session_vwap(
+            price_row, detail_row, session_bars,
+            now_local=now_local,
+            interval_minutes=_interval_minutes(interval),
+            day_low=day_low,
+            day_high=day_high,
+            missing=missing,
+            bounds=session_bounds,
+        )
         relative_volume = _relative_volume(volume, avg20_daily_volume, now_local, market="US")
         if session_vwap is None:
             missing.setdefault("session_vwap", "minute_or_cumulative_traded_value_unavailable")
@@ -420,7 +434,7 @@ class KISMicrostructureProvider:
             for key, reason in getattr(supplement, "limited_reason", {}).items():
                 missing.setdefault(key, reason)
 
-        halt_status = _status_from_keys(combined_price, ("halt", "trht", "mtyp", "stat"), default_name="normal")
+        halt_status = _status_from_keys(combined_price, ("halt", "trht", "mtyp", "stat"), default_name="unknown")
         if not halt_status.get("is_clear"):
             missing.setdefault("halt_status", "halt_status_not_confirmed_by_snapshot")
         luld_status = _unavailable_us_market_status("luld_status", raw_source_names)
@@ -668,14 +682,116 @@ def _vwap_from_cumulative(row: dict[str, Any]) -> float | None:
     return None
 
 
+def _us_session_bounds(now_local: datetime) -> tuple[datetime, datetime] | None:
+    from tradingagents.scheduled.market_calendar import market_session_state
+
+    state = market_session_state(market="US", now_local=now_local)
+    if state.get("source") != "exchange_calendars" or state.get("session_label") != now_local.date().isoformat():
+        return None
+    try:
+        return datetime.fromisoformat(state["session_open"]), datetime.fromisoformat(state["session_close"])
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def _us_regular_session_bars(
+    rows: list[dict[str, Any]], *, now_local: datetime,
+    bounds: tuple[datetime, datetime] | None, missing: dict[str, str],
+) -> list[dict[str, Any]]:
+    """Select explicitly dated, current-day US regular-session bars only."""
+    if bounds is None:
+        missing["minute_bars"] = "regular_session_calendar_unavailable_or_not_today"
+        return []
+    selected: dict[datetime, dict[str, Any]] = {}
+    for row in rows:
+        normalized = {str(key).lower(): value for key, value in row.items()}
+        day = str(normalized.get("xymd") or "")
+        clock = str(normalized.get("xhms") or "")
+        try:
+            stamp = datetime.strptime(day + clock, "%Y%m%d%H%M%S").replace(tzinfo=now_local.tzinfo)
+        except ValueError:
+            continue
+        if (
+            stamp.date() == now_local.date()
+            and bounds[0] <= stamp <= bounds[1]
+            and stamp <= now_local
+        ):
+            if stamp in selected and selected[stamp] != row:
+                missing["minute_bars"] = "conflicting_duplicate_bar_timestamp"
+                return []
+            selected[stamp] = row
+    return [selected[stamp] for stamp in sorted(selected, reverse=True)]
+
+
+def _us_session_vwap(
+    price_row: dict[str, Any],
+    detail_row: dict[str, Any],
+    bars: list[dict[str, Any]],
+    *,
+    now_local: datetime,
+    interval_minutes: int,
+    day_low: float,
+    day_high: float,
+    missing: dict[str, str],
+    bounds: tuple[datetime, datetime] | None,
+) -> float | None:
+    """Never divide a cumulative amount from one response by another's volume."""
+    rejected_reason = ""
+    for row in (price_row, detail_row):
+        candidate = _vwap_from_cumulative(row)
+        if candidate is None:
+            continue
+        source_low = _find_float(row, "low", "ovrs_nmix_lwpr")
+        source_high = _find_float(row, "high", "ovrs_nmix_hgpr")
+        if source_low is None or source_high is None:
+            rejected_reason = rejected_reason or "source_vwap_price_range_unavailable"
+            continue
+        if (
+            _price_inside_range(candidate, source_low, source_high)
+            and _price_inside_range(candidate, day_low, day_high)
+        ):
+            return candidate
+        rejected_reason = "source_vwap_price_range_inconsistent"
+
+    # A rolling 120-bar window is not a session VWAP (notably for 1-minute
+    # requests). Fall back only when the observed regular session includes its
+    # opening interval. KIS's documented overseas bar fields are EVOL/EAMT.
+    if bars and bounds is not None:
+        stamps = [_bar_asof([row], fallback=now_local, timezone_name=str(now_local.tzinfo)) for row in bars]
+        step = timedelta(minutes=max(1, interval_minutes))
+        covered = (
+            stamps[-1] <= bounds[0] + step
+            and min(now_local, bounds[1]) - stamps[0] <= step
+            and all(left - right <= step for left, right in zip(stamps, stamps[1:]))
+        )
+        if covered:
+            candidate = _vwap_from_bars(bars)
+            if candidate is not None and _price_inside_range(candidate, day_low, day_high):
+                return candidate
+            if candidate is not None:
+                rejected_reason = "source_vwap_price_range_inconsistent"
+        else:
+            missing["session_vwap"] = "regular_session_bar_coverage_incomplete"
+    if rejected_reason:
+        missing["session_vwap"] = rejected_reason
+    return None
+
+
+def _price_inside_range(value: float, low: float | None, high: float | None) -> bool:
+    if low is None or high is None or not all(isfinite(item) and item > 0 for item in (value, low, high)):
+        return False
+    tolerance = max(abs(low), abs(high)) * 1e-6
+    return low <= high and low - tolerance <= value <= high + tolerance
+
+
 def _vwap_from_bars(rows: list[dict[str, Any]]) -> float | None:
     total_amount = 0.0
     total_volume = 0.0
     for row in rows:
-        volume = _find_float(row, "cntg_vol", "volume", "tvol", "TVOL", "xymd_vol")
+        volume = _find_float(row, "evol", "cntg_vol", "volume", "tvol", "TVOL", "xymd_vol")
         if not volume or volume <= 0:
             continue
-        amount = _find_float(row, "tr_pbmn", "acml_tr_pbmn", "tamt", "TAMT")
+        amount = _find_float(row, "eamt", "tr_pbmn", "acml_tr_pbmn", "tamt", "TAMT")
         if amount is None:
             high = _find_float(row, "stck_hgpr", "high", "HIGH", "hprc")
             low = _find_float(row, "stck_lwpr", "low", "LOW", "lprc")
@@ -695,7 +811,7 @@ def _sum_volume(rows: list[dict[str, Any]]) -> float | None:
     total = 0.0
     found = False
     for row in rows:
-        value = _find_float(row, "cntg_vol", "volume", "tvol", "TVOL")
+        value = _find_float(row, "evol", "cntg_vol", "volume", "tvol", "TVOL")
         if value is not None:
             total += value
             found = True
@@ -865,6 +981,8 @@ def _status_from_keys(row: dict[str, Any], tokens: tuple[str, ...], *, default_n
         key: value
         for key, value in row.items()
         if any(token.lower() in str(key).lower() for token in tokens)
+        and value is not None
+        and str(value).strip() != ""
     }
     matched = {
         key: value

@@ -117,14 +117,22 @@ jobs:
     needs:
       - overlay_gate
     if: ${{ needs.overlay_gate.outputs.run_us == 'true' }}
-    runs-on: [self-hosted, Windows]
+    # A dedicated producer is opt-in; never borrow the Pages runner implicitly.
+    runs-on: ${{ fromJSON(((inputs.run_mode || 'overlay_only') == 'overlay_only' && vars.TRADINGAGENTS_OVERLAY_RUNNER_LABELS) || '["self-hosted", "Windows"]') }}
     timeout-minutes: 120
+    concurrency:
+      group: tradingagents-overlay-producer-us
+      cancel-in-progress: false
     defaults:
       run:
         shell: python {0}
     env:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_REPO_DIR: ${{ github.workspace }}\overlay-us-${{ github.run_id }}-${{ github.run_attempt }}
+      TRADINGAGENTS_OVERLAY_RUN_LABEL: github-actions-overlay-us-${{ github.run_id }}-${{ github.run_attempt }}
+      REQUESTED_RUN_MODE: ${{ inputs.run_mode || 'overlay_only' }}
+      REQUESTED_TICKERS: ${{ inputs.tickers }}
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
@@ -156,38 +164,61 @@ jobs:
       - name: Initialize overlay-us run-scoped temporary path
         shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
-          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-overlay-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT-overlay-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "TRADINGAGENTS_OVERLAY_VENV_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-venv-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT-overlay-us"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          path: overlay-us-${{ github.run_id }}-${{ github.run_attempt }}
+          clean: false
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
-      - name: Install TradingAgents
+      - name: Wait for safe Windows resource headroom
+        timeout-minutes: 16
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import subprocess
           import sys
 
-          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
-          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
+          subprocess.check_call([sys.executable, ".github/scripts/windows_resource_guard.py"])
 
-      - name: Run overlay refresh mode
+      - name: Install TradingAgents in run-scoped virtual environment
+        timeout-minutes: 15
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import os
           from pathlib import Path
           import subprocess
           import sys
 
+          venv_dir = Path(os.environ["TRADINGAGENTS_OVERLAY_VENV_DIR"])
+          subprocess.check_call([sys.executable, "-m", "venv", str(venv_dir)])
+          venv_python = str(venv_dir / "Scripts" / "python.exe")
+          subprocess.check_call([venv_python, "-m", "pip", "install", "-e", ".[translation]"])
+
+      - name: Run overlay refresh mode
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import os
+          from pathlib import Path
+          import subprocess
+
           config_path = "config/scheduled_analysis.toml"
           if not Path(config_path).exists():
               raise SystemExit("Missing config/scheduled_analysis.toml.")
 
-          run_mode = "${{ github.event.inputs.run_mode }}".strip() or "overlay_only"
+          run_mode = os.environ.get("REQUESTED_RUN_MODE", "").strip() or "overlay_only"
+          if run_mode not in {"overlay_only", "selective_rerun_only"}:
+              raise SystemExit("Unsupported overlay run mode.")
+          venv_python = str(Path(os.environ["TRADINGAGENTS_OVERLAY_VENV_DIR"]) / "Scripts" / "python.exe")
           args = [
-              sys.executable,
+              venv_python,
               "-m",
               "tradingagents.scheduled",
               "--config",
@@ -197,48 +228,103 @@ jobs:
               "--site-dir",
               os.environ["TRADINGAGENTS_SITE_DIR"],
               "--label",
-              "github-actions-overlay-us",
+              os.environ["TRADINGAGENTS_OVERLAY_RUN_LABEL"],
               "--skip-site-build",
               "--strict",
           ]
 
           archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
-          if archive_dir:
-              args += ["--archive-dir", archive_dir]
+          if not archive_dir or not Path(archive_dir).is_absolute() or not Path(archive_dir).is_dir():
+              raise SystemExit("An existing absolute TRADINGAGENTS_ARCHIVE_DIR is required for the shared baseline.")
+          if Path(archive_dir).resolve().is_relative_to(Path(os.environ["TRADINGAGENTS_REPO_DIR"]).resolve()):
+              raise SystemExit("The shared archive must be outside the disposable checkout.")
+          args += ["--archive-dir", archive_dir]
 
-          manual_tickers = "${{ github.event.inputs.tickers }}".strip()
+          manual_tickers = os.environ.get("REQUESTED_TICKERS", "").strip()
           if manual_tickers:
               args += ["--tickers", manual_tickers]
 
           subprocess.check_call(args)
 
       - name: Validate US decision bundle quality
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import os
+          from pathlib import Path
+          import re
           import subprocess
-          import sys
 
-          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip() or ".runtime/tradingagents-archive"
+          archive_dir = os.environ["TRADINGAGENTS_ARCHIVE_DIR"].strip()
+          venv_python = str(Path(os.environ["TRADINGAGENTS_OVERLAY_VENV_DIR"]) / "Scripts" / "python.exe")
+          label = os.environ["TRADINGAGENTS_OVERLAY_RUN_LABEL"]
+          if not re.fullmatch(r"github-actions-overlay-us-[0-9]+-[0-9]+", label):
+              raise SystemExit("Invalid overlay job label.")
+          runs_root = (Path(archive_dir) / "runs").resolve()
+          matches = [path for path in runs_root.glob("*/*_" + label)
+                     if path.is_dir() and path.resolve().is_relative_to(runs_root)]
+          if len(matches) != 1:
+              raise SystemExit(f"Expected exactly one completed run for this overlay job; found {len(matches)}.")
           subprocess.check_call([
-              sys.executable,
+              venv_python,
               ".github/scripts/verify_decision_bundle.py",
-              "--archive-dir",
-              archive_dir,
-              "--latest",
+              "--run-dir",
+              str(matches[0]),
           ])
+
+      - name: Clean run-scoped overlay-us files
+        if: ${{ always() }}
+        timeout-minutes: 5
+        run: |
+          import os
+          from pathlib import Path
+          import shutil
+          import stat
+
+          run_id, attempt = os.environ["GITHUB_RUN_ID"], os.environ["GITHUB_RUN_ATTEMPT"]
+          if not run_id.isdigit() or not attempt.isdigit():
+              raise SystemExit("Refusing unsafe run identity for cleanup.")
+          suffix = run_id + "-" + attempt
+          targets = []
+          for key, parent_key, name in (
+              ("TRADINGAGENTS_REPO_DIR", "GITHUB_WORKSPACE", "overlay-us-" + suffix),
+              ("TRADINGAGENTS_OVERLAY_VENV_DIR", "RUNNER_TEMP", "tradingagents-venv-" + suffix + "-overlay-us"),
+              ("TRADINGAGENTS_SITE_DIR", "RUNNER_TEMP", "tradingagents-site-" + suffix + "-overlay-us"),
+          ):
+              value, parent_value = os.environ.get(key, ""), os.environ.get(parent_key, "")
+              if not value:
+                  continue
+              if not parent_value:
+                  raise SystemExit("Refusing cleanup without its allowed parent.")
+              target, parent = Path(value).resolve(), Path(parent_value).resolve()
+              if parent == Path(parent.anchor) or target.parent != parent or target.name != name:
+                  raise SystemExit("Refusing unsafe run-scoped path cleanup.")
+              targets.append(target)
+          def clear_readonly(function, path, exception):
+              os.chmod(path, stat.S_IWRITE)
+              function(path)
+          for target in targets:
+              if target.exists():
+                  shutil.rmtree(target, onexc=clear_readonly)
 
   overlay_refresh_kr:
     needs:
       - overlay_gate
     if: ${{ needs.overlay_gate.outputs.run_kr == 'true' }}
-    runs-on: [self-hosted, Windows]
+    runs-on: ${{ fromJSON(((inputs.run_mode || 'overlay_only') == 'overlay_only' && vars.TRADINGAGENTS_OVERLAY_RUNNER_LABELS) || '["self-hosted", "Windows"]') }}
     timeout-minutes: 120
+    concurrency:
+      group: tradingagents-overlay-producer-kr
+      cancel-in-progress: false
     defaults:
       run:
         shell: python {0}
     env:
       PYTHONUTF8: "1"
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      TRADINGAGENTS_REPO_DIR: ${{ github.workspace }}\overlay-kr-${{ github.run_id }}-${{ github.run_attempt }}
+      TRADINGAGENTS_OVERLAY_RUN_LABEL: github-actions-overlay-kr-${{ github.run_id }}-${{ github.run_attempt }}
+      REQUESTED_RUN_MODE: ${{ inputs.run_mode || 'overlay_only' }}
+      REQUESTED_TICKERS: ${{ inputs.tickers }}
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       CODEX_BINARY: ${{ vars.CODEX_BINARY }}
       CODEX_HOME: ${{ vars.CODEX_HOME }}
@@ -268,38 +354,61 @@ jobs:
       - name: Initialize overlay-kr run-scoped temporary path
         shell: pwsh -NoLogo -NoProfile -NonInteractive -File {0}
         run: |
-          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-overlay-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "TRADINGAGENTS_SITE_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-site-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT-overlay-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "TRADINGAGENTS_OVERLAY_VENV_DIR=$([System.IO.Path]::Combine($env:RUNNER_TEMP, "tradingagents-venv-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT-overlay-kr"))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          path: overlay-kr-${{ github.run_id }}-${{ github.run_attempt }}
+          clean: false
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
-      - name: Install TradingAgents
+      - name: Wait for safe Windows resource headroom
+        timeout-minutes: 16
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import subprocess
           import sys
 
-          subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
-          subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[translation]"])
+          subprocess.check_call([sys.executable, ".github/scripts/windows_resource_guard.py"])
 
-      - name: Run overlay refresh mode
+      - name: Install TradingAgents in run-scoped virtual environment
+        timeout-minutes: 15
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import os
           from pathlib import Path
           import subprocess
           import sys
 
+          venv_dir = Path(os.environ["TRADINGAGENTS_OVERLAY_VENV_DIR"])
+          subprocess.check_call([sys.executable, "-m", "venv", str(venv_dir)])
+          venv_python = str(venv_dir / "Scripts" / "python.exe")
+          subprocess.check_call([venv_python, "-m", "pip", "install", "-e", ".[translation]"])
+
+      - name: Run overlay refresh mode
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        run: |
+          import os
+          from pathlib import Path
+          import subprocess
+
           config_path = "config/scheduled_analysis_korea.toml"
           if not Path(config_path).exists():
               raise SystemExit("Missing config/scheduled_analysis_korea.toml.")
 
-          run_mode = "${{ github.event.inputs.run_mode }}".strip() or "overlay_only"
+          run_mode = os.environ.get("REQUESTED_RUN_MODE", "").strip() or "overlay_only"
+          if run_mode not in {"overlay_only", "selective_rerun_only"}:
+              raise SystemExit("Unsupported overlay run mode.")
+          venv_python = str(Path(os.environ["TRADINGAGENTS_OVERLAY_VENV_DIR"]) / "Scripts" / "python.exe")
           args = [
-              sys.executable,
+              venv_python,
               "-m",
               "tradingagents.scheduled",
               "--config",
@@ -309,35 +418,83 @@ jobs:
               "--site-dir",
               os.environ["TRADINGAGENTS_SITE_DIR"],
               "--label",
-              "github-actions-overlay-kr",
+              os.environ["TRADINGAGENTS_OVERLAY_RUN_LABEL"],
               "--skip-site-build",
               "--strict",
           ]
 
           archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip()
-          if archive_dir:
-              args += ["--archive-dir", archive_dir]
+          if not archive_dir or not Path(archive_dir).is_absolute() or not Path(archive_dir).is_dir():
+              raise SystemExit("An existing absolute TRADINGAGENTS_ARCHIVE_DIR is required for the shared baseline.")
+          if Path(archive_dir).resolve().is_relative_to(Path(os.environ["TRADINGAGENTS_REPO_DIR"]).resolve()):
+              raise SystemExit("The shared archive must be outside the disposable checkout.")
+          args += ["--archive-dir", archive_dir]
 
-          manual_tickers = "${{ github.event.inputs.tickers }}".strip()
+          manual_tickers = os.environ.get("REQUESTED_TICKERS", "").strip()
           if manual_tickers:
               args += ["--tickers", manual_tickers]
 
           subprocess.check_call(args)
 
       - name: Validate KR decision bundle quality
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import os
+          from pathlib import Path
+          import re
           import subprocess
-          import sys
 
-          archive_dir = os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "").strip() or ".runtime/tradingagents-archive"
+          archive_dir = os.environ["TRADINGAGENTS_ARCHIVE_DIR"].strip()
+          venv_python = str(Path(os.environ["TRADINGAGENTS_OVERLAY_VENV_DIR"]) / "Scripts" / "python.exe")
+          label = os.environ["TRADINGAGENTS_OVERLAY_RUN_LABEL"]
+          if not re.fullmatch(r"github-actions-overlay-kr-[0-9]+-[0-9]+", label):
+              raise SystemExit("Invalid overlay job label.")
+          runs_root = (Path(archive_dir) / "runs").resolve()
+          matches = [path for path in runs_root.glob("*/*_" + label)
+                     if path.is_dir() and path.resolve().is_relative_to(runs_root)]
+          if len(matches) != 1:
+              raise SystemExit(f"Expected exactly one completed run for this overlay job; found {len(matches)}.")
           subprocess.check_call([
-              sys.executable,
+              venv_python,
               ".github/scripts/verify_decision_bundle.py",
-              "--archive-dir",
-              archive_dir,
-              "--latest",
+              "--run-dir",
+              str(matches[0]),
           ])
+
+      - name: Clean run-scoped overlay-kr files
+        if: ${{ always() }}
+        timeout-minutes: 5
+        run: |
+          import os
+          from pathlib import Path
+          import shutil
+          import stat
+
+          run_id, attempt = os.environ["GITHUB_RUN_ID"], os.environ["GITHUB_RUN_ATTEMPT"]
+          if not run_id.isdigit() or not attempt.isdigit():
+              raise SystemExit("Refusing unsafe run identity for cleanup.")
+          suffix = run_id + "-" + attempt
+          targets = []
+          for key, parent_key, name in (
+              ("TRADINGAGENTS_REPO_DIR", "GITHUB_WORKSPACE", "overlay-kr-" + suffix),
+              ("TRADINGAGENTS_OVERLAY_VENV_DIR", "RUNNER_TEMP", "tradingagents-venv-" + suffix + "-overlay-kr"),
+              ("TRADINGAGENTS_SITE_DIR", "RUNNER_TEMP", "tradingagents-site-" + suffix + "-overlay-kr"),
+          ):
+              value, parent_value = os.environ.get(key, ""), os.environ.get(parent_key, "")
+              if not value:
+                  continue
+              if not parent_value:
+                  raise SystemExit("Refusing cleanup without its allowed parent.")
+              target, parent = Path(value).resolve(), Path(parent_value).resolve()
+              if parent == Path(parent.anchor) or target.parent != parent or target.name != name:
+                  raise SystemExit("Refusing unsafe run-scoped path cleanup.")
+              targets.append(target)
+          def clear_readonly(function, path, exception):
+              os.chmod(path, stat.S_IWRITE)
+              function(path)
+          for target in targets:
+              if target.exists():
+                  shutil.rmtree(target, onexc=clear_readonly)
 
   publish_overlay_site:
     needs:

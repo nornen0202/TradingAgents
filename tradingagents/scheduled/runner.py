@@ -20,6 +20,8 @@ from zoneinfo import ZoneInfo
 
 import yfinance as yf
 
+from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
+from tradingagents.scheduled.failure_diagnostics import failure_diagnostics, format_failure_diagnostics
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
@@ -790,8 +792,9 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     manifest["finished_at"] = completed_at.isoformat()
     manifest["duration_seconds"] = round((completed_at - started_at).total_seconds(), 2)
     manifest["postprocessing_duration_seconds"] = round((completed_at - finished_at).total_seconds(), 2)
-    _write_json(run_dir / "run.json", manifest)
-    _write_json(config.storage.archive_dir / "latest-run.json", manifest)
+    _publish_completed_run_manifest(
+        archive_dir=config.storage.archive_dir, run_dir=run_dir, manifest=manifest,
+    )
     if skip_site_build:
         print("Skipped static site build for this run.", flush=True)
     else:
@@ -1219,7 +1222,9 @@ def _run_sequential_tickers(
         ticker_summaries.append(ticker_summary)
         print(
             f"Finished ticker {index + 1}/{len(run_tickers)}: {ticker} "
-            f"status={ticker_summary.get('status')} duration={ticker_summary.get('duration_seconds')}s",
+            f"status={ticker_summary.get('status')} duration={ticker_summary.get('duration_seconds')}s"
+            + (" " + format_failure_diagnostics(ticker_summary.get("failure_diagnostics"))
+               if ticker_summary.get("status") != "success" else ""),
             flush=True,
         )
         if ticker_summary["status"] != "success" and not config.run.continue_on_ticker_error:
@@ -1323,7 +1328,9 @@ def _run_parallel_tickers(
             summary = results[index]
             print(
                 f"Finished ticker worker {index + 1}/{len(run_tickers)}: {summary.get('ticker')} "
-                f"status={summary.get('status')} duration={summary.get('duration_seconds')}s",
+                f"status={summary.get('status')} duration={summary.get('duration_seconds')}s"
+                + (" " + format_failure_diagnostics(summary.get("failure_diagnostics"))
+                   if summary.get("status") != "success" else ""),
                 flush=True,
             )
             if _is_codex_failure_summary(summary):
@@ -2049,6 +2056,7 @@ def _run_single_ticker(
             "status": "failed",
             "analysis_date": analysis_date,
             "error": str(exc),
+            "failure_diagnostics": failure_diagnostics(exc),
             "traceback": traceback.format_exc(),
             "started_at": ticker_started.isoformat(),
             "finished_at": datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
@@ -2072,6 +2080,7 @@ def _run_single_ticker(
             "started_at": error_payload["started_at"],
             "finished_at": error_payload["finished_at"],
             "duration_seconds": error_payload["duration_seconds"],
+            "failure_diagnostics": error_payload["failure_diagnostics"],
             "metrics": {
                 **error_payload["metrics"],
                 "codex_usage": error_payload["llm_usage"],
@@ -3633,8 +3642,73 @@ def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
 
 
 def _write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    atomic_write_json(path, payload)
+
+
+def _manifest_publication_key(manifest: dict[str, Any]) -> tuple[datetime, str]:
+    """Order completed invocations, not their quote/account observations.
+
+    The archive and baseline selectors already order runs by invocation start.
+    Finishing later does not make an earlier invocation a newer market input.
+    A stable run-id tie break makes simultaneous publication deterministic.
+    """
+    run_id = str(manifest.get("run_id") or "").strip()
+    try:
+        started_at = datetime.fromisoformat(str(manifest.get("started_at") or "").replace("Z", "+00:00"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Run publication requires a valid start timestamp.") from exc
+    if not run_id or started_at.tzinfo is None:
+        raise ValueError("Run publication requires an identity and timezone-aware start timestamp.")
+    return started_at.astimezone(timezone.utc), run_id
+
+
+def _publish_completed_run_manifest(
+    *, archive_dir: Path, run_dir: Path, manifest: dict[str, Any],
+) -> bool:
+    """Archive this completed run, then conditionally advance the legacy index.
+
+    The entire manifest is selected atomically: never combine a market, full
+    analysis, or overlay with another run's fields. ``latest-run.json`` remains
+    a cross-market discovery hint, not a quote-freshness or success assertion.
+    Consumers must retain their market/mode/quality checks and archive fallback.
+    Cooperating producers hold this short lock only for the pointer transaction;
+    holding it during full analysis would recreate the long queue bottleneck.
+    """
+    candidate_key = _manifest_publication_key(manifest)
+    try:
+        finished_at = datetime.fromisoformat(str(manifest.get("finished_at") or "").replace("Z", "+00:00"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Only completed run manifests may be published.") from exc
+    if finished_at.tzinfo is None or finished_at.astimezone(timezone.utc) < candidate_key[0]:
+        raise ValueError("Run publication requires a verified completion timestamp.")
+    if str(manifest.get("run_id")) != run_dir.name:
+        raise ValueError("Run publication identity does not match its archive directory.")
+    latest_path = archive_dir / "latest-run.json"
+    with interprocess_file_lock(archive_dir / ".latest-run.lock", timeout=30):
+        run_path = run_dir / "run.json"
+        if run_path.exists():
+            try:
+                archived = json.loads(run_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError) as exc:
+                raise RuntimeError("Existing run archive cannot be verified.") from exc
+            if archived != manifest:
+                raise RuntimeError("Completed run identity collision; existing archive is preserved.")
+        else:
+            _write_json(run_path, manifest)
+        if latest_path.exists():
+            try:
+                incumbent = json.loads(latest_path.read_text(encoding="utf-8"))
+                if not isinstance(incumbent, dict):
+                    raise ValueError("Invalid pointer shape.")
+                incumbent_key = _manifest_publication_key(incumbent)
+            except (OSError, TypeError, ValueError) as exc:
+                # Do not overwrite a pointer whose chronology cannot be proved.
+                # The completed per-run artifact above remains recoverable.
+                raise RuntimeError("Latest-run index is unreadable or has unverified chronology.") from exc
+            if candidate_key < incumbent_key:
+                return False
+        _write_json(latest_path, manifest)
+    return True
 
 
 def _build_daily_thesis_artifact(
@@ -4125,7 +4199,7 @@ def _resolve_latest_overlay_source_manifest(
     run_mode = str((((candidate.get("settings") or {}).get("run_mode")) or "full")).strip().lower()
     candidate_market_ok = _manifest_market_matches(candidate, market=market)
     if candidate_market_ok and run_mode == "full" and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers):
-        return candidate
+        return _prefer_newer_completed_full_source(archive_dir, candidate, tickers=tickers, market=market)
 
     if (
         candidate_market_ok
@@ -4136,7 +4210,7 @@ def _resolve_latest_overlay_source_manifest(
             tickers=tickers,
         )
     ):
-        return candidate
+        return _prefer_newer_completed_full_source(archive_dir, candidate, tickers=tickers, market=market)
 
     source_run_id = str(candidate.get("overlay_source_run_id") or "").strip()
     if source_run_id:
@@ -4147,12 +4221,78 @@ def _resolve_latest_overlay_source_manifest(
                 resolved,
                 tickers=tickers,
             ):
-                return resolved
+                return _prefer_newer_completed_full_source(archive_dir, resolved, tickers=tickers, market=market)
 
     latest_full = _find_latest_full_run_manifest(archive_dir, tickers=tickers, market=market)
     if latest_full is not None:
         return latest_full
     return None
+
+
+def _prefer_newer_completed_full_source(
+    archive_dir: Path, candidate: dict[str, Any], *, tickers: list[str] | None, market: str | None,
+) -> dict[str, Any]:
+    """Do not let a later overlay hide a full thesis that completed afterwards.
+
+    Compare full-analysis lineage to full-analysis starts, never full starts to
+    overlay quote clocks. A replacement is one complete same-market baseline;
+    no overlay data or fields are transplanted into that baseline.
+    """
+    lineage = candidate
+    seen: set[str] = set()
+    lineage_key = None
+    for _ in range(64):
+        run_id = str(lineage.get("run_id") or "")
+        if not run_id or run_id in seen or not _manifest_market_matches(lineage, market=market):
+            break
+        seen.add(run_id)
+        if str((lineage.get("settings") or {}).get("run_mode") or "full").lower() == "full":
+            try:
+                lineage_key = _manifest_publication_key(lineage)
+            except ValueError:
+                pass
+            break
+        source_id = str(lineage.get("overlay_source_run_id") or "")
+        if source_id in {".", ".."} or "/" in source_id or "\\" in source_id:
+            break
+        source_path = _find_run_manifest_path_by_run_id(archive_dir, source_id) if source_id else None
+        if source_path is None:
+            break
+        try:
+            lineage = json.loads(source_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            break
+        if not isinstance(lineage, dict):
+            break
+
+    eligible: list[tuple[tuple[datetime, str], dict[str, Any]]] = []
+    for full, _ in _iter_run_manifests_desc(archive_dir):
+        settings = full.get("settings") if isinstance(full.get("settings"), dict) else {}
+        actual_market = str(settings.get("market_scope") or settings.get("market") or "").upper()
+        if (
+            not full.get("finished_at")
+            or actual_market not in {"KR", "US"}
+            or str(full.get("status") or "").lower() not in {"success", "completed", "complete"}
+            or _strict_required_coverage_failed(full)
+            or not _manifest_is_complete_overlay_baseline(
+                full, market=market, requested_tickers=tickers, required_holding_tickers=tickers,
+            )
+        ):
+            continue
+        try:
+            key = _manifest_publication_key(full)
+            finished = datetime.fromisoformat(str(full["finished_at"]).replace("Z", "+00:00"))
+            if (
+                finished.tzinfo is None
+                or finished.astimezone(timezone.utc) < key[0]
+                or finished.astimezone(timezone.utc) > datetime.now(timezone.utc)
+            ):
+                continue
+        except (TypeError, ValueError):
+            continue
+        if lineage_key is None or key > lineage_key:
+            eligible.append((key, full))
+    return max(eligible, key=lambda item: item[0])[1] if eligible else candidate
 
 
 def _resolve_latest_full_overlay_baseline_manifest(
@@ -5053,6 +5193,13 @@ def _execution_summary_model_for_update(*, config: ScheduledAnalysisConfig, upda
     explicit_model = str(config.execution.execution_llm_summary_model or "").strip()
     if explicit_model:
         return explicit_model
+    # Intraday refresh is a data fast path. Automatically escalating optional
+    # prose to a model for every actionable/degraded row can leave the freshly
+    # collected quotes stale before publication. Keep the deterministic update
+    # and the inherited research thesis; an explicit summary-model opt-in above
+    # still retains its documented meaning.
+    if str(config.run.run_mode or "full").strip().lower() == "overlay_only":
+        return None
 
     decision_state = str(getattr(getattr(update, "decision_state", None), "value", "") or "").upper()
     decision_now = str(getattr(getattr(update, "decision_now", None), "value", "") or "").upper()

@@ -1,5 +1,8 @@
 from pathlib import Path
 from types import SimpleNamespace
+from dataclasses import replace
+
+import pytest
 
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.runner import _execution_summary_model_for_update
@@ -74,3 +77,24 @@ def test_execution_summary_model_selection_honors_explicit_override(tmp_path: Pa
     model = _execution_summary_model_for_update(config=config, update=_update(state="WAIT"))
 
     assert model == "gpt-5.4"
+
+
+@pytest.mark.parametrize("state,action,health", [
+    ("ACTIONABLE_NOW", "STARTER_NOW", "OK"),
+    ("DEGRADED", "WAIT", "STALE"),
+    ("INVALIDATED", "SELL", "OK"),
+    ("WAIT", "NONE", "OK"),
+])
+def test_overlay_fast_path_does_not_escalate_optional_prose(tmp_path, state, action, health):
+    config = _config(tmp_path)
+    config = replace(config, run=replace(config.run, run_mode="overlay_only"))
+    update = _update(state=state, now=action, data_health=health)
+    assert _execution_summary_model_for_update(config=config, update=update) is None
+
+
+def test_overlay_preserves_explicit_summary_model_opt_in(tmp_path):
+    config = _config(tmp_path, execution_model="gpt-5.4")
+    config = replace(config, run=replace(config.run, run_mode="overlay_only"))
+    assert _execution_summary_model_for_update(
+        config=config, update=_update(state="DEGRADED", data_health="STALE"),
+    ) == "gpt-5.4"

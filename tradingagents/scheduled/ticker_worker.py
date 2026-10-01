@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import load_scheduled_config
+from .failure_diagnostics import failure_diagnostics
 from .runner import _run_single_ticker
 
 
@@ -38,6 +39,7 @@ def main(argv: list[str] | None = None) -> int:
         payload: dict[str, Any] = {
             "ticker": args.ticker,
             "status": "failed",
+            "failure_diagnostics": failure_diagnostics(exc),
             "error": str(exc),
             "traceback": traceback.format_exc(),
             "worker_pid": os.getpid(),

@@ -4,13 +4,16 @@ import json
 import math
 import os
 import re
+from contextlib import ExitStack
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from threading import RLock
 from time import monotonic, sleep
 from typing import Any
 
 import requests
 
+from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.dataflows.api_keys import get_api_key
 
 from .account_models import AccountSnapshot, PendingOrder, PortfolioProfile, Position
@@ -102,6 +105,8 @@ class KisClient:
         self.session = session or requests.Session()
         self.timeout_seconds = timeout_seconds
         self._access_token: str | None = None
+        self._invalidated_access_token: str | None = None
+        self._token_thread_lock = RLock()
         self._token_expires_at: datetime | None = None
         self._token_ttl_seconds_default = max(
             60,
@@ -142,11 +147,37 @@ class KisClient:
 
     def issue_access_token(self, *, force: bool = False) -> str:
         base_url = self._validated_base_url()
-        if not force:
-            cached = self._load_cached_token()
-            if cached:
-                return cached
+        with self._token_thread_lock:
+            if not self._token_file_cache_enabled:
+                return self._request_access_token(base_url)
+            previous = self._invalidated_access_token or self._access_token
+            if force and previous is None:
+                previous = self._load_cached_token()
+            with ExitStack() as stack:
+                # Lock only the refresh transaction, never the account/quote reads.
+                try:
+                    stack.enter_context(interprocess_file_lock(
+                        self._token_cache_path.with_suffix(self._token_cache_path.suffix + ".lock"),
+                        timeout=max(30.0, self.timeout_seconds + 5.0),
+                    ))
+                except OSError as exc:
+                    raise KisApiError("KIS token refresh coordination failed; no unlocked retry is allowed.") from exc
+                cached = self._load_cached_token()
+                # A peer may already have replaced the rejected/expired token.
+                if (
+                    cached and cached != self._invalidated_access_token
+                    and (not force or (previous is not None and cached != previous))
+                ):
+                    self._invalidated_access_token = None
+                    return cached
+                # Loading a rejected disk token must not resurrect it if HTTP fails.
+                if force:
+                    self._invalidated_access_token = previous
+                self._access_token = None
+                self._token_expires_at = None
+                return self._request_access_token(base_url)
 
+    def _request_access_token(self, base_url: str) -> str:
         response = self.session.post(
             f"{base_url}/oauth2/tokenP",
             headers={"content-type": "application/json"},
@@ -173,22 +204,27 @@ class KisClient:
         now = datetime.now(timezone.utc)
         self._access_token = token
         self._token_expires_at = now + timedelta(seconds=expires_in)
-        self._save_cached_token()
+        try:
+            self._save_cached_token()
+        except Exception:
+            self._access_token = None
+            self._token_expires_at = None
+            raise
+        self._invalidated_access_token = None
         return token
 
     def ensure_access_token(self) -> str:
-        if self._is_token_usable():
-            return self._access_token or self.issue_access_token(force=True)
+        with self._token_thread_lock:
+            if not self._invalidated_access_token and self._is_token_usable():
+                return self._access_token or self.issue_access_token(force=True)
 
-        cached = self._load_cached_token()
-        if cached:
-            return cached
-
-        return self.issue_access_token(force=True)
+            return self.issue_access_token(force=bool(self._invalidated_access_token))
 
     def invalidate_access_token(self) -> None:
-        self._access_token = None
-        self._token_expires_at = None
+        with self._token_thread_lock:
+            self._invalidated_access_token = self._access_token or self._invalidated_access_token
+            self._access_token = None
+            self._token_expires_at = None
 
     def _validated_base_url(self) -> str:
         expected = _kis_base_url(self.environment)
@@ -603,11 +639,9 @@ class KisClient:
             "source": "api",
         }
         try:
-            self._token_cache_path.parent.mkdir(parents=True, exist_ok=True)
-            self._token_cache_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
-            os.chmod(self._token_cache_path, 0o600)
-        except Exception:
-            return
+            atomic_write_json(self._token_cache_path, payload, mode=0o600)
+        except (OSError, TypeError, ValueError) as exc:
+            raise KisApiError("KIS token cache could not be persisted safely.") from exc
 
     def fetch_balance(self, *, account_no: str, product_code: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         tr_id = "VTTC8434R" if self.environment == "demo" else "TTTC8434R"
