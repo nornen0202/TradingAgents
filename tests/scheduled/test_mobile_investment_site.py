@@ -1052,3 +1052,45 @@ def test_full_site_never_copies_raw_private_or_execution_artifacts(tmp_path: Pat
     assert "portfolio" not in feed["runs"][0]
     assert "FRESH.NEW.PRIVATE" not in serialized_feed
     assert "SNAPSHOT.HOLD.PRIVATE" not in serialized_feed
+
+
+def test_trade_plan_is_built_for_both_views_without_leaking_account_inputs(tmp_path, monkeypatch):
+    import tradingagents.scheduled.mobile_site as mobile
+
+    def packet(market, **kwargs):
+        result = _packet(market, public=kwargs.get('public', False))
+        if not kwargs.get('public', False):
+            action = result['body']['current']['private_portfolio_overlay']['actions'][0]
+            action['risk_action_level'] = {'level_type': 'SUPPORT', 'price': 100}
+        return result
+
+    def sources(archive, payload):
+        assert payload['run_id'] == 'run-' + payload['market'].lower()
+        return {
+            'status': 'EXACT_RUN_ACCOUNT', 'fx_status': 'BROKER_REFERENCE_RATE',
+            'account_snapshot': {
+                'account_id': 'ACCOUNT-INPUT-MUST-STAY-LOCAL',
+                'as_of': '2026-07-16T09:00:00+09:00', 'snapshot_health': 'VALID',
+                'available_cash_krw': 1000, 'buying_power_krw': 1000,
+                'constraints': {'min_cash_buffer_krw': 0}, 'pending_orders': [],
+                'positions': [{'canonical_ticker': 'SECRET.HOLD', 'quantity': 3.5, 'available_qty': 2.5}],
+            },
+            'fx_krw_per_usd': 1400, 'fx_asof': '2026-07-16T09:00:00+09:00',
+        }
+
+    monkeypatch.setattr(mobile, 'build_surface_packet', packet)
+    monkeypatch.setattr(mobile, 'load_trade_plan_sources', sources)
+    build_mobile_site(site_dir=tmp_path / 'site', archive_dir=tmp_path / 'archive')
+    strategy = json.loads((tmp_path / 'site/mobile/strategy.json').read_text(encoding='utf-8'))
+    for key, currency in [('kr', 'KRW'), ('us', 'USD')]:
+        plan = strategy['markets'][key]['trade_plan']
+        held = next(row for row in plan['rows'] if row['ticker'] == 'SECRET.HOLD')
+        assert held['quantity'] == 2
+        assert held['currency'] == currency
+        assert held['order_ready'] is False
+    assert 'ACCOUNT-INPUT-MUST-STAY-LOCAL' not in json.dumps(strategy)
+    public = json.loads((tmp_path / 'site/mobile/public.json').read_text(encoding='utf-8'))
+    assert all('trade_plan' not in market for market in public['markets'].values())
+    assert 'SECRET.HOLD' not in json.dumps(public)
+    for page in ['strategy.html', 'mobile/strategy.html']:
+        assert 'private.js?v=' in (tmp_path / 'site' / page).read_text(encoding='utf-8')

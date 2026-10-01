@@ -10,6 +10,8 @@ from tradingagents.portfolio.kis import (
     KisApiError,
     KisClient,
     PortfolioConfigurationError,
+    _build_domestic_positions,
+    _build_overseas_positions,
     _extract_cash_snapshot,
     load_account_snapshot_from_kis,
     validate_kis_credentials,
@@ -217,6 +219,40 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(client.request_json.call_args_list[0].kwargs["params"]["NATN_CD"], "840")
         self.assertEqual(client.request_json.call_args_list[0].kwargs["tr_cont"], "")
         self.assertEqual(client.request_json.call_args_list[1].kwargs["tr_cont"], "N")
+
+    def test_overseas_present_balance_preserves_only_explicit_consistent_usd_reference_fx(self):
+        cases = [
+            ([{"crcy_cd": "USD", "frst_bltn_exrt": "1391.5"}], 1391.5),
+            ([{"crcy_cd": "JPY", "frst_bltn_exrt": "9.3"}], None),
+            ([{"crcy_cd": "USD", "frst_bltn_exrt": "0"}], None),
+            ([{"crcy_cd": "USD", "frst_bltn_exrt": "nan"}], None),
+            ([{"crcy_cd": "USD", "frst_bltn_exrt": "1391"}, {"crcy_cd": "USD", "frst_bltn_exrt": "1392"}], None),
+        ]
+        for currency_rows, expected in cases:
+            with self.subTest(currency_rows=currency_rows):
+                client = KisClient(app_key="app-key", app_secret="app-secret", session=Mock(), token_file_cache_enabled=False)
+                client.request_json = Mock(return_value=({"output1": [], "output2": currency_rows, "output3": {"tot_asst_amt": "500000"}}, {}))
+                _, summary = client.fetch_overseas_present_balance(account_no="12345678", product_code="01")
+                self.assertEqual((summary.get("fx_quote") or {}).get("rate"), expected)
+                if expected:
+                    quote = summary["fx_quote"]
+                    self.assertEqual(quote["source"], "kis.inquire_present_balance.output2.frst_bltn_exrt")
+                    self.assertIsNotNone(datetime.fromisoformat(quote["observed_at"]).tzinfo)
+
+    @patch("tradingagents.portfolio.kis.resolve_identity")
+    def test_sellable_quantity_zero_or_missing_is_never_promoted_to_entire_holding(self, mock_resolve):
+        mock_resolve.return_value = SimpleNamespace(canonical_ticker="AAPL", display_name="Apple Inc.")
+        for builder, quantity_key, available_key in (
+            (_build_domestic_positions, "hldg_qty", "ord_psbl_qty"),
+            (_build_overseas_positions, "cblc_qty13", "ord_psbl_qty1"),
+        ):
+            for value, expected in (("0", 0), (None, 0), ("nan", 0), ("-1", 0), ("3", 0), ("1", 1)):
+                with self.subTest(builder=builder.__name__, value=value):
+                    warnings = []
+                    item = {"pdno": "AAPL", quantity_key: "2", available_key: value}
+                    positions = builder([item], warnings=warnings)
+                    self.assertEqual(positions[0].available_qty, expected)
+                    self.assertEqual(positions[0].quantity, 2)
 
     @patch("tradingagents.portfolio.kis.datetime", _FixedDatetime)
     def test_fetch_domestic_order_fills_uses_daily_ccld_and_paginates(self):
@@ -585,7 +621,10 @@ class PortfolioKisTests(unittest.TestCase):
                     "evlu_pfls_amt2": "90000",
                 }
             ],
-            {"dncl_amt": "100000", "wdrw_psbl_tot_amt": "100000", "tot_asst_amt": "490000"},
+            {"dncl_amt": "100000", "wdrw_psbl_tot_amt": "100000", "tot_asst_amt": "490000",
+             "fx_quote": {"base_currency": "USD", "quote_currency": "KRW", "rate": 1300,
+                          "observed_at": "2026-01-01T00:00:00+00:00", "kind": "BROKER_REFERENCE_RATE",
+                          "source": "kis.inquire_present_balance.output2.frst_bltn_exrt"}},
         )
         client.fetch_overseas_pending_orders.return_value = []
         mock_from_api_keys.return_value = client
@@ -619,6 +658,7 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(snapshot.positions[0].market_price_krw, 195000)
         self.assertEqual(snapshot.positions[0].market_value_krw, 390000)
         self.assertEqual(snapshot.total_equity_krw, 490000)
+        self.assertEqual(snapshot.cash_diagnostics["fx_quote"]["rate"], 1300)
 
 
 if __name__ == "__main__":

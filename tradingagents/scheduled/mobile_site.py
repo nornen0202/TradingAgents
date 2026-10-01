@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Any
 
 from tradingagents.report_reader import READER_CSS, READER_JS
+from tradingagents.scheduled.trade_plan import build_trade_plan
+from tradingagents.scheduled.trade_plan_sources import load_trade_plan_sources
 
 from tradingagents.agents.utils.instrument_resolver import (
     InstrumentResolutionError,
@@ -248,6 +250,15 @@ def build_mobile_site(
             archive_dir=Path(archive_dir),
             integrated_report=current_integrated_report,
         )
+        plan_sources = load_trade_plan_sources(Path(archive_dir), market_payload)
+        market_payload["trade_plan"] = build_trade_plan(
+            {**market_payload, "market": market.upper()},
+            account_snapshot=plan_sources.get("account_snapshot"),
+            fx_krw_per_usd=plan_sources.get("fx_krw_per_usd"),
+            fx_asof=plan_sources.get("fx_asof"),
+        )
+        market_payload["trade_plan"]["source_status"] = plan_sources.get("status")
+        market_payload["trade_plan"]["fx_status"] = plan_sources.get("fx_status")
         strategy_payload["markets"][market] = market_payload
 
     public_payload = _normalize_mobile_machine_values(public_payload)
@@ -1329,7 +1340,7 @@ def _private_html(*, desktop: bool = False) -> str:
     <section class="hero-mobile">
       <p class="eyebrow">KR · US · YOUTUBE · PRISM · WORK</p>
       <h1>한눈에 보는 투자 전략</h1>
-      <p>전체 전략을 비교하고 종목별 진입 조건·위험 대응을 확인하세요.</p>
+      <p>종목별 매수·매도 수량, 가격 범위와 실행 조건을 비교하세요.</p>
       <p class="privacy-note">계좌번호·고객 식별정보는 공개하지 않습니다.</p>
       <nav class="report-nav" aria-label="전체 분석 리포트">
         <a href="{report_prefix}youtube/">YouTube 분석</a>
@@ -1495,11 +1506,14 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .summary-scroll { max-height: 520px; max-height: min(65vh, 520px); overflow: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
 .strategy-summary table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: .83rem; }
 .strategy-summary th { position: sticky; top: 0; z-index: 2; background: var(--panel-2); text-align: left; padding: 12px 10px; }
-.strategy-summary th:nth-child(1) { width: 35%; }
-.strategy-summary th:nth-child(2) { width: 40%; }
-.strategy-summary th:nth-child(3) { width: 25%; text-align: right; }
+.strategy-summary th:nth-child(1) { width: 18%; }
+.strategy-summary th:nth-child(2) { width: 16%; }
+.strategy-summary th:nth-child(3) { width: 12%; }
+.strategy-summary th:nth-child(4) { width: 17%; }
+.strategy-summary th:nth-child(5) { width: 17%; }
+.strategy-summary th:nth-child(6) { width: 20%; }
 .strategy-summary td { border-top: 1px solid var(--line); padding: 8px 10px; vertical-align: top; overflow-wrap: anywhere; }
-.strategy-summary td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.strategy-summary td { font-variant-numeric: tabular-nums; }
 .strategy-summary tbody tr:nth-child(even) { background: rgba(255,255,255,.025); }
 .strategy-summary .summary-detail { display: block; text-align: left; font-weight: 800; padding: 0; }
 .strategy-summary small { display: block; color: var(--muted); font-size: .72rem; margin-top: 4px; }
@@ -1508,6 +1522,32 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .summary-direction[data-direction="sell"], .summary-direction[data-direction="reduce"] { color: #ffbaae; }
 .summary-direction[data-direction="avoid"], .summary-direction[data-direction="research"] { color: #ffd080; }
 .summary-price { display: block; font-weight: 700; padding-top: 8px; }
+.plan-value { display: block; font-weight: 750; }
+.plan-part + .plan-part { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.plan-phase { display: block; margin-bottom: 4px; font-size: .72rem; color: var(--accent); }
+.plan-price > .plan-part:only-child > .plan-phase, .plan-amount > .plan-part:only-child > .plan-phase, .plan-check > .plan-part:only-child > .plan-phase { display: none; }
+.plan-status { display: block; color: var(--warn); font-size: .76rem; }
+.plan-condition { display: block; margin-top: 6px; color: var(--text); font-size: .77rem; }
+.plan-details { margin-top: 4px; }
+.plan-details summary { padding: 5px 0; font-size: .74rem; color: var(--accent); }
+.plan-details[open] { min-width: 0; }
+.plan-source-note { color: var(--muted); font-size: .76rem; }
+.plan-method { margin: 10px 0; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.025); }
+.plan-method summary { font-size: .8rem; }
+.plan-method p { margin: 0 0 12px; color: var(--muted); font-size: .78rem; }
+@media (max-width: 959px) {
+  .strategy-summary table, .strategy-summary tbody { display: block; }
+  .strategy-summary thead { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); }
+  .strategy-summary tbody tr { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); padding: 12px; border-bottom: 1px solid var(--line); gap: 12px 14px; }
+  .strategy-summary td { display: block; min-width: 0; padding: 0; border: 0; text-align: left; }
+  .strategy-summary td::before { content: attr(data-label); display: block; margin-bottom: 4px; color: var(--muted); font-size: .69rem; }
+  .strategy-summary td.plan-symbol::before, .strategy-summary td.plan-action::before { content: none; }
+  .strategy-summary td.plan-action { text-align: right; }
+  .strategy-summary td.plan-amount, .strategy-summary td.plan-check { grid-column: 1 / -1; }
+  .strategy-summary td.plan-amount .plan-part { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+  .strategy-summary .summary-price { padding-top: 0; }
+  .summary-scroll { max-height: min(72vh, 720px); }
+}
 .back-to-overview { display: block; margin: -5px 0 5px auto; font-size: .8rem; }
 .action-card { scroll-margin-top: 130px; }
 .source-disclosure { margin: 8px 0 12px; }
@@ -2236,6 +2276,66 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     }
     history.replaceState(null, '', url);
   }
+  function tradePlans(item, ticker) {
+    const keys = tickerKeys(ticker);
+    const plans = ((item.trade_plan || {}).rows || []);
+    if (!Array.isArray(plans)) return [];
+    return plans.filter((plan) => plan && typeof plan === 'object' && tickerKeys(plan.ticker).some((key) => keys.includes(key)));
+  }
+  function planMoney(value, currency) {
+    if (!Number.isFinite(numeric(value))) return '미확정';
+    const number = Number(value).toLocaleString('ko-KR', {minimumFractionDigits: currency === 'USD' ? 2 : 0, maximumFractionDigits: currency === 'USD' ? 2 : 0});
+    return currency === 'USD' ? '$' + number : number + '원';
+  }
+  function planPhase(plan) {
+    if (plan.phase === 'OBSERVE') return '현재 주문 없음';
+    return (plan.phase === 'CONDITIONAL' ? '조건 충족 시 ' : '검토 ') + (plan.action_label || actionLabel(plan.action) || '계획');
+  }
+  function planParts(plans, renderPart) {
+    return plans.map((plan) => '<div class="plan-part"><span class="plan-phase">' + esc(planPhase(plan)) + '</span>' + renderPart(plan) + '</div>').join('');
+  }
+  function planPrice(plan) {
+    if (plan.price_kind === 'NONE') return '해당 없음';
+    const low = numeric(plan.price_low), high = numeric(plan.price_high);
+    if (!Number.isFinite(low) || !Number.isFinite(high) || low <= 0 || high < low) return '범위 미확정';
+    const band = planMoney(low, plan.currency) + (low === high ? '' : ' ~ ' + planMoney(high, plan.currency));
+    const comparator = {'>=': ' 이상', '>': ' 초과', '<=': ' 이하', '<': ' 미만'}[plan.price_comparator] || '';
+    return band + (plan.price_kind === 'TRIGGER' ? comparator : '');
+  }
+  function tradeSummaryRow(entry, item) {
+    const ticker = entry.dataset.ticker;
+    const direction = entry.querySelector('.strategy-direction').textContent;
+    const readiness = entry.querySelector('.card-title .row-mode').textContent;
+    const inputPrice = entry.querySelector('.price-line strong').textContent;
+    let plans = tradePlans(item, ticker);
+    if (!plans.length) plans = [{phase: 'OBSERVE', action: 'WAIT', quantity: null, currency: panelCurrency(item), reasons: ['수량·가격 계획 자료를 다시 생성해야 합니다.'], conditions: []}];
+    const quantities = planParts(plans, (plan) => {
+      const qty = numeric(plan.quantity);
+      const valid = Number.isInteger(qty) && qty >= 0;
+      return '<strong class="plan-value">' + (valid ? esc(fmt(qty)) + '주' : '산출 보류') + '</strong><small>' + esc(valid && qty === 0 ? plan.status_label || '추가 거래 없음' : '입력 계좌 기준 검토 수량') + '</small>';
+    });
+    const prices = planParts(plans, (plan) => '<strong class="plan-value">' + esc(planPrice(plan)) + '</strong><small>' + esc(['TRIGGER', 'TRIGGER_RANGE', 'REFERENCE'].includes(plan.price_kind) ? '발동 기준 · 체결 범위 아님' : plan.price_kind === 'NONE' ? '추가 거래 계획 없음' : '분석의 가격 범위') + '</small>');
+    const amounts = planParts(plans, (plan) => {
+      const amount = plan.estimated_net_cash ?? plan.estimated_gross_high;
+      const fee = numeric(plan.estimated_fees);
+      const costKnown = Number.isFinite(numeric(plan.estimated_net_cash));
+      const label = !costKnown && Number.isFinite(numeric(amount)) ? '거래대금 · 비용 미확정' : plan.action === 'SELL' ? '상단 기준 예상 수령액' : plan.action === 'BUY' ? '상단 기준 예상 지출' : '추가 거래 금액';
+      return '<strong class="plan-value">' + esc(planMoney(Number.isFinite(numeric(amount)) ? Math.abs(Number(amount)) : null, plan.currency)) + '</strong><small>' + esc(label) + (Number.isFinite(fee) ? ' · 수수료·거래세 ' + esc(planMoney(fee, plan.currency)) : '') + '</small>';
+    });
+    const conditions = planParts(plans, (plan) => {
+      const quantity = numeric(plan.quantity);
+      const deadline = Date.parse(plan.valid_until || '');
+      const planRecheck = plan.status === 'RECHECK' || !Number.isFinite(deadline) || deadline <= Date.now() || (item.trade_plan || {}).account_fresh !== true;
+      const current = entry.dataset.readiness === 'READY' && plan.phase === 'NOW' && quantity > 0 && plan.status === 'CONDITIONAL' && !planRecheck;
+      const state = current ? '검토 가능 · 주문 전 최종 확인' : plan.phase === 'OBSERVE' ? '현재 주문 없음' : planRecheck || entry.dataset.readiness === 'RECHECK' || entry.dataset.readiness === 'RESEARCH' ? '현재 주문 없음 · 시세·계좌 재확인' : '조건 충족 전 주문 없음';
+      const reasons = fullConditions(plan.reasons);
+      const trigger = fullConditions(plan.condition, plan.trigger_conditions);
+      const issue = Array.isArray(plan.reasons) ? plan.reasons[0] : '';
+      return '<span class="plan-status">' + esc(state) + '</span>' + (issue ? '<small>' + esc(issue) + '</small>' : '') + (trigger || reasons ? '<details class="plan-details" data-plan-id="' + esc(plan.id || ticker + ':' + plan.phase) + '"><summary>발동 조건·산출 근거 전체 보기</summary>' + (trigger ? '<span class="plan-condition">' + esc(trigger) + '</span>' : '') + (reasons ? '<small>' + esc(reasons) + '</small>' : '') + (plan.valid_until ? '<small>기한 ' + esc(dateTime(plan.valid_until)) + '</small>' : '') + '</details>' : '');
+    });
+    return `<tr data-ticker="${esc(ticker)}"><td class="plan-symbol" data-label="종목"><button type="button" class="summary-detail" data-detail-target="${esc(entry.id)}" aria-label="${esc(entry.dataset.name)} 전략 조건·위험 상세 보기">${esc(entry.dataset.name)}</button><small>${esc(ticker)} · ${esc(roleLabel(entry.dataset.group))}</small><small>입력 시세 ${esc(inputPrice)}${panelCurrency(item) === 'USD' ? ' USD' : '원'}</small></td><td class="plan-action" data-label="전략"><span class="summary-direction" data-direction="${esc(entry.dataset.direction)}">${esc(direction)}</span><small>${esc(readiness)}</small></td><td class="plan-quantity" data-label="검토 수량">${quantities}</td><td class="plan-price" data-label="가격 범위·기준">${prices}</td><td class="plan-amount" data-label="예상 금액">${amounts}</td><td class="plan-check" data-label="발동 조건·현재 상태">${conditions}</td></tr>`;
+  }
+  function panelCurrency(item) { return String(item.market || '').toUpperCase() === 'US' ? 'USD' : 'KRW'; }
   function applyView(panel) {
     const view = views[panel.dataset.market];
     const entries = [...panel.querySelectorAll('.action-card')];
@@ -2265,12 +2365,13 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     panel.querySelector('.filter-empty').hidden = visible > 0 || entries.length === 0;
     const scroll = panel.querySelector('.summary-scroll');
     const scrollTop = scroll.scrollTop;
-    panel.querySelector('.strategy-summary tbody').innerHTML = ordered.filter((entry) => !entry.hidden).map((entry) => {
-      const direction = entry.querySelector('.strategy-direction').textContent;
-      const readiness = entry.querySelector('.card-title .row-mode').textContent;
-      const price = entry.querySelector('.price-line strong').textContent;
-      return `<tr data-ticker="${esc(entry.dataset.ticker)}"><td><button type="button" class="summary-detail" data-detail-target="${esc(entry.id)}" aria-label="${esc(entry.dataset.name)} 전략 조건·위험 상세 보기">${esc(entry.dataset.name)}</button><small>${esc(entry.dataset.ticker)} · ${esc(roleLabel(entry.dataset.group))}</small></td><td><span class="summary-direction" data-direction="${esc(entry.dataset.direction)}">${esc(direction)}</span><small>${esc(readiness)}</small></td><td><span class="summary-price">${esc(price)}</span><small>입력 시세</small></td></tr>`;
-    }).join('');
+    const openPlans = new Set([...scroll.querySelectorAll('.plan-details[open]')].map((detail) => detail.dataset.planId));
+    const focusedPlan = document.activeElement?.closest('.plan-details')?.dataset.planId;
+    panel.querySelector('.strategy-summary tbody').innerHTML = ordered.filter((entry) => !entry.hidden).map((entry) => tradeSummaryRow(entry, currentPayload.markets[panel.dataset.market] || {})).join('');
+    panel.querySelectorAll('.plan-details').forEach((detail) => {
+      detail.open = openPlans.has(detail.dataset.planId);
+      if (detail.dataset.planId === focusedPlan) detail.querySelector('summary').focus({preventScroll: true});
+    });
     scroll.scrollTop = scrollTop;
     scroll.hidden = visible === 0;
   }
@@ -2324,7 +2425,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
       + '<label for="sort-' + market + '">정렬<select id="sort-' + market + '"><option value="priority">우선순위</option><option value="name">종목명순</option><option value="change">등락률순 ↓</option></select></label></div>'
       + '<nav class="strategy-filters" aria-label="종목 유형">' + groups.map((group, index) => '<button type="button" data-group-target="' + group + '" data-label="' + ['핵심','보유','관심','신규','전체'][index] + '" aria-pressed="false"></button>').join('') + '</nav>'
       + '<p class="result-count" role="status" aria-live="polite" aria-atomic="true"></p>'
-      + '<section class="strategy-summary" id="summary-' + market + '" tabindex="-1"><h3>전체 전략 한눈에</h3><p class="readiness-note">종목명 선택 → 진입 조건·위험 대응 전문</p><div class="filter-empty" hidden><p>검색 조건에 맞는 종목이 없습니다.</p><button type="button" class="reset-filters">검색·필터 초기화</button></div><div class="summary-scroll" role="region" aria-label="종목별 전략 요약표 · 스크롤하여 전체 보기" tabindex="0"><table><thead><tr><th scope="col">종목</th><th scope="col">전략·현재 상태</th><th scope="col">시세</th></tr></thead><tbody></tbody></table></div></section>'
+      + '<section class="strategy-summary" id="summary-' + market + '" tabindex="-1"><h3>전체 전략 한눈에</h3><p class="readiness-note">매매 전략표 · 수량 → 가격 → 발동 조건 순서로 확인하세요. 종목명을 누르면 상세 근거가 열립니다.</p><p class="plan-source-note">수량 기준 계좌 ' + esc(dateTime((item.trade_plan || {}).account_asof || (item.freshness_receipt || {}).account_as_of)) + ' · KR 원화 / US 달러</p><details class="plan-method"><summary>수량·비용 계산 기준</summary><p>' + esc(fullConditions((item.trade_plan || {}).assumptions) || '정수 수량과 수수료를 반영한 검토안입니다. 자료가 부족하면 수량·가격을 임의로 만들지 않습니다.') + '</p><p>조건부 계획은 현재 주문과 구분합니다. 여러 계획은 동시에 실행하는 주문 묶음이 아닙니다. 매도 예정 대금을 미리 매수 예산으로 쓰지 않으며, 종목별 상세 근거와 현재 상태를 함께 확인하세요.</p></details><div class="filter-empty" hidden><p>검색 조건에 맞는 종목이 없습니다.</p><button type="button" class="reset-filters">검색·필터 초기화</button></div><div class="summary-scroll" role="region" aria-label="종목별 매매 전략표 · 스크롤하여 전체 보기" tabindex="0"><table><thead><tr><th scope="col">종목</th><th scope="col">전략</th><th scope="col">검토 수량</th><th scope="col">가격 범위·기준</th><th scope="col">예상 금액</th><th scope="col">발동 조건·현재 상태</th></tr></thead><tbody></tbody></table></div></section>'
       + '<div class="cards" id="cards-' + market + '"></div>' + integratedReport(item) + integratedReport(item, 'reference_report');
     const search = panel.querySelector('input');
     const sort = panel.querySelector('select');
