@@ -1217,8 +1217,12 @@ def _youtube_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
             "window_events": window_count,
             "transmitted_events": len(included),
             "truncated": len(included) < window_count,
-            "oldest_occurred_at": included[-1].get("occurred_at") if included else None,
-            "newest_occurred_at": included[0].get("occurred_at") if included else None,
+            "oldest_occurred_at": min(
+                (item["occurred_at"] for item in included), key=_timestamp, default=None
+            ),
+            "newest_occurred_at": max(
+                (item["occurred_at"] for item in included), key=_timestamp, default=None
+            ),
         },
         "events": included,
         "guardrails": {
