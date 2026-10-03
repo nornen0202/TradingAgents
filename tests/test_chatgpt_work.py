@@ -2315,6 +2315,49 @@ def test_advisory_source_health_detects_stale_producer(tmp_path: Path):
     assert packet["body"]["source"]["stale_after_hours"] == 36
 
 
+def test_youtube_coverage_clocks_follow_event_times_after_primary_priority(tmp_path: Path):
+    youtube = tmp_path / "youtube"
+    run_dir = youtube / "runs" / "2026" / "priority-run"
+    run_dir.mkdir(parents=True)
+    videos = [
+        ("primary", "2026-07-12T12:00:00Z", "USER_PRIMARY"),
+        ("latest", "2026-07-14T11:00:00Z", "STANDARD"),
+        ("middle", "2026-07-13T12:00:00Z", "STANDARD"),
+    ]
+    (run_dir / "youtube_run.json").write_text(
+        json.dumps(
+            {
+                "run_id": "priority-run",
+                "started_at": "2026-07-14T11:30:00Z",
+                "finished_at": "2026-07-14T11:40:00Z",
+                "status": "success",
+                "videos": [
+                    {
+                        "video_id": video_id,
+                        "published_at": published_at,
+                        "strategy_source_tier": tier,
+                    }
+                    for video_id, published_at, tier in videos
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    packet = build_surface_packet(
+        "youtube",
+        archive_dir=tmp_path / "archive",
+        youtube_archive_dir=youtube,
+        now=datetime(2026, 7, 14, 12, 0, tzinfo=timezone.utc),
+    )
+
+    events = packet["body"]["events"]
+    coverage = packet["body"]["coverage"]
+    assert [event["event_key"] for event in events] == ["primary", "latest", "middle"]
+    assert coverage["oldest_occurred_at"] == "2026-07-12T12:00:00Z"
+    assert coverage["newest_occurred_at"] == "2026-07-14T11:00:00Z"
+
+
 def test_youtube_packet_preserves_evidence_ids_for_claim_mapping(tmp_path: Path):
     run_dir = tmp_path / "run"
     summary_dir = run_dir / "videos" / "video-1"
