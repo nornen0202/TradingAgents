@@ -21,6 +21,8 @@
 - 공개 웹 복구 입력이 필요할 경우 `python -m tradingagents.work verify-public --surface us`로만 최신 커밋·해시·입력 시각을 검증한다. REFERENCE_ONLY/UNVERIFIED는 개인화 입력이 아니며 로컬 정본 packet을 대체하지 않는다. 검증 성공도 주문 승인이 아니다.
 
 - `current.freshness_receipt`를 `source_summary.freshness_receipt`에 그대로 복사한다. 최상위 `as_of`는 `market_data_oldest_at`과 정확히 일치시킨다(null이면 null). 게시·작성 시각으로 대체하지 않는다.
+- `market_data_basis=RESEARCH_OBSERVATION`은 분석 도구가 관측한 시세이며 실행용 갱신이 아니다. 관측시각·가격은 표시하되 현재 호가나 주문 승인으로 해석하지 않는다. `market_data_observed_count`와 `market_data_missing_count`가 있으면 시세 확보/누락 수를 함께 표시한다.
+- 분석 실패 시 `current.universe_coverage.analysis_failures`의 안전한 오류 분류를 실패 종목과 함께 설명한다. `STRUCTURED_OUTPUT_ERROR`는 모델 응답 형식 검증 실패이며 시세 공급 장애와 구분한다. 진단이 없으면 원인 미확인으로 표시하고 원문 오류나 모델 응답을 추정하지 않는다.
 - 첫 요약에 작성 시각, 원분석 기준 거래일 범위, 시세 관측시각 범위, 계좌 기준시각을 각각 표시한다. 현재 시각에서 경과시간을 계산한다. `producer_run_id`는 자료 갱신 실행이며 `analysis_run_id`와 다를 수 있다. 거래일·휴장과 시세 만료를 구분하며 오래된 시세로 최신 분석이 완료됐다고 쓰지 않는다.
 - 현재 manifest의 원결정에서 전달된 `thesis`를 보존한다. 시세와 원분석의 시각·조건이 다르면 각각 표시하고, 단순 overlay 갱신을 기업분석 재수행으로 세지 않는다. 생산 커버리지 COMPLETE는 신선도나 주문 가능성의 증명이 아니다.
 - 시세·계좌 미확인 상태의 수량은 확정 제안 대신 명시적인 가상 예시로만 표시한다. 서로 다른 시점의 총자산에서 재평가 증권액을 빼 현금으로 만들지 않는다. 조건표·요약·수량·취소 조건이 충돌하면 발행 전에 수정한다.

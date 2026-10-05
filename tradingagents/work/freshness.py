@@ -44,6 +44,14 @@ def source_freshness_receipt(
         "publication_does_not_refresh_inputs": True,
     }
     if not public:
+        receipt.update(
+            market_data_row_count=len(rows),
+            market_data_observed_count=len(valid),
+            market_data_missing_count=invalid,
+            market_data_research_observation_count=sum(
+                row.get("market_data_basis") == "RESEARCH_OBSERVATION" for row in rows
+            ),
+        )
         portfolio = manifest.get("portfolio") or {}
         snapshot = portfolio.get("private_coverage_snapshot") or {}
         receipt["account_as_of"] = snapshot.get("as_of")

@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
 from tradingagents.execution.risk_trigger import risk_condition_text, risk_trigger
+from tradingagents.scheduled.failure_diagnostics import sanitize_failure_diagnostics
 
 from tradingagents.presentation import (
     present_account_action,
@@ -286,6 +287,18 @@ def _build_strategy_row(
     benchmark_context: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     gate = context.get("asof_execution_gate") if isinstance(context.get("asof_execution_gate"), dict) else {}
+    # A research quote is evidence, not an execution checkpoint. Never mix it
+    # with a partial/failed overlay or inherit execution readiness from it.
+    observation = summary.get("research_market_observation") or {}
+    research_quote = (not context and observation.get("status") == "AVAILABLE"
+                      and observation.get("ticker") == ticker)
+    if research_quote:
+        context = {key: observation.get(key) for key in (
+            "market_data_asof", "last_price", "session_vwap", "relative_volume",
+        )}
+        context["source"] = {key: observation.get(key) for key in (
+            "provider", "market_session", "quote_delay_seconds", "execution_data_quality",
+        )}
     generated_current = context.get("generated_in_current_run") is True
     freshness = str(context.get("freshness_class") or "").upper()
     eligibility = str(context.get("execution_eligibility") or "").upper()
@@ -359,6 +372,10 @@ def _build_strategy_row(
         "strategy_ko": present_strategy_category(strategy_code),
         "last_price": last_price,
         "market_data_asof": context.get("market_data_asof"),
+        "market_data_basis": "RESEARCH_OBSERVATION" if research_quote else "EXECUTION_CONTEXT" if context else "MISSING",
+        "research_status": summary.get("status"),
+        "failure_diagnostics": (sanitize_failure_diagnostics(summary.get("failure_diagnostics"))
+                                if summary.get("status") == "failed" else None),
         "session_vwap": session_vwap,
         "vwap_distance_pct": vwap_distance_pct,
         "vwap_position_ko": _vwap_position_ko(vwap_distance_pct),
@@ -391,7 +408,7 @@ def _build_strategy_row(
         "sync_summary_ko": _sync_summary(sector_sync, index_sync),
         "execution_condition_ko": _execution_condition(context=context, candidate=candidate, action=action, strategy_code=strategy_code),
         "risk_condition_ko": _risk_condition(context=context, candidate=candidate, action=action),
-        "data_status_ko": data_status,
+        "data_status_ko": "분석 당시 관측 시세 · 실행 재확인 필요" if research_quote else data_status,
         "decision_state_ko": present_execution_state(context.get("decision_state")),
         "execution_timing_ko": present_execution_timing(context.get("execution_timing_state")),
         "reason_codes_ko": [present_reason_code(item) for item in reason_codes],

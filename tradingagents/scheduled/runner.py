@@ -22,6 +22,7 @@ import yfinance as yf
 
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.scheduled.failure_diagnostics import failure_diagnostics, format_failure_diagnostics
+from tradingagents.scheduled.research_observation import ResearchObservationRecorder
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
@@ -1816,6 +1817,7 @@ def _run_single_ticker(
     reset_llm_usage()
     graph = None
     stats_handler = None
+    observation_recorder = ResearchObservationRecorder(ticker)
 
     try:
         reset_tool_telemetry()
@@ -1829,7 +1831,7 @@ def _run_single_ticker(
             config.run.analysts,
             debug=False,
             config=_graph_config(config, engine_results_dir),
-            callbacks=[stats_handler],
+            callbacks=[stats_handler, observation_recorder],
         )
         final_state, decision = graph.propagate(
             ticker,
@@ -1903,6 +1905,7 @@ def _run_single_ticker(
                 f"::warning::{ticker} same-day analysis completed without get_intraday_snapshot tool usage."
             )
         analysis_payload = {
+            "research_market_observation": observation_recorder.receipt(),
             "ticker": ticker,
             "ticker_name": (
                 config.run.ticker_name_overrides.get(ticker)
@@ -2039,6 +2042,7 @@ def _run_single_ticker(
             "quality_flags": quality_flags,
             "report_writer": report_writer_payload,
             "execution_contract": execution_contract_payload,
+            "research_market_observation": observation_recorder.receipt(),
             "execution_update": execution_update_payload,
             "artifacts": {
                 "analysis_json": _relative_to_run(run_dir, analysis_path),
@@ -2051,6 +2055,7 @@ def _run_single_ticker(
         }
     except Exception as exc:
         error_payload = {
+            "research_market_observation": observation_recorder.receipt(),
             "ticker": ticker,
             "ticker_name": resolved_name,
             "status": "failed",
@@ -2081,6 +2086,7 @@ def _run_single_ticker(
             "finished_at": error_payload["finished_at"],
             "duration_seconds": error_payload["duration_seconds"],
             "failure_diagnostics": error_payload["failure_diagnostics"],
+            "research_market_observation": observation_recorder.receipt(),
             "metrics": {
                 **error_payload["metrics"],
                 "codex_usage": error_payload["llm_usage"],
