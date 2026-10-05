@@ -39,6 +39,12 @@ class _FakeTradingAgentsGraph:
         self.callbacks = callbacks or []
 
     def propagate(self, ticker, trade_date, analysis_date=None):
+        for callback in self.callbacks:
+            if hasattr(callback, "receipt"):
+                callback.on_tool_start({"name": "get_intraday_snapshot"}, "", run_id="quote")
+                callback.on_tool_end(json.dumps({"ok": True, "symbol": ticker, "snapshot": {
+                    "ticker": ticker, "asof": "2026-04-02T10:00:00-04:00", "last_price": 100.0,
+                }}), run_id="quote")
         if ticker == "FAIL":
             raise RuntimeError("synthetic failure")
 
@@ -236,6 +242,14 @@ NVDA = "NVIDIA Override"
             self.assertTrue((run_dir / "run.json").exists())
             self.assertTrue((run_dir / "tickers" / "NVDA" / "report" / "complete_report.md").exists())
             self.assertTrue((run_dir / "tickers" / "FAIL" / "error.json").exists())
+            for ticker, artifact in (("NVDA", "analysis.json"), ("FAIL", "error.json")):
+                receipt = json.loads((run_dir / "tickers" / ticker / artifact).read_text(encoding="utf-8"))["research_market_observation"]
+                row = next(item for item in manifest["tickers"] if item["ticker"] == ticker)
+                assert row["research_market_observation"] == receipt
+                assert receipt["market_data_asof"] == "2026-04-02T10:00:00-04:00"
+            bundle = json.loads((run_dir / "decision_bundle_v2.json").read_text(encoding="utf-8"))
+            assert all(row["market_data_basis"] == "RESEARCH_OBSERVATION" for row in bundle["strategy_table"])
+            assert all(row["quality"]["execution_ready"] is False for row in bundle["strategy_table"])
 
             index_html = (site_dir / "index.html").read_text(encoding="utf-8")
             run_html = (site_dir / "runs" / manifest["run_id"] / "index.html").read_text(encoding="utf-8")

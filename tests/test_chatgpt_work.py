@@ -845,6 +845,7 @@ def test_private_market_packet_reports_complete_required_universe(tmp_path: Path
         "missing_watchlist_tickers": [],
         "missing_analysis_tickers": [],
         "failed_tickers": [],
+        "analysis_failures": [],
     }
 
 

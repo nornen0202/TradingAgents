@@ -114,6 +114,18 @@ class FakeCodexSession:
 
 
 class CodexProviderTests(unittest.TestCase):
+    def test_third_attempt_recovers_repeated_control_marker_failure(self):
+        session = FakeCodexSession(responses=[json.dumps({"answer": value}) for value in (
+            "Report [im_end]", "Report [im_end] in prompt? No.", "Clean report",
+        )])
+        model = create_llm_client(
+            "codex", "gpt-5.5", codex_binary="C:/fake/codex",
+            codex_workspace_dir="C:/tmp/codex-workspace", codex_max_retries=2,
+            session_factory=lambda **kwargs: session, preflight_runner=lambda **kwargs: None,
+        ).get_llm()
+        self.assertEqual(model.invoke("Write the report").content, "Clean report")
+        self.assertEqual(len(session.invocations), 3)
+
     def test_report_control_markers_retry_and_never_become_final_evidence(self):
         for tool_mode in (False, True):
             for marker in (
@@ -136,6 +148,8 @@ class CodexProviderTests(unittest.TestCase):
                     self.assertEqual(bound.invoke("Write the report").content, "Clean report")
                     self.assertEqual(len(session.invocations), 2)
                     self.assertIn("serialization/control markers", session.invocations[1]["prompt"])
+                    self.assertTrue(session.invocations[1]["prompt"].endswith("schema and tool argument requirements."))
+                    self.assertNotIn("Report. " + marker, session.invocations[1]["prompt"])
 
                     session.responses.extend([payload(marker), payload(marker)])
                     with self.assertRaises(CodexStructuredOutputError):

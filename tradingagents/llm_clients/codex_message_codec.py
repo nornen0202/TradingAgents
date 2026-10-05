@@ -67,14 +67,20 @@ def format_messages_for_codex(
         lines.append("Tool argument requirements:")
         lines.extend(schema_lines)
     lines.append("Respond only with JSON that matches the requested output schema.")
-    if retry_message:
-        lines.append(retry_message)
+    lines.append(
+        "Final report text must contain only the requested analysis. "
+        "Do not include serialization delimiters, internal control tokens, schema commentary, "
+        "or self-correction notes in any report field."
+    )
 
     transcript: list[str] = []
     for message in messages:
         transcript.append(_format_message(message))
 
-    return "\n\n".join(lines + ["Conversation transcript:", *transcript])
+    # Keep repair instructions after long tool results so they are not buried
+    # under the transcript; no rejected output is reintroduced as evidence.
+    return "\n\n".join(lines + ["Conversation transcript:", *transcript]
+                       + (["Host validation retry instruction:\n" + retry_message] if retry_message else []))
 
 
 def strip_json_fence(text: str) -> str:

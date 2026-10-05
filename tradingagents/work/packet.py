@@ -17,7 +17,7 @@ WORK_REPORT_SCHEMA = "tradingagents.work-report/v1"
 SURFACES = ("kr", "us", "youtube", "prism")
 PROMPT_CONTRACTS = {
     "kr": "market-work-v12-kr",
-    "us": "market-work-v12-us",
+    "us": "market-work-v13-us",
     "youtube": "youtube-work-v5",
     "prism": "prism-work-v5",
 }
@@ -194,6 +194,9 @@ def _compact_market_row(row: dict[str, Any], display_priority: int) -> dict[str,
         "strategy_ko",
         "last_price",
         "market_data_asof",
+        "market_data_basis",
+        "research_status",
+        "failure_diagnostics",
         "session_vwap",
         "vwap_distance_pct",
         "vwap_position_ko",
@@ -893,12 +896,18 @@ def _market_universe_coverage(manifest: dict[str, Any], *, public: bool) -> dict
             payload.pop(key, None)
         payload["portfolio_coverage_details_omitted"] = True
     else:
+        from tradingagents.scheduled.failure_diagnostics import sanitize_failure_diagnostics
         payload.update(
             {
                 "missing_holding_tickers": missing_holdings,
                 "missing_watchlist_tickers": missing_watchlist,
                 "missing_analysis_tickers": missing_analysis,
                 "failed_tickers": failed_tickers,
+                "analysis_failures": [
+                    {"ticker": item.get("ticker"),
+                     **sanitize_failure_diagnostics(item.get("failure_diagnostics"))}
+                    for item in tickers if item.get("status") == "failed"
+                ],
             }
         )
     return payload
