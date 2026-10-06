@@ -54,7 +54,8 @@ def load_recovery_source(*, archive_dir: Path, source_run_id: str, settings: dic
                 "analysts", "output_language", "translation_backend", "translation_model",
                 "codex_reasoning_effort", "codex_quick_reasoning_effort", "codex_deep_reasoning_effort",
                 "codex_output_reasoning_effort", "codex_writer_reasoning_effort", "codex_judge_reasoning_effort",
-                "report_polisher_enabled", "max_debate_rounds", "max_risk_discuss_rounds", "codex_fallback_on_app_server_error"):
+                "report_polisher_enabled", "max_debate_rounds", "max_risk_discuss_rounds",
+                "codex_max_retries", "codex_fallback_on_app_server_error"):
         if key not in source_settings or settings.get(key) != source_settings[key]:
             raise ValueError(f"Recovery research configuration changed: {key}")
     if source_settings.get("codex_fallback_on_app_server_error") is not False:
