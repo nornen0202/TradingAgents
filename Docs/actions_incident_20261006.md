@@ -44,6 +44,10 @@ retrying only its unstarted deployment job.
   ledger remain active. Recovery reports an explicit reason and request outcome.
   This is bounded best-effort recovery, not a guarantee of hosted runner capacity
   or repeated webhook delivery during an infrastructure outage.
+- Accept both bare REST workflow paths and documented `@main`/`@refs/heads/main`
+  suffixes before the allowlist lookup; a commit suffix must equal the validated
+  run's head SHA. Reject other suffixes. The incident responses used bare paths,
+  so both representations are covered by regression tests.
 - PR [#333](https://github.com/nornen0202/TradingAgents/pull/333) was merged before
   its two P2 comments. Preserve the newest valid research quote by aware provider
   timestamp, including out-of-order completions and equivalent timezone offsets.

@@ -47,8 +47,15 @@ def recovery_reason(client, run, now):
     """Return eligibility only after validating the current attempt and all failures."""
     if (run.get("head_repository") or {}).get("full_name") != client.repository or run.get("head_branch") != "main":
         return "untrusted_source"
-    workflow = run.get("path", "").removeprefix(".github/workflows/")
-    if workflow not in ALLOWED_JOBS or run.get("event") not in {"schedule", "workflow_dispatch", "workflow_run"}:
+    workflow_path, separator, workflow_ref = run.get("path", "").partition("@")
+    allowed_refs = {"main", "refs/heads/main"}
+    if re.fullmatch(r"[0-9a-f]{40}", run.get("head_sha", "")):
+        allowed_refs.add(run["head_sha"])
+    if separator and workflow_ref not in allowed_refs:
+        return "untrusted_workflow_ref"
+    workflow = workflow_path.removeprefix(".github/workflows/")
+    if (not workflow_path.startswith(".github/workflows/") or workflow not in ALLOWED_JOBS
+            or run.get("event") not in {"schedule", "workflow_dispatch", "workflow_run"}):
         return "unsupported_workflow"
     if run.get("status") != "completed" or run.get("conclusion") not in {"failure", "cancelled"}:
         return "not_failed"

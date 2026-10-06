@@ -90,6 +90,28 @@ def test_dry_run_and_concurrent_recovery_do_not_post():
     assert client.posts == []
 
 
+@pytest.mark.parametrize("suffix", ["", "@main", "@refs/heads/main", "@" + "a" * 40])
+def test_documented_workflow_ref_suffix_is_normalized(suffix):
+    client = Client()
+    client.run["head_sha"] = "a" * 40
+    client.run["path"] += suffix
+    assert recovery.recover(client, 123, now=NOW)["rerun_requested"]
+
+
+@pytest.mark.parametrize("path", [
+    ".github/workflows/daily-codex-analysis.yml@feature",
+    ".github/workflows/daily-codex-analysis.yml@",
+    ".github/workflows/daily-codex-analysis.yml@main@feature",
+    ".github/workflows/daily-codex-analysis.yml@" + "b" * 40,
+    "daily-codex-analysis.yml",
+])
+def test_untrusted_workflow_refs_and_paths_are_rejected(path):
+    client = Client()
+    client.run.update(path=path, head_sha="a" * 40)
+    assert not recovery.recover(client, 123, now=NOW)["rerun_requested"]
+    assert client.posts == []
+
+
 def test_pagination_does_not_drop_later_failures():
     client = recovery.GitHubClient("owner/repo", "unused")
     calls = []
