@@ -84,6 +84,8 @@ def test_recovery_copies_original_bytes_and_times_without_recounting_calls(recov
     lambda s: s["settings"].update(run_mode="overlay_only"),
     lambda s: s["settings"].update(market="KR"),
     lambda s: s["settings"].update(deep_model="different"),
+    lambda s: s["settings"].update(codex_max_retries=2),
+    lambda s: s["settings"].pop("codex_max_retries"),
     lambda s: s["settings"].update(codex_fallback_on_app_server_error=True),
     lambda s: s["active_universe"].update(mode="holdings_first_watchlist_rotation"),
     lambda s: s["active_universe"]["coverage"].update(selection_complete=False),
@@ -102,6 +104,10 @@ def test_invalid_source_cohorts_fail_closed(recovery, mutate):
     with pytest.raises(ValueError):
         load(recovery)
     assert not recovery["destination"].exists()
+
+
+def test_settings_snapshot_records_retry_budget(recovery):
+    assert runner._settings_snapshot(recovery["config"])["codex_max_retries"] == 1
 
 
 def test_active_source_new_holdings_and_path_escape_are_rejected(recovery):

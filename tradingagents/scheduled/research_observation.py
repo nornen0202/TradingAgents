@@ -16,6 +16,8 @@ class ResearchObservationRecorder(BaseCallbackHandler):
         self._lock = threading.Lock()
         self._calls = set()
         self._receipt = {"status": "NOT_COLLECTED", "ticker": ticker}
+        self._latest_failure = None
+        self._failure_count = 0
 
     def on_tool_start(self, serialized, input_str, *, run_id, **kwargs):
         if (serialized or {}).get("name") == "get_intraday_snapshot":
@@ -54,11 +56,24 @@ class ResearchObservationRecorder(BaseCallbackHandler):
                             receipt[key] = value
             except (ValueError, TypeError, AttributeError):
                 receipt["status"] = "INVALID"
-            self._receipt = receipt
+            if receipt["status"] != "AVAILABLE":
+                self._failure_count += 1
+                self._latest_failure = receipt
+                if self._receipt["status"] != "AVAILABLE":
+                    self._receipt = receipt
+            elif (self._receipt["status"] != "AVAILABLE"
+                  or stamp > datetime.fromisoformat(
+                      str(self._receipt["market_data_asof"]).replace("Z", "+00:00"))):
+                # Provider time, not callback completion order, decides freshness.
+                self._receipt = receipt
 
     def on_tool_error(self, error, *, run_id, **kwargs):
         self.on_tool_end('{"ok":false}', run_id=run_id)
 
     def receipt(self):
         with self._lock:
-            return deepcopy(self._receipt)
+            result = deepcopy(self._receipt)
+            if self._latest_failure is not None:
+                result["collection_failure_count"] = self._failure_count
+                result["latest_collection_failure"] = deepcopy(self._latest_failure)
+            return result

@@ -2278,6 +2278,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "codex_writer_reasoning_effort": config.llm.codex_writer_reasoning_effort,
         "codex_judge_reasoning_effort": config.llm.codex_judge_reasoning_effort,
         "codex_preflight_mode": config.llm.codex_preflight_mode,
+        "codex_max_retries": config.llm.codex_max_retries,
         "codex_fallback_on_app_server_error": config.llm.codex_fallback_on_app_server_error,
         "output_language": config.run.output_language,
         "translation_backend": config.translation.backend,

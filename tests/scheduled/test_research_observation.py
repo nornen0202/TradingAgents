@@ -117,3 +117,48 @@ def test_legacy_archive_cannot_invent_clock_from_report_or_daily_date():
     bundle = bundle_for({"ticker": "ABBV", "status": "success", "trade_date": "2026-10-01",
                          "finished_at": "2026-10-02T15:00:00+00:00"})
     assert bundle["strategy_table"][0]["market_data_asof"] is None
+
+
+@pytest.mark.parametrize("failure", ['{"ok": false}', 'not json', 'exception'])
+def test_repeated_failure_preserves_valid_quote_and_records_safe_diagnostic(failure):
+    recorder = ResearchObservationRecorder("ABBV")
+    recorder.on_tool_start({"name": "get_intraday_snapshot"}, "", run_id="good")
+    recorder.on_tool_end(json.dumps({"ok": True, "symbol": "ABBV", "snapshot": QUOTE}), run_id="good")
+    original = recorder.receipt()
+    for index in range(2):
+        recorder.on_tool_start({"name": "get_intraday_snapshot"}, "", run_id=index)
+        if failure == "exception":
+            recorder.on_tool_error(RuntimeError("private provider credentials"), run_id=index)
+        else:
+            recorder.on_tool_end(failure, run_id=index)
+    result = recorder.receipt()
+    assert all(result[key] == value for key, value in original.items())
+    assert result["collection_failure_count"] == 2
+    assert result["latest_collection_failure"]["status"] == ("INVALID" if failure == "not json" else "UNAVAILABLE")
+    assert "private" not in json.dumps(result)
+    result["latest_collection_failure"]["status"] = "tampered"
+    assert recorder.receipt()["latest_collection_failure"]["status"] != "tampered"
+
+
+@pytest.mark.parametrize("order", [("new", "old"), ("old", "new")])
+def test_overlapping_calls_choose_provider_time_not_completion_order(order):
+    recorder = ResearchObservationRecorder("ABBV")
+    quotes = {"old": QUOTE, "new": {**QUOTE, "asof": "2026-10-02T14:06:00Z", "last_price": 201}}
+    for name in order:
+        recorder.on_tool_start({"name": "get_intraday_snapshot"}, "", run_id=name)
+    for name in order:
+        recorder.on_tool_end(json.dumps({"ok": True, "symbol": "ABBV", "snapshot": quotes[name]}), run_id=name)
+    assert recorder.receipt()["market_data_asof"] == quotes["new"]["asof"]
+    assert recorder.receipt()["last_price"] == 201
+
+
+def test_valid_quote_recovers_from_failure_and_equal_timestamp_cannot_replace_it():
+    recorder = ResearchObservationRecorder("ABBV")
+    for index, payload in enumerate([{"ok": False},
+            {"ok": True, "symbol": "ABBV", "snapshot": QUOTE},
+            {"ok": True, "symbol": "ABBV", "snapshot": {**QUOTE, "asof": "2026-10-02T14:05:00Z", "last_price": 999}}]):
+        recorder.on_tool_start({"name": "get_intraday_snapshot"}, "", run_id=index)
+        recorder.on_tool_end(json.dumps(payload), run_id=index)
+    assert recorder.receipt()["status"] == "AVAILABLE"
+    assert recorder.receipt()["last_price"] == 200
+    assert recorder.receipt()["collection_failure_count"] == 1
