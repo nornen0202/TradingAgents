@@ -20,6 +20,10 @@ class CodexAppServerError(RuntimeError):
     """Raised when the Codex app-server request cycle fails."""
 
 
+class CodexAppServerTimeoutError(CodexAppServerError):
+    """Raised when a bounded app-server operation exceeds its deadline."""
+
+
 class CodexAppServerAuthError(CodexAppServerError):
     """Raised when Codex login is missing or unusable."""
 
@@ -274,6 +278,11 @@ class CodexAppServerSession:
                     self.close()
 
     def request(self, method: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        # Only one RPC may own stdout; unmatched response IDs are then stale.
+        with self._lock:
+            return self._request_locked(method, params)
+
+    def _request_locked(self, method: str, params: dict[str, Any] | None) -> dict[str, Any]:
         request_id = str(uuid.uuid4())
         self._write({"id": request_id, "method": method, "params": params or {}})
         deferred: list[dict[str, Any]] = []
@@ -299,7 +308,9 @@ class CodexAppServerSession:
                 self._handle_server_request(message)
                 continue
 
-            deferred.append(message)
+            if "method" in message:
+                deferred.append(message)
+            # A response for another ID cannot belong to a future UUID request.
 
     def _initialize(self) -> None:
         response = self.request(
@@ -330,7 +341,9 @@ class CodexAppServerSession:
                 continue
 
             if "method" not in message:
-                self._pending.append(message)
+                # RPC requests are serialized and none is outstanding during
+                # turn collection. Drop late/duplicate replies instead of
+                # requeueing them forever and starving stdout notifications.
                 continue
 
             method = message["method"]
@@ -376,14 +389,22 @@ class CodexAppServerSession:
 
     def _next_message_before(self, deadline: float | None, operation: str) -> dict[str, Any]:
         timeout = self._remaining_timeout(deadline, operation)
-        return self._next_message(timeout)
+        try:
+            return self._next_message(timeout)
+        except CodexAppServerTimeoutError as exc:
+            # timeout is the remaining queue-wait slice, not the operation's
+            # configured budget. Report the latter even for a tiny final slice.
+            raise CodexAppServerTimeoutError(
+                f"Timed out waiting for {operation} after {self.request_timeout:g}s. "
+                f"stderr_tail={self._stderr_tail()}"
+            ) from exc
 
     def _remaining_timeout(self, deadline: float | None, operation: str) -> float | None:
         if deadline is None:
             return None
         remaining = deadline - time.monotonic()
         if remaining <= 0:
-            raise CodexAppServerError(
+            raise CodexAppServerTimeoutError(
                 f"Timed out waiting for {operation} after {self.request_timeout:g}s. "
                 f"stderr_tail={self._stderr_tail()}"
             )
@@ -423,7 +444,7 @@ class CodexAppServerSession:
             if deadline is not None:
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
-                    raise CodexAppServerError(
+                    raise CodexAppServerTimeoutError(
                         f"Timed out waiting for Codex app-server after {timeout}s. stderr_tail={self._stderr_tail()}"
                     )
                 wait_timeout = min(wait_timeout, remaining)
