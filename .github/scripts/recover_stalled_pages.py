@@ -66,7 +66,8 @@ def inspect(client, now):
     environment = client.request("/environments/github-pages")
     # Never release a lease that is intentionally waiting for a human, timer,
     # or custom protection app. Branch restrictions themselves remain intact.
-    if any(rule.get("type") != "branch_policy" for rule in environment.get("protection_rules", [])):
+    rules = environment.get("protection_rules")
+    if not isinstance(rules, list) or any(rule.get("type") != "branch_policy" for rule in rules):
         return None, "environment_protection_required"
     return {"run_id": run_id, "job_id": job_id, "attempt": run["run_attempt"],
             "started_at": job["started_at"],

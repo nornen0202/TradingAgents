@@ -90,6 +90,7 @@ def test_without_successor_retries_only_failed_jobs_after_cancellation():
     lambda c: c.pending.clear(),
     lambda c: c.environment.update(protection_rules=[{"type": "required_reviewers"}]),
     lambda c: c.environment.update(protection_rules=[{"type": "custom_deployment_protection_rule"}]),
+    lambda c: c.environment.pop("protection_rules"),
 ])
 def test_never_cancels_untrusted_started_protected_or_recent_jobs(mutate):
     client = Client()
