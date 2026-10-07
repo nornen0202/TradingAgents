@@ -129,6 +129,13 @@ and fix the cause instead of dispatching another identical attempt. Never amend
 historical manifests to pass compatibility, bypass environment protection, stop
 an active worker, force-push, weaken market/account/risk gates or place orders.
 
+When a default model changes during an active producer, failed-only recovery
+preflight selects the original terminal source's model roles. Ordinary production
+keeps the new defaults. The recovery runner still requires exact research settings,
+a current loaded account and intact successful artifacts; model pinning does not
+relax those checks or change the global configuration. An unavailable original
+model or unsupported role pairing fails closed before research starts.
+
 Do not keep a foreground turn waiting for hours of analysis. After confirming
 progress, record the active run, remaining checks and next scheduled check; the
 heartbeat continues from that record. This is `IN_PROGRESS`, not a verified

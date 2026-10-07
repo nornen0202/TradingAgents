@@ -7,7 +7,7 @@ import pytest
 
 from tradingagents.scheduled import runner
 from tradingagents.scheduled.config import load_scheduled_config
-from tradingagents.scheduled.research_recovery import copy_recovered_research, load_recovery_source
+from tradingagents.scheduled.research_recovery import copy_recovered_research, load_recovery_source, recovery_preflight_models
 
 
 def write(path, value):
@@ -60,6 +60,76 @@ def load(fixture, **overrides):
         "archive_dir": fixture["config"].storage.archive_dir, "source_run_id": fixture["source"]["run_id"],
         "settings": runner._settings_snapshot(fixture["config"]), "now": fixture["now"],
         "holding_tickers": [], "account_status": "disabled", **overrides})
+
+
+def preflight_models(fixture, **overrides):
+    return recovery_preflight_models(**{
+        "archive_dir": fixture["config"].storage.archive_dir,
+        "source_run_id": fixture["source"]["run_id"], "now": fixture["now"],
+        "quick_model": "gpt-6.1-sol", "deep_model": "gpt-6.1-sol", "output_model": "gpt-6.1-sol",
+        **overrides})
+
+
+def set_source_models(fixture):
+    fixture["source"]["settings"].update(provider="codex", **{
+        f"{role}_model": "gpt-6-sol" for role in ("quick", "deep", "output", "writer", "judge")})
+    write(fixture["root"] / "run.json", fixture["source"])
+
+
+def test_recovery_preflight_preserves_cohort_after_default_model_migration(recovery):
+    set_source_models(recovery)
+    source_bytes = (recovery["root"] / "run.json").read_bytes()
+    settings = deepcopy(recovery["source"]["settings"])
+    for role in ("quick", "deep", "output", "writer", "judge"):
+        settings[f"{role}_model"] = "gpt-6.1-sol"
+    with pytest.raises(ValueError, match="configuration changed: quick_model"):
+        load(recovery, settings=settings)
+    quick, deep, output = preflight_models(recovery)
+    assert (quick, deep, output) == ("gpt-6-sol",) * 3
+    settings.update(quick_model=quick, deep_model=deep, output_model=output,
+                    writer_model=output, judge_model=deep)
+    plan = load(recovery, settings=settings)
+    assert plan["retry_tickers"] == ["XOM"]
+    assert [r["ticker"] for r in plan["successful_rows"]] == ["AAPL"]
+    settings["max_debate_rounds"] += 1
+    with pytest.raises(ValueError, match="configuration changed: max_debate_rounds"):
+        load(recovery, settings=settings)
+    assert (recovery["root"] / "run.json").read_bytes() == source_bytes
+
+
+def test_ordinary_preflight_keeps_new_defaults_without_reading_archive(recovery):
+    assert preflight_models(recovery, source_run_id="") == ("gpt-6.1-sol",) * 3
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda s: s.update(status="success"),
+    lambda s: s.update(research_recovery={"source_run_id": "another"}),
+    lambda s: s.update(started_at="2000-01-01T00:00:00+00:00"),
+    lambda s: s.update(finished_at="2099-01-01T00:00:00+00:00"),
+    lambda s: s["settings"].update(provider="openai"),
+    lambda s: s["settings"].update(analysis_mode="smoke"),
+    lambda s: s["settings"].update(run_mode="overlay_only"),
+    lambda s: s["settings"].update(codex_fallback_on_app_server_error=True),
+    lambda s: s["settings"].pop("quick_model"),
+    lambda s: s["settings"].update(quick_model="bad\nmodel"),
+    lambda s: s["settings"].update(writer_model="different"),
+    lambda s: s["settings"].update(judge_model="different"),
+])
+def test_recovery_preflight_rejects_unsafe_source_before_model_selection(recovery, mutate):
+    set_source_models(recovery)
+    mutate(recovery["source"])
+    write(recovery["root"] / "run.json", recovery["source"])
+    with pytest.raises(ValueError):
+        preflight_models(recovery)
+
+
+def test_recovery_preflight_rejects_active_source_and_path_escape(recovery):
+    set_source_models(recovery)
+    with pytest.raises(ValueError, match="run ID"):
+        preflight_models(recovery, source_run_id="../other")
+    write(recovery["root"] / "attempt.json", {"status": "RUNNING"})
+    with pytest.raises(ValueError, match="still active"):
+        preflight_models(recovery)
 
 
 def test_recovery_copies_original_bytes_and_times_without_recounting_calls(recovery):
