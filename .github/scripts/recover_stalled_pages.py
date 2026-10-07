@@ -8,11 +8,12 @@ from urllib.error import HTTPError
 
 GROUP = "tradingagents-pages-deploy"
 ALLOWED = {
-    "daily-codex-analysis.yml": ("deploy", "build_pages"),
-    "intraday-overlay-refresh.yml": ("deploy_overlay", "publish_overlay_site"),
-    "work-report-pages-refresh.yml": ("deploy", "build_work_report_pages"),
-    "daily-youtube-reports.yml": ("deploy", "build_youtube_pages"),
-    "daily-prism-telegram-reports.yml": ("deploy", "build_prism_telegram_pages"),
+    "daily-codex-analysis.yml": ("deploy", ("build_pages",)),
+    "intraday-overlay-refresh.yml": ("deploy_overlay", ("publish_overlay_site",)),
+    "work-report-pages-refresh.yml": ("deploy", ("build_work_report_pages",)),
+    "daily-youtube-reports.yml": ("deploy", ("build_youtube_pages",)),
+    "daily-prism-telegram-reports.yml": ("deploy", ("build_prism_telegram_pages",)),
+    "account-portfolio-report-verify.yml": ("deploy", ("verify_kr", "verify_us")),
 }
 
 
@@ -53,8 +54,15 @@ def inspect(client, now):
             return None, "outside_stall_window"
     except (KeyError, ValueError, TypeError):
         return None, "invalid_clock"
-    jobs = client.pages(f"/actions/runs/{run_id}/attempts/{run['run_attempt']}/jobs", "jobs")
-    if (not any(j.get("name") == build and j.get("conclusion") == "success" for j in jobs)
+    # Failed-job reruns may retain successful upstream jobs from older attempts.
+    # Fold oldest to newest so a later failure never gets masked by old success.
+    latest_jobs = {}
+    for attempt in range(1, int(run["run_attempt"]) + 1):
+        for previous in client.pages(f"/actions/runs/{run_id}/attempts/{attempt}/jobs", "jobs"):
+            latest_jobs[previous.get("name")] = previous
+    jobs = list(latest_jobs.values())
+    if (not any(j.get("name") in build and j.get("conclusion") == "success" for j in jobs)
+            or latest_jobs.get(deploy, {}).get("id") != job_id
             or any(j.get("id") != job_id and (
                 j.get("status") != "completed" or j.get("conclusion") not in {"success", "skipped"}
             ) for j in jobs)):

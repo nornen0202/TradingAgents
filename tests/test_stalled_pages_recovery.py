@@ -30,6 +30,7 @@ class Client:
         self.posts = []
         self.group_reads = 0
         self.change = False
+        self.attempt_jobs = None
 
     def request(self, path, method="GET"):
         if method == "POST":
@@ -49,6 +50,8 @@ class Client:
         return deepcopy(self.job if "/jobs/" in path else self.run)
 
     def pages(self, path, key=None):
+        if self.attempt_jobs is not None:
+            return deepcopy(self.attempt_jobs[int(path.split("/attempts/")[1].split("/")[0])])
         return deepcopy(self.jobs)
 
 
@@ -114,6 +117,38 @@ def test_last_attempt_releases_lease_without_an_unbounded_retry():
     client.run["run_attempt"] = 3
     result = recovery.recover(client, now=NOW)
     assert result["cancel_requested"] and not result["rerun_requested"]
+
+
+def test_failed_job_rerun_preserves_prior_build_but_does_not_mask_new_failure():
+    client = Client(successor=False)
+    client.run["run_attempt"] = 2
+    client.attempt_jobs = {1: [client.jobs[0]], 2: [client.job]}
+    assert recovery.recover(client, now=NOW)["rerun_requested"]
+    client = Client()
+    client.run["run_attempt"] = 2
+    client.attempt_jobs = {1: [client.jobs[0]], 2: [{**client.jobs[0], "conclusion": "failure"}, client.job]}
+    assert recovery.recover(client, now=NOW)["reason"] == "upstream_not_successful"
+    assert not client.posts
+
+
+@pytest.mark.parametrize("selected", ["verify_kr", "verify_us"])
+def test_account_report_can_release_lease_after_selected_verification_succeeds(selected):
+    client = Client()
+    client.run["path"] = ".github/workflows/account-portfolio-report-verify.yml"
+    client.job["name"] = "deploy"
+    client.jobs[0]["name"] = selected
+    client.jobs.append({"id": 454, "name": "verify_us" if selected == "verify_kr" else "verify_kr",
+                        "status": "completed", "conclusion": "skipped"})
+    assert recovery.recover(client, now=NOW)["cancel_requested"]
+
+
+def test_account_report_failed_verification_cannot_be_cancelled_or_retried():
+    client = Client()
+    client.run["path"] = ".github/workflows/account-portfolio-report-verify.yml"
+    client.job["name"] = "deploy"
+    client.jobs[0]["name"] = "verify_kr"
+    client.jobs.append({"id": 454, "name": "verify_us", "status": "completed", "conclusion": "failure"})
+    assert not recovery.recover(client, now=NOW)["cancel_requested"]
 
 
 def test_watchdog_and_pages_queue_are_wired():
