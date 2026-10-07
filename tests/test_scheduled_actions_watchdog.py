@@ -307,6 +307,55 @@ def test_watchdog_treats_active_target_job_as_covered():
     assert "active target job(s): analyze_us" in reason
 
 
+def test_previous_session_jobless_schedule_does_not_block_new_kr_production():
+    # A native US-era run was still queued with no jobs when the KR window
+    # opened. It must retain US ownership without suppressing the new KR day.
+    client = FakeClient(runs={"daily-codex-analysis.yml": [{
+        "id": 37655538332, "event": "schedule", "status": "queued",
+        "created_at": "2026-10-07T16:57:30Z", "display_title": "Daily Codex Analysis",
+    }]})
+
+    messages = watchdog.run_watchdog(client=client, now_kst=_kst("2026-10-08T04:55:00"))
+
+    assert client.dispatches == [
+        ("daily-codex-analysis.yml", {"profile": "kr", "recovery_source": "cloud_watchdog"})
+    ]
+    assert any("daily-codex-us: covered" in message for message in messages)
+    assert any("daily-codex-kr: dispatched" in message for message in messages)
+
+
+def test_jobless_schedule_exception_preserves_current_or_identifiable_ownership():
+    target = next(t for t in watchdog.due_targets(_kst("2026-10-08T04:55:00"))
+                  if t.name == "daily-codex-kr")
+    old_run = {"id": 321, "event": "schedule", "status": "queued",
+               "created_at": "2026-10-07T16:57:30Z", "display_title": "Daily Codex Analysis"}
+    cases = [
+        ({"created_at": "2026-10-07T19:30:00Z"}, []),
+        ({"created_at": None}, []),
+        ({"created_at": "invalid"}, []),
+        ({"event": "workflow_dispatch"}, []),
+        ({"display_title": "Daily [profile=kr] [run_mode=full]"}, []),
+        ({"display_title": "Daily [profile=all]"}, []),
+        ({"status": "in_progress"}, []),
+        ({}, [{"name": "analysis_gate", "status": "queued", "conclusion": ""}]),
+        ({}, [{"name": "analyze_kr", "status": "in_progress", "conclusion": ""}]),
+        ({}, [{"name": "deploy", "status": "waiting", "conclusion": ""}]),
+    ]
+    for changes, jobs in cases:
+        client = FakeClient(runs=[old_run | changes], jobs={321: jobs})
+        assert watchdog.target_is_covered(client=client, target=target)[0], (changes, jobs)
+
+
+def test_previous_jobless_advisory_schedule_keeps_ownership():
+    target = watchdog.WatchdogTarget(
+        name="youtube-daily", workflow_file="daily-youtube-reports.yml",
+        job_names=("build_youtube_pages",), window_start_kst=_kst("2026-10-08T05:00:00"), inputs={},
+    )
+    client = FakeClient(runs=[{"id": 123, "event": "schedule", "status": "queued",
+                              "created_at": "2026-10-07T16:57:30Z"}])
+    assert watchdog.target_is_covered(client=client, target=target)[0]
+
+
 def test_watchdog_requires_publish_and_deploy_after_overlay_success():
     target = watchdog.WatchdogTarget(
         name="intraday-overlay-kr-1005",

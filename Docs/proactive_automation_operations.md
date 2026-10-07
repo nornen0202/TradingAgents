@@ -88,6 +88,7 @@ The watchdog also runs `recover_missing_followups.py`. Completed watchdog-dispat
 Daily/Overlay/YouTube producers can miss their `workflow_run` notification and
 mirror: GitHub suppresses events caused by `GITHUB_TOKEN`, while explicit
 `workflow_dispatch` is exempt ([GitHub event rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)).
+
 After a three-minute completion grace, the reconciler uses paginated run history
 and exact upstream ID/attempt markers to dispatch only missing followups. It
 preserves active ownership, rechecks immediately before dispatch, waits fifteen
@@ -102,6 +103,14 @@ Recovery looks back 24 hours. Older or budget-exhausted incidents require this
 operator's evidence-based repair, not another unbounded retry. A successful
 followup workflow is only coverage for dispatch deduplication: operations must
 still verify `SENT`/policy `SKIPPED` and actual mirror/Pages contents.
+
+For Daily analysis, an unidentified native scheduled run that is still queued
+with no jobs and was created before the target production window does not cover
+that new window. An October 8 check reproduced an earlier US-era queue blocking
+KR recovery this way. The old run is left intact. Any run with jobs, an explicit
+matching profile, a current/missing creation time, or a manual trigger retains
+the conservative active-ownership guard. A queued coverage result never proves
+analysis completion; verify the local manifest and heartbeat separately.
 
 For Work publication, read and apply
 [the repository Work skill](../.agents/skills/tradingagents-daily-investment-work/SKILL.md).
