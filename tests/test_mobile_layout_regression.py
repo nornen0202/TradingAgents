@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 
@@ -63,3 +64,55 @@ def test_mobile_layout_probe_checks_direction_and_separated_actions() -> None:
     ):
         assert label in source
     assert "확인할 진입·축소 조건" not in source
+
+
+class _Clock:
+    def __init__(self):
+        self.elapsed = 0.0
+
+    def monotonic(self):
+        return self.elapsed
+
+    def sleep(self, seconds):
+        self.elapsed += seconds
+
+
+def test_devtools_endpoint_recovers_from_windows_lock_and_partial_write(tmp_path, monkeypatch):
+    module = _module()
+    clock = _Clock()
+    reads = Mock(side_effect=[
+        FileNotFoundError(), PermissionError(), "9222\n", "92x\n/devtools/browser/id",
+        "9222\n/devtools/browser/", "9222\n/devtools/browser/ready-id\n",
+    ])
+    monkeypatch.setattr(module, "time", clock)
+    monkeypatch.setattr(Path, "read_text", reads)
+
+    assert module._devtools_endpoint(tmp_path, timeout_seconds=1) == (9222, "/devtools/browser/ready-id")
+    assert reads.call_count == 6
+    assert clock.elapsed == pytest.approx(0.5)
+
+
+@pytest.mark.parametrize("response,reason", [
+    (PermissionError(), "PermissionError"),
+    (FileNotFoundError(), "FileNotFoundError"),
+    ("9222\n", "incomplete marker"),
+    ("99999\n/devtools/browser/id", "incomplete marker"),
+])
+def test_devtools_endpoint_persistent_startup_problem_expires(tmp_path, monkeypatch, response, reason):
+    module = _module()
+    clock = _Clock()
+    reads = Mock(side_effect=response) if isinstance(response, Exception) else Mock(return_value=response)
+    monkeypatch.setattr(module, "time", clock)
+    monkeypatch.setattr(Path, "read_text", reads)
+
+    with pytest.raises(RuntimeError, match=rf"within 0.25s.*{reason}"):
+        module._devtools_endpoint(tmp_path, timeout_seconds=0.25)
+    assert clock.elapsed == pytest.approx(0.25)
+    assert reads.call_count == 3
+
+
+def test_devtools_endpoint_does_not_hide_unrelated_io_failure(tmp_path, monkeypatch):
+    module = _module()
+    monkeypatch.setattr(Path, "read_text", Mock(side_effect=OSError("disk failure")))
+    with pytest.raises(OSError, match="disk failure"):
+        module._devtools_endpoint(tmp_path)
