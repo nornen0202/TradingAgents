@@ -1755,6 +1755,7 @@ jobs:
     concurrency:
       group: tradingagents-pages-deploy
       cancel-in-progress: false
+      queue: max
     permissions:
       pages: write
       id-token: write

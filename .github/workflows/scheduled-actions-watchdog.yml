@@ -42,6 +42,11 @@ jobs:
             tradingagents-official-market-calendar-v1-
       - name: Install exchange calendar gate dependency
         run: python -m pip install --disable-pip-version-check "exchange-calendars>=4.13.2"
+      - name: Recover unstarted Pages deployment lease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RECOVERY_DRY_RUN: ${{ inputs.dry_run || false }}
+        run: python .github/scripts/recover_stalled_pages.py
       - name: Dispatch missing scheduled actions
         env:
           GH_REPOSITORY: ${{ github.repository }}

@@ -4,8 +4,9 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import time
 from datetime import datetime, timezone
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 BASE = "https://nornen0202.github.io/TradingAgents/ai"
@@ -59,8 +60,29 @@ def api(path: str, method: str = "GET", payload: dict | None = None):
         "Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
         "Content-Type": "application/json", "X-GitHub-Api-Version": "2022-11-28",
     })
-    with urlopen(request, timeout=30) as response:
-        return json.load(response)
+    # Git objects are content-addressed and ref updates remain non-forcing.
+    # Replay the identical request on transient failures, retaining all snapshot
+    # validation and the final ref verification in publish().
+    for attempt in range(4):
+        try:
+            with urlopen(request, timeout=30) as response:
+                return json.load(response)
+        except HTTPError as exc:
+            if exc.code not in {429, 500, 502, 503, 504} or attempt == 3:
+                raise
+            delay = (1, 3, 7)[attempt]
+            if exc.code == 429:
+                try:
+                    delay = min(30, max(delay, float(exc.headers.get("Retry-After", delay))))
+                except (AttributeError, TypeError, ValueError):
+                    pass
+            print(f"::warning::Public mirror API HTTP {exc.code}; retry {attempt + 2}/4")
+        except (URLError, TimeoutError):
+            if attempt == 3:
+                raise
+            delay = (1, 3, 7)[attempt]
+            print(f"::warning::Public mirror API connection unavailable; retry {attempt + 2}/4")
+        time.sleep(delay)
 
 
 def publish() -> None:

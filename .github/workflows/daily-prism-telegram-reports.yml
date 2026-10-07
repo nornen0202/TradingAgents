@@ -346,6 +346,7 @@ jobs:
     concurrency:
       group: tradingagents-pages-deploy
       cancel-in-progress: false
+      queue: max
     permissions:
       contents: read
       pages: write
