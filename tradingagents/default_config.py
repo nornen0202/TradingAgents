@@ -20,6 +20,13 @@ DEFAULT_CONFIG = {
     "deep_think_llm": "gpt-6-sol",
     "quick_think_llm": "gpt-6-sol",
     "output_think_llm": "gpt-6-sol",
+    # Optional per-tier overrides; unset tiers keep the shared provider/endpoint.
+    "deep_think_provider": None,
+    "quick_think_provider": None,
+    "output_think_provider": None,
+    "deep_think_backend_url": None,
+    "quick_think_backend_url": None,
+    "output_think_backend_url": None,
     "backend_url": None,
     # Provider-specific thinking configuration
     "google_thinking_level": None,      # "high", "minimal", etc.
@@ -67,6 +74,9 @@ DEFAULT_CONFIG = {
     "max_debate_rounds": 2,
     "max_risk_discuss_rounds": 2,
     "max_recur_limit": 100,
+    # Opt in after sizing API and local Codex capacity. Codex turns remain serialized.
+    "parallel_analysts": False,
+    "analyst_max_concurrency": 2,
     "market_country": "US",
     "timezone": "US/Eastern",
     "enable_no_trade": True,

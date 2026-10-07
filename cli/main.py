@@ -18,6 +18,7 @@ from rich.text import Text
 from rich.table import Table
 from collections import deque
 import time
+import sys
 from rich.tree import Tree
 from rich import box
 from rich.align import Align
@@ -646,9 +647,9 @@ def get_analysis_date():
             )
 
 
-def save_report_to_disk(final_state, ticker: str, save_path: Path, *, language: str = "English"):
+def save_report_to_disk(final_state, ticker: str, save_path: Path, *, language: str = "English", settings=None, html: bool = True):
     """Save complete analysis report to disk with organized subfolders."""
-    return save_report_bundle(final_state, ticker, save_path, language=language)
+    return save_report_bundle(final_state, ticker, save_path, language=language, settings=settings, html=html)
 
 
 def display_complete_report(final_state):
@@ -851,9 +852,14 @@ def format_tool_args(args, max_length=80) -> str:
         return result[:max_length - 3] + "..."
     return result
 
-def run_analysis(checkpoint: bool = False):
+def run_analysis(checkpoint: bool = False, *, selections=None, save=None, show=None, html: bool = True, output_dir: Optional[Path] = None):
     # First get all user selections
-    selections = get_user_selections()
+    unattended = selections is not None
+    selections = selections if unattended else get_user_selections()
+    # A second run in the same process must not reuse log-writing closures
+    # pointing at the first run's files.
+    global message_buffer
+    message_buffer = MessageBuffer()
 
     # Create config with selected research depth
     config = DEFAULT_CONFIG.copy()
@@ -871,6 +877,7 @@ def run_analysis(checkpoint: bool = False):
     config["anthropic_effort"] = selections.get("anthropic_effort")
     config["codex_reasoning_effort"] = selections.get("codex_reasoning_effort")
     config["output_language"] = selections.get("output_language", "English")
+    config.update(selections.get("config_overrides", {}))
 
     # Create stats callback handler for tracking LLM/tool calls
     stats_handler = StatsCallbackHandler()
@@ -878,14 +885,7 @@ def run_analysis(checkpoint: bool = False):
     # Normalize analyst selection to predefined order (selection is a 'set', order is fixed)
     selected_set = {analyst.value for analyst in selections["analysts"]}
     selected_analyst_keys = [a for a in ANALYST_ORDER if a in selected_set]
-
-    # Initialize the graph with callbacks bound to LLMs
-    graph = TradingAgentsGraph(
-        selected_analyst_keys,
-        config=config,
-        debug=True,
-        callbacks=[stats_handler],
-    )
+    config["analysts"] = selected_analyst_keys
 
     # Initialize message buffer with selected analysts
     message_buffer.init_for_analysis(selected_analyst_keys)
@@ -944,6 +944,14 @@ def run_analysis(checkpoint: bool = False):
     # Now start the display layout
     layout = create_layout()
 
+    # Finish local path/display setup before acquiring model processes and the
+    # checkpoint connection. The context owns all subsequent graph work.
+    graph = TradingAgentsGraph(
+        selected_analyst_keys,
+        config=config,
+        debug=True,
+        callbacks=[stats_handler],
+    )
     with graph, Live(layout, refresh_per_second=4) as live:
         # Initial display
         update_display(layout, stats_handler=stats_handler, start_time=start_time)
@@ -977,7 +985,8 @@ def run_analysis(checkpoint: bool = False):
 
         # Stream the analysis
         trace = []
-        for chunk in graph.graph.stream(init_agent_state, **args):
+        stream_run = getattr(graph, "stream_run", graph.graph.stream)
+        for chunk in stream_run(init_agent_state, **args):
             # Process messages if present (skip duplicates via message ID)
             if len(chunk["messages"]) > 0:
                 last_message = chunk["messages"][-1]
@@ -1103,29 +1112,36 @@ def run_analysis(checkpoint: bool = False):
     console.print("\n[bold cyan]Analysis Complete![/bold cyan]\n")
 
     # Prompt to save report
-    save_choice = typer.prompt("Save report?", default="Y").strip().upper()
+    save_choice = ("Y" if save is not False else "N") if unattended or save is not None else typer.prompt("Save report?", default="Y").strip().upper()
     if save_choice in ("Y", "YES", ""):
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         default_path = Path.cwd() / "reports" / f"{selections['ticker']}_{timestamp}"
-        save_path_str = typer.prompt(
-            "Save path (press Enter for default)",
-            default=str(default_path)
-        ).strip()
-        save_path = Path(save_path_str)
+        if output_dir is not None:
+            save_path = output_dir
+        elif unattended:
+            save_path = report_dir
+        else:
+            save_path = Path(typer.prompt(
+                "Save path (press Enter for default)", default=str(default_path)
+            ).strip())
         try:
             report_file = save_report_to_disk(
                 final_state,
                 selections["ticker"],
                 save_path,
                 language=selections.get("output_language", "English"),
+                settings=config,
+                html=html,
             )
             console.print(f"\n[green]✓ Report saved to:[/green] {save_path.resolve()}")
             console.print(f"  [dim]Complete report:[/dim] {report_file.name}")
         except Exception as e:
+            if unattended:
+                raise
             console.print(f"[red]Error saving report: {e}[/red]")
 
     # Prompt to display full report
-    display_choice = typer.prompt("\nDisplay full report on screen?", default="Y").strip().upper()
+    display_choice = ("Y" if show else "N") if unattended or show is not None else typer.prompt("\nDisplay full report on screen?", default="Y").strip().upper()
     if display_choice in ("Y", "YES", ""):
         display_complete_report(final_state)
 
@@ -1175,8 +1191,44 @@ def youtube_report(
 
 
 @app.command()
-def analyze(checkpoint: bool = typer.Option(False, "--checkpoint/--no-checkpoint", help="Resume an interrupted analysis with the same date and settings.")):
-    run_analysis(checkpoint=checkpoint)
+def analyze(
+    checkpoint: bool = typer.Option(False, "--checkpoint/--no-checkpoint", help="Resume an interrupted analysis with the same date and settings."),
+    ticker: Optional[str] = typer.Option(None, help="Ticker; with --date runs without prompts using configured defaults."),
+    date: Optional[str] = typer.Option(None, help="Analysis date, YYYY-MM-DD."),
+    analysts: Optional[str] = typer.Option(None, help="Comma-separated market,social,news,fundamentals."),
+    provider: Optional[str] = typer.Option(None, help="Shared model provider."),
+    quick_model: Optional[str] = typer.Option(None, help="Analyst model."),
+    deep_model: Optional[str] = typer.Option(None, help="Manager model."),
+    output_model: Optional[str] = typer.Option(None, help="Output model."),
+    quick_provider: Optional[str] = typer.Option(None, help="Provider for the analyst model."),
+    deep_provider: Optional[str] = typer.Option(None, help="Provider for the manager model."),
+    output_provider: Optional[str] = typer.Option(None, help="Provider for the output model."),
+    depth: Optional[int] = typer.Option(None, min=1, help="Rounds for both research and risk debates."),
+    language: Optional[str] = typer.Option(None, help="Report language, for example Korean or English."),
+    results_dir: Optional[Path] = typer.Option(None, help="Directory for run logs and automatic report bundles."),
+    out: Optional[Path] = typer.Option(None, help="Optional complete report bundle directory."),
+    save: Optional[bool] = typer.Option(None, "--save/--no-save", help="Save bundle (default in unattended mode: yes)."),
+    show: Optional[bool] = typer.Option(None, "--show/--no-show", help="Display complete report (default in unattended mode: no)."),
+    html: bool = typer.Option(True, "--html/--no-html", help="Also save one offline HTML page."),
+    parallel_analysts: Optional[bool] = typer.Option(None, "--parallel-analysts/--serial-analysts", help="Run independent analysts concurrently."),
+):
+    from cli.selections import unattended_selections
+
+    flags = dict(ticker=ticker, date=date, analysts=analysts, provider=provider,
+                 quick_model=quick_model, deep_model=deep_model, output_model=output_model,
+                 quick_provider=quick_provider, deep_provider=deep_provider, output_provider=output_provider,
+                 depth=depth, language=language, results_dir=results_dir, parallel_analysts=parallel_analysts)
+    unattended = any(value is not None for value in flags.values())
+    if unattended:
+        try:
+            selections = unattended_selections(flags, DEFAULT_CONFIG)
+        except ValueError as exc:
+            raise typer.BadParameter(str(exc)) from exc
+    else:
+        if not sys.stdin.isatty():
+            raise typer.BadParameter("No interactive terminal. Provide --ticker and --date to run without prompts.")
+        selections = None
+    run_analysis(checkpoint=checkpoint, selections=selections, save=save, show=show, html=html, output_dir=out)
 
 
 if __name__ == "__main__":

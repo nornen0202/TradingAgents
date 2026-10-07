@@ -307,7 +307,7 @@ def get_fundamentals(
     curr_date: Annotated[str, "analysis as-of date; historical snapshots are unavailable"] = None
 ):
     """Get company fundamentals overview from yfinance."""
-    if get_config().get("point_in_time_strict", False) and is_historical(curr_date):
+    if is_historical(curr_date):
         return "No fundamentals data: Yahoo overview is a current snapshot, not a historical vintage."
     try:
         resolved_ticker, info, attempts = _resolve_info_with_symbol_fallback(ticker)
@@ -371,6 +371,8 @@ def get_balance_sheet(
     curr_date: Annotated[str, "current date in YYYY-MM-DD format"] = None
 ):
     """Get balance sheet data from yfinance."""
+    if is_historical(curr_date):
+        return "Historical statement unavailable: Yahoo balance sheets have no verified filing dates or historical revisions."
     try:
         ticker_obj = yf.Ticker(ticker.upper())
 
@@ -403,6 +405,8 @@ def get_cashflow(
     curr_date: Annotated[str, "current date in YYYY-MM-DD format"] = None
 ):
     """Get cash flow data from yfinance."""
+    if is_historical(curr_date):
+        return "Historical statement unavailable: Yahoo cash flows have no verified filing dates or historical revisions."
     try:
         ticker_obj = yf.Ticker(ticker.upper())
 
@@ -435,6 +439,8 @@ def get_income_statement(
     curr_date: Annotated[str, "current date in YYYY-MM-DD format"] = None
 ):
     """Get income statement data from yfinance."""
+    if is_historical(curr_date):
+        return "Historical statement unavailable: Yahoo income statements have no verified filing dates or historical revisions."
     try:
         ticker_obj = yf.Ticker(ticker.upper())
 

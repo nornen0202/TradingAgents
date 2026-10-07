@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import threading
 from datetime import datetime
 from typing import Any
@@ -23,6 +24,12 @@ from .fred import get_macro_data
 from .naver_news import get_company_news_naver, get_social_sentiment_naver
 from .opendart import get_disclosures_opendart
 from .sec_edgar import get_disclosures_sec_edgar
+from .sec_edgar_statements import (
+    get_balance_sheet as get_sec_balance_sheet,
+    get_cashflow as get_sec_cashflow,
+    get_income_statement as get_sec_income_statement,
+)
+from .integrity import is_historical
 from .vendor_exceptions import (
     VendorConfigurationError,
     VendorInputError,
@@ -107,14 +114,17 @@ VENDOR_METHODS = {
         "yfinance": get_yfinance_fundamentals,
     },
     "get_balance_sheet": {
+        "sec_edgar": get_sec_balance_sheet,
         "alpha_vantage": get_alpha_vantage_balance_sheet,
         "yfinance": get_yfinance_balance_sheet,
     },
     "get_cashflow": {
+        "sec_edgar": get_sec_cashflow,
         "alpha_vantage": get_alpha_vantage_cashflow,
         "yfinance": get_yfinance_cashflow,
     },
     "get_income_statement": {
+        "sec_edgar": get_sec_income_statement,
         "alpha_vantage": get_alpha_vantage_income_statement,
         "yfinance": get_yfinance_income_statement,
     },
@@ -159,6 +169,11 @@ _SEMANTIC_EMPTY_MARKERS = (
     "no insider transactions data found",
     "no data found",
     "no fundamentals data found",
+    "no fundamentals data:",
+    "no balance sheet data found",
+    "no cash flow data found",
+    "no income statement data found",
+    "historical statement unavailable",
     "provider unavailable",
     "no social provider",
     "no social sentiment",
@@ -247,17 +262,24 @@ def _prioritize_market_specific_vendors(method: str, vendor_chain: list[str], ar
     try:
         from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 
-        if method in {"get_news", "get_company_news", "get_social_sentiment", "get_disclosures"}:
+        statements = {"get_balance_sheet", "get_cashflow", "get_income_statement"}
+        if method in {"get_news", "get_company_news", "get_social_sentiment", "get_disclosures"} | statements:
             symbol = kwargs.get("symbol") or kwargs.get("ticker") or (args[0] if args else None)
             if isinstance(symbol, str):
                 profile = resolve_instrument(symbol)
                 if profile.country == "KR":
+                    if method in statements:
+                        remove("sec_edgar")
                     if method in {"get_news", "get_company_news", "get_social_sentiment"}:
                         promote("naver")
                     if method == "get_disclosures":
                         promote("opendart")
                         remove("sec_edgar")
                 else:
+                    if method in statements:
+                        curr_date = kwargs.get("curr_date") or (args[2] if len(args) > 2 else None) or get_config().get("analysis_as_of")
+                        if is_historical(curr_date):
+                            promote("sec_edgar")
                     if method in {"get_news", "get_company_news", "get_social_sentiment"}:
                         remove("naver")
                     if method == "get_disclosures":
@@ -275,6 +297,8 @@ def _prioritize_market_specific_vendors(method: str, vendor_chain: list[str], ar
 
 def _validate_date(value: str, field_name: str) -> None:
     try:
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+            raise ValueError("Date must be zero-padded ISO format")
         datetime.strptime(value, "%Y-%m-%d")
     except ValueError as exc:
         raise VendorInputError(f"Field '{field_name}' must be in YYYY-MM-DD format.") from exc
@@ -306,6 +330,14 @@ def _validate_input_for_method(method: str, args: tuple[Any, ...], kwargs: dict[
     if method in {"get_stock_data", "get_news", "get_company_news", "get_disclosures", "get_social_sentiment"}:
         _validate_date(str(arg(1, "start_date")), "start_date")
         _validate_date(str(arg(2, "end_date")), "end_date")
+
+    if method in {"get_fundamentals", "get_balance_sheet", "get_cashflow", "get_income_statement"}:
+        curr_date = arg(1 if method == "get_fundamentals" else 2, "curr_date")
+        if curr_date is not None:
+            _validate_date(str(curr_date), "curr_date")
+
+    if method == "get_indicators":
+        _validate_date(str(arg(2, "curr_date")), "curr_date")
 
     if method in {"get_global_news", "get_macro_news"}:
         _validate_date(str(arg(0, "curr_date")), "curr_date")
@@ -363,15 +395,22 @@ def route_to_vendor(method: str, *args, **kwargs):
     if method not in VENDOR_METHODS:
         raise ValueError(f"Method '{method}' not supported")
 
-    _validate_input_for_method(method, args, kwargs)
     config = get_config()
     cutoff = config.get("analysis_as_of")
-    if config.get("point_in_time_strict") and cutoff:
+    date_index = {"get_fundamentals": 1, "get_balance_sheet": 2, "get_cashflow": 2, "get_income_statement": 2}.get(method)
+    if cutoff and date_index is not None:
+        if len(args) > date_index:
+            if not args[date_index]:
+                args = (*args[:date_index], cutoff, *args[date_index + 1:])
+        elif not kwargs.get("curr_date"):
+            kwargs = {**kwargs, "curr_date": cutoff}
+    _validate_input_for_method(method, args, kwargs)
+    if cutoff:
         # Guard tool arguments independently of the model's compliance with prompts.
         dates = [str(v) for v in (*args, *kwargs.values()) if isinstance(v, str) and len(v) == 10 and v[4:5] == "-" and v[7:8] == "-"]
         if any(value > cutoff for value in dates):
             raise VendorInputError("Requested data date exceeds the analysis as-of date")
-        if method == "get_insider_transactions":
+        if method == "get_insider_transactions" and (config.get("point_in_time_strict") or is_historical(cutoff)):
             return "No insider data: historical publication timestamps are not verified."
 
     category = get_category_for_method(method)

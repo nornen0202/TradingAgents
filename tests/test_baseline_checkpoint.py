@@ -36,12 +36,12 @@ def test_sqlite_resume_does_not_rerun_completed_nodes_and_config_isolated(tmp_pa
         graph = TradingAgentsGraph(config=config, selected_analysts=["market"])
         state, args = graph.prepare_run("AAPL", "2026-03-02")
         with pytest.raises(RuntimeError, match="interrupted"):
-            graph.graph.invoke(state, **args)
+            graph.invoke_run(state, **args)
         graph.close()
         graph = TradingAgentsGraph(config=config, selected_analysts=["market"])
         state, args = graph.prepare_run("AAPL", "2026-03-02")
         assert state is None
-        result = graph.graph.invoke(state, **args)
+        result = graph.invoke_run(state, **args)
         assert result["market_report"] == "grounded"
         assert result["news_report"] == "done"
         assert calls == ["first", "second", "second"]

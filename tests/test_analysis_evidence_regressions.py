@@ -71,7 +71,7 @@ def test_constructor_callbacks_reach_real_tool_execution(tmp_path):
     with patch("tradingagents.graph.trading_graph.create_llm_client", return_value=SimpleNamespace(get_llm=lambda: Mock())), patch("tradingagents.graph.setup.GraphSetup.setup_graph", setup):
         graph = TradingAgentsGraph(config=config, selected_analysts=["market"], callbacks=[stats])
         state, args = graph.prepare_run("AAPL", "2026-09-29", analysis_date="2026-09-30")
-        graph.graph.invoke(state, **args)
+        graph.invoke_run(state, **args)
         assert stats.get_stats()["tool_call_counts"] == {"sample_price": 1}
         _, overridden = graph.prepare_run("AAPL", "2026-09-29", callbacks=[])
         assert "callbacks" not in overridden["config"]

@@ -60,7 +60,7 @@ class YFinanceNewsTests(unittest.TestCase):
         ):
             result = get_news_yfinance("GOOGL", "2026-03-26", "2026-04-02")
 
-        self.assertIn("No news found for GOOGL between 2026-03-26 and 2026-04-02", result)
+        self.assertIn("Yahoo news unavailable for GOOGL between 2026-03-26 and 2026-04-02", result)
         self.assertIn("2026-04-05 to 2026-04-06", result)
 
 

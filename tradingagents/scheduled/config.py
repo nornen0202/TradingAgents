@@ -57,11 +57,19 @@ class RunSettings:
     fatal_error_patterns: tuple[str, ...] = tuple()
     daily_active_ticker_limit: int = 0
     analysis_mode: str = "full"
+    parallel_analysts: bool = False
+    analyst_max_concurrency: int = 2
 
 
 @dataclass(frozen=True)
 class LLMSettings:
     provider: str = "codex"
+    quick_think_provider: str | None = None
+    deep_think_provider: str | None = None
+    output_think_provider: str | None = None
+    quick_think_backend_url: str | None = None
+    deep_think_backend_url: str | None = None
+    output_think_backend_url: str | None = None
     deep_model: str = "gpt-6-sol"
     quick_model: str = "gpt-6-sol"
     output_model: str = "gpt-6-sol"
@@ -397,12 +405,26 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     site_dir = _resolve_path(storage_raw.get("site_dir", "site"), base_dir)
 
     codex_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_MODEL"))
-    quick_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_QUICK_MODEL")) or codex_model_override
-    deep_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_DEEP_MODEL")) or codex_model_override
-    output_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_OUTPUT_MODEL")) or codex_model_override
-    writer_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_WRITER_MODEL")) or codex_model_override
-    judge_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_JUDGE_MODEL")) or codex_model_override
-    execution_model_override = _optional_string(os.getenv("TRADINGAGENTS_EXECUTION_LLM_SUMMARY_MODEL")) or codex_model_override
+    shared_provider = str(llm_raw.get("provider", "codex")).strip().lower() or "codex"
+    tier_providers = {
+        tier: (_optional_string(llm_raw.get(f"{tier}_think_provider")) or shared_provider).lower()
+        for tier in ("quick", "deep", "output")
+    }
+
+    def codex_override(role: str, provider: str) -> str | None:
+        if provider != "codex":
+            return None
+        return _optional_string(os.getenv(f"TRADINGAGENTS_CODEX_{role.upper()}_MODEL")) or codex_model_override
+
+    quick_model_override = codex_override("quick", tier_providers["quick"])
+    deep_model_override = codex_override("deep", tier_providers["deep"])
+    output_model_override = codex_override("output", tier_providers["output"])
+    writer_model_override = codex_override("writer", shared_provider)
+    judge_model_override = codex_override("judge", shared_provider)
+    execution_model_override = (
+        _optional_string(os.getenv("TRADINGAGENTS_EXECUTION_LLM_SUMMARY_MODEL"))
+        or (codex_model_override if shared_provider == "codex" else None)
+    )
     codex_workspace_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_WORKSPACE_DIR"))
 
     return ScheduledAnalysisConfig(
@@ -447,9 +469,17 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             fatal_error_patterns=_normalize_string_tuple(run_raw.get("fatal_error_patterns") or ()),
             daily_active_ticker_limit=max(0, int(run_raw.get("daily_active_ticker_limit", 0) or 0)),
             analysis_mode=_normalize_analysis_mode(run_raw.get("analysis_mode", "full")),
+            parallel_analysts=bool(run_raw.get("parallel_analysts", False)),
+            analyst_max_concurrency=max(1, int(run_raw.get("analyst_max_concurrency", 2))),
         ),
         llm=LLMSettings(
-            provider=str(llm_raw.get("provider", "codex")).strip().lower() or "codex",
+            provider=shared_provider,
+            quick_think_provider=_optional_string(llm_raw.get("quick_think_provider")),
+            deep_think_provider=_optional_string(llm_raw.get("deep_think_provider")),
+            output_think_provider=_optional_string(llm_raw.get("output_think_provider")),
+            quick_think_backend_url=_optional_string(llm_raw.get("quick_think_backend_url")),
+            deep_think_backend_url=_optional_string(llm_raw.get("deep_think_backend_url")),
+            output_think_backend_url=_optional_string(llm_raw.get("output_think_backend_url")),
             deep_model=deep_model_override
             or str(llm_raw.get("deep_model", "gpt-6-sol")).strip()
             or "gpt-6-sol",

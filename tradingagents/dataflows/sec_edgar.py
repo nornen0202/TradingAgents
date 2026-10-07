@@ -31,7 +31,7 @@ def _get_json(url: str) -> dict:
         _LAST_REQUEST = time.monotonic()
     try:
         response = requests.get(url, timeout=25, headers={
-            "User-Agent": os.getenv("SEC_USER_AGENT") or "TradingAgents research contact https://github.com/nornen0202/TradingAgents/issues",
+            "User-Agent": os.getenv("SEC_EDGAR_USER_AGENT") or os.getenv("SEC_USER_AGENT") or "TradingAgents research contact https://github.com/nornen0202/TradingAgents/issues",
             "Accept-Encoding": "gzip, deflate", "Accept": "application/json",
         })
         response.raise_for_status()
