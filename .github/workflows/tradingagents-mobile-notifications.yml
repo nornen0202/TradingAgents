@@ -1,4 +1,9 @@
 name: TradingAgents Mobile Notifications
+run-name: >-
+  TradingAgents Mobile Notifications
+  [upstream=${{ github.event.workflow_run.id || inputs.upstream_run_id }}]
+  [attempt=${{ github.event.workflow_run.run_attempt || inputs.upstream_run_attempt || '1' }}]
+  [dry_run=${{ inputs.dry_run || false }}]
 
 on:
   workflow_run:
@@ -22,6 +27,11 @@ on:
         required: false
         default: false
         type: boolean
+      upstream_run_attempt:
+        description: "Upstream attempt for followup provenance"
+        required: false
+        default: "1"
+        type: string
 
 permissions:
   actions: read

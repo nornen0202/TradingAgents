@@ -21,11 +21,13 @@ class GitHubClient:
         self.repository = repository
         self.token = token
 
-    def request(self, path, method="GET"):
+    def request(self, path, method="GET", payload=None):
         request = urllib.request.Request(
             f"https://api.github.com/repos/{self.repository}{path}", method=method,
+            data=json.dumps(payload).encode("utf-8") if payload is not None else None,
             headers={"Authorization": f"Bearer {self.token}",
-                     "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"},
+                     "Accept": "application/vnd.github+json", "Content-Type": "application/json",
+                     "X-GitHub-Api-Version": "2022-11-28"},
         )
         with urllib.request.urlopen(request, timeout=30) as response:
             data = response.read()
