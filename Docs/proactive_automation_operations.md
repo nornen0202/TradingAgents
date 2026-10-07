@@ -84,6 +84,25 @@ producer finishing after the last Work slot still needs its report published.
 | Current quote/account data unusable | Use an existing permitted read-only refresh path when due; retain all execution gates | Actual observation times, coverage and correct readiness; otherwise explicit `NEEDS_LIVE_RECHECK` |
 | Repeated code defect with evidence | Isolated worktree, minimal fix and regression checks; commit, push `fork`, open PR, pass required CI and merge | Tests pass and the production symptom is rechecked |
 
+The watchdog also runs `recover_missing_followups.py`. Completed watchdog-dispatched
+Daily/Overlay/YouTube producers can miss their `workflow_run` notification and
+mirror: GitHub suppresses events caused by `GITHUB_TOKEN`, while explicit
+`workflow_dispatch` is exempt ([GitHub event rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)).
+After a three-minute completion grace, the reconciler uses paginated run history
+and exact upstream ID/attempt markers to dispatch only missing followups. It
+preserves active ownership, rechecks immediately before dispatch, waits fifteen
+minutes before retries, and counts all followup runs and reruns toward a three-attempt
+budget per upstream. Gate-only producers are ignored; mirrors require successful
+deployment. The existing notifier still verifies the upstream and deduplicates
+Telegram sends. The existing mirror still verifies public content hashes.
+
+The rollout starts with producer runs created at or after 2026-10-07 15:59 UTC;
+earlier incidents were manually delivered before the provenance markers existed.
+Recovery looks back 24 hours. Older or budget-exhausted incidents require this
+operator's evidence-based repair, not another unbounded retry. A successful
+followup workflow is only coverage for dispatch deduplication: operations must
+still verify `SENT`/policy `SKIPPED` and actual mirror/Pages contents.
+
 For Work publication, read and apply
 [the repository Work skill](../.agents/skills/tradingagents-daily-investment-work/SKILL.md).
 Keep its canonical local runtime directory even when code repairs use a worktree.

@@ -65,6 +65,14 @@ jobs:
         id: market_calendar_ready
         if: ${{ always() }}
         run: python .github/scripts/market_calendar_cache_status.py
+      - name: Recover missing completed-producer followups
+        # GITHUB_TOKEN dispatch may suppress workflow_run. Reconcile completed
+        # producers even if an unrelated calendar/producer dispatch failed.
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RECOVERY_DRY_RUN: ${{ inputs.dry_run || false }}
+        run: python .github/scripts/recover_missing_followups.py
       - name: Persist official market calendar
         if: ${{ always() && steps.market_calendar_ready.outputs.fresh == 'true' }}
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

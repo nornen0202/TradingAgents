@@ -1,7 +1,21 @@
 name: Publish AI Context Mirror
+run-name: >-
+  Publish AI Context Mirror
+  [upstream=${{ github.event.workflow_run.id || inputs.upstream_run_id || 'manual' }}]
+  [attempt=${{ github.event.workflow_run.run_attempt || inputs.upstream_run_attempt || '1' }}]
 
 on:
   workflow_dispatch:
+    inputs:
+      upstream_run_id:
+        description: "Completed producer run ID for followup provenance"
+        required: false
+        type: string
+      upstream_run_attempt:
+        description: "Upstream attempt for followup provenance"
+        required: false
+        default: "1"
+        type: string
   workflow_run:
     workflows: [Daily Codex Analysis, Intraday Overlay Refresh, Daily YouTube Verified Reports, Daily PRISM Telegram Reports, Work Report Pages Refresh]
     types: [completed]
