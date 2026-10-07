@@ -42,7 +42,7 @@ def test_invisible_service_listener_never_launches_a_duplicate(status):
     function Test-Path {{ param($LiteralPath,$PathType) return $true }}
     function Get-CimInstance {{ param($Filter) return [pscustomobject]@{{ExecutablePath=$null}} }}
     function Get-Content {{ param($LiteralPath,[switch]$Raw) return 'test-service' }}
-    function Get-Service {{ param($Name) return [pscustomobject]@{{Status=[ServiceProcess.ServiceControllerStatus]::{status}} }}
+    function Get-Service {{ param($Name) return [pscustomobject]@{{Status=[ServiceProcess.ServiceControllerStatus]::{status}}} }}
     function Start-Service {{ throw 'Unexpected service start' }}
     function Start-Process {{ throw 'Duplicate runner launched' }}
     & '{source}' -RunnerRoot C:\\actions-runner
