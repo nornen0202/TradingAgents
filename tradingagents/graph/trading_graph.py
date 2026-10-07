@@ -13,7 +13,7 @@ from typing import Dict, Any, Tuple, List, Optional
 from langgraph.prebuilt import ToolNode
 
 from tradingagents.llm_clients import create_llm_client
-from tradingagents.llm_clients.role_config import codex_client_kwargs
+from tradingagents.llm_clients.role_config import codex_client_kwargs, tier_provider, tier_backend_url
 
 from tradingagents.agents import *
 from tradingagents.default_config import DEFAULT_CONFIG
@@ -23,7 +23,7 @@ from tradingagents.agents.utils.agent_states import (
     InvestDebateState,
     RiskDebateState,
 )
-from tradingagents.dataflows.config import set_config
+from tradingagents.dataflows.config import run_config, run_config_context
 from tradingagents.schemas import StructuredDecisionValidationError, parse_structured_decision
 
 # Import the new abstract tool methods from agent_utils
@@ -76,9 +76,6 @@ class TradingAgentsGraph:
         self.config = deepcopy(config) if config is not None else deepcopy(DEFAULT_CONFIG)
         self.callbacks = callbacks or []
 
-        # Update the interface's config
-        set_config(self.config)
-
         # Create necessary directories
         os.makedirs(
             self.config["data_cache_dir"],
@@ -97,9 +94,9 @@ class TradingAgentsGraph:
             output_kwargs["callbacks"] = self.callbacks
 
         deep_client = create_llm_client(
-            provider=self.config["llm_provider"],
+            provider=tier_provider(self.config, "deep"),
             model=self.config["deep_think_llm"],
-            base_url=self.config.get("backend_url"),
+            base_url=tier_backend_url(self.config, "deep"),
             **deep_kwargs,
         )
         output_model = (
@@ -108,15 +105,15 @@ class TradingAgentsGraph:
             or self.config["quick_think_llm"]
         )
         quick_client = create_llm_client(
-            provider=self.config["llm_provider"],
+            provider=tier_provider(self.config, "quick"),
             model=self.config["quick_think_llm"],
-            base_url=self.config.get("backend_url"),
+            base_url=tier_backend_url(self.config, "quick"),
             **quick_kwargs,
         )
         output_client = create_llm_client(
-            provider=self.config["llm_provider"],
+            provider=tier_provider(self.config, "output"),
             model=output_model,
-            base_url=self.config.get("backend_url"),
+            base_url=tier_backend_url(self.config, "output"),
             **output_kwargs,
         )
 
@@ -151,7 +148,12 @@ class TradingAgentsGraph:
             self.conditional_logic,
         )
 
-        self.propagator = Propagator(self.config["max_recur_limit"])
+        max_concurrency = None
+        if self.config.get("parallel_analysts"):
+            max_concurrency = self.config.get("analyst_max_concurrency", 2)
+            if isinstance(max_concurrency, bool) or not isinstance(max_concurrency, int) or max_concurrency < 1:
+                raise ValueError("analyst_max_concurrency must be a positive integer")
+        self.propagator = Propagator(self.config["max_recur_limit"], max_concurrency)
         self.reflector = Reflector(self.deep_thinking_llm)
         self.signal_processor = SignalProcessor()
 
@@ -161,7 +163,8 @@ class TradingAgentsGraph:
         self.log_states_dict = {}  # date to full state dict
 
         # Set up the graph
-        self.selected_analysts = selected_analysts or ["market", "social", "news", "fundamentals"]
+        self.selected_analysts = list(selected_analysts) if selected_analysts is not None else ["market", "social", "news", "fundamentals"]
+        self._prepared_run_config = deepcopy(self.config)
         self._checkpoint_connection = None
         checkpointer = None
         if self.config.get("checkpoint_enabled"):
@@ -170,21 +173,28 @@ class TradingAgentsGraph:
             directory.mkdir(parents=True, exist_ok=True)
             self._checkpoint_connection = sqlite3.connect(directory / "runs.sqlite3", check_same_thread=False)
             checkpointer = SqliteSaver(self._checkpoint_connection)
-        self.graph = self.graph_setup.setup_graph(self.selected_analysts, checkpointer=checkpointer)
+        setup_options = {"parallel_analysts": True} if self.config.get("parallel_analysts") else {}
+        self.graph = self.graph_setup.setup_graph(
+            self.selected_analysts, checkpointer=checkpointer, **setup_options,
+        )
 
     def prepare_run(self, company_name, trade_date, analysis_date=None, callbacks=None):
         """Shared CLI/API lifecycle: resume with None to avoid duplicating messages."""
-        state = self.propagator.create_initial_state(company_name, trade_date, analysis_date=analysis_date)
+        self.curr_state = None
+        self.log_states_dict = {}
+        self._prepared_run_config = deepcopy(self.config)
+        self._prepared_run_config["analysis_as_of"] = analysis_date or trade_date
+        with run_config(self._prepared_run_config):
+            state = self.propagator.create_initial_state(company_name, trade_date, analysis_date=analysis_date)
         from tradingagents.dataflows.integrity import safe_symbol
         safe_symbol(state["company_of_interest"])
         self.ticker = state["company_of_interest"]
-        set_config({**self.config, "analysis_as_of": analysis_date or trade_date})
         for memory in (self.bull_memory, self.bear_memory, self.trader_memory, self.invest_judge_memory, self.portfolio_manager_memory):
             memory.as_of = analysis_date or trade_date
         args = self.propagator.get_graph_args(callbacks=self.callbacks if callbacks is None else callbacks)
         if self._checkpoint_connection is not None:
             identity = {
-                "version": 1, "ticker": self.ticker, "trade_date": trade_date,
+                "version": 2, "ticker": self.ticker, "trade_date": trade_date,
                 "analysis_date": analysis_date or trade_date, "analysts": self.selected_analysts,
                 "config": {key: value for key, value in self.config.items() if key not in {"api_keys_path", "results_dir", "project_dir", "data_cache_dir", "checkpoint_dir", "memory_dir"}},
             }
@@ -194,6 +204,31 @@ class TradingAgentsGraph:
             if previous.values:
                 state = None
         return state, args
+
+    def invoke_run(self, initial_state, **args):
+        """Invoke a prepared run with its own provider, vendor and date settings."""
+        with run_config(self._prepared_run_config):
+            return self.graph.invoke(initial_state, **args)
+
+    def stream_run(self, initial_state, **args):
+        """Stream a prepared run without leaking its settings between yields.
+
+        Use this after ``prepare_run`` instead of calling the raw graph stream.
+        The private context is also inherited by parallel analyst/tool workers.
+        """
+        context = run_config_context(self._prepared_run_config)
+        stream = context.run(self.graph.stream, initial_state, **args)
+        try:
+            while True:
+                try:
+                    chunk = context.run(next, stream)
+                except StopIteration:
+                    break
+                yield chunk
+        finally:
+            close = getattr(stream, "close", None)
+            if callable(close):
+                context.run(close)
 
     def close(self):
         for llm in (self.deep_thinking_llm, self.quick_thinking_llm, self.output_thinking_llm):
@@ -219,12 +254,15 @@ class TradingAgentsGraph:
         from tradingagents.dataflows.integrity import safe_symbol
         ticker = safe_symbol(ticker)
         path = save_path or Path(self.config["results_dir"]) / ticker / state["trade_date"] / "reports"
-        return save_report_bundle(state, ticker, path, language=self.config.get("output_language", "English"))
+        return save_report_bundle(
+            state, ticker, path, language=self.config.get("output_language", "English"),
+            settings={**self.config, "analysts": self.selected_analysts},
+        )
 
     def _get_provider_kwargs(self, role: str) -> Dict[str, Any]:
         """Get provider-specific kwargs for LLM client creation."""
         kwargs = {}
-        provider = self.config.get("llm_provider", "").lower()
+        provider = tier_provider(self.config, role)
         if provider != "codex":
             kwargs["max_retries"] = int(self.config.get("llm_max_retries", 2))
             if self.config.get("max_tokens") is not None:
@@ -256,6 +294,10 @@ class TradingAgentsGraph:
 
     def propagate(self, company_name, trade_date, analysis_date=None):
         """Run the trading agents graph for a company on a specific date."""
+        with run_config({**self.config, "analysis_as_of": analysis_date or trade_date}):
+            return self._propagate(company_name, trade_date, analysis_date=analysis_date)
+
+    def _propagate(self, company_name, trade_date, analysis_date=None):
 
         # Initialize state
         init_agent_state, args = self.prepare_run(
@@ -265,7 +307,7 @@ class TradingAgentsGraph:
         if self.debug:
             # Debug mode with tracing
             trace = []
-            for chunk in self.graph.stream(init_agent_state, **args):
+            for chunk in self.stream_run(init_agent_state, **args):
                 if len(chunk["messages"]) == 0:
                     pass
                 else:
@@ -275,7 +317,7 @@ class TradingAgentsGraph:
             final_state = trace[-1] if trace else self.graph.get_state(args["config"]).values
         else:
             # Standard mode without tracing
-            final_state = self.graph.invoke(init_agent_state, **args)
+            final_state = self.invoke_run(init_agent_state, **args)
 
         signal = self.process_signal(final_state["final_trade_decision"])
         final_state = self._localize_final_state(final_state)
@@ -291,7 +333,10 @@ class TradingAgentsGraph:
 
     def _log_state(self, trade_date, final_state):
         """Log the final state to a JSON file."""
+        from tradingagents.report_settings import public_run_settings
+
         self.log_states_dict[str(trade_date)] = {
+            "run_settings": public_run_settings({**self.config, "analysts": self.selected_analysts}),
             "input_instrument": final_state.get("input_instrument", final_state["company_of_interest"]),
             "company_of_interest": final_state["company_of_interest"],
             "instrument_profile": final_state.get("instrument_profile", {}),

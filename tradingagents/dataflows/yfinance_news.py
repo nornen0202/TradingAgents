@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 import yfinance as yf
@@ -15,6 +15,8 @@ from .news_models import (
     normalize_datetime,
 )
 from .stockstats_utils import yf_retry
+from .integrity import utc_window
+from .vendor_exceptions import VendorMalformedResponseError, VendorTransientError
 
 
 _TICKER_NEWS_FETCH_COUNTS = (20, 50, 100)
@@ -43,24 +45,28 @@ _GLOBAL_QUERY_PRESETS = {
 
 def _extract_article_fields(article: dict) -> dict:
     """Extract article data from yfinance news format."""
-    if "content" in article:
-        content = article["content"]
-        provider = content.get("provider") or {}
-        url_obj = content.get("canonicalUrl") or content.get("clickThroughUrl") or {}
+    if not isinstance(article, dict):
+        article = {}
+    content = article.get("content")
+    if isinstance(content, dict):
+        provider = content.get("provider")
+        provider = provider if isinstance(provider, dict) else {}
+        url_obj = content.get("canonicalUrl") or content.get("clickThroughUrl")
+        url_obj = url_obj if isinstance(url_obj, dict) else {}
         return {
-            "title": content.get("title", "No title"),
-            "summary": content.get("summary", ""),
-            "publisher": provider.get("displayName", "Unknown"),
-            "link": url_obj.get("url", ""),
+            "title": content.get("title") or "No title",
+            "summary": content.get("summary") or "",
+            "publisher": provider.get("displayName") or "Unknown",
+            "link": url_obj.get("url") or "",
             "pub_date": normalize_datetime(content.get("pubDate")),
             "raw_symbols": content.get("relatedTickers") or [],
         }
 
     return {
-        "title": article.get("title", "No title"),
-        "summary": article.get("summary", ""),
-        "publisher": article.get("publisher", "Unknown"),
-        "link": article.get("link", ""),
+        "title": article.get("title") or "No title",
+        "summary": article.get("summary") or "",
+        "publisher": article.get("publisher") or "Unknown",
+        "link": article.get("link") or "",
         "pub_date": normalize_datetime(article.get("providerPublishTime")),
         "raw_symbols": article.get("relatedTickers") or [],
     }
@@ -68,7 +74,8 @@ def _extract_article_fields(article: dict) -> dict:
 
 def normalize_yfinance_article(article: dict, *, fallback_symbol: str | None = None, country: str | None = None) -> NewsItem:
     data = _extract_article_fields(article)
-    symbols = [str(symbol).upper() for symbol in data["raw_symbols"] if str(symbol).strip()]
+    raw_symbols = data["raw_symbols"]
+    symbols = [symbol.strip().upper() for symbol in raw_symbols if isinstance(symbol, str) and symbol.strip()] if isinstance(raw_symbols, list) else []
     if fallback_symbol and fallback_symbol.upper() not in symbols:
         symbols.append(fallback_symbol.upper())
     return NewsItem(
@@ -88,6 +95,26 @@ def normalize_yfinance_article(article: dict, *, fallback_symbol: str | None = N
     )
 
 
+def _search_ticker_news(ticker: str) -> list[dict]:
+    """Search is a recent sample; only an explicit symbol tag proves relevance."""
+    search = yf_retry(lambda: yf.Search(ticker, news_count=_TICKER_NEWS_FETCH_COUNTS[-1]))
+    news = getattr(search, "news", None) or []
+    if not isinstance(news, list):
+        raise VendorMalformedResponseError("Yahoo search returned an invalid news list")
+    tagged = []
+    for article in news:
+        symbols = _extract_article_fields(article)["raw_symbols"]
+        if isinstance(symbols, list) and ticker in {
+            symbol.strip().upper() for symbol in symbols if isinstance(symbol, str)
+        }:
+            tagged.append(article)
+    if not tagged:
+        raise VendorTransientError(
+            f"Yahoo news unavailable for {ticker}: the quote feed is empty and search has no tagged articles; this does not establish an absence of news"
+        )
+    return tagged
+
+
 def _collect_ticker_news(
     ticker: str,
     start_dt: datetime,
@@ -100,7 +127,14 @@ def _collect_ticker_news(
     for count in _TICKER_NEWS_FETCH_COUNTS:
         news = yf_retry(lambda batch_size=count: yf.Ticker(ticker).get_news(count=batch_size))
         if not news:
-            continue
+            if collected:
+                break
+            news = _search_ticker_news(ticker)
+            from_search = True
+        else:
+            from_search = False
+        if not isinstance(news, list):
+            raise VendorMalformedResponseError("Yahoo returned an invalid ticker news list")
 
         batch = dedupe_news_items(
             [normalize_yfinance_article(article, fallback_symbol=ticker) for article in news]
@@ -115,7 +149,7 @@ def _collect_ticker_news(
                 if oldest_pub_date is None or pub_date < oldest_pub_date:
                     oldest_pub_date = pub_date
 
-        if oldest_pub_date and oldest_pub_date.replace(tzinfo=None) <= start_dt:
+        if from_search or (oldest_pub_date and oldest_pub_date <= start_dt):
             break
         if len(news) < count:
             break
@@ -146,10 +180,19 @@ def fetch_company_news_yfinance(
     start_date: str,
     end_date: str,
 ) -> tuple[list[NewsItem], datetime | None, datetime | None]:
-    start_dt = datetime.strptime(start_date, "%Y-%m-%d")
-    end_dt = datetime.strptime(end_date, "%Y-%m-%d") + relativedelta(days=1)
-    articles, oldest_pub_date, newest_pub_date = _collect_ticker_news(ticker, start_dt)
+    from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+
+    start_dt, end_dt = utc_window(start_date, end_date)
+    profile = resolve_instrument(ticker)
+    canonical = (profile.yahoo_symbol or profile.normalized_symbol).upper()
+    articles, oldest_pub_date, newest_pub_date = _collect_ticker_news(canonical, start_dt)
     filtered = filter_news_items_by_date(articles, start_date=start_dt, end_date=end_dt)
+    if not filtered:
+        coverage = _format_coverage_note(oldest_pub_date, newest_pub_date)
+        raise VendorTransientError(
+            f"Yahoo news unavailable for {ticker} between {start_date} and {end_date}{coverage}; "
+            "recent feed/search samples cannot establish an absence of news in this window"
+        )
     return filtered[:_MAX_FILTERED_TICKER_ARTICLES], oldest_pub_date, newest_pub_date
 
 
@@ -167,7 +210,7 @@ def get_company_news_yfinance(
             f"{ticker} Company News, from {start_date} to {end_date}",
             filtered,
             max_items=_MAX_FILTERED_TICKER_ARTICLES,
-        )
+        ) + "\n\nCoverage: recent Yahoo feed/search sample; not an exhaustive news archive."
     except Exception as exc:
         return f"Error fetching news for {ticker}: {exc}"
 
@@ -201,16 +244,11 @@ def fetch_macro_news_yfinance(
         search_news = getattr(search, "news", None) or []
         batch = [normalize_yfinance_article(article, country=country) for article in search_news]
         all_news.extend(batch)
-        if len(all_news) >= limit * len(_get_query_preset(region)):
-            break
 
-    filtered = []
-    for item in dedupe_news_items(all_news):
-        if item.published_at:
-            published = item.published_at.replace(tzinfo=None)
-            if published < start_dt or published > curr_dt + relativedelta(days=1):
-                continue
-        filtered.append(item)
+    filtered = filter_news_items_by_date(
+        dedupe_news_items(all_news), start_date=start_dt,
+        end_date=curr_dt + relativedelta(days=1),
+    )
 
     filtered.sort(
         key=lambda article: article.published_at.timestamp() if article.published_at else float("-inf"),

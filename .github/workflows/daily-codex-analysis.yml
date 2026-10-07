@@ -244,6 +244,9 @@ jobs:
       TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"
+      # Exact role models are exported by preflight; do not enable optional summaries.
+      TRADINGAGENTS_CODEX_MODEL: ""
+      TRADINGAGENTS_EXECUTION_LLM_SUMMARY_MODEL: ""
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       PRISM_TELEGRAM_MODE: ${{ vars.PRISM_TELEGRAM_MODE || 'user_session' }}
       PRISM_TELEGRAM_DOWNLOAD_PDFS: ${{ vars.PRISM_TELEGRAM_DOWNLOAD_PDFS || 'true' }}
@@ -531,9 +534,9 @@ jobs:
           workspace_dir = Path(os.environ["GITHUB_WORKSPACE"]) / ".codex-preflight"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
-          preferred_deep_model = "gpt-6-sol"
-          preferred_quick_model = "gpt-6-sol"
-          preferred_output_model = "gpt-6-sol"
+          preferred_deep_model = "gpt-6.1-sol"
+          preferred_quick_model = "gpt-6.1-sol"
+          preferred_output_model = "gpt-6.1-sol"
           deep_fallback_models = codex_preflight_fallback_models("deep")
           efficient_fallback_models = codex_preflight_fallback_models("quick")
 
@@ -603,8 +606,8 @@ jobs:
               raise SystemExit(1)
           except CodexModelUnavailableError as exc:
               message = (
-                  "No configured Codex model or fallback model is available for the runner. "
-                  "Update the Codex installation/account or adjust the fallback list."
+                  "Required Codex model gpt-6.1-sol is unavailable for the runner. "
+                  "Update the Codex installation/account; automatic model fallback is disabled."
               )
               print(f"::error::{message}")
               print(exc)
@@ -619,24 +622,15 @@ jobs:
               )
               raise SystemExit(1)
 
-          if deep_result.fallback_used:
-              warning = (
-                  f"Preferred deep/judge Codex model {deep_result.requested_model} is not available on this runner; "
-                  f"using {deep_result.resolved_model} from model/list."
-              )
-              print(f"::warning::{warning}")
-          if quick_result.fallback_used:
-              warning = (
-                  f"Preferred quick Codex model {quick_result.requested_model} is not available on this runner; "
-                  f"using {quick_result.resolved_model} from model/list."
-              )
-              print(f"::warning::{warning}")
-          if output_result.fallback_used:
-              warning = (
-                  f"Preferred output/writer Codex model {output_result.requested_model} is not available on this runner; "
-                  f"using {output_result.resolved_model} from model/list."
-              )
-              print(f"::warning::{warning}")
+          for role, expected, result in (
+              ("deep/judge", preferred_deep_model, deep_result),
+              ("quick", preferred_quick_model, quick_result),
+              ("output/writer", preferred_output_model, output_result),
+          ):
+              if result.fallback_used or result.resolved_model != expected:
+                  raise SystemExit(
+                      f"Required {role} model {expected} was not selected; model fallback is disabled."
+                  )
 
           if github_env:
               with open(github_env, "a", encoding="utf-8") as handle:
@@ -838,6 +832,9 @@ jobs:
       TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"
+      # Exact role models are exported by preflight; do not enable optional summaries.
+      TRADINGAGENTS_CODEX_MODEL: ""
+      TRADINGAGENTS_EXECUTION_LLM_SUMMARY_MODEL: ""
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       PRISM_TELEGRAM_MODE: ${{ vars.PRISM_TELEGRAM_MODE || 'user_session' }}
       PRISM_TELEGRAM_DOWNLOAD_PDFS: ${{ vars.PRISM_TELEGRAM_DOWNLOAD_PDFS || 'true' }}
@@ -1168,9 +1165,9 @@ jobs:
           workspace_dir = Path(os.environ["GITHUB_WORKSPACE"]) / ".codex-preflight"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
-          preferred_deep_model = "gpt-6-sol"
-          preferred_quick_model = "gpt-6-sol"
-          preferred_output_model = "gpt-6-sol"
+          preferred_deep_model = "gpt-6.1-sol"
+          preferred_quick_model = "gpt-6.1-sol"
+          preferred_output_model = "gpt-6.1-sol"
           deep_fallback_models = codex_preflight_fallback_models("deep")
           efficient_fallback_models = codex_preflight_fallback_models("quick")
 
@@ -1240,8 +1237,8 @@ jobs:
               raise SystemExit(1)
           except CodexModelUnavailableError as exc:
               message = (
-                  "No configured Codex model or fallback model is available for the runner. "
-                  "Update the Codex installation/account or adjust the fallback list."
+                  "Required Codex model gpt-6.1-sol is unavailable for the runner. "
+                  "Update the Codex installation/account; automatic model fallback is disabled."
               )
               print(f"::error::{message}")
               print(exc)
@@ -1256,24 +1253,15 @@ jobs:
               )
               raise SystemExit(1)
 
-          if deep_result.fallback_used:
-              warning = (
-                  f"Preferred deep/judge Codex model {deep_result.requested_model} is not available on this runner; "
-                  f"using {deep_result.resolved_model} from model/list."
-              )
-              print(f"::warning::{warning}")
-          if quick_result.fallback_used:
-              warning = (
-                  f"Preferred quick Codex model {quick_result.requested_model} is not available on this runner; "
-                  f"using {quick_result.resolved_model} from model/list."
-              )
-              print(f"::warning::{warning}")
-          if output_result.fallback_used:
-              warning = (
-                  f"Preferred output/writer Codex model {output_result.requested_model} is not available on this runner; "
-                  f"using {output_result.resolved_model} from model/list."
-              )
-              print(f"::warning::{warning}")
+          for role, expected, result in (
+              ("deep/judge", preferred_deep_model, deep_result),
+              ("quick", preferred_quick_model, quick_result),
+              ("output/writer", preferred_output_model, output_result),
+          ):
+              if result.fallback_used or result.resolved_model != expected:
+                  raise SystemExit(
+                      f"Required {role} model {expected} was not selected; model fallback is disabled."
+                  )
 
           if github_env:
               with open(github_env, "a", encoding="utf-8") as handle:

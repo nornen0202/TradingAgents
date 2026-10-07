@@ -617,7 +617,7 @@ def test_market_packet_distinguishes_runtime_observed_analysis_from_configured_w
     assert provenance["market_analysis"]["verification_status"] == "RUNTIME_USAGE_OBSERVED"
     assert provenance["market_analysis"]["observed_calls"] == 9
     assert "gpt-5.6-sol" in provenance["market_analysis"]["observed_models"]
-    assert provenance["work_synthesis"]["requested_model"] == "gpt-6-sol"
+    assert provenance["work_synthesis"]["requested_model"] == "gpt-6.1-sol"
     assert provenance["work_synthesis"]["verification_status"] == "CONFIGURED_NOT_RUNTIME_VERIFIED"
     assert provenance["work_synthesis"]["observed_model"] is None
 
@@ -2718,7 +2718,7 @@ def test_scheduled_work_task_manifest_uses_gpt6_local_mode_and_unique_surfaces()
     manifest = json.loads(Path("config/chatgpt_work_tasks.json").read_text(encoding="utf-8"))
 
     assert manifest["execution_mode"] == "local"
-    assert manifest["model"] == "gpt-6-sol"
+    assert manifest["model"] == "gpt-6.1-sol"
     assert manifest["reasoning_effort"] == "xhigh"
     boundary = manifest["capability_boundary"]
     assert boundary["local_archives_require_local_host"] is True

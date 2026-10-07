@@ -17,6 +17,8 @@ def save_report_bundle(
     *,
     generated_at: dt.datetime | None = None,
     language: str = "English",
+    settings: Mapping[str, Any] | None = None,
+    html: bool = True,
 ) -> Path:
     """Persist a complete TradingAgents report bundle to disk."""
 
@@ -135,7 +137,30 @@ def save_report_bundle(
 
     header = f"# {labels['report_title']}: {ticker}\n\n" + "\n".join(metadata_lines) + "\n\n"
     complete_report = save_path / "complete_report.md"
-    _write_text(complete_report, header + "\n\n".join(sections))
+    from tradingagents.report_settings import public_run_settings
+
+    public_settings = public_run_settings(settings)
+    if public_settings:
+        settings_json = json.dumps(public_settings, ensure_ascii=False, indent=2, allow_nan=False)
+        _write_text(save_path / "run_settings.json", settings_json + "\n")
+        # A model name may contain backticks; it must not close the JSON fence.
+        fence = "`" * max(3, 1 + max((len(m.group()) for m in re.finditer(r"`+", settings_json)), default=0))
+        title = "실행 설정" if labels["language"] == "Korean" else "Run settings"
+        sections.append(f"## {title}\n\n{fence}json\n{settings_json}\n{fence}")
+    else:
+        # Reusing an output directory must not attribute an earlier run's
+        # settings to a run whose caller supplied none.
+        (save_path / "run_settings.json").unlink(missing_ok=True)
+    report_text = header + "\n\n".join(sections)
+    _write_text(complete_report, report_text)
+    if html:
+        from tradingagents.report_html import render_report_html
+
+        _write_text(save_path / "complete_report.html", render_report_html(
+            report_text, title=f"{labels['report_title']}: {ticker}", language=language,
+        ))
+    else:
+        (save_path / "complete_report.html").unlink(missing_ok=True)
     return complete_report
 
 

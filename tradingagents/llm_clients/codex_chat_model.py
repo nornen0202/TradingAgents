@@ -85,6 +85,7 @@ class CodexChatModel(BaseChatModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     _session: CodexAppServerSession | None = PrivateAttr(default=None)
+    _generation_lock: threading.RLock = PrivateAttr(default_factory=threading.RLock)
     _session_lock: threading.Lock = PrivateAttr(default_factory=threading.Lock)
     _preflight_lock: threading.Lock = PrivateAttr(default_factory=threading.Lock)
     _preflight_done: bool = PrivateAttr(default=False)
@@ -150,12 +151,26 @@ class CodexChatModel(BaseChatModel):
         return self.bind(tools=normalized_tools, tool_choice=tool_choice, **kwargs)
 
     def close(self) -> None:
-        with self._session_lock:
+        with self._generation_lock, self._session_lock:
             if self._session is not None:
                 self._session.close()
                 self._session = None
 
     def _generate(
+        self,
+        messages: list[BaseMessage],
+        stop: list[str] | None = None,
+        run_manager=None,
+        **kwargs: Any,
+    ) -> ChatResult:
+        # A failed turn may replace the shared stdio session. Keep its recovery
+        # inside the same lock so another analyst cannot start on that session
+        # between the failed invocation and close/retry. RLock permits close()
+        # from the recovery path while also protecting external shutdown.
+        with self._generation_lock:
+            return self._generate_locked(messages, stop=stop, run_manager=run_manager, **kwargs)
+
+    def _generate_locked(
         self,
         messages: list[BaseMessage],
         stop: list[str] | None = None,

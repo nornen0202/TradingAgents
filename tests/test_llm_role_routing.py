@@ -54,6 +54,16 @@ def test_action_judge_uses_sol_with_judge_effort():
     assert create_client.call_args.kwargs["model_role"] == "judge"
 
 
+def test_action_judge_without_configured_models_uses_current_codex_default():
+    with patch("tradingagents.portfolio.action_judge.create_llm_client") as create_client:
+        create_client.return_value.get_llm.return_value = object()
+        _create_action_llm(SimpleNamespace(provider="codex", codex_judge_reasoning_effort="xhigh"))
+
+    assert create_client.call_args.kwargs["model"] == "gpt-6.1-sol"
+    assert create_client.call_args.kwargs["codex_reasoning_effort"] == "xhigh"
+    assert create_client.call_args.kwargs["model_role"] == "judge"
+
+
 def test_semantic_judge_uses_sol_with_judge_effort():
     with patch(
         "tradingagents.portfolio.semantic_judge.create_llm_client"

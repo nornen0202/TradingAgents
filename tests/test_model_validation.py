@@ -2,7 +2,7 @@
 import warnings
 
 from tradingagents.llm_clients.base_client import BaseLLMClient
-from tradingagents.llm_clients.model_catalog import get_known_models
+from tradingagents.llm_clients.model_catalog import get_known_models, get_model_options
 from tradingagents.llm_clients.validators import validate_model
 
 
@@ -73,3 +73,9 @@ class ModelValidationTests(unittest.TestCase):
         for provider in ("openai", "codex"):
             with self.subTest(provider=provider):
                 self.assertTrue(validate_model(provider, "gpt-6-sol"))
+
+    def test_gpt_6_1_sol_is_the_preferred_codex_model(self):
+        self.assertTrue(validate_model("codex", "gpt-6.1-sol"))
+        for mode in ("quick", "deep"):
+            with self.subTest(mode=mode):
+                self.assertEqual(get_model_options("codex", mode)[0][1], "gpt-6.1-sol")

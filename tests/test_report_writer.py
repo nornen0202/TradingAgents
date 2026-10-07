@@ -69,6 +69,15 @@ def _structured_decision():
 
 
 class ReportWriterTests(unittest.TestCase):
+    def test_writer_without_configured_models_uses_current_codex_default(self):
+        with patch("tradingagents.report_writer.create_llm_client") as create_client:
+            create_client.return_value.get_llm.return_value = object()
+            _create_writer_llm(SimpleNamespace(provider="codex", codex_writer_reasoning_effort="high"))
+
+        self.assertEqual(create_client.call_args.kwargs["model"], "gpt-6.1-sol")
+        self.assertEqual(create_client.call_args.kwargs["codex_reasoning_effort"], "high")
+        self.assertEqual(create_client.call_args.kwargs["model_role"], "writer")
+
     def test_writer_prefers_dedicated_luna_model_for_low_risk_polishing(self):
         settings = _llm_settings()
         settings.quick_model = "gpt-5.4-mini"

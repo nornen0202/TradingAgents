@@ -132,7 +132,7 @@ def filter_financials_by_date(data: pd.DataFrame, curr_date: str) -> pd.DataFram
     """
     if not curr_date or data.empty:
         return data
-    if get_config().get("point_in_time_strict", False) and is_historical(curr_date):
+    if is_historical(curr_date):
         # Yahoo exposes fiscal period ends, not historical filing vintages.
         return data.iloc[:, :0]
     cutoff = pd.Timestamp(curr_date)

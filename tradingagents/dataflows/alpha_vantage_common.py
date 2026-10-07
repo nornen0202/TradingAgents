@@ -7,7 +7,7 @@ from io import StringIO
 
 from .api_keys import get_api_key as get_documented_api_key
 from .config import get_config
-from .vendor_exceptions import VendorConfigurationError, VendorTransientError
+from .vendor_exceptions import VendorConfigurationError, VendorTransientError, VendorMalformedResponseError
 
 API_BASE_URL = "https://www.alphavantage.co/query"
 
@@ -39,7 +39,7 @@ def format_datetime_for_api(date_input) -> str:
     else:
         raise ValueError(f"Date must be string or datetime object, got {type(date_input)}")
 
-class AlphaVantageRateLimitError(Exception):
+class AlphaVantageRateLimitError(VendorTransientError):
     """Exception raised when Alpha Vantage API rate limit is exceeded."""
     pass
 
@@ -74,22 +74,31 @@ def _make_api_request(function_name: str, params: dict) -> dict | str:
             timeout=float(get_config().get("vendor_timeout", 15)),
         )
         response.raise_for_status()
-    except requests.RequestException as exc:
-        raise VendorTransientError(f"Alpha Vantage request failed: {exc}") from exc
+    except requests.RequestException:
+        # Request exceptions can contain the full URL, including the API key.
+        raise VendorTransientError("Alpha Vantage request failed (network or HTTP error).") from None
 
     response_text = response.text
     
-    # Check if response is JSON (error responses are typically JSON)
+    # Error responses are JSON even when CSV data was requested. Never pass an
+    # API rejection to an analyst as if it were financial evidence.
     try:
         response_json = json.loads(response_text)
-        # Check for rate limit error
-        if "Information" in response_json:
-            info_message = response_json["Information"]
-            if "rate limit" in info_message.lower() or "api key" in info_message.lower():
-                raise AlphaVantageRateLimitError(f"Alpha Vantage rate limit exceeded: {info_message}")
     except json.JSONDecodeError:
-        # Response is not JSON (likely CSV data), which is normal
-        pass
+        return response_text
+
+    if not isinstance(response_json, dict):
+        raise VendorMalformedResponseError("Alpha Vantage returned an unexpected JSON payload.")
+    notice = response_json.get("Information") or response_json.get("Note")
+    if notice:
+        low = str(notice).lower()
+        if any(marker in low for marker in ("rate limit", "requests per day", "call frequency", "premium")):
+            raise AlphaVantageRateLimitError("Alpha Vantage rate limit or subscription limit exceeded.")
+        if "api key" in low or "apikey" in low:
+            raise VendorConfigurationError("Alpha Vantage API key is invalid or missing.")
+        raise VendorTransientError("Alpha Vantage returned a service notice instead of data.")
+    if "Error Message" in response_json:
+        raise VendorTransientError("Alpha Vantage rejected the request.")
 
     return response_text
 
@@ -127,7 +136,6 @@ def _filter_csv_by_date_range(csv_data: str, start_date: str, end_date: str) -> 
         # Convert back to CSV string
         return filtered_df.to_csv(index=False)
 
-    except Exception as e:
-        # If filtering fails, return original data with a warning
-        print(f"Warning: Failed to filter CSV data by date range: {e}")
-        return csv_data
+    except Exception:
+        # Returning the original full series here would leak future prices.
+        raise VendorMalformedResponseError("Alpha Vantage price dates could not be filtered safely.") from None

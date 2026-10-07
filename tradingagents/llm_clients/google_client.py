@@ -26,7 +26,8 @@ class GoogleClient(BaseLLMClient):
     def get_llm(self) -> Any:
         """Return configured ChatGoogleGenerativeAI instance."""
         self.warn_if_unknown_model()
-        llm_kwargs = {"model": self.model}
+        # Bound stalled Gemini requests just as the other hosted clients do.
+        llm_kwargs = {"model": self.model, "timeout": 600.0}
         if self.kwargs.get("max_tokens") is not None:
             llm_kwargs["max_output_tokens"] = self.kwargs["max_tokens"]
 

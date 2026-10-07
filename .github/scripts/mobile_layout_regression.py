@@ -161,13 +161,31 @@ def _chrome_binary() -> Path:
 def _devtools_endpoint(profile: Path, *, timeout_seconds: float = 15.0) -> tuple[int, str]:
     marker = profile / "DevToolsActivePort"
     deadline = time.monotonic() + timeout_seconds
+    last_observation = "marker not created"
     while time.monotonic() < deadline:
-        if marker.is_file():
+        try:
             lines = marker.read_text(encoding="utf-8").splitlines()
-            if len(lines) >= 2:
-                return int(lines[0]), lines[1]
-        time.sleep(0.1)
-    raise RuntimeError("Chrome DevToolsActivePort was not created")
+        except (FileNotFoundError, PermissionError) as exc:
+            # Chrome can create/replace this file before releasing its Windows
+            # write handle. Poll the same startup within the original deadline.
+            last_observation = type(exc).__name__
+        else:
+            last_observation = "incomplete marker"
+            if len(lines) >= 2 and lines[1].startswith("/devtools/browser/") and lines[1].removeprefix("/devtools/browser/"):
+                try:
+                    port = int(lines[0])
+                except ValueError:
+                    pass
+                else:
+                    if 0 < port <= 65535:
+                        return port, lines[1]
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            time.sleep(min(0.1, remaining))
+    raise RuntimeError(
+        f"Chrome DevToolsActivePort was not created or readable within {timeout_seconds:g}s "
+        f"(last observation: {last_observation})"
+    )
 
 
 async def _cdp_call(socket: Any, call_id: int, method: str, params: dict[str, Any] | None = None) -> dict[str, Any]:

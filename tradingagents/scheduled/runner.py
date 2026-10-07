@@ -1136,7 +1136,15 @@ def _parallel_ticker_execution_summary(config: ScheduledAnalysisConfig, *, enabl
 def _effective_parallel_worker_count(*, config: ScheduledAnalysisConfig, ticker_count: int) -> tuple[int, str | None]:
     requested = max(1, int(getattr(config.run, "max_parallel_tickers", 1) or 1))
     effective = min(requested, max(1, ticker_count))
-    if str(getattr(config.llm, "provider", "") or "").strip().lower() != "codex":
+    shared_provider = str(getattr(config.llm, "provider", "") or "").strip().lower()
+    providers = {
+        str(getattr(config.llm, f"{tier}_think_provider", None) or shared_provider).strip().lower()
+        for tier in ("quick", "deep", "output")
+    }
+    # The ticker's optional report writer still uses the shared provider.
+    if getattr(config.run, "report_polisher_enabled", True):
+        providers.add(shared_provider)
+    if "codex" not in providers:
         return effective, None
 
     cap = _codex_parallel_ticker_cap()
@@ -1827,10 +1835,11 @@ def _run_single_ticker(
         analysis_date = ticker_started.astimezone(ZoneInfo(resolve_instrument(ticker).timezone)).date().isoformat()
         trade_date = trade_date_override or resolve_trade_date(ticker, config)
         stats_handler = StatsCallbackHandler()
+        graph_config = _graph_config(config, engine_results_dir)
         graph = TradingAgentsGraph(
             config.run.analysts,
             debug=False,
-            config=_graph_config(config, engine_results_dir),
+            config=graph_config,
             callbacks=[stats_handler, observation_recorder],
         )
         final_state, decision = graph.propagate(
@@ -1856,6 +1865,7 @@ def _run_single_ticker(
             report_dir,
             generated_at=ticker_started,
             language=config.run.output_language,
+            settings={**graph_config, "analysts": list(config.run.analysts)},
         )
         final_state_path = ticker_dir / "final_state.json"
         _write_json(final_state_path, _serialize_final_state(final_state))
@@ -2160,6 +2170,12 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     graph_config = deepcopy(DEFAULT_CONFIG)
     graph_config["results_dir"] = str(engine_results_dir)
     graph_config["llm_provider"] = config.llm.provider
+    for tier in ("quick", "deep", "output"):
+        for suffix in ("provider", "backend_url"):
+            key = f"{tier}_think_{suffix}"
+            graph_config[key] = getattr(config.llm, key)
+    graph_config["parallel_analysts"] = config.run.parallel_analysts
+    graph_config["analyst_max_concurrency"] = config.run.analyst_max_concurrency
     graph_config["quick_think_llm"] = config.llm.quick_model
     graph_config["deep_think_llm"] = config.llm.deep_model
     graph_config["output_think_llm"] = config.llm.output_model
@@ -2266,6 +2282,9 @@ def _serialize_final_state(final_state: dict[str, Any]) -> dict[str, Any]:
 def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
     return {
         "provider": config.llm.provider,
+        "quick_think_provider": config.llm.quick_think_provider or config.llm.provider,
+        "deep_think_provider": config.llm.deep_think_provider or config.llm.provider,
+        "output_think_provider": config.llm.output_think_provider or config.llm.provider,
         "quick_model": config.llm.quick_model,
         "deep_model": config.llm.deep_model,
         "output_model": config.llm.output_model,
@@ -2292,6 +2311,8 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "max_runtime_minutes": config.run.max_runtime_minutes,
         "min_remaining_minutes_for_next_ticker": config.run.min_remaining_minutes_for_next_ticker,
         "parallel_ticker_execution": config.run.parallel_ticker_execution,
+        "parallel_analysts": config.run.parallel_analysts,
+        "analyst_max_concurrency": config.run.analyst_max_concurrency,
         "max_parallel_tickers": config.run.max_parallel_tickers,
         "per_ticker_timeout_minutes": config.run.per_ticker_timeout_minutes,
         "codex_circuit_breaker_enabled": config.run.codex_circuit_breaker_enabled,
