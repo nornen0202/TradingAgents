@@ -18,6 +18,10 @@ def test_daily_configs_keep_full_depth_while_production_universe_is_capped():
         payload = _load_toml(path)
         run = payload["run"]
         llm = payload["llm"]
+        assert llm["provider"] == "codex", path
+        for role in ("quick", "deep", "output", "writer", "judge"):
+            assert llm[f"{role}_model"] == "gpt-6.1-sol", path
+        assert llm["codex_fallback_on_app_server_error"] is False, path
         performance = payload["portfolio_performance"]
         summary_image = payload["summary_image"]
 

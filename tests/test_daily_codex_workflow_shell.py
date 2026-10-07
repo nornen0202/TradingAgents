@@ -187,6 +187,10 @@ def test_daily_analysis_preflight_and_runtime_both_preserve_requested_quality():
     )
     assert workflow.count('codex_preflight_fallback_models("deep")') == 2
     assert workflow.count('codex_preflight_fallback_models("quick")') == 2
+    for role in ("deep", "quick", "output"):
+        assert workflow.count(f'preferred_{role}_model = "gpt-6.1-sol"') == 2
+    assert workflow.count('TRADINGAGENTS_CODEX_MODEL: ""') == 2
+    assert workflow.count('TRADINGAGENTS_EXECUTION_LLM_SUMMARY_MODEL: ""') == 2
     assert 'os.getenv("TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK", "1")' not in workflow
 
 

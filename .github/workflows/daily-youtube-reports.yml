@@ -111,6 +111,9 @@ jobs:
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"
       TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"
+      # YouTube role models are exported by preflight; keep base-site summaries optional.
+      TRADINGAGENTS_CODEX_MODEL: ""
+      TRADINGAGENTS_EXECUTION_LLM_SUMMARY_MODEL: ""
       TRADINGAGENTS_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_ARCHIVE_DIR }}
       TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
       TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
@@ -452,7 +455,7 @@ jobs:
           try:
               judge_result = run_codex_preflight(
                   codex_binary=os.environ.get("CODEX_BINARY") or None,
-                  model="gpt-6-sol",
+                  model="gpt-6.1-sol",
                   request_timeout=30.0,
                   workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
                   cleanup_threads=True,
@@ -460,7 +463,7 @@ jobs:
               )
               quick_result = run_codex_preflight(
                   codex_binary=os.environ.get("CODEX_BINARY") or None,
-                  model="gpt-6-sol",
+                  model="gpt-6.1-sol",
                   request_timeout=30.0,
                   workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
                   cleanup_threads=True,
@@ -468,7 +471,7 @@ jobs:
               )
               writer_result = run_codex_preflight(
                   codex_binary=os.environ.get("CODEX_BINARY") or None,
-                  model="gpt-6-sol",
+                  model="gpt-6.1-sol",
                   request_timeout=30.0,
                   workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
                   cleanup_threads=True,
@@ -479,7 +482,17 @@ jobs:
           except CodexAppServerBinaryError as exc:
               raise SystemExit(f"Codex binary is not usable: {exc}") from exc
           except CodexModelUnavailableError as exc:
-              raise SystemExit(f"No configured GPT-5.6 role model or compatibility fallback is available: {exc}") from exc
+              raise SystemExit(f"Required Codex model gpt-6.1-sol is unavailable; automatic model fallback is disabled: {exc}") from exc
+
+          for role, result in (
+              ("judge/synthesis", judge_result),
+              ("extraction/research", quick_result),
+              ("writer", writer_result),
+          ):
+              if result.fallback_used or result.resolved_model != "gpt-6.1-sol":
+                  raise SystemExit(
+                      f"Required YouTube {role} model gpt-6.1-sol was not selected; model fallback is disabled."
+                  )
 
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:
               handle.write("TRADINGAGENTS_CODEX_PREFLIGHT_OK=1\n")
@@ -493,16 +506,6 @@ jobs:
           print("YouTube extraction/research model:", quick_result.resolved_model)
           print("YouTube writer model:", writer_result.resolved_model)
           print("YouTube cross-video synthesis model:", judge_result.resolved_model)
-          for role, result in (
-              ("judge", judge_result),
-              ("extraction/research", quick_result),
-              ("writer", writer_result),
-          ):
-              if result.fallback_used:
-                  print(
-                      f"::warning::Preferred YouTube {role} model {result.requested_model} is unavailable; "
-                      f"using compatibility model {result.resolved_model}."
-                  )
 
       - name: Rebuild base scheduled site
         if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}

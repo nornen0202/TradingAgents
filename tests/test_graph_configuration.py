@@ -92,9 +92,9 @@ class GraphConfigurationTests(unittest.TestCase):
 
         calls = create_client.call_args_list
         self.assertEqual([call.kwargs["model"] for call in calls], [
-            "gpt-6-sol",
-            "gpt-6-sol",
-            "gpt-6-sol",
+            "gpt-6.1-sol",
+            "gpt-6.1-sol",
+            "gpt-6.1-sol",
         ])
         self.assertEqual([call.kwargs["model_role"] for call in calls], ["deep", "quick", "output"])
         self.assertEqual(

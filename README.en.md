@@ -66,11 +66,11 @@ The base config lives in [tradingagents/default_config.py](tradingagents/default
 
 Current default model roles on `main` are:
 
-- `quick_think_llm`: `gpt-6-sol`
-- `deep_think_llm`: `gpt-6-sol`
-- `output_think_llm`: `gpt-6-sol`
+- `quick_think_llm`: `gpt-6.1-sol`
+- `deep_think_llm`: `gpt-6.1-sol`
+- `output_think_llm`: `gpt-6.1-sol`
 
-Scheduled analysis further separates `writer_model=gpt-6-sol` and `judge_model=gpt-6-sol`. Default reasoning effort is quick/writer=`high`, deep/judge=`xhigh`, output=`medium`.
+Scheduled analysis further separates `writer_model=gpt-6.1-sol` and `judge_model=gpt-6.1-sol`. Default reasoning effort is quick/writer=`high`, deep/judge=`xhigh`, output=`medium`.
 
 Example:
 
@@ -80,9 +80,9 @@ from tradingagents.default_config import DEFAULT_CONFIG
 
 config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
-config["quick_think_llm"] = "gpt-6-sol"
-config["deep_think_llm"] = "gpt-6-sol"
-config["output_think_llm"] = "gpt-6-sol"
+config["quick_think_llm"] = "gpt-6.1-sol"
+config["deep_think_llm"] = "gpt-6.1-sol"
+config["output_think_llm"] = "gpt-6.1-sol"
 
 graph = TradingAgentsGraph(debug=True, config=config)
 final_state, decision = graph.propagate("NVDA", "2026-01-15")
@@ -221,6 +221,8 @@ On Windows, you can override binary discovery explicitly:
 ```powershell
 $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 ```
+
+Use a Codex CLI that lists `gpt-6.1-sol`. Authentication, exact model selection and a real response were verified with official `@openai/codex 0.161.0`. An older CLI bundled with the desktop app can fail independently of the model selected in the app. The interactive/headless CLI reads the project `.env`; scheduled processes use their environment or the GitHub repository's `CODEX_BINARY` variable. Reopen existing terminals after changing the environment variable.
 
 ## Scheduled Analysis and Static Reports
 

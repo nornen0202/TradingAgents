@@ -26,7 +26,7 @@
 | 실행 간 설정 격리 | 모듈 전역 데이터 공급자 설정을 덮어씀 | context-local 설정과 명시적 실행 wrapper로 서로 다른 그래프를 격리 |
 | 패키지 레이아웃 재편 | 기존 import가 예약·계좌·PRISM·YouTube까지 넓게 연결 | 보류. 기능적 이익 없이 대규모 호환성 비용 발생 |
 | Jev 게시물 분류 | 현재 social 경로는 Yahoo/Naver 뉴스 기반 대체 정보 | 보류. Reddit/StockTwits 원문 수집이 없는 상태에서는 게시물 전용 분류 적용 대상이 없음 |
-| Sol/Luna 기본 모델 | 이미 Codex `gpt-6-sol`, 역할별 추론 강도 정책 운영 | 기본 모델 유지. 비용 절약을 위한 Luna 변경은 새 tier 설정으로 선택 가능 |
+| Sol/Luna 기본 모델 | 기존 Codex `gpt-6-sol`, 역할별 추론 강도 정책 운영 | 현재 공식 Codex 모델 `gpt-6.1-sol`로 모든 활성 기본 역할을 갱신. 기존 역할별 추론 강도와 모델 자동 대체 금지 유지 |
 
 ## 데이터 정확도와 장애 처리
 
@@ -87,17 +87,21 @@ analyst_max_concurrency = 2
 
 [llm]
 provider = "codex"
-quick_think_provider = "openai"
-quick_model = "gpt-6-luna"
+quick_think_provider = "codex"
+quick_model = "gpt-6.1-sol"
 deep_think_provider = "codex"
-deep_model = "gpt-6-sol"
+deep_model = "gpt-6.1-sol"
 output_think_provider = "codex"
-output_model = "gpt-6-sol"
+output_model = "gpt-6.1-sol"
 ```
 
 제공자별 자격 증명은 기존 설정 경로를 사용한다. 필요할 때 `quick_think_backend_url`, `deep_think_backend_url`, `output_think_backend_url`을 지정할 수 있다. 공통 endpoint를 다른 제공자에 자동 전달하지 않는다. Ollama·OpenRouter·xAI도 명시적 endpoint를 우선한다. Codex 전용 모델 환경변수는 실제 Codex 역할에만 적용하고, 공유 제공자가 다른 경우에도 Codex 역할이 있으면 기존 프로세스 수 제한을 유지한다. endpoint·인증키·로컬 경로는 공개 보고서 설정에서 제외한다.
 
 ## 보고서 보안과 재현성
+
+프로젝트 기본 모델은 **Codex `gpt-6.1-sol`**이다. 분석 quick/deep/output, 보고서 writer, judge, 계좌 판단, YouTube 추출·검증·종합 및 예약 워크플로의 선호 모델을 함께 변경한다. [공식 Codex 모델 문서](https://learn.chatgpt.com/docs/models#recommended-models)의 정확한 모델 ID를 사용한다. 과거 기록이나 사용자가 명시적으로 선택할 수 있는 호환 모델 목록은 과거 모델을 유지할 수 있지만 현재 기본값과는 구별한다. 실행 환경의 자격 및 모델 가용성 검사는 기존 preflight를 사용하며, 모델이 없을 때 다른 모델로 조용히 대체하지 않는다.
+
+실제 실행 환경도 확인했다. 기존 `codex-cli 0.156.1`의 모델 목록에는 요청 모델이 없어 사전검사가 실패했다. 공식 `@openai/codex 0.161.0`을 프로젝트의 무시된 `.runtime/codex-cli`에 별도 설치하고, 프로젝트 `.env`, 기존 사용자 `CODEX_BINARY` 환경변수와 GitHub 저장소의 같은 변수를 새 실행 파일로 연결했다. 데스크톱 앱 실행 파일이나 Codex 전역 설정 파일은 변경하지 않았다. 새 프로세스에서 정확한 모델의 인증·가용성 확인과 프로젝트 `CodexClient`를 통한 짧은 응답 검증이 성공했고 모델 대체는 없었다. 기존 터미널은 이전 환경변수를 보유할 수 있으므로 다시 열어야 한다. 이미 진행 중인 분석은 중단하지 않았다.
 
 HTML은 외부 스크립트·이미지·스타일시트 없이 읽을 수 있는 단일 파일이다. 모델이 출력한 HTML은 escape하고, 링크는 HTTP(S)/문서 내부 앵커만 허용하며 CSP로 실행·외부 자원 로딩을 제한한다. 기존 Markdown 반환 경로와 섹션 파일을 유지한다. 설정은 종합 보고서 부록과 별도 JSON에 기록하고 섹션 조각의 기존 형식은 유지한다.
 
@@ -113,6 +117,8 @@ HTML은 외부 스크립트·이미지·스타일시트 없이 읽을 수 있는
 
 ## 검증
 
-외부 LLM이나 실제 투자 판단을 호출하지 않는 단위·통합 회귀 검사를 사용한다. Yahoo 장애/태그/날짜 경계, SEC 수정공시/기간/단위, 공급자 대체, 실행 설정 격리, 병렬 완료 장벽, 체크포인트, CLI 비대화형 동작, 한국어 보고서와 HTML 안전성, 예약 설정 전달을 검증한다.
+GitHub의 기존 Dependabot 경고 13건은 잠금 파일의 네 패키지에 해당했다. 전체 의존성을 일괄 갱신하지 않고 보고된 수정 버전인 `langgraph-sdk 0.4.4`, `multidict 6.9.1`, `pypdf 6.19.0`, `urllib3 2.8.0`만 잠금 파일에 반영했다. 새 HTML 렌더링의 `markdown-it-py`는 기존 전이 의존성을 명시적 의존성으로 선언했다.
+
+단위·통합 회귀 검사에서는 외부 LLM과 실제 투자 판단을 호출하지 않는다. Yahoo 장애/태그/날짜 경계, SEC 수정공시/기간/단위, 공급자 대체, 실행 설정 격리, 병렬 완료 장벽, 체크포인트, CLI 비대화형 동작, 한국어 보고서와 HTML 안전성, 예약 설정 전달을 검증한다. 모델 전환에 한해 실제 `gpt-6.1-sol`로 고정 문구를 반환하는 짧은 연결 검사를 별도로 수행했다. 투자 분석이나 주문은 실행하지 않았다.
 
 360·390·430px 모바일 화면, 전략 상호작용, 보고서 탐색의 기존 브라우저 회귀 검사가 통과했다. 새 HTML은 360px/1440px에서 긴 한국어 제목·표·목차, 가로 넘침, 스크립트 및 외부 자원 미로딩을 확인했다. 로컬 전체 검사에서는 이 변경과 관계없는 저장공간 정리 테스트 2개가 실제 Windows Runner.Worker의 경로 조회 제한 때문에 안전하게 정리를 중단하여 실패한다. 운영 보호장치를 우회하거나 실제 작업자를 중단하지 않으며, 최종 전체 검사와 GitHub CI 결과는 PR 본문에 기록한다.

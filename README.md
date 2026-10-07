@@ -120,13 +120,13 @@ docker compose --profile ollama run --rm tradingagents-ollama
 
 최신 `main` 기준 기본 모델 역할은 아래와 같습니다.
 
-- `quick_think_llm`: `gpt-6-sol`
-- `deep_think_llm`: `gpt-6-sol`
-- `output_think_llm`: `gpt-6-sol`
+- `quick_think_llm`: `gpt-6.1-sol`
+- `deep_think_llm`: `gpt-6.1-sol`
+- `output_think_llm`: `gpt-6.1-sol`
 
-스케줄 분석은 `writer_model=gpt-6-sol`, `judge_model=gpt-6-sol`을 추가로 분리합니다. 기본 reasoning effort는 quick/writer=`high`, deep/judge=`xhigh`, output=`medium`입니다.
+스케줄 분석은 `writer_model=gpt-6.1-sol`, `judge_model=gpt-6.1-sol`을 추가로 분리합니다. 기본 reasoning effort는 quick/writer=`high`, deep/judge=`xhigh`, output=`medium`입니다.
 
-YouTube 일일 파이프라인은 영상별 추출·검증·작성 뒤, 모든 공개 요약과 검증 리포트를 `gpt-6-sol`의 `high` reasoning으로 다시 교차 종합합니다. 종합 단계는 영상 간 공통점·상충점, 시장 환경, 종목별 조건부 행동과 무효화 조건을 구조화하며 YouTube 원문을 실시간 주문 지시로 승격하지 않습니다. 최신 결과는 PC `/youtube/insights.html`, 모바일 `/mobile/youtube-insights.html`에 게시되고 YouTube 완료 텔레그램 알림의 기본 링크로 제공됩니다.
+YouTube 일일 파이프라인은 영상별 추출·검증·작성 뒤, 모든 공개 요약과 검증 리포트를 `gpt-6.1-sol`의 `high` reasoning으로 다시 교차 종합합니다. 종합 단계는 영상 간 공통점·상충점, 시장 환경, 종목별 조건부 행동과 무효화 조건을 구조화하며 YouTube 원문을 실시간 주문 지시로 승격하지 않습니다. 최신 결과는 PC `/youtube/insights.html`, 모바일 `/mobile/youtube-insights.html`에 게시되고 YouTube 완료 텔레그램 알림의 기본 링크로 제공됩니다.
 
 예시:
 
@@ -136,9 +136,9 @@ from tradingagents.default_config import DEFAULT_CONFIG
 
 config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
-config["quick_think_llm"] = "gpt-6-sol"
-config["deep_think_llm"] = "gpt-6-sol"
-config["output_think_llm"] = "gpt-6-sol"
+config["quick_think_llm"] = "gpt-6.1-sol"
+config["deep_think_llm"] = "gpt-6.1-sol"
+config["output_think_llm"] = "gpt-6.1-sol"
 
 graph = TradingAgentsGraph(debug=True, config=config)
 final_state, decision = graph.propagate("NVDA", "2026-01-15")
@@ -278,6 +278,8 @@ Windows에서 자동 탐지를 덮어쓰려면:
 ```powershell
 $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 ```
+
+`gpt-6.1-sol`을 제공하는 Codex CLI가 필요합니다. 이번 변경에서는 공식 `@openai/codex 0.161.0`으로 인증, 정확한 모델 선택, 실제 응답을 확인했습니다. 데스크톱 앱에 포함된 오래된 CLI를 가리키면 앱의 모델 선택과 별개로 분석이 실패할 수 있습니다. CLI는 프로젝트 `.env`를 읽고, 예약 실행은 프로세스 환경변수 또는 GitHub 저장소의 `CODEX_BINARY` 변수를 사용합니다. 환경변수를 바꾼 뒤 이미 열려 있던 터미널은 다시 여세요.
 
 ## 스케줄 분석과 정적 리포트 사이트
 
