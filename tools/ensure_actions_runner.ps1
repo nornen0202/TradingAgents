@@ -59,7 +59,7 @@ function Wait-ForTargetRunnerListener {
 
 $mutex = [Threading.Mutex]::new(
     $false,
-    "Local\TradingAgentsActionsRunnerKeepAlive"
+    ("Local\TradingAgentsActionsRunnerKeepAlive-" + $resolvedRunnerRoot.Replace(':', '').Replace('\', '-'))
 )
 $ownsMutex = $false
 try {
@@ -85,8 +85,20 @@ try {
             $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
             if ($null -ne $service) {
                 try {
+                    # A least-privilege process cannot always see a service
+                    # listener's ExecutablePath. Running service state is
+                    # authoritative; never launch a competing login session.
+                    if ($service.Status -eq [ServiceProcess.ServiceControllerStatus]::Running) {
+                        Write-Output "HEALTHY runner service is active name=$serviceName"
+                        return
+                    }
                     if ($service.Status -ne [ServiceProcess.ServiceControllerStatus]::Running) {
                         Start-Service -Name $serviceName -ErrorAction Stop
+                    }
+                    $service.Refresh()
+                    if ($service.Status -eq [ServiceProcess.ServiceControllerStatus]::Running) {
+                        Write-Output "RECOVERED runner service is active name=$serviceName"
+                        return
                     }
                     $listener = @(Wait-ForTargetRunnerListener -Seconds 15)
                     if ($listener.Count -gt 0) {
@@ -94,6 +106,16 @@ try {
                         return
                     }
                 } catch {
+                    # Starting a service can time out while it is still coming
+                    # up. Do not turn that uncertainty into a second listener.
+                    $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+                    if ($null -ne $service -and $service.Status -in @(
+                        [ServiceProcess.ServiceControllerStatus]::Running,
+                        [ServiceProcess.ServiceControllerStatus]::StartPending
+                    )) {
+                        Write-Output "DEFERRED runner service owns startup name=$serviceName"
+                        return
+                    }
                     Write-Warning (
                         "Runner service could not start; using the current-user fallback. " +
                         $_.Exception.Message

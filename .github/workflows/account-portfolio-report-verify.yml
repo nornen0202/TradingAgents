@@ -410,6 +410,7 @@ jobs:
     concurrency:
       group: tradingagents-pages-deploy
       cancel-in-progress: false
+      queue: max
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
