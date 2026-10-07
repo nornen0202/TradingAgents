@@ -194,6 +194,21 @@ def target_is_covered(
         if active_matches:
             return True, f"Run {run_id} has active target job(s): {', '.join(active_matches)}."
         if status != "completed":
+            # Native schedules can remain queued before GitHub evaluates the
+            # run name or creates jobs. Such an unidentified run from before
+            # this production window cannot establish ownership of a new
+            # market session. Keep all identifiable/current runs and any run
+            # with jobs protected; do not cancel or retry the old run.
+            if (
+                target.workflow_file == "daily-codex-analysis.yml"
+                and target.inputs.get("profile") in {"kr", "us"}
+                and str(run.get("event") or "").lower() == "schedule"
+                and status == "queued"
+                and not jobs
+                and not in_target_window
+                and not _run_marker(run, "profile", {"kr", "us", "all"})
+            ):
+                continue
             return True, f"Run {run_id} is active before all target jobs are available."
         if in_target_window and target_job_names <= successful_matches:
             covered = ", ".join(sorted(successful_matches))
