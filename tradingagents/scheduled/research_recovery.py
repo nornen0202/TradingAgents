@@ -26,8 +26,7 @@ def _tickers(values):
     return values
 
 
-def load_recovery_source(*, archive_dir: Path, source_run_id: str, settings: dict,
-                         now: datetime, holding_tickers: list[str], account_status: str):
+def _load_terminal_source(*, archive_dir: Path, source_run_id: str, now: datetime):
     if not re.fullmatch(r"\d{8}T\d{6}_[A-Za-z0-9_-]+", source_run_id):
         raise ValueError("Invalid recovery source run ID")
     root = archive_dir.resolve()
@@ -35,7 +34,6 @@ def load_recovery_source(*, archive_dir: Path, source_run_id: str, settings: dic
     if not source_dir.is_relative_to(root):
         raise ValueError("Recovery source escapes archive")
     source = _read(source_dir / "run.json")
-    source_settings = source.get("settings") or {}
     if source.get("run_id") != source_run_id or source.get("status") not in {"partial_failure", "failed"}:
         raise ValueError("Recovery requires a completed failed or partial full run")
     if source.get("research_recovery"):
@@ -46,6 +44,36 @@ def load_recovery_source(*, archive_dir: Path, source_run_id: str, settings: dic
     started, finished = _instant(source["started_at"]), _instant(source["finished_at"])
     if not started <= finished <= now or now - started > timedelta(hours=24):
         raise ValueError("Recovery source is future-dated, reversed or older than 24 hours")
+    return source, source_dir
+
+
+def recovery_preflight_models(*, archive_dir: Path, source_run_id: str, now: datetime,
+                              quick_model: str, deep_model: str, output_model: str):
+    """Pin only failed-only preflight to the original cohort's model roles.
+
+    The runner still checks every research setting, current holdings and artifact
+    integrity before reuse. Ordinary production keeps its configured defaults.
+    """
+    if not source_run_id:
+        return quick_model, deep_model, output_model
+    source, _ = _load_terminal_source(archive_dir=archive_dir, source_run_id=source_run_id, now=now)
+    settings = source.get("settings") or {}
+    if (settings.get("provider") != "codex"
+            or settings.get("run_mode") != "full" or settings.get("analysis_mode") != "full"
+            or settings.get("codex_fallback_on_app_server_error") is not False):
+        raise ValueError("Recovery preflight requires full Codex research without model fallbacks")
+    models = [settings.get(f"{role}_model") for role in ("quick", "deep", "output", "writer", "judge")]
+    if not all(isinstance(m, str) and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", m) for m in models):
+        raise ValueError("Recovery source model roles are missing or invalid")
+    if models[3] != models[2] or models[4] != models[1]:
+        raise ValueError("Recovery preflight requires paired output/writer and deep/judge models")
+    return tuple(models[:3])
+
+
+def load_recovery_source(*, archive_dir: Path, source_run_id: str, settings: dict,
+                         now: datetime, holding_tickers: list[str], account_status: str):
+    source, source_dir = _load_terminal_source(archive_dir=archive_dir, source_run_id=source_run_id, now=now)
+    source_settings = source.get("settings") or {}
     for key in ("run_mode", "analysis_mode"):
         if settings.get(key) != "full" or source_settings.get(key) != "full":
             raise ValueError("Only full research can be recovered; smoke/overlay is not a full cohort")

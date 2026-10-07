@@ -537,6 +537,17 @@ jobs:
           preferred_deep_model = "gpt-6.1-sol"
           preferred_quick_model = "gpt-6.1-sol"
           preferred_output_model = "gpt-6.1-sol"
+          from datetime import datetime, timezone
+          from tradingagents.scheduled.research_recovery import recovery_preflight_models
+
+          preferred_quick_model, preferred_deep_model, preferred_output_model = recovery_preflight_models(
+              archive_dir=Path(os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "")),
+              source_run_id=os.environ.get("TRADINGAGENTS_RESUME_FROM_RUN", "").strip(),
+              now=datetime.now(timezone.utc),
+              quick_model=preferred_quick_model,
+              deep_model=preferred_deep_model,
+              output_model=preferred_output_model,
+          )
           deep_fallback_models = codex_preflight_fallback_models("deep")
           efficient_fallback_models = codex_preflight_fallback_models("quick")
 
@@ -1168,6 +1179,17 @@ jobs:
           preferred_deep_model = "gpt-6.1-sol"
           preferred_quick_model = "gpt-6.1-sol"
           preferred_output_model = "gpt-6.1-sol"
+          from datetime import datetime, timezone
+          from tradingagents.scheduled.research_recovery import recovery_preflight_models
+
+          preferred_quick_model, preferred_deep_model, preferred_output_model = recovery_preflight_models(
+              archive_dir=Path(os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", "")),
+              source_run_id=os.environ.get("TRADINGAGENTS_RESUME_FROM_RUN", "").strip(),
+              now=datetime.now(timezone.utc),
+              quick_model=preferred_quick_model,
+              deep_model=preferred_deep_model,
+              output_model=preferred_output_model,
+          )
           deep_fallback_models = codex_preflight_fallback_models("deep")
           efficient_fallback_models = codex_preflight_fallback_models("quick")
 

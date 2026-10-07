@@ -80,7 +80,21 @@ def test_recovery_input_is_passed_as_data_to_both_market_commands():
     assert "      resume_from_run:" in workflow
     assert "TRADINGAGENTS_RESUME_FROM_RUN: ${{ inputs.resume_from_run || '' }}" in workflow
     assert workflow.count('args += ["--resume-from-run", resume_from_run]') == 2
-    assert workflow.count('os.environ.get("TRADINGAGENTS_RESUME_FROM_RUN", "")') == 2
+    assert workflow.count('os.environ.get("TRADINGAGENTS_RESUME_FROM_RUN", "")') == 4
+
+
+def test_both_market_preflights_pin_recovery_models_before_provider_checks():
+    import yaml
+
+    workflow = yaml.safe_load(_workflow_text())
+    for market in ("us", "kr"):
+        steps = workflow["jobs"][f"analyze_{market}"]["steps"]
+        script = next(s["run"] for s in steps if s["name"] == "Verify Codex login and model availability")
+        assert script.index("= recovery_preflight_models(") < script.index("deep_result = run_codex_preflight(")
+        assert 'source_run_id=os.environ.get("TRADINGAGENTS_RESUME_FROM_RUN", "").strip()' in script
+        assert 'archive_dir=Path(os.environ.get("TRADINGAGENTS_ARCHIVE_DIR", ""))' in script
+        assert "${{ inputs.resume_from_run }}" not in script
+        compile(script, f"{market}-preflight", "exec")
 
 
 def test_daily_analysis_job_timeout_bounds_scheduled_runs():
