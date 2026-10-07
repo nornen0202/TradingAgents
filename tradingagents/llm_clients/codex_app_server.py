@@ -20,6 +20,10 @@ class CodexAppServerError(RuntimeError):
     """Raised when the Codex app-server request cycle fails."""
 
 
+class CodexAppServerTimeoutError(CodexAppServerError):
+    """Raised when a bounded app-server operation exceeds its deadline."""
+
+
 class CodexAppServerAuthError(CodexAppServerError):
     """Raised when Codex login is missing or unusable."""
 
@@ -320,48 +324,54 @@ class CodexAppServerSession:
         notifications: list[dict[str, Any]] = []
         final_messages: list[str] = []
         fallback_messages: list[str] = []
+        deferred: list[dict[str, Any]] = []
         deadline = self._operation_deadline()
 
-        while True:
-            message = self._next_message_before(deadline, f"Codex turn {turn_id}")
+        try:
+            while True:
+                message = self._next_message_before(deadline, f"Codex turn {turn_id}")
 
-            if "method" in message and "id" in message:
-                self._handle_server_request(message)
-                continue
+                if "method" in message and "id" in message:
+                    self._handle_server_request(message)
+                    continue
 
-            if "method" not in message:
-                self._pending.append(message)
-                continue
+                if "method" not in message:
+                    # Requeueing here makes _next_message return the same
+                    # unrelated RPC response forever, starving stdout events.
+                    deferred.append(message)
+                    continue
 
-            method = message["method"]
-            params = message.get("params", {})
-            notifications.append(message)
+                method = message["method"]
+                params = message.get("params", {})
+                notifications.append(message)
 
-            if (
-                method == "item/completed"
-                and isinstance(params, dict)
-                and params.get("turnId") == turn_id
-            ):
-                item = params.get("item", {})
-                if isinstance(item, dict) and item.get("type") == "agentMessage":
-                    text = str(item.get("text", ""))
-                    if item.get("phase") == "final_answer":
-                        final_messages.append(text)
-                    else:
-                        fallback_messages.append(text)
-                continue
+                if (
+                    method == "item/completed"
+                    and isinstance(params, dict)
+                    and params.get("turnId") == turn_id
+                ):
+                    item = params.get("item", {})
+                    if isinstance(item, dict) and item.get("type") == "agentMessage":
+                        text = str(item.get("text", ""))
+                        if item.get("phase") == "final_answer":
+                            final_messages.append(text)
+                        else:
+                            fallback_messages.append(text)
+                    continue
 
-            if method == "turn/completed" and isinstance(params, dict):
-                turn = params.get("turn", {})
-                if isinstance(turn, dict) and turn.get("id") == turn_id:
-                    status = turn.get("status")
-                    if status == "failed":
-                        error = turn.get("error", {})
-                        message_text = error.get("message") if isinstance(error, dict) else None
-                        raise CodexAppServerError(
-                            message_text or f"Codex turn {turn_id} failed without an error message."
-                        )
-                    break
+                if method == "turn/completed" and isinstance(params, dict):
+                    turn = params.get("turn", {})
+                    if isinstance(turn, dict) and turn.get("id") == turn_id:
+                        status = turn.get("status")
+                        if status == "failed":
+                            error = turn.get("error", {})
+                            message_text = error.get("message") if isinstance(error, dict) else None
+                            raise CodexAppServerError(
+                                message_text or f"Codex turn {turn_id} failed without an error message."
+                            )
+                        break
+        finally:
+            self._restore_deferred(deferred)
 
         if final_messages:
             return final_messages[-1], notifications
@@ -376,14 +386,22 @@ class CodexAppServerSession:
 
     def _next_message_before(self, deadline: float | None, operation: str) -> dict[str, Any]:
         timeout = self._remaining_timeout(deadline, operation)
-        return self._next_message(timeout)
+        try:
+            return self._next_message(timeout)
+        except CodexAppServerTimeoutError as exc:
+            # timeout is the remaining queue-wait slice, not the operation's
+            # configured budget. Report the latter even for a tiny final slice.
+            raise CodexAppServerTimeoutError(
+                f"Timed out waiting for {operation} after {self.request_timeout:g}s. "
+                f"stderr_tail={self._stderr_tail()}"
+            ) from exc
 
     def _remaining_timeout(self, deadline: float | None, operation: str) -> float | None:
         if deadline is None:
             return None
         remaining = deadline - time.monotonic()
         if remaining <= 0:
-            raise CodexAppServerError(
+            raise CodexAppServerTimeoutError(
                 f"Timed out waiting for {operation} after {self.request_timeout:g}s. "
                 f"stderr_tail={self._stderr_tail()}"
             )
@@ -423,7 +441,7 @@ class CodexAppServerSession:
             if deadline is not None:
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
-                    raise CodexAppServerError(
+                    raise CodexAppServerTimeoutError(
                         f"Timed out waiting for Codex app-server after {timeout}s. stderr_tail={self._stderr_tail()}"
                     )
                 wait_timeout = min(wait_timeout, remaining)

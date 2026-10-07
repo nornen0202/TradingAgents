@@ -18,6 +18,7 @@ from tradingagents.llm_clients.codex_app_server import (
     CodexAppServerAuthError,
     CodexAppServerBinaryError,
     CodexAppServerError,
+    CodexAppServerTimeoutError,
     CodexModelUnavailableError,
     CodexStructuredOutputError,
 )
@@ -34,6 +35,7 @@ _RULES: tuple[tuple[type[BaseException], tuple[str, str, str]], ...] = (
     (CodexAppServerBinaryError, ("RUNTIME_CONFIGURATION_ERROR", "CodexAppServerBinaryError", "NON_RETRYABLE")),
     (CodexModelUnavailableError, ("MODEL_UNAVAILABLE", "CodexModelUnavailableError", "NON_RETRYABLE")),
     (CodexStructuredOutputError, ("STRUCTURED_OUTPUT_ERROR", "CodexStructuredOutputError", "UNKNOWN")),
+    (CodexAppServerTimeoutError, ("PROVIDER_TIMEOUT", "CodexAppServerTimeoutError", "RETRYABLE")),
     (CodexAppServerError, ("PROVIDER_ERROR", "CodexAppServerError", "UNKNOWN")),
     (request_errors.SSLError, ("TLS_ERROR", "requests.SSLError", "NON_RETRYABLE")),
     (request_errors.InvalidURL, ("REQUEST_CONFIGURATION_ERROR", "requests.InvalidURL", "NON_RETRYABLE")),

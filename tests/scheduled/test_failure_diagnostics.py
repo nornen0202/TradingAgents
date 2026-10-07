@@ -8,6 +8,7 @@ from tradingagents.llm_clients.codex_app_server import (
     CodexAppServerAuthError,
     CodexAppServerBinaryError,
     CodexAppServerError,
+    CodexAppServerTimeoutError,
     CodexModelUnavailableError,
     CodexStructuredOutputError,
 )
@@ -27,6 +28,7 @@ _UNKNOWN = {"failure_category": "UNKNOWN_ERROR", "exception_class": "OtherError"
     (CodexAppServerBinaryError(_SENSITIVE_SENTINEL), "RUNTIME_CONFIGURATION_ERROR", "CodexAppServerBinaryError", "NON_RETRYABLE"),
     (CodexModelUnavailableError(_SENSITIVE_SENTINEL), "MODEL_UNAVAILABLE", "CodexModelUnavailableError", "NON_RETRYABLE"),
     (CodexStructuredOutputError(_SENSITIVE_SENTINEL), "STRUCTURED_OUTPUT_ERROR", "CodexStructuredOutputError", "UNKNOWN"),
+    (CodexAppServerTimeoutError(_SENSITIVE_SENTINEL), "PROVIDER_TIMEOUT", "CodexAppServerTimeoutError", "RETRYABLE"),
     (CodexAppServerError("Timed out waiting for turn " + _SENSITIVE_SENTINEL), "PROVIDER_ERROR", "CodexAppServerError", "UNKNOWN"),
     (request_errors.SSLError(_SENSITIVE_SENTINEL), "TLS_ERROR", "requests.SSLError", "NON_RETRYABLE"),
     (request_errors.InvalidURL(_SENSITIVE_SENTINEL), "REQUEST_CONFIGURATION_ERROR", "requests.InvalidURL", "NON_RETRYABLE"),

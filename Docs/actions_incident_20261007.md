@@ -61,3 +61,31 @@ concurrent job starts, queue wiring, a real PowerShell execution with an
 invisible service listener, identical API replay, and permanent/error exhaustion.
 Existing scheduler, hosted recovery, and public snapshot integrity tests passed.
 A live dry-run returned `no_active_lease` after operational recovery.
+
+## Follow-up while verifying fresh KR production
+
+The restarted full run reproduced a separate provider timeout for Samsung Fire
+`000810.KS`: the worker ran for 1,250 seconds before failing. Its configuration
+uses a 600-second request budget and one retry. The last queue-wait slice was
+only 0.003162 seconds, which the old exception misleadingly printed as the
+timeout duration. The generic exception also produced `PROVIDER_ERROR / UNKNOWN`.
+The account still allowed ordinary model usage; weekly consumption was 5%.
+
+A local transport reproduction queued an unrelated RPC response ahead of two
+valid turn-completion notifications. `_collect_turn` requeued that response on
+every iteration, so it timed out with both valid notifications still unread.
+Defer unrelated responses until collection exits, retaining their order for
+subsequent requests. This is a reproduced path to the observed timeout symptom;
+the original worker's wire stream was not retained, so it does not establish
+that this path caused that particular production failure.
+
+Actual deadline expiration now raises `CodexAppServerTimeoutError`, classified
+by type as `PROVIDER_TIMEOUT / RETRYABLE`. Operation-level messages show the
+configured budget, including when the final queue slice is tiny. Request
+deadlines, retry limits, session reset behavior, and tool restrictions remain
+unchanged. Legacy generic errors are still not reclassified from message text.
+
+Failed-ticker-only recovery will use the new finalized run's immutable manifest;
+successful research will be reused. Historical manifests are not amended to
+manufacture recovery compatibility. Focused transport/provider and private
+diagnostic tests passed: 82 tests and 20 subtests.
