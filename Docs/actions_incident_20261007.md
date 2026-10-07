@@ -74,8 +74,8 @@ The account still allowed ordinary model usage; weekly consumption was 5%.
 A local transport reproduction queued an unrelated RPC response ahead of two
 valid turn-completion notifications. `_collect_turn` requeued that response on
 every iteration, so it timed out with both valid notifications still unread.
-Defer unrelated responses until collection exits, retaining their order for
-subsequent requests. This is a reproduced path to the observed timeout symptom;
+Serialize RPC requests and discard stale replies during requests and turn
+collection. Preserve early notifications that arrive ahead of an RPC response. This is a reproduced path to the observed timeout symptom;
 the original worker's wire stream was not retained, so it does not establish
 that this path caused that particular production failure.
 
@@ -88,4 +88,4 @@ unchanged. Legacy generic errors are still not reclassified from message text.
 Failed-ticker-only recovery will use the new finalized run's immutable manifest;
 successful research will be reused. Historical manifests are not amended to
 manufacture recovery compatibility. Focused transport/provider and private
-diagnostic tests passed: 82 tests and 20 subtests.
+diagnostic tests passed: 84 tests and 20 subtests.

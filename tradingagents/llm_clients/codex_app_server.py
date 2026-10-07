@@ -278,6 +278,11 @@ class CodexAppServerSession:
                     self.close()
 
     def request(self, method: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        # Only one RPC may own stdout; unmatched response IDs are then stale.
+        with self._lock:
+            return self._request_locked(method, params)
+
+    def _request_locked(self, method: str, params: dict[str, Any] | None) -> dict[str, Any]:
         request_id = str(uuid.uuid4())
         self._write({"id": request_id, "method": method, "params": params or {}})
         deferred: list[dict[str, Any]] = []
@@ -303,7 +308,9 @@ class CodexAppServerSession:
                 self._handle_server_request(message)
                 continue
 
-            deferred.append(message)
+            if "method" in message:
+                deferred.append(message)
+            # A response for another ID cannot belong to a future UUID request.
 
     def _initialize(self) -> None:
         response = self.request(
@@ -324,54 +331,50 @@ class CodexAppServerSession:
         notifications: list[dict[str, Any]] = []
         final_messages: list[str] = []
         fallback_messages: list[str] = []
-        deferred: list[dict[str, Any]] = []
         deadline = self._operation_deadline()
 
-        try:
-            while True:
-                message = self._next_message_before(deadline, f"Codex turn {turn_id}")
+        while True:
+            message = self._next_message_before(deadline, f"Codex turn {turn_id}")
 
-                if "method" in message and "id" in message:
-                    self._handle_server_request(message)
-                    continue
+            if "method" in message and "id" in message:
+                self._handle_server_request(message)
+                continue
 
-                if "method" not in message:
-                    # Requeueing here makes _next_message return the same
-                    # unrelated RPC response forever, starving stdout events.
-                    deferred.append(message)
-                    continue
+            if "method" not in message:
+                # RPC requests are serialized and none is outstanding during
+                # turn collection. Drop late/duplicate replies instead of
+                # requeueing them forever and starving stdout notifications.
+                continue
 
-                method = message["method"]
-                params = message.get("params", {})
-                notifications.append(message)
+            method = message["method"]
+            params = message.get("params", {})
+            notifications.append(message)
 
-                if (
-                    method == "item/completed"
-                    and isinstance(params, dict)
-                    and params.get("turnId") == turn_id
-                ):
-                    item = params.get("item", {})
-                    if isinstance(item, dict) and item.get("type") == "agentMessage":
-                        text = str(item.get("text", ""))
-                        if item.get("phase") == "final_answer":
-                            final_messages.append(text)
-                        else:
-                            fallback_messages.append(text)
-                    continue
+            if (
+                method == "item/completed"
+                and isinstance(params, dict)
+                and params.get("turnId") == turn_id
+            ):
+                item = params.get("item", {})
+                if isinstance(item, dict) and item.get("type") == "agentMessage":
+                    text = str(item.get("text", ""))
+                    if item.get("phase") == "final_answer":
+                        final_messages.append(text)
+                    else:
+                        fallback_messages.append(text)
+                continue
 
-                if method == "turn/completed" and isinstance(params, dict):
-                    turn = params.get("turn", {})
-                    if isinstance(turn, dict) and turn.get("id") == turn_id:
-                        status = turn.get("status")
-                        if status == "failed":
-                            error = turn.get("error", {})
-                            message_text = error.get("message") if isinstance(error, dict) else None
-                            raise CodexAppServerError(
-                                message_text or f"Codex turn {turn_id} failed without an error message."
-                            )
-                        break
-        finally:
-            self._restore_deferred(deferred)
+            if method == "turn/completed" and isinstance(params, dict):
+                turn = params.get("turn", {})
+                if isinstance(turn, dict) and turn.get("id") == turn_id:
+                    status = turn.get("status")
+                    if status == "failed":
+                        error = turn.get("error", {})
+                        message_text = error.get("message") if isinstance(error, dict) else None
+                        raise CodexAppServerError(
+                            message_text or f"Codex turn {turn_id} failed without an error message."
+                        )
+                    break
 
         if final_messages:
             return final_messages[-1], notifications
