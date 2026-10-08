@@ -9,6 +9,7 @@ PRODUCERS = {
     "daily-codex-analysis.yml": {"analyze_kr", "analyze_us"},
     "intraday-overlay-refresh.yml": {"overlay_refresh_kr", "overlay_refresh_us"},
     "daily-youtube-reports.yml": {"build_youtube_pages"},
+    "daily-prism-telegram-reports.yml": {"build_prism_telegram_pages"},
 }
 FOLLOWUPS = ("tradingagents-mobile-notifications.yml", "publish-ai-context.yml")
 # Earlier incidents were already delivered manually, before provenance run names

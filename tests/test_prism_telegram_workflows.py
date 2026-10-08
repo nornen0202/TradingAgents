@@ -4,6 +4,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_prism_recovery_provenance_preserves_native_schedule_and_collection_mode():
+    import yaml
+    value = yaml.safe_load((ROOT / ".github/workflows/daily-prism-telegram-reports.yml").read_text(encoding="utf-8"))
+    triggers = value.get("on", value.get(True))
+    assert triggers["schedule"] == [{"cron": "35 22 * * *"}]
+    inputs = triggers["workflow_dispatch"]["inputs"]
+    assert inputs["recovery_source"]["options"] == ["manual", "cloud_watchdog"]
+    assert inputs["mode"]["default"] == "user_session"
+    assert "[recovery_source=${{ inputs.recovery_source || 'native' }}]" in value["run-name"]
+
+
 def test_prism_telegram_workflow_keeps_pages_permission_off_self_hosted_build_job() -> None:
     workflow = (ROOT / ".github" / "workflows" / "daily-prism-telegram-reports.yml").read_text(encoding="utf-8")
 

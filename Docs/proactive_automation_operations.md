@@ -85,7 +85,7 @@ producer finishing after the last Work slot still needs its report published.
 | Repeated code defect with evidence | Isolated worktree, minimal fix and regression checks; commit, push `fork`, open PR, pass required CI and merge | Tests pass and the production symptom is rechecked |
 
 The watchdog also runs `recover_missing_followups.py`. Completed watchdog-dispatched
-Daily/Overlay/YouTube producers can miss their `workflow_run` notification and
+Daily/Overlay/YouTube/PRISM producers can miss their `workflow_run` notification and
 mirror: GitHub suppresses events caused by `GITHUB_TOKEN`, while explicit
 `workflow_dispatch` is exempt ([GitHub event rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)).
 
@@ -96,6 +96,19 @@ minutes before retries, and counts all followup runs and reruns toward a three-a
 budget per upstream. Gate-only producers are ignored; mirrors require successful
 deployment. The existing notifier still verifies the upstream and deduplicates
 Telegram sends. The existing mirror still verifies public content hashes.
+
+PRISM has a daily 07:35 KST collection schedule, including weekends and market
+holidays. The watchdog recovers missing runs from 07:50 until 17:00 KST, yielding
+to active KR/US analysis, overlays, and YouTube publication. The recovery extends
+the six-hour lookback by the actual scheduling delay so the original collection
+interval remains included, keeps the 80-message cap, and leaves the configured
+authentication mode unchanged. Existing active-run ownership and per-cause retry
+limits apply. Successful collection and deployment, not yesterday's Work ACK or
+an empty current event window, establish completion. PRISM recovery provenance
+also enables the bounded downstream notification/mirror reconciler.
+If the collection/build succeeded but deployment failed, the watchdog preserves
+that source and leaves delivery to Pages recovery and the operator; it does not
+start another collection to repair deployment.
 
 The rollout starts with producer runs created at or after 2026-10-07 15:59 UTC;
 earlier incidents were manually delivered before the provenance markers existed.

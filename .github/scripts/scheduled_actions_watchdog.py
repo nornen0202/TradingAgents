@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import math
 import os
 import re
 import urllib.error
@@ -761,6 +762,36 @@ def due_targets(
                 blockers=(
                     _daily_codex_active_blocker("us", now_kst),
                     _intraday_overlay_active_blocker("us", now_kst),
+                ),
+            )
+        )
+
+    # PRISM's native collection is due at 07:35 every day. Recover missing
+    # probes after a 15-minute grace while preserving the original six-hour
+    # collection window when the scheduler is late (and the 80-message cap).
+    if time(7, 50) <= kst_time < time(17, 0):
+        prism_window = datetime.combine(kst_date, time(7, 35), tzinfo=KST)
+        lookback_minutes = 360 + math.ceil((now_kst - prism_window).total_seconds() / 60)
+        targets.append(
+            WatchdogTarget(
+                name="prism-daily",
+                workflow_file="daily-prism-telegram-reports.yml",
+                # Preserve a successful collection if only deployment failed.
+                # The Pages recovery path/operator verifies that delivery.
+                job_names=("build_prism_telegram_pages",),
+                work_job_names=("build_prism_telegram_pages",),
+                window_start_kst=prism_window,
+                inputs={
+                    "lookback_minutes": str(lookback_minutes),
+                    "max_messages": "80",
+                    "recovery_source": "cloud_watchdog",
+                },
+                blockers=(
+                    _daily_codex_active_blocker("kr", now_kst),
+                    _intraday_overlay_active_blocker("kr", now_kst),
+                    _daily_codex_active_blocker("us", now_kst),
+                    _intraday_overlay_active_blocker("us", now_kst),
+                    _youtube_active_blocker(now_kst),
                 ),
             )
         )
