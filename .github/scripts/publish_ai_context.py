@@ -53,12 +53,14 @@ def download_snapshot() -> tuple[dict, dict[str, bytes]]:
             if first != fetch(f"{BASE}/manifest.json"):
                 raise ValueError("Pages changed during snapshot fetch; mirror not updated")
             validate_snapshot(manifest, files)
-        except ValueError:
+        except (ValueError, URLError, TimeoutError) as exc:
             # A manifest can stay stable while an edge serves an older child
             # file. Discard the entire download; never relax its hash checks.
+            if isinstance(exc, HTTPError) and exc.code not in {429, 500, 502, 503, 504}:
+                raise
             if attempt == 2:
                 raise
-            print(f"::warning::Public snapshot not consistent; retry {attempt + 2}/3")
+            print(f"::warning::Public snapshot inconsistent or temporarily unavailable; retry {attempt + 2}/3")
             time.sleep((2, 5)[attempt])
             continue
         files["manifest.json"] = first

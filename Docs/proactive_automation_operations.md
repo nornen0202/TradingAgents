@@ -128,6 +128,11 @@ workflow left the mirror at the prior generation. Bounded workflow retries
 restored it; cache-bypassing reads prevent reuse of that cached response. Exact
 CDN propagation behavior was not established by the logs.
 
+Transient download HTTP 429/500/502/503/504, connection errors and timeouts share
+that same three-attempt whole-snapshot budget. Partial downloads are discarded;
+permanent HTTP failures propagate immediately. A 503 during the October 9 US
+Work handoff exposed that transport errors previously bypassed this retry loop.
+
 For Daily analysis, an unidentified native scheduled run that is still queued
 with no jobs and was created before the target production window does not cover
 that new window. An October 8 check reproduced an earlier US-era queue blocking

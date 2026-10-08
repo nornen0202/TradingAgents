@@ -7,6 +7,7 @@ import io
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
+from urllib.error import HTTPError, URLError
 
 import pytest
 
@@ -124,6 +125,48 @@ def test_mirror_integrity_retry_budget_never_publishes_corruption(monkeypatch, t
     with pytest.raises(ValueError, match="integrity"):
         mirror.publish()
     assert len(calls) == 3 * (len(mirror.FILES) + 2) and delays == [2, 5]
+
+
+def test_mirror_restarts_partial_snapshot_after_transient_http_error(monkeypatch, tmp_path):
+    manifest = build_ai_context(tmp_path, now=datetime(2026, 7, 11, tzinfo=timezone.utc))
+    expected = {name: (tmp_path / "ai" / name).read_bytes() for name in mirror.FILES}
+    expected["manifest.json"] = json.dumps(manifest).encode()
+    calls, delays = [], []
+    def fetch(url):
+        calls.append(url)
+        if len(calls) == 3:
+            raise HTTPError(url, 503, "unavailable", {}, None)
+        return expected[url.split("/ai/")[1]]
+    monkeypatch.setattr(mirror, "fetch", fetch)
+    monkeypatch.setattr(mirror.time, "sleep", delays.append)
+    actual, files = mirror.download_snapshot()
+    assert actual == manifest and files == expected
+    assert calls[0] == calls[3] == f"{mirror.BASE}/manifest.json"
+    assert len(calls) == 3 + len(mirror.FILES) + 2 and delays == [2]
+
+
+@pytest.mark.parametrize("error", [URLError("offline"), TimeoutError(), HTTPError("url", 503, "unavailable", {}, None)])
+def test_mirror_download_transport_retry_budget_never_publishes(monkeypatch, error):
+    calls, delays = [], []
+    def fail(url):
+        calls.append(url)
+        raise error
+    monkeypatch.setattr(mirror, "fetch", fail)
+    monkeypatch.setattr(mirror.time, "sleep", delays.append)
+    monkeypatch.setattr(mirror, "api", lambda *a, **k: pytest.fail("incomplete snapshot reached Git API"))
+    with pytest.raises(type(error)):
+        mirror.publish()
+    assert len(calls) == 3 and delays == [2, 5]
+
+
+@pytest.mark.parametrize("code", [401, 403, 404, 422])
+def test_mirror_download_permanent_http_error_is_not_retried(monkeypatch, code):
+    def fail(url):
+        raise HTTPError(url, code, "permanent failure", {}, None)
+    monkeypatch.setattr(mirror, "fetch", fail)
+    monkeypatch.setattr(mirror.time, "sleep", lambda _: pytest.fail("must not retry permanent HTTP failure"))
+    with pytest.raises(HTTPError):
+        mirror.download_snapshot()
 
 
 def test_sell_condition_cannot_inherit_buy_trigger():
