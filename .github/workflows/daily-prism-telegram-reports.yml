@@ -1,4 +1,7 @@
 name: Daily PRISM Telegram Reports
+run-name: >-
+  Daily PRISM Telegram Reports
+  [recovery_source=${{ inputs.recovery_source || 'native' }}]
 
 on:
   schedule:
@@ -6,6 +9,14 @@ on:
     - cron: '35 22 * * *'
   workflow_dispatch:
     inputs:
+      recovery_source:
+        description: "Dispatch provenance for bounded followup recovery"
+        required: false
+        default: "manual"
+        type: choice
+        options:
+          - manual
+          - cloud_watchdog
       mode:
         description: "Collection mode: public_preview / bot_api / user_session"
         required: false

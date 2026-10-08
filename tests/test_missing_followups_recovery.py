@@ -75,6 +75,24 @@ def test_missing_followups_dispatched_once_without_repeating_producer():
     assert len(client.posts) == 2
 
 
+@pytest.mark.parametrize("conclusion,expected", [("success", 2), ("failure", 1), ("skipped", 0)])
+def test_prism_recovery_notifies_real_collection_and_mirrors_only_deployed_output(conclusion, expected):
+    workflow = "daily-prism-telegram-reports.yml"
+    client = Client()
+    client.upstream = run(workflow, display_title="PRISM [recovery_source=cloud_watchdog]",
+        conclusion="failure" if conclusion == "failure" else "success")
+    client.histories[WORKFLOW] = []
+    client.histories[workflow] = [client.upstream]
+    client.jobs = [{"name": "build_prism_telegram_pages", "conclusion": conclusion},
+        {"name": "deploy", "conclusion": "success" if conclusion == "success" else "skipped"}]
+    result = recovery.recover(client, now=NOW)
+    assert len(result) == len(client.posts) == expected
+    assert all(r["dispatch_requested"] for r in result)
+    if expected:
+        assert all(r["reason"] == "active_followup" for r in recovery.recover(client, now=NOW))
+        assert len(client.posts) == expected
+
+
 @pytest.mark.parametrize("changes", [
     {"head_branch": "feature"}, {"head_repository": {"full_name": "evil/repo"}},
     {"path": f".github/workflows/{WORKFLOW}@other"}, {"event": "pull_request"},

@@ -83,6 +83,47 @@ def test_youtube_watchdog_is_due_after_backup_window():
     assert youtube[0].blockers[1].window_start_kst == _kst("2026-06-01T22:30:00")
 
 
+def test_prism_recovery_grace_daily_window_and_original_collection_interval():
+    for moment in ("2026-10-08T07:49:59", "2026-10-08T17:00:00", "2026-10-09T01:00:00"):
+        assert not any(t.name == "prism-daily" for t in watchdog.due_targets(_kst(moment)))
+    for moment, lookback in (("2026-10-08T07:50:00", "375"),
+                             ("2026-10-08T08:35:00.1", "421"),
+                             ("2026-10-10T10:00:00", "505")):
+        target = next(t for t in watchdog.due_targets(_kst(moment)) if t.name == "prism-daily")
+        assert target.window_start_kst == _kst(moment[:10] + "T07:35:00")
+        assert target.inputs == {"lookback_minutes": lookback, "max_messages": "80", "recovery_source": "cloud_watchdog"}
+        assert target.work_job_names == ("build_prism_telegram_pages",)
+        assert "mode" not in target.inputs
+    targets = watchdog.due_targets(_kst("2026-10-09T10:00:00"),
+        market_status_resolver=lambda **kwargs: type("Closed", (), {"is_session": False})())
+    assert any(t.name == "prism-daily" for t in targets)
+
+
+def test_prism_old_success_is_not_today_completion_but_active_owner_is_protected():
+    target = next(t for t in watchdog.due_targets(_kst("2026-10-08T10:00:00")) if t.name == "prism-daily")
+    for created, status, jobs, expected in (
+        ("2026-10-07T01:44:00Z", "completed", [{"name": n, "status": "completed", "conclusion": "success"} for n in target.job_names], False),
+        ("2026-10-07T22:35:00Z", "completed", [{"name": n, "status": "completed", "conclusion": "success"} for n in target.job_names], True),
+        ("2026-10-07T22:35:00Z", "completed", [{"name": "build_prism_telegram_pages", "status": "completed", "conclusion": "success"}, {"name": "deploy", "status": "completed", "conclusion": "cancelled"}], True),
+        ("2026-10-07T22:35:00Z", "queued", [], True),
+        ("2026-10-07T01:44:00Z", "in_progress", [{"name": "build_prism_telegram_pages", "status": "in_progress"}], True),
+    ):
+        client = FakeClient(runs=[dict(id=100, created_at=created, status=status, conclusion="success" if status == "completed" else "")], jobs={100: jobs})
+        assert watchdog.target_is_covered(client=client, target=target)[0] is expected
+
+
+def test_prism_yields_to_active_market_or_youtube_jobs_and_keeps_retry_budget():
+    target = next(t for t in watchdog.due_targets(_kst("2026-10-08T10:00:00")) if t.name == "prism-daily")
+    for blocker in target.blockers:
+        client = FakeClient(runs={blocker.workflow_file: [dict(id=100, created_at="2026-10-08T00:55:00Z", status="in_progress")]},
+            jobs={100: [dict(name=blocker.job_names[0], status="in_progress")]})
+        assert watchdog.blockers_are_clear(client=client, target=target)[0] is False
+    client = FakeClient(runs=[dict(id=i, created_at="2026-10-08T00:00:00Z", status="completed", conclusion="failure") for i in (100, 101)],
+        jobs={i: [dict(name="build_prism_telegram_pages", status="completed", conclusion="failure")] for i in (100, 101)})
+    covered, reason = watchdog.target_is_covered(client=client, target=target)
+    assert covered and reason.startswith("Retry budget exhausted")
+
+
 def test_daily_codex_us_watchdog_is_due_on_weekday_afternoon():
     targets = watchdog.due_targets(_kst("2026-06-01T18:07:00"))
 
