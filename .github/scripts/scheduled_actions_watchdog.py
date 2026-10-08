@@ -215,6 +215,11 @@ def target_is_covered(
             covered = ", ".join(sorted(successful_matches))
             return True, f"Run {run_id} covers target job set: {covered}."
         no_work = _completed_success_no_work(run=run, jobs=jobs, target=target)
+        if no_work and _overlay_gate_predates_ready_baseline(client=client, jobs=jobs, target=target):
+            # A gate held while research was unfinished is not coverage once
+            # that baseline completes. Do not count the skip as a failure or
+            # let it reset the existing consecutive-failure budget.
+            continue
         if in_target_window and no_work:
             return True, f"Run {run_id} completed successfully with an explicit no-work target result."
         if in_failure_window and (target_job_names <= successful_matches or no_work):
@@ -359,6 +364,37 @@ def _completed_success_no_work(
         and str(job.get("conclusion") or "").lower() in {"skipped", "neutral"}
         for job in work_jobs
     )
+
+
+def _overlay_gate_predates_ready_baseline(
+    *, client: GitHubActionsClient, jobs: list[dict[str, Any]], target: WatchdogTarget,
+) -> bool:
+    if target.workflow_file != "intraday-overlay-refresh.yml" or not target.dependencies:
+        return False
+    gate = next((job for job in jobs if job.get("name") == "overlay_gate"), {})
+    if gate.get("status") != "completed" or gate.get("conclusion") != "success":
+        return False
+    gate_completed = _workflow_run_created_at({"created_at": gate.get("completed_at")})
+    if gate_completed is None:
+        return False
+    for dependency in target.dependencies:
+        for run in client.list_runs(
+            dependency.workflow_file,
+            created_since_utc=dependency.window_start_kst.astimezone(UTC),
+        ):
+            if run.get("status") != "completed" or run.get("conclusion") != "success":
+                continue
+            required = set(dependency.job_names)
+            completed = {
+                job.get("name"): _workflow_run_created_at({"created_at": job.get("completed_at")})
+                for job in client.list_jobs(int(run.get("id", 0)))
+                if job.get("name") in required
+                and job.get("status") == "completed" and job.get("conclusion") == "success"
+            }
+            if required <= completed.keys() and all(completed.values()):
+                if max(completed.values()) > gate_completed:
+                    return True
+    return False
 
 
 def _workflow_failure_fallback(

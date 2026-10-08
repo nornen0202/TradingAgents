@@ -576,6 +576,58 @@ def test_watchdog_skipped_target_jobs_do_not_consume_retry_budget():
     assert "explicit no-work" in reason
 
 
+def test_overlay_held_before_baseline_completion_is_reconsidered():
+    target = next(t for t in watchdog.due_targets(_kst("2026-10-08T23:53:00"))
+                  if t.workflow_file == "intraday-overlay-refresh.yml")
+    runs = {
+        target.workflow_file: [{"id": 1, "status": "completed", "conclusion": "success",
+                               "created_at": "2026-10-08T14:10:05Z", "display_title": "[profile=us]"}],
+        "daily-codex-analysis.yml": [{"id": 2, "status": "completed", "conclusion": "success"}],
+    }
+    for completed_at, covered in [("2026-10-08T14:15:24Z", False),
+                                  ("2026-10-08T14:00:00Z", True), (None, True), ("invalid", True)]:
+        jobs = {
+            1: [{"name": "overlay_gate", "status": "completed", "conclusion": "success",
+                 "completed_at": "2026-10-08T14:10:36Z"},
+                {"name": "overlay_refresh_us", "status": "completed", "conclusion": "skipped"}],
+            2: [{"name": name, "status": "completed", "conclusion": "success", "completed_at": completed_at}
+                for name in target.dependencies[0].job_names],
+        }
+        assert watchdog.target_is_covered(client=FakeClient(runs=runs, jobs=jobs), target=target)[0] is covered
+    # Active overlay ownership and unsuccessful/mismatched baselines remain protected.
+    for baseline_status, baseline_profile in [("in_progress", "us"), ("completed", "kr")]:
+        runs["daily-codex-analysis.yml"][0]["status"] = baseline_status
+        jobs[2] = [{"name": name, "status": "completed", "conclusion": "success",
+                    "completed_at": "2026-10-08T14:15:24Z"}
+                   for name in (f"analyze_{baseline_profile}", "build_pages")]
+        assert watchdog.target_is_covered(client=FakeClient(runs=runs, jobs=jobs), target=target)[0]
+    runs[target.workflow_file][0]["status"] = "in_progress"
+    jobs[1][1].update(status="in_progress", conclusion="")
+    assert watchdog.target_is_covered(client=FakeClient(runs=runs, jobs=jobs), target=target)[0]
+
+
+def test_obsolete_overlay_skip_does_not_reset_failure_budget():
+    target = next(t for t in watchdog.due_targets(_kst("2026-10-08T23:53:00"))
+                  if t.workflow_file == "intraday-overlay-refresh.yml")
+    runs = {target.workflow_file: [
+        {"id": 3, "status": "completed", "conclusion": "failure", "head_sha": "abc",
+         "created_at": "2026-10-08T14:30:00Z"},
+        {"id": 2, "status": "completed", "conclusion": "success",
+         "created_at": "2026-10-08T14:10:05Z"},
+        {"id": 1, "status": "completed", "conclusion": "failure", "head_sha": "abc",
+         "created_at": "2026-10-08T14:00:00Z"},
+    ], "daily-codex-analysis.yml": [{"id": 4, "status": "completed", "conclusion": "success"}]}
+    failure = [{"name": "overlay_refresh_us", "status": "completed", "conclusion": "failure"}]
+    jobs = {1: failure, 3: failure, 2: [
+        {"name": "overlay_gate", "status": "completed", "conclusion": "success",
+         "completed_at": "2026-10-08T14:10:36Z"},
+        {"name": "overlay_refresh_us", "status": "completed", "conclusion": "skipped"}],
+        4: [{"name": name, "status": "completed", "conclusion": "success",
+             "completed_at": "2026-10-08T14:15:24Z"} for name in target.dependencies[0].job_names]}
+    covered, reason = watchdog.target_is_covered(client=FakeClient(runs=runs, jobs=jobs), target=target)
+    assert covered and reason.startswith("Retry budget exhausted after 2")
+
+
 def test_watchdog_repeated_log_unavailable_failure_has_bounded_budget():
     target = watchdog.WatchdogTarget(
         name="intraday-overlay-us",

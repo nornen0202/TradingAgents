@@ -1107,7 +1107,7 @@ def _market_sources(archive_dir: Path, market: str) -> list[dict[str, Any]]:
 def _local_private_overlay(run_dir: Path, manifest: dict[str, Any], bundle: dict[str, Any]) -> dict[str, Any]:
     artifacts = ((manifest.get("portfolio") or {}).get("artifacts") or {})
     report = load_json(_safe_artifact(run_dir, artifacts.get("portfolio_report_json")))
-    selected = {str(row.get("ticker") or "").upper() for row in (bundle.get("strategy_table") or [])}
+    selected = {str(row.get("ticker") or "").upper(): row for row in (bundle.get("strategy_table") or [])}
     actions = []
     for action in report.get("actions") or []:
         if not isinstance(action, dict):
@@ -1151,11 +1151,39 @@ def _local_private_overlay(run_dir: Path, manifest: dict[str, Any], bundle: dict
         ]
         if external_signals:
             compact_action["external_signals"] = external_signals
+        conditions = compact_action.get("trigger_conditions")
+        if isinstance(conditions, list):
+            # Portfolio conditions repeat the same full research plans already
+            # present in this ticker's thesis. Reference exact strings only;
+            # retain unique conditions, all gates, sizing and the full thesis.
+            shared = _thesis_text_references(selected[ticker].get("thesis") or {})
+            compact_action["trigger_conditions"] = [
+                {"thesis_ref": shared[item]} if isinstance(item, str) and item in shared else item
+                for item in conditions
+            ]
         actions.append(compact_action)
     return {
         "privacy": "LOCAL_ONLY_DO_NOT_PUBLISH",
         "actions": actions,
     } if actions else {}
+
+
+def _thesis_text_references(thesis: dict[str, Any]) -> dict[str, str]:
+    references: dict[str, str] = {}
+
+    def visit(value: Any, pointer: str) -> None:
+        if isinstance(value, str) and len(value) >= 128:
+            references.setdefault(value, pointer)
+        elif isinstance(value, dict):
+            for key, child in value.items():
+                escaped = str(key).replace("~", "~0").replace("/", "~1")
+                visit(child, f"{pointer}/{escaped}")
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                visit(child, f"{pointer}/{index}")
+
+    visit(thesis, "")
+    return references
 
 
 def _compact_private_external_signal(signal: dict[str, Any]) -> dict[str, Any]:

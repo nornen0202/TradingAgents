@@ -136,6 +136,15 @@ matching profile, a current/missing creation time, or a manual trigger retains
 the conservative active-ownership guard. A queued coverage result never proves
 analysis completion; verify the local manifest and heartbeat separately.
 
+An overlay gate that skipped before its research dependency completed does not
+cover a later check with that completed baseline. The watchdog compares the
+successful gate's completion time with the successful dependency job times and
+reconsiders the overlay only when that ordering is proven. Unknown timestamps,
+active owners and normal no-work results stay protected. An obsolete skip neither
+consumes nor clears the existing failure budget. October 8's 23:10 overlay was
+held until the US analysis completed at 23:12, but previously suppressed recovery
+for the rest of the 22:40 checkpoint window.
+
 For Work publication, read and apply
 [the repository Work skill](../.agents/skills/tradingagents-daily-investment-work/SKILL.md).
 Keep its canonical local runtime directory even when code repairs use a worktree.
@@ -144,6 +153,13 @@ Respect `NOOP`, `RESUME`, busy and regression results. Do not manually clear or
 overwrite pending state. An existing pending event can belong to an active
 scheduled writer; check before resuming it. Preserve thesis, required rows,
 receipt binding and execution gates. Do not re-ACK to repair a deployment.
+
+The local portfolio overlay can reference an exact repeated thesis condition by
+`thesis_ref`, a JSON Pointer into the same ticker's complete strategy-table thesis.
+Resolve these references when composing the report; retain unique portfolio
+conditions as well. This lossless representation keeps the packet's existing
+600,000-character limit and all rows, research, sizing and execution gates. It
+repairs the October 8 US packet overflow caused by repeated long research plans.
 
 All retries count toward the existing incident budget, including native,
 watchdog and manual attempts. A new heartbeat must not reset that budget. Group
