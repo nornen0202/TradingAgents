@@ -5,6 +5,7 @@ from tradingagents.llm_clients.codex_chat_model import CodexChatModel
 from tradingagents.llm_clients.role_config import codex_client_kwargs
 from tradingagents.portfolio.action_judge import _create_action_llm
 from tradingagents.portfolio.semantic_judge import _create_semantic_llm
+from tradingagents.scheduled.config import LLMSettings
 
 
 def _settings() -> SimpleNamespace:
@@ -59,7 +60,7 @@ def test_action_judge_without_configured_models_uses_current_codex_default():
         create_client.return_value.get_llm.return_value = object()
         _create_action_llm(SimpleNamespace(provider="codex", codex_judge_reasoning_effort="xhigh"))
 
-    assert create_client.call_args.kwargs["model"] == "gpt-6.1-sol"
+    assert create_client.call_args.kwargs["model"] == "gpt-6-astra"
     assert create_client.call_args.kwargs["codex_reasoning_effort"] == "xhigh"
     assert create_client.call_args.kwargs["model_role"] == "judge"
 
@@ -75,6 +76,17 @@ def test_semantic_judge_uses_sol_with_judge_effort():
     assert create_client.call_args.kwargs["model"] == "gpt-5.6-sol"
     assert create_client.call_args.kwargs["codex_reasoning_effort"] == "medium"
     assert create_client.call_args.kwargs["model_role"] == "judge"
+
+
+def test_default_portfolio_judges_use_astra_with_existing_effort():
+    for module, factory in (("action_judge", _create_action_llm), ("semantic_judge", _create_semantic_llm)):
+        with patch(f"tradingagents.portfolio.{module}.create_llm_client") as create_client:
+            create_client.return_value.get_llm.return_value = object()
+            factory(LLMSettings())
+
+        assert create_client.call_args.kwargs["model"] == "gpt-6-astra"
+        assert create_client.call_args.kwargs["codex_reasoning_effort"] == "xhigh"
+        assert create_client.call_args.kwargs["model_role"] == "judge"
 
 
 def test_codex_fallback_order_preserves_role_cost_class(monkeypatch):

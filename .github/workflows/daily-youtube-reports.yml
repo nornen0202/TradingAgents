@@ -455,7 +455,7 @@ jobs:
           try:
               judge_result = run_codex_preflight(
                   codex_binary=os.environ.get("CODEX_BINARY") or None,
-                  model="gpt-6.1-sol",
+                  model="gpt-6-astra",
                   request_timeout=30.0,
                   workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
                   cleanup_threads=True,
@@ -482,16 +482,16 @@ jobs:
           except CodexAppServerBinaryError as exc:
               raise SystemExit(f"Codex binary is not usable: {exc}") from exc
           except CodexModelUnavailableError as exc:
-              raise SystemExit(f"Required Codex model gpt-6.1-sol is unavailable; automatic model fallback is disabled: {exc}") from exc
+              raise SystemExit(f"A required Codex role model (gpt-6-astra or gpt-6.1-sol) is unavailable; automatic model fallback is disabled: {exc}") from exc
 
-          for role, result in (
-              ("judge/synthesis", judge_result),
-              ("extraction/research", quick_result),
-              ("writer", writer_result),
+          for role, result, expected_model in (
+              ("judge/synthesis", judge_result, "gpt-6-astra"),
+              ("extraction/research", quick_result, "gpt-6.1-sol"),
+              ("writer", writer_result, "gpt-6.1-sol"),
           ):
-              if result.fallback_used or result.resolved_model != "gpt-6.1-sol":
+              if result.fallback_used or result.resolved_model != expected_model:
                   raise SystemExit(
-                      f"Required YouTube {role} model gpt-6.1-sol was not selected; model fallback is disabled."
+                      f"Required YouTube {role} model {expected_model} was not selected; model fallback is disabled."
                   )
 
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as handle:

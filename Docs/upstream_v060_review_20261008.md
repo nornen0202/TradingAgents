@@ -26,7 +26,7 @@
 | 실행 간 설정 격리 | 모듈 전역 데이터 공급자 설정을 덮어씀 | context-local 설정과 명시적 실행 wrapper로 서로 다른 그래프를 격리 |
 | 패키지 레이아웃 재편 | 기존 import가 예약·계좌·PRISM·YouTube까지 넓게 연결 | 보류. 기능적 이익 없이 대규모 호환성 비용 발생 |
 | Jev 게시물 분류 | 현재 social 경로는 Yahoo/Naver 뉴스 기반 대체 정보 | 보류. Reddit/StockTwits 원문 수집이 없는 상태에서는 게시물 전용 분류 적용 대상이 없음 |
-| Sol/Luna 기본 모델 | 기존 Codex `gpt-6-sol`, 역할별 추론 강도 정책 운영 | 현재 공식 Codex 모델 `gpt-6.1-sol`로 모든 활성 기본 역할을 갱신. 기존 역할별 추론 강도와 모델 자동 대체 금지 유지 |
+| Sol/Luna 기본 모델 | 기존 Codex `gpt-6-sol`, 역할별 추론 강도 정책 운영 | 우선 `gpt-6.1-sol`로 갱신 후 후속 요청에 따라 최종 판단 deep/judge와 YouTube 검증·종합은 `gpt-6-astra`, 일반 분석·작성은 `gpt-6.1-sol`로 분리. 역할별 추론 강도와 모델 자동 대체 금지 유지 |
 
 ## 데이터 정확도와 장애 처리
 
@@ -90,7 +90,7 @@ provider = "codex"
 quick_think_provider = "codex"
 quick_model = "gpt-6.1-sol"
 deep_think_provider = "codex"
-deep_model = "gpt-6.1-sol"
+deep_model = "gpt-6-astra"
 output_think_provider = "codex"
 output_model = "gpt-6.1-sol"
 ```
@@ -99,7 +99,9 @@ output_model = "gpt-6.1-sol"
 
 ## 보고서 보안과 재현성
 
-프로젝트 기본 모델은 **Codex `gpt-6.1-sol`**이다. 분석 quick/deep/output, 보고서 writer, judge, 계좌 판단, YouTube 추출·검증·종합 및 예약 워크플로의 선호 모델을 함께 변경한다. [공식 Codex 모델 문서](https://learn.chatgpt.com/docs/models#recommended-models)의 정확한 모델 ID를 사용한다. 과거 기록이나 사용자가 명시적으로 선택할 수 있는 호환 모델 목록은 과거 모델을 유지할 수 있지만 현재 기본값과는 구별한다. 실행 환경의 자격 및 모델 가용성 검사는 기존 preflight를 사용하며, 모델이 없을 때 다른 모델로 조용히 대체하지 않는다.
+모델 기본값은 최초 **Codex `gpt-6.1-sol`**로 통합했다. 이후 같은 날 사용자가 최종 분석·판단에 **`gpt-6-astra`**를 지정하여 deep/judge를 Astra로 분리했다. 투자 심의·매매 계획·최종 포트폴리오 위험 판단과 계좌 행동·의미 평가가 해당한다. YouTube의 검증 및 최종 교차 종합도 Astra를 사용한다. 일반 자료 분석·토론(quick), 번역(output), 보고서 문장 작성(writer)은 Sol을 유지하며 기존 결정과 수치를 다시 판단하지 않는다. [공식 Codex 모델 문서](https://learn.chatgpt.com/docs/models#recommended-models)의 정확한 모델 ID를 사용한다. 기존 추론 강도와 자동 대체 금지 정책을 유지하고, Astra의 `xhigh` 호출에서 실제 짧은 응답을 별도로 확인했다.
+
+이 정책은 새 분석의 기본값이다. 명시적인 사용자 모델 설정은 계속 지원한다. `--resume-from-run`은 원본 실행의 성공 종목과 복구 종목을 같은 조건으로 묶는 기존 정책에 따라 원본 모델을 유지한다. Astra로 새 판단을 생성하려면 새 전체 분석을 시작해야 한다. 과거 보고서나 기록을 Astra 결과로 다시 표시하지 않는다. ChatGPT Work 브리핑의 요청 모델 정보와 응답 모델 미검증 표시는 별도로 유지한다.
 
 실제 실행 환경도 확인했다. 기존 `codex-cli 0.156.1`의 모델 목록에는 요청 모델이 없어 사전검사가 실패했다. 공식 `@openai/codex 0.161.0`을 프로젝트의 무시된 `.runtime/codex-cli`에 별도 설치하고, 프로젝트 `.env`, 기존 사용자 `CODEX_BINARY` 환경변수와 GitHub 저장소의 같은 변수를 새 실행 파일로 연결했다. 데스크톱 앱 실행 파일이나 Codex 전역 설정 파일은 변경하지 않았다. 새 프로세스에서 정확한 모델의 인증·가용성 확인과 프로젝트 `CodexClient`를 통한 짧은 응답 검증이 성공했고 모델 대체는 없었다. 기존 터미널은 이전 환경변수를 보유할 수 있으므로 다시 열어야 한다. 이미 진행 중인 분석은 중단하지 않았다.
 

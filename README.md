@@ -121,12 +121,14 @@ docker compose --profile ollama run --rm tradingagents-ollama
 최신 `main` 기준 기본 모델 역할은 아래와 같습니다.
 
 - `quick_think_llm`: `gpt-6.1-sol`
-- `deep_think_llm`: `gpt-6.1-sol`
+- `deep_think_llm`: `gpt-6-astra`
 - `output_think_llm`: `gpt-6.1-sol`
 
-스케줄 분석은 `writer_model=gpt-6.1-sol`, `judge_model=gpt-6.1-sol`을 추가로 분리합니다. 기본 reasoning effort는 quick/writer=`high`, deep/judge=`xhigh`, output=`medium`입니다.
+최종 투자 전략을 정하는 투자 심의(Research Manager), 매매 계획(Trader), 포트폴리오 위험 판단(Portfolio Manager)은 deep 모델인 **`gpt-6-astra`**를 사용합니다. 스케줄 분석의 계좌 행동 판단·의미 평가도 `judge_model=gpt-6-astra`를 사용합니다. 자료 분석·찬반 토론은 quick, 번역·표현 정리는 output, 보고서 작성은 `writer_model=gpt-6.1-sol`입니다. 기본 reasoning effort는 quick/writer=`high`, deep/judge=`xhigh`, output=`medium`입니다.
 
-YouTube 일일 파이프라인은 영상별 추출·검증·작성 뒤, 모든 공개 요약과 검증 리포트를 `gpt-6.1-sol`의 `high` reasoning으로 다시 교차 종합합니다. 종합 단계는 영상 간 공통점·상충점, 시장 환경, 종목별 조건부 행동과 무효화 조건을 구조화하며 YouTube 원문을 실시간 주문 지시로 승격하지 않습니다. 최신 결과는 PC `/youtube/insights.html`, 모바일 `/mobile/youtube-insights.html`에 게시되고 YouTube 완료 텔레그램 알림의 기본 링크로 제공됩니다.
+새 분석과 예약 실행은 이 역할 구분을 기본으로 사용하며 자동 모델 대체를 허용하지 않습니다. 명시적인 모델 설정은 계속 지원합니다. `--resume-from-run`으로 과거 실행을 복구하면 성공 종목과 새로 복구할 종목을 같은 조건으로 묶기 위해 원본 실행의 모델을 유지합니다. Astra 기준의 새 판단이 필요하면 새 전체 분석을 실행하세요. ChatGPT Work 브리핑 모델 설정은 별도 요청 정보이며 실제 응답 모델을 검증한 증거로 취급하지 않습니다.
+
+YouTube 일일 파이프라인은 영상별 검증과 최종 교차 종합에 `gpt-6-astra`를 사용하고, 추출·작성에는 `gpt-6.1-sol`을 유지합니다. 교차 종합의 reasoning은 기존 `high`를 유지합니다. 종합 단계는 영상 간 공통점·상충점, 시장 환경, 종목별 조건부 행동과 무효화 조건을 구조화하며 YouTube 원문을 실시간 주문 지시로 승격하지 않습니다. 최신 결과는 PC `/youtube/insights.html`, 모바일 `/mobile/youtube-insights.html`에 게시되고 YouTube 완료 텔레그램 알림의 기본 링크로 제공됩니다.
 
 예시:
 
@@ -137,7 +139,7 @@ from tradingagents.default_config import DEFAULT_CONFIG
 config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
 config["quick_think_llm"] = "gpt-6.1-sol"
-config["deep_think_llm"] = "gpt-6.1-sol"
+config["deep_think_llm"] = "gpt-6-astra"
 config["output_think_llm"] = "gpt-6.1-sol"
 
 graph = TradingAgentsGraph(debug=True, config=config)
@@ -279,7 +281,7 @@ Windows에서 자동 탐지를 덮어쓰려면:
 $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 ```
 
-`gpt-6.1-sol`을 제공하는 Codex CLI가 필요합니다. 이번 변경에서는 공식 `@openai/codex 0.161.0`으로 인증, 정확한 모델 선택, 실제 응답을 확인했습니다. 데스크톱 앱에 포함된 오래된 CLI를 가리키면 앱의 모델 선택과 별개로 분석이 실패할 수 있습니다. CLI는 프로젝트 `.env`를 읽고, 예약 실행은 프로세스 환경변수 또는 GitHub 저장소의 `CODEX_BINARY` 변수를 사용합니다. 환경변수를 바꾼 뒤 이미 열려 있던 터미널은 다시 여세요.
+`gpt-6-astra`와 `gpt-6.1-sol`을 제공하는 Codex CLI가 필요합니다. 공식 `@openai/codex 0.161.0`으로 두 모델의 인증, 정확한 모델 선택, 실제 응답을 확인했습니다. 데스크톱 앱에 포함된 오래된 CLI를 가리키면 앱의 모델 선택과 별개로 분석이 실패할 수 있습니다. CLI는 프로젝트 `.env`를 읽고, 예약 실행은 프로세스 환경변수 또는 GitHub 저장소의 `CODEX_BINARY` 변수를 사용합니다. 환경변수를 바꾼 뒤 이미 열려 있던 터미널이나 실행 앱은 다시 여세요.
 
 ## 스케줄 분석과 정적 리포트 사이트
 

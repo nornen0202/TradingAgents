@@ -534,7 +534,7 @@ jobs:
           workspace_dir = Path(os.environ["GITHUB_WORKSPACE"]) / ".codex-preflight"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
-          preferred_deep_model = "gpt-6.1-sol"
+          preferred_deep_model = "gpt-6-astra"
           preferred_quick_model = "gpt-6.1-sol"
           preferred_output_model = "gpt-6.1-sol"
           from datetime import datetime, timezone
@@ -617,7 +617,7 @@ jobs:
               raise SystemExit(1)
           except CodexModelUnavailableError as exc:
               message = (
-                  "Required Codex model gpt-6.1-sol is unavailable for the runner. "
+                  f"Required Codex role model is unavailable (deep/judge={preferred_deep_model}, quick={preferred_quick_model}, output/writer={preferred_output_model}). "
                   "Update the Codex installation/account; automatic model fallback is disabled."
               )
               print(f"::error::{message}")
@@ -1176,7 +1176,7 @@ jobs:
           workspace_dir = Path(os.environ["GITHUB_WORKSPACE"]) / ".codex-preflight"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
-          preferred_deep_model = "gpt-6.1-sol"
+          preferred_deep_model = "gpt-6-astra"
           preferred_quick_model = "gpt-6.1-sol"
           preferred_output_model = "gpt-6.1-sol"
           from datetime import datetime, timezone
@@ -1259,7 +1259,7 @@ jobs:
               raise SystemExit(1)
           except CodexModelUnavailableError as exc:
               message = (
-                  "Required Codex model gpt-6.1-sol is unavailable for the runner. "
+                  f"Required Codex role model is unavailable (deep/judge={preferred_deep_model}, quick={preferred_quick_model}, output/writer={preferred_output_model}). "
                   "Update the Codex installation/account; automatic model fallback is disabled."
               )
               print(f"::error::{message}")
