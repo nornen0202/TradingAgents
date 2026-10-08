@@ -647,7 +647,7 @@ def _load_recovery_report(
     return report, report_path
 
 
-def validate_packet(packet: dict[str, Any], *, max_chars: int = 600_000) -> None:
+def validate_packet(packet: dict[str, Any], *, max_chars: int = 700_000) -> None:
     required = (
         "schema",
         "surface",
@@ -820,7 +820,7 @@ _REPORT_SENSITIVE_VALUE_PATTERNS = (
 )
 
 
-def validate_work_report(report: dict[str, Any], *, max_chars: int = 500_000) -> None:
+def validate_work_report(report: dict[str, Any], *, max_chars: int = 600_000) -> None:
     required = (
         "schema",
         "surface",

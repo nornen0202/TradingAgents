@@ -13,7 +13,7 @@ import pytest
 from tradingagents.work import packet as work_packet
 from tradingagents.work.handoff import WORK_HANDOFF_SCHEMA, dispatch_pages_handoff
 from tradingagents.work.packet import WORK_REPORT_SCHEMA, WORK_SCHEMA, build_surface_packet
-from tradingagents.work.runtime import WorkRuntime, WorkRuntimeError, validate_packet
+from tradingagents.work.runtime import WorkRuntime, WorkRuntimeError, validate_packet, validate_work_report
 from tradingagents.work.site import _fit_packet_budget, build_work_site
 
 
@@ -25,6 +25,15 @@ def test_packet_budget_counts_serialized_content_without_layout_whitespace():
     validate_packet(packet, max_chars=compact_chars)
     with pytest.raises(WorkRuntimeError, match="Work packet is too large"):
         validate_packet(packet, max_chars=compact_chars - 1)
+
+
+def test_packet_budget_accommodates_complete_market_universe():
+    packet = work_packet.seal_packet("us", body={"kind": "market", "items": ["x"] * 160_000})
+    compact_chars = len(json.dumps(packet, ensure_ascii=False, separators=(",", ":")))
+    assert 600_000 < compact_chars < 700_000
+    validate_packet(packet)
+    with pytest.raises(WorkRuntimeError, match="Work packet is too large"):
+        validate_packet(packet, max_chars=600_000)
 
 
 def test_expiry_downgrades_all_current_labels_but_preserves_research_thesis():
@@ -558,6 +567,28 @@ def _publish_market(runtime: WorkRuntime, prepared: dict, *, archive: Path) -> d
         archive_dir=archive,
         now=market_asof + timedelta(minutes=6),
     )
+
+
+def test_complete_market_report_can_exceed_legacy_budget(tmp_path: Path):
+    archive = tmp_path / "archive"
+    _write_market_run(archive, run_id="expanded-report", market="us",
+                      started_at="2026-07-14T14:00:00Z")
+    runtime = WorkRuntime(tmp_path / "runtime")
+    prepared = runtime.prepare("us", archive_dir=archive,
+                               now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc))
+    published = runtime.publish(
+        "us", prepared["event_id"], prepared["source_sha256"],
+        report_markdown="# 테스트 전략\n\n" + "자료 확인. " * 75_000,
+        structured_report=_structured_report(prepared),
+        archive_dir=archive,
+        now=datetime(2026, 7, 14, 14, 6, tzinfo=timezone.utc),
+    )
+    report = json.loads(Path(published["report_path"]).read_text(encoding="utf-8"))
+    size = len(json.dumps(report, ensure_ascii=False, indent=2))
+    assert 500_000 < size < 600_000
+    validate_work_report(report)
+    with pytest.raises(WorkRuntimeError, match="Work report is too large"):
+        validate_work_report(report, max_chars=500_000)
 
 
 def test_non_ready_latest_market_run_still_builds_work_event(tmp_path: Path):
