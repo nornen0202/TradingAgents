@@ -3,8 +3,10 @@ from __future__ import annotations
 import importlib.util
 import base64
 import json
+import io
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -61,9 +63,67 @@ def test_mirror_retries_mixed_deployment_but_never_publishes_it(monkeypatch, tmp
             return encoded if len(calls) % (len(mirror.FILES) + 2) == 1 else encoded + b" "
         return (tmp_path / "ai" / url.split("/ai/")[1]).read_bytes()
     monkeypatch.setattr(mirror, "fetch", fetch)
+    monkeypatch.setattr(mirror.time, "sleep", lambda _: None)
     with pytest.raises(ValueError, match="changed"):
         mirror.download_snapshot()
-    assert len(calls) == 2 * (len(mirror.FILES) + 2)
+    assert len(calls) == 3 * (len(mirror.FILES) + 2)
+
+
+def test_mirror_bypasses_coherent_stale_url_cache(monkeypatch, tmp_path):
+    old = build_ai_context(tmp_path, now=datetime(2026, 7, 10, tzinfo=timezone.utc))
+    old_files = {name: (tmp_path / "ai" / name).read_bytes() for name in mirror.FILES}
+    old_files["manifest.json"] = json.dumps(old).encode()
+    current = build_ai_context(tmp_path, now=datetime(2026, 7, 11, tzinfo=timezone.utc))
+    current_files = {name: (tmp_path / "ai" / name).read_bytes() for name in mirror.FILES}
+    current_files["manifest.json"] = json.dumps(current).encode()
+    urls = []
+    def cached_response(request, timeout):
+        urls.append(request.full_url)
+        parsed = urlsplit(request.full_url)
+        name = parsed.path.split("/ai/")[1]
+        # The CDN can retain a complete, hash-valid previous deployment at
+        # stable URLs despite Cache-Control: no-cache on the request.
+        return io.BytesIO((current_files if parsed.query else old_files)[name])
+    monkeypatch.setattr(mirror, "urlopen", cached_response)
+    manifest, files = mirror.download_snapshot()
+    assert manifest == current and files == current_files
+    assert len(set(urls)) == len(mirror.FILES) + 2
+
+
+def test_mirror_retries_stable_manifest_with_one_stale_file(monkeypatch, tmp_path):
+    manifest = build_ai_context(tmp_path, now=datetime(2026, 7, 11, tzinfo=timezone.utc))
+    expected = {name: (tmp_path / "ai" / name).read_bytes() for name in mirror.FILES}
+    encoded = json.dumps(manifest).encode()
+    calls, delays = [], []
+    def fetch(url):
+        calls.append(url)
+        if url.endswith("manifest.json"):
+            return encoded
+        name = url.split("/ai/")[1]
+        if name == "us/latest.md" and len(calls) <= len(mirror.FILES) + 2:
+            return b"old deployment"
+        return expected[name]
+    monkeypatch.setattr(mirror, "fetch", fetch)
+    monkeypatch.setattr(mirror.time, "sleep", delays.append)
+    actual, files = mirror.download_snapshot()
+    assert actual == manifest and files == {**expected, "manifest.json": encoded}
+    assert len(calls) == 2 * (len(mirror.FILES) + 2) and delays == [2]
+
+
+def test_mirror_integrity_retry_budget_never_publishes_corruption(monkeypatch, tmp_path):
+    manifest = build_ai_context(tmp_path, now=datetime(2026, 7, 11, tzinfo=timezone.utc))
+    calls, delays = [], []
+    def fetch(url):
+        calls.append(url)
+        if url.endswith("manifest.json"):
+            return json.dumps(manifest).encode()
+        return b"permanent mismatch"
+    monkeypatch.setattr(mirror, "fetch", fetch)
+    monkeypatch.setattr(mirror.time, "sleep", delays.append)
+    monkeypatch.setattr(mirror, "api", lambda *a, **k: pytest.fail("unverified snapshot reached Git API"))
+    with pytest.raises(ValueError, match="integrity"):
+        mirror.publish()
+    assert len(calls) == 3 * (len(mirror.FILES) + 2) and delays == [2, 5]
 
 
 def test_sell_condition_cannot_inherit_buy_trigger():

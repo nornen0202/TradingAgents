@@ -8,6 +8,7 @@ import time
 from datetime import datetime, timezone
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+from uuid import uuid4
 
 BASE = "https://nornen0202.github.io/TradingAgents/ai"
 API = "https://api.github.com/repos/nornen0202/TradingAgents"
@@ -16,6 +17,9 @@ FILES = {f"{market}/latest.{extension}" for market in ("kr", "us") for extension
 
 
 def fetch(url: str) -> bytes:
+    # Stable Pages URLs can serve a coherent old snapshot despite no-cache.
+    # Give every read (including the second manifest) a fresh CDN cache key.
+    url = f"{url}{'&' if '?' in url else '?'}snapshot_read={uuid4().hex}"
     with urlopen(Request(url, headers={"Cache-Control": "no-cache", "User-Agent": "TradingAgents-Public-Reader"}), timeout=30) as response:
         return response.read(600_001)
 
@@ -41,16 +45,25 @@ def validate_snapshot(manifest: dict, files: dict[str, bytes]) -> None:
 
 
 def download_snapshot() -> tuple[dict, dict[str, bytes]]:
-    for _ in range(2):
-        first = fetch(f"{BASE}/manifest.json")
-        manifest = json.loads(first)
-        files = {name: fetch(f"{BASE}/{name}") for name in sorted(FILES)}
-        if first != fetch(f"{BASE}/manifest.json"):
+    for attempt in range(3):
+        try:
+            first = fetch(f"{BASE}/manifest.json")
+            manifest = json.loads(first)
+            files = {name: fetch(f"{BASE}/{name}") for name in sorted(FILES)}
+            if first != fetch(f"{BASE}/manifest.json"):
+                raise ValueError("Pages changed during snapshot fetch; mirror not updated")
+            validate_snapshot(manifest, files)
+        except ValueError:
+            # A manifest can stay stable while an edge serves an older child
+            # file. Discard the entire download; never relax its hash checks.
+            if attempt == 2:
+                raise
+            print(f"::warning::Public snapshot not consistent; retry {attempt + 2}/3")
+            time.sleep((2, 5)[attempt])
             continue
-        validate_snapshot(manifest, files)
         files["manifest.json"] = first
         return manifest, files
-    raise ValueError("Pages changed during snapshot fetch; mirror not updated")
+    raise RuntimeError("Public snapshot retry budget exhausted")
 
 
 def api(path: str, method: str = "GET", payload: dict | None = None):
@@ -97,7 +110,9 @@ def publish() -> None:
         import base64
         old = json.loads(base64.b64decode(api(f"/contents/manifest.json?ref={head}")["content"]))
         if timestamp(old["generated_at"]) >= timestamp(manifest["generated_at"]):
-            print("Mirror already at this or a newer snapshot; no update")
+            print("Mirror already at this or a newer snapshot; no update; "
+                  f"public_generated_at={manifest['generated_at']} "
+                  f"mirror_generated_at={old['generated_at']}")
             return
     tree = api("/git/trees", "POST", {"tree": [
         {"path": name, "mode": "100644", "type": "blob", "content": content.decode("utf-8")}
