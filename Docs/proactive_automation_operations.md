@@ -117,6 +117,17 @@ operator's evidence-based repair, not another unbounded retry. A successful
 followup workflow is only coverage for dispatch deduplication: operations must
 still verify `SENT`/policy `SKIPPED` and actual mirror/Pages contents.
 
+Public AI mirrors use a unique cache key on every Pages read, including both
+manifest reads. A stable manifest with a stale child file is retried as a whole
+snapshot, at most three attempts with two- and five-second backoffs. Hash, byte
+count, generation, allowlist and non-rollback checks remain mandatory. A green
+`already at this or a newer snapshot` log still needs the current branch manifest
+and live Pages manifest compared; its log includes both generation timestamps.
+On October 8, a stable-URL read first failed integrity, then a later successful
+workflow left the mirror at the prior generation. Bounded workflow retries
+restored it; cache-bypassing reads prevent reuse of that cached response. Exact
+CDN propagation behavior was not established by the logs.
+
 For Daily analysis, an unidentified native scheduled run that is still queued
 with no jobs and was created before the target production window does not cover
 that new window. An October 8 check reproduced an earlier US-era queue blocking
