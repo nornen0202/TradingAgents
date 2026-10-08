@@ -42,7 +42,8 @@ MODEL_OPTIONS: ProviderModeOptions = {
             ("GPT-4.1 - Strong non-reasoning fallback", "gpt-4.1"),
         ],
         "deep": [
-            ("GPT-6.1 Sol - Default Codex reasoning", "gpt-6.1-sol"),
+            ("GPT-6 Astra - Default investment decisions", "gpt-6-astra"),
+            ("GPT-6.1 Sol - General Codex reasoning", "gpt-6.1-sol"),
             ("GPT-6 Sol - High-quality Codex reasoning", "gpt-6-sol"),
             ("GPT-5.6 Sol - Frontier Codex model", "gpt-5.6-sol"),
             ("GPT-5.6 Terra - Balanced Codex model", "gpt-5.6-terra"),

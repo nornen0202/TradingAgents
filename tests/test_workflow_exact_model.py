@@ -5,6 +5,7 @@ from types import SimpleNamespace
 import pytest
 
 from tradingagents.llm_clients import codex_preflight
+from tradingagents.scheduled import research_recovery
 
 
 def _preflight_scripts(path):
@@ -20,12 +21,16 @@ SCRIPTS = [
 
 
 @pytest.mark.parametrize("script", SCRIPTS, ids=["us", "kr", "youtube"])
-@pytest.mark.parametrize("resolved,fallback", [("gpt-6-sol", True), ("gpt-6-sol", False), ("gpt-6.1-sol", True)])
+@pytest.mark.parametrize("resolved,fallback", [
+    ("gpt-6-sol", True), ("gpt-6-sol", False), ("gpt-6.1-sol", True),
+    ("gpt-6.1-sol", False), ("gpt-6-astra", False),
+])
 def test_workflow_rejects_model_substitution_before_export(tmp_path, monkeypatch, script, resolved, fallback):
     env_file = tmp_path / "github-env"
     monkeypatch.setenv("GITHUB_ENV", str(env_file))
     monkeypatch.setenv("GITHUB_WORKSPACE", str(tmp_path))
     monkeypatch.setenv("TRADINGAGENTS_CODEX_WORKSPACE_DIR", str(tmp_path))
+    monkeypatch.setenv("TRADINGAGENTS_RESUME_FROM_RUN", "")
     monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
     monkeypatch.setenv("TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK", "0")
     calls = []
@@ -38,7 +43,8 @@ def test_workflow_rejects_model_substitution_before_export(tmp_path, monkeypatch
     with pytest.raises(SystemExit, match="model fallback is disabled"):
         exec(compile(script, "workflow-preflight", "exec"), {})
     assert len(calls) == 3
-    assert all(call["model"] == "gpt-6.1-sol" and not call["fallback_models"] for call in calls)
+    assert [call["model"] for call in calls] == ["gpt-6-astra", "gpt-6.1-sol", "gpt-6.1-sol"]
+    assert all(not call["fallback_models"] for call in calls)
     assert not env_file.exists()
 
 
@@ -48,15 +54,49 @@ def test_workflow_exports_exact_target_for_each_active_role(tmp_path, monkeypatc
     monkeypatch.setenv("GITHUB_ENV", str(env_file))
     monkeypatch.setenv("GITHUB_WORKSPACE", str(tmp_path))
     monkeypatch.setenv("TRADINGAGENTS_CODEX_WORKSPACE_DIR", str(tmp_path))
+    monkeypatch.setenv("TRADINGAGENTS_RESUME_FROM_RUN", "")
     monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
     monkeypatch.setenv("TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK", "0")
     monkeypatch.setattr(codex_preflight, "run_codex_preflight", lambda **kwargs: SimpleNamespace(
-        requested_model=kwargs["model"], resolved_model="gpt-6.1-sol", fallback_used=False,
-        account="test-account", models=["gpt-6.1-sol"],
+        requested_model=kwargs["model"], resolved_model=kwargs["model"], fallback_used=False,
+        account="test-account", models=["gpt-6-astra", "gpt-6.1-sol"],
     ))
     exec(compile(script, "workflow-preflight", "exec"), {})
     exported = env_file.read_text(encoding="utf-8").splitlines()
     models = [line for line in exported if "_MODEL=" in line]
     assert len(models) in (4, 5)
-    assert all(line.endswith("=gpt-6.1-sol") for line in models)
+    for line in models:
+        expected = "gpt-6-astra" if any(role in line for role in ("_DEEP_", "_JUDGE_", "_SYNTHESIS_")) else "gpt-6.1-sol"
+        assert line.endswith(f"={expected}")
+    assert len([line for line in models if line.endswith("=gpt-6-astra")]) == 2
     assert "TRADINGAGENTS_CODEX_PREFLIGHT_OK=1" in exported
+
+
+@pytest.mark.parametrize("script", SCRIPTS[:2], ids=["us", "kr"])
+def test_explicit_recovery_preserves_verified_source_cohort_models(tmp_path, monkeypatch, script):
+    env_file = tmp_path / "github-env"
+    monkeypatch.setenv("GITHUB_ENV", str(env_file))
+    monkeypatch.setenv("GITHUB_WORKSPACE", str(tmp_path))
+    monkeypatch.setenv("TRADINGAGENTS_RESUME_FROM_RUN", "20261008T010000_full")
+    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+    monkeypatch.setenv("TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK", "0")
+    requested = []
+
+    def recovered_models(**kwargs):
+        assert kwargs["source_run_id"] == "20261008T010000_full"
+        assert (kwargs["quick_model"], kwargs["deep_model"], kwargs["output_model"]) == (
+            "gpt-6.1-sol", "gpt-6-astra", "gpt-6.1-sol",
+        )
+        return ("gpt-6-sol",) * 3
+
+    def preflight(**kwargs):
+        requested.append(kwargs["model"])
+        return SimpleNamespace(requested_model=kwargs["model"], resolved_model=kwargs["model"],
+                               fallback_used=False, account="test-account", models=["gpt-6-sol"])
+
+    monkeypatch.setattr(research_recovery, "recovery_preflight_models", recovered_models)
+    monkeypatch.setattr(codex_preflight, "run_codex_preflight", preflight)
+    exec(compile(script, "workflow-recovery-preflight", "exec"), {})
+    assert requested == ["gpt-6-sol"] * 3
+    models = [line for line in env_file.read_text(encoding="utf-8").splitlines() if "_MODEL=" in line]
+    assert len(models) == 5 and all(line.endswith("=gpt-6-sol") for line in models)

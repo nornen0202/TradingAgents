@@ -67,10 +67,14 @@ The base config lives in [tradingagents/default_config.py](tradingagents/default
 Current default model roles on `main` are:
 
 - `quick_think_llm`: `gpt-6.1-sol`
-- `deep_think_llm`: `gpt-6.1-sol`
+- `deep_think_llm`: `gpt-6-astra`
 - `output_think_llm`: `gpt-6.1-sol`
 
-Scheduled analysis further separates `writer_model=gpt-6.1-sol` and `judge_model=gpt-6.1-sol`. Default reasoning effort is quick/writer=`high`, deep/judge=`xhigh`, output=`medium`.
+The Research Manager, Trader and Portfolio Manager use the deep model **`gpt-6-astra`** for final investment strategy, trading plans and portfolio risk decisions. Scheduled account-action and semantic judgments use `judge_model=gpt-6-astra`. Routine analysis/debate, localization and report writing retain `gpt-6.1-sol` through quick/output and `writer_model`. Default reasoning effort is quick/writer=`high`, deep/judge=`xhigh`, output=`medium`.
+
+Fresh analyses and scheduled runs use this split without automatic model substitution; explicit custom settings remain supported. `--resume-from-run` retains the source run's models so recovered and reused research share the same model provenance. Start a new full analysis for fresh Astra decisions. ChatGPT Work briefing model settings are a separate request contract, not proof of the actual response model.
+
+YouTube verification and final cross-video synthesis use `gpt-6-astra`; extraction and report writing retain `gpt-6.1-sol`. Existing reasoning efforts, including `high` for synthesis, remain unchanged.
 
 Example:
 
@@ -81,7 +85,7 @@ from tradingagents.default_config import DEFAULT_CONFIG
 config = DEFAULT_CONFIG.copy()
 config["llm_provider"] = "codex"
 config["quick_think_llm"] = "gpt-6.1-sol"
-config["deep_think_llm"] = "gpt-6.1-sol"
+config["deep_think_llm"] = "gpt-6-astra"
 config["output_think_llm"] = "gpt-6.1-sol"
 
 graph = TradingAgentsGraph(debug=True, config=config)
@@ -222,7 +226,7 @@ On Windows, you can override binary discovery explicitly:
 $env:CODEX_BINARY = "C:\full\path\to\codex.exe"
 ```
 
-Use a Codex CLI that lists `gpt-6.1-sol`. Authentication, exact model selection and a real response were verified with official `@openai/codex 0.161.0`. An older CLI bundled with the desktop app can fail independently of the model selected in the app. The interactive/headless CLI reads the project `.env`; scheduled processes use their environment or the GitHub repository's `CODEX_BINARY` variable. Reopen existing terminals after changing the environment variable.
+Use a Codex CLI that lists both `gpt-6-astra` and `gpt-6.1-sol`. Authentication, exact model selection and real responses for both were verified with official `@openai/codex 0.161.0`. An older CLI bundled with the desktop app can fail independently of the model selected in the app. The interactive/headless CLI reads the project `.env`; scheduled processes use their environment or the GitHub repository's `CODEX_BINARY` variable. Reopen existing terminals or launching apps after changing the environment variable.
 
 ## Scheduled Analysis and Static Reports
 

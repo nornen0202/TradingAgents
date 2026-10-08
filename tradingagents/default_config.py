@@ -17,7 +17,7 @@ DEFAULT_CONFIG = {
     "data_cache_dir": os.getenv("TRADINGAGENTS_DATA_CACHE_DIR", str(Path.home() / ".tradingagents" / "cache")),
     # LLM settings
     "llm_provider": "codex",
-    "deep_think_llm": "gpt-6.1-sol",
+    "deep_think_llm": "gpt-6-astra",
     "quick_think_llm": "gpt-6.1-sol",
     "output_think_llm": "gpt-6.1-sol",
     # Optional per-tier overrides; unset tiers keep the shared provider/endpoint.
