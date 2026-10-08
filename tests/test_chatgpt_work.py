@@ -247,6 +247,44 @@ def _write_market_run(
     return run_dir
 
 
+def test_private_overlay_references_duplicate_conditions_losslessly(tmp_path: Path):
+    import copy
+
+    rows, actions = [], []
+    for index in range(30):
+        ticker = f"TEST{index}"
+        condition = f"{ticker} 지지 회복·거래량 확인 후 검토. " * 500
+        rows.append({"ticker": ticker, "thesis": {"execution/plan": {"entry~condition": condition}}})
+        actions.append({"canonical_ticker": ticker,
+                        "trigger_conditions": [condition, "계좌 위험 한도를 재확인", condition],
+                        "action_now": "HOLD", "delta_krw_now": 0,
+                        "gate_reasons": ["ACCOUNT_RECHECK"], "position_metrics": {"weight": 0.1}})
+    original_rows = copy.deepcopy(rows)
+    (tmp_path / "portfolio.json").write_text(json.dumps({"actions": actions}), encoding="utf-8")
+    compact = work_packet._local_private_overlay(
+        tmp_path, {"portfolio": {"artifacts": {"portfolio_report_json": "portfolio.json"}}},
+        {"strategy_table": rows},
+    )
+    for original, action, row in zip(actions, compact["actions"], rows):
+        restored = []
+        for item in action["trigger_conditions"]:
+            if isinstance(item, dict):
+                value = row["thesis"]
+                for key in item["thesis_ref"].split("/")[1:]:
+                    key = key.replace("~1", "/").replace("~0", "~")
+                    value = value[int(key)] if isinstance(value, list) else value[key]
+                restored.append(value)
+            else:
+                restored.append(item)
+        assert restored == original["trigger_conditions"]
+        assert action["action_now"] == "HOLD" and action["delta_krw_now"] == 0
+        assert action["gate_reasons"] == ["ACCOUNT_RECHECK"]
+        assert action["position_metrics"] == {"weight": 0.1}
+    assert rows == original_rows
+    assert len(json.dumps(compact, ensure_ascii=False)) < len(json.dumps(actions, ensure_ascii=False)) / 10
+    assert work_packet._thesis_text_references({"conditions": ["x" * 128]}) == {"x" * 128: "/conditions/0"}
+
+
 def test_private_overlay_compacts_external_signals_without_losing_decision_inputs(tmp_path: Path):
     run_dir = tmp_path / "run"
     run_dir.mkdir()

@@ -4,6 +4,8 @@
 
 ## 처리 전 검증
 
+로컬 `private_portfolio_overlay.actions[].trigger_conditions`의 `{"thesis_ref":"/경로"}` 항목은 같은 `canonical_ticker`의 `current.bundle.strategy_table[].thesis` 안에 있는 문자열을 가리키는 JSON Pointer다. 원문이 정확히 같을 때만 중복 대신 참조하며, 새 조건이나 생략이 아니다. 해당 원문을 찾아 고유 조건·계좌 제약과 함께 해석하고, 보고서에는 참조 객체 대신 실제 조건을 쓴다.
+
 1. `surface=kr`, schema, event ID, prompt contract, source hash의 존재와 일치를 확인한다.
 2. `current`와 `last_ready`를 절대 합쳐 현재 전략처럼 표현하지 않는다. 과거 last-ready는 명시적으로 만료된 참고 자료다.
 3. 답변을 만드는 현재 시각에 `generated_at`, `started_at`, `market_data_asof`, `guardrails.valid_until`, 행별 `row_valid_until`을 다시 검증한다. 필드가 없거나 파싱 불가·미래 시각·순서 역전이면 fail-closed 한다.
