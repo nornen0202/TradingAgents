@@ -70,6 +70,87 @@ producer finishing after the last Work slot still needs its report published.
 
 ## Recovery decisions
 
+### Require an outcome, not another observation
+
+The heartbeat is an operator, not an audit-only task. For each open incident,
+finish the run with one of these outcomes and concrete evidence:
+
+- `REPAIRED`: the original symptom is absent and the intended result is verified.
+- `IN_PROGRESS`: an actual run/worker is progressing; record its ID, last progress,
+  remaining verification and next check. An accepted dispatch alone is not progress.
+- `BLOCKED_EXTERNAL`: name the exact external control, evidence, responsible
+  party, supported unblock action and the observation that will permit recovery.
+- `HEALTHY`: the relevant production and delivery obligations are satisfied.
+
+Use these as incident outcomes, not as the Codex Goal API's status. Unchanged
+timestamps, repeated API reads and new snapshots are not repair progress. Two
+consecutive checks without progress require a different diagnostic or a concrete
+external handoff in that run; do not merely roll `next_check_at` forward. This
+does not reset retry limits or require changes without evidence. Continue
+independent authorized repairs while one action is blocked. After a documented
+external handoff, check only its clearance signal until it changes; do not repeat
+the full archive/report audit hourly. Recheck affected delivery obligations when
+their deadlines change or when the blocker clears.
+
+For a newly blocked or materially worsened incident, report impact, exact action
+already attempted, blocker and next owner/action. Preserve the outstanding action
+even if duplicate alerts are suppressed; never equate `DONT_NOTIFY` with resolved
+or "no action needed". Notify on repair, new impact or newly required user action.
+
+### Repository invocation block: inspect the actual control
+
+`actions/permissions.enabled=true`, active workflow definitions and online runners
+do not prove that GitHub permits repository execution. When annotations say
+`repository invocation blocked` or dispatch returns `Actions has been disabled
+for this repository`, inspect the repository's Actions page with an authorized
+signed-in browser, in addition to the API. A signed-out page can expose the
+reason but omit the maintainer's repair control. If the browser is unavailable,
+try the supported available browser surface; do not label this a support-only
+incident without inspecting the accessible control.
+
+On 2026-10-10, the signed-in page explicitly said GitHub had disabled workflows
+on this fork because of Actions usage, and offered a maintainer re-enable button.
+The normal repository permissions API still returned enabled. The authorized
+operator used that official control and observed `Actions Enabled.`; no token,
+repository permission or environment protection was changed. This is a supported
+restoration path when the displayed reason and user authorization permit it,
+not permission to bypass an account/security restriction or accept new terms.
+Escalate those cases with the exact screen and required action.
+
+After clearance, check active ownership and launch one bounded existing watchdog
+run. Verify its jobs, then recover only still-required production/delivery stages
+using current-session and exact-report evidence. Do not replay every missed
+schedule, re-ACK a report, or call yesterday's research today's analysis. A missed
+session can remain `MISSED` even after infrastructure and reference delivery are
+restored. Record those outcomes separately.
+
+Usage-related disablement also requires reviewing native probes, local dispatches,
+watchdog retries and downstream fan-out. Attribute counts before changing cadence;
+the banner establishes the usage-related disablement but does not identify a
+specific threshold or offending workflow. Reduce proven redundant work while
+preserving market deadlines and failure notifications. Do not repeatedly re-enable
+and flood the same workflows as a substitute for that review.
+
+### Keep approval failures scoped to the rejected action
+
+A Codex automatic approval rejection and a GitHub execution restriction are
+different incidents. Capture the rejected action and actual reason; if the only
+reason is `blocked by policy`, say so rather than inventing a cause. Do not retry
+the same prohibited effect through another tool or disable approval protections.
+Continue unrelated permitted diagnostics and repairs. If durable receipt writing
+is blocked, report the last persisted time and include the new evidence in the
+chat; do not claim it was saved or let stale state override current evidence.
+Request only the specific missing approval if it is necessary to proceed.
+
+The current topology has an independent Codex observer, but its recovery dispatch
+still depends on GitHub Actions. Moving the same dispatch to a local timer does
+not remove that dependency. A future availability redesign should separate the
+calendar/lease-driven producer from GitHub transport, reuse the same validated
+entrypoints, and maintain one writer with immutable execution/delivery receipts.
+Keep repository CI and deployment on their existing paths until an independently
+authorized and tested replacement exists. Such a redesign is not activated by
+this runbook and must never serve as a workaround for an explicit policy denial.
+
 | Evidence | Action | Completion evidence |
 | --- | --- | --- |
 | Watchdog has not started for over 60 minutes and none is active | Dispatch `scheduled-actions-watchdog.yml` once on `main`, with `dry_run=false`; record its run ID and inspect its output | Actual watchdog completion and the due target's run ID or a justified covered/held result |
