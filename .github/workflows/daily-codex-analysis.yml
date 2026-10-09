@@ -1761,7 +1761,7 @@ jobs:
   deploy:
     needs:
       - build_pages
-    if: ${{ always() && needs.build_pages.result == 'success' }}
+    if: ${{ always() && vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && needs.build_pages.result == 'success' }}
     runs-on: ubuntu-latest
     concurrency:
       group: tradingagents-pages-deploy

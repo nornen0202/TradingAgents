@@ -303,7 +303,7 @@ jobs:
 
   deploy:
     needs: build_work_report_pages
-    if: ${{ needs.build_work_report_pages.result == 'success' }}
+    if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && needs.build_work_report_pages.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     concurrency:

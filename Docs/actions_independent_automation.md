@@ -74,8 +74,8 @@ to the local authority variable, and other report-addon workflows retain their
 collectors while their Pages deploy jobs yield to the single local publisher.
 YouTube/PRISM collection itself remains a separate workflow capability.
 
-Disable the old `IntradayOverlay-*` Windows dispatch tasks after installing the
-local scheduler: the local scheduler uses exchange-calendar checkpoints and
+The installer records and disables the old `IntradayOverlay-*` Windows dispatch
+tasks for this repository: the local scheduler uses exchange-calendar checkpoints and
 does not need repeated cloud dispatch. Disable the cloud scheduled watchdog
 and daily/overlay workflow schedules after the admitted run has drained to
 avoid continuing to create empty skipped runs. Keep runner registrations.

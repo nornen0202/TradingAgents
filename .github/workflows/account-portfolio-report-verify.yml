@@ -405,7 +405,7 @@ jobs:
     needs:
       - verify_kr
       - verify_us
-    if: ${{ always() && github.ref == 'refs/heads/main' && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && ((github.event.inputs.profile == 'all' && needs.verify_us.result == 'success') || (github.event.inputs.profile == 'us' && needs.verify_us.result == 'success') || (github.event.inputs.profile == 'kr' && needs.verify_kr.result == 'success')) }}
+    if: ${{ always() && vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && github.ref == 'refs/heads/main' && !contains(join(needs.*.result, ','), 'failure') && !contains(join(needs.*.result, ','), 'cancelled') && ((github.event.inputs.profile == 'all' && needs.verify_us.result == 'success') || (github.event.inputs.profile == 'us' && needs.verify_us.result == 'success') || (github.event.inputs.profile == 'kr' && needs.verify_kr.result == 'success')) }}
     runs-on: ubuntu-latest
     concurrency:
       group: tradingagents-pages-deploy

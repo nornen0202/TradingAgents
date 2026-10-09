@@ -162,6 +162,10 @@ def test_core_cloud_writers_yield_to_local_authority():
                           ("daily-youtube-reports.yml", "deploy"), ("daily-prism-telegram-reports.yml", "deploy")]:
         workflow = yaml.safe_load(Path(f".github/workflows/{filename}").read_text(encoding="utf-8"))
         assert "vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local'" in workflow["jobs"][job]["if"]
+    for filename, job in [("daily-codex-analysis.yml", "deploy"), ("intraday-overlay-refresh.yml", "deploy_overlay"),
+                          ("work-report-pages-refresh.yml", "deploy"), ("account-portfolio-report-verify.yml", "deploy")]:
+        workflow = yaml.safe_load(Path(f".github/workflows/{filename}").read_text(encoding="utf-8"))
+        assert "vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local'" in workflow["jobs"][job]["if"]
 
 
 def test_local_handoff_queues_without_dispatch_and_never_claims_delivery(tmp_path, monkeypatch):

@@ -246,7 +246,7 @@ def test_daily_analysis_deploy_runs_after_final_pages_build():
 
     assert "      - build_pages" in deploy_block
     assert (
-        "if: ${{ always() && needs.build_pages.result == 'success' }}" in deploy_block
+        "if: ${{ always() && vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && needs.build_pages.result == 'success' }}" in deploy_block
     )
     assert "artifact_name: github-pages-final" in deploy_block
     assert "permissions:\n      pages: write\n      id-token: write" in deploy_block
