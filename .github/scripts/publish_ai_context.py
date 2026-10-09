@@ -100,8 +100,16 @@ def api(path: str, method: str = "GET", payload: dict | None = None):
         time.sleep(delay)
 
 
-def publish() -> None:
-    manifest, files = download_snapshot()
+def publish(snapshot: tuple[dict, dict[str, bytes]] | None = None) -> None:
+    # Local publication must not depend on an Actions deployment or a CDN
+    # refresh. Accept only the same validated public file contract.
+    manifest, files = snapshot if snapshot is not None else download_snapshot()
+    files = dict(files)
+    if set(files) != FILES | {"manifest.json"}:
+        raise ValueError("Unexpected local public mirror file set")
+    validate_snapshot(manifest, {name: files[name] for name in FILES})
+    if json.loads(files["manifest.json"]) != manifest:
+        raise ValueError("Public manifest bytes do not match the snapshot")
     head = None
     try:
         head = api(f"/git/ref/heads/{BRANCH}")["object"]["sha"]

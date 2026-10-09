@@ -42,12 +42,22 @@ def _directory(path: Path, *, modified: datetime | None = None) -> Path:
 
 
 def _run_maintenance(tmp_path: Path, *, apply: bool) -> subprocess.CompletedProcess[str]:
+    # These fixtures model an idle temporary runner, regardless of unrelated
+    # production Runner.Worker processes on the machine running the tests.
+    wrapper = tmp_path / "maintenance-test-wrapper.ps1"
+    wrapper.write_text(
+        "function Get-Process { [CmdletBinding()] param([string[]] $Name)\n"
+        "  if ($Name -contains 'Runner.Worker') { return @() }\n"
+        "  Microsoft.PowerShell.Management\\Get-Process -Name $Name -ErrorAction SilentlyContinue\n"
+        "}\n& $env:TEST_MAINTENANCE_SCRIPT @args\nexit $LASTEXITCODE\n",
+        encoding="utf-8",
+    )
     command = [
         PWSH,
         "-NoLogo",
         "-NoProfile",
         "-File",
-        str(SCRIPT),
+        str(wrapper),
         "-DataRoot",
         str(tmp_path / "data"),
         "-RunnerRoot",
@@ -71,7 +81,8 @@ def _run_maintenance(tmp_path: Path, *, apply: bool) -> subprocess.CompletedProc
     ]
     if apply:
         command.append("-Apply")
-    return subprocess.run(command, check=False, capture_output=True, text=True)
+    return subprocess.run(command, check=False, capture_output=True, text=True,
+                          env={**os.environ, "TEST_MAINTENANCE_SCRIPT": str(SCRIPT)})
 
 
 @pytest.mark.skipif(os.name != "nt" or PWSH is None, reason="Windows PowerShell 7 is required")

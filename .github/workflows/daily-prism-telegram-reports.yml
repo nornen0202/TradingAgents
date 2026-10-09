@@ -352,7 +352,7 @@ jobs:
 
   deploy:
     needs: build_prism_telegram_pages
-    if: ${{ needs.build_prism_telegram_pages.result == 'success' }}
+    if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && needs.build_prism_telegram_pages.result == 'success' }}
     runs-on: ubuntu-latest
     concurrency:
       group: tradingagents-pages-deploy
