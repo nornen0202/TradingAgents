@@ -251,7 +251,9 @@ def push_site(site, state):
            "GIT_AUTHOR_NAME": "TradingAgents local automation", "GIT_AUTHOR_EMAIL": "automation@users.noreply.github.com",
            "GIT_COMMITTER_NAME": "TradingAgents local automation", "GIT_COMMITTER_EMAIL": "automation@users.noreply.github.com"}
     git_run([*prefix, "read-tree", "--empty"], env=env)
-    git_run(["-C", str(site), *prefix, f"--work-tree={site}", "add", "--all", "."], env=env)
+    # Generated artifacts are verified byte-for-byte against Pages. Windows
+    # autocrlf must not rewrite their bytes when staging the publication tree.
+    git_run(["-c", "core.autocrlf=false", "-C", str(site), *prefix, f"--work-tree={site}", "add", "--all", "."], env=env)
     tree = git_run([*prefix, "write-tree"], env=env)
     commit = git_run([*prefix, "commit-tree", tree, *(["-p", head] if head else [])], input="Local public report snapshot\n", env=env)
     git_run([*prefix, "push", "fork", f"{commit}:refs/heads/gh-pages"])
