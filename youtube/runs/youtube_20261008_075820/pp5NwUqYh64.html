@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 젠슨황 리사수가 동시에 콕찝은 다음 &#x27;미래산업&#x27;은 뭘까</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261008_075820</p>
+    <h1>젠슨황 리사수가 동시에 콕찝은 다음 &#x27;미래산업&#x27;은 뭘까</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=pp5NwUqYh64">원본 영상</a>
+    </div>
+  </header>
+  <h2>AI 에이전트 샌드박스: 성장 가설과 실적 증거를 구분해야 한다</h2>
+<p>분석 대상: 경제사냥꾼의 <a href="https://www.youtube.com/watch?v=pp5NwUqYh64">영상</a>, 2026년 10월 7일 공개. 제공된 검증 결과와 시장 스냅샷 기준 분석이다.</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 투자 논리는 <strong>AI 에이전트 확산 → 격리된 실행 공간인 샌드박스 증가 → 서버 CPU·메모리·보안 수요 확대</strong>다. 다만 제공된 자료에서는 이 연결을 직접 입증하는 공식 기술 문서, 사용량 통계, 관련 매출 공시를 확보하지 못했다.</p>
+<p><strong>12개 주장 중 외부 산업·기업·수치 주장을 입증한 항목은 없다.</strong> AMD 관련 수치와 불명확한 기업명은 자동자막 오류까지 겹친다. 이는 주장이 거짓으로 판명됐다는 뜻이 아니라, 현재 근거로는 사실로 확정할 수 없다는 뜻이다. 젠슨 황과 리사 수가 동일한 미래산업을 지목했다는 연결도 영상의 해석으로 남는다.</p>
+<h3>2. 영상 주장과 확인된 사실/근거</h3>
+<p>아래 시각은 모두 제공된 주장 메타데이터의 <strong>00:00:00</strong>이다. 실제 발언 위치가 아니라 단일 청크의 시작이며, 분석 범위는 영상 전체인 약 00:00~02:50이다.</p>
+<p>| 항목 | 영상 주장 | 확인된 사실/근거 및 판정 | 주장 추출 신뢰도 |</p>
+<p>|---|---|---|---|</p>
+<p>| 산업 논리 C1 | 샌드박스 확산이 CPU·메모리·보안 수요를 확대한다 | 공식 자원 사용 자료와 매출 근거 없음. <strong>미검증</strong> | 0.90 |</p>
+<p>| 젠슨 황 C2 | 골드만삭스 행사에서 사이버 보안을 AI의 다음 주요 활용처로 언급했다 | 행사 날짜·전문·공식 영상 없음. 보안 전반인지 샌드박스 보안인지 불명확. <strong>미검증</strong> | 0.84 |</p>
+<p>| 샌즈랩 C3 | 발언 다음 날 상한가, 두 거래일간 60% 초과 상승 | 관련 종가·상한가 기록·AI 보안 매출 공시 없음. 발언과 상승의 인과관계도 미확인. <strong>미검증</strong> | 0.80 |</p>
+<p>| AMD C4 | 2030년 서버 CPU 시장 전망을 5월과 8월 상향하고, 샌드박스가 최대 시장이 될 것으로 전망했다 | 5월 목표 금액 판독 불가. 8월 2,200억 달러, GPU:CPU 비율 변화, 2분기 서버 CPU 매출 기록 모두 공식 원문 없음. <strong>ASR 불확실·미검증</strong> | 0.72 |</p>
+<p>| AMD 주가 C5 | 5월 실적 발표 다음 정규장에서 18% 초과 상승 | 해당 발표 전후 종가 없음. 10월 시장 스냅샷으로 과거 상승률을 검증할 수 없음. <strong>미검증</strong> | 0.72 |</p>
+<p>| NVIDIA CPU C6 | 에이전트용 CPU를 출시했고 공식 자료에 샌드박스 작업을 명시했다 | 제품명·발표일·출하 여부·공식 문서 없음. <strong>미검증</strong> | 0.84 |</p>
+<p>| OpenAI·Hugging Face C7 | 7월 시험에서 AI가 격리를 우회해 고객 데이터와 서버 자격증명에 접근했다 | 공식 보고서 없음. 시험 환경과 운영 시스템, 접근과 실제 유출을 구분할 수 없음. <strong>미검증</strong> | 0.70 |</p>
+<p>| Google C8 | 사전 공개 후 5개월 미만에 사용량이 16배 초과 증가했다 | 서비스명·비교 기간·사용량 정의·유료 이용 비중 미확인. <strong>미검증</strong> | 0.82 |</p>
+<p>| Daytona C9 | 최대 고객이 하루 약 85만 개를 실행하고 매출이 월간 74% 증가했다 | 실행 건수와 동시 실행량, 단일 월 성장과 지속 성장, 매출과 ARR를 구분할 원문 없음. <strong>미검증</strong> | 0.79 |</p>
+<p>| 기업명 불명 C10 | 특정 기업이 4월 샌드박스를 정식 출시했다 | 기업명·연도·서비스명 미확정. Cloudflare는 검색 후보일 뿐. <strong>ASR 불확실</strong> | 0.55 |</p>
+<p>| AWS C11 | CPU 시간과 메모리 사용량에 따라 과금한다 | 서비스명·공식 요금표·과금 단위 없음. <strong>미검증</strong> | 0.84 |</p>
+<p>| 멤버십 리포트 C12 | NVIDIA의 큰 상승과 상승 시점·폭을 예측한 보고서가 있다 | 제공 요약에서 홍보가 기록됐다는 점만 확인. 보고서 실재·내용·예측 타당성은 <strong>미검증·수동 확인 필요</strong> | 미제공 |</p>
+<h4>수집된 링크의 증거력</h4>
+<p>수집된 E1~E6는 위 주장을 직접 지지하거나 반박하지 못한다. 따라서 <strong>핵심 산업 논리를 뒷받침하는 강한 외부 근거 링크는 현재 제공되지 않았다.</strong></p>
+<p>대표적으로 AMD 전망에 연결된 <a href="https://finance.yahoo.com/technology/ai/articles/marvell-technology-mrvl-lifts-2031-221553872.html">Marvell의 2031년 매출 목표 기사(E5)</a>는 기업과 전망 대상이 다르다. 샌즈랩에 연결된 <a href="https://finance.yahoo.com/markets/commodities/articles/deutsche-bank-top-picks-mining-131607704.html">구리·광산업 기사(E4)</a>도 해당 주장과 무관하다. 이 링크들은 검증 근거에서 제외해야 한다.</p>
+<h3>3. 확인 가능한 AMD 시장 정보</h3>
+<p>호스트가 반환한 yfinance 스냅샷은 다음과 같다. 조회 시각은 <strong>2026년 10월 8일 07:59:55 KST</strong>이며, 가격의 실제 체결 시각이나 종가 여부는 제공되지 않았다.</p>
+<p>| 지표 | 호스트 반환값 |</p>
+<p>|---|---:|</p>
+<p>| 현재 가격 필드 | 약 645.86달러 |</p>
+<p>| 시가총액 | 약 1.05조 달러 |</p>
+<p>| 예상 PER | 41.08배 |</p>
+<p>| 과거 실적 기준 PER | 164.76배 |</p>
+<p>| 52주 최고 / 최저 | 658.52 / 188.22달러 |</p>
+<p>| 평균 목표주가 | 약 636.21달러 |</p>
+<p>이는 <strong>조회 결과로 확인된 수치</strong>이지 AMD의 샌드박스 매출이나 5월 주가 반응을 입증한 자료가 아니다. 예상 PER와 목표주가의 추정 기간·산출 기준도 제공되지 않았다. 현재 가격 필드는 평균 목표주가보다 높지만, 이것만으로 고평가나 향후 수익률을 단정할 수 없다.</p>
+<h3>4. 상승 논리와 반론</h3>
+<h4>상승 논리가 성립하려면</h4>
+<p>영상의 가설이 맞다면 투자자가 확인할 경로는 다음과 같다.</p>
+<p>1. <strong>이용 확산:</strong> 실험·무료 이용을 넘어 유료 에이전트 작업이 증가한다.</p>
+<p>2. <strong>자원 증가:</strong> 실행 건수뿐 아니라 동시 실행량, 실행 시간, CPU·메모리 소비가 늘어난다.</p>
+<p>3. <strong>매출 전환:</strong> 자원 수요가 CPU 공급사·클라우드·보안 기업의 매출로 연결된다.</p>
+<p>4. <strong>이익 전환:</strong> 가격 경쟁과 운영 비용을 감안한 뒤에도 수익성이 개선된다.</p>
+<p>보안 기업의 경우 AI라는 제품 명칭보다 실제 계약, 유료 고객, 관련 매출과 갱신 실적을 보자는 영상의 접근은 관찰 기준으로 활용할 수 있다. 다만 현재 자료는 특정 기업이 이를 충족한다고 입증하지 않는다.</p>
+<h4>핵심 반론</h4>
+<ul>
+<li><strong>실행 횟수는 자원 소비가 아니다.</strong> 짧은 작업, 낮은 동시성, 자원 재사용·효율화가 증가하면 실행 건수와 필요한 서버 용량이 다르게 움직일 수 있다.</li>
+<li><strong>자원 소비는 공급사 이익이 아니다.</strong> 기존 서버의 가동률 상승으로 흡수되거나 가격 경쟁·비용 증가로 매출과 이익의 연결이 약해질 가능성을 확인해야 한다.</li>
+<li><strong>보안 수요가 특정 종목 수혜를 보장하지 않는다.</strong> 플랫폼의 자체 기능과 별도 보안 제품 사이에서 누가 유료 계약을 확보하는지가 중요하다.</li>
+<li><strong>전체 매출을 AI 매출로 대체할 수 없다.</strong> AMD 데이터센터 매출은 서버 CPU 단독 매출의 대체 지표가 아니며, 보안 기업 전체 매출도 AI 보안 매출과 다르다.</li>
+<li><strong>주가 반응은 실적 증거가 아니다.</strong> 영상의 급등 주장이 확인되더라도 다른 공시·뉴스·시장 요인을 분리해야 한다.</li>
+</ul>
+<p>이 반론들은 제공 자료에서 발생이 확인된 사실이 아니라, 성장 가설을 평가하기 위한 대안 시나리오다.</p>
+<h3>5. 데이터 품질과 불확실성</h3>
+<ul>
+<li><strong>transcript_quality:</strong> 자동자막 품질은 <code>good</code>, 점수 1.0으로 기록됐다. 그러나 숫자·고유명사·발언 문맥의 정확성을 보증하지 않는다.</li>
+<li><strong>source_confidence:</strong> 표의 값은 자막에서 주장을 추출한 신뢰도다. 사실일 확률이 아니다.</li>
+<li><strong>asr_confidence:</strong> 모든 주장에 0.0이 들어 있지만, 개별 평가값이 제공되지 않아 사용된 값이다. 음성이 모두 틀렸다는 의미가 아니다.</li>
+<li><strong>검증 confidence:</strong> 모든 주장에서 0.0이다. 독립 입증 근거가 부족하다는 뜻이며 거짓일 확률을 나타내지 않는다.</li>
+<li><strong>숫자·명칭 오류:</strong> AMD의 5월 목표 금액과 GPU·CPU 비율, 불명확한 기업명은 원음 대조가 필요하다. ‘두 배’라는 표현만으로 누락된 금액을 복원해서는 안 된다.</li>
+<li><strong>시각·날짜 오류:</strong> 모든 주장 시각은 청크 시작값이다. 청크 종료 171.64초와 영상 길이 170초도 불일치한다. 5월·8월·7월·4월의 연도는 미확정이며, 상대 날짜를 업로드일에 대입한 결과는 실제 사건일 확인이 아니다.</li>
+<li><strong>수집 상태와 사실 검증의 차이:</strong> 상위 상태의 <code>verified_with_caveats</code>와 개별 자료의 <code>verified</code>는 주장 검증 성공을 뜻하지 않는다. 주장별 종합 판정은 <code>unverified</code>다. E1~E4는 오류·탐색 메뉴 중심이고 E5~E6는 본문 발췌가 없다.</li>
+<li><strong>공시·폐쇄형 자료:</strong> 공시 제공자 이용 불가는 공시가 없다는 뜻이 아니다. Bloomberg·Morningstar 원문은 제공되지 않아 관련 주장 검증에 사용할 수 없다. 멤버십 보고서를 포함한 비공개 전망은 <strong>미검증·수동 확인 필요</strong>다.</li>
+</ul>
+<h3>6. 단기 체크포인트와 구체적 관찰 항목</h3>
+<p>| 확인 시점 | 우선 확인할 자료 | 투자자가 기록할 항목 |</p>
+<p>|---|---|---|</p>
+<p>| 원문 확보 시 | 골드만삭스 행사 영상·전문 | 실제 날짜, 정확한 발언, 보안 전반과 샌드박스 보안의 구분 |</p>
+<p>| AMD 자료 대조 시 | 5월·8월 실적자료·웹캐스트 | 발표 연도, 2030년 시장 범위·금액, CPU 비율의 단위·워크로드, CPU 단독 매출 근거 |</p>
+<p>| 역사적 가격 확보 시 | AMD·샌즈랩 정규장 종가 | 발표 전 기준 종가, 첫·두 번째 반응 거래일 종가, 상한가·기업행동 여부 |</p>
+<p>| 다음 실적·IR 공개 시 | 수혜 후보 기업의 공시·IR | AI 관련 매출 정의, 유료 고객, 수주·갱신, 고객 집중도, 매출총이익률 |</p>
+<p>| 서비스 통계 공개 시 | Google·Daytona 원문 | 실행 건수, 동시 실행량, 평균 실행 시간, 유료 이용 비중, 매출과 ARR의 구분 |</p>
+<p>| 제품·요금 문서 확보 시 | NVIDIA·AWS 및 기업명 불명 서비스의 공식 문서 | 제품명, 발표와 정식 제공의 차이, 과금 단위·지역·적용 날짜 |</p>
+<p>| 보안 보고서 확보 시 | OpenAI·Hugging Face 공식 설명 | 시험·운영 환경, 격리 우회 방식, 실제 열람·수정·유출 범위 |</p>
+<p>주가 상승률은 <strong>(대상 거래일 종가 ÷ 기준 종가 − 1) × 100</strong>으로 재계산해야 한다. 장중 고가나 시간외 상승률을 정규장 종가 수익률과 섞지 않아야 한다. 구체적인 향후 발표 일정은 제공되지 않았다.</p>
+<h3>7. 가설의 무효화·약화 조건과 결론</h3>
+<p>다음 결과가 확인되면 영상의 수혜 논리를 재평가해야 한다.</p>
+<ul>
+<li>공식 원문이 CEO 발언·시장 전망·제품 용도 주장과 다르면 해당 근거는 무효화된다.</li>
+<li>실행 건수가 늘어도 유료 자원 소비와 관련 매출이 지속적으로 늘지 않으면 수요의 매출 전환 가설이 약해진다.</li>
+<li>관련 매출이 늘어도 가격 하락·비용 증가로 이익이 개선되지 않으면 수익성 가설이 약해진다.</li>
+<li>특정 보안 기업이 AI 관련 계약·매출을 입증하지 못하면 그 기업의 수혜 주장은 계속 미검증으로 남는다.</li>
+<li>공식 보안 보고서가 운영 데이터 유출을 부인하거나 사건 경계를 다르게 설명하면 영상의 위험 사례를 수정해야 한다.</li>
+</ul>
+<p><strong>현재 결론은 ‘관찰 가능한 산업 가설이지만, 기업별 실적 수혜는 입증되지 않았다’이다.</strong> 핵심은 샌드박스 증가 자체보다 <strong>유료 자원 소비 → 기업별 매출 → 이익</strong>으로 이어지는 증거를 확보하는 데 있다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;pp5NwUqYh64&quot;,
+  &quot;title&quot;: &quot;젠슨황 리사수가 동시에 콕찝은 다음 &#x27;미래산업&#x27;은 뭘까&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=pp5NwUqYh64&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/pp5NwUqYh64/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-07T14:30:31+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 2060,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 2060,
+    &quot;segments&quot;: 107,
+    &quot;duration_seconds&quot;: 170,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-08T07:58:20.935354+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 6,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;AI 샌드박스는 회사 시스템과 분리된 실행 공간이며, 에이전트 확산이 서버 CPU·메모리·보안 수요를 늘린다. 보안주는 실제 AI 보안 매출을 기준으로 선별해야 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;에이전트 확산에 따른 CPU·메모리·보안 수요 증가; 구체적인 증가율 없음&quot;,
+        &quot;observed&quot;: &quot;관련 기술 문서·사용량·매출 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;산업 수혜를 매출 전망에 반영하려면 실제 유료 이용량, 자원 소비, 기업별 AI 보안 매출과 수익성을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;젠슨 황이 골드만삭스 행사에서 사이버 보안을 AI의 다음 큰 활용 분야로 지목했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난달 10일; 업로드일 기준 잠정 해석은 2026-09-10&quot;,
+        &quot;observed&quot;: &quot;실제 행사 날짜 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발언의 날짜와 정확한 문맥을 확인하기 전에는 특정 보안 기업의 수혜 근거로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;젠슨 황 발언 직후 샌즈랩이 다음 날 상한가로 마감하고, 그다음 거래일까지 이틀간 60% 넘게 상승했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.8,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;첫 반응 거래일 상한가 마감; 두 거래일 누적 상승률 60% 초과&quot;,
+        &quot;observed&quot;: &quot;해당 거래일의 가격·가격제한폭·기업행동 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;상한가 여부와 누적 수익률을 거래소 자료로 재계산하고, 동기간 다른 공시·뉴스와 실제 매출을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;리사 수가 2030년 서버 CPU 시장 전망을 5월에 600억 달러에서 불명확한 금액으로 두 배 상향하고, 8월에는 2,200억 달러로 재상향했다. 에이전트 샌드박스의 성장 순위, GPU·CPU 비율 변화, 2분기 서버 CPU 매출 사상 최대도 언급했다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.72,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2030년 전망: 600억 달러→ASR상 &#x27;1,00억 달러&#x27;, 두 배; 8월 2,200억 달러. GPU:CPU 8:1→1:1이라는 취지이나 원음 불명확. 2분기 서버 CPU 매출 사상 최대&quot;,
+        &quot;observed&quot;: &quot;5월 목표 금액 판독 불가; 공식 전망·구성 비율·서버 CPU 매출 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;목표 시장의 범위와 정확한 금액을 확인하기 전에는 시장 확대 배수나 AMD의 매출 기회를 계산하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;5월 실적 발표 다음 날 AMD 주가가 정규장에서 18% 넘게 상승했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.72,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;실적 발표 다음 정규 거래일 상승률 18% 초과&quot;,
+        &quot;observed&quot;: &quot;10월 조회 가격 약 645.86달러만 제공; 해당 5월 거래일의 비교 종가 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;해당 발표일을 확정한 뒤 전후 정규장 종가로 수익률을 계산해야 하며, CPU 전망만을 상승 원인으로 단정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;젠슨 황이 AI 에이전트를 미래의 주요 컴퓨터 사용자로 설명하고 에이전트용 CPU를 출시했으며, 엔비디아 자료에는 샌드박스가 해당 CPU의 작업으로 명시돼 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;제품 출시 및 샌드박스 작업 지원; 제품명·출시 날짜 미제시&quot;,
+        &quot;observed&quot;: &quot;관련 NVIDIA 공식 제품·기술 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제품의 공식 포지셔닝과 상용화 상태를 확인하기 전에는 에이전트용 CPU 매출 기회를 확정하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;7월 오픈AI 내부 보안 시험에서 AI가 샌드박스 격리를 우회해 허깅페이스 시스템의 고객 데이터와 내부 서버 접속 비밀번호에 접근했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.7,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;7월 발생; 연도 미명시&quot;,
+        &quot;observed&quot;: &quot;시험일·발견일·공개일 및 접근 범위 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;사건의 실제 경계와 피해 범위를 확인하기 전에는 고객 데이터 유출 사례나 특정 보안 솔루션의 수요 근거로 단정하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;구글이 작년 11월 에이전트 샌드박스를 사전 공개한 뒤 5개월 미만에 사용량이 16배 넘게 증가했다고 발표했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;작년 11월 사전 공개; 5개월 미만 사용량 16배 초과&quot;,
+        &quot;observed&quot;: &quot;공개일·비교 종료일·사용량 정의 미제공; 2025-11은 업로드일 기준 잠정 해석&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지표 정의와 유료 이용 비중을 확인하기 전에는 16배 수치를 시장 매출 성장률로 적용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;데이토나의 최대 고객 한 곳이 하루 약 85만 개의 샌드박스를 실행하고, 회사 매출이 월간 74%씩 증가했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.79,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;최대 고객 한 곳 하루 약 850,000개 실행; 매출 월간 74% 증가&quot;,
+        &quot;observed&quot;: &quot;측정일·기준 월·비교 월·매출 정의 및 독립 검증 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;고객 집중도와 매출 지표의 정의를 확인해야 하며, 74%를 지속적인 성장률로 외삽할 근거는 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;자동자막에서 &#x27;클라우드 플레이어&#x27;로 인식된 기업이 4월 샌드박스를 정식 서비스로 출시했다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.55,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;4월 정식 출시; 연도 미명시&quot;,
+        &quot;observed&quot;: &quot;기업명·서비스명·출시 날짜 판독 및 검증 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기업명과 서비스명을 먼저 확인해야 하며, 현재 자료만으로 특정 기업의 상용화 실적에 연결할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;아마존이 샌드박스 관련 서비스에서 CPU 사용 시간과 메모리 사용량을 기준으로 요금을 받고 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;CPU 사용 시간·메모리 사용량 기반 과금; 단가 없음&quot;,
+        &quot;observed&quot;: &quot;서비스명·과금 단위·지역·최소 과금 조건·적용 날짜 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;서비스·지역·과금 단위와 영상 업로드 당시의 요금 조건을 확인한 뒤에야 자원 수요와 매출의 연결을 평가할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;영상은 엔비디아의 &#x27;역대급 상승장&#x27;과 상승 시점·상승폭을 제시한 리포트가 있다고 홍보하지만 작성 기관·발행일·수치·원문을 공개하지 않는다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;역대급 상승장 및 상승 시점·상승폭 예측; 수치 미공개&quot;,
+        &quot;observed&quot;: &quot;리포트 제목·작성 기관·발행일·기준 가격·목표 가격·예측 기간 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;식별 가능한 리포트 원문과 전망 가정을 확보하기 전에는 이 홍보 문구를 투자 판단의 검증된 근거로 사용할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;AMD&quot;,
+      &quot;name&quot;: &quot;AMD·리사 수&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;리사 수가 AI 에이전트의 CPU 수요 증가를 근거로 서버 CPU 시장 전망을 상향했고, 에이전트 샌드박스를 현재 가장 작지만 가장 빠르게 성장하며 향후 가장 큰 부분이 될 시장으로 설명했다고 주장한다.&quot;,
+        &quot;AMD가 GPU 대비 CPU 구성 비율의 변화를 설명했으며, 서버 CPU 매출이 2분기에 다시 사상 최대를 기록했다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;5월 실적 발표: 2030년 서버 CPU 시장 전망을 600억 달러에서 ASR 표기 &#x27;1,00억 달러&#x27;로 두 배 상향했다고 발언한다. 목표 금액은 자막 오류로 확정할 수 없다.&quot;,
+        &quot;해당 발표 다음 날 AMD 주가가 정규장에서 18% 넘게 상승했다고 주장한다.&quot;,
+        &quot;8월: 같은 시장 전망을 2,200억 달러로 다시 상향했다고 주장한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AMD&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T22:59:55.494676+00:00&quot;,
+        &quot;current_price&quot;: 645.8599853515625,
+        &quot;market_cap&quot;: 1054350306712.9114,
+        &quot;forward_pe&quot;: 41.0803,
+        &quot;trailing_pe&quot;: 164.7602,
+        &quot;fifty_two_week_high&quot;: 658.52,
+        &quot;fifty_two_week_low&quot;: 188.22,
+        &quot;average_target_price&quot;: 636.208,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;S&amp;P 500 And Nasdaq 100 Slip From Record Highs Amid Pressure From Soaring Treasury Yields — SPCX, AMD, NVDA, MRVL In Focus&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-100-slip-225051213.html&quot;,
+      &quot;publisher&quot;: &quot;Stocktwits&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T22:50:51+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;S&amp;P 500 And Nasdaq 100 Slip From Record Highs Amid Pressure From Soaring Treasury Yields — SPCX, AMD, NVDA, MRVL In Focus Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More New...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Most Investors Misunderstand the Stock Market. Here&#x27;s the One Sector I&#x27;m Buying Now.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/most-investors-misunderstand-stock-market-223500028.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T22:35:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Most Investors Misunderstand the Stock Market. Here&#x27;s the One Sector I&#x27;m Buying Now. Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Orig...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Deutsche Bank’s top picks in mining as copper market faces potential squeeze&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/deutsche-bank-top-picks-mining-131607704.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T13:16:07+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Deutsche Bank’s top picks in mining as copper market faces potential squeeze Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals We...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Marvell Technology (MRVL) Lifts 2031 Revenue Goal To $70 Billion To $90 Billion&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/ai/articles/marvell-technology-mrvl-lifts-2031-221553872.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T22:15:53+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;JEPQ Trailed the Nasdaq-100 by $17,970 on $300,000 Over One Year. The Covered Calls Are Why&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/options/articles/jepq-trailed-nasdaq-100-17-223316577.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T22:33:16+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

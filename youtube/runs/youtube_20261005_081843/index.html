@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - youtube_20261005_081843</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="../../index.html">YouTube 홈</a><a href="../../../index.html">TradingAgents 홈</a></nav>
+<header class="hero compact">
+  <p class="eyebrow">투자 유튜브 채널</p>
+  <h1>youtube_20261005_081843</h1>
+  <p>2026-10-04T08:18:43.109588+09:00 - 2026-10-05T08:18:43.109588+09:00</p>
+</header>
+
+<section class="synthesis-callout">
+  <p class="eyebrow">CODEX CROSS-VIDEO SYNTHESIS</p>
+  <h2>영상 전체를 다시 종합한 투자 인사이트</h2>
+  <p>개별 영상 주장과 검증 근거를 한 번 더 비교해 공통점·충돌·조건부 전략으로 정리했습니다.</p>
+  <a class="primary-link" href="../../insights.html">종합 인사이트 보기</a>
+</section>
+
+<section class="stats">
+  <span>총 14개</span>
+  <span>성공 14개</span>
+  <span>실패 0개</span>
+</section>
+<section>
+  <h2>영상별 리포트</h2>
+  <div class="grid">
+<a class="card" href="runs/youtube_20261005_081843/hl1bFB6AZWg.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/hl1bFB6AZWg/maxresdefault.jpg" alt="고금리 폭탄에 무너질 첫번째 나라는 프랑스? (박종훈의 지식한방)" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    <span class="badge user-primary">사용자 검증 최우선</span>
+    <strong>고금리 폭탄에 무너질 첫번째 나라는 프랑스? (박종훈의 지식한방)</strong>
+    <small class="source-line">출처/채널: 박종훈의 지식한방 · @kpunch / 동영상</small>
+    <small>2026-10-04T10:30:13+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/0ag6lKsq57w.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/0ag6lKsq57w/maxresdefault.jpg" alt="5% 고금리 뚫고 올라갈 하반기 주가 방어 전략은?ㅣ장우진 금시공 대표, 박명석 큐레이터 [주말인터뷰]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>5% 고금리 뚫고 올라갈 하반기 주가 방어 전략은?ㅣ장우진 금시공 대표, 박명석 큐레이터 [주말인터뷰]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-10-04T23:00:26+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/4QYtyQnR_eM.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/4QYtyQnR_eM/maxresdefault.jpg" alt="10월 5일 투자자들이 꼭 알아야 하는 오늘의 투자 포인트" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>10월 5일 투자자들이 꼭 알아야 하는 오늘의 투자 포인트</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-10-04T22:04:50+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/rxV0UVS5pWM.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/rxV0UVS5pWM/maxresdefault.jpg" alt="이재용이 &#x27;삼성전자&#x27; 역대급 상승장 준비하는 방법" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    
+    <strong>이재용이 &#x27;삼성전자&#x27; 역대급 상승장 준비하는 방법</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-10-04T12:00:11+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/HXrsRH9EY3A.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/HXrsRH9EY3A/maxresdefault.jpg" alt="[#찐시황]  금리 5%에도 AI는 안 죽는다… AI發 MLCC·기판 ‘초대형 공급 부족’ 시작? / 10월 주도주는 ‘여기’  | 미래에셋자산운용 최창규 이사" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-contradicted">contradicted</span>
+    
+    <strong>[#찐시황]  금리 5%에도 AI는 안 죽는다… AI發 MLCC·기판 ‘초대형 공급 부족’ 시작? / 10월 주도주는 ‘여기’  | 미래에셋자산운용 최창규 이사</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-10-04T11:00:05+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/c-YUkrMBylE.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/c-YUkrMBylE/maxresdefault.jpg" alt="SK하이닉스는 &#x27;40조 자사주 매입&#x27; 끝나면, 뭐부터 할까?" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    
+    <strong>SK하이닉스는 &#x27;40조 자사주 매입&#x27; 끝나면, 뭐부터 할까?</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-10-04T10:00:20+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/dONn3eEEvuE.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/dONn3eEEvuE/maxresdefault.jpg" alt="AI데이터센터 전력난이 돈을 만든다… 신재생에너지 내년 실적 폭발 / 가장 먼저 움직일 주식은 ‘여기’  ㅣ유진투자증권 한병화 이사" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>AI데이터센터 전력난이 돈을 만든다… 신재생에너지 내년 실적 폭발 / 가장 먼저 움직일 주식은 ‘여기’  ㅣ유진투자증권 한병화 이사</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-10-04T08:00:07+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/imhcllFNVMI.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/imhcllFNVMI/maxresdefault.jpg" alt="투자자들이 꼭 알아야 할 &#x27;10월&#x27; 새로운 &#x27;매도 기준&#x27; 3가지" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    
+    <strong>투자자들이 꼭 알아야 할 &#x27;10월&#x27; 새로운 &#x27;매도 기준&#x27; 3가지</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-10-04T08:00:03+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/mbd_XtJTs3k.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/mbd_XtJTs3k/maxresdefault.jpg" alt="[한국어] 뉴욕증권거래소에서 만난 켄 피셔! 투자 거장이 내년 상반기까지 증시를 낙관하는 이유 [Global Money Talk]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>[한국어] 뉴욕증권거래소에서 만난 켄 피셔! 투자 거장이 내년 상반기까지 증시를 낙관하는 이유 [Global Money Talk]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-10-04T06:00:16+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/yyfCTQ2LAZQ.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/yyfCTQ2LAZQ/maxresdefault.jpg" alt="10월 현시점, 월가가 바라보는 &#x27;코스피+나스닥&#x27; 연말 전망" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>10월 현시점, 월가가 바라보는 &#x27;코스피+나스닥&#x27; 연말 전망</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-10-04T03:00:35+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/zyG3-yP-O6w.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/zyG3-yP-O6w/maxresdefault.jpg" alt="삼전·SK하닉 다음은 ‘여기’다… 현대차, ESS, 바이오주 ‘대반전’ 온다ㅣ장인투자클럽 이창대 대표" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>삼전·SK하닉 다음은 ‘여기’다… 현대차, ESS, 바이오주 ‘대반전’ 온다ㅣ장인투자클럽 이창대 대표</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-10-04T03:00:11+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/EjQZKj9WnuQ.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/EjQZKj9WnuQ/maxresdefault.jpg" alt="이란이 정말 한계에 몰렸나? 지금 공격을 멈춘 진짜 이유 | 성일광·박현도 서강대 유로메나연구소 교수 [신과대화]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>이란이 정말 한계에 몰렸나? 지금 공격을 멈춘 진짜 이유 | 성일광·박현도 서강대 유로메나연구소 교수 [신과대화]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-10-04T02:00:22+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/Mkf-2Bq75kk.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/Mkf-2Bq75kk/maxresdefault.jpg" alt="삼전·닉스&#x27;가 없었다면, 누가 코스피 대장주였을까?" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>삼전·닉스&#x27;가 없었다면, 누가 코스피 대장주였을까?</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-10-04T01:00:38+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20261005_081843/s7oQAD83OvA.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/s7oQAD83OvA/maxresdefault.jpg" alt="삼전·SK하닉 지금 팔 때 아니다…외국인 돌아오는 결정적 신호…HBM4가 만드는 2027년 ‘초대형 사이클’ㅣ미래에셋자산운용 최창규 이사" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>삼전·SK하닉 지금 팔 때 아니다…외국인 돌아오는 결정적 신호…HBM4가 만드는 2027년 ‘초대형 사이클’ㅣ미래에셋자산운용 최창규 이사</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-10-03T23:30:05+00:00</small>
+  </span>
+</a>
+</div>
+</section>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

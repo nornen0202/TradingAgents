@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 다들 국채 금리로 불안해하는 지금이 디지털자산은 기회입니다  | 김동환, 서동주, 박상혁 디지털애셋 편집장 [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261001_085849</p>
+    <h1>다들 국채 금리로 불안해하는 지금이 디지털자산은 기회입니다  | 김동환, 서동주, 박상혁 디지털애셋 편집장 [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=yAwWnnoWfms">원본 영상</a>
+    </div>
+  </header>
+  <h2>디지털자산 투자 관찰 리포트</h2>
+<p><a href="https://www.youtube.com/watch?v=yAwWnnoWfms">삼프로TV 영상</a> · 2026년 9월 30일 업로드 · 검토 기준 2026년 10월 1일</p>
+<h3>핵심 판단</h3>
+<p><strong>영상 주장:</strong> 높은 미국 국채금리가 비트코인 등 위험자산을 압박하지만, 스테이블코인과 디지털자산의 역할이 커지는 지금을 기회로 볼 수 있다는 견해다. 단, 금리가 급격히 오르면 이 논리도 흔들릴 수 있다고 출연진은 인정한다. <a href="https://www.youtube.com/watch?v=yAwWnnoWfms&amp;t=1106s">영상 18:26·31:09</a></p>
+<p><strong>확인된 사실/근거:</strong> 제공된 외부 기사 E1~E8은 대체로 해당 주장과 무관하거나 관련 본문이 없어, 핵심 수치·정책·시장 반응을 독립적으로 뒷받침하지 못한다. 따라서 이 리포트의 강세 시나리오는 <strong>검증된 전망이 아니라 관찰할 가설</strong>이다. 호스트 시장자료에는 2026년 10월 1일 00:37 UTC의 WTI 선물 <code>CL=F</code> 단일 가격 90.48달러가 있으나, 영상 속 과거 가격 경로나 하락률을 증명하지는 않는다.</p>
+<h3>쟁점별 검증</h3>
+<p>| 쟁점 | 영상 주장 | 확인된 사실/근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 국채금리·비트코인 (<a href="https://www.youtube.com/watch?v=yAwWnnoWfms&amp;t=364s">06:04</a>, <a href="https://www.youtube.com/watch?v=yAwWnnoWfms&amp;t=1106s">18:26</a>) | 미 10년물 금리가 5.2~5.3%에 육박했고 비트코인은 상대적으로 버텼다. 8월에는 금과 동조했다. | 해당 거래일의 10년·30년물 금리, BTC·금 비교 시계열이 없다. 역사적 최고치, 상대 강도, 동조성과 금리의 인과관계 모두 미검증이다. |</p>
+<p>| 유가·연준 (<a href="https://www.youtube.com/watch?v=yAwWnnoWfms&amp;t=364s">06:04</a>, <a href="https://www.youtube.com/watch?v=yAwWnnoWfms&amp;t=736s">12:16</a>) | WTI가 92~94달러에서 90달러 아래로 하락했고, 원유 공급 회복·협상 기대가 영향을 줬다. 10월 금리 인상 확률도 낮아졌다고 설명한다. | 단일 WTI 선물 스냅샷으로 과거 가격·변동률은 확인할 수 없다. 운송량 80%, 사우디산 배럴당 8달러 할인, 전략비축유 발표, 연준 발언 원문과 당시 FedWatch 기록도 없다. ‘25%가 덜어진’은 수치의 단위 자체가 불명확하다. |</p>
+<p>| 스테이블코인·토큰화 (<a href="https://www.youtube.com/watch?v=yAwWnnoWfms&amp;t=1106s">18:26</a>, <a href="https://www.youtube.com/watch?v=yAwWnnoWfms&amp;t=1869s">31:09</a>) | 스테이블코인이 국채 문제의 해법이 될 수 있고, GENIUS법·SEC ‘혁신 면제’·CLARITY 법안 논의가 산업에 유리하다. | 법률·규칙·SEC 발표의 영상 시점 원문과 시행 상태가 제공되지 않았다. 스테이블코인 국채 수요가 금리를 낮춘다는 실증 근거도 없다. 정책 기대와 시행, 실제 사업 성과는 별개다. |</p>
+<p>| 개별 디지털자산 (<a href="https://www.youtube.com/watch?v=yAwWnnoWfms&amp;t=1483s">24:43</a>) | ‘Q&amp;T/퀀트’로 들리는 자산이 7일간 약 260% 급등했고, 솔라나·프라이버시 자산·THORChain도 주목받았다고 한다. | 자산명·티커 식별부터 불확실하다. 제공된 <code>QNT</code> 시장자료와 Quantinuum 관련 뉴스는 영상의 암호자산·업체 선정·260% 상승을 입증하지 않는다. 솔라나 활동 이동, DEX 거래량, THORChain 기능 출시도 검증할 자료가 없다. |</p>
+<h3>투자자가 볼 강세 논리와 반론</h3>
+<p>강세 가설은 <strong>국채금리 상승세가 진정되는 가운데 비트코인이 상대적으로 견조하고, 스테이블코인·토큰화의 실제 채택이 늘어나는 경우</strong>다. 반론은 국채 수익률이 계속 오르면 이자를 지급하지 않는 비트코인의 상대 매력이 약해질 수 있고, 규제 논의나 기술 제공업체 선정이 곧바로 토큰 수요·가치 포착으로 이어지지는 않는다는 점이다. 유가 하락의 지속성과 연준 경로 역시 영상 발언만으로 확정할 수 없다.</p>
+<h3>가까운 시일의 관찰 항목·가설 무효화 조건</h3>
+<ul>
+<li><strong>거시:</strong> 영상의 실제 녹화·인용 거래일을 확인한 뒤 미 10년·30년물 금리와 동일 계약월 WTI 가격을 대조한다. 국채금리가 재차 급등하고 BTC가 동반 약세를 보이면 ‘금리 부담에도 견조하다’는 가설은 약해진다.</li>
+<li><strong>정책:</strong> 연준 발언 원문과 당시 CME FedWatch 기록, GENIUS법·CLARITY 법안 및 SEC 문서의 발표일·시행 여부를 확인한다. 제도화가 지연되거나 내용이 기대보다 제한적이면 정책 수혜 가설을 재평가해야 한다.</li>
+<li><strong>채택:</strong> 스테이블코인 준비자산의 실제 국채 보유액, 토큰화 서비스의 가동·이용량, 솔라나 DEX 거래량을 같은 기준으로 추적한다. 발표만 있고 이용량이나 토큰의 필수 사용 근거가 없다면 개별 자산의 강세 논리는 약해진다.</li>
+<li><strong>명칭·가격:</strong> ‘Q&amp;T/퀀트’의 정확한 자산 식별과 7일 가격·거래량, THORChain의 공식 기능 릴리스 여부를 먼저 확인한다. 식별되지 않은 급등률은 판단 근거에서 제외한다.</li>
+</ul>
+<h3>자료 품질</h3>
+<p>자동 한국어 자막의 <code>transcript_quality</code>는 1.0(<code>good</code>)이지만, 이는 자막 수집·형식의 품질이지 숫자와 고유명사의 정확성을 보증하지 않는다. 위 시각은 개별 발언의 정확한 시각이 아닌 <strong>자막 청크 시작 시각</strong>이다. 추출된 <code>source_confidence</code>는 국채·BTC 약 0.85~0.86, 정책·유가 약 0.68~0.78, QNT 추정 자산 0.55이며, 검증 단계의 <code>asr_confidence</code>는 연준 수치 0.62, QNT 식별 0.48로 특히 낮다. 실제 녹화일도 확인되지 않았다. Bloomberg·Morningstar 등 폐쇄형 자료나 공개 원문이 없는 업계 관계자·운송량 주장은 <strong>미검증·수동 확인 필요</strong>로 남긴다. <code>evidence.status=verified</code>는 관련 페이지의 수집 상태일 뿐 영상 주장의 사실 확인을 뜻하지 않는다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;yAwWnnoWfms&quot;,
+  &quot;title&quot;: &quot;다들 국채 금리로 불안해하는 지금이 디지털자산은 기회입니다  | 김동환, 서동주, 박상혁 디지털애셋 편집장 [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=yAwWnnoWfms&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/yAwWnnoWfms/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-09-30T03:02:21+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 16639,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 16639,
+    &quot;segments&quot;: 944,
+    &quot;duration_seconds&quot;: 1953,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-10-01T08:58:49.572072+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 8,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 8,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;미국 10년물 금리가 5.2~5.3%에 육박하며 2007년 이후 최고, 30년물은 2002년 6월 이후 최고였고 금리 상승이 위험자산을 압박했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:04&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10년물 5.2~5.3%; 2007년 이후 최고; 30년물 2002년 6월 이후 최고&quot;,
+        &quot;observed&quot;: &quot;해당일 금리 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;금리 수준과 상승 속도를 원자료로 확인하기 전에는 이를 투자 판단의 확정적 근거로 삼기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;WTI가 배럴당 92~94달러에서 90달러 아래로 하락했고 전일 약 3~4%, 이후 0.13% 추가 하락했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.94,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:04&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.76,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;92~94달러에서 90달러 미만; 전일 -3~-4%; 이후 -0.13%&quot;,
+        &quot;observed&quot;: &quot;CL=F 90.48달러, 2026-10-01 00:37 UTC 단일 스냅샷&quot;
+      },
+      &quot;investor_implication&quot;: &quot;가격 방향과 하락률은 동일 계약의 시계열로 재확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;사우디 수출 재개, 미국 전략비축유 방출과 미국·이란 협상 기대가 유가 하락에 기여했고, 원유 운송량은 전쟁 전 2월의 약 80%로 회복됐으며 사우디가 배럴당 약 8달러 할인했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:16&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;운송량 약 80% 회복; 배럴당 약 8달러 할인&quot;,
+        &quot;observed&quot;: &quot;검증 가능한 원자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공급 회복과 유가 하락의 지속성을 전제로 포지션을 잡기에는 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;윌리엄스 뉴욕 연은 총재 발언 후 10월 금리 인상 확률이 종전 75%에서 하락했고, 바 연준 이사의 발언은 긴축 우려를 남겼다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:04&quot;,
+      &quot;source_confidence&quot;: 0.8,
+      &quot;asr_confidence&quot;: 0.62,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;종전 인상 확률 75%; 이후 ‘25%가 덜어진’&quot;,
+        &quot;observed&quot;: &quot;전후 확률 및 단위 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확률 수치와 정책 해석은 원문 및 당시 시점의 FedWatch 기록 확인 전까지 보류해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;비트코인은 높은 국채금리에도 상대적으로 횡보했고, 8월에는 금과 동조하는 디베이스먼트 트레이드가 나타났다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:26&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 연도 8월 금과 동조&quot;,
+        &quot;observed&quot;: &quot;상관관계·수익률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;상대 강도나 금과의 동조를 지속적인 투자 신호로 간주할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;스테이블코인이 미국 국채금리 문제의 해법으로 주목받으며 투자 기회가 될 수 있고, 연준이 GENIUS법 시행 관련 규제안을 냈다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:31:09&quot;,
+      &quot;source_confidence&quot;: 0.77,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 주장 없음&quot;,
+        &quot;observed&quot;: &quot;정량 근거 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정책 존재 여부와 국채 수요·금리 효과를 분리해 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;SEC의 ‘혁신 면제’ 논의와 CLARITY 법안 진행이 토큰화 주식 관련 자산의 제도권 진입 기대를 높였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:43&quot;,
+      &quot;source_confidence&quot;: 0.68,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 주장 없음&quot;,
+        &quot;observed&quot;: &quot;관련 정책·가격 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;규제 기대에 따른 가격 상승을 제도 확정이나 수익 실현으로 해석해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;미국 결제 인프라 기관의 기술 제공업체 선정 뒤 ‘Q&amp;T/퀀트’로 들리는 자산이 7일간 약 260% 상승했으나 서비스 가동과 토큰 활용 방식은 확인되지 않았다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:43&quot;,
+      &quot;source_confidence&quot;: 0.55,
+      &quot;asr_confidence&quot;: 0.48,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;7일간 약 +260%&quot;,
+        &quot;observed&quot;: &quot;QNT 표기 스냅샷 가격 48.06; 7일 수익률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정확한 토큰 식별, 발표 원문, 가격 산식과 토큰 가치 포착 구조를 확인하기 전에는 뉴스 기반 급등을 투자 근거로 삼기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;로빈후드 관련 활동은 약해지고 토큰화 주식 활동이 솔라나 생태계로 이동해 관련 자산이 강세였으나 최근 DEX 거래량 상승세는 둔화했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:43&quot;,
+      &quot;source_confidence&quot;: 0.67,
+      &quot;asr_confidence&quot;: 0.63,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;최근 7일 거래량 상승세 둔화&quot;,
+        &quot;observed&quot;: &quot;7일 거래량 및 비교 기간 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;생태계 이동과 가격 강세의 연관성을 판단하려면 동일 기준의 온체인 지표가 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;프라이버시 관련 자산이 강세였고 THORChain 메인넷은 2022년에 출시됐으며 Monero·Zcash와 래핑 토큰 없는 직접 교환 기능을 개발 중이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:43&quot;,
+      &quot;source_confidence&quot;: 0.7,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;메인넷 출시 2022년&quot;,
+        &quot;observed&quot;: &quot;공식 출시 기록 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출시 이력과 실제 사용 가능한 기능을 분리해 확인하고, 기능 개발 기대만으로 채택을 가정하지 않아야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;CL=F&quot;,
+      &quot;name&quot;: &quot;WTI 원유&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;사우디아라비아의 원유 수출 재개, 미국·이란 협상 기대, 미국 전략비축유 방출 발표가 유가 하락에 영향을 줬다고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;WTI가 앞서 배럴당 92~94달러 수준까지 올랐다가 90달러 아래로 내려왔다고 말했다.&quot;,
+        &quot;전일 유가가 약 3~4% 하락하고 이후 0.13% 추가 하락했다고 말했다.&quot;,
+        &quot;산유국의 원유 운송량이 전쟁 전인 해당 연도 2월 수준의 약 80%까지 회복됐다는 분석을 인용했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CL=F&quot;,
+        &quot;as_of&quot;: &quot;2026-10-01T00:37:46.931248+00:00&quot;,
+        &quot;current_price&quot;: 90.4800033569336,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 119.48,
+        &quot;fifty_two_week_low&quot;: 54.98,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;QNT&quot;,
+      &quot;name&quot;: &quot;퀀트로 추정되는 디지털자산&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;미국 대형 결제 인프라 업체의 기술 제공업체 선정 소식 이후 가격이 급등했으나, 실제 서비스 가동과 QNT 토큰의 활용 방식은 아직 제시되지 않았다고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;지난 7일 동안 약 260% 급등했다고 말했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;QNT&quot;,
+        &quot;as_of&quot;: &quot;2026-10-01T00:37:47.865873+00:00&quot;,
+        &quot;current_price&quot;: 48.06,
+        &quot;market_cap&quot;: 1886998283.1000001,
+        &quot;forward_pe&quot;: -30.121841,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 86.79,
+        &quot;fifty_two_week_low&quot;: 46.54,
+        &quot;average_target_price&quot;: 97.16667,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Metlen shares rise after Wood lifts price target by 45%&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/metlen-shares-rise-wood-lifts-124820143.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-09-29T12:48:20+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Metlen shares rise after Wood lifts price target by 45% Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Fin...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;One and One Green Technologies Reports First Half 2026 Results&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/one-one-green-technologies-reports-120000419.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-09-29T12:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;One and One Green Technologies Reports First Half 2026 Results Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newslett...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Micron Earnings Crush Views, S&amp;P 500 At Critical Level As Treasury Yields Rise&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/958fb542-74b3-3d16-bde8-baba1e31461e/dow-jones-futures%3A-micron.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T00:13:07+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures: Micron Earnings Crush Views, S&amp;P 500 At Critical Level As Treasury Yields Rise Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;A Tech-Fueled Stock Market Powers Through, but Limps Into the Fourth Quarter&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/39c33298-f2a7-373d-a538-2ab63c3be697/a-tech-fueled-stock-market.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-09-30T21:37:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Best Performing ETFs of 2026 So Far&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/best-performing-etfs-2026-far-003323612.html&quot;,
+      &quot;publisher&quot;: &quot;etf.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T00:33:23+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;The “Tax-Free Forever” ETF Redemption Loophole Is Safe. Treasury Just Drew a Line Around Six Ways Funds Have Been Stretching It&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/economy/policy/articles/tax-free-forever-etf-redemption-182133775.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-09-30T18:21:33+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;Moderna, Cerebras, Jabil, HPE, Cal-Maine, Mattel, and More Stocks That Explain Today’s Market&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/9bef82b0-bc35-31b4-a05e-cfa3a8677db4/moderna%2C-cerebras%2C-jabil%2C.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-09-30T21:09:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

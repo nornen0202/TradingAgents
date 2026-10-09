@@ -1,0 +1,572 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "prism",
+  "event_id": "prism:230ba16ef4ec9d52b1ba300730e6944c",
+  "prompt_contract_version": "prism-work-v5",
+  "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
+  "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
+  "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
+  "workflow_contract_sha256": "affa33ed518a96ac60bff25950a3fe646a7ff652ceb8d1ab5a9f50dde0362c75",
+  "source_sha256": "93e664f2edebbb6e6077195baa5c759310242ff540f6addb6f5da95e9ae0616f",
+  "body": {
+    "kind": "prism",
+    "source_health": "OK",
+    "source": {
+      "health": "OK",
+      "run_id": "prism_telegram_20261007_104638",
+      "last_run_at": "2026-10-07T10:46:50.200171+09:00",
+      "status": "success",
+      "stale_after_hours": 30
+    },
+    "window_hours": 24,
+    "execution_eligible": false,
+    "evidence_policy": {
+      "profile": "balanced_external",
+      "material_thesis_effects": [
+        "ranking",
+        "confidence",
+        "position_size_within_existing_risk_limits",
+        "research_priority"
+      ],
+      "supported_evidence_weight": "MEDIUM",
+      "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+      "unverified_evidence_weight": "LOW_LABELED",
+      "user_primary_channels": [
+        "@kpunch",
+        "@sosumonkey"
+      ],
+      "user_primary_source_tier": "USER_PRIMARY",
+      "user_primary_evidence_weight": "HIGH",
+      "user_primary_validation_policy": "USER_ACCEPTED",
+      "matching_multi_source_signal_may_raise_thesis_priority": true,
+      "conflicting_signal_must_be_visible": true,
+      "may_bypass_market_or_portfolio_execution_gate": false
+    },
+    "coverage": {
+      "total_unique_events": 114,
+      "window_events": 10,
+      "transmitted_events": 10,
+      "truncated": false,
+      "oldest_occurred_at": "2026-10-07T00:44:19+00:00",
+      "newest_occurred_at": "2026-10-07T00:55:40+00:00"
+    },
+    "events": [
+      {
+        "event_key": "stock_ai_agent:15758",
+        "content_sha256": "6e4809c46ecf277bdaf82e7b7dd882c39743aceaa9b391802759f63680c2cf6b",
+        "occurred_at": "2026-10-07T00:55:40+00:00",
+        "relevance": {
+          "tickers": [
+            "252990.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15758",
+          "posted_at": "2026-10-07T00:55:40+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15758",
+          "preview": "📊 프리즘 시뮬레이터 | 실시간 포트폴리오 (2026-10-07 09:55) 🔸 현재 보유: 1/10개 ✅ 최고 수익: 샘씨엔에스(252990) +18.57% ⚠️ 최저 수익: 샘씨엔에스(252990) +18.57% 🔸 보유 종목: - 샘씨엔에스(252990) [전기·전자] 매수가: 15,780원 / 현재가: 18,710원 목표가: 22,500원 / 손절가: 15,780원 수익률: ⬆️...",
+          "signals": [
+            {
+              "canonical_ticker": "252990.KS",
+              "display_name": "샘씨엔에스",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:55:40+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 15780.0,
+              "target_price": 22500.0,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 534,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15757",
+        "content_sha256": "6f893cd194de1930f5888b46ede22f9b92df218e04edaa8fff4958707ea35ce8",
+        "occurred_at": "2026-10-07T00:55:37+00:00",
+        "relevance": {
+          "tickers": [
+            "069540.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15757",
+          "posted_at": "2026-10-07T00:55:37+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15757",
+          "preview": "⚠️ 매수 보류: 빛과전자(069540) 현재가: 5,370원 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 약세장 산업군: 전기·전자 보류 사유: AI 판단: 미진입 — 온건 약세 국면에서 필수인 수익성 기준 미달: 최근 두 분기 영업손실이 각각 17억원·21억원으로 지속되었습니다. / 점수 부족 (2/5.0) 분석 의견: 보고서 2-1·2-2 및 5-1에 따르면 광모듈 제조·...",
+          "signals": [
+            {
+              "canonical_ticker": "069540.KS",
+              "display_name": "빛과전자",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:55:37+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 756,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15756",
+        "content_sha256": "10e0d038194c92af07624f4f900a0244a0be445405c3cfb904e0d78fdb770b93",
+        "occurred_at": "2026-10-07T00:55:35+00:00",
+        "relevance": {
+          "tickers": [
+            "204270.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15756",
+          "posted_at": "2026-10-07T00:55:35+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15756",
+          "preview": "⚠️ 매수 보류: 제이앤티씨(204270) 현재가: 26,400원 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 약세장 산업군: 전기·전자 보류 사유: AI 판단: 미진입 — 온건 약세 국면의 필수 펀더멘털 기준에서 수익성과 성장성이 미달합니다. / 점수 부족 (2/5.0) 분석 의견: 보고서 2-1·5-1의 2026년 상반기 연결 영업손실 364.4억원과 2-1·2-2의 음수...",
+          "signals": [
+            {
+              "canonical_ticker": "204270.KS",
+              "display_name": "제이앤티씨",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:55:35+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 746,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15755",
+        "content_sha256": "aca39de055e49769021cf2d417c3fb665e6ee8ed562cc3fb4e7ce37ff8606ed6",
+        "occurred_at": "2026-10-07T00:50:39+00:00",
+        "relevance": {
+          "tickers": [
+            "069540.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15755",
+          "posted_at": "2026-10-07T00:50:39+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15755",
+          "preview": "📊 빛과전자 (069540) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "069540.KS",
+              "display_name": "빛과전자",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:50:39+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 75,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15754",
+        "content_sha256": "383935eaa13d46313474d295f1cb184212ef5e5a52afd9f29d6fc5d393fac174",
+        "occurred_at": "2026-10-07T00:50:22+00:00",
+        "relevance": {
+          "tickers": [
+            "204270.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15754",
+          "posted_at": "2026-10-07T00:50:22+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15754",
+          "preview": "📊 제이앤티씨 (204270) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "204270.KS",
+              "display_name": "제이앤티씨",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:50:22+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 76,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15753",
+        "content_sha256": "188eba657d9c6b3a26c542a49aaffaaf7784d37beddecc411065f15200745456",
+        "occurred_at": "2026-10-07T00:49:56+00:00",
+        "relevance": {
+          "tickers": [
+            "069540.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15753",
+          "posted_at": "2026-10-07T00:49:56+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15753",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "069540.KS",
+              "display_name": "빛과전자",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:49:56+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15752",
+        "content_sha256": "5cb579779181d7c67f8ab10d7664a623e9e4e81c5d12eba43cc4bf26a9cf4aa5",
+        "occurred_at": "2026-10-07T00:49:48+00:00",
+        "relevance": {
+          "tickers": [
+            "204270.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15752",
+          "posted_at": "2026-10-07T00:49:48+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15752",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "204270.KS",
+              "display_name": "제이앤티씨",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:49:48+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15751",
+        "content_sha256": "47993347ee3bc157367600b998536425e9fa4a33fc061e767ced67d2a75cdce4",
+        "occurred_at": "2026-10-07T00:49:40+00:00",
+        "relevance": {
+          "tickers": [
+            "069540.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15751",
+          "posted_at": "2026-10-07T00:49:40+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15751",
+          "preview": "📈 집중 자금 유입 포착 | 빛과전자(069540) 광통신 장비·광모듈 업체로, 데이터센터·방산 사업도 확대 중입니다. 💹 KIS 10/7 마감 기준 종가 5,430원(+8.38%, 전일 5,010원), 거래량 23,689,426주로 전일보다 29.2% 감소. 시가총액은 약 6,108억원입니다. 보고서의 5,440원은 장중 조회값으로 마감 수치와 구분해야 합니다. 📰 AI 데이터센터 투...",
+          "signals": [
+            {
+              "canonical_ticker": "069540.KS",
+              "display_name": "집중 자금 유입 포착 | 빛과전자",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:49:40+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 517,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15750",
+        "content_sha256": "2a7c6f69efb14f26a58eebb439f588cc606b7a5da738f4c4086186736c4a557b",
+        "occurred_at": "2026-10-07T00:49:36+00:00",
+        "relevance": {
+          "tickers": [
+            "204270.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15750",
+          "posted_at": "2026-10-07T00:49:36+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15750",
+          "preview": "📈 갭 상승 모멘텀 | 제이앤티씨(204270) — 모바일·자동차용 강화유리와 커넥터를 제조하며 TGV 유리기판 사업을 추진합니다. 💹 2026.10.07 종가 26,150원(+13.94%). 거래량 2,183,534주로 전일 대비 30.3% 감소. 시총 1조 5,127억원. 📰 딜사이트는 TGV 생산시설 3,470억원 투자 계획을 보도했습니다. 성장 기대 요인이지만 자금 조달·차입 부...",
+          "signals": [
+            {
+              "canonical_ticker": "204270.KS",
+              "display_name": "갭 상승 모멘텀 | 제이앤티씨",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:49:36+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 457,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15749",
+        "content_sha256": "6ce646d8b860e011ee227226c22ae5d6fc571d0aa0a001c172eac0b5b4f09ed0",
+        "occurred_at": "2026-10-07T00:44:19+00:00",
+        "relevance": {
+          "tickers": [
+            "204270.KS",
+            "069540.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15749",
+          "posted_at": "2026-10-07T00:44:19+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15749",
+          "preview": "🔔 오전 프리즘 시그널 얼럿 📅 2026.10.07 장 시작 후 10분 시점 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 약세 | 실행기준: 온건 약세 | 선정: 탑다운 0종목 + 바텀업 2종목 🧭 오늘 돈이 몰린 테마 (상승 상위 종목 + KIS 뉴스 제목 기준) 1) 통신장비: 빛과전자 +9.0%,...",
+          "signals": [
+            {
+              "canonical_ticker": "204270.KS",
+              "display_name": "제이앤티씨",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:44:19+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.86,
+              "composite_score": 0.86,
+              "confidence": 0.86,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "069540.KS",
+              "display_name": "빛과전자",
+              "market": "KR",
+              "source_asof": "2026-10-07T00:44:19+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.89,
+              "composite_score": 0.89,
+              "confidence": 0.89,
+              "warnings": []
+            }
+          ],
+          "signals_total": 2,
+          "signals_transmitted": 2,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 704,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      }
+    ],
+    "guardrails": {
+      "untrusted_content": true,
+      "advisory_only": true,
+      "may_promote_market_execution": false,
+      "multi_ticker_message_prices_require_recheck": true
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    }
+  }
+}

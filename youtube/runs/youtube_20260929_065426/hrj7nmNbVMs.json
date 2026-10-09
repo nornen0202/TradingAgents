@@ -1,0 +1,315 @@
+{
+  "version": 4,
+  "video_id": "hrj7nmNbVMs",
+  "title": "[9월 28일 마감시황] 코스피 급락에도 돈은 돌았다…지수보다 먼저 봐야 할 수급 변화ㅣ홍선애, 이권희, 김장열 [클로징벨 라이브]",
+  "url": "https://www.youtube.com/watch?v=hrj7nmNbVMs",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/hrj7nmNbVMs/maxresdefault.jpg",
+  "published_at": "2026-09-28T08:11:31+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 36138,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 36138,
+    "segments": 2098,
+    "duration_seconds": 4331,
+    "repeated_ngram_ratio": 0.001
+  },
+  "generated_at": "2026-09-29T06:54:26.850589+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 5,
+  "claim_status_summary": {
+    "partially_supported": 1,
+    "unverified": 6,
+    "asr_uncertain": 3
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "On 2026-09-28, KOSPI closed near 6,889 after falling about 2.7%, while KOSDAQ rose about 0.25% to 846; investor flows and market breadth showed gains outside large-cap stocks.",
+      "status": "partially_supported",
+      "confidence": 0.85,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "12:49",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "KOSPI ≈6,889, −2.7%; KOSDAQ ≈846, +0.25%; foreign −₩3.6tn, institutions −₩1.3tn, individuals +₩3.2tn; 611 gainers, 249 decliners",
+        "observed": "^KS11 yfinance snapshot: 6,889.74; other figures unavailable"
+      },
+      "investor_implication": "Confirm exchange closing statistics before relying on the breadth-versus-index thesis."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "Samsung Electronics and SK hynix each fell about 5% on September 28 and underperformed cited overseas semiconductor comparators since July 31; rates and flows were proposed as causes.",
+      "status": "unverified",
+      "confidence": 0.9,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "12:49",
+      "source_confidence": 0.79,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "Both stocks down about 5%; SK hynix ADR +33%, Micron +31%, Taiwan index +11%, SOX +12% since July 31",
+        "observed": "Unavailable"
+      },
+      "investor_implication": "Do not use the relative-performance or causal narrative without matched-date prices and flow data."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "US 10-year and 30-year Treasury yields were about 5.2% and 5.5%, respectively, with a claimed high since 2004.",
+      "status": "unverified",
+      "confidence": 0.9,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "06:28",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "10-year ≈5.2%; 30-year ≈5.5%; highest since 2004",
+        "observed": "Unavailable"
+      },
+      "investor_implication": "Verify the dated Treasury series before using these rates to explain equity moves."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "A Blue Owl-linked Oracle data-center project received a force-majeure notice and faced a roughly seven-month delay on an approximately $18 billion project; Oracle CDS rose from about 200 to 240 bp and about 20% of global AI-infrastructure demand was affected.",
+      "status": "unverified",
+      "confidence": 0.93,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "38:09",
+      "source_confidence": 0.62,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "$18bn project; ≈7-month delay; CDS ≈200→240 bp; ≈20% of global AI-infrastructure demand",
+        "observed": "Unavailable"
+      },
+      "investor_implication": "Treat the project, credit-spread, and global-demand figures as unconfirmed risk scenarios."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "The speaker cited Micron gross-margin levels of 84.9%, 86%, and at least 87%, revenue of about $50.4 billion and $57 billion, and long-term supply agreements as earnings checkpoints.",
+      "status": "asr_uncertain",
+      "confidence": 0.92,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "57:44",
+      "source_confidence": 0.57,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "Gross margin 84.9%, 86%, ≥87%; revenue ≈$50.4bn and ≈$57bn",
+        "observed": "Unavailable; numbers and units unresolved"
+      },
+      "investor_implication": "Do not model earnings from these numbers; obtain the original audio and Micron's dated IR materials."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "Solar shares rose by the stated percentages after an interpreted reduction in concern about easing US restrictions on Chinese panels following a US–China summit.",
+      "status": "unverified",
+      "confidence": 0.91,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "31:47",
+      "source_confidence": 0.76,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "Hanwha Solutions ≈+14%; OCI Holdings >+10%; HD Hyundai Energy Solutions ≈+4%; CS Wind ≈+5%",
+        "observed": "Unavailable"
+      },
+      "investor_implication": "Separate any verified stock returns from the unverified policy explanation."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "ESS and data-center power-demand expectations helped battery shares; EcoPro BM rose about 6%, Seojin System about 11%, SK Innovation received prismatic LFP/ESS orders, and ESS demand could reach 1 TW.",
+      "status": "unverified",
+      "confidence": 0.93,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "19:18",
+      "source_confidence": 0.69,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "EcoPro BM ≈+6%; Seojin System ≈+11%; ESS demand up to 1 TW",
+        "observed": "Unavailable"
+      },
+      "investor_implication": "Require contract terms and a dated demand forecast before attributing earnings to ESS growth."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "HLB hit its daily upper price limit following favorable cholangiocarcinoma news; Lunit rose about 19%, and Lunit, VUNO, and JLK had order or overseas-expansion developments.",
+      "status": "asr_uncertain",
+      "confidence": 0.9,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.59,
+      "asr_confidence": 0.4,
+      "numeric_parse": {
+        "claimed": "HLB limit-up; Lunit ≈+19%",
+        "observed": "Unavailable"
+      },
+      "investor_implication": "Verify the precise drug-development milestone and realized medical-AI revenue before drawing conclusions from the reported rallies."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "LG Electronics rose about 4% intraday and closed about 2% higher amid Nvidia-related cooling expectations; LG Innotek moved on substrate rotation, while reported Nvidia glass-substrate interest remained commercially uncertain.",
+      "status": "unverified",
+      "confidence": 0.91,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "44:38",
+      "source_confidence": 0.66,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "LG Electronics ≈+4% intraday, ≈+2% at close",
+        "observed": "Unavailable"
+      },
+      "investor_implication": "Do not equate thematic price moves or reported evaluation with signed contracts or revenue."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "The speaker cited S&P 500 EPS growth figures of 34%, 15%, and a Goldman Sachs reduction to 11%, plus a CAPE reading near 41.",
+      "status": "asr_uncertain",
+      "confidence": 0.93,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "01:04:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.35,
+      "numeric_parse": {
+        "claimed": "EPS growth 34%, 15%, 11%; CAPE ≈41 (unit uncertain)",
+        "observed": "Unavailable"
+      },
+      "investor_implication": "Exclude these valuation and earnings inputs until their dates, definitions, and original sources are established."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피·코스닥",
+      "status": "unverified",
+      "claims": [
+        "코스피 하락에도 상승 종목이 하락 종목보다 많아 지수와 종목별 체감 흐름이 달랐다고 설명했다."
+      ],
+      "numeric_claims": [
+        "9월 28일 종가 기준 코스피 약 2.7% 하락·6,889선, 코스닥 약 0.25% 상승·846선으로 언급했다.",
+        "코스피 외국인 약 3조6천억 원, 기관 약 1조3천억 원 순매도와 개인 약 3조2천억 원 순매수를 언급했다.",
+        "코스피 상승 611개·하락 249개로 언급했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-09-28T22:16:53.809487+00:00",
+        "current_price": 6889.74,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "ORCL",
+      "name": "오라클",
+      "status": "unverified",
+      "claims": [
+        "출연자는 블루아울이 관여한 오라클 데이터센터 사업에서 불가항력 통보와 지연 문제가 불거져 AI 인프라의 전력·인허가·자금 조달 실행 위험이 부각됐다고 설명했다."
+      ],
+      "numeric_claims": [
+        "관련 사업 규모를 180억 달러, 지연 기간을 약 7개월로 언급했다.",
+        "오라클 CDS 프리미엄이 약 200bp에서 240bp 안팎으로 상승했다고 말했다.",
+        "오라클 관련 수요가 세계 AI 인프라에 약 20% 영향을 준다는 출연자 추정치를 제시했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "ORCL",
+        "as_of": "2026-09-28T22:16:54.607819+00:00",
+        "current_price": 132.60000610351562,
+        "market_cap": 400947412055.4199,
+        "forward_pe": 12.057626,
+        "trailing_pe": 20.783699,
+        "fifty_two_week_high": 322.54,
+        "fifty_two_week_low": 114.5,
+        "average_target_price": 237.97415,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Green Science Alliance Developed Stable Rechargeable Aqueous Aluminum Ion Battery with Conductive Carbon Rubber Sheet as Cathode Current Collector",
+      "source_url": "https://finance.yahoo.com/energy/articles/green-science-alliance-developed-stable-141200305.html",
+      "publisher": "PR Newswire",
+      "published_at": "2026-09-28T14:12:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Green Science Alliance Developed Stable Rechargeable Aqueous Aluminum Ion Battery with Conductive Carbon Rubber Sheet as Cathode Current Collector Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home New..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Copper Could Jump 50% to Hit $10 a Pound, Deutsche Bank Predicts",
+      "source_url": "https://finance.yahoo.com/m/6ab12509-5dee-3eeb-ac88-ff19aca23d0b/copper-could-jump-50%25-to-hit.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-09-28T12:12:59+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Copper Could Jump 50% to Hit $10 a Pound, Deutsche Bank Predicts Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change Health Science Origina..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Why the Midterm Elections Matter for the Stock Market This Year",
+      "source_url": "https://finance.yahoo.com/m/4716543a-3b7d-3856-9c64-812fb49c37f0/why-the-midterm-elections.html",
+      "publisher": "Barrons.com",
+      "published_at": "2026-09-28T21:22:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Why the Midterm Elections Matter for the Stock Market This Year Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change Health Science Original..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "Dow Jones Futures: Trump Sparks Stock Market Losses; Elon Musk-Led SpaceX, Tesla In Focus",
+      "source_url": "https://finance.yahoo.com/m/35969249-b51b-3ba3-8c6c-a06251d1d0ec/dow-jones-futures%3A-trump.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-09-28T20:48:52+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

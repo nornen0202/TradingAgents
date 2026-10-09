@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "run_id": "prism_telegram_20260929_111429",
+  "channel": "stock_ai_agent",
+  "message_id": "15419",
+  "posted_at": "2026-09-29T00:53:36+00:00",
+  "source_url": "https://t.me/stock_ai_agent/15419",
+  "preview": "⚠️ 포트폴리오 조정: 샘씨엔에스(252990) 손절가: 18,136원으로 상향조정 처리 상태: 프로그램이 위 변경을 전략 원장 DB에 반영했습니다. 아래 근거는 AI 제안 원문이며, AI의 ‘DB 미수정’ 표현은 프로그램의 반영 결과와 별개입니다. AI 제안 근거: 제공된 진입 후 최고가 19,090원은 매수가 15,780원 대비 20.98% 높아 추적 손절 활성화 조건을 충족합니다....",
+  "signals": [
+    {
+      "canonical_ticker": "252990.KS",
+      "display_name": "포트폴리오 조정: 샘씨엔에스",
+      "market": "KR",
+      "source_asof": "2026-09-29T00:53:36+00:00",
+      "signal_action": "STOP_LOSS",
+      "trigger_type": "telegram_message",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 18136.0,
+      "target_price": 22500.0,
+      "confidence": 0.45,
+      "warnings": []
+    }
+  ],
+  "simulation_only": false,
+  "actionability": "research_only",
+  "execution_eligible": false
+}

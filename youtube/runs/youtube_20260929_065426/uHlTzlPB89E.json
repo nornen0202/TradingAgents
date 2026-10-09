@@ -1,0 +1,313 @@
+{
+  "version": 4,
+  "video_id": "uHlTzlPB89E",
+  "title": "'국채'가 도대체 뭐길래.. 주가가 하락하는 걸까?",
+  "url": "https://www.youtube.com/watch?v=uHlTzlPB89E",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/uHlTzlPB89E/maxresdefault.jpg",
+  "published_at": "2026-09-28T15:03:30+00:00",
+  "status": "unverified",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 14453,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 14453,
+    "segments": 749,
+    "duration_seconds": 1356,
+    "repeated_ngram_ratio": 0.001
+  },
+  "generated_at": "2026-09-29T06:54:26.850589+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 5,
+  "claim_status_summary": {
+    "partially_supported": 2,
+    "unverified": 8
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "9월 28일 코스피가 2.7% 하락해 6,900선을 이탈했고 외국인·기관 순매도와 국고채 금리 상승이 동반됐다는 주장",
+      "status": "partially_supported",
+      "confidence": 0.86,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.62,
+      "asr_confidence": 0.62,
+      "numeric_parse": {
+        "claimed": "-2.7%, 6,900선 이탈; 외국인 순매도 ‘3조 2,억 원’",
+        "observed": "제공된 ^KS11 스냅샷 6,889.74; 나머지 수치 없음"
+      },
+      "investor_implication": "지수 하락 폭과 수급·금리의 동시 움직임을 원자료로 확인하기 전에는 원인 분석에 의존하지 말아야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "삼성전자 -5.4%, SK하이닉스 약 -5%, SK스퀘어 -7.5% 초과였고 금리·AI 수요 우려가 하락의 주원인이라는 주장",
+      "status": "partially_supported",
+      "confidence": 0.84,
+      "supporting_evidence_ids": [
+        "E4"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.43,
+      "asr_confidence": 0.83,
+      "numeric_parse": {
+        "claimed": "삼성전자 -5.4%, SK하이닉스 약 -5%, SK스퀘어 -7.5% 초과",
+        "observed": "E4 제목에 SK하이닉스 -5.1%; 나머지 없음"
+      },
+      "investor_implication": "개별 종목 가격과 공시를 확인하고, 가격 하락과 금리의 인과관계는 분리해 평가해야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "미국 10년물 금리가 8월 말 4.7%대에서 5.2% 이상으로 올라 19년 최고치이며 2년물·30년물 금리와 2023년 11월 금리 하락 수치도 제시했다는 주장",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "10:05",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.71,
+      "numeric_parse": {
+        "claimed": "10년물 4.7%대→5.2% 이상; 2년물 4.9%대; 30년물 5.5%; 2023년 11월 4.93%→4.33%",
+        "observed": "대조 가능한 금리 시계열 없음"
+      },
+      "investor_implication": "현재 금리 수준과 과거 반등 사례를 투자 판단의 전제로 삼기 전에 같은 기준의 공식 시계열로 재계산해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "미국 5년물 경매 응찰배율 2.21배가 2018년 12월 이후 최저이고 연방부채가 40조 달러를 넘으며 재정적자가 GDP의 5%를 넘고 11월 4일 발행계획이 금리 변수라는 주장",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "10:05",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.81,
+      "numeric_parse": {
+        "claimed": "응찰배율 2.21배; 부채 40조 달러 초과; 적자/GDP 5% 초과",
+        "observed": "대조 가능한 공식 수치 없음"
+      },
+      "investor_implication": "국채 공급 위험을 정량화하기 전 경매 원자료와 부채·적자의 기준일 및 정의를 확인해야 한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "연준이 2026년 9월 금리를 0.25%포인트 인상했고 시장은 다음 회의 추가 인상 확률 60% 이상과 향후 1년 세 차례 인상을 반영했다는 주장",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "10:05",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.61,
+      "numeric_parse": {
+        "claimed": "9월 +0.25%포인트; 다음 회의 인상 확률 60% 초과; 향후 세 차례 인상",
+        "observed": "대조 가능한 정책·선물 자료 없음"
+      },
+      "investor_implication": "정책 결정과 시장 확률을 혼동하지 말고 각각 원자료의 날짜와 산식을 확인해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "미국 PMI 잠정치 58.4가 5년 2개월 최고이고 애틀랜타 연은 모델이 해당 분기 성장률 5%를 추정했다는 주장",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "05:04",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.78,
+      "numeric_parse": {
+        "claimed": "PMI 58.4; GDPNow 성장률 5%",
+        "observed": "대조 가능한 지표 원자료 없음"
+      },
+      "investor_implication": "경기 강세를 금리 상승의 근거로 사용할 때 지표 정의와 추정 시점을 먼저 확인해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "유가가 배럴당 100달러 안팎이어서 물가·금리인상 우려를 높였다는 주장",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "10:05",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.82,
+      "numeric_parse": {
+        "claimed": "배럴당 약 100달러",
+        "observed": "대조 가능한 유가 없음"
+      },
+      "investor_implication": "원유 가격과 물가·금리 전망을 별개의 변수로 확인해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "오라클이 데이터센터 개발사에 불가항력 통지를 보냈으나 공사는 계획대로 진행 중이라고 밝혔다고 전한 주장",
+      "status": "unverified",
+      "confidence": 0.96,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "05:04",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "해당 없음"
+      },
+      "investor_implication": "프로젝트 지연이나 지급 의무 변화를 사실로 전제하지 말고 회사·개발사 발표를 확인해야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "소프트뱅크가 OpenAI 투자자금으로 110억 달러를 차입하고 높은 금리를 약속했다는 주장",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "05:04",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "110억 달러 차입",
+        "observed": "대조 가능한 거래 자료 없음"
+      },
+      "investor_implication": "AI 투자자의 조달비용을 반도체 수요 전망에 반영하기 전에 거래 구조와 실제 금리 조건을 확인해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "블룸버그 설문 응답자 절반 이상이 연말 미국 30년물 금리 6%를 예상했고 10년물 6%에서는 강제매도 위험이 있다는 트레이더 견해를 전한 주장",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "10:05",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.78,
+      "numeric_parse": {
+        "claimed": "응답자 절반 이상이 30년물 6% 전망; 10년물 6% 강제매도 위험",
+        "observed": "대조 가능한 설문·발언 원문 없음"
+      },
+      "investor_implication": "6% 수준을 확정적 임계치로 취급하지 말고 설문과 매도 메커니즘의 원문 조건을 확인해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피",
+      "status": "unverified",
+      "claims": [
+        "영상은 추석 연휴 중 누적된 미국 금리 상승, 반도체 대형주의 지수 비중, 외국인·기관 매도가 한국 증시의 상대적으로 큰 하락을 설명한다고 본다.",
+        "일부 비반도체 종목과 코스닥은 상승해 매도가 반도체에 집중됐다는 해석을 제시한다."
+      ],
+      "numeric_claims": [
+        "코스피가 하루 2.7% 하락하고 6,900선이 무너졌다고 주장.",
+        "같은 비교에서 일본 닛케이 -0.73%, 홍콩 항셍 +0.72%라고 주장.",
+        "연휴 중 미국 10년물 금리가 5.11%에서 5.2%대로 올랐다고 주장."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-09-28T21:56:03.090686+00:00",
+        "current_price": 6889.74,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "ORCL",
+      "name": "오라클",
+      "status": "unverified",
+      "claims": [
+        "영상은 오라클이 미국 대형 데이터센터 개발사에 불가항력 통지를 보냈다고 전하면서도, 오라클은 공사가 계획대로 진행 중이라고 밝혔다고 설명한다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "ORCL",
+        "as_of": "2026-09-28T21:56:04.091308+00:00",
+        "current_price": 132.60000610351562,
+        "market_cap": 400947412055.4199,
+        "forward_pe": 12.057626,
+        "trailing_pe": 20.783699,
+        "fifty_two_week_high": 322.54,
+        "fifty_two_week_low": 114.5,
+        "average_target_price": 237.97415,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Green Science Alliance Developed Stable Rechargeable Aqueous Aluminum Ion Battery with Conductive Carbon Rubber Sheet as Cathode Current Collector",
+      "source_url": "https://finance.yahoo.com/energy/articles/green-science-alliance-developed-stable-141200305.html",
+      "publisher": "PR Newswire",
+      "published_at": "2026-09-28T14:12:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Green Science Alliance Developed Stable Rechargeable Aqueous Aluminum Ion Battery with Conductive Carbon Rubber Sheet as Cathode Current Collector Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home New..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Copper Could Jump 50% to Hit $10 a Pound, Deutsche Bank Predicts",
+      "source_url": "https://finance.yahoo.com/m/6ab12509-5dee-3eeb-ac88-ff19aca23d0b/copper-could-jump-50%25-to-hit.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-09-28T12:12:59+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Copper Could Jump 50% to Hit $10 a Pound, Deutsche Bank Predicts Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change Health Science Origina..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "SK Hynix Stock Falls 5.1% as Rubin Memory Moves Into View",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/sk-hynix-stock-falls-5-204223692.html",
+      "publisher": "GuruFocus.com",
+      "published_at": "2026-09-28T20:42:23+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "SK Hynix Stock Falls 5.1% as Rubin Memory Moves Into View Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change Health Science Originals News..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C4",
+      "title": "S&P 500's Newest Member Is Monday's Biggest Loser",
+      "source_url": "https://finance.yahoo.com/m/3f09d80c-e3a1-3601-8dc0-2a8c1d4332af/s%26p-500%27s-newest-member-is.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-09-28T21:39:23+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

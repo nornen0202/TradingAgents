@@ -1,0 +1,459 @@
+{
+  "version": 4,
+  "video_id": "jgStSQNvJ5I",
+  "title": "높은 금리가 만든 증시 양극화…실적 버티는 섹터만 오른다 | 성상현 ABP자산운용 전무 [글로벌 인터뷰]",
+  "url": "https://www.youtube.com/watch?v=jgStSQNvJ5I",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/jgStSQNvJ5I/maxresdefault.jpg",
+  "published_at": "2026-09-27T23:01:40+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 18294,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 18294,
+    "segments": 1056,
+    "duration_seconds": 2091,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-09-29T06:54:26.850589+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 9,
+  "claim_status_summary": {
+    "unverified": 7,
+    "partially_supported": 2,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "미국 장기금리 약 5.2%를 약 4.2%의 성장·물가 관련 성분과 약 1%의 텀 프리미엄으로 분해하고, 2월 말 약 4%와 비교한다.",
+      "status": "unverified",
+      "confidence": 0.08,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.78,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "금리 5.2%=4.2%+1.0%; 2월 말 4.0%=3.5%+0.5%",
+        "observed": "동일 만기·기준일의 국채 수익률 및 텀 프리미엄 자료 없음"
+      },
+      "investor_implication": "5.2%와 텀 프리미엄 수치를 투자 판단의 확정 전제로 사용하지 말아야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "연준의 ‘GDP 나우’가 2026년 3분기 성장률을 연율 약 5.0~5.2%, 이전 분기를 약 1%로 제시했다.",
+      "status": "unverified",
+      "confidence": 0.06,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "06:09",
+      "source_confidence": 0.78,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "3분기 연율 5.0~5.2%; 이전 분기 약 1%",
+        "observed": "해당 기준일의 GDPNow 기록 및 이전 분기 수치 없음"
+      },
+      "investor_implication": "성장률 전망을 금리 상승의 근거로 사용하기 전에 해당 날짜의 모형 기록과 공식 성장률을 대조해야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "S&P 500 선행 PER이 약 19~20배이고 이익수익률은 약 5%이며, 미국 10년물 금리와의 차이가 거의 0이다.",
+      "status": "partially_supported",
+      "confidence": 0.35,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "12:12",
+      "source_confidence": 0.83,
+      "asr_confidence": 0.83,
+      "numeric_parse": {
+        "claimed": "선행 PER 19~20배; 이익수익률 약 5%; 금리 차이 거의 0",
+        "observed": "역수 계산만 5.00~5.26%; 시장 PER·10년물 관측값 없음"
+      },
+      "investor_implication": "금리 대비 주식 밸류에이션이 불리하다는 결론은 동일 날짜의 PER과 10년물 수익률로 재계산해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "2026년 3월 이후 S&P 500 동일가중 지수의 상대 성과가 약해졌고, 상승이 일부 IT·반도체 대형주에 집중됐다.",
+      "status": "unverified",
+      "confidence": 0.07,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "06:09",
+      "source_confidence": 0.83,
+      "asr_confidence": 0.82,
+      "numeric_parse": {
+        "claimed": "3월부터 상대 성과 하락, 4~6월 일시 개선 후 재하락",
+        "observed": "비교 가능한 지수 시계열 없음"
+      },
+      "investor_implication": "상승 종목의 집중도를 판단하려면 동일가중·시가총액가중 지수의 상대 성과와 섹터별 실적을 확인해야 한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "2023년 8~10월 미국 10년물 금리가 약 5%에 이르고 S&P 500이 약 4,600에서 4,200으로 하락했으며, 11월 국채 발행 계획 변화 뒤 금리가 하락했다.",
+      "status": "unverified",
+      "confidence": 0.07,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "12:12",
+      "source_confidence": 0.79,
+      "asr_confidence": 0.76,
+      "numeric_parse": {
+        "claimed": "10년물 약 5%; S&P 500 약 4,600→4,200",
+        "observed": "2023년 해당 기간 시계열 없음"
+      },
+      "investor_implication": "과거 사례를 2026년 금리 전망에 적용하기 전에 당시 날짜별 수치와 정책 발표를 확인해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "2026년 11월 초 장기채 공급 축소와 은행 규제 완화·토큰화·스테이블코인에 따른 국채 수요 증가가 금리 안정에 기여할 수 있다.",
+      "status": "unverified",
+      "confidence": 0.09,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "18:19",
+      "source_confidence": 0.78,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "정량 수치 없음",
+        "observed": "확정 발행 규모·수요 증가액 없음"
+      },
+      "investor_implication": "금리 안정 시나리오로만 취급하고 재무부 발표, 규제 문서, 실제 국채 보유액을 확인해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "한국 시장의 1주·1개월·3개월 수익률은 각각 약 +4.9%, +1.9%, -14%이고 고점 대비 약 -20%인 반면 대만은 고점 부근이다.",
+      "status": "unverified",
+      "confidence": 0.06,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "18:19",
+      "source_confidence": 0.79,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "한국 1주 +4.9%, 1개월 +1.9%, 3개월 -14%, 고점 대비 -20%",
+        "observed": "대상 지수와 비교 시계열 없음"
+      },
+      "investor_implication": "한국의 낙폭과 대만 대비 상대 매력도를 판단하기 전에 동일 기준일의 지수·통화·배당 포함 여부를 맞춰야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "한국 EPS 추정치는 6개월 전보다 약 91% 높지만 최근 상향 속도가 둔화됐고, 대만은 3개월 약 46% 상승했으며 한국 밸류에이션은 최근 36개월 범위 하단이다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "24:32",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.58,
+      "numeric_parse": {
+        "claimed": "한국 6개월 EPS +91%; 대만 3개월 EPS 약 +46%; 한국 36개월 밸류에이션 범위 하단",
+        "observed": "EPS·밸류에이션 원자료 없음"
+      },
+      "investor_implication": "한국 저평가와 대만 이익 모멘텀 비교는 동일 정의의 컨센서스 EPS 및 밸류에이션 원자료 확인 전까지 보류해야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "‘이번 주/9월’ 마이크론과 ‘다음 주’ 삼성전자 실적 발표가 메모리 업황과 한국 EPS 추정치의 확인 계기다.",
+      "status": "partially_supported",
+      "confidence": 0.32,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "24:32",
+      "source_confidence": 0.82,
+      "asr_confidence": 0.72,
+      "numeric_parse": {
+        "claimed": "마이크론 ‘이번 주/9월’, 삼성전자 ‘다음 주’",
+        "observed": "9월 28일 뉴스 발췌의 마이크론 실적 예고만 확인; 공식 발표일·삼성전자 일정 없음"
+      },
+      "investor_implication": "마이크론과 삼성전자 실적은 확인 항목으로 적절하지만, 상대 날짜와 실제 결과는 각사 공식 IR·공시로 확인해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "이름이 확인되지 않은 한국 시장 지표의 저항은 7,300~7,400과 약 8,900, 지지는 약 6,800이다.",
+      "status": "asr_uncertain",
+      "confidence": 0.04,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "30:32",
+      "source_confidence": 0.79,
+      "asr_confidence": 0.46,
+      "numeric_parse": {
+        "claimed": "저항 7,300~7,400; 볼린저밴드 상단 약 8,900; 지지 약 6,800",
+        "observed": "대상 지표와 검증 가능한 시계열 없음"
+      },
+      "investor_implication": "대상 지표가 식별될 때까지 해당 수준을 매매 기준으로 사용해서는 안 된다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "UST",
+      "name": "미국 장기국채",
+      "status": "unverified",
+      "claims": [
+        "발화자는 장기금리 상승분에 성장·인플레이션 기대와 국채 수급 불확실성이 함께 반영됐으며, 후자인 텀 프리미엄 상승이 주식 밸류에이션에 더 불리하다고 해석한다.",
+        "장기채 공급 축소, 단기채 발행 확대, 은행 규제 완화와 스테이블코인 등을 통한 국채 수요 확대가 금리 안정에 기여할 수 있다고 전망한다."
+      ],
+      "numeric_claims": [
+        "발화 당시 미국 장기금리 약 5.2%; 구성 요소를 약 4.2%와 텀 프리미엄 약 1%로 설명.",
+        "2월 말에는 구성 요소 약 3.5%와 0.5%, 장기금리 약 4%였다고 비교.",
+        "2023년 8~10월 미국 10년물 금리가 약 5%까지 올랐고, 이후 11월 하락했다고 회고."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "UST",
+        "as_of": "2026-09-28T22:31:54.945420+00:00",
+        "current_price": 38.040000915527344,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 45.43,
+        "fifty_two_week_low": 37.8692,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "SPX",
+      "name": "S&P 500 및 미국 주식시장",
+      "status": "unverified",
+      "claims": [
+        "높은 금리에서도 이익이 늘어나는 일부 IT·반도체 대형주가 지수를 주도하며, 동일가중 지수 대비 시가총액가중 지수의 강세는 상승 종목의 집중을 시사한다고 설명한다.",
+        "금리 하락 또는 기업 이익 증가가 주식 이익수익률과 국채금리의 격차를 넓힐 수 있으며, 향후 시장 상승이 다른 섹터로 확산되는지 확인해야 한다고 주장한다."
+      ],
+      "numeric_claims": [
+        "S&P 500 선행 PER을 약 19~20배, 그 역수인 이익수익률을 약 5%, 미국 10년물 금리와의 격차를 거의 0이라고 설명.",
+        "동일가중 지수의 상대 성과가 2026년 3월부터 하락했고 4~6월 잠시 개선된 뒤 다시 하락했다고 설명.",
+        "2023년 8~10월 S&P 500이 약 4,600에서 4,200으로 하락했다고 회고."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "SPX",
+        "as_of": "2026-09-28T22:31:57.865008+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "KR_MARKET",
+      "name": "한국 주식시장",
+      "status": "unverified",
+      "claims": [
+        "한국은 최근 36개월 밸류에이션 범위에서 낮은 수준이고 고점 대비 낙폭도 커 반등 여지가 있지만, 최근 EPS 추정치의 상향 속도가 둔화돼 즉각적인 상승 동력은 확인되지 않았다고 평가한다.",
+        "메모리 수요처인 자율주행·휴머노이드 산업의 성장과 반도체 실적이 EPS 상향 속도를 다시 높일 수 있다는 조건부 전망을 제시한다.",
+        "발화자는 이름을 특정하지 않은 한국 시장 지표의 기술적 저항·지지 수준을 제시하며, 현재 IT 주도주의 상승이 다른 업종으로 확산되는지 지켜봐야 한다고 말한다."
+      ],
+      "numeric_claims": [
+        "한국 시장 수익률을 최근 1주 약 +4.9%, 1개월 약 +1.9%, 3개월 약 -14%로 제시.",
+        "한국 시장이 고점 대비 약 20% 낮다고 설명.",
+        "한국 EPS 추정치가 6개월 전 대비 약 91% 올랐다고 설명하되 최근 1개월 상향 폭은 둔화됐다고 평가."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "KR_MARKET",
+        "as_of": "2026-09-28T22:32:00.651451+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "TW_MARKET",
+      "name": "대만 주식시장",
+      "status": "unverified",
+      "claims": [
+        "대만은 한국과 달리 EPS 상향 속도가 유지되고 고점 부근에서 거래돼, 비싸더라도 이익 모멘텀이 있는 시장이 강세를 보인다는 비교 사례로 제시된다."
+      ],
+      "numeric_claims": [
+        "대만 EPS 추정치가 최근 3개월 약 46% 상승했다고 언급한 것으로 들리나 비교 대상과 기간 확인이 필요."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "TW_MARKET",
+        "as_of": "2026-09-28T22:32:04.747952+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "MU",
+      "name": "마이크론 테크놀로지",
+      "status": "unverified",
+      "claims": [
+        "예정된 마이크론 실적을 메모리 업황과 한국 EPS 상향 속도 회복 여부를 가늠할 단서로 제시한다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "MU",
+        "as_of": "2026-09-28T22:32:08.368975+00:00",
+        "current_price": 1053.97998046875,
+        "market_cap": 1190357771232.52,
+        "forward_pe": 6.542628,
+        "trailing_pe": 23.807995,
+        "fifty_two_week_high": 1255.0,
+        "fifty_two_week_low": 159.97,
+        "average_target_price": 1520.7609,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930.KS",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "향후 삼성전자 실적도 한국 메모리 사이클과 EPS 상향 추세를 판단할 자료로 언급된다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "005930.KS",
+        "as_of": "2026-09-28T22:32:10.580953+00:00",
+        "current_price": 270000.0,
+        "market_cap": 1772972038620000.0,
+        "forward_pe": 3.7811837,
+        "trailing_pe": null,
+        "fifty_two_week_high": 374500.0,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": 478627.88,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Green Science Alliance Developed Stable Rechargeable Aqueous Aluminum Ion Battery with Conductive Carbon Rubber Sheet as Cathode Current Collector",
+      "source_url": "https://finance.yahoo.com/energy/articles/green-science-alliance-developed-stable-141200305.html",
+      "publisher": "PR Newswire",
+      "published_at": "2026-09-28T14:12:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Green Science Alliance Developed Stable Rechargeable Aqueous Aluminum Ion Battery with Conductive Carbon Rubber Sheet as Cathode Current Collector Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home New..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Copper Could Jump 50% to Hit $10 a Pound, Deutsche Bank Predicts",
+      "source_url": "https://finance.yahoo.com/m/6ab12509-5dee-3eeb-ac88-ff19aca23d0b/copper-could-jump-50%25-to-hit.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-09-28T12:12:59+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Copper Could Jump 50% to Hit $10 a Pound, Deutsche Bank Predicts Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change Health Science Origina..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C3",
+      "title": "Sierra Madre Announces Guitarra Processing Plant Achieves Throughputs of up to 720 Tonnes per Day as Development at Nazareno and Guitarra Mines Accelerates",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/sierra-madre-announces-guitarra-processing-210000876.html",
+      "publisher": "TMX Newsfile",
+      "published_at": "2026-09-28T21:00:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Sierra Madre Announces Guitarra Processing Plant Achieves Throughputs of up to 720 Tonnes per Day as Development at Nazareno and Guitarra Mines Accelerates Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C3",
+      "title": "Energy & Utilities Roundup: Market Talk",
+      "source_url": "https://finance.yahoo.com/m/6c03601d-844c-31ce-8331-4b0587bc0bec/energy-%26-utilities-roundup%3A.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-09-28T16:32:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C9",
+      "title": "Why the Midterm Elections Matter for the Stock Market This Year",
+      "source_url": "https://finance.yahoo.com/m/4716543a-3b7d-3856-9c64-812fb49c37f0/why-the-midterm-elections.html",
+      "publisher": "Barrons.com",
+      "published_at": "2026-09-28T21:22:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C10",
+      "title": "U.S. Stocks Slide as Treasury Selloff Deepens",
+      "source_url": "https://finance.yahoo.com/m/4330c95a-ec5d-32e4-8277-e6bb83bf12b1/u.s.-stocks-slide-as-treasury.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-09-28T20:48:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C10",
+      "title": "U.S. Treasury Yields Climb to Fresh Highs Ahead Economic Data",
+      "source_url": "https://finance.yahoo.com/m/f5440b0a-d274-3ee7-af4a-205f5533a7b5/u.s.-treasury-yields-climb-to.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-09-28T19:56:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

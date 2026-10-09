@@ -1,0 +1,331 @@
+{
+  "version": 4,
+  "video_id": "JauYuNtbxVY",
+  "title": "외신들이 '세계 최악'이라 말한, 코스피 '하락'의 진짜 원인",
+  "url": "https://www.youtube.com/watch?v=JauYuNtbxVY",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/JauYuNtbxVY/maxresdefault.jpg",
+  "published_at": "2026-10-03T23:00:12+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1858,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 1858,
+    "segments": 97,
+    "duration_seconds": 155,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-04T08:10:46.233426+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 9,
+  "claim_status_summary": {
+    "partially_supported": 3,
+    "unverified": 6,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "코스피가 연초 대비 60% 상승해 6월 19일 장중 9,385에 도달한 뒤 7월 상승세가 꺾였다.",
+      "status": "partially_supported",
+      "confidence": 0.76,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00–02:36",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.4,
+      "numeric_parse": {
+        "claimed": "연초 대비 +60%; 6월 19일 장중 9,385",
+        "observed": "^KS11 52주 최고 9,385.59; 발생일·연초 수익률 미제공"
+      },
+      "investor_implication": "9,385 수준만 참고하고 상승률·날짜·전환 시점은 투자 판단에 사용하기 전에 확인해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "최근 3개월 미국 대표지수는 2.45% 상승하고 코스피는 약 16% 하락해 코스피가 주요 증시 중 최악이었다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00–02:36",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "미국 +2.45%, 코스피 약 -16%, 최근 3개월",
+        "observed": "동일 기간 비교 데이터 없음"
+      },
+      "investor_implication": "상대수익률과 ‘세계 최악’이라는 표현을 검증된 성과로 취급하지 않아야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "AI 데이터센터 투자 수익성 의문과 반도체 고점 우려가 7월 코스피 하락의 계기였다.",
+      "status": "unverified",
+      "confidence": 0.94,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00–02:36",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "7월 하락의 원인",
+        "observed": "원인 검증 자료 없음"
+      },
+      "investor_implication": "이를 확인된 하락 원인보다 검증되지 않은 해석으로 봐야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "삼성전자·SK하이닉스의 일일 움직임을 2배 추종하는 ETF가 개인에게 판매됐으며 출시 한 달 미만에 8조원 넘게 매수됐다.",
+      "status": "partially_supported",
+      "confidence": 0.65,
+      "supporting_evidence_ids": [
+        "E7"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00–02:36",
+      "source_confidence": 0.3,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "일일 2배; 출시 한 달 미만 개인 매수액 8조원 초과",
+        "observed": "E7에서 관련 레버리지 상품 언급만 확인; 배율·매수액 미확인"
+      },
+      "investor_implication": "8조원 매수 주장은 공식 상품·거래 자료 확인 전까지 규모 판단에 사용하면 안 된다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "일일 2배 상품은 기초자산의 하루 ±5%에 약 ±10%를 추구하고, 등락 반복 시 기초자산이 원위치여도 손실이 남을 수 있으며, 하락 시 운용사 매도가 시장 하락을 증폭한다.",
+      "status": "partially_supported",
+      "confidence": 0.82,
+      "supporting_evidence_ids": [
+        "E7"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00–02:36",
+      "source_confidence": 0.4,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "기초자산 하루 ±5% → 상품 약 ±10%",
+        "observed": "일일 2배 목표라는 조건하에서 산술적으로 일치; 해당 상품의 공식 목표 배율 미확인"
+      },
+      "investor_implication": "장기 보유 시 경로 의존적 손실 위험은 고려하되 시장 전체에 대한 매도 충격 규모는 미검증으로 취급해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "삼성전자와 SK하이닉스의 코스피 내 합산 비중이 절반을 넘는다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00–02:36",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "두 종목 합산 코스피 비중 >50%",
+        "observed": "동일 지수·기준일 비중 없음"
+      },
+      "investor_implication": "두 종목의 지수 영향력을 ‘절반 초과’로 전제하지 않아야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "골드만삭스는 7월 중순 기관 매도 물량의 62%가 레버리지 상품 정리에서 발생했다고 추정했다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00–02:36",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.4,
+      "numeric_parse": {
+        "claimed": "기관 매도 물량의 62%",
+        "observed": "원문·산식 없음"
+      },
+      "investor_implication": "레버리지 상품이 기관 매도의 대부분을 차지했다는 근거로 사용하면 안 된다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "올해 코스피 서킷브레이커가 9회 발동했고 그중 7회가 해당 레버리지 상품 출시 이후였다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00–02:36",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "2026년 9회 중 출시 후 7회",
+        "observed": "공식 발동 기록 및 상장일 없음"
+      },
+      "investor_implication": "9회·7회라는 빈도를 검증된 시장위험 지표로 사용하지 않아야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "씨티는 국내 개인의 레버리지 상품 손실을 약 56조원, 그중 삼성전자·SK하이닉스 관련 손실을 약 32조원으로 추정했다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00–02:36",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "개인 손실 약 56조원; 두 종목 관련 약 32조원",
+        "observed": "원문·손실 산식 없음"
+      },
+      "investor_implication": "이 손실 규모를 확정된 투자자 피해액으로 제시하면 안 된다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "블룸버그가 레버리지 상품의 시장 영향과 한국 정부의 승인을 비판했고 ‘시츄에이션널 어웨어니스’라는 헤지펀드도 유사하게 평가했다.",
+      "status": "asr_uncertain",
+      "confidence": 0.84,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00–02:36",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.2,
+      "numeric_parse": {
+        "claimed": "해당 없음",
+        "observed": "해당 없음"
+      },
+      "investor_implication": "두 외부 기관의 권위를 근거로 영상의 인과 주장을 신뢰하지 않아야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피",
+      "status": "unverified",
+      "claims": [
+        "영상은 7월 상승세가 꺾였고, 주요 증시 중 최악의 성적을 기록했다고 주장한다.",
+        "영상은 AI 데이터센터 투자 대비 수익성 의문과 반도체 고점 우려를 하락의 계기로 지목한다.",
+        "영상은 레버리지 ETF의 하락 시 매도가 지수 하락을 증폭했다고 주장한다."
+      ],
+      "numeric_claims": [
+        "영상 주장: 연초 이후 60% 상승, 6월 19일 장중 9,385 도달.",
+        "영상 주장: 최근 3개월 미국의 미상 지수는 2.45% 상승하고 코스피는 약 16% 하락.",
+        "영상 주장: 삼성전자·SK하이닉스의 코스피 내 비중이 절반 초과."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-03T23:12:01.544767+00:00",
+        "current_price": 7003.740234375,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 3522.54,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "4 Dividends That Have Not Been Raised in Years and Are Still Worth Owning",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/4-dividends-not-raised-years-174552284.html",
+      "publisher": "24/7 Wall St.",
+      "published_at": "2026-10-03T17:45:52+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "4 Dividends That Have Not Been Raised in Years and Are Still Worth Owning Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weath..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Bank of America Raises Long-Term Copper Forecast to $12,000 Per Ton",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/bank-america-raises-long-term-132700996.html",
+      "publisher": "InvestorsHub",
+      "published_at": "2026-10-02T13:27:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Bank of America Raises Long-Term Copper Forecast to $12,000 Per Ton Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather New..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Comstock Launches 24/7 Solar Panel Recycling at Nevada Facility",
+      "source_url": "https://finance.yahoo.com/energy/articles/comstock-launches-24-7-solar-060203686.html",
+      "publisher": "MarketBeat",
+      "published_at": "2026-10-02T06:02:03+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Comstock Launches 24/7 Solar Panel Recycling at Nevada Facility Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newslet..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C4",
+      "title": "Indian Oil Stock And 2 Refiners Linked To Shifting Middle East Oil Flows",
+      "source_url": "https://finance.yahoo.com/energy/articles/indian-oil-stock-2-refiners-210933303.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-03T21:09:33+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C4",
+      "title": "Iran’s rial hits fresh low as $2 billion currency intervention fails to stem slide",
+      "source_url": "https://finance.yahoo.com/markets/currencies/articles/iran-rial-hits-fresh-low-204319407.html",
+      "publisher": "Investing.com",
+      "published_at": "2026-10-03T20:43:19+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C5",
+      "title": "[이슈X레이] 파는 이가 \"사지 말라\"는 레버리지…원금 녹이는 두 겹의 비...",
+      "source_url": "http://www.fieldnews.kr/news/articleView.html?idxno=30254",
+      "publisher": "Naver News",
+      "published_at": "2026-07-27T18:04:00+09:00",
+      "source_tier": "news",
+      "excerpt": "현물 78.45%, 다른 운용사가 만든 SK하이닉스 레버리지 ETF 11.81%, 개별주 선물 15계약이다. ACE 삼성전자단일종... 이 일일 재조정 과정에서 손실이 남는다. 출발점은 퍼센트 등락의 비대칭이다. 100이 90으로 10% 내렸다고..."
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C6",
+      "title": "KB증권, '매주 리워드 쌓이는 신용 순매수 챌린지'…키움증권, 첫 발행어...",
+      "source_url": "http://www.sisaon.co.kr/news/articleView.html?idxno=178620",
+      "publisher": "Naver News",
+      "published_at": "2025-12-16T16:42:00+09:00",
+      "source_tier": "news",
+      "excerpt": "또한, 삼성전자·SK하이닉스 등 주요 기업의 이익 체력 개선이 성장 동력으로 작용할 전망이다. 이영곤... 중 시가총액 상위 10개 종목에 투자한다. ETF 기초지수는 'Indxx US Tech Top 10 Index'로 현재 애플, 마이크로소프트..."
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C6",
+      "title": "[증권소식] 정은보, FTSE 러셀 CEO 면담/거래소·유관기관, 2000억 밸류업...",
+      "source_url": "https://www.asiatime.co.kr/article/20241101500373",
+      "publisher": "Naver News",
+      "published_at": "2024-11-01T17:08:00+09:00",
+      "source_tier": "news",
+      "excerpt": "100종목으로 구성된다. 편입 종목을 보면 SK하이닉스(15.18%), 삼성전자(12.66%), 현대차(8.34%), 셀트리온(7.03%), 기아(6.13%), 신한지주(6.01%) 등의 비중이 높다. 코리아 밸류업 지수는 코스피 200과 같은 기존 대표지수와 달리..."
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

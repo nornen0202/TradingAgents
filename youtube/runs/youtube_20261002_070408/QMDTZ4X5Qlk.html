@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 7년 만에 한국 찾은 조셉 루빈, 글로벌 거장들이 한국 시장을 찾는 이유 | 서동주, 김동환, 박현영 뉴스1 기자 [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261002_070408</p>
+    <h1>7년 만에 한국 찾은 조셉 루빈, 글로벌 거장들이 한국 시장을 찾는 이유 | 서동주, 김동환, 박현영 뉴스1 기자 [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=QMDTZ4X5Qlk">원본 영상</a>
+    </div>
+  </header>
+  <h2>디지털자산 투자 관찰 리포트</h2>
+<p><a href="https://www.youtube.com/watch?v=QMDTZ4X5Qlk">삼프로TV 영상</a> · 게시: 2026년 10월 1일 · 검증 자료 기준: 2026년 10월 2일</p>
+<h3>핵심 판단</h3>
+<p>영상은 <strong>비트코인의 거시지표 민감도</strong>, 해외 디지털자산 기업의 한국 진출, 원화 스테이블코인과 가상자산 과세를 연결한다. 다만 제공된 검증 결과에서 10개 주장 중 9개는 미검증 또는 자막상 불확실, 1개는 부분 지지다. 따라서 이 리포트의 숫자와 사업 계획은 투자 판단의 확정 근거가 아니라 <strong>확인할 가설</strong>이다. 증거 묶음의 <code>verified</code> 표시는 영상 주장 자체가 검증됐다는 뜻이 아니다.</p>
+<h3>영상 주장과 확인된 사실/근거</h3>
+<p>| 쟁점 | 영상 주장 | 확인된 사실/근거와 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 비트코인·거시경제 [00:00–06:08] | 미국 8월 물가지표 이후 BTC가 약 8만5천 달러에서 8만3천 달러대로 되돌렸고, 국채 금리 상승과 동행했다. 2분기 GDP 상향 조정, 10년물 금리의 2002년 5월 이후 최고치도 언급했다. | 해당 시점의 BTC·주가지수·금리 시계열, 미국 공식 통계가 제공되지 않아 <strong>모두 미검증</strong>이다. 물가지표 명칭과 ‘예상 대비 −0.3%포인트’, 산정 방식 변경 효과는 자막상 특히 불확실하다(asr_confidence 0.45). 제공된 ‘BTC 37.44달러’ 스냅샷은 자산 식별 오류 가능성 때문에 사용하지 않는다. |</p>
+<p>| 금리 기대·ETF [06:08–12:12] | 10월 금리 동결:인상 전망이 3:7→5:5→6:4로 변했고, 현물 BTC ETF에 9거래일 연속 순유입이 있었다. | 시각별 금리 확률과 ETF 일별 자금흐름이 없어 <strong>미검증</strong>이다. <a href="https://finance.yahoo.com/markets/crypto/articles/xrp-solana-lead-crypto-majors-150528608.html">9월 25일 기사</a>의 ‘2026년 누적 ETF 유입 전환’ 언급은 9거래일 연속 유입이나 영상의 장중 가격을 입증하지 않는다. |</p>
+<p>| 메타마스크·컨센시스 [06:08–12:12] | 분사와 조셉 루빈의 직책, 카드·스테이블코인 수익 기능, 향후 지갑 내 자산 운용 확대를 언급했다. | 회사 발표·직책 자료·제품 문서가 없어 <strong>미검증</strong>이다. 추가 기능 구상은 비공개 인터뷰에 관한 주장으로 <strong>원문 또는 공식 발표 수동 확인 필요</strong>다. |</p>
+<p>| 문페이·서클 [12:12–18:14] | 문페이 코리아의 신고·은행 협업·카카오뱅크 송금 실증, 서클의 한국 채용을 전했다. 실증 결과는 약 3개월 뒤로 전망했고, USDC와 은행 환전망 연결을 예상했다. | 회사·은행 발표, 신고 자료, 채용 공고가 제공되지 않아 <strong>미검증</strong>이다. ‘3개월’은 출연진 전망이고, 환전망 전략은 추정이지 확정 사업 계획이 아니다. 비트고 코리아 신고 수리 언급도 자막과 당국 자료 대조가 필요하다. |</p>
+<p>| 원화 스테이블코인 [18:14–24:19] | 기본법 논의 지연과 은행 중심 발행 후 빅테크·핀테크 참여를 여는 ‘하이브리드’ 모델을 언급했다. | 연구보고서 원문과 법안 심의 기록이 없어 <strong>미검증</strong>이다. 제안된 모델을 확정 정책으로 해석할 수 없다. |</p>
+<p>| 가상자산 과세 [24:19–30:34] | 2027년 1월 과세 개시, 2028년 첫 신고, 국세청 지침·거래소 준비 일정, 유예 논쟁과 미국의 2029년 정보교환 시점을 언급했다. | <a href="https://www.ekoreanews.co.kr/news/articleView.html?idxno=88329">2026년 9월 30일 보도</a>는 ‘내년 1월’ 과세 예정과 유예 논란만 <strong>부분적으로 뒷받침</strong>한다. 법정 일정·실제 유예 여부, 나머지 날짜와 특정 인물의 발언은 법령·국세청·당사자 원문 확인 전까지 미검증이다. ‘3개월’은 준비 기간과 제출 주기가 혼재했을 수 있다. |</p>
+<h3>투자 논리와 반론</h3>
+<p><strong>상승 논리:</strong> 물가·고용 지표가 금리 부담을 낮추고 ETF 순유입이 지속된다면 BTC 수급에 우호적일 수 있다. 한국에서는 공식 신고·은행 실증·명확한 발행 규칙이 확인될 경우 디지털자산 서비스의 사업 가능성을 평가하기 쉬워진다. 이는 <strong>조건부 시나리오</strong>이며 영상에서 제시한 수치나 제휴가 입증됐다는 의미는 아니다.</p>
+<p><strong>반론·무효화 조건:</strong> 실제 국채 금리가 상승하거나 고용·물가 결과가 금리 완화 기대를 뒤집을 수 있다. ETF 일별 자료가 연속 유입 주장을 부정하거나 동일 시점의 시장 데이터가 가격·금리 동행을 보여주지 못하면 영상의 단기 수급·거시 해석은 약해진다. 기업 발표·신고 수리·실증 성과가 없거나 법안이 다른 발행 구조로 진행된다면 한국 진출·제도화 논리도 재평가해야 한다. 가격 동행이 확인되더라도 인과관계나 ‘ETF보다 거시에 더 민감하다’는 비교 판단에는 별도 분석이 필요하다.</p>
+<h3>가까운 관찰 항목</h3>
+<p>1. 미국 물가지표의 <strong>정확한 명칭·발표치·예상치·산정 방식</strong>, 2분기 GDP 수정치와 고용지표의 공식 발표일을 대조한다. 영상의 ‘어제’와 ‘금요일’은 절대 날짜로 확정되지 않았다.</p>
+<p>2. 동일 날짜·시간대의 BTC 체결가, 미국 주가지수, 10년물 금리, 금리 확률과 <strong>ETF별 일별 순자금흐름</strong>을 나란히 확인한다.</p>
+<p>3. 메타마스크·컨센시스의 직책·출시 기능, 문페이·카카오뱅크의 실증 발표, 서클 채용·은행 제휴, 관련 사업자 신고 상태를 <strong>각 당사자와 당국 자료</strong>에서 확인한다.</p>
+<p>4. 국회 보고서·법안 심의, 현행 세법, 국세청 지침과 국제 정보교환 일정을 원문으로 확인한다. 과세 유예 논쟁과 실제 법률 변경은 구분해야 한다.</p>
+<h3>자료 품질</h3>
+<p>한국어 자동자막은 전체 품질 점수 1.0(<code>transcript_quality</code>)이지만, 지표명·인명·정책 날짜 등 개별 표현의 오류를 배제하지 못한다. 영상 주장 추출의 <code>source_confidence</code>는 대체로 0.73~0.85인 반면, 일부 핵심 항목의 <code>asr_confidence</code>는 물가지표 0.45, 금리 전망 0.65, 과세 0.70이다. 검증 항목의 높은 <code>confidence</code>는 <strong>‘미검증’ 판정에 대한 확신</strong>이지 주장 진실성의 확률이 아니다. 수집된 웹 증거 9건 중 과세 관련 기사 1건만 일부 관련되고, 나머지는 무관하거나 발췌가 비어 있다. Bloomberg·Morningstar 자료는 제공되지 않았으며, 비공개 인터뷰와 닫힌 출처에 기대는 주장은 <strong>미검증·수동 확인 필요</strong>다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;QMDTZ4X5Qlk&quot;,
+  &quot;title&quot;: &quot;7년 만에 한국 찾은 조셉 루빈, 글로벌 거장들이 한국 시장을 찾는 이유 | 서동주, 김동환, 박현영 뉴스1 기자 [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=QMDTZ4X5Qlk&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/QMDTZ4X5Qlk/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-01T02:48:11+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 16177,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 16177,
+    &quot;segments&quot;: 943,
+    &quot;duration_seconds&quot;: 1865,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-02T07:04:08.217674+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 9,
+  &quot;claim_status_summary&quot;: {
+    &quot;asr_uncertain&quot;: 1,
+    &quot;unverified&quot;: 8,
+    &quot;partially_supported&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;8월 미국 물가지표가 예상보다 0.3%포인트 낮았고 포트폴리오 수수료 산정 방식 변경 효과도 약 0.3%포인트였다는 주장&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;예상 대비 -0.3%포인트; 산정 방식 변경 효과 약 0.3%포인트&quot;,
+        &quot;observed&quot;: &quot;대조 가능한 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;물가 둔화와 금리 전망의 근거로 사용하지 말고 지표명·발표치·예상치·방법론 변경을 먼저 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;미국 2분기 GDP가 상향 조정됐고 10년물 국채 금리가 2002년 5월 이후 최고였다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2002년 5월 이후 약 24년 만의 10년물 금리 최고&quot;,
+        &quot;observed&quot;: &quot;BEA 수정치·재무부 금리 시계열 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;성장률 수정과 금리 급등을 투자 판단의 확정 근거로 삼을 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;물가지표 발표 후 비트코인이 약 8만5,000달러까지 상승했다가 8만3,000달러대로 하락하며 미국 증시·국채 금리와 함께 움직였다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;BTC 약 85,000달러 → 83,000달러대&quot;,
+        &quot;observed&quot;: &quot;동일 시점의 검증 가능한 BTC 시계열 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;가격 수준과 거시지표와의 동행·인과관계를 확인된 사실로 제시하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;10월 연준 금리 동결:인상 예상 비율이 3:7에서 5:5, 물가지표 후 6:4로 변했고 금요일 고용지표를 주시했다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;06:08&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;동결:인상 3:7 → 5:5 → 6:4&quot;,
+        &quot;observed&quot;: &quot;시점별 확률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확률 변화를 당시 시장 컨센서스로 인용하기 전에 원천 자료를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;미국 비트코인 현물 ETF가 9거래일 연속 순유입됐다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;06:08&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;9거래일 연속 순유입&quot;,
+        &quot;observed&quot;: &quot;일별 자금흐름 표 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;연속 순유입을 수급 호재로 확정해 반영할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;메타마스크 분사, 조셉 루빈의 메타마스크 CEO·컨센시스 이사회 의장 직책, 카드·스테이블코인 수익 기능 및 추가 자산 운용 구상에 관한 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;06:08&quot;,
+      &quot;source_confidence&quot;: 0.8,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출시된 기능과 향후 구상을 구분하고, 사업 확대를 확정 사실로 평가하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;문페이 코리아의 가상자산사업자 신고 계획, 금융기관 협업, 카카오뱅크 유학생 해외송금 실증, 비트고 코리아 신고 수리 및 약 3개월 후 결과 전망에 관한 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;12:12&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;실증 결과 약 3개월 후 전망&quot;,
+        &quot;observed&quot;: &quot;공식 일정 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제휴·신고 완료·실증 성과를 확정된 사업 진전으로 반영하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;서클이 한국 담당자 채용을 시작했고 은행 환전망과 USDC를 연결하는 기관 중심 사업을 우선 추진할 것이라는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;12:12&quot;,
+      &quot;source_confidence&quot;: 0.73,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;채용 여부와 실제 사업계획을 분리해 관찰해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;디지털자산 기본법 논의가 지연됐고 정무위 관련 연구보고서가 은행 중심 발행 후 빅테크·핀테크 참여를 허용하는 원화 스테이블코인 하이브리드 모델을 제시했다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;18:14&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;특정 발행 모델을 확정된 정책 방향으로 취급하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;2027년 1월 가상자산 과세 개시, 2028년 첫 신고, 2027년 5월 전 국세청 지침 배포, 거래소 자료 제출 일정, 최소 2년 유예 주장 및 미국의 2029년 정보교환 시점에 관한 주장&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.9,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E9&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;24:19&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 1월 과세; 2027년 5월 전 지침; 2028년 첫 신고; 최소 2년 유예; 미국 2029년 정보교환&quot;,
+        &quot;observed&quot;: &quot;E9는 2026년 9월 말 기준 ‘내년 1월’ 과세 예정 및 유예 논란만 보도&quot;
+      },
+      &quot;investor_implication&quot;: &quot;과세 관련 투자·신고 계획에는 법령과 국세청의 최신 공식 일정 확인이 필요하다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;BTC&quot;,
+      &quot;name&quot;: &quot;비트코인&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;미국 8월 물가 지표 발표 후 증시와 동반 상승했다가 국채 금리 상승과 함께 하락했다.&quot;,
+        &quot;출연진은 최근 비트코인 가격이 현물 ETF 수급보다 거시경제 지표에 더 민감하다고 평가하고, 금요일 고용 지표를 주시했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;방송에서 비트코인이 8만5,000달러까지 올랐다가 8만3,000달러대로 하락했다고 언급했다.&quot;,
+        &quot;미국 10년물 국채 금리가 2002년 5월 이후 약 24년 만의 최고 수준이라고 주장했다.&quot;,
+        &quot;미국 8월 물가 지표가 예상치보다 0.3%포인트 낮았으며, 포트폴리오 수수료 산정 방식 변경 효과도 약 0.3%포인트라고 설명했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;BTC&quot;,
+        &quot;as_of&quot;: &quot;2026-10-01T22:39:36.604270+00:00&quot;,
+        &quot;current_price&quot;: 37.439998626708984,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 55.96,
+        &quot;fifty_two_week_low&quot;: 25.65,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Moody’s upgrades Kaiser Aluminum to Ba3 on strong cash flow and debt metrics&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/moody-upgrades-kaiser-aluminum-ba3-211448624.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T21:14:48+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Moody’s upgrades Kaiser Aluminum to Ba3 on strong cash flow and debt metrics Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals We...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;BofA Securities names top mining stocks as copper outlook brightens&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/bofa-securities-names-top-mining-190437796.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T19:04:37+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;BofA Securities names top mining stocks as copper outlook brightens Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather New...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Silvercorp Metals Maps Global Growth With Ecuador and Kyrgyzstan Mine Builds&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/silvercorp-metals-maps-global-growth-210211444.html&quot;,
+      &quot;publisher&quot;: &quot;MarketBeat&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T21:02:11+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Silvercorp Metals Maps Global Growth With Ecuador and Kyrgyzstan Mine Builds Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals We...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Greenland Mines Identifies Critical Minerals Additions Including Gallium and Vanadium as Landmark 2026 Skaergaard PGM Program Concludes&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/greenland-mines-identifies-critical-minerals-163300450.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T16:33:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Sherritt Provides Update on Court Application and Confirms Shareholder Meeting for December 15, 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/sherritt-provides-court-application-confirms-223500817.html&quot;,
+      &quot;publisher&quot;: &quot;Business Wire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T22:35:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Kayne Anderson Energy Infrastructure Fund Provides Unaudited Balance Sheet Information and Announces Its Net Asset Value and Asset Coverage Ratios as of Sept...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/kayne-anderson-energy-infrastructure-fund-222500414.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T22:25:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;가상자산 과세 유예 여론 확산, 정치적 해법 마련될까&quot;,
+      &quot;source_url&quot;: &quot;https://www.ekoreanews.co.kr/news/articleView.html?idxno=88329&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-09-30T15:32:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;내년 1월부터 시행되는 디지털자산(가상자산) 과세를 3개월 앞두고 유예 논란이 뜨겁다. 국민의힘 등 야권과... 교환체계의 첫 자료 교환이 내년부터 이뤄지기 때문에 그 전에 과세를 하면 해외거래소 이용자의 소득은...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

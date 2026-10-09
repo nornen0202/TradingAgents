@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 템퍼스 AI 질주에 다시 뜨는 미국 바이오, 최대 수혜주는? | 박현지, 강하나 여도은, 허재무 [아침N투자]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261009_065806</p>
+    <h1>템퍼스 AI 질주에 다시 뜨는 미국 바이오, 최대 수혜주는? | 박현지, 강하나 여도은, 허재무 [아침N투자]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=YHF9soni-WI">원본 영상</a>
+    </div>
+  </header>
+  <h2>미국 바이오·템퍼스 AI: 성장 논리와 검증 공백</h2>
+<p><strong>분석 기준:</strong> 2026년 10월 9일 제공 자료</p>
+<p><strong>대상 영상:</strong> 삼프로TV, 2026년 10월 8일 게시 — <a href="https://www.youtube.com/watch?v=YHF9soni-WI">원영상</a></p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 핵심은 <strong>바이오 투자 관심이 기대감에서 임상 데이터·계약·매출로 이동하고, mRNA 항암백신과 AI 신약개발의 성장이 진단·데이터 인프라 기업으로 확산될 수 있다</strong>는 논리다. 템퍼스 AI를 이 연결고리의 중심에 놓고, 혁신 바이오 ETF와 상대적으로 분산된 바이오 ETF를 구분한다.</p>
+<p>그러나 <strong>제공 자료만으로 최대 수혜주나 최근 급등의 정당성을 확정할 수 없다.</strong> 연구계획의 세부 주장 10개 중 8개는 미검증, 2개는 자막 인식 불확실로 판정됐다. 직접 지지된 주장은 없으며, 템퍼스·모더나·한미약품·ETF 관련 주요 주장은 이번 세부 검증 범위 밖이다. 미검증은 거짓이라는 뜻이 아니라 확인 근거가 부족하다는 뜻이다.</p>
+<h3>2. 확인된 사실·근거의 범위</h3>
+<h4>특허 분쟁: 미국 절차에 관한 과거 보도만 확보</h4>
+<p>외부 증거 E1은 2026년 7월 25일 기사다. 발췌에 따르면 할로자임이 알테오젠 제조방법 특허 <strong>US 12,221,638</strong>을 대상으로 제기한 무효심판은 심리 개시가 기각됐다. 같은 기사에는 미국 뉴저지 연방법원의 키트루다 SC 특허 침해 본안 소송 구두변론이 7월 31일 예정이라고 나온다. 이후 결과는 제공되지 않았다. <a href="https://www.edaily.co.kr/news/newspath.asp?newsid=01925366645518128">이데일리 기사</a></p>
+<p>이는 <strong>미국의 별도 특허 절차에 관한 보도</strong>이며, 영상이 언급한 네덜란드 침해 판단을 확인하지 않는다. 또한 무효심판 개시 기각을 침해 본안 승소로 바꾸어 해석할 수 없다. 합의 여부, 머크의 비용 부담, 알테오젠의 영향 제한도 확인되지 않았다.</p>
+<h4>시장 자료: IBB 단일 스냅샷만 제공</h4>
+<p>호스트가 수집한 yfinance 자료에서 IBB 가격은 2026년 10월 8일 22:58 UTC 조회 기준 약 <strong>200.48달러</strong>, 52주 최고·최저는 <strong>217.12달러·149.09달러</strong>다. 이는 수집된 가격 스냅샷이지 영상 속 관찰 시점의 가격이나 확정 종가를 뜻하지 않는다.</p>
+<p>단일 스냅샷으로는 영상의 IBB 최근 1개월 수익률, 보유 종목 수, 상위 종목 비중을 검증할 수 없다. 제공된 모더나 관련 뉴스 제목 역시 임상 결과나 특정 기간 상승률을 확인하는 근거로는 부족하다.</p>
+<h3>3. 주요 기업: 영상 주장과 확인 상태</h3>
+<p>아래 시각은 <strong>개별 발언 시각이 아닌 청크 시작 시각</strong>이다. <code>source_confidence</code>는 발언 추출 신뢰도이며 사실일 확률이 아니다.</p>
+<p>| 대상·관련 시각 | 영상 주장 | 확인된 사실/근거 및 공백 |</p>
+<p>|---|---|---|</p>
+<p>| <strong>템퍼스 AI·퍼스널리스</strong> · 13:51, 27:29, 34:05, 48:51 · 추출 신뢰도 0.90 | 암 검사에서 축적되는 유전체·치료반응 데이터가 핵심 가치이며, 모더나·머크 협력과 퍼스널리스 인수가 항암백신·MRD 인프라 노출을 강화한다. | 실적 원문, 협력 발표, 인수 공시가 없다. 신규 계약인지 기존 관계 확대인지, 인수가 발표·진행·완료 중 어느 단계인지 확인 불가. |</p>
+<p>| <strong>모더나·mRNA 항암백신</strong> · 13:51, 20:37, 48:51 · 0.78 | 머크와의 개인맞춤형 항암백신 데이터가 재평가를 촉발했으며 키트루다 병용과 다른 암종 확장이 성장 동력이다. | 임상 원자료가 없다. 1천명 이상 환자의 3상 결과라는 설명, 당일 최대 177% 상승, 8월 대비 200~250% 상승 모두 미검증. |</p>
+<p>| <strong>머크</strong> · 13:51, 20:37, 48:51 · 0.90 | 키트루다 기존 매출에 SC 제형과 항암백신 병용이 추가 성장 동력을 제공한다. | 제품별 매출, SC 상용화 현황, 병용 임상 성과 및 특허 만료 영향을 대조할 자료가 없다. 안정성과 모멘텀을 함께 갖췄다는 평가는 출연자 의견이다. |</p>
+<p>| <strong>한미약품</strong> · 06:46, 20:37, 27:29 · 0.83 | UCN2 후보물질은 근육 보존·체성분 개선을 겨냥하며, 로슈·제넨텍 계약 가치가 충분히 반영되지 않았다. | 약 3조원 총액·약 2,800억원 선급금, 초기 개발 단계에 관한 계약 원문이 없다. 별도 비만치료제 승인·가격 주장과 구분해야 한다. |</p>
+<p>| <strong>펩트론·릴리</strong> · 00:00, 06:46, 56:05 · 0.90 | 기술평가 종료 시점의 본계약 부재가 급락 배경이며 후속 계약이 핵심 변수다. | 평가 종료·연장·협상 관련 공지와 시세가 없다. 자료 부재가 본계약 부재를 입증하지 않으며, 평가 종료와 협상 중단도 다르다. |</p>
+<p>| <strong>알테오젠·머크·할로자임</strong> · 00:00, 06:46 · 0.78 | 네덜란드 특허 판단에도 합의와 머크의 비용 부담 가능성 때문에 직접 영향은 제한적이다. | E1은 미국 절차의 배경만 제공한다. 네덜란드 판단, 비용 귀속, 당일 하락률과 인과관계는 미검증이다. |</p>
+<h4>템퍼스 실적에서 특히 주의할 숫자</h4>
+<p>영상은 매출 <strong>3억 8,250만 달러·전년 대비 22% 증가</strong>, 데이터 앤드 애플리케이션스 매출 <strong>9,320만 달러·약 30% 증가</strong>를 언급한다. 하지만 보고 기간과 비교 기준이 제공되지 않아 분기·연간 수치로 확정할 수 없다. 흑자 주장도 순이익, 영업이익, 조정 지표 중 무엇인지 확인되지 않았다.</p>
+<p>따라서 이 숫자로 성장률 추세나 가치평가 배수를 계산하기에 앞서 실적 원문 확인이 필요하다.</p>
+<h3>4. 강세 논리와 반론</h3>
+<h4>강세 논리 — 확인을 전제로 한 투자 가설</h4>
+<ul>
+<li><strong>개발사 외 인프라로의 수혜 확장:</strong> 항암백신 개발이 확대되면 환자 선별, 유전체 분석, 치료반응 추적 수요가 늘어 진단·데이터 기업에 기회가 생길 수 있다는 논리다.</li>
+<li><strong>데이터 축적의 사업화:</strong> 템퍼스의 검사 데이터가 제약사 협력과 데이터 매출로 이어진다면, 검사와 데이터 사업의 연결성이 성장 동력이 될 수 있다.</li>
+<li><strong>임상·계약 중심의 선별:</strong> 실질 임상 성과와 계약 현금 유입이 확인되는 기업을 구분하자는 영상의 분석 틀은 관찰 기준으로 활용할 수 있다. 다만 실제 자금 이동은 확인되지 않았다.</li>
+</ul>
+<h4>반론 — 기술 진전과 주주 수익은 별개</h4>
+<ul>
+<li><strong>임상 일반화의 한계:</strong> 흑색종 수술 후 보조요법에서의 결과를 다른 암종, 단독요법 또는 mRNA 전체의 효능으로 확대할 수 없다.</li>
+<li><strong>사업화 병목:</strong> 영상도 개인맞춤형 치료제의 대량생산과 가격 문제를 지적한다. 임상 성공만으로 생산·공급·수익성 확보까지 입증되는 것은 아니다.</li>
+<li><strong>협력·인수의 경제성:</strong> 협력 발표가 확정 매출을 의미하지 않으며, 인수 효과도 통합 비용과 자금 부담을 함께 봐야 한다. 템퍼스의 실제 비용 부담은 자료가 없다.</li>
+<li><strong>계약 총액의 착시:</strong> 한미약품의 언급된 총액은 선급금과 구분해야 한다. 조건부 지급액을 당장 확보된 현금처럼 해석할 수 없다.</li>
+<li><strong>가격 반영 위험:</strong> 영상이 언급한 급등률과 고평가 판단은 재검증이 필요하다. 성장 기대가 이미 가격에 얼마나 반영됐는지는 현재 자료로 판단하기 어렵다.</li>
+</ul>
+<p>AI가 발굴 시간을 절반 이상 단축하고 비용을 20~50% 줄인다는 수치, 알츠하이머·유전자 편집 시장 전망, AI 기반 물질의 승인 이력이 없다는 발언도 원출처·정의·기준일이 없어 미검증이다.</p>
+<h3>5. ETF 비교: 영상의 분류와 검증 공백</h3>
+<p>| 상품 | 영상의 분류 | 실제로 확인할 항목 |</p>
+<p>|---|---|---|</p>
+<p>| <strong>ARKG</strong> | 유전체·혁신 바이오 중심의 공격적 상품 | 최신 보유 내역, 상위 비중, 템퍼스 등 실제 편입 여부 |</p>
+<p>| <strong>원큐 미국 메디컬 AI</strong> | 진단·정밀의료 중심, 11종목 압축 구성 | 종목 수, 일루미나 약 13%·머크 약 10%, 구글·엔비디아 편출 여부 |</p>
+<p>| <strong>코액트 미국 바이오헬스케어 액티브</strong> | 상대적으로 집중된 액티브 상품, 인수 후보도 편입 | 상위 비중의 대상 종목 수, 교체 내역, 인수 기대 노출 |</p>
+<p>| <strong>IBB</strong> | 비교 상품 중 상대적으로 폭넓게 분산 | 약 250종목·상위 합계 약 20% 주장과 기준일 |</p>
+<p>영상의 변동성 순서 <strong>ARKG → 원큐 → 코액트 → IBB</strong>는 출연자 평가이며 실측 결과가 아니다. 최근 1개월 수익률 차이도 동일 기준일·통화·분배금 반영 방식으로 확인해야 한다. 상대적으로 분산됐다는 설명이 저위험을 뜻하지는 않는다.</p>
+<p>대형 제약과 AI 신약 테마를 7:3 또는 6:4로 나눈 예시, 위성 비중 5~10% 발언은 검증된 최적 배분이 아닌 출연자의 사례다.</p>
+<h3>6. 단기 체크포인트와 논지 무효화 조건</h3>
+<p>확정된 발표 일정은 제공되지 않았다. 다음은 <strong>자료 확보 또는 차기 발표 시점에 확인할 관찰 항목</strong>이다.</p>
+<p>| 관찰 대상 | 구체적인 확인 항목 | 강세 논지를 약화·무효화할 조건 |</p>
+<p>|---|---|---|</p>
+<p>| <strong>템퍼스 실적</strong> | 보고 기간, 검사·데이터 부문 성장률, 인수 효과 제외 성장, 이익 지표와 현금흐름 | 인수 효과를 제외한 성장이 둔화되고 비용·현금 유출 부담이 지속되는 경우 |</p>
+<p>| <strong>협력·퍼스널리스 인수</strong> | 계약 발표일, 신규·기존 관계 구분, 매출 연결 조건, 인수 단계·대가·통합 비용 | 협력이 유료 사업으로 연결되지 않거나 인수 부담이 기대 효과를 압도하는 경우 |</p>
+<p>| <strong>모더나·머크 임상</strong> | 시험명·단계·환자 수, 평가변수, 대조군, 효과 크기, 추적 기간, 안전성 | 핵심 평가변수 미충족, 안전성 악화 또는 다른 암종으로의 확장 근거 부재 |</p>
+<p>| <strong>키트루다 SC 특허</strong> | 네덜란드 판단 원문, 대상 특허·제품·효력 범위, 최신 미국 절차, 비용 부담 조항 | 사업 제한 또는 알테오젠의 직접 비용 부담이 확인돼 영향 제한 가정이 깨지는 경우 |</p>
+<p>| <strong>펩트론·한미약품 계약</strong> | 평가 종료와 후속 협상 구분, 계약 총액·선급금·조건부 지급 구조 | 후속 계약 기대가 해소되거나 개발·계약 조건이 가치 실현을 제한하는 경우 |</p>
+<p>| <strong>ETF</strong> | 기준일별 보유 내역, 집중도·중복 편입, 동일 조건 수익률·변동성 | 영상의 분산·변동성 구분과 실제 구성 또는 측정 결과가 일치하지 않는 경우 |</p>
+<p>JP모건 헬스케어 컨퍼런스 전 1~2주 상승 경향도 영상의 관찰이다. 실제 일정과 과거 표본 수익률이 없어 반복 가능한 효과로 전제할 수 없다.</p>
+<h3>7. 데이터 품질과 해석 제한</h3>
+<ul>
+<li><strong>자막 품질과 사실 정확성은 다르다.</strong> <code>transcript_quality</code>는 자동 평가상 good·1.0이지만 숫자·제품명·고유명사 오류가 다수 지적됐다.</li>
+<li><strong>ASR 신뢰도는 별도 음성 검수 결과가 아니다.</strong> 검증 대상에서 펩트론 0.90, 알테오젠 0.78은 추정치다. 삼성전자 숫자는 0.20, 하락률은 0.10으로 낮다. 템퍼스·모더나 등에는 별도 claim-level ASR 점수가 제공되지 않았다.</li>
+<li><strong>불명확한 수치는 보정하지 않는다.</strong> 삼성전자 실적의 소수점·단위, 모더나 상승률, 반도체 밸류에이션 지표 등을 임의로 고치지 않았다. 삼성전자 추출 신뢰도도 0.48에 그친다.</li>
+<li><strong>검증 범위가 좁다.</strong> 외부 증거는 E1 한 건이며 과거 미국 특허 절차에 한정된다. 제외된 검색 결과 제목은 증거로 사용하지 않았다. 수집 상태의 verified 표시는 영상 주장 전체가 확인됐다는 뜻이 아니다.</li>
+<li><strong>시간 기준을 유지한다.</strong> 게시일과 실제 방송일을 동일시하지 않으며, ‘어제·지난주’도 절대 날짜로 바꾸지 않았다. 장중 하락률과 종가, 초반과 말미 관찰을 구분했다.</li>
+<li><strong>공시 미확보는 공시 부재가 아니다.</strong> 공시 제공자 이용 불가로 원문을 확보하지 못했다. Bloomberg·Morningstar 및 기타 폐쇄형 자료에 의존하는 주장은 근거가 제공되지 않은 경우 <strong>미검증·수동 확인 필요</strong>로 취급한다.</li>
+</ul>
+<p>국내 지수·개별 종목 등락률과 누리호·스페이스X 관련 발언도 확인 근거가 없어 핵심 투자 논거에서 제외했다.</p>
+<h3>결론</h3>
+<p>영상은 <strong>임상 성과 → 진단·데이터 수요 → 협력·매출</strong>이라는 미국 바이오의 수혜 경로를 제시한다. 다만 제공 근거로는 그 경로가 템퍼스의 지속 성장과 이익으로 연결됐는지, 모더나 임상·주가 수치가 정확한지, 특허 위험이 제한적인지 확인할 수 없다.</p>
+<p>투자자가 우선 관찰할 것은 테마의 강도보다 <strong>임상 원자료, 계약의 현금화 조건, 인수 효과를 분리한 매출·현금흐름, 특허 판단 범위, 최신 ETF 구성</strong>이다. 이 항목들이 확인되기 전에는 ‘최대 수혜주’보다 ‘검증이 필요한 성장 가설’로 해석하는 것이 현재 증거에 부합한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;YHF9soni-WI&quot;,
+  &quot;title&quot;: &quot;템퍼스 AI 질주에 다시 뜨는 미국 바이오, 최대 수혜주는? | 박현지, 강하나 여도은, 허재무 [아침N투자]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=YHF9soni-WI&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/YHF9soni-WI/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-08T02:25:31+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 27148,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 27148,
+    &quot;segments&quot;: 1517,
+    &quot;duration_seconds&quot;: 3552,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-10-09T06:58:06.448375+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 1,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 8,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1_1&quot;,
+      &quot;claim_text&quot;: &quot;잠정실적이 예상에 부합했음에도 주가는 하락해, 실적 개선이 당일 주가 상승으로 이어지지 않았다고 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.48,
+      &quot;asr_confidence&quot;: 0.48,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없는 실적·주가 방향 주장&quot;,
+        &quot;observed&quot;: &quot;대조 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실적 개선과 주가 반응의 관계를 투자 근거로 사용하려면 동일 발표일의 공시·컨센서스·시세 대조가 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C1_2&quot;,
+      &quot;claim_text&quot;: &quot;실적 관련 &#x27;107조&#x27;, 영업이익 전년 대비 &#x27;782%&#x27; 증가라는 발화가 있으나 항목·소수점·단위 확인이 필요하다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.48,
+      &quot;asr_confidence&quot;: 0.2,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&#x27;107조&#x27;; 영업이익 전년 대비 &#x27;782%&#x27; 증가&quot;,
+        &quot;observed&quot;: &quot;항목·소수점·단위 및 실제 공시 수치 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;해당 숫자는 원음과 잠정실적 공시를 대조하기 전까지 실적 성장률·가치평가 계산에 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C1_3&quot;,
+      &quot;claim_text&quot;: &quot;당일 하락률은 &#x27;0.5%대 5%대&#x27;로 인식돼 확정할 수 없다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.48,
+      &quot;asr_confidence&quot;: 0.1,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&#x27;0.5%대 5%대&#x27; 하락&quot;,
+        &quot;observed&quot;: &quot;확정 가능한 하락률 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;하락 폭을 확정하거나 다른 종목과 비교하기 전에 발언 수치와 관찰 시각을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2_1&quot;,
+      &quot;claim_text&quot;: &quot;릴리와의 기술평가 종료 시점에 본계약이 나오지 않아 계약 기대가 반영된 펩트론 주가가 급락했으며, 추가 계약 여부가 반등의 핵심 변수라고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없는 계약·주가 인과 주장&quot;,
+        &quot;observed&quot;: &quot;계약·공지·시세 대조 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;평가 종료와 협상 중단을 구분하고 실제 계약 공시를 확인해야 하며, 계약 기대만으로 반등을 전제할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2_2&quot;,
+      &quot;claim_text&quot;: &quot;초반 펩트론 약 29% 급락을 언급했고, 영상 말미에는 하한가 진입을 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;초반 약 29% 하락; 말미 하한가 진입&quot;,
+        &quot;observed&quot;: &quot;시점별 가격·등락률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장중 하한가 도달 여부와 종가 수익률을 구분해 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2_3&quot;,
+      &quot;claim_text&quot;: &quot;기술평가 기간은 방송 기준 &#x27;어제&#x27;까지였다고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;평가 기간 종료: 방송 기준 &#x27;어제&#x27;&quot;,
+        &quot;observed&quot;: &quot;절대 종료일 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;종료일과 연장·후속 협상 관련 공지를 확인하기 전에는 계약 발표 시점을 추정하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3_1&quot;,
+      &quot;claim_text&quot;: &quot;네덜란드에서 키트루다 SC 제품의 할로자임 특허 침해 판단이 보도돼 알테오젠이 하락했지만, 출연자는 합의와 머크의 비용 부담 가능성을 들어 알테오젠의 직접 영향은 제한적이라고 평가했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없는 특허 판단·비용 귀속·영향 주장&quot;,
+        &quot;observed&quot;: &quot;네덜란드 판단과 비용 귀속 확인자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미국의 별도 절차 결과를 네덜란드 분쟁 해소나 알테오젠의 비용 부담 면제로 해석할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3_2&quot;,
+      &quot;claim_text&quot;: &quot;초반 알테오젠의 당일 주가 하락률을 5%대로 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;초반 당일 주가 5%대 하락&quot;,
+        &quot;observed&quot;: &quot;해당 시각 시세 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발언 시각과 등락률 기준가격을 확인해야 실제 하락 폭을 비교할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4_1&quot;,
+      &quot;claim_text&quot;: &quot;고금리 아래에서는 임상 데이터·계약·매출이 확인되는 기업으로 자금이 선별되고, 특허 만료를 앞둔 빅파마의 인수합병·기술이전과 AI 기반 개발 효율화가 투자 기회를 만든다고 주장했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.8,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없는 자금 선별·거래·개발 효율 주장&quot;,
+        &quot;observed&quot;: &quot;관련 통계와 비교자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;업종 전체의 기회로 일반화하기보다 개별 기업의 임상 결과·계약 조건·매출과 비용을 확인할 필요가 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4_2&quot;,
+      &quot;claim_text&quot;: &quot;기대에 못 미치는 데이터를 발표한 미국 바이오텍이 30~40% 하락하는 사례를 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.8,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 바이오텍 사례의 주가 30~40% 하락&quot;,
+        &quot;observed&quot;: &quot;기업·날짜·가격 자료 없어 재계산 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;30~40%를 바이오 투자 전반의 예상 손실률로 사용할 수 없으며 구체적인 사례와 측정 기간 확인이 필요하다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;IBB&quot;,
+      &quot;name&quot;: &quot;IBB 바이오 ETF&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;버텍스·암젠·길리어드 등 바이오 기업을 폭넓게 담아, 영상에서 비교한 혁신 바이오 ETF보다 보수적인 접근 수단으로 제시했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;약 250개 기업에 투자한다고 설명했다.&quot;,
+        &quot;상위 기업 합산 비중을 약 20%로 언급했다.&quot;,
+        &quot;최근 1개월 수익률은 마이너스라고 말했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;IBB&quot;,
+        &quot;as_of&quot;: &quot;2026-10-08T22:58:10.395820+00:00&quot;,
+        &quot;current_price&quot;: 200.47999572753906,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: 25.045832,
+        &quot;fifty_two_week_high&quot;: 217.12,
+        &quot;fifty_two_week_low&quot;: 149.09,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C3_1&quot;,
+      &quot;title&quot;: &quot;[바이오맥짚기] 알테오젠, 특허 족쇄 벗고 급등…삼천당제약 &#x27;FDA 신기루...&quot;,
+      &quot;source_url&quot;: &quot;https://www.edaily.co.kr/news/newspath.asp?newsid=01925366645518128&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-07-25T08:38:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;할로자임이 알테오젠 제조방법 특허(US 12,221,638)를 겨냥해 낸 무효심판은 심리 개시 자체가 기각됐다. 다만 미국 뉴저지 연방법원에서 할로자임이 키트루다 SC의 특허 침해를 주장한 본안 소송 구두변론이 7월 31일로...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

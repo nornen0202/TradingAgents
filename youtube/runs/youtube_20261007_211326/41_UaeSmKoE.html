@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 美국채 5.3%에도 뉴욕증시는 올랐다… 나스닥 사상 최고 / 코스피는 언제 날아가나? 돈은 2차전지로?ㅣ 이주연 대표</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261007_211326</p>
+    <h1>美국채 5.3%에도 뉴욕증시는 올랐다… 나스닥 사상 최고 / 코스피는 언제 날아가나? 돈은 2차전지로?ㅣ 이주연 대표</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=41_UaeSmKoE">원본 영상</a>
+    </div>
+  </header>
+  <h2>투자자 관찰 리포트 | 고금리 속 미국 증시와 한국 업종 순환</h2>
+<p><a href="https://www.youtube.com/watch?v=41_UaeSmKoE">영상: 815Money talk, 2026년 10월 6일 게시</a> · 자동 생성 한국어 자막 기반</p>
+<h3>핵심 판단</h3>
+<p>영상의 중심 논리는 <strong>미국 증시가 높은 금리에도 AI·실적 기대를 바탕으로 강세를 보이고, 한국에서는 반도체에서 바이오·2차전지 등으로 수급이 확산될 수 있다</strong>는 것이다. 다만 제공된 독립 근거가 직접 뒷받침하는 범위는 나스닥 최고치 *보도 제목*과 TSMC 관련 2차 뉴스 요약 정도다. 국채 금리 5.3%, 업종별 등락률, 실적 전망치, 정책·인수·임상 촉매는 대부분 원자료가 없어 투자 전제로 확정할 수 없다.</p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>| 주제 | 영상 주장 | 확인된 사실·근거와 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 미국 증시·금리 <a href="https://www.youtube.com/watch?v=41_UaeSmKoE&amp;t=6s">00:06</a> | 나스닥이 1% 이상 올라 최고치를 경신했고 미국 10년물 국채 수익률은 5.3%를 넘었다. | <a href="https://finance.yahoo.com/markets/stocks/articles/dow-p-500-nasdaq-futures-024536034.html">Stocktwits 기사</a>와 <a href="https://finance.yahoo.com/markets/stocks/articles/u-stock-futures-steady-nasdaq-020350692.html">Investing.com 기사</a>의 <strong>제목</strong>은 나스닥 최고치 도달을 보도한다. 제공된 발췌에는 종가·상승률·국채 수익률이 없고, 기사 발행 시점은 영상 게시 후다. 따라서 같은 거래일의 ‘1% 상승·5.3%’ 조합은 미확인이다. |</p>
+<p>| 서비스업·실적 <a href="https://www.youtube.com/watch?v=41_UaeSmKoE&amp;t=6s">00:06</a>, <a href="https://www.youtube.com/watch?v=41_UaeSmKoE&amp;t=864s">14:24</a> | 9월 서비스업 PMI 54.9, 가격지수 74.5; S&amp;P 500의 3분기 실적 전망 약 30% 증가; 11월 자사주 매입 가속. | 해당 ISM 보고서, 비교 가능한 실적 전망치, 기업별 매입 공시가 없다. 자막에는 PMI 54.9와 ‘수축’이 함께 등장해 내부적으로도 맞지 않는다. 실적·매입은 기대와 실제 집행을 구분해야 한다. |</p>
+<p>| 한국 증시 <a href="https://www.youtube.com/watch?v=41_UaeSmKoE&amp;t=6s">00:06</a> | ‘지난 금요일’ 코스닥이 4% 이상 올랐고 코스피와 다른 업종으로 강세가 번질 수 있다. 삼성전자·SK하이닉스 자사주 매입 종료 후 외국인 수급 변화에 주목한다. | 해당 거래일 코스닥 등락률, 외국인 순매매 및 양사 자사주 공시가 제공되지 않았다. 코스피 단일 시점 가격이나 두 회사를 합친 비정상적 티커 스냅샷으로는 이를 검증할 수 없다. 업종 순환은 전망이다. |</p>
+<p>| AI·반도체 <a href="https://www.youtube.com/watch?v=41_UaeSmKoE&amp;t=458s">07:38</a>, <a href="https://www.youtube.com/watch?v=41_UaeSmKoE&amp;t=864s">14:24</a> | TSMC의 약 2~3% 상승과 머스크 관련 사업과의 제휴 논의가 AI 공급망에 긍정적이다. | 제공된 <strong>24/7 Wall St. 2차 뉴스 요약</strong>은 2026년 10월 5일 TSM 약 2% 상승 및 Terafab 관련 초기 논의를 전하지만, 공식 계약은 발표되지 않았다고 한다. 별도 원문 링크·거래 원자료·당사자 발표는 제공되지 않았다. 확정 매출로 환산할 근거는 없다. |</p>
+<p>| 기타 촉매 <a href="https://www.youtube.com/watch?v=41_UaeSmKoE&amp;t=458s">07:38</a>–<a href="https://www.youtube.com/watch?v=41_UaeSmKoE&amp;t=1325s">22:05</a> | PTC 인수설, 원전 대출 지원, 백신 임상, 테슬라 인도량, 영국의 중국산 전기차 관세, 항공우주 목표주가·발사 일정이 관련 업종에 유리하다. | 공시·정책 원문·임상 결과·거래자료가 없어 각 사건과 주가 반응을 확인할 수 없다. 특히 백신 기업명, ‘SpaceX’ 주가의 대상 종목과 국내 발사체 명칭은 자막 인식이 불명확하다. 테슬라 인도량의 예상 대비 방향도 자막 안에서 상충한다. |</p>
+<h3>상승 논리와 반론</h3>
+<p>미국 대형 기술주의 실제 이익 전망이 상향되고 AI 주문이 지속된다면, 높은 금리에도 성장 기대가 주가를 지탱한다는 영상의 논리는 설득력을 얻는다. 한국에서도 반도체에 집중된 상승이 코스피·코스닥의 다른 업종으로 확대되고 외국인 순매수가 동반된다면 업종 순환 가설을 관찰할 수 있다. <strong>현재 증거 묶음은 이 조건들이 충족됐음을 보여주지 않는다.</strong></p>
+<p>반대로 금리 상승이 이어지거나 AI 주문·실적이 기대에 못 미치면 성장주 강세 논리가 약해진다. TSMC의 초기 협의는 계약 불발 가능성이 있고, 바이오 임상·인수설·관세·원전 지원은 사실관계와 실제 수혜 기업이 각각 다르다. 특정 미국 종목의 상승을 국내 업종 전체의 수혜로 연결하는 데에도 추가 근거가 필요하다.</p>
+<h3>가까운 확인 지점과 무효화 조건</h3>
+<ul>
+<li><strong>시장·거시:</strong> 영상 속 ‘오늘·지난 금요일’에 해당하는 거래일을 먼저 특정한 뒤 나스닥·코스닥 종가와 전일 대비 등락률, 미국 10년물 수익률을 대조한다. ISM 9월 서비스업 원보고서에서 PMI·가격지수·전월치를 확인한다. 수치가 다르면 ‘고금리에도 동반 강세’라는 영상의 출발점이 약해진다.</li>
+<li><strong>실적·수급:</strong> S&amp;P 500 3분기 전망의 작성일과 EPS·순이익 중 무엇이 약 30% 증가한다는 것인지 확인하고, 이후 실제 실적·내년도 전망·자사주 매입 집행을 추적한다. 한국에서는 KRX의 외국인 순매매와 삼성전자·SK하이닉스의 개별 공시를 확인한다. 이익 상향이나 수급 확산 없이 일부 종목만 오르면 광범위한 상승 논리는 약해진다.</li>
+<li><strong>기업·정책 촉매:</strong> TSMC와 제휴 상대의 공식 발표, PTC·슈나이더의 공시, 미국 원전 대출의 대상·조건, 백신 기업의 정확한 명칭과 임상 원자료, 테슬라 인도량, 영국 정부의 관세율·발효일, 한국 발사 일정의 공식 발표를 각각 확인한다. 발표가 없거나 수혜 연결이 입증되지 않으면 해당 테마 촉매는 관찰 가설로만 남는다.</li>
+</ul>
+<h3>자료 신뢰도</h3>
+<p>자막 전체 품질 평가는 <strong>good(1.0)</strong>이지만, 자동 생성 자막의 전반적 가독성이 개별 숫자·고유명사의 정확성을 보증하지는 않는다. 표의 시각은 정확한 발화 시각이 아닌 <strong>자막 청크 시작 시각</strong>이다. 주장별 <code>source_confidence</code>는 미국 증시 0.78, 서비스업 지표 0.55, 한국 증시 0.76, TSMC 0.61, 항공우주 0.36이고, 대응하는 <code>asr_confidence</code>는 각각 0.90, 0.48, 0.68, 0.55, 0.22다. 특히 서비스업 수치와 항공우주 종목 식별은 낮은 인식 신뢰도를 반영해 수동 확인이 필요하다. 제공된 웹 증거 4건 중 직접 관련성이 있는 것은 나스닥 최고치 보도 제목 2건뿐이며, 가격 스냅샷의 ‘verified’는 <strong>조회 성공</strong>을 뜻할 뿐 영상 주장 검증을 뜻하지 않는다. 공시 제공자도 이용 불가였다. 영상이 언급한 시타델·모건스탠리의 비공개 또는 유료 자료, 기타 Bloomberg·Morningstar 등 닫힌 출처의 주장도 원문이 제공되지 않아 <strong>미검증·수동 확인 필요</strong>다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;41_UaeSmKoE&quot;,
+  &quot;title&quot;: &quot;美국채 5.3%에도 뉴욕증시는 올랐다… 나스닥 사상 최고 / 코스피는 언제 날아가나? 돈은 2차전지로?ㅣ 이주연 대표&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=41_UaeSmKoE&quot;,
+  &quot;channel&quot;: &quot;815Money talk&quot;,
+  &quot;channel_id&quot;: &quot;UCCG6BEYjfQMGzypJw2EJCDQ&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@815moneytalk/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/41_UaeSmKoE/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-06T01:38:49+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 10925,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 10925,
+    &quot;segments&quot;: 514,
+    &quot;duration_seconds&quot;: 1532,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-10-06T12:01:39.199551+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;partially_supported&quot;: 3,
+    &quot;asr_uncertain&quot;: 4,
+    &quot;unverified&quot;: 3
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;나스닥이 ‘오늘’ 1% 이상 상승해 사상 최고치를 경신했고 미국 10년물 국채 수익률은 5.3%를 웃돌았다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.55,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E1&quot;,
+        &quot;E3&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;나스닥 1% 이상 상승; 미국 10년물 5.3% 초과&quot;,
+        &quot;observed&quot;: &quot;E1·E3에 해당 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;나스닥 최고치 보도만 확인된다. 1% 상승과 10년물 5.3%를 투자 판단의 확정 수치로 사용하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;9월 미국 서비스업 PMI가 54.9, 가격지수가 74.5로 전월 대비 1.4포인트 올라 2022년 이후 최고였다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.12,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;14:24&quot;,
+      &quot;source_confidence&quot;: 0.55,
+      &quot;asr_confidence&quot;: 0.48,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;PMI 54.9; 가격지수 74.5; 전월 대비 +1.4포인트; 2022년 이후 최고&quot;,
+        &quot;observed&quot;: &quot;관련 원자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;서비스업 물가 압력과 금리 상승의 연결 해석은 지표 원자료 확인 전까지 보류해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;S&amp;P 500 기업의 3분기 실적 전망이 전년 대비 거의 30% 늘었고 자사주 매입이 10월 중순 이후 재개돼 11월 가속될 것이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3분기 실적 전망 전년 대비 약 +30%; 10월 중순 재개·11월 가속&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 전망치·매입 일정 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실적 성장률과 자사주 매입을 미국 증시의 확정적인 상승 동력으로 전제하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;‘지난 금요일’ 코스닥이 4% 이상 올랐고, 코스피의 후속 강세 및 삼성전자·SK하이닉스 자사주 매입 종료 이후 수급 변화가 예상된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06&quot;,
+      &quot;source_confidence&quot;: 0.76,
+      &quot;asr_confidence&quot;: 0.68,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난 금요일 코스닥 +4% 초과&quot;,
+        &quot;observed&quot;: &quot;해당 거래일 코스닥 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;국내 업종 순환과 외국인 수급 변화는 KRX 거래자료와 양사 공시를 확인한 뒤 판단해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;TSMC 주가가 약 2~3% 올랐고 일론 머스크 관련 ‘테라’와 초기 제휴 논의가 있으나 계약은 확정되지 않았다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.58,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;14:24&quot;,
+      &quot;source_confidence&quot;: 0.61,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;TSMC 약 +2~3%&quot;,
+        &quot;observed&quot;: &quot;TSM 관련 2차 뉴스 요약은 약 +2%라고 보도; 거래 원자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;초기 협의를 확정된 제휴나 매출로 반영하지 말고 당사자 발표를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;엔비디아·브로드컴은 강세였지만 메모리주는 약세였고, 웨스턴디지털·시게이트 급락에는 ‘도시바 인증서 발행’이 영향을 줬으며 모건스탠리는 데이터센터 전력 병목을 평가했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.24,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;07:38&quot;,
+      &quot;source_confidence&quot;: 0.63,
+      &quot;asr_confidence&quot;: 0.54,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;마이크론 약 -1%, 샌디스크 -0.9%, SK하이닉스 약 -0.06%, 웨스턴디지털·시게이트 약 -10%&quot;,
+        &quot;observed&quot;: &quot;브로드컴 약 +2%라는 2차 뉴스 요약 외 해당 등락률 원자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;메모리·스토리지 약세의 원인을 특정 발표나 전력 병목으로 단정하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;슈나이더 일렉트릭의 PTC 인수 보도로 PTC가 30% 이상 상승했고, 미국 정부의 42억 달러 원전 대출 지원 보도가 비스트라·컨스텔레이션에 호재였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;07:38&quot;,
+      &quot;source_confidence&quot;: 0.59,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;PTC +30% 초과; 원전 대출 지원 42억 달러&quot;,
+        &quot;observed&quot;: &quot;관련 공시·정책 원문·거래자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;인수설과 원전 지원 규모를 확정된 기업·정책 촉매로 취급하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;XBI와 모더나·‘노바’·‘Vaxsite’가 급등했으며 폐렴구균 백신 임상 결과가 촉매였다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;14:24&quot;,
+      &quot;source_confidence&quot;: 0.54,
+      &quot;asr_confidence&quot;: 0.42,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;XBI +1% 초과; 모더나 약 +7%; ‘노바’ +20% 초과; ‘Vaxsite’ +30% 초과&quot;,
+        &quot;observed&quot;: &quot;동일 거래일 등락률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;백신 관련 종목과 임상 성과를 특정하기 전에는 바이오 업종 전반의 수혜로 확대 해석하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;테슬라 인도량이 전기차 회복을 시사하고, 영국의 중국산 전기차 관세 강화 가능성은 국내 2차전지에 유리하다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.09,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;22:05&quot;,
+      &quot;source_confidence&quot;: 0.51,
+      &quot;asr_confidence&quot;: 0.46,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기본 관세 10%와 추가 7~35%, 최대 약 45%; 영국 현행 10%&quot;,
+        &quot;observed&quot;: &quot;영국 관세율·시행일 공식 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;인도량의 예상 대비 방향과 관세 시행 여부를 확인하기 전에는 국내 2차전지 수혜를 확정하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;‘SpaceX’ 주가가 7.6% 상승했고 모건스탠리가 목표주가 300달러를 제시했으며 국내 발사체의 5차 발사가 예정돼 있다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;22:05&quot;,
+      &quot;source_confidence&quot;: 0.36,
+      &quot;asr_confidence&quot;: 0.22,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘SpaceX’ +7.6%; 목표주가 300달러; 국내 발사체 5차 발사&quot;,
+        &quot;observed&quot;: &quot;대상 종목·리서치 원문·공식 발사 일정 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;대상 종목과 발사 일정을 확인하기 전에는 관련 국내 종목의 촉매로 사용하지 말아야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;코스피·코스닥&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;발표자는 코스피가 다른 아시아 증시에 뒤처졌지만 코스닥을 뒤따를 수 있다고 예상하며, 반도체 중소형주에서 다른 업종으로 수급이 이동하는지 주시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;지난 금요일 코스닥이 4% 이상 상승했다고 말한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-06T03:09:27.089613+00:00&quot;,
+        &quot;current_price&quot;: 6942.77001953125,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 3522.54,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;005930.KS, 000660.KS&quot;,
+      &quot;name&quot;: &quot;삼성전자·SK하이닉스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;발표자는 두 회사의 자사주 매입 종료 시점을 거론하며 이후 외국인 수급 변화를 주시해야 한다고 본다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;005930.KS, 000660.KS&quot;,
+        &quot;as_of&quot;: &quot;2026-10-06T03:09:28.438418+00:00&quot;,
+        &quot;current_price&quot;: 272500.0,
+        &quot;market_cap&quot;: 1789388467994624.0,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 374500.0,
+        &quot;fifty_two_week_low&quot;: 89750.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;TSM&quot;,
+      &quot;name&quot;: &quot;TSMC&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;발표자는 AI 수요와 제휴 논의가 TSMC 및 반도체 공급망에 긍정적이라고 해석하지만, 제휴는 확정되지 않았다고 명시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;TSMC 주가가 약 2~3% 상승했다고 말한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSM&quot;,
+        &quot;as_of&quot;: &quot;2026-10-06T03:09:33.766257+00:00&quot;,
+        &quot;current_price&quot;: 485.79998779296875,
+        &quot;market_cap&quot;: 2519589012203.9497,
+        &quot;forward_pe&quot;: 22.157253,
+        &quot;trailing_pe&quot;: 35.30523,
+        &quot;fifty_two_week_high&quot;: 487.46,
+        &quot;fifty_two_week_low&quot;: 266.82,
+        &quot;average_target_price&quot;: 554.2594,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;IGV&quot;,
+      &quot;name&quot;: &quot;소프트웨어·사이버보안&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;미국 소프트웨어주와 IGV가 강세였으며, PTC는 인수 보도에 급등했다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;슈나이더 일렉트릭의 PTC 인수 보도 이후 PTC 주가가 30% 이상 상승했다고 한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;IGV&quot;,
+        &quot;as_of&quot;: &quot;2026-10-06T03:09:35.400649+00:00&quot;,
+        &quot;current_price&quot;: 109.72000122070312,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: 32.861305,
+        &quot;fifty_two_week_high&quot;: 117.76,
+        &quot;fifty_two_week_low&quot;: 73.93,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;XBI&quot;,
+      &quot;name&quot;: &quot;미국 바이오테크&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;발표자는 중소 바이오테크와 백신 개발사로 투자 심리가 확산될 가능성을 제시하며, 관련 백신 이슈를 알테오젠과는 무관하다고 구분한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;XBI가 1% 이상, 모더나가 약 7%, ‘노바’가 20% 이상, ‘Vaxsite’가 30% 이상 상승했다고 말한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;XBI&quot;,
+        &quot;as_of&quot;: &quot;2026-10-06T03:09:39.761047+00:00&quot;,
+        &quot;current_price&quot;: 156.19000244140625,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 169.89,
+        &quot;fifty_two_week_low&quot;: 102.55,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;TSLA&quot;,
+      &quot;name&quot;: &quot;전기차·2차전지&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;발표자는 테슬라 인도량을 전기차 시장 회복 조짐으로 해석하고, 중국산 전기차에 대한 관세 강화 가능성이 국내 2차전지에 유리할 것으로 전망한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;중국산 전기차 관세를 기본 10%와 추가 7~35%, 최대 약 45%로 설명하고 영국의 현행 관세는 10%라고 말한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSLA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-06T03:09:43.375226+00:00&quot;,
+        &quot;current_price&quot;: 378.7300109863281,
+        &quot;market_cap&quot;: 1495812127920.6436,
+        &quot;forward_pe&quot;: 176.58551,
+        &quot;trailing_pe&quot;: 350.67593,
+        &quot;fifty_two_week_high&quot;: 498.83,
+        &quot;fifty_two_week_low&quot;: 297.38,
+        &quot;average_target_price&quot;: 396.41104,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow, S&amp;P 500, Nasdaq Futures Edge Higher After Nasdaq Climbs To Record High: SPCX, USAR, CEG, NVAX Stocks In Focus&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/dow-p-500-nasdaq-futures-024536034.html&quot;,
+      &quot;publisher&quot;: &quot;Stocktwits&quot;,
+      &quot;published_at&quot;: &quot;2026-10-06T02:45:36+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow, S&amp;P 500, Nasdaq Futures Edge Higher After Nasdaq Climbs To Record High: SPCX, USAR, CEG, NVAX Stocks In Focus Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Po...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dan Ives Says Nvidia Fuels AI Market, But What If It Has a Lehman Moment?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/ai/articles/dan-ives-says-nvidia-fuels-023821739.html&quot;,
+      &quot;publisher&quot;: &quot;BeInCrypto&quot;,
+      &quot;published_at&quot;: &quot;2026-10-06T02:38:21+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dan Ives Says Nvidia Fuels AI Market, But What If It Has a Lehman Moment? Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weath...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Worst Performing ETFs of 2026 So Far&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/options/articles/worst-performing-etfs-2026-far-233935711.html&quot;,
+      &quot;publisher&quot;: &quot;etf.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-05T23:39:35+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Worst Performing ETFs of 2026 So Far A &#x27;Market Wizard,&#x27; crypto income funds and Chinese tech stocks sit at the bottom of the leaderboard.&lt;/p&gt;\&quot;&gt; A &#x27;Market Wizard,&#x27; crypto income funds and Chinese tech stocks sit at the bottom of the leaderboard.&lt;/p&gt;\&quot;&gt; A &#x27;Mar...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

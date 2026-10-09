@@ -1,0 +1,1797 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "prism",
+  "event_id": "prism:82a04d65e5cc3583eafa3796c72372df",
+  "prompt_contract_version": "prism-work-v5",
+  "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
+  "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
+  "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
+  "workflow_contract_sha256": "affa33ed518a96ac60bff25950a3fe646a7ff652ceb8d1ab5a9f50dde0362c75",
+  "source_sha256": "966f59aee2a2bba23c15e810a6e3272e4002c7536de51822a29c2a1ac3c647be",
+  "body": {
+    "kind": "prism",
+    "source_health": "OK",
+    "source": {
+      "health": "OK",
+      "run_id": "prism_telegram_20261009_085436",
+      "last_run_at": "2026-10-09T08:54:48.808200+09:00",
+      "status": "success",
+      "stale_after_hours": 30
+    },
+    "window_hours": 24,
+    "execution_eligible": false,
+    "evidence_policy": {
+      "profile": "balanced_external",
+      "material_thesis_effects": [
+        "ranking",
+        "confidence",
+        "position_size_within_existing_risk_limits",
+        "research_priority"
+      ],
+      "supported_evidence_weight": "MEDIUM",
+      "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+      "unverified_evidence_weight": "LOW_LABELED",
+      "user_primary_channels": [
+        "@kpunch",
+        "@sosumonkey"
+      ],
+      "user_primary_source_tier": "USER_PRIMARY",
+      "user_primary_evidence_weight": "HIGH",
+      "user_primary_validation_policy": "USER_ACCEPTED",
+      "matching_multi_source_signal_may_raise_thesis_priority": true,
+      "conflicting_signal_must_be_visible": true,
+      "may_bypass_market_or_portfolio_execution_gate": false
+    },
+    "coverage": {
+      "total_unique_events": 148,
+      "window_events": 33,
+      "transmitted_events": 33,
+      "truncated": false,
+      "oldest_occurred_at": "2026-10-08T00:44:16+00:00",
+      "newest_occurred_at": "2026-10-08T19:10:55+00:00"
+    },
+    "events": [
+      {
+        "event_key": "stock_ai_agent:15878",
+        "content_sha256": "9dfc7d972c55dce989397d284f35174c9a428e53a149c2f319fff20fa603722b",
+        "occurred_at": "2026-10-08T19:10:55+00:00",
+        "relevance": {
+          "tickers": [
+            "FRO",
+            "SPCX",
+            "NVDA",
+            "FRSH",
+            "BKH"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15878",
+          "posted_at": "2026-10-08T19:10:55+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15878",
+          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-09 04:10) 🔸 현재 보유: 5/10개 🔸 사용 비중: 3.92/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Frontline Plc(FRO) +2.34% ⚠️ 최저 수익: Space Exploration Technologies (SPCX) -3.54% 🔸 보유 종목: - NVIDIA Corporation(...",
+          "signals": [
+            {
+              "canonical_ticker": "FRO",
+              "display_name": "Frontline Plc",
+              "market": "US",
+              "source_asof": "2026-10-08T19:10:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "SPCX",
+              "display_name": "Space Exploration Technologies",
+              "market": "US",
+              "source_asof": "2026-10-08T19:10:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "NVDA",
+              "display_name": "NVIDIA Corporation",
+              "market": "US",
+              "source_asof": "2026-10-08T19:10:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 222.38,
+              "target_price": 276.54,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "FRSH",
+              "display_name": "Freshworks Inc.",
+              "market": "US",
+              "source_asof": "2026-10-08T19:10:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 13.15,
+              "target_price": 16.43,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "BKH",
+              "display_name": "Black Hills Corporation",
+              "market": "US",
+              "source_asof": "2026-10-08T19:10:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 73.5,
+              "target_price": 91.88,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            }
+          ],
+          "signals_total": 5,
+          "signals_transmitted": 5,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1199,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15877",
+        "content_sha256": "92afb29cd1fbf4a64a4541ccb4cd15a5376931fee1e7ac6ae56c4b936ecdfbf3",
+        "occurred_at": "2026-10-08T19:10:53+00:00",
+        "relevance": {
+          "tickers": [
+            "TEVA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15877",
+          "posted_at": "2026-10-08T19:10:53+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15877",
+          "preview": "⚠️ 매수 보류: Teva Pharmaceutical Industries (TEVA) 현재가: $39.59 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Healthcare 보류 사유: AI 판단: 미진입 — 최근 두 분기 연속 영업흑자 기준과 부채비율 기준이 모두 미달해 펀더멘털 게이트를 통과하지 못했습니다. / 점수 부족 (2/5) — AI 사유: 최근 두 분...",
+          "signals": [
+            {
+              "canonical_ticker": "TEVA",
+              "display_name": "Teva Pharmaceutical Industries",
+              "market": "US",
+              "source_asof": "2026-10-08T19:10:53+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 838,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15876",
+        "content_sha256": "c71ae69f867edb55634c331359b308ac6b7294433dcc3508faa2de34baf33d86",
+        "occurred_at": "2026-10-08T19:10:50+00:00",
+        "relevance": {
+          "tickers": [
+            "MANE"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15876",
+          "posted_at": "2026-10-08T19:10:50+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15876",
+          "preview": "⚠️ 매수 보류: Veradermics, Incorporated(MANE) 현재가: $122.84 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Healthcare 보류 사유: AI 판단: 미진입 — 수익성·성장성 기준 두 항목이 미달하여 강세 국면의 단일 항목 보완 예외를 적용할 수 없습니다. / 점수 부족 (2/5) — AI 사유: 수익성·성장성 기준 두 항목...",
+          "signals": [
+            {
+              "canonical_ticker": "MANE",
+              "display_name": "Veradermics, Incorporated",
+              "market": "US",
+              "source_asof": "2026-10-08T19:10:50+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 818,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15875",
+        "content_sha256": "8693626ef293b80a4ec24dd6c2fd94a462b0824dcbf9e6810d938309479e9dd8",
+        "occurred_at": "2026-10-08T19:10:47+00:00",
+        "relevance": {
+          "tickers": [
+            "GFS"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15875",
+          "posted_at": "2026-10-08T19:10:47+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15875",
+          "preview": "⚠️ 매수 보류: GlobalFoundries Inc.(GFS) 현재가: $49.23 매수 점수: 7/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Technology 보류 사유: AI 판단: 미진입 — 손익비 하한 미달: 최신 장중 가격 49.27달러에서 첫 확정 저항 50.99달러는 3.49% 위에 있어 분할의 3% 이내 저항 제외 규칙에 해당하지 않습니다. / 섹터 집중 (...",
+          "signals": [
+            {
+              "canonical_ticker": "GFS",
+              "display_name": "GlobalFoundries Inc.",
+              "market": "US",
+              "source_asof": "2026-10-08T19:10:47+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.7,
+              "composite_score": 0.7,
+              "confidence": 0.7,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1023,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15874",
+        "content_sha256": "96887f6c2397d84dfa386be90040b9c247f79a1c2f7dbae607df47f13f3f4cdf",
+        "occurred_at": "2026-10-08T18:43:21+00:00",
+        "relevance": {
+          "tickers": [
+            "TEVA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15874",
+          "posted_at": "2026-10-08T18:43:21+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15874",
+          "preview": "📊 Teva Pharmaceutical Industries (TEVA) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "TEVA",
+              "display_name": "Teva Pharmaceutical Industries",
+              "market": "US",
+              "source_asof": "2026-10-08T18:43:21+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 99,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15873",
+        "content_sha256": "56d47aeb743b82f2deda4e0a7a75319719d06595ed55647b911812c5ac38a11b",
+        "occurred_at": "2026-10-08T18:43:07+00:00",
+        "relevance": {
+          "tickers": [
+            "GFS"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15873",
+          "posted_at": "2026-10-08T18:43:07+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15873",
+          "preview": "📊 GlobalFoundries Inc. (GFS) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "GFS",
+              "display_name": "GlobalFoundries Inc.",
+              "market": "US",
+              "source_asof": "2026-10-08T18:43:07+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 88,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15872",
+        "content_sha256": "cfa38e394fb439d7f7530ab0e986917b9feb500972674a6a1b5bac35401203fc",
+        "occurred_at": "2026-10-08T18:42:51+00:00",
+        "relevance": {
+          "tickers": [
+            "TEVA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15872",
+          "posted_at": "2026-10-08T18:42:51+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15872",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "TEVA",
+              "display_name": "Teva Pharmaceutical Industries",
+              "market": "US",
+              "source_asof": "2026-10-08T18:42:51+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15871",
+        "content_sha256": "9c55ad194d3a81f429add79479a4fbd4cc9d449d90b371bee14ffe896bd4eff6",
+        "occurred_at": "2026-10-08T18:42:44+00:00",
+        "relevance": {
+          "tickers": [
+            "MANE",
+            "HIMS",
+            "BHC"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15871",
+          "posted_at": "2026-10-08T18:42:44+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15871",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "MANE",
+              "display_name": "Veradermics,  Incorporated",
+              "market": "US",
+              "source_asof": "2026-10-08T18:42:44+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "HIMS",
+              "display_name": "경쟁사와 비교하면 — Hims & Hers",
+              "market": "US",
+              "source_asof": "2026-10-08T18:42:44+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "BHC",
+              "display_name": "와 Bausch Health",
+              "market": "US",
+              "source_asof": "2026-10-08T18:42:44+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15870",
+        "content_sha256": "757095f8d5dc28dca85891c1bb14e2a88d4d174d6e38a7e7a9f6d2633025e25c",
+        "occurred_at": "2026-10-08T18:42:31+00:00",
+        "relevance": {
+          "tickers": [
+            "GFS",
+            "TSEM",
+            "SKYT"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15870",
+          "posted_at": "2026-10-08T18:42:31+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15870",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "GFS",
+              "display_name": "GlobalFoundries Inc.",
+              "market": "US",
+              "source_asof": "2026-10-08T18:42:31+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "TSEM",
+              "display_name": "경쟁사와 비교하면 — 비교 대상인 Tower Semiconductor",
+              "market": "US",
+              "source_asof": "2026-10-08T18:42:31+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "SKYT",
+              "display_name": "와 SkyWater Technology",
+              "market": "US",
+              "source_asof": "2026-10-08T18:42:31+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15869",
+        "content_sha256": "6260c243af8293b588fda1b70ef6f63c775ed4dd51f77d0c6955686c34e9271e",
+        "occurred_at": "2026-10-08T18:42:25+00:00",
+        "relevance": {
+          "tickers": [
+            "TEVA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15869",
+          "posted_at": "2026-10-08T18:42:25+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15869",
+          "preview": "📊 Teva Pharmaceutical Industries (TEVA) 제네릭 의약품과 전문·바이오의약품을 판매하는 제약사로, AUSTEDO·AJOVY 등 브랜드 제품 성장과 바이오시밀러 확장이 주요 기대 요인입니다. 💵 거래 현황 | 2026.10.08 관측치 - 주가: $39.40~$39.41 — 장 마감 전 관측으로 종가 확정 여부는 미확인 - 전일 대비 등락률: 보고서에 수치 없...",
+          "signals": [
+            {
+              "canonical_ticker": "TEVA",
+              "display_name": "Teva Pharmaceutical Industries",
+              "market": "US",
+              "source_asof": "2026-10-08T18:42:25+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 885,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15868",
+        "content_sha256": "f07c45edab09b6006ab55f8917c1ed2d7746d93f0ed444bcc6a7f35f4610daa1",
+        "occurred_at": "2026-10-08T18:42:20+00:00",
+        "relevance": {
+          "tickers": [
+            "MANE"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15868",
+          "posted_at": "2026-10-08T18:42:20+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15868",
+          "preview": "📊 Veradermics (MANE) 탈모 치료 후보물질을 개발하는 임상 단계 바이오기업입니다. 제품 매출은 아직 없으며, 기업가치의 핵심은 남녀형 탈모 치료제 VDPHL01의 임상 결과입니다. 💰 거래 현황 | 2026.10.08 관측치 - 주가: $125.00 (장중 관측, 확정 종가 아님) - 전일 대비: +$14.05, 약 +12.7% - 거래량: 약 274만 주로 전일 약 65...",
+          "signals": [
+            {
+              "canonical_ticker": "MANE",
+              "display_name": "Veradermics",
+              "market": "US",
+              "source_asof": "2026-10-08T18:42:20+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 840,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15867",
+        "content_sha256": "6f9ff439135523b18c9d8efdad36e6d71763044fa84466ad955611242205cb40",
+        "occurred_at": "2026-10-08T18:42:16+00:00",
+        "relevance": {
+          "tickers": [
+            "GFS"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15867",
+          "posted_at": "2026-10-08T18:42:16+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15867",
+          "preview": "📊 GlobalFoundries (GFS) — 특수 공정 중심의 반도체 파운드리로, 고객사가 설계한 칩을 제조합니다. TSMC와 맺은 5년·20억 달러 규모의 실리콘 인터포저 공급 계약이 단기 관심 재료입니다. 💰 거래 현황 | 2026년 10월 8일 - 현재가: $49.78 (미 동부시간 오후 2:36 장중 관측) - 전일 종가 $48.07 대비 +3.55%. 당일 최종 종가는 미확인...",
+          "signals": [
+            {
+              "canonical_ticker": "GFS",
+              "display_name": "GlobalFoundries",
+              "market": "US",
+              "source_asof": "2026-10-08T18:42:16+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 868,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15866",
+        "content_sha256": "a07151361d2fb2524670efbe9685d02ec93d295b49eda8789ccb18ebbc4eb6e2",
+        "occurred_at": "2026-10-08T18:36:21+00:00",
+        "relevance": {
+          "tickers": [
+            "GFS",
+            "MANE",
+            "TEVA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15866",
+          "posted_at": "2026-10-08T18:36:21+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15866",
+          "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.10.08 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 강세 | 스윙: 상승 지속 | 실행기준: 온건 강세 | 선정: 탑다운 1종목 + 바텀업 2종목 🧭 오늘 테마 흐름 (미국 테마 지도 1,019종목, 알림 직전 시세·전일 종가 대비, 테마...",
+          "signals": [
+            {
+              "canonical_ticker": "GFS",
+              "display_name": "GlobalFoundries Inc.",
+              "market": "US",
+              "source_asof": "2026-10-08T18:36:21+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "MANE",
+              "display_name": "Veradermics, Incorporated",
+              "market": "US",
+              "source_asof": "2026-10-08T18:36:21+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.86,
+              "composite_score": 0.86,
+              "confidence": 0.86,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "TEVA",
+              "display_name": "Teva Pharmaceutical Industries",
+              "market": "US",
+              "source_asof": "2026-10-08T18:36:21+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.92,
+              "composite_score": 0.92,
+              "confidence": 0.92,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1068,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15865",
+        "content_sha256": "143e02abd1ce8f5471e53359da0a0a4a602be7f9c3fa4baaf6397cc23bb8e4ae",
+        "occurred_at": "2026-10-08T18:15:19+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15865",
+          "posted_at": "2026-10-08T18:15:19+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15865",
+          "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/09 03:14:36 KST 💵 청산 결과 정리 수량: 0.034 BTC 진입 → 청산: 81,064.60 USDT → 80,715.90 USDT 보유 시간: 133.9분 확정 순손익: 8.83 USDT • 시작 계좌 9,528.55 USDT 대비 +0.09% • 수수료 3.03 USDT · 펀딩 0.00 USDT 반영 💰 종료 후...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 260,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15864",
+        "content_sha256": "719da4ca7209b1dd40d4d5def31ccfa774a2b323dcd47235cb4fbe9a2ef477e9",
+        "occurred_at": "2026-10-08T18:06:26+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15864",
+          "posted_at": "2026-10-08T18:06:26+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15864",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/09 03:06:22 KST 📦 보유량 0.034 BTC · 평단 81,064.60 USDT 💰 계좌 순자산: 9,543.04 USDT • 총 증거금 275.69 USDT(계좌 2.89%) · 10배 · 교차 🛡 수익 보호 SL 80,920.00 → 80,697.20 USDT · 남은 전량 • 예상 손익: +12.49 USDT · 계좌 +...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 597,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15863",
+        "content_sha256": "f06b022cee9ba78bd47b34abcff9f4fab77759545eab5d17c0d514e4fb13503a",
+        "occurred_at": "2026-10-08T17:51:28+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15863",
+          "posted_at": "2026-10-08T17:51:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15863",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/09 02:51:22 KST 📦 보유량 0.034 BTC · 평단 81,064.60 USDT 💰 계좌 순자산: 9,544.19 USDT • 총 증거금 275.57 USDT(계좌 2.89%) · 10배 · 교차 🛡 수익 보호 SL 81,000.00 → 80,920.00 USDT · 남은 전량 • 예상 손익: +4.92 USDT · 계좌 +0...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 595,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15862",
+        "content_sha256": "090a58dbc13a3de4e1d3a2a42b07587e5f9c9e43f6afba70ddb895bf87f602fd",
+        "occurred_at": "2026-10-08T17:26:25+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15862",
+          "posted_at": "2026-10-08T17:26:25+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15862",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/09 02:26:21 KST 📦 보유량 0.034 BTC · 평단 81,064.60 USDT 💰 계좌 순자산: 9,547.65 USDT • 총 증거금 275.23 USDT(계좌 2.88%) · 10배 · 교차 🛡 수익 보호 SL 81,600.00 → 81,000.00 USDT · 남은 전량 • 예상 손익: +2.20 USDT · 계좌 +0...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 595,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15822",
+        "content_sha256": "5151b70ea16f1e2134134b208eed603d228b09a8a59bcacd779dc0373185552b",
+        "occurred_at": "2026-10-08T01:06:46+00:00",
+        "relevance": {
+          "tickers": [
+            "252990.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15822",
+          "posted_at": "2026-10-08T01:06:46+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15822",
+          "preview": "📊 프리즘 시뮬레이터 | 실시간 포트폴리오 (2026-10-08 10:06) 🔸 현재 보유: 1/10개 ✅ 최고 수익: 샘씨엔에스(252990) +19.14% ⚠️ 최저 수익: 샘씨엔에스(252990) +19.14% 🔸 보유 종목: - 샘씨엔에스(252990) [전기·전자] 매수가: 15,780원 / 현재가: 18,800원 목표가: 22,500원 / 손절가: 15,780원 수익률: ⬆️...",
+          "signals": [
+            {
+              "canonical_ticker": "252990.KS",
+              "display_name": "샘씨엔에스",
+              "market": "KR",
+              "source_asof": "2026-10-08T01:06:46+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 15780.0,
+              "target_price": 22500.0,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 534,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15821",
+        "content_sha256": "34f13361c53a42c2239b92f0e5cb466916b9a46ec413a6f60962cc2ce91d28b3",
+        "occurred_at": "2026-10-08T01:06:41+00:00",
+        "relevance": {
+          "tickers": [
+            "038500.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15821",
+          "posted_at": "2026-10-08T01:06:41+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15821",
+          "preview": "📉 매도: 삼표시멘트(038500) 매수가: 7,740원 매도가: 7,320원 수익률: ⬇️ 5.43% 보유기간: 0일 매도이유: TIER1_STOPLOSS: price<=stop_loss(7400.5000) 비중 68% (1슬롯 기준) / 슬롯 기준 손익 -3.69% 📡 전략 원장 거래: 38건, 승률 29%, 누적 이익/손실 비율 0.89 / 관찰 후보: 30일 상승 비율 46% (...",
+          "signals": [
+            {
+              "canonical_ticker": "038500.KS",
+              "display_name": "매도: 삼표시멘트",
+              "market": "KR",
+              "source_asof": "2026-10-08T01:06:41+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 225,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15820",
+        "content_sha256": "d6a31e91736d664ab28a77d488ddc46a0a494b0d5498adae62e39bdaa27bbe24",
+        "occurred_at": "2026-10-08T01:02:28+00:00",
+        "relevance": {
+          "tickers": [
+            "252990.KS",
+            "038500.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15820",
+          "posted_at": "2026-10-08T01:02:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15820",
+          "preview": "📊 프리즘 시뮬레이터 | 실시간 포트폴리오 (2026-10-08 10:02) 🔸 현재 보유: 2/10개 🔸 사용 비중: 1.68/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: 샘씨엔에스(252990) +19.14% ⚠️ 최저 수익: 삼표시멘트(038500) -0.90% 🔸 보유 종목: - 샘씨엔에스(252990) [전기·전자] 매수가: 15,780원 / 현재가: 18,800원...",
+          "signals": [
+            {
+              "canonical_ticker": "252990.KS",
+              "display_name": "샘씨엔에스",
+              "market": "KR",
+              "source_asof": "2026-10-08T01:02:28+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "038500.KS",
+              "display_name": "삼표시멘트",
+              "market": "KR",
+              "source_asof": "2026-10-08T01:02:28+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 2,
+          "signals_transmitted": 2,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 725,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15819",
+        "content_sha256": "34748ab384b01208a3e52ad6a35170cd5081dab0106ec1ee883cec8c0d700550",
+        "occurred_at": "2026-10-08T01:02:26+00:00",
+        "relevance": {
+          "tickers": [
+            "373220.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15819",
+          "posted_at": "2026-10-08T01:02:26+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15819",
+          "preview": "⚠️ 매수 보류: LG에너지솔루션(373220) 현재가: 415,000원 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 약세장 산업군: 전기·전자 보류 사유: AI 판단: 미진입 — 성장성 기준 미달입니다. / 점수 부족 (2/5.0) 분석 의견: 보고서 2-2·5-2에서 전기차·ESS·소형 배터리 제조·판매 사업이 확인되며, 3장의 2026년 10월 8일 회사 공시 기반 보도는...",
+          "signals": [
+            {
+              "canonical_ticker": "373220.KS",
+              "display_name": "LG에너지솔루션",
+              "market": "KR",
+              "source_asof": "2026-10-08T01:02:26+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 744,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15818",
+        "content_sha256": "93b978d3531319cb43f18bcdf0e58abebd94b30c39a15c235bfd1b18af492b7d",
+        "occurred_at": "2026-10-08T01:02:24+00:00",
+        "relevance": {
+          "tickers": [
+            "036930.KQ"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15818",
+          "posted_at": "2026-10-08T01:02:24+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15818",
+          "preview": "⚠️ 매수 보류: 주성엔지니어링(036930) 현재가: 263,500원 매수 점수: 7/10 결정: 미진입 시장 상황: 보통 약세장 산업군: 기계·장비 보류 사유: AI 판단: 미진입 — 손익비 하한 미달입니다. 분석 의견: 보고서 2-1·2-2·5의 실제 연결 실적과 사업 자료에서 영업흑자 전환, 낮은 부채비율, 자기자본이익률 6.2%, 반도체 장비 매출원을 확인했습니다. 10월 6일...",
+          "signals": [
+            {
+              "canonical_ticker": "036930.KQ",
+              "display_name": "주성엔지니어링",
+              "market": "KR",
+              "source_asof": "2026-10-08T01:02:24+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.7,
+              "composite_score": 0.7,
+              "confidence": 0.7,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 683,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15817",
+        "content_sha256": "5a30c5bdd7beca6e2943bc8b28ed1170496f93b716c0c93a6aea4fa85abb7f96",
+        "occurred_at": "2026-10-08T01:02:21+00:00",
+        "relevance": {
+          "tickers": [
+            "006400.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15817",
+          "posted_at": "2026-10-08T01:02:21+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15817",
+          "preview": "⚠️ 매수 보류: 삼성SDI(006400) 현재가: 581,000원 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 약세장 산업군: 전기·전자 보류 사유: AI 판단: 미진입 — 성장성 기준이 미달한 상태에서 확정 시장 국면이 온건 약세이므로 펀더멘털 게이트를 통과하지 못합니다. / 점수 부족 (2/5.0) 분석 의견: 2분기 영업흑자 전환과 부채비율 77.45%, 배터리·전자재료...",
+          "signals": [
+            {
+              "canonical_ticker": "006400.KS",
+              "display_name": "삼성SDI",
+              "market": "KR",
+              "source_asof": "2026-10-08T01:02:21+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 821,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15816",
+        "content_sha256": "c4f58353efe8d52aabadb6cd8ab4231f7f5368542219d4bb212b9ff69f3eed02",
+        "occurred_at": "2026-10-08T00:51:11+00:00",
+        "relevance": {
+          "tickers": [
+            "373220.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15816",
+          "posted_at": "2026-10-08T00:51:11+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15816",
+          "preview": "📊 LG에너지솔루션 (373220) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "373220.KS",
+              "display_name": "LG에너지솔루션",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:51:11+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 79,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15815",
+        "content_sha256": "b3cd9174108a6f1ade393fc755f94cafb325ef2039361c7147dc9ea55b306f38",
+        "occurred_at": "2026-10-08T00:50:52+00:00",
+        "relevance": {
+          "tickers": [
+            "036930.KQ"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15815",
+          "posted_at": "2026-10-08T00:50:52+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15815",
+          "preview": "📊 주성엔지니어링 (036930) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "036930.KQ",
+              "display_name": "주성엔지니어링",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:50:52+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 78,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15814",
+        "content_sha256": "68ae1e3e2f75ec4c74e9373f2aaf8bd62d6609620f5eedb36871808923de62b2",
+        "occurred_at": "2026-10-08T00:50:34+00:00",
+        "relevance": {
+          "tickers": [
+            "006400.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15814",
+          "posted_at": "2026-10-08T00:50:34+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15814",
+          "preview": "📊 삼성SDI (006400) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "006400.KS",
+              "display_name": "삼성SDI",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:50:34+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 76,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15813",
+        "content_sha256": "5d9fff876c345af87dc2866a6a176a8210779741ec46709e266f36d4d956660b",
+        "occurred_at": "2026-10-08T00:50:16+00:00",
+        "relevance": {
+          "tickers": [
+            "373220.KS",
+            "AMPC"
+          ],
+          "markets": [
+            "KR",
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15813",
+          "posted_at": "2026-10-08T00:50:16+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15813",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "373220.KS",
+              "display_name": "LG에너지솔루션",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:50:16+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "AMPC",
+              "display_name": "겉으로 보면 영업이익이 시장 전망을 122.8% 웃돌았지만, 보도 기준 미국 생산세액공제",
+              "market": "US",
+              "source_asof": "2026-10-08T00:50:16+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 2,
+          "signals_transmitted": 2,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15812",
+        "content_sha256": "5285635819600b9e588d53d9e4637b62197ec0129fd4d686313514acc4f177e1",
+        "occurred_at": "2026-10-08T00:50:11+00:00",
+        "relevance": {
+          "tickers": [
+            "036930.KQ"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15812",
+          "posted_at": "2026-10-08T00:50:11+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15812",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "036930.KQ",
+              "display_name": "주성엔지니어링",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:50:11+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15811",
+        "content_sha256": "a1fd21cc652ef836107f1448d3b5e818080b7f7d7e20f7b4748a103b13059a56",
+        "occurred_at": "2026-10-08T00:50:05+00:00",
+        "relevance": {
+          "tickers": [
+            "006400.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15811",
+          "posted_at": "2026-10-08T00:50:05+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15811",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "006400.KS",
+              "display_name": "삼성SDI",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:50:05+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15810",
+        "content_sha256": "4747cc50e183ebaff3e707d19e131ca665f95219410c0616bc2f2301e42d33ed",
+        "occurred_at": "2026-10-08T00:49:56+00:00",
+        "relevance": {
+          "tickers": [
+            "373220.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15810",
+          "posted_at": "2026-10-08T00:49:56+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15810",
+          "preview": "📈 갭 상승 모멘텀 | LG에너지솔루션(373220): 전기차·ESS·IT기기용 배터리를 제조합니다. 💹 10/8 KIS 마감 기준 416,500원(+6.52%), 거래량 318,412주(전일 대비 -10.1%), 시가총액 97.34조원. 보고서의 장중 09:44 가격은 414,500원으로 마감 수치와 구분해야 합니다. 비교기업 3개사 중 매출 규모가 가장 큽니다. 📰 3분기 잠정 영업...",
+          "signals": [
+            {
+              "canonical_ticker": "373220.KS",
+              "display_name": "갭 상승 모멘텀 | LG에너지솔루션",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:49:56+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 482,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15809",
+        "content_sha256": "2f705caf454780a2b28f3407bb00d6c7bddfa768fb4721dff079ee1e4c7a22a0",
+        "occurred_at": "2026-10-08T00:49:50+00:00",
+        "relevance": {
+          "tickers": [
+            "036930.KQ"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15809",
+          "posted_at": "2026-10-08T00:49:50+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15809",
+          "preview": "📈 갭 상승 모멘텀 트리거 | 주성엔지니어링(036930) 반도체·태양광·디스플레이 장비 업체로, 사업 중심은 반도체 장비입니다. 트리거 포착은 실제 갭 상승 확인을 뜻하지 않습니다. 📊 KIS 10/8 종가 263,500원(+6.46%), 거래량 704,889주로 전일 대비 71.0% 감소. 시가총액 약 12.22조원(업계 순위 UNKNOWN). 📰 뉴스핌은 반도체 수출 600억 달러...",
+          "signals": [
+            {
+              "canonical_ticker": "036930.KQ",
+              "display_name": "갭 상승 모멘텀 트리거 | 주성엔지니어링",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:49:50+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 477,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15808",
+        "content_sha256": "288eafffac015f8251d71c078f1667d4299bbc67e9d83465e204616e9bd5da98",
+        "occurred_at": "2026-10-08T00:49:45+00:00",
+        "relevance": {
+          "tickers": [
+            "006400.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15808",
+          "posted_at": "2026-10-08T00:49:45+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15808",
+          "preview": "📈 갭 상승 모멘텀 | 삼성SDI(006400)는 전기차·ESS 배터리와 전자재료를 생산합니다. 📊 10/8 KIS 종가 587,000원(+4.45%), 거래량 241,267주(전일 대비 -29.4%; 전일 341,875주). 시총 47.38조원. 5세션 기관·외국인 373,034주 순매수, 20세션은 104,344주 순매도입니다. 📰 ESS·LFP 수주 기대가 재료지만 전망과 확정 계...",
+          "signals": [
+            {
+              "canonical_ticker": "006400.KS",
+              "display_name": "갭 상승 모멘텀 | 삼성SDI",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:49:45+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 548,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:15807",
+        "content_sha256": "b6209017a7c52fac141aa3cc38898bb6279575128d25bbfb4184cd98e58bfbac",
+        "occurred_at": "2026-10-08T00:44:16+00:00",
+        "relevance": {
+          "tickers": [
+            "006400.KS",
+            "036930.KQ",
+            "373220.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "15807",
+          "posted_at": "2026-10-08T00:44:16+00:00",
+          "source_url": "https://t.me/stock_ai_agent/15807",
+          "preview": "🔔 오전 프리즘 시그널 얼럿 📅 2026.10.08 장 시작 후 10분 시점 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 약세 | 실행기준: 온건 약세 | 선정: 탑다운 0종목 + 바텀업 3종목 📈 갭 상승 모멘텀 상위주 · 삼성SDI (006400) 585,000원 ⬆️ 4.09% 📌 바텀업 (개별종목...",
+          "signals": [
+            {
+              "canonical_ticker": "006400.KS",
+              "display_name": "삼성SDI",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:44:16+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.86,
+              "composite_score": 0.86,
+              "confidence": 0.86,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "036930.KQ",
+              "display_name": "주성엔지니어링",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:44:16+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.82,
+              "composite_score": 0.82,
+              "confidence": 0.82,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "373220.KS",
+              "display_name": "LG에너지솔루션",
+              "market": "KR",
+              "source_asof": "2026-10-08T00:44:16+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.66,
+              "composite_score": 0.66,
+              "confidence": 0.66,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 489,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      }
+    ],
+    "guardrails": {
+      "untrusted_content": true,
+      "advisory_only": true,
+      "may_promote_market_execution": false,
+      "multi_ticker_message_prices_require_recheck": true
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    }
+  }
+}

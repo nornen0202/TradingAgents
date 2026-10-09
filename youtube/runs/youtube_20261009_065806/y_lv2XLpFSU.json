@@ -1,0 +1,467 @@
+{
+  "version": 4,
+  "video_id": "y_lv2XLpFSU",
+  "title": "미 국채 금리만 볼 때가 아니다…글로벌 증시에 새로 등장한 위험 변수ㅣ명민준, 박가영, 유영화 [주린이 구조대]",
+  "url": "https://www.youtube.com/watch?v=y_lv2XLpFSU",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/y_lv2XLpFSU/maxresdefault.jpg",
+  "published_at": "2026-10-08T10:00:35+00:00",
+  "status": "unverified",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 21716,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 21716,
+    "segments": 1301,
+    "duration_seconds": 2768,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-09T06:58:06.448375+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 9,
+  "claim_status_summary": {
+    "partially_supported": 3,
+    "unverified": 7
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "국내 지수 하락과 업종 추세 약화, 반도체의 상대적 강세, 기타법인 매수 감소 및 외국인 매도가 나타났으며 고금리와 자금 회수가 배경이라는 주장.",
+      "status": "partially_supported",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [
+        "market_evidence[0].market_snapshot"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.8,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "코스피 약 -2.6%, 장중 6,650 하회·약 6,625 마감; 코스닥 약 -0.7%·892; 7,200 돌파 3~4회 실패; 5·20일선 및 자막상 520일선; 기타법인 1.5조원→0.9조원, 외국인 매도 약 2조원; 주성 약 +10%, 알테오젠 약 -6%.",
+        "observed": "코스피 current_price 6,625.93만 제공됨. 등락률·OHLC·이동평균·수급·개별 종목 등락률은 확인 불가."
+      },
+      "investor_implication": "6,625 부근이라는 지수 수준만 제한적으로 확인된다. 이를 근거로 지지선, 업종 전환 또는 외국인 이탈을 확정해서는 안 된다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "삼성전자 잠정실적은 기대에 부합했지만 주가가 오르지 않았고 자사주 매입 종료가 수급을 약화시켰으며, SK하이닉스 PER은 약 4배라는 주장.",
+      "status": "partially_supported",
+      "confidence": 0.92,
+      "supporting_evidence_ids": [
+        "market_evidence[1].external_context.disclosure_excerpt",
+        "market_evidence[1].external_context.company_news_excerpt"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.85,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "SK하이닉스 PER 약 4배, 추가 조정 시 3배대 가능성.",
+        "observed": "SK하이닉스 forward_pe·trailing_pe·current_price가 모두 null. 삼성전자 주가 -2.05%는 뉴스 발췌에서만 확인되며 거래소 원자료는 없음."
+      },
+      "investor_implication": "실적 발표와 주가 약세에는 일부 근거가 있지만, 기대 충족 여부나 PER 4배를 근거로 저평가·매수 기회를 판단할 수는 없다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "미국 10년물 금리가 5.35%를 넘은 뒤 약 5.3% 입찰의 양호한 수요로 안정됐고, MOVE 반락이 주식 회복을 도울 수 있다는 주장.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "미국 10년물 장중 금리 5.35% 초과, 입찰 금리 약 5.3%; MOVE 최근 급등 후 반락.",
+        "observed": "동일 거래일 금리·공식 입찰 수치·MOVE 관측값 모두 미제공."
+      },
+      "investor_implication": "채권시장 안정과 주식 반등의 연결은 확인된 매매 신호가 아니라 발화자의 조건부 시나리오로 취급해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "나스닥·S&P 500이 신고가와 5일선을 유지했고 중간선거 이후 상승 통계가 100%이며, 실적·CPI·AI 투자 수익성 확인이 회복 조건이라는 주장.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:57",
+      "source_confidence": 0.85,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "전일 조정에도 5일선 유지; 중간선거 이후 상승 통계 100%; 다음 주 CPI와 월말 무렵 빅테크 실적.",
+        "observed": "지수 시계열, 통계 표본 및 공식 발표 일정 미제공."
+      },
+      "investor_implication": "중간선거 이후 상승 확률을 100%로 적용하거나 확인되지 않은 발표 일정에 투자 시점을 맞출 근거는 없다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "프랑스 10년물 금리가 약 4.920~4.95%로 2002년 이후 최고이자 그리스·이탈리아보다 높고, 재정적자는 주요국 중 미국 다음이라는 주장.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:57",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "10년물 4.920~4.95%, 5% 근접; 2002년 이후 최고; 그리스·이탈리아보다 높은 금리; 주요국 재정적자 미국 다음.",
+        "observed": "대조 가능한 국채 금리·장기 시계열·동일 기준 재정통계가 없음."
+      },
+      "investor_implication": "프랑스를 새로운 위험 요인으로 관찰할 수는 있지만, 제공 자료만으로 금리 급등의 정도나 다른 국가 대비 위험 순위를 확정할 수 없다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "무디스 프랑스 평가일은 10월 23일이며, 유럽 개장 직후 주가지수·미국 선물이 급락했고 프랑스 불안이 환율·채권·위험자산으로 전이될 수 있다는 주장.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:21:07",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "무디스 프랑스 평가 10월 23일; 유럽 개장 전후 유로스톡스·나스닥 선물 급락 후 일부 회복.",
+        "observed": "평가 일정과 장중 가격 모두 미제공. 2026-10-09 기준 해당 연도 10월 23일 평가 결과는 아직 미래 사건임."
+      },
+      "investor_implication": "신용등급 강등이나 글로벌 위험 회피가 발생한 것으로 전제하지 말고, 공식 일정과 실제 시장 반응을 각각 확인해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "배터리 주가와 중국 탄산리튬 가격의 최근 괴리는 ESS 기대 때문이며, ESS 비중은 약 10~20%이고 EV 회복이 실적에 중요하다는 주장.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:34:29",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.78,
+      "numeric_parse": {
+        "claimed": "ESS 비중 약 10~20% 또는 약 20%.",
+        "observed": "비중의 분모·기업 범위·기준연도 및 대응 관측값이 모두 없음."
+      },
+      "investor_implication": "ESS 성장 기대가 EV 부진을 상쇄하는지는 업체별 매출·마진·확정 수주로 확인해야 하며, 불명확한 10~20%를 실적 추정에 사용할 수 없다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "유럽 FSD 승인 관련 10월 6일 회의가 12월 무렵으로 연기됐으며, 향후 승인이 테슬라와 국내 배터리 업체에 긍정적이라는 주장.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:34:29",
+      "source_confidence": 0.85,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "10월 6일 예정 회의가 12월 무렵으로 연기; 12월 일정도 미확정.",
+        "observed": "공식 회의 일정·변경 공지·승인 결정 미제공."
+      },
+      "investor_implication": "12월 승인이나 관련 배터리 수주 증가를 확정적 촉매로 반영할 근거가 없다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "유럽 산업 가속화법의 12월 14일 표결 및 핵심부품 3개 이상 현지 조달 조건이 국내 배터리 업체에 유리하고 CATL에 불리할 수 있다는 주장.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:34:29",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.78,
+      "numeric_parse": {
+        "claimed": "12월 14일 표결; 핵심부품 3개 이상 유럽 조달에 배터리 셀 포함; 12월~다음 해 초 투자 관찰.",
+        "observed": "공식 일정·조달 조건·기업별 생산 충족률 모두 미제공."
+      },
+      "investor_implication": "법안 통과와 국내 업체 수혜는 별도의 검증 대상이다. 최종 조달 요건과 공장별 적격성 확인 전에는 국적만으로 수혜 기업을 결정할 수 없다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "LG에너지솔루션이 당일 실적을 발표했고 유럽 정책 민감도는 삼성SDI가 가장 크며 LG에너지솔루션이 다음이고, 엘앤에프는 LFP 쪽으로 전환했다는 주장.",
+      "status": "partially_supported",
+      "confidence": 0.93,
+      "supporting_evidence_ids": [
+        "market_evidence[5].external_context.disclosure_excerpt",
+        "market_evidence[5].external_context.company_news_excerpt",
+        "E9"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:34:29",
+      "source_confidence": 0.68,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "LG에너지솔루션 당일 실적 발표; 정책 민감도 삼성SDI 1순위·LG에너지솔루션 다음. 영상 실적 수치는 미제시.",
+        "observed": "잠정실적 공시일 2026-10-08 확인. 정책 민감도 순위를 검증할 관측치 없음. 엘앤에프 관련 근거는 2026-02-12 보도임."
+      },
+      "investor_implication": "실적 공시의 존재와 과거 LFP 사업 추진 보도는 확인되지만, 이를 정책 수혜 순위·확정 수주·전면 사업 전환으로 확대하면 안 된다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "국내 증시·코스피·코스닥",
+      "status": "unverified",
+      "claims": [
+        "반도체 대형주와 소부장만 상대적으로 버티고 자동차·조선·방산·전력설비 등 기존 주도 업종의 추세가 약해져 시장의 상승 기반이 좁아졌으며, 고금리와 신흥국 자금 회수가 국내 증시를 압박한다는 해석이다."
+      ],
+      "numeric_claims": [
+        "당일 코스피 약 2.6% 하락, 장중 6,650을 하회해 약 6,625에서 저가 마감했다고 발언했다.",
+        "코스닥은 약 0.7% 하락해 900 아래인 약 892에서 마감했다고 발언했으나 하락률 자막에 중복 오류가 있다.",
+        "코스피는 7,200선 돌파를 약 3~4차례 실패했고, 9월 22일 무렵부터 변동성이 커지며 5일·20일 이동평균선을 하회했다고 설명했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-08T22:44:15.736999+00:00",
+        "current_price": 6625.93,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 3522.54,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "잠정실적은 시장 기대에 부합했지만, 시장이 이익 규모보다 반도체의 경기순환성과 범용 AI 관련 재평가 여부를 중시해 주가가 오르지 못했다는 해석이다. 자사주 매입 마무리도 매수 수급 약화 요인으로 제시했다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-10-08T22:44:16.750821+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "이익이 잘 나와도 시장이 높은 밸류에이션을 부여하지 않고 있으나, 국내 다른 업종보다 주가 추세는 상대적으로 견조하다고 평가했다."
+      ],
+      "numeric_claims": [
+        "당일 PER이 약 4배이며, 다음 주 추가 조정 시 3배대로 내려갈 수 있다고 발언했다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-10-08T22:44:18.968703+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "TSLA",
+      "name": "테슬라·유럽 FSD 승인",
+      "status": "unverified",
+      "claims": [
+        "유럽 전역의 FSD 승인이 테슬라와 국내 배터리 밸류체인에 긍정적 계기가 될 것으로 기대했으나, 관련 회의 지연으로 단기 모멘텀이 늦춰졌다고 설명했다."
+      ],
+      "numeric_claims": [
+        "10월 6일 예정이었다고 설명한 유럽 FSD 승인 관련 회의가 12월 무렵으로 연기됐으며, 12월 일정도 확정은 아니라고 발언했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "TSLA",
+        "as_of": "2026-10-08T22:44:21.034596+00:00",
+        "current_price": 375.0,
+        "market_cap": 1481080272750.0,
+        "forward_pe": 174.84636,
+        "trailing_pe": 347.2222,
+        "fifty_two_week_high": 498.83,
+        "fifty_two_week_low": 297.38,
+        "average_target_price": 392.42215,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "006400",
+      "name": "삼성SDI",
+      "status": "unverified",
+      "claims": [
+        "유럽 OEM의 각형 배터리 선호와 ESS 수주를 근거로 유럽 정책 변화에 대한 주가 민감도가 국내 셀 업체 중 삼성SDI에서 가장 클 수 있다고 평가했다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "006400",
+        "as_of": "2026-10-08T22:44:24.623595+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "373220",
+      "name": "LG에너지솔루션",
+      "status": "unverified",
+      "claims": [
+        "당일 실적 발표를 언급했으며, ESS 수주가 점차 늘어날 것으로 예상하고 유럽 정책 변화에 대한 민감도는 삼성SDI 다음일 수 있다고 평가했다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "373220",
+        "as_of": "2026-10-08T22:44:28.030223+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Eureka Metals Identifies Consistent Scandium Mineralization at Tyee Titanium Project in Québec",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/eureka-metals-identifies-consistent-scandium-110000087.html",
+      "publisher": "TMX Newsfile",
+      "published_at": "2026-10-08T11:00:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Eureka Metals Identifies Consistent Scandium Mineralization at Tyee Titanium Project in Québec Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Sc..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Novelis produces first cold mill coil at US aluminium plant",
+      "source_url": "https://finance.yahoo.com/news/novelis-produces-first-cold-mill-085746261.html",
+      "publisher": "Packaging Gateway",
+      "published_at": "2026-10-08T08:57:46+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Novelis produces first cold mill coil at US aluminium plant Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "The Memory Trade Cools After Samsung’s Preliminary Results Disappoint",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/memory-trade-cools-samsung-preliminary-155142154.html",
+      "publisher": "Investopedia",
+      "published_at": "2026-10-08T15:51:42+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "The Memory Trade Cools After Samsung’s Preliminary Results Disappoint Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather N..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C4",
+      "title": "Basic Materials Roundup: Market Talk",
+      "source_url": "https://finance.yahoo.com/m/03f3becc-a134-3d43-87f7-cf4245933f3f/basic-materials-roundup%3A.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-08T20:57:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C4",
+      "title": "Comex Gold Settles 0.44% Higher at $4131.80",
+      "source_url": "https://finance.yahoo.com/m/f142d705-4e87-3af7-bd2d-57296340d711/comex-gold-settles-0.44%25.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-08T19:40:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C8",
+      "title": "Tesla (TSLA) Deliveries Beat Expectations. But TSLA’s 159x Forward P/E Is Betting on Much More",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/tesla-tsla-deliveries-beat-expectations-211716069.html",
+      "publisher": "Insider Monkey",
+      "published_at": "2026-10-08T21:17:16+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C9",
+      "title": "Dow Jones Futures: AI Stocks Tumble On OpenAI News; SpaceX Move Slams Verizon, AT&T Late",
+      "source_url": "https://finance.yahoo.com/m/955f9165-6ca4-336e-9d6e-fff1a7c7f4e0/dow-jones-futures%3A-ai-stocks.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-08T22:35:03+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C10",
+      "title": "2차전지·소재·부품 관련주, '맑음' 에스코넥·더블유씨피·에코프로머...",
+      "source_url": "http://www.finomy.com/news/articleView.html?idxno=249696",
+      "publisher": "Naver News",
+      "published_at": "2026-02-12T18:06:00+09:00",
+      "source_tier": "news",
+      "excerpt": "엘앤에프는 NCM과 LFP 양극재를 중심으로 한 '투트랙' 전략으로 프리미엄 전기차 시장과 보급형 EV·ESS 시장을 모두 공략한다는 비전을 제시한다. 성우는 LG에너지솔루션을 통해 스페이스X와 테슬라 양측에 핵심 배터리..."
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

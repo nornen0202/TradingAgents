@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - &#x27;앵커리지 디지털&#x27;이 말하는 기관 금융·스테이블코인의 미래 | 서동주, 김동환, 모제스 리(Moses Lee) APAC 총괄, 진동욱 APAC 스테이블코인 담당 [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261009_065806</p>
+    <h1>&#x27;앵커리지 디지털&#x27;이 말하는 기관 금융·스테이블코인의 미래 | 서동주, 김동환, 모제스 리(Moses Lee) APAC 총괄, 진동욱 APAC 스테이블코인 담당 [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=z8JkxSU9OHM">원본 영상</a>
+    </div>
+  </header>
+  <h2>앵커리지 디지털·스테이블코인: 기관 금융 인프라 확장 논리와 검증 과제</h2>
+<ul>
+<li>대상: 삼프로TV 3PROTV, 2026년 10월 8일 공개 영상</li>
+<li>분석 기준: 제공된 영상 주장 요약·외부 증거 묶음·주장별 검증 결과</li>
+<li>원자료: <a href="https://www.youtube.com/watch?v=z8JkxSU9OHM">영상 보기</a></li>
+</ul>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심 논리는 <strong>스테이블코인이 가상자산 거래 수단에서 기관의 결제·해외송금·유동성 관리 인프라로 확장될 수 있다</strong>는 것이다. 앵커리지 디지털은 자동화 수탁과 규제 기반 발행·상환 서비스를 이러한 전환의 기반으로 소개한다.</p>
+<p>다만 이번 자료에서 이 논리를 직접 뒷받침하는 유효한 외부 증거는 확보되지 않았다. 주장별 판정은 <strong>8건 미검증, 2건 음성인식 불확실</strong>이며, 확인된 외부 사실과 반증은 모두 없다. 이는 주장이 거짓이라는 뜻이 아니라, 투자 판단에 필요한 검증이 아직 끝나지 않았다는 뜻이다.</p>
+<p>관련 상장 티커·주가·실적·밸류에이션 자료도 없어 특정 종목의 수익 전망으로 연결할 수 없다.</p>
+<h3>2. 영상 주장과 확인된 사실/근거</h3>
+<p>아래 시각은 개별 발언의 정확한 위치가 아닌 자막 청크 시작점이다. 신뢰도는 <code>source_confidence / asr_confidence</code> 순서다.</p>
+<p>| 주제·구간 | 영상 주장 | 확인된 사실/근거 및 판정 | 신뢰도 |</p>
+<p>| --- | --- | --- | --- |</p>
+<p>| 회사 연혁·인가, <a href="https://www.youtube.com/watch?v=z8JkxSU9OHM&amp;t=0s">00:00</a> | 2017년 설립, 2021년 1월 OCC 인가, 미국 최초 연방인가 디지털 자산 은행 | OCC 결정문·공식 연혁 미제공. 그룹과 은행 법인의 인가 범위도 미확인. <strong>미검증</strong> | 0.94 / 0.90 |</p>
+<p>| 수탁 기술, <a href="https://www.youtube.com/watch?v=z8JkxSU9OHM&amp;t=374s">06:14</a> | 자동화로 개인키의 사람 접촉을 없애고 수초 내 접근, 기존 방식 대비 위험 감소 | 독립 감사·성능 측정·비교 표본 없음. 접근과 실제 출금 시간을 직접 비교할 수 없음. <strong>미검증</strong> | 0.94 / 0.80 |</p>
+<p>| 기관 서비스·발행, 00:00·<a href="https://www.youtube.com/watch?v=z8JkxSU9OHM&amp;t=1097s">18:17</a> | 수탁·거래·금융·스테이킹 등을 제공하고 기업 대신 발행·상환·준비자산·컴플라이언스를 담당 | 제공 법인·약관·운영 실적·기간 절감 사례 미제공. 예금 및 예금보험 적용 여부도 미확인. <strong>미검증</strong> | 0.94 / 0.85 |</p>
+<p>| GENIUS Act, 00:00·18:17 | 1:1 준비자산과 정기 증명, 규제 명확화가 도입 촉진 | 법률·후속 규칙 원문 없음. ‘내년 초·내년 1월·2028년’의 단계별 의미 확인 필요. <strong>미검증</strong> | 0.87 / 0.70 |</p>
+<p>| 감독기관 규정안, <a href="https://www.youtube.com/watch?v=z8JkxSU9OHM&amp;t=726s">12:06</a> | 연준이 ‘지난 24일’ 준비자산·자본·위험관리 규정안 발표 | 기관·문서·월·연도 미확인. <strong>미검증</strong> | 0.87 / 0.60 |</p>
+<p>| BIS·은행 자본, 18:17 | 공공 블록체인 자산의 자본 부담이 도입을 늦추고 은행은 예금 토큰 병행 | BCBS 기준·관할별 규정·은행 직접 설명 없음. <strong>미검증</strong> | 0.87 / 0.75 |</p>
+<p>| 시장 규모·성장, 12:06 | 일정 규모를 넘은 뒤 성장 정체 | 금액 인식이 불완전하고 시장 시계열도 없음. <strong>음성인식 불확실</strong>, 성장 정체는 별도로 미검증 | 0.87 / 0.20 |</p>
+<p>| 기관 활용·정산, 12:06·<a href="https://www.youtube.com/watch?v=z8JkxSU9OHM&amp;t=1470s">24:30</a> | 최근 1~2년 결제·송금 활용 확대, 수분 내 정산, 향후 AI 결제 가능 | 고객·거래량·처리시간 자료 없음. AI 결제와 금융 인프라 재편은 전망. <strong>미검증</strong> | 0.87 / 0.70 |</p>
+<p>| 한국·아시아, 24:30 | 한국 기관의 역량 준비와 향후 1~2년 아시아 수요 증가 | 법안·감독 해석·고객명·계약 실적 없음. 관찰과 예상의 일반화 불가. <strong>미검증</strong> | 0.89 / 0.80 |</p>
+<p>| 캐나다 총리 인용, 24:30 | 국제 거래 비용 하락 관련 발언 인용 | 인명·문맥·공식 원문 미확인. <strong>음성인식 불확실</strong>, 비용 개선도 별도로 미검증 | 0.89 / 0.25 |</p>
+<h4>외부 증거 묶음의 실질적 한계</h4>
+<p>수집된 E1~E7은 모두 주장 검증에 사용할 수 없었다. E1은 일반 종목 기사에 오류·탐색 문구가 섞였고, E2~E7은 발췌가 비어 있으며 제목도 해당 주장과 무관하다. 예를 들어 <a href="https://finance.yahoo.com/m/b361f1db-c32b-3b1d-8f3f-7d6523484abf/chipotle%2C-starbucks%2C.html">E1: 일반 주식시장 기사</a>와 <a href="https://finance.yahoo.com/markets/stocks/articles/ringcentral-announce-third-quarter-2026-224600387.html">E5: RingCentral 실적 발표 예고</a>는 각각 앵커리지의 인가나 한국 스테이블코인 제도를 뒷받침하지 않는다.</p>
+<p>따라서 <strong>가장 강한 외부 검증 근거로 제시할 자료는 없다.</strong> 위 영상 링크는 발언 확인용이지 사실 입증용이 아니다. 수집 상태의 <code>verified</code> 표시 역시 영상 주장이 검증됐다는 의미가 아니다. 기사 게시 시각도 모두 영상 공개 이후여서 공개 당시 자료와 후속 확인 자료를 구분해야 한다.</p>
+<h3>3. 강세 논리: 성립하려면 무엇이 필요한가</h3>
+<p>영상에서 도출되는 다음 논리는 모두 조건부 해석이다.</p>
+<ul>
+<li><strong>기관 업무로의 확장:</strong> 결제·송금·유동성 관리에서 반복적인 상용 거래가 늘면 수탁·상환·컴플라이언스 서비스 수요로 이어질 수 있다. 핵심 지표는 전체 토큰 규모보다 실제 기관 고객과 반복 거래다.</li>
+<li><strong>발행 인프라의 외부화:</strong> 기업이 전문 파트너를 활용해 구축 부담을 줄일 수 있다면 도입 문턱이 낮아질 수 있다. 다만 실제 비용·기간 절감과 책임 분담을 확인해야 한다.</li>
+<li><strong>상환 신뢰의 축적:</strong> 준비자산과 상환권이 투명하게 확인되고 스트레스 상황에서도 상환이 유지된다면 기관 채택 논리에 힘이 실릴 수 있다. 영상의 1:1 담보 설명만으로 이러한 신뢰를 입증할 수는 없다.</li>
+<li><strong>프로그래밍 결제:</strong> AI 결제는 장기 활용 시나리오다. 실제 서비스·거래 실적이 없는 상태에서 현재 매출이나 채택 실적으로 간주할 수 없다.</li>
+</ul>
+<h3>4. 반론과 투자 논리의 약점</h3>
+<p><strong>빠른 온체인 처리와 완결된 금융 정산은 다르다.</strong> 수탁 접근·서명·체인 확정·법적 정산·법정화폐 상환 시간을 따로 측정해야 한다. 국제 지급의 비용도 환전·네트워크·수취·상환·컴플라이언스를 포함한 종단 간 기준으로 비교해야 한다.</p>
+<p><strong>인가와 규제 설명은 적용 범위가 중요하다.</strong> 은행 법인의 인가를 그룹 전체 서비스에 대한 감독·보증으로 확대하거나, ‘연방은행 상품’을 예금보험 적용 상품으로 해석할 근거는 없다. 법안·규정안·최종 규정·시행을 구분하지 않으면 정책 촉매의 시점도 잘못 판단할 수 있다.</p>
+<p><strong>자동화가 전체 위험 감소를 보장하지는 않는다.</strong> 키 관리·권한 통제·장애 대응·보안 감사가 함께 확인돼야 한다. 회사 측 인터뷰는 이해관계자의 설명이므로 독립 검증이 특히 중요하다.</p>
+<p><strong>산업 채택과 특정 사업자의 수익은 별개다.</strong> 채택이 확대되더라도 누가 어떤 수수료와 비용 구조로 수익을 얻는지 자료가 없다. 한국 기관 면담과 아시아 수요 전망 역시 공개 계약이나 실적을 대신할 수 없다.</p>
+<h3>5. 단기 체크포인트와 관찰 항목</h3>
+<p>| 우선순위 | 확인할 자료·관찰 지표 | 판단에 필요한 구분 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 1. 원음·날짜 | 시장 규모 숫자, 성장 표현, 캐나다 인용, 녹화일 | 누락 숫자를 시장 통계로 역추정하지 않기. 상대 날짜를 임의 확정하지 않기 |</p>
+<p>| 2. 규제 원문 | OCC 결정문, GENIUS Act 및 후속 규칙, ‘지난 24일’ 문서 | 법인·관할·적용 대상, 규칙 제정·발효·집행 단계 |</p>
+<p>| 3. 토큰별 신뢰 | 발행·상환 약관, 준비자산 구성·보고 기준일, 독립 검증 | 상환 가능 주체·조건·수수료·지연, 예금보험 여부 |</p>
+<p>| 4. 성능·운영 | 처리시간 분포, 장애 기록, 독립 보안·운영 평가 | 접근·서명·출금·체인 확정·현금 상환을 분리 |</p>
+<p>| 5. 기관 채택 | 공개 고객명, 유료 계약, 상용 거래량, 반복 이용 | 발표·파일럿·상용화를 구분하고 거래소·봇 거래와 결제 이용 분리 |</p>
+<p>| 6. 시장·한국 제도 | 동일 토큰 범위의 30·90·365일 변화, 입법 단계, 외환·회계·세무 해석 | 브리지·래핑 중복 제거, 규정 부재와 해석 불확실성 구분 |</p>
+<h4>논리 약화·무효화 조건</h4>
+<ul>
+<li>준비자산 부족·검증 불일치·상환 중단이나 지속적인 액면가 이탈이 확인되면 상환 신뢰에 기반한 확장 논리는 약화된다.</li>
+<li>동일 조건의 비교에서 종단 간 시간·총비용 이점이 사라지면 속도·비용 중심의 도입 논리는 약화된다.</li>
+<li>규제가 목표 고객·사용처를 제한하거나 실제 자본·운영 비용이 사업성을 훼손하면 규제 명확화만으로 채택을 설명하기 어렵다.</li>
+<li>발표와 파일럿이 유료 상용 계약·반복 거래로 전환되지 않으면 기관 수요 확대 전망을 재평가해야 한다.</li>
+<li>독립 감사나 운영 자료가 보안·위험 감소 설명과 어긋나면 수탁 경쟁우위 주장은 재검토 대상이다.</li>
+</ul>
+<p>이 조건들은 현재 발생이 확인된 사건이 아니라 앞으로 관찰할 검증 기준이다.</p>
+<h3>6. 데이터 품질과 결론</h3>
+<p>자동자막의 <code>transcript_quality</code>는 <strong>good, 1.0</strong>이지만 개별 숫자·인명·영어 문장의 정확성을 보장하지 않는다. 특히 시장 규모와 캐나다 인용의 <code>asr_confidence</code>는 각각 <strong>0.20, 0.25</strong>로 낮다. 이 값은 원음 대조 측정치가 아니라 제공된 요약·오류 경고에 기반한 판단값이다.</p>
+<p><code>source_confidence</code> <strong>0.87~0.94</strong>는 자막에서 주장을 추출한 신뢰도이며 사실일 확률이 아니다. 주장 검증의 <code>confidence</code> <strong>0.98~0.99</strong>도 ‘미검증·음성인식 불확실’이라는 판정에 대한 신뢰도다.</p>
+<p>비공개 키 관리 구현·내부 성능·고객별 구축 비용·한국 기관 면담과 파이프라인은 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 자료는 제공되지 않았으므로 해당 출처에 기대는 주장 역시 <strong>미검증·수동 확인 필요</strong>로 남는다.</p>
+<p>결론적으로 이 영상은 기관 금융 인프라의 확장 가능성을 제시하지만, 이번 증거 묶음만으로 채택 속도·비용 우위·상환 안정성·사업 수익을 입증하지 못한다. 투자자가 우선 관찰할 것은 시장 규모의 누락 숫자나 장기 전망보다 <strong>공식 규제 문서, 토큰별 상환·준비자산 자료, 독립 운영 검증, 실제 기관의 반복 거래 실적</strong>이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;z8JkxSU9OHM&quot;,
+  &quot;title&quot;: &quot;&#x27;앵커리지 디지털&#x27;이 말하는 기관 금융·스테이블코인의 미래 | 서동주, 김동환, 모제스 리(Moses Lee) APAC 총괄, 진동욱 APAC 스테이블코인 담당 [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=z8JkxSU9OHM&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/z8JkxSU9OHM/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-08T03:30:23+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 15851,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 15851,
+    &quot;segments&quot;: 898,
+    &quot;duration_seconds&quot;: 1841,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-10-09T06:58:06.448375+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 7,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 8,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;앵커리지 디지털은 2017년 설립됐으며, 2021년 1월 OCC 인가를 받은 미국 최초 연방인가 디지털 자산 은행이라는 소개.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;설립 2017년; OCC 인가 2021년 1월&quot;,
+        &quot;observed&quot;: &quot;관련 공식 날짜 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;연방인가라는 소개를 그룹의 모든 서비스에 대한 감독 또는 보증으로 확대 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;콜드스토리지 접근과 서명을 자동화하고 사람의 개인키 접촉을 제거해 수초 내 접근을 제공하며, 기존 수탁보다 시장위험과 운영위험을 줄였다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:14&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;자사 접근 수초; 기존 방식 인출 수시간&quot;,
+        &quot;observed&quot;: &quot;측정값·표본·서비스 수준 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;속도와 위험 감소를 검증된 경쟁우위로 반영하기 전에 측정 조건과 독립 검증 자료를 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;기관 수탁·거래·금융·스테이킹·달러 결제·예금 토큰 서비스를 제공하고, 기업 대신 스테이블코인 발행·상환·준비자산 관리·컴플라이언스를 담당해 출시 기간을 단축한다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;자체 인가·자본·감독 체계 구축에 수년 소요 가능&quot;,
+        &quot;observed&quot;: &quot;구축 기간 및 파트너 이용 시 단축 폭 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발행 파트너십을 평가하려면 책임 법인, 상환권, 준비자산 및 실제 상용화 실적을 먼저 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;GENIUS Act가 규제 명확성, 우량·고유동성 준비자산에 의한 1:1 담보 및 정기 증명을 요구하며, 관련 일정으로 내년 초·내년 1월·2028년이 언급된다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;담보 1:1; 규칙 제정 내년 초; 발효 내년 1월; 집행 2028년&quot;,
+        &quot;observed&quot;: &quot;법정 기한·실제 규칙 제정 현황·담보 요건 모두 확인 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;영상의 일정이나 1:1 담보 설명을 확정된 규제 요건으로 사용하지 말고 법률 조문과 후속 규칙을 대조한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;연준이 지난 24일 스테이블코인 발행사의 준비자산·자본·위험관리 관련 규정안을 발표했다는 인용.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:06&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난 24일 발표&quot;,
+        &quot;observed&quot;: &quot;월·연도·녹화일·공식 발표일 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이 발언을 확정된 규제 변화나 시행 촉매로 반영하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;BIS 지침에 따른 공공 블록체인 자산의 높은 자본 부담이 은행의 스테이블코인 도입을 늦추며, 은행들이 예금 토큰도 병행한다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:17&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;높은 자본 부담; 구체적인 위험가중치·한도 수치는 제시되지 않음&quot;,
+        &quot;observed&quot;: &quot;자산 분류·위험가중치·익스포저 한도 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;은행의 자본 비용을 추정하려면 토큰별 분류와 실제 관할 규정을 확인하고, 도입 지연의 원인을 별도로 검증한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;글로벌 스테이블코인 시장 규모가 3,억 달러를 넘은 뒤 성장이 정체됐다는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:06&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.2,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3,억 달러 초과: 숫자 누락으로 금액 확정 불가&quot;,
+        &quot;observed&quot;: &quot;market_evidence가 비어 있어 시가총액·공급량·30일·90일·365일 변화율 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;누락된 금액을 복원하기 전 시장 규모를 인용하지 않으며, 성장 정체를 투자 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;최근 1~2년 기관의 스테이블코인 활용이 결제·해외송금·유동성 관리로 확대됐고 수분 이내 정산과 프로그래밍이 가능하며, 향후 금융 인프라 재편과 AI 결제로 이어질 수 있다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:06&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;최근 1~2년 활용 확대; 정산에 수분 미만&quot;,
+        &quot;observed&quot;: &quot;기간별 이용 통계·처리시간 분포·측정 조건 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;도입 발표·파일럿·상용 거래를 구분하고 실거래 지표와 종단 간 처리시간을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;한국의 원화 스테이블코인 제도 세부 내용이 미확정인 가운데 기관들이 관련 역량과 달러 코인의 외환규정상 취급을 준비하고 있으며, 향후 1~2년 아시아 수요가 증가할 것이라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:30&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;향후 1~2년 아시아 기업·단체의 수요 증가 예상&quot;,
+        &quot;observed&quot;: &quot;고객 수·계약액·도입 규모·전망 산정 근거 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;규제 상태와 기관별 실제 사업 진행을 확인하기 전 지역 수요 전망을 매출 성장으로 연결하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;지난주 캐나다 총리 carne가 거래 비용 하락을 언급했다는 인용과, 공공 블록체인이 한국 기업의 국제 거래 속도·비용을 개선할 수 있다는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:30&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.25,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난주 발언; 비용 절감률·처리시간 수치 없음&quot;,
+        &quot;observed&quot;: &quot;발언 날짜·발언자 신원·절감 효과 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;인용을 정책적 지지의 근거로 사용하지 않고 비용 개선도 검증 전의 가능성으로만 취급한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Chipotle, Starbucks, Palantir, Intel, SpaceX, Wolfspeed, and More Stocks That Explain Today’s Market&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/b361f1db-c32b-3b1d-8f3f-7d6523484abf/chipotle%2C-starbucks%2C.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T16:38:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Chipotle, Starbucks, Palantir, Intel, SpaceX, Wolfspeed, and More Stocks That Explain Today’s Market Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World T...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;2 Profitable Stocks to Target This Week and 1 We Brush Off&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/2-profitable-stocks-target-week-081609145.html&quot;,
+      &quot;publisher&quot;: &quot;StockStory&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T08:16:09+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: AI Stocks Tumble On OpenAI News; SpaceX Move Slams Verizon, AT&amp;T Late&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/955f9165-6ca4-336e-9d6e-fff1a7c7f4e0/dow-jones-futures%3A-ai-stocks.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T22:35:03+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Stocks to Watch Recap: Intel, Samsung, PepsiCo, TSMC&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/3c5c28ac-abc7-3e88-b86a-bd3bd6721844/stocks-to-watch-recap%3A-intel%2C.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T21:31:21+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;RingCentral to Announce Third Quarter 2026 Financial Results&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/ringcentral-announce-third-quarter-2026-224600387.html&quot;,
+      &quot;publisher&quot;: &quot;Business Wire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T22:46:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Epique Realty COO Chris Miller Wins 2026 Gold Globee(R) Award for Transformational Leader in 14th Annual Leadership Awards&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/real-estate/articles/epique-realty-coo-chris-miller-223500622.html&quot;,
+      &quot;publisher&quot;: &quot;ACCESS Newswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T22:35:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

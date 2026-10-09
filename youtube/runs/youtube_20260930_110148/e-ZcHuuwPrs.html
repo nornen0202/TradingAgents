@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - [#긴급인터뷰]  SK하이닉스보다 삼성전자? / HBM만 보면 늦는다… 서버 D램·낸드까지 ‘메모리 초 호황’ 번진다  | 더 프레미어 강관우 대표</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20260930_110148</p>
+    <h1>[#긴급인터뷰]  SK하이닉스보다 삼성전자? / HBM만 보면 늦는다… 서버 D램·낸드까지 ‘메모리 초 호황’ 번진다  | 더 프레미어 강관우 대표</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs">원본 영상</a>
+    </div>
+  </header>
+  <h2>메모리 ‘초호황’과 삼성전자 상대 우위론: 검증 결과</h2>
+<p><strong>대상:</strong> <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs">815Money talk 인터뷰</a> · 2026년 9월 29일 공개 · <strong>검토 기준:</strong> 2026년 9월 30일 제공 자료</p>
+<h3>핵심 판단</h3>
+<p>영상의 중심 논리는 AI 수요가 HBM에서 서버용 D램·기업용 SSD로 확산되고, 그 과정에서 삼성전자의 실적 개선 폭이 SK하이닉스보다 클 수 있다는 <strong>출연자의 전망</strong>이다. 그러나 제공된 외부 자료에는 이를 뒷받침할 출하량·가격·공식 실적·고객 인증 자료가 없다. <strong>수요 확산이나 삼성전자 상대 우위를 확인된 사실로 볼 수 없다.</strong> 근거가 없다는 것은 전망이 틀렸다는 증거도 아니다.</p>
+<h3>영상 주장과 확인된 사실/근거</h3>
+<p>| 영상 주장 | 확인된 사실/근거 및 판단 |</p>
+<p>| --- | --- |</p>
+<p>| <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs&amp;t=0s">00:00</a> AI 추론 확대로 서버용 D램·기업용 SSD 수요가 늘어난다. | 관련 출하량·가격·매출·수출 통계가 제공되지 않았다. <strong>미검증</strong>. 주장 확인을 위한 ASR 신뢰도 0.80이 시장 근거를 뜻하지는 않는다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs&amp;t=0s">00:00</a>, <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs&amp;t=445s">07:25</a> 삼성전자 HBM4 인증·양산 진전과 범용 메모리 회복으로 SK하이닉스보다 마진 개선 폭이 클 수 있다. | 양사·고객사의 인증 확인 자료와 비교 가능한 제품별 수익성 자료가 없다. <strong>미검증 전망</strong>. 해당 주장의 ASR 신뢰도는 0.75, 검증 근거의 source_confidence는 0이다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs&amp;t=445s">07:25</a>, <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs&amp;t=885s">14:45</a> 2027·2028년 영업이익 추정치가 삼성전자 각각 8조·19조 원, SK하이닉스 각각 5조·7.9조 원 상향됐고, 양사 선행 PER은 4배 초중반이다. | 추정기관·기준일·개정 전후 수치, PER 산식과 기준 주가가 없다. <strong>수치와 저평가 해석 모두 미검증</strong>. ASR 신뢰도 0.65. Bloomberg·Morningstar 등 유료·폐쇄형 컨센서스에 의존한 수치라면 원천 자료를 확보해 <strong>수동 확인 필요</strong>. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs&amp;t=445s">07:25</a> SK하이닉스 외국인 보유율은 50% 초반, 양사 격차는 약 4.6%포인트이며 향후 2~3%포인트로 축소될 수 있다. | 동일 거래일의 거래소 보유율 자료가 없다. 현재 수준·격차는 <strong>미검증</strong>, 축소는 <strong>예측</strong>이다. ASR 신뢰도 0.80이지만 외부 source_confidence는 0이다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs&amp;t=885s">14:45</a> HBM4·HBM4e 전환 시 웨이퍼 사용량이 3배가 돼 범용 D램 공급과 가격 하락이 제한된다. | ‘3배’의 비교 대상·산식, 실제 생산능력과 계약가격 자료가 없다. 웨이퍼 투입 증가와 가격 방어는 별도로 검증해야 한다. <strong>미검증</strong>. ASR 신뢰도 0.65. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs&amp;t=885s">14:45</a> 중국 업체와 고급 제품의 기술 격차는 1~2년이다. | 비교 제품·공정·양산 수율과 연수 산정 기준이 없다. <strong>미검증 평가</strong>. ASR 신뢰도 0.70. |</p>
+<p>마이크론 실적 호조 및 발표 후 조정 가능성(<a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs&amp;t=0s">00:00</a>)도 전망이다. 제공된 <a href="https://finance.yahoo.com/m/0f05df74-8e19-37cc-8a3a-5b6885fbc760/dow-jones-futures-rise-with.html">관련 기사</a>는 제목에 마이크론을 언급할 뿐, 제공 발췌문에는 공식 발표일·실적·가이던스·주가 반응이 없어 검증 근거가 되지 않는다. 나머지 수집 기사 4건은 해당 주장들과 무관하다.</p>
+<h3>강세 논리와 반론</h3>
+<p><strong>강세 논리:</strong> HBM 이외 제품의 수요와 가격이 함께 개선되고 삼성전자의 HBM4 생산·수율이 확인된다면, 영상이 제시한 삼성전자 실적 개선 시나리오에 힘이 실릴 수 있다. HBM 생산 확대가 범용 D램 공급을 제약한다는 가설도 이 논리의 일부다.</p>
+<p><strong>반론·위험:</strong> 서버 D램·기업용 SSD의 실제 판매 증가가 확인되지 않을 수 있고, HBM 인증·수율 또는 제품 수익성이 기대에 못 미칠 수 있다. 중국 업체의 공급 확대, HBM 가격 경쟁, 하이퍼스케일러 설비투자 축소는 업황 가설을 약화시킬 수 있다. 이익 추정치가 하향되면 영상의 낮은 PER 해석도 성립하지 않을 수 있다. 영상이 언급한 미국 10년물 금리 5%대·5.2%와 주가 영향은 해당 날짜의 금리·주가 자료가 없어 확인되지 않았으며, 자막상 방향 해석도 불명확하다(ASR 신뢰도 0.45).</p>
+<h3>가까운 확인 지점과 무효화 조건</h3>
+<ul>
+<li><strong>삼성전자 3분기 잠정실적:</strong> 공식 발표 시 매출·영업이익과 제품별 설명을 확인한다. 발표 일정과 결과는 제공 자료로 확정할 수 없다. 기대한 이익 개선이 나타나지 않으면 상대 우위 논리는 약해진다.</li>
+<li><strong>양사 IR·고객사 자료:</strong> HBM4 인증·양산 상태, 출하 및 수익성, 서버용 D램·기업용 SSD 판매 지표를 확인한다. 인증 지연이나 수율·마진 부진은 핵심 전제를 훼손한다.</li>
+<li><strong>가격·공급 자료:</strong> 범용 D램 계약가격과 생산능력 변화를 함께 관찰한다. HBM 확대에도 범용 가격이 급락한다면 ‘공급 제약이 가격을 지지한다’는 주장은 약해진다.</li>
+<li><strong>마이크론 공식 발표:</strong> 실적·총이익률·가이던스를 발표 전 기대치와 구분해 확인하고, 발표 후 주가 반응은 별도로 관찰한다. 현재 자료만으로 발표 일정이나 결과를 단정할 수 없다.</li>
+<li><strong>동일 기준일 시장 자료:</strong> 거래소 외국인 보유율, 추정기관별 2027~2028년 이익 전망 개정치, PER 계산 기준을 확보한다. 수치가 재현되지 않으면 영상의 수급·저평가 논거로 사용하기 어렵다.</li>
+</ul>
+<h3>자료 품질과 해석 범위</h3>
+<p>자동자막의 <code>transcript_quality</code> 점수는 1.0이지만, 이는 전반적인 전사 품질 지표이지 개별 숫자의 정확성이나 주장 검증을 보장하지 않는다. 표시한 시각은 문장별 시각이 아닌 <strong>청크 시작 시각</strong>이다. 특히 <a href="https://www.youtube.com/watch?v=e-ZcHuuwPrs&amp;t=445s">07:25</a>의 ‘110조~111조 원’, ‘환율 약 200원’, ‘10.5% 충당금’은 지표·기간·기준이 불명확하다(ASR 신뢰도 0.25). 같은 구간의 ‘약 4,500원 배당금’도 대상 종목과 배당 기준이 식별되지 않는다(0.20). 원음과 공시를 대조하기 전에는 어느 회사의 확정 수치로도 인용하기 어렵다.</p>
+<p>제공된 시장 스냅샷은 사용 가능한 가격·PER 필드가 없었고 공시 제공자도 이용 불가였다. 외부 자료의 수집 상태가 ‘verified’로 표시된 것과 <strong>개별 투자 주장이 검증됐다는 것</strong>은 다르다. 따라서 현재 이 보고서는 실적 확정 판단이 아니라, 영상의 가설과 이를 판별할 관찰 항목을 정리한 것이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;e-ZcHuuwPrs&quot;,
+  &quot;title&quot;: &quot;[#긴급인터뷰]  SK하이닉스보다 삼성전자? / HBM만 보면 늦는다… 서버 D램·낸드까지 ‘메모리 초 호황’ 번진다  | 더 프레미어 강관우 대표&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=e-ZcHuuwPrs&quot;,
+  &quot;channel&quot;: &quot;815Money talk&quot;,
+  &quot;channel_id&quot;: &quot;UCCG6BEYjfQMGzypJw2EJCDQ&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@815moneytalk/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/e-ZcHuuwPrs/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-09-29T08:15:25+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 9102,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 9102,
+    &quot;segments&quot;: 441,
+    &quot;duration_seconds&quot;: 1225,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-09-30T11:01:48.659804+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 5,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 8,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;AI 추론 확대로 HBM 외 서버용 D램·기업용 SSD 수요와 수출이 증가하고 있다는 주장 및 향후 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수요·수출 증가, 수치 없음&quot;,
+        &quot;observed&quot;: &quot;관련 통계 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;메모리 수요 확산을 확인된 성장률로 가정하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자의 HBM4 인증·양산 진전과 범용 메모리 회복으로 SK하이닉스보다 실적·마진 개선 폭이 커질 수 있다는 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;삼성전자의 상대적 실적·마진 개선&quot;,
+        &quot;observed&quot;: &quot;비교 실적 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;삼성전자 상대 우위는 출연자의 전망으로만 취급해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;마이크론의 예정된 실적 발표가 양호할 수 있으나 기대치 때문에 발표 후 주가 조정도 가능하다는 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.15,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.1,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;양호한 실적 및 발표 후 조정 가능성; 수치 없음&quot;,
+        &quot;observed&quot;: &quot;공식 실적·시장 반응 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실적 발표 후 매매 판단에 이 전망을 단독 근거로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자 3분기 잠정실적과 관련해 110조~111조 원, 환율 약 200원 하락, 영업이익의 10.5% 충당금이 언급됐다는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;07:25&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.25,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;110조~111조 원; 환율 약 200원 하락; 10.5% 충당금&quot;,
+        &quot;observed&quot;: &quot;지표·기간·기준 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이 수치를 삼성전자 매출·이익 추정치로 인용하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;2027·2028년 영업이익 추정치가 삼성전자 각각 8조·19조 원, SK하이닉스 각각 5조·7.9조 원 상향됐고 양사 선행 PER은 4배 초중반이라는 발언.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;07:25&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;삼성전자 +8조·+19조 원; SK하이닉스 +5조·+7.9조 원; 선행 PER 4배 초중반&quot;,
+        &quot;observed&quot;: &quot;컨센서스·PER 데이터 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;상향 폭과 저평가 판단을 재현 가능한 컨센서스로 취급하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;SK하이닉스 외국인 보유 비중이 50% 초반이고 양사 격차가 약 4.6%포인트이며 2~3%포인트로 축소될 수 있다는 발언·전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;07:25&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;SK하이닉스 50% 초반; 격차 약 4.6%포인트; 향후 2~3%포인트&quot;,
+        &quot;observed&quot;: &quot;일별 보유율 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;외국인 보유율 격차를 상대매매 신호로 쓰기 전에 거래소 일별 수치를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;중국 업체가 범용 메모리에서는 추격했으나 EUV 활용 고급 제품에서는 뒤처지며 기술 격차가 1~2년이라는 평가.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;14:45&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기술 격차 1~2년&quot;,
+        &quot;observed&quot;: &quot;비교 기준 및 실측 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;중국 업체의 경쟁력과 한국 업체의 기술 우위를 단일 연수로 확정해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;HBM4·HBM4e 전환으로 웨이퍼 사용량이 3배가 되어 범용 D램 공급이 제한되고 가격 급락 가능성이 낮다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;14:45&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;HBM4·HBM4e 전환 시 웨이퍼 사용량 3배&quot;,
+        &quot;observed&quot;: &quot;제조사 원자료·산식 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;3배 수치나 가격 하방 제한을 투자모형의 확정 가정으로 넣기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;미국 10년물 금리가 5%대·5.2%였고 금리 상승이 반도체 주가에 영향을 줬으며 하이퍼스케일러 자본지출 축소가 위험이라는 발언.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 10년물 5%대·5.2%&quot;,
+        &quot;observed&quot;: &quot;해당일 금리 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;금리 수준과 주가 하락 원인을 확정 사실로 인용하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;배당락일과 약 4,500원 배당금을 언급하지만 대상 종목·배당 종류·기준일이 불명확하다는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;07:25&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.2,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 4,500원 배당금&quot;,
+        &quot;observed&quot;: &quot;종목·배당 공시 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;약 4,500원을 삼성전자나 SK하이닉스의 확정 배당금으로 해석하지 말아야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;미제공&quot;,
+      &quot;name&quot;: &quot;삼성전자&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;HBM4 인증·양산 진전과 범용 메모리 업황 회복을 전제로 SK하이닉스보다 실적·마진 개선 폭이 클 수 있다고 전망한다.&quot;,
+        &quot;외국인 보유 비중 격차가 과도하다고 보고 삼성전자 매수·SK하이닉스 매도 방향의 재조정 가능성을 제시한다.&quot;,
+        &quot;단기 배당락보다 3분기 잠정실적과 중장기 이익 전망에 주목한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;출연자는 삼성전자 관련 추정치로 110조~111조 원을 언급했으나 대상 기간·지표가 자막상 불명확하다.&quot;,
+        &quot;출연자는 삼성전자 2027년·2028년 영업이익 추정치가 각각 8조 원·19조 원 상향됐다고 말한다.&quot;,
+        &quot;출연자는 삼성전자와 SK하이닉스의 외국인 보유 비중 격차가 약 4.6%포인트이며 2~3%포인트로 좁혀질 수 있다고 본다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;미제공&quot;,
+        &quot;as_of&quot;: &quot;2026-09-30T02:21:43.140769+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;미제공&quot;,
+      &quot;name&quot;: &quot;SK하이닉스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;기존 HBM 사업의 높은 수익성 때문에 삼성전자보다 추가 마진 개선 폭이 작을 수 있다고 본다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;출연자는 SK하이닉스 2027년·2028년 영업이익 추정치가 각각 5조 원·7조 9천억 원 상향됐다고 말한다.&quot;,
+        &quot;출연자는 외국인 보유 비중이 최근 50% 초반대로 내려왔다고 말한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;미제공&quot;,
+        &quot;as_of&quot;: &quot;2026-09-30T02:21:48.473745+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;미제공&quot;,
+      &quot;name&quot;: &quot;마이크론 테크놀로지&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;실적 발표가 양호할 것으로 예상하면서도 높은 기대치가 이미 반영돼 발표 후 단기 조정이 가능하다고 본다.&quot;,
+        &quot;조정 시 매수 기회를 검토할 수 있다는 의견을 제시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;미제공&quot;,
+        &quot;as_of&quot;: &quot;2026-09-30T02:21:53.959162+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;미제공&quot;,
+      &quot;name&quot;: &quot;메모리 반도체 업황&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;AI 활용이 학습에서 추론으로 확대되면 HBM 외에도 서버용 D램과 기업용 SSD 수요가 증가할 것으로 전망한다.&quot;,
+        &quot;중국 업체들이 범용 제품에서는 추격했지만 EUV를 활용하는 고급 제품에서는 격차가 남아 있다고 평가한다.&quot;,
+        &quot;HBM4·HBM4e 생산 확대가 범용 D램 공급을 제약해 과거와 같은 급격한 가격 하락 가능성을 낮춘다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;출연자는 HBM4·HBM4e 전환 시 웨이퍼 사용량이 3배가 된다고 주장한다.&quot;,
+        &quot;출연자는 미국 10년물 국채금리의 5%대 수준과 5.2%를 언급한다.&quot;,
+        &quot;중국 업체와의 기술 격차가 1~2년이라는 시장의 견해를 소개한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;미제공&quot;,
+        &quot;as_of&quot;: &quot;2026-09-30T02:21:58.311928+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Why Equinox Gold (TSX:EQX) Is Down 9.9% After Sector-Wide Bullion-Driven Canadian Mining Pullback&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/why-equinox-gold-tsx-eqx-010948863.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-09-30T01:09:48+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Why Equinox Gold (TSX:EQX) Is Down 9.9% After Sector-Wide Bullion-Driven Canadian Mining Pullback Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Clim...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Gold Fields (JSE:GFI) Stock Fair Value Edges Lower After More Cautious Analyst Targets&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/gold-fields-jse-gfi-stock-010809730.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-09-30T01:08:09+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Gold Fields (JSE:GFI) Stock Fair Value Edges Lower After More Cautious Analyst Targets Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures Rise With Micron, Inflation Data Due; Yields Pressure Stocks But Bloom Energy Soars&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/0f05df74-8e19-37cc-8a3a-5b6885fbc760/dow-jones-futures-rise-with.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-09-30T02:18:47+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures Rise With Micron, Inflation Data Due; Yields Pressure Stocks But Bloom Energy Soars Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Sandisk (SNDK) Could Be 19% Undervalued After Its Memory Forum Update&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/sandisk-sndk-could-19-undervalued-010858696.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-09-30T01:08:58+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Sandisk (SNDK) Could Be 19% Undervalued After Its Memory Forum Update Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change Health Science Or...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Oura Shows How Shaky the IPO Market Really Is&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/bcb200dd-b4bf-33f9-a185-fe3a828f5257/oura-shows-how-shaky-the-ipo.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-09-29T20:24:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

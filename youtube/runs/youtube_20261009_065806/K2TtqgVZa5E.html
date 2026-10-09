@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 비트코인 급락, 이더리움은 더 아팠다 | 서동주, 김동환, 박현영 뉴스1 기자 [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261009_065806</p>
+    <h1>비트코인 급락, 이더리움은 더 아팠다 | 서동주, 김동환, 박현영 뉴스1 기자 [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=K2TtqgVZa5E">원본 영상</a>
+    </div>
+  </header>
+  <h2>비트코인·이더리움 급락 해석과 국내 제도화 점검</h2>
+<p>분석 대상: <a href="https://www.youtube.com/watch?v=K2TtqgVZa5E">삼프로TV 크립토 PLUS 영상</a> · 게시일 2026년 10월 8일 · 검증 자료 기준 2026년 10월 9일</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심 논리는 <strong>레버리지 청산과 장기금리 상승이 암호자산을 압박했고, 이더리움에는 주요 매수 주체의 매집 종료 우려까지 겹쳤다</strong>는 것이다. 다만 제공된 자료로는 가격 경로·청산 규모·국채 입찰·비트마인 발언을 독립적으로 확인하지 못했다. 따라서 이는 확인된 시장 진단이 아니라 검증이 필요한 설명이다.</p>
+<p>12개 검증 항목 중 <strong>2개는 부분 뒷받침, 9개는 미검증, 1개는 자막 인식 불확실</strong>로 분류됐다. 실질적인 외부 근거는 루센트블록의 국정감사 참여와 디지털자산기본법 지연에 관한 기사 발췌에 집중돼 있다. 상위 처리 상태가 <code>verified_with_caveats</code>여도 개별 주장 검증의 전체 판정은 <code>unverified</code>다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 시각은 정확한 발언 시점이 아닌 자막 청크의 시작 시각이다.</p>
+<p>| 주제·시각 | 영상 주장 | 확인된 사실·근거와 한계 |</p>
+<p>|---|---|---|</p>
+<p>| BTC·ETH·ZEC 가격, 00:00:00~11:55 | BTC는 약 85,000달러에서 83,000달러대로 하락했고 저점은 82,700~82,900달러. ETH는 장중 약 6%, ZEC는 약 5% 하락 후 약 3% 하락 마감 | 사건 당시 거래소 가격·청산 원자료가 없어 모두 미검증. 저점 차이의 원인과 ZEC 마감 기준도 불명확 |</p>
+<p>| 미국 국채, 00:00:00·06:03 | 10년물 390억 달러 입찰, 응찰 배율 2.77배, 직전 금리 5.317%, 낙찰 금리 5.3%, 딜러 인수 약 2.5%가 불안을 완화 | E2 기사 제목에 390억 달러 입찰이 등장하지만 본문·만기·입찰일이 없어 동일 사건인지 확인 불가. 역사적 최고금리와 나머지 수치도 미검증 |</p>
+<p>| FOMC, 06:03 | 9월 만장일치 금리 인상, 연말 추가 인상 의견, FedWatch의 10월 동결 전망과 JP모건의 12월 인상 가능성 | 대상 연도·결정문·회의록·당시 확률·전망 원문이 없어 미검증. 현재 정책 경로로 해석할 수 없음 |</p>
+<p>| 비트마인, 06:03·11:55 | ETH 공급량 5% 확보 후 매집 중단. 현재 4.9%, 추가 약 10만 ETH, 목표까지 4~6주 | 공식 연설·회사 공시·동일 기준일 보유량이 없어 미검증. 5%가 확정 중단 조건인지도 불명확 |</p>
+<p>| 지캐시 ETF·지원 활동, 11:55 | 윙클보스 형제가 나스닥 현물 ETF 상장을 추진하고 2018년부터 거래·보관·기부·투자·채굴로 지원 | 신청서·발행사 발표·지원 활동 원문이 없어 미검증. 상품명과 ‘윙크’의 공식 티커 철자도 확인되지 않음 |</p>
+<p>| 국내 프라이버시 코인 규제, 11:55 | 취급 제한을 지캐시의 거래내역 공개 기능 발전에 맞춰 바꿔야 한다는 업계 의견 | 유효 법령·감독당국 해석·기술 문서가 없어 적용 범위 미확인. 기술적 공개 가능성과 국내 거래 허용은 별개 |</p>
+<p>| 네이버·두나무, 11:55 | 기업결합 심사 지연으로 종결 기한을 ‘내년 3월 31일’로 연장, 향후 지분 제한에 따라 구조 변경 가능 | 정정공시·공정위 자료가 없어 미검증. 2027년 3월 31일을 확정 일정으로 채택하지 않음 |</p>
+<p>| 루센트블록·인가, 18:06 | 대표가 국감 증인으로 채택됐고 특정 컨소시엄만 인가받아 형평성 논란 예상 | E8은 대표의 <strong>참고인 출석과 인가 정책 문제 제기</strong>를 보도. 감사 참여는 부분 확인되지만 증인이라는 표현과 불일치. 전체 인가 현황은 미확인 |</p>
+<p>| 디지털자산기본법, 18:06 | 정부안 제출·입법 지연이 국감 쟁점이며 대주주 지분 제한 도입 가능 | E9·E10이 입법 지연을 부분 뒷받침. 방송일 현재 제출 상태·실제 감사 질의·구체적 지분 한도는 미확인 |</p>
+<h4>가장 강한 외부 근거</h4>
+<ul>
+<li><strong>루센트블록의 실제 문제 제기:</strong> 이데일리의 10월 8일 보도 발췌는 허세영 대표가 정무위원회 금융위원회 국정감사에 참고인으로 출석해 조각투자 장외거래소 인가 정책을 비판했다고 전한다. 영상 게시 이후 나온 사후 보강 자료이며, 객관적 차별이나 재심사 결정까지 입증하지는 않는다. <a href="https://www.edaily.co.kr/News/Read?newsId=05044646645610952&amp;mediaCodeNo=257">이데일리 기사</a></li>
+<li><strong>정부안 지연에 관한 보도:</strong> 10월 1일 기사는 정부안 제출 지연으로 거론되던 공청회가 열리지 못했다고 전한다. 지연 주장에는 근거가 있지만 공식 의안 접수 상태를 대신하지 않는다. <a href="https://www.news2day.co.kr/article/20261001500003">뉴스투데이 기사</a></li>
+<li><strong>지연의 앞선 맥락:</strong> 9월 3일 기사도 2단계 입법 지연과 당시 정부안 제출 전망을 다룬다. 대주주 규율 언급은 있으나 영상의 향후 지분 제한과 동일한 조항인지 확인되지 않았다. <a href="https://www.seoulfn.com/news/articleView.html?idxno=637218">서울파이낸스 기사</a></li>
+</ul>
+<h3>3. 상승 논리와 반론</h3>
+<h4>BTC: 청산 진정과 금리 안정이라는 조건부 회복 논리</h4>
+<p>영상 해석이 맞다면 강제 청산이 진정되고 장기금리 압력이 완화될 때 가격 회복을 기대할 수 있다는 논리가 성립한다. 그러나 현재 자료에는 청산이 하락을 먼저 촉발했는지, 하락의 결과로 확대됐는지 판단할 시계열이 없다. 입찰 직후 반등이 확인되더라도 시간적 동행만으로 원인을 확정할 수 없다.</p>
+<p>국채 입찰 한 번의 양호한 결과가 지속적인 수요 회복을 뜻하지도 않는다. 특히 10년물 결과만으로 30년물 수요를 예측할 수 없다는 영상의 유보는 유지할 필요가 있다.</p>
+<h4>ETH: 주요 매수 수요의 지속 여부가 핵심</h4>
+<p>매집 중단 조건이 잘못 전달됐거나 공식 순매입이 계속된다면 영상이 제시한 부담 요인 하나는 약해질 수 있다. 반대로 실제 중단이 확인되고 다른 수요가 이를 대체하지 못한다면 상대적 약세 설명이 강화될 수 있다. 어느 경우든 비트마인 발언과 ETH 하락 사이의 인과관계는 별도 검증이 필요하다.</p>
+<p><strong>영상 수치에는 산술상 점검할 부분도 있다.</strong> 추가 필요량 10만 ETH를 주당 1만~2만 ETH로 나누면 단순 소요 기간은 <strong>5~10주</strong>다. 제시된 속도만으로 4~6주 전망 전체를 재현할 수 없다. 또한 4.9%와 5%를 정확한 값으로 취급하면 차이는 0.1%포인트이며, 이를 10만 ETH로 환산한 공급량은 1억 ETH다. 실제 공급량과 반올림 정도가 없어 일치 여부는 판단할 수 없다. 이는 조건부 계산이지 실제 보유량 검증이 아니다.</p>
+<h4>ZEC·국내 제도화: 기대와 실행을 구분</h4>
+<p>ETF가 실제 상장되고 순유입이 발생한다면 접근성 확대라는 상승 논리를 검토할 수 있다. 하지만 신청·승인·거래 개시·자금 유입은 각각 다른 단계이며 현재 자료에서는 신청 자체도 확인되지 않았다. 기부·채굴·기업 투자 역시 곧바로 현물 매수 수요로 환산할 수 없다.</p>
+<p>국내에서는 인가 기준 명확화와 입법 진전이 불확실성을 줄일 가능성이 있다. 다만 국감 문제 제기가 인가 취소·재심사·특정 기업 수혜로 이어진다는 근거는 없다. ‘조각투자 장외거래소 인가’와 포괄적인 ‘토큰증권 인가’도 같은 법적 업종인지 확인해야 한다.</p>
+<h3>4. 데이터 품질과 신뢰도</h3>
+<p>자동자막의 <code>transcript_quality</code>는 good·1.0이지만, 이는 개별 숫자나 법률 용어의 정확도를 보장하지 않는다. 수동 자막과 원음 대조 결과는 제공되지 않았다.</p>
+<p>| 주장 | source_confidence | asr_confidence |</p>
+<p>|---|---:|---:|</p>
+<p>| 가격·청산 복합 주장 C1 | 0.85 | 0.70 |</p>
+<p>| 국채 입찰 C2 | 0.78 | 0.55 |</p>
+<p>| FOMC C3 | 0.73 | 0.55 |</p>
+<p>| 비트마인 C4 | 0.84 | 0.60 |</p>
+<p>| 대상 미상 25배 전망 C5 | 0.40 | 0.25 |</p>
+<p>| ZEC ETF·지원·규제 C6~C8 | 각 0.85 | 0.70~0.75 |</p>
+<p>| 네이버·두나무 C9 | 0.91 | 0.85 |</p>
+<p>| 루센트블록 C10 | 0.88 | 0.65 |</p>
+<p>| 기본법 C11 | 0.88 | 0.80 |</p>
+<p>| 기관 미상 보안·ETF 이슈 C12 | 0.50 | 0.50 |</p>
+<p><code>source_confidence</code>는 자막에서 주장을 식별한 확신도이며 사실일 확률이 아니다. <code>asr_confidence</code>도 의심 표현을 바탕으로 한 정성 평가이지 음성 대조로 측정한 정확도가 아니다. 외부 근거의 지지 강도는 별도이며, 부분 뒷받침된 C10·C11은 각각 0.60·0.65다.</p>
+<p>추가 한계는 다음과 같다.</p>
+<ul>
+<li>BTC·ETH 스냅샷은 자산 유형·거래소·거래쌍·통화가 확인되지 않아 코인 현물 시세와 52주 범위를 분석에서 제외했다. ZEC 조회 실패도 가격이나 뉴스가 없다는 뜻은 아니다.</li>
+<li>E1은 오류·탐색 문구 위주이고 E2~E7은 본문이 없거나 주장과 무관하다. 조회 상태의 <code>verified</code>를 주장 검증으로 승계하지 않았다.</li>
+<li>게시일과 실제 녹화일·거시정책 대상 연도는 구분해야 한다. ‘어제·내일·내년’을 확정 사건 날짜로 바꾸지 않았다.</li>
+<li>개인 매수가, 미공개 의원실 취재, JP모건 원보고서 및 출처 불명 차트는 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 원문은 제공되지 않았으므로 해당 폐쇄형 출처에 기대는 주장도 <strong>미검증·수동 확인 필요</strong>다.</li>
+<li>대상 미상 ‘25배’ 전망과 기관 미상 은행 보안 사고·레버리지 ETF 논란은 특정 자산이나 기관의 투자 근거로 연결할 수 없다.</li>
+</ul>
+<h3>5. 단기 체크포인트와 해석의 무효화 조건</h3>
+<p>사건 날짜부터 확정한 뒤 아래 항목을 같은 시간축에서 관찰할 필요가 있다.</p>
+<p>| 관찰 대상 | 구체적 확인 항목 | 영상 해석을 약화·무효화하는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| BTC·ETH·ZEC 가격·청산 | 동일 거래소·상품의 분봉, 하락률 기준, 롱·숏 청산 시각·규모, ETH/BTC 상대 흐름 | 해당 가격 경로가 재현되지 않거나 청산이 최초 하락 이후 발생하면 ‘청산 촉발’ 설명 약화 |</p>
+<p>| 국채·FOMC | 입찰 날짜·만기·낙찰 금리·응찰 배율·딜러 배정, 공식 결정문·회의록, 당시 FedWatch 기록 | 수치·대상 연도가 다르거나 반등이 입찰보다 먼저라면 해당 사건 설명 재검토 |</p>
+<p>| 비트마인 | 공식 연설의 중단 조건, 같은 기준일 보유량·공급량, 주간 순매입, 목표 달성 후 매입 여부 | 5% 이후에도 매입을 지속하거나 원발언이 재검토 기준이면 ‘확정 매집 종료’ 전제 무효 |</p>
+<p>| ZEC ETF·규제 | 공식 접수 문서·상품명·예정 티커, 승인·효력·거래 개시, 출시 후 순유입, 유효 법령·기술 문서 | 신청과 출시의 혼동, 순유입 부재, 공개 기능의 제한은 기대한 수요·규제 완화 논리 약화 |</p>
+<p>| 네이버·두나무 | 원공시·정정공시의 당사자·기한·조건·연장 사유, 공정위 공식 상태 | 공시 기한·사유가 영상과 다르거나 지분 제한 적용 대상이 아니면 거래 해석 수정 |</p>
+<p>| 인가·기본법 | 국회 공식 출석 명단·회의록, 전체 인가 사업자·단계·심사 근거, 정부안 의안번호·제출일·조문 | 감사 문제 제기만 있고 제도 변경이 없으면 수혜 기대 제한. 방송 전 정부안 제출이 확인되면 당시 지연 해석 재검토 |</p>
+<h3>결론</h3>
+<p>현재 근거로 가장 분명하게 말할 수 있는 것은 <strong>루센트블록 인가 논란이 실제 국감에서 제기됐다는 보도와 기본법 지연에 관한 보도가 존재한다</strong>는 점이다. 암호자산 급락의 구체적 원인, 비트마인 매집 종료, ZEC ETF와 기업결합 일정은 아직 확인되지 않았다.</p>
+<p>투자자가 우선 관찰할 것은 영상의 가격 숫자 자체보다 <strong>사건 날짜의 일치, 정확한 자산 식별, 공식 수요 자료, 신청·승인·시행 단계의 실제 변화</strong>다. 이 조건들이 확인될 때에만 영상의 상승·하락 논리를 구체적인 시장 시나리오로 평가할 수 있다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;K2TtqgVZa5E&quot;,
+  &quot;title&quot;: &quot;비트코인 급락, 이더리움은 더 아팠다 | 서동주, 김동환, 박현영 뉴스1 기자 [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=K2TtqgVZa5E&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/K2TtqgVZa5E/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-08T03:05:37+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 10920,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 10920,
+    &quot;segments&quot;: 622,
+    &quot;duration_seconds&quot;: 1251,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-09T06:58:06.448375+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;asr_uncertain&quot;: 1,
+    &quot;partially_supported&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;BTC가 약 85,000달러에서 83,000달러대로 하락하고 82,700~82,900달러 부근에서 저점을 기록한 뒤 회복했으며, ETH는 장중 약 6%, ZEC는 약 5% 하락 후 약 3% 하락으로 마감했다. BTC·ETH 하락은 롱 청산, BTC의 추가 하락과 반등은 유가·국채 금리 및 입찰과 관련됐다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;BTC 약 85,000→83,000달러대; 저점 82,900달러대 또는 바이낸스 82,700~82,800달러; 하락 약 2,000~3,000달러·2~4%; 7일 11~12시 KST; ETH 장중 약 -6%; ZEC 약 -5% 후 마감 약 -3%; 개인 매수가 84,900달러.&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 사건 시점의 실제 가격·수익률·청산 규모는 제공되지 않았다. 조회된 BTC·ETH 수치는 종목 식별 미확인으로 제외했고 ZEC는 유효 수치가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제시된 저점과 하락 원인을 확인된 매매 기준으로 사용하지 말고, 자산 식별이 완료된 동일 거래소 시계열부터 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;미국 10년물 금리가 2002년 이후 최고치였고, 390억 달러 입찰의 응찰 배율은 2.77배, 직전 금리는 5.317%, 낙찰 금리는 5.3%, 딜러 인수 비중은 약 2.5%였다. 양호한 수요가 부채 우려를 완화했으며 3년·10년·30년물 입찰이 연이어 KST 새벽 2시에 진행된다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10년물; 2002년 이후 최고; 입찰 390억 달러; 응찰 배율 2.77배·최근 6회 평균 상회; 직전 5.317%·낙찰 5.3%; 딜러 약 2.5%; KST 02:00.&quot;,
+        &quot;observed&quot;: &quot;E2 제목에만 390억 달러와 외국인 80%가 표시돼 있다. 동일 입찰 여부가 확인되지 않아 검증 수치로 채택하지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;국채 수요 회복을 확인된 반등 근거로 취급할 수 없으며, 10년물 결과를 30년물 수요에 그대로 적용할 근거도 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;9월 FOMC에서 만장일치 금리 인상이 있었고 회의록에 연말 한 차례 추가 인상 의견이 담겼다. 회의록은 KST 새벽 3시에 공개됐으며 FedWatch는 10월 동결, JP모건은 12월 추가 인상 가능성을 제시했다. 회의록의 시장 영향은 국채 금리보다 제한적이었다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:03&quot;,
+      &quot;source_confidence&quot;: 0.73,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;9월 만장일치 인상; 연말까지 1회 추가 인상 의견; 10월 동결 가능성 우세; 12월 추가 인상 가능성; 회의록 KST 03:00 공개.&quot;,
+        &quot;observed&quot;: &quot;해당 연도·회의일·금리 변경 폭·표결·확률·공개 시각을 확인할 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;금리 인상·동결 전망을 현재 정책 경로로 받아들이기 전에 대상 회의와 당시 자료를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;비트마인이 싱가포르 행사에서 ETH 공급량 5% 확보 후 매집 중단을 선언했다. 현재 보유 비중은 4.9%, 추가 필요량은 약 10만 ETH이며 최근 매입 속도로 4~6주 뒤 목표에 도달할 수 있어 ETH 매도 압력이 선반영됐을 수 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:03&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;보유 4.9%; 목표 5%; 추가 약 100,000 ETH; 8월 말 50,000 ETH 매입; 이후 주당 약 10,000~20,000 ETH; 목표까지 4~6주·약 5주; 자막의 25,개는 불명확.&quot;,
+        &quot;observed&quot;: &quot;실제 보유·매입·공급량 자료는 없다. 제시된 수치만의 조건부 계산에서는 100,000÷주당 10,000~20,000=5~10주이며, 이는 실제 매입 실적의 검증이 아니다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매집 종료일이나 향후 매수 수요 감소 규모를 확정하지 말고, 공식 발언과 같은 기준일의 보유량·공급량·순매입량을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;영상에 25배 상승 전망을 비판하는 발언이 있으나 원발언자·대상 자산·예측 기간·산출 근거가 특정되지 않는다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:55&quot;,
+      &quot;source_confidence&quot;: 0.4,
+      &quot;asr_confidence&quot;: 0.25,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;25배 상승이라는 인용 표현; 대상·기준 가격·목표 가격·기간 미상.&quot;,
+        &quot;observed&quot;: &quot;원음과 원출처가 없어 숫자의 인식 및 예측 조건 모두 확인할 수 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;25배라는 표현을 목표가격·기대수익률이나 특정 자산의 투자 근거로 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;윙클보스 형제가 윙클보스 지캐시 현물 ETF의 나스닥 상장을 추진하며 예정 종목 코드는 윙크라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:55&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;검증할 수치 없음. 상품명은 윙클보스 지캐시 ETF, 예정 티커 발음은 윙크라고 제시됐다.&quot;,
+        &quot;observed&quot;: &quot;상품명·예정 티커·접수일·진행 단계 모두 확인 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;ETF 출시나 자금 유입을 확정된 촉매로 취급할 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;윙클보스 형제와 제미니가 2018년부터 지캐시를 지원했고, 제미니가 승인된 거래소 중 최초로 거래·보관 서비스를 제공했으며 개발 조직 기부·트레저리 기업 투자·채굴에도 참여했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:55&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2018년부터 지원; 승인된 거래소 중 최초 거래·보관 서비스.&quot;,
+        &quot;observed&quot;: &quot;지원 개시 연도와 최초 지위, 기부·투자·채굴 규모를 검증할 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지원 활동의 규모와 지속성이 확인되기 전에는 이를 신규 ZEC 매수 수요로 환산할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;특금법 시행령이 프라이버시 코인 취급을 금지하며, 지캐시의 거래내역 공개 기능 발전에 맞춰 국내 기준을 바꿔야 한다는 업계 의견이 있다. 국내 허용 시 선행 투자자의 매도 물량이 나올 수 있다는 주장도 제시됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:55&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적인 수치 주장 없음.&quot;,
+        &quot;observed&quot;: &quot;법령의 시행일·적용 범위 및 기술 버전을 확인할 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;국내 거래 허용이나 규제 완화를 확정된 호재로 취급하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;네이버·두나무 거래가 공정위 기업결합 심사 지연으로 종결 기한을 내년 3월 31일까지 연장했고, 증권·핀테크 영향 검토 및 향후 대주주 지분 제한에 따라 거래 구조가 조정될 수 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:55&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;거래 종결 기한을 내년 3월 31일로 연장.&quot;,
+        &quot;observed&quot;: &quot;변경 공시가 없다. 게시 연도만 적용하면 2027-03-31이지만, 실제 녹화일과 공시상 기한이 확인되지 않아 확정 날짜로 채택하지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;종결일이나 승인 가능성, 지배구조 변경을 확정 일정과 결과로 전제하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;루센트블록 대표가 금융위 국정감사 증인으로 채택됐고 토큰증권 관련 인가를 넥스트레이드·한국거래소 주도 컨소시엄만 받았으며, 스타트업 차별과 혁신금융서비스 지원 연속성이 쟁점이 될 수 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.6,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E8&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:06&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;인가 수혜자가 넥스트레이드·한국거래소 주도 컨소시엄으로 한정됐다는 주장; 명시적 금액·비율 없음.&quot;,
+        &quot;observed&quot;: &quot;E8은 10월 8일 참고인 출석과 문제 제기를 보도한다. 전체 인가 사업자 수와 인가 종류·단계는 확인되지 않는다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;인가 논란이 감사에서 다뤄졌다는 점은 부분 확인되지만, 인가 취소·재심사나 특정 사업자의 수혜를 예단할 근거는 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;금융위 정부안 제출과 디지털자산기본법 입법이 지연됐고 입법조사처가 이를 국정감사 이슈로 제기했다. 당일 감사에서 관련 질의가 예상되며 대주주 지분 제한이 향후 도입될 수 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.65,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E9&quot;,
+        &quot;E10&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:06&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정부안 제출·입법 지연 및 향후 대주주 지분 제한 가능성; 확정 제출일이나 제한 비율은 제시되지 않음.&quot;,
+        &quot;observed&quot;: &quot;E10은 9월 3일 당시 그달 제출 전망을, E9는 10월 1일 당시 제출 지연을 보도한다. 실제 제출일·의안번호·지분 한도는 확인되지 않는다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;입법 지연에 관한 보도 근거는 있으나, 시행 시점이나 지분 제한을 확정된 기업가치·거래 구조 변수로 반영하기에는 자료가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;직전 주말 은행권 해킹·개인정보 유출 및 레버리지 ETF 이슈가 국정감사 관심을 집중시켜 가상자산·토큰증권 논의를 제한할 수 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:06&quot;,
+      &quot;source_confidence&quot;: 0.5,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;직전 주말이라는 상대 시점; 피해 기관 수·유출 규모·ETF 상품 수는 미제시.&quot;,
+        &quot;observed&quot;: &quot;사건 날짜·피해 범위·대상 상품과 실제 감사 논의 비중 모두 확인할 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;식별되지 않은 보안 사고나 ETF 논란을 특정 은행·상품의 위험 또는 가상자산 입법 전망으로 확대 적용하지 않아야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;BTC&quot;,
+      &quot;name&quot;: &quot;비트코인&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;한국시간 7일 오전의 1차 하락은 대규모 롱 청산이 촉발한 것으로 분석됐다.&quot;,
+        &quot;이후 유가와 미국 국채 금리 상승에 맞물려 2차 하락이 발생했으며, 10년물 국채 입찰 결과가 양호하게 나온 시점부터 반등했다고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;출연자는 매수가를 처음 잘못 말한 뒤 84,900달러, 약 85,000달러로 정정했다.&quot;,
+        &quot;1차 하락 시각은 한국시간 7일 오전 11~12시로 제시됐다.&quot;,
+        &quot;가격은 약 85,000달러에서 83,000달러대로 하락했다고 설명했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;BTC&quot;,
+        &quot;as_of&quot;: &quot;2026-10-08T22:56:40.370804+00:00&quot;,
+        &quot;current_price&quot;: 36.119998931884766,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 54.68,
+        &quot;fifty_two_week_low&quot;: 25.65,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ETH&quot;,
+      &quot;name&quot;: &quot;이더리움&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;이더리움의 상대적으로 큰 하락에는 대규모 롱 청산과 비트마인 매집 종료에 대한 우려가 영향을 줬을 수 있으며, 실제 매집 종료 이전에 매도 압력이 선반영될 수 있다고 해석했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;장중 하락률은 약 6%에 가까웠고 이후 일부 회복했다고 설명했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ETH&quot;,
+        &quot;as_of&quot;: &quot;2026-10-08T22:56:43.678173+00:00&quot;,
+        &quot;current_price&quot;: 23.479999542236328,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 41.45,
+        &quot;fifty_two_week_low&quot;: 14.53,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ZEC&quot;,
+      &quot;name&quot;: &quot;지캐시&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;윙클보스 형제가 지캐시 현물 ETF의 나스닥 상장을 추진하며, 거래소 서비스·개발 조직 기부·트레저리 기업 투자·채굴 등에서도 지캐시를 지원한다고 전했다.&quot;,
+        &quot;국내에서는 프라이버시 코인이 특금법 시행령상 취급 금지 대상이라고 설명하면서, 지캐시의 거래소 대상 거래내역 제공 기능 등 기술 발전을 반영해 국내 기준을 바꿔야 한다는 업계 의견을 소개했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;지캐시는 약 5% 하락한 뒤 빠르게 회복해 약 3% 하락으로 마감했다고 설명했다.&quot;,
+        &quot;윙클보스 형제의 지캐시 지원은 2018년부터라고 설명했다.&quot;,
+        &quot;추진 ETF의 이름은 &#x27;윙클보스 지캐시 ETF&#x27;, 종목 코드는 &#x27;윙크&#x27;로 발언했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ZEC&quot;,
+        &quot;as_of&quot;: &quot;2026-10-08T22:56:47.243751+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: AI Stocks Tumble On OpenAI News; SpaceX Move Slams Verizon, AT&amp;T Late&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/955f9165-6ca4-336e-9d6e-fff1a7c7f4e0/dow-jones-futures%3A-ai-stocks.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T22:35:03+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures: AI Stocks Tumble On OpenAI News; SpaceX Move Slams Verizon, AT&amp;T Late Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Foreign Buyers Took 80% of the Treasury’s $39 Billion Auction&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/currencies/articles/foreign-buyers-took-80-treasury-150855998.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T15:08:55+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;The AI Trade Is Alive and Well as Bond Yields Keep Rising&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/dee4c0f3-0067-36bd-b32b-e5e034a45d61/the-ai-trade-is-alive-and.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T18:13:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Stocks Sink After OpenAI Report Sours AI Trade&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/3e003936-6fe4-375c-99cf-748a773e4776/stocks-sink-after-openai.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T18:06:16+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;The S&amp;P 500 ETF You Know Charges 0.0945%. These 2 Charge 0.03%&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/p-500-etf-know-charges-220310762.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T22:03:10+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Why Direxion Daily Semiconductor Bull 3X ETF Just Popped&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/why-direxion-daily-semiconductor-bull-155502191.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-09-21T15:55:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Why Direxion Daily Semiconductor Bull 3X ETF Dropped Today&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/why-direxion-daily-semiconductor-bull-174030964.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-09-14T17:40:30+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;\&quot;7년 생고생 성과를 대형거래소에\&quot;…루센트블록 탈락 논란 도마&quot;,
+      &quot;source_url&quot;: &quot;https://www.edaily.co.kr/News/Read?newsId=05044646645610952&amp;mediaCodeNo=257&amp;utm_source=naver&amp;utm_medium=referral&amp;utm_campaign=news_syndication&amp;utm_content=original_article&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T16:55:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;허세영 루센트블록 대표가 8일 서울 여의도 국회에서 열린 국회 정무위원회의 금융위원회 국정감사에 참고인으로 출석해 조각투자 장외거래소 인가 정책의 문제점을 제기하며 이 같이 호소했다. 허세영 루센트블록...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;title&quot;: &quot;[투데이 Pick] 기본법 늦고 과세는 코앞…디지털자산 국감 쟁점은&quot;,
+      &quot;source_url&quot;: &quot;https://www.news2day.co.kr/article/20261001500003&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T05:12:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;하지만 2단계 입법의 핵심이 될 디지털자산기본법 논의는 당초 일정에서 밀리고 있다. 전일 개최가 거론됐던 공청회가 정부안 제출 지연으로 열리지 못하면서 첫 단계부터 차질이 생겼다. 금융위원회는 내달 정무위...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;title&quot;: &quot;가상자산, &#x27;더딘&#x27; 제도화·&#x27;앞선&#x27; 규제···시장 혼란·경쟁력 우려&quot;,
+      &quot;source_url&quot;: &quot;https://www.seoulfn.com/news/articleView.html?idxno=637218&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-09-03T18:12:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;2단계 입법은 지연되는 반면 거래소 대주주 규제와 가상자산 과세 등 개별 규율은 먼저 시행되면서 시장의 불확실성이 커지고 있다. 금융위원회가 이달 중 디지털자산기본법 정부안을 국회에 제출할 것으로 예상되지만...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

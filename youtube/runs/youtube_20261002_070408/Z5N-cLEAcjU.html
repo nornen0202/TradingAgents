@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 제미나이 4와 구글의 전략, 전부 뜯어왔습니다</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261002_070408</p>
+    <h1>제미나이 4와 구글의 전략, 전부 뜯어왔습니다</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=Z5N-cLEAcjU">원본 영상</a>
+    </div>
+  </header>
+  <h2>알파벳(GOOGL): AI 모델보다 실제 배치와 경제성이 관건</h2>
+<p><strong>분석 기준: 2026년 10월 2일 | 검증 결론: 영상의 핵심 주장 9건 모두 미검증</strong></p>
+<p><a href="https://www.youtube.com/watch?v=Z5N-cLEAcjU">경제사냥꾼 영상</a>은 구글의 새 최상위 AI 모델이 경쟁력을 회복했으며, 투자상 핵심은 벤치마크 순위보다 검색·크롬·안드로이드 등에 실제로 배치되는 시점과 비용·안전성·규제의 균형이라고 주장한다. <strong>제공된 외부 검색 결과 7건은 해당 주장과 무관하거나 본문이 비어 있다.</strong> 따라서 모델의 발표 자체를 포함해 성능·가격·이용자 수·규제 일정 어느 것도 독립적으로 확인되지 않았다.</p>
+<h3>영상 주장과 확인된 사실/근거</h3>
+<p>| 주제 | 영상 주장 | 확인된 사실/근거와 판단 |</p>
+<p>|---|---|---|</p>
+<p>| 모델 공개·배치 (<a href="https://www.youtube.com/watch?v=Z5N-cLEAcjU&amp;t=0s">00:00</a>, <a href="https://www.youtube.com/watch?v=Z5N-cLEAcjU&amp;t=611s">10:11</a>) | 구글이 9월 30일 ‘제미나이 4 아르곤’을 공개하고 접근을 제한했으며, 주요 제품 배치는 아직 발표하지 않았다는 설명 | 구글·DeepMind 발표문이 제공되지 않아 <strong>모델명, 공개일, 접근 정책 모두 미확인</strong>이다. 배치 발표를 찾지 못했다는 사실만으로 미탑재를 단정할 수도 없다. |</p>
+<p>| 성능 (<a href="https://www.youtube.com/watch?v=Z5N-cLEAcjU&amp;t=0s">00:00</a>, <a href="https://www.youtube.com/watch?v=Z5N-cLEAcjU&amp;t=305s">05:05</a>) | 구글 시험 18개 중 단독 1위 12개, 외부 평가 종합 53점·업무 자동화 77.5%·명령창 코딩 57.1% 등 | 모델 카드와 Artificial Analysis 원표가 없다. 시험 조건·비교 모델·평가 시점이 확인되지 않아 순위나 실사용 우위를 인정하기 어렵다. ‘최대 출력 100만 토큰’도 출력 한도와 입력 컨텍스트의 혼동 가능성이 있다. |</p>
+<p>| 가격·배포 전략 (<a href="https://www.youtube.com/watch?v=Z5N-cLEAcjU&amp;t=305s">05:05</a>) | 할인 API 단가가 입력·출력 100만 토큰당 2·10달러, 정가가 4·20달러이고 작업당 비용은 1.99달러라는 설명. 저가 Flash와 고가 모델의 역할 분담을 예상 | 공식 요금표·할인 종료 조건·작업당 비용 산식이 없다. ‘2층 구조’는 <strong>영상의 해석</strong>이지 확인된 구글 공식 전략이 아니다. |</p>
+<p>| 이용자·인프라 (<a href="https://www.youtube.com/watch?v=Z5N-cLEAcjU&amp;t=305s">05:05</a>, <a href="https://www.youtube.com/watch?v=Z5N-cLEAcjU&amp;t=611s">10:11</a>) | AI 모드와 Gemini 앱의 월 이용자가 각각 10억 명을 넘고, 8세대 TPU의 동일 비용당 성능이 80% 높다는 설명 | Alphabet IR·제품 발표·TPU 측정 자료가 없어 수치가 미검증이다. 설령 칩 지표가 확인되더라도 전체 서비스의 원가·마진 우위를 바로 입증하지는 않는다. |</p>
+<p>| 에이전트 안전성·규제 (<a href="https://www.youtube.com/watch?v=Z5N-cLEAcjU&amp;t=911s">15:11</a>) | 컴퓨터 조작 완료율 39.5%, 프롬프트 인젝션 성공률 0.7%, EU의 안드로이드·검색 데이터 관련 요구와 구글의 법적 대응 등을 제시 | 안전성 시험 원표, EU 결정문, 법원 기록이 제공되지 않았다. 수치의 분모·판정 기준과 법적 절차·결과 모두 수동 확인이 필요하다. 집행정지 <strong>신청</strong>을 인용 결정으로 해석해서는 안 된다. |</p>
+<p><strong>확인된 시장 맥락:</strong> 제공된 yfinance 시장 스냅샷에는 GOOGL 가격 <strong>338.24달러</strong>, 시가총액 약 <strong>4.14조 달러</strong>, 선행 PER <strong>22.44배</strong>가 기록돼 있다(2026년 10월 1일 22:05 UTC 조회). 이는 모델 발표나 주가 반응의 인과관계를 입증하지 않는다. 회사 공시는 ‘없음’이 아니라 <strong>제공업체 이용 불가로 확인하지 못한 상태</strong>다.</p>
+<h3>투자 논리와 반론</h3>
+<p><strong>상승 논리—조건부:</strong> 영상의 가설대로 구글이 검증된 모델을 기존 서비스의 사용자 접점에 배치하고, 작업 완료율을 높이면서 추론 비용을 통제한다면 AI 기능의 이용 확대가 가능하다. 그러나 기존 제품 이용자 수가 곧 에이전트 사용량이나 거래 수익으로 전환되는 것은 아니다. 쇼핑·예약·결제 기능의 지원 범위와 수익성도 확인돼야 한다.</p>
+<p><strong>반론:</strong> 벤치마크와 실제 업무 성능은 다를 수 있고, 복잡한 작업 실패·프롬프트 인젝션·결제 오류는 상용화를 늦출 수 있다. 높은 추론 비용이나 할인 종료도 배치 규모를 제한할 수 있다. 규제가 플랫폼·데이터 접근상의 이점을 축소할 가능성은 있지만, 영상이 제시한 EU 조치의 내용과 효력부터 확인해야 한다.</p>
+<h3>가까운 시일 내 관찰할 항목과 가설 무효화 조건</h3>
+<ul>
+<li><strong>공식 출시 기록:</strong> 구글·DeepMind 발표에서 정확한 모델명, 공개 범위, 개발자 접근 및 검색·크롬·안드로이드의 첫 적용 제품을 확인한다. 공식 발표가 없거나 주장과 다른 모델·일정이 확인되면 영상의 출발 가설을 재평가해야 한다.</li>
+<li><strong>동일 조건의 성능·비용:</strong> 모델 카드, Artificial Analysis 원표, 구글 API 요금표에서 모델 버전·시험 날짜·토큰 한도·할인 종료일·실제 작업당 비용을 대조한다. 실사용 완수율이 낮거나 비용이 배치 확대를 어렵게 하면 경제성 가설이 약해진다.</li>
+<li><strong>사업 성과와 안전성:</strong> Alphabet IR의 제품별 이용 지표와 수익성, 공개 안전성 평가의 실패·공격 성공 기준을 추적한다. 이용 확대가 검증되지 않거나 오류·보안 문제가 지속되면 서비스 확산 가설을 재검토해야 한다.</li>
+<li><strong>규제 기록:</strong> EU 결정문과 법원 사건 기록에서 의무 범위, 기한, 신청과 판결을 구별해 확인한다.</li>
+</ul>
+<h3>자료의 한계</h3>
+<p>자막은 자동 생성본이다. <code>transcript_quality</code>는 *good(1.0)*이지만 이는 수집 상태를 나타낼 뿐 고유명사와 숫자의 정확성을 보증하지 않는다. 주장 추출의 <code>source_confidence</code>는 0.78인 반면, 개별 검증 항목의 외부 근거 <code>source_confidence</code>는 <strong>모두 0.0</strong>, <code>asr_confidence</code>는 <strong>0.52~0.72</strong>다. 특히 ‘아르곤’, Flash 버전명, 경쟁 모델명과 일부 단위는 재확인이 필요하다. Bloomberg·Reuters 관련 내부 평가·모델 취소 보도와 Bloomberg Intelligence의 최대 4억 달러 학습비 추정은 원문이 없어 <strong>미검증·수동 확인 필요</strong>다. 이 추정액을 취소 프로젝트의 확정 손실로 볼 근거도 없다. Morningstar 자료는 제공되지 않았다. 이 보고서는 영상의 투자 가설을 정리한 것이며, 확인된 회사 발표로 취급해서는 안 된다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;Z5N-cLEAcjU&quot;,
+  &quot;title&quot;: &quot;제미나이 4와 구글의 전략, 전부 뜯어왔습니다&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=Z5N-cLEAcjU&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/Z5N-cLEAcjU/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-01T15:14:07+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 12571,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 12571,
+    &quot;segments&quot;: 651,
+    &quot;duration_seconds&quot;: 1194,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-02T07:04:08.217674+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 7,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;구글이 2026-09-30 ‘Gemini 4 Argon’을 발표하고 초기 접근을 제한했으며, 개발자·AI Ultra 개방을 예고했지만 검색·크롬·안드로이드 배치 일정은 발표하지 않았다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.58,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-09-30 발표&quot;,
+        &quot;observed&quot;: &quot;확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;모델 공개와 실제 제품 배치를 투자 근거로 확정하지 말고 공식 출시 기록을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;5월 예고된 중간 모델의 6월 출시 취소, 부정적 내부 코딩·실사용 평가, 최대 4억 달러 학습비 추정에 관한 외신 인용&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-05-14 예고·6월 출시 취소; 학습비 최대 4억 달러&quot;,
+        &quot;observed&quot;: &quot;확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;개발 지연이나 손실액을 확정적인 투자 변수로 반영하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;구글 자체 시험 18개 중 단독 1위 12개·공동 1위 1개, 법률 과제 19.6% 대 6.7%, 명령창 코딩 57.4% 대 66.4%, 최대 출력 6만4천→100만 토큰이라는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.56,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;18개 중 단독 1위 12개·공동 1위 1개; 19.6%/6.7%; 57.4%/66.4%; 6만4천→100만 토큰&quot;,
+        &quot;observed&quot;: &quot;확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;벤치마크 우위나 출력 용량을 제품 성능 우위로 반영하기 이르다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;Artificial Analysis의 종합 53점, 업무 자동화 77.5%, 명령창 코딩 57.1%·4위, 코딩 종합 64점·3위, 작업당 비용 1.99달러라는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;05:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.66,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;종합 53점; 자동화 77.5%; 명령창 코딩 57.1%·4위; 코딩 64점·3위; 작업당 1.99달러&quot;,
+        &quot;observed&quot;: &quot;확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제삼자 평가를 근거로 경쟁 순위나 비용 우위를 산정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;API 할인 단가가 입력·출력 100만 토큰당 2·10달러이고 정가는 4·20달러이며, 작업당 비용이 1.99→3.98달러로 오른다는 주장; Flash와 최상위 모델의 역할 분담은 영상의 해석&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;05:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;입력·출력 100만 토큰당 할인 2·10달러, 정가 4·20달러; 작업당 1.99→3.98달러&quot;,
+        &quot;observed&quot;: &quot;확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;추론 원가와 대규모 배치 가능성을 현 단계에서 수치화하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;검색 AI 모드와 Gemini 앱의 월 이용자가 각각 10억 명을 넘고, Flash 배치·동의 기반 정보 연동·쇼핑 및 호텔 결제 기능이 에이전트 배포 기반이라는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;05:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.52,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;AI 모드·Gemini 앱 각각 월 이용자 10억 명 초과; 10억 명 초과 제품 13개 중 5개는 30억 명 초과&quot;,
+        &quot;observed&quot;: &quot;확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기존 사용자 기반이 에이전트 사용량이나 거래 매출로 전환될 것이라고 단정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;8세대 TPU의 추론용 칩은 전 세대보다 동일 비용당 성능이 80% 높고, 자체 인프라·모델·서비스 통합이 비용 우위를 제공한다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;10:11&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;8세대 TPU 추론용 칩의 동일 비용당 성능 +80%&quot;,
+        &quot;observed&quot;: &quot;확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;인프라 투자 대비 수익성 우위는 실제 운영비와 서비스 마진 자료로 별도 검증해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;보안·에이전트 시험에서 취약점 수정 68%, 웹 취약점 공격 70.9%, 컴퓨터 조작 완료 39.5%, 프롬프트 인젝션 성공률 0.7%, 공격 시도 32% 증가, 약 100만 건 중 AI 단독 완수 10% 미만이라는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;15:11&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.57,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;68%; 70.9%; 39.5%; 0.7% 대 8.5%·51.8%; 공격 시도 +32%; 약 100만 건 중 단독 완수 10% 미만&quot;,
+        &quot;observed&quot;: &quot;확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;에이전트의 성능·안전성이 결제나 업무 자동화에 충분하다고 판단할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;EU가 2026-07-16 안드로이드 접근과 익명 검색 데이터 제공을 요구하고 2027-01 가격안 기한을 제시했으며, 구글이 2026-09-29 이의 제기·09-30 집행정지를 신청했다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;15:11&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.68,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-07-16 요구; 2027-01 기한; 2026-09-29 이의 제기·09-30 집행정지 신청&quot;,
+        &quot;observed&quot;: &quot;확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;플랫폼 접근 의무나 소송 결과가 사업에 미칠 영향을 현재 자료만으로 평가할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;GOOGL&quot;,
+      &quot;name&quot;: &quot;알파벳(구글)&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;영상에 따르면 구글은 9월 30일 제미나이 4 ‘아르곤’을 공개했으나 초기 사용을 내부 인력과 선정된 보안 조직으로 제한하고, 유료 개발자·AI 울트라 가입자에게 순차 개방할 계획이다.&quot;,
+        &quot;영상은 아르곤이 최상위 모델군에 복귀했지만 업무 자동화에는 강하고 코딩에는 상대적으로 약하다고 평가한다.&quot;,
+        &quot;영상은 높은 작업당 비용 때문에 저렴한 플래시 모델을 대규모 서비스에 쓰고 아르곤을 어려운 작업에 배치하는 구도가 유력하다고 해석한다. 구글이 이를 공식 ‘2층 구조’로 발표한 것은 아니라고 명시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;9월 30일 공개, 이전 최상위 모델 공개 후 약 7개월이라는 주장; 5월 14일 행사에서 6월 출시를 예고한 중간 모델이 취소됐다는 주장.&quot;,
+        &quot;구글 공개 시험 18개 중 단독 1위 12개·공동 1위 1개; 법률 업무 시험 19.6% 대 경쟁 모델 최고 6.7%; 명령창 코딩 57.4% 대 경쟁 모델 66.4%.&quot;,
+        &quot;외부 평가사 ‘아티피셜 애널리시스’ 종합 점수 53점, 비교 모델 58점·56점, 구글 이전 모델 30점; 업무 자동화 77.5% 대 71.3%·69.5%; 명령창 코딩 57.1%로 4위, 코딩 종합 64점으로 3위라는 주장.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;GOOGL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-01T22:05:39.390774+00:00&quot;,
+        &quot;current_price&quot;: 338.239990234375,
+        &quot;market_cap&quot;: 4136653037804.4824,
+        &quot;forward_pe&quot;: 22.442299,
+        &quot;trailing_pe&quot;: 16.97992,
+        &quot;fifty_two_week_high&quot;: 408.61,
+        &quot;fifty_two_week_low&quot;: 235.84,
+        &quot;average_target_price&quot;: 429.36295,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Moody’s upgrades Kaiser Aluminum to Ba3 on strong cash flow and debt metrics&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/moody-upgrades-kaiser-aluminum-ba3-211448624.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T21:14:48+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Moody’s upgrades Kaiser Aluminum to Ba3 on strong cash flow and debt metrics Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals We...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;BofA Securities names top mining stocks as copper outlook brightens&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/bofa-securities-names-top-mining-190437796.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T19:04:37+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;BofA Securities names top mining stocks as copper outlook brightens Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather New...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;What a $3,000 Investment in Walmart Stock Could Be Worth in 1 Year&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/3-000-investment-walmart-stock-215000227.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T21:50:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;What a $3,000 Investment in Walmart Stock Could Be Worth in 1 Year Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather News...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Stocks Rise Off Support As Yields Tumble, Micron, Meta In Focus; Tesla, Jobs Report Due&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/f6c899dd-7f15-3879-b266-51980008982d/dow-jones-futures%3A-stocks.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T21:47:08+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Top 3 Cybersecurity Stocks To Watch In October 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/top-3-cybersecurity-stocks-watch-201030761.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T20:10:30+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Global Foods Group (Jaca) Presenting at NIBA&#x27;s 153rd Investment Conference in Fort Lauderdale, FL October 7, 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/small-business/articles/global-foods-group-jaca-presenting-181500238.html&quot;,
+      &quot;publisher&quot;: &quot;ACCESS Newswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T18:15:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

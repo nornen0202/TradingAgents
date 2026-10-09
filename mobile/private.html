@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#081a2b">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'">
+  <title>TradingAgents 통합 투자 전략</title>
+  <link rel="stylesheet" href="mobile.css?v=d53e1f74b01d1bc7">
+</head>
+<body class="private-body" data-strategy-url="strategy.json">
+  <a class="skip-link" href="#strategy-content">투자 전략으로 바로가기</a>
+  <header class="topbar"><a href="../index.html">TradingAgents 홈</a><span>모바일 투자 전략</span></header>
+  <main>
+    <section class="hero-mobile">
+      <p class="eyebrow">KR · US · YOUTUBE · PRISM · WORK</p>
+      <h1>한눈에 보는 투자 전략</h1>
+      <p>종목별 매수·매도 수량, 가격 범위와 실행 조건을 비교하세요.</p>
+      <p class="privacy-note">계좌번호·고객 식별정보는 공개하지 않습니다.</p>
+      <nav class="report-nav" aria-label="전체 분석 리포트">
+        <a href="../youtube/">YouTube 분석</a>
+        <a href="../prism-telegram/">PRISM 분석</a>
+        <a href="../work/">Work 원문</a>
+      </nav>
+    </section>
+    <div class="refresh-bar"><div id="private-status" class="privacy-banner" role="status" aria-live="polite">통합 전략 데이터를 불러오는 중입니다.</div><button id="strategy-refresh" type="button">새로고침</button></div>
+    <noscript><p class="privacy-banner">전략 검색은 JavaScript가 필요합니다. <a href="strategy.json">전략 데이터 보기</a></p></noscript>
+    <nav id="private-tabs" class="market-tabs" aria-label="시장 선택" hidden></nav>
+    <div id="strategy-content" tabindex="-1"><div id="private-root" aria-busy="true"></div></div>
+    <details class="pipeline-explainer">
+      <summary><span class="eyebrow">HOW IT IS MADE</span><strong id="pipeline-title">이 전략이 만들어지는 과정</strong></summary>
+      <ol>
+        <li><strong>종목 분석</strong><span>KIS·시장 데이터로 보유/관심/신규 후보의 가격·거래량·수급·위험을 분석</span></li>
+        <li><strong>외부 관점</strong><span>YouTube·PRISM의 주장, 종목, 주요 이슈를 일일 단위로 구조화</span></li>
+        <li><strong>ChatGPT Work 종합</strong><span>KR/US별로 모든 근거를 다시 비교해 순위·매수/보유/축소 조건과 무효화 행동을 결정</span></li>
+        <li><strong>안전한 공개</strong><span>계좌 식별정보를 제거한 동일 전략을 PC·모바일·JSON으로 게시</span></li>
+      </ol>
+      <p class="trusted-note"><strong>우선 신뢰 채널:</strong> @kpunch(박종훈의 지식한방)와 @sosumonkey(소수몽키) 영상은 사용자 검증 최우선 근거로 취급하되, 실제 주문 직전 시세·계좌·위험 확인은 별도로 유지합니다.</p>
+    </details>
+  </main>
+  <script src="private.js?v=2cbd4c81003a58fe" defer></script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+{
+  "version": 4,
+  "video_id": "_eS9-EevqUU",
+  "title": "10억 아파트 산 사람과 주식 산 사람, 5년 뒤 운명이 완전히 갈리는 이유",
+  "url": "https://www.youtube.com/watch?v=_eS9-EevqUU",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/_eS9-EevqUU/maxresdefault.jpg",
+  "published_at": "2026-09-24T07:36:26+00:00",
+  "status": "contradicted",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 10694,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 10694,
+    "segments": 558,
+    "duration_seconds": 995,
+    "repeated_ngram_ratio": 0.007
+  },
+  "generated_at": "2026-09-25T08:16:16.526151+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 5,
+  "claim_status_summary": {
+    "unverified": 7,
+    "asr_uncertain": 1,
+    "contradicted": 1,
+    "partially_supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "2026-09-21 기준 S&P 500 총수익률은 최근 5년 연 13.14%, 누적 85.4%로, 10억 원이 약 18억 5천만 원이 됐다.",
+      "status": "unverified",
+      "confidence": 0.88,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "04:56",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "연 13.14%; 누적 85.4%; 10억→약 18.5억 원",
+        "observed": "가정값의 복리 산술만 약 85.39%; 약 18.54억 원"
+      },
+      "investor_implication": "18억 5천만 원을 검증된 원화 기준 ETF 실현수익으로 받아들이면 안 된다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "2021년 9월~2026년 7월 서울 아파트 실거래가격지수가 약 9% 올라 10억 원 주택이 비용 전 약 10억 9천만 원이 됐다.",
+      "status": "unverified",
+      "confidence": 0.88,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "04:56",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "지수 약 +9%; 10억→10.9억 원",
+        "observed": "지수값 미제공; 9% 적용 산술은 10.9억 원"
+      },
+      "investor_implication": "9%를 서울 아파트의 검증된 기간 수익률로 사용하지 말아야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "같은 기간 서울 아파트 평균가격이 약 34% 올랐으며 평균가격 변화와 실거래가격지수 변화는 동일한 투자수익률이 아니다.",
+      "status": "unverified",
+      "confidence": 0.81,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "04:56",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "평균가격 약 +34%",
+        "observed": "원자료 없음"
+      },
+      "investor_implication": "평균가격 상승률을 특정 주택의 수익률로 대입하지 말고 지표 정의를 확인해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "자동자막은 2026년 7월 신규 주택담보대출 평균금리를 14.48%로 표시하지만, 5억 원 대출의 연 이자 2천만 원은 4%를 전제한다.",
+      "status": "asr_uncertain",
+      "confidence": 0.94,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "자막 14.48%; 계산 가정 4%",
+        "observed": "5억×4%=연 2천만 원; 5억×14.48%=연 7,240만 원"
+      },
+      "investor_implication": "자막의 14.48%를 사실로 인용하거나 4% 예시를 당시 평균금리로 간주하면 안 된다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "9억 원 초과 주택의 취득세 표준세율은 3%이고 지방교육세 등이 추가된다.",
+      "status": "unverified",
+      "confidence": 0.84,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "04:56",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "9억 원 초과 주택 취득세 3%",
+        "observed": "법령 원자료 없음"
+      },
+      "investor_implication": "실제 취득비용은 거래일과 주택 수 등 개인별 조건에 맞춰 재산정해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "2021년 9월 9억 원 초과 서울 주택 매매 중개보수 상한은 0.9%였고 10억 원 거래의 상한액은 900만 원이었다.",
+      "status": "unverified",
+      "confidence": 0.87,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "04:56",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "상한 0.9%; 10억 원 거래 시 900만 원",
+        "observed": "0.9% 적용 산술은 900만 원; 당시 요율 미확인"
+      },
+      "investor_implication": "거래일에 유효한 상한요율과 실제 약정 보수를 확인해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "자기자본 10억 원·대출 5억 원으로 14억 4천만 원 주택을 사서 9% 상승, 5년 이자 1억 원을 반영하면 약 9억 7천만 원이 남고, 주식 성과에 맞서려면 집값이 연 약 12% 올라야 한다.",
+      "status": "unverified",
+      "confidence": 0.84,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "14.4억 원 매입; 9% 상승; 5년 이자 1억 원; 최종 약 9.7억 원; 필요 상승률 연 약 12%",
+        "observed": "제시 가정의 최종값 9.696억 원; 단순 손익분기 상승률 연 약 11.2%"
+      },
+      "investor_implication": "9.7억 원은 검증된 투자 결과가 아니라 선택된 가정의 산출값이다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "14억 4천만 원 주택의 연 2% 순임대수익으로 5년간 1억 4,400만 원을 얻고 이자 1억 원을 상쇄하여 최종 아파트 가치가 약 12억 원이 된다.",
+      "status": "contradicted",
+      "confidence": 0.94,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "09:56",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "임대료 1.44억 원; 최종 약 12억 원",
+        "observed": "9.696억+1.44억=11.136억 원; 차이 0.864억 원"
+      },
+      "investor_implication": "아파트 최종 12억 원과 주식 18.5억 원의 격차를 정밀한 비교 결과로 사용하면 안 된다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "지수와 아파트의 비교에는 환율, ETF 보수·거래비용·세금 및 일부 주택 보유·매각비용이 빠져 있어 순수익 비교가 아니다.",
+      "status": "partially_supported",
+      "confidence": 0.75,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "14:52",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "순수익 비교가 아님",
+        "observed": "누락 비용의 금액 자료 없음"
+      },
+      "investor_implication": "원화·세후·총비용 기준으로 양쪽을 다시 계산해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "2021년 9월은 서울 아파트 실거래가격지수의 역사적 고점이어서 부동산에 불리한 비교 시작점이었다.",
+      "status": "unverified",
+      "confidence": 0.87,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "09:56",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "2021년 9월 역사적 고점",
+        "observed": "시계열 없음"
+      },
+      "investor_implication": "시작점 편향 여부를 판단하려면 동일 지수의 장기 시계열을 확인해야 한다."
+    }
+  ],
+  "entities": [],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Talisman Metals acquires three new licences at Tirzzit Copper Project",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/talisman-metals-acquires-three-licences-140524397.html",
+      "publisher": "Mining Technology",
+      "published_at": "2026-09-24T14:05:24+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Talisman Metals acquires three new licences at Tirzzit Copper Project Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change Health Science Or..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Nine Mile Metals reports high-grade copper-zinc intercept at Wedge Mine",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/nine-mile-metals-reports-high-130500829.html",
+      "publisher": "Proactive",
+      "published_at": "2026-09-24T13:05:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Nine Mile Metals reports high-grade copper-zinc intercept at Wedge Mine Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change Health Science..."
+    },
+    {
+      "evidence_id": "E3",
+      "claim_id": "C2",
+      "title": "Crude Prices Surge as Risks to Middle East Crude Supplies Intensify",
+      "source_url": "https://finance.yahoo.com/energy/articles/crude-prices-surge-risks-middle-153657697.html",
+      "publisher": "Barchart",
+      "published_at": "2026-09-24T15:36:57+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Crude Prices Surge as Risks to Middle East Crude Supplies Intensify Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change Health Science Orig..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Market Chatter: Rio Tinto Unveils Expansion Plans For Metals Trading Business",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/market-chatter-rio-tinto-unveils-084005843.html",
+      "publisher": "MT Newswires",
+      "published_at": "2026-09-24T08:40:05+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Market Chatter: Rio Tinto Unveils Expansion Plans For Metals Trading Business Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Climate change Health Sc..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C8",
+      "title": "M&A Deals in Pharmaceuticals, Biotechnology and Diagnostics 2021-2026 | Life Sciences M&A Surges as 2,500+ Pharmaceutical, Biotechnology and Diagnostics Deal...",
+      "source_url": "https://finance.yahoo.com/healthcare/articles/m-deals-pharmaceuticals-biotechnology-diagnostics-150100278.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-09-22T15:01:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

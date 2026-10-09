@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 월가에서 현시점 엔비디아가 저평가 됐다는 이유</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261009_065806</p>
+    <h1>월가에서 현시점 엔비디아가 저평가 됐다는 이유</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=N-DmjglU-Ac">원본 영상</a>
+    </div>
+  </header>
+  <h2>엔비디아 저평가 논리 점검: 성장 가설과 검증된 근거의 간극</h2>
+<ul>
+<li>영상: <a href="https://www.youtube.com/watch?v=N-DmjglU-Ac">월가에서 현시점 엔비디아가 저평가 됐다는 이유</a> — 경제사냥꾼, 2026년 10월 8일 게시, 2분 46초</li>
+<li>분석 대상: 엔비디아(NVDA), 고객 수요 사례로 언급된 아마존(AMZN)</li>
+<li>분석 기준: 제공된 영상 주장, 호스트 수집 자료, 주장별 검증 결과</li>
+</ul>
+<h3>1. 핵심 결론</h3>
+<p><strong>영상의 강세 논리는 ‘미래 이익 증가가 현재 주가를 정당화하고 추가 상승도 뒷받침한다’는 것이다. 그러나 제공 자료만으로 저평가를 입증하지는 못했다.</strong></p>
+<p>주장별 검증 결과는 12개 모두 <strong>미검증(unverified)</strong>이다. 이는 주장이 거짓으로 확인됐다는 뜻이 아니라, 실적·예상 EPS·고객 주문·제품 성능을 직접 대조할 근거가 부족하다는 의미다. 수집 단계의 <code>verified</code> 표기나 상위 요약의 <code>verified_with_caveats</code>를 투자 논리의 검증 완료로 해석해서는 안 된다.</p>
+<p>확인 가능한 참고 정보는 영상 게시 이후의 시장 스냅샷이다. 여기서 예상 PER은 약 14.48배로 영상의 15배와 비슷하지만, 대상 회계연도와 예상 EPS가 없어 <strong>FY2028 기준 15배라는 주장도, 저평가라는 판단도 확인되지 않았다.</strong></p>
+<h3>2. 영상 주장과 확인된 사실/근거</h3>
+<p>아래 주장들의 시각 정보는 모두 <strong>00:00–02:46 전체 구간</strong>이다. 개별 주장 발생 시각은 제공되지 않았다.</p>
+<p>| 항목 | 영상 주장 | 확인된 사실/근거 및 판정 |</p>
+<p>|---|---|---|</p>
+<p>| 최고가·월가 평가(C1·C2) | 게시 주간 사상 최고가 경신에도 월가는 매수 추천·최선호 평가를 유지하며 매집 | 게시 이전 가격 이력, 추천 보고서, 기관 거래 자료 없음. 모두 미검증. 추천 의견은 실제 매집의 증거가 아님 |</p>
+<p>| 분기 실적(C3) | ‘올해 2분기’ 매출 962억 달러, 전년 대비 106% 증가, 사업 이익 두 배 이상 | IR 실적표·10-Q 미확보. 회계분기와 달력분기, 영업이익과 순이익, GAAP과 비GAAP 기준 불명확. 미검증 |</p>
+<p>| 밸류에이션(C4) | 2028년 1월 종료 회계연도 예상 이익 대비 약 15배로 저평가 | 게시 이후 스냅샷의 forward PER 14.482299만 확인. 해당 연도 EPS·추정 기관·산정 기준은 없음. 미검증 |</p>
+<p>| 시스템·제품 성능(C5) | GPU 외 칩·연결 장비까지 공급하고 Vera Rubin이 동일 전력에서 더 많은 작업 처리 | 공식 구성·전력·처리량·출하 자료 없음. E5의 제품명 언급은 성능이나 판매 범위의 증거가 아님. 미검증 |</p>
+<p>| 전력 제약(C6) | 전력 부족이 데이터센터 확장을 제한 | 지역별 전력 확보·계통 접속·사업 지연 자료 없음. 제공 자료로 적용 범위를 판단할 수 없음 |</p>
+<p>| 동일 전력의 경제성(C7) | Blackwell 250억 달러, Vera Rubin 400억 달러의 ‘수익’ 창출 | 발언 원문·슬라이드·전력 용량·산정 기간 없음. 엔비디아 매출인지 고객 매출·이익인지도 불명확. 미검증 |</p>
+<p>| 산업별 AI 수요(C8) | 탐색·프로그램 구축·검증의 연산 수요가 엔비디아 장비 수요 확대 | 작업별 연산량과 실제 구매 전환 자료 없음. 조건부 전망으로 취급 |</p>
+<p>| 아마존 등 구매(C9) | 대형 기술기업이 칩 200만 개 추가 구매 발표 | 공식 발표 없음. 아마존 단독인지 여러 기업 합계인지, 주문인지 누적 계획인지 불명확. 미검증 |</p>
+<p>| 인도·말레이시아 구매(C10) | 최신 칩 수만 개 구매 및 미출시 제품 구매 움직임 | 구매 주체·국가별 수량·계약·제품·납기 없음. 국가명이 정부 직접 구매를 뜻하지는 않음. 미검증 |</p>
+<p>| 공급 초과(C11) | 주문 급증으로 공급 부족 | 제품별 주문·백로그·공급량·납기 자료 없음. 미검증 |</p>
+<p>| 미래 매출(C12) | 2028년 1월 종료 회계연도 매출 70% 증가 | 비교 기간·예상 매출액·전망 기관 없음. 회사 가이던스인지도 확인되지 않음. 미검증 |</p>
+<h4>시장 스냅샷에서 확인되는 범위</h4>
+<p>호스트가 제공한 yfinance 자료는 다음과 같다. 이는 거래소 원자료를 별도로 대조한 결과가 아니라 <strong>제공된 스냅샷의 기록값</strong>이다.</p>
+<p>| 지표 | NVDA |</p>
+<p>|---|---:|</p>
+<p>| 조회 시각 | 2026-10-08 22:16:04 UTC |</p>
+<p>| 가격 | 230.48달러 |</p>
+<p>| 예상 PER | 14.48배 |</p>
+<p>| 과거 이익 기준 PER | 29.14배 |</p>
+<p>| 52주 최고가 | 243.37달러 |</p>
+<p>| 평균 목표주가 | 328.72달러 |</p>
+<p>영상 게시 시각은 같은 날 <strong>08:55:15 UTC</strong>로, 스냅샷보다 앞선다. 따라서 이 가격을 영상의 ‘현재 주가’로 대체할 수 없다. 가격이 52주 최고가보다 낮다는 사실도 해당 주간 최고가 경신을 반박하지 않는다. 평균 목표주가는 집계 대상·갱신일·분포가 없어 월가 전체의 판단이나 매집을 입증하지 못한다.</p>
+<p>AMZN 스냅샷도 제공됐지만, 주가·PER은 엔비디아 칩 200만 개 구매 여부와 무관하다.</p>
+<h3>3. 수집된 외부 근거의 실제 증명력</h3>
+<p><strong>이번 묶음에는 핵심 숫자를 직접 지지하는 실적 공시·구매 발표·제품 비교 원문이 없다.</strong> 상대적으로 내용이 있는 E5조차 제품명 확인의 제한적 단서에 그친다.</p>
+<ul>
+<li><strong>E5:</strong> <a href="https://www.nytimes.com/2025/03/18/business/dealbook/san-francisco-giants-sell-stake-private-equity-sixth-street.html?partner=naver">NYT 연결 기사</a>의 제공 발췌에는 Blackwell Ultra와 Vera Rubin 명칭이 나온다. 그러나 250억·400억 달러나 동일 전력 비교는 없다. 기사 제목은 야구단 지분 거래이며 표시 매체와 연결 도메인도 달라 원문 맥락 확인이 필요하다.</li>
+<li><strong>E1·E2:</strong> <a href="https://finance.yahoo.com/m/955f9165-6ca4-336e-9d6e-fff1a7c7f4e0/dow-jones-futures%3A-ai-stocks.html">IBD 연결 기사</a> 등을 수집했지만, 발췌가 오류 메시지·탐색 메뉴 중심이다. 게시 이후 기사이며 NVDA의 역사적 최고가를 확인할 가격 자료가 없다.</li>
+<li><strong>E3·E4:</strong> 제목이 각각 Broadcom과 Jones Lang LaSalle 관련이고 발췌도 메뉴 중심이다. NVDA 추천·기관 매집의 근거로 사용할 수 없다.</li>
+<li><strong>E6:</strong> <a href="https://finance.yahoo.com/news/msft-orcl-nvda-qqq-focus-190141481.html">OpenAI 매출 전망 관련 기사</a>는 제공 본문이 비어 있고 영상 게시 이후 자료다. NVDA의 FY2028 매출 70% 증가를 뒷받침하지 않는다.</li>
+</ul>
+<p>공시 조회의 <code>provider unavailable</code>은 <strong>조회 제공자를 이용할 수 없었다</strong>는 뜻이다. 관련 공시가 존재하지 않는다는 뜻이 아니다.</p>
+<h3>4. 강세 논리가 성립하려면</h3>
+<p>영상의 논리는 세 단계로 정리된다.</p>
+<p>1. <strong>수요 확대:</strong> 산업별 AI 도입과 반복적인 추론·검증 작업이 고객의 연산 투자를 늘린다.</p>
+<p>2. <strong>공급 가치 확대:</strong> GPU뿐 아니라 시스템 구성품과 연결 장비까지 공급하고 전력당 처리량을 개선해 고객당 판매 가치를 높인다.</p>
+<p>3. <strong>이익 성장:</strong> 주문이 출하·매출로 전환되고 수익성이 유지되면 EPS가 증가해 현재 배수의 부담이 낮아진다.</p>
+<p>이 연결은 가능한 시나리오지만, 각 단계의 실제 수치가 필요하다. AI 사용 증가가 엔비디아 구매로 이어지는 비율, 시스템 판매의 마진, 출하 속도와 고객 가동 일정은 제공 자료에서 확인되지 않는다.</p>
+<p>평가 관계는 <strong>주가 ≈ 예상 EPS × 예상 PER</strong>로 볼 수 있다. 동일 기준의 EPS가 늘고 PER이 유지된다면 계산상 주가는 상승한다. 다만 EPS 증가와 배수 유지 모두 가정이다. 영상의 <strong>매출 70% 증가를 EPS 70% 증가로 치환할 수는 없다.</strong></p>
+<h3>5. 반론과 논리 약화·무효화 조건</h3>
+<p>다음은 확인된 악재가 아니라 투자 가설을 점검할 반대 시나리오다.</p>
+<ul>
+<li><strong>예상 이익 하향:</strong> 15배의 분모인 EPS가 낮아지면 같은 주가에서도 배수는 높아진다. 장기 전망의 정확성이 낮다면 낮은 표시 PER만으로 저평가를 판단하기 어렵다.</li>
+<li><strong>수요와 매출의 괴리:</strong> 예약·관심 표명이 확정 주문으로 이어지지 않거나 전력·건설 지연으로 인도가 늦어지면 수요 기대가 매출로 전환되지 않을 수 있다.</li>
+<li><strong>경쟁·효율 개선:</strong> 자체 ASIC, 경쟁 제품, 연산 효율 개선이 엔비디아의 판매량·가격·점유율을 제한할 수 있다. 이번 자료에서 실제 발생이 확인된 것은 아니다.</li>
+<li><strong>성능과 경제성의 괴리:</strong> 특정 워크로드에서의 전력당 성능 향상이 모든 고객의 매출·이익 개선을 의미하지는 않는다. 가동률과 총비용도 확인해야 한다.</li>
+<li><strong>배수 하락:</strong> 이익 성장에도 시장이 부여하는 PER이 낮아지면 가격 상승이 제한될 수 있다.</li>
+</ul>
+<p>저평가 가설은 <strong>동일 회계연도 EPS의 지속적인 하향, 주문 취소·출하 지연, 마진 악화, 실제 고객 환경에서의 성능·경제성 미달</strong>이 나타나면 약화된다. 15배의 원래 계산이 기간·지표 혼용으로 재현되지 않는다면 영상의 핵심 밸류에이션 근거는 성립하지 않는다.</p>
+<h3>6. 단기 체크포인트와 관찰 항목</h3>
+<p>구체적인 실적 발표일·출하일은 제공되지 않았다. 다음 자료가 공개되거나 확보될 때 우선 확인할 항목은 아래와 같다.</p>
+<p>| 우선순위 | 확인 자료 | 구체적인 관찰 항목 |</p>
+<p>|---|---|---|</p>
+<p>| 1 | 공식 분기 실적·10-Q | 962억 달러·106%의 해당 기간과 재계산, 영업이익·순이익 및 GAAP·비GAAP 구분 |</p>
+<p>| 2 | FY2028 EPS·매출 추정 원문 | 발행일·추정 기관·대상 회계연도, 동일 시점 가격으로 15배 재계산, 70%의 비교 기준 |</p>
+<p>| 3 | 고객 공식 구매 발표 | 200만 개의 기업별 배분, GPU·칩·시스템 단위, 추가분·누적분, 계약·계획·실제 인도 구분 |</p>
+<p>| 4 | 제품·경제성 원문 | Rubin 발표·출하·고객 사용 상태, 전력당 처리량의 비교 조건, 250억·400억 달러의 귀속 주체·기간 |</p>
+<p>| 5 | 실적 설명회·고객 가동 자료 | 제품별 납기·백로그, 주문의 매출 전환, 전력 접속·가동 일정, 매출총이익률·현금흐름 변화 |</p>
+<p>| 6 | 가격 이력·기관 보고서 | 게시 이전 장중·종가 최고가, 추천 기관·날짜·근거, 추천과 실제 보유 변화의 분리 |</p>
+<p>기관 보유 공시는 분기말 잔액과 공개 지연을 고려해야 한다. 해당 주간의 ‘조용한 매집’을 직접 확인하는 자료로 취급할 수 없다.</p>
+<h3>7. 자막·신뢰도·폐쇄형 자료의 한계</h3>
+<ul>
+<li><strong>transcript_quality:</strong> 자동 한국어 자막의 상태는 <code>good</code>, 점수는 1.0이다. 이는 자막 품질 지표이지 숫자나 투자 주장의 사실성 점수가 아니다.</li>
+<li><strong>추출 source_confidence:</strong> NVDA 0.97, AMZN 0.94는 영상에서 해당 주장을 추출한 확실성을 뜻한다.</li>
+<li><strong>검증 source_confidence:</strong> C1 0.15, C4 0.25, C5·C7 0.05, 나머지 0.0이다. 검증에 활용할 자료의 적합도 평가로, 추출 점수와 의미가 다르며 보정된 확률도 아니다.</li>
+<li><strong>asr_confidence:</strong> 모든 주장에 0.0이 기록됐지만 원음 기반 개별 ASR 신뢰도가 미제공된 데 따른 미측정 표기다. 자막 오류가 확정됐다는 의미는 아니다.</li>
+<li><strong>판정 confidence:</strong> 0.98~0.99는 ‘자료만으로 미검증이라고 판단한다’는 확신이지, 주장이 사실일 확률이 아니다.</li>
+<li><strong>표현 혼용:</strong> ‘수익’이 매출·이익·EPS·고객 수익 중 무엇인지 불분명하다. 본문의 ‘2028년 1월 종료 회계연도’와 결론의 ‘내년’도 임의로 같은 기간으로 통일하지 않았다.</li>
+<li><strong>폐쇄형 출처:</strong> Bloomberg·Morningstar 원문은 제공되지 않았고 영상의 특정 출처로도 확인되지 않았다. 해당 서비스나 유료 리서치에 의존하는 EPS·매출 전망·추천 주장은 <strong>미검증·수동 확인 필요</strong>다. 비공개 계약·주문장에 의존하는 구매량과 공급 초과 주장도 동일하다.</li>
+</ul>
+<h3>결론</h3>
+<p>이 영상은 <strong>수요 확대 → 시스템 가치 상승 → 이익 성장 → 주가 정당화</strong>라는 강세 가설을 제시한다. 그러나 현재 근거 묶음은 그 연결을 실적으로 검증하기에 부족하다.</p>
+<p>투자자가 우선 관찰할 것은 ‘월가가 저평가라고 본다’는 표현보다 <strong>동일 기준의 예상 EPS 변화, 공식 주문의 실제 출하·매출 전환, 마진 유지, 고객의 전력 확보와 가동 일정</strong>이다. 이 자료들이 확보되기 전까지 15배·매출 70% 증가·칩 200만 개는 확인된 투자 전제가 아니라 검증 대기 항목이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;N-DmjglU-Ac&quot;,
+  &quot;title&quot;: &quot;월가에서 현시점 엔비디아가 저평가 됐다는 이유&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=N-DmjglU-Ac&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/N-DmjglU-Ac/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-08T08:55:15+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 2672,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 2672,
+    &quot;segments&quot;: 123,
+    &quot;duration_seconds&quot;: 166,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-09T06:58:06.448375+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 6,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 12
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;영상 게시 주간에 엔비디아 주가가 사상 최고치를 경신했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.15,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;게시 주간 사상 최고가 경신; 가격 미제시&quot;,
+        &quot;observed&quot;: &quot;게시 이후 스냅샷 가격 230.48달러, 52주 최고가 243.37달러; 최고가 발생일·역대 최고가 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;사상 최고가 경신을 확인된 투자 전제로 사용하지 말고 게시 이전 가격 이력에서 장중·종가 최고가를 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;월가가 엔비디아 매수 추천과 최고의 반도체 종목 선정을 유지하며 주식을 조용히 매집하고 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수치 주장 없음&quot;,
+        &quot;observed&quot;: &quot;추천·매집을 확인할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;추천 의견과 실제 기관 매수를 분리하고, 미확인 매집 주장을 투자 신호로 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;올해 2분기 매출은 962억 달러로 전년 동기 대비 106% 증가했으며 사업 이익도 두 배 이상 증가했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;매출 962억 달러=96.2 billion USD; 전년 동기 대비 +106%; 사업 이익 두 배 이상&quot;,
+        &quot;observed&quot;: &quot;해당 기간의 매출·전년 매출·이익 수치 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실적 성장에 근거한 투자 논리는 매출과 이익의 기간·지표를 공식 실적표에 대조한 뒤 평가해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;현재 주가는 2028년 1월 종료 회계연도 예상 이익의 약 15배여서 저평가되어 있으며, 결론에서는 이를 내년 예상 수익의 15배라고 표현한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.25,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2028년 1월 종료 회계연도 예상 이익 대비 약 15배; 결론은 &#x27;내년 예상 수익&#x27;&quot;,
+        &quot;observed&quot;: &quot;2026-10-08 22:16:04 UTC 스냅샷 forward_pe 14.482299; 대상 회계연도·예상 EPS 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;동일 시점의 가격과 해당 회계연도 EPS로 배수를 재계산해야 한다. EPS 증가와 PER 불변을 가정하면 계산상 주가는 상승하지만, 실제 이익 증가나 배수 유지는 확인되지 않았다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;엔비디아가 GPU뿐 아니라 작업 분산용 칩과 연결 장비를 포함한 전체 시스템 공급을 확대하며, Vera Rubin은 같은 전력으로 더 많은 AI 작업을 처리한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.05,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;동일 전력에서 AI 처리량 증가; 구체적 성능 배수 없음&quot;,
+        &quot;observed&quot;: &quot;전력·처리량·비교 조건 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제품 구성과 동일 전력 비교의 워크로드·시스템 범위·측정 조건을 확인하고, 발표와 실제 출하·매출 전환을 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;전력 부족이 AI 데이터센터 확장의 주요 제약이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수치 주장 없음&quot;,
+        &quot;observed&quot;: &quot;전력 수요·공급·접속 지연 수치 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;투자 대상 데이터센터의 전력 확보와 가동 일정을 확인해야 하며, 제공 자료로 전 세계적 전력 제약을 단정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;젠슨이 동일 전력 용량에서 Blackwell은 약 250억 달러, Vera Rubin은 약 400억 달러의 수익을 창출할 수 있다고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.05,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;Blackwell 250억 달러=25 billion USD; Vera Rubin 400억 달러=40 billion USD; 동일 전력 가정&quot;,
+        &quot;observed&quot;: &quot;해당 금액·전력 용량·수익 지표·산정 기간 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 금액을 엔비디아의 확정 매출이나 이익 추정에 직접 반영해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;AI의 데이터 탐색·프로그램 구축·결과 검증에도 지속적인 연산이 필요해 산업별 AI 도입 확대가 엔비디아 장비 수요를 늘릴 것이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수치 주장 없음&quot;,
+        &quot;observed&quot;: &quot;연산량·산업별 도입률·추가 구매량 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;조건부 수요 전망으로 다루고 실제 고객 도입·설비투자·매출 전환으로 검증해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;아마존 같은 대형 기술기업이 엔비디아 칩 200만 개를 추가 구매한다고 발표했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;엔비디아 칩 200만 개=2,000,000개 추가 구매&quot;,
+        &quot;observed&quot;: &quot;구매 발표·기업별 배분·대상 제품·공급 일정 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공식 발표에서 구매자별 물량과 주문·계획·인도를 구분하기 전에는 확정 매출의 근거로 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;인도와 말레이시아가 데이터센터용 최신 칩 수만 개를 구매하며 미출시 제품에 대한 구매 움직임도 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;인도·말레이시아의 최신 칩 수만 개 구매; 국가별 수량 없음&quot;,
+        &quot;observed&quot;: &quot;국가별 구매량·제품·계약·공급 일정 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;구매 주체·제품·계약 상태·납기를 확인한 후 수요 전망에 반영해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;엔비디아 주문량이 급증해 공급을 초과한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;주문 급증 및 주문량의 공급 초과; 수치 없음&quot;,
+        &quot;observed&quot;: &quot;주문량·공급량·백로그·납기 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제품별 주문과 공급량, 납기 및 매출 인식을 구분해 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;2028년 1월 종료 회계연도의 매출이 70% 더 증가할 것으로 확신한다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00–00:02:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2028년 1월 종료 회계연도 매출 +70%; 비교 기준 미명시&quot;,
+        &quot;observed&quot;: &quot;해당 매출 전망·기준 매출·증가율 근거 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;70%를 공식 성장 가이던스나 확정 실적으로 사용하지 말고, 원래 전망과 비교 기준을 확보해 재계산해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;이번 주 주가가 사상 최고치를 경신했지만 월가는 매수 추천과 최고의 반도체 종목 평가를 유지하며 주식을 매집하고 있다고 주장한다.&quot;,
+        &quot;매출과 사업 이익의 급증을 근거로 기대감뿐 아니라 실제 수익 창출에 기반한 성장 기업이라고 설명한다.&quot;,
+        &quot;미래 회계연도의 예상 이익 대비 현재 주가 배수가 낮아 저평가되어 있다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;올해 2분기 매출: 962억 달러.&quot;,
+        &quot;올해 2분기 매출의 전년 동기 대비 증가율: 106%.&quot;,
+        &quot;사업에서 얻은 이익: 전년 대비 두 배 이상 증가했다고 표현하며 정확한 이익 지표는 제시하지 않는다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-08T22:16:04.941051+00:00&quot;,
+        &quot;current_price&quot;: 230.47999572753906,
+        &quot;market_cap&quot;: 5565400456832.886,
+        &quot;forward_pe&quot;: 14.482299,
+        &quot;trailing_pe&quot;: 29.1378,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 164.27,
+        &quot;average_target_price&quot;: 328.71695,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AMZN&quot;,
+      &quot;name&quot;: &quot;아마존&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;영상은 아마존을 예로 든 대형 기술기업들이 엔비디아 칩 추가 구매를 발표했다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;아마존 등 대형 기술기업의 추가 구매 물량으로 엔비디아 칩 200만 개를 제시한다. 아마존 단독 물량인지 여러 기업의 합계인지는 불명확하다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AMZN&quot;,
+        &quot;as_of&quot;: &quot;2026-10-08T22:16:07.103066+00:00&quot;,
+        &quot;current_price&quot;: 254.05999755859375,
+        &quot;market_cap&quot;: 2740370799768.547,
+        &quot;forward_pe&quot;: 24.273798,
+        &quot;trailing_pe&quot;: 20.439259,
+        &quot;fifty_two_week_high&quot;: 287.2,
+        &quot;fifty_two_week_low&quot;: 196.0,
+        &quot;average_target_price&quot;: 331.53,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: AI Stocks Tumble On OpenAI News; SpaceX Move Slams Verizon, AT&amp;T Late&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/955f9165-6ca4-336e-9d6e-fff1a7c7f4e0/dow-jones-futures%3A-ai-stocks.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T22:07:44+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures: AI Stocks Tumble On OpenAI News; SpaceX Move Slams Verizon, AT&amp;T Late Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;The S&amp;P 500 ETF You Know Charges 0.0945%. These 2 Charge 0.03%&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/p-500-etf-know-charges-220310762.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T22:03:10+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;The S&amp;P 500 ETF You Know Charges 0.0945%. These 2 Charge 0.03% Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newslett...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Why Broadcom Stock Took a Dive Today&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/why-broadcom-stock-took-dive-220557842.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T22:05:57+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Why Broadcom Stock Took a Dive Today Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfolio N...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Jones Lang LaSalle Eyes $1 Trillion Outsourcing Market With AI, REMS Growth&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/real-estate/articles/jones-lang-lasalle-eyes-1-220207635.html&quot;,
+      &quot;publisher&quot;: &quot;MarketBeat&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T22:02:07+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Jones Lang LaSalle Eyes $1 Trillion Outsourcing Market With AI, REMS Growth Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Wea...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;San Francisco Giants Sell Stake to Private Equity&quot;,
+      &quot;source_url&quot;: &quot;https://www.nytimes.com/2025/03/18/business/dealbook/san-francisco-giants-sell-stake-private-equity-sixth-street.html?partner=naver&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2025-03-18T21:02:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;Huang has promised more details about the company’s upcoming Blackwell Ultra chip, and a new A.I. super-chip, Vera Rubin, named after the astronomer who discovered dark matter. The Rubin line...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;title&quot;: &quot;MSFT, ORCL, NVDA, QQQ In Focus: OpenAI’s Annualized Revenue Reportedly Trails Prior Expectations By $20B&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/news/msft-orcl-nvda-qqq-focus-190141481.html&quot;,
+      &quot;publisher&quot;: &quot;Stocktwits&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T19:01:41+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

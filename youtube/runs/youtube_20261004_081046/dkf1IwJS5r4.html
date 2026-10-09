@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 원달러 환율 급변.. 삼성전자·SK하이닉스 실적 영향 받을까? / 10년물 미국채 금리 하락을 알려줄 &#x27;결정적 신호&#x27; | 오로라투자자문 이지환 대표</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261004_081046</p>
+    <h1>원달러 환율 급변.. 삼성전자·SK하이닉스 실적 영향 받을까? / 10년물 미국채 금리 하락을 알려줄 &#x27;결정적 신호&#x27; | 오로라투자자문 이지환 대표</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=dkf1IwJS5r4">원본 영상</a>
+    </div>
+  </header>
+  <h2>원·달러 환율과 미국 장기금리: 영상 주장 검증 리포트</h2>
+<p><strong>대상:</strong> <a href="https://www.youtube.com/watch?v=dkf1IwJS5r4">815Money talk 영상</a> · 업로드 2026년 10월 3일 · 검토 기준 2026년 10월 4일</p>
+<h3>핵심 판단</h3>
+<p>영상의 투자 논리는 <strong>원화 강세의 실적 부담이 삼성전자·SK하이닉스보다 환헤지가 취약한 일부 반도체 협력업체에 클 수 있고, 미국의 추가 금리 인상 종료가 장기금리 하락의 관찰 신호가 될 수 있다</strong>는 것이다. 다만 제공된 자료에는 이를 검증할 기업 공시, 환율·국채금리 시계열, 연준 기록이 없다. <strong>개별 주장 C1~C10은 모두 미검증</strong>이며, 제시된 수치와 시점을 현재 시장의 사실로 사용하기 어렵다.</p>
+<p>| 구분 | 영상 주장 | 확인된 사실·근거와 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 발화 시점 | ‘오늘 밤’ 9월 고용보고서와 10월·12월 인상 가능성을 논의 (<a href="https://www.youtube.com/watch?v=dkf1IwJS5r4&amp;t=0s">00:00</a>, <a href="https://www.youtube.com/watch?v=dkf1IwJS5r4&amp;t=1050s">17:30</a>) | 확인된 것은 <strong>업로드일 2026-10-03</strong>뿐이다. 녹화일과 발화 당시 일정이 없어 당시 전망인지 현재 전망인지 판단할 수 없다. |</p>
+<p>| 원·달러 | 엔화에 동조하며 대체로 1,300원대 중반~1,400원에 머물고 1,300원 아래 안착은 어렵다는 전망 (<a href="https://www.youtube.com/watch?v=dkf1IwJS5r4&amp;t=364s">06:04</a>) | 일별 원·달러·엔·달러 환율, 한미 금리·성장률의 동일 기간 자료가 제공되지 않았다. 동조성과 범위는 검증되지 않았다. |</p>
+<p>| 삼성전자·SK하이닉스 | 헤지와 해외 생산으로 환율 민감도가 과거보다 작다는 평가 (<a href="https://www.youtube.com/watch?v=dkf1IwJS5r4&amp;t=718s">11:58</a>) | 양사의 외화 순노출, 헤지 규모, 비용 통화 구성 및 과거 비교 공시가 없다. 해외 생산시설 자체가 민감도 감소를 입증하지는 않는다. |</p>
+<p>| 삼성전자 수치 | 환율 10원당 영업이익 약 2천억 원, 5% 변동당 2천억~4천억 원, 약 10% 원화 강세 시 약 8천억 원 감소 및 ‘영업이익 100조 원 초과’를 언급 (<a href="https://www.youtube.com/watch?v=dkf1IwJS5r4&amp;t=718s">11:58</a>) | 기간·단위·추정 산식, 공시 실적, 환위험 주석, 3분기 컨센서스가 없다. <strong>모두 미검증 추정</strong>이며 실적 전망치에 직접 대입할 수 없다. |</p>
+<p>| 반도체 협력업체 | 일부 업체는 원자재 상승과 환헤지 부족으로 대기업보다 환율 위험이 크다는 주장 (<a href="https://www.youtube.com/watch?v=dkf1IwJS5r4&amp;t=0s">00:00</a>, <a href="https://www.youtube.com/watch?v=dkf1IwJS5r4&amp;t=718s">11:58</a>) | 업체 표본과 상반기 실적·원가율·헤지 자료가 없다. 업종 전체로 일반화할 근거가 부족하다. |</p>
+<p>| 미국 국채·연준 | 10년물 5.3% 초과, 2년물 4.9~5%, 장기 평균 스프레드 1.24%포인트, 10년물 5.5% 초과 장기화의 주식시장 부담 및 인상 종료 후 금리 하락 가능성 (<a href="https://www.youtube.com/watch?v=dkf1IwJS5r4&amp;t=364s">06:04</a>, <a href="https://www.youtube.com/watch?v=dkf1IwJS5r4&amp;t=1050s">17:30</a>) | 해당 날짜의 금리·정책금리와 평균 스프레드 계산 자료가 없다. <strong>4.0%+1.24%포인트=5.24%라는 산술만 확인</strong>된다. 5.5%는 검증된 임계값이 아닌 발화자의 전망이다. |</p>
+<h3>투자 논리와 반론</h3>
+<p><strong>상승 논리:</strong> 원화 강세가 달러 매출의 원화 환산액을 낮추더라도 헤지·현지 비용이 이를 상쇄한다면 대형사의 실적 충격은 제한될 수 있다. 반대로 외화 원재료 매입과 매출 통화가 어긋나는 협력업체는 마진 변동이 커질 수 있다. 미국 물가·고용 둔화와 연준의 정책 경로 변화가 함께 확인된다면 장기금리 하락 기대가 형성될 수 있다. 이는 모두 <strong>조건부 시나리오</strong>다.</p>
+<p><strong>반론:</strong> 환율 영향은 기업별 순외화노출과 계약·헤지 만기에 따라 달라진다. 협력업체라도 달러 비용 감소가 원화 강세의 불리함을 상쇄할 수 있다. 장기금리는 정책금리 전망 외에도 물가 기대, 국채 공급·수요 등에 좌우되므로 인상 종료만으로 하락을 보장할 수 없다. 영상의 중국 국채 수요 감소, 입찰 부진, 안전자산 선호의 금 이동 역시 관련 통계가 없어 미검증이다.</p>
+<h3>특히 주의할 수치·정책 주장</h3>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=dkf1IwJS5r4&amp;t=364s">06:04</a>의 재무부 ‘매입 프로그램’ 금액(80억~100억·60억·40억 달러)은 공식 공고·집행 결과가 없다. 자동자막의 ‘자사주 매입’은 정책 명칭 오인식 가능성이 있어 <strong>원영상 및 공식 자료 수동 확인 필요</strong>하다.</li>
+<li>같은 구간의 한국 30년 채권 ‘연평균 약 -30%’는 상품, 기간, 이자 포함 여부가 불명확하다. 일반적인 장기채 연간 손실률로 해석해서는 안 된다.</li>
+<li>‘최근 여론’의 삼성전자 민감도, ‘많은 보고서’의 국채 매입 시기, 개인적 매수 관찰은 원 출처가 특정되지 않았다. <strong>비공개·폐쇄형 자료를 포함해 원문이 제공되지 않은 주장—Bloomberg·Morningstar 자료가 근거로 제시될 경우도 포함—은 미검증이며 수동 확인이 필요</strong>하다.</li>
+</ul>
+<h3>가까운 점검 항목과 논리의 무효화 조건</h3>
+<p>1. <strong>시점:</strong> 원본 녹화일을 확인하고 영상의 9월 고용보고서·PCE·FOMC 언급을 당시 발표 일정과 대조한다. 업로드일과 발화일이 다르면 ‘현재 전망’으로 읽는 해석은 무효다.</p>
+<p>2. <strong>금리:</strong> 발화 기준일의 미국 2·10년물 금리와 정책금리, 이후 FOMC 결정·점도표·물가·고용 발표를 확인한다. 인상 종료 후에도 장기금리가 유지·상승하면 ‘인상 종료가 결정적 하락 신호’라는 논리는 약해진다.</p>
+<p>3. <strong>기업 실적:</strong> 양사 분기 공시의 영업이익, 외화 순노출·환헤지·환위험 민감도와 기준일별 전망치 변화를 각각 확인한다. 실제 민감도가 영상 추정과 다르거나 양사 간 차이가 크면 대형주 일반화는 성립하지 않는다.</p>
+<p>4. <strong>협력업체:</strong> 관찰할 회사를 먼저 특정한 뒤 원재료비·원가율·외화 순노출·헤지·영업이익을 같은 기간에 비교한다. 충분한 헤지 또는 마진 개선이 확인되면 ‘중소업체가 더 취약하다’는 가설은 해당 회사에 적용하기 어렵다.</p>
+<p>5. <strong>환율·국채 수요:</strong> 원·달러와 엔·달러의 일별 움직임, 국채 입찰 결과, 국가별 미국 국채 보유잔액과 순거래를 구분해 추적한다. 영상의 환율 범위가 지속적으로 벗어나거나 수요 약화가 통계로 확인되지 않으면 해당 전제를 재평가해야 한다.</p>
+<p><strong>자료 품질:</strong> 한국어 자동자막은 전체 품질 점수 1.0으로 수집됐지만, 이는 <strong>인식·수집 품질</strong>이지 주장 정확성 점수가 아니다. 타임스탬프는 문장 시각이 아닌 청크 시작 시각이다. 특히 정책 명칭, 인명, ‘환율/금리’ 단위와 숫자에 오류 가능성이 있다. 관련 주장들의 ASR 신뢰도는 대체로 0.62~0.88이고 매입 프로그램은 0.45다. 주장 추출의 source_confidence는 약 0.61~0.79이지만, 독립 증거의 source_confidence는 <strong>0.0</strong>으로 평가됐다. 수집된 외부 기사 4건은 주장과 무관하거나 본문이 없어 근거에서 제외했다. 따라서 이 보고서의 링크는 <strong>영상 내 주장 위치</strong>를 가리킬 뿐, 주장에 대한 독립적 사실 확인 링크가 아니다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;dkf1IwJS5r4&quot;,
+  &quot;title&quot;: &quot;원달러 환율 급변.. 삼성전자·SK하이닉스 실적 영향 받을까? / 10년물 미국채 금리 하락을 알려줄 &#x27;결정적 신호&#x27; | 오로라투자자문 이지환 대표&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=dkf1IwJS5r4&quot;,
+  &quot;channel&quot;: &quot;815Money talk&quot;,
+  &quot;channel_id&quot;: &quot;UCCG6BEYjfQMGzypJw2EJCDQ&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@815moneytalk/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/dkf1IwJS5r4/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-03T08:00:34+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 10688,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 10688,
+    &quot;segments&quot;: 525,
+    &quot;duration_seconds&quot;: 1176,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-10-04T08:10:46.233426+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;업로드일과 발화의 고용보고서·금리 인상·재무장관 언급이 같은 시기의 사실인지 불명확하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-10-03 업로드; 9월 고용보고서·10월·12월 인상 언급&quot;,
+        &quot;observed&quot;: &quot;업로드일만 제공; 발화 기준일 미상&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발화의 시점을 확정하기 전에는 금리 전망을 현재 전망으로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;미국 10년물 5.3% 초과, 2년물 4.9~5%, 정책금리 3.75~4.0% 및 평균 스프레드 1.24%p를 주장하고, 10년물 5.5% 초과 장기화가 주식에 부담이라고 전망한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10년물 &gt;5.3%; 2년물 4.9~5%; 정책금리 3.75~4.0%; 평균 차이 1.24%p; 기준 5.24%·5.5%&quot;,
+        &quot;observed&quot;: &quot;시장 시계열 없음; 5.24% 산술만 일치&quot;
+      },
+      &quot;investor_implication&quot;: &quot;수익률 수준과 기준일을 확인하기 전에는 채권·주식 매매 기준으로 삼기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;미국 재무부 국채 매입 프로그램의 기대·추산·집행 규모가 80억~100억·약 60억·때로 약 40억 달러이며 금리 하락 효과가 제한됐다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.94,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;06:04&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기대 80억~100억 달러; 추산 60억 달러; 때로 집행 40억 달러&quot;,
+        &quot;observed&quot;: &quot;공식 매입 결과 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;프로그램 명칭과 회차별 집행액을 확인하기 전에는 국채 수급 판단에 반영하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;중국의 미국 국채 보유·매입이 영국·일본보다 적어졌고, 최근 입찰 수요가 부진하며 안전자산 선호가 금으로 이동했다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;06:04&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;중국의 보유·매입이 영국·일본보다 적음&quot;,
+        &quot;observed&quot;: &quot;국가별 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;국채 수요 약화를 전제로 한 포지션은 공식 보유·입찰 통계 확인이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;PCE·고용지표 이후 10월 인상 기대가 12월로 미뤄졌고, 추가 인상 종료가 장기금리 하락의 핵심 신호라는 전망이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;17:30&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 인상 기대가 12월로 이동; 25bp 인상 기대&quot;,
+        &quot;observed&quot;: &quot;회의별 시장확률·결정 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발화 당시의 정책 경로와 현재 경로를 혼동하면 금리 방향을 잘못 판단할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;원/달러가 9월 초 저점 이후 재상승했고 엔화에 동조하며 장기적으로 1,300원대 중반~1,400원에 머물 것이라고 전망한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;06:04&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;원/달러 대체로 1,300원대 중반~1,400원; 엔화에 따라 약 100원 변동&quot;,
+        &quot;observed&quot;: &quot;일별 USD/KRW·USD/JPY 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;환율 가정에 민감한 실적 추정은 여러 환율 시나리오로 점검해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자 영업이익의 환율 민감도를 10원당 약 2천억 원, 5%당 2천억~4천억 원, 약 10% 원화 강세 시 약 8천억 원 감소로 추정하고, 현재 영업이익 100조 원 초과와 3분기 전망치 하향을 언급한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;11:58&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.62,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10원당 2천억 원; 5%당 2천억~4천억 원; 약 10%당 8천억 원; 영업이익 100조 원 초과&quot;,
+        &quot;observed&quot;: &quot;공시 실적·환율 민감도·컨센서스 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이 숫자를 삼성전자 실적 전망치에 직접 대입해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자와 SK하이닉스는 환헤지 확대와 해외 생산시설로 과거보다 환율에 덜 민감하다고 평가한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;11:58&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 회사의 환율 민감도를 동일하게 가정하지 말고 각각의 공시를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;일부 반도체 중소 협력업체는 원자재 가격 상승과 환헤지 부족으로 상반기 실적이 부진했고 대기업보다 환율 위험이 크다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;11:58&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;&quot;
+      },
+      &quot;investor_implication&quot;: &quot;협력업체 투자는 업체별 외화 순노출·원가율·실적을 따로 점검해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;한국 30년 만기 채권 투자자의 연평균 수익률이 약 -30%였다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;06:04&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.68,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연평균 수익률 약 -30%&quot;,
+        &quot;observed&quot;: &quot;상품·기간·총수익률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;-30%를 장기채의 일반적인 연간 손실률로 받아들여서는 안 된다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Indian Oil Stock And 2 Refiners Linked To Shifting Middle East Oil Flows&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/indian-oil-stock-2-refiners-210933303.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-03T21:09:33+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Indian Oil Stock And 2 Refiners Linked To Shifting Middle East Oil Flows Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weathe...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Iran’s rial hits fresh low as $2 billion currency intervention fails to stem slide&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/currencies/articles/iran-rial-hits-fresh-low-204319407.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-03T20:43:19+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Iran’s rial hits fresh low as $2 billion currency intervention fails to stem slide Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Origin...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Bloomberg’s ETF Guru Watched $7 Billion Pour Into a Falling Treasury Fund, Then Warned Buyers to Walk Away&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/options/articles/bloomberg-etf-guru-watched-7-205146512.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-02T20:51:46+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

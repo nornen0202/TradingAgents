@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 삼성전자·SK하이닉스 왜 못 가나? 지금 강한 곳은 따로 있다 | 박병창 MP파트너스 대표 [마켓 인사이드]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261007_211326</p>
+    <h1>삼성전자·SK하이닉스 왜 못 가나? 지금 강한 곳은 따로 있다 | 박병창 MP파트너스 대표 [마켓 인사이드]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=Lacr3C3biDY">원본 영상</a>
+    </div>
+  </header>
+  <h2>삼성전자·SK하이닉스 약세와 순환매: 영상 주장 검증 리포트</h2>
+<p><strong>대상:</strong> <a href="https://www.youtube.com/watch?v=Lacr3C3biDY">삼프로TV 영상</a>, 2026년 10월 7일 게시. 이 보고서는 영상의 시장 해석과 별도로, 제공된 자료로 확인할 수 있는 사실의 범위를 구분한다.</p>
+<h3>핵심 판단</h3>
+<p>영상은 삼성전자·SK하이닉스의 약세를 실적 악화로 단정하기보다 달러 강세, 수급 쏠림, 향후 메모리 공급 증가 우려가 겹친 결과로 해석한다. 동시에 전력 인프라와 코스닥 바이오·2차전지로 매기가 순환하지만 시장 전체의 단기 상승 여력은 제한적이라는 견해다. <strong>이 인과관계와 종목별 당일 등락률은 제공된 외부 자료로 확인되지 않았다.</strong> 영상이 제기한 관찰 가설로 읽는 것이 적절하다.</p>
+<h3>영상 주장과 확인된 사실/근거</h3>
+<p>| 주제 | 영상 주장 | 확인된 사실/근거 및 한계 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 반도체·수급 | <a href="https://www.youtube.com/watch?v=Lacr3C3biDY&amp;t=0s">00:00</a>·<a href="https://www.youtube.com/watch?v=Lacr3C3biDY&amp;t=421s">07:01</a>: 삼성전자·SK하이닉스 프리마켓 약세, SK하이닉스 ADR −6.3%, AMD +2.8%. ETF 리밸런싱만으로 양사 동반 약세를 설명하기 어렵다는 견해. | 해당 거래 시각의 가격, ADR 거래 자료, ETF별 편입비중·주문 자료가 없다. 수치와 하락 원인은 <strong>미검증</strong>이다. |</p>
+<p>| 실적·업황 | <a href="https://www.youtube.com/watch?v=Lacr3C3biDY&amp;t=1197s">19:57</a>: 삼성전자 잠정실적 기대치 하향 가능성, 메모리 증설에 따른 공급 부담을 제기하고 본실적의 수요·가격·비용 설명을 중시. | 실적 컨센서스 이력, 일회성 비용, 양사 증설 계획을 입증할 IR·공시가 없다. 이는 현재 확인된 실적 사실이 아니라 전망과 해석이다. |</p>
+<p>| AI·전력 인프라 | <a href="https://www.youtube.com/watch?v=Lacr3C3biDY&amp;t=1197s">19:57</a>: 마벨의 AI 매출 전망이 관련주에 긍정적이라는 설명. <a href="https://www.youtube.com/watch?v=Lacr3C3biDY&amp;t=797s">13:17</a>: LS ELECTRIC·HD현대일렉트릭의 북미 수주와 프리마켓 약 +3%를 언급. | 마벨 발표 원문, 행사 전후 가격, 전력기기 양사의 해당 시각 가격·수주·납기 자료가 없다. 특히 마벨의 120억·110억·200억 달러는 <strong>연도 및 전체/AI 매출 구분조차 불명확</strong>하다. |</p>
+<p>| 순환매·정책 | <a href="https://www.youtube.com/watch?v=Lacr3C3biDY&amp;t=1591s">26:31</a>·<a href="https://www.youtube.com/watch?v=Lacr3C3biDY&amp;t=2355s">39:15</a>: 한국투자증권의 박스권 전망을 인용하고 전력기기·바이오·2차전지로의 순환을 설명. 미국 청정에너지 정책 변화 가능성도 거론. | 한국투자증권 보고서 원문과 미국 정당 공약·법안이 없다. ‘코스피 6,400~7,600’, ‘선행 PER 약 5~5.9배’는 확인된 증권사 수치로 재인용할 수 없다. 선거 결과와 정책 시행 역시 미확정이다. |</p>
+<p>| 신기술·배터리 | <a href="https://www.youtube.com/watch?v=Lacr3C3biDY&amp;t=1980s">33:00</a>: 삼성전기 유리기판 라인 목표와 삼성SDI·에코프로비엠 전고체 협력을 소개. | 회사 발표문·공시가 없다. 삼성전기 ‘100mm×100mm’와 비교 수치 ‘81.5·74.8’은 원자료 및 단위 확인이 필요하다. 양사 협력의 형식·역할·상용화 일정도 <strong>미검증</strong>이다. |</p>
+<p><strong>실제로 대조 가능한 시장 자료는 제한적이다.</strong> 제공된 yfinance 단일 스냅샷은 2026년 10월 7일 13:01 UTC 무렵 AMD <strong>649.42달러</strong>(52주 최고가 658.52달러), 코스피 <strong>6,803.90</strong>을 표시한다. 이는 조회 시점의 값일 뿐, 영상에서 말한 등락률·신고가나 증권사 전망을 입증하지 않는다. 스냅샷의 개별 원문 링크는 제공되지 않았다. 수집된 뉴스 E1~E7은 배정된 핵심 주장과 무관하며, E8~E10은 삼성SDI·에코프로비엠 간 협약을 입증하지 않는다. 자료 묶음의 ‘verified’ 표시는 <strong>검색·수집 성공</strong>을 뜻할 뿐 영상 주장 검증 성공을 뜻하지 않는다.</p>
+<h3>상승 논리와 반론</h3>
+<p>상승 논리는 반도체 대형주의 정체가 업황 붕괴가 아니라 일시적인 수급 문제라면 실적 가이던스와 외국인 수급 변화가 재평가의 계기가 될 수 있고, 그 사이 AI 전력 설비·유리기판·배터리 소재 등으로 관심이 이동할 수 있다는 것이다. 반론은 메모리 공급 증가가 실제 가격과 이익률을 압박할 가능성, 달러·금리 변동이 외국인 수급에 주는 부담, 테마의 기대가 확인 가능한 수주·매출보다 앞설 위험이다. 전력기기 수주가 확인되더라도 <strong>특정일 주가 상승의 원인</strong>까지 자동으로 입증하지는 않는다. 마벨 발표나 미국 정책 기대를 국내 업체의 확정 실적으로 연결하는 것도 이르다.</p>
+<h3>가까운 점검 일정·관찰 항목</h3>
+<p>1. <strong>10월 8일 관련 일정:</strong> 영상이 언급한 옵션 만기와 ETF 리밸런싱을 한국거래소 일정, 각 ETF의 방법론·실제 삼성전자 비중·변경 공지로 대조한다. ‘25% 초과’는 ETF를 특정하기 전까지 일반화하지 않는다.</p>
+<p>2. <strong>반도체 실적 발표:</strong> 삼성전자·SK하이닉스 IR·공시에서 잠정실적, 이후 본실적의 메모리 수요·판매가격·재고·설비투자·일회성 비용을 확인한다. 발표 전후 컨센서스 변화와 외국인 순매수도 같은 날짜 기준으로 비교한다.</p>
+<p>3. <strong>거시·미국 기술주:</strong> 거래 시각을 맞춘 달러지수·원/달러 환율·미국 10년물 금리와 AMD·마벨 및 관련주의 종가를 관찰한다. 영상의 미국 금리 <strong>5.32%→5.27%</strong>, 프랑스 국채 ‘10P’는 원 시계열·단위가 없어 미검증이며, <strong>4.9~4.95%는 가정 사례</strong>다.</p>
+<p>4. <strong>기업별 사업 진척:</strong> 마벨 투자자의 날 원자료에서 AI 매출의 회계연도와 범주, LS ELECTRIC·HD현대일렉트릭의 북미 수주잔고·납기, 삼성전기의 유리기판 라인 일정, 삼성SDI·에코프로비엠의 공식 협력 범위와 양산 목표를 확인한다.</p>
+<p>영상의 중심 가설을 약화시키는 조건은 <strong>메모리 가격·수요 또는 실적 가이던스의 뚜렷한 악화</strong>, 공식 자료로 확인되는 증설발 공급 압력, 달러 강세 속 외국인 매도 지속, 전력·배터리 테마에서 기대한 수주·양산 진척의 부재다. 반대로 일시적 수급 정체라는 해석은 가격·이익 전망과 수급이 함께 개선될 때 더 설득력을 얻는다.</p>
+<p><strong>자료 신뢰도:</strong> 자동자막 전체 품질 평가는 양호(1.0)이지만 이는 숫자와 고유명사의 정확성을 보증하지 않는다. 발언 추출의 <code>source_confidence</code>는 주요 반도체 주장 약 0.87, 마벨 0.63, 한국투자증권 인용 0.69이며, 해당 숫자의 <code>asr_confidence</code>는 마벨 0.35, PER 0.50, 삼성전기 규격 비교 0.40으로 낮다. 검증 판정의 높은 confidence는 <strong>‘현재 자료로 입증되지 않았다는 판정’에 대한 확신</strong>이지 주장의 사실 확률이 아니다. 기관 포트폴리오 포화·실제 ETF 주문처럼 비공개 거래 자료가 필요한 주장과 원문이 제공되지 않은 증권사 보고서 인용은 수동 확인 대상이다. Bloomberg·Morningstar 등 유료·폐쇄형 자료의 원문은 제공되지 않았으므로 이를 근거로 한 수치나 해석 역시 <strong>미검증·수동 확인 필요</strong>로 취급한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;Lacr3C3biDY&quot;,
+  &quot;title&quot;: &quot;삼성전자·SK하이닉스 왜 못 가나? 지금 강한 곳은 따로 있다 | 박병창 MP파트너스 대표 [마켓 인사이드]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=Lacr3C3biDY&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/Lacr3C3biDY/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-07T00:11:15+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 20336,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 20336,
+    &quot;segments&quot;: 1200,
+    &quot;duration_seconds&quot;: 2496,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-07T21:13:26.939017+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 6,
+    &quot;asr_uncertain&quot;: 4
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자·SK하이닉스의 프리마켓 하락, SK하이닉스 ADR -6.3%, AMD +2.8%, 미국 주요 지수·종목의 신고가와 도시바 HDD 증산에 따른 스토리지주 하락&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;삼성전자 약 -0.9%, SK하이닉스 약 -1.6~-1.7%, ADR -6.3%, AMD +2.8%&quot;,
+        &quot;observed&quot;: &quot;AMD의 사후 단일 가격 스냅샷만 제공됨; 주장한 시점의 등락률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제시된 등락률과 HDD 증산의 주가 영향은 해당 거래일 시세 및 원보도 확인 전 투자 근거로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;10월 8일 옵션 만기·ETF 리밸런싱과 일부 ETF의 삼성전자 비중 25% 초과가 매도 요인으로 거론됐으나 SK하이닉스 동반 약세는 이 설명만으로 부족하다는 견해&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:07:01&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 8일 옵션 만기; 일부 ETF 삼성전자 비중 25% 초과&quot;,
+        &quot;observed&quot;: &quot;거래소 일정과 ETF별 비중·규정 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;ETF 매도설을 확인된 하락 원인으로 단정하지 말고 ETF별 구성·거래 자료를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자 잠정실적 기대치가 일회성 비용 등으로 낮아졌고 메모리 증설이 향후 공급 증가·사이클 둔화 우려를 낳는다는 해석&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:57&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 실적 수치 없음&quot;,
+        &quot;observed&quot;: &quot;대조 가능한 실적·컨센서스 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실적 기대치 하향이나 공급 과잉을 기정사실로 반영하기 전에 공식 발표와 컨센서스 이력을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;마벨 투자자의 날 AI 매출 전망이 주가 및 ASIC·광통신 관련주에 긍정적으로 작용했다는 설명과 AI 매출 관련 120억·110억·200억 달러 수치&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:57&quot;,
+      &quot;source_confidence&quot;: 0.63,
+      &quot;asr_confidence&quot;: 0.35,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;120억 달러 이상; 내년도 200억 달러 중 AI 매출 110억 달러로도 인식됨&quot;,
+        &quot;observed&quot;: &quot;마벨 IR 원자료 없음; 연도·매출 범주 판정 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI 매출 숫자와 관련주 수혜 논리는 마벨 발표자료 확인 전 인용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;미국 10년물 금리 5.32%에서 5.27%로 하락, 프랑스 국채 약 ‘10P’ 하락 및 달러 강세가 한국 대형주 수급에 부담이라는 해석&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:17&quot;,
+      &quot;source_confidence&quot;: 0.69,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 10년물 5.32%→5.27%; 프랑스 국채 약 10P 하락; 4.9~4.95%는 가정&quot;,
+        &quot;observed&quot;: &quot;해당 시각 금리 시계열 없음; ‘10P’ 단위 미확정&quot;
+      },
+      &quot;investor_implication&quot;: &quot;금리 수치와 달러발 수급 압박을 확인된 시장 원인으로 취급하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;한국투자증권 10월 전략 보고서가 코스피 6,400~7,600 밴드, 12개월 선행 PER 약 5~5.9배, 박스권 전망 및 AI 인프라·2차전지 선호를 제시했다는 인용&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:26:31&quot;,
+      &quot;source_confidence&quot;: 0.69,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;코스피 6,400~7,600; 12개월 선행 PER 약 5~5.9배&quot;,
+        &quot;observed&quot;: &quot;코스피 단일 스냅샷 6,803.90; 보고서·PER 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;증권사의 공식 지수 목표나 밸류에이션 수치로 재인용하기 전에 보고서 원문을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;미국 민주당의 하원 다수당 가능성과 IRA 청정에너지 세액공제 복원·인허가 간소화·송전망 및 ESS 투자 확대 공약&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:26:31&quot;,
+      &quot;source_confidence&quot;: 0.69,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 수치 없음&quot;,
+        &quot;observed&quot;: &quot;공약·선거 전망 원자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정책 수혜와 선거 결과를 확정적으로 전제한 투자 판단은 이르다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;LS ELECTRIC·HD현대일렉트릭이 프리마켓에서 약 3% 상승했고 북미 수주와 긴 납기가 강세 배경이라는 설명&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:17&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;양사 프리마켓 약 +3%&quot;,
+        &quot;observed&quot;: &quot;해당 프리마켓 시세 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;가격과 수주 모멘텀을 분리해 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;삼성전기가 유리기판 생산라인을 발화 기준 ‘내년 말’ 가동 목표로 추진하며 100mm×100mm를 개발 중이고 엔비디아 관련 기판 ‘81.5·74.8’과 비교했다는 발언&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:33:00&quot;,
+      &quot;source_confidence&quot;: 0.75,
+      &quot;asr_confidence&quot;: 0.4,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;내년 말 라인 가동 목표; 100mm×100mm; 비교 수치 81.5·74.8&quot;,
+        &quot;observed&quot;: &quot;회사 원자료 없음; 비교 수치 단위·제품명 불명&quot;
+      },
+      &quot;investor_implication&quot;: &quot;라인 가동 일정과 기판 규격을 확정된 상용화 성과로 해석하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;삼성SDI·에코프로비엠의 전고체 배터리 협력, 셀 양산 기술·소재 기술 역할 분담 및 발표에 따른 주가 상승&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:33:00&quot;,
+      &quot;source_confidence&quot;: 0.77,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 주가 상승률·상용화 연도 없음&quot;,
+        &quot;observed&quot;: &quot;양사 발표 및 가격 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;협력 범위와 상용화 일정을 확인하기 전에는 전고체 테마의 사업 성과를 선반영하지 않아야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;ORCL&quot;,
+      &quot;name&quot;: &quot;Oracle&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;마벨 강세에 동반 상승한 AI 인프라 관련 종목 중 하나로 짧게 언급됐다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ORCL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T13:01:25.262134+00:00&quot;,
+        &quot;current_price&quot;: 144.77000427246094,
+        &quot;market_cap&quot;: 438870434292.70026,
+        &quot;forward_pe&quot;: 13.164271,
+        &quot;trailing_pe&quot;: 22.691223,
+        &quot;fifty_two_week_high&quot;: 322.54,
+        &quot;fifty_two_week_low&quot;: 114.5,
+        &quot;average_target_price&quot;: 237.97415,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AMD&quot;,
+      &quot;name&quot;: &quot;AMD&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;엔비디아에 비해 저평가받던 시기를 지나 최근 강한 상승과 신고가를 보인 사례로 들어, 반도체 내 수급 선호가 바뀔 수 있다고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;AMD가 2.8% 상승했다고 언급했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AMD&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T13:01:30.189856+00:00&quot;,
+        &quot;current_price&quot;: 649.4199829101562,
+        &quot;market_cap&quot;: 1060161913876.8966,
+        &quot;forward_pe&quot;: 41.306736,
+        &quot;trailing_pe&quot;: 165.66837,
+        &quot;fifty_two_week_high&quot;: 658.52,
+        &quot;fifty_two_week_low&quot;: 188.22,
+        &quot;average_target_price&quot;: 636.208,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;코스피&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;인용한 한국투자증권 10월 전망은 매크로 불확실성과 약해진 수급으로 박스권을 예상하고, 실적이 뚜렷한 반도체·하드웨어·전력 등 AI 인프라와 2차전지에 주목했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;한국투자증권 보고서의 10월 코스피 밴드를 6,400~7,600으로 소개했다.&quot;,
+        &quot;12개월 선행 PER을 약 5~5.9배로 소개했으나 자동자막의 숫자 표현이 불명확하다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T13:01:34.321231+00:00&quot;,
+        &quot;current_price&quot;: 6803.89990234375,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 3522.54,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;VIZSLA COPPER INTERSECTS 307.5 G/T SILVER EQUIVALENT OVER 21.2 METERS AT PALMER, SOUTHEAST ALASKA&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/vizsla-copper-intersects-307-5-120000031.html&quot;,
+      &quot;publisher&quot;: &quot;CNW Group&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T12:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;VIZSLA COPPER INTERSECTS 307.5 G/T SILVER EQUIVALENT OVER 21.2 METERS AT PALMER, SOUTHEAST ALASKA Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;METALLIS DISCOVERS NEW SILVER-GOLD VEINS AND EXPANDS EXPLORATION TARGETS AT GREYHOUND&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/metallis-discovers-silver-gold-veins-120000573.html&quot;,
+      &quot;publisher&quot;: &quot;CNW Group&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T12:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;METALLIS DISCOVERS NEW SILVER-GOLD VEINS AND EXPANDS EXPLORATION TARGETS AT GREYHOUND Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Ori...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Global Bauxite Market Size, Share, Trends, Competitive Landscape, and Forecast Report Releases; Bauxite Market to Reach USD 19.3 Billion by 2033 as Aluminum...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/global-bauxite-market-size-share-080500863.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T08:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Global Bauxite Market Size, Share, Trends, Competitive Landscape, and Forecast Report Releases; Bauxite Market to Reach USD 19.3 Billion by 2033 as Aluminum Demand Accelerates Oops, something went wrong Skip to navigation Skip to main content Skip to right...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Which Cryptocurrency Is Most Likely to 10x by 2030: Bitcoin, Ethereum, XRP, or Solana?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/crypto/articles/cryptocurrency-most-likely-10x-2030-123011185.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T12:30:11+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Stock Market Today: Dow Tumbles 400 Points As Yields Jump; Fed Minutes On Deck (Live Coverage)&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/06a29f87-8869-33a5-8fbe-90d7976fe7e3/stock-market-today%3A-dow.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T12:49:05+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Zelestra Passes $1 Billion in 2026 US Project Financing with $350 Million Close for 203 MW Reclamation Solar Project Backed by Meta&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/zelestra-passes-1-billion-2026-120000446.html&quot;,
+      &quot;publisher&quot;: &quot;Business Wire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T12:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;2차전지 관련주, &#x27;맑음&#x27; 나인테크·글로벌에스엠·대성하이텍... &#x27;흐림&#x27; ...&quot;,
+      &quot;source_url&quot;: &quot;http://www.finomy.com/news/articleView.html?idxno=250011&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-02-21T00:20:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;전고체 배터리용 황화리튬을 생산하며, 연간 20톤 규모의 황화리튬 증설 설비를 완료해 본격 가동에 들어갔다. 회사는 에코프로비엠·롯데에너지머티리얼즈 등과 전략적 협약을 체결하며 전고체전지 소재 공급망을...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;2차전지 관련주, &#x27;껑충껑충&#x27; 나인테크·대진첨단소재,·씨아이에스... &#x27;...&quot;,
+      &quot;source_url&quot;: &quot;http://www.finomy.com/news/articleView.html?idxno=249495&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-02-11T00:20:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;전고체 배터리용 황화리튬을 생산하며, 연간 20톤 규모의 황화리튬 증설 설비를 완료해 본격 가동에 들어갔다. 회사는 에코프로비엠·롯데에너지머티리얼즈 등과 전략적 협약을 체결하며 전고체전지 소재 공급망을...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+{
+  "version": 4,
+  "video_id": "3CKtq9InEN4",
+  "title": "\" 발표나면 떨어지는 국룰\" 이럴 때 숫자가 반전 만들 것 | 김록호 하나증권 리서치센터 팀장 [더블 업]",
+  "url": "https://www.youtube.com/watch?v=3CKtq9InEN4",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/3CKtq9InEN4/maxresdefault.jpg",
+  "published_at": "2026-10-07T02:29:59+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 12767,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 12767,
+    "segments": 716,
+    "duration_seconds": 1664,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-07T21:13:26.939017+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 9,
+  "claim_status_summary": {
+    "asr_uncertain": 2,
+    "unverified": 7,
+    "partially_supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "하나증권의 2026년 3분기 삼성전자·SK하이닉스 실적 추정치 하향은 메모리 가격보다 환율 가정 변경 때문이며 삼성전자 목표주가는 유지했다는 발언",
+      "status": "asr_uncertain",
+      "confidence": 0.93,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "1,500원→약 1,415원; 자막 ‘78% 하향’",
+        "observed": "제시 수치 간 하락률 약 5.7%; 원 보고서 수치 미확인"
+      },
+      "investor_implication": "환율 효과를 실적 하향의 주된 원인으로 확정하지 말아야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "메모리 가격은 양호하지만 삼성전자 스마트폰·TV·가전의 비용 부담으로 2026년 3분기 이익이 전망보다 1~2조원 낮을 수 있다는 전망",
+      "status": "unverified",
+      "confidence": 0.93,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "전망 대비 이익 1~2조원 하회 가능",
+        "observed": "비교 가능한 실적·전망 자료 없음"
+      },
+      "investor_implication": "세트 사업의 이익 감소 규모를 투자 판단의 확정 입력값으로 사용하지 말아야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "삼성전자 자사주 매입 집행률 100% 초과, 직원 보상 관련 15조원, 추가 주주환원 재원 약 100조원, 순이익 300조원 및 대규모 배당·자사주 매입과 배당 분리과세 요건에 관한 발언",
+      "status": "asr_uncertain",
+      "confidence": 0.96,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "13:33",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.2,
+      "numeric_parse": {
+        "claimed": "집행률 100% 초과; 15조·100조·300조·70조·30조·65조원 등",
+        "observed": "공시 및 원음 미확인"
+      },
+      "investor_implication": "주주환원 규모나 세후 배당수익을 추정하는 데 이 수치를 사용하지 말아야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "SK하이닉스 자사주 매입이 2026년 11월보다 이른 10월경 종료되고 3분기 실적 발표 때 추가 주주환원이 나올 수 있다는 전망 및 자막상 매일 1조원·30~50조원 발언",
+      "status": "partially_supported",
+      "confidence": 0.67,
+      "supporting_evidence_ids": [
+        "E5"
+      ],
+      "manual_check_required": true,
+      "timestamp": "13:33",
+      "source_confidence": 0.38,
+      "asr_confidence": 0.35,
+      "numeric_parse": {
+        "claimed": "10월경 조기 종료; 매일 약 1조원 매입; 추가 환원 30~50조원",
+        "observed": "E5에 11월 8일 계약 종료일 언급만 있음; 집행액·추가 환원액 미확인"
+      },
+      "investor_implication": "11월 계약 기한과 실제 매입 완료일을 구분하고, 추가 환원은 공식 발표 전까지 기대 시나리오로만 취급해야 한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "마이크론 최근 실적의 매출·EPS가 예상보다 약 8%, 가이던스가 약 6~7% 높았지만 매출총이익률 우려가 주가 상승을 제한했다는 발언",
+      "status": "unverified",
+      "confidence": 0.94,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "06:45",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.74,
+      "numeric_parse": {
+        "claimed": "매출·EPS 약 8% 초과; 가이던스 약 6~7% 초과",
+        "observed": "실적 및 당시 컨센서스 미제공"
+      },
+      "investor_implication": "마이크론의 실적 초과폭을 국내 메모리주 가치평가의 검증된 비교 근거로 사용하지 말아야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "2026년 6월 말 고점 대비 마이크론은 10%대, 삼성전자·SK하이닉스는 약 40% 하락했으며 개인 매도와 소부장주로의 수급 이동이 국내주 회복 지연의 원인이라는 해석",
+      "status": "unverified",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "06:45",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.68,
+      "numeric_parse": {
+        "claimed": "마이크론 10%대 하락; 삼성전자·SK하이닉스 약 40% 하락",
+        "observed": "비교 가능한 시세 자료 없음"
+      },
+      "investor_implication": "하락폭 비교와 수급 원인론을 검증된 상대가치 신호로 취급하지 말아야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "DGX Spark 단일 제품 판매량보다 Vera Rubin 증산 일정이 국내 업체의 HBM4·LPDDR 수요에 더 큰 변수라는 분석",
+      "status": "unverified",
+      "confidence": 0.92,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.69,
+      "numeric_parse": {
+        "claimed": "정량 수치 없음",
+        "observed": "공식 일정·채택 자료 없음"
+      },
+      "investor_implication": "Vera Rubin 일정과 메모리 공급 관계가 공식 확인되기 전까지 수요 확대를 확정하지 말아야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "메모리 공급 부족이 2028년까지 지속될 수 있으나 증설과 장기공급계약이 가격 상승을 제한하고, 안정적 현금흐름과 주주환원이 재평가 요인이 될 수 있다는 전망",
+      "status": "unverified",
+      "confidence": 0.94,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "06:45",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.71,
+      "numeric_parse": {
+        "claimed": "공급 부족이 2028년까지 지속 가능",
+        "observed": "수급 전망 자료 없음"
+      },
+      "investor_implication": "공급 부족의 기간이나 가격 상승 탄력을 확정된 투자 전제로 삼지 말아야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "솔리다임 IPO·지분 매각은 추진 여부가 불확실하며 기업용 SSD의 연결실적 기여를 고려하면 별도 상장의 자금조달 필요성과 SK하이닉스 기존 주주 편익이 불분명하다는 평가",
+      "status": "unverified",
+      "confidence": 0.94,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "13:33",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.67,
+      "numeric_parse": {
+        "claimed": "정량 수치 없음",
+        "observed": "공식 거래·실적 기여 자료 없음"
+      },
+      "investor_implication": "IPO나 지분 매각을 확정된 거래로 반영하지 말아야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "전공정 장비 매출 성장률은 2026년 40~60%에서 2027년 20~30%로 둔화하고 후공정은 10~30%에서 30~50%로 확대되며, 일부 장비주 상승 배수와 PSK홀딩스 상대 선호를 제시한 발언",
+      "status": "unverified",
+      "confidence": 0.96,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "20:45",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "전공정 2026년 40~60%, 2027년 20~30%; 후공정 2026년 10~30%, 2027년 30~50%; 주가 8~10배 또는 3~4배 상승",
+        "observed": "원 보고서·실적·시세 미제공"
+      },
+      "investor_implication": "제시된 성장률·주가 상승 배수를 검증된 목표치로 사용하지 말고 종목별 수주와 실적을 확인해야 한다."
+    }
+  ],
+  "entities": [],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Global Bauxite Market Size, Share, Trends, Competitive Landscape, and Forecast Report Releases; Bauxite Market to Reach USD 19.3 Billion by 2033 as Aluminum...",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/global-bauxite-market-size-share-080500863.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-10-07T08:05:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Global Bauxite Market Size, Share, Trends, Competitive Landscape, and Forecast Report Releases; Bauxite Market to Reach USD 19.3 Billion by 2033 as Aluminum Demand Accelerates Oops, something went wrong Skip to navigation Skip to main content Skip to right..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Wabash Welcomes Final U.S. Ruling on Unfairly Traded Chinese Trailer Imports; Canada and Mexico Investigations Advance Toward Final Decisions",
+      "source_url": "https://finance.yahoo.com/economy/policy/articles/wabash-welcomes-final-u-ruling-201800298.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-10-06T20:18:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Wabash Welcomes Final U.S. Ruling on Unfairly Traded Chinese Trailer Imports; Canada and Mexico Investigations Advance Toward Final Decisions Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Fin..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C3",
+      "title": "Did IREN’s Pivot From Bitcoin Mining to AI Cloud Deals Just Shift IREN's (IREN) Investment Narrative?",
+      "source_url": "https://finance.yahoo.com/technology/ai/articles/did-iren-pivot-bitcoin-mining-150655271.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-06T15:06:55+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Did IREN’s Pivot From Bitcoin Mining to AI Cloud Deals Just Shift IREN's (IREN) Investment Narrative? Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C4",
+      "title": "[주요공시] 삼성전자, 남선알미늄, 화천기계, SK케미칼, 씨젠, 대양전기...",
+      "source_url": "https://www.kdpress.co.kr/news/articleView.html?idxno=205129",
+      "publisher": "Naver News",
+      "published_at": "2026-05-09T22:32:00+09:00",
+      "source_tier": "news",
+      "excerpt": "372원 분기배당을 공시한 바 있다. SK하이닉스는 직전일 자기주식처분결과보고서를 제출한 데 이어... 자기주식취득 신탁계약 체결을 결정했다. 계약기간은 2026년 5월 8일부터 11월 8일까지이고..."
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C5",
+      "title": "Oil prices climb above $100 on Strait of Hormuz attacks, Gulf storm threat",
+      "source_url": "https://finance.yahoo.com/markets/article/oil-prices-climb-above-100-on-strait-of-hormuz-attacks-gulf-storm-threat-122612488.html",
+      "publisher": "Yahoo Finance",
+      "published_at": "2026-10-07T12:26:12+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C7",
+      "title": "Stock Market Today: Dow Tumbles 400 Points As Yields Jump; Fed Minutes On Deck (Live Coverage)",
+      "source_url": "https://finance.yahoo.com/m/06a29f87-8869-33a5-8fbe-90d7976fe7e3/stock-market-today%3A-dow.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-07T12:49:05+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C7",
+      "title": "NVIDIA or AMD: If I Could Only Own 1 for the Next Decade, This Is It",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/nvidia-amd-could-only-own-124536893.html",
+      "publisher": "24/7 Wall St.",
+      "published_at": "2026-10-07T12:45:36+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C9",
+      "title": "Micron Stock Falls as Memory Plant Threat Adds to Chip-Sector Gloom",
+      "source_url": "https://finance.yahoo.com/m/93e89224-f703-3b64-9666-2ae853fac5ae/micron-stock-falls-as-memory.html",
+      "publisher": "Barrons.com",
+      "published_at": "2026-10-07T11:32:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

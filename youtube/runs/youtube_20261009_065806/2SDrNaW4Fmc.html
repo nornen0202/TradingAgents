@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 골드만삭스·JP모건은 왜 이 블록체인을 골랐을까</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261009_065806</p>
+    <h1>골드만삭스·JP모건은 왜 이 블록체인을 골랐을까</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=2SDrNaW4Fmc">원본 영상</a>
+    </div>
+  </header>
+  <h2>캔톤과 금융자산 토큰화: 기관 참여보다 실사용·수익·순공급 검증이 먼저</h2>
+<p>영상: <a href="https://www.youtube.com/watch?v=2SDrNaW4Fmc">PLUS TV — 골드만삭스·JP모건은 왜 이 블록체인을 골랐을까</a> · 공개일 2026-10-08 · 길이 42:41</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 투자 논리는 <strong>전통 금융의 온체인 전환 → 담보·결제 효율 개선 → 캔톤의 기관 실사용 확대 → 코인 사용·소각 증가</strong>로 요약된다. 다만 각 연결고리는 별도 검증이 필요하다. 금융기관의 네트워크 참여가 유료 상용 운영이나 코인 보유를 뜻하지 않으며, 서비스 성장도 토큰 가격 상승을 보장하지 않는다.</p>
+<p><strong>이번 제공 자료에서 독립적으로 확인된 외부 사실은 없다.</strong> 검색 10건에 대해 채택된 증거는 0건이며, 공시·공식 발표·시장 가격·원장 데이터가 제공되지 않았다. 주장 검증 결과는 C9가 자막 불확실성, 나머지 11개가 미검증이다. 이는 허위 판정이 아니라 확인 자료의 부재를 의미한다. 전체 처리 상태의 ‘verified_with_caveats’를 개별 주장에 대한 사실 확인으로 읽어서는 안 된다.</p>
+<h3>2. 영상 주장과 확인된 사실/근거</h3>
+<p>아래 시각은 정확한 발언 시점이 아닌 <strong>관련 자막 청크의 시작 시각</strong>이다. 링크는 영상 발언 확인용이며 독립 검증 자료가 아니다.</p>
+<p>| 주제·관련 시각 | 영상 주장 | 확인된 사실/근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 기관 채택 C1 · <a href="https://www.youtube.com/watch?v=2SDrNaW4Fmc&amp;t=0s">00:00</a>, 12:48 | 골드만삭스·JP모건·DTCC가 캔톤을 사용한다. | 기관별 공식 자료 없음. 참여·투자·파일럿·유료 운영·코인 보유를 구분해야 한다. 제목의 ‘골랐다’는 표현만으로 선택 범위나 독점성을 판단할 수 없다. |</p>
+<p>| 기술·거버넌스 C2 · 00:00, 12:48, 24:55, 30:26 | 2023년 약 15개사와 테스트넷을 출시했고 직후 메인넷으로 전환했다. 약 10년 개발, 독립 재단 운영, 권한 기반 프라이버시를 강조한다. | 출시 이력·정관·통제권·지식재산권·보안 감사 자료 없음. 재단 독립성, 기술 소유권, 실제 분산 운영은 별개다. |</p>
+<p>| 파일럿 C3 · <a href="https://www.youtube.com/watch?v=2SDrNaW4Fmc&amp;t=768s">12:48</a> | DTCC와 3년 파일럿, 미국 3개 주 지원 프로그램 파일럿을 진행한다. | 사업명·주명·기간·상용화 결과 미확인. 3년이 계획 기간인지 경과 기간인지도 불명확하다. |</p>
+<p>| 토큰경제 C4 · <a href="https://www.youtube.com/watch?v=2SDrNaW4Fmc&amp;t=1495s">24:55</a> | 거래 비용을 코인 소각으로 지불하며 ICO 없이 출시했다. 장기적으로 보상의 약 80%를 애플리케이션에 배분한다. | 공식 설계와 실제 집행 모두 미검증. 80%의 분모·도달 시점, 초기 배분, 신규 발행량이 없다. ICO 미실시만으로 공정한 배분을 입증할 수 없다. |</p>
+<p>| 신한 참여 C5 · <a href="https://www.youtube.com/watch?v=2SDrNaW4Fmc&amp;t=1826s">30:26</a> | 신한증권이 네트워크 기여를 통해 슈퍼 검증자가 됐다. | 정확한 법인명·가입 결의·기여 이행·보상 조건 미확인. 증권사와 은행의 자막 혼동 가능성도 있다. |</p>
+<p>| Hyperliquid C6 · 24:55 | 수수료 수익으로 토큰을 매입·소각한 것이 가격 상승의 배경이다. | 매입·보유·영구 소각은 다르다. 지갑 기록, 발행·언락, 가격 관측 기간이 없어 공급 감소와 상승 인과관계를 확인할 수 없다. |</p>
+<p>| 레포 C7 · 24:55, <a href="https://www.youtube.com/watch?v=2SDrNaW4Fmc&amp;t=2208s">36:48</a> | 세계 레포 일일 거래량은 약 15조 달러이며 캔톤 기반 플랫폼이 존재한다. 주말 거래에서 오래된 은행 시스템의 제약을 경험했다. | 시장 통계·운영사 실적·장애 기록 없음. <strong>15조 달러는 영상이 주장하는 세계 시장 수치이지 캔톤 거래량이 아니다.</strong> 거래량·잔액·양측 중복 집계를 확인해야 한다. |</p>
+<p>| 정책 C8·C9 · 00:00, 12:48, 18:51, 30:26 | 미국 정책이 최근 6~12개월간 우호적으로 바뀌었고, 한국 STO 승인과 프라이빗 체인 요구가 있다고 설명한다. | 정책 원문·발효일·적용 범위 없음. 한국 STO 날짜는 자막 복원이 불확실하다. 특정 네트워크 승인이나 도입 의무로 확대 해석할 수 없다. |</p>
+<p>| 토큰화 전망 C10 · 여러 청크 | 향후 5년 내 자산의 지갑 표시·담보 활용, 국제 이전 비용의 사실상 0달러화, 브라질 ABS의 20% 이상 수익률 접근 가능성을 제시한다. | 현재 실측치나 확정 일정이 아니다. 브라질 상품·통화·기간·신용 및 환위험 조건이 없어 20%를 수익률 계산에 사용할 수 없다. |</p>
+<p>| 주변 사례 C11·C12 · 30:26, 24:55 | 한국의 미국 외 테슬라 최대 보유 순위와 블랙록의 토큰화 펀드 사례를 언급한다. | 국가별 비교 통계와 공식 상품 문서 없음. 테슬라 순위는 인터뷰이도 확신하지 않았으며, 블랙록 상품명·규모·네트워크를 추정해 확정할 수 없다. |</p>
+<p>외부 증거 항목이 비어 있으므로 가장 강한 공식 근거의 링크도 제공할 수 없다. 조사 계획에 적힌 검색어와 확인 대상은 증거가 아니다.</p>
+<h3>3. 강세 논리: 성립하려면 무엇이 필요한가</h3>
+<p>영상의 사업 논리는 세 가지다. 모두 사업 관계자의 설명과 전망으로 읽어야 한다.</p>
+<ul>
+<li><strong>기관의 연결 효과:</strong> 주요 금융기관이 실제 업무를 같은 네트워크에서 처리하면 후속 기관의 참여 유인이 커질 수 있다. 이를 확인하려면 기관 수보다 반복 이용, 유료 고객, 갱신 계약과 수수료 실적이 필요하다.</li>
+<li><strong>담보·결제 효율:</strong> 자산 이전과 담보 활용의 지연을 줄이면 재무관리 비용을 낮출 가능성이 있다. 다만 법적 담보 효력, 현금 결제, 기존 시스템 연동까지 포함한 실측 개선이 있어야 한다.</li>
+<li><strong>실사용 기반 토큰 수요:</strong> 수수료 소각이 실제로 작동하고 사용이 지속적으로 증가한다면 토큰 수요를 뒷받침할 수 있다. 그러나 발행·보상·유통량 증가를 함께 계산해야 경제적 효과를 판단할 수 있다.</li>
+</ul>
+<p>핵심은 <strong>네트워크 사업의 성공과 코인 보유자에게 돌아가는 가치가 동일하지 않다</strong>는 점이다. 사업 매출, 코인 결제 필요성, 소각, 신규 공급의 연결 구조가 확인돼야 한다.</p>
+<h3>4. 반론과 주요 위험</h3>
+<ul>
+<li><strong>기관 이름의 과대 해석:</strong> 실증 참여나 기술 협력이 상용 매출·토큰 투자로 이어졌다는 자료가 없다. 파일럿의 기술적 성공도 고객의 지속적인 지불 의사를 입증하지 않는다.</li>
+<li><strong>공급 분석의 공백:</strong> 같은 기간의 발행량과 소각량을 비교해야 한다. 총공급 변화와 유통량 변화는 다르며, 잠금 해제·보상 물량의 시장 유입도 따로 관찰해야 한다.</li>
+<li><strong>프라이버시와 규제의 간극:</strong> 권한 기반 공개라는 설명만으로 보안성이나 적법성이 확인되지 않는다. 실제 접근 권한, 감독기관 열람, 감사 결과와 의사결정 집중도를 확인해야 한다.</li>
+<li><strong>24시간 거래의 운영 위험:</strong> 거래 체결이 가능해도 현금 결제와 담보 이전이 주말에 완료되지 않을 수 있다. 영상도 야간·주말 유동성 부족과 기존 은행 시스템 제약을 지적한다.</li>
+<li><strong>전망의 수치화 위험:</strong> 5년·사실상 0달러·20% 이상은 각각 전망 또는 조건이 빠진 예시다. 현재의 보장된 일정·비용·수익률로 사용할 수 없다.</li>
+</ul>
+<h3>5. 단기 체크포인트와 구체적 관찰 항목</h3>
+<p>확정된 예정 일정은 제공되지 않았다. 다음 공식 발표와 월별 관측에서 아래 항목을 같은 기준으로 누적하는 것이 핵심이다.</p>
+<p>| 관찰 대상 | 확보할 자료·지표 | 판단에 중요한 변화 |</p>
+<p>|---|---|---|</p>
+<p>| 기관 실사용 | 기관 자체 발표의 법인명·사업명·운영 단계, 유료 고객·수수료·반복 이용 | 신규 참여 발표가 실제 서비스 개시·계약 갱신으로 이어지는가 |</p>
+<p>| DTCC·주정부 사업 | 협약 기간, 주명·프로그램·예산, 실증 결과·상용화 결정 | 파일럿에서 유료 운영으로 전환되는가, 지연·중단되는가 |</p>
+<p>| Canton Coin | 동일 기간 발행·소각·총공급·유통량, 초기 배분, 실제 보상 내역 | 이용 증가와 함께 순공급 및 시장 유입 물량이 어떻게 변하는가 |</p>
+<p>| 레포 플랫폼 | 운영사, 거래액 집계 정의, 수수료, 주말 현금·담보 결제 시각 | 세계 시장 규모가 아닌 플랫폼 자체의 반복 실적이 증가하는가 |</p>
+<p>| 거버넌스·신한 참여 | 정관·의결 규칙·검증자 명단·가입 결의·기여 이행 | 공식 지위와 경제적 기여가 영상 설명에 부합하는가 |</p>
+<p>| 규제·비용 | 미국 정책 원문, 한국 STO 결정문·시행일, 전체 이전 비용 | 제안과 시행을 구분할 수 있는가, 환전·수탁·규제 비용까지 절감되는가 |</p>
+<p>Hyperliquid는 공식 지갑의 매입과 영구 소각을 별도로 확인하고, 브라질 ABS는 상품 설명서와 통화·기간·세금·신용·환위험 조건이 확보되기 전까지 수익률 비교에서 제외해야 한다.</p>
+<h3>6. 투자 가설의 무효화·약화 조건</h3>
+<p>아래는 현재 확인된 부정적 사실이 아니라, 향후 관찰할 조건이다.</p>
+<ul>
+<li>주요 기관의 참여가 실증에 머물고 유료 고객·반복 거래가 늘지 않으면 기관 채택의 경제적 효과 가설이 약해진다.</li>
+<li>실제 이용이 늘어도 소각보다 발행이 크다면 ‘사용 증가가 순공급 감소를 만든다’는 설명은 해당 기간에 성립하지 않는다. 이것만으로 가격 방향까지 확정할 수는 없다.</li>
+<li>전체 비용과 결제시간이 기존 방식보다 개선되지 않거나 주말 최종 결제가 반복적으로 막히면 효율성·24시간 금융의 논리가 약해진다.</li>
+<li>규제상 이용 제한, 중대한 보안 사고 또는 거버넌스 집중이 확인되면 기관 친화적 경쟁우위에 대한 재평가가 필요하다.</li>
+</ul>
+<p>자료가 계속 공개되지 않는 것은 반증 자체는 아니지만, 투자 가설을 검증하기 어려운 상태를 지속시킨다.</p>
+<h3>7. 데이터 품질과 수동 확인 범위</h3>
+<p>자동 한국어 자막의 transcript_quality는 ‘good’, 점수 1.0, 경고 없음으로 제공됐다. 그러나 캔톤·Digital Asset·Hyperliquid 등의 표기 혼선, STO 날짜, 프라이버시와 익명성의 용어 충돌이 별도로 보고됐다. 특히 C9는 원음과 정책 원문을 함께 확인해야 한다.</p>
+<p>엔터티별 source_confidence는 캔톤 0.91, 토큰화 시장 0.87, Hyperliquid 0.83이다. 이는 <strong>발언 추출의 명확성</strong>이지 사실 확률이나 투자 신뢰도가 아니다. 개별 검증 결과의 confidence·source_confidence·asr_confidence 0.0은 미산정 표기이며, 허위 확률이나 자막 오류율로 해석할 수 없다.</p>
+<p>검토 범위는 00:00~42:32로 마지막 약 8~9초가 빠져 있고 실제 녹화일은 알려지지 않았다. 따라서 ‘최근 6~12개월’, ‘지난주’, ‘향후 5년’의 정확한 기준일도 확정할 수 없다. 가격·거래량·공급·실적 자료가 없어 현재 가치평가나 가격 반응 분석은 불가능하다.</p>
+<p><strong>비공개 자료는 미검증·수동 확인 필요:</strong> 내부 개발기간·기술 권리 계약, 파일럿 협약, 신한의 기여 약정, 주말 거래 장애 기록은 당사자 자료가 필요하다. Bloomberg·Morningstar 자료는 제공되지 않았으며, 해당 자료에 의존하는 주장 역시 미검증·수동 확인 필요로 남는다.</p>
+<h3>결론</h3>
+<p>이 영상은 캔톤의 기관 금융 활용 가능성과 실사용 중심 평가 기준을 제시하지만, 이번 자료만으로 기관 채택·상용 매출·토큰 공급 효과를 확인할 수는 없다. 다음 판단의 중심은 유명 기관의 이름보다 <strong>유료 상용 운영, 반복 거래와 수수료, 발행 대비 소각, 실제 결제 완결성</strong>이어야 한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;2SDrNaW4Fmc&quot;,
+  &quot;title&quot;: &quot;골드만삭스·JP모건은 왜 이 블록체인을 골랐을까&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=2SDrNaW4Fmc&quot;,
+  &quot;channel&quot;: &quot;PLUS TV (플러스 TV)&quot;,
+  &quot;channel_id&quot;: &quot;UCuHUaZo43N9PgOCjs3Hg2Uw&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@plus_tv_official/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/2SDrNaW4Fmc/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-08T08:00:05+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 22141,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 22141,
+    &quot;segments&quot;: 994,
+    &quot;duration_seconds&quot;: 2561,
+    &quot;repeated_ngram_ratio&quot;: 0.005
+  },
+  &quot;generated_at&quot;: &quot;2026-10-09T06:58:06.448375+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 0,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 11,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;골드만삭스·JP모건·DTCC가 캔톤을 사용한다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없음.&quot;,
+        &quot;observed&quot;: &quot;기관별 참여 형태와 실제 이용 실적 확인 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기관 이름만으로 상용 매출이나 코인 투자 수요가 입증됐다고 판단하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;2023년 약 15개 회사와 테스트넷을 출시한 직후 메인넷을 출시했고 약 10년간 기술을 개발했다는 주장. 독립 재단·복수 조직의 운영, Digital Asset의 통제권·기술 소유권 부재, 권한 기반 정보 공개 및 기여·초다수 투표 기반 슈퍼 검증자 선정도 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2023년·약 15개 회사·약 10년 개발·초다수 찬성. 메인넷까지의 정확한 간격과 의결 비율은 미제시.&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 출시일·회사 수·개발기간·의결 정족수 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거버넌스와 기술 권리 구조를 확인하기 전 분산 운영이나 규제 적합성을 확정적인 경쟁우위로 반영하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;DTCC 사업은 3년간의 파일럿이며 미국 3개 주에서도 주정부 지원 프로그램 파일럿을 진행한다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:48&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;DTCC 파일럿 3년·미국 3개 주.&quot;,
+        &quot;observed&quot;: &quot;기간과 참여 주를 확인할 외부 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;사업 식별과 상용화 결정, 실제 고객 지불 여부를 확인하기 전 확정 매출로 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;Canton Coin은 거래 비용을 소각으로 지불하고 ICO 없이 공정 출시했으며 장기적으로 보상의 약 80%를 애플리케이션에 배분한다는 주장. 이용 증가가 희소성을 강화한다고 설명한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:55&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;시간이 지나면 네트워크 보상의 약 80%를 애플리케이션에 배분.&quot;,
+        &quot;observed&quot;: &quot;실제 배분율·도달 시점·발행량·소각량·순공급 관측값 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발행·소각·유통량 변화를 대조하기 전 사용량 증가를 공급 감소나 가격 상승으로 연결하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;신한증권이 자금 투입 대신 네트워크 기여를 약속·이행해 슈퍼 검증자가 되었다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:30:26&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없음.&quot;,
+        &quot;observed&quot;: &quot;가입일·투표 결과·기여 실적 확인 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;법인명·검증자 지위·기여 내용·보상 조건을 확인한 뒤 기관 참여의 경제적 의미를 판단한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;Hyperliquid가 수수료 수익으로 토큰을 매입·소각해 공급을 줄였고 이것이 가격 상승의 배경이라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:55&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;가격 상승 폭·기간과 매입·소각 규모 미제시.&quot;,
+        &quot;observed&quot;: &quot;수수료 수익·매입·소각·순공급·가격 관측값 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;수익 배분과 실제 소각 집행, 발행·언락을 포함한 공급 변화를 확인하기 전 가격 상승 설명을 투자 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;세계 레포 시장의 일일 거래량이 약 15조 달러이고 캔톤 파트너가 레포 플랫폼을 구축했다는 주장. 첫 주말 거래에서 약 20년 된 은행 시스템이 토요일 처리를 막았다는 사례도 제시한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:55&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;세계 레포 일일 거래량 약 15조 달러·은행 시스템 연령 약 20년.&quot;,
+        &quot;observed&quot;: &quot;시장 규모와 시스템 연령을 확인할 관측 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;세계 시장 규모를 캔톤의 처리량이나 매출로 대입하지 않고 플랫폼별 실제 거래와 수익을 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;최근 6~12개월간 미국 당국이 금융기관의 블록체인 활동을 촉진하는 방향으로 바뀌었으며 은행 서비스에는 KYC·AML 의무가 적용된다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;최근 6~12개월의 정책 변화.&quot;,
+        &quot;observed&quot;: &quot;녹화일 및 해당 기간의 정책 변경 증거 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정책 방향 발언을 캔톤에 대한 당국의 승인이나 은행의 도입 의무로 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;한국이 &#x27;지난주에 2월에 최초의 STO&#x27;를 승인했고 규제가 프라이빗 체인 사용을 요구한다는 발언.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&#x27;지난주&#x27;·&#x27;2월&#x27;·&#x27;최초&#x27;라는 불명확한 시점·순서 표현.&quot;,
+        &quot;observed&quot;: &quot;절대 날짜와 승인 대상 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;원음과 공식 결정문을 대조하기 전 제도 시행이나 특정 네트워크 수혜의 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;5년 내 다양한 자산의 지갑 표시·실시간 담보 활용, 국제 자산 이전 비용의 사실상 0달러화, 한국 투자자의 브라질 ABS 20% 이상 수익률 접근 가능성을 전망한다. 24시간 운영의 유동성·은행 시스템 위험도 지적한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;향후 5년·국제 이전 비용 사실상 0달러·브라질 ABS 수익률 20% 이상.&quot;,
+        &quot;observed&quot;: &quot;전망 기준일·실측 비용·식별 가능한 상품 수익률 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;20% 이상을 보장 수익으로 해석하지 않으며, 상품과 비용·위험 조건을 확인하기 전 투자 수익률 계산에 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;미국을 제외하면 한국이 테슬라의 최대 주주라는 통계를 봤다는 발언.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:30:26&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 제외 국가별 보유 순위 1위라는 취지.&quot;,
+        &quot;observed&quot;: &quot;동일 기준 국가별 보유 순위 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;국가별 최대 보유 주장으로 한국의 투자 영향력이나 추가 매수 여력을 추정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;블랙록이 머니마켓펀드를 토큰화했고 이후 유사 사업이 유행했다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:55&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;상품명·출시일·규모·후속 출시 건수 미제시.&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 상품 및 시장 관측 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;토큰화 사례의 존재, 상품의 정확한 구조, 후속 사업의 성장성과 차별성을 구분해 확인한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

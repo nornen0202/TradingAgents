@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 이재용 회장이 삼전&#x27;우&#x27;, 자사주 소각을 계속 고민하는 이유</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261003_080654</p>
+    <h1>이재용 회장이 삼전&#x27;우&#x27;, 자사주 소각을 계속 고민하는 이유</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=A0WPDxP4gts">원본 영상</a>
+    </div>
+  </header>
+  <h2>삼성전자 우선주 매입·소각 주장 점검</h2>
+<p><strong>대상:</strong> <a href="https://www.youtube.com/watch?v=A0WPDxP4gts">경제사냥꾼 영상</a> (2026년 10월 2일 게시)</p>
+<p><strong>판단 기준:</strong> 2026년 10월 3일 제공된 자료</p>
+<h3>핵심 판단</h3>
+<p>영상의 투자 논리는 <strong>우선주가 보통주보다 저렴하다면 같은 자금으로 더 많은 주식을 매입·소각할 수 있다</strong>는 것이다. 이 산식은 조건부로 성립하지만, 제공된 자료에는 삼성전자의 매입 계획, 당시 가격, 배당 규모와 일정 등을 입증할 관련 공시·시장 데이터가 없다. 따라서 <strong>영상의 전망을 확정된 주주환원 정책으로 받아들일 근거는 부족하다.</strong></p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>| 주제 | 영상 주장 | 확인된 사실·근거 및 판단 |</p>
+<p>|---|---|---|</p>
+<p>| 우선주 매입 제안 | 자산운용사가 삼성전자 이사회에 우선주 우선 매입·소각을 제안했다. | 서한 원문과 회사 답변이 제공되지 않았다. 운용사 명칭도 자동자막에서 불일치한다. <strong>미확인.</strong> |</p>
+<p>| 가격 할인과 소각 효율 | 우선주가 26.7% 저렴해 같은 돈으로 약 1.36배 많은 주식을 살 수 있다. | <strong>26.7% 할인을 가정하면</strong> 1÷0.733≈1.36으로 산술은 맞다. 그러나 동일 기준일의 보통주·우선주 가격이 없어 실제 할인율은 확인되지 않았다. 실제 매입·소각 수량도 집행 가격과 조건에 달린다. |</p>
+<p>| 주가·수급 | 보통주 9%, 우선주 15% 이상 상승; 개인의 우선주 순매수 8천억 원 초과. | 수익률 산정 기간·가격과 투자자별 거래 자료가 없다. 상승 원인을 자사주 기대감으로 단정할 수도 없다. <strong>모두 미확인.</strong> |</p>
+<p>| 회사 방침·내부 분위기 | 삼성전자는 가격 차이 축소를 검토하지만 우선주만 매입하겠다고 확약하지 않았고, 내부에서는 전액 우선주 사용에 부정적이다. | 회사 답변 원문과 내부 분위기를 전한 원보도가 없다. 제안, 회사의 공식 결정, 익명 관측을 구분해야 한다. <strong>미확인.</strong> |</p>
+<p>| 계열사 지분·규제 | 보통주 소각으로 삼성생명·삼성화재의 지분율이 올라 일부 매각이 필요할 수 있다. | 보유 주식 수, 소각 규모, 적용 법령·산정 기준이 없다. <strong>매각 의무 발생 여부는 판단할 수 없다.</strong> |</p>
+<p>| 규모·일정·전망 | 약 30조 원 현금배당, 2026년 10월 말 및 2027년 1월 말 결정, 월가의 강한 주가 전망. | 관련 공시·이사회 일정·보고서 원문이 없다. 특히 ‘30조 원 현금배당’은 자막 인식 오류 가능성이 있어 금액의 성격부터 재확인이 필요하다. <strong>확정 이벤트로 취급할 수 없다.</strong> |</p>
+<h3>투자 논리와 반론</h3>
+<p>우선주 할인율이 실제로 크고 회사가 우선주를 매입·소각한다면, 동일한 지출로 제거하는 <strong>우선주 수량</strong>은 보통주 매입 때보다 많을 수 있다. 다만 이것만으로 주당 가치 상승 폭이나 주가 상승을 보장하지는 않는다. 매입 대상과 규모를 정하는 과정에는 보통주 주주와의 형평성 문제가 제기될 수 있고, 영상이 주장하는 계열사 지분·규제 문제도 별도 검증이 필요하다. 무엇보다 <strong>삼성전자의 종류별 매입·소각 결정 자체가 제공 자료로 확인되지 않았다.</strong> 영상 제목의 ‘이재용 회장이 고심한다’는 개인의 판단에 관한 표현으로, 직접 발언이나 신뢰할 만한 기록 없이 확인할 수 없다.</p>
+<h3>자료의 신뢰도와 한계</h3>
+<p>자동자막의 전체 품질 점수는 <strong>1.0(good)</strong>이지만, 이는 개별 숫자와 고유명사의 정확성을 보증하지 않는다. 검증 결과에서 원출처 신뢰도(<strong>source_confidence</strong>)는 주요 주장 모두 <strong>0.0</strong>이다. 자막 신뢰도(<strong>asr_confidence</strong>)도 운용사 명칭과 ‘30조 원 현금배당’은 각각 <strong>0.35</strong>, 규제 관련 표현은 <strong>0.55</strong>로 낮다. 가격 할인 주장도 <strong>0.70</strong>에 그친다. 제공된 주장의 시각 표시는 모두 <strong>00:00</strong>이며, 실제로는 영상 전체 <strong>00:00~02:36</strong>이 단일 구간으로 처리돼 개별 발언 시각을 특정할 수 없다.</p>
+<p>수집된 외부 기사 E1~E4는 각각 다른 기업이나 구리 가격에 관한 내용으로, <strong>삼성전자 주장에 대한 확인 근거가 아니다.</strong> 증거 묶음의 ‘verified’ 표시는 해당 주장의 사실 검증 완료를 뜻하지 않는다. 따라서 인용할 만한 관련 외부 근거 링크는 제공되지 않았다. 출처가 특정되지 않은 월가 보고서와 Bloomberg·Morningstar 등 비공개·유료 자료에 의존하는 주장은 <strong>미검증이며 원문 수동 확인이 필요하다.</strong></p>
+<h3>가까운 시점의 관찰 항목</h3>
+<ul>
+<li><strong>공식 결정:</strong> 삼성전자의 주주환원·배당·자사주 공시와 이사회 결의에서 금액, 주식 종류, 매입·소각 여부를 확인한다. 영상이 제시한 2026년 10월 말·2027년 1월 말은 <strong>검증되지 않은 예상 시점</strong>이다.</li>
+<li><strong>가격과 수급:</strong> 같은 날짜의 보통주·우선주 가격으로 할인율을 다시 계산하고, 기간이 명시된 거래소 자료로 상승률과 개인 순매수액을 검증한다.</li>
+<li><strong>제안과 답변:</strong> 운용사 서한 및 삼성전자 답변 원문으로 제안 주체와 회사의 확약 여부를 확인한다.</li>
+<li><strong>규제 영향:</strong> 실제 소각안이 나오면 계열사 보유량·소각 규모별 지분율과 적용 규정을 대조한다.</li>
+</ul>
+<p><strong>논리의 무효화 조건:</strong> 실제 우선주 할인율이 주장보다 현저히 작거나, 회사가 우선주 중심 매입·소각을 채택하지 않거나, 공시된 배당·환원 재원의 규모와 성격이 영상 주장과 다르면 영상의 핵심 투자 논리는 재평가해야 한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;A0WPDxP4gts&quot;,
+  &quot;title&quot;: &quot;이재용 회장이 삼전&#x27;우&#x27;, 자사주 소각을 계속 고민하는 이유&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=A0WPDxP4gts&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/A0WPDxP4gts/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-02T00:59:46+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 2102,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 2102,
+    &quot;segments&quot;: 102,
+    &quot;duration_seconds&quot;: 156,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-03T08:06:54.532413+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;asr_uncertain&quot;: 2,
+    &quot;unverified&quot;: 8
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;행동주의 운용사가 삼성전자 이사회에 남은 주주환원 자금으로 우선주를 우선 매입·소각하자는 서한을 보냈다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.35,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제안 자체와 제안 주체를 확인하기 전에는 회사의 환원 계획으로 받아들일 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;우선주가 보통주보다 26.7% 저렴해 같은 금액으로 약 1.36배 많은 주식을 매입·소각할 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.25,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;우선주 26.7% 할인; 보통주 1주당 우선주 약 1.36주; 예시 자금 1조 원&quot;,
+        &quot;observed&quot;: &quot;가격 자료 없음; 조건부 산식 1÷0.733≈1.364&quot;
+      },
+      &quot;investor_implication&quot;: &quot;1조 원 투입 효과는 기준일 가격과 실제 매입·소각 조건을 확인한 뒤 추정해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;자사주 매입 기대감에 보통주가 9%, 우선주가 15% 넘게 상승했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;보통주 +9%; 우선주 +15% 초과&quot;,
+        &quot;observed&quot;: &quot;기간·가격 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;검증되지 않은 과거 수익률이나 촉매 해석을 투자 판단의 근거로 삼기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;주주환원 발표 후 개인투자자가 삼성전자우를 8천억 원 넘게 순매수했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;개인 순매수 8천억 원 초과&quot;,
+        &quot;observed&quot;: &quot;거래소 수급 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;개인 수급 규모와 지속성을 확인할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자는 보통주·우선주 가격 차이 축소 방안을 검토하겠다고 답했지만 우선주만 매입하겠다고 확약하지 않았다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;우선주 전용 매입을 확정 정책으로 가정해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;최근 보도에 따르면 삼성 내부는 환원 자금 전액을 우선주에 쓰는 데 부정적이며 보통주 주주와의 형평성을 우려한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.07,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;환원 자금 전액&quot;,
+        &quot;observed&quot;: &quot;금액·비중 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;익명 내부 관측을 이사회 방침으로 해석하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;보통주 소각 시 삼성생명·삼성화재의 삼성전자 지분율이 상승해 규제상 일부 매각이 필요할 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.15,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;소각에 따른 지분율 상승 및 일부 매각 가능성&quot;,
+        &quot;observed&quot;: &quot;보유량·소각량·규제 한도 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실제 규제 제약은 지분율 시뮬레이션과 법령·당국 해석 확인 후 판단해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;약 30조 원 현금배당의 세부 방식은 2026년 10월 말 이사회가 정하고, 남은 자금의 사용 방식은 2027년 1월 말경 결정한다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.07,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.35,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;현금배당 약 30조 원; 2026년 10월 말; 2027년 1월 말경&quot;,
+        &quot;observed&quot;: &quot;공식 금액·일정 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;배당 규모나 결정 시점을 확정된 투자 이벤트로 취급해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;최근 월가 보고서가 삼성전자 주가의 사상 최고 수준 상승을 전망했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;사상 최고 수준 상승 전망&quot;,
+        &quot;observed&quot;: &quot;목표주가·기준가격 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출처 미상의 낙관적 전망에 투자 판단을 의존할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;우선주 대량 매입·소각은 주식 수를 줄이지만 주식 종류 선택은 주주 형평성과 계열사 지분 문제 사이의 선택이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.18,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;우선주 대량 매입·소각&quot;,
+        &quot;observed&quot;: &quot;실제 매입·소각 규모 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;영상의 전략적 해석을 확정된 회사 방침으로 받아들이지 말아야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Zymeworks Completes Theravance Deal, Adds YUPELRI Cash Flow and Raises 2026 Outlook&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/healthcare/articles/zymeworks-completes-theravance-deal-adds-230204566.html&quot;,
+      &quot;publisher&quot;: &quot;MarketBeat&quot;,
+      &quot;published_at&quot;: &quot;2026-10-02T23:02:04+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Zymeworks Completes Theravance Deal, Adds YUPELRI Cash Flow and Raises 2026 Outlook Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Origi...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;New World Development Co Ltd (NWWDF) (H1 2026) Earnings Call Highlights: Hong Kong Sales Hit ...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/real-estate/articles/world-development-co-ltd-nwwdf-230026329.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-02T23:00:26+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;New World Development Co Ltd (NWWDF) (H1 2026) Earnings Call Highlights: Hong Kong Sales Hit ... Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Bank of America Raises Long-Term Copper Forecast to $12,000 Per Ton&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/bank-america-raises-long-term-132700996.html&quot;,
+      &quot;publisher&quot;: &quot;InvestorsHub&quot;,
+      &quot;published_at&quot;: &quot;2026-10-02T13:27:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Bank of America Raises Long-Term Copper Forecast to $12,000 Per Ton Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather New...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+{
+  "version": 4,
+  "video_id": "N-DmjglU-Ac",
+  "title": "월가에서 현시점 엔비디아가 저평가 됐다는 이유",
+  "url": "https://www.youtube.com/watch?v=N-DmjglU-Ac",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/N-DmjglU-Ac/maxresdefault.jpg",
+  "published_at": "2026-10-08T08:55:15+00:00",
+  "status": "unverified",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 2672,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 2672,
+    "segments": 123,
+    "duration_seconds": 166,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-09T06:58:06.448375+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 6,
+  "claim_status_summary": {
+    "unverified": 12
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "영상 게시 주간에 엔비디아 주가가 사상 최고치를 경신했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.15,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "게시 주간 사상 최고가 경신; 가격 미제시",
+        "observed": "게시 이후 스냅샷 가격 230.48달러, 52주 최고가 243.37달러; 최고가 발생일·역대 최고가 미제공"
+      },
+      "investor_implication": "사상 최고가 경신을 확인된 투자 전제로 사용하지 말고 게시 이전 가격 이력에서 장중·종가 최고가를 구분해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "월가가 엔비디아 매수 추천과 최고의 반도체 종목 선정을 유지하며 주식을 조용히 매집하고 있다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "추천·매집을 확인할 자료 없음"
+      },
+      "investor_implication": "추천 의견과 실제 기관 매수를 분리하고, 미확인 매집 주장을 투자 신호로 사용하지 않아야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "올해 2분기 매출은 962억 달러로 전년 동기 대비 106% 증가했으며 사업 이익도 두 배 이상 증가했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "매출 962억 달러=96.2 billion USD; 전년 동기 대비 +106%; 사업 이익 두 배 이상",
+        "observed": "해당 기간의 매출·전년 매출·이익 수치 미제공"
+      },
+      "investor_implication": "실적 성장에 근거한 투자 논리는 매출과 이익의 기간·지표를 공식 실적표에 대조한 뒤 평가해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "현재 주가는 2028년 1월 종료 회계연도 예상 이익의 약 15배여서 저평가되어 있으며, 결론에서는 이를 내년 예상 수익의 15배라고 표현한다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.25,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "2028년 1월 종료 회계연도 예상 이익 대비 약 15배; 결론은 '내년 예상 수익'",
+        "observed": "2026-10-08 22:16:04 UTC 스냅샷 forward_pe 14.482299; 대상 회계연도·예상 EPS 미제공"
+      },
+      "investor_implication": "동일 시점의 가격과 해당 회계연도 EPS로 배수를 재계산해야 한다. EPS 증가와 PER 불변을 가정하면 계산상 주가는 상승하지만, 실제 이익 증가나 배수 유지는 확인되지 않았다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "엔비디아가 GPU뿐 아니라 작업 분산용 칩과 연결 장비를 포함한 전체 시스템 공급을 확대하며, Vera Rubin은 같은 전력으로 더 많은 AI 작업을 처리한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.05,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "동일 전력에서 AI 처리량 증가; 구체적 성능 배수 없음",
+        "observed": "전력·처리량·비교 조건 미제공"
+      },
+      "investor_implication": "제품 구성과 동일 전력 비교의 워크로드·시스템 범위·측정 조건을 확인하고, 발표와 실제 출하·매출 전환을 구분해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "전력 부족이 AI 데이터센터 확장의 주요 제약이다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "전력 수요·공급·접속 지연 수치 미제공"
+      },
+      "investor_implication": "투자 대상 데이터센터의 전력 확보와 가동 일정을 확인해야 하며, 제공 자료로 전 세계적 전력 제약을 단정할 수 없다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "젠슨이 동일 전력 용량에서 Blackwell은 약 250억 달러, Vera Rubin은 약 400억 달러의 수익을 창출할 수 있다고 설명했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.05,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "Blackwell 250억 달러=25 billion USD; Vera Rubin 400억 달러=40 billion USD; 동일 전력 가정",
+        "observed": "해당 금액·전력 용량·수익 지표·산정 기간 미제공"
+      },
+      "investor_implication": "두 금액을 엔비디아의 확정 매출이나 이익 추정에 직접 반영해서는 안 된다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "AI의 데이터 탐색·프로그램 구축·결과 검증에도 지속적인 연산이 필요해 산업별 AI 도입 확대가 엔비디아 장비 수요를 늘릴 것이다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "연산량·산업별 도입률·추가 구매량 미제공"
+      },
+      "investor_implication": "조건부 수요 전망으로 다루고 실제 고객 도입·설비투자·매출 전환으로 검증해야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "아마존 같은 대형 기술기업이 엔비디아 칩 200만 개를 추가 구매한다고 발표했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "엔비디아 칩 200만 개=2,000,000개 추가 구매",
+        "observed": "구매 발표·기업별 배분·대상 제품·공급 일정 미제공"
+      },
+      "investor_implication": "공식 발표에서 구매자별 물량과 주문·계획·인도를 구분하기 전에는 확정 매출의 근거로 사용하지 않아야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "인도와 말레이시아가 데이터센터용 최신 칩 수만 개를 구매하며 미출시 제품에 대한 구매 움직임도 있다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "인도·말레이시아의 최신 칩 수만 개 구매; 국가별 수량 없음",
+        "observed": "국가별 구매량·제품·계약·공급 일정 미제공"
+      },
+      "investor_implication": "구매 주체·제품·계약 상태·납기를 확인한 후 수요 전망에 반영해야 한다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "엔비디아 주문량이 급증해 공급을 초과한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "주문 급증 및 주문량의 공급 초과; 수치 없음",
+        "observed": "주문량·공급량·백로그·납기 미제공"
+      },
+      "investor_implication": "제품별 주문과 공급량, 납기 및 매출 인식을 구분해 확인해야 한다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "2028년 1월 종료 회계연도의 매출이 70% 더 증가할 것으로 확신한다고 주장한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00–00:02:46",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "2028년 1월 종료 회계연도 매출 +70%; 비교 기준 미명시",
+        "observed": "해당 매출 전망·기준 매출·증가율 근거 미제공"
+      },
+      "investor_implication": "70%를 공식 성장 가이던스나 확정 실적으로 사용하지 말고, 원래 전망과 비교 기준을 확보해 재계산해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "NVDA",
+      "name": "엔비디아",
+      "status": "unverified",
+      "claims": [
+        "이번 주 주가가 사상 최고치를 경신했지만 월가는 매수 추천과 최고의 반도체 종목 평가를 유지하며 주식을 매집하고 있다고 주장한다.",
+        "매출과 사업 이익의 급증을 근거로 기대감뿐 아니라 실제 수익 창출에 기반한 성장 기업이라고 설명한다.",
+        "미래 회계연도의 예상 이익 대비 현재 주가 배수가 낮아 저평가되어 있다고 주장한다."
+      ],
+      "numeric_claims": [
+        "올해 2분기 매출: 962억 달러.",
+        "올해 2분기 매출의 전년 동기 대비 증가율: 106%.",
+        "사업에서 얻은 이익: 전년 대비 두 배 이상 증가했다고 표현하며 정확한 이익 지표는 제시하지 않는다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "NVDA",
+        "as_of": "2026-10-08T22:16:04.941051+00:00",
+        "current_price": 230.47999572753906,
+        "market_cap": 5565400456832.886,
+        "forward_pe": 14.482299,
+        "trailing_pe": 29.1378,
+        "fifty_two_week_high": 243.37,
+        "fifty_two_week_low": 164.27,
+        "average_target_price": 328.71695,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "AMZN",
+      "name": "아마존",
+      "status": "unverified",
+      "claims": [
+        "영상은 아마존을 예로 든 대형 기술기업들이 엔비디아 칩 추가 구매를 발표했다고 주장한다."
+      ],
+      "numeric_claims": [
+        "아마존 등 대형 기술기업의 추가 구매 물량으로 엔비디아 칩 200만 개를 제시한다. 아마존 단독 물량인지 여러 기업의 합계인지는 불명확하다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "AMZN",
+        "as_of": "2026-10-08T22:16:07.103066+00:00",
+        "current_price": 254.05999755859375,
+        "market_cap": 2740370799768.547,
+        "forward_pe": 24.273798,
+        "trailing_pe": 20.439259,
+        "fifty_two_week_high": 287.2,
+        "fifty_two_week_low": 196.0,
+        "average_target_price": 331.53,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Dow Jones Futures: AI Stocks Tumble On OpenAI News; SpaceX Move Slams Verizon, AT&T Late",
+      "source_url": "https://finance.yahoo.com/m/955f9165-6ca4-336e-9d6e-fff1a7c7f4e0/dow-jones-futures%3A-ai-stocks.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-08T22:07:44+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Dow Jones Futures: AI Stocks Tumble On OpenAI News; SpaceX Move Slams Verizon, AT&T Late Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "The S&P 500 ETF You Know Charges 0.0945%. These 2 Charge 0.03%",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/p-500-etf-know-charges-220310762.html",
+      "publisher": "24/7 Wall St.",
+      "published_at": "2026-10-08T22:03:10+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "The S&P 500 ETF You Know Charges 0.0945%. These 2 Charge 0.03% Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newslett..."
+    },
+    {
+      "evidence_id": "E3",
+      "claim_id": "C2",
+      "title": "Why Broadcom Stock Took a Dive Today",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/why-broadcom-stock-took-dive-220557842.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-08T22:05:57+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Why Broadcom Stock Took a Dive Today Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfolio N..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Jones Lang LaSalle Eyes $1 Trillion Outsourcing Market With AI, REMS Growth",
+      "source_url": "https://finance.yahoo.com/real-estate/articles/jones-lang-lasalle-eyes-1-220207635.html",
+      "publisher": "MarketBeat",
+      "published_at": "2026-10-08T22:02:07+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Jones Lang LaSalle Eyes $1 Trillion Outsourcing Market With AI, REMS Growth Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Wea..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C7",
+      "title": "San Francisco Giants Sell Stake to Private Equity",
+      "source_url": "https://www.nytimes.com/2025/03/18/business/dealbook/san-francisco-giants-sell-stake-private-equity-sixth-street.html?partner=naver",
+      "publisher": "Naver News",
+      "published_at": "2025-03-18T21:02:00+09:00",
+      "source_tier": "news",
+      "excerpt": "Huang has promised more details about the company’s upcoming Blackwell Ultra chip, and a new A.I. super-chip, Vera Rubin, named after the astronomer who discovered dark matter. The Rubin line..."
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C12",
+      "title": "MSFT, ORCL, NVDA, QQQ In Focus: OpenAI’s Annualized Revenue Reportedly Trails Prior Expectations By $20B",
+      "source_url": "https://finance.yahoo.com/news/msft-orcl-nvda-qqq-focus-190141481.html",
+      "publisher": "Stocktwits",
+      "published_at": "2026-10-08T19:01:41+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

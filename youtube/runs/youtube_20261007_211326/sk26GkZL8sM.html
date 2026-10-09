@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - AI가 은행까지 해킹하는 시대, 내 자산은 안전할까? BitGo CEO가 비트코인 100개를 내건 이유</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261007_211326</p>
+    <h1>AI가 은행까지 해킹하는 시대, 내 자산은 안전할까? BitGo CEO가 비트코인 100개를 내건 이유</h1>
+    <div class="meta">
+      <span class="badge status-contradicted">contradicted</span>
+      <a href="https://www.youtube.com/watch?v=sk26GkZL8sM">원본 영상</a>
+    </div>
+  </header>
+  <h2>BitGo CEO 인터뷰: 디지털자산 수탁과 토큰화의 투자 관찰 포인트</h2>
+<p><strong>핵심 판단:</strong> 영상은 기관의 디지털자산 참여가 늘면 전문 수탁 수요도 커지고, 스테이블코인·자산 토큰화가 금융 서비스를 바꿀 수 있다는 전망을 제시한다. 그러나 제공된 외부 근거가 독립적으로 뒷받침하는 항목은 <strong>비트고코리아의 VASP 신고 수리 보도</strong>뿐이다. 고객 관계, 보안 성능, 시장 규모, 가격 전망은 확인된 사실로 취급할 수 없다.</p>
+<h3>영상 주장과 확인된 근거</h3>
+<p>| 주제 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>| --- | --- | --- |</p>
+<p>| BitGo 수탁·수익 모델 | 거래 기능과 분리된 수탁, 다중서명·MPC·콜드스토리지·외부 감사, 수탁·이체·스테이킹 관련 수익을 설명했다(<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=238s">03:58</a>–<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=494s">08:14</a>). | 공식 제품 문서, 유효한 감사 자료, 공개 수수료표가 제공되지 않았다. 통제의 실효성이나 수익 규모는 <strong>미검증·수동 확인 필요</strong>. |</p>
+<p>| Fidelity 관계 | Fidelity가 BitGo의 이더리움 스테이킹 서비스를 이용한다고 말했다(<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=494s">08:14</a>). | 양사의 발표나 계약 자료가 없다. 확인된 고객 또는 매출로 전제해서는 안 된다. <strong>미검증·수동 확인 필요</strong>. |</p>
+<p>| 한국 사업 | 비트고코리아의 VASP 신고 수리와 사업 확대를 언급했다(<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=1852s">30:52</a>). | <a href="https://www.newsfreezone.co.kr/news/articleView.html?idxno=705102">2026년 8월 21일 기사</a>는 8월 18일 KoFIU 신고 수리를 보도한다. 다만 FIU 원문이 아니며, 허용 업무 범위·실제 영업 성과·구축에 약 2년 반이 걸렸다는 발언은 확인되지 않았다. 신고 수리를 포괄적 ‘라이선스’와 동일시할 수도 없다. |</p>
+<p>| ‘100 BTC’ AI 해킹 도전 | CEO는 공개 주소의 비트코인 100개를 탈취하는 도전을 제시했고 자금이 이동하지 않았다고 주장했다(<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=494s">08:14</a>–<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=709s">11:49</a>). | 원 게시물, 주소의 소유·통제 근거, 온체인 거래 내역이 제공되지 않았다. <strong>미검증·수동 확인 필요</strong>. 설령 특정 주소에서 탈취가 없었더라도 전체 수탁 서비스의 안전성을 입증하지는 못한다. |</p>
+<p>| BTC 가격·보상액 | 도전 공개 당시 BTC 약 6만5,000달러와 보상 약 50만 달러, 인터뷰 당시 BTC 약 8만4,000달러와 보상 약 840만 달러를 언급한 것으로 추출됐다(<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=709s">11:49</a>). | <strong>산술상 첫 수치가 불일치한다.</strong> 100×6만5,000달러는 650만 달러이며, 100×8만4,000달러는 840만 달러다. 첫 보상액은 원음 또는 자동자막 오류일 수 있다. 게시·녹화일과 당시 BTC/USD 시세가 없어 시장가격 자체는 검증되지 않았다. |</p>
+<p>| BTC·ETH 전망 | CEO는 채택 확대와 달러 구매력 하락을 근거로 BTC 장기 상승을 전망했다(<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=1161s">19:21</a>). 진행자는 과거 Tom Lee의 ETH 6만 달러 전망을 인용했다(<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=920s">15:20</a>). | ‘1970년 이후 달러 구매력 92% 하락’은 기준월·종료월과 공식 CPI 자료가 없어 미검증이다. BTC의 지속 상승은 예측이지 보장된 사실이 아니다. ETH 6만 달러는 <strong>BitGo CEO의 목표가가 아니며</strong>, 원 인터뷰·전망 기간도 확인되지 않았다. |</p>
+<p>| 스테이블코인·토큰화 | 상시·저비용 이전, 스테이블코인의 ‘위험 없는 수익’, GENIUS Act의 수익 지급 제한, 향후 토큰화 주식의 배당·의결권 처리를 논의했다(<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=1382s">23:02</a>–<a href="https://www.youtube.com/watch?v=sk26GkZL8sM&amp;t=1852s">30:52</a>). | 법률 원문·시행 규정, 실제 송금비용, Robinhood 상품 약관이 제공되지 않았다. 수익의 무위험성은 입증되지 않았고, 가격 노출형 토큰과 실제 주주권을 가진 주식은 구분해야 한다. <strong>모두 수동 확인 필요</strong>. |</p>
+<h3>투자 논리와 반론</h3>
+<p><strong>상승 논리:</strong> 기관 참여가 확대된다면 자산 보관, 이체, 스테이킹 연결 및 규제 대응 서비스의 수요가 늘 수 있다. 한국 신고 수리 보도는 현지 사업 기반에 관한 제한적인 긍정 근거다. 스테이블코인과 토큰화가 실제 사용성과 법적 권리를 확보하면 관련 인프라 수요도 커질 수 있다.</p>
+<p><strong>반론:</strong> 수탁 수요 증가가 곧 BitGo의 매출·이익 증가를 뜻하지는 않는다. 고객 계약, 수수료율, 거래량, 비용 및 경쟁 상황이 확인되지 않았다. 해킹·인적 오류·운영 사고 위험은 남아 있고, ‘100 BTC 도전’은 독립 감사의 대체물이 아니다. 스테이블코인의 환매·디페깅·규제 위험, 토큰화 상품의 권리 제한도 고려해야 한다. Strategy의 BTC 및 BitMine의 ETH 축적·레버리지 설명과 BlackRock ETF 규모는 관련 공시·공식 수치가 없으며, ETF 금액은 자막이 손상돼 인용할 수 없다.</p>
+<h3>가까운 시일 내 확인할 항목과 논리의 무효화 조건</h3>
+<ul>
+<li><strong>한국 사업:</strong> FIU 원문에서 비트고코리아의 법인명, 신고 수리일과 허용 업무 범위를 확인하고, 이후 실제 서비스 개시·고객 확보 여부를 관찰한다. 허용 범위가 영상의 사업 확대 기대보다 좁거나 실적이 나타나지 않으면 한국 성장 논리는 약해진다.</li>
+<li><strong>고객·보안:</strong> Fidelity·BitGo의 공식 발표와 서비스 범위, 독립 감사의 유효기간 및 사고 공시를 확인한다. 고객 관계가 부인되거나 중대한 통제 실패가 드러나면 수탁 경쟁력 주장을 재평가해야 한다.</li>
+<li><strong>AI 도전·가격:</strong> CEO 원 게시물, 공개 주소와 온체인 이동 내역, 인터뷰 원음 및 두 기준일의 BTC/USD 가격을 대조한다. 주소 소유·잔액이 확인되지 않거나 원음 수치가 다르면 해당 사례를 근거로 사용할 수 없다.</li>
+<li><strong>제도·상품 권리:</strong> GENIUS Act 원문과 후속 규정에서 수익 지급 주체·범위를, Robinhood 약관에서 기초주식 소유권·배당·의결권을 확인한다. 실제 권리나 경제성이 예상보다 제한되면 토큰화·스테이블코인 채택 논리는 약해진다.</li>
+<li><strong>시장 전망:</strong> 공식 CPI 시계열로 구매력 수치를 재계산하고, Strategy·BitMine 공시, IBIT 공식 자료, Tom Lee 원 인터뷰를 각각 확인한다. 검증 전에는 보유량·레버리지·ETF 규모·가격 목표를 투자 근거로 인용하기 어렵다.</li>
+</ul>
+<h3>자료 신뢰도</h3>
+<p>자동자막의 <code>transcript_quality</code>는 *good*(점수 1.0)이지만, 이는 발언 수치와 고유명사의 정확성을 보증하지 않는다. 표시한 시각은 정확한 발화 순간이 아닌 <strong>자막 청크 시작 시각</strong>이다. 검증 결과의 외부 <code>source_confidence</code>는 한국 신고 수리 보도에만 <strong>0.56</strong>이며, 나머지 주요 주장에는 독립 근거가 없어 <strong>0.0</strong>이다. 특히 보상액의 <code>asr_confidence</code>는 <strong>0.48</strong>, ETF 규모는 <strong>0.42</strong>로 낮다. 관련성이 없는 검색 결과와 종목 식별이 불명확한 BTC·ETH 가격 스냅샷은 근거에서 제외했다. 비공개 계약·수수료·보안 자료와 Bloomberg·Morningstar 등 제공되지 않은 폐쇄형 자료에 의존하는 주장은 <strong>미검증·수동 확인 필요</strong>다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;sk26GkZL8sM&quot;,
+  &quot;title&quot;: &quot;AI가 은행까지 해킹하는 시대, 내 자산은 안전할까? BitGo CEO가 비트코인 100개를 내건 이유&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=sk26GkZL8sM&quot;,
+  &quot;channel&quot;: &quot;PLUS TV (플러스 TV)&quot;,
+  &quot;channel_id&quot;: &quot;UCuHUaZo43N9PgOCjs3Hg2Uw&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@plus_tv_official/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/sk26GkZL8sM/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-06T08:00:02+00:00&quot;,
+  &quot;status&quot;: &quot;contradicted&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 29869,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 29869,
+    &quot;segments&quot;: 1655,
+    &quot;duration_seconds&quot;: 2207,
+    &quot;repeated_ngram_ratio&quot;: 0.013
+  },
+  &quot;generated_at&quot;: &quot;2026-10-07T21:13:26.939017+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 3,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 7,
+    &quot;partially_supported&quot;: 1,
+    &quot;contradicted&quot;: 1,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;BitGo CEO는 거래와 분리된 수탁, 다중서명·MPC·콜드스토리지·외부 감사 및 수수료 수익원을 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;03:58&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;개인키 3개&quot;,
+        &quot;observed&quot;: &quot;독립 확인 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;보안 통제의 실효성과 수익 구조를 확정 사실로 반영하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;CEO는 Fidelity가 이더리움 스테이킹에 BitGo 서비스를 이용한다고 주장했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;08:14&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;&quot;
+      },
+      &quot;investor_implication&quot;: &quot;Fidelity를 확인된 BitGo 고객으로 전제해 매출을 추정해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;비트고코리아의 한국 VASP 신고 수리와 사업 확대가 언급됐고, CEO는 기관 구축에 약 2년 반이 걸렸다고 말했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.78,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E1&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;30:52&quot;,
+      &quot;source_confidence&quot;: 0.56,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기관 구축 약 2년 반&quot;,
+        &quot;observed&quot;: &quot;기간 확인 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;신고 수리 보도와 실제 영업 범위·사업 성과를 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;CEO는 공개 주소의 비트코인 100개를 탈취하면 가져도 된다는 AI 해킹 도전을 제시했고 자금이 이동하지 않았다고 주장했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;08:14&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.68,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;비트코인 100개&quot;,
+        &quot;observed&quot;: &quot;주소·잔액 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;보안성을 평가할 때 도전 발언을 감사·사고 이력의 대체 자료로 삼지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;CEO는 도전 공개 당시 BTC 약 6만5000달러·100 BTC 보상 약 50만 달러, 인터뷰 당시 BTC 약 8만4000달러·보상 840만 달러라고 말했다.&quot;,
+      &quot;status&quot;: &quot;contradicted&quot;,
+      &quot;confidence&quot;: 0.91,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;11:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.48,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;100 BTC×약 $65,000=약 $500,000; 100 BTC×약 $84,000=약 $8,400,000&quot;,
+        &quot;observed&quot;: &quot;산술 결과 각각 $6,500,000 및 $8,400,000; 시장가격 미검증&quot;
+      },
+      &quot;investor_implication&quot;: &quot;첫 보상액은 산술상 불일치하므로 원음과 기준 시점의 가격을 확인하기 전 인용하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;CEO는 1970년 이후 달러 구매력이 92% 하락했다고 주장하고 BTC의 달러 기준 장기 상승을 전망했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;19:21&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1970년 이후 달러 구매력 92% 하락&quot;,
+        &quot;observed&quot;: &quot;공식 물가지표와 기준 시점 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;구매력 수치와 BTC 수익률 전망을 분리해 검토해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;CEO는 Strategy의 BTC·BitMine의 ETH 축적과 레버리지 노출을 설명했고 BlackRock 비트코인 ETF 규모를 언급했다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.93,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;15:20&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.42,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;BlackRock ETF ‘$0 billion’ 자막&quot;,
+        &quot;observed&quot;: &quot;원음·공식 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;보유량·레버리지·ETF 규모를 투자 판단에 사용하기 전에 각각 공시와 원음을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;CEO는 스테이블코인의 상시·저비용 이전, ‘위험 없는 수익’ 및 GENIUS Act의 이용자 직접 수익 지급 제한을 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;23:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.73,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;24시간·주 7일 이전; 대출금리 10%·9% 예시&quot;,
+        &quot;observed&quot;: &quot;실제 수수료·금리 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;스테이블코인 수익과 비용 절감이 보장된다고 가정하지 말고 법적·환매 위험을 별도로 검토해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;CEO는 당시 Robinhood의 미국 외 토큰화 상품이 실제 주주권보다 가격 노출을 제공한다고 구분하고 향후 배당·의결권의 온체인 처리를 전망했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;27:12&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.77,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;&quot;
+      },
+      &quot;investor_implication&quot;: &quot;토큰 가격 노출을 실제 주식 소유권·배당권·의결권과 동일시하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;진행자는 과거 인터뷰에서 Tom Lee가 ETH 6만 달러를 전망했다고 전했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;15:20&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;Tom Lee의 ETH $60,000 전망으로 진행자가 인용&quot;,
+        &quot;observed&quot;: &quot;원 인터뷰·전망 기간 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;6만 달러를 BitGo CEO의 목표가나 검증된 가격 전망으로 제시해서는 안 된다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;BTC&quot;,
+      &quot;name&quot;: &quot;Bitcoin&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;CEO는 글로벌 채택 증가와 달러 구매력 하락을 근거로 비트코인의 장기 상승을 전망했으며, 글로벌 가치 이전·상시 거래를 활용 사례로 들었다.&quot;,
+        &quot;기관 참여가 확대되고 있지만 연금·퇴직자금처럼 규제가 강한 자금은 더 늦게 진입할 것이라고 전망했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;CEO는 1970년 이후 달러 구매력이 92% 하락했다고 주장했다.&quot;,
+        &quot;AI 해킹 도전 공개 당시 비트코인이 약 6만5000달러, 인터뷰 시점에는 약 8만4000달러라고 말했다.&quot;,
+        &quot;비트코인 100개의 보상 가치를 공개 당시 약 50만 달러, 인터뷰 시점 약 840만 달러라고 말했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;BTC&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T13:17:04.438002+00:00&quot;,
+        &quot;current_price&quot;: 37.84000015258789,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 55.01,
+        &quot;fifty_two_week_low&quot;: 25.65,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ETH&quot;,
+      &quot;name&quot;: &quot;Ethereum&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;스마트계약·디파이·스테이킹이 기관 관심을 이끄는 활용 사례라고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;진행자는 과거 인터뷰에서 Tom Lee가 이더리움 6만 달러를 전망했다고 전했다. 이는 이번 인터뷰의 BitGo CEO 목표가가 아니다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ETH&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T13:17:08.319710+00:00&quot;,
+        &quot;current_price&quot;: 25.65999984741211,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 42.92,
+        &quot;fifty_two_week_low&quot;: 14.53,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;하나금융도 합류···5대 은행, 디지털자산 수탁 &#x27;진용 완성&#x27;&quot;,
+      &quot;source_url&quot;: &quot;https://www.newsfreezone.co.kr/news/articleView.html?idxno=705102&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-08-21T15:30:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;가상자산 수탁 사업 기반을 다지고 있다. 21일 금융권에 따르면 하나금융 합작법인 비트고코리아가 지난 18일 금융정보분석원(KoFIU)으로부터 가상자산사업자(VASP) 신고 수리를 완료했다. 비트고코리아는 하나금융이...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Earnings To Watch: Admicom Oyj (OHEL:ADMCM) Q3 2026 -- GF Value Sees 101% Upside&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/earnings-watch-admicom-oyj-ohel-131530856.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T13:15:30+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

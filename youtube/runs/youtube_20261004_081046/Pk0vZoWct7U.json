@@ -1,0 +1,506 @@
+{
+  "version": 4,
+  "video_id": "Pk0vZoWct7U",
+  "title": "\"엔비디아 부진해도 삼전은 올라갈 것\" 어떻게 되길래?ㅣ노근창 세미콘리서치랩 대표 [주말인터뷰]",
+  "url": "https://www.youtube.com/watch?v=Pk0vZoWct7U",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/Pk0vZoWct7U/maxresdefault.jpg",
+  "published_at": "2026-10-03T06:00:06+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 25580,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 25580,
+    "segments": 1384,
+    "duration_seconds": 3090,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-04T08:10:46.233426+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 11,
+  "claim_status_summary": {
+    "asr_uncertain": 3,
+    "unverified": 5,
+    "partially_supported": 2
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "마이크론의 최근 매출·이익률·EPS와 메모리 가격·출하량·데이터센터 매출 비중이 상승했고 다음 분기 매출이 약 13% 늘 것이라는 발언",
+      "status": "asr_uncertain",
+      "confidence": 0.9,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.55,
+      "asr_confidence": 0.35,
+      "numeric_parse": {
+        "claimed": "매출 540억 달러, 영업이익률 82%, EPS 33달러, 다음 분기 매출 약 13% 증가 등",
+        "observed": "마이크론 실적 원문이 제공되지 않아 대조 불가"
+      },
+      "investor_implication": "마이크론 실적과 업황 판단에 해당 수치를 사용하지 말고 IR 원문을 확인해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "TrendForce 자료상 9월 PC D램 고정가격 약 4% 상승, 4분기 약 18% 상승 및 HBM3·HBM4 가격 급등 전망",
+      "status": "unverified",
+      "confidence": 0.96,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.6,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "PC D램 9월 약 4%, 4분기 약 18%; HBM3 30~40%; HBM4 최대 5달러/GB; HBM ASP 약 120%",
+        "observed": "TrendForce 원자료 없음"
+      },
+      "investor_implication": "메모리 가격 전망을 실적 추정에 반영하기 전 TrendForce 원자료와 가격 기준을 확인해야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "삼성전자 10월 8일 잠정실적 발표 예정, 추정치 약 100조~104조 원과 출연자 추정치 약 110조 원, 가격·제품 믹스에 따른 양호한 실적 전망",
+      "status": "partially_supported",
+      "confidence": 0.73,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:19:09",
+      "source_confidence": 0.63,
+      "asr_confidence": 0.4,
+      "numeric_parse": {
+        "claimed": "10월 8일; 증권사 약 100조~104조 원, 출연자 약 110조 원",
+        "observed": "3분기 잠정실적 관련 뉴스 발췌만 제공; 날짜·금액 대조 불가"
+      },
+      "investor_implication": "잠정실적 공시에서 발표일·매출·영업이익을 각각 확인해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "삼성전자가 HBM4에서 앞서며 SK하이닉스는 점유율이 낮아져도 HBM 매출이 증가할 수 있다는 평가",
+      "status": "unverified",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:25:32",
+      "source_confidence": 0.62,
+      "asr_confidence": 0.72,
+      "numeric_parse": {
+        "claimed": "HBM 점유율 하락 가능성, 매출 증가 가능성",
+        "observed": "비교 가능한 점유율·매출 자료 없음"
+      },
+      "investor_implication": "양사 공식 공급 발표와 동일 기간 HBM 매출·점유율 자료를 확인해야 한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "SK하이닉스 3분기 영업이익, 솔리다임 상장 미결정 및 중복상장 우려, 10월 중순 자사주 매입 종료 가능성",
+      "status": "asr_uncertain",
+      "confidence": 0.91,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:31:42",
+      "source_confidence": 0.62,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "3분기 영업이익 ‘70조 내 정도’, 10월 중순 자사주 매입 종료 가능성",
+        "observed": "관련 실적·자사주·IPO 공시 없음"
+      },
+      "investor_implication": "실적 수치와 자사주 일정은 공식 공시 전까지 투자 근거로 사용하지 않아야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "구글 TPU 외부 판매액·판매량과 2027~2028년 목표가 급증하고 자유현금흐름 개선으로 이어질 것이라는 전망",
+      "status": "asr_uncertain",
+      "confidence": 0.94,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:12:49",
+      "source_confidence": 0.55,
+      "asr_confidence": 0.35,
+      "numeric_parse": {
+        "claimed": "2026년 100억 달러·430만 개, 2027년 1,000억 달러, 2028년 2,500억 달러; 2028년 물량 450만 개 또는 700만 개 초과",
+        "observed": "공식 수치 없음; 2028년 물량은 제공된 영상 요약 내부에서 상충"
+      },
+      "investor_implication": "TPU 성장 규모나 현금흐름 효과를 투자 모델에 넣기 전 공식 공시와 원발언을 확인해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "엔비디아 고객군별 데이터센터 매출 약 480억·400억 달러, 2026년 가속기 약 650만 개와 2028년 약 1,000만 개, 호실적 대비 제한적 주가 반응",
+      "status": "unverified",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:23",
+      "source_confidence": 0.67,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "고객군별 약 480억·400억 달러; 가속기 2026년 약 650만 개, 2028년 약 1,000만 개",
+        "observed": "대응하는 공시·판매량 자료 없음"
+      },
+      "investor_implication": "엔비디아 IR 자료와 해당 실적 발표 전후 주가 데이터로 분리 검증해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "각국 10년물 국채금리가 제시된 수준에 있고 고금리가 외국인 매도를 유발해 한국 반도체주를 박스권에 묶을 수 있다는 해석",
+      "status": "partially_supported",
+      "confidence": 0.76,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:44:47",
+      "source_confidence": 0.6,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "미국 10년물 5.2~5.3%, 영국·호주 5% 초과, 일본 3% 초과",
+        "observed": "동일 날짜 공식 금리 자료 없음; 제공 뉴스 발췌는 외국인 순매도 20조3050억 원을 보도"
+      },
+      "investor_implication": "외국인 매도는 관찰된 수급 변수지만 금리 수치와 주가 전망은 별도 검증이 필요하다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "AI 데이터센터 투자가 초중반이고 미국 용량이 약 40GW에서 2030년 120GW로 늘며 자체 칩·TSMC 생산이 HBM·서버 D램 수요를 확대할 것이라는 전망",
+      "status": "unverified",
+      "confidence": 0.94,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:12:49",
+      "source_confidence": 0.6,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "미국 데이터센터 약 40GW에서 2030년 120GW",
+        "observed": "동일 기준의 공식 용량·전력 자료 없음"
+      },
+      "investor_implication": "전력 수요·설비 용량을 구분하고 실제 투자 및 메모리 조달 발표를 확인해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "반도체 장비업계가 향후 약 5년간 연 20~30% 성장하고 장비·부품은 공급 부족이나 소재는 그렇지 않다는 발언",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:38:15",
+      "source_confidence": 0.6,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "향후 약 5년간 연 20~30% 성장",
+        "observed": "성장률의 대상 시장·기간을 확인할 자료 없음"
+      },
+      "investor_implication": "소부장 전반에 동일한 성장률을 적용하지 말고 품목별 공식 수주·가동률·공급 자료를 확인해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "005930.KS",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "HBM4에서 우위를 잡았다는 평가이며, 메모리 가격·제품 믹스 개선으로 시장 예상보다 양호한 실적을 전망한다.",
+        "고금리 환경의 외국인 매도와 자사주 매입 종료가 단기 수급 부담이지만, 구글 TPU 사업의 현금흐름 개선이 확인되면 재평가될 수 있다고 본다."
+      ],
+      "numeric_claims": [
+        "10월 8일 잠정실적 발표 예정이라는 진행자 발언; 최근 증권사 추정치는 약 100조~104조 원, 출연자 추정치는 약 110조 원으로 언급됐으나 실적 지표·분기 확인 필요."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "005930.KS",
+        "as_of": "2026-10-03T23:30:06.613837+00:00",
+        "current_price": 276000.0,
+        "market_cap": 1812371417256000.0,
+        "forward_pe": 3.9094155,
+        "trailing_pe": null,
+        "fifty_two_week_high": 374500.0,
+        "fifty_two_week_low": 89750.0,
+        "average_target_price": 477516.75,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660.KS",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "삼성전자의 HBM4 약진으로 HBM 점유율은 낮아져도 전체 HBM 매출은 늘 수 있다고 전망한다.",
+        "솔리다임의 중복 상장 가능성은 주가 리스크이나, 녹화 당시 상장 결정은 없었다고 언급한다."
+      ],
+      "numeric_claims": [
+        "3분기 영업이익을 자동자막상 ‘70조 내 정도’로 언급하나 수치 인식 오류 가능성이 높다.",
+        "자사주 매입은 10월 중순께 종료될 수 있다는 진행자 발언이 있다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "000660.KS",
+        "as_of": "2026-10-03T23:30:08.180787+00:00",
+        "current_price": 1841000.0,
+        "market_cap": 1306842854331000.0,
+        "forward_pe": 3.9148088,
+        "trailing_pe": null,
+        "fifty_two_week_high": 2987000.0,
+        "fifty_two_week_low": 395500.0,
+        "average_target_price": 3141024.8,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "MU",
+      "name": "마이크론",
+      "status": "unverified",
+      "claims": [
+        "출연자는 최근 실적과 다음 분기 가이던스가 메모리 업황의 조기 꺾임 우려를 약화한다고 평가한다."
+      ],
+      "numeric_claims": [
+        "자동자막에는 분기 매출 ‘540억 달러’, 영업이익률 ‘82%’로 기록돼 단위·지표 확인이 필요하다.",
+        "NAND 가격 약 30% 상승·출하량 약 10% 증가, D램 출하량 약 5% 증가·ASP 약 18~19% 상승이라는 발언.",
+        "데이터센터 매출 비중이 직전 분기 61%에서 이번 분기 63%, 다음 분기 매출은 약 13% 증가 예상이라는 발언."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "MU",
+        "as_of": "2026-10-03T23:30:09.469766+00:00",
+        "current_price": 1074.8900146484375,
+        "market_cap": 1213973420622.2349,
+        "forward_pe": 5.219066,
+        "trailing_pe": 14.451332,
+        "fifty_two_week_high": 1255.0,
+        "fifty_two_week_low": 179.61,
+        "average_target_price": 1520.0217,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "NVDA",
+      "name": "엔비디아",
+      "status": "unverified",
+      "claims": [
+        "호실적에도 주가 반응이 제한적이며, 구글 TPU 등 경쟁 칩이 성장하면 엔비디아 주가와 한국 메모리주의 움직임이 달라질 수 있다고 본다."
+      ],
+      "numeric_claims": [
+        "출연자는 올해 엔비디아 가속기 판매량을 약 650만 개, 2028년을 약 1,000만 개로 추정한다.",
+        "엔비디아 데이터센터 매출의 하이퍼스케일러 부문 약 480억 달러, 기타 고객 부문 약 400억 달러라는 발언은 집계 기간 확인이 필요하다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "NVDA",
+        "as_of": "2026-10-03T23:30:11.018706+00:00",
+        "current_price": 233.9499969482422,
+        "market_cap": 5649190576309.204,
+        "forward_pe": 14.905945,
+        "trailing_pe": 29.576487,
+        "fifty_two_week_high": 237.88,
+        "fifty_two_week_low": 164.27,
+        "average_target_price": 327.7,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "GOOGL",
+      "name": "알파벳·구글",
+      "status": "unverified",
+      "claims": [
+        "출연자는 구글의 TPU 외부 판매가 확대되고 현금흐름이 플러스로 전환되면 한국 메모리주 투자심리가 개선될 수 있다고 전망한다.",
+        "TPU와 엔비디아 가속기의 경쟁이 HBM 수요처를 넓힐 수 있다는 주장이다."
+      ],
+      "numeric_claims": [
+        "올해 TPU 판매액 약 100억 달러, 올해 판매량 약 430만 개라는 발언.",
+        "내년 자체 칩 외부 판매 목표 약 1,000억 달러·영업이익률 약 60%, 2028년 목표 약 2,500억 달러라는 발언은 주체·목표의 원출처 확인이 필요하다.",
+        "2028년 TPU 물량은 한 구간에서 450만 개, 다른 구간에서 700만 개 초과로 상충한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "GOOGL",
+        "as_of": "2026-10-03T23:30:12.951237+00:00",
+        "current_price": 343.5,
+        "market_cap": 4200982614448.5,
+        "forward_pe": 22.791302,
+        "trailing_pe": 17.243977,
+        "fifty_two_week_high": 408.61,
+        "fifty_two_week_low": 235.84,
+        "average_target_price": 429.36295,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "AMZN",
+      "name": "아마존",
+      "status": "unverified",
+      "claims": [
+        "자체 가속기와 Graviton CPU의 외부 공급 확대가 HBM과 서버 D램 수요에 기여할 수 있다는 전망이다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "AMZN",
+        "as_of": "2026-10-03T23:30:15.182969+00:00",
+        "current_price": 251.52000427246094,
+        "market_cap": 2712973635713.5435,
+        "forward_pe": 24.009829,
+        "trailing_pe": 20.234915,
+        "fifty_two_week_high": 287.2,
+        "fifty_two_week_low": 196.0,
+        "average_target_price": 330.59192,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "TSM",
+      "name": "TSMC",
+      "status": "unverified",
+      "claims": [
+        "출연자는 TSMC가 AI 칩 생산을 폭넓게 맡아 수요를 파악할 수 있으며, AI·보안 기능 확대가 생산능력 및 가격에 영향을 줄 수 있다고 본다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "TSM",
+        "as_of": "2026-10-03T23:30:17.453274+00:00",
+        "current_price": 472.7799987792969,
+        "market_cap": 2452061177534.995,
+        "forward_pe": 21.563414,
+        "trailing_pe": 35.334827,
+        "fifty_two_week_high": 479.0,
+        "fifty_two_week_low": 266.82,
+        "average_target_price": 552.2594,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Bank of America Raises Long-Term Copper Forecast to $12,000 Per Ton",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/bank-america-raises-long-term-132700996.html",
+      "publisher": "InvestorsHub",
+      "published_at": "2026-10-02T13:27:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Bank of America Raises Long-Term Copper Forecast to $12,000 Per Ton Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather New..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Copper Price Gains Analyst Attention Heading Into October. Here's Why",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/copper-price-gains-analyst-attention-093802222.html",
+      "publisher": "BeInCrypto",
+      "published_at": "2026-10-02T09:38:02+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Copper Price Gains Analyst Attention Heading Into October. Here's Why Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather N..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Better International ETF: Vanguard VEA vs. iShares URTH",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/better-international-etf-vanguard-vea-220725324.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-03T22:07:25+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Better International ETF: Vanguard VEA vs. iShares URTH Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Fin..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "Why I'm Building My Entire Retirement Around Dividend Stocks in 2026",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/why-im-building-entire-retirement-220500860.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-03T22:05:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C4",
+      "title": "2차전지 관련주, '맑음' 나노팀·유일에너테크·엠케이전자·지아이텍.....",
+      "source_url": "http://www.finomy.com/news/articleView.html?idxno=248336",
+      "publisher": "Naver News",
+      "published_at": "2026-01-24T00:16:00+09:00",
+      "source_tier": "news",
+      "excerpt": "솔루션을 공급하고 있다. 엠케이전자는 반도체 후공정 소재 기업으로 본딩 와이어, 솔더볼, 비금속 와이어 등 첨단 패키징 소재를 생산하고 있다. 삼성전자, SK하이닉스, 엔비디아 등을 고객사로 두고 있으며..."
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C4",
+      "title": "2차전지 관련주, '봄날의 햇살' 이수스페셜티케미컬·엠오티·케이지에...",
+      "source_url": "http://www.finomy.com/news/articleView.html?idxno=247993",
+      "publisher": "Naver News",
+      "published_at": "2026-01-20T00:20:00+09:00",
+      "source_tier": "news",
+      "excerpt": "부품 공급 계약을 체결했다고 12월 8일 밝혔다. 이번 계약은 최근 매출액 대비 약 24.4%에 해당한다. 계약... 삼성전자, SK하이닉스, 엔비디아 등을 고객사로 두고 있으며 2023년에는 삼성전자의 우수협력사로 지정된 바..."
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C7",
+      "title": "Nvidia (NVDA) Is At The Center Of An $8 Billion AI Financing Shift",
+      "source_url": "https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-center-8-billion-230622829.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-03T23:06:22+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E10",
+      "claim_id": "C7",
+      "title": "Here's What a $10,000 Investment in Cameco 5 Years Ago Is Worth Today -- and What the Next 5 Years Could Look Like",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/heres-10-000-investment-cameco-222500912.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-03T22:25:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E11",
+      "claim_id": "C9",
+      "title": "Dow Jones Futures: Nasdaq Hits High As Nvidia, SpaceX, Bloom Energy Flash Buy Signals, But Note These Risks",
+      "source_url": "https://finance.yahoo.com/m/b98e0c13-f78a-3e19-ad93-12d5a340e701/dow-jones-futures%3A-nasdaq.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-03T17:58:50+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

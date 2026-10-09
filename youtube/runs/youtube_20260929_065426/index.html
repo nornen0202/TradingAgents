@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - youtube_20260929_065426</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="../../index.html">YouTube 홈</a><a href="../../../index.html">TradingAgents 홈</a></nav>
+<header class="hero compact">
+  <p class="eyebrow">투자 유튜브 채널</p>
+  <h1>youtube_20260929_065426</h1>
+  <p>2026-09-28T06:54:26.850589+09:00 - 2026-09-29T06:54:26.850589+09:00</p>
+</header>
+
+<section class="synthesis-callout">
+  <p class="eyebrow">CODEX CROSS-VIDEO SYNTHESIS</p>
+  <h2>영상 전체를 다시 종합한 투자 인사이트</h2>
+  <p>개별 영상 주장과 검증 근거를 한 번 더 비교해 공통점·충돌·조건부 전략으로 정리했습니다.</p>
+  <a class="primary-link" href="../../insights.html">종합 인사이트 보기</a>
+</section>
+
+<section class="stats">
+  <span>총 32개</span>
+  <span>성공 32개</span>
+  <span>실패 0개</span>
+</section>
+<section>
+  <h2>영상별 리포트</h2>
+  <div class="grid">
+<a class="card" href="runs/youtube_20260929_065426/4muqJe1bX-I.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/4muqJe1bX-I/maxresdefault.jpg" alt="메타의 승부수에 깜짝 놀란 증시? AI 3차 변곡점의 새로운 수혜주들" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    <span class="badge user-primary">사용자 검증 최우선</span>
+    <strong>메타의 승부수에 깜짝 놀란 증시? AI 3차 변곡점의 새로운 수혜주들</strong>
+    <small class="source-line">출처/채널: 소수몽키 · @sosumonkey / 동영상</small>
+    <small>2026-09-28T12:10:04+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/uHlTzlPB89E.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/uHlTzlPB89E/maxresdefault.jpg" alt="&#x27;국채&#x27;가 도대체 뭐길래.. 주가가 하락하는 걸까?" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    
+    <strong>&#x27;국채&#x27;가 도대체 뭐길래.. 주가가 하락하는 걸까?</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 동영상</small>
+    <small>2026-09-28T15:03:30+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/uNFQ22jMkEQ.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/uNFQ22jMkEQ/maxresdefault.jpg" alt="삼성전자 팔고 재매수 기다린다…유창희 대표가 이번 조정을 매수 기회로 보는 이유ㅣ명민준, 서수진, 유창희 [주린이 구조대]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>삼성전자 팔고 재매수 기다린다…유창희 대표가 이번 조정을 매수 기회로 보는 이유ㅣ명민준, 서수진, 유창희 [주린이 구조대]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T13:00:16+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/nsm9_AjUbFo.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/nsm9_AjUbFo/maxresdefault.jpg" alt="현시점 &#x27;AI 반도체&#x27; 산업은 어디까지 와 있을까?" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    
+    <strong>현시점 &#x27;AI 반도체&#x27; 산업은 어디까지 와 있을까?</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-09-28T12:00:39+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/Xt8IUVyR2S0.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/Xt8IUVyR2S0/maxresdefault.jpg" alt="삼전닉스 급락, 오라클 때문일까? AI 데이터센터 지연이 반도체에 중요한 이유ㅣ명민준, 서수진, 송재경 [주린이 구조대]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    
+    <strong>삼전닉스 급락, 오라클 때문일까? AI 데이터센터 지연이 반도체에 중요한 이유ㅣ명민준, 서수진, 송재경 [주린이 구조대]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T12:00:13+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/iVrS4dJ8K2I.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/iVrS4dJ8K2I/maxresdefault.jpg" alt="[#찐시황]  오후 2시부터 1조 말아올렸다… 선물 보면 내일 증시 희망이 보인다 / 악재는 없는데 급락한 삼전 하닉 (급락장)  이권희 대표" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>[#찐시황]  오후 2시부터 1조 말아올렸다… 선물 보면 내일 증시 희망이 보인다 / 악재는 없는데 급락한 삼전 하닉 (급락장)  이권희 대표</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-09-28T11:00:08+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/7J0T9ybPqPI.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/7J0T9ybPqPI/maxresdefault.jpg" alt="9월 28일 미국 투자자들이 꼭 알아야 하는 오늘의 &#x27;미장 시황&#x27; 투자 포인트" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    
+    <strong>9월 28일 미국 투자자들이 꼭 알아야 하는 오늘의 &#x27;미장 시황&#x27; 투자 포인트</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-09-28T10:30:25+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/0WaWFIpBZA4.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/0WaWFIpBZA4/maxresdefault.jpg" alt="[#긴급인터뷰] 증시 급락시킨 3가지 이유… 외인은 왜 삼성전자·SK하이닉스를 3조나 던졌나? | 황유현 팀장" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>[#긴급인터뷰] 증시 급락시킨 3가지 이유… 외인은 왜 삼성전자·SK하이닉스를 3조나 던졌나? | 황유현 팀장</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-09-28T09:30:10+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/jSm5Gd8qEOA.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/jSm5Gd8qEOA/maxresdefault.jpg" alt="공급이 수요를 못 따라간다…공장까지 앞당겨 짓는다! 현장에서 확인한 반도체 &#x27;진짜 업황&#x27;ㅣ홍선애, 김창욱 보스턴컨설팅그룹 MD파트너 [여의도 인사이트]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    
+    <strong>공급이 수요를 못 따라간다…공장까지 앞당겨 짓는다! 현장에서 확인한 반도체 &#x27;진짜 업황&#x27;ㅣ홍선애, 김창욱 보스턴컨설팅그룹 MD파트너 [여의도 인사이트]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T09:08:57+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/UNWvc3xaf4A.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/UNWvc3xaf4A/maxresdefault.jpg" alt="[#긴급인터뷰] 코스닥 강세장 언제 시작될까? / 10월 증시에서 끝까지 살아남을 주식은 ‘이것’  |  디멘젼투자자문 송재경 대표" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>[#긴급인터뷰] 코스닥 강세장 언제 시작될까? / 10월 증시에서 끝까지 살아남을 주식은 ‘이것’  |  디멘젼투자자문 송재경 대표</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-09-28T08:30:44+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/Wcb8FfNiz9Q.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/Wcb8FfNiz9Q/maxresdefault.jpg" alt="트럼프가 이란의 휴전 제안을 &#x27;거부&#x27;한 진짜 이유" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    
+    <strong>트럼프가 이란의 휴전 제안을 &#x27;거부&#x27;한 진짜 이유</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 동영상</small>
+    <small>2026-09-28T08:16:40+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/hrj7nmNbVMs.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/hrj7nmNbVMs/maxresdefault.jpg" alt="[9월 28일 마감시황] 코스피 급락에도 돈은 돌았다…지수보다 먼저 봐야 할 수급 변화ㅣ홍선애, 이권희, 김장열 [클로징벨 라이브]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>[9월 28일 마감시황] 코스피 급락에도 돈은 돌았다…지수보다 먼저 봐야 할 수급 변화ㅣ홍선애, 이권희, 김장열 [클로징벨 라이브]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T08:11:31+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/wvEZHOwxMCE.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/wvEZHOwxMCE/maxresdefault.jpg" alt="LG이노텍은 길게, 켐트로닉스는 지금? 이재규 차장이 짚은 기판주 매수 기준ㅣ권다영, 이재규 SK증권 WM1 영업본부 차장 [2시 마켓워치]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>LG이노텍은 길게, 켐트로닉스는 지금? 이재규 차장이 짚은 기판주 매수 기준ㅣ권다영, 이재규 SK증권 WM1 영업본부 차장 [2시 마켓워치]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T07:01:08+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/IKlRA_U7gdE.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/IKlRA_U7gdE/maxresdefault.jpg" alt="[글로벌인사이트] 삼성전자 3분기 실적 우려는 ‘노이즈’일까? / 기판주가 계속 급등하는 진짜 이유, 돈은 이미 ‘여기’로 간다 ㅣ 세미콘 리서치랩 노근창 대표" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>[글로벌인사이트] 삼성전자 3분기 실적 우려는 ‘노이즈’일까? / 기판주가 계속 급등하는 진짜 이유, 돈은 이미 ‘여기’로 간다 ㅣ 세미콘 리서치랩 노근창 대표</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-09-28T07:00:36+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/RhiTq2lcXy8.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/RhiTq2lcXy8/maxresdefault.jpg" alt="이번주 &#x27;수요일·목요일&#x27;이 투자자한테 진짜 중요한 이유" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>이번주 &#x27;수요일·목요일&#x27;이 투자자한테 진짜 중요한 이유</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-09-28T06:24:36+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/JwiTCD8uIkc.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/JwiTCD8uIkc/maxresdefault.jpg" alt="코스피는 급락인데 종목은 살아있다…지금 봐야 할 &#x27;순환매의 다음 차례&#x27;ㅣ권다영, 김태성 아이에셋 본부장 [2시 마켓워치]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>코스피는 급락인데 종목은 살아있다…지금 봐야 할 &#x27;순환매의 다음 차례&#x27;ㅣ권다영, 김태성 아이에셋 본부장 [2시 마켓워치]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T06:24:22+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/yel7i1i4IoU.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/yel7i1i4IoU/maxresdefault.jpg" alt="[#긴급시황]  급락이냐 급등이냐… ‘폭풍전야’ 코스피 어디로 갈까? / 노이즈는 끝난다, 삼성전자 분할매수할 결정적 이유ㅣ이주현 대표" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>[#긴급시황]  급락이냐 급등이냐… ‘폭풍전야’ 코스피 어디로 갈까? / 노이즈는 끝난다, 삼성전자 분할매수할 결정적 이유ㅣ이주현 대표</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-09-28T05:30:25+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/kQt0gNBmAEA.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/kQt0gNBmAEA/maxresdefault.jpg" alt="삼성전자 &#x27;30조 배당금&#x27; 이후, 내일부터 벌어질 일" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>삼성전자 &#x27;30조 배당금&#x27; 이후, 내일부터 벌어질 일</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-09-28T04:30:00+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/Va5z9tN1tq8.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/Va5z9tN1tq8/maxresdefault.jpg" alt="기준 통화로 자리 잡는 온체인, 거래 • 담보 • 구조화 순서로 보세요 | 서동주, 김동환, 조동현 언디파인드랩스 대표 [크립토 PLUS]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>기준 통화로 자리 잡는 온체인, 거래 • 담보 • 구조화 순서로 보세요 | 서동주, 김동환, 조동현 언디파인드랩스 대표 [크립토 PLUS]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T03:25:53+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/SX8lyt52wEQ.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/SX8lyt52wEQ/maxresdefault.jpg" alt="세계 5위 거래소 비트겟 추석 빈틈에 털렸다 이용자 자산은 안전할까? | 김동환, 서동주, 박상혁 디지털애셋 편집장 [크립토 PLUS]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>세계 5위 거래소 비트겟 추석 빈틈에 털렸다 이용자 자산은 안전할까? | 김동환, 서동주, 박상혁 디지털애셋 편집장 [크립토 PLUS]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T03:15:57+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/xndXiTaS2BQ.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/xndXiTaS2BQ/maxresdefault.jpg" alt="4번째 도전, 코스피 7,050이 중요한 이유... 삼성SDI·2차전지 다시 봐야 할 때ㅣ이권희 대표" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>4번째 도전, 코스피 7,050이 중요한 이유... 삼성SDI·2차전지 다시 봐야 할 때ㅣ이권희 대표</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-09-28T03:00:34+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/zJHJkqc5QDM.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/zJHJkqc5QDM/maxresdefault.jpg" alt="하이닉스 &#x27;분할 상장&#x27; 주가 떨어질까?!" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-unverified">unverified</span>
+    
+    <strong>하이닉스 &#x27;분할 상장&#x27; 주가 떨어질까?!</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-09-28T02:59:21+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/80IReKiMQLI.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/80IReKiMQLI/maxresdefault.jpg" alt="윤지호, 빈센트, 장우진의 전략 대공개 | [하나증권 대규모 세미나 영상]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>윤지호, 빈센트, 장우진의 전략 대공개 | [하나증권 대규모 세미나 영상]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T02:42:39+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/yKvMwIHoVzg.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/yKvMwIHoVzg/maxresdefault.jpg" alt="하락하지만 오르는 종목은 더 많은 시장! 아무것도 보지 않고 딱 하나만 봐야 한다면?| 여도은, 허재무, 이혁진 [아침N투자]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>하락하지만 오르는 종목은 더 많은 시장! 아무것도 보지 않고 딱 하나만 봐야 한다면?| 여도은, 허재무, 이혁진 [아침N투자]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T02:39:59+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/3nWeMz53Zg8.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/3nWeMz53Zg8/maxresdefault.jpg" alt="7,000 지켜낸 그 다음은 어떻게 될까? | 이경수 하나증권 리서치센터 수석연구위원  [더블 업]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>7,000 지켜낸 그 다음은 어떻게 될까? | 이경수 하나증권 리서치센터 수석연구위원  [더블 업]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T01:51:15+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/mPHLZW3WlVM.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/mPHLZW3WlVM/maxresdefault.jpg" alt="흔들리는 반도체 장세… 마이크론 실적이 ‘방향키’ / SK하이닉스, 솔리다임 상장 악재 될까? | 이주연 대표" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>흔들리는 반도체 장세… 마이크론 실적이 ‘방향키’ / SK하이닉스, 솔리다임 상장 악재 될까? | 이주연 대표</strong>
+    <small class="source-line">출처/채널: 815Money talk · @815moneytalk / 동영상</small>
+    <small>2026-09-28T01:38:53+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/qa7xT3TzceI.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/qa7xT3TzceI/maxresdefault.jpg" alt="&quot;메타가 사고쳤다&quot; 반도체 또 다시 들썩? 배당 이후는...! | 이지은 이지스탁 대표 [더블 체크]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>&quot;메타가 사고쳤다&quot; 반도체 또 다시 들썩? 배당 이후는...! | 이지은 이지스탁 대표 [더블 체크]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T01:37:24+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/giCNupq2uLc.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/giCNupq2uLc/maxresdefault.jpg" alt="고금리에도 AI 투자는 계속된다? 반도체·메모리 시장의 변화 | 박병창 MP파트너스 대표 [마켓 인사이드]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>고금리에도 AI 투자는 계속된다? 반도체·메모리 시장의 변화 | 박병창 MP파트너스 대표 [마켓 인사이드]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-28T00:05:30+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/_-0MMS4DvpY.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/_-0MMS4DvpY/maxresdefault.jpg" alt="소문난 잔치로 끝난 미중 정상회담…&quot;300억弗 관세 인하“ | 미국 5년 국채도 5% 고금리의 일상화…그래도 AI는 간다는 월가 | 권순우 삼프로TV 취재팀장 [뉴스3]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>소문난 잔치로 끝난 미중 정상회담…&quot;300억弗 관세 인하“ | 미국 5년 국채도 5% 고금리의 일상화…그래도 AI는 간다는 월가 | 권순우 삼프로TV 취재팀장 [뉴스3]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-27T23:17:58+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/841k_s89-ls.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/841k_s89-ls/maxresdefault.jpg" alt="9월 28일 투자자들이 꼭 알아야 하는 투자 포인트" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>9월 28일 투자자들이 꼭 알아야 하는 투자 포인트</strong>
+    <small class="source-line">출처/채널: 경제사냥꾼 · @경제사냥꾼 / 쇼츠</small>
+    <small>2026-09-27T23:03:58+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/jgStSQNvJ5I.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/jgStSQNvJ5I/maxresdefault.jpg" alt="높은 금리가 만든 증시 양극화…실적 버티는 섹터만 오른다 | 성상현 ABP자산운용 전무 [글로벌 인터뷰]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>높은 금리가 만든 증시 양극화…실적 버티는 섹터만 오른다 | 성상현 ABP자산운용 전무 [글로벌 인터뷰]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-27T23:01:40+00:00</small>
+  </span>
+</a>
+
+
+<a class="card" href="runs/youtube_20260929_065426/FucMcZ4c6Io.html">
+  <span class="thumb"><img src="https://i.ytimg.com/vi/FucMcZ4c6Io/maxresdefault.jpg" alt="금리 급등에도 선방한 뉴욕증시...이번주 마이크론 실적 전망은? [월가 뉴스레터]" loading="lazy" referrerpolicy="no-referrer"></span>
+  <span class="card-body">
+    <span class="badge status-asr_uncertain">asr_uncertain</span>
+    
+    <strong>금리 급등에도 선방한 뉴욕증시...이번주 마이크론 실적 전망은? [월가 뉴스레터]</strong>
+    <small class="source-line">출처/채널: 삼프로TV 3PROTV · @3protv / 동영상</small>
+    <small>2026-09-27T22:03:20+00:00</small>
+  </span>
+</a>
+</div>
+</section>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

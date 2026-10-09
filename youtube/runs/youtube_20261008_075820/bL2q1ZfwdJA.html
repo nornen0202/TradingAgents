@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 끌로드, 챗GPT가 주식투자도 대신해준다? AI 실생활 침투 가속화의 수혜주들</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261008_075820</p>
+    <h1>끌로드, 챗GPT가 주식투자도 대신해준다? AI 실생활 침투 가속화의 수혜주들</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA">원본 영상</a>
+    </div>
+  </header>
+  <h2>AI 에이전트 확산과 관련 종목: 영상 주장 점검</h2>
+<p><strong>대상:</strong> <a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA">소수몽키 영상</a>, 2026년 10월 7일 게시 · <strong>판단 기준:</strong> 제공된 검증 묶음</p>
+<h3>핵심 판단</h3>
+<p>영상의 투자 논리는 모델 이용 비용 하락 → AI 에이전트 도입 확대 → 금융·배달·반도체 설계·기업 컨설팅 및 인프라 수요 증가로 이어진다는 것이다. 그러나 제공된 외부 검색 결과 4건은 해당 주장과 무관하고, 관련 공식 발표·공시·실적 자료도 확보되지 않았다. <strong>제품 발표, 이용 규모, 실적 기여를 확인된 사실로 받아들일 단계는 아니다.</strong> 검증 결과는 10개 주장 중 9개가 미검증, 1개가 자막 인식 불확실로 분류됐다. 근거 부재는 주장의 반증도 아니다.</p>
+<h3>영상 주장과 확인된 근거</h3>
+<p>| 대상 | 영상 주장 | 확인된 사실·검증 상태 |</p>
+<p>|---|---|---|</p>
+<p>| 로빈후드(HOOD), <a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA&amp;t=0s">약 00:00</a>·<a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA&amp;t=328s">05:28</a> | 모델 선택형 투자 에이전트가 분석·매매 제안을 하고 사용자 승인 후 거래한다. 5월 베타 이후 15만 계좌, AI 호출 ‘1평균 3천만 건’, 실적 예측시장과 거래상품 확대도 언급한다. | <strong>미검증.</strong> 공식 제품 자료와 집계 정의가 없다. 호출량의 기간·단위는 자동자막상 특히 불명확하다. ‘24시간’의 적용 자산·거래 범위와 암호화폐 무기한 선물의 ‘4배’ 조건도 확인되지 않았다. |</p>
+<p>| AI 모델 비용, <a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA&amp;t=0s">약 00:00</a> | 과거 GPT-4 이용 비용 약 30달러 대비 현재 더 나은 모델의 비용이 약 100분의 1이다. | <strong>미검증.</strong> 30달러의 과금 단위, 입력·출력 토큰과 작업·성능 기준, 양 시점의 공식 가격표가 없다. |</p>
+<p>| 도어대시(DASH), <a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA&amp;t=328s">약 05:28</a> | 앱을 열지 않고 문자로 배달 주문하는 AI 기능을 발표했다. | <strong>미검증.</strong> 제품 발표, 출시 지역, 결제 조건과 이용률 자료가 없다. |</p>
+<p>| 애플(AAPL), <a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA&amp;t=328s">약 05:28</a> | 출처 미상의 월가 보고서가 에이전트의 앱 우회에 따른 앱스토어 부담을 제기했다. | <strong>미검증·원문 수동 확인 필요.</strong> 보고서 작성자와 원문, 실제 서비스 매출 영향이 확인되지 않았다. 영상도 당장의 위기로 단정하지 않는다. |</p>
+<p>| 시놉시스(SNPS), <a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA&amp;t=640s">약 10:40</a> | 오픈AI와 ‘GPT 시놉시스’를 공동 개발해 칩 개발 기간을 수주~수개월 줄일 수 있으며, 아마존 계약 확대·전망 상향 뒤 주가가 반등했다. | <strong>자막 인식 불확실·나머지 미검증.</strong> 정확한 제품명과 기간 단축의 비교 기준, 계약 범위, 변경 전후 전망 및 기간별 주가가 없다. |</p>
+<p>| 액센츄어(ACN), <a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA&amp;t=640s">약 10:40</a> | 기업의 AI 도입 지원 수요가 늘어 예상 상회 실적과 성장 회복, 주가 반등으로 이어졌다. | <strong>미검증.</strong> 해당 실적 발표, AI 수주·매출·마진, 시장 예상치와 발표 전후 주가 자료가 없다. |</p>
+<p>| 인프라·사이버보안, <a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA&amp;t=328s">약 05:28</a>·<a href="https://www.youtube.com/watch?v=bL2q1ZfwdJA&amp;t=640s">10:40</a> | 에이전트 확산이 클라우드·반도체·보안주에 유리하고, 국내 금융권 해킹 이슈가 보안 수요를 부각한다. | <strong>미검증 전망.</strong> 관련 지출·수주·수익성 자료와 해당 사고의 공식 확인 자료가 없다. 사고와 AI 확산 사이의 인과관계도 입증되지 않았다. |</p>
+<h3>투자 논리와 반론</h3>
+<p>에이전트가 실제 주문·업무 흐름에 자리 잡는다면 플랫폼 거래량, 설계 도구 사용량, 기업 도입 프로젝트와 컴퓨팅·보안 지출이 늘어날 가능성은 있다. 반대로 <strong>기능 발표와 반복 이용, 매출, 이익은 서로 다른 단계</strong>다. 모델 비용 하락분이 고객 가격 인하나 더 높은 사용 비용으로 상쇄될 수 있고, AI가 기존 컨설팅 업무를 줄일 수도 있다. 에이전트의 투자 제안에는 성과·오류·승인 방식의 불확실성이 있으며, 예측시장과 레버리지 상품은 거래 증가 가능성과 별개로 투기·규제 위험을 수반한다. 실적 결과를 맞히는 것과 주가 방향을 맞히는 것도 다르다.</p>
+<h3>관찰 항목과 논리의 무효화 조건</h3>
+<ul>
+<li><strong>다음 제품·실적 발표:</strong> 로빈후드는 공식 출시 범위, 거래 승인 절차, 베타 계좌·호출량의 정의, 실제 이용·수익 기여를 확인한다. 기능이 제한된 시험에 머물거나 반복 이용·수익 기여가 나타나지 않으면 플랫폼 성장 논리는 약해진다.</li>
+<li><strong>도어대시·애플:</strong> 문자 주문의 제공 지역, 주문 전환율, 결제 경로와 앱스토어 수익 구조를 확인한다. 주문 이용이 미미하거나 앱 우회가 수익 감소로 연결되지 않으면 각각의 영상 논리는 약해진다.</li>
+<li><strong>시놉시스·액센츄어:</strong> 협업 발표 원문, 계약 규모·기간, 전후 가이던스, AI 수주가 매출·마진으로 전환되는지를 확인한다. 생산성 개선이 재현되지 않거나 신규 수요가 기존 매출 감소를 상쇄하지 못하면 수혜 추정은 재검토해야 한다.</li>
+<li><strong>공통 변수:</strong> 동일 작업·토큰 기준 모델 가격, 클라우드 사용량과 설비투자, 반도체 수주, 보안 지출 및 마진을 함께 본다. 지출만 늘고 수익성이 개선되지 않으면 ‘AI 확산 → 관련주 이익 증가’의 연결 고리가 약해진다. 국내 보안 사고는 감독당국 공지로 사실관계와 AI 관련성을 별도로 확인해야 한다.</li>
+</ul>
+<h3>자료 품질과 해석 한계</h3>
+<p>제공된 자막의 전체 품질 평가는 <strong>good(1.0)</strong>이지만, 한국어 자동자막이며 제시된 시각은 네 청크의 시작점이라 개별 발화의 정확한 시각이 아니다. 주장별 <code>source_confidence</code>는 <strong>0.62~0.81</strong>, <code>asr_confidence</code>는 <strong>0.50~0.85</strong>다. 이는 영상 발화의 전달·인식 신뢰도이지 외부 사실 확인 점수가 아니다. 특히 ‘1평균 3천만 건’과 ‘GPT 시놉시스’는 원영상·공식 자료 대조가 필요하다.</p>
+<p>제공된 yfinance 단일 시점 가격은 HOOD <strong>112.00달러</strong>, DASH <strong>193.62달러</strong>, AAPL <strong>333.63달러</strong>, SNPS <strong>505.17달러</strong>, ACN <strong>193.40달러</strong>다(2026년 10월 7일 약 12:15 UTC 조회). 이는 가격 수준만 보여주며 영상에서 말한 발표 이후 <strong>주가 반등이나 실적 효과의 증거는 아니다</strong>. 공시 제공자는 이용할 수 없었고, 검색된 기사 4건도 주장과 무관해 근거 링크로 인용하지 않았다. Bloomberg·Morningstar 등 폐쇄형 자료는 제공되지 않았으므로 해당 자료에 의존하는 해석은 <strong>미검증·수동 확인 필요</strong>다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;bL2q1ZfwdJA&quot;,
+  &quot;title&quot;: &quot;끌로드, 챗GPT가 주식투자도 대신해준다? AI 실생활 침투 가속화의 수혜주들&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=bL2q1ZfwdJA&quot;,
+  &quot;channel&quot;: &quot;소수몽키&quot;,
+  &quot;channel_id&quot;: &quot;UCC3yfxS5qC6PCwDzetUuEWg&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@sosumonkey/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/bL2q1ZfwdJA/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-07T12:05:04+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;USER_PRIMARY&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;HIGH&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;USER_ACCEPTED&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 10560,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 10560,
+    &quot;segments&quot;: 546,
+    &quot;duration_seconds&quot;: 1083,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-07T21:13:26.939017+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;로빈후드가 모델 선택형 투자 AI 에이전트와 승인 후 거래를 발표했으며, 5월 베타에서 15만 계좌와 ‘1평균 3천만 건’의 AI 호출이 발생했다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;15만 계좌; ‘1평균 3천만 건’; 24시간; 13F 3개월&quot;,
+        &quot;observed&quot;: &quot;독립 확인 자료 없음; ‘1평균 3천만 건’의 기간·단위 불명&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제품 출시와 실제 이용·거래 성과를 확인하기 전에는 성장 기여를 실적으로 간주할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;로빈후드가 실적 예측시장, 옵션 거래시간 확대, 암호화폐 무기한 선물 4배 레버리지를 발표했다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;05:28&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;암호화폐 무기한 선물 레버리지 4배&quot;,
+        &quot;observed&quot;: &quot;확인 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출시 여부와 규제·상품 조건을 확인해야 거래량 및 매출 효과를 평가할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;과거 GPT-4 비용 약 30달러 대비 현재 더 나은 모델의 비용이 100분의 1이라는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.68,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 30달러; 현재 비용은 약 1/100&quot;,
+        &quot;observed&quot;: &quot;동일 기준 가격 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;모델 비용 하락을 기업 마진이나 수요 증가의 정량적 근거로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;도어대시가 앱을 열지 않고 문자로 배달을 주문하는 AI 에이전트 기능을 발표했다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;05:28&quot;,
+      &quot;source_confidence&quot;: 0.81,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;관련 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출시 지역, 결제 경로, 주문 전환율 확인 전에는 매출 기여를 추정하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;출처 미상의 월가 보고서가 AI 에이전트의 앱 우회에 따른 애플 앱스토어 부담을 전망했다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;05:28&quot;,
+      &quot;source_confidence&quot;: 0.65,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;매출 영향 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;앱 우회 가능성을 애플 서비스 매출 감소의 확인된 사실로 해석해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;시놉시스가 40주년 행사에서 오픈AI와 ‘GPT 시놉시스’를 공동 개발하고 칩 개발 기간을 수주에서 수개월 단축할 수 있다는 주장&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.94,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;10:40&quot;,
+      &quot;source_confidence&quot;: 0.73,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;40주년 행사; 칩 개발 기간 수주~수개월 단축&quot;,
+        &quot;observed&quot;: &quot;공식 제품·성과 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;협업 실체와 정량적 생산성 효과가 확인되기 전에는 수혜 규모를 산정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;시놉시스의 아마존 계약 확대, 전망 상향 및 주가 반등 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;10:40&quot;,
+      &quot;source_confidence&quot;: 0.73,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;계약·가이던스·기간별 주가 비교치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;계약 규모와 가이던스 변화, 해당 기간 주가 수익률을 각각 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;액센츄어의 AI 도입 지원 수요 증가, 예상 상회 실적, 역성장 탈출 및 주가 반등 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;10:40&quot;,
+      &quot;source_confidence&quot;: 0.75,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;실적·수주·성장률 비교치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI 관련 수주가 실제 매출과 이익으로 전환되는지 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;최근 한국 은행·저축은행·캐피탈 해킹과 비상 소집 보도가 있었다는 주장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;10:40&quot;,
+      &quot;source_confidence&quot;: 0.62,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;사고 건수·피해 규모 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;보안주 수혜 논리를 특정 사고나 AI 원인론에 연결하기에는 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;AI 에이전트 확산과 모델 비용 하락이 클라우드·반도체·사이버보안 수요 및 관련주에 유리하다는 전망&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;05:28&quot;,
+      &quot;source_confidence&quot;: 0.62,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;투자 논리를 검증할 수요·수익성 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;수요 증가와 기업 이익, 주가 성과는 별도로 검증해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;HOOD&quot;,
+      &quot;name&quot;: &quot;로빈후드&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;연례 행사에서 ChatGPT·클로드 등 모델을 선택해 시장 분석과 매매 제안을 받고 사용자가 승인하면 거래하는 AI 에이전트를 발표했다고 설명한다. 13F, 정치인 거래, 기관·파생상품 동향 등은 분석 사례로 제시됐다.&quot;,
+        &quot;5월 외부 연동 베타의 반응이 컸다며 에이전트 서비스의 흥행을 자신했다고 전한다.&quot;,
+        &quot;실적 결과 자체에 베팅하는 예측시장 도입과 거래·암호화폐 상품 확대를 발표했다고 전한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;13F 포트폴리오 공개 주기를 3개월로 설명한다.&quot;,
+        &quot;AI 거래 기능을 연중무휴 24시간 이용하는 구상을 제시한다.&quot;,
+        &quot;5월 베타 이후 관련 계좌 15만 개가 열렸다고 주장한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;HOOD&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T12:14:52.742287+00:00&quot;,
+        &quot;current_price&quot;: 112.0,
+        &quot;market_cap&quot;: 100697214576.0,
+        &quot;forward_pe&quot;: 32.58485,
+        &quot;trailing_pe&quot;: 49.339207,
+        &quot;fifty_two_week_high&quot;: 153.56,
+        &quot;fifty_two_week_low&quot;: 63.515,
+        &quot;average_target_price&quot;: 133.36214,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;DASH&quot;,
+      &quot;name&quot;: &quot;도어대시&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;AI 에이전트를 이용해 앱을 열지 않고 문자로 배달을 주문하는 기능을 발표했다고 전한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;DASH&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T12:14:58.468154+00:00&quot;,
+        &quot;current_price&quot;: 193.6199951171875,
+        &quot;market_cap&quot;: 83894702411.77856,
+        &quot;forward_pe&quot;: 23.464455,
+        &quot;trailing_pe&quot;: 101.90526,
+        &quot;fifty_two_week_high&quot;: 285.5,
+        &quot;fifty_two_week_low&quot;: 143.3,
+        &quot;average_target_price&quot;: 257.72287,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AAPL&quot;,
+      &quot;name&quot;: &quot;애플&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;영상이 언급한 출처 미상의 월가 보고서는 AI 에이전트가 앱 사용을 우회하면 앱스토어 생태계에 부담이 될 수 있다고 봤으며, 진행자는 당장의 위기로 단정하지 않았다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AAPL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T12:15:02.099736+00:00&quot;,
+        &quot;current_price&quot;: 333.6300048828125,
+        &quot;market_cap&quot;: 4869056344660.645,
+        &quot;forward_pe&quot;: 34.81532,
+        &quot;trailing_pe&quot;: 38.26032,
+        &quot;fifty_two_week_high&quot;: 345.34,
+        &quot;fifty_two_week_low&quot;: 243.42,
+        &quot;average_target_price&quot;: 328.09384,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;SNPS&quot;,
+      &quot;name&quot;: &quot;시놉시스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;반도체 설계 소프트웨어 기업 시놉시스가 오픈AI와 ‘GPT 시놉시스’를 공동 개발한다고 발표했으며, AI 시뮬레이션과 설계 검증으로 칩 개발 기간·비용을 줄일 수 있다고 전한다.&quot;,
+        &quot;아마존과의 계약 확대 및 빅테크 맞춤형 칩 수요를 근거로 전망 상향과 주가 반등을 언급한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;협업 발표를 시놉시스 40주년 행사와 연결한다.&quot;,
+        &quot;칩 설계 기간을 최소 수주에서 수개월까지 단축할 수 있다고 주장한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;SNPS&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T12:15:06.412768+00:00&quot;,
+        &quot;current_price&quot;: 505.1700134277344,
+        &quot;market_cap&quot;: 96809087033.06598,
+        &quot;forward_pe&quot;: 27.18451,
+        &quot;trailing_pe&quot;: 89.252655,
+        &quot;fifty_two_week_high&quot;: 539.48,
+        &quot;fifty_two_week_low&quot;: 362.55,
+        &quot;average_target_price&quot;: 570.5712,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ACN&quot;,
+      &quot;name&quot;: &quot;액센츄어&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;AI가 컨설팅 수요를 없앨 것이라는 우려와 달리, 기업의 AI 도입을 돕는 중간 파트너 역할로 문의와 일감이 늘고 있다고 회사 설명을 전한다.&quot;,
+        &quot;최근 실적이 예상보다 좋았고 역성장에서 벗어나며 주가 반등을 시도했다고 전한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ACN&quot;,
+        &quot;as_of&quot;: &quot;2026-10-07T12:15:10.166409+00:00&quot;,
+        &quot;current_price&quot;: 193.39999389648438,
+        &quot;market_cap&quot;: 118349600145.60178,
+        &quot;forward_pe&quot;: 12.123788,
+        &quot;trailing_pe&quot;: 14.262536,
+        &quot;fifty_two_week_high&quot;: 291.09,
+        &quot;fifty_two_week_low&quot;: 118.15,
+        &quot;average_target_price&quot;: 223.65459,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Three Stocks Are Now 21% of the S&amp;P 500, the Most Ever&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/three-stocks-now-21-p-113012691.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T11:30:12+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Three Stocks Are Now 21% of the S&amp;P 500, the Most Ever Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Fina...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Broadcom Remains So Full of Promise And Continues to Disappoint&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/broadcom-remains-full-promise-continues-111521242.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T11:15:21+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Broadcom Remains So Full of Promise And Continues to Disappoint Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newslet...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Global Bauxite Market Size, Share, Trends, Competitive Landscape, and Forecast Report Releases; Bauxite Market to Reach USD 19.3 Billion by 2033 as Aluminum...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/global-bauxite-market-size-share-080500863.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-07T08:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Global Bauxite Market Size, Share, Trends, Competitive Landscape, and Forecast Report Releases; Bauxite Market to Reach USD 19.3 Billion by 2033 as Aluminum Demand Accelerates Oops, something went wrong Skip to navigation Skip to main content Skip to right...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

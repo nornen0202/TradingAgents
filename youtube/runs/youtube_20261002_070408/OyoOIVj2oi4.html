@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 30년 아시아 투자자의 시선으로 보는 한국 시장의 새로운 기회</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261002_070408</p>
+    <h1>30년 아시아 투자자의 시선으로 보는 한국 시장의 새로운 기회</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=OyoOIVj2oi4">원본 영상</a>
+    </div>
+  </header>
+  <h2>한국·아시아 시장, AI 공급망 밖까지 기회가 확산될까?</h2>
+<p><a href="https://www.youtube.com/watch?v=OyoOIVj2oi4">PLUS TV 영상</a> 분석 | 공개: 2026년 10월 1일 | 검증 자료 생성: 2026년 10월 2일</p>
+<p><strong>핵심 판단:</strong> 영상은 한국·아시아의 AI 공급망과 소비시장 성장 가능성을 제시하면서, 미국 대형 기술주와 한국 반도체에 대한 집중, 기업의 질·지배구조·가격을 함께 살피자고 주장한다. 다만 제공된 외부 검색 결과는 주장과 무관하거나 검증 가능한 내용이 없어, <strong>시장 성과와 거시 전망을 확인된 사실로 받아들일 근거는 부족하다.</strong></p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>| 쟁점 | 영상 주장 | 확인된 사실·근거 및 판단 |</p>
+<p>|---|---|---|</p>
+<p>| 한국 증시 [00:00, 05:52] | 25~30년간 투자 가능한 기업군이 넓어졌으나 최근 상승은 메모리·반도체에 집중됐다. | 비교 시점별 업종 구성, 상승 기간, 업종별 지수 기여도가 제공되지 않았다. <strong>미검증.</strong> |</p>
+<p>| 한국 지배구조 [05:52] | 공시·이사회·자사주 활용과 외국인 주주의 영향력이 투자 매력도 및 시장 분류에 중요하다. | 투자 관점의 견해다. 지수 제공사의 공식 분류 기준과 기업별 공시가 없어 시장 분류 변경 가능성을 확인할 수 없다. |</p>
+<p>| 아시아 AI 공급망 [00:00, 05:52] | 한국을 포함한 아시아 하드웨어 기업이 AI에 필수적이며, 관련 이익은 영구적이지 않을 수 있다. | 기업별 공급 역할·AI 관련 실적·계약 자료가 없어 ‘필수적’이라는 강한 표현은 <strong>미검증</strong>이다. 이익 지속성은 전망이다. |</p>
+<p>| 미국 대비 아시아 [00:00, 05:52] | 미국 주식의 약 10년 성과와 대형 기술주 집중을 고려하면 아시아가 분산·가치평가 대안이 될 수 있다. | 같은 통화·배당 기준의 지수 성과, 밸류에이션, 집중도, 자금 흐름 자료가 없다. 상대적 저평가나 분산 효과는 <strong>확인되지 않았다.</strong> |</p>
+<p>| 중국 [05:52, 11:48] | 소비·부동산 안정화, 자체 기술 개발, 약 14억 명의 잠재 고객이 기회다. | 소비·주택 시계열, 공식 인구 통계, 반도체 생산·기술 자료가 없다. 특히 인구를 실제 고객 수로 볼 수 없고, ‘15~20년 전 메모리 산업 부재’도 <strong>미검증</strong>이다. |</p>
+<p>| 인도 [05:52, 11:48] | 인구·소득·소비 확대는 장기 기회지만 성장·인프라 속도 둔화와 AI의 IT 서비스 고용 영향이 변수다. | GDP·소비·인프라 집행 및 IT 서비스 기업의 실적·인원 자료가 없어 둔화 여부를 판단할 수 없다. 고용 영향은 불확실한 전망이다. |</p>
+<p>위 시각은 <strong>개별 발화가 아니라 자막 청크의 시작 시각</strong>이다. 각 주장의 <code>source_confidence</code>는 독립 근거 부재로 <strong>0.0</strong>이며, 발언을 자막에서 읽어낸 <code>asr_confidence</code>는 대체로 <strong>0.75~0.85</strong>다. 이는 주장의 사실성에 대한 확률이 아니다.</p>
+<h3>투자 논리와 반론</h3>
+<p><strong>상승 논리:</strong> AI 설비투자가 아시아 공급망의 실적에 반영되고 한국 증시의 비반도체 업종까지 이익·주가 상승이 확산된다면, 영상이 말하는 기회의 폭이 넓어질 수 있다. 중국의 소비·부동산 지표 개선, 인도의 소비·인프라 집행 지속도 같은 논리를 뒷받침할 관찰 대상이다.</p>
+<p><strong>반론:</strong> AI 관련 수요가 늘어도 공급 확대·경쟁·가격 하락으로 이익이 둔화될 수 있다. 한국 시장의 상승이 소수 반도체 기업에 머물 수 있으며, 아시아 주식이 미국 대형 기술주보다 저렴하거나 포트폴리오 분산에 유리하다는 점도 현재 자료로는 입증되지 않는다. 중국의 부동산·규제 변수와 인도 IT 서비스의 AI 영향 역시 열려 있다.</p>
+<h3>가까운 시일에 확인할 항목</h3>
+<p>1. <strong>한국 시장 폭:</strong> 비교 기간을 먼저 정한 뒤 반도체·비반도체 업종의 수익률, 시가총액 변화, 지수 기여도를 확인한다.</p>
+<p>2. <strong>AI 수익성:</strong> 관련 기업 공시에서 AI 연관 매출·물량, 마진, 설비투자와 공급 계약의 변화를 추적한다.</p>
+<p>3. <strong>상대 가치:</strong> 미국·아시아 지수를 동일 통화와 배당 재투자 기준으로 비교하고, 상위 종목 비중과 기업의 현금흐름·가격을 함께 본다.</p>
+<p>4. <strong>중국·인도 지표:</strong> 중국의 소비심리·주택 가격·거래·투자, 인도의 성장·소비·인프라 집행, IT 서비스 기업의 매출·고용 공시를 확인한다.</p>
+<p>5. <strong>한국 지배구조:</strong> 기업별 공시에서 이사회 구성, 자사주 처리, 주주권 관련 변화를 살핀다. 공식 시장 분류 기준과 발언자의 선호는 구분한다.</p>
+<p><strong>논리가 약해지는 조건</strong>은 비반도체 이익·주가로 상승이 확산되지 않거나, AI 관련 매출 증가에도 수익성이 악화되는 경우다. 중국 안정화·인도 성장 주장과 반대되는 지표가 이어지거나, 동일 기준 비교에서 아시아의 가격·분산 이점이 나타나지 않아도 영상의 핵심 가정을 다시 평가해야 한다.</p>
+<h3>자료 품질과 수동 확인</h3>
+<p>자동 생성 한국어 자막의 <code>transcript_quality</code> 점수는 <strong>1.0</strong>이지만, 이는 전사 형식의 품질 지표이지 개별 문장의 정확성이나 사실 검증을 뜻하지 않는다. 환율 설명, 중국 정책명, 지역·인명 등에 의심스러운 인식·번역 오류가 있다. 따라서 1997년 호텔 객실의 달러 표시 가격이 약 <strong>30%</strong> 하락했다는 회고 [00:00]는 원음·방한 일자·당시 요금과 환율을 확인하기 전까지 투자 근거로 사용하기 어렵다. 중국의 2022년 정책 설명 [05:52]도 원음 확인이 필요하다.</p>
+<p>발언자의 기업별 위험평가 <strong>‘98개 질문’</strong> [17:14]은 질문 목록이나 공식 방법론이 없고, 영상의 JP모건 관련 표현이 <strong>기관 공식 전망인지 개인 견해인지도 확인되지 않았다.</strong> Bloomberg·Morningstar 등 유료·폐쇄형 자료에서 비롯된 주장 역시 이 자료 묶음으로 확인할 수 없어 <strong>미검증·수동 확인 필요</strong>로 취급한다. 개별 상장사·티커가 특정되지 않아 종목별 결론도 낼 수 없다.</p>
+<p>제공된 검색 결과 E1~E7은 각 주장과 무관하거나 입증 가능한 내용이 없어 근거 링크로 제시하지 않았다. 현재 직접 확인할 수 있는 출처는 <a href="https://www.youtube.com/watch?v=OyoOIVj2oi4">원영상</a>뿐이며, 원영상은 <strong>발언의 출처</strong>이지 시장·거시 주장의 독립 검증 자료는 아니다. 이 보고서는 관찰 기준을 정리한 것으로 매수·매도 판단을 제시하지 않는다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;OyoOIVj2oi4&quot;,
+  &quot;title&quot;: &quot;30년 아시아 투자자의 시선으로 보는 한국 시장의 새로운 기회&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=OyoOIVj2oi4&quot;,
+  &quot;channel&quot;: &quot;PLUS TV (플러스 TV)&quot;,
+  &quot;channel_id&quot;: &quot;UCuHUaZo43N9PgOCjs3Hg2Uw&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@plus_tv_official/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/OyoOIVj2oi4/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-01T08:00:03+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 15798,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 15798,
+    &quot;segments&quot;: 715,
+    &quot;duration_seconds&quot;: 1712,
+    &quot;repeated_ngram_ratio&quot;: 0.006
+  },
+  &quot;generated_at&quot;: &quot;2026-10-02T07:04:08.217674+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 7,
+  &quot;claim_status_summary&quot;: {
+    &quot;asr_uncertain&quot;: 2,
+    &quot;unverified&quot;: 8
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;발언자는 1997년 방한 주간 호텔 객실의 달러 표시 가격이 약 30% 하락했다고 회고한다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1997년 방한 주간 달러 표시 객실 가격 약 30% 하락&quot;,
+        &quot;observed&quot;: &quot;방한 날짜·객실 요금·해당 주 환율 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이 일화를 환율 또는 한국 자산의 투자 성과 근거로 사용하지 말 것.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;한국의 투자 가능 기업군이 25~30년간 넓어졌지만 최근 증시 상승은 메모리·반도체 중심이었다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 25~30년간 기업군 확대; 최근 상승의 반도체 집중&quot;,
+        &quot;observed&quot;: &quot;비교 시점별 업종 구성·정의된 상승 기간의 기여도 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;반도체 외 업종의 수익률과 지수 기여도를 확인한 뒤 시장 전반의 상승으로 해석할 것.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;공시, 이사회, 자사주 활용 및 외국인 주주의 영향력이 한국의 시장 분류와 투자 매력도에 중요하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;05:52&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시장 분류 변경을 전제로 투자하지 말고 공식 분류 기준과 기업별 지배구조를 확인할 것.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;한국을 포함한 아시아 하드웨어 기업이 AI 공급망에 필수적이며 관련 이익은 영구적이지 않을 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI 노출도와 지속 이익을 가정하기 전 기업별 공시·공급 계약·수익성을 확인할 것.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;미국 주식은 약 10년간 우수한 성과를 냈고 대형 기술주 집중으로 아시아 주식이 분산·가치평가 대안이 될 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 주식의 약 10년 우수한 성과&quot;,
+        &quot;observed&quot;: &quot;비교 지수와 10년 수익률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;비교 지수·기간·통화·배당 기준을 통일하고 가격과 포트폴리오 중복도를 점검할 것.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;2022년 무렵 중국의 방역·부동산 정책이 소비심리를 약화시켰고 이후 소비심리와 부동산이 안정화되고 있다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;05:52&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2022년 무렵 정책 변화와 이후 안정화&quot;,
+        &quot;observed&quot;: &quot;정책 시행일·소비심리·주택 지표 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;중국 경기 안정화를 전제로 삼기 전 정책명과 소비·주택 지표의 추세를 확인할 것.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;15~20년 전 중국에는 메모리 산업이 없었으나 지금은 있으며 최첨단 기술은 한국·대만에 못 미친다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;11:48&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 2006~2011년에는 산업 부재; 2026년에는 존재&quot;,
+        &quot;observed&quot;: &quot;당시 및 현재 생산·기술 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;중국 업체의 경쟁 수준을 평가할 때 제품별 생산능력과 검증 가능한 기술 지표를 비교할 것.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;중국에는 약 14억 명의 잠재 고객이 있고 독자적인 인터넷·AI 규제 환경이 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;11:48&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;잠재 고객 약 14억 명&quot;,
+        &quot;observed&quot;: &quot;공식 인구 및 실제 고객 수 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;주소 가능 시장을 인구만으로 산정하지 말고 실제 이용자·구매력·규제 접근성을 확인할 것.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;인도의 인구·소득·소비는 장기 기회지만 최근 성장과 인프라 구축이 다소 둔화됐고 AI의 IT 서비스·고용 영향은 불확실하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;05:52&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;&quot;
+      },
+      &quot;investor_implication&quot;: &quot;인도 성장 둔화와 IT 서비스 위험은 지표 및 기업 공시로 나눠 평가할 것.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;발언자는 기업마다 위험 평가 질문 98개를 적용하고 기업의 질·현금흐름·경영진·가격 및 분산투자를 중시한다고 말한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;17:14&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기업별 위험 평가 질문 98개&quot;,
+        &quot;observed&quot;: &quot;공식 방법론·질문 목록 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;98문항 방법론이나 JP모건의 공식 전망으로 인용하지 말고 원음과 기관 자료를 확인할 것.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;한국 증시&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;투자 가능한 기업군이 과거의 중공업·경기민감주·금융·유틸리티 중심에서 브랜드와 첨단 전자 등으로 넓어졌다.&quot;,
+        &quot;최근 증시 상승은 메모리·반도체의 좁은 부문이 주도했으며, 혁신의 수혜가 시장 전반으로 확산되는지가 관건이다.&quot;,
+        &quot;공시, 이사회 구성, 자사주 활용, 외국인 투자자의 이사회 정책 영향력이 시장 분류와 투자 매력도에 중요하다고 본다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;발언자는 1997년 첫 방한 이후 약 25~30년 사이 한국 기업군이 크게 넓어졌다고 비교한다.&quot;,
+        &quot;1997년 첫 방한 주간 호텔 객실의 달러 표시 가격이 약 30% 하락했다고 회고한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-01T22:48:03.661858+00:00&quot;,
+        &quot;current_price&quot;: 6971.35,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Stock market today: Dow, S&amp;P 500, Nasdaq stage comeback as Treasury yields fall, chip stocks gain&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/live/stock-market-today-thursday-oct-1-dow-sp-500-nasdaq-080602402.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T20:07:35+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Stock market today: Dow, S&amp;P 500, Nasdaq stage comeback as Treasury yields fall, chip stocks gain Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Moody’s upgrades Kaiser Aluminum to Ba3 on strong cash flow and debt metrics&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/moody-upgrades-kaiser-aluminum-ba3-211448624.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T21:14:48+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Moody’s upgrades Kaiser Aluminum to Ba3 on strong cash flow and debt metrics Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals We...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;ISM manufacturing prices jump in September 2026, pressuring Fed&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/economy/policy/articles/ism-manufacturing-prices-jump-september-181218889.html&quot;,
+      &quot;publisher&quot;: &quot;Quartz&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T18:12:18+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;The 25-Year Stock Market Supercycle: Why The Biggest Acceleration Phase Is Still Ahead&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/c5d34bcb-5870-3b94-b2d4-a3752e22a167/the-25-year-stock-market.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T20:22:47+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Planet Launches Suncatcher, Tanager-2, and 18 SuperDove Satellites&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/articles/planet-launches-suncatcher-tanager-2-224200368.html&quot;,
+      &quot;publisher&quot;: &quot;Business Wire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T22:42:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;SpaceX vs. Lockheed Martin: Which Aerospace Stock Is a Better Buy in 2026?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/spacex-vs-lockheed-martin-aerospace-214401711.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T21:44:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;Bond Yields Turn Around, But Stocks Don’t Follow&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/8841c62a-29fc-3bf3-a1e3-b0b9ef62cae9/bond-yields-turn-around%2C-but.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-01T16:27:24+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
