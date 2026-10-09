@@ -107,17 +107,24 @@ def test_site_branch_is_nonforcing_public_only_and_blocks_rollback(tmp_path, mon
     state.mkdir()
     site.mkdir()
     (site / "index.html").write_text("public")
+    strategy_bytes = b'{\r\n  "schema": "test",\r\n  "rows": []\r\n}\r\n'
+    (site / "strategy.json").write_bytes(strategy_bytes)
     snapshot = {"schema": "tradingagents.pages-snapshot/v1", "generated_epoch_ms": 1000, "run_id": 1, "run_attempt": 1}
     (site / "pages-snapshot.json").write_text(json.dumps(snapshot))
     original = local.git_run
     def git_run(args, **kwargs):
         if "remote" in args and "add" in args:
             args = [*args[:-1], str(upstream)]
-        return original(args, **kwargs)
+        result = original(args, **kwargs)
+        if "init" in args:
+            # Reproduce a Windows host with inherited autocrlf conversion.
+            original([f"--git-dir={state / 'pages.git'}", "config", "core.autocrlf", "true"])
+        return result
     monkeypatch.setattr(local, "git_run", git_run)
     commit = local.push_site(site, state)
     files = original([f"--git-dir={upstream}", "ls-tree", "-r", "--name-only", "gh-pages"])
-    assert files.splitlines() == [".nojekyll", "index.html", "pages-snapshot.json"]
+    assert files.splitlines() == [".nojekyll", "index.html", "pages-snapshot.json", "strategy.json"]
+    assert subprocess.check_output(["git", f"--git-dir={upstream}", "show", f"{commit}:strategy.json"]) == strategy_bytes
     assert original([f"--git-dir={upstream}", "rev-parse", "gh-pages"]) == commit
     with pytest.raises(ValueError, match="superseded"):
         local.push_site(site, state)
