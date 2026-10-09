@@ -34,7 +34,7 @@ concurrency:
 
 jobs:
   prepare_self_hosted_runner:
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && github.ref == 'refs/heads/main' }}
     runs-on: ${{ fromJSON(vars.TRADINGAGENTS_PAGES_RUNNER_LABELS || '["self-hosted", "Windows"]') }}
     timeout-minutes: 10
     permissions:

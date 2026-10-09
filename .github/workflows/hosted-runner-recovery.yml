@@ -30,10 +30,10 @@ concurrency:
 jobs:
   recover:
     if: >-
-      ${{ github.event_name == 'workflow_dispatch' ||
+      ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && (github.event_name == 'workflow_dispatch' ||
           (github.event.workflow_run.head_repository.full_name == github.repository &&
            github.event.workflow_run.head_branch == 'main' &&
-           contains(fromJSON('["failure", "cancelled"]'), github.event.workflow_run.conclusion)) }}
+           contains(fromJSON('["failure", "cancelled"]'), github.event.workflow_run.conclusion))) }}
     # Use another hosted OS pool so an Ubuntu allocation incident does not block recovery itself.
     runs-on: windows-latest
     timeout-minutes: 10

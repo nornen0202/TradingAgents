@@ -22,6 +22,7 @@ concurrency:
 
 jobs:
   dispatch_missing_scheduled_actions:
+    if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' }}
     runs-on: ubuntu-latest
     concurrency:
       group: tradingagents-official-market-calendar

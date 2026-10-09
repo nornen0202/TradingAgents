@@ -61,6 +61,7 @@ permissions:
 
 jobs:
   overlay_gate:
+    if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' }}
     runs-on: ubuntu-latest
     concurrency:
       group: tradingagents-official-market-calendar

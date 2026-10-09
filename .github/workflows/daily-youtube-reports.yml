@@ -668,7 +668,7 @@ jobs:
 
   deploy:
     needs: build_youtube_pages
-    if: ${{ needs.build_youtube_pages.result == 'success' && needs.build_youtube_pages.outputs.did_build == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
+    if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && needs.build_youtube_pages.result == 'success' && needs.build_youtube_pages.outputs.did_build == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
     runs-on: ubuntu-latest
     concurrency:
       group: tradingagents-pages-deploy

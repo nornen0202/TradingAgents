@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -9,6 +10,7 @@ from pathlib import Path
 from typing import Any, Callable, Sequence
 
 from .runtime import WorkRuntime, WorkRuntimeError
+from tradingagents.atomic_io import atomic_write_json
 
 
 WORK_HANDOFF_SCHEMA = "tradingagents.work-pages-handoff/v1"
@@ -61,6 +63,8 @@ def dispatch_pages_handoff(
         raise WorkRuntimeError("Pages handoff acknowledged report file is unavailable")
 
     receipt_path = runtime.root / "handoffs" / key / f"{report_sha}.json"
+    local_enabled = runtime.root.parent / "local-automation" / "enabled.json"
+    local_backend = os.getenv("TRADINGAGENTS_AUTOMATION_BACKEND") == "local" or local_enabled.is_file()
     if receipt_path.is_file() and not force:
         try:
             previous = json.loads(receipt_path.read_text(encoding="utf-8"))
@@ -68,7 +72,16 @@ def dispatch_pages_handoff(
             raise WorkRuntimeError(f"Invalid Pages handoff receipt: {receipt_path}: {exc}") from exc
         if not isinstance(previous, dict) or previous.get("schema") != WORK_HANDOFF_SCHEMA:
             raise WorkRuntimeError(f"Unsupported Pages handoff receipt: {receipt_path}")
+        if local_backend and previous.get("external_delivery_verified") is not True and previous.get("workflow") != "local-publication":
+            return _queue_local_handoff(receipt_path, key, event, report_sha, repo, branch)
+        if previous.get("workflow") == "local-publication":
+            return {**previous, "already_queued": True}
         return {**previous, "status": "ALREADY_DISPATCHED"}
+
+    # The persistent local publisher watches canonical archives; it can finish
+    # this exact handoff even while GitHub rejects all workflow invocations.
+    if local_backend:
+        return _queue_local_handoff(receipt_path, key, event, report_sha, repo, branch)
 
     gh = shutil.which("gh")
     if not gh:
@@ -101,6 +114,10 @@ def dispatch_pages_handoff(
         raise WorkRuntimeError(f"GitHub Pages handoff dispatch failed: {exc}") from exc
     if int(completed.returncode) != 0:
         detail = " ".join(str(completed.stderr or completed.stdout or "").split())[:500]
+        if "Actions has been disabled for this repository" in detail:
+            # Queue durably, but never claim that a dispatcher or a publisher
+            # completed external delivery. A configured local task must verify it.
+            return _queue_local_handoff(receipt_path, key, event, report_sha, repo, branch)
         raise WorkRuntimeError(
             f"GitHub Pages handoff dispatch failed with exit {completed.returncode}: {detail or 'no diagnostic'}"
         )
@@ -121,4 +138,16 @@ def dispatch_pages_handoff(
     temporary = receipt_path.with_suffix(".tmp")
     temporary.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     temporary.replace(receipt_path)
+    return receipt
+
+
+def _queue_local_handoff(path, surface, event, report_sha, repository, ref):
+    receipt = {
+        "schema": WORK_HANDOFF_SCHEMA, "surface": surface, "event_id": event,
+        "report_sha256": report_sha, "repository": repository, "ref": ref,
+        "workflow": "local-publication", "status": "LOCAL_PUBLISH_PENDING",
+        "dispatched_at": datetime.now().astimezone().isoformat(),
+        "external_delivery_verified": False,
+    }
+    atomic_write_json(path, receipt)
     return receipt
