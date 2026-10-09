@@ -80,6 +80,15 @@ does not need repeated cloud dispatch. Disable the cloud scheduled watchdog
 and daily/overlay workflow schedules after the admitted run has drained to
 avoid continuing to create empty skipped runs. Keep runner registrations.
 
+Keep `tradingagents-mobile-notifications.yml` enabled. It owns neither production
+nor Pages and must still inspect admitted cloud runs and YouTube/PRISM collectors.
+Its existing provenance, terminal-deployment, deduplication and silent Work-handoff
+checks remain authoritative. Local ownership alone is not a reason to mute these
+notifications. A missed cloud notice can be recovered with one exact upstream
+run/attempt dispatch after verifying that no matching notification is active.
+The local producer/publisher does not yet emit Telegram notifications; its Pages
+delivery receipt must not be reported as a Telegram `SENT` receipt.
+
 After the drain, the first publisher saves the old Pages settings in local
 `previous-pages.json` and changes Pages to `legacy`, source `gh-pages:/`.
 The output includes `.nojekyll`. GitHub explicitly supports

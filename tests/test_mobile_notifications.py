@@ -1007,6 +1007,9 @@ class WorkflowDefinitionTests(unittest.TestCase):
         self.assertIn("runs-on: ubuntu-latest", text)
         self.assertIn("head_repository.full_name == github.repository", text)
         self.assertIn("head_branch == 'main'", text)
+        # Local production/publication ownership must not suppress terminal
+        # notifications from already admitted or independent cloud collectors.
+        self.assertNotIn("TRADINGAGENTS_AUTOMATION_BACKEND", text)
         self.assertIn(
             "TELEGRAM_BOT_TOKEN: ${{ secrets.DEPLOYMENT_TELEGRAM_BOT_TOKEN }}",
             text,
