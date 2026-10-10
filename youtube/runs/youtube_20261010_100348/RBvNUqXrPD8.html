@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 10월 9일 우리가 꼭 알고 있어야 할, 저평가 &#x27;AI건설&#x27; 소형주</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261010_100348</p>
+    <h1>10월 9일 우리가 꼭 알고 있어야 할, 저평가 &#x27;AI건설&#x27; 소형주</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=RBvNUqXrPD8">원본 영상</a>
+    </div>
+  </header>
+  <h2>CRH: ‘AI 건설 저평가주’ 논리와 검증 한계</h2>
+<h3>1. 핵심 결론</h3>
+<p><a href="https://www.youtube.com/watch?v=RBvNUqXrPD8">경제사냥꾼 영상</a>(2026년 10월 9일 게시)은 <strong>CRH의 데이터센터 건설자재 공급 확대와 송전 인프라 진출이 성장으로 이어지는 가운데 주가는 저평가돼 있다</strong>고 주장한다.</p>
+<p>그러나 제공된 검증 결과에서 <strong>전체 투자 논지는 미검증</strong>이다. 시장 스냅샷은 고점 대비 약 38% 하락과 영상에 가까운 평균 목표주가 수준만 부분적으로 뒷받침한다. 데이터센터 계약·매장량·인수·실적 성장에는 관련 원자료가 없다. 제목의 ‘소형주’와 본문의 ‘독점·유일 공급업체’도 확인된 사실로 사용할 수 없다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 주장의 시각 표시는 모두 <strong>00:00:02</strong>다. 이는 개별 발화 시각이 아니라, 약 00:02.988~02:58.844에 걸친 단일 자막 청크의 시작 표시다.</p>
+<p>| 항목 | 영상 주장 | 확인된 사실·근거 및 판정 |</p>
+<p>|---|---|---|</p>
+<p>| 기업 규모·사업 | 북미 최대급 골재 공급업체이며 저평가 AI 건설 소형주 | 제품 구성·시장 순위는 미검증. 스냅샷 시가총액은 54,247,299,026.94로, 달러라면 약 542.47억 달러다. 통화·분류 기준은 없지만 ‘소형주’ 표현을 재검토할 중요한 수치다. |</p>
+<p>| 데이터센터 참여 | 2월 100곳에서 7월 200곳으로 증가 | 미검증. 실제 공급 현장·입찰·잠재 프로젝트 중 무엇을 집계했는지 불명확하다. 현장 수 두 배가 매출·이익 두 배를 뜻하지 않는다. |</p>
+<p>| 시설 인접성 | 미국 발표 부지의 85%가 시설 반경 40km 이내 | 미검증. 부지 목록·지도·거리 정의가 없다. 인접성은 시장점유율이나 확정 수주가 아니다. |</p>
+<p>| 텍사스 공급 | 골재 300만 톤 공급 합의, 비용 700억 원 초과 | 미검증. 고객·계약 상태·공급 기간·톤 단위·실제 단가가 없다. 고객 비용과 CRH 매출·이익도 구분해야 한다. |</p>
+<p>| 매장량·진입장벽 | 골재 190억 톤을 독점하고 80년 이상 공급 가능 | 미검증. 매장량·자원량·채굴권과 생산량을 확인해야 한다. 자사 자원 보유가 북미 시장 독점을 의미하지 않는다. |</p>
+<p>| 통합 공급 | 지하 시설부터 콘크리트·아스팔트까지 일괄 공급하는 유일한 업체이며 IT 기업과 설계 협업 | 미검증. CEO 브리핑 원문·고객 확인·경쟁사 비교가 없다. 공급 능력과 개별 현장의 전 공정 수주는 별개다. |</p>
+<p>| 아르코사 인수 | 지난해 6월 11조 원에 완전 인수했으며 내년 초 편입 | <strong>발화·시제 불확실, 거래 사실 미검증.</strong> 완료와 향후 편입 설명이 충돌한다. 인수 주체·대상·승인·종결 공시가 필요하다. |</p>
+<p>| 송전 사업 | 아르코사는 미국 3위이며 수주 잔고가 6개월간 약 50% 증가 | 미검증. 제품 범위·순위 기준·두 시점 잔고가 없다. 증가 원인이 AI 수요라는 근거도 없다. |</p>
+<p>| 분기 실적 | 매출 102억→108억 달러, 핵심 이익 7% 증가 | 미검증. 제시 매출의 증가율은 약 5.88%로 산술상 6%와 맞지만, 실제 연도·분기/누적 구분·이익 지표·조정표는 없다. |</p>
+<p>| 주가 | 1월 약 131달러→현재 약 81달러, 38% 하락 | 부분 지지. 조회 스냅샷 가격 81.54와 52주 최고가 131.55는 약 38.02% 하락에 해당한다. 최고가가 1월 가격이었다는 근거는 없다. |</p>
+<p>| 밸류에이션 | 예상 PER 14배, 경쟁사 약 25배, 평균 목표주가 130달러 | 부분 지지·일부 불일치. 스냅샷 예상 PER은 12.72배, 후행 PER은 14.41배다. 경쟁사 수치는 없으며 평균 목표주가는 127.96이다. |</p>
+<h4>시장 스냅샷의 해석</h4>
+<p>호스트가 수집한 yfinance 조회 시각은 <strong>2026년 10월 10일 00:09:43 UTC, 한국시간 09:09:43</strong>으로 영상 게시 이후다. 실제 거래 시각·거래소·통화·가격 조정 여부와 직접 출처 링크는 제공되지 않았다.</p>
+<ul>
+<li>평균 목표주가 127.96과 가격 81.54를 동일 통화로 비교하면 계산상 차이는 <strong>약 56.93%</strong>다. 실현 수익률이나 저평가의 증명은 아니다.</li>
+<li>영상의 14배는 스냅샷의 후행 PER에 가깝지만, 영상이 후행·예상 PER을 혼동했다고 확정할 수 없다.</li>
+<li>14÷25는 56%다. 영상 수치를 받아들여도 ‘정확히 절반’이 아니라 <strong>44% 낮은 배수</strong>이며, 동일 시점·예측 기간·EPS 정의의 비교가 필요하다.</li>
+<li>700억 원÷300만 톤은 약 <strong>23,333원/톤</strong>, 190억 톤÷80년은 연평균 <strong>2.375억 톤</strong>이다. 모두 주장 수치를 이용한 조건부 산술이며 계약금액·생산량 검증이 아니다.</li>
+</ul>
+<h3>3. 상승 논리와 반론</h3>
+<h4>상승 논리 — 원자료 확인이 전제</h4>
+<p>영상이 제시한 구조는 <strong>데이터센터 착공 증가 → 인근 자재 공급 → 여러 공정의 추가 판매 → 매출·이익 확대</strong>다. 운송비 부담과 인허가 제약이 확인된다면 지역 시설망은 경쟁우위가 될 수 있다. 설계 단계 협업과 실제 통합 공급이 입증된다면 현장당 공급 범위 확대도 관찰할 가치가 있다.</p>
+<p>아르코사 거래가 실제로 종결되고 송전 사업이 연결된다면 전력 인프라로의 확장 논리도 평가할 수 있다. 다만 현재는 거래 사실과 상태부터 확인해야 하므로 관련 이익을 확정 입력으로 넣을 근거가 없다.</p>
+<h4>핵심 반론</h4>
+<ul>
+<li><strong>현장 수·인접성·매장량은 이익과 다르다.</strong> 공급 점유율, 물량, 판매단가, 운송비와 마진이 필요하다.</li>
+<li><strong>단일 현장을 200곳에 적용할 수 없다.</strong> 텍사스 사례의 규모와 공급 범위가 다른 현장에서도 같다는 증거가 없다.</li>
+<li><strong>주가 하락만으로 저평가가 입증되지 않는다.</strong> 낮은 배수가 성장 둔화·사업 구성·재무 부담을 반영하는지 확인해야 한다. 이는 점검할 가능성이지 확인된 하락 원인이 아니다.</li>
+<li><strong>목표주가는 확정 가치가 아니다.</strong> 집계 표본·갱신일·분산이 없고 예상 EPS 변화에 따라 평가도 달라질 수 있다.</li>
+</ul>
+<h3>4. 증거와 자막의 품질 한계</h3>
+<p>수집된 기사 E1~E3는 각각 <a href="https://finance.yahoo.com/m/c5587e8c-4acc-351f-b945-7034e4fa1062/venezuela-wants-to-return-to.html">베네수엘라 석유</a>, <a href="https://finance.yahoo.com/markets/stocks/articles/much-costlier-fuel-hitting-carnival-225136665.html">Carnival 연료비</a>, <a href="https://finance.yahoo.com/energy/articles/could-wrong-chevron-221359442.html">Chevron</a>에 관한 것으로 <strong>CRH 주장과 무관하다</strong>. 발췌도 오류·사이트 탐색 문구 중심이어서 투자 논지의 지지·반박 근거에서 제외한다. 수집 상태의 <code>verified</code>는 주장 검증 완료를 의미하지 않는다.</p>
+<p>뉴스 조회는 오류, 공시는 제공자 이용 불가 상태다. 이는 뉴스·공시·계약이 실제로 없다는 증거가 아니다. 제공 번들에는 투자 논지를 확인할 관련 공시나 직접적인 사업 근거 링크가 없다.</p>
+<ul>
+<li><strong>transcript_quality:</strong> 자동 한국어 자막의 상태는 good, 점수는 1.0이다. 수치·고유명사·시제의 원음 정확성을 보증하지 않는다.</li>
+<li><strong>source_confidence:</strong> CRH 0.92, 아르코사 0.76, 벌칸 0.85, 마틴 마리에타 0.90이다. 이는 자막에서 기업·주장을 추출한 확신도이지 사실일 확률이 아니다.</li>
+<li><strong>asr_confidence:</strong> 모든 주장에서 0.0은 개별 ASR 신뢰도 <strong>미평가 표식</strong>이다. 오인식 확률 100%라는 뜻이 아니다.</li>
+<li><strong>시간·용어:</strong> ‘올해·지난해·내년·현재’를 게시일에 기계적으로 대입할 수 없다. ‘독점’, ‘유일’, ‘송전탑’, ‘핵심 이익’과 인수 완료 시제는 원음·원문 대조가 필요하다.</li>
+</ul>
+<p><strong>Bloomberg·Morningstar 자료는 제공되지 않았으며 해당 출처 기반 주장은 미검증·수동 확인 필요다.</strong> 출처 미식별 CEO 브리핑과 화자의 주식 분석 도구도 같은 상태다. 다른 시장 스냅샷이 해당 비공개 화면의 내용을 대신 입증하지는 않는다.</p>
+<h3>5. 단기 체크포인트와 관찰 항목</h3>
+<p>확정된 발표·종결 일정은 제공되지 않았다. 다음은 자료 확보와 후속 공시에서 확인할 항목이다.</p>
+<p>| 우선순위 | 확보할 자료 | 투자자가 관찰할 구체적 항목 |</p>
+<p>|---|---|---|</p>
+<p>| 1 | 날짜·통화·거래소가 명확한 시세와 주식 수 | 영상 당시 가격, 1월 가격과 고점 발생일, 시가총액 및 소형주 분류 기준 |</p>
+<p>| 2 | CRH 공식 실적 발표·조정표 | 해당 회계연도, 분기 단독 매출, 핵심 이익 정의, 유기적 성장과 인수·환율 효과, 마진·현금흐름 |</p>
+<p>| 3 | 데이터센터 집계 원문·공급 계약 | 100→200곳의 동일 집계 여부, 공급 중인 현장 비중, 물량·기간·단가, 실제 매출 전환 |</p>
+<p>| 4 | 시설 지도·매장량 공시 | 85%의 모집단·거리 기준, 채굴 가능량과 권리, 연간 생산량, 경쟁 공급자 |</p>
+<p>| 5 | 아르코사 거래 관련 양사 공시 | 정확한 법인·인수 주체, 계약금액과 부채 포함 여부, 승인·실제 종결·연결 편입일 |</p>
+<p>| 6 | 송전 사업 실적·동일 기준 경쟁사 데이터 | 수주 잔고의 시작·종료 수치, 취소·납품 일정, AI 연관성, 동일 기간 예상 PER과 목표주가 갱신 내역 |</p>
+<h3>6. 논지 무효화·재평가 조건</h3>
+<ul>
+<li>현장 증가가 실제 공급 확대가 아니거나 매출·이익·현금흐름으로 이어지지 않으면 <strong>데이터센터 성장 논리</strong>를 재평가해야 한다.</li>
+<li>시설 인접성이 경쟁 공급자로 대체 가능하고 가격·마진 우위로 나타나지 않으면 <strong>지역망 경쟁우위 논리</strong>는 약해진다.</li>
+<li>실제 채굴 가능량·권리가 주장과 다르거나 경쟁사도 유사한 통합 공급을 제공하면 <strong>독점·유일 공급·80년 공급 논리</strong>는 수정해야 한다.</li>
+<li>인수 주체·대상·상태가 영상과 다르거나 종결되지 않았다면 <strong>CRH의 송전 사업 연결 수혜 전제</strong>를 사용할 수 없다.</li>
+<li>동일 기준으로 비교했을 때 할인 폭이 사라지거나 예상 이익 하향으로 설명된다면 <strong>상대적 저평가 논리</strong>를 재평가해야 한다.</li>
+</ul>
+<p><strong>종합하면, 현재 확인 가능한 것은 일부 시장 수치와 조건부 계산이다. AI 건설 수혜가 CRH의 실적과 가치로 연결된다는 결론에는 계약·공시·실적 원자료가 더 필요하다.</strong></p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;RBvNUqXrPD8&quot;,
+  &quot;title&quot;: &quot;10월 9일 우리가 꼭 알고 있어야 할, 저평가 &#x27;AI건설&#x27; 소형주&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=RBvNUqXrPD8&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/RBvNUqXrPD8/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-09T06:58:07+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 2576,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 2576,
+    &quot;segments&quot;: 114,
+    &quot;duration_seconds&quot;: 178,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-10T08:58:11.130631+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 3,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;asr_uncertain&quot;: 1,
+    &quot;partially_supported&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;CRH는 북미 최대급 골재 공급업체로 골재·시멘트·콘크리트·아스팔트를 판매하며, 저평가 AI건설 소형주다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;소형주; 시가총액 수치 없음&quot;,
+        &quot;observed&quot;: &quot;market_evidence[0].market_snapshot.market_cap=54,247,299,026.94; 통화·분류 기준 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;소형주라는 제목이나 북미 시장 지위를 확인된 투자 전제로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;미국 데이터센터 건설 참여 현장이 올해 2월 100곳에서 7월 200곳으로 5개월 만에 두 배 증가했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2월 100곳→7월 200곳; 5개월간 두 배&quot;,
+        &quot;observed&quot;: &quot;실제 현장 수는 확인 불가. 제시된 수치만 계산하면 증가율은 100%.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;현장 수 증가를 매출 또는 이익의 두 배 증가로 해석할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;미국에서 발표된 데이터센터 부지의 85%가 CRH 시설에서 40km 이내에 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;발표 부지의 85%; 시설 반경 40km&quot;,
+        &quot;observed&quot;: &quot;비율·거리의 원자료 없음; 마일 환산 여부도 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;85%를 CRH의 데이터센터 시장점유율이나 수주 확률로 사용해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;CRH가 텍사스 동부의 한 데이터센터 부지에 골재 300만 톤을 공급하기로 합의했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;골재 300만 톤 공급 합의&quot;,
+        &quot;observed&quot;: &quot;계약·물량을 확인할 외부 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;300만 톤을 확정 수주나 특정 연도의 매출로 반영할 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;텍사스 해당 현장의 골재 비용만 700억 원을 넘으며, 이와 같은 대규모 현장이 200곳 있다는 취지로 일반화한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;300만 톤의 골재 비용 700억 원 초과; 유사 현장 200곳&quot;,
+        &quot;observed&quot;: &quot;700억 원÷300만 톤≈23,333.33원/톤. 같은 비용 범위라면 이 단가를 넘어야 하지만 실제 단가는 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;단일 현장 추산에 200을 곱해 전체 매출이나 이익을 추정하는 방식은 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;높은 운송비와 수년에 걸친 채석장 인허가가 진입장벽이며, CRH는 북미 골재 190억 톤을 독점하여 80년 이상 판매할 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;190억 톤; 80년 이상 판매 가능&quot;,
+        &quot;observed&quot;: &quot;190억 톤÷80년=연평균 2.375억 톤이라는 조건부 계산만 가능. 실제 생산량·회수 가능량은 미제공.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장기 공급 능력이나 가격 결정력을 평가하려면 채굴 가능량·생산량·권리와 경쟁 상황을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;CEO 브리핑에 따르면 CRH는 지하 시설부터 콘크리트·아스팔트까지 반복 공급하는 유일한 업체이며 대형 IT 기업과 설계 단계부터 자재를 공동 기획한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;전 공정 일괄 제공이 가능한 유일한 업체&quot;,
+        &quot;observed&quot;: &quot;원문 발언·경쟁사 비교·고객 확인 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;통합 공급 능력을 독점 수주나 확정 매출로 해석하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;CRH가 지난해 6월 11조 원에 아르코사를 완전히 인수했으며, 주주 승인은 완료됐고 내년 초 계열사로 편입된다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.9,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.76,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난해 6월; 11조 원; 완전 인수; 내년 초 편입&quot;,
+        &quot;observed&quot;: &quot;게시일에 기계적으로 대입하면 2025년 6월과 2027년 초이나, 실제 발화 기준 연도·거래 일정·금액은 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;인수 완료나 연결 실적 편입을 전제로 송전 인프라 이익을 계산할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;아르코사는 미국 3위 송전탑 제조업체이며 전력망 수주 잔고가 6개월 만에 거의 50% 증가해 사상 최고치를 기록했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.76,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 3위; 6개월간 수주 잔고 약 50% 증가; 사상 최고&quot;,
+        &quot;observed&quot;: &quot;순위 자료와 수주 잔고의 시작·종료 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미검증 순위와 수주 증가율을 CRH의 AI 관련 성장률로 연결할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;올해 2분기 매출은 전년 동기 102억 달러에서 108억 달러로 약 6% 증가했고, 일회성 이익을 제외한 핵심 이익은 7% 증가했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;매출 102억→108억 달러, 약 6% 증가; 핵심 이익 7% 증가&quot;,
+        &quot;observed&quot;: &quot;제시 매출 수치의 증가율은 약 5.88%로 반올림한 6%와 일치. 실제 매출과 이익 증가율은 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매출 증가의 산술적 일관성만으로 실적 성장이나 이익의 질이 검증된 것은 아니다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;CRH 주가는 올해 1월 약 131달러에서 현재 약 81달러로 38% 하락했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.95,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;market_evidence[0].market_snapshot&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;131달러→81달러; 약 38% 하락&quot;,
+        &quot;observed&quot;: &quot;주장 수치 기준 약 38.17% 하락. 스냅샷 131.55→81.54 기준 약 38.02% 하락; 최고가 발생일 미제공.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;약 38%라는 고점 대비 하락 규모는 관측치와 비슷하지만, 영상의 1월 기준 수익률이나 저평가 근거까지 확인된 것은 아니다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;CRH 예상 PER은 14배, 벌칸·마틴 마리에타는 약 25배라 절반 수준이며, 평균 목표주가 130달러는 거의 60% 상승 여력을 뜻한다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.94,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;market_evidence[0].market_snapshot&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;예상 PER 14배 대 25배; 평균 목표주가 130달러; 상승 여력 거의 60%&quot;,
+        &quot;observed&quot;: &quot;예상 PER 12.724381배, 후행 PER 14.406361배; 평균 목표주가 127.96042; 관측 가격 대비 약 56.93%. 주장 수치 130÷81−1은 약 60.49%. 경쟁사 수치는 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;목표주가 대비 계산상 상승 여력은 일부 재현되지만 경쟁사 대비 저평가 결론은 검증되지 않았다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;CRH&quot;,
+      &quot;name&quot;: &quot;CRH&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;미국 도로·구조물 건설용 자재를 판매하는 북미 최대급 골재 공급업체 중 하나라고 소개한다.&quot;,
+        &quot;데이터센터의 잠재적 수혜 기업을 넘어 이미 다수의 미국 데이터센터 건설 현장에 참여하고 있다고 주장한다.&quot;,
+        &quot;골재·시멘트의 높은 운송비 때문에 건설 현장과 가까운 시설·채석장이 경쟁 우위를 제공한다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;데이터센터 건설 참여 현장: 올해 2월 100곳에서 7월 200곳으로, 5개월 만에 두 배 증가했다고 주장한다.&quot;,
+        &quot;미국에서 발표된 데이터센터 부지의 85%가 CRH 시설에서 40km 이내에 있다고 주장한다.&quot;,
+        &quot;텍사스 동부의 한 데이터센터 부지에 골재 300만 톤을 공급하기로 합의했다고 주장한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CRH&quot;,
+        &quot;as_of&quot;: &quot;2026-10-10T00:09:43.051506+00:00&quot;,
+        &quot;current_price&quot;: 81.54,
+        &quot;market_cap&quot;: 54247299026.94,
+        &quot;forward_pe&quot;: 12.724381,
+        &quot;trailing_pe&quot;: 14.406361,
+        &quot;fifty_two_week_high&quot;: 131.55,
+        &quot;fifty_two_week_low&quot;: 80.13,
+        &quot;average_target_price&quot;: 127.96042,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Venezuela Wants to Return to the Days When Its Oil Fields Were Booming—With U.S. Help&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/c5587e8c-4acc-351f-b945-7034e4fa1062/venezuela-wants-to-return-to.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-09T23:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Venezuela Wants to Return to the Days When Its Oil Fields Were Booming—With U.S. Help Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Ori...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;How Much Is Costlier Fuel Hitting Carnival’s Bottom Line?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/much-costlier-fuel-hitting-carnival-225136665.html&quot;,
+      &quot;publisher&quot;: &quot;Trefis&quot;,
+      &quot;published_at&quot;: &quot;2026-10-09T22:51:36+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;How Much Is Costlier Fuel Hitting Carnival’s Bottom Line? Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters F...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
