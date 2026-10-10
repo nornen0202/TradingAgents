@@ -1,26 +1,21 @@
-# YouTube 검증 델타 — 2026-10-10 10:55
-작성 2026-10-10T10:55:04.711418+09:00 · 수집 완료 2026-10-10T10:17:55.727949+09:00 · source health OK · 연구 전용.
+# YouTube 검증 델타 — 2026-10-11 07:26 KST
 
-새 영상 1건은 금리와 주식의 관계에 관한 미검증 시나리오다. 안전 금리·폭락 임계점·자동 매도 규칙으로 채택하지 않고, 금리 방향의 원인과 기업 현금흐름 검증을 연구 과제로 추가한다. 실행 가능한 신규 변화는 없다.
+**소스 상태 OK · 연구 전용 · NO_ACTIONABLE_DELTA**  
+작성 2026-10-11T07:26:36+09:00 · producer 완료 2026-10-10T10:17:55+09:00
 
-신규 1건, 수정 0건, 동일 내용 59건 제외. 최근 72시간 75건 중 60건 전송·15건 생략되어 전체 범위는 PARTIAL이다. 이번 신규 영상은 10월 10일 09:00:34 KST 게시되어 최근 24시간 자료다.
+새로 전달되거나 수정된 영상이 없어 이번 검증 델타는 NO_ACTIONABLE_DELTA다. 기존 영상의 주장과 종목 판단은 재검증하지 않았다.
 
-출처: [금리 5.3%에도 버티는 증시… ‘임계점’ 넘으면 폭락장 시작? / 로봇·자율주행 현대차가 선택받는 순간은 ‘이때’ ㅣLS증권 염승환 이사](https://www.youtube.com/watch?v=W1acM8mjmWI) · evidence event W1acM8mjmWI
+- 신규 0건 · 수정 0건 · 동일 내용 50건 제외
+- 최근 72시간 범위 50건 중 50건 전송 · 생략 0건 · 잘림 없음
+- 범위 상태 COMPLETE는 packet의 전송 범위만 뜻한다. 이전 영상의 주장·증거를 이번에 재검증했다는 뜻은 아니다.
 
-| 주장 ID | 판정 | 연구 검토 |
-| --- | --- | --- |
-| C1 | 미검증 | 5.3%를 안전선이나 6%를 폭락선으로 사용하지 말고 동일 기간의 금리·지수 자료를 먼저 확인해야 한다. |
-| C2 | 미검증 | 역사적 비율과 낙폭을 검증된 통계로 인용하거나 현재 시장의 안전성을 뒷받침하는 근거로 사용하기 어렵다. |
-| C3 | 미검증 | 성장률 수치나 국채 수요 전언만으로 금리 방향을 확정하지 말고 지표 정의와 입찰 원표를 확인해야 한다. |
-| C4 | ASR 불확실 | 수출 급증을 투자 근거로 인용하기 전에 원음과 해당 월 공식 수출 통계를 대조해야 한다. |
-| C5 | 미검증 | 이 발언을 확정된 금리 일정으로 사용하지 말고 당시 의사록과 회의 일정을 확인해야 한다. |
-| C6 | 미검증 | AI 투자 확대와 투자 수익·이익 성장을 구분해 확인해야 하며, 금리 하락 자체를 자동 매도 신호로 적용할 근거는 부족하다. |
+## 검증 변화와 투자 영향
 
-CL=F만 정규화되어 있으나 전달된 핵심 주장 6건은 금리·수출·정책 중심이다. 원유 가격이나 현대차 티커·목표가를 새로 추정하지 않는다. C1의 연결 기사 제목은 주장을 직접 입증하지 않고, C9는 전달된 주장 목록에 없어 검증 근거로 쓰지 않는다.
+신규 공식 검증 대상이나 반증은 없다. `balanced_external` 가중치를 추가 적용할 새 event가 없으므로 KR·US thesis 순위, 확신도, 기존 위험 한도 내 비중, 연구 우선순위를 이번 델타로 변경하지 않는다. 영상 자료 자체는 주문 근거가 아니며 시장·계좌·위험 실행 게이트를 통과시키지 않는다.
 
-후속 KR·US 종합에는 금리 변화의 원인과 AI 투자 회수·기업 현금흐름 검증을 추가한다. 기존 thesis·확신도·비중·시장 및 계좌 게이트는 상향하지 않는다. 수출 수치의 단위는 원음과 공식 월간 통계 확인 전 인용하지 않는다.
-추가 공식 검증 과제: 미국 재무부 금리·입찰 원표, 연준 의사록과 회의 일정, 한국 공식 수출 통계, 기업 IR의 설비투자·현금흐름. 이번 보고서는 독립 재검증을 수행하지 않았으며 영상의 숫자·전망을 전략 근거로 채택하지 않았다.
-다음 확인: 다음 producer 완료 또는 2026-10-10 11:55 KST. NO_ACTIONABLE_DELTA.
+허용 액션은 **NO_ACTIONABLE_DELTA**다. 이전 영상의 수치·전망, ASR 불확실 표현을 현재 사실로 재인용하지 않는다. 다음 producer 완료 시 새 `video_id + content_sha256`만 확인하고, 중요한 전략 변경 주장은 공식 원자료와 대조한다.
 
-COVERAGE_RECEIPT {"event_id": "youtube:7f0bcd2bc562f0c6ba88a4e73dfdd3b5", "status": "PARTIAL", "window_events": 75, "transmitted_events": 60, "truncated": true, "new_events": 1, "revised_events": 0}
-MOBILE_HANDOFF {"owner": "external_github_notification_pipeline", "status": "PENDING_EXTERNAL_VERIFICATION", "work_sent_notification": false}
+소스 신선도는 이 작성 시각의 검증이다. 72시간 범위의 가장 오래된 시각은 2026-10-08T07:35:14+09:00이며 경계는 2026-10-11T07:35:14+09:00이다. 이후에는 새 packet 없이 현재 델타로 승격하지 않는다.
+
+COVERAGE_RECEIPT {"event_id":"youtube:842e20442886dd3cf99337b7b5ad4315","status":"COMPLETE","window_events":50,"transmitted_events":50,"truncated":false,"new_events":0,"revised_events":0}
+MOBILE_HANDOFF {"owner":"external_github_notification_pipeline","status":"PENDING_EXTERNAL_VERIFICATION","work_sent_notification":false}
