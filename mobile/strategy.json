@@ -1,11 +1,11 @@
 {
   "schema": "tradingagents.mobile-strategy/v1",
-  "generated_at": "2026-10-10T08:30:40.902821+09:00",
+  "generated_at": "2026-10-10T09:30:35.349568+09:00",
   "privacy": "PLAINTEXT_ACTION_DATA_NO_RAW_ACCOUNT_IDENTIFIERS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:1ce51c44a4c9df983c196b153022a3c2",
+      "event_id": "kr:2495b07bcedc50fc9a206ec38feb4ce2",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261008T152727_github-actions-overlay-kr-37737486862-1",
@@ -22700,7 +22700,7 @@
     },
     "us": {
       "market": "US",
-      "event_id": "us:f50bf4def56134a883d74fba557deedc",
+      "event_id": "us:30ad21a7acfdfe8f975b6c1863a15738",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261010T040116_github-actions-us",
@@ -35533,26 +35533,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:25:00-04:00",
-                "valid_until": "2026-10-09T15:55:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -35839,26 +35819,6 @@
                     "reason": "고객 금융과 AI 고객의 지급능력 위험 주장을 원공시의 매출채권·회수·계약 노출과 대조할 필요가 있어 조사 우선순위를 높인다. 인물·금액·역사적 손실 유추는 미검증이므로 신뢰도나 비중을 올리지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:50:00-04:00",
-                "valid_until": "2026-10-09T16:20:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [
                 {
@@ -36151,26 +36111,6 @@
                     "reason": "반도체 공급망 경쟁 주장을 실제 고객 인증·계약·TSM 현금창출과 대조하는 조사 순서를 높인다. 영상의 미검증 주장을 수주 확정으로 취급하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:20:00-04:00",
-                "valid_until": "2026-10-09T16:50:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [
                 {
@@ -36477,26 +36417,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:25:00-04:00",
-                "valid_until": "2026-10-09T15:55:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -36763,26 +36683,6 @@
                     "reason": "제공된 2026-10-08 기사 제목은 MPWR 실적 발표 예정일을 2026-10-29로 제시한다. 원문 확인과 정확한 발표 시각은 확보되지 않았다. / 검증된 수요와 실제 가동 가능한 생산능력 확대가 함께 확인되면 성장 논지가 강화된다. 공격적 분석가의 생산 위탁 확대 주장은 계약 비용·의무·가동 시점 확인이 필요하다. / 실적 전망, 지속 가능한 영업이익률, 매출채권 회수와 투자 이후 현금 창출의 확인은 긍정적 촉매다. 중립 분석가 지적대로 인공지능 수요·생산 확대·실적 기대를 독립적인 세 가지 증거로 계산하지 않는다. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:45:00-04:00",
-                "valid_until": "2026-10-09T16:15:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -37056,26 +36956,6 @@
                     "reason": "AI 반도체 성장 기대와 고객별 공급 참여를 공식 계약·매출로 검증하는 조사 순서를 높인다. 음성인식 불확실 실적 숫자와 매수 시점 제안은 근거로 채택하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:00:00-04:00",
-                "valid_until": "2026-10-09T15:30:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [
                 {
@@ -37367,26 +37247,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:00:00-04:00",
-                "valid_until": "2026-10-09T15:30:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -37556,26 +37416,6 @@
                     "reason": "공식 수익률·보수·순자산가치·보유내역 및 계좌 자금 회수 조건 확보는 신규 배분 재평가의 검증 이정표다. 확보 일정은 미확인이다. / 공격적 분석가가 제시한 단기금리 유지·상승은 재투자 수익에 우호적일 수 있으나 실제 금리 수준과 방향은 미확인이다. 금리 하락 시 소득 감소를 큰 자본차익이 보완한다고 가정하지 않는다. / 다음 공식 분배금과 분배락 일정 확인이 필요하다. 확인된 발표일은 없으며 제한된 분배금 기록만으로 지속적인 소득 악화를 확정하지 않는다. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:15:00-04:00",
-                "valid_until": "2026-10-09T16:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -37898,26 +37738,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:45:00-04:00",
-                "valid_until": "2026-10-09T16:15:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -38218,26 +38038,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:00:00-04:00",
-                "valid_until": "2026-10-09T15:30:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -38518,26 +38318,6 @@
                     "reason": "공격적 분석가가 제시한 전력 인프라 수요가 수익성 있는 주문·수주잔고와 사업부 이익률 개선으로 연결된다는 원공시 확인. 발표 일정은 이용 불가다. / 보수·중립 분석가가 요구한 비경상 손익·세금 효과와 운전자본 변동을 분리한 반복 가능한 이익·현금 창출 검증. / 1052.78 위 거래량 동반 돌파, 재시험 성공 및 다음 확인된 거래일 지지 유지. 가까운 저항 대비 보상·위험 검증은 별도 필요하다. / JPMorgan 목표주가 1330에서 1150으로의 조정 원문·투자의견·변경 이유 확인. 현재 제목만으로 회사 전망 하향을 의미하지 않는다. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:25:00-04:00",
-                "valid_until": "2026-10-09T15:55:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -38835,26 +38615,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:55:00-04:00",
-                "valid_until": "2026-10-09T16:25:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -39100,26 +38860,6 @@
                     "reason": "공격적 분석가가 제시한 종양 분야 혁신치료제 지정 2건에 대한 회사·규제기관의 공식 확인과 임상 세부 자료. 지정은 판매 승인이 아니다. / 휴미라 이후 성장을 뒷받침하는 제품별 실적과 회사 전망, 현금 전환 및 배당 여력의 원문 확인. 예정 발표일은 제공되지 않았다. / 274.94 위 정규장 돌파와 성공적인 재시험, 지속적인 거래 참여 확인. / 보고된 증권사 목표가 상향을 뒷받침하는 이익 추정 변경·통화·기간 확인. UBS의 중립 의견도 고려하며 목표가 제목만으로 적정가치를 확정하지 않는다. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:05:00-04:00",
-                "valid_until": "2026-10-09T17:35:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -39405,26 +39145,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:15:00-04:00",
-                "valid_until": "2026-10-09T17:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -39681,26 +39401,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:20:00-04:00",
-                "valid_until": "2026-10-09T16:50:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -39936,26 +39636,6 @@
                     "reason": "제목에 보도된 SHEL 생산 전망 개선과 액화천연가스·정유 강점이 공식 분기 자료에서 확인되는 경우. 실적 발표 일정은 이용 불가다. / 미국 시설 4곳의 생산 중단이 단기에 종료되고 손실 물량·복구비가 제한되는 경우. / 펄 시설 부분 재가동이 실제 가동률과 판매 회복으로 이어지는 경우. / 이익 추정 하향과 현금흐름 추정 상향의 차이가 설명되고, 운전자본 효과를 구분한 반복 가능한 현금창출력이 확인되는 경우. / 베이 뒤 노르 비운영 지분 30% 인수의 가격·개발비·일정·통제 범위가 경제성을 뒷받침하는 경우. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:30:00-04:00",
-                "valid_until": "2026-10-09T18:00:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -40216,26 +39896,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:15:00-04:00",
-                "valid_until": "2026-10-09T17:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -40491,26 +40151,6 @@
                     "reason": "확정된 일정형 직접 촉매는 제공되지 않았다. / 90.62~90.81 시험 후 회복과 비용 반영 손익비 개선은 최초 진입 재평가 계기다. / 92.00 위 공식 종가·거래량 증가·재시험 지지와 상단 목표 근거 확보는 돌파 전략 재평가 계기다. / SPYM 개별 순유입·추적 성과·기초 기업 이익 개선이 공식 자료로 확인되면 중기 논거가 강화될 수 있다. 현재 저비용·인공지능 뉴스만으로 입증되지는 않았다. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:10:00-04:00",
-                "valid_until": "2026-10-09T17:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -40779,26 +40419,6 @@
                     "reason": "전달된 보도상 V의 2026-10-27 회계연도 4분기·연간 실적발표. 발표 시각, 시장 예상과 결과는 미확인이다. / Gate의 40개 시장 카드 확대와 Moomoo 서비스에서 실제 이용, 결제액 및 증분 수익성이 확인되면 성장 논거가 강화된다. / 결제 경로 선택 관련 입법의 범위·시행 가능성·시점에 관한 검증된 변화는 시행 전에도 위험 평가를 바꿀 수 있다. 현재 통과나 손익 영향은 확정되지 않았다. / 385.57을 넘는 검증된 정규장 종가, 거래량 확인, 이후 지지 확인 및 독립적으로 뒷받침된 상위 목표가 확보되면 진입 준비도를 높일 수 있다. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:45:00-04:00",
-                "valid_until": "2026-10-09T17:15:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -41080,26 +40700,6 @@
                     "reason": "공식 PM 실적과 전망이 제품 성장·수익성·주주 귀속 이익을 확인하는 경우. 발표일과 시장 예상치는 제공되지 않았다. / 일차 공시가 배당 재원, 운전자본 효과, 주요 채무 만기 및 차환 능력을 검증하는 경우. / 새로운 정규장 자료에서 193.80–195.00 재시험 후 회복이 확인되고 실제 체결 가격의 비용 차감 후 보상비가 충족되는 경우. / 권위 있는 규제 자료가 PM에 대한 적용 범위와 영향을 명확히 하는 경우. 현재 인도 관련 제목만으로 피해를 확정할 수 없다. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:15:00-04:00",
-                "valid_until": "2026-10-09T17:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -41393,26 +40993,6 @@
                     "reason": "149.48~150.02 지지 전환과 거래량을 동반한 150.76 위 정규장 종가 확인. 초기 돌파의 후속 검증이지 자동 매수 승인은 아니다. / 제공 뉴스의 Evercore 평가 상향과 BofA 목표주가 160→170 상향. 추정치 근거와 목표 기간이 미확인이라 실행 목표로 사용하지 않는다. / 다음 검증 가능한 실적에서 비용 부담 안정, 판매량·제품구성 개선 및 반복 가능한 현금창출 확인. 발표 일정은 확인 불가다. / Pampers 개선과 아시아·태평양 제휴의 실제 매출·이익 기여 확인. 현재는 성과가 아닌 사업 활동 발표다. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:45:00-04:00",
-                "valid_until": "2026-10-09T17:15:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -41721,26 +41301,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:35:00-04:00",
-                "valid_until": "2026-10-09T18:05:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -42009,26 +41569,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:20:00-04:00",
-                "valid_until": "2026-10-09T16:50:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -42296,26 +41836,6 @@
                     "reason": "Google 관련 890메가와트·20년 계약 보도의 원문 확인: 가격, 공급 개시, 투자 의무, 승인 조건이 수익성을 뒷받침하는지 검증한다. / 동일 사건의 반복 보도가 아닌 추가 고객 계약과 수익성 있는 공급 실적 확인. / 공시 원문, 경영진 전망, 부채 만기와 유동성 자료의 대조·검증. 다음 실적 발표일은 제공되지 않았다. / 최신 가격·거래량으로 확인되는 지지 회복 또는 300.98 돌파 후 재시험 성공. 계약 보도가 2026-10-06 급등의 원인이었다고 단정하지 않는다. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:35:00-04:00",
-                "valid_until": "2026-10-09T18:05:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -42617,26 +42137,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:55:00-04:00",
-                "valid_until": "2026-10-09T16:25:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -42907,26 +42407,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:50:00-04:00",
-                "valid_until": "2026-10-09T17:20:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
             },
@@ -43174,26 +42654,6 @@
                     "reason": "Arm 분쟁의 공식 결과와 실제 제한 범위. 기사상 판결 예상은 결과나 확정 발표시각이 아니며, 양방향 가능성이 유리한 기대수익을 뜻하지 않는다. / 보도된 다년 특허계약의 공식 조건과 경제적 효과. 별도 Arm 분쟁 해소로 간주하지 않는다. / 인공지능·데이터센터·로봇·통신 분야의 실제 고객계약과 수익성 검증. 경영진 발언과 Tejas Networks 시연만으로 이익 다변화를 인정하지 않는다. / 분석 기준일까지 공개된 공식 자료에서 영업이익률·재고 회전·현금전환·주주환원의 지속가능성 확인. 다음 실적발표일은 제공되지 않았다. — 원분석의 확인 과제이며 별도로 검증한 사건 발생 시각이나 완료 사실을 뜻하지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:25:00-04:00",
-                "valid_until": "2026-10-09T17:55:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "이번 packet의 정상 YouTube·PRISM event에서 이 종목과 직접 일치한 근거를 확인하지 못했다. 다른 종목의 신호로 방향이나 비중을 바꾸지 않는다."
@@ -43496,26 +42956,6 @@
                     "reason": "사용자 우선 채널 소수몽키의 AI 실생활 확산 논점을 HIGH 가중치의 조사 과제로 채택해 애플 생태계 수익 전환을 먼저 확인한다. 다른 기업의 제품 발표를 AAPL 확정 매출로 전용하지 않으며 수치·제품 주장은 미검증 상태를 유지한다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:00:00-04:00",
-                "valid_until": "2026-10-09T15:30:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [
                 {
@@ -43828,26 +43268,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:30:00-04:00",
-                "valid_until": "2026-10-09T16:00:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -44149,26 +43569,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:45:00-04:00",
-                "valid_until": "2026-10-09T17:15:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "미국 정규장 실시간 시세·호가·체결비용·동시간대 거래량 확인",
-                  "LULD·Reg SHO·뉴스 거래정지 상태와 공급자 시세 지연 여부 확인",
-                  "30분 미만 계좌 관측, 가용 현금·보유량·집중도·상관 노출 확인",
-                  "원분석 조건의 만료와 종가·거래량·다음 거래일 확인 증거 대조"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "publication_inputs_expired_or_unverified"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -44399,16 +43799,17 @@
           "next_checkpoint": "다음 미국 정규장 전 공식 거래일·장시간을 확인한 뒤, 30분 미만 계좌·최신 통합 호가·실제 종가와 거래량·LULD 및 뉴스 거래정지를 재조회한다. GLDM 80.75 방어 조건과 NVDA/TSM 현금창출·수요 공시부터 검증한다. 기존 위험 한도와 조건 만료는 유지하고 현재 주문은 보류한다."
         },
         "lineage": {
-          "status": "CURRENT_PACKET",
+          "status": "CURRENT_ANALYSIS_LINEAGE",
           "current_action_cards_enriched": true,
-          "reason": "event_source_and_ticker_coverage_match",
+          "reason": "analysis_source_run_and_ticker_coverage_match",
           "workflow_contract_matches": true,
           "ticker_coverage_matches": true,
           "report_ticker_count": 30,
           "current_ticker_count": 30,
           "report_source_run_id": "20261010T040116_github-actions-us",
           "current_analysis_source_run_id": "20261010T040116_github-actions-us"
-        }
+        },
+        "analysis_only": true
       },
       "role_counts": {
         "HOLDING": 14,
