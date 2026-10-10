@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "run_id": "prism_telegram_20261010_094526",
+  "channel": "stock_ai_agent",
+  "message_id": "15908",
+  "posted_at": "2026-10-09T18:43:33+00:00",
+  "source_url": "https://t.me/stock_ai_agent/15908",
+  "preview": "📊 Fastly, Inc. (FSLY) 엣지 클라우드 기업으로, 콘텐츠 전송(CDN)과 사이버보안·트래픽 처리 서비스를 제공합니다. AI 트래픽 수익화와 보안 계약 확대 기대가 주가 재평가의 배경입니다. 💰 거래 현황 | 2026.10.09 관측치 • 주가: $29.84 • 전일 대비: 약 +18% (전일 $25.29 기준) • 거래량: 약 1,107만 주. 급등 구간에서 거래가 크게...",
+  "signals": [
+    {
+      "canonical_ticker": "FSLY",
+      "display_name": "Fastly, Inc.",
+      "market": "US",
+      "source_asof": "2026-10-09T18:43:33+00:00",
+      "signal_action": "UNKNOWN",
+      "trigger_type": "telegram_message",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "confidence": 0.45,
+      "warnings": []
+    },
+    {
+      "canonical_ticker": "CDN",
+      "display_name": "엣지 클라우드 기업으로, 콘텐츠 전송",
+      "market": "US",
+      "source_asof": "2026-10-09T18:43:33+00:00",
+      "signal_action": "UNKNOWN",
+      "trigger_type": "telegram_message",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "target_price": 35.0,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    }
+  ],
+  "simulation_only": false,
+  "actionability": "research_only",
+  "execution_eligible": false
+}

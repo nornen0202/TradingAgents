@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "run_id": "prism_telegram_20261010_094526",
+  "channel": "stock_ai_agent",
+  "message_id": "15918",
+  "posted_at": "2026-10-09T19:10:38+00:00",
+  "source_url": "https://t.me/stock_ai_agent/15918",
+  "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-10 04:10) 🔸 현재 보유: 6/10개 🔸 사용 비중: 4.27/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Frontline Plc(FRO) +2.05% ⚠️ 최저 수익: Space Exploration Technologies (SPCX) -4.32% 🔸 보유 종목: - NVIDIA Corporation(...",
+  "signals": [
+    {
+      "canonical_ticker": "FRO",
+      "display_name": "Frontline Plc",
+      "market": "US",
+      "source_asof": "2026-10-09T19:10:38+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "confidence": 0.45,
+      "warnings": []
+    },
+    {
+      "canonical_ticker": "SPCX",
+      "display_name": "Space Exploration Technologies",
+      "market": "US",
+      "source_asof": "2026-10-09T19:10:38+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "confidence": 0.45,
+      "warnings": []
+    },
+    {
+      "canonical_ticker": "NVDA",
+      "display_name": "NVIDIA Corporation",
+      "market": "US",
+      "source_asof": "2026-10-09T19:10:38+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 222.38,
+      "target_price": 276.54,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    },
+    {
+      "canonical_ticker": "FRSH",
+      "display_name": "Freshworks Inc.",
+      "market": "US",
+      "source_asof": "2026-10-09T19:10:38+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 13.15,
+      "target_price": 16.43,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    },
+    {
+      "canonical_ticker": "BKH",
+      "display_name": "Black Hills Corporation",
+      "market": "US",
+      "source_asof": "2026-10-09T19:10:38+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 73.5,
+      "target_price": 91.88,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    },
+    {
+      "canonical_ticker": "IOVA",
+      "display_name": "Iovance Biotherapeutics, Inc.",
+      "market": "US",
+      "source_asof": "2026-10-09T19:10:38+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 13.72,
+      "target_price": 17.69,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    }
+  ],
+  "simulation_only": true,
+  "actionability": "research_only",
+  "execution_eligible": false
+}
