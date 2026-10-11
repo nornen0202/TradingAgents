@@ -1,0 +1,79 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:c9938f9a8e74513587c995c756a60c51",
+  "source_sha256": "86e2cc0ce8e8d9c1f085a46bd4aeb441ff728dc70ef2d679fbab36bb88276277",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "f5ba656baa3255d8d08768ab816048f458ac176a41169461691a2454a685df37",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 · 2026-10-12\n\n기준 10-12 07:27 KST · 소스 **정상** (생산 10-11 09:40 KST). **NO_ACTIONABLE_DELTA** — 이번 로컬 전달의 신규·수정 영상은 없습니다.\n\n## 한 화면 핵심\n\n- 신규 **0건**, 수정 **0건**, 중복 제외 **30건**. 새로 검증하거나 반증할 주장도 없습니다.\n- 최근 72시간 창 **30건 중 30건** 전송, 생략 **0건**, 잘림 없음. 이 완전성은 패킷 전송 범위에만 해당합니다.\n- KR·US 연구 순위, thesis 확신, 기존 위험 한도 내 크기와 관심종목 우선순위는 **이번 델타로 변경하지 않습니다**. 이전 영상의 판단을 재검증한 결과로 해석하지 않습니다.\n- 모든 YouTube 근거는 연구 참고용입니다. 실행 적격성은 false이며 실시간 시세·계좌·위험 게이트를 통과한 주문 근거가 아닙니다.\n\n## 검증과 다음 과제\n\n새 공식 원자료 검증 대상이나 반증 대상은 전달되지 않았습니다. 이전 영상의 수치·ASR·오래된 주장은 현재 사실로 재사용하지 않습니다. 다음 생산 성공분에서 새롭거나 수정된 정확한 이벤트 키가 전달되면 공식 원자료와 대조하고, 관련 KR·US 가설의 연구 우선순위 및 확신을 다시 평가합니다. 현재 패킷의 가장 이른 신선도 경계는 **10-12 09:31 KST**입니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:c9938f9a8e74513587c995c756a60c51\",\"status\":\"COMPLETE\",\"window_events\":30,\"transmitted_events\":30,\"truncated\":false,\"new_events\":0,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:c9938f9a8e74513587c995c756a60c51",
+      "source_sha256": "86e2cc0ce8e8d9c1f085a46bd4aeb441ff728dc70ef2d679fbab36bb88276277"
+    },
+    "title": "YouTube 검증 델타 — 신규·수정 0건 (2026-10-12)",
+    "generated_at": "2026-10-12T07:27:03+09:00",
+    "as_of": "2026-10-11T08:30:21+09:00",
+    "source_health": "OK",
+    "report_mode": "NO_ACTIONABLE_DELTA",
+    "summary": "신규·수정 canonical YouTube 이벤트 없음. 기존 영상은 재검증하지 않았고 투자 thesis 및 실행 판단에 신규 영향 없음.",
+    "top_actions": [],
+    "strategies": [],
+    "coverage_receipt": {
+      "event_id": "youtube:c9938f9a8e74513587c995c756a60c51",
+      "status": "COMPLETE",
+      "window_events": 30,
+      "transmitted_events": 30,
+      "truncated": false,
+      "new_events": 0,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer_run_id": "youtube_20261011_093524",
+      "producer_last_run_at": "2026-10-11T09:40:06.886257+09:00",
+      "producer_status": "success",
+      "window_hours": 72,
+      "oldest_occurred_at": "2026-10-09T00:31:01+00:00",
+      "newest_occurred_at": "2026-10-10T23:30:21+00:00",
+      "new_events": 0,
+      "revised_events": 0,
+      "unchanged_events": 30,
+      "delivered_event_keys": [],
+      "event_manifest": [],
+      "source_contributions": [],
+      "balanced_external_effect": "No new or revised canonical event; no incremental ranking, confidence, risk-bounded sizing, or research-priority change.",
+      "execution_eligible": false,
+      "external_delivery_verified": false
+    },
+    "next_checkpoint": "2026-10-12T09:31:01+09:00"
+  },
+  "report_id": "youtube:775577d8fd39004a914a668ea5239235",
+  "report_sha256": "775577d8fd39004a914a668ea52392352caf8b59b38cf33b2569ec5592fddca3",
+  "published_at": "2026-10-12T07:27:07.115671+09:00"
+}

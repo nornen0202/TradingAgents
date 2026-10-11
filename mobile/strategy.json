@@ -1,11 +1,11 @@
 {
   "schema": "tradingagents.mobile-strategy/v1",
-  "generated_at": "2026-10-12T01:20:31.523142+09:00",
+  "generated_at": "2026-10-12T07:30:37.896141+09:00",
   "privacy": "PLAINTEXT_ACTION_DATA_NO_RAW_ACCOUNT_IDENTIFIERS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:1e86edfcb4285805f92faaecfee06876",
+      "event_id": "kr:69bdcfd92945d7ddd29ef069cdde8e49",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261008T152727_github-actions-overlay-kr-37737486862-1",
@@ -34,15 +34,12 @@
       },
       "latest_attempt": {
         "schema": "tradingagents.analysis-attempt/v1",
-        "run_id": "20261008T071336_github-actions-kr",
+        "run_id": "20261012T055403_local-scheduler-kr-full",
         "market": "KR",
         "run_mode": "full",
-        "started_at": "2026-10-08T07:13:36.019509+09:00",
-        "status": "SUCCESS",
-        "heartbeat_at": "2026-10-07T22:40:10.338161+00:00",
-        "finished_at": "2026-10-07T22:40:10.338150+00:00",
-        "completed_tickers": 30,
-        "error_type": null
+        "started_at": "2026-10-12T05:54:03.869791+09:00",
+        "status": "RUNNING",
+        "heartbeat_at": "2026-10-11T22:30:35.893469+00:00"
       },
       "latest_completed_analysis": {
         "run_id": "20261008T071336_github-actions-kr",
@@ -22700,7 +22697,7 @@
     },
     "us": {
       "market": "US",
-      "event_id": "us:0582a9fdea248d691dbbc66471a17fbe",
+      "event_id": "us:b311dc309738288c4112a2e5f7193c1e",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261010T040116_github-actions-us",
@@ -35541,21 +35538,6 @@
                 ],
                 "research_priority": "HIGH"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:25:00-04:00",
-                "valid_until": "2026-10-09T15:55:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -35857,21 +35839,6 @@
                   "원분석의 반증·위험 조건: 공식 자료에서 지속적인 현금창출 악화, 중대한 전망 하향 또는 성장 가설 훼손 확인: 핵심 보유 유지 판단 철회"
                 ],
                 "research_priority": "HIGH"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:20:00-04:00",
-                "valid_until": "2026-10-09T16:50:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [
                 {
@@ -36211,21 +36178,6 @@
                 ],
                 "research_priority": "HIGH"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:50:00-04:00",
-                "valid_until": "2026-10-09T16:20:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -36533,21 +36485,6 @@
                   "원분석의 반증·위험 조건: 전체 손실예산·집중도·갭 스트레스 한도 초과는 현재 보유 규모를 무효화한다. 기업 전망이 유지돼도 초과 노출은 축소한다."
                 ],
                 "research_priority": "HIGH"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:00:00-04:00",
-                "valid_until": "2026-10-09T15:30:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [
                 {
@@ -36864,21 +36801,6 @@
                   "원분석의 반증·위험 조건: 공시·시장·계좌 자료로 확인할 조건(확인 시점 미정): 계좌 집중도·전체 손실 한도 초과 또는 확인된 산업 환경 악화로 기존 노출을 감당할 수 없는 경우."
                 ],
                 "research_priority": "HIGH"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:00:00-04:00",
-                "valid_until": "2026-10-09T15:30:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [
                 {
@@ -37199,21 +37121,6 @@
                 ],
                 "research_priority": "HIGH"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:00:00-04:00",
-                "valid_until": "2026-10-09T15:30:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -37527,21 +37434,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:25:00-04:00",
-                "valid_until": "2026-10-09T15:55:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -37816,21 +37708,6 @@
                   "원분석의 반증·위험 조건: 공시·시장·계좌 자료로 확인할 조건(확인 시점 미정): 원문 재무자료가 제공업체의 긍정적 수익성·유동성 주장과 중대하게 충돌하면 방향성과 보유 판단을 재평가한다."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:45:00-04:00",
-                "valid_until": "2026-10-09T16:15:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -38119,21 +37996,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:00:00-04:00",
-                "valid_until": "2026-10-09T15:30:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -38311,21 +38173,6 @@
                   "원분석의 반증·위험 조건: 지속적인 불리한 순자산가치 괴리, 거래비용 확대, 지급·유동성 문제 또는 분배락 영향을 제거한 추세 훼손이 확인되는 경우."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:15:00-04:00",
-                "valid_until": "2026-10-09T16:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -38656,21 +38503,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:45:00-04:00",
-                "valid_until": "2026-10-09T16:15:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -38948,21 +38780,6 @@
                   "원분석의 반증·위험 조건: 계좌 검증에서 위험·종목 비중·관련 노출 한도 초과가 확인되거나 별도로 확정한 실행손절이 충족되는 경우. 이는 사업 논거 유지 여부와 별개의 보유 축소 조건이다."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:25:00-04:00",
-                "valid_until": "2026-10-09T15:55:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -39266,21 +39083,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:55:00-04:00",
-                "valid_until": "2026-10-09T16:25:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -39581,21 +39383,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:30:00-04:00",
-                "valid_until": "2026-10-09T16:00:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -39849,21 +39636,6 @@
                   "원분석의 반증·위험 조건: 확인된 포트폴리오 집중도 또는 사건 손실 한도 초과는 기술적 추세와 별개로 해당 초과 노출을 축소할 사유다."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:05:00-04:00",
-                "valid_until": "2026-10-09T17:35:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -40156,21 +39928,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:15:00-04:00",
-                "valid_until": "2026-10-09T17:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -40434,21 +40191,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:20:00-04:00",
-                "valid_until": "2026-10-09T16:50:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -40689,21 +40431,6 @@
                   "원분석의 반증·위험 조건: 실제 유가·정제마진 약세와 생산 차질이 겹쳐 중대한 실적 악화가 확인되는 경우."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:30:00-04:00",
-                "valid_until": "2026-10-09T18:00:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -40971,21 +40698,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:15:00-04:00",
-                "valid_until": "2026-10-09T17:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -41247,21 +40959,6 @@
                   "원분석의 반증·위험 조건: 실제 집중한도·손실예산 초과, 검증된 기초 기업 전망 악화 또는 SPYM 운용·추적 문제. 현재 발생 여부는 미확인이다."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:10:00-04:00",
-                "valid_until": "2026-10-09T17:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -41537,21 +41234,6 @@
                   "원분석의 반증·위험 조건: 실적 또는 전망이 검증된 기대치를 중대하게 하회하면 투자 판단을 재평가한다. 전망 자료가 없다는 사실 자체는 하향 조정이 아니다."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:45:00-04:00",
-                "valid_until": "2026-10-09T17:15:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -41840,21 +41522,6 @@
                   "원분석의 반증·위험 조건: 공시·시장·계좌 자료로 확인할 조건(확인 시점 미정): 확인된 중대한 규제 피해가 사업 전망을 훼손하는 경우."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:15:00-04:00",
-                "valid_until": "2026-10-09T17:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -42155,21 +41822,6 @@
                   "원분석의 반증·위험 조건: 원문 공시로 지속적인 현금창출 훼손, 구조적 환원 여력 약화 또는 투자 논거를 무너뜨리는 차환 문제 확인. 잠정 제공사 비교만으로 발생을 확정하지 않는다."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:45:00-04:00",
-                "valid_until": "2026-10-09T17:15:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -42485,21 +42137,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:35:00-04:00",
-                "valid_until": "2026-10-09T18:05:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -42775,21 +42412,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:20:00-04:00",
-                "valid_until": "2026-10-09T16:50:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -43064,21 +42686,6 @@
                   "원분석의 반증·위험 조건: 비용 차감 후 손익비 2 미달은 신규 진입을 차단한다. 그 자체로 사업 가설의 실패를 의미하지는 않는다."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:35:00-04:00",
-                "valid_until": "2026-10-09T18:05:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -43388,21 +42995,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T15:55:00-04:00",
-                "valid_until": "2026-10-09T16:25:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -43680,21 +43272,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:50:00-04:00",
-                "valid_until": "2026-10-09T17:20:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             },
@@ -43950,21 +43527,6 @@
                   "원분석의 반증·위험 조건: 실제 포트폴리오 위험한도 초과는 보유규모 축소 사유다. 순손익비 2:1 미달은 신규 진입 차단 사유이며 그 자체로 모든 기존 보유분의 즉시 청산을 뜻하지 않는다."
                 ],
                 "research_priority": "NORMAL"
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T17:25:00-04:00",
-                "valid_until": "2026-10-09T17:55:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
@@ -44257,21 +43819,6 @@
                 ],
                 "research_priority": "NORMAL"
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "BLOCKED_STALE",
-                "as_of": "2026-10-09T16:45:00-04:00",
-                "valid_until": "2026-10-09T17:15:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "NEEDS_LIVE_RECHECK"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "전송된 정상 YouTube·PRISM 이벤트 중 이 종목에 직접 매칭된 근거가 없다. 전체 시장 서사는 종목별 확신도·비중의 근거로 전용하지 않는다."
             }
@@ -44498,16 +44045,17 @@
           "next_checkpoint": "다음 실제 미국 거래 세션에서 공식 거래일·장시간, 30분 미만 계좌 관측, 통합 호가·스프레드·체결비용, LULD·뉴스 거래정지, 종가와 비교 가능한 거래량을 다시 확인한다. GLDM 전술적 보유 위험선, TSM 공식 월매출, NVDA 고객 자금조달·현금회수, AVGO 계약, AMZN AWS 공식 부문 실적, AAPL 공식 공급망 근거를 순서대로 대조한다. 원분석 조건 만료를 연장하지 않는다."
         },
         "lineage": {
-          "status": "CURRENT_PACKET",
+          "status": "CURRENT_ANALYSIS_LINEAGE",
           "current_action_cards_enriched": true,
-          "reason": "event_source_and_ticker_coverage_match",
+          "reason": "analysis_source_run_and_ticker_coverage_match",
           "workflow_contract_matches": true,
           "ticker_coverage_matches": true,
           "report_ticker_count": 30,
           "current_ticker_count": 30,
           "report_source_run_id": "20261010T040116_github-actions-us",
           "current_analysis_source_run_id": "20261010T040116_github-actions-us"
-        }
+        },
+        "analysis_only": true
       },
       "role_counts": {
         "HOLDING": 14,
