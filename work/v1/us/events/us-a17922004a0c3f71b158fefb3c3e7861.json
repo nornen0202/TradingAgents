@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:e663408f1956bda39d6fcc7f9e90dd9d",
+  "event_id": "us:a17922004a0c3f71b158fefb3c3e7861",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "28ccef5622f4181bc3518b4a17864a5471d37a8b69183d84abc04a7aec734cbd",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
   "workflow_contract_sha256": "1214108b100a61193755513b3a7bc2a26a1b0659c1a3f2e31d8966b76e1d2754",
-  "source_sha256": "bf9a8b3430b01fd0317c2d1c1b6c6244bf929c973699e40f497b647022da2941",
+  "source_sha256": "048efd5cda571acc03d7c50654db4da8609091da1e9b81316202b877f999863c",
   "body": {
     "kind": "market",
     "market": "US",
@@ -1924,154 +1924,21 @@
         "execution_eligible": false
       },
       "prism": {
-        "source_health": "OK",
+        "source_health": "EMPTY",
         "coverage": {
-          "total_unique_events": 155,
-          "window_events": 5,
-          "transmitted_events": 5,
+          "total_unique_events": 150,
+          "window_events": 0,
+          "transmitted_events": 0,
           "truncated": false,
-          "oldest_occurred_at": "2026-10-10T20:41:27+00:00",
-          "newest_occurred_at": "2026-10-11T01:00:08+00:00",
-          "available_events_before_context_cap": 5,
+          "oldest_occurred_at": null,
+          "newest_occurred_at": null,
+          "available_events_before_context_cap": 0,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
           "omitted_before_context_selection": 0
         },
-        "events": [
-          {
-            "event_key": "stock_ai_agent:15932",
-            "content_sha256": "648d7682dea2093085d38ace2df0c1f220f8b250944617777b2b3fdb150371dc",
-            "occurred_at": "2026-10-11T01:00:08+00:00",
-            "relevance": {
-              "tickers": [
-                "038500.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "15932",
-              "posted_at": "2026-10-11T01:00:08+00:00",
-              "source_url": "https://t.me/stock_ai_agent/15932",
-              "preview": "📋 PRISM 주간 인사이트 (10/4 ~ 10/11) 이번 주 매매 내역과 누적 학습·가격 관측을 정리합니다. 📈 이번 주 매매 요약 ━━━━━━━━━━━━━━━━━━━━ 🇰🇷 한국시장 매도: 삼표시멘트(038500) 7,320원 → -5.4% (0일 보유) · 비중 68% (슬롯 기준 -3.7%) 🇺🇸 미국시장 매수: SPCX $168.20 → 현재 $160.93 (-4.3%) ·...",
-              "signals": [
-                {
-                  "canonical_ticker": "038500.KS",
-                  "display_name": "매도: 삼표시멘트",
-                  "market": "KR",
-                  "source_asof": "2026-10-11T01:00:08+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:15931",
-            "content_sha256": "c8bfb4b30ea916bfd35e508f0858417126ed0d57cf4bd383d96bf3b8258c6afe",
-            "occurred_at": "2026-10-10T22:47:24+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "15931",
-              "posted_at": "2026-10-10T22:47:24+00:00",
-              "source_url": "https://t.me/stock_ai_agent/15931",
-              "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/11 07:46:17 KST 💵 청산 결과 정리 수량: 0.05 BTC 진입 → 청산: 83,023.90 USDT → 82,903.00 USDT 보유 시간: 10.9분 확정 순손익: -10.61 USDT • 시작 계좌 9,499.75 USDT 대비 -0.11% • 수수료 4.56 USDT · 펀딩 0.00 USDT 반영 💰 종료 후...",
-              "signals": [],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:15930",
-            "content_sha256": "e1f15a93acc0b641e1d44a36ea59ea18e69522b4a5fafb95b6eaf6d5c7a4a3c5",
-            "occurred_at": "2026-10-10T22:36:27+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "15930",
-              "posted_at": "2026-10-10T22:36:27+00:00",
-              "source_url": "https://t.me/stock_ai_agent/15930",
-              "preview": "📌 BTC 데모 첫 진입 체결 · 롱 🕐 10/11 07:35:24 KST 🧾 이번 체결: 0.05 BTC · 83,023.90 USDT • 체결금액(명목): 4,151.19 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0.05 BTC · 관측 기준 • 평단 83,023.90 USDT 💰 계좌 순자산: 9,497.49 USDT • 총 증거금 417.18 USDT(계좌 4.39...",
-              "signals": [],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:15929",
-            "content_sha256": "69cb0c4f26f02dbfddb2469144cb8864cc8378af25688c2b8659adb108ed81d0",
-            "occurred_at": "2026-10-10T22:21:24+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "15929",
-              "posted_at": "2026-10-10T22:21:24+00:00",
-              "source_url": "https://t.me/stock_ai_agent/15929",
-              "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/11 07:20:41 KST 💵 청산 결과 정리 수량: 0.05 BTC 진입 → 청산: 82,987.00 USDT → 82,956.70 USDT 보유 시간: 200.3분 확정 순손익: -6.08 USDT • 시작 계좌 9,505.82 USDT 대비 -0.06% • 수수료 4.56 USDT · 펀딩 0.00 USDT 반영 💰 종료 후...",
-              "signals": [],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:15928",
-            "content_sha256": "570d2d6054031795cb991cf72b1b91ffc3952968c6f526d42982109706d2f058",
-            "occurred_at": "2026-10-10T20:41:27+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "15928",
-              "posted_at": "2026-10-10T20:41:27+00:00",
-              "source_url": "https://t.me/stock_ai_agent/15928",
-              "preview": "🛡 BTC 데모 보호 변경 확인 · 롱 🕐 10/11 05:41:22 KST 📦 보유량 0.05 BTC · 평단 82,987.00 USDT 💰 계좌 순자산: 9,505.21 USDT • 총 증거금 417.16 USDT(계좌 4.39%) · 10배 · 교차 🛡 손절 SL 82,890.00 → 82,940.00 USDT · 남은 전량 • 예상 손익: -2.35 USDT · 계좌 -0.02%...",
-              "signals": [],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          }
-        ],
+        "events": [],
         "execution_eligible": false
       },
       "receipt_contract": {
@@ -2108,22 +1975,16 @@
             }
           },
           "prism": {
-            "source_health": "OK",
-            "event_keys": [
-              "stock_ai_agent:15932",
-              "stock_ai_agent:15931",
-              "stock_ai_agent:15930",
-              "stock_ai_agent:15929",
-              "stock_ai_agent:15928"
-            ],
+            "source_health": "EMPTY",
+            "event_keys": [],
             "coverage": {
-              "total_unique_events": 155,
-              "window_events": 5,
-              "transmitted_events": 5,
+              "total_unique_events": 150,
+              "window_events": 0,
+              "transmitted_events": 0,
               "truncated": false,
-              "oldest_occurred_at": "2026-10-10T20:41:27+00:00",
-              "newest_occurred_at": "2026-10-11T01:00:08+00:00",
-              "available_events_before_context_cap": 5,
+              "oldest_occurred_at": null,
+              "newest_occurred_at": null,
+              "available_events_before_context_cap": 0,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,
