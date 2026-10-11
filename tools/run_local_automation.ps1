@@ -49,6 +49,15 @@ try {
         "--archive-dir", $ArchiveRoot, "--state-dir", $stateRoot,
         "--runtime-dir", (Join-Path $RepositoryRoot ".runtime\chatgpt-work"))
     if ($DryRun) { $arguments += "--dry-run" }
-    & $pythonPath @arguments *>> $logPath
-    if ($LASTEXITCODE -ne 0) { throw "Local $Command failed. See $logPath" }
+    # Windows PowerShell converts redirected native stderr to error records.
+    # A recoverable Python warning must not terminate the worker mid-attempt.
+    $savedErrorActionPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        & $pythonPath @arguments *>> $logPath
+        $workerExitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $savedErrorActionPreference
+    }
+    if ($workerExitCode -ne 0) { throw "Local $Command failed. See $logPath" }
 } finally { Pop-Location }
