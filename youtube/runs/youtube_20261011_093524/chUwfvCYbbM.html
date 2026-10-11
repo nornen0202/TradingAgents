@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 투자자들이 꼭 봐야하는, 다음주 &#x27;미국 투자&#x27; 포인트(10.12~16)</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261011_093524</p>
+    <h1>투자자들이 꼭 봐야하는, 다음주 &#x27;미국 투자&#x27; 포인트(10.12~16)</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=chUwfvCYbbM">원본 영상</a>
+    </div>
+  </header>
+  <h2>미국 투자 주간 점검: 2026년 10월 12~16일</h2>
+<p><strong>기준일: 2026년 10월 11일 | 분석 대상: <a href="https://www.youtube.com/watch?v=chUwfvCYbbM">경제사냥꾼 영상</a></strong></p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 핵심은 <strong>AI 투자 지속 여부와 미국 경제의 고금리 부담을 함께 확인하자</strong>는 것이다. 데이터센터·반도체 설비투자, 은행 신용지표, 물가·고용·소비 통계, 연준 발언을 연결하는 관찰 틀이다. 오라클 단일 종목의 재평가 논리가 중심인 영상은 아니다.</p>
+<p>다만 <strong>제공된 검증 결과에서 직접적이고 충분한 외부 근거로 확인된 주장은 없다.</strong> 10개 주장 중 9개는 미검증, AI 데이터센터 행사 관련 1개는 음성인식 불확실로 분류됐다. 이는 주장이 틀렸다는 판정이 아니라, 이를 뒷받침할 자료가 부족하다는 뜻이다.</p>
+<p>따라서 아래 날짜와 수치는 <strong>확정 일정·컨센서스가 아닌 영상 주장</strong>으로 읽어야 한다. 기준일 현재 해당 주간은 미래이므로 실제 발표 결과와 이후 시장 반응도 확인되지 않았다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>| 주제 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 시장 일정 | 10/12 채권시장 휴장·주식시장 개장, 10/16 월간 옵션 만기 | 공식 거래·만기 달력 미제공. 채권 휴장이 모든 금리 신호의 부재를 뜻하지 않으며, 만기만으로 변동성 확대를 확정할 수 없음 |</p>
+<p>| AI 데이터센터 | 10/12 행사에서 구글·메타·마이크로소프트·오라클의 2027년 건설 계획에 주목 | 행사명이 식별되지 않음. 개최일·참가 기업·투자 발표 모두 미확인 |</p>
+<p>| 은행 실적 | JP모건·골드만삭스·웰스파고·시티가 10/13 한국시간 저녁 발표. 카드 연체·충당금이 핵심 | 은행별 IR 일정과 신용지표 원문 미제공. 실제 연체·충당금 증가가 확인된 것은 아님 |</p>
+<p>| 고용·소기업 | 10/13 소기업 경기 전망과 ADP 고용 지표 발표 | 정확한 지표명·월간/주간 구분·대상 기간·수정치 미확인. 고용 약화 지속 여부도 판단 불가 |</p>
+<p>| CPI·금리 | 10/14 21:30 CPI 발표. 근원 예상·직전 2.4%, 2.5% 이상이면 국채 금리 5.35% 재돌파 가능 | 공식 일정·전망 설문 없음. 변화율 기준과 국채 만기 불명확. 금리·기술주 반응은 조건부 전망 |</p>
+<p>| 애플·LG전자 | 10/13 애플 스마트홈 허브 공개, LG전자가 도어벨·도어락 제조·판매 | 공식 제품·협력 발표 없음. 인용된 블룸버그 원문 제목·날짜·링크 미제공: <strong>미검증·수동 확인 필요</strong> |</p>
+<p>| 앤트로픽 | 10/14 상장 전 투자자 행사, 기업가치 약 2조 달러, 아마존·구글 투자 관계 | 행사·상장 준비·평가액·투자 관계의 직접 자료 없음. 오픈AI 매출 논란도 특정 출처 미제공 |</p>
+<p>| TSMC | 10/15 설명회에서 2027년 설비투자를 늘리면 AI 주문 지속과 엔비디아·브로드컴에 긍정적 | 뉴스 목록에 날짜를 언급한 제목은 있지만 공식 일정 확인에는 부족. 설비투자 확대는 발표 사실이 아닌 관찰 조건 |</p>
+<p>| PPI·소매판매 | 10/15 21:30 발표. PPI 전년 대비 예상 5.9%, 직전 5.4% | 공식 일정·전망 출처·대상 월·세부 계열 없음. 실제 발표값으로 사용할 수 없음 |</p>
+<p>| 연준·IMF | 베이지북 10/15 03:00, 케빈 워시 IMF 대담 10/16 12:30, FOMC 10/27~28 | 공식 프로그램·달력·직책 자료 없음. 영상이 지칭한 ‘연준 의장’ 직책과 시간대 모두 미확인 |</p>
+<h4>외부 증거의 실질적 내용</h4>
+<p>호스트는 10개 검색 질의에서 7개 증거 항목을 수집했지만, <strong>어느 항목도 배정된 주장을 직접 지지하거나 반박하지 못했다.</strong> E1~E4는 오류 문구와 사이트 메뉴 중심으로 추출됐고, E5~E7은 본문 발췌가 비어 있다. 관련성 점수도 0.17~0.28로 낮다.</p>
+<p>상대적으로 주제에 가까운 자료는 다음과 같지만, 강한 검증 근거로 사용할 수는 없다.</p>
+<ul>
+<li><a href="https://finance.yahoo.com/markets/article/tech-rebounds-as-ai-trade-jitters-ease-alphacheck-135417533.html">AI 거래 우려 완화를 다룬 Yahoo Finance 기사(E1)</a>: 제목은 AI 시장 분위기와 관련되지만, 제공된 추출문으로 휴장·옵션 만기를 확인할 수 없다.</li>
+<li><a href="https://finance.yahoo.com/technology/ai/articles/amazon-amzn-wants-investors-finance-221126922.html">아마존의 엔비디아 칩 금융조달 관련 기사(E7)</a>: AI 투자 재원이라는 후속 조사 주제와 연결되지만, 본문이 없어 제목 속 금액·거래 구조를 확인하지 못했다. TSMC 투자 계획이나 앤트로픽 평가액의 증거도 아니다.</li>
+</ul>
+<p>애플 뉴스 목록의 Huxe 관련 기사는 스마트홈 협력과 별개다. 공시 제공자 장애와 오라클 뉴스 조회 실패 역시 공시·뉴스가 실제로 없다는 증거가 아니다. <strong>직접 검증을 뒷받침하는 강한 외부 출처 링크는 제공 자료에 없다.</strong></p>
+<h3>3. 호스트가 조회한 시장 수치</h3>
+<p>아래는 제공된 yfinance 스냅샷이다. 조회 시각은 10/10 23:44 UTC 전후이며, 실제 거래 체결 시각과 동일하다고 볼 수 없다.</p>
+<p>| 종목 | 조회 가격(달러) | 선행 PER | 최근 52주 저가~고가 |</p>
+<p>| --- | ---: | ---: | ---: |</p>
+<p>| ORCL | 141.40 | 12.86배 | 114.50~322.54 |</p>
+<p>| AAPL | 336.64 | 35.11배 | 243.42~345.34 |</p>
+<p>| TSM | 453.31 | 20.68배 | 266.82~487.47 |</p>
+<p>이 수치는 시장 배경 정보이지 행사 참가·제품 출시·설비투자 계획을 입증하지 않는다. 선행 PER의 추정 기간과 이익 산정 기준도 제공되지 않아, 배수 차이만으로 상대적 저평가를 결론낼 수 없다. 세 종목의 조회 시각·데이터 기준을 통일한 뒤 실적 추정 변화와 함께 비교할 필요가 있다.</p>
+<h3>4. 상승 논리와 반론</h3>
+<h4>상승 논리가 성립할 조건</h4>
+<ul>
+<li><strong>AI 투자와 매출의 연결:</strong> 공식 데이터센터 투자 계획, TSMC의 AI 수요·주문 발언, 투자 집행이 함께 확인되면 인프라 수요 지속 논리가 강화될 수 있다.</li>
+<li><strong>물가 안정과 경기 유지의 조합:</strong> 검증된 컨센서스 대비 물가가 안정되고 고용·소비가 급격히 약화되지 않는다면, 금리 부담 완화와 기업 이익 유지가 양립할 여지가 있다.</li>
+<li><strong>소비자 신용 안정:</strong> 은행의 카드 연체율·순상각률이 안정되고 충당금 변화가 대출 증가 등으로 설명된다면 소비자 부담에 관한 우려를 재평가할 수 있다.</li>
+</ul>
+<p>이는 영상의 관찰 틀을 바탕으로 한 <strong>조건부 분석</strong>이며, 현재 자료에서 해당 조건이 충족됐다는 뜻은 아니다.</p>
+<h4>주요 반론</h4>
+<p>1. <strong>설비투자 확대와 AI 수익성은 다르다.</strong> 증설에는 비AI 수요, 해외 생산시설, 공정 전환 등 다른 목적이 있을 수 있다. 투자액뿐 아니라 가동률·주문·매출·마진·현금흐름을 함께 봐야 한다.</p>
+<p>2. <strong>고용 둔화는 금리 완화 기대와 이익 악화를 동시에 부를 수 있다.</strong> 금리가 낮아진다는 해석만으로 주가에 긍정적이라고 단정할 수 없다.</p>
+<p>3. <strong>충당금 증가에는 여러 원인이 있다.</strong> 충당금 비용과 잔액을 구분하고 대출 규모·구성·거시 가정 변화를 확인해야 소비자 부실 신호를 평가할 수 있다.</p>
+<p>4. <strong>물가 임계값은 자동적인 시장 반응 공식이 아니다.</strong> 근원 CPI 2.5%와 국채 금리 5.35%의 연결은 만기·통계 기준·시장 기대가 확인되지 않은 전망이다. PPI 상승도 기업 투입비용 상승이나 소비자 가격 전가와 동일하지 않다.</p>
+<p>5. <strong>행사·제품·평가액은 이익 기여의 증거가 아니다.</strong> 투자자 행사 개최나 높은 기업가치만으로 AI의 현금 창출 능력을 판단할 수 없다. 발표가 확인돼도 기대의 주가 반영 정도는 별도 문제다.</p>
+<h3>5. 단기 체크포인트와 관찰 항목</h3>
+<p><strong>다음 날짜는 모두 영상이 제시한 일정이다. 공식 확인 후 시간대를 통일해야 한다.</strong></p>
+<p>| 영상상 날짜 | 우선 확인할 자료 | 투자자가 기록할 항목 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 10/12 | SIFMA·NYSE·Nasdaq 달력, AI 행사 공식 프로그램 | 시장별 거래 여부, 행사명·연사·참가 기업, 투자 계획의 확정 여부·기간·재원 |</p>
+<p>| 10/13 | 은행별 IR, NFIB·ADP 원문, Apple·LG전자 발표 | 카드 연체율·순상각률·충당금 비용/잔액의 전분기·전년 대비 변화, 고용 수정치, 제품·협력 역할 |</p>
+<p>| 10/14 | BLS CPI 일정·통계, 시점이 명확한 전망 설문, 앤트로픽 공식 자료 | 근원 CPI 전월비/전년비, 예상 대비 차이, 만기별 금리, 매출·연환산 매출·이익·현금수입 구분 |</p>
+<p>| 10/15 | TSMC IR, BLS PPI, Census 소매판매, 연준 베이지북 | 설비투자 금액·목적·집행 시기, AI 주문 직접 발언, PPI 계열·수정치, 소매판매 자동차 제외 항목, 지역별 경기 차이 |</p>
+<p>| 10/16 | IMF 프로그램·연준 직책 자료, Cboe·OCC 상품별 달력 | 발언자의 직책·문맥, 물가/고용 강조점, 옵션 최종거래·결제 시각, 거래량·장중 및 마감 변동성 |</p>
+<p>시장 반응을 기록할 때는 <strong>발표 전 기대 → 실제 결과 → 발표 직후 반응 → 마감까지의 변화</strong>를 분리하는 것이 유용하다. 같은 시각의 다른 뉴스도 확인해야 한 지표나 행사에 가격 변화를 과도하게 귀속하지 않을 수 있다.</p>
+<h3>6. 논리의 무효화·약화 조건</h3>
+<ul>
+<li><strong>일정·출처 전제:</strong> 공식 달력이나 원음 대조에서 날짜·행사명·숫자가 다르게 확인되면 해당 촉매의 시점과 수치 전제를 수정해야 한다. 자료를 찾지 못했다는 이유만으로 취소·부재를 단정하지 않는다.</li>
+<li><strong>AI 수요 지속:</strong> 공식 투자 축소·집행 지연과 함께 주문·가동률·수익성 약화가 확인되면 상승 논리가 약해진다. 2027년 가이던스가 나오지 않는 것만으로 수요 감소가 입증되지는 않는다.</li>
+<li><strong>고금리 부담 완화:</strong> 물가가 예상보다 높거나, 신용지표·고용·소비가 함께 악화되면 물가 안정과 경기 유지가 양립한다는 시나리오가 약해진다.</li>
+<li><strong>애플 스마트홈·앤트로픽 촉매:</strong> 공식 발표가 영상과 다른 일정·역할·평가액을 제시하면 기존 전제를 재평가해야 한다. 원문 확보 전에는 확정된 실적 촉매로 취급할 근거가 없다.</li>
+<li><strong>정책 해석:</strong> 실제 발언이 영상의 ‘추가 인상’ 구도와 다르거나 정책 기대가 다르게 움직이면 발언과 시장 전망을 다시 연결해야 한다.</li>
+</ul>
+<h3>7. 자막·신뢰도 및 폐쇄형 출처 한계</h3>
+<p>자동 한국어 자막의 <code>transcript_quality</code>는 good, 점수는 1.0이다. 그러나 이는 행사명·숫자·단위·직책의 정확성을 보증하지 않는다.</p>
+<p>| 주장 | source_confidence | asr_confidence | 특히 주의할 부분 |</p>
+<p>| --- | ---: | ---: | --- |</p>
+<p>| C1 시장 일정 | 0.88 | 0.80 | 상품별 만기·결제 구분 |</p>
+<p>| C2 AI 행사 | 0.78 | 0.30 | 행사명 식별 불가 |</p>
+<p>| C3 은행 | 0.95 | 0.85 | 은행명·충당금 문맥 교정 |</p>
+<p>| C4 고용 | 0.94 | 0.90 | 지표 주기·대상 기간 |</p>
+<p>| C5 CPI | 0.94 | 0.65 | 2.4%·2.5%·5.35%의 기준 |</p>
+<p>| C6 스마트홈 | 0.93 | 0.90 | 블룸버그 원문 부재 |</p>
+<p>| C7 앤트로픽 | 0.83 | 0.55 | 행사 표현·2조 달러 단위 |</p>
+<p>| C8 TSMC | 0.96 | 0.90 | 예정 조건과 실제 발표 구분 |</p>
+<p>| C9 PPI | 0.94 | 0.65 | 5.9%·5.4%의 계열 |</p>
+<p>| C10 연준 | 0.88 | 0.80 | 직책·시간대·발언 문맥 |</p>
+<p><code>source_confidence</code>는 자막에서 내용을 추출한 확신도이지 사실일 확률이 아니다. <code>asr_confidence</code>는 원음 대조·통계적 보정 없이 부여된 정성적 추정치다. 검증 판정의 높은 confidence 역시 <strong>미검증이라는 상태 판단의 확신도</strong>이지 주장 진실성의 확률이 아니다.</p>
+<p>모든 주장 타임스탬프는 <strong>00:00:00</strong>으로 표시되지만 개별 발언 시각이 아닌 청크 시작 표기다. 제공 청크 범위는 00:00.12~02:50.48이며, 정확한 발언별 시각은 제공되지 않았다. E4~E7은 영상 공개 이후 게시됐으므로 영상 공개 당시 근거로 소급할 수 없다.</p>
+<p><strong>블룸버그 스마트홈 보도는 미검증·수동 확인 필요다.</strong> 특정 기사의 존재나 유료 접근 여부까지 확인된 것은 아니다. Morningstar 원문도 제공되지 않았다. 앤트로픽 관련 자료가 비공개 투자자 자료에만 존재하는지도 미확인이다. 출처 미제공과 폐쇄형 출처 의존은 구분해야 하며, 접근 불가능한 자료를 확인된 근거로 대신 제시할 수 없다.</p>
+<h3>결론</h3>
+<p>이 영상은 <strong>AI 투자 지속성과 물가·소비·신용의 균형을 점검하는 관찰 목록</strong>으로 활용할 수 있다. 다만 현 단계에서는 일정·컨센서스·기업 행사·직책의 검증 기반이 부족하다. 투자자가 우선 확인할 것은 영상의 숫자 자체보다 <strong>공식 일정, 통계 기준, 실제 주문·현금흐름, 소비자 신용 변화, 발표 전후 시장 기대의 차이</strong>다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;chUwfvCYbbM&quot;,
+  &quot;title&quot;: &quot;투자자들이 꼭 봐야하는, 다음주 &#x27;미국 투자&#x27; 포인트(10.12~16)&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=chUwfvCYbbM&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/chUwfvCYbbM/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-10T03:00:25+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 2067,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 2067,
+    &quot;segments&quot;: 108,
+    &quot;duration_seconds&quot;: 171,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-11T08:42:45.564361+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 7,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;2026년 10월 12일 콜럼버스 데이에 미국 채권시장은 휴장하고 주식시장은 개장하며, 10월 16일 월간 옵션 만기로 장 막판 변동성이 커질 수 있다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-10-12 채권 휴장·주식 개장; 2026-10-16 월간 옵션 만기.&quot;,
+        &quot;observed&quot;: &quot;공식 거래일·만기 일정 및 해당일 장중 변동성 자료 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시장별 공식 달력과 상품별 최종거래·결제 시각을 확인하기 전에는 확정된 거래 일정으로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;10월 12일 ‘50 섬’으로 인식된 AI 데이터센터 행사가 시작되고 구글·메타·마이크로소프트·오라클이 참가하며, 2027년 추가 건설 발언이 AI 투자 지속의 단서라는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.78,
+      &quot;asr_confidence&quot;: 0.3,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-10-12 행사 시작; 2027년 데이터센터 추가 건설 계획 관찰.&quot;,
+        &quot;observed&quot;: &quot;행사명·공식 일정·참가 명단·2027년 계획 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;원음으로 행사명을 식별한 뒤 공식 프로그램과 기업 발표를 확인하고, 건설 계획 발표와 실제 투자 집행을 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;JP모건·골드만삭스·웰스파고·시티가 10월 13일 한국시간 저녁에 3분기 실적을 발표하고, 카드 연체·충당금 증가가 소비자의 고금리 부담을 보여준다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-10-13 한국시간 저녁, 네 은행의 2026년 3분기 실적 발표.&quot;,
+        &quot;observed&quot;: &quot;은행별 공식 발표 일정·시간과 카드 연체·충당금 수치 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;네 은행의 발표일을 각각 확인하고 카드 연체율·순상각률·충당금 비용과 잔액을 구분해 비교한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;10월 13일 소기업 경기 전망과 ADP 고용 지표가 발표되고, 고용 약화가 이어지면 미국 경제의 고금리 감내 능력에 대한 우려가 커진다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-10-13 소기업 경기 전망 및 ADP 고용 지표 발표.&quot;,
+        &quot;observed&quot;: &quot;공식 일정·대상 월 또는 주·고용 변화 수치 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;NFIB·ADP의 정확한 지표명·주기·대상 기간과 수정치를 확인한 뒤 경기 해석에 반영한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;9월 CPI가 10월 14일 밤 9시 30분 발표되고 근원 CPI 예상·직전 수치는 2.4%이며, 2.5% 이상이면 국채 금리의 5.35% 재돌파·기술주 약세·추가 인상 우려로 이어지고 2.4%이면 금리 우려가 완화된다는 조건부 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 9월 CPI: 2026-10-14 21:30 발표; 근원 예상·직전 2.4%; 상방 조건 2.5% 이상; 국채 금리 5.35% 재돌파 전망. 시간대·변화율 기준·국채 만기 미확인.&quot;,
+        &quot;observed&quot;: &quot;공식 발표 일정·직전치·당시 컨센서스·만기별 금리와 과거 5.35% 돌파 기록 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;통계 기준, 발표 시간대, 전망 작성 시점과 국채 만기를 확인하기 전에는 해당 숫자를 매매 기준으로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;애플이 10월 13일 현지에서 스마트홈 허브를 공개하고 LG전자가 도어벨·도어락을 LG 브랜드로 판매한다는 협력 구도를 블룸버그 보도로 제시한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.93,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-10-13 현지 스마트홈 허브 공개.&quot;,
+        &quot;observed&quot;: &quot;공식 제품 공개 일정 및 협력 역할을 입증하는 원문 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;Apple·LG전자 공식 발표와 블룸버그 원문을 확보하기 전에는 공개일과 협력 구조를 확정 사실로 제시하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;앤트로픽이 상장을 앞두고 10월 14일 투자자 행사를 열며 기업가치는 약 2조 달러이고 아마존·구글이 투자자라는 주장. 오픈AI 매출 논란 이후 AI 수익 창출 능력을 확인할 자리라는 해석.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-10-14 투자자 행사; 상장 전 기업가치 약 2조 달러.&quot;,
+        &quot;observed&quot;: &quot;공식 행사 일정·상장 준비 근거·기업가치 산정 자료·투자 내역 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;2조 달러의 원음·통화·평가 시점·거래 조건을 확인하고, 투자 관계와 매출·수익성 자료를 각각 검증한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;TSMC가 10월 15일 실적 설명회를 열며 2027년 설비투자 확대를 제시하면 AI 칩 주문이 줄지 않았다는 신호이고 엔비디아·브로드컴에 긍정적이라는 조건부 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-10-15 실적 설명회; 2027년 설비투자 확대 여부 관찰.&quot;,
+        &quot;observed&quot;: &quot;TSM 뉴스 목록에 October 15를 언급한 기사 제목만 존재. 공식 설명회 일정과 2027년 투자 수치·방향은 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;TSMC IR 일정과 실제 가이던스에서 투자 목적·AI 수요 관련 직접 발언을 확인한 뒤 고객사 영향을 평가한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;10월 15일 밤 9시 30분 PPI와 소매판매가 발표되며 PPI 전년 대비 예상은 5.9%, 직전은 5.4%로 기업 가격 상승 압력이 커질 수 있다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-10-15 21:30 PPI·소매판매 발표; PPI 전년 대비 예상 5.9%, 직전 5.4%. 시간대·대상 월·세부 계열 미확인.&quot;,
+        &quot;observed&quot;: &quot;공식 발표 일정·예상치 원출처·직전치 및 실제 결과 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 통계의 발표 일정을 따로 확인하고, PPI 전망의 계열·비교 기준과 소매판매 세부 항목을 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;베이지북이 10월 15일 새벽 3시 발표되고 ‘연준 의장’ 케빈 워시가 10월 16일 낮 12시 30분 IMF 대담에 출연하며 FOMC는 10월 27~28일이라는 주장. 물가 강조는 추가 인상 우려, 고용·소비 둔화 강조는 금리 부담 완화로 이어진다는 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;베이지북 2026-10-15 03:00; IMF 대담 2026-10-16 12:30; FOMC 2026-10-27~28; 2026년 연내 추가 인상 가능성. 발표·대담 시간대 미확인.&quot;,
+        &quot;observed&quot;: &quot;공식 일정·시간대·재임 자료·발언 녹취·정책 기대 자료 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;직책·공식 프로그램·시간대와 날짜 이동을 먼저 확인하고, 정책 해석은 실제 발언 문맥과 시장 기대를 대조해 제시한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;ORCL&quot;,
+      &quot;name&quot;: &quot;오라클 및 구글·메타·마이크로소프트&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;AI 데이터센터 행사에서 이들 기업이 다음 해 데이터센터 추가 건설을 언급하면 AI 투자 지속 여부를 판단할 첫 단서가 된다는 주장이다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;10월 12일 현지에서 AI 데이터센터 행사가 시작된다는 주장.&quot;,
+        &quot;다음 해인 2027년 데이터센터 건설 계획을 주목하라는 설명.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ORCL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-10T23:44:19.772680+00:00&quot;,
+        &quot;current_price&quot;: 141.39999389648438,
+        &quot;market_cap&quot;: 428654243965.7854,
+        &quot;forward_pe&quot;: 12.855725,
+        &quot;trailing_pe&quot;: 22.163008,
+        &quot;fifty_two_week_high&quot;: 322.54,
+        &quot;fifty_two_week_low&quot;: 114.5,
+        &quot;average_target_price&quot;: 237.97415,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AAPL&quot;,
+      &quot;name&quot;: &quot;애플 및 LG전자·아마존·구글&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;애플이 스마트홈 허브를 공개하고, LG전자가 도어벨·도어락을 만들어 LG 브랜드로 판매하며 애플이 허브를 맡아 아마존·구글 생태계에 도전한다는 구도를 블룸버그 보도로 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;10월 13일 현지에서 애플 스마트홈 허브 신제품 공개 주장.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;Bloomberg/Morningstar 등 폐쇄형 출처 주장은 자동 검증하지 못했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AAPL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-10T23:44:23.550416+00:00&quot;,
+        &quot;current_price&quot;: 336.6400146484375,
+        &quot;market_cap&quot;: 4912984968981.934,
+        &quot;forward_pe&quot;: 35.11173,
+        &quot;trailing_pe&quot;: 38.605507,
+        &quot;fifty_two_week_high&quot;: 345.34,
+        &quot;fifty_two_week_low&quot;: 243.42,
+        &quot;average_target_price&quot;: 328.09384,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;TSM&quot;,
+      &quot;name&quot;: &quot;TSMC 및 엔비디아·브로드컴&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;TSMC가 실적 설명회에서 다음 해 설비투자 확대를 제시하면 AI 칩 주문이 줄지 않았다는 신호이며 엔비디아와 브로드컴에 긍정적으로 작용할 것이라는 조건부 전망이다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;10월 15일: TSMC 실적 설명회 개최 주장.&quot;,
+        &quot;다음 해인 2027년 설비투자 확대 여부를 점검하라는 설명.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSM&quot;,
+        &quot;as_of&quot;: &quot;2026-10-10T23:44:26.789636+00:00&quot;,
+        &quot;current_price&quot;: 453.30999755859375,
+        &quot;market_cap&quot;: 2351080522170.7397,
+        &quot;forward_pe&quot;: 20.67539,
+        &quot;trailing_pe&quot;: 32.94404,
+        &quot;fifty_two_week_high&quot;: 487.47,
+        &quot;fifty_two_week_low&quot;: 266.82,
+        &quot;average_target_price&quot;: 555.0094,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Tech rebounds as AI trade jitters ease: AlphaCheck&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/article/tech-rebounds-as-ai-trade-jitters-ease-alphacheck-135417533.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-09T13:54:17+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Tech rebounds as AI trade jitters ease: AlphaCheck Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Indonesia exports its first EV batteries&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/indonesia-exports-first-ev-batteries-120547796.html&quot;,
+      &quot;publisher&quot;: &quot;Just Auto&quot;,
+      &quot;published_at&quot;: &quot;2026-10-09T12:05:47+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Indonesia exports its first EV batteries Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfol...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;A COVID Vaccine Stock on the S&amp;P 500 Is Up 600% This Year&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/covid-vaccine-stock-p-500-222354759.html&quot;,
+      &quot;publisher&quot;: &quot;BeInCrypto&quot;,
+      &quot;published_at&quot;: &quot;2026-10-10T22:23:54+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;A COVID Vaccine Stock on the S&amp;P 500 Is Up 600% This Year Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters F...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Broadcom vs. Intel: Which Chip Stock Is a Better Buy in 2026?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/broadcom-vs-intel-chip-stock-153502766.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-10T15:35:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Advanced Micro Devices vs. Qualcomm: Which Technology Stock Is a Better Buy in 2026?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/advanced-micro-devices-vs-qualcomm-170301024.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-10T17:03:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Amazon (AMZN) Wants Investors to Finance $8 Billion of Nvidia Chips. Is AI Spending Getting Too Heavy?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/ai/articles/amazon-amzn-wants-investors-finance-221126922.html&quot;,
+      &quot;publisher&quot;: &quot;Insider Monkey&quot;,
+      &quot;published_at&quot;: &quot;2026-10-10T22:11:26+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

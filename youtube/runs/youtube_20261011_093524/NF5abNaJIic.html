@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 반도체 -4.6% 급락, 펠로시도 위기준비 시작했다!</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261011_093524</p>
+    <h1>반도체 -4.6% 급락, 펠로시도 위기준비 시작했다!</h1>
+    <div class="meta">
+      <span class="badge status-contradicted">contradicted</span>
+      <a href="https://www.youtube.com/watch?v=NF5abNaJIic">원본 영상</a>
+    </div>
+  </header>
+  <h2>반도체 조정과 AI 투자 지속성: 영상 주장 검증 리포트</h2>
+<p><strong>기준일: 2026년 10월 11일 · 대상: <a href="https://www.youtube.com/watch?v=NF5abNaJIic">수페TV 영상</a>, 2026년 10월 10일 공개</strong></p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심 논지는 <strong>반도체 조정이 AI 수요 붕괴를 뜻하지는 않으며, 실적·투자 지속성과 기술주 집중 위험을 함께 점검해야 한다</strong>는 것이다. 그러나 제공된 증거만으로 OpenAI 매출 논란, TSMC 성장률, 엔비디아 금융 지원, 펠로시 거래를 확정할 수 없다.</p>
+<p>검증 대상 10개 묶음 중 <strong>8개는 미검증, 1개는 제한적 부분 확인, 1개는 내부 산술 불일치</strong>로 판정됐다. 부분 확인은 KRC의 약 34달러 가격에 한정되며, 산술 불일치는 상승장·하락장 수익률의 배수 설명에 한정된다. 따라서 영상 제목의 <strong>‘반도체 -4.6%’와 ‘펠로시의 위기 준비’는 확인된 시장 사실이나 투자 동기로 취급할 수 없다.</strong></p>
+<p>세일즈포스는 추정 포트폴리오 비중으로 등장할 뿐이다. 제공 자료에는 세일즈포스의 실적·수주·자사주 매입·AI 제품을 중심으로 재평가 논리를 전개할 근거가 없다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 시각은 <strong>개별 문장의 정확한 발화 시각이 아니라 자막 청크의 시작점</strong>이다.</p>
+<p>| 주제·참조 시각 | 영상 주장 | 확인된 사실/근거와 한계 | 판정 |</p>
+<p>| --- | --- | --- | --- |</p>
+<p>| 시장·순환매 · 00:00:01 | 가치주·동일가중이 상대적으로 강하고 반도체가 하락했다. S&amp;P 500은 주간 +1.1%, 반도체는 본문 -4.5%로 설명한다. | 지수·ETF 가격 시계열이 없다. 제목 -4.6%와 본문 -4.5%의 상품·기간도 불명확하다. 환율·배당률·해외주식 매매 순위 역시 확인되지 않았다. | 미검증 |</p>
+<p>| 국채·물가 · 00:00:01 | 30년물 입찰은 약화하고 10년물은 개선됐다. 30년물 낙찰금리 5.62%, 10년물 응찰배율 2.71→2.77배 등을 제시한다. | 재무부 입찰 원표·비교 표본·BLS 달력이 없다. 입찰 수요만으로 시장금리 하락이나 금리 인상 가능성을 확정할 수 없다. | 미검증 |</p>
+<p>| 에너지·정책 · 00:00:01 | WTI 약 90달러, 선거 전 이란 공격 부인, 호르무즈 선박 피격, 러시아 디젤 공급 완화를 설명한다. | 관련 기사에는 10월 2일 기준 공격 재개 검토와 러시아 디젤 수출 금지가 언급된다. 이후 정책 변경 여부와 선박 사건은 확인되지 않았다. | 미검증·선행 반대 정보 존재 |</p>
+<p>| 엔비디아·AI 금융 · 00:06:24 | 금융 지원과 칩 담보대출로 AI 투자가 확대되고, PER도 평균보다 낮아 버블 판단은 이르다고 본다. | 시장 스냅샷의 가격·PER만 확보됐다. 지원 금액, 계약 구조, 집행 여부, 비교 평균은 없다. 자막의 금융 지원 금액은 복원 불가다. | 미검증 |</p>
+<p>| TSMC · 00:06:24 | 3분기 매출 +51%, 1~9월 누적 NT$3.9조, 전망 약 2% 상회, 2분기 ‘순이익률’ 55.6%를 제시한다. | 월별 매출·손익계산서·컨센서스 원자료가 없다. 55.6%의 정확한 지표명도 미확정이다. 실적·배당 일정은 공식 달력과 대조되지 않았다. | 미검증 |</p>
+<p>| OpenAI·Anthropic · 00:06:24 | OpenAI 연환산 매출 500억 달러와 기대 700억 달러의 차이는 산정 방식 문제이며, Anthropic은 성장 둔화와 11월 상장 연기설이 있다고 설명한다. | 금액의 출처·측정 월·매출 정의와 기존 상장 일정이 없다. 실제 매출 감소가 없었다는 결론이나 반도체 하락과의 인과관계도 확인되지 않았다. | 미검증 |</p>
+<p>| AI 대체 위험 · 00:06:24 | 콘센트릭스·파이서브·제록스 추정 기업의 기존 사업이 AI·새 결제 방식·전자문서로 압박받는다고 본다. | 사업별 매출·마진·고객 유지·조정주가 자료가 없다. 주가 하락만으로 AI 대체를 입증할 수 없다. ‘재력수’와 ‘뮤즈’는 식별이 불확실하다. | 미검증 |</p>
+<p>| 통신 경쟁 · 00:12:34 | SpaceX 주파수 확보와 휴대전화 연결 확대 때문에 버라이즌·AT&amp;T가 역대 최대 일간 낙폭을 기록했다고 주장한다. | FCC 문서·서비스 조건·전체 가격 이력이 없다. 주간 -6.9%를 일간 낙폭으로 사용할 수 없고, 한국 통신사 영향도 전망이다. | 미검증 |</p>
+<p>| 펠로시·KRC · 00:12:34 | 비상장 부동산에 50만~100만 달러를 투자했고 KRC로 관련 흐름을 관찰할 수 있다고 제안한다. 전체 보유 비중·추정 수익률도 제시한다. | KRC 조회 가격 34.25달러만 영상의 약 34달러와 부합한다. 하원 원공시·거래 자산·소유자·현재 보유량은 없다. 비상장 투자와 KRC는 같은 대상이 아니다. | 가격만 부분 확인 |</p>
+<p>| 상승장·하락장 통계 · 00:12:34 | 상승장은 5.3년·+254%, 하락장은 약 1년·-31%이며 기간과 절댓값 수익이 모두 약 5배라고 설명한다. | 제시 숫자로 기간은 5.3배지만 수익률 절댓값 비율은 약 8.19배다. 원 통계의 표본·정의·출처는 미확인이다. | 배수 설명의 산술 불일치 |</p>
+<h4>활용 가능한 외부 근거의 범위</h4>
+<p><strong>에너지 기사:</strong> <a href="https://www.newspim.com/news/view/20261002000018">뉴스핌의 2026년 10월 2일 보도</a>는 중간선거 이후 이란 공격 재개 검토와 러시아의 10월까지 디젤 수출 금지를 언급한다. 확인된 것은 <strong>그 기사의 보도 내용</strong>이며, 대통령 직접 발언이나 이후 정책 상태까지 확인된 것은 아니다. 기사 제목의 브렌트 102달러는 유종과 시점이 달라 영상의 WTI 약 90달러를 확인하거나 반박하지 못한다.</p>
+<p><strong>호스트 제공 시장 스냅샷:</strong> 다음 값은 yfinance 조회 결과다. 원자료 링크와 실제 가격 관측 거래일은 제공되지 않았다.</p>
+<p>| 종목 | 조회 가격 | 선행 PER | 후행 PER | 52주 최고가 |</p>
+<p>| --- | ---: | ---: | ---: | ---: |</p>
+<p>| NVDA | 229.28달러 | 14.41배 | 28.99배 | 243.37달러 |</p>
+<p>| TSM | 453.31달러 | 20.68배 | 32.94배 | 487.47달러 |</p>
+<p>| KRC | 34.25달러 | 100.74배 | 23.95배 | 43.58달러 |</p>
+<p>조회 시각은 10월 11일이지만 이를 해당 날짜의 체결가격으로 볼 수 없다. 이 표만으로 주간 수익률·신고가·역사적 평균 대비 저평가를 판단할 수도 없다. KRC의 오피스·배당 지속성은 PER 외에 FFO, 임대율, 부채 만기와 현금흐름 자료가 필요하다.</p>
+<p>나머지 수집 기사 대부분은 주제 불일치, 사이트 탐색 문구 오염 또는 본문 부재로 투자 논지를 지지하지 못한다. 기사 제목만 제공된 AI 금융·TSMC 일정 뉴스도 계약 집행이나 공식 발표일의 증거로 확대하지 않았다.</p>
+<h3>3. 강세 논리와 반론</h3>
+<h4>강세 논리: 실적과 현금흐름으로 확인해야 할 가설</h4>
+<ul>
+<li><strong>AI 투자 지속:</strong> 실제 고객 수요와 빅테크 투자 집행이 유지되고 TSMC 매출·이익률·가이던스가 이를 뒷받침한다면, 단기 반도체 조정을 수요 붕괴와 구분할 수 있다. 현재 제공 자료에서는 이 조건이 확인되지 않았다.</li>
+<li><strong>매출 정의 차이:</strong> OpenAI 수치 차이가 동일 시점의 총결제액과 인식 매출 정의 차이로 설명된다면 ‘매출 쇼크’ 해석이 완화될 수 있다. 두 숫자의 정의와 기간을 먼저 맞춰야 한다.</li>
+<li><strong>시장 상승의 확산:</strong> 동일가중·가치주 상대 강세가 여러 주 이어지고 이익 전망도 개선된다면 상승 참여가 넓어지는 신호일 수 있다. 한 주 움직임만으로 지속적 순환매를 확정하기는 어렵다.</li>
+<li><strong>오피스 회복:</strong> 임대율·임대료·FFO 개선과 금융비용 부담 완화가 함께 나타난다면 회복 논리가 강화될 수 있다. 펠로시 거래나 높은 배당률만으로 이를 대신할 수 없다.</li>
+</ul>
+<h4>주요 반론</h4>
+<ul>
+<li><strong>금융 지원이 최종 수요를 보장하지 않는다.</strong> 칩 판매 확대가 고객의 영업현금흐름보다 추가 조달에 의존한다면 신용·차환 위험도 함께 커질 수 있다. 협의, 약정, 집행을 구분해야 한다.</li>
+<li><strong>성장과 적정 가격은 별개다.</strong> 높은 매출 성장도 기대치에 못 미치거나 마진이 악화하면 주가를 지지하지 못할 수 있다. 단일 PER에 비교 평균과 이익 추정 근거가 없으면 저평가 결론은 성립하지 않는다.</li>
+<li><strong>금리 하락의 원인이 중요하다.</strong> 공급 부담 완화에 따른 하락과 경기둔화 우려에 따른 하락은 주식·오피스에 다른 의미를 갖는다.</li>
+<li><strong>배당률 상승은 경쟁력 개선의 증거가 아니다.</strong> 통신·오피스·기존 서비스 기업은 현금흐름, 부채, 고객 유지와 사업 전환 성과를 함께 봐야 한다.</li>
+<li><strong>펠로시 거래에서 투자 동기를 읽을 수 없다.</strong> 신고 금액 구간과 거래일 종가 추정만으로 정확한 원가·현재 비중·실제 수익률을 복원할 수 없다. ‘위기 준비’라는 해석은 미확인이다.</li>
+<li><strong>시장 역사 평균은 개별 기업 회복을 보장하지 않는다.</strong> 상승장 통계와 구조적 사업 쇠퇴 가능성은 별도로 판단해야 한다.</li>
+</ul>
+<h3>4. 자막·증거 품질과 불확실성</h3>
+<p>자막은 한국어 자동자막이며 <code>transcript_quality</code>는 good, 점수 1.0이다. 이는 수집·형식 품질을 나타낼 뿐 <strong>숫자·기업명·경제적 사실의 정확성을 보증하지 않는다.</strong> 원음 대조나 수동자막 검증 결과는 없다.</p>
+<p>| 주제 | source_confidence | asr_confidence |</p>
+<p>| --- | ---: | ---: |</p>
+<p>| 시장·순환매 | 0.86 | 0.65 |</p>
+<p>| 국채·물가 | 0.95 | 0.84 |</p>
+<p>| 에너지·정책 | 0.86 | 0.82 |</p>
+<p>| 엔비디아 금융 | 0.83 | 0.60 |</p>
+<p>| TSMC | 0.92 | 0.84 |</p>
+<p>| OpenAI·Anthropic | 0.90 | 0.86 |</p>
+<p>| AI 대체 기업 묶음 | 0.79 | 0.66 |</p>
+<p>| 통신 경쟁 | 0.89 | 0.80 |</p>
+<p>| 펠로시·KRC | 0.90 | 0.68 |</p>
+<p>| 장기 시장 통계 | 0.95 | 0.92 |</p>
+<p><code>source_confidence</code>는 발화 추출의 명확성이지 사실일 확률이 아니다. <code>asr_confidence</code>는 원음 미확인 상태에서 자막 명확성을 평가한 추정치이며, 측정된 인식 정확도가 아니다. 높은 점수의 TSMC·OpenAI 주장도 외부 원자료가 없어 미검증이다.</p>
+<p>특히 금융 지원 금액, 중복 인식된 환율·월마트·SCHD 숫자, ‘XOXL’, ‘FB’, ‘블루 에너지’, ‘재력수’는 임의 복원하지 않았다. 영상의 ‘이번 주·어제·현재’도 정확한 거래일·촬영일과 같다고 단정할 수 없다.</p>
+<p>공시 조회에는 제공업체 이용 불가가 표시됐다. 이는 <strong>실제 공시가 없었다는 뜻이 아니다.</strong> 또한 상위 처리 상태의 ‘verified’는 기사 수집이나 조회 성공을 뜻할 수 있으며, 핵심 주장에 대한 최종 검증 결과는 미검증이다.</p>
+<p><strong>Bloomberg·Morningstar·폐쇄형 리서치 또는 비공개 내부 자료가 필요한 주장: 미검증 / 수동 확인 필요.</strong> 해당 원문은 제공되지 않았다. OpenAI·Anthropic 내부 매출, 월가 기대치, 상장 연기 사유, 칩 담보대출 협상 조건, 기관 목표가의 상세 논거, 펠로시의 실제 원가·보유량·투자 동기를 공개된 것처럼 취급하지 않는다.</p>
+<h3>5. 가까운 체크포인트와 구체적 관찰 항목</h3>
+<p>영상은 10월 13일 JPMorgan·Goldman Sachs, 14일 ASML, 15일 TSMC 실적과 14~15일 CPI·PPI를 제시한다. <strong>모두 공식 일정 대조 전의 영상 주장</strong>이다. 배당 일정도 배당락일·기준일·지급일이 구분되지 않아 달력 정보로 확정할 수 없다.</p>
+<p>| 관찰 대상 | 우선 확인할 자료·지표 | 해석할 때의 기준 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 반도체·순환매 | 하락 대상 지수/ETF, 동일 기간 조정가격, 동일가중 대비 시가총액가중 수익률 | 일간·주간, 가격·총수익 기준을 통일하고 상대 강세의 지속성을 관찰 |</p>
+<p>| TSMC·ASML | 공식 IR 일정, 월별 매출, 분기 마진, 수주·가이던스 | TSMC +51%·NT$3.9조와 55.6% 지표를 원표에서 대조 |</p>
+<p>| AI 투자·금융 | 빅테크 CAPEX 실제 집행·가이던스, 금융 계약과 집행액, 고객 현금흐름 | 투자 발표와 현금 지출, 조달 검토와 실행을 분리 |</p>
+<p>| OpenAI·Anthropic | 측정 월, 연환산 매출·인식 매출·총결제액 정의, 공식 상장 관련 발표 | 동일 기준 시계열 없이는 성장 둔화나 매출 감소 여부 판단 보류 |</p>
+<p>| 국채·물가 | 재무부 입찰 결과, 만기별 금리, BLS 달력과 발표 후 지표 | 응찰배율·딜러 비중을 비교 입찰과 대조하고 금리 변동 원인을 구분 |</p>
+<p>| 에너지 | 계약월별 WTI 정산가격, 선박 사건 원문, 러시아 정책 변경일 | 10월 2일 수출 금지 보도 이후 완화가 있었는지 시간순 확인 |</p>
+<p>| 통신 경쟁 | FCC 신청·승인, 서비스 개시·용량·가격, 통신사 가입자·현금흐름 | 주파수 확보와 상용화를 구분하고 ‘역대 최대 낙폭’은 장기 가격 자료로 검산 |</p>
+<p>| AI 대체 기업 | 유기적 매출 성장, 마진, 고객 유지, AI 신규 매출·서비스 전환 성과 | 주가 하락보다 사업 지표로 구조적 축소 여부 판단 |</p>
+<p>| 펠로시·오피스 | 하원 원공시의 자산·소유자·거래연도·금액 구간, KRC 임대율·FFO·부채·배당 | 신고 거래와 현재 보유를 구분하고 비상장 투자와 KRC를 연결하지 않음 |</p>
+<p>한국 투자자의 원화 환산 성과는 달러 수익률과 USD/KRW 변동률을 같은 기간으로 맞춘 뒤 <code>(1+달러 수익률)×(1+환율 변동률)-1</code>로 검산할 수 있다. 영상의 환율 변동률이 불명확하므로 제시된 +0.7%는 현재 재현할 수 없다.</p>
+<h3>6. 투자 가설의 무효화 조건</h3>
+<p>다음은 이미 발생한 사실이 아니라 <strong>영상의 낙관적 해석을 약화시키는 관찰 조건</strong>이다.</p>
+<ul>
+<li><strong>AI 수요 지속 가설:</strong> 주요 고객의 투자 축소·주문 취소, 공급업체 매출·마진·가이던스 악화, 고객의 조달·상환 부담 확대가 함께 확인되는 경우.</li>
+<li><strong>단순 매출 산정 차이 가설:</strong> 정의와 측정 기간을 맞춘 뒤에도 매출 둔화나 기대 미달이 남거나, 500억·700억 달러의 출처 자체가 확보되지 않는 경우.</li>
+<li><strong>건전한 순환매 가설:</strong> 동일가중 상대 강세가 지속되지 않고 시장 참여 폭·이익 전망도 개선되지 않는 경우.</li>
+<li><strong>오피스 회복 가설:</strong> 임대율·FFO·현금흐름이 악화하고 차환 비용이나 배당 부담이 높아지는 경우.</li>
+<li><strong>펠로시 위기 대비 해석:</strong> 원공시가 다른 자산·소유자·연도의 거래로 확인되거나, 전체 보유와 투자 동기를 뒷받침할 근거가 없는 경우. 현재도 이 해석을 확정할 자료는 없다.</li>
+</ul>
+<h3>결론</h3>
+<p>영상은 AI 수혜와 대체 위험, 실적과 금융 지원, 신규 거래와 전체 포트폴리오를 구분해 볼 필요성을 제기한다. 다만 <strong>핵심 숫자·사건·공시의 직접 증거는 부족하다.</strong> 현재 확인 범위는 시장 스냅샷 일부, 에너지 기사의 제한적 보도 내용, 제시 숫자의 산술 검산이다.</p>
+<p>투자자가 우선 관찰할 것은 제목의 위기 서사가 아니라 <strong>공식 실적·투자 집행·고객 현금흐름·금리 변화의 원인·원공시</strong>다. 이 자료들이 확보되기 전에는 영상의 낙관론이나 위기 해석 어느 쪽도 검증된 결론으로 확대하기 어렵다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;NF5abNaJIic&quot;,
+  &quot;title&quot;: &quot;반도체 -4.6% 급락, 펠로시도 위기준비 시작했다!&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=NF5abNaJIic&quot;,
+  &quot;channel&quot;: &quot;수페TV&quot;,
+  &quot;channel_id&quot;: &quot;UCfnqgWlC5IvJEAPTmyjaixA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@supe-tv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/NF5abNaJIic/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-10T09:00:19+00:00&quot;,
+  &quot;status&quot;: &quot;contradicted&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 10012,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 10012,
+    &quot;segments&quot;: 525,
+    &quot;duration_seconds&quot;: 1187,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-11T08:42:45.564361+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 8,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 8,
+    &quot;partially_supported&quot;: 1,
+    &quot;contradicted&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;가치주와 동일가중 지수가 상대적으로 강했고 반도체가 하락했다는 주장 및 관련 시장 수익률·가격·배당률·매매 순위·신고가 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;다우 +1%, S&amp;P 500 +1.1%, 나스닥 +0.2%, 장기채 +0.7%; 정보기술 -2.2%, 경기방어주 +3.3%, 중형 가치주 +2%; 반도체 -4.6% 또는 -4.5%, 비트코인 -1.7%; 인텔 -12%, &#x27;마이크로&#x27; -4%, 비자·마스터카드 6%대 상승, 월마트 &#x27;6.8% 8%&#x27;, SCHD &#x27;0.9% 9%&#x27;; 아마존 +3.8%, 메타 -1.1%, 버라이즌 -6.9%, 알트리아 +5.6%; 알트리아 약 71달러·상단까지 약 4달러·배당률 6.22%; USD/KRW 약 1,340원·변동률 &#x27;0.4% 4%&#x27;·원화 환산 수익률 +0.7%; 두 달 가중방식별 격차 4% 초과; SOXL 순매수 1위, &#x27;XOXL&#x27; 매도 1위, SOXX 매수 3위, 반도체 ETF 3일 연속 하락.&quot;,
+        &quot;observed&quot;: &quot;이를 대조할 지수·ETF·개별주·환율·매매 통계 시계열이 제공되지 않았다. 중복 인식 숫자와 미확정 티커는 복원하지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;섹터 이동이나 반도체 집중도 조정의 근거로 사용하기 전에 동일 기간·동일 수익률 기준의 원자료가 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;30년물 국채 입찰 수요는 약화하고 10년물은 개선되었으며, CPI·PPI가 10월 14~15일 발표된다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.84,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;30년물 낙찰금리 5.62%, 딜러 평균 비중 약 10%; 10년물 응찰배율 2.71→2.77배, 딜러 비중 2.54%; CPI·PPI 10월 14~15일.&quot;,
+        &quot;observed&quot;: &quot;입찰 수치 및 지표별 공식 발표일 모두 확인 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장기채 판단에 앞서 만기별 입찰 원표와 실제 금리 움직임을 확인하고, 수요 개선과 경기둔화 해석을 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;WTI 약 90달러, 트럼프의 중간선거 전 이란 공격 부인, 호르무즈 인근 선박 피격, 요청에 따른 러시아 디젤 공급 완화 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.95,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;영상 시점 WTI 선물 약 90달러.&quot;,
+        &quot;observed&quot;: &quot;E4 제목은 10월 2일 브렌트 102달러를 제시한다. 영상 시점 WTI의 계약월·정산가격은 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;유가 방향을 단정하기 전에 계약월별 WTI 가격과 사건·정책 변경의 시간순 자료를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;엔비디아의 AI 금융 지원·칩 담보대출 논의, 관련 기업 자금 조달, 신고가·평균보다 낮은 PER·노트북 협업을 근거로 버블 판단은 이르다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:24&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난달 금융 지원 &#x27;5,억 달러&#x27;; 4월 이후 상승 및 해당 주 신고가; 평균보다 낮은 PER.&quot;,
+        &quot;observed&quot;: &quot;지원 금액은 ASR상 해석 불가. 스냅샷 PER은 선행 14.41배·후행 28.99배이나 비교 평균과 주가 이력이 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;금융 논의와 실제 집행, 제품 수요와 금융 지원에 의존한 수요를 분리해 평가해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;TSMC 매출 성장률·누적 매출·전망 상회·이익률 주장과 TSMC·JPMorgan·Goldman Sachs·ASML 실적 및 관련 기업 배당 일정 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:24&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.84,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3분기 매출 전년 대비 +51%, 1~9월 누적 NT$3.9조, 전망 약 2% 상회, 2분기 &#x27;순이익률&#x27; 55.6%; 10월 13일 JPMorgan·Goldman Sachs, 14일 ASML, 15일 TSMC 실적; 12~23일 제너럴 밀스·&#x27;FB&#x27;·델타항공·애보트·로우스 배당 관련 일정.&quot;,
+        &quot;observed&quot;: &quot;매출·이익률·컨센서스 원자료와 공식 실적·배당 일정 모두 미제공.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공식 매출·이익률·가이던스 확인 전에는 높은 성장률이나 일정 정보를 확정된 실적 근거로 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;OpenAI 연환산 매출 500억 달러와 기대치 700억 달러의 차이가 실제 매출 감소가 아닌 산정 방식 차이라는 설명 및 Anthropic 성장 둔화·11월 상장 연기설.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:24&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;OpenAI 연환산 매출 500억 달러, 시장 기대 700억 달러; Anthropic 상장 11월로 연기.&quot;,
+        &quot;observed&quot;: &quot;두 금액의 정의·기준일·출처와 상장 변경 일정 모두 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매출 실적·연환산 수치·총결제액을 구분하기 전에는 매출 쇼크 또는 단순 산정 착오로 단정하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;콘센트릭스·파이서브·제록스 추정 기업이 AI·스테이블코인·전자문서로 구조적 압박을 받으며, 관련 주가 하락이 단순 저평가 기회가 아니라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:24&quot;,
+      &quot;source_confidence&quot;: 0.79,
+      &quot;asr_confidence&quot;: 0.66,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;콘센트릭스는 2024년 100달러 초과에서 27달러로 하락; &#x27;재력수&#x27;는 4→6달러로 50% 반등한 뒤 현재 2달러대.&quot;,
+        &quot;observed&quot;: &quot;4→6달러의 +50% 계산만 일치한다. 기업 식별·날짜·기업행위 조정이 반영된 가격 이력은 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;구조적 쇠퇴 가능성은 점검할 가설이지만, 실제 사업 지표 없이 기업별 투자 결론으로 확정해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;SpaceX의 미국 전역 저대역 주파수 확보와 휴대전화 연결 서비스 확대 때문에 버라이즌·AT&amp;T가 역대 최대 일간 낙폭을 기록했다는 주장 및 버라이즌 배당률 약 6% 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:34&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;버라이즌 배당률 약 6%; 버라이즌·AT&amp;T 역대 최대 일간 낙폭, 구체적 하락률 미제시.&quot;,
+        &quot;observed&quot;: &quot;배당률 계산 자료와 일간·장기 가격 비교 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;배당률과 경쟁 위협을 평가하려면 주파수 승인 단계, 서비스 경제성 및 통신사 실적을 함께 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;펠로시의 비상장 상업용 부동산 투자와 전체 포트폴리오 비중·추정 수익률 주장, 그리고 KRC를 관련 흐름의 간접 관찰 대상으로 제시한 주장.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;M_KRC&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:34&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.68,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;비상장 부동산 투자 50만~100만 달러; KRC 80달러 초과→약 34달러, 50% 이상 하락, 배당률 6.35%; &#x27;블루 에너지&#x27; 7월 24·28일 매수, 175.9→280달러·약 +59%; 인텔 5월 29일·7월 24일 매수, 103.5→104.7달러·약 +1%; 우버 5월 29일 매수, 70.4→71.5달러·약 +1.5%; 인텔 비중 1%대, 세일즈포스 7.5%.&quot;,
+        &quot;observed&quot;: &quot;KRC 스냅샷 가격은 34.25달러. 제시 가격의 단순 변화율은 각각 +59.18%, +1.16%, +1.56%이나 실제 거래·원가·보유 비중·배당률은 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;부분적으로 확인된 것은 KRC의 대략적인 가격이다. 이를 펠로시의 투자 전략이나 특정 종목 매수 근거로 확대해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;평균 하락장 약 1년·-31%, 상승장 5.3년·+254%이며 상승 기간과 절댓값 수익이 각각 약 다섯 배라는 주장.&quot;,
+      &quot;status&quot;: &quot;contradicted&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:34&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.92,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;하락장 약 1년·-31%, 상승장 5.3년·+254%; 기간과 절댓값 수익 모두 약 5배.&quot;,
+        &quot;observed&quot;: &quot;제시 수치 기준 기간은 5.3배, 절댓값 수익률은 약 8.19배. 원 통계의 실측값은 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장기 투자 논거를 사용할 때 검증된 역사 통계와 산술 비율, 투자 판단을 분리해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아·AI 인프라 금융&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;엔비디아가 GPU 판매뿐 아니라 금융 지원과 AI 칩 담보대출 논의를 통해 AI 투자 규모를 확대하고 있으며, 발표자는 아직 버블로 단정하기 이르다고 판단했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;지난달 AI 금융 지원 규모는 자막에 &#x27;5,억 달러&#x27;로 인식돼 정확한 금액을 확정할 수 없다.&quot;,
+        &quot;주가는 4월부터 상승해 이번 주 신고가를 경신했다고 설명했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-11T00:00:18.072305+00:00&quot;,
+        &quot;current_price&quot;: 229.27999877929688,
+        &quot;market_cap&quot;: 5536424130523.682,
+        &quot;forward_pe&quot;: 14.406897,
+        &quot;trailing_pe&quot;: 28.986094,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 164.27,
+        &quot;average_target_price&quot;: 328.71695,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;TSM&quot;,
+      &quot;name&quot;: &quot;TSMC&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;AI 반도체 수요 증가로 매출이 성장하고 있으며, 발표자는 실적이 뒷받침되는 기업의 주가는 결국 실적에 수렴한다고 주장했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;3분기 매출 전년 대비 51% 증가.&quot;,
+        &quot;9월까지 누적 매출 3조 9천억 대만달러; 역대 최대 분기 매출 달성이라고 설명했다.&quot;,
+        &quot;실적이 전망을 약 2% 상회할 것으로 예상했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSM&quot;,
+        &quot;as_of&quot;: &quot;2026-10-11T00:00:21.361553+00:00&quot;,
+        &quot;current_price&quot;: 453.30999755859375,
+        &quot;market_cap&quot;: 2351080522170.7397,
+        &quot;forward_pe&quot;: 20.67539,
+        &quot;trailing_pe&quot;: 32.94404,
+        &quot;fifty_two_week_high&quot;: 487.47,
+        &quot;fifty_two_week_low&quot;: 266.82,
+        &quot;average_target_price&quot;: 555.0094,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;KRC&quot;,
+      &quot;name&quot;: &quot;킬로이 리얼티·샌프란시스코 오피스 부동산&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;펠로시의 비상장 상업용 부동산 투자를 소개하며, 샌프란시스코 오피스를 보유한 KRC로 관련 흐름을 간접 관찰할 수 있다고 제안했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;10월 공개 공시에 펠로시의 50만~100만 달러 투자가 있었다고 설명했다.&quot;,
+        &quot;KRC 주가가 80달러 이상에서 34달러까지 내려와 50% 넘게 하락했고 배당률은 6.35%라고 제시했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;KRC&quot;,
+        &quot;as_of&quot;: &quot;2026-10-11T00:00:24.376564+00:00&quot;,
+        &quot;current_price&quot;: 34.25,
+        &quot;market_cap&quot;: 3983582839.0,
+        &quot;forward_pe&quot;: 100.73529,
+        &quot;trailing_pe&quot;: 23.95105,
+        &quot;fifty_two_week_high&quot;: 43.58,
+        &quot;fifty_two_week_low&quot;: 27.36,
+        &quot;average_target_price&quot;: 40.07143,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Indonesia exports its first EV batteries&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/indonesia-exports-first-ev-batteries-120547796.html&quot;,
+      &quot;publisher&quot;: &quot;Just Auto&quot;,
+      &quot;published_at&quot;: &quot;2026-10-09T12:05:47+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Indonesia exports its first EV batteries Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfol...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Eureka Metals Identifies Consistent Scandium Mineralization at Tyee Titanium Project in Québec&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/eureka-metals-identifies-consistent-scandium-110000087.html&quot;,
+      &quot;publisher&quot;: &quot;TMX Newsfile&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T11:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Eureka Metals Identifies Consistent Scandium Mineralization at Tyee Titanium Project in Québec Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Sc...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;[금/유가] 美 중동 증파에 유가 4% &#x27;껑충&#x27;…브렌트 102달러&quot;,
+      &quot;source_url&quot;: &quot;https://www.newspim.com/news/view/20261002000018&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-10-02T05:59:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;도널드 트럼프 미국 대통령이 미 중간선거 이후 이란에 대한 공격 재개를 검토하는 가운데 나온 소식으로... 여파로 공급이 빠듯한 상황이다. 특히 주요 디젤 수출국인 러시아가 10월까지 디젤 수출을 금지하면서... [금/유가] 美 중동 증파에 유가 4% &#x27;껑충&#x27;…브렌트 102달러 닫기 전체기사 최신뉴스 GAM KSPOT 영상 영상 포토 포토 정치 청와대·감사원 국회·정당 통일·외교 국방·안보 북한 한민족·다문화 정책·서울 서울시 서울시의회 자치구 총리실 노동...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;EIA Boosts Oil Price Forecast by $5 in 2026, $10 in 2027&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/eia-boosts-oil-price-forecast-173246436.html&quot;,
+      &quot;publisher&quot;: &quot;Rigzone.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-08T17:32:46+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;A COVID Vaccine Stock on the S&amp;P 500 Is Up 600% This Year&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/covid-vaccine-stock-p-500-222354759.html&quot;,
+      &quot;publisher&quot;: &quot;BeInCrypto&quot;,
+      &quot;published_at&quot;: &quot;2026-10-10T22:23:54+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Notice - PETER MICHAEL DEEB and CANADIAN INVESTMENT REGULATORY ORGANIZATION and ONTARIO SECURITIES COMMISSION, File No. 2026-10&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/notice-peter-michael-deeb-canadian-202800801.html&quot;,
+      &quot;publisher&quot;: &quot;CNW Group&quot;,
+      &quot;published_at&quot;: &quot;2026-09-09T20:28:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
