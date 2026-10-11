@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:7e2b25c04d120381b4e1705565a46fa6",
+  "event_id": "youtube:a8d69c18efc41b00987fd112c952f852",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
   "workflow_contract_sha256": "f5ba656baa3255d8d08768ab816048f458ac176a41169461691a2454a685df37",
-  "source_sha256": "0a20fda75ce5156203d4b5f4462c156b1c1212124afa3b827e2521f778949531",
+  "source_sha256": "cfe47293863b3aac8d8927014daa1e84c2648ae40403f6af4e3467eaac5fd50c",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,12 +44,12 @@
     },
     "coverage": {
       "total_unique_events": 341,
-      "window_events": 57,
+      "window_events": 30,
       "transmitted_events": 25,
       "truncated": true,
-      "oldest_occurred_at": "2026-10-08T01:52:13+00:00",
+      "oldest_occurred_at": "2026-10-09T00:31:01+00:00",
       "newest_occurred_at": "2026-10-10T23:30:21+00:00",
-      "omitted_due_to_packet_budget": 32
+      "omitted_due_to_packet_budget": 5
     },
     "events": [
       {
@@ -500,280 +500,6 @@
               "source_url": "https://finance.yahoo.com/m/ae5c37e7-78f4-3bc7-b1ac-85a2207e46af/basic-materials-roundup%3A.html",
               "publisher": "The Wall Street Journal",
               "published_at": "2026-10-09T21:08:00+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "YgMO4F-o37U",
-        "content_sha256": "180ebbaa4dc272f296647fec758d2a356aeb682c367a7af37f67df9ed9790c59",
-        "occurred_at": "2026-10-08T10:45:18+00:00",
-        "relevance": {
-          "tickers": [
-            "^KS11"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "verified_entities"
-        },
-        "strategy_source_tier": "USER_PRIMARY",
-        "strategy_evidence_weight": "HIGH",
-        "summary": {
-          "video_id": "YgMO4F-o37U",
-          "title": "돈은 당신을 두번 배신했다...뒤집힌 40년 부의 법칙 (박종훈의 지식한방)",
-          "channel": "박종훈의 지식한방",
-          "source_url": "https://www.youtube.com/watch?v=YgMO4F-o37U",
-          "published_at": "2026-10-08T10:45:18+00:00",
-          "status": "contradicted",
-          "strategy_source_tier": "USER_PRIMARY",
-          "strategy_evidence_weight": "HIGH",
-          "strategy_validation_policy": "USER_ACCEPTED",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 14830,
-            "segments": 780,
-            "duration_seconds": 1985,
-            "repeated_ngram_ratio": 0.001
-          },
-          "claim_status_summary": {
-            "unverified": 8,
-            "asr_uncertain": 3,
-            "contradicted": 1
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "1980년 재형저축 최고 수익률은 41.6%로 은행금리 약 35%와 정부 장려금·면세를 포함했고, 2020년 한국 평균 예금금리는 2.9%, 1980년 연준 금리는 19.1%, 버핏의 60년 평균 수익률은 19.9%였다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "제시된 금리를 확정된 역사적 사실이나 현재 투자수익률의 기준으로 사용하지 않는다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "연준 자산이 2007년 대비 2014년 약 5배, 2022년 약 10배로 증가했고, 금리 인하·양적완화가 저축자에서 자산가로 부를 이전해 상위 1% 자산점유율을 22%에서 31%로 높였다는 주장. 계층별 차입금리와 2014년 금융위기 극복 선언도 포함한다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "산술 예시는 맞지만 이를 통화정책의 일방적인 부의 이전이나 차입 투자 우위의 증거로 확대하지 않는다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "한국 주식 투자자의 평균 보유기간은 자막상 ‘다세’이며, 잦은 매매 때문에 아파트 장기 보유자보다 자산 상승의 혜택을 덜 누렸다는 주장.",
-              "status": "asr_uncertain",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "보유기간 수치를 인용하거나 부동산 투자자의 성과 우위를 검증된 결론으로 제시하지 않는다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "명칭이 ‘음마 아파트’로 인식된 단지의 31평 가격이 2005년 7억 원에서 2026년 9월 31.3억 원으로 상승했고, 달러로 약 3.4배, 금으로는 약 63% 하락했다는 주장. 강남구 평균 실거래가의 약 20년간 2.7배 상승도 포함한다.",
-              "status": "asr_uncertain",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "환산 계산이 성립하더라도 특정 아파트의 실제 수익률이나 강남 전체의 성과로 확정할 수 없다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "금 1g이 2005년 약 1.5만 원에서 현재 17.7만 원으로 약 12배 올랐고, 100만 원의 금 구매량이 68.4g→20.8g→5.6g으로 줄었다는 주장. 최근 25% 하락, 2019년 대비 약 4배, 금 통화 사용 역사 및 달러 지폐 167년도 제시한다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "금의 상대가격 상승만으로 현금의 전체 구매력 하락률이나 금의 방어 성과를 확정하지 않는다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "약 20년간 나스닥은 달러 12배·원화 16배, 금은 달러 7.5배·원화 10배, S&P 500은 원화 8배, 코스피는 5배 상승했다는 주장. 나스닥의 닷컴버블 낙폭 약 78%와 50년 연평균 11%도 제시한다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "자산별 성과 순위를 확정하거나 연평균 11%와 대출금리의 단순 차이로 차입 투자의 타당성을 판단하지 않는다."
-            }
-          ],
-          "entities": [
-            {
-              "ticker": "^KS11",
-              "name": "나스닥·S&P 500·코스피·금·강남 아파트 장기 비교",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            }
-          ],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C2",
-              "title": "2 Profitable Stocks to Target This Week and 1 We Brush Off",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/2-profitable-stocks-target-week-081609145.html",
-              "publisher": "StockStory",
-              "published_at": "2026-10-08T08:16:09+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C9",
-              "title": "Nvidia vs. Broadcom: Which AI Chip Stock Is the Better Buy for the Next 5 Years?",
-              "source_url": "https://finance.yahoo.com/technology/ai/articles/nvidia-vs-broadcom-ai-chip-214900606.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-08T21:49:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E3",
-              "claim_id": "C9",
-              "title": "Stocks to Watch Recap: Intel, Samsung, PepsiCo, TSMC",
-              "source_url": "https://finance.yahoo.com/m/3c5c28ac-abc7-3e88-b86a-bd3bd6721844/stocks-to-watch-recap%3A-intel%2C.html",
-              "publisher": "The Wall Street Journal",
-              "published_at": "2026-10-08T21:31:21+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "MjEc_J9gYko",
-        "content_sha256": "6bcf74f8c64497a9e4b486d3c99353f686c4dc0dbad3363d8c69191a8a18ac8f",
-        "occurred_at": "2026-10-08T10:17:57+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "title_and_claim_context"
-        },
-        "strategy_source_tier": "USER_PRIMARY",
-        "strategy_evidence_weight": "HIGH",
-        "summary": {
-          "video_id": "MjEc_J9gYko",
-          "title": "올해 메모리 놓친 사람 주목? AI 반도체 다음 격전지가 될 투자처",
-          "channel": "소수몽키",
-          "source_url": "https://www.youtube.com/watch?v=MjEc_J9gYko",
-          "published_at": "2026-10-08T10:17:57+00:00",
-          "status": "unverified",
-          "strategy_source_tier": "USER_PRIMARY",
-          "strategy_evidence_weight": "HIGH",
-          "strategy_validation_policy": "USER_ACCEPTED",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean (Original)",
-            "model_or_format": "json3",
-            "chars": 16053,
-            "segments": 881,
-            "duration_seconds": 1815,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 10
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "AI 서버의 전력 소모 증가가 MLCC 탑재량과 사양을 높이며, 서버당 2만~3만 개로 일반 서버 대비 10배 이상 필요하다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "탑재량 주장을 MLCC 수요 규모나 기업별 매출 성장률로 환산할 근거가 부족하다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "랙당 MLCC 금액 4,320달러는 랙 가격 780만 달러의 약 0.06%이며, 낮은 비용 비중 때문에 고객이 가격 인상을 수용하기 쉽다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "0.06%의 계산 일치와 실제 판가 인상 가능성을 분리해 판단해야 한다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "주문/출하 비율은 무라타 전사 1.34·MLCC 1.47, 삼성전기 1.31, 타이요유덴 1.72, 업계 평균 1.04이며, 무라타의 2018년 비교값 1.25를 웃돈다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "제시된 비율을 확정된 수요 강세나 과거 사이클 고점 돌파의 증거로 사용하기 어렵다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "MLCC 납기는 2024년 말 10주에서 2026년 표준품 16주·고용량 23주로 늘고 삼성전기 고용량 제품은 40주로 2018년 고점 수준이며, 판가 인상과 고부가 제품 믹스가 마진 개선으로 이어질 수 있다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "납기·판가·수익성의 연결을 각각 확인하기 전에는 이익 전망 상향의 근거로 삼기 어렵다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "고사양 제품은 일반품 대비 생산능력을 4~7배 소모하고 낮은 수율·장비 납기가 증설을 제약하며, 2027~2029년 증설 물량이 빅테크 투자 둔화와 겹치면 공급 과잉이 발생할 수 있다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "증설 시점과 투자 둔화를 확정된 매매 시점으로 사용하지 말고, 공식 공급 일정과 수요 전망을 대조해야 한다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "전체 MLCC 점유율은 무라타 40%·삼성전기 23%·타이요유덴 11%·TDK 7%이며, AI 서버용 고사양 제품은 무라타 45%·삼성전기 40%로 합계 85%다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "시장 집중도와 기업별 수혜 강도를 판단하려면 같은 기간·같은 시장 정의의 원자료가 필요하다."
-            }
-          ],
-          "entities": [],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Dow Jones Futures: AI Stocks Tumble On OpenAI News; SpaceX Move Slams Verizon, AT&T Late",
-              "source_url": "https://finance.yahoo.com/m/955f9165-6ca4-336e-9d6e-fff1a7c7f4e0/dow-jones-futures%3A-ai-stocks.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-10-08T21:20:17+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C5",
-              "title": "Analyst Sets Stark S&P 500 Target For 2027",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/analyst-sets-stark-p-500-204818520.html",
-              "publisher": "GuruFocus.com",
-              "published_at": "2026-10-08T20:48:18+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E3",
-              "claim_id": "C5",
-              "title": "The Trade Desk Is Down 68% This Year: Is TTD Stock Dead Money or Due for a Bounce?",
-              "source_url": "https://finance.yahoo.com/news/trade-desk-down-68-ttd-191242712.html",
-              "publisher": "24/7 Wall St.",
-              "published_at": "2026-10-08T19:12:42+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C6",
-              "title": "Stocks to Watch Recap: Intel, Samsung, PepsiCo, TSMC",
-              "source_url": "https://finance.yahoo.com/m/3c5c28ac-abc7-3e88-b86a-bd3bd6721844/stocks-to-watch-recap%3A-intel%2C.html",
-              "publisher": "The Wall Street Journal",
-              "published_at": "2026-10-08T21:31:21+00:00",
               "source_tier": "news"
             }
           ]
@@ -4054,6 +3780,271 @@
               "source_url": "https://finance.yahoo.com/markets/stocks/articles/coreweave-stock-fell-nearly-8-165813372.html",
               "publisher": "TIKR",
               "published_at": "2026-10-09T16:58:13+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "RBvNUqXrPD8",
+        "content_sha256": "d7f17eb721b8f8487e05214e59a59758400cd5c6c0234f9a6e3fb2536f3af6b9",
+        "occurred_at": "2026-10-09T06:58:07+00:00",
+        "relevance": {
+          "tickers": [
+            "CRH"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "RBvNUqXrPD8",
+          "title": "10월 9일 우리가 꼭 알고 있어야 할, 저평가 'AI건설' 소형주",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=RBvNUqXrPD8",
+          "published_at": "2026-10-09T06:58:07+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 2576,
+            "segments": 114,
+            "duration_seconds": 178,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 1,
+            "partially_supported": 2
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "CRH는 북미 최대급 골재 공급업체로 골재·시멘트·콘크리트·아스팔트를 판매하며, 저평가 AI건설 소형주다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "소형주라는 제목이나 북미 시장 지위를 확인된 투자 전제로 사용하기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "미국 데이터센터 건설 참여 현장이 올해 2월 100곳에서 7월 200곳으로 5개월 만에 두 배 증가했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "현장 수 증가를 매출 또는 이익의 두 배 증가로 해석할 수 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "미국에서 발표된 데이터센터 부지의 85%가 CRH 시설에서 40km 이내에 있다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "85%를 CRH의 데이터센터 시장점유율이나 수주 확률로 사용해서는 안 된다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "CRH가 텍사스 동부의 한 데이터센터 부지에 골재 300만 톤을 공급하기로 합의했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "300만 톤을 확정 수주나 특정 연도의 매출로 반영할 근거가 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "텍사스 해당 현장의 골재 비용만 700억 원을 넘으며, 이와 같은 대규모 현장이 200곳 있다는 취지로 일반화한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "단일 현장 추산에 200을 곱해 전체 매출이나 이익을 추정하는 방식은 근거가 부족하다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "높은 운송비와 수년에 걸친 채석장 인허가가 진입장벽이며, CRH는 북미 골재 190억 톤을 독점하여 80년 이상 판매할 수 있다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "장기 공급 능력이나 가격 결정력을 평가하려면 채굴 가능량·생산량·권리와 경쟁 상황을 확인해야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "CRH",
+              "name": "CRH",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Venezuela Wants to Return to the Days When Its Oil Fields Were Booming—With U.S. Help",
+              "source_url": "https://finance.yahoo.com/m/c5587e8c-4acc-351f-b945-7034e4fa1062/venezuela-wants-to-return-to.html",
+              "publisher": "The Wall Street Journal",
+              "published_at": "2026-10-09T23:00:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "How Much Is Costlier Fuel Hitting Carnival’s Bottom Line?",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/much-costlier-fuel-hitting-carnival-225136665.html",
+              "publisher": "Trefis",
+              "published_at": "2026-10-09T22:51:36+00:00",
+              "source_tier": "market_or_news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "aZ4ExpT04dM",
+        "content_sha256": "95daacfa71f7442e1f7d0773b881f7d191d2604fe8b06b1cbf731c0a047d24fe",
+        "occurred_at": "2026-10-09T06:30:35+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "title_and_claim_context"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "aZ4ExpT04dM",
+          "title": "김정은이 노리는 공격 1순위는 청와대가 아니다? / 러·우 전쟁에 북한군 1만 명 추가 파병설… 진짜 속내는?   | 평양24시 강철환 대표",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=aZ4ExpT04dM",
+          "published_at": "2026-10-09T06:30:35+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 11936,
+            "segments": 661,
+            "duration_seconds": 1417,
+            "repeated_ngram_ratio": 0.005
+          },
+          "claim_status_summary": {
+            "unverified": 10
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "출연자는 평택 미군기지와 계룡대가 청와대보다 우선 타격 대상일 것으로 추정하고, 정치화·숙청이 북한군의 자율적 작전 능력을 약화했으며 실무자 얼굴 모자이크는 위협 과시라고 평가한다. 지난 13년간 장군 40명 이상과 하급 군인 수백 명이 처형됐다는 수치도 제시한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "확인된 공격 계획이나 군사 능력 평가로 사용해 투자 판단을 내려서는 안 된다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "진행자는 북한군 1만 명 추가 파병 가능성에 대한 우크라이나 측 경고를 소개한다. 출연자는 누적 파병 5만 명 이상, 사망 약 1만 명을 추정하고 영웅 묘지 380개를 근거로 들며, 큰 희생을 감수한 북한군 돌격이 러시아의 전투 성과에 기여했다고 평가한다. 자막의 기존 병력·보도 사망자·최소 사망자 숫자는 일부 유실됐다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "추가 파병과 북한군 역량 확대는 확인 전 시나리오로만 취급해야 하며 방산 수요나 실적 증가로 직결할 수 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "젤렌스키가 이재명 대통령에게 대공 무기 지원을 대가로 드론 기술·무기 공유를 제안했다는 발언이 나온다. 출연자는 북한군의 실전 경험 확산에 대비해 한국이 이를 활용해야 한다고 주장한다. 경험자 5만 명이 50만 명에게 교육한다는 설명은 가정이며, 러시아의 세계 2위 군사력 및 드론전 열세도 평가다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "드론 협력이나 대공 무기 공급이 합의·계약·매출로 이어졌다고 해석할 근거가 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "출연자는 평양의 소비·차량 증가가 북한 전체 경제 회복을 뜻하지 않으며 주민 거의 90%의 생활은 개선되지 않았다고 주장한다. 이를 뒷받침한다는 외신 기자·방문자와 촬영 자료는 식별되지 않았다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "지역별 관찰이나 미검증 비율을 북한 전체의 성장률·구매력 추정에 사용하기 어렵다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "출연자는 러시아의 현금 고갈로 북한 파병·무기 공급 대가가 현금보다 대공 시스템·전투기·핵잠수함·SLBM 등 군사 자산에 집중된다고 주장한다. 실제 인도, 북한의 도입 희망, 출연자의 예상은 구분해야 한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "첨단 무기 이전에 따른 북한 역량 강화와 관련 투자 수요는 실제 인도 및 성능 확인을 전제로 평가해야 한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "출연자는 김정은 별장이 49개이고 별장 하나의 운영비가 1억 달러라고 주장하지만 이후 별장 수를 40개로 표현한다. 운영비의 산정 기간은 제시되지 않았다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "이 수치들을 곱해 연간 사치성 지출이나 주민 경제의 기회비용을 산출해서는 안 된다."
+            }
+          ],
+          "entities": [],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C2",
+              "title": "Small-Cap Stocks Are Getting Hit Hard",
+              "source_url": "https://finance.yahoo.com/m/7e9e7be5-1192-3312-a500-ecaeb8b81730/small-cap-stocks-are-getting.html",
+              "publisher": "The Wall Street Journal",
+              "published_at": "2026-10-09T22:30:12+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C2",
+              "title": "As Yields Surged, Small-Cap Stocks Were Hit Hard",
+              "source_url": "https://finance.yahoo.com/m/3e671def-2149-3bbb-ad9a-3f1b866daed0/as-yields-surged%2C-small-cap.html",
+              "publisher": "The Wall Street Journal",
+              "published_at": "2026-10-09T21:45:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E3",
+              "claim_id": "C10",
+              "title": "(2nd LD) (News Focus) Summit shows China more focused on countering U.S. ...",
+              "source_url": "https://en.yna.co.kr/view/AEN20260610000352315?input=2106m",
+              "publisher": "Naver News",
+              "published_at": "2026-06-10T06:12:00+09:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C10",
+              "title": "(LEAD) (News Focus) Summit shows China more focused on countering U.S. in...",
+              "source_url": "https://en.yna.co.kr/view/AEN20260610000351315?input=2106m",
+              "publisher": "Naver News",
+              "published_at": "2026-06-10T05:51:00+09:00",
               "source_tier": "news"
             }
           ]
