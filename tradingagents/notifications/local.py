@@ -60,11 +60,37 @@ def queue_failure(state, *, stage, source_key, error_type, finished_at):
                          "error_type": error_type, "finished_at": finished_at})
 
 
+def published_strategy_covers(manifest, strategy):
+    """Bind a completion to the strategy bytes that verify_live checks.
+
+    A previous snapshot can still be DELIVERY_VERIFIED while the next producer
+    finishes. Its status alone says nothing about that new run's publication.
+    Full research remains covered when a later overlay explicitly resolves its
+    analysis lineage to that same completed run.
+    """
+    market = str((manifest.get("settings") or {}).get("market", "")).lower()
+    payload = (strategy.get("markets") or {}).get(market) or {}
+    freshness = payload.get("freshness_receipt") or {}
+    run_id, finished = manifest.get("run_id"), manifest.get("finished_at")
+    if (payload.get("run_id") == run_id
+            and freshness.get("producer_run_id") == run_id
+            and freshness.get("producer_finished_at") == finished):
+        return True
+    completed = payload.get("latest_completed_analysis") or {}
+    return ((manifest.get("settings") or {}).get("run_mode", "full") == "full"
+            and freshness.get("analysis_lineage_status") == "RESOLVED"
+            and freshness.get("analysis_run_id") == run_id
+            and completed.get("run_id") == run_id
+            and completed.get("status") == "success"
+            and completed.get("finished_at") == finished)
+
+
 def queue_completed(archive, state, *, now=None):
     now = now or datetime.now(ZoneInfo("Asia/Seoul"))
     publication = read(state / "publication.json")
     if publication.get("status") != "DELIVERY_VERIFIED":
         return
+    strategy = read(state / "site" / "mobile" / "strategy.json")
     marker_path = state / "notifications" / "enabled.json"
     marker = read(marker_path)
     if not marker:
@@ -83,6 +109,8 @@ def queue_completed(archive, state, *, now=None):
             continue
         # Bootstrap the current daily result; never replay old overlay notices.
         if settings.get("run_mode", "full") != "full" and finished < timestamp(marker["started_at"]):
+            continue
+        if not published_strategy_covers(manifest, strategy):
             continue
         queue(state, {"kind": "success", "run_id": manifest["run_id"], "market": market,
                       "finished_at": manifest["finished_at"]})
@@ -170,9 +198,15 @@ def compose(event, archive, state):
     # Verify the actual site again in the credential-owning workflow, not merely
     # the scheduler's earlier push/dispatch receipt.
     from tradingagents.local_automation import verify_live
-    publication = read(state / "publication.json")
-    if publication.get("status") != "DELIVERY_VERIFIED" or not verify_live(state / "site"):
-        raise NotificationError("Local Pages delivery is not verified.")
+    # Share the publisher's lane lock so a rebuild cannot change the site
+    # between source-lineage validation and the byte-for-byte live check.
+    with interprocess_file_lock(state / "publish.lock", timeout=30):
+        publication = read(state / "publication.json")
+        strategy = read(state / "site" / "mobile" / "strategy.json")
+        if (publication.get("status") != "DELIVERY_VERIFIED"
+                or not published_strategy_covers(manifest, strategy)
+                or not verify_live(state / "site")):
+            raise NotificationError("Local Pages delivery is not verified for this analysis run.")
     market = event["market"]
     text = (f"TradingAgents {market.upper()} 투자 분석 완료\n"
             f"완료 시각: {event['finished_at']}\n"

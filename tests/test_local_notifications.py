@@ -27,14 +27,28 @@ def completed(archive, mode="full", **changes):
                 "summary": {"total_tickers": 30, "successful_tickers": 30, "failed_tickers": 0},
                 "active_universe": {"coverage": {"complete": True}}}
     manifest.update(changes)
-    write(archive / "runs" / "2026" / run / "run.json", manifest)
+    write(archive / "runs" / "2026" / manifest["run_id"] / "run.json", manifest)
     return manifest
+
+
+def published_strategy(state, manifest, *, analysis=None):
+    analysis = analysis or manifest
+    write(state / "site/mobile/strategy.json", {"markets": {"kr": {
+        "run_id": manifest["run_id"],
+        "freshness_receipt": {"producer_run_id": manifest["run_id"],
+                              "producer_finished_at": manifest["finished_at"],
+                              "analysis_lineage_status": "RESOLVED",
+                              "analysis_run_id": analysis["run_id"]},
+        "latest_completed_analysis": {"run_id": analysis["run_id"], "status": "success",
+                                      "finished_at": analysis["finished_at"]},
+    }}})
 
 
 def prepared(tmp_path, monkeypatch):
     archive, state = tmp_path / "archive", tmp_path / "state"
     manifest = completed(archive)
     write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
+    published_strategy(state, manifest)
     monkeypatch.setattr(automation, "verify_live", lambda site: True)
     local.queue_completed(archive, state, now=NOW)
     path = next((state / "notifications/events").glob("*.json"))
@@ -43,8 +57,9 @@ def prepared(tmp_path, monkeypatch):
 
 def test_bootstrap_recovers_today_full_but_not_old_overlays(tmp_path):
     archive, state = tmp_path / "archive", tmp_path / "state"
-    completed(archive)
-    completed(archive, "overlay_only")
+    full = completed(archive)
+    overlay = completed(archive, "overlay_only")
+    published_strategy(state, overlay, analysis=full)
     write(state / "publication.json", {"status": "PAGES_PENDING"})
     local.queue_completed(archive, state, now=NOW)
     assert not (state / "notifications/events").exists()
@@ -52,7 +67,8 @@ def test_bootstrap_recovers_today_full_but_not_old_overlays(tmp_path):
     local.queue_completed(archive, state, now=NOW)
     local.queue_completed(archive, state, now=NOW + timedelta(minutes=5))
     assert len(list((state / "notifications/events").glob("*.json"))) == 1
-    completed(archive, "overlay_only", finished_at=(NOW + timedelta(minutes=10)).isoformat())
+    overlay = completed(archive, "overlay_only", finished_at=(NOW + timedelta(minutes=10)).isoformat())
+    published_strategy(state, overlay, analysis=full)
     local.queue_completed(archive, state, now=NOW + timedelta(minutes=15))
     assert len(list((state / "notifications/events").glob("*.json"))) == 2
 
@@ -69,6 +85,40 @@ def test_unfinished_failed_future_or_old_production_is_not_notified(tmp_path, ch
     write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
     local.queue_completed(archive, state, now=NOW)
     assert not list((state / "notifications/events").glob("*.json"))
+
+
+def test_new_completion_waits_for_exact_published_lineage(tmp_path, monkeypatch):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    previous = completed(archive, run_id="20261010T050000_local-scheduler-kr-full",
+                         started_at=(NOW - timedelta(days=2, hours=3)).isoformat(),
+                         finished_at=(NOW - timedelta(days=2)).isoformat())
+    current = completed(archive)
+    write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
+    published_strategy(state, previous)
+    monkeypatch.setattr(automation, "verify_live", lambda _: True)
+    local.queue_completed(archive, state, now=NOW)
+    assert not list((state / "notifications/events").glob("*.json"))
+
+    # A previously queued event must also fail closed if only the older
+    # strategy is live; a verified publication status is insufficient.
+    key = local.queue(state, {"kind": "success", "run_id": current["run_id"],
+                              "market": "kr", "finished_at": current["finished_at"]})
+    with pytest.raises(NotificationError, match="this analysis run"):
+        local.notify(key, archive, state, dry_run=True)
+
+    published_strategy(state, current)
+    assert local.notify(key, archive, state, dry_run=True)["status"] == "DRY_RUN"
+
+
+def test_live_verification_holds_the_publication_lane(tmp_path, monkeypatch):
+    archive, state, _, key = prepared(tmp_path, monkeypatch)
+    def verify(_):
+        with pytest.raises(TimeoutError):
+            with local.interprocess_file_lock(state / "publish.lock", timeout=0):
+                pytest.fail("publisher could rewrite the validated strategy")
+        return True
+    monkeypatch.setattr(automation, "verify_live", verify)
+    assert local.notify(key, archive, state, dry_run=True)["status"] == "DRY_RUN"
 
 
 def test_dispatch_is_not_sent_and_active_owner_prevents_retry(tmp_path, monkeypatch):
@@ -183,7 +233,7 @@ def test_workflow_keeps_cloud_path_and_uses_bound_main_local_receipt():
     assert 'upstream_run_id' in jobs['resolve']['if'] and "inputs.local_event_id == ''" in jobs['resolve']['if']
     job = jobs['notify_local']
     assert "github.ref == 'refs/heads/main'" in job['if']
-    assert job['runs-on'][-1] == 'tradingagents-pages'
+    assert job['runs-on'] == ['tradingagents-pages']
     assert job['steps'][0]['with']['ref'] == 'main'
     assert 'DEPLOYMENT_TELEGRAM_BOT_TOKEN' in job['steps'][1]['env']['TELEGRAM_BOT_TOKEN']
     assert len(jobs['notify_remote']['steps']) == 6

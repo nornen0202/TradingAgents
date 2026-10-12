@@ -179,7 +179,7 @@ jobs:
   notify_local:
     name: Validate local result and send Telegram notification
     if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && vars.TRADINGAGENTS_AUTOMATION_BACKEND == 'local' && inputs.local_event_id != '' && inputs.upstream_run_id == '' }}
-    runs-on: [self-hosted, Windows, X64, tradingagents-pages]
+    runs-on: [tradingagents-pages]
     timeout-minutes: 10
     steps:
       - name: Check out trusted notifier code from main
