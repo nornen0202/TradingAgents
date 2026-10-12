@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "prism",
-  "event_id": "prism:6f8892387d040c7ce8a9f2745fbe1ac5",
+  "event_id": "prism:b4aeedf7a1f7eae94f0f1fa1ba2f486c",
   "prompt_contract_version": "prism-work-v5",
   "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
   "workflow_contract_sha256": "affa33ed518a96ac60bff25950a3fe646a7ff652ceb8d1ab5a9f50dde0362c75",
-  "source_sha256": "4a85fd2b8412900182afef96165fc89b0186c56186bb74fe1a206d733358ddf6",
+  "source_sha256": "ac24e84974c4255b61eb72d505bc1136a4ee0a209218c337595888aebae10f35",
   "body": {
     "kind": "prism",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 145,
-      "window_events": 3,
-      "transmitted_events": 3,
+      "window_events": 1,
+      "transmitted_events": 1,
       "truncated": false,
-      "oldest_occurred_at": "2026-10-10T22:36:27+00:00",
+      "oldest_occurred_at": "2026-10-11T01:00:08+00:00",
       "newest_occurred_at": "2026-10-11T01:00:08+00:00"
     },
     "events": [
@@ -94,70 +94,6 @@
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
             "text_chars": 1200,
-            "text_source": "public_metadata",
-            "action_changes": [],
-            "recovered_tickers": []
-          }
-        }
-      },
-      {
-        "event_key": "stock_ai_agent:15931",
-        "content_sha256": "c8bfb4b30ea916bfd35e508f0858417126ed0d57cf4bd383d96bf3b8258c6afe",
-        "occurred_at": "2026-10-10T22:47:24+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "message_context"
-        },
-        "summary": {
-          "channel": "stock_ai_agent",
-          "message_id": "15931",
-          "posted_at": "2026-10-10T22:47:24+00:00",
-          "source_url": "https://t.me/stock_ai_agent/15931",
-          "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/11 07:46:17 KST 💵 청산 결과 정리 수량: 0.05 BTC 진입 → 청산: 83,023.90 USDT → 82,903.00 USDT 보유 시간: 10.9분 확정 순손익: -10.61 USDT • 시작 계좌 9,499.75 USDT 대비 -0.11% • 수수료 4.56 USDT · 펀딩 0.00 USDT 반영 💰 종료 후...",
-          "signals": [],
-          "signals_total": 0,
-          "signals_transmitted": 0,
-          "signals_truncated": false,
-          "simulation_only": false,
-          "actionability": "research_only",
-          "normalization": {
-            "version": "prism-telegram/v3",
-            "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 260,
-            "text_source": "public_metadata",
-            "action_changes": [],
-            "recovered_tickers": []
-          }
-        }
-      },
-      {
-        "event_key": "stock_ai_agent:15930",
-        "content_sha256": "e1f15a93acc0b641e1d44a36ea59ea18e69522b4a5fafb95b6eaf6d5c7a4a3c5",
-        "occurred_at": "2026-10-10T22:36:27+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "message_context"
-        },
-        "summary": {
-          "channel": "stock_ai_agent",
-          "message_id": "15930",
-          "posted_at": "2026-10-10T22:36:27+00:00",
-          "source_url": "https://t.me/stock_ai_agent/15930",
-          "preview": "📌 BTC 데모 첫 진입 체결 · 롱 🕐 10/11 07:35:24 KST 🧾 이번 체결: 0.05 BTC · 83,023.90 USDT • 체결금액(명목): 4,151.19 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0.05 BTC · 관측 기준 • 평단 83,023.90 USDT 💰 계좌 순자산: 9,497.49 USDT • 총 증거금 417.18 USDT(계좌 4.39...",
-          "signals": [],
-          "signals_total": 0,
-          "signals_transmitted": 0,
-          "signals_truncated": false,
-          "simulation_only": false,
-          "actionability": "research_only",
-          "normalization": {
-            "version": "prism-telegram/v3",
-            "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 796,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []

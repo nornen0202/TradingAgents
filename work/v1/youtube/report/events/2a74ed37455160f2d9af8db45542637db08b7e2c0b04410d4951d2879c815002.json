@@ -1,0 +1,574 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:8b1e7723a9b69dab6c3b426e52775b29",
+  "source_sha256": "7577db37fd5be7c9710d7aaa607738c9a72da156dd84b5b63e31efcdabc33a53",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "f5ba656baa3255d8d08768ab816048f458ac176a41169461691a2454a685df37",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 · 2026-10-12 09:28 KST\n\n소스 상태 **OK** · 생산 성공 2026-10-12T09:24:11.620915+09:00 · 실행 가능 **아니오**. 72시간 전송 범위의 가장 오래된 이벤트는 2026-10-09T00:31:01+00:00이며, 시간이 지나면 다시 준비·검증해야 합니다.\n\n## 모바일 핵심 델타\n\n1. **AI 매출과 반도체** — 여러 신규 영상이 OpenAI 매출 인식 차이와 메모리 투자 지속성을 거론합니다. 핵심 수치와 인과는 미검증입니다. 005930·000660·NVDA 연구 우선순위를 올리고 thesis 확신·기존 위험 한도 내 크기 증액은 공식 실적 확인까지 보류합니다. [DLu-u4xo3Pc](https://www.youtube.com/watch?v=DLu-u4xo3Pc)·[TtFx3S0N_wM](https://www.youtube.com/watch?v=TtFx3S0N_wM)·[NAnTn_wV4Kw](https://www.youtube.com/watch?v=NAnTn_wV4Kw).\n2. **KR 수급** — 외국인 매도, 자사주 매입 종료, 야간선물 수치는 원자료가 확인되지 않았습니다. KRX 수급과 기업 공시를 확인할 때까지 현재 주문 신호로 쓰지 않습니다. [MoKFO8ZtQaU](https://www.youtube.com/watch?v=MoKFO8ZtQaU)·[jZFXszbt2tg](https://www.youtube.com/watch?v=jZFXszbt2tg)·[DnYfHShwgEU](https://www.youtube.com/watch?v=DnYfHShwgEU).\n3. **PLTR·ORCL** — AI 소프트웨어 수익성과 고객 집중이 연구 과제로 부각됐습니다. 목표가·매출 증가율·OpenAI 계약 비중은 미검증이므로 PLTR·ORCL의 관심 순위만 올리고 thesis 확신과 크기는 유지합니다. [3YMQO1EjuOc](https://www.youtube.com/watch?v=3YMQO1EjuOc)·[QlDu4iUrAjg](https://www.youtube.com/watch?v=QlDu4iUrAjg).\n4. **유가와 지정학** — 유가 급등과 특정 공격·휴전 수치는 영상 주장 단계입니다. 공식 발표와 시세 전에는 CL=F·BZ=F의 위험 재점검 과제로만 둡니다. [ZPcYqedm_iQ](https://www.youtube.com/watch?v=ZPcYqedm_iQ).\n\n신규 **12** · 수정 **0** · 중복 제외 **30** · 전송 **42/42** · 생략 **0** · 잘림 **아니오**. COMPLETE는 이 로컬 패킷의 전송 범위에만 해당합니다.\n\n## 검증 상태와 연구 영향\n\n패킷의 일부 지지는 [DLu-u4xo3Pc C2](https://www.youtube.com/watch?v=DLu-u4xo3Pc)의 코스피 대략적 가격대 및 [jZFXszbt2tg C4](https://www.youtube.com/watch?v=jZFXszbt2tg)의 프리IPO 관련 보도 수준입니다. 반등 목표나 SK하이닉스 하락 원인까지 입증하지 않습니다. 공식 원자료 추가 검증은 이번 실행에서 완료되지 않았습니다. 모든 신규 영상은 STANDARD 가중치이며 USER_PRIMARY/HIGH 이벤트는 없습니다.\n\n| 신규 이벤트 | 패킷 상태 | 다음 처리 |\n|---|---|---|\n| [코스피 개장·야간선물](https://www.youtube.com/watch?v=DnYfHShwgEU) `DnYfHShwgEU` | 미검증/ASR | 지수·야간선물 수치를 확인 전 매매 근거에서 제외 |\n| [유가·지정학·메모리 공급](https://www.youtube.com/watch?v=ZPcYqedm_iQ) `ZPcYqedm_iQ` | 미검증 | 에너지·반도체 공식 자료 확인 우선 |\n| [AI 투자 병목과 한국 반도체](https://www.youtube.com/watch?v=DLu-u4xo3Pc) `DLu-u4xo3Pc` | 대부분 미검증; C2 일부 지지 | 005930·000660·PLTR·NVDA 연구 우선순위만 상향 |\n| [외국인 수급·OpenAI 매출](https://www.youtube.com/watch?v=MoKFO8ZtQaU) `MoKFO8ZtQaU` | 미검증/ASR | KR 거래소 수급·공시 확인 전 신호 제외 |\n| [OpenAI 매출·ORCL·PLTR](https://www.youtube.com/watch?v=TtFx3S0N_wM) `TtFx3S0N_wM` | 대부분 미검증 | AI 고객 집중과 소프트웨어 수익성 검증 과제 |\n| [AI 매출·반도체 일정](https://www.youtube.com/watch?v=NAnTn_wV4Kw) `NAnTn_wV4Kw` | 미검증 | 공식 실적·경제지표 일정 재확인 |\n| [금리·반도체 설비투자](https://www.youtube.com/watch?v=QFpEpQ7ag78) `QFpEpQ7ag78` | 미검증/ASR | 녹화 기준일과 금리·설비투자 수치 재확인 |\n| [ORCL 고객 집중·AI 투자](https://www.youtube.com/watch?v=QlDu4iUrAjg) `QlDu4iUrAjg` | 미검증 | 공식 수주잔고·고객 집중 확인 |\n| [KR 반도체 수급·솔리다임 IPO](https://www.youtube.com/watch?v=jZFXszbt2tg) `jZFXszbt2tg` | 대부분 미검증; C4 일부 지지 | 000660 주주가치 영향 연구, 가격 원인 단정 금지 |\n| [미식별 전력반도체](https://www.youtube.com/watch?v=xHQiao6wEX8) `xHQiao6wEX8` | 미검증/ASR | 종목 식별 전 후보에서 제외 |\n| [미디어 회사 인터뷰](https://www.youtube.com/watch?v=oofWLln4ZNY) `oofWLln4ZNY` | 미검증 | 상장 투자 영향 없음; 연구 우선순위 유지 |\n| [PLTR 성장·증권사 의견](https://www.youtube.com/watch?v=3YMQO1EjuOc) `3YMQO1EjuOc` | 미검증/ASR | 공식 실적과 증권사 원문 확인 전 목표가 제외 |\n\n## 다음 공식 검증\n\n- OpenAI·ORCL: 회사 공시와 실적 발표로 매출 인식, 수주잔고, 고객 집중 확인.\n- 삼성전자·SK하이닉스: KRX 외국인 수급, 자사주 공시, 공식 설비투자·실적 자료 확인.\n- PLTR: 회사 분기 보고서의 상업 매출·고객 지표 및 증권사 원문 확인.\n- 유가: 거래소 시세와 정부·기업 공식 발표로 공급·지정학 주장을 교차 확인.\n- 제목과 자동자막이 불일치하거나 종목이 식별되지 않은 영상은 수치·종목을 추정하지 않습니다. 특히 xHQiao6wEX8의 미식별 회사, QFpEpQ7ag78의 출연자·기준일, MoKFO8ZtQaU의 PMT 수치는 보류합니다.\n\n허용 액션은 UPGRADE_RESEARCH·MAINTAIN·REQUIRES_PRIMARY_VERIFICATION·EXCLUDE 범위입니다. 모든 실행 readiness는 RESEARCH_ONLY이며 시장·계좌·위험 게이트를 통과했다는 의미가 없습니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:8b1e7723a9b69dab6c3b426e52775b29\",\"status\":\"COMPLETE\",\"window_events\":42,\"transmitted_events\":42,\"truncated\":false,\"new_events\":12,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "schema": "tradingagents.work-report/v1",
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:8b1e7723a9b69dab6c3b426e52775b29",
+      "source_sha256": "7577db37fd5be7c9710d7aaa607738c9a72da156dd84b5b63e31efcdabc33a53"
+    },
+    "title": "YouTube 검증 델타",
+    "generated_at": "2026-10-12T09:28:54+09:00",
+    "as_of": "2026-10-12T09:28:54+09:00",
+    "source_health": "OK",
+    "report_mode": "VERIFICATION_DELTA",
+    "summary": "신규 12건, 수정 0건. AI 매출·반도체·KR 수급·PLTR/ORCL·유가 주장은 대부분 미검증이며 연구 우선순위만 조정한다. 실행 불가.",
+    "top_actions": [
+      {
+        "action": "UPGRADE_RESEARCH",
+        "tickers": [
+          "005930",
+          "000660",
+          "NVDA"
+        ],
+        "reason": "AI 매출·반도체 투자 지속성 공식 실적 검증",
+        "event_keys": [
+          "DLu-u4xo3Pc",
+          "TtFx3S0N_wM",
+          "NAnTn_wV4Kw"
+        ]
+      },
+      {
+        "action": "UPGRADE_RESEARCH",
+        "tickers": [
+          "PLTR",
+          "ORCL"
+        ],
+        "reason": "AI 소프트웨어 수익성·고객 집중 공식 자료 확인",
+        "event_keys": [
+          "3YMQO1EjuOc",
+          "QlDu4iUrAjg"
+        ]
+      },
+      {
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "tickers": [
+          "CL=F",
+          "BZ=F"
+        ],
+        "reason": "지정학·유가 수치 원자료 확인",
+        "event_keys": [
+          "ZPcYqedm_iQ",
+          "DnYfHShwgEU"
+        ]
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "005930",
+        "display_name": "삼성전자",
+        "rank": 1,
+        "research_priority": "HIGH_RESEARCH",
+        "allowed_action": "UPGRADE_RESEARCH",
+        "thesis_confidence_change": "NONE_PENDING_PRIMARY_VERIFICATION",
+        "position_size_change": "NONE",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "official_primary_source",
+            "live_market",
+            "account_and_risk_gates"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "DLu-u4xo3Pc",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "MoKFO8ZtQaU",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "jZFXszbt2tg",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "000660",
+        "display_name": "SK하이닉스",
+        "rank": 2,
+        "research_priority": "HIGH_RESEARCH",
+        "allowed_action": "UPGRADE_RESEARCH",
+        "thesis_confidence_change": "NONE_PENDING_PRIMARY_VERIFICATION",
+        "position_size_change": "NONE",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "official_primary_source",
+            "live_market",
+            "account_and_risk_gates"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "DLu-u4xo3Pc",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "MoKFO8ZtQaU",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "jZFXszbt2tg",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "NVDA",
+        "display_name": "엔비디아",
+        "rank": 3,
+        "research_priority": "HIGH_RESEARCH",
+        "allowed_action": "UPGRADE_RESEARCH",
+        "thesis_confidence_change": "NONE_PENDING_PRIMARY_VERIFICATION",
+        "position_size_change": "NONE",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "official_primary_source",
+            "live_market",
+            "account_and_risk_gates"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "DLu-u4xo3Pc",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "NAnTn_wV4Kw",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "PLTR",
+        "display_name": "팔란티어",
+        "rank": 4,
+        "research_priority": "HIGH_RESEARCH",
+        "allowed_action": "UPGRADE_RESEARCH",
+        "thesis_confidence_change": "NONE_PENDING_PRIMARY_VERIFICATION",
+        "position_size_change": "NONE",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "official_primary_source",
+            "live_market",
+            "account_and_risk_gates"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "DLu-u4xo3Pc",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "TtFx3S0N_wM",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "3YMQO1EjuOc",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "ORCL",
+        "display_name": "오라클",
+        "rank": 5,
+        "research_priority": "HIGH_RESEARCH",
+        "allowed_action": "UPGRADE_RESEARCH",
+        "thesis_confidence_change": "NONE_PENDING_PRIMARY_VERIFICATION",
+        "position_size_change": "NONE",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "official_primary_source",
+            "live_market",
+            "account_and_risk_gates"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "TtFx3S0N_wM",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "QlDu4iUrAjg",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "CL=F",
+        "display_name": "WTI 원유",
+        "rank": 6,
+        "research_priority": "RISK_RECHECK",
+        "allowed_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "thesis_confidence_change": "NONE_PENDING_PRIMARY_VERIFICATION",
+        "position_size_change": "NONE",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "official_primary_source",
+            "live_market",
+            "account_and_risk_gates"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ZPcYqedm_iQ",
+            "affected_field": "research_priority",
+            "direction": "RISK_RECHECK",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "MoKFO8ZtQaU",
+            "affected_field": "research_priority",
+            "direction": "RISK_RECHECK",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "BZ=F",
+        "display_name": "브렌트유",
+        "rank": 7,
+        "research_priority": "RISK_RECHECK",
+        "allowed_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "thesis_confidence_change": "NONE_PENDING_PRIMARY_VERIFICATION",
+        "position_size_change": "NONE",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "official_primary_source",
+            "live_market",
+            "account_and_risk_gates"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "DnYfHShwgEU",
+            "affected_field": "research_priority",
+            "direction": "RISK_RECHECK",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "신규 관련 영상의 투자 주장에 공식 근거가 부족하므로 검증 작업 우선순위에 반영; 실행 게이트 유지",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "youtube:8b1e7723a9b69dab6c3b426e52775b29",
+      "status": "COMPLETE",
+      "window_events": 42,
+      "transmitted_events": 42,
+      "truncated": false,
+      "new_events": 12,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "youtube_20261012_084747",
+        "last_run_at": "2026-10-12T09:24:11.620915+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 353,
+        "window_events": 42,
+        "transmitted_events": 42,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-09T00:31:01+00:00",
+        "newest_occurred_at": "2026-10-11T23:40:09+00:00"
+      },
+      "delta": {
+        "new_events": 12,
+        "revised_events": 0,
+        "unchanged_events": 30,
+        "delivered_event_keys": [
+          "DnYfHShwgEU",
+          "ZPcYqedm_iQ",
+          "DLu-u4xo3Pc",
+          "MoKFO8ZtQaU",
+          "TtFx3S0N_wM",
+          "NAnTn_wV4Kw",
+          "QFpEpQ7ag78",
+          "QlDu4iUrAjg",
+          "jZFXszbt2tg",
+          "xHQiao6wEX8",
+          "oofWLln4ZNY",
+          "3YMQO1EjuOc"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "event_manifest": [
+        {
+          "event_key": "DnYfHShwgEU",
+          "content_sha256": "2eae8f8c782fb91923a7e0dec6046864d24bb0d85fb7aa169e0439b56335554f",
+          "occurred_at": "2026-10-11T23:40:09+00:00",
+          "published_at": "2026-10-11T23:40:09+00:00",
+          "status": "asr_uncertain",
+          "source_url": "https://www.youtube.com/watch?v=DnYfHShwgEU",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "ZPcYqedm_iQ",
+          "content_sha256": "65c7d1b17c9094f91be259055a00fdfea339c8b4db8f883e9532e5f92b2efa08",
+          "occurred_at": "2026-10-11T23:25:46+00:00",
+          "published_at": "2026-10-11T23:25:46+00:00",
+          "status": "unverified",
+          "source_url": "https://www.youtube.com/watch?v=ZPcYqedm_iQ",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "DLu-u4xo3Pc",
+          "content_sha256": "74e86945cc5303ece3d65de8fa589d4eb8b4510f7670290031001b7f2a338a48",
+          "occurred_at": "2026-10-11T22:44:39+00:00",
+          "published_at": "2026-10-11T22:44:39+00:00",
+          "status": "asr_uncertain",
+          "source_url": "https://www.youtube.com/watch?v=DLu-u4xo3Pc",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "MoKFO8ZtQaU",
+          "content_sha256": "76372925a47fe0be5cd6a7c8823c49e18969aa92bd6d7297b9811fe3660be9bc",
+          "occurred_at": "2026-10-11T22:14:36+00:00",
+          "published_at": "2026-10-11T22:14:36+00:00",
+          "status": "asr_uncertain",
+          "source_url": "https://www.youtube.com/watch?v=MoKFO8ZtQaU",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "TtFx3S0N_wM",
+          "content_sha256": "28066f74fbc670b97c46eceabcb9f866a7c99ddbf2a80f113df4c0da1d4986b8",
+          "occurred_at": "2026-10-11T22:11:28+00:00",
+          "published_at": "2026-10-11T22:11:28+00:00",
+          "status": "unverified",
+          "source_url": "https://www.youtube.com/watch?v=TtFx3S0N_wM",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "NAnTn_wV4Kw",
+          "content_sha256": "c78c8639e7755bc34ac39c21599d053bc563a4f2b6cb4a2df33cfdd1ce2baf96",
+          "occurred_at": "2026-10-11T11:00:22+00:00",
+          "published_at": "2026-10-11T11:00:22+00:00",
+          "status": "unverified",
+          "source_url": "https://www.youtube.com/watch?v=NAnTn_wV4Kw",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "QFpEpQ7ag78",
+          "content_sha256": "d4b6cc41c8f0840a7058f9875d917f46ec99672226a721624a7ce762baee0a41",
+          "occurred_at": "2026-10-11T08:00:27+00:00",
+          "published_at": "2026-10-11T08:00:27+00:00",
+          "status": "asr_uncertain",
+          "source_url": "https://www.youtube.com/watch?v=QFpEpQ7ag78",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "QlDu4iUrAjg",
+          "content_sha256": "2fdde8f99c91e330850815086106fdd0dbfe5d16ee90d362dbe6cc5f00b6f7b6",
+          "occurred_at": "2026-10-11T06:00:33+00:00",
+          "published_at": "2026-10-11T06:00:33+00:00",
+          "status": "unverified",
+          "source_url": "https://www.youtube.com/watch?v=QlDu4iUrAjg",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "jZFXszbt2tg",
+          "content_sha256": "97774b7ff948086a0eeef723d8baa9423033d0288de413eb794e4e7573ed31a3",
+          "occurred_at": "2026-10-11T06:00:32+00:00",
+          "published_at": "2026-10-11T06:00:32+00:00",
+          "status": "unverified",
+          "source_url": "https://www.youtube.com/watch?v=jZFXszbt2tg",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "xHQiao6wEX8",
+          "content_sha256": "0a7ab72fbdb9fecdd8d14741b6b3675b1788099df964169fe4759f5bc57c9cae",
+          "occurred_at": "2026-10-11T04:00:07+00:00",
+          "published_at": "2026-10-11T04:00:07+00:00",
+          "status": "asr_uncertain",
+          "source_url": "https://www.youtube.com/watch?v=xHQiao6wEX8",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "oofWLln4ZNY",
+          "content_sha256": "93b25d9a1c89fe10370b03a333f57de2c8cc6d6ac27051f24102c9886a47b8e9",
+          "occurred_at": "2026-10-11T02:26:05+00:00",
+          "published_at": "2026-10-11T02:26:05+00:00",
+          "status": "unverified",
+          "source_url": "https://www.youtube.com/watch?v=oofWLln4ZNY",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "3YMQO1EjuOc",
+          "content_sha256": "28df966f860e0ff02142d12d12f74c0ebac5b6f4426db0644a9f206f71936d39",
+          "occurred_at": "2026-10-11T01:00:22+00:00",
+          "published_at": "2026-10-11T01:00:22+00:00",
+          "status": "asr_uncertain",
+          "source_url": "https://www.youtube.com/watch?v=3YMQO1EjuOc",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        }
+      ],
+      "official_primary_verification_completed": false,
+      "external_delivery_verified": false
+    },
+    "next_checkpoint": "공식 실적·KRX 수급·공시와 다음 신선한 생산자 실행을 확인. 72시간 범위 만료 후 재준비 필수.",
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    }
+  },
+  "report_id": "youtube:2a74ed37455160f2d9af8db45542637d",
+  "report_sha256": "2a74ed37455160f2d9af8db45542637db08b7e2c0b04410d4951d2879c815002",
+  "published_at": "2026-10-12T09:28:59.302561+09:00"
+}

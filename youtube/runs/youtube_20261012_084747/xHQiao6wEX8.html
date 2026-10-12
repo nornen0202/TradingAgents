@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 10월 11일 우리가 꼭 알고 있어야 할, 저평가 &#x27;AI반도체&#x27; 소형주정체</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261012_084747</p>
+    <h1>10월 11일 우리가 꼭 알고 있어야 할, 저평가 &#x27;AI반도체&#x27; 소형주정체</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=xHQiao6wEX8">원본 영상</a>
+    </div>
+  </header>
+  <h2>알파앤 오메가 세미컨덕터: AI 전력 반도체 전환과 저평가 주장 점검</h2>
+<p><strong>분석 기준:</strong> 2026년 10월 12일 제공 자료</p>
+<p><strong>영상:</strong> 경제사냥꾼, 2026년 10월 11일 게시 — <a href="https://www.youtube.com/watch?v=xHQiao6wEX8">원영상</a></p>
+<h3>1. 핵심 결론</h3>
+<p>영상의 투자 논리는 <strong>PC 중심 매출에서 AI 서버용 전력 반도체로의 전환 → 수익성 개선 → 기업가치 재평가</strong>다. 그러나 제공된 외부 증거로는 이 연결고리의 핵심 수치와 협력 관계를 확인하지 못했다.</p>
+<ul>
+<li>검증 대상 12개 주장 중 <strong>11개는 미검증</strong>, 연매출 주장은 <strong>자동자막 판독 불확실</strong>로 분류됐다. 모든 항목이 수동 확인 대상이다.</li>
+<li>공식 티커, 실적 자료, 주주 공시, 시장 가격 자료가 없어 <strong>저평가 여부와 AI 전환 속도를 정량적으로 평가할 수 없다.</strong></li>
+<li>직접 반증도 없다. 따라서 현재 결론은 ‘거짓’이 아니라 <strong>입증되지 않은 조건부 투자 가설</strong>이다.</li>
+</ul>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>아래 항목의 시각은 모두 <strong>00:00:00으로 기록</strong>돼 있다. 이는 개별 발언 시각이 아니라 전체 영상을 포함하는 단일 청크의 시작점이다.</p>
+<p>| 항목 | 영상 주장 | 확인된 사실·근거 및 판정 |</p>
+<p>|---|---|---|</p>
+<p>| 회사·생산시설 C1 | 나스닥 상장 전력 반도체 업체이며 오리건 자체 공장에서 고객 맞춤 생산 | 공식 법인명·티커·시설 소유 및 생산 범위를 확인할 자료 없음. <strong>미검증</strong> |</p>
+<p>| 기존 사업 C2 | 6월 종료 연매출의 약 절반이 컴퓨터 분야이며 상당 부분은 PC 부품 | 매출 금액 판독 불가. 회계연도·달러 매출·컴퓨터 및 PC 비중 모두 확인 불가. <strong>자막 불확실</strong> |</p>
+<p>| AI 성장 실적 C3 | 8월 통화에서 HPC 매출이 전분기 대비 35% 증가하고 컴퓨터 부문 내 비중 31%로 최고치 | 통화 원문과 대상 연도 없음. HPC와 AI 서버의 범위도 불명확. <strong>미검증</strong> |</p>
+<p>| 다음 분기 전망 C4 | 7~9월 AI 서버 매출 60% 초과 성장, HPC의 전체 매출 비중 약 20% | 성장 비교 기준과 매출 분류, 회사 전망인지 제작자 계산인지 확인 불가. <strong>미검증</strong> |</p>
+<p>| 수익성 C5 | AI 제품의 가격·마진 우위와 이익률 23.7% → 약 24.5% | 이익률 종류, GAAP 여부, 실적과 전망의 구분 없음. <strong>미검증</strong> |</p>
+<p>| 엔비디아 협력 C6·C7 | 800V 반도체 공동 설계, ‘내년’ 관련 매출 발생 가능성 | 양사 공식 발표와 대표 발언 원문 없음. 협력 범위·시작일·매출 시점 모두 <strong>미검증</strong> |</p>
+<p>| 가격·가치평가 C8·C9 | 1년 고점 54달러에서 28달러대로 하락, 시가총액 약 1조 1,500억 원·매출 대비 1.3배 | 가격 이력·주식수·환율·매출 분모 없음. 배수 재계산 불가. <strong>미검증</strong> |</p>
+<p>| 주주 C10 | 창업자 13.6%, 블랙록 12% 초과 보유 | 주주 공시와 기준일 없음. 최대주주·보유 유지 여부도 <strong>미검증</strong> |</p>
+<p>| 목표주가 C11 | 애널리스트 4명 평균 42.75달러, 약 50% 상승 여력 | 집계일·제공자·개별 목표가 없음. <strong>미검증·수동 확인 필요</strong> |</p>
+<p>| 실적 촉매 C12 | 11월 초 실적에서 AI 성장과 마진 개선 확인 시 재평가 가능 | 공식 발표일과 대상 분기 미확정. 재평가는 <strong>조건부 해석</strong>이지 확인된 사실이 아님 |</p>
+<p><strong>수치 해석 주의:</strong> 31%는 영상상 ‘컴퓨터 부문 내 비중’이지 회사 전체 매출 비중이 아니다. 23.7%와 24.5%의 차이는 산술적으로 0.8%포인트지만, 이것만으로 실제 수익성 개선이나 가이던스 상향이 확인되는 것은 아니다.</p>
+<h3>3. 외부 증거의 실제 유효성</h3>
+<p>호스트가 수집한 증거는 5개지만, <strong>대상 회사의 투자 주장을 직접 지지하거나 반박하는 항목은 없다.</strong></p>
+<ul>
+<li><strong>E1:</strong> <a href="https://finance.yahoo.com/m/0d7a86f7-63d8-35ac-9402-ed0f2ca814ac/dow-jones-futures-rise-as.html">IBD의 시장·반도체 뉴스</a>는 다른 기업과 시장 전반을 다룬다. 제공 발췌에는 대상 회사의 상장·시설·엔비디아 협력 정보가 없다.</li>
+<li><strong>E2:</strong> <a href="https://finance.yahoo.com/markets/stocks/articles/not-alphabet-not-amazon-microsoft-201400664.html">Microsoft 가치평가 기사</a>는 대상 회사의 연매출이나 사업 구성을 검증하지 못한다.</li>
+<li><strong>E3~E5:</strong> 미국 무역, 인도네시아 배터리, 광물 탐사 관련 기사이며 발췌가 비어 있다. 분석 대상과의 연결 근거가 없다.</li>
+</ul>
+<p>E1·E2의 발췌 대부분은 오류 메시지와 사이트 탐색 문구다. 두 자료의 표시 게시시각도 영상 게시 이후다. 따라서 이 링크들은 <strong>투자 논거가 아니라 수집 자료의 한계를 보여주는 출처</strong>다.</p>
+<p>상위 처리 상태의 <code>verified_with_caveats</code>와 증거 묶음의 <code>verified</code>를 기업 주장 검증 완료로 읽어서는 안 된다. 개별 주장 검증의 최종 상태는 <strong>unverified</strong>이며, 외부 자료로 확정된 기업·시장 사실은 없다.</p>
+<h3>4. 강세 논리와 반론</h3>
+<h4>강세 논리 — 확인될 경우의 의미</h4>
+<p>영상 주장이 공식 자료로 확인된다면 다음 경로는 검토할 만하다.</p>
+<p>1. <strong>매출 구성 변화:</strong> AI 서버 매출이 실제로 증가하고 전체 매출 내 비중도 확대된다면 PC 중심 사업이라는 평가를 수정할 근거가 생긴다.</p>
+<p>2. <strong>이익의 질 개선:</strong> AI 제품의 가격·마진 우위가 회사 전체 이익과 현금흐름으로 연결된다면 매출 성장 이상의 의미를 갖는다.</p>
+<p>3. <strong>장기 사업 기회:</strong> 800V 협력이 고객 평가·양산·매출 단계로 진전된다면 새로운 성장 기회가 될 수 있다.</p>
+<p>다만 세 경로 모두 현재는 <strong>확인 전 가설</strong>이다. 기존 AI 서버 성장 주장과 장기 800V 사업 기회도 별도로 평가해야 한다.</p>
+<h4>주요 반론</h4>
+<ul>
+<li><strong>HPC 성장과 AI 서버 성장은 같지 않을 수 있다.</strong> 분류가 확인되지 않으면 AI 기여도를 과대평가할 수 있다.</li>
+<li><strong>비중 상승만으로 매출 증가를 입증할 수 없다.</strong> 다른 사업 매출 감소로도 비중은 올라갈 수 있으므로 절대 매출액이 필요하다.</li>
+<li><strong>전체 마진 개선을 AI 효과로 단정할 수 없다.</strong> 가동률·비용·다른 제품 구성 등의 영향을 함께 확인해야 한다.</li>
+<li><strong>협력 발표는 확정 수주나 매출이 아니다.</strong> 공동 설계, 생태계 참여, 제품 호환성은 서로 다른 관계다.</li>
+<li><strong>고점 대비 하락과 낮은 매출 배수는 저평가의 충분조건이 아니다.</strong> 수익성·성장 지속성·재무상태·비교기업 자료가 빠져 있다.</li>
+<li><strong>기관 보유와 목표주가는 수익률 보장이 아니다.</strong> 보유 목적과 목표가의 작성 시점·가정도 확인해야 한다.</li>
+<li><strong>좋은 실적과 주가 재평가는 별개다.</strong> 실적이 개선돼도 시장 기대에 못 미치거나 이미 반영돼 있을 가능성을 따져야 한다.</li>
+</ul>
+<h3>5. 자막·시점·신뢰도 한계</h3>
+<p><strong>자막 품질:</strong> <code>transcript_quality</code>는 good, 점수 1.0이지만 자동 생성 한국어 자막이다. 이 점수는 핵심 숫자나 기업 주장의 사실성을 보증하지 않는다. 특히 연매출 금액은 임의 복원하거나 가치평가 계산에 사용해서는 안 된다.</p>
+<p><strong>신뢰도 구분:</strong></p>
+<ul>
+<li>추출 단계의 <code>source_confidence</code> <strong>0.88</strong>은 영상 주장 추출의 명료성에 관한 값이다.</li>
+<li>검증 단계의 <code>source_confidence</code>는 모든 주장에서 <strong>0.0</strong>이다. 제공 외부 자료의 직접 지지가 없다는 뜻이다.</li>
+<li><code>asr_confidence</code>는 <strong>0.25~0.85</strong>의 정성적 추정이다. 연매출 C2가 0.25로 가장 낮고, 성장률 C3는 0.65다. 원음으로 검증한 점수가 아니다.</li>
+<li>판정 <code>confidence</code> <strong>0.99</strong>는 미검증·자막 불확실이라는 판단의 확신이지, 영상 주장이 사실일 확률이 아니다.</li>
+</ul>
+<p><strong>시간 기준:</strong> 영상은 2026년 10월 11일 게시됐지만 인용한 ‘8월’, ‘7~9월’, ‘작년 10월’, ‘내년’의 원자료 연도는 확인되지 않았다. 게시일만으로 협력 시작을 2025년, 매출 발생을 2027년으로 확정할 수 없다. 오래된 자료의 재사용 여부도 현재는 판정할 수 없다.</p>
+<p><strong>위치 정보:</strong> 청크 범위는 약 00:00~02:45이며 종료 165.36초가 영상 길이 164초를 소폭 초과한다. 특정 숫자의 정확한 발언 위치는 제공되지 않았다.</p>
+<p><strong>폐쇄형 출처:</strong> Bloomberg·Morningstar 원자료는 제공되지 않았고 목표가 집계 제공자도 특정되지 않았다. 이들 또는 다른 유료·폐쇄형 자료에 의존하는 주장과 ‘월가만 알고 있었다’는 정보 접근성 주장은 <strong>미검증·수동 확인 필요</strong>다.</p>
+<h3>6. 가까운 확인 시점과 구체적 관찰 항목</h3>
+<p>‘11월 초’는 영상의 예상이며 공식 일정이 아니다. 우선 발표일과 해당 회계분기를 확인한 뒤 아래 항목을 같은 정의로 비교해야 한다.</p>
+<p>| 확인 순서 | 필요한 자료·관찰 항목 | 해석 기준 |</p>
+<p>|---|---|---|</p>
+<p>| 지금: 기업 식별 | 공식 법인명·티커, 오리건 시설 소유·운영·생산 범위 | 자체 생산을 경쟁우위로 평가할 기초 확보 |</p>
+<p>| 실적 전: 원자료 대조 | 날짜가 확인되는 8월 통화와 연차보고서 | 35%·31%·60% 초과·20%의 연도, 분모, 분류 및 실적·전망 구분 |</p>
+<p>| 실적 발표 시 | AI 서버와 HPC 각각의 절대 매출·성장률·전체 매출 비중 | PC 등 다른 사업 감소에 따른 비중 상승과 실제 성장 구분 |</p>
+<p>| 실적 발표 시 | 이익률 종류·GAAP 여부·실제치·전망, 영업이익·현금흐름 | 동일 지표 비교 및 성장의 이익 전환 여부 확인 |</p>
+<p>| 다음 분기 전망 | AI 수요 지속성, 회사의 성장·수익성 설명 | 한 분기 변화인지 지속 가능한 추세인지 점검 |</p>
+<p>| 800V 사업 진전 시 | 양사 공식 발표, 고객 평가·양산·매출 단계 | 협력 가능성과 실현된 사업 성과 구분 |</p>
+<p>| 가치평가 재점검 | 같은 기준일 가격·주식수·환율·연매출, 현금·부채 | 시가총액/매출과 기업가치/매출을 구분해 재계산 |</p>
+<p>| 주주·목표가 갱신 시 | 날짜가 확인되는 주주 공시와 개별 목표가 목록 | 보유율 변화와 목표가 표본·유효성 확인 |</p>
+<h3>7. 투자 가설의 무효화·약화 조건</h3>
+<p>다음은 관측된 악재가 아니라 <strong>영상 논리를 평가하기 위한 조건</strong>이다.</p>
+<ul>
+<li>공식 원자료가 성장률이나 매출 분류와 다르다면 영상의 핵심 수치 논리를 수정해야 한다.</li>
+<li>AI 서버 절대 매출이 늘지 않고 다른 사업 감소로 비중만 상승한다면 ‘AI 전환 가속’ 논리가 약해진다.</li>
+<li>같은 정의의 실제 이익률이 개선되지 않거나 매출 증가가 이익·현금흐름으로 연결되지 않으면 수익성 재평가 논리가 약해진다.</li>
+<li>공식 자료가 800V 관계를 공동 설계가 아닌 제한적 참여로 설명한다면 협력의 의미를 축소해야 한다. 매출 일정이 지연되면 가까운 실적 촉매로 볼 근거도 약해진다.</li>
+<li>동일 기준일 재계산에서 1.3배 주장이 성립하지 않거나 낮은 배수가 취약한 수익성으로 설명된다면 ‘저평가’ 결론을 재검토해야 한다.</li>
+</ul>
+<p><strong>종합:</strong> 관찰의 중심은 ‘AI 기업이라는 명칭’이 아니라 <strong>정의가 일치하는 매출 성장, 이익 전환, 협력의 상업화 단계</strong>다. 현재 자료는 이를 확인하기 위한 질문을 제시하지만, 저평가나 재평가 시점을 확정할 근거는 제공하지 못한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;xHQiao6wEX8&quot;,
+  &quot;title&quot;: &quot;10월 11일 우리가 꼭 알고 있어야 할, 저평가 &#x27;AI반도체&#x27; 소형주정체&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=xHQiao6wEX8&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/xHQiao6wEX8/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-11T04:00:07+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1944,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1944,
+    &quot;segments&quot;: 100,
+    &quot;duration_seconds&quot;: 164,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-12T08:47:47.751146+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 5,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 11,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;나스닥 상장 전력 반도체 회사이며 미국 오리건 자체 공장에서 고객 사양에 맞춰 생산한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;직접적인 수치 주장 없음&quot;,
+        &quot;observed&quot;: &quot;상장 정보·공식 티커·시설 자료 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미국 자체 생산시설을 경쟁우위로 평가하려면 시설 소유·운영과 실제 생산 범위를 먼저 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;지난 6월 종료 연간 매출은 약 ‘9,00억 원’이고 컴퓨터 분야가 약 절반이며 상당 부분은 PC용 부품이었다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.25,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연매출 약 ‘9,00억 원’; 컴퓨터 분야 약 50%&quot;,
+        &quot;observed&quot;: &quot;금액 판독 불가; 실제 연매출과 부문 비중 확인 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매출 규모와 PC 의존도가 확인되지 않아 AI 전환 속도 및 매출 대비 기업가치를 계산할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;8월 실적 통화에서 AI 서버용 고성능 컴퓨터 매출이 전분기 대비 35% 증가했고 컴퓨터 부문 내 비중 31%로 역대 최고였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;전분기 대비 35% 증가; 컴퓨터 부문 내 31%&quot;,
+        &quot;observed&quot;: &quot;두 수치와 역대 최고 여부를 확인할 실적 원자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;성장률을 AI 서버의 실제 성장으로 받아들이거나 31%를 회사 전체 매출 비중으로 해석해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;7~9월 AI 서버 매출이 60% 넘게 증가하고 고성능 컴퓨터 매출은 전체 매출의 약 20%에 도달할 것으로 회사가 전망했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;7~9월 AI 서버 매출 성장률 60% 초과; 고성능 컴퓨터의 전체 매출 비중 약 20%&quot;,
+        &quot;observed&quot;: &quot;전망 원문·비교 기준·대상 연도·실제 달성 여부 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;60%와 20%를 확정 실적으로 반영할 수 없으며 같은 기간·분류의 실제 실적과 대조해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;AI 서버 제품은 더 높은 가격과 수익성을 확보할 수 있으며 회사가 이익률 전망을 23.7%에서 약 24.5%로 높였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;이익률 23.7%에서 약 24.5%&quot;,
+        &quot;observed&quot;: &quot;실제 지표 확인 불가; 주장 수치 간 산술 차이만 0.8%포인트&quot;
+      },
+      &quot;investor_implication&quot;: &quot;해당 수치를 순이익률로 해석하거나 AI 제품이 회사 전체 이익 개선을 확정적으로 이끈다고 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;작년 10월부터 엔비디아와 차세대 데이터센터의 800V 전력 방식용 반도체를 공동 설계한다고 회사가 발표했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;작년 10월 협력 시작; 800V 전력 방식&quot;,
+        &quot;observed&quot;: &quot;협력 시점과 기술 범위 확인 불가; 게시일에 단순 대입하면 작년 10월은 2025년 10월이나 원발언 기준은 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;협력 주장을 확정 수주·양산·매출 또는 특정 고객에 대한 독점적 공급 관계로 확대 해석할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;대표가 800V 관련 매출이 내년에 발생해도 놀랍지 않다고 발언했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;800V 관련 매출이 내년에 발생할 가능성&quot;,
+        &quot;observed&quot;: &quot;발언과 매출 시점 확인 불가; 게시일 기준 내년은 2027년이나 원발언에도 적용되는지는 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;800V 관련 매출을 특정 연도의 확정 실적 추정치에 반영할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;최근 1년 주가 고점이 54달러였고 영상 당시 주가는 28달러대로 거의 반토막이었다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;최근 1년 고점 54달러; 당시 주가 28달러대&quot;,
+        &quot;observed&quot;: &quot;실제 가격 자료 없음; 54달러에서 정확히 28달러로 하락했다면 산술 하락률은 약 48.1%&quot;
+      },
+      &quot;investor_implication&quot;: &quot;하락 폭을 매수 근거로 사용하기 전에 동일 기준의 가격 이력과 실적 전망 변화를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;영상 당시 시가총액이 약 1조 1,500억 원이고 연매출 대비 약 1.3배였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;시가총액 약 1조 1,500억 원; 연매출 대비 약 1.3배&quot;,
+        &quot;observed&quot;: &quot;시가총액·환산 환율·매출 분모가 없어 재계산 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;1.3배를 확인된 가치평가 지표로 사용하거나 시장이 AI 사업을 반영하지 않았다고 단정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;창업자가 최대주주로 지분 13.6%를 유지하고 있고 블랙록도 12% 넘게 보유한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;창업자 13.6%; 블랙록 12% 초과&quot;,
+        &quot;observed&quot;: &quot;해당 비율·기준일·최대주주 순위 확인 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기관이나 창업자의 보유 주장은 독립적인 기업가치 검증이나 향후 수익률 보장이 아니다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;애널리스트 4명의 평균 목표주가가 42.75달러이며 당시 주가 대비 약 50% 상승 여력이 있었다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;애널리스트 4명; 평균 목표가 42.75달러; 상승 여력 약 50%&quot;,
+        &quot;observed&quot;: &quot;컨센서스 확인 불가; 비교 주가가 28.50달러라면 42.75/28.50−1은 정확히 50%&quot;
+      },
+      &quot;investor_implication&quot;: &quot;약 50%를 기대수익률로 제시할 근거가 없으며 날짜가 확인되는 목표가 원자료가 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;11월 초 예상되는 다음 실적에서 AI 매출 60% 성장과 이익률 개선이 확인되면 PC 부품 회사에서 AI 전력 반도체 회사로 재평가될 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;다음 실적 발표 11월 초 예상; AI 매출 약 60% 성장과 이익률 개선 확인&quot;,
+        &quot;observed&quot;: &quot;공식 일정·성장률·이익률 결과 모두 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확인된 실적 촉매나 재평가 기회로 단정할 수 없다. 실제 매출 구성·이익률·시장 기대를 함께 비교해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures Rise As Trump Claims Russia-Ukraine &#x27;Energy Ceasefire&#x27;; ASML, Nvidia Chipmaker Taiwan Semi Earnings Loom&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/0d7a86f7-63d8-35ac-9402-ed0f2ca814ac/dow-jones-futures-rise-as.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-11T23:46:46+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures Rise As Trump Claims Russia-Ukraine &#x27;Energy Ceasefire&#x27;; ASML, Nvidia Chipmaker Taiwan Semi Earnings Loom Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More Ne...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Not Alphabet. Not Amazon. Microsoft Trades at Big Tech&#x27;s Cheapest Valuation.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/not-alphabet-not-amazon-microsoft-201400664.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-11T20:14:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Not Alphabet. Not Amazon. Microsoft Trades at Big Tech&#x27;s Cheapest Valuation. Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals We...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Trump&#x27;s trade wars sting US manufacturers ahead of midterms&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/economy/policy/articles/trumps-trade-wars-sting-us-013151179.html&quot;,
+      &quot;publisher&quot;: &quot;AFP&quot;,
+      &quot;published_at&quot;: &quot;2026-10-11T01:31:51+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Indonesia exports its first EV batteries&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/indonesia-exports-first-ev-batteries-120547796.html&quot;,
+      &quot;publisher&quot;: &quot;Just Auto&quot;,
+      &quot;published_at&quot;: &quot;2026-10-09T12:05:47+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
