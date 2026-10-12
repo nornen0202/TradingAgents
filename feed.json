@@ -1,6 +1,62 @@
 {
-  "generated_at": "2026-10-12T09:35:18.228266",
+  "generated_at": "2026-10-12T10:50:19.458244",
   "runs": [
+    {
+      "run_id": "20261012T100857_local-scheduler-kr-overlay_only",
+      "label": "local-scheduler-kr-overlay_only",
+      "started_at": "2026-10-12T10:08:57.822324+09:00",
+      "finished_at": "2026-10-12T10:11:20.735300+09:00",
+      "status": "success",
+      "market": "KR",
+      "run_mode": "overlay_only",
+      "settings": {
+        "market": "KR",
+        "run_mode": "overlay_only"
+      },
+      "summary": {
+        "total_tickers": 27
+      },
+      "ticker_count": 27,
+      "success_count": 27,
+      "decision_bundle": {
+        "version": 2,
+        "decision_ready": true,
+        "conditional_strategy_ready": true,
+        "quality_label_ko": "장중 투자 판단 가능",
+        "fresh_row_ratio": 1.0,
+        "conditional_row_ratio": 1.0
+      },
+      "published_to_site": true,
+      "run_url": "runs/20261012T100857_local-scheduler-kr-overlay_only/index.html"
+    },
+    {
+      "run_id": "20261012T055403_local-scheduler-kr-full",
+      "label": "local-scheduler-kr-full",
+      "started_at": "2026-10-12T05:54:03.869791+09:00",
+      "finished_at": "2026-10-12T09:40:06.609719+09:00",
+      "status": "success",
+      "market": "KR",
+      "run_mode": "full",
+      "settings": {
+        "market": "KR",
+        "run_mode": "full"
+      },
+      "summary": {
+        "total_tickers": 27
+      },
+      "ticker_count": 27,
+      "success_count": 27,
+      "decision_bundle": {
+        "version": 2,
+        "decision_ready": false,
+        "conditional_strategy_ready": false,
+        "quality_label_ko": "연구 자료만 제공, 장중 데이터 대기",
+        "fresh_row_ratio": 0.0,
+        "conditional_row_ratio": 0.0
+      },
+      "published_to_site": true,
+      "run_url": "runs/20261012T055403_local-scheduler-kr-full/index.html"
+    },
     {
       "run_id": "20261010T040116_github-actions-us",
       "label": "github-actions-us",

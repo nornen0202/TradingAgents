@@ -1,20 +1,20 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:be34b9f097f9653842940da1acdc5218",
+  "event_id": "youtube:d7cb55270e522ac7577e9b2f0e826136",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
   "workflow_contract_sha256": "f5ba656baa3255d8d08768ab816048f458ac176a41169461691a2454a685df37",
-  "source_sha256": "c1354b6060dca108f8519b167951ef7ad6aa5b5da2d7c6e63a3b67c6636f3258",
+  "source_sha256": "c35212ca4dfe5f4b9b4612f0322d130d8b5886c76f8b1b1c391edbd27ae38aa1",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
     "source": {
       "health": "OK",
-      "run_id": "youtube_20261012_084747",
-      "last_run_at": "2026-10-12T09:24:11.620915+09:00",
+      "run_id": "youtube_20261012_094110",
+      "last_run_at": "2026-10-12T09:57:20.813464+09:00",
       "status": "success",
       "stale_after_hours": 36
     },
@@ -43,13 +43,13 @@
       "may_bypass_market_or_portfolio_execution_gate": false
     },
     "coverage": {
-      "total_unique_events": 353,
-      "window_events": 41,
-      "transmitted_events": 25,
+      "total_unique_events": 354,
+      "window_events": 42,
+      "transmitted_events": 24,
       "truncated": true,
       "oldest_occurred_at": "2026-10-09T02:00:10+00:00",
-      "newest_occurred_at": "2026-10-11T23:40:09+00:00",
-      "omitted_due_to_packet_budget": 16
+      "newest_occurred_at": "2026-10-12T00:15:45+00:00",
+      "omitted_due_to_packet_budget": 18
     },
     "events": [
       {
@@ -500,6 +500,172 @@
               "source_url": "https://finance.yahoo.com/m/ae5c37e7-78f4-3bc7-b1ac-85a2207e46af/basic-materials-roundup%3A.html",
               "publisher": "The Wall Street Journal",
               "published_at": "2026-10-09T21:08:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "1zD9ebjFZjM",
+        "content_sha256": "1e2ddb0a8363bbd5fcd95a03a27c9327a7714eea53afddb4221d542206213f45",
+        "occurred_at": "2026-10-12T00:15:45+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11",
+            "ASML"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "1zD9ebjFZjM",
+          "title": "코스피 6600선 붕괴 우려…중간선거 앞두고 봐야 하는 곳은? | 박병창 MP파트너스 대표 [마켓 인사이드]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=1zD9ebjFZjM",
+          "published_at": "2026-10-12T00:15:45+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 21360,
+            "segments": 1265,
+            "duration_seconds": 2571,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "직전 3거래일 코스피가 5.39% 하락해 6,625포인트에 도달했고 외국인 7.3조원·금융투자 3.2조원·기관 전체 3.3조원 매도가 있었다는 주장. 옵션 만기·ETF 리밸런싱을 하락 원인으로 지목하며 6,600선 이탈 시 6,000선을 제시한다. 50% 되돌림·박스권 중간선 관리 기준과 '한투' 전망도 인용한다.",
+              "status": "unverified",
+              "confidence": 0.1,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "6,600선 아래의 스냅샷은 관찰할 수 있지만 종가 이탈이나 추세 전환으로 확정할 수 없다. 금융투자와 기관 전체 매도액은 중복 합산하지 않아야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "국내 대형 주도주의 저점 이탈·거래량 증가가 지수 지지력을 약화시켰고, 방송 중 반도체주는 약세인 반면 LG에너지솔루션·삼성SDI와 ESS·재생에너지 분야는 미국 선거 기대에 상대적으로 강했다는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "주도주 회복 여부와 테마 강세는 시각별 시세·거래량으로 확인해야 하며, 선거 수혜를 확정된 상승 원인으로 제시할 근거는 부족하다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "미국 중간선거까지 한 달 미만, 약 3주가 남았으며 사우디 공격과 미국 개입 검토, 러시아 정유시설 공격 중단 여섯 차례 요청, 젤렌스키 비판, 미국·러시아 경유 거래 및 우크라이나 정보 지원 중단 경고가 있었다는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "확인되지 않은 군사·외교 보도를 전제로 에너지 공급이나 선거 전후 시장 방향을 단정할 수 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "경유 가격이 6달러까지 올라 두 배가 됐고 러시아의 경유 수출 중단이 이를 악화시켰다는 주장. 'WTI 3달러에서 4점몇 달러'라는 수치도 언급한다.",
+              "status": "asr_uncertain",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "원음과 동일 지표의 가격 시계열을 확인하기 전에는 해당 숫자를 에너지 가격 급등의 검증된 근거로 사용할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "미국과 유럽, 나스닥과 다우, AI와 비AI 분야의 성과 차별화가 심화했으며 프랑스 증시는 8월 이후 크게 하락했다는 주장. AI 분야에 집중하자는 결론은 투자 의견이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "상대 성과가 확인되지 않은 상태에서 AI 집중이 더 안전하거나 유리하다고 결론 내릴 수 없다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "클라우드 매출 100달러를 Anthropic은 총액 100달러, OpenAI는 클라우드 몫 20달러를 제외한 80달러로 인식한다는 예시. OpenAI 기대 매출 700억달러와 불명확한 비교 수치를 둘러싼 논란이 AI 관련 주가에 영향을 줬다는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "총액·순액 및 대상 기간을 통일하기 전에는 회사 간 매출 규모나 PSR을 직접 비교하거나 매출 논란이 해소됐다고 단정할 수 없다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "코스피·코스닥",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "ASML",
+              "name": "ASML·Applied Materials·Tokyo Electron 및 반도체 장비업계",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Trump's trade wars sting US manufacturers ahead of midterms",
+              "source_url": "https://finance.yahoo.com/economy/policy/articles/trumps-trade-wars-sting-us-013151179.html",
+              "publisher": "AFP",
+              "published_at": "2026-10-11T01:31:51+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Indonesia exports its first EV batteries",
+              "source_url": "https://finance.yahoo.com/energy/articles/indonesia-exports-first-ev-batteries-120547796.html",
+              "publisher": "Just Auto",
+              "published_at": "2026-10-09T12:05:47+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Foreign investors flee South Korean stocks as AI boom loses steam",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/foreign-investors-flee-south-korean-025304336.html",
+              "publisher": "Investing.com",
+              "published_at": "2026-10-11T02:53:04+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C5",
+              "title": "Dow Jones Futures Rise As Trump Claims Russia-Ukraine 'Energy Ceasefire'; ASML, Nvidia Chipmaker Taiwan Semi Earnings Loom",
+              "source_url": "https://finance.yahoo.com/m/0d7a86f7-63d8-35ac-9402-ed0f2ca814ac/dow-jones-futures-rise-as.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-10-12T00:09:34+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C9",
+              "title": "Prediction: A $5,000 Investment in IonQ Could Be Worth This Much by 2028",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/prediction-5-000-investment-ionq-002000375.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-10-12T00:20:00+00:00",
               "source_tier": "news"
             }
           ]
@@ -3784,336 +3950,6 @@
               "source_url": "https://finance.yahoo.com/markets/stocks/articles/voo-doesnt-hold-spacex-taiwan-205133562.html",
               "publisher": "Motley Fool",
               "published_at": "2026-10-10T20:51:33+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "chUwfvCYbbM",
-        "content_sha256": "c2dc821018adcb1831ee5c13c4fe8152fdd4945aa5c18bb08007916dd10b3395",
-        "occurred_at": "2026-10-10T03:00:25+00:00",
-        "relevance": {
-          "tickers": [
-            "ORCL",
-            "AAPL",
-            "TSM"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "verified_entities"
-        },
-        "strategy_source_tier": "STANDARD",
-        "strategy_evidence_weight": "STANDARD",
-        "summary": {
-          "video_id": "chUwfvCYbbM",
-          "title": "투자자들이 꼭 봐야하는, 다음주 '미국 투자' 포인트(10.12~16)",
-          "channel": "경제사냥꾼",
-          "source_url": "https://www.youtube.com/watch?v=chUwfvCYbbM",
-          "published_at": "2026-10-10T03:00:25+00:00",
-          "status": "asr_uncertain",
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD",
-          "strategy_validation_policy": "STANDARD_REVIEW",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean (Original)",
-            "model_or_format": "json3",
-            "chars": 2067,
-            "segments": 108,
-            "duration_seconds": 171,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 9,
-            "asr_uncertain": 1
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "2026년 10월 12일 콜럼버스 데이에 미국 채권시장은 휴장하고 주식시장은 개장하며, 10월 16일 월간 옵션 만기로 장 막판 변동성이 커질 수 있다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "시장별 공식 달력과 상품별 최종거래·결제 시각을 확인하기 전에는 확정된 거래 일정으로 사용하지 않는다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "10월 12일 ‘50 섬’으로 인식된 AI 데이터센터 행사가 시작되고 구글·메타·마이크로소프트·오라클이 참가하며, 2027년 추가 건설 발언이 AI 투자 지속의 단서라는 주장.",
-              "status": "asr_uncertain",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "원음으로 행사명을 식별한 뒤 공식 프로그램과 기업 발표를 확인하고, 건설 계획 발표와 실제 투자 집행을 구분한다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "JP모건·골드만삭스·웰스파고·시티가 10월 13일 한국시간 저녁에 3분기 실적을 발표하고, 카드 연체·충당금 증가가 소비자의 고금리 부담을 보여준다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "네 은행의 발표일을 각각 확인하고 카드 연체율·순상각률·충당금 비용과 잔액을 구분해 비교한다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "10월 13일 소기업 경기 전망과 ADP 고용 지표가 발표되고, 고용 약화가 이어지면 미국 경제의 고금리 감내 능력에 대한 우려가 커진다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "NFIB·ADP의 정확한 지표명·주기·대상 기간과 수정치를 확인한 뒤 경기 해석에 반영한다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "9월 CPI가 10월 14일 밤 9시 30분 발표되고 근원 CPI 예상·직전 수치는 2.4%이며, 2.5% 이상이면 국채 금리의 5.35% 재돌파·기술주 약세·추가 인상 우려로 이어지고 2.4%이면 금리 우려가 완화된다는 조건부 전망.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "통계 기준, 발표 시간대, 전망 작성 시점과 국채 만기를 확인하기 전에는 해당 숫자를 매매 기준으로 사용하지 않는다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "애플이 10월 13일 현지에서 스마트홈 허브를 공개하고 LG전자가 도어벨·도어락을 LG 브랜드로 판매한다는 협력 구도를 블룸버그 보도로 제시한 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "Apple·LG전자 공식 발표와 블룸버그 원문을 확보하기 전에는 공개일과 협력 구조를 확정 사실로 제시하지 않는다."
-            }
-          ],
-          "entities": [
-            {
-              "ticker": "ORCL",
-              "name": "오라클 및 구글·메타·마이크로소프트",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "AAPL",
-              "name": "애플 및 LG전자·아마존·구글",
-              "status": "unverified",
-              "verification_notes": [
-                "Bloomberg/Morningstar 등 폐쇄형 출처 주장은 자동 검증하지 못했습니다."
-              ]
-            },
-            {
-              "ticker": "TSM",
-              "name": "TSMC 및 엔비디아·브로드컴",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            }
-          ],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Tech rebounds as AI trade jitters ease: AlphaCheck",
-              "source_url": "https://finance.yahoo.com/markets/article/tech-rebounds-as-ai-trade-jitters-ease-alphacheck-135417533.html",
-              "publisher": "Yahoo Finance",
-              "published_at": "2026-10-09T13:54:17+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "Indonesia exports its first EV batteries",
-              "source_url": "https://finance.yahoo.com/energy/articles/indonesia-exports-first-ev-batteries-120547796.html",
-              "publisher": "Just Auto",
-              "published_at": "2026-10-09T12:05:47+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C2",
-              "title": "A COVID Vaccine Stock on the S&P 500 Is Up 600% This Year",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/covid-vaccine-stock-p-500-222354759.html",
-              "publisher": "BeInCrypto",
-              "published_at": "2026-10-10T22:23:54+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C3",
-              "title": "Broadcom vs. Intel: Which Chip Stock Is a Better Buy in 2026?",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/broadcom-vs-intel-chip-stock-153502766.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-10T15:35:02+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C4",
-              "title": "Advanced Micro Devices vs. Qualcomm: Which Technology Stock Is a Better Buy in 2026?",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/advanced-micro-devices-vs-qualcomm-170301024.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-10T17:03:01+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E7",
-              "claim_id": "C8",
-              "title": "Amazon (AMZN) Wants Investors to Finance $8 Billion of Nvidia Chips. Is AI Spending Getting Too Heavy?",
-              "source_url": "https://finance.yahoo.com/technology/ai/articles/amazon-amzn-wants-investors-finance-221126922.html",
-              "publisher": "Insider Monkey",
-              "published_at": "2026-10-10T22:11:26+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "Dn_uQ1i03s8",
-        "content_sha256": "17a65d0c354c974e19b4370421205424606b744cdde0c4dc11ea2474d99beb77",
-        "occurred_at": "2026-10-10T03:00:13+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "title_and_claim_context"
-        },
-        "strategy_source_tier": "STANDARD",
-        "strategy_evidence_weight": "STANDARD",
-        "summary": {
-          "video_id": "Dn_uQ1i03s8",
-          "title": "삼성SDI보다 LG엔솔이 더 강하다? / 에코프로·포스코퓨처엠에 열린 거대한 기회… 배터리주 진짜 승부처는 ‘여기’ㅣ윤석천 평론가",
-          "channel": "815Money talk",
-          "source_url": "https://www.youtube.com/watch?v=Dn_uQ1i03s8",
-          "published_at": "2026-10-10T03:00:13+00:00",
-          "status": "asr_uncertain",
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD",
-          "strategy_validation_policy": "STANDARD_REVIEW",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 9321,
-            "segments": 505,
-            "duration_seconds": 1216,
-            "repeated_ngram_ratio": 0.004
-          },
-          "claim_status_summary": {
-            "partially_supported": 1,
-            "asr_uncertain": 3,
-            "unverified": 8
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "LG에너지솔루션의 국내 최고 ESS 경쟁력과 연말 북미 약 50GWh 역량, Vertech·난징·폴란드 사업이 성장과 수익성 개선을 뒷받침한다는 주장.",
-              "status": "partially_supported",
-              "confidence": 0.88,
-              "supporting_evidence_ids": [
-                "E1"
-              ],
-              "manual_check_required": true,
-              "investor_implication": "50GWh를 실현된 출하나 이익으로 반영하지 말고 공식 증설 일정, 수주·가동률 및 사업별 수익성을 확인해야 한다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "JV2 AC Link 제품이 NVIDIA DGX SuperPOD Ready 프로그램에 포함되고 해당 기업은 히타치·테슬라·LG에너지솔루션 세 곳뿐이라는 주장.",
-              "status": "asr_uncertain",
-              "confidence": 0.97,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "제품명과 프로그램 자격을 확인하기 전에는 NVIDIA 인증이나 3사 독점 구도를 투자 근거로 사용하지 않는 것이 타당하다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "LG에너지솔루션의 내년 성장률 약 400%, 블룸버그 인용 2028년까지 EPS 성장률 80%와 추가 주가 상승 여력이 있다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "두 성장률은 원자료와 계산 기준이 확인되기 전까지 실적 추정이나 목표주가 산정에 사용하기 어렵다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "에코프로의 전구체 없는 LFP 공동개발·국가과제·200톤 시범라인이 비용 절감과 중국 공급망 100% 배제를 가능하게 하며, NCM이 장기적으로 우세하고 특정 첨단 용도에는 LFP를 사용할 수 없다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "개발 목표와 상업적 성과를 분리하고 양산 수율·원가·고객 승인 및 원재료 조달 내역을 확인해야 한다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "북미에서는 중국산 LFP 소재를 사용할 수 없고 CATL은 EU산 소재를 사용해야 하며 중국산 소재를 사용할 수 없다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "법적 적용 범위가 확인되기 전에는 탈중국 수요가 특정 기업에 의무적으로 귀속된다고 가정할 수 없다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "삼성SDI의 내년 전고체 상용화 또는 조건부 2027년 양산과 에코프로 측 MOU·선행 소재 주문이 공급망 촉매가 된다는 주장.",
-              "status": "unverified",
-              "confidence": 0.98,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "2027년 일정과 관련 소재 매출을 확정적으로 반영하지 말고 공식 로드맵 및 실제 공급계약을 확인해야 한다."
-            }
-          ],
-          "entities": [],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Lg에너지솔루션, 압도적 북미 생산 네트워크로 성장 가속화",
-              "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.chosun.com%2Fspecial%2Fspecial_section%2F2026%2F08%2F26%2FLOXFIRYAIJGXFJLREWSCGFKX6I%2F&rut=84b84928b1f7c0365c4c0885b7511bbeeec907f1b6eefce0cbc1de6ec25e4d10",
-              "publisher": "duckduckgo.com",
-              "source_tier": "web"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C6",
-              "title": "[Who Is ?] 최문호 에코프로비엠 대표이사 사장",
-              "source_url": "https://www.businesspost.co.kr/BP?command=article_view&num=437152",
-              "publisher": "Naver News",
-              "published_at": "2026-05-08T07:02:00+09:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E3",
-              "claim_id": "C6",
-              "title": "2차전지 소재·부품 관련주, '웃음꽃' 성우하이텍·엠케이전자·케이이...",
-              "source_url": "http://www.finomy.com/news/articleView.html?idxno=251222",
-              "publisher": "Naver News",
-              "published_at": "2026-03-11T18:16:00+09:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C7",
-              "title": "[Who Is ?] 이강명 성일하이텍 대표이사 회장",
-              "source_url": "https://www.businesspost.co.kr/BP?command=article_view&num=376899",
-              "publisher": "Naver News",
-              "published_at": "2024-12-17T08:54:00+09:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C7",
-              "title": "[Who Is ?] 이강명 성일하이텍 대표이사 회장",
-              "source_url": "https://www.businesspost.co.kr/BP?command=article_view&num=324951",
-              "publisher": "Naver News",
-              "published_at": "2023-08-22T08:32:00+09:00",
               "source_tier": "news"
             }
           ]
