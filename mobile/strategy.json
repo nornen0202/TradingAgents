@@ -1,11 +1,11 @@
 {
   "schema": "tradingagents.mobile-strategy/v1",
-  "generated_at": "2026-10-12T14:45:38.298659+09:00",
+  "generated_at": "2026-10-12T16:35:47.760048+09:00",
   "privacy": "PLAINTEXT_ACTION_DATA_NO_RAW_ACCOUNT_IDENTIFIERS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:f45b6c1c166c51d3b3407ebdfb9b31e7",
+      "event_id": "kr:a57eb3453bf964f1ea37419fe6b26341",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261012T132357_local-scheduler-kr-overlay_only",
@@ -12978,27 +12978,6 @@
                   "기술적 약세 완화: 189000원 돌파·재지지와 유효 거래량·정규장 거래량가중평균가격 상회 이후 192400원 및 갱신된 10일 지수이동평균을 회복하고 다음 실제 거래일에도 유지한다. 이것만으로 신규 매수를 승인하지 않는다."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "risk_action_confirmation_required",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -13307,27 +13286,6 @@
                 ],
                 "bearish_drivers": [
                   "75200 이탈 확인은 단기 반등 가설을 무효화한다. 71800~73300 지지 후보를 이유로 손절을 미루지 않는다."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "risk_action_close_confirmation_required",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -13644,27 +13602,6 @@
                 ],
                 "bearish_drivers": [
                   "1,678,000원 아래 정규장 종가와 이후 반등의 1,671,000원 회복 실패가 함께 확인되는 기술적 지지 붕괴."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "intraday_invalidation_breached",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -14040,27 +13977,6 @@
                   "005930.KS의 257000원 이탈 후 회복 실패는 전술 노출 축소 사유이며, 246000원 아래 거래량 동반 정규장 마감은 박스권 전술 논지의 무효화 조건이다."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "support_zone_failed",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -14433,27 +14349,6 @@
                   "402340.KS의 981,000원 아래 정규장 종가와 다음 확인된 거래일 회복 실패는 박스권 회복 논지를 무효화한다."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "risk_action_confirmation_required",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -14783,27 +14678,6 @@
                   "매출채권 회수 지연과 음의 영업현금흐름이 지속되고, 검증된 연체·대손·고객 부실로 현금회수 전망이 훼손되는 경우."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "support_zone_failed",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -15080,27 +14954,6 @@
                 ],
                 "bearish_drivers": [
                   "공식 자료로 확인되는 생산 복구 지연, 추가 노사 차질 또는 중대한 이연 주문 취소."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "support_zone_failed",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -15412,27 +15265,6 @@
                   "62,900에 이어 61,900을 이탈하고 최신 정규장 자료에서 회복에 실패하는 경우."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "support_zone_failed",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -15737,27 +15569,6 @@
                   "083450.KQ가 정규장 종가 기준 54,400원을 하회하고 다음 확인된 거래일에 정해진 회복 조건을 충족하지 못하는 경우."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "waiting_for_trigger",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -16060,27 +15871,6 @@
                 ],
                 "bearish_drivers": [
                   "확정 실적·가이던스에서 중대한 수익성 훼손 또는 성장 가설 약화가 확인되는 경우. 두 조건의 동시 발생을 기다리지 않는다."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "failed_breakout",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -16393,28 +16183,6 @@
                   "353200.KS의 확인된 정규장 종가가 148,100원 아래이면 잔여 전술적 보유분 손절, 143,500원 아래이면 재진입 보류를 강화한다."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "vwap_unconfirmed",
-                  "relative_volume_unconfirmed",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -16711,27 +16479,6 @@
                 ],
                 "bearish_drivers": [
                   "192,100원 종가 이탈 후 다음 확인 거래일 첫 60분 동안 193,819원 회복·유지 실패는 박스권 유지 가정을 약화시킨다."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "risk_action_confirmation_required",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -17031,27 +16778,6 @@
                 ],
                 "bearish_drivers": [
                   "검증된 정규장 종가가 596,000원을 하회하면 단기 저점 유지 가설을 무효화한다. 현재 발생 여부는 미확인이다."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "risk_action_close_confirmation_required",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -17377,27 +17103,6 @@
                   "원공시에서 중대한 계약 취소·인도 지연·채산성 악화 또는 실제 손실계약 관련 충당부채 증가가 확인되는 경우."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "risk_action_confirmation_required",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -17711,27 +17416,6 @@
                 ],
                 "bearish_drivers": [
                   "010950.KS의 162000원 정규장 종가 이탈, 이어 157700원 종가 이탈과 다음 실제 거래일 회복 실패."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "intraday_invalidation_breached",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -18048,27 +17732,6 @@
                 ],
                 "bearish_drivers": [
                   "197,100원 종가 이탈은 추가 축소, 196,836원 종가 이탈은 잔여 손절 조건이다. 제공 자료에서는 이탈이 확인되지 않았다."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "risk_action_close_confirmation_required",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -18395,27 +18058,6 @@
                 ],
                 "bearish_drivers": [
                   "197,500원 이탈 후 회복 실패는 단기 강세 전환 가설의 무효화 조건이며, 190,200원 아래 종가는 잔여 총노출 추가 축소 조건이다."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "risk_action_close_confirmation_required",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -18745,27 +18387,6 @@
                   "090430.KS의 129000원 아래 공식 정규장 종가: 중장기 가격 구조 무효화와 잔여 전량 손절 조건."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "risk_action_confirmation_required",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -19093,27 +18714,6 @@
                   "제공업체의 수익성 신호가 비교 기준 차이에 불과하거나 정상화 이익과 현금 창출에서 지속되지 않는 경우."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "risk_action_close_confirmation_required",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -19404,27 +19004,6 @@
                 ],
                 "bearish_drivers": [
                   "확정 실적·회사 전망에서 해외 성장 둔화와 수익성 악화가 확인되는 경우."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "failed_breakout",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -19726,27 +19305,6 @@
                 ],
                 "bearish_drivers": [
                   "386,500원 하회 정규장 종가와 후속 회복 실패, 또는 사전 확정 손절·위험한도 위반."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "failed_breakout",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -20097,27 +19655,6 @@
                   "010580.KS의 검증된 정규장 종가가 2,105원 미만이면 반등 목적 보유 논거를 무효화한다."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "failed_breakout",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -20431,28 +19968,6 @@
                 ],
                 "bearish_drivers": [
                   "갱신된 200일선 아래 종가 재이탈과 3,765원 지지 붕괴. 3,647원 아래 종가는 전술적 회복 가설의 최종 무효화 기준이다."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "vwap_unconfirmed",
-                  "relative_volume_unconfirmed",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -20794,27 +20309,6 @@
                 ],
                 "bearish_drivers": [
                   "128,700원 아래 일봉 마감과 다음 실제 거래일의 회복 실패."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "failed_breakout",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -21169,27 +20663,6 @@
                   "535,000원 아래 확인된 정규장 종가: 전술 반등 가설 무효화."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "failed_breakout",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -21490,28 +20963,6 @@
                 ],
                 "bearish_drivers": [
                   "062040.KS의 215,000원 아래 일봉 마감과 정의된 후속 회복 실패."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "failed_breakout",
-                  "support_zone_failed",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -21849,27 +21300,6 @@
                   "출시 지연·공급 차질 또는 낮은 순판매가격과 약한 처방 지속성으로 상업화 경제성이 훼손되는 경우."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "waiting_for_trigger",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -22191,27 +21621,6 @@
                   "105560.KS 최신 정규장 종가가 162800원 아래이거나 회복 시도 후 165300원 아래에서 마감하면 단기 회복 가설이 약화된다."
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "waiting_for_trigger",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
-                ]
-              },
               "source_contributions": [
                 {
                   "source": "tradingagents",
@@ -22499,28 +21908,6 @@
                 ],
                 "bearish_drivers": [
                   "096770.KS의 152200원 하회 확정 종가는 위험축소, 돌파 진입 후 163400원 아래 5분봉 두 개 연속 마감은 해당 물량 손절, 147000원 하회 확정 종가는 단기 추세 무효화로 구분한다."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "failed_breakout",
-                  "support_zone_failed",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -22861,27 +22248,6 @@
                 ],
                 "bearish_drivers": [
                   "최신 자료에서 607000원 아래 연속 두 개의 5분봉 마감과 재시험 회복 실패: 초기 방어 시나리오 약화."
-                ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "as_of": "2026-10-12T13:24:00+09:00",
-                "valid_until": "2026-10-12T13:54:00+09:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인",
-                  "최신 호가·거래량·수급·VI·경보·정지·계좌·기존 주문·원공시 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "relative_volume_unconfirmed",
-                  "market_data_expired_at_response_time",
-                  "account_snapshot_expired_at_response_time",
-                  "timestamp_validation_failed"
                 ]
               },
               "source_contributions": [
@@ -23238,16 +22604,17 @@
           "next_checkpoint": "새 실시간 가격·계좌 스냅샷과 원공시·실적을 확인한다. 보유 NAVER·두산에너빌리티의 원분석 REDUCE 위험 조건을 최신 가격·수급으로 재검증하고, 삼성전자·SK하이닉스 관련 YouTube의 미검증 주장을 독립 대조한다. PRISM 전송 사건 1건은 직접 매칭이 없어 전용하지 않는다. VI·경보·정지·미체결 주문 및 기존 위험 한도를 주문 전에 재검증한다."
         },
         "lineage": {
-          "status": "CURRENT_PACKET",
+          "status": "CURRENT_ANALYSIS_LINEAGE",
           "current_action_cards_enriched": true,
-          "reason": "event_source_and_ticker_coverage_match",
+          "reason": "analysis_source_run_and_ticker_coverage_match",
           "workflow_contract_matches": true,
           "ticker_coverage_matches": true,
           "report_ticker_count": 30,
           "current_ticker_count": 30,
           "report_source_run_id": "20261012T132357_local-scheduler-kr-overlay_only",
           "current_analysis_source_run_id": "20261012T120400_local-scheduler-kr-overlay_only"
-        }
+        },
+        "analysis_only": true
       },
       "role_counts": {
         "HOLDING": 13,
@@ -25058,7 +24425,7 @@
     },
     "us": {
       "market": "US",
-      "event_id": "us:15e79e136ea3cf75205d48cef89bc043",
+      "event_id": "us:8b575085a187cb3bf3bf5d170e154d46",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261010T040116_github-actions-us",
