@@ -1,16 +1,17 @@
 # KR 투자 브리핑
 
-**생산 시각 순서 역전 · 생산 커버리지 COMPLETE · 현재 주문 보류**
+**입력 유효시간 만료 · 생산 커버리지 COMPLETE · 현재 주문 보류**
 
-- 보고서 작성: 2026-10-12T13:41:41.168496+09:00
+- 보고서 작성: 2026-10-12T14:40:32.347466+09:00
+- 데이터 상태: STALE; 원패킷 모드 OUTAGE; 현재 실행 모드 RECHECK_REQUIRED
 - 원분석 거래일: 2026-10-08 ~ 2026-10-08; 분석 완료 2026-10-12T09:07:17.272511+09:00
-- 시세 관측: 2026-10-12T13:24:00+09:00 ~ 2026-10-12T13:24:00+09:00; 최오래 시세 1061초 경과
-- 계좌 관측: 2026-10-12T13:26:16.868579+09:00; 924초 경과
+- 시세 관측: 2026-10-12T13:24:00+09:00 ~ 2026-10-12T13:24:00+09:00; 최오래 시세 4592초 경과
+- 계좌 관측: 2026-10-12T13:26:16.868579+09:00; 4455초 경과
 - 입력 유효기간: 2026-10-12T13:54:00+09:00; 작성·게시는 입력을 갱신하지 않음
 - 최신 전체 분석 시도: 20261012T055403_local-scheduler-kr-full · SUCCESS; 최신 완료 분석: 20261012T055403_local-scheduler-kr-full · success · 30/30
 - 연구 복구: 이번 분석 영수증에 연구 복구 기록 없음
 - 자료 갱신 실행: 20261012T132357_local-scheduler-kr-overlay_only · 완료 2026-10-12T13:26:20.510282+09:00; 원분석 실행 20261012T055403_local-scheduler-kr-full
-- 세션: KR:2026-10-12; 이벤트 `kr:ed05aa6eb521126d2ddb22fc8428e854`
+- 세션: KR:2026-10-12; 이벤트 `kr:f45b6c1c166c51d3b3407ebdfb9b31e7`
 
 분석 시점 방향과 현재 실행 준비도를 분리했습니다. 아래 가격과 관찰선은 현재 주문 신호가 아닙니다.
 
@@ -44,7 +45,7 @@
 
 **COMPLETE** · 보유 13/13, 필수 관심 27/27 전송, 생산 분석 30/30 성공. 전달 전략 30개를 모두 표시합니다. 생산 완료가 시세 신선도나 주문 가능성을 뜻하지는 않습니다.
 
-COVERAGE_RECEIPT {"event_id":"kr:ed05aa6eb521126d2ddb22fc8428e854","status":"COMPLETE","holdings":{"expected":13,"missing_count":0,"missing":[]},"watchlist":{"expected":27,"missing_count":0,"missing":[],"all_rendered":true},"analysis":{"total":30,"successful":30,"failed":0,"failed_tickers":[]},"response_scanner_limit":10}
+COVERAGE_RECEIPT {"event_id":"kr:f45b6c1c166c51d3b3407ebdfb9b31e7","status":"COMPLETE","holdings":{"expected":13,"missing_count":0,"missing":[]},"watchlist":{"expected":27,"missing_count":0,"missing":[],"all_rendered":true},"analysis":{"total":30,"successful":30,"failed":0,"failed_tickers":[]},"response_scanner_limit":10}
 
 ## 보유·필수 관심 전체 행동표
 
