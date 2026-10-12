@@ -1,0 +1,168 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:d98cc113d89d981e8c998332fc80a361",
+  "source_sha256": "de340b59f392d0f25334c24c2f94bfcef3851320933e78db19d4cc5cbc83027f",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "f5ba656baa3255d8d08768ab816048f458ac176a41169461691a2454a685df37",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 추가 검증 — 2026년 10월 12일\n\n생산자 상태는 정상입니다. 영상은 09:15 KST 게시, 생산은 09:57 완료됐습니다. 이번 보고는 마지막 예약 이후 도착한 새 영상 1건만 다룹니다.\n\n- 코스피 수급과 주도주 회복, 반도체 장비 수요의 공식 검증을 우선합니다.\n- 영상 주장은 미검증이며 에너지 가격 표현에는 음성인식 불확실성이 있습니다. 검증된 투자 신호는 없습니다.\n- 연구 우선순위만 높이고 확신도·보유 비중·실행 허용은 변경하지 않습니다.\n\n## 범위와 출처\n72시간 창 42건 중 전송 42건, 범위 생략 0건입니다. 신규 1건·수정 0건·중복 제외 41건입니다. 이는 수집된 창의 범위이며 YouTube 전체 전수조사를 뜻하지 않습니다.\n\n[삼프로TV 마켓 인사이드 영상](https://www.youtube.com/watch?v=1zD9ebjFZjM), 사건 키 `1zD9ebjFZjM`. 원문 검증 집계는 미검증 9개·음성인식 불확실 1개이며, 현재 패킷에는 핵심 주장 C1~C6이 전송됐습니다. 자동 자막 품질이 양호해도 주장이 사실로 검증된 것은 아닙니다.\n\n## 검증 상태와 반증 과제\nC1의 지수 하락·기관 수급·지지선 주장과 C2의 반도체 약세·배터리 강세 원인은 미검증입니다. 시점이 다른 시세를 섞거나 금융투자와 기관 전체를 합산하지 않습니다. 연결 자료 E1·E2·E4는 보조 기사이며 개별 수치의 직접 증거가 아닙니다.\n\nC3의 군사·외교 주장을 확정 사실로 사용하지 않습니다. C4의 에너지 가격은 단위와 지표가 불명확하므로 원음 및 동일 시계열 대조 전 제외합니다. C5의 AI 집중 의견과 C6의 기업 매출 인식 비교도 공식 자료가 부족합니다. 관련 기사 E5만으로 성과 차별화나 매출 회계의 정확성을 입증할 수 없습니다. 이 보고에서 추가 원자료 검증을 완료했다고 주장하지 않습니다.\n\n## 시장 연구 반영\n| 대상 | 허용 조치 | 실제 반영과 제한 |\n|---|---|---|\n| 코스피 ^KS11 | UPGRADE_RESEARCH | C1·C2의 KRX 수급 및 주도주 가격·거래량 대조를 우선. 확신도·비중 유지. |\n| ASML | UPGRADE_RESEARCH | 패킷의 장비업계 관련성을 공식 실적·수주 검증 우선순위에 반영. 업계 묶음 주장을 개별 기업 사실로 단정하지 않음. |\n\n두 대상 모두 연구 전용입니다. 새로운 목표가·손절가·주문 지시를 만들지 않으며 기존 시장·계좌·위험 확인을 통과하기 전 실행을 승격하지 않습니다. 다음 확인은 KRX 공식 수급, ASML 공식 발표, 에너지 원음과 단위입니다.\n\nCOVERAGE_RECEIPT {\"event_id\": \"youtube:d98cc113d89d981e8c998332fc80a361\", \"status\": \"COMPLETE\", \"window_events\": 42, \"transmitted_events\": 42, \"truncated\": false, \"new_events\": 1, \"revised_events\": 0}\n\nMOBILE_HANDOFF {\"owner\": \"external_github_notification_pipeline\", \"status\": \"PENDING_EXTERNAL_VERIFICATION\", \"work_sent_notification\": false}",
+  "structured_report": {
+    "schema": "tradingagents.work-report/v1",
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:d98cc113d89d981e8c998332fc80a361",
+      "source_sha256": "de340b59f392d0f25334c24c2f94bfcef3851320933e78db19d4cc5cbc83027f"
+    },
+    "title": "YouTube 추가 검증 — 코스피 수급·장비업계 주장",
+    "generated_at": "2026-10-12T10:56:01.045456+09:00",
+    "as_of": "2026-10-12T10:56:01.045456+09:00",
+    "source_health": "OK",
+    "report_mode": "VERIFICATION_DELTA",
+    "summary": [
+      "새 영상 1건은 미검증·음성인식 불확실 주장으로, 현재 매매 변경 근거가 아닙니다.",
+      "코스피 수급·주도주 회복과 ASML 장비 수요의 공식 자료 확인 우선순위를 높입니다.",
+      "확신도·비중은 유지하고 시장·계좌·위험 제한을 그대로 적용합니다."
+    ],
+    "top_actions": [
+      {
+        "action": "UPGRADE_RESEARCH",
+        "tickers": [
+          "^KS11",
+          "ASML"
+        ],
+        "reason": "미검증 주장을 공식 자료와 대조하는 연구 우선순위만 상향",
+        "event_keys": [
+          "1zD9ebjFZjM"
+        ]
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "^KS11",
+        "display_name": "코스피",
+        "rank": 1,
+        "research_priority": "HIGH_RESEARCH",
+        "allowed_action": "UPGRADE_RESEARCH",
+        "thesis_confidence_change": "NONE_PENDING_PRIMARY_VERIFICATION",
+        "position_size_change": "NONE",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "official_primary_source",
+            "live_market",
+            "account_and_risk_gates"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "1zD9ebjFZjM",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "KRX 투자자별 수급과 대형 주도주의 시각별 가격·거래량을 대조한다. 기관과 금융투자를 중복 합산하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "ASML",
+        "display_name": "ASML",
+        "rank": 2,
+        "research_priority": "HIGH_RESEARCH",
+        "allowed_action": "UPGRADE_RESEARCH",
+        "thesis_confidence_change": "NONE_PENDING_PRIMARY_VERIFICATION",
+        "position_size_change": "NONE",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "official_primary_source",
+            "live_market",
+            "account_and_risk_gates"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "1zD9ebjFZjM",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "공식 실적·수주·가이던스로 장비 수요와 AI 집중 의견을 검증한다. 영상의 업계 묶음 표현을 ASML 개별 사실로 바꾸지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "youtube:d98cc113d89d981e8c998332fc80a361",
+      "status": "COMPLETE",
+      "window_events": 42,
+      "transmitted_events": 42,
+      "truncated": false,
+      "new_events": 1,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer_run_id": "youtube_20261012_094110",
+      "producer_last_run_at": "2026-10-12T09:57:20.813464+09:00",
+      "producer_status": "success",
+      "window_hours": 72,
+      "new_events": 1,
+      "revised_events": 0,
+      "unchanged_events": 41,
+      "event_manifest": [
+        {
+          "event_key": "1zD9ebjFZjM",
+          "content_sha256": "1e2ddb0a8363bbd5fcd95a03a27c9327a7714eea53afddb4221d542206213f45",
+          "occurred_at": "2026-10-12T00:15:45+00:00",
+          "status": "asr_uncertain",
+          "source_url": "https://www.youtube.com/watch?v=1zD9ebjFZjM"
+        }
+      ],
+      "claim_status_summary": {
+        "unverified": 9,
+        "asr_uncertain": 1
+      },
+      "official_primary_verification_completed": false,
+      "external_delivery_verified": false,
+      "execution_eligible": false
+    },
+    "next_checkpoint": "KRX 공식 수급·시세, ASML 공식 실적·수주, 에너지 원음·동일 지표를 확인한 뒤 후속 시장 보고서에 반영",
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    }
+  },
+  "report_id": "youtube:b42589e14f735a1dc72d84d8dc5114ee",
+  "report_sha256": "b42589e14f735a1dc72d84d8dc5114ee59370b908cb5f8391e223f2d80cbdcd8",
+  "published_at": "2026-10-12T10:56:01.321223+09:00"
+}

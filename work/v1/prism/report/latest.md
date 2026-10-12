@@ -1,24 +1,15 @@
-# PRISM 연구 델타 · 10월 11일
+# PRISM 운영 공지 — 2026년 10월 12일
 
-**핵심:** 삼표시멘트(038500.KS) 위험 근거의 확인 순서를 높입니다. 현재 매매 신호는 없습니다.
+생산자 상태 정상. 09:30 KST 게시 공지를 10:42에 수집했습니다. **NO_ACTIONABLE_DELTA** — 새 주식 종목 신호는 없습니다.
 
-- **근거 상태:** OK. 생산 성공 10/11 10:13 KST, 최근 이벤트 10:00 KST. 이벤트 5건 모두 현재 24시간 범위입니다.
-- **주식 1건:** 주간 인사이트의 삼표시멘트 매도 회고([stock_ai_agent:15932](https://t.me/stock_ai_agent/15932))입니다. 패킷의 정규화 신호는 WATCH입니다. 과거 매도·손익·비중 언급을 현재 주문이나 개인 계좌 상태로 해석하지 않습니다.
-- **기타 4건:** BTC 데모 진입·보호 변경·정산 기록(15928–15931)입니다. 주식 후보 순위·포지션 크기·실행 판단에 반영하지 않습니다.
+[원문 공지](https://t.me/stock_ai_agent/15939), 사건 키 `stock_ai_agent:15939`는 시장 조정을 이유로 해당 채널이 오전 분석을 쉬고 종가 확인 시간대 하루 한 번 분석하겠다는 내용입니다. 보유 종목 손절·청산 모니터링을 지속한다는 설명도 채널 자체 주장으로, 실제 작동을 여기서 독립 검증하지 않았습니다.
 
-## 범위와 판단
+최근 24시간 창 1건, 전송 1건, 생략 0건, 신규 1건·수정 0건·중복 제외 0건입니다. 범위 잘림은 없습니다. 개별 종목·가격·목표·손절 신호는 0건이며 시뮬레이션 자료도 아닙니다.
 
-신규 5건, 수정 0건, 기존 중복 0건. 최근 24시간 범위의 5/5건 전송, 생략 0건, truncation 없음. **COMPLETE는 패킷 전송 범위의 완전성만 뜻하며 독립 사실 검증은 아닙니다.** 단일 채널 자료는 `balanced_external`의 LOW_LABELED 가중치로 사용합니다.
+이 공지를 TradingAgents의 작업 중단 명령이나 매도 신호로 해석하지 않습니다. KR·US 순위, 확신도, 비중 및 실행 상태를 바꿀 종목별 근거가 없으므로 기존 전략과 시장·계좌·위험 제한을 유지합니다. 외부 신호 공급 빈도 변화만 후속 확인 대상으로 남깁니다.
 
-| 시장·종목 | 연구 영향 | 검증 상태·실행 |
-|---|---|---|
-| KR · 038500.KS | 주간 매도 회고 사유와 기존 투자 논리의 충돌 여부를 후속 KR 브리핑의 **위험 검증 우선순위 상단**에 둠. 유리한 후보 순위 상향은 보류 | 원공시, KRX 시세·거래량·수급, 현 보유/관심 목록 및 기존 위험 한도 재확인 필요. 현재 신규 매도·매수 배분 0% |
-| US 주식 | 이번 패킷에서 검증된 신규 개별 주식 신호 없음 | 기존 순위·thesis 확신도·비중 유지 |
-| BTC 데모 | 주식 전략에서 제외 | 실제 계좌·주식 체결 근거 아님 |
+다음 정기 점검에서 후속 공지를 확인하고 종가 시간대 생산을 별도로 확인합니다. 새로운 종목 신호가 나오면 공식 공시·IR·거래소 자료와 대조합니다. ACK는 이 공지 처리 완료이며 외부 전달이나 채널 모니터링 정상의 증거가 아닙니다.
 
-## 다음 확인
+COVERAGE_RECEIPT {"event_id": "prism:5102c91d2e12e154db232e23094e97d0", "status": "COMPLETE", "window_events": 1, "transmitted_events": 1, "truncated": false, "new_events": 1, "revised_events": 0}
 
-10/11 11:15 KST 전후 새 **sanitized 생산 run**과 038500.KS의 DART/KIND 공시, KRX 가격·거래량·수급을 대조합니다. 당일 시장·계좌·위험 gate를 통과하기 전에는 어떤 PRISM 문구도 주문으로 승격하지 않습니다. 외부 Telegram 또는 Pages 전달 영수증은 없습니다.
-
-COVERAGE_RECEIPT {"event_id":"prism:bde6273abb8904e70b6cad2b734dde97","status":"COMPLETE","window_events":5,"transmitted_events":5,"truncated":false,"new_events":5,"revised_events":0}
-MOBILE_HANDOFF {"owner":"external_github_notification_pipeline","status":"PENDING_EXTERNAL_VERIFICATION","work_sent_notification":false}
+MOBILE_HANDOFF {"owner": "external_github_notification_pipeline", "status": "PENDING_EXTERNAL_VERIFICATION", "work_sent_notification": false}
