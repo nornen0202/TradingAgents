@@ -29,6 +29,40 @@ for these local archives. See the official
 
 ## Each check
 
+### Current local backend and Telegram delivery
+
+Since October 10, `TRADINGAGENTS_AUTOMATION_BACKEND=local` gives the existing
+`LocalAutomation-run-due` and `LocalAutomation-publish` tasks production and
+publication ownership. The cloud watchdog and core cloud writers are intentionally
+disabled. Do not re-enable or dispatch them solely because their last run is old;
+check the actual local task, manifest and receipt instead. The older cloud recovery
+instructions below apply when GitHub owns production or a real admitted cloud
+writer needs recovery.
+
+The October 12 investigation confirmed that KR research completed at 09:40 with
+30/30 tickers, while no local producer invoked Telegram. Cloud `workflow_run`
+notifications cannot observe local Python completion. The notification workflow's
+cloud guard had already been repaired, but that did not create a local event bridge.
+
+The local producer now records safe terminal failures, including preflight
+exceptions, and the publication lane reconciles `notifications/events` into the
+existing `tradingagents-mobile-notifications.yml` workflow using an exact outbox
+hash. The trusted main job on the Pages runner validates canonical completion and
+live publication before using the existing deployment Telegram secrets. No bot
+credential is copied into local configuration or an outbox. Daily completion is
+backfilled only within 24 hours; historical overlays are not replayed. New overlays
+after bridge activation retain completion notices. Work ACK/handoff success remains
+silent and never substitutes for a producer completion notice.
+
+`notifications/dispatches` records bounded attempts (three, fifteen-minute cooldown)
+and active workflow ownership. `DISPATCH_ACCEPTED` is pending. Only a corresponding
+`notifications/results` Telegram `SENT`/deduplicated `NOOP` receipt establishes
+delivery. The existing atomic Telegram ledger preserves partial cursors and failure
+incident cooldown. A successful workflow missing its local receipt requires
+diagnosis rather than blind retransmission. Failed notification transport does not
+terminate healthy research. A PC/network outage still requires the independent
+observer; it cannot send from an offline host.
+
 1. Read `AGENTS.md` and the previous local operations receipt. Record the actual
    timezone-aware current time. Use `nornen0202/TradingAgents` and remote `fork`.
    Fetch fresh GitHub data; do not rely on a previous conversation's run status.

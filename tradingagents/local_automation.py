@@ -171,16 +171,30 @@ def run_due(archive, state, *, now=None, dry_run=False):
         profile = target.inputs["profile"]
         config = ROOT / "config" / ("scheduled_analysis_korea.toml" if profile == "kr" else "scheduled_analysis.toml")
         mode = "full" if target.workflow_file == "daily-codex-analysis.yml" else "overlay_only"
-        if mode == "full":
-            preflight(config)
         args = [sys.executable, "-u", "-m", "tradingagents.scheduled", "--config", str(config),
                 "--archive-dir", str(archive), "--run-mode", mode, "--skip-site-build", "--strict",
                 "--label", f"local-scheduler-{profile}-{mode}"]
         if mode == "full":
             args.append("--disable-execution-refresh")
-        result = subprocess.run(args, cwd=ROOT, check=False, timeout=12 * 3600)
-        atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1, "started_at": now.isoformat(),
-                                       "finished_at": datetime.now(timezone.utc).isoformat(), "exit_code": result.returncode})
+        stage = "preflight" if mode == "full" else "analysis"
+        exit_code, error_type = 1, "WorkerInterrupted"
+        try:
+            if mode == "full":
+                preflight(config)
+            stage = "analysis"
+            result = subprocess.run(args, cwd=ROOT, check=False, timeout=12 * 3600)
+            exit_code, error_type = result.returncode, "WorkerExitError"
+        except Exception as exc:
+            exit_code, error_type = 1, type(exc).__name__
+            raise
+        finally:
+            finished = datetime.now(timezone.utc).isoformat()
+            atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1, "started_at": now.isoformat(),
+                                           "finished_at": finished, "exit_code": exit_code,
+                                           "stage": stage, "error_type": error_type if exit_code else None})
+            if exit_code:
+                from tradingagents.notifications.local import queue_failure
+                queue_failure(state, stage=stage, source_key=key, error_type=error_type, finished_at=finished)
         # Re-evaluate calendars and archives on the next tick, after a long run.
         break
     return decisions
@@ -294,6 +308,8 @@ def ensure_branch_pages(state):
 
 
 def publish(archive, state, runtime_dir, *, rebuild=False):
+    from tradingagents.notifications.local import reconcile_safely
+    reconcile_safely(archive, state)
     fingerprint = archive_fingerprint(archive)
     receipt_path = state / "publication.json"
     receipt = read_json(receipt_path, {})
@@ -345,6 +361,7 @@ def publish(archive, state, runtime_dir, *, rebuild=False):
         receipt.update(status="DELIVERY_VERIFIED", verified_at=datetime.now(timezone.utc).isoformat(), public_url=PUBLIC_BASE)
         atomic_write_json(receipt_path, receipt)
         complete_handoffs(site, runtime_dir, receipt)
+        reconcile_safely(archive, state)
     return receipt
 
 
@@ -383,11 +400,26 @@ def main():
                 print(json.dumps({"status": "DRAINING_ACTIONS_WRITERS", "run_ids": active}))
                 return 0
             if args.command == "run-due":
-                result = run_due(args.archive_dir, args.state_dir, dry_run=args.dry_run)
+                try:
+                    result = run_due(args.archive_dir, args.state_dir, dry_run=args.dry_run)
+                finally:
+                    if not args.dry_run:
+                        from tradingagents.notifications.local import reconcile_safely
+                        reconcile_safely(args.archive_dir, args.state_dir)
             elif args.dry_run:
                 result = {"fingerprint": archive_fingerprint(args.archive_dir), "status": "DRY_RUN"}
             else:
-                result = publish(args.archive_dir, args.state_dir, args.runtime_dir, rebuild=args.rebuild)
+                try:
+                    result = publish(args.archive_dir, args.state_dir, args.runtime_dir, rebuild=args.rebuild)
+                except Exception as exc:
+                    from tradingagents.notifications.local import queue_failure, reconcile_safely
+                    # Daily identity and incident cooldown prevent a five-minute
+                    # publisher retry from flooding the user's phone.
+                    day = datetime.now(ZoneInfo("Asia/Seoul")).date().isoformat()
+                    queue_failure(args.state_dir, stage="publish", source_key=day,
+                                  error_type=type(exc).__name__, finished_at=datetime.now(timezone.utc).isoformat())
+                    reconcile_safely(args.archive_dir, args.state_dir)
+                    raise
             print(json.dumps(result, ensure_ascii=False))
     except TimeoutError:
         if lane_acquired:

@@ -26,6 +26,12 @@ def _parser() -> argparse.ArgumentParser:
     _add_upstream_arguments(inspect_parser)
     inspect_parser.add_argument("--github-output", type=Path)
 
+    local_parser = subparsers.add_parser("notify-local")
+    local_parser.add_argument("--local-event-id", required=True)
+    local_parser.add_argument("--archive-dir", type=Path, required=True)
+    local_parser.add_argument("--state-dir", type=Path, required=True)
+    local_parser.add_argument("--dry-run", action="store_true")
+
     notify_parser = subparsers.add_parser("notify")
     _add_upstream_arguments(notify_parser)
     notify_parser.add_argument("--archive-dir", type=Path, required=True)
@@ -150,7 +156,11 @@ def _requires_private_chat(
 def main() -> int:
     args = _parser().parse_args()
     try:
-        result = _inspect(args) if args.command == "inspect" else _notify(args)
+        if args.command == "notify-local":
+            from .local import notify
+            result = notify(args.local_event_id, args.archive_dir, args.state_dir, dry_run=args.dry_run)
+        else:
+            result = _inspect(args) if args.command == "inspect" else _notify(args)
     except NotificationError as exc:
         print(json.dumps({"status": "ERROR", "error": str(exc)}, ensure_ascii=False))
         return 2

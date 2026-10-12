@@ -4,6 +4,7 @@ run-name: >-
   [upstream=${{ github.event.workflow_run.id || inputs.upstream_run_id }}]
   [attempt=${{ github.event.workflow_run.run_attempt || inputs.upstream_run_attempt || '1' }}]
   [dry_run=${{ inputs.dry_run || false }}]
+  [local=${{ inputs.local_event_id }}]
 
 on:
   workflow_run:
@@ -20,7 +21,11 @@ on:
     inputs:
       upstream_run_id:
         description: "Completed upstream GitHub Actions run ID to inspect and notify"
-        required: true
+        required: false
+        type: string
+      local_event_id:
+        description: "Exact credential-free local notification outbox hash"
+        required: false
         type: string
       dry_run:
         description: "Compose and validate without contacting Telegram"
@@ -38,7 +43,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: tradingagents-mobile-notification-${{ github.event.workflow_run.id || inputs.upstream_run_id }}
+  group: tradingagents-mobile-notification-${{ inputs.local_event_id || github.event.workflow_run.id || inputs.upstream_run_id }}
   cancel-in-progress: false
 
 jobs:
@@ -47,7 +52,7 @@ jobs:
     # the independent YouTube/PRISM collectors still need their terminal notices.
     if: >-
       ${{
-        github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'workflow_dispatch' && inputs.upstream_run_id != '' && inputs.local_event_id == '') ||
         (
           github.event.workflow_run.head_repository.full_name == github.repository &&
           github.event.workflow_run.head_branch == 'main'
@@ -109,6 +114,7 @@ jobs:
         with:
           path: ${{ runner.temp }}/deployment-telegram-notification-ledger.json
           key: deployment-telegram-notification-ledger-v1-${{ github.run_id }}-${{ github.run_attempt }}
+
           restore-keys: |
             deployment-telegram-notification-ledger-v1-
 
@@ -169,3 +175,31 @@ jobs:
         with:
           path: ${{ runner.temp }}/deployment-telegram-notification-ledger.json
           key: deployment-telegram-notification-ledger-v1-${{ github.run_id }}-${{ github.run_attempt }}
+
+  notify_local:
+    name: Validate local result and send Telegram notification
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && vars.TRADINGAGENTS_AUTOMATION_BACKEND == 'local' && inputs.local_event_id != '' && inputs.upstream_run_id == '' }}
+    runs-on: [tradingagents-pages]
+    timeout-minutes: 10
+    steps:
+      - name: Check out trusted notifier code from main
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Validate canonical local outbox and deliver with existing Telegram pipeline
+        shell: pwsh
+        env:
+          LOCAL_EVENT_ID: ${{ inputs.local_event_id }}
+          NOTIFICATION_DRY_RUN: ${{ inputs.dry_run || false }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.DEPLOYMENT_TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.DEPLOYMENT_TELEGRAM_NOTIFICATION_CHAT_ID }}
+        run: |
+          $env:PYTHONUTF8 = '1'
+          $argsList = @('-m', 'tradingagents.notifications', 'notify-local',
+            '--local-event-id', $env:LOCAL_EVENT_ID,
+            '--archive-dir', 'C:/TradingAgentsData/archive',
+            '--state-dir', 'C:/Projects/TradingAgents/.runtime/local-automation')
+          if ($env:NOTIFICATION_DRY_RUN -eq 'true') { $argsList += '--dry-run' }
+          & 'C:/Projects/TradingAgents/.venv/Scripts/python.exe' @argsList
+          if ($LASTEXITCODE -ne 0) { throw 'Local Telegram delivery failed; receipt remains pending.' }
