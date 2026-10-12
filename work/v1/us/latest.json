@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:ce26b8b6ed89868eef3b20f2cdc6e3b0",
+  "event_id": "us:6dd55c14a2ce90d34f1bc1ec4365d012",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "28ccef5622f4181bc3518b4a17864a5471d37a8b69183d84abc04a7aec734cbd",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
   "workflow_contract_sha256": "1214108b100a61193755513b3a7bc2a26a1b0659c1a3f2e31d8966b76e1d2754",
-  "source_sha256": "14818728330691a0b923bd2724960f3cb06119d326611e89c2f4dcc96ec0a6ba",
+  "source_sha256": "73466b3fa227b914ece0c33931d930f71fe5cd765ade24996fb7b328ce64149e",
   "body": {
     "kind": "market",
     "market": "US",
@@ -690,15 +690,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 354,
-          "window_events": 40,
+          "window_events": 39,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-09T04:33:55+00:00",
+          "oldest_occurred_at": "2026-10-09T08:30:11+00:00",
           "newest_occurred_at": "2026-10-12T00:15:45+00:00",
-          "available_events_before_context_cap": 40,
+          "available_events_before_context_cap": 39,
           "context_event_cap": 12,
-          "omitted_events": 28,
-          "omitted_due_to_context_cap": 28,
+          "omitted_events": 27,
+          "omitted_due_to_context_cap": 27,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -949,83 +949,6 @@
                 {
                   "ticker": "TSM",
                   "name": "TSMC",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "ne6GDkVxDds",
-            "content_sha256": "1e1b96cf32dccf0e96fd2d07c88c2e971aea4551e06f3b9ee0b9d852bc689b1f",
-            "occurred_at": "2026-10-09T04:33:55+00:00",
-            "relevance": {
-              "tickers": [
-                "AMZN"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "AMZN"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "video_id": "ne6GDkVxDds",
-              "title": "주식 전문가들이 현시점, 아마존이 저평가 됐다는 이유",
-              "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=ne6GDkVxDds",
-              "claim_status_summary": {
-                "unverified": 10
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "골드만삭스가 아마존을 추천 목록에 편입하고 UBS가 대형 인터넷 기업 최고 추천으로 선정했다. UBS의 2027년까지 AWS 매출 성장 전망은 47%로 전문가 평균 34%보다 높으며 이익률 개선도 예상한다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "증권사 추천과 전망 차이를 투자 근거로 사용하려면 원문 또는 구체적인 인용 보도를 먼저 확보해야 한다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "아마존 주가는 8월 3일 284달러까지 상승한 뒤 10월 7일경 약 260달러로 하락했고 증권사 추천은 그 이후 이루어졌다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "가격 하락 폭과 추천 시점의 선후 관계는 해당 연도의 일별 OHLC 및 보고서 발표일로 대조해야 한다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "AWS 매출의 전년 동기 대비 성장률이 지난해 3분기 20%, 4분기 24%, 올해 1분기 28%, 2분기 37%로 가속했다. AWS 매출 비중은 약 21%이며 영업이익 166억 달러는 북미 사업의 91억 달러보다 크다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "성장 가속과 이익 기여도를 가치평가에 반영하기 전에 같은 기간의 공식 부문 실적으로 재계산해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "미이행 계약 의무는 약 664조 원이며 대부분 AWS 관련으로, 향후 약 6년에 걸쳐 자금이 유입된다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "664조 원을 확정 현금이나 이익으로 간주하지 말고 공시상 수행의무와 인식·수취 조건부터 확인해야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "AMZN",
-                  "name": "아마존(Amazon·AWS 포함)",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -1844,6 +1767,82 @@
                 }
               ]
             }
+          },
+          {
+            "event_key": "QFpEpQ7ag78",
+            "content_sha256": "d4b6cc41c8f0840a7058f9875d917f46ec99672226a721624a7ce762baee0a41",
+            "occurred_at": "2026-10-11T08:00:27+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "video_id": "QFpEpQ7ag78",
+              "title": "코스피 보다 코스닥? 4분기 포트폴리오 갈아타라? / 내년 실적 성장 1위는 2차전지? 대반전 시작되나 | 유진투자증권 허재환 상무",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=QFpEpQ7ag78",
+              "claim_status_summary": {
+                "asr_uncertain": 3,
+                "unverified": 9
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "영상 제목과 자막 추출본의 출연자 이름·직함 및 일부 숫자·정책명·지역명이 불일치하며, 녹화일과 전망 기준일은 확인되지 않았다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "기준연도와 핵심 숫자를 확인하기 전에는 영상을 현재 시점의 투자 전망으로 적용하지 않는다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "미국 10년물 금리는 5.2~5.3%이며, 금리가 5%를 넘어도 주가가 상승할 수 있지만 5.5~6% 초과에서는 상승 유지가 어렵다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "5.5~6%를 검증된 매매 임계값으로 사용하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "고금리 지속·급등 때 AI·기술주·반도체로 자금이 집중되고 금리 안정 때 소외 업종으로 확산되며, 전일에도 AI주와 소비 관련 업종의 차별화가 나타났다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "압축 투자와 분산 투자의 전환 조건은 검증된 규칙이 아닌 출연자의 조건부 전략으로 취급한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "고금리에 따른 중소기업 부실과 충당금 부담 때문에 국내 대출 비중이 높은 은행의 노출을 줄여야 하며, 기업대출이 중소기업에서 대기업 중심으로 이동했다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "은행 비중 조정은 개별 은행의 대출 구성과 대손비용을 확인한 뒤 판단할 사안이다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스닥·코스피",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
           }
         ],
         "execution_eligible": false
@@ -1898,7 +1897,6 @@
             "event_keys": [
               "TtFx3S0N_wM",
               "XtmmAHH5r_M",
-              "ne6GDkVxDds",
               "chUwfvCYbbM",
               "NF5abNaJIic",
               "DLu-u4xo3Pc",
@@ -1907,19 +1905,20 @@
               "1zD9ebjFZjM",
               "DnYfHShwgEU",
               "ZPcYqedm_iQ",
-              "MoKFO8ZtQaU"
+              "MoKFO8ZtQaU",
+              "QFpEpQ7ag78"
             ],
             "coverage": {
               "total_unique_events": 354,
-              "window_events": 40,
+              "window_events": 39,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-09T04:33:55+00:00",
+              "oldest_occurred_at": "2026-10-09T08:30:11+00:00",
               "newest_occurred_at": "2026-10-12T00:15:45+00:00",
-              "available_events_before_context_cap": 40,
+              "available_events_before_context_cap": 39,
               "context_event_cap": 12,
-              "omitted_events": 28,
-              "omitted_due_to_context_cap": 28,
+              "omitted_events": 27,
+              "omitted_due_to_context_cap": 27,
               "omitted_before_context_selection": 0
             }
           },
