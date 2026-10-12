@@ -103,6 +103,15 @@ def test_dispatch_retry_budget_survives_new_scheduler_tick(tmp_path, monkeypatch
     assert local.read(state / 'notifications/dispatches' / f'{key}.json')['attempts'] == 3
 
 
+def test_incident_cooldown_is_policy_skip_not_delivery(tmp_path):
+    key = local.queue_failure(tmp_path, stage='analysis', source_key='a' * 64,
+                              error_type='TimeoutError', finished_at=NOW.isoformat())
+    write(tmp_path / 'notifications/results' / f'{key}.json',
+          {'status': 'NOOP', 'reason': 'INCIDENT_COOLDOWN', 'local_event_id': key, 'message_ids': []})
+    local.reconcile(tmp_path, now=NOW, runner=lambda *a, **k: pytest.fail('retransmission'))
+    assert local.read(tmp_path / 'notifications/dispatches' / f'{key}.json')['status'] == 'POLICY_SKIPPED'
+
+
 def test_canonical_validation_and_telegram_receipt_deduplicate(tmp_path, monkeypatch):
     archive, state, _, key = prepared(tmp_path, monkeypatch)
     sent = []

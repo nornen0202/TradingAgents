@@ -98,8 +98,9 @@ def reconcile(state, *, now=None, runner=subprocess.run):
             receipt_path = root / "dispatches" / f"{key}.json"
             receipt = read(receipt_path)
             if result.get("status") in {"SENT", "NOOP"} and result.get("local_event_id") == key:
-                if receipt.get("status") != "DELIVERY_VERIFIED":
-                    atomic_write_json(receipt_path, {**receipt, "status": "DELIVERY_VERIFIED", "result": result})
+                status = "POLICY_SKIPPED" if result.get("reason") == "INCIDENT_COOLDOWN" else "DELIVERY_VERIFIED"
+                if receipt.get("status") != status:
+                    atomic_write_json(receipt_path, {**receipt, "status": status, "result": result})
                 continue
             if int(receipt.get("attempts", 0)) >= 3:
                 continue
