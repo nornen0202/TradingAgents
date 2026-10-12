@@ -1009,7 +1009,8 @@ class WorkflowDefinitionTests(unittest.TestCase):
         self.assertIn("head_branch == 'main'", text)
         # Local production/publication ownership must not suppress terminal
         # notifications from already admitted or independent cloud collectors.
-        self.assertNotIn("TRADINGAGENTS_AUTOMATION_BACKEND", text)
+        cloud_jobs = text.split("  notify_local:", 1)[0]
+        self.assertNotIn("TRADINGAGENTS_AUTOMATION_BACKEND", cloud_jobs)
         self.assertIn(
             "TELEGRAM_BOT_TOKEN: ${{ secrets.DEPLOYMENT_TELEGRAM_BOT_TOKEN }}",
             text,
