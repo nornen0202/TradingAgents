@@ -206,8 +206,9 @@ def archive_fingerprint(archive):
     roots = {"research": archive,
              "youtube": Path(os.getenv("TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR") or archive / "youtube-archive"),
              "prism": Path(os.getenv("TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR") or archive / "prism-telegram-archive")}
+    manifest_names = {"research": "run.json", "youtube": "youtube_run.json", "prism": "prism_telegram_run.json"}
     for label, root in roots.items():
-        paths = list((root / "runs").rglob("manifest.json"))
+        paths = list((root / "runs").glob(f"*/*/{manifest_names[label]}"))
         if label == "research":
             paths += list((root / "work-reports").glob("*/latest.json"))
         for path in sorted(paths):

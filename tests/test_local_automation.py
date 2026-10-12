@@ -100,6 +100,29 @@ def test_archive_outbox_detects_report_changes_but_not_worker_scratch(tmp_path, 
     assert local.archive_fingerprint(tmp_path) != before
 
 
+@pytest.mark.parametrize("subdir,filename", [
+    ("", "run.json"),
+    ("youtube-archive", "youtube_run.json"),
+    ("prism-telegram-archive", "prism_telegram_run.json"),
+])
+def test_archive_outbox_detects_producer_completion_without_work_report(tmp_path, monkeypatch, subdir, filename):
+    monkeypatch.delenv("TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR", raising=False)
+    monkeypatch.delenv("TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR", raising=False)
+    run_dir = tmp_path / subdir / "runs" / "2026" / "producer-run"
+    run_dir.mkdir(parents=True)
+    before = local.archive_fingerprint(tmp_path)
+    (run_dir / "attempt.json").write_text('{"status":"RUNNING"}')
+    scratch = run_dir / "tickers" / "TEST"
+    scratch.mkdir(parents=True)
+    (scratch / "run.json").write_text('{"status":"success"}')
+    assert local.archive_fingerprint(tmp_path) == before
+    (run_dir / filename).write_text('{"status":"success","finished_at":"2026-10-12T03:06:00Z"}')
+    completed = local.archive_fingerprint(tmp_path)
+    assert completed != before
+    (run_dir / "attempt.json").write_text('{"status":"SUCCESS"}')
+    assert local.archive_fingerprint(tmp_path) == completed
+
+
 def test_site_branch_is_nonforcing_public_only_and_blocks_rollback(tmp_path, monkeypatch):
     upstream = tmp_path / "upstream.git"
     subprocess.run(["git", "init", "--bare", str(upstream)], check=True, capture_output=True)
