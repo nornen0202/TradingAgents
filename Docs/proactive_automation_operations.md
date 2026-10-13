@@ -414,6 +414,64 @@ progress, record the active run, remaining checks and next scheduled check; the
 heartbeat continues from that record. This is `IN_PROGRESS`, not a verified
 recovery. Use waits of at most 60 seconds while actively checking.
 
+## Local recovery of advisory schedules
+
+The local `run-due` lane recovers only the existing YouTube and PRISM Actions
+collectors when no core worker is due on that tick. Core research and overlays
+always run first, without an advisory API dependency. A tick that starts core
+work returns after that worker; recovery reevaluates on the next tick using the
+current calendar. The existing `run-due.lock` protects this local admission,
+including a worker already running an older immutable revision. Advisory runs
+keep their native independent workspaces and archives and do not hold that lock
+for their remote lifetime: a three-hour YouTube run must not delay the 10:05 KR
+overlay or the 10:40 Work publication. Native collector schedules are unchanged.
+
+Recovery reuses watchdog windows, inputs, active blockers and consecutive-failure
+budgets, dispatches at most one advisory per tick on `main`, and marks it
+`local_watchdog`. It additionally checks live advisory ownership without a
+creation-date filter, so an active rerun of an old run is still protected.
+PRISM retains the watchdog's delayed six-hour lookback and 80-message cap.
+The local path does not enable any disabled core workflow.
+
+Under the local state directory, `advisory-recovery/admission.json` is written
+before dispatch, together with `advisory-recovery/attempts/<session-hash>.json`.
+The latter enforces at least 60 minutes between attempts and at most two local
+dispatches per target/session; the existing native plus watchdog failure budget
+can stop recovery sooner. An accepted request is not delivery. A timeout, lost
+response or not-yet-visible run leaves the admission unresolved across ticks and
+sessions. No timer alone authorizes a second dispatch: one matching, terminal
+run must first resolve it. Ambiguous, corrupt or truncated evidence fails closed.
+For `ADVISORY_DISPATCH_UNRESOLVED`, the operator must inspect the saved workflow,
+request time and prior run IDs, identify the exact new run or prove rejection,
+and preserve that evidence before a targeted repair; do not clear receipts to
+reset the budget.
+
+Coverage requires the real successful collection step, a uniquely matching
+canonical completed manifest inside that step's time interval, and the successful
+publication stamp/build. A local skipped cloud deploy is expected; a green
+runtime gate without collection is not coverage and does not reset failure
+history. A completed collection with missing canonical evidence or an incomplete
+publication is diagnosed without launching that research again. These checks
+are separate from live Pages and Telegram verification. Only matching canonical
+run-name timestamps are read, so unrelated damaged archives stay untouched.
+If an old GitHub run is retried successfully today, its original creation date
+can put it outside history queries. Current-window canonical completion with
+default source coverage then produces `CANONICAL_COMPLETE_PRODUCER_UNRESOLVED`
+and prevents recollection until the exact producer attempt is verified.
+
+Advisory diagnostics never become core-analysis failures. Fixed reason codes
+distinguish authentication/API availability, truncated history, invalid receipts,
+missing/incomplete canonical production and completed collection awaiting
+publication repair. Per-target source/receipt errors do not starve the other
+collector; unresolved admission and unknown active ownership remain shared
+barriers. Continue the normal publication/notification lane and verify actual
+manifest, Pages, Work handoff and `SENT` or policy `SKIPPED` independently.
+
+The October 14 incident showed missing YouTube native probes and the 07:35 PRISM
+run while other Actions executed successfully. The confirmed repair is closing
+the local-backend watchdog coverage gap; the internal cause of GitHub not
+creating those native runs was not established.
+
 ## Durable receipts and reporting
 
 Store credential-free operations evidence in the canonical main checkout:
