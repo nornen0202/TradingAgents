@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
+import pytest
+
 from tradingagents.dataflows.intraday.microstructure import KISMicrostructureProvider, render_microstructure_report
 from tradingagents.dataflows.intraday.us_microstructure_sources import USMicrostructureSupplement
 from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY
@@ -214,6 +216,76 @@ def test_kr_microstructure_snapshot_normalizes_kis_fields():
     assert snapshot.program_flow_status == "available"
     assert snapshot.vi_status["is_clear"] is True
     assert snapshot.market_alert_status["is_clear"] is True
+
+
+class DomesticVwapClient(FakeKisClient):
+    def __init__(self, *, price=None, bars=None):
+        self.price = price or {}
+        self.bars = bars or []
+
+    def domestic_price(self, code):
+        payload = super().domestic_price(code)
+        payload["output"].update(self.price)
+        return payload
+
+    def domestic_time_itemchartprice(self, code, *, input_hour, include_past_data):
+        return {"output2": self.bars}
+
+
+@pytest.mark.parametrize("day", ["20261013", "20261014"])
+def test_kr_cumulative_minute_amount_never_supplies_session_vwap(day):
+    # Reproduces zero pre-open quote totals with prior-session minute bars.
+    # The same rolling window is also insufficient during the current session.
+    result = KISMicrostructureProvider(client=DomesticVwapClient(
+        price={"stck_prpr": "232000", "stck_hgpr": "0", "stck_lwpr": "0",
+               "acml_vol": "0", "acml_tr_pbmn": "0"},
+        bars=[
+            {"stck_bsop_date": day, "stck_cntg_hour": "195900",
+             "stck_prpr": "234000", "cntg_vol": "5448", "acml_tr_pbmn": "5916362713500"},
+            {"stck_bsop_date": day, "stck_cntg_hour": "195800",
+             "stck_prpr": "234000", "cntg_vol": "3307", "acml_tr_pbmn": "5915088589500"},
+        ],
+    )).fetch("005930.KS", market_timezone="Asia/Seoul")
+    assert result.last_price == 232000
+    assert result.session_vwap is None
+    assert result.missing_reason["session_vwap"] == "cumulative_traded_value_or_volume_unavailable"
+    assert result.execution_data_quality == DELAYED_ANALYSIS_ONLY
+    assert result.asof.startswith(f"{day[:4]}-{day[4:6]}-{day[6:8]}")
+
+
+@pytest.mark.parametrize("price,reason", [
+    ({"acml_vol": "0"}, "cumulative_traded_value_or_volume_unavailable"),
+    ({"acml_vol": None}, "cumulative_traded_value_or_volume_unavailable"),
+    ({"acml_tr_pbmn": None}, "cumulative_traded_value_or_volume_unavailable"),
+    ({"acml_tr_pbmn": "1000000000"}, "source_vwap_price_range_inconsistent"),
+    ({"acml_tr_pbmn": "0"}, "source_vwap_price_range_inconsistent"),
+    ({"acml_tr_pbmn": "-102000"}, "source_vwap_price_range_inconsistent"),
+    ({"acml_tr_pbmn": "inf"}, "source_vwap_price_range_inconsistent"),
+    ({"acml_tr_pbmn": "nan"}, "source_vwap_price_range_inconsistent"),
+    ({"stck_lwpr": None}, "source_vwap_price_range_unavailable"),
+    ({"stck_hgpr": None}, "source_vwap_price_range_unavailable"),
+    ({"stck_lwpr": "0", "stck_hgpr": "0"}, "source_vwap_price_range_inconsistent"),
+    ({"stck_lwpr": "108", "stck_hgpr": "99"}, "source_vwap_price_range_inconsistent"),
+    ({"stck_hgpr": "inf"}, "source_vwap_price_range_inconsistent"),
+])
+def test_kr_invalid_cumulative_vwap_cannot_borrow_bar_range_or_volume(price, reason):
+    result = KISMicrostructureProvider(client=DomesticVwapClient(
+        price=price,
+        bars=[{"stck_prpr": "102", "stck_hgpr": "108", "stck_lwpr": "99",
+               "cntg_vol": "1000", "tr_pbmn": "102000"}],
+    )).fetch("005930.KS", market_timezone="Asia/Seoul")
+    assert result.session_vwap is None
+    assert result.missing_reason["session_vwap"] == reason
+    assert result.execution_data_quality == DELAYED_ANALYSIS_ONLY
+
+
+def test_bar_vwap_never_divides_cumulative_amount_by_interval_volume():
+    from tradingagents.dataflows.intraday.microstructure import _vwap_from_bars
+
+    assert _vwap_from_bars([
+        {"stck_prpr": "100", "cntg_vol": "10", "acml_tr_pbmn": "9000000"},
+        {"stck_prpr": "103", "cntg_vol": "20", "acml_tr_pbmn": "10000000"},
+    ]) == 102
 
 
 def test_kr_microstructure_uses_kis_tday_rltv_and_clear_00_market_alert_code():

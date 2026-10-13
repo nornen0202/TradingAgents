@@ -174,6 +174,25 @@ override stale quotes or execution gates.
 
 ## Recovery decisions
 
+### Korean session VWAP source consistency
+
+The October 14 pre-open audit reproduced an invalid KR VWAP: a domestic quote
+had zero cumulative volume/value, so the old fallback summed minute bars'
+`acml_tr_pbmn` (cumulative traded value) and divided by `cntg_vol` (interval
+volume). These field meanings are documented in the
+[official KIS example](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_time_itemchartprice/chk_inquire_time_itemchartprice.py).
+The resulting price was far outside the observed trading range.
+
+KR session VWAP now requires paired cumulative totals and a valid daily range
+from the same domestic price response. Missing totals or an inconsistent value
+produce `session_vwap=null`, an explicit missing reason and analysis-only data
+quality. A rolling minute window, including previous-day bars, cannot replace
+session VWAP. Neither publication nor this change refreshes the quote timestamp.
+Historical artifacts stay intact; inspect whether the original research excluded
+the bad observation before deciding on recovery. A healthy immutable producer is
+not restarted to apply a data-collection fix; later scheduled quote refreshes use
+the new source snapshot and still require their normal session and risk checks.
+
 ### Korean daily history provider gaps
 
 The local scheduler enables `TRADINGAGENTS_KIS_RESEARCH_FALLBACK_ENABLED=1`
