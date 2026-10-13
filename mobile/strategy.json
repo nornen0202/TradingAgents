@@ -1,11 +1,11 @@
 {
   "schema": "tradingagents.mobile-strategy/v1",
-  "generated_at": "2026-10-14T03:20:32.382545+09:00",
+  "generated_at": "2026-10-14T07:35:40.597670+09:00",
   "privacy": "PLAINTEXT_ACTION_DATA_NO_RAW_ACCOUNT_IDENTIFIERS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:266eaef652a8866f1d937425e3a13168",
+      "event_id": "kr:1981e846199a9893654fc5240e749387",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261013T132402_local-scheduler-kr-overlay_only",
@@ -34,15 +34,12 @@
       },
       "latest_attempt": {
         "schema": "tradingagents.analysis-attempt/v1",
-        "run_id": "20261013T094359_local-scheduler-kr-full",
+        "run_id": "20261014T054901_local-scheduler-kr-full",
         "market": "KR",
         "run_mode": "full",
-        "started_at": "2026-10-13T09:43:59.631692+09:00",
-        "status": "FAILED",
-        "heartbeat_at": "2026-10-13T00:55:13.210058+00:00",
-        "finished_at": "2026-10-13T00:55:13.210044+00:00",
-        "completed_tickers": 0,
-        "error_type": null
+        "started_at": "2026-10-14T05:49:01.287212+09:00",
+        "status": "RUNNING",
+        "heartbeat_at": "2026-10-13T22:35:33.365879+00:00"
       },
       "latest_completed_analysis": {
         "run_id": "20261012T055403_local-scheduler-kr-full",
@@ -773,10 +770,12 @@
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
-              "실시간 시세와 주문 가능 상태 재확인"
+              "실시간 시세와 주문 가능 상태 재확인",
+              "명시 가격 구간과 구조화 low/high 불일치 재확인: execution_levels.levels[1]: low/high [55, 54400] outside source_text [54400, 55700] KRW"
             ],
             "blockers": [
-              "work_packet_row_expired"
+              "work_packet_row_expired",
+              "structured_price_range_conflict"
             ],
             "source_readiness": "READY_NOW"
           },
@@ -800,7 +799,7 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 54,400 이하 하락, 종가 확인 후 손절 조건 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "54,400 이하 하락, 종가 확인 후 손절 조건",
-          "data_status_ko": "시세 유효기간 만료",
+          "data_status_ko": "구조화 가격 구간 재확인 필요",
           "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "투자 근거 무효화",
           "display_priority": 2,
@@ -818,7 +817,8 @@
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
             "provider_blockers": [
-              "work_packet_row_expired"
+              "work_packet_row_expired",
+              "structured_price_range_conflict"
             ],
             "row_valid_until": "2026-10-13T13:54:00+09:00",
             "expired_at_build": true,
@@ -826,12 +826,21 @@
             "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
+            "reference_plan": {
+              "action_now": "HOLD",
+              "action_if_triggered": "STOP_LOSS_IF_TRIGGERED",
+              "delta_krw_now": 0,
+              "delta_krw_if_triggered": -106200,
+              "target_weight_now": 0.0104,
+              "target_weight_if_triggered": 0.0,
+              "strategy_state": "reduce_or_exit",
+              "execution_feasibility_now": "risk_exit_review"
+            },
             "canonical_ticker": "083450.KQ",
             "confidence": 0.62,
-            "action_now": "HOLD",
+            "action_now": "WAIT",
             "delta_krw_now": 0,
-            "target_weight_now": 0.0104,
-            "action_if_triggered": "STOP_LOSS_IF_TRIGGERED",
+            "action_if_triggered": "NONE",
             "trigger_conditions": [
               "083450.KQ의 실제 거래일과 최신 정규장 자료를 먼저 확인한다. 2026-10-12 연구일과 2026-10-08 가격 기준일을 혼동하지 않는다.",
               "083450.KQ가 54,400~55,700원에서 매도 거래량 감소 후 55,000원 부근을 회복하고, 완성된 두 개의 5분봉에서 저점이 상승하며 유효한 장중 거래량가중평균가격을 지지하는지 점검한다.",
@@ -862,10 +871,9 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -106200,
-            "target_weight_if_triggered": 0.0,
-            "strategy_state": "reduce_or_exit",
-            "execution_feasibility_now": "risk_exit_review",
+            "delta_krw_if_triggered": 0,
+            "strategy_state": "RECHECK_REQUIRED",
+            "execution_feasibility_now": "RECHECK_REQUIRED_or_degraded_data",
             "portfolio_relative_action": "STOP_LOSS",
             "risk_action": "STOP_LOSS",
             "risk_action_level": {
@@ -930,7 +938,10 @@
             ],
             "gate_reasons": [
               "high_fallback_count",
-              "BUY_MATRIX_REVIEW"
+              "BUY_MATRIX_REVIEW",
+              "structured_price_range_conflict",
+              "실시간 시세와 주문 가능 상태 재확인",
+              "명시 가격 구간과 구조화 low/high 불일치 재확인: execution_levels.levels[1]: low/high [55, 54400] outside source_text [54400, 55700] KRW"
             ]
           },
           "universe_role": "HOLDING"
@@ -7035,10 +7046,12 @@
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
-              "실시간 시세와 주문 가능 상태 재확인"
+              "실시간 시세와 주문 가능 상태 재확인",
+              "명시 가격 구간과 구조화 low/high 불일치 재확인: execution_levels.levels[4]: low/high [212, 207000] outside source_text [207000, 212788] KRW"
             ],
             "blockers": [
-              "work_packet_row_expired"
+              "work_packet_row_expired",
+              "structured_price_range_conflict"
             ],
             "source_readiness": "READY_NOW"
           },
@@ -7062,7 +7075,7 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "판단시각은 2026-10-12T07:21:18.610412+09:00이다. 실제 거래일·정규장·휴장·정지 여부와 최신 체결시각은 미확인이다. 장중 자료 표기 2026-10-08 20:00은 당일 조건 판단에 사용하지 않는다. 검증된 만료시각이 없으므로 만료나 다음 세션 연장을 선언하지 않는다. / 197,100~198,800원 지지 방어와 완결된 5분봉의 재시험 저점 유지, 210,956~212,788원 회복을 관찰한다. 정상 거래량가중평균가격과 상대거래량은 별도로 확보하며 1.2는 관측값이 아닌 제안 기준이다.",
           "risk_condition_ko": "197,100 이하 하락, 종가 확인 후 리스크 축소",
-          "data_status_ko": "시세 유효기간 만료",
+          "data_status_ko": "구조화 가격 구간 재확인 필요",
           "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 17,
@@ -7080,7 +7093,8 @@
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
             "provider_blockers": [
-              "work_packet_row_expired"
+              "work_packet_row_expired",
+              "structured_price_range_conflict"
             ],
             "row_valid_until": "2026-10-13T13:54:00+09:00",
             "expired_at_build": true,
@@ -7088,11 +7102,20 @@
             "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
+            "reference_plan": {
+              "action_now": "WATCH",
+              "action_if_triggered": "NONE",
+              "delta_krw_now": 0,
+              "delta_krw_if_triggered": 0,
+              "target_weight_now": 0.0,
+              "target_weight_if_triggered": 0.0,
+              "strategy_state": "hold_or_watch",
+              "execution_feasibility_now": "not_actionable_now"
+            },
             "canonical_ticker": "066570.KS",
             "confidence": 0.61,
-            "action_now": "WATCH",
+            "action_now": "WAIT",
             "delta_krw_now": 0,
-            "target_weight_now": 0.0,
             "action_if_triggered": "NONE",
             "trigger_conditions": [
               {
@@ -7131,9 +7154,8 @@
               }
             ],
             "delta_krw_if_triggered": 0,
-            "target_weight_if_triggered": 0.0,
-            "strategy_state": "hold_or_watch",
-            "execution_feasibility_now": "not_actionable_now",
+            "strategy_state": "RECHECK_REQUIRED",
+            "execution_feasibility_now": "RECHECK_REQUIRED_or_degraded_data",
             "portfolio_relative_action": "WATCH",
             "risk_action": "REDUCE_RISK",
             "risk_action_level": {
@@ -7185,7 +7207,10 @@
             "gate_reasons": [
               "high_fallback_count",
               "wait_heavy_batch_reduce_immediate_entries",
-              "BUY_MATRIX_PASS"
+              "BUY_MATRIX_PASS",
+              "structured_price_range_conflict",
+              "실시간 시세와 주문 가능 상태 재확인",
+              "명시 가격 구간과 구조화 low/high 불일치 재확인: execution_levels.levels[4]: low/high [212, 207000] outside source_text [207000, 212788] KRW"
             ]
           },
           "universe_role": "WATCHLIST"
@@ -9960,10 +9985,14 @@
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
-              "실시간 시세와 주문 가능 상태 재확인"
+              "실시간 시세와 주문 가능 상태 재확인",
+              "명시 가격 구간과 구조화 low/high 불일치 재확인: execution_levels.levels[0]: low/high [175, 175200] outside source_text [175200, 175300] KRW",
+              "명시 가격 구간과 구조화 low/high 불일치 재확인: execution_levels.levels[5]: low/high [183, 183600] outside source_text [183600, 183900] KRW",
+              "명시 가격 구간과 구조화 low/high 불일치 재확인: execution_levels.levels[6]: low/high [186, 186600] outside source_text [186600, 186900] KRW"
             ],
             "blockers": [
-              "work_packet_row_expired"
+              "work_packet_row_expired",
+              "structured_price_range_conflict"
             ],
             "source_readiness": "READY_NOW"
           },
@@ -9987,7 +10016,7 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
           "execution_condition_ko": "033780.KS의 최신 가격 시각, 거래일 달력, 정규장 여부, 거래정지·시장경보 및 체결 유동성을 검증한다. 판단 시각 2026-10-12T07:50:43.237953+09:00은 세션이나 가격 신선도를 입증하지 않는다. 2026-10-08 가격을 현재가로 사용하지 않는다. / 175,200~175,300원 회복·재시험 또는 180,800원 돌파·재시험, 정상 세션 거래량가중평균가격 상회와 동시간대 상대거래량 1.2 이상을 관찰한다. 순보상·위험 기준이 미달하면 계속 대기한다.",
           "risk_condition_ko": "174,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-          "data_status_ko": "시세 유효기간 만료",
+          "data_status_ko": "구조화 가격 구간 재확인 필요",
           "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "돌파 실패",
           "display_priority": 24,
@@ -10005,7 +10034,8 @@
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
             "provider_blockers": [
-              "work_packet_row_expired"
+              "work_packet_row_expired",
+              "structured_price_range_conflict"
             ],
             "row_valid_until": "2026-10-13T13:54:00+09:00",
             "expired_at_build": true,
@@ -10013,12 +10043,21 @@
             "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
+            "reference_plan": {
+              "action_now": "WATCH",
+              "action_if_triggered": "WATCH_TRIGGER",
+              "delta_krw_now": 0,
+              "delta_krw_if_triggered": 0,
+              "target_weight_now": 0.0,
+              "target_weight_if_triggered": 0.0,
+              "strategy_state": "watch_if_triggered",
+              "execution_feasibility_now": "not_actionable_now"
+            },
             "canonical_ticker": "033780.KS",
             "confidence": 0.6,
-            "action_now": "WATCH",
+            "action_now": "WAIT",
             "delta_krw_now": 0,
-            "target_weight_now": 0.0,
-            "action_if_triggered": "WATCH_TRIGGER",
+            "action_if_triggered": "NONE",
             "trigger_conditions": [
               {
                 "thesis_ref": "/observation_conditions/0"
@@ -10055,9 +10094,8 @@
               "돌파 후 180,800원 또는 유효한 세션 거래량가중평균가격을 잃으면 신규 매수를 차단한다. 완성된 5분봉 두 개가 180,800원 아래에 머물고 거래량가중평균가격도 하회하면 돌파 추가분 전량을 위험 축소로 회수한다."
             ],
             "delta_krw_if_triggered": 0,
-            "target_weight_if_triggered": 0.0,
-            "strategy_state": "watch_if_triggered",
-            "execution_feasibility_now": "not_actionable_now",
+            "strategy_state": "RECHECK_REQUIRED",
+            "execution_feasibility_now": "RECHECK_REQUIRED_or_degraded_data",
             "portfolio_relative_action": "WATCH",
             "risk_action": "HOLD",
             "risk_action_level": {
@@ -10107,7 +10145,12 @@
             "gate_reasons": [
               "high_fallback_count",
               "wait_heavy_batch_reduce_immediate_entries",
-              "BUY_MATRIX_REVIEW"
+              "BUY_MATRIX_REVIEW",
+              "structured_price_range_conflict",
+              "실시간 시세와 주문 가능 상태 재확인",
+              "명시 가격 구간과 구조화 low/high 불일치 재확인: execution_levels.levels[0]: low/high [175, 175200] outside source_text [175200, 175300] KRW",
+              "명시 가격 구간과 구조화 low/high 불일치 재확인: execution_levels.levels[5]: low/high [183, 183600] outside source_text [183600, 183900] KRW",
+              "명시 가격 구간과 구조화 low/high 불일치 재확인: execution_levels.levels[6]: low/high [186, 186600] outside source_text [186600, 186900] KRW"
             ]
           },
           "universe_role": "WATCHLIST"
@@ -23248,9 +23291,9 @@
             "display_name": "033780",
             "action": "WAIT",
             "action_label": "대기",
-            "action_now": "WATCH",
+            "action_now": "WAIT",
             "phase": "OBSERVE",
-            "quantity": 0,
+            "quantity": null,
             "quantity_basis": null,
             "price_low": null,
             "price_high": null,
@@ -23259,14 +23302,14 @@
             "price_comparator": null,
             "price_confirmation": null,
             "currency": "KRW",
-            "estimated_gross_low": 0.0,
-            "estimated_gross_high": 0.0,
-            "estimated_fees": 0.0,
-            "estimated_net_cash": 0.0,
+            "estimated_gross_low": null,
+            "estimated_gross_high": null,
+            "estimated_fees": null,
+            "estimated_net_cash": null,
             "fx_budget_reserve_krw": 0.0,
             "commission_rate": 0.00147,
             "sell_levy_rate": 0.0,
-            "target_weight": 0.0,
+            "target_weight": null,
             "constraint_review_required": false,
             "condition": "033780.KS의 최신 가격 시각, 거래일 달력, 정규장 여부, 거래정지·시장경보 및 체결 유동성을 검증한다. 판단 시각 2026-10-12T07:50:43.237953+09:00은 세션이나 가격 신선도를 입증하지 않는다. 2026-10-08 가격을 현재가로 사용하지 않는다. / 175,200~175,300원 회복·재시험 또는 180,800원 돌파·재시험, 정상 세션 거래량가중평균가격 상회와 동시간대 상대거래량 1.2 이상을 관찰한다. 순보상·위험 기준이 미달하면 계속 대기한다.",
             "trigger_conditions": [
@@ -23304,10 +23347,10 @@
               "달력으로 확인한 다음 정규 거래일 첫 30~60분에 180,800원과 정상 세션 거래량가중평균가격의 지지 또는 재돌파·재시험을 확인한 뒤 목표규모까지의 추가를 검토한다. 다음 거래일 날짜와 주문 만료는 현재 확정하지 않는다.",
               "돌파 후 180,800원 또는 유효한 세션 거래량가중평균가격을 잃으면 신규 매수를 차단한다. 완성된 5분봉 두 개가 180,800원 아래에 머물고 거래량가중평균가격도 하회하면 돌파 추가분 전량을 위험 축소로 회수한다."
             ],
-            "status": "OBSERVE",
-            "status_label": "매매 없음",
+            "status": "RECHECK",
+            "status_label": "최신 정보 재확인",
             "reasons": [
-              "진입 조건과 계좌 배정이 확정되지 않았습니다."
+              "분석 원문과 가격 범위가 일치하지 않아 재확인 전에는 행동·수량을 산정하지 않습니다."
             ],
             "account_asof": "2026-10-13T13:26:29.533367+09:00",
             "price_asof": "2026-10-12T07:55:07.662630+09:00",
@@ -23569,9 +23612,9 @@
             "display_name": "LG전자",
             "action": "WAIT",
             "action_label": "대기",
-            "action_now": "WATCH",
+            "action_now": "WAIT",
             "phase": "OBSERVE",
-            "quantity": 0,
+            "quantity": null,
             "quantity_basis": null,
             "price_low": null,
             "price_high": null,
@@ -23580,14 +23623,14 @@
             "price_comparator": null,
             "price_confirmation": null,
             "currency": "KRW",
-            "estimated_gross_low": 0.0,
-            "estimated_gross_high": 0.0,
-            "estimated_fees": 0.0,
-            "estimated_net_cash": 0.0,
+            "estimated_gross_low": null,
+            "estimated_gross_high": null,
+            "estimated_fees": null,
+            "estimated_net_cash": null,
             "fx_budget_reserve_krw": 0.0,
             "commission_rate": 0.00147,
             "sell_levy_rate": 0.0,
-            "target_weight": 0.0,
+            "target_weight": null,
             "constraint_review_required": false,
             "condition": "판단시각은 2026-10-12T07:21:18.610412+09:00이다. 실제 거래일·정규장·휴장·정지 여부와 최신 체결시각은 미확인이다. 장중 자료 표기 2026-10-08 20:00은 당일 조건 판단에 사용하지 않는다. 검증된 만료시각이 없으므로 만료나 다음 세션 연장을 선언하지 않는다. / 197,100~198,800원 지지 방어와 완결된 5분봉의 재시험 저점 유지, 210,956~212,788원 회복을 관찰한다. 정상 거래량가중평균가격과 상대거래량은 별도로 확보하며 1.2는 관측값이 아닌 제안 기준이다.",
             "trigger_conditions": [
@@ -23626,10 +23669,10 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "status": "OBSERVE",
-            "status_label": "매매 없음",
+            "status": "RECHECK",
+            "status_label": "최신 정보 재확인",
             "reasons": [
-              "진입 조건과 계좌 배정이 확정되지 않았습니다."
+              "분석 원문과 가격 범위가 일치하지 않아 재확인 전에는 행동·수량을 산정하지 않습니다."
             ],
             "account_asof": "2026-10-13T13:26:29.533367+09:00",
             "price_asof": "2026-10-12T07:25:29.627401+09:00",
@@ -23639,40 +23682,66 @@
             "order_ready": false
           },
           {
-            "id": "083450.KQ:RISK",
+            "id": "083450.KQ:OBSERVE",
             "ticker": "083450.KQ",
             "display_name": "GST",
-            "action": "SELL",
-            "action_label": "매도·축소",
-            "action_now": "HOLD",
-            "phase": "CONDITIONAL",
-            "quantity": 1,
-            "quantity_basis": "STRUCTURED_FULL_EXIT_OF_HELD_SHARES",
-            "price_low": 54400.0,
-            "price_high": 54400.0,
-            "price_kind": "TRIGGER",
-            "price_source": "portfolio_action.risk_action_level",
-            "price_comparator": "<=",
-            "price_confirmation": "close",
+            "action": "WAIT",
+            "action_label": "대기",
+            "action_now": "WAIT",
+            "phase": "OBSERVE",
+            "quantity": null,
+            "quantity_basis": null,
+            "price_low": null,
+            "price_high": null,
+            "price_kind": "NONE",
+            "price_source": null,
+            "price_comparator": null,
+            "price_confirmation": null,
             "currency": "KRW",
-            "estimated_gross_low": 54400.0,
-            "estimated_gross_high": 54400.0,
-            "estimated_fees": 188.768,
-            "estimated_net_cash": 54211.232,
+            "estimated_gross_low": null,
+            "estimated_gross_high": null,
+            "estimated_fees": null,
+            "estimated_net_cash": null,
             "fx_budget_reserve_krw": 0.0,
             "commission_rate": 0.00147,
-            "sell_levy_rate": 0.002,
-            "target_weight": 0.0,
-            "constraint_review_required": true,
-            "condition": "54,400 이하 하락, 종가 확인 후 손절 조건",
+            "sell_levy_rate": 0.0,
+            "target_weight": null,
+            "constraint_review_required": false,
+            "condition": "위험 대응 조건: 54,400 이하 하락, 종가 확인 후 손절 조건 (매수 돌파·거래량 조건과 별도 판정)",
             "trigger_conditions": [
-              "54,400 이하 하락, 종가 확인 후 손절 조건"
+              "083450.KQ의 실제 거래일과 최신 정규장 자료를 먼저 확인한다. 2026-10-12 연구일과 2026-10-08 가격 기준일을 혼동하지 않는다.",
+              "083450.KQ가 54,400~55,700원에서 매도 거래량 감소 후 55,000원 부근을 회복하고, 완성된 두 개의 5분봉에서 저점이 상승하며 유효한 장중 거래량가중평균가격을 지지하는지 점검한다.",
+              "083450.KQ 회복 거래량은 비교 가능한 과거 동일 시간대 대비 최소 1.2배가 필요하다. 일간 거래량 1.58배를 이 조건 충족으로 대체하지 않는다.",
+              "083450.KQ 실제 진입가와 갱신된 손절폭으로 비용 차감 후 손익비를 재계산한다. 계좌 여력과 필수 공시 검토, 명시적 시간대 포함 만료시각이 마련되기 전에는 조건부 주문을 활성화하지 않는다.",
+              "083450.KQ의 55,700원·54,400원과 갱신된 단기 이동평균을 기보유분 위험관리용으로 확인한다. 58,900원 돌파만으로는 매수를 승인하지 않는다.",
+              "083450.KQ가 60,000~61,400원 저항대와 61,100원 시나리오 목표 부근에서 거부되거나 모멘텀이 약해지면 부분 수익실현 계획을 별도로 수립한다. 현재 자동 수익실현 주문은 없다.",
+              "083450.KQ의 2026-08-14 반기보고서와 자기주식 공시 원문을 확인한다. 다음 실적발표일, 독립적인 사회관계망 심리, 정량화된 포지셔닝 및 관련 거시자료는 미확인이다.",
+              "083450.KQ의 냉각 시연·협력이 유료 공급계약이나 반복 주문으로 연결되고 매출 시점·이익률이 공개되는 경우. 공격적 분석가가 인용한 활동은 5~6월의 것으로 신규 10월 수주가 아니며 향후 일정은 미확인이다.",
+              "083450.KQ의 원문 재무공시에서 비교 가능한 수익성, 재고 회전 및 반복 가능한 현금창출이 확인되는 경우.",
+              "083450.KQ의 2026-07-28 자기주식 신탁 결정과 2026-10-01 자기주식 처분 결정에 대해 실제 집행, 목적, 상대방 및 순공급 효과가 확인되는 경우.",
+              "083450.KQ의 최신 가격·동일 시간대 거래량으로 눌림목 회복과 중간 저항 흡수가 확인되는 경우. 지속적인 기관 매수는 아직 미확인이다.",
+              "083450.KQ가 정규장 종가 기준 54,400원을 하회하고 다음 확인된 거래일에 정해진 회복 조건을 충족하지 못하는 경우.",
+              "083450.KQ가 갱신된 10일 지수이동평균을 이탈한 뒤 갱신된 거래량가중이동평균 회복에도 실패하는 경우.",
+              "추후 승인된 083450.KQ 전술적 매수분에서 52,300원 손절선의 실제 체결 가능한 이탈이 발생하는 경우.",
+              "083450.KQ의 이익률·출하·재고 가치·현금전환 악화나 가용 현금의 중대한 제약이 원문 자료로 확인되는 경우.",
+              "083450.KQ의 상용화 차질, 불리한 자기주식 처분 조건 또는 반도체·인공지능 설비투자 환경 악화가 검증되는 경우. 두 사업의 공통 투자주기 노출은 분산효과로 계산하지 않는다.",
+              {
+                "thesis_ref": "/execution_levels/intraday_pilot_rule"
+              },
+              {
+                "thesis_ref": "/execution_levels/close_confirm_rule"
+              },
+              {
+                "thesis_ref": "/execution_levels/next_day_followthrough_rule"
+              },
+              {
+                "thesis_ref": "/execution_levels/failed_breakout_rule"
+              }
             ],
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "계획 거래대금이 계좌 최소 거래금액 100,000원 미만입니다. 표시 수량은 참고값이며 실행 수량을 재검토합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "분석 원문과 가격 범위가 일치하지 않아 재확인 전에는 행동·수량을 산정하지 않습니다."
             ],
             "account_asof": "2026-10-13T13:26:29.533367+09:00",
             "price_asof": "2026-10-12T07:03:08.700681+09:00",
@@ -24408,8 +24477,8 @@
         "summary": {
           "row_count": 30,
           "buy_count": 0,
-          "sell_count": 13,
-          "sized_count": 4,
+          "sell_count": 12,
+          "sized_count": 3,
           "buy_budget_used_krw": 0.0
         },
         "assumptions": [
@@ -24426,7 +24495,7 @@
     },
     "us": {
       "market": "US",
-      "event_id": "us:2e9bcf8f9829dd4b73f6c47dab894917",
+      "event_id": "us:6ebd028bcd94bb63252ab83c4d659922",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261014T021357_local-scheduler-us-overlay_only",
@@ -37747,21 +37816,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:15:00-04:00",
-                "valid_until": "2026-10-13T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -38077,21 +38131,6 @@
                     "reason": "촉매: 83.11 돌파, 82.99~83.11 재지지, 정규장 거래량가중평균가격 상회와 검증된 거래 참여 확대. 상대강도지수 50 회복과 히스토그램 양수 전환은 보조 확인이다. 반증: 회복·안정화 시나리오: 80.75 정규장 종가 이탈. 거래량 증가는 확증일 뿐 손절의 필수 조건이 아니다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
@@ -38433,21 +38472,6 @@
                     }
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [
                 {
@@ -38812,21 +38836,6 @@
                     }
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [
                 {
@@ -39200,21 +39209,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -39563,21 +39557,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -39905,21 +39884,6 @@
                     }
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [
                 {
@@ -40275,21 +40239,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -40606,21 +40555,6 @@
                     "reason": "촉매: 공격적 분석가가 제시한 성장 가능성이 최신 공식 실적의 반복 가능한 영업 수익성 및 투자 후 현금 회수 개선으로 확인되는 경우. 다음 실적 발표일은 확인 불가다. 반증: 253.78 아래 검증된 정규장 종가는 단기 반등 논거 약화와 첫 전술 위험 축소 조건이다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
@@ -40939,21 +40873,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -41258,21 +41177,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -41566,21 +41470,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -41848,21 +41737,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -42084,21 +41958,6 @@
                     "reason": "촉매: 공격적·중립 분석가가 지적한 단기금리 유지·상승은 확인될 경우 재투자 소득을 지지할 수 있다. 현재 금리 수준과 경로는 확인 불가다. 반증: 검증된 금리 하락이나 비용 증가로 보유기간 순편익이 투자 목적에 미달하거나 비교 가능한 현금성 대안보다 지속적으로 불리해지는 경우."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
@@ -42365,21 +42224,6 @@
                     "reason": "촉매: 공식 자료로 인공지능 주문의 출하·매출 전환과 사업부 마진 또는 서비스 기여가 확인되는 경우. 반증: 556.77 아래 정규장 종가 확인과 다음 실제 거래일까지의 회복 실패."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
@@ -42702,21 +42546,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -42989,21 +42818,6 @@
                     "reason": "촉매: 공격적 분석가가 언급한 가이아나·퍼미안 증산이 공식 생산량·실현 가격·단위원가·투자비 자료에서 수익성 개선으로 확인되는 경우. 현재 기사 제목만으로는 확정할 수 없다. 반증: 172.55 돌파 후 돌파선 또는 정규장 거래량가중평균가격을 잃고 두 개의 완료된 5분봉에서도 회복하지 못하면 해당 전술적 진입이 무효화된다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
@@ -43313,21 +43127,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -43600,21 +43399,6 @@
                     "reason": "촉매: 최신 정규장에서 SPYM의 90.83~91.07 시험 후 회복·재시험 지지가 확인되고 비용 후 손익비까지 충족되는 경우. 반증: 90.67 아래 정규장 종가와 다음 확인된 거래일 초반 회복 실패는 전술 보유 감축 근거다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
@@ -43916,21 +43700,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -44209,21 +43978,6 @@
                     "reason": "촉매: SHEL Bay du Nord 지분 30% 인수 보도의 공식 조건·대금·개발 일정과 투자 후 경제성 확인. 반복 보도는 하나의 사건으로 취급한다. 반증: SHEL 99.29 지지 실패와 회복 실패는 갭 상승 논거를 약화시키고, 98.07 아래 정규장 종가는 전술적 상승 논거를 무효화한다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:15:00-04:00",
-                "valid_until": "2026-10-13T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
@@ -44519,21 +44273,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -44807,21 +44546,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:15:00-04:00",
-                "valid_until": "2026-10-13T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -45090,21 +44814,6 @@
                     "reason": "촉매: 제공된 2026-10-13 V 중국 사업 준비 승인 보도와 향후 최종 허가·제휴·서비스 개시·거래량 공개. 세 분석가가 인정한 성장 선택지지만 준비 승인은 영업 개시나 이익 상향의 증거가 아니다. 반증: 384.65 아래 종가와 정해진 회복 실패는 첫 위험 축소 조건이다. 갱신된 10일 지수이동평균 이탈에 거래량 증가·상승 동력 둔화가 겹치면 추가 축소한다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:15:00-04:00",
-                "valid_until": "2026-10-13T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
@@ -45398,21 +45107,6 @@
                     "reason": "촉매: 제공된 서부 물류 확장 보도가 공식 자료로 확인되고 가동률·배송 효율·단위비용 개선으로 이어지는지 확인한다. 중복 시설 보도는 하나의 개발 사안으로 취급한다. 반증: 회복 실패 후 정규장 종가 111.23 하회는 단기 돌파 지지 가설을 훼손한다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
@@ -45710,21 +45404,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:15:00-04:00",
-                "valid_until": "2026-10-13T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -46018,21 +45697,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:15:00-04:00",
-                "valid_until": "2026-10-13T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -46295,21 +45959,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             },
@@ -46570,21 +46219,6 @@
                     "reason": "촉매: 343.13–344.59 지지 구간 회복 또는 353.53 돌파·재시험이 확인되고 거래량과 실제 진입 경제성이 함께 개선되는 경우. 반증: 정규장 일봉 종가의 338.19 하회는 현재 기술적 회복 가설을 무효화한다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
@@ -46868,21 +46502,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-13T13:10:00-04:00",
-                "valid_until": "2026-10-13T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 전송된 YouTube·PRISM 이벤트에 이 종목과 직접 일치하는 event key가 없다. 원분석 논지와 기존 우선순위를 유지한다."
             }
@@ -47130,16 +46749,17 @@
           "next_checkpoint": "새 정규장 시세·호가·계좌·위험한도와 공식 기업 자료를 재확인한 뒤 별도 실행 판단. 기존 만료시각은 연장하지 않음."
         },
         "lineage": {
-          "status": "CURRENT_PACKET",
+          "status": "CURRENT_ANALYSIS_LINEAGE",
           "current_action_cards_enriched": true,
-          "reason": "event_source_and_ticker_coverage_match",
+          "reason": "analysis_source_run_and_ticker_coverage_match",
           "workflow_contract_matches": true,
           "ticker_coverage_matches": true,
           "report_ticker_count": 30,
           "current_ticker_count": 30,
           "report_source_run_id": "20261014T021357_local-scheduler-us-overlay_only",
           "current_analysis_source_run_id": "20261014T004358_local-scheduler-us-overlay_only"
-        }
+        },
+        "analysis_only": true
       },
       "role_counts": {
         "HOLDING": 14,

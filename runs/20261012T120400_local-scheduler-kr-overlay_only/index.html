@@ -271,14 +271,424 @@
                 <span class="status success">success</span>
               </div>
               <p><strong>종목명</strong><span>LG전자 (066570.KS)</span></p>
-              <p><strong>투자판단</strong><span>보유</span></p>
-              <p><strong>중기 리서치 관점</strong><span>보유</span></p>
-              <p><strong>오늘 할 일</strong><span>종가 확인 대기: 판단시각은 2026-10-12T07:21:18.610412+09:00이다. 실제 거래일·정규장·휴장·정지 여부와 최신 체결시각은 미확인이다. 장중 자료 표기 2026-10-08 20:00은 당일 조건 판단에 사용하지 않는다. 검증된 만료시각이 없...</span></p>
-              <p><strong>장중 pilot 조건</strong><span>10:30 이후 판단시각은 2026-10-12T07:21:18.610412+09:00이다. 실제 거래일·정규장·휴장·정지 여부와 최신 체결시각은 미확인이다. 장중 자료 표기 2026-10-08 20:00은 당일 조건 판단에 사용하지 않는다. 검증된 만료시각이 없... + VWAP 위 + 거래량 확인 시 소액 starter만 검토</span></p>
-              <p><strong>종가 확인 시 할 일</strong><span>종가 기준 판단시각은 2026-10-12T07:21:18.610412+09:00이다. 실제 거래일·정규장·휴장·정지 여부와 최신 체결시각은 미확인이다. 장중 자료 표기 2026-10-08 20:00은 당일 조건 판단에 사용하지 않는다. 검증된 만료시각이 없... 유지 시 본격 add 검토</span></p>
-              <p><strong>내일 follow-through</strong><span>다음 거래일 첫 30~60분 동안 판단시각은 2026-10-12T07:21:18.610412+09:00이다. 실제 거래일·정규장·휴장·정지 여부와 최신 체결시각은 미확인이다. 장중 자료 표기 2026-10-08 20:00은 당일 조건 판단에 사용하지 않는다. 검증된 만료시각이 없... 재이탈이 없는지 확인</span></p>
-              <p class="long-field"><strong>핵심 가격대</strong><span>판단시각은 2026-10-12T07:21:18.610412+09:00이다. 실제 거래일·정규장·휴장·정지 여부와 최신 체결시각은 미확인이다. 장중 자료 표기 2026-10-08 20:00은 당일 조건 판단에 사용하지 않는다. 검증된 만료시각이 없...</span></p>
-              <p class="long-field"><strong>위험 요약</strong><span>197,100원 종가 이탈은 추가 축소, 196,836원 종가 이탈은 잔여 손절 조건이다. 제공 자료에서는 이탈이 확인되지 않았다.</span></p>
+              <p><strong>투자판단</strong><span>{
+  &quot;rating&quot;: &quot;hold&quot;,
+  &quot;portfolio stance&quot;: &quot;bullish&quot;,
+  &quot;entry action&quot;: &quot;wait&quot;,
+  &quot;conditional entry action&quot;: &quot;none&quot;,
+  &quot;conditional entry valid until&quot;: null,
+  &quot;setup quality&quot;: &quot;developing&quot;,
+  &quot;confidence&quot;: 0.61,
+  &quot;time horizon&quot;: &quot;medium&quot;,
+  &quot;entry logic&quot;: &quot;공격적 분석가의 냉각 계약·생산 확대 가능성과 상승 중인 중장기 이동평균 논거를 받아들여 066570.ks의 중기 강세 가설은 유지한다. 다만 신규 진입에서는 보수·중립 분석가의 손익비 반론이 우세하다. 212,788원 진입, 196,836원 손절, 첫 저항 216,000원을 적용하면 비용 전 손익비는 약 0.20에 불과하다. 새로운 구조적 지지가 형성되지 않는 한 회복선 돌파만으로 매수하지 않는다. 200,500원은 2026-10-08 종가이며 현재가가 아니다. 위험 축소 판단이 해소되고 회복·재시험, 정상 거래량가중평균가격 상회, 동일 시간대 상대거래량 1.2 이상, 첫 저항까지 비용 차감 손익비 2 이상이 확인되면 작은 스타터를 재평가할 수 있다. 현재는 조건과 유효기한이 미확인이고 매도 위험 판단도 유지되므로 조건부 매수는 활성화하지 않는다.&quot;,
+  &quot;exit logic&quot;: &quot;보유자는 최신 정규장·거래상태·조정가격·호가 확인 후 최초 방어 집행 직전 기준 보유수량의 25%를 우선 축소한다. 잔여 보유는 지지 유지와 위험예산 충족 시에만 유지한다. 실제로 207,000~212,788원 반등을 거친 뒤 207,000원 아래에서 완결된 5분봉 두 개가 마감하거나 정규장 종가가 197,100원 미만이면 누적 축소 목표를 기준 보유수량의 최소 50%로 높인다. 두 조건은 합쳐 한 번만 적용하며 위험예산 조정으로 이미 매도한 수량도 차감한다. 정규장 종가가 196,836원 미만이면 잔여 전량 손절을 우선하고 다음 확인 가능한 거래 기회에 청산한다. 동시 충족 시 가장 강한 방어만 집행한다. 주요 계약 취소나 회사 전체 현금흐름 전망의 중대한 악화는 단독으로도 영향 규모에 따라 전량 청산을 재평가한다. 미보유자는 매도하거나 공매도하지 않는다. 실제 주문·체결은 확인되지 않았다.&quot;,
+  &quot;position sizing&quot;: &quot;보유수량·취득가·순자산·현금·업종 집중도가 없어 실제 주문수량은 산출할 수 없다. 최초 25% 축소 이후에도 잔여 계획손실이 순자산의 0.5%를 넘거나 집중도 한도를 초과하면 필요한 만큼 더 줄인다. 향후 별도로 승인되는 스타터는 목표수량의 최대 25%, 신규 계획손실은 순자산의 0.25% 이내로 제한한다. 수량은 허용손실금액을 실제 진입가와 구조적 손절가의 차이 및 예상 비용으로 나눈 값, 목표수량의 25%, 가용현금과 집중도 한도가 허용하는 수량 중 최솟값을 정수화한다. 종목 평가비중 한도는 순자산의 5%를 제안하며 기존 계좌 기준이 더 엄격하면 이를 따른다.&quot;,
+  &quot;risk limits&quot;: &quot;기존·신규 보유를 합친 현재 평가액에서 손절까지의 추가 계획손실은 순자산의 0.5% 이내로 제안한다. 갭·슬리피지 스트레스를 별도로 평가하며 실제 손실의 보장 한도는 아니다. 보수적 분석가가 지적한 기준 종가와 손절선의 거리는 평균 실제 진폭 11,553원의 약 0.32배이고, 추가 축소선과 손절선은 264원 차이에 불과하다. 따라서 단계별 체결이나 잔여 75%의 안전성을 가정하지 않는다. 손익비를 맞추기 위한 임의의 좁은 손절과 지지 이탈 후 물타기는 금지한다. 비정상 거래량가중평균가격 761,515,527.69원과 지연 장중 자료는 배제한다. 지표 임계값은 주문가격이 아니며 조정 이력·호가단위·세션·정지 여부를 확인한다. 신규 대기자금은 현금으로 유지하고 비교 자료가 없는 분산형 상장지수펀드의 순수익 우위를 가정하지 않는다.&quot;,
+  &quot;catalysts&quot;: [
+    &quot;냉각 장기공급계약의 공식 상대방·기간·금액·마진·취소 조건 확인. 공격적 분석가의 성장 가설은 인정하지만 보도된 5gw는 공급 용량이지 매출이 아니다.&quot;,
+    &quot;미국·한국 생산 확대의 실제 가동·납품과 투자 부담 확인. 중립 분석가의 구분대로 제한적 스타터에는 검증된 핵심 사업 근거와 현실적인 현금흐름 전망을, 비중 확대에는 납품·현금창출 실현을 더 엄격하게 요구한다.&quot;,
+    &quot;2026-10-13 스마트홈 공개 예정 보도의 공식 확인과 066570.ks의 역할·상용화·수익 배분 구체화. 확정 일정이나 발표 완료로 취급하지 않는다.&quot;,
+    &quot;2026-10-07 잠정실적·기업설명회 공시 본문을 통해 기존 사업 비용과 신규 사업 이익 기여 확인.&quot;,
+    &quot;미국 프리미엄 가전 제품·유통 확대가 실제 판매와 이익률 개선으로 연결되는지 확인.&quot;
+  ],
+  &quot;invalidators&quot;: [
+    &quot;197,100원 종가 이탈은 추가 축소, 196,836원 종가 이탈은 잔여 손절 조건이다. 제공 자료에서는 이탈이 확인되지 않았다.&quot;,
+    &quot;212,788원 회복 후 재시험 실패 또는 실제 반등 이후 207,000원 유지 실패는 회복 가설을 약화시킨다.&quot;,
+    &quot;공식적인 주요 냉각 계약 취소·불리한 조건·중대한 납품 지연이나 회사 전체 현금흐름 전망 악화는 단독으로도 영향 규모에 따라 성장 가설을 무효화할 수 있다.&quot;,
+    &quot;공식 실적에서 기존 사업 이익 감소를 신규 사업이 보완하지 못하고 전망도 하향되는 경우 추가 방어한다.&quot;,
+    &quot;원공시 검증 결과 잠정적인 수익성·현금흐름 근거가 부정되는 경우 재평가한다. 현재 자료 불일치 자체를 실제 희석이나 재무위기의 증거로 보지는 않는다.&quot;
+  ],
+  &quot;watchlist triggers&quot;: [
+    &quot;판단시각은 2026-10-12t07:21:18.610412+09:00이다. 실제 거래일·정규장·휴장·정지 여부와 최신 체결시각은 미확인이다. 장중 자료 표기 2026-10-08 20:00은 당일 조건 판단에 사용하지 않는다. 검증된 만료시각이 없으므로 만료나 다음 세션 연장을 선언하지 않는다.&quot;,
+    &quot;197,100~198,800원 지지 방어와 완결된 5분봉의 재시험 저점 유지, 210,956~212,788원 회복을 관찰한다. 정상 거래량가중평균가격과 상대거래량은 별도로 확보하며 1.2는 관측값이 아닌 제안 기준이다.&quot;,
+    &quot;212,788원에서 216,000원까지 여력은 3,212원이다. 손익비 2에는 비용 전에도 위험 거리가 1,606원 이하여야 하므로 독립적인 구조적 지지와 변동성 적합성이 없으면 대기한다. 221,000원만 목표로 삼아 가까운 저항을 생략하지 않는다.&quot;,
+    &quot;최초 축소 후 잔여 손실예산·업종 중복 노출·갭 스트레스를 점검한다. 축소 수량을 기록해 가격 조건과 예산 조정의 중복 매도를 방지한다.&quot;,
+    &quot;2026-09-07·2026-10-06 미확정 해명공시 본문과 후속 기한을 확인한다. 냉각·스마트홈 사안과의 연결은 미확인이다.&quot;,
+    &quot;재무제표 표시통화·단위·기간, 보통주·우선주 배분, 주당순이익 분모와 해외예탁증서 환산비율 적용 여부는 원문 미제공으로 확인할 수 없다. 거래통화만으로 재무 통화를 추정하지 않고 예상 주가수익비율 11.72배를 가치평가 근거로 사용하지 않는다.&quot;,
+    &quot;중립 분석가가 지적한 공급자 최신 표시기간 2026-06-30의 양의 현금흐름을 이후 생산 확대 투자 성과로 해석하지 않는다. 영업이익률 6.63%도 원공시 대사 전 잠정값이다.&quot;,
+    &quot;뉴스 15건·공시 4건·거시 항목 1건은 인계된 집계다. 직접 소셜 자료와 원문 검증은 없으며 반복 보도를 독립적인 호재로 누적하지 않는다. 거시 기사 하나로 현재 시장 추세나 066570.ks 하락 원인을 확정하지 않는다.&quot;
+  ],
+  &quot;data coverage&quot;: {
+    &quot;company news count&quot;: 15,
+    &quot;disclosures count&quot;: 4,
+    &quot;social source&quot;: &quot;news derived&quot;,
+    &quot;macro items count&quot;: 1
+  },
+  &quot;execution levels&quot;: {
+    &quot;intraday pilot rule&quot;: &quot;현재 비활성이다. 위험 축소 사유 해소와 실제 정규장 확인 후 한국 시각 10:30 이후에만 목표수량 최대 25%의 스타터를 재평가한다. 212,788원 회복·재시험, 완결된 5분봉 두 개 유지, 정상 거래량가중평균가격 상회, 동일 시간대 상대거래량 1.2 이상과 비용 차감 손익비 2 이상이 필요하다. 10:30은 최초 검토시각이지 만료시각이 아니다. 활성화 전 별도의 시간대가 명시된 유효기한을 정해야 한다.&quot;,
+    &quot;close confirm rule&quot;: &quot;목표 규모 진입·추가는 212,788원 상회 정규장 종가와 재시험 지지, 거래량, 공식 사업 근거, 잔여 위험예산이 확인된 뒤 별도로 판단한다. 현재 위험 축소 판단이 유지되거나 첫 저항까지 손익비가 부족하면 종가 돌파만으로 증액하지 않는다.&quot;,
+    &quot;next day followthrough rule&quot;: &quot;실제 다음 거래일을 확인하고 첫 30~60분 동안 212,788원과 정상 거래량가중평균가격 유지 여부를 점검한 뒤 추가 진입을 판단한다. 실패하면 추가 매수를 차단한다. 기존 계획의 유효기한을 자동 연장하지 않는다.&quot;,
+    &quot;failed breakout rule&quot;: &quot;212,788원 돌파 뒤 해당 기준 또는 정상 거래량가중평균가격을 잃고 회복하지 못하면 신규 매수를 차단한다. 실제 207,000~212,788원 반등 이후 207,000원 아래에서 완결된 5분봉 두 개가 마감하면 추가 축소한다. 과거 종가가 207,000원 미만이라는 사실만으로 이 조건이 충족되지는 않는다.&quot;,
+    &quot;trim rule&quot;: &quot;최신 거래상태·호가 확인 후 기준 보유수량의 25%를 우선 위험 축소한다. 반등 실패 또는 197,100원 종가 이탈 시 누적 축소 목표를 최소 50%로 높이되 이미 매도한 수량을 차감한다. 위험예산 초과분은 별도로 반영한다. 196,836원 종가 이탈 시 잔여 전량 손절이 우선이다. 방어 집행에 최소 거래량 조건을 붙이지 않는다.&quot;,
+    &quot;levels&quot;: [
+      {
+        &quot;label&quot;: &quot;첫 지지 구간&quot;,
+        &quot;level type&quot;: &quot;support&quot;,
+        &quot;price&quot;: 198800.0,
+        &quot;low&quot;: 197100.0,
+        &quot;high&quot;: 198800.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;two bar&quot;,
+        &quot;volume rule&quot;: &quot;동일 시간대 재시험 거래량 비교&quot;,
+        &quot;source text&quot;: &quot;제공된 2026-10-08 기준 지지 구간. 완결된 5분봉의 저점 유지 관찰용이며 접촉 자체는 매수 신호가 아니다.&quot;,
+        &quot;reason code&quot;: &quot;support retest&quot;
+      },
+      {
+        &quot;label&quot;: &quot;첫 지지 하단 이탈&quot;,
+        &quot;level type&quot;: &quot;invalidation&quot;,
+        &quot;price&quot;: 197100.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;최소 거래량 조건 없음&quot;,
+        &quot;source text&quot;: &quot;최신 정규장 종가가 이 가격 미만이면 추가 축소한다. 현재 이탈은 미확인이다.&quot;,
+        &quot;reason code&quot;: &quot;support broken&quot;
+      },
+      {
+        &quot;label&quot;: &quot;잔여 보유 손절 기준&quot;,
+        &quot;level type&quot;: &quot;stop loss&quot;,
+        &quot;price&quot;: 196836.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;거래량 조건 없음&quot;,
+        &quot;source text&quot;: &quot;2026-10-08 50일 이동평균에서 채택한 기준선. 조정가격 대사 후 종가 이탈 시 잔여 전량 손절한다. 이동평균 하락만으로 손절선을 낮추지 않으며 체결가격은 보장되지 않는다.&quot;,
+        &quot;reason code&quot;: &quot;trend support broken&quot;
+      },
+      {
+        &quot;label&quot;: &quot;하방 관찰 구간&quot;,
+        &quot;level type&quot;: &quot;support&quot;,
+        &quot;price&quot;: 192600.0,
+        &quot;low&quot;: 190228.0,
+        &quot;high&quot;: 192600.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;최신 체결·호가 확인&quot;,
+        &quot;source text&quot;: &quot;제공된 2026-10-08 기준 기술자료의 하방 관찰 영역. 자동 매수 가격이나 손절 연기 근거가 아니다.&quot;,
+        &quot;reason code&quot;: &quot;downside monitor&quot;
+      },
+      {
+        &quot;label&quot;: &quot;실제 반등 이후 유지 실패&quot;,
+        &quot;level type&quot;: &quot;trim&quot;,
+        &quot;price&quot;: 207000.0,
+        &quot;low&quot;: 212.0,
+        &quot;high&quot;: 207000.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;two bar&quot;,
+        &quot;volume rule&quot;: &quot;실패 확인에 상대거래량 하한 없음&quot;,
+        &quot;source text&quot;: &quot;207,000~212,788원 반등을 실제로 거친 뒤 207,000원 아래에서 완결된 5분봉 두 개가 마감하면 추가 축소한다.&quot;,
+        &quot;reason code&quot;: &quot;failed recovery&quot;
+      },
+      {
+        &quot;label&quot;: &quot;첫 반등 저항 구간&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 208500.0,
+        &quot;low&quot;: 207000.0,
+        &quot;high&quot;: 208500.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;반등 거래량과 매도 호가 확인&quot;,
+        &quot;source text&quot;: &quot;제공된 기술자료의 첫 저항 구간이며 상단은 2026-10-08 고가다.&quot;,
+        &quot;reason code&quot;: &quot;overhead resistance&quot;
+      },
+      {
+        &quot;label&quot;: &quot;핵심 회복·재시험 구간&quot;,
+        &quot;level type&quot;: &quot;pullback&quot;,
+        &quot;price&quot;: 210956.0,
+        &quot;low&quot;: 210956.0,
+        &quot;high&quot;: 212788.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;two bar&quot;,
+        &quot;volume rule&quot;: &quot;재시험 저점 유지와 거래량 구조 확인&quot;,
+        &quot;source text&quot;: &quot;하단은 2026-10-08 10일 지수이동평균, 상단은 거래량가중이동평균 참조값이다. 최신 자료 대사가 필요하다.&quot;,
+        &quot;reason code&quot;: &quot;recovery retest&quot;
+      },
+      {
+        &quot;label&quot;: &quot;핵심 회복선 상회&quot;,
+        &quot;level type&quot;: &quot;breakout&quot;,
+        &quot;price&quot;: 212788.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;비교 가능한 상대거래량 1.2 이상&quot;,
+        &quot;source text&quot;: &quot;정규장 상회 종가와 재시험 지지를 확인한다. 정상 세션 거래량가중평균가격 확인을 대체하지 않으며 단독 매수 신호가 아니다.&quot;,
+        &quot;reason code&quot;: &quot;breakout trigger&quot;
+      },
+      {
+        &quot;label&quot;: &quot;회복 이후 매물 구간&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 216000.0,
+        &quot;low&quot;: 216000.0,
+        &quot;high&quot;: 221000.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;접근 시 거래량·매도 호가와 하단 돌파 후 지지 전환 확인&quot;,
+        &quot;source text&quot;: &quot;신규 진입 손익비는 가까운 하단 216,000원을 먼저 적용한다. 상단 221,000원은 확정 목표주가나 익절 주문가격이 아니다.&quot;,
+        &quot;reason code&quot;: &quot;overhead resistance&quot;
+      }
+    ],
+    &quot;min relative volume&quot;: 1.2,
+    &quot;vwap required&quot;: true,
+    &quot;earliest pilot time local&quot;: &quot;10:30&quot;,
+    &quot;funding priority&quot;: &quot;low&quot;,
+    &quot;entry window&quot;: &quot;mid&quot;,
+    &quot;trigger quality&quot;: &quot;weak&quot;
+  },
+  &quot;risk action&quot;: &quot;reduce risk&quot;,
+  &quot;risk action reason&quot;: &quot;066570.ks는 중기 성장 가능성을 유지하되 보유 위험을 우선 축소한다. 세 분석가가 인용한 2026-10-06 종가 대비 2026-10-08까지의 13.76% 하락과 돌파일보다 44.54% 많았던 실패일 거래량이 핵심 근거다. 실적 기대치 미달은 보도 수준의 보조 근거이며 공식 수치 대사는 미완료다. 신규 매수의 불리한 손익비도 방어를 지지한다. 현재 지지 이탈이나 사업 가설의 전면 훼손이 확인된 것은 아니므로 전량 청산 대신 일부 축소를 선택한다. 자금 마련이나 이익 실현 목적은 아니다.&quot;,
+  &quot;risk action reason codes&quot;: [
+    &quot;failed breakout&quot;,
+    &quot;weak earnings reported&quot;,
+    &quot;high volatility&quot;,
+    &quot;unfavorable reward risk&quot;
+  ],
+  &quot;risk action confidence&quot;: 0.78,
+  &quot;risk action level&quot;: {
+    &quot;label&quot;: &quot;첫 지지 이탈에 따른 추가 축소 기준&quot;,
+    &quot;level type&quot;: &quot;invalidation&quot;,
+    &quot;price&quot;: 197100.0,
+    &quot;low&quot;: null,
+    &quot;high&quot;: null,
+    &quot;currency&quot;: &quot;krw&quot;,
+    &quot;confirmation&quot;: &quot;close&quot;,
+    &quot;volume rule&quot;: &quot;&quot;,
+    &quot;source text&quot;: &quot;최신 정규장 종가가 197,100원 미만이면 추가 위험 축소한다. 현재 충족 여부는 미확인이며 최초 25% 축소를 기다리게 하는 조건은 아니다.&quot;,
+    &quot;reason code&quot;: &quot;support broken&quot;
+  },
+  &quot;profit taking plan&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;stage 1 price&quot;: null,
+    &quot;stage 1 fraction&quot;: 0.0,
+    &quot;stage 2 price&quot;: null,
+    &quot;stage 2 fraction&quot;: 0.0,
+    &quot;trailing stop price&quot;: null,
+    &quot;trailing stop fraction&quot;: 0.0,
+    &quot;keep core fraction&quot;: null,
+    &quot;reentry condition&quot;: &quot;위험 축소 사유 해소, 사업 근거와 최신 가격 구조 확인, 비용 차감 손익비 충족 후 재진입을 별도로 판단한다. 무조건 유지할 핵심 보유 비율은 지정하지 않는다.&quot;,
+    &quot;reason codes&quot;: [
+      &quot;failed breakout&quot;,
+      &quot;weak earnings reported&quot;,
+      &quot;high volatility&quot;,
+      &quot;unfavorable reward risk&quot;,
+      &quot;support broken&quot;
+    ]
+  }
+}</span></p>
+              <p><strong>중기 리서치 관점</strong><span>{
+  &quot;rating&quot;: &quot;hold&quot;,
+  &quot;portfolio stance&quot;: &quot;bullish&quot;,
+  &quot;entry action&quot;: &quot;wait&quot;,
+  &quot;conditional entry action&quot;: &quot;none&quot;,
+  &quot;conditional entry valid until&quot;: null,
+  &quot;setup quality&quot;: &quot;developing&quot;,
+  &quot;confidence&quot;: 0.61,
+  &quot;time horizon&quot;: &quot;medium&quot;,
+  &quot;entry logic&quot;: &quot;공격적 분석가의 냉각 계약·생산 확대 가능성과 상승 중인 중장기 이동평균 논거를 받아들여 066570.ks의 중기 강세 가설은 유지한다. 다만 신규 진입에서는 보수·중립 분석가의 손익비 반론이 우세하다. 212,788원 진입, 196,836원 손절, 첫 저항 216,000원을 적용하면 비용 전 손익비는 약 0.20에 불과하다. 새로운 구조적 지지가 형성되지 않는 한 회복선 돌파만으로 매수하지 않는다. 200,500원은 2026-10-08 종가이며 현재가가 아니다. 위험 축소 판단이 해소되고 회복·재시험, 정상 거래량가중평균가격 상회, 동일 시간대 상대거래량 1.2 이상, 첫 저항까지 비용 차감 손익비 2 이상이 확인되면 작은 스타터를 재평가할 수 있다. 현재는 조건과 유효기한이 미확인이고 매도 위험 판단도 유지되므로 조건부 매수는 활성화하지 않는다.&quot;,
+  &quot;exit logic&quot;: &quot;보유자는 최신 정규장·거래상태·조정가격·호가 확인 후 최초 방어 집행 직전 기준 보유수량의 25%를 우선 축소한다. 잔여 보유는 지지 유지와 위험예산 충족 시에만 유지한다. 실제로 207,000~212,788원 반등을 거친 뒤 207,000원 아래에서 완결된 5분봉 두 개가 마감하거나 정규장 종가가 197,100원 미만이면 누적 축소 목표를 기준 보유수량의 최소 50%로 높인다. 두 조건은 합쳐 한 번만 적용하며 위험예산 조정으로 이미 매도한 수량도 차감한다. 정규장 종가가 196,836원 미만이면 잔여 전량 손절을 우선하고 다음 확인 가능한 거래 기회에 청산한다. 동시 충족 시 가장 강한 방어만 집행한다. 주요 계약 취소나 회사 전체 현금흐름 전망의 중대한 악화는 단독으로도 영향 규모에 따라 전량 청산을 재평가한다. 미보유자는 매도하거나 공매도하지 않는다. 실제 주문·체결은 확인되지 않았다.&quot;,
+  &quot;position sizing&quot;: &quot;보유수량·취득가·순자산·현금·업종 집중도가 없어 실제 주문수량은 산출할 수 없다. 최초 25% 축소 이후에도 잔여 계획손실이 순자산의 0.5%를 넘거나 집중도 한도를 초과하면 필요한 만큼 더 줄인다. 향후 별도로 승인되는 스타터는 목표수량의 최대 25%, 신규 계획손실은 순자산의 0.25% 이내로 제한한다. 수량은 허용손실금액을 실제 진입가와 구조적 손절가의 차이 및 예상 비용으로 나눈 값, 목표수량의 25%, 가용현금과 집중도 한도가 허용하는 수량 중 최솟값을 정수화한다. 종목 평가비중 한도는 순자산의 5%를 제안하며 기존 계좌 기준이 더 엄격하면 이를 따른다.&quot;,
+  &quot;risk limits&quot;: &quot;기존·신규 보유를 합친 현재 평가액에서 손절까지의 추가 계획손실은 순자산의 0.5% 이내로 제안한다. 갭·슬리피지 스트레스를 별도로 평가하며 실제 손실의 보장 한도는 아니다. 보수적 분석가가 지적한 기준 종가와 손절선의 거리는 평균 실제 진폭 11,553원의 약 0.32배이고, 추가 축소선과 손절선은 264원 차이에 불과하다. 따라서 단계별 체결이나 잔여 75%의 안전성을 가정하지 않는다. 손익비를 맞추기 위한 임의의 좁은 손절과 지지 이탈 후 물타기는 금지한다. 비정상 거래량가중평균가격 761,515,527.69원과 지연 장중 자료는 배제한다. 지표 임계값은 주문가격이 아니며 조정 이력·호가단위·세션·정지 여부를 확인한다. 신규 대기자금은 현금으로 유지하고 비교 자료가 없는 분산형 상장지수펀드의 순수익 우위를 가정하지 않는다.&quot;,
+  &quot;catalysts&quot;: [
+    &quot;냉각 장기공급계약의 공식 상대방·기간·금액·마진·취소 조건 확인. 공격적 분석가의 성장 가설은 인정하지만 보도된 5gw는 공급 용량이지 매출이 아니다.&quot;,
+    &quot;미국·한국 생산 확대의 실제 가동·납품과 투자 부담 확인. 중립 분석가의 구분대로 제한적 스타터에는 검증된 핵심 사업 근거와 현실적인 현금흐름 전망을, 비중 확대에는 납품·현금창출 실현을 더 엄격하게 요구한다.&quot;,
+    &quot;2026-10-13 스마트홈 공개 예정 보도의 공식 확인과 066570.ks의 역할·상용화·수익 배분 구체화. 확정 일정이나 발표 완료로 취급하지 않는다.&quot;,
+    &quot;2026-10-07 잠정실적·기업설명회 공시 본문을 통해 기존 사업 비용과 신규 사업 이익 기여 확인.&quot;,
+    &quot;미국 프리미엄 가전 제품·유통 확대가 실제 판매와 이익률 개선으로 연결되는지 확인.&quot;
+  ],
+  &quot;invalidators&quot;: [
+    &quot;197,100원 종가 이탈은 추가 축소, 196,836원 종가 이탈은 잔여 손절 조건이다. 제공 자료에서는 이탈이 확인되지 않았다.&quot;,
+    &quot;212,788원 회복 후 재시험 실패 또는 실제 반등 이후 207,000원 유지 실패는 회복 가설을 약화시킨다.&quot;,
+    &quot;공식적인 주요 냉각 계약 취소·불리한 조건·중대한 납품 지연이나 회사 전체 현금흐름 전망 악화는 단독으로도 영향 규모에 따라 성장 가설을 무효화할 수 있다.&quot;,
+    &quot;공식 실적에서 기존 사업 이익 감소를 신규 사업이 보완하지 못하고 전망도 하향되는 경우 추가 방어한다.&quot;,
+    &quot;원공시 검증 결과 잠정적인 수익성·현금흐름 근거가 부정되는 경우 재평가한다. 현재 자료 불일치 자체를 실제 희석이나 재무위기의 증거로 보지는 않는다.&quot;
+  ],
+  &quot;watchlist triggers&quot;: [
+    &quot;판단시각은 2026-10-12t07:21:18.610412+09:00이다. 실제 거래일·정규장·휴장·정지 여부와 최신 체결시각은 미확인이다. 장중 자료 표기 2026-10-08 20:00은 당일 조건 판단에 사용하지 않는다. 검증된 만료시각이 없으므로 만료나 다음 세션 연장을 선언하지 않는다.&quot;,
+    &quot;197,100~198,800원 지지 방어와 완결된 5분봉의 재시험 저점 유지, 210,956~212,788원 회복을 관찰한다. 정상 거래량가중평균가격과 상대거래량은 별도로 확보하며 1.2는 관측값이 아닌 제안 기준이다.&quot;,
+    &quot;212,788원에서 216,000원까지 여력은 3,212원이다. 손익비 2에는 비용 전에도 위험 거리가 1,606원 이하여야 하므로 독립적인 구조적 지지와 변동성 적합성이 없으면 대기한다. 221,000원만 목표로 삼아 가까운 저항을 생략하지 않는다.&quot;,
+    &quot;최초 축소 후 잔여 손실예산·업종 중복 노출·갭 스트레스를 점검한다. 축소 수량을 기록해 가격 조건과 예산 조정의 중복 매도를 방지한다.&quot;,
+    &quot;2026-09-07·2026-10-06 미확정 해명공시 본문과 후속 기한을 확인한다. 냉각·스마트홈 사안과의 연결은 미확인이다.&quot;,
+    &quot;재무제표 표시통화·단위·기간, 보통주·우선주 배분, 주당순이익 분모와 해외예탁증서 환산비율 적용 여부는 원문 미제공으로 확인할 수 없다. 거래통화만으로 재무 통화를 추정하지 않고 예상 주가수익비율 11.72배를 가치평가 근거로 사용하지 않는다.&quot;,
+    &quot;중립 분석가가 지적한 공급자 최신 표시기간 2026-06-30의 양의 현금흐름을 이후 생산 확대 투자 성과로 해석하지 않는다. 영업이익률 6.63%도 원공시 대사 전 잠정값이다.&quot;,
+    &quot;뉴스 15건·공시 4건·거시 항목 1건은 인계된 집계다. 직접 소셜 자료와 원문 검증은 없으며 반복 보도를 독립적인 호재로 누적하지 않는다. 거시 기사 하나로 현재 시장 추세나 066570.ks 하락 원인을 확정하지 않는다.&quot;
+  ],
+  &quot;data coverage&quot;: {
+    &quot;company news count&quot;: 15,
+    &quot;disclosures count&quot;: 4,
+    &quot;social source&quot;: &quot;news derived&quot;,
+    &quot;macro items count&quot;: 1
+  },
+  &quot;execution levels&quot;: {
+    &quot;intraday pilot rule&quot;: &quot;현재 비활성이다. 위험 축소 사유 해소와 실제 정규장 확인 후 한국 시각 10:30 이후에만 목표수량 최대 25%의 스타터를 재평가한다. 212,788원 회복·재시험, 완결된 5분봉 두 개 유지, 정상 거래량가중평균가격 상회, 동일 시간대 상대거래량 1.2 이상과 비용 차감 손익비 2 이상이 필요하다. 10:30은 최초 검토시각이지 만료시각이 아니다. 활성화 전 별도의 시간대가 명시된 유효기한을 정해야 한다.&quot;,
+    &quot;close confirm rule&quot;: &quot;목표 규모 진입·추가는 212,788원 상회 정규장 종가와 재시험 지지, 거래량, 공식 사업 근거, 잔여 위험예산이 확인된 뒤 별도로 판단한다. 현재 위험 축소 판단이 유지되거나 첫 저항까지 손익비가 부족하면 종가 돌파만으로 증액하지 않는다.&quot;,
+    &quot;next day followthrough rule&quot;: &quot;실제 다음 거래일을 확인하고 첫 30~60분 동안 212,788원과 정상 거래량가중평균가격 유지 여부를 점검한 뒤 추가 진입을 판단한다. 실패하면 추가 매수를 차단한다. 기존 계획의 유효기한을 자동 연장하지 않는다.&quot;,
+    &quot;failed breakout rule&quot;: &quot;212,788원 돌파 뒤 해당 기준 또는 정상 거래량가중평균가격을 잃고 회복하지 못하면 신규 매수를 차단한다. 실제 207,000~212,788원 반등 이후 207,000원 아래에서 완결된 5분봉 두 개가 마감하면 추가 축소한다. 과거 종가가 207,000원 미만이라는 사실만으로 이 조건이 충족되지는 않는다.&quot;,
+    &quot;trim rule&quot;: &quot;최신 거래상태·호가 확인 후 기준 보유수량의 25%를 우선 위험 축소한다. 반등 실패 또는 197,100원 종가 이탈 시 누적 축소 목표를 최소 50%로 높이되 이미 매도한 수량을 차감한다. 위험예산 초과분은 별도로 반영한다. 196,836원 종가 이탈 시 잔여 전량 손절이 우선이다. 방어 집행에 최소 거래량 조건을 붙이지 않는다.&quot;,
+    &quot;levels&quot;: [
+      {
+        &quot;label&quot;: &quot;첫 지지 구간&quot;,
+        &quot;level type&quot;: &quot;support&quot;,
+        &quot;price&quot;: 198800.0,
+        &quot;low&quot;: 197100.0,
+        &quot;high&quot;: 198800.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;two bar&quot;,
+        &quot;volume rule&quot;: &quot;동일 시간대 재시험 거래량 비교&quot;,
+        &quot;source text&quot;: &quot;제공된 2026-10-08 기준 지지 구간. 완결된 5분봉의 저점 유지 관찰용이며 접촉 자체는 매수 신호가 아니다.&quot;,
+        &quot;reason code&quot;: &quot;support retest&quot;
+      },
+      {
+        &quot;label&quot;: &quot;첫 지지 하단 이탈&quot;,
+        &quot;level type&quot;: &quot;invalidation&quot;,
+        &quot;price&quot;: 197100.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;최소 거래량 조건 없음&quot;,
+        &quot;source text&quot;: &quot;최신 정규장 종가가 이 가격 미만이면 추가 축소한다. 현재 이탈은 미확인이다.&quot;,
+        &quot;reason code&quot;: &quot;support broken&quot;
+      },
+      {
+        &quot;label&quot;: &quot;잔여 보유 손절 기준&quot;,
+        &quot;level type&quot;: &quot;stop loss&quot;,
+        &quot;price&quot;: 196836.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;거래량 조건 없음&quot;,
+        &quot;source text&quot;: &quot;2026-10-08 50일 이동평균에서 채택한 기준선. 조정가격 대사 후 종가 이탈 시 잔여 전량 손절한다. 이동평균 하락만으로 손절선을 낮추지 않으며 체결가격은 보장되지 않는다.&quot;,
+        &quot;reason code&quot;: &quot;trend support broken&quot;
+      },
+      {
+        &quot;label&quot;: &quot;하방 관찰 구간&quot;,
+        &quot;level type&quot;: &quot;support&quot;,
+        &quot;price&quot;: 192600.0,
+        &quot;low&quot;: 190228.0,
+        &quot;high&quot;: 192600.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;최신 체결·호가 확인&quot;,
+        &quot;source text&quot;: &quot;제공된 2026-10-08 기준 기술자료의 하방 관찰 영역. 자동 매수 가격이나 손절 연기 근거가 아니다.&quot;,
+        &quot;reason code&quot;: &quot;downside monitor&quot;
+      },
+      {
+        &quot;label&quot;: &quot;실제 반등 이후 유지 실패&quot;,
+        &quot;level type&quot;: &quot;trim&quot;,
+        &quot;price&quot;: 207000.0,
+        &quot;low&quot;: 212.0,
+        &quot;high&quot;: 207000.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;two bar&quot;,
+        &quot;volume rule&quot;: &quot;실패 확인에 상대거래량 하한 없음&quot;,
+        &quot;source text&quot;: &quot;207,000~212,788원 반등을 실제로 거친 뒤 207,000원 아래에서 완결된 5분봉 두 개가 마감하면 추가 축소한다.&quot;,
+        &quot;reason code&quot;: &quot;failed recovery&quot;
+      },
+      {
+        &quot;label&quot;: &quot;첫 반등 저항 구간&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 208500.0,
+        &quot;low&quot;: 207000.0,
+        &quot;high&quot;: 208500.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;반등 거래량과 매도 호가 확인&quot;,
+        &quot;source text&quot;: &quot;제공된 기술자료의 첫 저항 구간이며 상단은 2026-10-08 고가다.&quot;,
+        &quot;reason code&quot;: &quot;overhead resistance&quot;
+      },
+      {
+        &quot;label&quot;: &quot;핵심 회복·재시험 구간&quot;,
+        &quot;level type&quot;: &quot;pullback&quot;,
+        &quot;price&quot;: 210956.0,
+        &quot;low&quot;: 210956.0,
+        &quot;high&quot;: 212788.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;two bar&quot;,
+        &quot;volume rule&quot;: &quot;재시험 저점 유지와 거래량 구조 확인&quot;,
+        &quot;source text&quot;: &quot;하단은 2026-10-08 10일 지수이동평균, 상단은 거래량가중이동평균 참조값이다. 최신 자료 대사가 필요하다.&quot;,
+        &quot;reason code&quot;: &quot;recovery retest&quot;
+      },
+      {
+        &quot;label&quot;: &quot;핵심 회복선 상회&quot;,
+        &quot;level type&quot;: &quot;breakout&quot;,
+        &quot;price&quot;: 212788.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;비교 가능한 상대거래량 1.2 이상&quot;,
+        &quot;source text&quot;: &quot;정규장 상회 종가와 재시험 지지를 확인한다. 정상 세션 거래량가중평균가격 확인을 대체하지 않으며 단독 매수 신호가 아니다.&quot;,
+        &quot;reason code&quot;: &quot;breakout trigger&quot;
+      },
+      {
+        &quot;label&quot;: &quot;회복 이후 매물 구간&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 216000.0,
+        &quot;low&quot;: 216000.0,
+        &quot;high&quot;: 221000.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;접근 시 거래량·매도 호가와 하단 돌파 후 지지 전환 확인&quot;,
+        &quot;source text&quot;: &quot;신규 진입 손익비는 가까운 하단 216,000원을 먼저 적용한다. 상단 221,000원은 확정 목표주가나 익절 주문가격이 아니다.&quot;,
+        &quot;reason code&quot;: &quot;overhead resistance&quot;
+      }
+    ],
+    &quot;min relative volume&quot;: 1.2,
+    &quot;vwap required&quot;: true,
+    &quot;earliest pilot time local&quot;: &quot;10:30&quot;,
+    &quot;funding priority&quot;: &quot;low&quot;,
+    &quot;entry window&quot;: &quot;mid&quot;,
+    &quot;trigger quality&quot;: &quot;weak&quot;
+  },
+  &quot;risk action&quot;: &quot;reduce risk&quot;,
+  &quot;risk action reason&quot;: &quot;066570.ks는 중기 성장 가능성을 유지하되 보유 위험을 우선 축소한다. 세 분석가가 인용한 2026-10-06 종가 대비 2026-10-08까지의 13.76% 하락과 돌파일보다 44.54% 많았던 실패일 거래량이 핵심 근거다. 실적 기대치 미달은 보도 수준의 보조 근거이며 공식 수치 대사는 미완료다. 신규 매수의 불리한 손익비도 방어를 지지한다. 현재 지지 이탈이나 사업 가설의 전면 훼손이 확인된 것은 아니므로 전량 청산 대신 일부 축소를 선택한다. 자금 마련이나 이익 실현 목적은 아니다.&quot;,
+  &quot;risk action reason codes&quot;: [
+    &quot;failed breakout&quot;,
+    &quot;weak earnings reported&quot;,
+    &quot;high volatility&quot;,
+    &quot;unfavorable reward risk&quot;
+  ],
+  &quot;risk action confidence&quot;: 0.78,
+  &quot;risk action level&quot;: {
+    &quot;label&quot;: &quot;첫 지지 이탈에 따른 추가 축소 기준&quot;,
+    &quot;level type&quot;: &quot;invalidation&quot;,
+    &quot;price&quot;: 197100.0,
+    &quot;low&quot;: null,
+    &quot;high&quot;: null,
+    &quot;currency&quot;: &quot;krw&quot;,
+    &quot;confirmation&quot;: &quot;close&quot;,
+    &quot;volume rule&quot;: &quot;&quot;,
+    &quot;source text&quot;: &quot;최신 정규장 종가가 197,100원 미만이면 추가 위험 축소한다. 현재 충족 여부는 미확인이며 최초 25% 축소를 기다리게 하는 조건은 아니다.&quot;,
+    &quot;reason code&quot;: &quot;support broken&quot;
+  },
+  &quot;profit taking plan&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;stage 1 price&quot;: null,
+    &quot;stage 1 fraction&quot;: 0.0,
+    &quot;stage 2 price&quot;: null,
+    &quot;stage 2 fraction&quot;: 0.0,
+    &quot;trailing stop price&quot;: null,
+    &quot;trailing stop fraction&quot;: 0.0,
+    &quot;keep core fraction&quot;: null,
+    &quot;reentry condition&quot;: &quot;위험 축소 사유 해소, 사업 근거와 최신 가격 구조 확인, 비용 차감 손익비 충족 후 재진입을 별도로 판단한다. 무조건 유지할 핵심 보유 비율은 지정하지 않는다.&quot;,
+    &quot;reason codes&quot;: [
+      &quot;failed breakout&quot;,
+      &quot;weak earnings reported&quot;,
+      &quot;high volatility&quot;,
+      &quot;unfavorable reward risk&quot;,
+      &quot;support broken&quot;
+    ]
+  }
+}</span></p>
+              <p><strong>오늘 할 일</strong><span>종가 확인 대기: 조건 확인</span></p>
+              <p><strong>장중 pilot 조건</strong><span>10:30 이후 조건 확인 + VWAP 위 + 거래량 확인 시 소액 starter만 검토</span></p>
+              <p><strong>종가 확인 시 할 일</strong><span>종가 기준 조건 확인 유지 시 본격 add 검토</span></p>
+              <p><strong>내일 follow-through</strong><span>다음 거래일 첫 30~60분 동안 조건 확인 재이탈이 없는지 확인</span></p>
+              <p class="long-field"><strong>핵심 가격대</strong><span>조건 확인</span></p>
+              <p class="long-field"><strong>위험 요약</strong><span>위험 조건 확인 필요</span></p>
               <p><strong>리서치 기준</strong><span>리서치 본문은 2026-10-08 일봉 기준</span></p>
               <p><strong>실행 기준</strong><span>실행 오버레이는 2026-10-12T12:04:51.054092+09:00 장중 스냅샷 기준</span></p>
               
@@ -385,14 +795,378 @@
                 <span class="status success">success</span>
               </div>
               <p><strong>종목명</strong><span>033780 (033780.KS)</span></p>
-              <p><strong>투자판단</strong><span>보유</span></p>
-              <p><strong>중기 리서치 관점</strong><span>보유</span></p>
-              <p><strong>오늘 할 일</strong><span>실패 돌파 주의, 신규 금지 또는 축소 검토: 033780.KS의 최신 가격 시각, 거래일 달력, 정규장 여부, 거래정지·시장경보 및 체결 유동성을 검증한다. 판단 시각 2026-10-12T07:50:43.237953+09:00은 세션이나 가격 신선도를 입증하지 않는다. 2026-10-08...</span></p>
-              <p><strong>장중 pilot 조건</strong><span>10:30 이후 033780.KS의 최신 가격 시각, 거래일 달력, 정규장 여부, 거래정지·시장경보 및 체결 유동성을 검증한다. 판단 시각 2026-10-12T07:50:43.237953+09:00은 세션이나 가격 신선도를 입증하지 않는다. 2026-10-08... + VWAP 위 + 거래량 확인 시 소액 starter만 검토</span></p>
+              <p><strong>투자판단</strong><span>{
+  &quot;rating&quot;: &quot;hold&quot;,
+  &quot;portfolio stance&quot;: &quot;bullish&quot;,
+  &quot;entry action&quot;: &quot;wait&quot;,
+  &quot;conditional entry action&quot;: &quot;none&quot;,
+  &quot;conditional entry valid until&quot;: null,
+  &quot;setup quality&quot;: &quot;developing&quot;,
+  &quot;confidence&quot;: 0.6,
+  &quot;time horizon&quot;: &quot;medium&quot;,
+  &quot;entry logic&quot;: &quot;033780.ks는 중기 조건부 강세지만 즉시 매수 가능한 구조는 없다. 공격적 분석의 성장 참여 논리를 기존 보유에 적용하고, 보수적 분석의 검증 우선 논리를 신규 진입에 적용한다. 제공자 내부 영업이익률 24.4%와 현금전환율 104.7%는 잠정 참고이며 확정 실적이나 저평가의 증거로 사용하지 않는다. 177,400원은 2026-10-08 종가이지 현재가가 아니다. 세 분석가가 인정한 175,300원 진입·171,200원 손절·180,800원 첫 저항의 보상·위험은 비용 전 1.34배로 기준 1.5배에 미달한다. 181,000원 진입과 4,100원 위험을 가정한 돌파 사례도 183,700원 참고 저항까지 약 0.66배에 불과하다. 지지 회복이나 돌파만으로 매수하지 않는다. 새 가격 구조와 필수 검증이 확보되면 소규모 시험 매수는 정당화될 수 있으나, 현재 유효한 매수안과 만료시각이 없어 조건부 진입은 비활성이다.&quot;,
+  &quot;exit logic&quot;: &quot;검증된 정규장 종가가 174,000원 미만이면 전술 보유분 전량을 위험 축소 대상으로 전환해 다음 체결 가능한 유효 세션에서 집행하고 코어는 별도 재평가한다. 향후 실제 진입에서 171,200원 손절을 채택한 전술분은 해당 수준 하회 시 종가나 거래량을 기다리지 않고 손절한다. 180,800원 돌파 후 완성된 5분봉 두 개가 그 아래에 머물고 유효한 세션 거래량가중평균가격도 하회하면 돌파 추가분 전량을 회수한다. 확정 실적·회사 전망 악화나 중대한 환원 차질에는 위험을 축소하고, 현금흐름·차환 문제로 핵심 사업 가설이 무효화되면 가격 회복을 기다리지 않고 청산한다. 현재 이 조건들의 발동은 확인되지 않았다.&quot;,
+  &quot;position sizing&quot;: &quot;현재 신규 배정은 0이다. 향후 시험 매수 수량은 목표수량의 20%, 순자산의 0.25%를 비용 포함 주당 손절위험으로 나눈 수량, 기존 전체 보유 위험을 차감한 종목 손실예산의 잔여 수량, 순자산 5% 비중 상한까지의 잔여 수량, 가용 현금으로 매수 가능한 수량 중 최솟값을 내림한다. 종목 전체 계획손실 한도는 순자산 0.5%이며 계좌 규정이 더 엄격하면 이를 따른다. 잔여 여력이 없으면 매수하지 않는다. 보유량·순자산·현금·목표수량·코어 위험 기준이 확인되지 않아 실제 주문 수량과 기존 노출의 적정성은 산정 불가하다. 종가와 다음 거래일 확인 전에는 시험 매수 한도를 넘지 않으며 차입 매수는 하지 않는다.&quot;,
+  &quot;risk limits&quot;: &quot;첫 확인 저항까지 비용 차감 후 보상·위험 1.5배 이상을 요구한다. 먼 저항을 기본 목표로 삼거나 기준 통과를 위해 손절을 임의로 좁히지 않는다. 이 비율만으로 양의 기대수익이 입증되는 것은 아니다. 보수적 분석의 예처럼 종목비중 5%에서 10% 급락하면 순자산 약 0.5% 손실이 발생하므로 갭 위험을 별도 평가한다. 재무제표 표시통화·금액 배율·기간·주식 기준 및 주식예탁증서 해당 여부와 환산비율은 원문 검증이 불가능한 상태다. 거래통화가 원화라는 이유로 이를 추정하지 않으며 재무금액 혼합이나 주당이익·주가수익비율·배당수익률 기반 저평가 판정을 하지 않는다. 신규 자금은 원화 현금으로 유지하되 이는 상대수익 우위 판단이 아니다. 분산형 지역 상장지수펀드도 가격·비용·포트폴리오 중복 확인 전 자동 대체 매수하지 않는다.&quot;,
+  &quot;catalysts&quot;: [
+    &quot;033780.ks의 2026-09-22 취득·소각 결정에 따른 실제 취득과 소각 이행. 공격적 분석의 핵심 근거이나 보수적·중립 분석이 강조했듯 결정과 매수 신청은 완료가 아니다. 제공 공시: https://dart.fss.or.kr/dsaf001/main.do?rcpno=20260922000256 및 https://dart.fss.or.kr/dsaf001/main.do?rcpno=20260922800292&quot;,
+    &quot;인도네시아 신공장의 가동률 상승과 실제 원가·현금흐름 개선. 세 분석가 모두 2028년 해외 생산 비중 60%를 현재 실적이 아닌 목표로 구분했다. 제공 보도: https://www.news1.kr/industry/distribution/6313699&quot;,
+    &quot;3분기 확정 실적에서 해외 성장과 수익성 확인. 해외 궐련 매출 12% 증가와 전체 영업이익 6.7% 증가는 단일 증권사 전망이며 시장 합의나 확정 실적이 아니다. 발표 일정은 확인 불가다. 제공 보도: https://www.bigtanews.co.kr/article/view/big202610090007&quot;
+  ],
+  &quot;invalidators&quot;: [
+    &quot;확정 실적·회사 전망에서 해외 성장 둔화와 수익성 악화가 확인되는 경우.&quot;,
+    &quot;신공장 초기 비용, 채권·재고 부담 또는 차환 문제로 투자와 환원을 감당할 현금 여력이 지속적으로 훼손되는 경우. 중립 분석이 지적했듯 생산 확대와 환원은 같은 현금 재원을 사용한다.&quot;,
+    &quot;취득·소각의 중대한 축소·취소 또는 집행 차질이 확인되는 경우.&quot;,
+    &quot;174,000원 미만 정규장 종가는 전술 회복 가설의 무효화 조건이다. 실제 채택한 171,200원 손절 이탈은 해당 전술 거래의 종료 조건이다.&quot;,
+    &quot;180,800원 돌파 후 완성된 5분봉 두 개와 유효한 세션 거래량가중평균가격이 실패를 확인하면 돌파 추가분의 근거가 무효화된다.&quot;
+  ],
+  &quot;watchlist triggers&quot;: [
+    &quot;033780.ks의 최신 가격 시각, 거래일 달력, 정규장 여부, 거래정지·시장경보 및 체결 유동성을 검증한다. 판단 시각 2026-10-12t07:50:43.237953+09:00은 세션이나 가격 신선도를 입증하지 않는다. 2026-10-08 가격을 현재가로 사용하지 않는다.&quot;,
+    &quot;175,200~175,300원 회복·재시험 또는 180,800원 돌파·재시험, 정상 세션 거래량가중평균가격 상회와 동시간대 상대거래량 1.2 이상을 관찰한다. 순보상·위험 기준이 미달하면 계속 대기한다.&quot;,
+    &quot;보수적·중립 분석이 지적한 구간 하단·상단 필드 오류는 실행 입력에서 제외한다. 아래 숫자는 제공 본문의 관찰 기준이며, 원자료 및 가격 조정 여부 재검증 전 자동 주문에 연결하지 않는다.&quot;,
+    &quot;원문 재무 기준과 잉여현금흐름·상각 전 영업이익 불일치, 차입 만기, 매출채권 회수, 투자·환원 재원을 확인한다. 분기 배당 초과 지급과 제공자상 유동 차입·리스 비중 50.1%는 점검 사유이지 연간 환원 불능이나 차환 위기의 확정 증거가 아니다.&quot;,
+    &quot;기존 코어·전술분을 모두 포함해 손실예산과 집중도를 계산한다. 한도 초과가 확인되면 지지 이탈을 기다리지 않고 위험 축소에 필요한 수량을 산정한다.&quot;,
+    &quot;실제 취득·소각 이행과 확정 실적을 확인한다. 뉴스 15건을 독립적인 호재 15개로 합산하지 않는다. 실제 투자자 포지셔닝, 소송의 재무 영향 및 최근 거시·환율 방향은 확인 불가다.&quot;,
+    &quot;세션·계좌·재무·가격 구조와 비용 후 보상이 확보되고 시간대가 명시된 유효기간을 정한 뒤에만 조건부 시험 매수를 재판정한다. 10:30은 최초 검토시각일 뿐 만료시각이 아니며, 만료나 다음 세션 이월을 추정하지 않는다.&quot;
+  ],
+  &quot;data coverage&quot;: {
+    &quot;company news count&quot;: 15,
+    &quot;disclosures count&quot;: 3,
+    &quot;social source&quot;: &quot;news derived&quot;,
+    &quot;macro items count&quot;: 0
+  },
+  &quot;execution levels&quot;: {
+    &quot;intraday pilot rule&quot;: &quot;033780.ks의 검증된 정규장에서 서울 현지시각 10:30 이후 목표수량 20% 이내 시험 매수만 검토한다. 175,200~175,300원 회복·재시험 또는 180,800원 돌파·재시험, 정상 세션 거래량가중평균가격 상회, 동시간대 상대거래량 1.2 이상, 비용 후 보상·위험 1.5배 이상과 재무·계좌·주문 유효기간 검증이 모두 필요하다. 현재는 비활성 관찰 규칙이다.&quot;,
+    &quot;close confirm rule&quot;: &quot;목표규모 진입·추가의 필수 조건은 180,800원 위 검증된 정규장 종가와 일일 거래량의 20일 평균 대비 1.2배 이상이다. 유효 손절·첫 저항·비용 후 보상·재무 근거·계좌 한도를 함께 확인한다. 종가 돌파만으로 자동 증액하지 않으며 다음 거래일 유지 확인 전에는 시험 매수 한도를 넘지 않는다.&quot;,
+    &quot;next day followthrough rule&quot;: &quot;달력으로 확인한 다음 정규 거래일 첫 30~60분에 180,800원과 정상 세션 거래량가중평균가격의 지지 또는 재돌파·재시험을 확인한 뒤 목표규모까지의 추가를 검토한다. 다음 거래일 날짜와 주문 만료는 현재 확정하지 않는다.&quot;,
+    &quot;failed breakout rule&quot;: &quot;돌파 후 180,800원 또는 유효한 세션 거래량가중평균가격을 잃으면 신규 매수를 차단한다. 완성된 5분봉 두 개가 180,800원 아래에 머물고 거래량가중평균가격도 하회하면 돌파 추가분 전량을 위험 축소로 회수한다.&quot;,
+    &quot;trim rule&quot;: &quot;174,000원 미만 정규장 종가에는 전술 보유분 전량을 위험 축소 대상으로 전환한다. 실제 채택된 171,200원 손절은 해당 전술분에 장중 적용한다. 계좌 한도 초과나 중대한 사업 가설 훼손에도 위험을 축소한다. 더 우수한 대체 투자나 자금 수요가 확인되지 않아 자금조달 목적 축소는 선택하지 않는다. 최근 하루의 모멘텀 둔화만으로 과도한 상승을 확정할 수 없어 별도 이익실현 계획은 적용하지 않는다.&quot;,
+    &quot;levels&quot;: [
+      {
+        &quot;label&quot;: &quot;눌림 지지 관찰 구간 하단&quot;,
+        &quot;level type&quot;: &quot;support&quot;,
+        &quot;price&quot;: 175200.0,
+        &quot;low&quot;: 175.0,
+        &quot;high&quot;: 175200.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;two bar&quot;,
+        &quot;volume rule&quot;: &quot;동시간대 상대거래량 1.2 이상&quot;,
+        &quot;source text&quot;: &quot;제공 본문의 175,200~175,300원 관찰 구간 하단이다. 완성된 5분봉 회복과 후속 재시험을 요구하며 단순 접촉은 매수 신호가 아니다.&quot;,
+        &quot;reason code&quot;: &quot;pullback support&quot;
+      },
+      {
+        &quot;label&quot;: &quot;눌림 회복 관찰 구간 상단&quot;,
+        &quot;level type&quot;: &quot;pullback&quot;,
+        &quot;price&quot;: 175300.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;two bar&quot;,
+        &quot;volume rule&quot;: &quot;동시간대 상대거래량 1.2 이상&quot;,
+        &quot;source text&quot;: &quot;제공 본문의 회복 기준이다. 171,200원 예시 손절과 180,800원 첫 저항을 적용하면 보상·위험이 부족하므로 이 가격 회복만으로 진입하지 않는다.&quot;,
+        &quot;reason code&quot;: &quot;pullback reclaim&quot;
+      },
+      {
+        &quot;label&quot;: &quot;최근 고점 돌파 기준 및 첫 저항&quot;,
+        &quot;level type&quot;: &quot;breakout&quot;,
+        &quot;price&quot;: 180800.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;종가 확인 시 일일 거래량의 20일 평균 대비 1.2배 이상&quot;,
+        &quot;source text&quot;: &quot;제공된 2026-10-08 고점이다. 장중 시험 매수 검토에는 돌파·재시험이 필요하고 목표규모 추가에는 종가와 다음 거래일 유지 및 별도 보상·위험 검증이 필요하다.&quot;,
+        &quot;reason code&quot;: &quot;breakout trigger&quot;
+      },
+      {
+        &quot;label&quot;: &quot;전술 회복 가설 무효화&quot;,
+        &quot;level type&quot;: &quot;invalidation&quot;,
+        &quot;price&quot;: 174000.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;위험 축소에 거래량 증가를 요구하지 않음&quot;,
+        &quot;source text&quot;: &quot;제공 계획에서 볼린저 상·하단 중간값을 사용한 운용 기준이다. 검증된 정규장 종가가 이 가격 미만이면 전술 보유분을 위험 축소한다. 현재 발동 여부는 확인 불가다.&quot;,
+        &quot;reason code&quot;: &quot;support broken&quot;
+      },
+      {
+        &quot;label&quot;: &quot;실제 채택한 전술분에만 적용할 예시 손절&quot;,
+        &quot;level type&quot;: &quot;stop loss&quot;,
+        &quot;price&quot;: 171200.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;손절에 거래량 또는 종가 확인을 요구하지 않음&quot;,
+        &quot;source text&quot;: &quot;제공 보고서의 계획상 예시다. 당일 구조와 실제 진입에서 채택한 전술분에만 적용하며 기존 코어 전체의 자동 손절선은 아니다.&quot;,
+        &quot;reason code&quot;: &quot;tactical stop&quot;
+      },
+      {
+        &quot;label&quot;: &quot;돌파 후 참고 저항&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 183700.0,
+        &quot;low&quot;: 183.0,
+        &quot;high&quot;: 183600.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;통과 시 거래량과 재시험 지지 확인&quot;,
+        &quot;source text&quot;: &quot;제공 본문의 183,600~183,900원 과거 고점대 내 참고값이다. 가격 조정 여부가 미검증이므로 확정 목표로 사용하지 않는다.&quot;,
+        &quot;reason code&quot;: &quot;secondary resistance&quot;
+      },
+      {
+        &quot;label&quot;: &quot;상위 참고 저항&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 186600.0,
+        &quot;low&quot;: 186.0,
+        &quot;high&quot;: 186600.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;통과 시 거래량과 재시험 지지 확인&quot;,
+        &quot;source text&quot;: &quot;제공 본문의 186,600~186,900원 상위 고점대 하단이다. 중간 저항 돌파를 전제하므로 현재 진입의 기본 목표 보상으로 계산하지 않는다.&quot;,
+        &quot;reason code&quot;: &quot;upper resistance&quot;
+      }
+    ],
+    &quot;min relative volume&quot;: 1.2,
+    &quot;vwap required&quot;: true,
+    &quot;earliest pilot time local&quot;: &quot;10:30&quot;,
+    &quot;funding priority&quot;: &quot;low&quot;,
+    &quot;entry window&quot;: &quot;mid&quot;,
+    &quot;trigger quality&quot;: &quot;medium&quot;
+  },
+  &quot;risk action&quot;: &quot;hold&quot;,
+  &quot;risk action reason&quot;: &quot;033780.ks의 기존 보유분은 위험한도 안에서 조건부 유지한다. 공격적·중립 분석이 제시한 상승하는 200일 평균, 취득·소각 결정과 해외 생산 확대는 중기 강세 관점을 지지한다. 보수적 분석의 저항대 거부·재무 불일치·계좌 위험 미확인도 반영해 추가 배정은 0으로 둔다. 제공 자료에서는 사업 가설 훼손이나 174,000원 종가 이탈이 확인되지 않았지만, 현재 지지 유지와 보유 규모의 적정성도 확인되지 않았다. 한도 초과가 확인되면 가격 지지 여부와 무관하게 위험을 축소한다.&quot;,
+  &quot;risk action reason codes&quot;: [
+    &quot;long term trend constructive&quot;,
+    &quot;support break not confirmed&quot;,
+    &quot;resistance rejection&quot;,
+    &quot;live execution unverified&quot;,
+    &quot;portfolio risk unverified&quot;
+  ],
+  &quot;risk action confidence&quot;: 0.6,
+  &quot;risk action level&quot;: {
+    &quot;label&quot;: &quot;전술 보유분의 조건부 위험 축소 기준&quot;,
+    &quot;level type&quot;: &quot;invalidation&quot;,
+    &quot;price&quot;: 174000.0,
+    &quot;low&quot;: null,
+    &quot;high&quot;: null,
+    &quot;currency&quot;: &quot;krw&quot;,
+    &quot;confirmation&quot;: &quot;close&quot;,
+    &quot;volume rule&quot;: &quot;&quot;,
+    &quot;source text&quot;: &quot;제공 계획의 운용상 무효화 기준이다. 검증된 정규장 종가가 174,000원 미만이면 전술 보유분 전량을 위험 축소 대상으로 전환한다. 현재 충족 여부는 확인 불가이며 코어 전체의 자동 청산선은 아니다.&quot;,
+    &quot;reason code&quot;: &quot;support broken&quot;
+  },
+  &quot;profit taking plan&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;stage 1 price&quot;: null,
+    &quot;stage 1 fraction&quot;: 0.0,
+    &quot;stage 2 price&quot;: null,
+    &quot;stage 2 fraction&quot;: 0.0,
+    &quot;trailing stop price&quot;: null,
+    &quot;trailing stop fraction&quot;: 0.0,
+    &quot;keep core fraction&quot;: 1.0,
+    &quot;reentry condition&quot;: &quot;현재 이익실현 주문은 없다. 위험 축소 후 재진입은 지지 회복, 정상 세션 거래량가중평균가격, 거래량, 계좌 여력과 비용 후 보상·위험을 재검증한다. 코어 유지 비율은 별도의 손절·위험 축소 규칙을 면제하지 않는다.&quot;,
+    &quot;reason codes&quot;: [
+      &quot;long term trend constructive&quot;,
+      &quot;support break not confirmed&quot;,
+      &quot;resistance rejection&quot;,
+      &quot;live execution unverified&quot;,
+      &quot;portfolio risk unverified&quot;,
+      &quot;no confirmed extension&quot;,
+      &quot;profit taking not activated&quot;,
+      &quot;support broken&quot;
+    ]
+  }
+}</span></p>
+              <p><strong>중기 리서치 관점</strong><span>{
+  &quot;rating&quot;: &quot;hold&quot;,
+  &quot;portfolio stance&quot;: &quot;bullish&quot;,
+  &quot;entry action&quot;: &quot;wait&quot;,
+  &quot;conditional entry action&quot;: &quot;none&quot;,
+  &quot;conditional entry valid until&quot;: null,
+  &quot;setup quality&quot;: &quot;developing&quot;,
+  &quot;confidence&quot;: 0.6,
+  &quot;time horizon&quot;: &quot;medium&quot;,
+  &quot;entry logic&quot;: &quot;033780.ks는 중기 조건부 강세지만 즉시 매수 가능한 구조는 없다. 공격적 분석의 성장 참여 논리를 기존 보유에 적용하고, 보수적 분석의 검증 우선 논리를 신규 진입에 적용한다. 제공자 내부 영업이익률 24.4%와 현금전환율 104.7%는 잠정 참고이며 확정 실적이나 저평가의 증거로 사용하지 않는다. 177,400원은 2026-10-08 종가이지 현재가가 아니다. 세 분석가가 인정한 175,300원 진입·171,200원 손절·180,800원 첫 저항의 보상·위험은 비용 전 1.34배로 기준 1.5배에 미달한다. 181,000원 진입과 4,100원 위험을 가정한 돌파 사례도 183,700원 참고 저항까지 약 0.66배에 불과하다. 지지 회복이나 돌파만으로 매수하지 않는다. 새 가격 구조와 필수 검증이 확보되면 소규모 시험 매수는 정당화될 수 있으나, 현재 유효한 매수안과 만료시각이 없어 조건부 진입은 비활성이다.&quot;,
+  &quot;exit logic&quot;: &quot;검증된 정규장 종가가 174,000원 미만이면 전술 보유분 전량을 위험 축소 대상으로 전환해 다음 체결 가능한 유효 세션에서 집행하고 코어는 별도 재평가한다. 향후 실제 진입에서 171,200원 손절을 채택한 전술분은 해당 수준 하회 시 종가나 거래량을 기다리지 않고 손절한다. 180,800원 돌파 후 완성된 5분봉 두 개가 그 아래에 머물고 유효한 세션 거래량가중평균가격도 하회하면 돌파 추가분 전량을 회수한다. 확정 실적·회사 전망 악화나 중대한 환원 차질에는 위험을 축소하고, 현금흐름·차환 문제로 핵심 사업 가설이 무효화되면 가격 회복을 기다리지 않고 청산한다. 현재 이 조건들의 발동은 확인되지 않았다.&quot;,
+  &quot;position sizing&quot;: &quot;현재 신규 배정은 0이다. 향후 시험 매수 수량은 목표수량의 20%, 순자산의 0.25%를 비용 포함 주당 손절위험으로 나눈 수량, 기존 전체 보유 위험을 차감한 종목 손실예산의 잔여 수량, 순자산 5% 비중 상한까지의 잔여 수량, 가용 현금으로 매수 가능한 수량 중 최솟값을 내림한다. 종목 전체 계획손실 한도는 순자산 0.5%이며 계좌 규정이 더 엄격하면 이를 따른다. 잔여 여력이 없으면 매수하지 않는다. 보유량·순자산·현금·목표수량·코어 위험 기준이 확인되지 않아 실제 주문 수량과 기존 노출의 적정성은 산정 불가하다. 종가와 다음 거래일 확인 전에는 시험 매수 한도를 넘지 않으며 차입 매수는 하지 않는다.&quot;,
+  &quot;risk limits&quot;: &quot;첫 확인 저항까지 비용 차감 후 보상·위험 1.5배 이상을 요구한다. 먼 저항을 기본 목표로 삼거나 기준 통과를 위해 손절을 임의로 좁히지 않는다. 이 비율만으로 양의 기대수익이 입증되는 것은 아니다. 보수적 분석의 예처럼 종목비중 5%에서 10% 급락하면 순자산 약 0.5% 손실이 발생하므로 갭 위험을 별도 평가한다. 재무제표 표시통화·금액 배율·기간·주식 기준 및 주식예탁증서 해당 여부와 환산비율은 원문 검증이 불가능한 상태다. 거래통화가 원화라는 이유로 이를 추정하지 않으며 재무금액 혼합이나 주당이익·주가수익비율·배당수익률 기반 저평가 판정을 하지 않는다. 신규 자금은 원화 현금으로 유지하되 이는 상대수익 우위 판단이 아니다. 분산형 지역 상장지수펀드도 가격·비용·포트폴리오 중복 확인 전 자동 대체 매수하지 않는다.&quot;,
+  &quot;catalysts&quot;: [
+    &quot;033780.ks의 2026-09-22 취득·소각 결정에 따른 실제 취득과 소각 이행. 공격적 분석의 핵심 근거이나 보수적·중립 분석이 강조했듯 결정과 매수 신청은 완료가 아니다. 제공 공시: https://dart.fss.or.kr/dsaf001/main.do?rcpno=20260922000256 및 https://dart.fss.or.kr/dsaf001/main.do?rcpno=20260922800292&quot;,
+    &quot;인도네시아 신공장의 가동률 상승과 실제 원가·현금흐름 개선. 세 분석가 모두 2028년 해외 생산 비중 60%를 현재 실적이 아닌 목표로 구분했다. 제공 보도: https://www.news1.kr/industry/distribution/6313699&quot;,
+    &quot;3분기 확정 실적에서 해외 성장과 수익성 확인. 해외 궐련 매출 12% 증가와 전체 영업이익 6.7% 증가는 단일 증권사 전망이며 시장 합의나 확정 실적이 아니다. 발표 일정은 확인 불가다. 제공 보도: https://www.bigtanews.co.kr/article/view/big202610090007&quot;
+  ],
+  &quot;invalidators&quot;: [
+    &quot;확정 실적·회사 전망에서 해외 성장 둔화와 수익성 악화가 확인되는 경우.&quot;,
+    &quot;신공장 초기 비용, 채권·재고 부담 또는 차환 문제로 투자와 환원을 감당할 현금 여력이 지속적으로 훼손되는 경우. 중립 분석이 지적했듯 생산 확대와 환원은 같은 현금 재원을 사용한다.&quot;,
+    &quot;취득·소각의 중대한 축소·취소 또는 집행 차질이 확인되는 경우.&quot;,
+    &quot;174,000원 미만 정규장 종가는 전술 회복 가설의 무효화 조건이다. 실제 채택한 171,200원 손절 이탈은 해당 전술 거래의 종료 조건이다.&quot;,
+    &quot;180,800원 돌파 후 완성된 5분봉 두 개와 유효한 세션 거래량가중평균가격이 실패를 확인하면 돌파 추가분의 근거가 무효화된다.&quot;
+  ],
+  &quot;watchlist triggers&quot;: [
+    &quot;033780.ks의 최신 가격 시각, 거래일 달력, 정규장 여부, 거래정지·시장경보 및 체결 유동성을 검증한다. 판단 시각 2026-10-12t07:50:43.237953+09:00은 세션이나 가격 신선도를 입증하지 않는다. 2026-10-08 가격을 현재가로 사용하지 않는다.&quot;,
+    &quot;175,200~175,300원 회복·재시험 또는 180,800원 돌파·재시험, 정상 세션 거래량가중평균가격 상회와 동시간대 상대거래량 1.2 이상을 관찰한다. 순보상·위험 기준이 미달하면 계속 대기한다.&quot;,
+    &quot;보수적·중립 분석이 지적한 구간 하단·상단 필드 오류는 실행 입력에서 제외한다. 아래 숫자는 제공 본문의 관찰 기준이며, 원자료 및 가격 조정 여부 재검증 전 자동 주문에 연결하지 않는다.&quot;,
+    &quot;원문 재무 기준과 잉여현금흐름·상각 전 영업이익 불일치, 차입 만기, 매출채권 회수, 투자·환원 재원을 확인한다. 분기 배당 초과 지급과 제공자상 유동 차입·리스 비중 50.1%는 점검 사유이지 연간 환원 불능이나 차환 위기의 확정 증거가 아니다.&quot;,
+    &quot;기존 코어·전술분을 모두 포함해 손실예산과 집중도를 계산한다. 한도 초과가 확인되면 지지 이탈을 기다리지 않고 위험 축소에 필요한 수량을 산정한다.&quot;,
+    &quot;실제 취득·소각 이행과 확정 실적을 확인한다. 뉴스 15건을 독립적인 호재 15개로 합산하지 않는다. 실제 투자자 포지셔닝, 소송의 재무 영향 및 최근 거시·환율 방향은 확인 불가다.&quot;,
+    &quot;세션·계좌·재무·가격 구조와 비용 후 보상이 확보되고 시간대가 명시된 유효기간을 정한 뒤에만 조건부 시험 매수를 재판정한다. 10:30은 최초 검토시각일 뿐 만료시각이 아니며, 만료나 다음 세션 이월을 추정하지 않는다.&quot;
+  ],
+  &quot;data coverage&quot;: {
+    &quot;company news count&quot;: 15,
+    &quot;disclosures count&quot;: 3,
+    &quot;social source&quot;: &quot;news derived&quot;,
+    &quot;macro items count&quot;: 0
+  },
+  &quot;execution levels&quot;: {
+    &quot;intraday pilot rule&quot;: &quot;033780.ks의 검증된 정규장에서 서울 현지시각 10:30 이후 목표수량 20% 이내 시험 매수만 검토한다. 175,200~175,300원 회복·재시험 또는 180,800원 돌파·재시험, 정상 세션 거래량가중평균가격 상회, 동시간대 상대거래량 1.2 이상, 비용 후 보상·위험 1.5배 이상과 재무·계좌·주문 유효기간 검증이 모두 필요하다. 현재는 비활성 관찰 규칙이다.&quot;,
+    &quot;close confirm rule&quot;: &quot;목표규모 진입·추가의 필수 조건은 180,800원 위 검증된 정규장 종가와 일일 거래량의 20일 평균 대비 1.2배 이상이다. 유효 손절·첫 저항·비용 후 보상·재무 근거·계좌 한도를 함께 확인한다. 종가 돌파만으로 자동 증액하지 않으며 다음 거래일 유지 확인 전에는 시험 매수 한도를 넘지 않는다.&quot;,
+    &quot;next day followthrough rule&quot;: &quot;달력으로 확인한 다음 정규 거래일 첫 30~60분에 180,800원과 정상 세션 거래량가중평균가격의 지지 또는 재돌파·재시험을 확인한 뒤 목표규모까지의 추가를 검토한다. 다음 거래일 날짜와 주문 만료는 현재 확정하지 않는다.&quot;,
+    &quot;failed breakout rule&quot;: &quot;돌파 후 180,800원 또는 유효한 세션 거래량가중평균가격을 잃으면 신규 매수를 차단한다. 완성된 5분봉 두 개가 180,800원 아래에 머물고 거래량가중평균가격도 하회하면 돌파 추가분 전량을 위험 축소로 회수한다.&quot;,
+    &quot;trim rule&quot;: &quot;174,000원 미만 정규장 종가에는 전술 보유분 전량을 위험 축소 대상으로 전환한다. 실제 채택된 171,200원 손절은 해당 전술분에 장중 적용한다. 계좌 한도 초과나 중대한 사업 가설 훼손에도 위험을 축소한다. 더 우수한 대체 투자나 자금 수요가 확인되지 않아 자금조달 목적 축소는 선택하지 않는다. 최근 하루의 모멘텀 둔화만으로 과도한 상승을 확정할 수 없어 별도 이익실현 계획은 적용하지 않는다.&quot;,
+    &quot;levels&quot;: [
+      {
+        &quot;label&quot;: &quot;눌림 지지 관찰 구간 하단&quot;,
+        &quot;level type&quot;: &quot;support&quot;,
+        &quot;price&quot;: 175200.0,
+        &quot;low&quot;: 175.0,
+        &quot;high&quot;: 175200.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;two bar&quot;,
+        &quot;volume rule&quot;: &quot;동시간대 상대거래량 1.2 이상&quot;,
+        &quot;source text&quot;: &quot;제공 본문의 175,200~175,300원 관찰 구간 하단이다. 완성된 5분봉 회복과 후속 재시험을 요구하며 단순 접촉은 매수 신호가 아니다.&quot;,
+        &quot;reason code&quot;: &quot;pullback support&quot;
+      },
+      {
+        &quot;label&quot;: &quot;눌림 회복 관찰 구간 상단&quot;,
+        &quot;level type&quot;: &quot;pullback&quot;,
+        &quot;price&quot;: 175300.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;two bar&quot;,
+        &quot;volume rule&quot;: &quot;동시간대 상대거래량 1.2 이상&quot;,
+        &quot;source text&quot;: &quot;제공 본문의 회복 기준이다. 171,200원 예시 손절과 180,800원 첫 저항을 적용하면 보상·위험이 부족하므로 이 가격 회복만으로 진입하지 않는다.&quot;,
+        &quot;reason code&quot;: &quot;pullback reclaim&quot;
+      },
+      {
+        &quot;label&quot;: &quot;최근 고점 돌파 기준 및 첫 저항&quot;,
+        &quot;level type&quot;: &quot;breakout&quot;,
+        &quot;price&quot;: 180800.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;종가 확인 시 일일 거래량의 20일 평균 대비 1.2배 이상&quot;,
+        &quot;source text&quot;: &quot;제공된 2026-10-08 고점이다. 장중 시험 매수 검토에는 돌파·재시험이 필요하고 목표규모 추가에는 종가와 다음 거래일 유지 및 별도 보상·위험 검증이 필요하다.&quot;,
+        &quot;reason code&quot;: &quot;breakout trigger&quot;
+      },
+      {
+        &quot;label&quot;: &quot;전술 회복 가설 무효화&quot;,
+        &quot;level type&quot;: &quot;invalidation&quot;,
+        &quot;price&quot;: 174000.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;위험 축소에 거래량 증가를 요구하지 않음&quot;,
+        &quot;source text&quot;: &quot;제공 계획에서 볼린저 상·하단 중간값을 사용한 운용 기준이다. 검증된 정규장 종가가 이 가격 미만이면 전술 보유분을 위험 축소한다. 현재 발동 여부는 확인 불가다.&quot;,
+        &quot;reason code&quot;: &quot;support broken&quot;
+      },
+      {
+        &quot;label&quot;: &quot;실제 채택한 전술분에만 적용할 예시 손절&quot;,
+        &quot;level type&quot;: &quot;stop loss&quot;,
+        &quot;price&quot;: 171200.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;손절에 거래량 또는 종가 확인을 요구하지 않음&quot;,
+        &quot;source text&quot;: &quot;제공 보고서의 계획상 예시다. 당일 구조와 실제 진입에서 채택한 전술분에만 적용하며 기존 코어 전체의 자동 손절선은 아니다.&quot;,
+        &quot;reason code&quot;: &quot;tactical stop&quot;
+      },
+      {
+        &quot;label&quot;: &quot;돌파 후 참고 저항&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 183700.0,
+        &quot;low&quot;: 183.0,
+        &quot;high&quot;: 183600.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;통과 시 거래량과 재시험 지지 확인&quot;,
+        &quot;source text&quot;: &quot;제공 본문의 183,600~183,900원 과거 고점대 내 참고값이다. 가격 조정 여부가 미검증이므로 확정 목표로 사용하지 않는다.&quot;,
+        &quot;reason code&quot;: &quot;secondary resistance&quot;
+      },
+      {
+        &quot;label&quot;: &quot;상위 참고 저항&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 186600.0,
+        &quot;low&quot;: 186.0,
+        &quot;high&quot;: 186600.0,
+        &quot;currency&quot;: &quot;krw&quot;,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;통과 시 거래량과 재시험 지지 확인&quot;,
+        &quot;source text&quot;: &quot;제공 본문의 186,600~186,900원 상위 고점대 하단이다. 중간 저항 돌파를 전제하므로 현재 진입의 기본 목표 보상으로 계산하지 않는다.&quot;,
+        &quot;reason code&quot;: &quot;upper resistance&quot;
+      }
+    ],
+    &quot;min relative volume&quot;: 1.2,
+    &quot;vwap required&quot;: true,
+    &quot;earliest pilot time local&quot;: &quot;10:30&quot;,
+    &quot;funding priority&quot;: &quot;low&quot;,
+    &quot;entry window&quot;: &quot;mid&quot;,
+    &quot;trigger quality&quot;: &quot;medium&quot;
+  },
+  &quot;risk action&quot;: &quot;hold&quot;,
+  &quot;risk action reason&quot;: &quot;033780.ks의 기존 보유분은 위험한도 안에서 조건부 유지한다. 공격적·중립 분석이 제시한 상승하는 200일 평균, 취득·소각 결정과 해외 생산 확대는 중기 강세 관점을 지지한다. 보수적 분석의 저항대 거부·재무 불일치·계좌 위험 미확인도 반영해 추가 배정은 0으로 둔다. 제공 자료에서는 사업 가설 훼손이나 174,000원 종가 이탈이 확인되지 않았지만, 현재 지지 유지와 보유 규모의 적정성도 확인되지 않았다. 한도 초과가 확인되면 가격 지지 여부와 무관하게 위험을 축소한다.&quot;,
+  &quot;risk action reason codes&quot;: [
+    &quot;long term trend constructive&quot;,
+    &quot;support break not confirmed&quot;,
+    &quot;resistance rejection&quot;,
+    &quot;live execution unverified&quot;,
+    &quot;portfolio risk unverified&quot;
+  ],
+  &quot;risk action confidence&quot;: 0.6,
+  &quot;risk action level&quot;: {
+    &quot;label&quot;: &quot;전술 보유분의 조건부 위험 축소 기준&quot;,
+    &quot;level type&quot;: &quot;invalidation&quot;,
+    &quot;price&quot;: 174000.0,
+    &quot;low&quot;: null,
+    &quot;high&quot;: null,
+    &quot;currency&quot;: &quot;krw&quot;,
+    &quot;confirmation&quot;: &quot;close&quot;,
+    &quot;volume rule&quot;: &quot;&quot;,
+    &quot;source text&quot;: &quot;제공 계획의 운용상 무효화 기준이다. 검증된 정규장 종가가 174,000원 미만이면 전술 보유분 전량을 위험 축소 대상으로 전환한다. 현재 충족 여부는 확인 불가이며 코어 전체의 자동 청산선은 아니다.&quot;,
+    &quot;reason code&quot;: &quot;support broken&quot;
+  },
+  &quot;profit taking plan&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;stage 1 price&quot;: null,
+    &quot;stage 1 fraction&quot;: 0.0,
+    &quot;stage 2 price&quot;: null,
+    &quot;stage 2 fraction&quot;: 0.0,
+    &quot;trailing stop price&quot;: null,
+    &quot;trailing stop fraction&quot;: 0.0,
+    &quot;keep core fraction&quot;: 1.0,
+    &quot;reentry condition&quot;: &quot;현재 이익실현 주문은 없다. 위험 축소 후 재진입은 지지 회복, 정상 세션 거래량가중평균가격, 거래량, 계좌 여력과 비용 후 보상·위험을 재검증한다. 코어 유지 비율은 별도의 손절·위험 축소 규칙을 면제하지 않는다.&quot;,
+    &quot;reason codes&quot;: [
+      &quot;long term trend constructive&quot;,
+      &quot;support break not confirmed&quot;,
+      &quot;resistance rejection&quot;,
+      &quot;live execution unverified&quot;,
+      &quot;portfolio risk unverified&quot;,
+      &quot;no confirmed extension&quot;,
+      &quot;profit taking not activated&quot;,
+      &quot;support broken&quot;
+    ]
+  }
+}</span></p>
+              <p><strong>오늘 할 일</strong><span>실패 돌파 주의, 신규 금지 또는 축소 검토: 조건 확인</span></p>
+              <p><strong>장중 pilot 조건</strong><span>10:30 이후 조건 확인 + VWAP 위 + 거래량 확인 시 소액 starter만 검토</span></p>
               <p><strong>종가 확인 시 할 일</strong><span>종가에도 약하면 축소 우선 검토</span></p>
-              <p><strong>내일 follow-through</strong><span>다음 거래일 첫 30~60분 동안 033780.KS의 최신 가격 시각, 거래일 달력, 정규장 여부, 거래정지·시장경보 및 체결 유동성을 검증한다. 판단 시각 2026-10-12T07:50:43.237953+09:00은 세션이나 가격 신선도를 입증하지 않는다. 2026-10-08... 재이탈이 없는지 확인</span></p>
-              <p class="long-field"><strong>핵심 가격대</strong><span>033780.KS의 최신 가격 시각, 거래일 달력, 정규장 여부, 거래정지·시장경보 및 체결 유동성을 검증한다. 판단 시각 2026-10-12T07:50:43.237953+09:00은 세션이나 가격 신선도를 입증하지 않는다. 2026-10-08...</span></p>
-              <p class="long-field"><strong>위험 요약</strong><span>확정 실적·회사 전망에서 해외 성장 둔화와 수익성 악화가 확인되는 경우.</span></p>
+              <p><strong>내일 follow-through</strong><span>다음 거래일 첫 30~60분 동안 조건 확인 재이탈이 없는지 확인</span></p>
+              <p class="long-field"><strong>핵심 가격대</strong><span>조건 확인</span></p>
+              <p class="long-field"><strong>위험 요약</strong><span>위험 조건 확인 필요</span></p>
               <p><strong>리서치 기준</strong><span>리서치 본문은 2026-10-08 일봉 기준</span></p>
               <p><strong>실행 기준</strong><span>실행 오버레이는 2026-10-12T12:04:51.329169+09:00 장중 스냅샷 기준</span></p>
               

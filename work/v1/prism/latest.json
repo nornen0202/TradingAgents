@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "prism",
-  "event_id": "prism:94a3d9dd6ac393456fc407064a69500d",
+  "event_id": "prism:bdf037ae01a61a462f391fc05e66c0bc",
   "prompt_contract_version": "prism-work-v5",
   "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
   "workflow_contract_sha256": "affa33ed518a96ac60bff25950a3fe646a7ff652ceb8d1ab5a9f50dde0362c75",
-  "source_sha256": "2370ec06f97f1d7f2f3970e7a6c6fe320b07d41b5ef88d9d568684d1bbbb38b5",
+  "source_sha256": "8ca35350a525341b22767065db7daf6d057272cc644898e1e8e8a6f60b5852d5",
   "body": {
     "kind": "prism",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 158,
-      "window_events": 12,
-      "transmitted_events": 12,
+      "window_events": 11,
+      "transmitted_events": 11,
       "truncated": false,
-      "oldest_occurred_at": "2026-10-12T22:26:26+00:00",
+      "oldest_occurred_at": "2026-10-12T22:59:27+00:00",
       "newest_occurred_at": "2026-10-13T01:04:25+00:00"
     },
     "events": [
@@ -444,38 +444,6 @@
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
             "text_chars": 808,
-            "text_source": "public_metadata",
-            "action_changes": [],
-            "recovered_tickers": []
-          }
-        }
-      },
-      {
-        "event_key": "stock_ai_agent:15998",
-        "content_sha256": "ec6d3a27c34142ebc434cc112d05f7293974bfe60b404695cfa93fe502785607",
-        "occurred_at": "2026-10-12T22:26:26+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "message_context"
-        },
-        "summary": {
-          "channel": "stock_ai_agent",
-          "message_id": "15998",
-          "posted_at": "2026-10-12T22:26:26+00:00",
-          "source_url": "https://t.me/stock_ai_agent/15998",
-          "preview": "📌 BTC 데모 첫 진입 체결 · 숏 🕐 10/13 07:25:43 KST 🧾 이번 체결: 0.05 BTC · 82,566.50 USDT • 체결금액(명목): 4,128.32 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0.05 BTC · 관측 기준 • 평단 82,566.50 USDT 💰 계좌 순자산: 9,479.35 USDT • 총 증거금 415.45 USDT(계좌 4.38...",
-          "signals": [],
-          "signals_total": 0,
-          "signals_transmitted": 0,
-          "signals_truncated": false,
-          "simulation_only": false,
-          "actionability": "research_only",
-          "normalization": {
-            "version": "prism-telegram/v3",
-            "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 799,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []
