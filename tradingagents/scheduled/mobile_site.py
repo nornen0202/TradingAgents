@@ -85,6 +85,7 @@ _PRIVATE_ROW_FIELDS = (
 )
 
 _PRIVATE_ACTION_FIELDS = (
+    "reference_plan",
     "canonical_ticker",
     "confidence",
     "action_now",

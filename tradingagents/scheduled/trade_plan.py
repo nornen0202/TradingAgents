@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from tradingagents.execution.risk_trigger import risk_trigger
+from tradingagents.schemas.decision import explicit_price_range_conflicts
 
 
 _ACCOUNT_SOURCE_MESSAGES = {
@@ -338,6 +339,11 @@ def build_trade_plan(
         seen.add(identity)
         action = _mapping(source.get("portfolio_action"))
         thesis = _mapping(source.get("thesis"))
+        price_range_blocked = bool(
+            explicit_price_range_conflicts(thesis)
+            or "structured_price_range_conflict" in _items(_mapping(source.get("execution")).get("blockers"))
+            or "structured_price_range_conflict" in _items(action.get("gate_reasons"))
+        )
         held = source.get("is_held") is True or (
             _positive(_mapping(positions.get(identity)).get("quantity")) is not None
         )
@@ -369,6 +375,9 @@ def build_trade_plan(
                 side = "BUY"
         if side is None:
             side, phase, delta = ("HOLD" if held else "WAIT"), "OBSERVE", 0.0
+        if price_range_blocked:
+            current_action = "WAIT"
+            side, phase, delta = "WAIT", "OBSERVE", 0.0
         reasons: list[str] = []
         price = (
             _price_level(source, action, side, currency)
@@ -395,7 +404,9 @@ def build_trade_plan(
         structured_sell = (
             sell_fraction is not None and delta != 0 and (delta is None or delta < 0)
         )
-        if side in {"HOLD", "WAIT"}:
+        if price_range_blocked:
+            reasons.append("분석 원문과 가격 범위가 일치하지 않아 재확인 전에는 행동·수량을 산정하지 않습니다.")
+        elif side in {"HOLD", "WAIT"}:
             quantity = 0
             reasons.append(
                 "현재 추가 매매 배정이 없습니다."
@@ -621,6 +632,9 @@ def build_trade_plan(
         if constraint_reasons:
             reasons = constraint_reasons + reasons
             status = "RECHECK"
+        if price_range_blocked:
+            status = "RECHECK"
+            target_weight = None
         condition = (
             source.get("risk_condition_ko")
             if side == "SELL"

@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from tradingagents.schemas.decision import explicit_price_range_conflicts
+
 from .freshness import aware_datetime, source_freshness_receipt
 
 
@@ -1028,7 +1030,11 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
         )
         execution["as_of"] = row.get("market_data_asof")
         execution["valid_until"] = quality["row_valid_until"]
-        if invalid or expired:
+        thesis = row.get("thesis")
+        conflicts = explicit_price_range_conflicts(thesis) if isinstance(thesis, dict) else []
+        if conflicts:
+            quality["structured_price_range_conflicts"] = conflicts
+        if invalid or expired or conflicts:
             if not isinstance(row.get("thesis"), dict):
                 row["thesis"] = _market_row_thesis(row)
             quality.setdefault("source_row_mode", quality.get("row_mode"))
@@ -1037,7 +1043,7 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
             quality["execution_ready"] = False
             quality["conditional_strategy_ready"] = False
             quality["current_execution_promotion"] = "BLOCKED"
-            # Keep the research thesis above intact, but do not leave a stale
+            # Keep the research thesis intact, but do not leave an actionable
             # BUY_NOW/READY label next to execution_ready=false in JSON readers.
             row.setdefault("reference_strategy", {
                 key: row.get(key) for key in
@@ -1046,22 +1052,25 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
             row["strategy_code"] = "DATA_CHECK"
             row["strategy_ko"] = "데이터 확인 전 대기"
             row["decision_state_ko"] = "데이터 확인 전 대기"
-            row["data_status_ko"] = "시세 시각 확인 필요" if invalid else "시세 유효기간 만료"
+            row["data_status_ko"] = "구조화 가격 구간 재확인 필요" if conflicts else "시세 시각 확인 필요" if invalid else "시세 유효기간 만료"
             blockers = [str(item) for item in (quality.get("provider_blockers") or []) if str(item)]
-            reason = "work_packet_row_invalid_timestamp" if invalid else "work_packet_row_expired"
-            quality["provider_blockers"] = list(dict.fromkeys([*blockers, reason]))
-            execution["source_readiness"] = execution.get("readiness")
+            reasons = (["work_packet_row_invalid_timestamp"] if invalid else ["work_packet_row_expired"] if expired else [])
+            if conflicts:
+                reasons.append("structured_price_range_conflict")
+            quality["provider_blockers"] = list(dict.fromkeys([*blockers, *reasons]))
+            execution.setdefault("source_readiness", execution.get("readiness"))
             execution["readiness"] = "NEEDS_LIVE_RECHECK"
             execution["action_now"] = None
             execution["action_if_triggered"] = None
             execution["blockers"] = list(
-                dict.fromkeys([*(execution.get("blockers") or []), reason])
+                dict.fromkeys([*(execution.get("blockers") or []), *reasons])
             )
             execution["required_rechecks"] = list(
                 dict.fromkeys(
                     [
                         *(execution.get("required_rechecks") or []),
-                        "실시간 시세와 주문 가능 상태 재확인",
+                        *(["실시간 시세와 주문 가능 상태 재확인"] if invalid or expired else []),
+                        *(f"명시 가격 구간과 구조화 low/high 불일치 재확인: {conflict}" for conflict in conflicts),
                     ]
                 )
             )
@@ -1069,7 +1078,7 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
         row["execution"] = execution
     rows = [row for row in bundle.get("strategy_table", []) if isinstance(row, dict)]
     bundle_quality = bundle.get("quality") or {}
-    if any((row.get("quality") or {}).get("expired_at_build") or "work_packet_row_invalid_timestamp" in ((row.get("quality") or {}).get("provider_blockers") or []) for row in rows):
+    if any((row.get("quality") or {}).get("expired_at_build") or (row.get("quality") or {}).get("structured_price_range_conflicts") or "work_packet_row_invalid_timestamp" in ((row.get("quality") or {}).get("provider_blockers") or []) for row in rows):
         bundle_quality["decision_ready"] = False
         bundle_quality["conditional_strategy_ready"] = False
         bundle_quality["report_mode"] = _market_report_mode(bundle)
@@ -1161,6 +1170,26 @@ def _local_private_overlay(run_dir: Path, manifest: dict[str, Any], bundle: dict
                 {"thesis_ref": shared[item]} if isinstance(item, str) and item in shared else item
                 for item in conditions
             ]
+        if "structured_price_range_conflict" in ((selected[ticker].get("execution") or {}).get("blockers") or []):
+            # Retain the exact archived allocation as a reference, while the
+            # second action table follows the same row execution gate as Work.
+            compact_action["reference_plan"] = {
+                key: compact_action[key] for key in (
+                    "action_now", "action_if_triggered", "delta_krw_now", "delta_krw_if_triggered",
+                    "target_weight_now", "target_weight_if_triggered", "strategy_state", "execution_feasibility_now",
+                ) if key in compact_action
+            }
+            compact_action.update(
+                action_now="WAIT", action_if_triggered="NONE",
+                delta_krw_now=0, delta_krw_if_triggered=0,
+                target_weight_now=None, target_weight_if_triggered=None,
+                strategy_state="BLOCKED_STALE",
+                execution_feasibility_now="blocked_stale_or_degraded_data",
+            )
+            compact_action["gate_reasons"] = list(dict.fromkeys([
+                *(compact_action.get("gate_reasons") or []), "structured_price_range_conflict",
+                *((selected[ticker].get("execution") or {}).get("required_rechecks") or []),
+            ]))
         actions.append(compact_action)
     return {
         "privacy": "LOCAL_ONLY_DO_NOT_PUBLISH",
