@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:f0414de908abb965353898a4ee091a33",
+  "event_id": "kr:49e2c475c3d4e16a67235fd9c98ad0e4",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "c8841b735958409f8713a6ad25339e660992c3937436b9c8a56f6db16de44607",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
   "workflow_contract_sha256": "c1d788846326636ea149db0745b3c64dd5f9864872f663186e6f75c87b32613b",
-  "source_sha256": "0de935e6236b0cb3432fe1c6ff7e6b44c9aacc04a14bac170ead1b8ef1cdad90",
+  "source_sha256": "6b7040f9bf684dd6aa442d43490cee6b82933e316d9d8b9ea694dd90ad3c0a82",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -45,7 +45,7 @@
         "run_mode": "full",
         "started_at": "2026-10-14T05:49:01.287212+09:00",
         "status": "RUNNING",
-        "heartbeat_at": "2026-10-13T22:35:03.349467+00:00"
+        "heartbeat_at": "2026-10-13T23:35:35.709470+00:00"
       },
       "latest_completed_analysis": {
         "run_id": "20261012T055403_local-scheduler-kr-full",
@@ -939,15 +939,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 394,
-          "window_events": 55,
+          "window_events": 53,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-11T22:44:39+00:00",
           "newest_occurred_at": "2026-10-13T07:09:28+00:00",
-          "available_events_before_context_cap": 55,
+          "available_events_before_context_cap": 53,
           "context_event_cap": 12,
-          "omitted_events": 43,
-          "omitted_due_to_context_cap": 43,
+          "omitted_events": 41,
+          "omitted_due_to_context_cap": 41,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -2144,12 +2144,12 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 158,
-          "window_events": 11,
-          "transmitted_events": 11,
+          "window_events": 8,
+          "transmitted_events": 8,
           "truncated": false,
-          "oldest_occurred_at": "2026-10-12T22:59:27+00:00",
+          "oldest_occurred_at": "2026-10-12T23:46:25+00:00",
           "newest_occurred_at": "2026-10-13T01:04:25+00:00",
-          "available_events_before_context_cap": 11,
+          "available_events_before_context_cap": 8,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
@@ -2386,75 +2386,6 @@
               "simulation_only": false,
               "actionability": "research_only"
             }
-          },
-          {
-            "event_key": "stock_ai_agent:16001",
-            "content_sha256": "00936e0f87a4f01f839629f9121e7dd279816b7ccaf162578851d60af31934ba",
-            "occurred_at": "2026-10-12T23:06:25+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "16001",
-              "posted_at": "2026-10-12T23:06:25+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16001",
-              "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/13 08:06:07 KST 💵 청산 결과 정리 수량: 0.05 BTC 진입 → 청산: 82,566.50 USDT → 82,052.30 USDT 보유 시간: 40.4분 확정 순손익: 24.06 USDT • 시작 계좌 9,481.42 USDT 대비 +0.25% • 수수료 1.65 USDT · 펀딩 0.00 USDT 반영 💰 종료 후 순...",
-              "signals": [],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16000",
-            "content_sha256": "974d4c71d51a986d6a3aaf9339027ed516fd4cd399343958ff231df05a22052f",
-            "occurred_at": "2026-10-12T23:01:26+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "16000",
-              "posted_at": "2026-10-12T23:01:26+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16000",
-              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/13 08:01:22 KST 📦 보유량 0.025 BTC · 평단 82,566.50 USDT 💰 계좌 순자산: 9,497.80 USDT • 총 증거금 206.68 USDT(계좌 2.18%) · 10배 · 교차 🛡 손절 SL 82,800.00 → 82,660.00 USDT · 남은 전량 • 예상 손익: -2.34 USDT · 계좌 -0.02...",
-              "signals": [],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:15999",
-            "content_sha256": "2fb57e43f9137beb56638bb34f2e8c96eb5990b96477f4b93f00b029d3513baf",
-            "occurred_at": "2026-10-12T22:59:27+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "15999",
-              "posted_at": "2026-10-12T22:59:27+00:00",
-              "source_url": "https://t.me/stock_ai_agent/15999",
-              "preview": "✂️ BTC 데모 부분 청산 체결 · 숏 🕐 10/13 07:59:04 KST 사유: 부분 익절 🧾 이번 체결: 0.025 BTC · 82,257.30 USDT • 체결금액(명목): 2,056.43 USDT · 증거금 아님 • 이번 청산 가격손익: +7.73 USDT · 계좌 +0.08% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전체...",
-              "signals": [],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
           }
         ],
         "execution_eligible": false
@@ -2480,15 +2411,15 @@
             ],
             "coverage": {
               "total_unique_events": 394,
-              "window_events": 55,
+              "window_events": 53,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-11T22:44:39+00:00",
               "newest_occurred_at": "2026-10-13T07:09:28+00:00",
-              "available_events_before_context_cap": 55,
+              "available_events_before_context_cap": 53,
               "context_event_cap": 12,
-              "omitted_events": 43,
-              "omitted_due_to_context_cap": 43,
+              "omitted_events": 41,
+              "omitted_due_to_context_cap": 41,
               "omitted_before_context_selection": 0
             }
           },
@@ -2502,19 +2433,16 @@
               "stock_ai_agent:16005",
               "stock_ai_agent:16004",
               "stock_ai_agent:16003",
-              "stock_ai_agent:16002",
-              "stock_ai_agent:16001",
-              "stock_ai_agent:16000",
-              "stock_ai_agent:15999"
+              "stock_ai_agent:16002"
             ],
             "coverage": {
               "total_unique_events": 158,
-              "window_events": 11,
-              "transmitted_events": 11,
+              "window_events": 8,
+              "transmitted_events": 8,
               "truncated": false,
-              "oldest_occurred_at": "2026-10-12T22:59:27+00:00",
+              "oldest_occurred_at": "2026-10-12T23:46:25+00:00",
               "newest_occurred_at": "2026-10-13T01:04:25+00:00",
-              "available_events_before_context_cap": 11,
+              "available_events_before_context_cap": 8,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,
