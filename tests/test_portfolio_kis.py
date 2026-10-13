@@ -1,3 +1,5 @@
+import json
+import os
 import unittest
 from datetime import date, datetime
 from types import SimpleNamespace
@@ -24,6 +26,19 @@ class _FixedDatetime(datetime):
     def now(cls, tz=None):
         value = datetime(2026, 6, 1, 12, 0)
         return value.replace(tzinfo=tz) if tz else value
+
+
+def _kis_http_response(status_code, payload):
+    response = requests.Response()
+    response.status_code = status_code
+    response.url = "https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/trading/inquire-balance"
+    response._content = (
+        payload.encode("utf-8")
+        if isinstance(payload, str)
+        else json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    )
+    response.headers["Content-Type"] = "application/json"
+    return response
 
 
 class PortfolioKisTests(unittest.TestCase):
@@ -154,6 +169,153 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(payload["rt_cd"], "0")
         self.assertEqual(session.request.call_count, 2)
         sleep_mock.assert_called_once()
+
+    def test_request_json_refreshes_expired_token_reported_as_http_500(self):
+        session = Mock()
+        session.post.side_effect = [
+            _kis_http_response(200, {"access_token": "old-token", "expires_in": 86400}),
+            _kis_http_response(200, {"access_token": "new-token", "expires_in": 86400}),
+        ]
+        session.request.side_effect = [
+            _kis_http_response(500, {"rt_cd": "1", "msg_cd": "EGW00123", "msg1": "기간이 만료된 token 입니다."}),
+            _kis_http_response(200, {"rt_cd": "0", "output": []}),
+        ]
+        client = KisClient(app_key="app-key", app_secret="app-secret", session=session, token_file_cache_enabled=False)
+
+        with patch.dict(os.environ, {"KIS_API_MAX_RETRIES": "3"}), patch("tradingagents.portfolio.kis.sleep") as sleep_mock:
+            payload, _headers = client.request_json(
+                method="GET", path="/uapi/domestic-stock/v1/trading/inquire-balance", tr_id="TTTC8434R", params={}
+            )
+
+        self.assertEqual(payload["rt_cd"], "0")
+        self.assertEqual(session.post.call_count, 2)
+        self.assertEqual(session.request.call_count, 2)
+        self.assertEqual(
+            [call.kwargs["headers"]["authorization"] for call in session.request.call_args_list],
+            ["Bearer old-token", "Bearer new-token"],
+        )
+        sleep_mock.assert_not_called()
+
+    def test_request_json_http_500_expiry_is_identified_without_message_text(self):
+        session = Mock()
+        session.post.side_effect = [
+            _kis_http_response(200, {"access_token": "old-token", "expires_in": 86400}),
+            _kis_http_response(200, {"access_token": "new-token", "expires_in": 86400}),
+        ]
+        session.request.side_effect = [
+            _kis_http_response(500, {"rt_cd": "1", "msg_cd": "EGW00123"}),
+            _kis_http_response(200, {"rt_cd": "0", "output": []}),
+        ]
+        client = KisClient(app_key="app-key", app_secret="app-secret", session=session, token_file_cache_enabled=False)
+
+        with patch.dict(os.environ, {"KIS_API_MAX_RETRIES": "3"}), patch("tradingagents.portfolio.kis.sleep") as sleep_mock:
+            payload, _headers = client.request_json(
+                method="GET", path="/uapi/domestic-stock/v1/trading/inquire-balance", tr_id="TTTC8434R", params={}
+            )
+
+        self.assertEqual(payload["rt_cd"], "0")
+        self.assertEqual(session.post.call_count, 2)
+        self.assertEqual(session.request.call_count, 2)
+        sleep_mock.assert_not_called()
+
+    def test_request_json_persistent_http_500_expiry_refreshes_at_most_once(self):
+        session = Mock()
+        session.post.side_effect = [
+            _kis_http_response(200, {"access_token": "old-token", "expires_in": 86400}),
+            _kis_http_response(200, {"access_token": "new-token", "expires_in": 86400}),
+        ]
+        session.request.return_value = _kis_http_response(
+            500, {"rt_cd": "1", "msg_cd": "EGW00123", "msg1": "기간이 만료된 token 입니다."}
+        )
+        client = KisClient(app_key="app-key", app_secret="app-secret", session=session, token_file_cache_enabled=False)
+
+        with patch.dict(os.environ, {"KIS_API_MAX_RETRIES": "3"}), patch("tradingagents.portfolio.kis.sleep"):
+            with self.assertRaises((requests.HTTPError, KisApiError)):
+                client.request_json(
+                    method="GET", path="/uapi/domestic-stock/v1/trading/inquire-balance", tr_id="TTTC8434R", params={}
+                )
+
+        self.assertEqual(session.post.call_count, 2)
+        self.assertGreaterEqual(session.request.call_count, 2)
+        self.assertLessEqual(session.request.call_count, 3)
+        self.assertEqual(session.request.call_args_list[0].kwargs["headers"]["authorization"], "Bearer old-token")
+        self.assertTrue(all(
+            call.kwargs["headers"]["authorization"] == "Bearer new-token"
+            for call in session.request.call_args_list[1:]
+        ))
+
+    def test_request_json_http_500_expiry_does_not_expand_request_budget(self):
+        session = Mock()
+        session.post.side_effect = [
+            _kis_http_response(200, {"access_token": "old-token", "expires_in": 86400}),
+            _kis_http_response(200, {"access_token": "new-token", "expires_in": 86400}),
+        ]
+        session.request.return_value = _kis_http_response(
+            500, {"rt_cd": "1", "msg_cd": "EGW00123", "msg1": "기간이 만료된 token 입니다."}
+        )
+        client = KisClient(app_key="app-key", app_secret="app-secret", session=session, token_file_cache_enabled=False)
+
+        with patch.dict(os.environ, {"KIS_API_MAX_RETRIES": "1"}), patch("tradingagents.portfolio.kis.sleep") as sleep_mock:
+            with self.assertRaises((requests.HTTPError, KisApiError)):
+                client.request_json(
+                    method="GET", path="/uapi/domestic-stock/v1/trading/inquire-balance", tr_id="TTTC8434R", params={}
+                )
+
+        self.assertEqual(session.request.call_count, 1)
+        self.assertLessEqual(session.post.call_count, 2)
+        sleep_mock.assert_not_called()
+
+    def test_request_json_non_auth_http_500_preserves_transient_retry_without_refresh(self):
+        errors = (
+            "<html>upstream unavailable</html>",
+            {"rt_cd": "1", "msg_cd": "EGW99999", "msg1": "Internal server error"},
+            {"rt_cd": "1", "msg_cd": "EGW99999", "msg1": "access token service temporarily unavailable"},
+            {"rt_cd": "0", "msg_cd": "EGW00123"},
+            [{"rt_cd": "1", "msg_cd": "EGW00123"}],
+            None,
+        )
+        for error in errors:
+            with self.subTest(error=error):
+                session = Mock()
+                session.post.return_value = _kis_http_response(200, {"access_token": "token", "expires_in": 86400})
+                session.request.side_effect = [
+                    _kis_http_response(500, error),
+                    _kis_http_response(200, {"rt_cd": "0", "output": []}),
+                ]
+                client = KisClient(app_key="app-key", app_secret="app-secret", session=session, token_file_cache_enabled=False)
+
+                with patch.dict(os.environ, {"KIS_API_MAX_RETRIES": "3"}), patch("tradingagents.portfolio.kis.sleep") as sleep_mock:
+                    payload, _headers = client.request_json(
+                        method="GET", path="/uapi/domestic-stock/v1/trading/inquire-balance", tr_id="TTTC8434R", params={}
+                    )
+
+                self.assertEqual(payload["rt_cd"], "0")
+                self.assertEqual(session.post.call_count, 1)
+                self.assertEqual(session.request.call_count, 2)
+                self.assertTrue(all(
+                    call.kwargs["headers"]["authorization"] == "Bearer token"
+                    for call in session.request.call_args_list
+                ))
+                sleep_mock.assert_called_once()
+
+    def test_request_json_http_403_does_not_refresh_even_with_auth_payload(self):
+        session = Mock()
+        session.post.return_value = _kis_http_response(200, {"access_token": "token", "expires_in": 86400})
+        session.request.return_value = _kis_http_response(
+            403, {"rt_cd": "1", "msg_cd": "EGW00123", "msg1": "기간이 만료된 token 입니다."}
+        )
+        client = KisClient(app_key="app-key", app_secret="app-secret", session=session, token_file_cache_enabled=False)
+
+        with patch.dict(os.environ, {"KIS_API_MAX_RETRIES": "3"}), patch("tradingagents.portfolio.kis.sleep") as sleep_mock:
+            with self.assertRaises(requests.HTTPError) as caught:
+                client.request_json(
+                    method="GET", path="/uapi/domestic-stock/v1/trading/inquire-balance", tr_id="TTTC8434R", params={}
+                )
+
+        self.assertEqual(caught.exception.response.status_code, 403)
+        self.assertEqual(session.post.call_count, 1)
+        self.assertEqual(session.request.call_count, 1)
+        sleep_mock.assert_not_called()
 
     def test_kis_snapshot_failure_degrades_to_watchlist_only_when_allowed(self):
         profile = PortfolioProfile(

@@ -280,7 +280,21 @@ class KisClient:
                     continue
                 raise
 
-            if response.status_code == 401 and not auth_refreshed:
+            # KIS also reports an expired token as HTTP 500 / EGW00123.
+            # Recognize only that explicit broker code before generic HTTP
+            # retries; other server/permission failures must not refresh auth.
+            expired_token = False
+            if response.status_code == 500:
+                try:
+                    error_payload = response.json()
+                except ValueError:
+                    error_payload = None
+                expired_token = (
+                    isinstance(error_payload, dict)
+                    and str(error_payload.get("rt_cd", "0")) not in {"0", ""}
+                    and error_payload.get("msg_cd") == "EGW00123"
+                )
+            if (response.status_code == 401 or expired_token) and not auth_refreshed:
                 auth_refreshed = True
                 self.invalidate_access_token()
                 self.issue_access_token(force=True)
