@@ -54,6 +54,33 @@ backfilled only within 24 hours; historical overlays are not replayed. New overl
 after bridge activation retain completion notices. Work ACK/handoff success remains
 silent and never substitutes for a producer completion notice.
 
+YouTube and PRISM still collect through GitHub, but their `deploy` jobs are
+intentionally skipped with the local backend. Their successful build alone does
+not prove delivery. The local publisher now queues a separate advisory completion
+only for a canonical successful run completed within 24 hours, after matching one
+trusted main-branch GitHub run and exact attempt. The successful collection step
+must contain the canonical start/finish times, and the Pages snapshot step must
+also succeed. Gate-only runs, YouTube `publish=false`, failures, native cloud
+deployments and superseded cloud deployments cannot create these local notices.
+
+Before sending, the existing trusted Telegram workflow rechecks that attempt and
+the immutable manifest hash. Under the publication lane lock it checks the
+published input packet's source run, completion time and recomputed source hash,
+then compares its bytes with the actual live Pages packet in addition to the
+existing site verification. The notice describes external material processing and
+publication; it does not claim a new investment analysis or Work report. Work ACK
+and handoff remain silent. Rebuilding a packet or retrying a tick cannot create a
+second completion event for the same immutable advisory run.
+
+The outbox retains the existing three-attempt budget, 15-minute dispatch cooldown,
+active-workflow ownership check and atomic Telegram delivery ledger. A broken
+collector or GitHub read cannot block unrelated queued failures or the other
+collector. For a missed advisory notice, inspect `notifications/events`, the exact
+GitHub attempt, live `work/v1/<surface>/latest.json`, and finally the matching
+`notifications/results` receipt. `DISPATCH_ACCEPTED` is not `SENT`. Native failure
+notifications continue through the original workflow; do not replay them through
+the advisory completion lane or dispatch the producer again merely to send a notice.
+
 Completion text distinguishes full investment research from an overlay's quote
 and account refresh. A verified strategy data publication does not establish a
 new Work briefing or a newly completed full analysis; overlay notices explicitly

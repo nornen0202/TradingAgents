@@ -223,6 +223,9 @@ jobs:
           LOCAL_EVENT_ID: ${{ inputs.local_event_id }}
           NOTIFICATION_DRY_RUN: ${{ inputs.dry_run || false }}
           LOCAL_PYTHON_UNAVAILABLE: ${{ steps.local_python.outputs.unavailable }}
+          GH_TOKEN: ${{ github.token }}
+          TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR }}
+          TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.DEPLOYMENT_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.DEPLOYMENT_TELEGRAM_NOTIFICATION_CHAT_ID }}
         run: |
