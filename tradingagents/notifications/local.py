@@ -168,7 +168,7 @@ def reconcile_safely(archive, state):
 
 def compose(event, archive, state):
     if event.get("kind") == "failure":
-        if event.get("stage") not in {"preflight", "analysis", "publish"}:
+        if event.get("stage") not in {"launcher", "preflight", "analysis", "publish"}:
             raise NotificationError("Unknown local failure stage.")
         if not re.fullmatch(r"[A-Za-z0-9_]+", str(event.get("error_type", ""))):
             raise NotificationError("Unsafe local diagnostic.")
@@ -208,10 +208,14 @@ def compose(event, archive, state):
                 or not verify_live(state / "site")):
             raise NotificationError("Local Pages delivery is not verified for this analysis run.")
     market = event["market"]
-    text = (f"TradingAgents {market.upper()} 투자 분석 완료\n"
+    overlay = settings.get("run_mode", "full") == "overlay_only"
+    title = "시세·계좌 갱신 완료" if overlay else "투자 분석 완료"
+    detail = ("기존 연구를 재사용한 갱신이며 새로운 전체 분석 완료가 아닙니다.\n"
+              if overlay else "")
+    text = (f"TradingAgents {market.upper()} {title}\n"
             f"완료 시각: {event['finished_at']}\n"
-            f"종목: {summary['successful_tickers']}/{summary['total_tickers']} 성공 · 실패 0\n"
-            "공개 보고서 반영을 확인했습니다.\n"
+            f"종목: {summary['successful_tickers']}/{summary['total_tickers']} {'갱신' if overlay else '분석'} 성공 · 실패 0\n"
+            f"{detail}공개 전략 데이터 반영을 확인했습니다.\n"
             "분석 방향과 실제 주문 가능 여부는 별개입니다. 최신 시세·계좌·위험 조건을 재확인하세요.")
     base = "https://nornen0202.github.io/TradingAgents"
     buttons = [[{"text": f"{market.upper()} 모바일 전략", "url": f"{base}/mobile/strategy.html?market={market}"}]]

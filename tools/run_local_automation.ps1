@@ -7,17 +7,26 @@ param(
 $ErrorActionPreference = "Stop"
 $stateRoot = Join-Path $RepositoryRoot ".runtime\local-automation"
 $pythonPath = Join-Path $RepositoryRoot ".venv\Scripts\python.exe"
-if (-not (Test-Path -LiteralPath $pythonPath)) { throw "Local Python runtime is unavailable." }
-[IO.Directory]::CreateDirectory($stateRoot) | Out-Null
+. (Join-Path $PSScriptRoot 'local_automation_launcher_notifications.ps1')
+$pythonInvoked = $false
+$locationPushed = $false
+$launcherErrorType = 'LocalRuntimeUnavailable'
 
 # Never change the user's checkout or the runner workspaces. Materialize a
 # tracked, immutable main revision for each run; no credentials are copied.
-Push-Location $RepositoryRoot
 try {
+    if (-not (Test-Path -LiteralPath $pythonPath)) { throw "Local Python runtime is unavailable." }
+    $launcherErrorType = 'StateDirectoryUnavailable'
+    [IO.Directory]::CreateDirectory($stateRoot) | Out-Null
+    $launcherErrorType = 'SourceFetchFailed'
+    Push-Location $RepositoryRoot
+    $locationPushed = $true
     & git fetch fork main --quiet
     if ($LASTEXITCODE -ne 0) { throw "Could not refresh fork/main." }
+    $launcherErrorType = 'SourceRevisionInvalid'
     $revision = (& git rev-parse fork/main).Trim()
     if ($revision -notmatch '^[0-9a-f]{40}$') { throw "Invalid source revision." }
+    $launcherErrorType = 'SourceSnapshotUnavailable'
     $sourceRoot = Join-Path $stateRoot "source\$revision"
     $sourceMutex = [Threading.Mutex]::new($false, "Local\TradingAgentsSource-$revision")
     $sourceOwned = $false
@@ -36,6 +45,7 @@ try {
         if ($sourceOwned) { $sourceMutex.ReleaseMutex() }
         $sourceMutex.Dispose()
     }
+    $launcherErrorType = 'WorkerPreparationFailed'
     $env:PYTHONUTF8 = "1"
     $env:TRADINGAGENTS_SOURCE_SHA = $revision
     $env:TRADINGAGENTS_API_KEYS_PATH = Join-Path $RepositoryRoot "config\api_keys.json"
@@ -52,12 +62,28 @@ try {
     # Windows PowerShell converts redirected native stderr to error records.
     # A recoverable Python warning must not terminate the worker mid-attempt.
     $savedErrorActionPreference = $ErrorActionPreference
+    $launcherErrorType = 'WorkerLaunchFailed'
+    $exitSentinel = [int]::MinValue
+    $global:LASTEXITCODE = $exitSentinel
     try {
         $ErrorActionPreference = "Continue"
         & $pythonPath @arguments *>> $logPath
         $workerExitCode = $LASTEXITCODE
     } finally {
+        # Native launch/redirection errors leave LASTEXITCODE unset. A real
+        # Python exit, including failure, owns its existing terminal notification.
+        $pythonInvoked = $LASTEXITCODE -ne $exitSentinel
         $ErrorActionPreference = $savedErrorActionPreference
     }
+    if (-not $pythonInvoked) { throw "Local Python worker could not start." }
     if ($workerExitCode -ne 0) { throw "Local $Command failed. See $logPath" }
-} finally { Pop-Location }
+    # End worker process boundary.
+} catch {
+    if (-not $pythonInvoked -and -not $DryRun) {
+        try { Send-LocalAutomationLauncherFailure -StateRoot $stateRoot -ErrorType $launcherErrorType }
+        catch { Write-Warning 'Launcher notification remains pending; durable state or dispatch was unavailable.' }
+    }
+    throw
+} finally {
+    if ($locationPushed) { Pop-Location }
+}

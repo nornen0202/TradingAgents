@@ -121,6 +121,25 @@ def test_live_verification_holds_the_publication_lane(tmp_path, monkeypatch):
     assert local.notify(key, archive, state, dry_run=True)["status"] == "DRY_RUN"
 
 
+@pytest.mark.parametrize("mode", ["full", "overlay_only"])
+def test_completion_message_distinguishes_research_from_quote_refresh(tmp_path, monkeypatch, mode):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    manifest = completed(archive, mode)
+    write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
+    published_strategy(state, manifest)
+    monkeypatch.setattr(automation, "verify_live", lambda _: True)
+    text, _, _ = local.compose({"kind": "success", "run_id": manifest["run_id"],
+                                "market": "kr", "finished_at": manifest["finished_at"]}, archive, state)
+    if mode == "overlay_only":
+        assert text.splitlines()[0] == "TradingAgents KR 시세·계좌 갱신 완료"
+        assert "새로운 전체 분석 완료가 아닙니다" in text
+        assert "30/30 갱신 성공" in text
+    else:
+        assert text.splitlines()[0] == "TradingAgents KR 투자 분석 완료"
+        assert "30/30 분석 성공" in text
+    assert "공개 전략 데이터 반영" in text
+
+
 def test_dispatch_is_not_sent_and_active_owner_prevents_retry(tmp_path, monkeypatch):
     archive, state, _, key = prepared(tmp_path, monkeypatch)
     calls = []
@@ -235,5 +254,14 @@ def test_workflow_keeps_cloud_path_and_uses_bound_main_local_receipt():
     assert "github.ref == 'refs/heads/main'" in job['if']
     assert job['runs-on'] == ['tradingagents-pages']
     assert job['steps'][0]['with']['ref'] == 'main'
-    assert 'DEPLOYMENT_TELEGRAM_BOT_TOKEN' in job['steps'][1]['env']['TELEGRAM_BOT_TOKEN']
+    sender = next(step for step in job['steps'] if 'TELEGRAM_BOT_TOKEN' in step.get('env', {}))
+    assert 'DEPLOYMENT_TELEGRAM_BOT_TOKEN' in sender['env']['TELEGRAM_BOT_TOKEN']
+    fallback = next(step for step in job['steps'] if step.get('uses', '').startswith('actions/setup-python@'))
+    assert "steps.local_python.outputs.unavailable == 'true'" in fallback['if']
+    assert fallback['with']['python-version'] == '3.13'
+    probe = next(step for step in job['steps'] if step.get('id') == 'local_python')
+    assert not probe.get('env') and 'secrets.' not in probe['run']
+    assert 'WaitForExit(10000)' in probe['run']
+    assert "$env:LOCAL_PYTHON_UNAVAILABLE -eq 'true'" in sender['run']
+    assert "Join-Path $env:pythonLocation 'python.exe'" in sender['run']
     assert len(jobs['notify_remote']['steps']) == 6

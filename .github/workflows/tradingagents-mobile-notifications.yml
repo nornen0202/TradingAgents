@@ -187,11 +187,42 @@ jobs:
         with:
           ref: main
           persist-credentials: false
+      - name: Check notification Python runtime
+        id: local_python
+        shell: pwsh
+        run: |
+          $python = 'C:/Projects/TradingAgents/.venv/Scripts/python.exe'
+          $usable = $false
+          if (Test-Path -LiteralPath $python -PathType Leaf) {
+            $probe = [Diagnostics.Process]::new()
+            try {
+              $probe.StartInfo.FileName = $python
+              $probe.StartInfo.Arguments = '-I -S -c "import sys, json, urllib.request, zoneinfo; sys.exit(sys.version_info < (3, 10))"'
+              $probe.StartInfo.UseShellExecute = $false
+              $probe.StartInfo.CreateNoWindow = $true
+              $probe.StartInfo.RedirectStandardOutput = $true
+              $probe.StartInfo.RedirectStandardError = $true
+              if ($probe.Start()) {
+                $stdout = $probe.StandardOutput.ReadToEndAsync()
+                $stderr = $probe.StandardError.ReadToEndAsync()
+                if ($probe.WaitForExit(10000)) { $usable = $probe.ExitCode -eq 0 }
+                else { $probe.Kill() }
+              }
+            } catch { $usable = $false }
+            finally { $probe.Dispose() }
+          }
+          "unavailable=$(((-not $usable).ToString()).ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+      - name: Set up independent failure-notification Python when analysis runtime is unavailable
+        if: ${{ steps.local_python.outputs.unavailable == 'true' }}
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
       - name: Validate canonical local outbox and deliver with existing Telegram pipeline
         shell: pwsh
         env:
           LOCAL_EVENT_ID: ${{ inputs.local_event_id }}
           NOTIFICATION_DRY_RUN: ${{ inputs.dry_run || false }}
+          LOCAL_PYTHON_UNAVAILABLE: ${{ steps.local_python.outputs.unavailable }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.DEPLOYMENT_TELEGRAM_BOT_TOKEN }}
           TELEGRAM_NOTIFICATION_CHAT_ID: ${{ secrets.DEPLOYMENT_TELEGRAM_NOTIFICATION_CHAT_ID }}
         run: |
@@ -201,5 +232,7 @@ jobs:
             '--archive-dir', 'C:/TradingAgentsData/archive',
             '--state-dir', 'C:/Projects/TradingAgents/.runtime/local-automation')
           if ($env:NOTIFICATION_DRY_RUN -eq 'true') { $argsList += '--dry-run' }
-          & 'C:/Projects/TradingAgents/.venv/Scripts/python.exe' @argsList
+          $python = 'C:/Projects/TradingAgents/.venv/Scripts/python.exe'
+          if ($env:LOCAL_PYTHON_UNAVAILABLE -eq 'true') { $python = Join-Path $env:pythonLocation 'python.exe' }
+          & $python @argsList
           if ($LASTEXITCODE -ne 0) { throw 'Local Telegram delivery failed; receipt remains pending.' }
