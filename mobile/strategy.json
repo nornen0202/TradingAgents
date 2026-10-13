@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.mobile-strategy/v1",
-  "generated_at": "2026-10-13T12:10:48.962009+09:00",
+  "generated_at": "2026-10-13T13:00:42.714986+09:00",
   "privacy": "PLAINTEXT_ACTION_DATA_NO_RAW_ACCOUNT_IDENTIFIERS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:0a211a0643e409b8e85c3014abd488d3",
-      "source_health": "OK",
-      "report_mode": "READY",
+      "event_id": "kr:324abaa5c5cc672ac207be363b88b927",
+      "source_health": "STALE",
+      "report_mode": "OUTAGE",
       "run_id": "20261013T120358_local-scheduler-kr-overlay_only",
       "started_at": "2026-10-13T12:03:58.433443+09:00",
       "manifest_status": "success",
@@ -23,7 +23,7 @@
         "analysis_trade_date_latest": "2026-10-08",
         "market_data_oldest_at": "2026-10-13T12:04:00+09:00",
         "market_data_latest_at": "2026-10-13T12:04:00+09:00",
-        "market_data_status": "FRESH",
+        "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true,
         "market_data_row_count": 30,
         "market_data_observed_count": 30,
@@ -49,7 +49,7 @@
         "status": "success",
         "finished_at": "2026-10-12T09:40:06.609719+09:00"
       },
-      "decision_ready": true,
+      "decision_ready": false,
       "source": {
         "run_id": "20261013T120358_local-scheduler-kr-overlay_only",
         "last_run_at": "2026-10-13T12:06:23.438159+09:00",
@@ -57,13 +57,13 @@
       },
       "guardrails": {
         "valid_until": "2026-10-13T12:34:00+09:00",
-        "expired_at_build": false,
-        "decision_ready": true,
-        "conditional_strategy_ready": true
+        "expired_at_build": true,
+        "decision_ready": false,
+        "conditional_strategy_ready": false
       },
       "quality": {
-        "decision_ready": true,
-        "conditional_strategy_ready": true,
+        "decision_ready": false,
+        "conditional_strategy_ready": false,
         "quality_label_ko": "장중 투자 판단 가능",
         "fresh_row_ratio": 1.0,
         "conditional_row_ratio": 1.0,
@@ -96,6 +96,12 @@
       "portfolio_action_count": 30,
       "rows": [
         {
+          "reference_strategy": {
+            "strategy_code": "SELL",
+            "strategy_ko": "매도·청산 검토",
+            "decision_state_ko": "투자 근거 무효화",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -347,21 +353,26 @@
             "position_sizing": "현재 신규 배정은 0이다. 보유 수량·원가·순자산·가용현금·반도체 집중도가 없어 실제 주문 수량이나 한도 초과 여부는 산출할 수 없다. 트레이더가 제안하고 보수적·중립 분석가가 지지한 상한은 종목 전체 계획손실 순자산의 0.5%, 종목 비중 5%, 반도체 합산 20%이며 채울 목표가 아니다. 기존 계좌 규칙이 더 엄격하면 우선한다. 추가 가능 수량은 기존 노출을 차감한 잔여 손실예산을 주당 현실적 손실로 나눈 수량, 종목·업종 잔여 배정한도에 따른 수량, 가용현금으로 살 수 있는 수량 중 최솟값을 정수로 내린다. 주당 손실에는 실제 진입가와 검증된 무효화가의 차이, 왕복 비용·슬리피지·갭 완충액을 포함한다. 잔여 한도가 없으면 추가 수량은 0이다. 향후 시험 진입은 허용 추가 수량의 10% 이내이며 1주 미만이면 생략한다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "매도·청산 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "000660.KS",
           "display_name": "SK하이닉스",
           "is_held": true,
-          "strategy_code": "SELL",
-          "strategy_ko": "매도·청산 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 1459000.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 1489879.9773422554,
@@ -376,8 +387,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 1,678,000 이하 하락, 종가 확인 후 손절 조건 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "1,678,000 이하 하락, 종가 확인 후 손절 조건",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "투자 근거 무효화",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "투자 근거 무효화",
           "display_priority": 1,
           "table_priority": 1,
@@ -386,17 +397,20 @@
             "intraday invalidation breached"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "000660.KS",
@@ -507,6 +521,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "SELL",
+            "strategy_ko": "매도·청산 검토",
+            "decision_state_ko": "투자 근거 무효화",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -746,21 +766,26 @@
             "position_sizing": "현재 083450.KQ 신규 매수 수량은 0이다. 순자산, 보유 수량, 취득원가, 현금 및 기존 손실위험이 없어 실행 수량은 산출할 수 없다. 추후 진입 심사에는 기존 보유분을 포함한 총 노출 5% 이하와 해당 설정의 계획손실 0.25% 이하를 포트폴리오 순자산 대비 상한으로 제안한다. 이는 확인된 회사 공통 규정이나 반드시 채울 목표가 아니다. 실제 계좌·상관 업종 한도가 더 엄격하면 이를 우선한다. 추가 수량은 남은 노출 한도, 남은 손실예산, 미사용 현금으로 각각 산출한 수량 중 최솟값을 정수로 내림하고 유동성 제약을 적용한다. 55,000원과 52,300원의 주당 가격위험은 비용 전 2,700원이다. 시험 진입은 승인된 추가 수량의 최대 25%이며 후속 매수도 같은 합산 예산을 사용한다. 기보유분의 손실위험을 정량화할 수 없거나 여력이 없으면 추가하지 않는다. 대기 자금은 현금으로 유지한다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "매도·청산 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "083450.KQ",
           "display_name": "GST",
           "is_held": true,
-          "strategy_code": "SELL",
-          "strategy_ko": "매도·청산 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 52400.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 53038.96056146119,
@@ -775,8 +800,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 54,400 이하 하락, 종가 확인 후 손절 조건 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "54,400 이하 하락, 종가 확인 후 손절 조건",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "투자 근거 무효화",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "투자 근거 무효화",
           "display_priority": 2,
           "table_priority": 2,
@@ -785,17 +810,20 @@
             "intraday invalidation breached"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "083450.KQ",
@@ -908,6 +936,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "REDUCE",
+            "strategy_ko": "비중 축소 검토",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -1167,21 +1201,26 @@
             "position_sizing": "005930.KS 현재 신규 배정은 0이다. 재검증 후에도 단일 전술 아이디어의 기존·추가 물량 합산 계획손실은 순자산의 0.25% 이내, 핵심·전술을 합친 종목 비중은 5% 이내로 제한하며 기존 계좌 한도가 더 낮으면 이를 따른다. 보수적 분석가의 예처럼 비중 5%를 262000원에서 246000원까지 유지하면 비용 전 순자산 손실이 약 0.31%이므로 두 한도는 독립적으로 충족해야 한다. 신규 수량은 잔여 손실예산을 실제 진입가와 구조적 손절가의 차이 및 주당 비용·불리한 체결 여유로 나눈 수량, 가용현금 한도 수량, 종목·업종 잔여 한도 수량 중 최솟값을 내림한다. 시험 진입은 이렇게 검증된 최종 신규 수량의 25% 이하이며 확대도 동일한 누적 손실예산 안에서만 한다. 순자산·현금·기존 수량·업종 집중도 자료가 없어 실제 수량은 산출하지 않는다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "비중 축소 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "005930.KS",
           "display_name": "삼성전자",
           "is_held": true,
-          "strategy_code": "REDUCE",
-          "strategy_ko": "비중 축소 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 229500.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 235003.8777905188,
@@ -1196,8 +1235,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 257,000 이하 하락, 2개 봉 확인 후 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "257,000 이하 하락, 2개 봉 확인 후 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 3,
           "table_priority": 6,
@@ -1206,17 +1245,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "005930.KS",
@@ -1329,6 +1371,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "REDUCE",
+            "strategy_ko": "비중 축소 검토",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -1568,21 +1616,26 @@
             "position_sizing": "현재 신규 주문수량은 0이다. 재무 정합성 공백을 반영해 보수적 분석가의 최초 계획손실 순자산 0.0625%, 전체 보유·신규 합산 계획손실 0.25%, 종목 비중 5%를 임시 상한으로 채택한다. 이는 최적 비중의 실증값이 아니라 불확실성에 대한 운용 판단이다. 최초 진입은 계획 총수량의 최대 25% 조건도 별도로 충족해야 한다. 원안의 0.5%·10% 한도를 현재 확대 목표로 사용하지 않는다. 실제 신규 수량은 가용 손실예산을 실제 진입가와 검증된 손절가의 차이 및 주당 왕복비용의 합으로 나눈 수량, 가용 현금으로 가능한 수량, 기존 보유를 차감한 비중 한도 수량 중 최솟값을 정수로 내림한다. 업종 집중도와 갭 위험에 따라 더 줄이고 차입은 사용하지 않는다. 기존 보유는 검증된 한도 초과분을 감축하되 불확실성만으로 일률적인 절반 매도를 지시하지 않는다. 순자산·보유량·현금·실제 손절가가 확인 불가이므로 주문 주수와 현재 초과 여부는 산출할 수 없다. 무보유자는 현금을 유지한다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "비중 축소 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "278470.KS",
           "display_name": "에이피알",
           "is_held": true,
-          "strategy_code": "REDUCE",
-          "strategy_ko": "비중 축소 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 283500.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 300364.6134951726,
@@ -1597,8 +1650,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 356,500 이하 하락, 종가 확인 후 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "356,500 이하 하락, 종가 확인 후 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 4,
           "table_priority": 7,
@@ -1607,17 +1660,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "278470.KS",
@@ -1733,6 +1789,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "REDUCE",
+            "strategy_ko": "비중 축소 검토",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -1946,21 +2008,26 @@
             "position_sizing": "현재 신규 주문수량은 0이다. 순자산, 보유수량·평단, 가용현금과 업종 집중도가 없어 실제 매매수량은 산출할 수 없다. 기존 보유를 포함한 종목 비중은 순자산의 4%, 계획 손실예산은 0.25%를 제안 상한으로 둔다. 기존 위험은 최초 매수가가 아니라 최신 평가액에서 재측정한다. 신규수량은 남은 손실예산을 진입가와 구조적 손절가의 차이 및 주당 비용·체결 미끄러짐·갭 완충의 합으로 나눈 수량, 남은 비중한도에 따른 수량, 가용현금에 따른 수량 중 최솟값을 정수 내림하고 0 미만이면 0으로 한다. 업종 위험 여력도 필요하다. 정상 단계축소와 중간 단계를 건너뛰는 갭 스트레스를 각각 계산해 더 엄격한 제약을 적용한다. 향후 시험매수는 산출한 계획 신규수량의 최대 25%로 제한한다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "비중 축소 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "058470.KQ",
           "display_name": "리노공업",
           "is_held": true,
-          "strategy_code": "REDUCE",
-          "strategy_ko": "비중 축소 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 76300.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 76882.80651753266,
@@ -1975,8 +2042,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 84,300 이하 하락, 종가 확인 후 (거래량 조건 없음) 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "84,300 이하 하락, 종가 확인 후 (거래량 조건 없음) 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 5,
           "table_priority": 8,
@@ -1985,17 +2052,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "058470.KQ",
@@ -2101,6 +2171,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "REDUCE",
+            "strategy_ko": "비중 축소 검토",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -2365,21 +2441,26 @@
             "position_sizing": "현재 신규 배정은 0이다. 향후 최종 종목 비중은 순자산가치의 최대 2%, 최초 시험 매수는 계획 포지션의 25% 이내이면서 순자산가치의 최대 0.5%로 제한한다. 기존 보유를 포함한 합산 계획손실은 순자산가치의 0.25% 이내다. 수량은 배정액·잔여 종목 한도·비용 차감 후 가용현금으로 계산한 매수 가능 수량과 잔여 허용손실액을 주당 계획손실로 나눈 수량 중 최솟값을 정수로 내림한다. 주당 계획손실에는 진입가와 확정 손절가의 차이, 왕복비용 및 예상 슬리피지를 포함한다. 기존 보유가 위험 예산을 소진하면 추가 수량은 0이다. 기존 포트폴리오의 더 엄격한 종목·업종 한도를 우선한다. 실제 순자산가치·보유량·원가·현금·손절이 없어 확정 수량과 초과 비중은 산출할 수 없다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "비중 축소 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "042700.KS",
           "display_name": "한미반도체",
           "is_held": true,
-          "strategy_code": "REDUCE",
-          "strategy_ko": "비중 축소 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 219500.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 224063.22957388204,
@@ -2394,8 +2475,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 252,000 이하 하락, 다음 거래일 확인 후 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "252,000 이하 하락, 다음 거래일 확인 후 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 6,
           "table_priority": 9,
@@ -2404,17 +2485,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "042700.KS",
@@ -2529,6 +2613,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "REDUCE",
+            "strategy_ko": "비중 축소 검토",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -2774,21 +2864,26 @@
             "position_sizing": "353200.KS 신규 주문수량은 0이다. 향후 시험매수는 순자산의 0.5% 이하, 기존 보유를 포함한 총 종목 비중은 3% 이하로 제한한다. 신규 거래와 종목 전체 잔여 계획손실은 각각 순자산의 0.25% 이하여야 한다. 수량은 시험매수 금액 한도, 종목·업종 집중도 잔여 한도, 가용 현금, 비용·슬리피지를 포함한 주당 위험으로 산출한 허용수량 중 최솟값을 정수로 내림한다. 기존 보유도 같은 위험한도를 점검하고 초과하면 목표가격이나 수익 여부와 관계없이 한도 내로 감축한다. 계좌 순자산·보유수량·원가·업종 노출이 없어 실제 매도수량이나 안전한 잔여 비중은 산출할 수 없다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "비중 축소 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "353200.KS",
           "display_name": "대덕전자",
           "is_held": true,
-          "strategy_code": "REDUCE",
-          "strategy_ko": "비중 축소 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 138300.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 140394.82545307543,
@@ -2803,8 +2898,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 158,200 이상 도달, 장중 확인 시 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "158,200 이상 도달, 장중 확인 시 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 7,
           "table_priority": 10,
@@ -2813,17 +2908,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "353200.KS",
@@ -2923,6 +3021,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "REDUCE",
+            "strategy_ko": "비중 축소 검토",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -3167,21 +3271,26 @@
             "position_sizing": "계좌 순자산·보유량·원가·현금·업종 집중도가 없어 실제 주문 수량은 산정할 수 없다. 향후 신규 거래 손실예산은 순자산의 0.25%, 기존분을 포함한 종목 전체 잔여 손실예산은 0.50%, 종목 총평가액은 5%를 상한으로 제안한다. 주당 위험은 진입가와 구조적 손절가의 차이에 왕복 체결비용과 갭 완충액을 더한다. 신규 최대수량은 신규 손실예산, 기존 위험 차감 후 잔여 손실예산, 기존 평가액 차감 후 종목 비중 한도 및 가용현금이 각각 허용하는 수량 중 최솟값을 정수로 내린 값이다. 시험 진입은 그 수량의 25% 이하이며 차입하지 않는다. 기존 주식과 상장지수펀드를 합산한 업종 한도도 충족해야 한다. 매도 계획은 시작 시 확인된 보유량을 기준으로 이익실현 20%·20%, 위험관리 20%, 핵심 40%를 구분한다. 각 물량은 한 번만 사용하고 누적 매도는 잔여수량을 넘지 않는다. 핵심 40%도 위험 한도 초과나 최종 무효화 시 보호되지 않는다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "비중 축소 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "403870.KQ",
           "display_name": "HPSP",
           "is_held": true,
-          "strategy_code": "REDUCE",
-          "strategy_ko": "비중 축소 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 58200.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 59458.78881278829,
@@ -3196,8 +3305,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 66,900 이상 도달, 2개 봉 확인 후 (상승 거래량 둔화 또는 매도 거래량 확대를 보조 확인) 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "66,900 이상 도달, 2개 봉 확인 후 (상승 거래량 둔화 또는 매도 거래량 확대를 보조 확인) 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 8,
           "table_priority": 11,
@@ -3206,17 +3315,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "403870.KQ",
@@ -3321,6 +3433,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -3554,21 +3672,26 @@
             "position_sizing": "현재 신규 주문은 0이다. 향후 별도 계획이 승인되면 장중 시험 진입은 위험예산으로 산정한 예정 수량의 최대 25%, 종목 총비중은 순자산의 2%, 종목 전체 계획 손실은 순자산의 0.25% 이내로 제한한다. 신규 수량은 비중한도 잔여액÷진입가, 기존 위험을 차감한 잔여 손실예산÷(진입가−구조적 손절가+주당 예상 비용), 가용현금÷비용 포함 매입단가 중 최솟값을 정수로 내림한다. 잔여 예산이 없으면 매수하지 않는다. 같은 전력설비·데이터센터 수요에 노출된 다른 보유자산과 계좌 전체 위험한도를 함께 적용하며 차입 매수는 하지 않는다. 기존 보유분에도 단계별 잔량과 비중·손실한도 중 더 엄격한 기준을 적용한다. 보유량·원가·순자산·현금이 없어 실제 주문 수량은 산출할 수 없다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "010120.KS",
           "display_name": "LS ELECTRIC",
           "is_held": true,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 175700.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 177186.3860669527,
@@ -3583,8 +3706,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "010120.KS의 가격 제공자 간 종가 차이·분할 조정·호가단위를 대사하고 실제 거래일과 신선한 정규장 봉·호가·거래량가중평균가격을 확인한다. / 192,100~195,500원에서 저점 갱신 중단과 재시험 지지를 관찰한다. 지지 접촉 자체는 매수 신호가 아니다.",
           "risk_condition_ko": "200,854 이하 하락, 2개 봉 확인 후 (위험 축소에는 매수용 상대거래량 하한을 적용하지 않는다.) 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 9,
           "table_priority": 12,
@@ -3593,17 +3716,20 @@
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "010120.KS",
@@ -3709,6 +3835,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -3943,21 +4075,26 @@
             "position_sizing": "현재 신규 배정은 0이다. 향후 시험 비중은 순자산의 0.5%, 종목 총비중 3%, 동일 전력인프라 테마 합산 10%, 종목 전체 계획손실 0.25%를 각각 상한으로 적용한다. 목표 비중이 아니며 가장 엄격한 한도가 우선한다. 기존 보유의 현재가 기준 스트레스 손실을 먼저 차감하고 잔여 손실예산이 없으면 추가 진입하지 않는다. 신규 수량은 잔여 손실예산을 주당 스트레스 손실로 나눈 수량, 비중·집중도 잔여 한도 수량, 비용을 반영한 가용현금 수량 중 최솟값을 내림한다. 주당 스트레스 손실은 진입가와 검증된 손절가의 차이, 최신 평균진폭, 별도 갭 스트레스 중 큰 값에 비용을 더한다. 계좌 순자산·보유량·현금·테마 노출이 없어 실제 수량은 산출할 수 없다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "267260.KS",
           "display_name": "HD현대일렉트릭",
           "is_held": true,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 538000.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 548097.0852895149,
@@ -3972,8 +4109,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "실제 거래일·정규장 운영·거래정지·시장경보와 최신 시세·호가 시각을 확인하고 계좌 손실예산·집중도를 먼저 점검한다. / 596,000원 유지, 623,000~628,000원 회복·재시험, 643,000원 매물 흡수 여부를 관찰한다. 관찰선 도달은 자동 매수 지시가 아니다.",
           "risk_condition_ko": "596,000 이하 하락, 종가 확인 후 (거래량 미확인을 지지 유지의 증거로 해석하지 않는다.) 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 10,
           "table_priority": 13,
@@ -3982,17 +4119,20 @@
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "267260.KS",
@@ -4099,6 +4239,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -4357,21 +4503,26 @@
             "position_sizing": "현재 010140.KS 신규 주문 수량은 0이다. 향후 재승인되는 시험 진입은 위험한도에 맞춰 산정한 전체 계획 수량의 최대 25%, 초기 계좌위험 0.25% 이내로 제한한다. 기존 보유와 추가분의 합산 예상손실 상한은 계좌평가액의 0.5%, 종목 시가 노출 상한은 5%로 두며 기존 정책이 더 엄격하면 우선한다. 신규 허용 수량은 잔여 손실예산을 주당 예상손실로 나눈 정수 수량, 가용현금 한도 수량, 집중도 한도 수량 중 최솟값이다. 기존 보유 위험은 최신 가격부터 검증된 위험 경계까지의 추가 손실에 비용·슬리피지·갭 여유를 더해 평가하되, 이미 발생한 손실이나 기존 계좌 손실한도를 초기화하지 않는다. 계좌규모·보유량·매입가·현금·조선업 상관 노출이 없어 실제 주문 수량과 감축 비율은 산정할 수 없다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "010140.KS",
           "display_name": "삼성중공업",
           "is_held": true,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 17350.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 17513.60650707003,
@@ -4386,8 +4537,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "010140.KS 실제 거래일·세션·최신 체결시각·매수매도 호가·스프레드·거래량과 정상적인 세션 거래량가중평균가격을 우선 확인한다. / 18,850원 재시험, 19,160원 재탈환 실패와 18,440원 거래량 동반 이탈을 우선 감시한다. 위험한도 위반은 별도 감축 사유다.",
           "risk_condition_ko": "18,440 이하 하락, 거래량 조건 확인 후 (비교 가능한 거래량 기준 대비 증가를 동반한 하향 이탈 확인) 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 11,
           "table_priority": 14,
@@ -4396,17 +4547,20 @@
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "010140.KS",
@@ -4513,6 +4667,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "REDUCE",
             "rating": "UNDERWEIGHT",
@@ -4760,21 +4920,26 @@
             "position_sizing": "035420.KS 신규 배정은 0이다. 보유 수량·총자산·현금·기존 손실예산은 확인 자료가 없어 실제 주문 주수는 산정하지 않는다. 위험정책으로 총보유 시가를 총자산의 3%와 기존 계좌 집중한도 중 더 엄격한 한도 이하로 관리한다. 향후 승인 거래의 계획 손실은 총자산의 0.25%와 기존 손실한도 중 더 엄격한 한도 이하, 시험 매수는 승인 최대 보유량의 25% 이하로 제한한다. 기존 보유와 관련 상품의 중첩 노출을 먼저 반영한다. 신규 가능 수량은 잔여 손실예산을 주당 위험으로 나눈 값, 가용현금을 비용 포함 진입가로 나눈 값, 잔여 집중한도를 진입가로 나눈 값 중 최솟값을 정수 주로 내림한다. 주당 위험에는 검증된 무효화 가격까지의 거리와 예상 왕복 비용·슬리피지를 포함한다. 한도는 목표 비중이 아니며 하락 중 평균단가 인하 목적의 추가 매수는 금지한다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "035420.KS",
           "display_name": "NAVER",
           "is_held": true,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 174700.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 174930.62778578105,
@@ -4789,8 +4954,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "035420.KS의 실제 거래일·세션·최신 체결·호가·잔량·스프레드·거래정지 여부부터 확인한다. 제공된 2026-10-08 20:00 자료와 비정상적인 거래량가중평균가격 670110558.30원은 실행 근거에서 제외한다. / 가격 기준일 2026-10-08과 판단일 2026-10-12를 구분하고 2026-10-11 뉴스가 과거 종가에 반영됐다고 가정하지 않는다.",
           "risk_condition_ko": "183,100 이하 하락, 2개 봉 확인 후 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 12,
           "table_priority": 15,
@@ -4799,17 +4964,20 @@
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "035420.KS",
@@ -4917,6 +5085,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "REDUCE",
             "rating": "UNDERWEIGHT",
@@ -5162,21 +5336,26 @@
             "position_sizing": "현재 신규 수량은 0이며 보유량·취득가·순자산·현금·관련 업종 노출은 확인 불가다. 향후 매수 가능 상태로 재평가될 때만 시험 진입을 정상 목표비중의 최대 25%, 기존 보유를 포함한 종목 총비중을 순자산의 3% 이하, 거래당 계획 손실을 순자산의 0.25% 이하로 제한한다. 모두 상한이며 목표 배정이 아니다. 허용 손실액을 구조적 손절 거리와 주당 왕복비용·슬리피지의 합으로 나눈 수량, 갭 스트레스 기준 수량, 가용현금 기준 수량, 종목 잔여 한도 및 시험 진입 한도 중 최솟값을 정수로 내림한다. 관련 발전·원전 노출도 합산하며 레버리지는 사용하지 않는다. 중립 분석가의 정정을 채택한다. 79800 매수·73300 청산 가정에서 비중 3%의 손실은 비용 전 순자산 약 0.244%이며, 약 0.35% 사례는 종목 비중 한도를 동시에 적용한 결과가 아니다. 다만 73300은 예상 체결가나 최대 손실 경계가 아니다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "holding",
           "ticker": "034020.KS",
           "display_name": "두산에너빌리티",
           "is_held": true,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 68500.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 68882.23553659032,
@@ -5191,8 +5370,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "034020.KS의 실제 거래일 달력, 최신 정규장 가격·호가 시각, 정상 장중 거래량가중평균가격과 검증된 동시간대 누적 상대거래량을 확보한다. / 75200 방어와 78700~79800 회복 실패를 구분한다. 지지 접촉만으로 매수하지 않으며 위험 축소와 손절 신호를 우선 감시한다.",
           "risk_condition_ko": "78,700 이하 하락, 종가 확인 후 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 13,
           "table_priority": 16,
@@ -5201,17 +5380,20 @@
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "034020.KS",
@@ -5318,6 +5500,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "SELL",
+            "strategy_ko": "매도·청산 검토",
+            "decision_state_ko": "투자 근거 무효화",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -5568,21 +5756,26 @@
             "position_sizing": "현재 신규 주문 수량은 0이다. 중립 분석가의 단계적 제안을 채택해 재검증 후 첫 시험매수는 순자산의 최대 0.5%로 제한한다. 별도 확대 심사를 거친 시험매수 합계 1%, 기존 보유분을 포함한 018880.KS 총 노출 3%, 기존 전술적 보유분과 신규 주문의 합산 계획 손실 0.25%를 외곽 상한으로 둔다. 이 상한은 목표 비중이나 최적화된 수치가 아니다. 수량은 비중 한도·업종 집중도·가용 현금·잔여 손실예산이 허용하는 수량 중 최솟값을 정수로 내림한다. 위험 기준 수량에는 진입가와 손절가 차이 및 주당 왕복 비용·슬리피지를 반영한다. 실제 순자산·보유량·현금이 없어 주수는 산정할 수 없다. 새로 제안된 2% 상한만으로 기존 보유분을 기계적으로 매도하지 않으며 실제 노출과 위험부터 측정한다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "매도·청산 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "018880.KS",
           "display_name": "018880",
           "is_held": false,
-          "strategy_code": "SELL",
-          "strategy_ko": "매도·청산 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 3695.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 3744.1061969415923,
@@ -5597,8 +5790,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 3,878.83 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "3,878.83 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "투자 근거 무효화",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "투자 근거 무효화",
           "display_priority": 14,
           "table_priority": 3,
@@ -5607,17 +5800,20 @@
             "intraday invalidation breached"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "018880.KS",
@@ -5720,6 +5916,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "SELL",
+            "strategy_ko": "매도·청산 검토",
+            "decision_state_ko": "투자 근거 무효화",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -5970,21 +6172,26 @@
             "position_sizing": "순자산·보유수량·현금·업종 집중도가 없어 현재 신규 주문수량은 0이다. 향후 시험 수량은 계획 신규 목표수량의 25% 이하이며, 동일 신규 매매 아이디어의 누적 실현손실과 미청산 계획위험을 합쳐 순자산의 0.25% 이하로 제한한다. 반복 재진입마다 예산을 초기화하지 않는다. 수량은 잔여 허용손실액을 진입가와 손절가의 차이 및 주당 예상 왕복비용·슬리피지 여유의 합으로 나눈 내림값으로 산정하고, 가용현금과 종목·업종 한도로 추가 제한한다. 신규 배분 후 단일종목 총비중은 순자산 5%와 기존 계좌 한도 중 낮은 값을 적용한다. 기존 보유위험도 계좌 전체 손실예산에 합산한다. 한도는 사용할 할당량이 아니라 상한이다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "매도·청산 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "010950.KS",
           "display_name": "S-Oil",
           "is_held": false,
-          "strategy_code": "SELL",
-          "strategy_ko": "매도·청산 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 155600.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 155653.4548477201,
@@ -5999,8 +6206,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 162,000 이하 하락, 종가 확인 후 (확정 종가 이탈 시 거래량 증가를 추가로 요구하지 않음) 신규 진입 보류·보유 위험 대응 계획 재확인 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "162,000 이하 하락, 종가 확인 후 (확정 종가 이탈 시 거래량 증가를 추가로 요구하지 않음) 신규 진입 보류·보유 위험 대응 계획 재확인",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "투자 근거 무효화",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "투자 근거 무효화",
           "display_priority": 15,
           "table_priority": 4,
@@ -6009,17 +6216,20 @@
             "intraday invalidation breached"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "010950.KS",
@@ -6122,6 +6332,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "SELL",
+            "strategy_ko": "매도·청산 검토",
+            "decision_state_ko": "투자 근거 무효화",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -6405,21 +6621,26 @@
             "position_sizing": "010580.KS 신규 수량은 현재 0이다. 높은 변동성과 재무 검증 공백을 반영해 보수적 분석가의 제안인 시험진입 순자산 0.5% 이하, 기존분 포함 종목 총노출 1% 이하, 종목 전체 계획손실 0.1% 이하를 이번 관리 상한으로 채택한다. 이는 관측된 보유량이나 안전성 보장이 아니다. 향후 수량은 시험진입 예산·남은 종목 한도·가용 현금이 허용하는 수량과, 남은 손실예산을 주당 진입가와 구조적 보호선의 차이 및 왕복 거래비용으로 나눈 수량 중 최솟값을 내림한다. 음수 여유 한도는 0으로 처리한다. 기존 보유 위험과 업종·계열 집중도를 먼저 반영하고, 확인된 한도 초과는 위험 축소한다. 순자산·현금·보유량이 없어 실제 수량은 산출할 수 없다. 신규 자금은 현금 대기를 우선하며 비교 상품으로의 즉시 전환은 지시하지 않는다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "매도·청산 검토",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "010580.KS",
           "display_name": "010580",
           "is_held": false,
-          "strategy_code": "SELL",
-          "strategy_ko": "매도·청산 검토",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 2020.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 2065.713722180375,
@@ -6434,8 +6655,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 2,200 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "2,200 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "투자 근거 무효화",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "투자 근거 무효화",
           "display_priority": 16,
           "table_priority": 5,
@@ -6444,17 +6665,20 @@
             "intraday invalidation breached"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "010580.KS",
@@ -6547,6 +6771,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -6798,21 +7028,26 @@
             "position_sizing": "보유수량·취득가·순자산·현금·업종 집중도가 없어 실제 주문수량은 산출할 수 없다. 최초 25% 축소 이후에도 잔여 계획손실이 순자산의 0.5%를 넘거나 집중도 한도를 초과하면 필요한 만큼 더 줄인다. 향후 별도로 승인되는 스타터는 목표수량의 최대 25%, 신규 계획손실은 순자산의 0.25% 이내로 제한한다. 수량은 허용손실금액을 실제 진입가와 구조적 손절가의 차이 및 예상 비용으로 나눈 값, 목표수량의 25%, 가용현금과 집중도 한도가 허용하는 수량 중 최솟값을 정수화한다. 종목 평가비중 한도는 순자산의 5%를 제안하며 기존 계좌 기준이 더 엄격하면 이를 따른다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "066570.KS",
           "display_name": "LG전자",
           "is_held": false,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 172600.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 175666.6413157287,
@@ -6827,8 +7062,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "판단시각은 2026-10-12T07:21:18.610412+09:00이다. 실제 거래일·정규장·휴장·정지 여부와 최신 체결시각은 미확인이다. 장중 자료 표기 2026-10-08 20:00은 당일 조건 판단에 사용하지 않는다. 검증된 만료시각이 없으므로 만료나 다음 세션 연장을 선언하지 않는다. / 197,100~198,800원 지지 방어와 완결된 5분봉의 재시험 저점 유지, 210,956~212,788원 회복을 관찰한다. 정상 거래량가중평균가격과 상대거래량은 별도로 확보하며 1.2는 관측값이 아닌 제안 기준이다.",
           "risk_condition_ko": "197,100 이하 하락, 종가 확인 후 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 17,
           "table_priority": 17,
@@ -6837,17 +7072,20 @@
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "066570.KS",
@@ -6953,6 +7191,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -7223,21 +7467,26 @@
             "position_sizing": "보유량·원가·순자산·현금·집중도가 없어 실제 주문 수량은 산출할 수 없다. 향후 정당화되는 시험 진입은 중립 분석가의 제안을 채택해 순자산의 0.25% 이하로 제한한다. 기존 보유 포함 128940.KS 총 노출 2%, 종목 전체 계획손실 0.25%는 목표가 아니라 최대 한도다. 추가 운용기준으로 15% 불리한 가격변동의 가상 스트레스 손실도 순자산 0.25% 이내로 제한한다. 따라서 노출 2%를 그대로 채우지 않으며, 스트레스 기준상 비용 전에도 약 1.67%보다 작은 노출이 필요하다. 신규 수량은 시험 진입 한도, 잔여 종목 한도, 현금, 기존 보유 손실을 차감한 잔여 손실예산, 스트레스 한도를 적용한 수량 중 최솟값을 주문단위로 내림한다. 위험기준 수량은 잔여 손실예산을 실제 진입가와 검증된 구조적 손절가의 차이 및 예상 거래비용으로 나누어 계산한다. 한도 부족 시 신규 수량은 0이며 핵심 보유도 예외로 두지 않는다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "128940.KS",
           "display_name": "128940",
           "is_held": false,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 455500.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 456637.85936707945,
@@ -7252,8 +7501,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "128940.KS의 실제 거래일·정규장 상태·시장경보·타임스탬프가 있는 최신 시세와 호가부터 확인한다. 제공 판단 시각 2026-10-12T08:07:16.940031+09:00은 연구일과 일치하지만 세션이나 조건 충족을 증명하지 않는다. / 475,000원 지지·저점 상승과 492,500~499,000원 회복·재시험을 관찰한다. 이어 505,000~509,500원 회복과 지지 전환을 확인하되 가격 접촉만으로 주문하지 않는다.",
           "risk_condition_ko": "475,000 이하 하락, 거래량 조건 확인 후 (신선한 정규장 자료에서 하회 거래 지속과 매도 거래량 증가 확인) 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 18,
           "table_priority": 18,
@@ -7262,17 +7511,20 @@
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "128940.KS",
@@ -7373,6 +7625,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -7634,21 +7892,26 @@
             "position_sizing": "095340.KQ 신규 투입은 현재 0이다. 향후 별도 매수 승인 시 첫 진입은 목표수량의 최대 25%, 최초 계획손실은 순자산의 최대 0.25%, 기존 핵심분을 포함한 종목 전체 계획손실은 최대 0.50%로 제한한다. 종목 평가액 5%와 반도체 총노출 20%는 제안 상한이지 목표나 검증된 안전수준이 아니며 더 엄격한 기존 정책을 우선한다. 수량은 허용손실액을 실제 진입가와 검증된 손절가의 차이 및 주당 왕복비용·슬리피지·갭 여유액의 합으로 나누어 정수 이하로 산정한다. 목표수량·집중도 잔여한도·예비현금을 제외한 비차입 가용현금 한도도 함께 적용한다. 계좌 규모·보유량·취득가·기존 위험·가용현금이 없어 실제 주문수량과 현재 한도 초과 여부는 산정할 수 없다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "095340.KQ",
           "display_name": "ISC",
           "is_held": false,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 177300.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 181369.07867059318,
@@ -7663,8 +7926,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "095340.KQ의 실제 거래일·정규장 상태·거래정지·변동성 완화 상태와 시각이 검증된 호가·체결·5분봉을 확보한다. 199,400원은 현재가가 아니라 2026-10-08 종가다. / 197,500~199,900원 방어, 204,000~205,300원 회복, 207,000원 돌파·재지지를 구분한다. 감시 신호는 매수 주문이 아니며 위험축소 판단 해소와 손익비 재검증이 필요하다.",
           "risk_condition_ko": "199,900 이하 하락, 종가 확인 후 (거래량 부족만으로 위험축소를 미루지 않는다.) 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 19,
           "table_priority": 19,
@@ -7673,17 +7936,20 @@
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "095340.KQ",
@@ -7778,6 +8044,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -8034,21 +8306,26 @@
             "position_sizing": "105560.KS 현재 신규 투입은 0이다. 보수·중립 분석가의 제안대로 핵심·전술 보유를 모두 포함해 종목 비중 순자산 5%, 은행업 합산 15%, 해당 종목 총 보유분 계획손실 순자산 0.5%를 잠정 상한으로 사용하되 기존의 더 엄격한 한도를 우선한다. 이는 사용자에게 최적이라고 검증된 한도가 아니다. 향후 최초 매수량은 목표수량 25%, 잔여손실예산/(진입가-검증된 손절가+주당 왕복비용+갭충당액), 가용현금과 종목·업종 잔여한도가 허용하는 수량 중 최솟값을 정수 내림한다. 기존 보유 위험을 먼저 차감하고 잔여 예산이 없으면 매수하지 않는다. 25% 축소 후에도 한도를 넘으면 정상화에 필요한 추가 수량을 줄인다. 순자산·현금·보유수량·핵심 및 전술 구분이 미제공되어 주문 수량은 확정할 수 없으며 하락 중 물타기는 하지 않는다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "105560.KS",
           "display_name": "105560",
           "is_held": false,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 159200.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 159251.9235355925,
@@ -8063,8 +8340,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "105560.KS 실제 거래일·세션, 최신 체결·호가·스프레드·거래량 시각과 보유량·순자산·집중도를 확인한다. 한도 내 보유 유지와 축소 필요량을 구분하는 선행 조건이다. / 105560.KS 162800원 안정, 166400원 회복 및 165300~166400원 재시험에서 저점 상승을 관찰한다. 이는 관찰 조건이지 자동 매수 조건이 아니다.",
           "risk_condition_ko": "162,800 이하 하락, 종가 확인 후 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 20,
           "table_priority": 20,
@@ -8073,17 +8350,20 @@
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "105560.KS",
@@ -8173,6 +8453,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -8435,21 +8721,26 @@
             "position_sizing": "현재 신규 배정은 0이다. 계좌 순자산, 보유수량, 평균단가, 가용현금, 업종 집중도는 확인 불가이므로 주문수량을 확정하지 않는다. 제안 상한은 090430.KS 전체 시가 비중이 순자산의 5%, 전체 포지션의 계획 손실이 순자산의 0.5%다. 기존 보유분은 최신 평가가격에서 129000원까지의 하락 위험에 비용과 가격 공백 완충액을 더해 평가한다. 향후 신규 목표수량은 기존 보유 위험을 차감한 잔여 손실예산, 종목 비중 한도의 잔여액, 가용현금이 각각 허용하는 수량 중 최솟값을 정수로 내림한다. 132500원은 부분 축소선이므로 전량 손절가처럼 사용해 수량을 늘리지 않는다. 승인 가능한 시험 진입은 계산된 신규 목표수량의 최대 25%이며, 정상 목표 비중 확대는 종가 또는 다음 거래일 확인 단계에서만 검토한다. 계좌 자체 한도나 업종 집중도 제한이 더 엄격하면 이를 우선한다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "090430.KS",
           "display_name": "090430",
           "is_held": false,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 129300.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 129299.53539088798,
@@ -8464,8 +8755,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "당일 거래소 정규장 일정, 최신 실제 체결 시각, 정상적인 세션 거래량가중평균가격과 동일시간 누적 상대거래량을 확보한다. 제공 자료의 비정상 값 1041408087.5는 제외하며 거래량가중이동평균 139731원을 세션 평균가격으로 대체하지 않는다. / 계좌 순자산·실제 보유수량·업종 집중도를 확인하여 비중 5%와 계획 손실 0.5% 한도 초과 여부를 먼저 판정한다.",
           "risk_condition_ko": "137,900 이하 하락, 2개 봉 확인 후 (위험 축소에는 최소 상대거래량 조건을 적용하지 않음) 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 21,
           "table_priority": 21,
@@ -8474,17 +8765,20 @@
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "090430.KS",
@@ -8580,6 +8874,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -8842,21 +9142,26 @@
             "position_sizing": "현재 신규 투입은 0이다. 보유수량·전술 및 핵심분 구분·순자산·현금·계열 및 산업 노출이 없어 실제 주문수량은 산출할 수 없다. 재평가 후 허용되는 스타터는 계획 수량의 25% 이하, 스타터 손실예산은 순자산의 0.125% 이하, 기존 핵심·전술분을 포함한 종목 전체 손실예산은 0.5% 이하로 제한한다. 종목 평가액은 순자산의 3% 이하이며 기존 포트폴리오 한도가 더 낮으면 이를 따른다. 모두 목표가 아닌 상한이다. 기존 보유의 위험을 먼저 차감하고, 잔여 손실예산을 주당 구조적 손절거리·갭 여유·체결비용의 합으로 나눈 정수 이하로 신규 수량을 정한다. 현금과 집중도 한도로도 제한하며 1주가 한도를 넘으면 매수하지 않는다. 핵심분도 한도 초과 감축 대상이다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "000150.KS",
           "display_name": "두산",
           "is_held": false,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 1127000.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 1156798.2128567619,
@@ -8871,8 +9176,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "거래소 달력·정규장·거래정지 여부·최신 봉 시각·호가를 별도로 확인한다. 2026-10-08 분봉과 거래량 0·비정상 거래량가중평균가격은 현재 신호에서 제외한다. / 1,325,000원 시험 후 저점 상승·재상회, 또는 1,408,000원 돌파 후 재시험 지지를 완료된 5분봉 두 개로 확인한다. 이는 재평가 조건이지 매수 승인 자체가 아니다.",
           "risk_condition_ko": "1,325,000 이하 하락, 종가 확인 후 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 22,
           "table_priority": 22,
@@ -8881,17 +9186,20 @@
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "000150.KS",
@@ -8991,6 +9299,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT_CLOSE",
+            "strategy_ko": "종가 확인 후 판단",
+            "decision_state_ko": "조건 충족, 종가 확인 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "REDUCE",
             "rating": "UNDERWEIGHT",
@@ -9249,21 +9563,26 @@
             "position_sizing": "402340.KS 신규 배정은 현재 0이다. 향후 새 진입 결정 시 시험 진입의 계획 손실예산은 총자산의 0.25%, 기존 보유분을 포함한 종목 합산 추가손실예산은 0.5% 이내로 제한한다. 명목 비중 상한은 시험 진입 2%, 전체 5%이며 목표 비중이 아니다. 주문수량은 잔여 손실예산을 진입가와 검증된 구조적 손절가의 차이 및 주당 예상 왕복비용·슬리피지의 합으로 나눈 수량, 가용현금으로 매수 가능한 수량, 잔여 비중한도에 해당하는 수량 중 최솟값을 정수주로 내림한다. 기존 반도체·유사 투자자산 노출도 함께 점검한다. 총자산·보유량·원가·현금·집중도는 확인 불가이므로 확정 수량을 산출하거나 신규 주문을 실행하지 않는다. 현금 우선은 대체수익 우월성이 아니라 신규 위험 억제에 근거하며, 상장지수펀드도 비용과 중복 노출 검증 없이 자동 대안으로 채택하지 않는다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "종가 확인 후 판단",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "402340.KS",
           "display_name": "402340",
           "is_held": false,
-          "strategy_code": "WAIT_CLOSE",
-          "strategy_ko": "종가 확인 후 판단",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 869000.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 888246.226624675,
@@ -9278,8 +9597,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "402340.KS의 거래소 일정, 최신 정규장 체결·호가, 정상 거래량가중평균가격, 동시간대 상대거래량 및 계좌 위험을 확보한다. / 1,050,000원 지지 실패는 보유 위험 축소 조건, 1,060,000원 회복·재시험은 관찰 조건으로 구분한다.",
           "risk_condition_ko": "1,050,000 이하 하락, 2개 봉 확인 후 (위험 축소에는 상대거래량 최저 조건을 적용하지 않는다.) 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족, 종가 확인 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "종가 확인 대기",
           "display_priority": 23,
           "table_priority": 23,
@@ -9288,17 +9607,20 @@
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "402340.KS",
@@ -9398,6 +9720,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "WAIT",
+            "strategy_ko": "조건 충족 전 대기",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -9625,21 +9953,26 @@
             "position_sizing": "현재 신규 배정은 0이다. 향후 시험 매수 수량은 목표수량의 20%, 순자산의 0.25%를 비용 포함 주당 손절위험으로 나눈 수량, 기존 전체 보유 위험을 차감한 종목 손실예산의 잔여 수량, 순자산 5% 비중 상한까지의 잔여 수량, 가용 현금으로 매수 가능한 수량 중 최솟값을 내림한다. 종목 전체 계획손실 한도는 순자산 0.5%이며 계좌 규정이 더 엄격하면 이를 따른다. 잔여 여력이 없으면 매수하지 않는다. 보유량·순자산·현금·목표수량·코어 위험 기준이 확인되지 않아 실제 주문 수량과 기존 노출의 적정성은 산정 불가하다. 종가와 다음 거래일 확인 전에는 시험 매수 한도를 넘지 않으며 차입 매수는 하지 않는다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "조건 충족 전 대기",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "033780.KS",
           "display_name": "033780",
           "is_held": false,
-          "strategy_code": "WAIT",
-          "strategy_ko": "조건 충족 전 대기",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 179900.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 179920.5312040094,
@@ -9654,8 +9987,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "033780.KS의 최신 가격 시각, 거래일 달력, 정규장 여부, 거래정지·시장경보 및 체결 유동성을 검증한다. 판단 시각 2026-10-12T07:50:43.237953+09:00은 세션이나 가격 신선도를 입증하지 않는다. 2026-10-08 가격을 현재가로 사용하지 않는다. / 175,200~175,300원 회복·재시험 또는 180,800원 돌파·재시험, 정상 세션 거래량가중평균가격 상회와 동시간대 상대거래량 1.2 이상을 관찰한다. 순보상·위험 기준이 미달하면 계속 대기한다.",
           "risk_condition_ko": "174,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "돌파 실패",
           "display_priority": 24,
           "table_priority": 24,
@@ -9664,17 +9997,20 @@
             "돌파 후 안착 실패"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "033780.KS",
@@ -9777,6 +10113,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "AVOID",
+            "strategy_ko": "신규 매수 회피",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -10014,21 +10356,26 @@
             "position_sizing": "현재 신규 배정은 0이다. 재검증 후 첫 진입은 계산된 전체 계획수량의 최대 25%로 제한한다. 기존 보유를 포함한 062040.KS 비중 5%와 계좌자산 대비 계획손실 0.5%를 서로 독립적인 최대 한도로 적용하며 목표 배정으로 보지 않는다. 기존 포트폴리오의 더 엄격한 종목·업종 한도를 우선한다. 추가수량은 잔여 손실예산으로 허용되는 수량, 잔여 비중 한도로 허용되는 수량, 비용을 포함해 가용현금으로 매수 가능한 수량 중 최소 정수로 정한다. 주당 위험에는 검증된 손절 실행 기준까지의 가격 차이와 갭·슬리피지·거래비용을 반영한다. 계좌자산·보유수량·취득단가·상관 노출이 없어 실제 수량은 산출하지 않는다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "신규 매수 회피",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "062040.KS",
           "display_name": "062040",
           "is_held": false,
-          "strategy_code": "AVOID",
-          "strategy_ko": "신규 매수 회피",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 202500.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 205762.71371503262,
@@ -10043,8 +10390,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 215,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "215,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 25,
           "table_priority": 25,
@@ -10053,17 +10400,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "062040.KS",
@@ -10171,6 +10521,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "AVOID",
+            "strategy_ko": "신규 매수 회피",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -10407,21 +10763,26 @@
             "position_sizing": "현재 신규 배정은 0이다. 향후 재평가를 통과한 경우에만 최초 시범분은 순자산의 0.6% 이하, 기존분과 신규분을 합친 종목 비중은 3% 이하, 합산 계획 손실예산은 순자산의 0.25% 이하로 제한한다. 모두 목표가 아닌 상한이다. 신규 수량은 잔여 손실예산을 보수적 주당 위험폭으로 나눈 수량, 잔여 종목한도, 시범분 한도, 비용 차감 가용현금으로 가능한 수량 중 최솟값을 정수 내림한다. 주당 위험폭은 실제 진입가와 사전 확정 손절가의 차이 및 최신 평균진폭 중 큰 값에 비용·체결오차 여유를 더한다. 보유량·순자산·현금·산업 집중도가 없어 실제 수량과 현재 한도 충족 여부는 산출할 수 없다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "신규 매수 회피",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "373220.KS",
           "display_name": "LG에너지솔루션",
           "is_held": false,
-          "strategy_code": "AVOID",
-          "strategy_ko": "신규 매수 회피",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 383000.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 384728.5207271155,
@@ -10436,8 +10797,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 386,500 이하 하락, 다음 거래일 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "386,500 이하 하락, 다음 거래일 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 26,
           "table_priority": 26,
@@ -10446,17 +10807,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "373220.KS",
@@ -10557,6 +10921,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "AVOID",
+            "strategy_ko": "신규 매수 회피",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -10781,21 +11151,26 @@
             "position_sizing": "096770.KS의 실제 신규 수량은 0이다. 중립 측 제안대로 기존 보유를 포함한 종목 비중 5%, 동일 매매계획의 총 계획손실은 순자산의 0.5%를 최대 상한으로 둔다. 같은 계획의 실현손실과 남은 보유 위험을 차감하고 재진입 때 예산을 초기화하지 않는다. 주당 수량산정 위험은 예상 진입가와 구조적 손절가의 차이 및 최신 평균진폭의 1.5배 중 큰 값에 예상 거래비용·슬리피지를 더한다. 기준일 평균진폭 9582원의 1.5배인 14373원은 수량 제한 참고값이지 실제 손절가격이 아니다. 추가 수량은 잔여 손실예산, 잔여 종목 비중, 가용 현금, 별도 스트레스 한도가 허용하는 수량 중 최소값을 정수 주로 내림한다. 보수 측이 제시한 과거 11.04% 하락을 스트레스 가정으로만 적용하면 순자산 0.5% 손실한도에 대응하는 종목 비중은 비용 전 약 4.53%이므로 5% 상한보다 엄격하다. 비용·관련 업종 동반 하락을 반영하면 더 낮춘다. 최초 진입은 산정된 추가 가능 수량의 25% 이하이면서 순자산의 1.25% 이하로 제한하고 더 엄격한 스트레스 한도를 적용한다. 계좌 자산·보유량·현금·업종 집중도가 없어 실제 허용 수량은 산정할 수 없으며 차입 진입은 하지 않는다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "신규 매수 회피",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "096770.KS",
           "display_name": "096770",
           "is_held": false,
-          "strategy_code": "AVOID",
-          "strategy_ko": "신규 매수 회피",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 150900.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 149619.6496920162,
@@ -10810,8 +11185,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 152,200 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "152,200 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 27,
           "table_priority": 27,
@@ -10820,17 +11195,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "096770.KS",
@@ -10924,6 +11302,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "AVOID",
+            "strategy_ko": "신규 매수 회피",
+            "decision_state_ko": "조건 충족 전 대기",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -11199,21 +11583,26 @@
             "position_sizing": "현재 신규 배정은 0이다. 향후 재승인 시 시험매수는 승인된 최종 수량의 20% 이내로 제한한다. 관리 상한으로 시험매수 손실위험은 순자산의 0.25%, 기존 보유를 포함한 종목 합산 손실위험은 0.5%, 향후 신규 배정 시 종목 합산 시가비중은 5%를 제안한다. 기존 사용자 한도가 더 엄격하면 우선한다. 신규 수량은 잔여 손실예산을 주당 위험으로 나눈 수량, 사용 가능 현금으로 매수 가능한 수량, 잔여 집중도 한도로 가능한 수량 중 최솟값을 정수로 내림한다. 주당 위험에는 실제 진입가와 검증된 손절가의 차이, 갱신한 평균진폭, 갭 스트레스, 왕복 비용과 예상 체결 미끄러짐을 보수적으로 반영한다. 계좌·보유량·취득가·현금·집중도 자료가 없어 실제 수량과 예산 초과 여부는 산출할 수 없다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "신규 매수 회피",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "000810.KS",
           "display_name": "000810",
           "is_held": false,
-          "strategy_code": "AVOID",
-          "strategy_ko": "신규 매수 회피",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 608000.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 609238.987869869,
@@ -11228,8 +11617,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 607,000 이하 하락, 2개 봉 확인 후 (방어 매도에는 거래량 증가나 거래량가중평균가격 조건을 요구하지 않는다.) 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "607,000 이하 하락, 2개 봉 확인 후 (방어 매도에는 거래량 증가나 거래량가중평균가격 조건을 요구하지 않는다.) 리스크 축소",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "조건 충족 전 대기",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "대기",
           "display_priority": 28,
           "table_priority": 28,
@@ -11238,17 +11627,20 @@
             "waiting for trigger"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "000810.KS",
@@ -11345,6 +11737,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "AVOID",
+            "strategy_ko": "신규 매수 회피",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -11621,21 +12019,26 @@
             "position_sizing": "현재 신규 배정은 0이다. 중립 분석가의 제안대로 향후 시험 진입은 총자산의 최대 0.5%, 기존 보유를 포함한 180640.KS 전체 비중은 최대 2%로 유지하되 채워야 할 목표로 해석하지 않는다. 보수적 분석가의 위험예산 우선 원칙은 채택하지만, 실제 포트폴리오가 없는 상태에서 1%·0.25%를 일률적으로 적용하지는 않는다. 실제 허용 비중은 손실예산·항공 및 그룹 중복노출·갭 위험에 따라 더 작아질 수 있다. 주문 수량은 시험 비중 한도, 전체 비중 잔여 한도, 가용현금, 잔여 손실예산을 각각 비용 포함 수량으로 환산한 값 중 최솟값을 정수 내림하며 음수는 0으로 한다. 잔여 손실예산은 총자산의 0.25%에서 기보유분의 계획손실을 뺀 값이다. 보유량·총자산·현금·실제 위험거리가 없어 현재 주문 수량은 산출할 수 없다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "신규 매수 회피",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "180640.KS",
           "display_name": "180640",
           "is_held": false,
-          "strategy_code": "AVOID",
-          "strategy_ko": "신규 매수 회피",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 129000.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 129379.27171679161,
@@ -11650,8 +12053,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 128,700 이하 하락, 종가 확인 후 (축소에 거래량 증가를 요구하지 않음) 신규 진입 보류·보유 위험 대응 계획 재확인 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "128,700 이하 하락, 종가 확인 후 (축소에 거래량 증가를 요구하지 않음) 신규 진입 보류·보유 위험 대응 계획 재확인",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 29,
           "table_priority": 29,
@@ -11660,17 +12063,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "180640.KS",
@@ -11766,6 +12172,12 @@
           "universe_role": "WATCHLIST"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "AVOID",
+            "strategy_ko": "신규 매수 회피",
+            "decision_state_ko": "실행 조건 감시 중",
+            "market_data_asof": "2026-10-13T12:04:00+09:00"
+          },
           "thesis": {
             "stance": "HOLD",
             "rating": "HOLD",
@@ -12053,21 +12465,26 @@
             "position_sizing": "현재 신규 수량은 0이다. 향후 검증을 통과한 최초 시험 진입은 순자산의 0.25% 이하, 기존 보유 포함 종목 총비중은 2% 이하, 종목 전체 계획 손실예산은 순자산의 0.25%로 제한하고 레버리지는 사용하지 않는다. 최초 시험 규모는 중립 분석가의 단계적 실행 제안을 채택한 정책 한도이지 최적 비중의 추정치가 아니다. 신규 수량은 시험 배분 한도, 총비중 잔여 한도, 가용 현금, 잔여 손실예산으로 각각 산출한 수량 중 최솟값을 정수 내림한다. 주당 투입액과 위험에는 비용을 포함하고, 기존 전술분·중기분의 현재 평가가격부터 각 손절선까지의 위험을 먼저 차감한다. 업종 집중도와 갭 스트레스에 따라 허용 규모는 더 작거나 0일 수 있다. 실제 계좌 자료가 없어 확정 수량은 산출하지 않는다."
           },
           "execution": {
-            "readiness": "READY_NOW",
+            "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
             "as_of": "2026-10-13T12:04:00+09:00",
             "valid_until": "2026-10-13T12:34:00+09:00",
-            "action_now": "신규 매수 회피",
+            "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "READY_NOW"
           },
           "portfolio_role": "watchlist",
           "ticker": "006400.KS",
           "display_name": "삼성SDI",
           "is_held": false,
-          "strategy_code": "AVOID",
-          "strategy_ko": "신규 매수 회피",
+          "strategy_code": "DATA_CHECK",
+          "strategy_ko": "데이터 확인 전 대기",
           "last_price": 520000.0,
           "market_data_asof": "2026-10-13T12:04:00+09:00",
           "session_vwap": 521802.12054737285,
@@ -12082,8 +12499,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "위험 대응 조건: 560,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인 (매수 돌파·거래량 조건과 별도 판정)",
           "risk_condition_ko": "560,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
-          "decision_state_ko": "실행 조건 감시 중",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "지지선 이탈",
           "display_priority": 30,
           "table_priority": 30,
@@ -12092,17 +12509,20 @@
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-13T12:34:00+09:00",
-            "expired_at_build": false,
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "expired_at_build": true,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           },
           "portfolio_action": {
             "canonical_ticker": "006400.KS",
@@ -22306,8 +22726,8 @@
             "trigger_conditions": [
               "1,678,000 이하 하락, 종가 확인 후 손절 조건"
             ],
-            "status": "CONDITIONAL",
-            "status_label": "조건 확인 후 재계산",
+            "status": "RECHECK",
+            "status_label": "최신 정보 재확인",
             "reasons": [
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
@@ -22420,8 +22840,8 @@
             "trigger_conditions": [
               "257,000 이하 하락, 2개 봉 확인 후 리스크 축소"
             ],
-            "status": "CONDITIONAL",
-            "status_label": "조건 확인 후 재계산",
+            "status": "RECHECK",
+            "status_label": "최신 정보 재확인",
             "reasons": [
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
@@ -23975,7 +24395,7 @@
     },
     "us": {
       "market": "US",
-      "event_id": "us:78cb5b295517ba8402d9b2e7b2ebf8cc",
+      "event_id": "us:950b65e83f30e2880cec4bab792abecd",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261012T224903_local-scheduler-us-full",

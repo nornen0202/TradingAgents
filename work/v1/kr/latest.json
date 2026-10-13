@@ -1,24 +1,24 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:942791edc1e740b0966ab979841cf4c0",
+  "event_id": "kr:2a6986cd59eac25d2d4fb515d860804f",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "c8841b735958409f8713a6ad25339e660992c3937436b9c8a56f6db16de44607",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
   "workflow_contract_sha256": "c1d788846326636ea149db0745b3c64dd5f9864872f663186e6f75c87b32613b",
-  "source_sha256": "a4a9d8e487eda6e87c3ded259bee144dc2497992414d287d5e7884d521125a18",
+  "source_sha256": "4733accc8a76d07473b0dbe74fabbe8c1582ac7dbb7afa7c3f94cc9e54c881af",
   "body": {
     "kind": "market",
     "market": "KR",
     "session_id": "KR:2026-10-13",
-    "source_health": "OK",
+    "source_health": "STALE",
     "source": {
       "run_id": "20261013T120358_local-scheduler-kr-overlay_only",
       "last_run_at": "2026-10-13T12:06:23.438159+09:00",
       "status": "success"
     },
-    "report_mode": "READY",
+    "report_mode": "OUTAGE",
     "current": {
       "run_id": "20261013T120358_local-scheduler-kr-overlay_only",
       "started_at": "2026-10-13T12:03:58.433443+09:00",
@@ -35,7 +35,7 @@
         "analysis_trade_date_latest": "2026-10-08",
         "market_data_oldest_at": "2026-10-13T12:04:00+09:00",
         "market_data_latest_at": "2026-10-13T12:04:00+09:00",
-        "market_data_status": "FRESH",
+        "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true
       },
       "latest_attempt": {
@@ -70,9 +70,9 @@
         "checkpoint": "11:35",
         "checkpoint_timezone": "Asia/Seoul",
         "quality": {
-          "report_mode": "READY",
-          "decision_ready": true,
-          "conditional_strategy_ready": true,
+          "report_mode": "OUTAGE",
+          "decision_ready": false,
+          "conditional_strategy_ready": false,
           "quality_label_ko": "장중 투자 판단 가능",
           "fresh_row_ratio": 1.0,
           "conditional_row_ratio": 1.0,
@@ -94,15 +94,15 @@
             "day_high": 1554000.0,
             "day_low": 1449000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "intraday invalidation breached"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -124,15 +124,15 @@
             "day_high": 3860.0,
             "day_low": 3630.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "intraday invalidation breached"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -154,15 +154,15 @@
             "day_high": 159200.0,
             "day_low": 152700.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "intraday invalidation breached"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -184,15 +184,15 @@
             "day_high": 2150.0,
             "day_low": 1994.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "intraday invalidation breached"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -214,15 +214,15 @@
             "day_high": 244000.0,
             "day_low": 228000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -244,15 +244,15 @@
             "day_high": 331500.0,
             "day_low": 283000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -274,15 +274,15 @@
             "day_high": 78700.0,
             "day_low": 75200.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -304,15 +304,15 @@
             "day_high": 237000.0,
             "day_low": 216000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -334,15 +334,15 @@
             "day_high": 146800.0,
             "day_low": 136000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -364,15 +364,15 @@
             "day_high": 182500.0,
             "day_low": 173100.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -394,15 +394,15 @@
             "day_high": 567000.0,
             "day_low": 531000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -424,15 +424,15 @@
             "day_high": 177400.0,
             "day_low": 173200.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -454,15 +454,15 @@
             "day_high": 70600.0,
             "day_low": 67300.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -484,15 +484,15 @@
             "day_high": 182000.0,
             "day_low": 170800.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -514,15 +514,15 @@
             "day_high": 470000.0,
             "day_low": 444000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -544,15 +544,15 @@
             "day_high": 187400.0,
             "day_low": 174600.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -574,15 +574,15 @@
             "day_high": 161900.0,
             "day_low": 156400.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -604,15 +604,15 @@
             "day_high": 131100.0,
             "day_low": 128100.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -634,15 +634,15 @@
             "day_high": 1198000.0,
             "day_low": 1108000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -664,15 +664,15 @@
             "day_high": 943000.0,
             "day_low": 858000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -694,15 +694,15 @@
             "day_high": 181000.0,
             "day_low": 177700.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "돌파 후 안착 실패"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -724,15 +724,15 @@
             "day_high": 214500.0,
             "day_low": 199800.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -754,15 +754,15 @@
             "day_high": 396000.0,
             "day_low": 377000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -784,15 +784,15 @@
             "day_high": 153800.0,
             "day_low": 143000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -814,15 +814,15 @@
             "day_high": 622000.0,
             "day_low": 595000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -844,15 +844,15 @@
             "day_high": 132200.0,
             "day_low": 127100.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -874,15 +874,15 @@
             "day_high": 541000.0,
             "day_low": 511000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -2040,21 +2040,345 @@
         "execution_eligible": false
       },
       "prism": {
-        "source_health": "EMPTY",
+        "source_health": "OK",
         "coverage": {
-          "total_unique_events": 146,
-          "window_events": 0,
-          "transmitted_events": 0,
+          "total_unique_events": 158,
+          "window_events": 12,
+          "transmitted_events": 12,
           "truncated": false,
-          "oldest_occurred_at": null,
-          "newest_occurred_at": null,
-          "available_events_before_context_cap": 0,
+          "oldest_occurred_at": "2026-10-12T22:26:26+00:00",
+          "newest_occurred_at": "2026-10-13T01:04:25+00:00",
+          "available_events_before_context_cap": 12,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
           "omitted_before_context_selection": 0
         },
-        "events": [],
+        "events": [
+          {
+            "event_key": "stock_ai_agent:16007",
+            "content_sha256": "7b4779f8fea4ed62238a6b9975c8ae93d5c27f2d8158744f18675a11450cc604",
+            "occurred_at": "2026-10-13T00:56:48+00:00",
+            "relevance": {
+              "tickers": [
+                "252990.KS",
+                "028670.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16007",
+              "posted_at": "2026-10-13T00:56:48+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16007",
+              "preview": "📊 프리즘 시뮬레이터 | 실시간 포트폴리오 (2026-10-13 09:56) 🔸 현재 보유: 2/10개 🔸 사용 비중: 1.57/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: 샘씨엔에스(252990) +12.29% ⚠️ 최저 수익: 팬오션(028670) 0.00% 🔸 보유 종목: - 샘씨엔에스(252990) [전기·전자] 매수가: 15,780원 / 현재가: 17,720원 목표가...",
+              "signals": [
+                {
+                  "canonical_ticker": "252990.KS",
+                  "display_name": "샘씨엔에스",
+                  "market": "KR",
+                  "source_asof": "2026-10-13T00:56:48+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "028670.KS",
+                  "display_name": "팬오션",
+                  "market": "KR",
+                  "source_asof": "2026-10-13T00:56:48+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16006",
+            "content_sha256": "493668b120432a1acef992e650dcda2237f8fec019ad237e3d26e52e05278852",
+            "occurred_at": "2026-10-13T00:56:43+00:00",
+            "relevance": {
+              "tickers": [
+                "403870.KQ"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16006",
+              "posted_at": "2026-10-13T00:56:43+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16006",
+              "preview": "📉 매도: HPSP(403870) 매수가: 62,200원 매도가: 59,100원 수익률: ⬇️ -4.98% (실제 투입 비중 40% 반영 시 -2.02%) 보유기간: 19시간 55분 매도이유: 손절선 이탈 — 손절선 59,655원(장중 0.5% 여유 59,357원) 아래로 내려가 59,100원에 매도했습니다. 🔁 재진입 종목 (기준 가격 눌림 지지 매수, 1/3번째 시도) 📡 전략 원장...",
+              "signals": [
+                {
+                  "canonical_ticker": "403870.KQ",
+                  "display_name": "매도: HPSP",
+                  "market": "KR",
+                  "source_asof": "2026-10-13T00:56:43+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16009",
+            "content_sha256": "37d959d4d1027afaeef0e7ab828d708d64504a0129e02e06217fe080ac760866",
+            "occurred_at": "2026-10-13T01:04:25+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16009",
+              "posted_at": "2026-10-13T01:04:25+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16009",
+              "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/13 10:03:16 KST 💵 청산 결과 정리 수량: 0.02 BTC 진입 → 청산: 81,796.10 USDT → 81,599.90 USDT 보유 시간: 77.8분 확정 순손익: 2.12 USDT • 시작 계좌 9,505.49 USDT 대비 +0.02% • 수수료 1.80 USDT · 펀딩 -0.01 USDT 반영 💰 종료 후 순...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16008",
+            "content_sha256": "f611d49b1181b569499bb7adf9eab59515bacf04b95403b325c646ac7892fbd2",
+            "occurred_at": "2026-10-13T01:01:26+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16008",
+              "posted_at": "2026-10-13T01:01:26+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16008",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/13 10:01:21 KST 📦 보유량 0.02 BTC · 평단 81,796.10 USDT 💰 계좌 순자산: 9,510.06 USDT • 총 증거금 164.03 USDT(계좌 1.72%) · 10배 · 교차 🛡 가격이익 구간 SL 81,650.00 → 81,600.00 USDT · 남은 전량 • 예상 손익: +3.92 USDT · 계좌 +...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16005",
+            "content_sha256": "57e2fa7b6a719510e799f34ec425ce272f7d044119f6c01fa269dc8fe82f51da",
+            "occurred_at": "2026-10-13T00:46:26+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16005",
+              "posted_at": "2026-10-13T00:46:26+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16005",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/13 09:46:22 KST 📦 보유량 0.02 BTC · 평단 81,796.10 USDT 💰 계좌 순자산: 9,514.84 USDT • 총 증거금 163.56 USDT(계좌 1.72%) · 10배 · 교차 🛡 가격이익 구간 SL 81,950.00 → 81,650.00 USDT · 남은 전량 • 예상 손익: +2.92 USDT · 계좌 +...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16004",
+            "content_sha256": "170954e11ed7c56df136817308a9dd6280163ac668f3b207c38d35ec61dd569c",
+            "occurred_at": "2026-10-13T00:30:12+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16004",
+              "posted_at": "2026-10-13T00:30:12+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16004",
+              "preview": "📉 시장 조정 구간 감지 — 이번 오전 분석은 쉬어갑니다. 시장이 고점 대비 크게 하락한 조정 구간이라, 무리한 신규 진입을 줄이기 위해 오늘은 하루 한 번(종가 확인 시간대)만 분석을 진행합니다. 보유 종목의 손절·청산 모니터링은 평소처럼 계속 가동 중입니다. 시장 회복 신호가 확인되면 자동으로 재개됩니다. 🙏",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16003",
+            "content_sha256": "815eb28d7b57cc8ed131cc2f9e4a609f28acd42dd131d4bd5b915bc048122bc2",
+            "occurred_at": "2026-10-13T00:26:26+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16003",
+              "posted_at": "2026-10-13T00:26:26+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16003",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/13 09:26:22 KST 📦 보유량 0.02 BTC · 평단 81,796.10 USDT 💰 계좌 순자산: 9,512.83 USDT • 총 증거금 163.76 USDT(계좌 1.72%) · 10배 · 교차 🛡 손절 SL 82,240.00 → 81,950.00 USDT · 남은 전량 • 예상 손익: -3.08 USDT · 계좌 -0.03%...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16002",
+            "content_sha256": "1a91e9e46fe94fe8c2b73a531253db2ea246383d6329adc4820bf16e3e914a3c",
+            "occurred_at": "2026-10-12T23:46:25+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16002",
+              "posted_at": "2026-10-12T23:46:25+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16002",
+              "preview": "📌 BTC 데모 첫 진입 체결 · 숏 🕐 10/13 08:45:27 KST 🧾 이번 체결: 0.02 BTC · 81,796.10 USDT • 체결금액(명목): 1,635.92 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0.02 BTC · 관측 기준 • 평단 81,796.10 USDT 💰 계좌 순자산: 9,504.37 USDT • 총 증거금 164.60 USDT(계좌 1.73...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16001",
+            "content_sha256": "00936e0f87a4f01f839629f9121e7dd279816b7ccaf162578851d60af31934ba",
+            "occurred_at": "2026-10-12T23:06:25+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16001",
+              "posted_at": "2026-10-12T23:06:25+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16001",
+              "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/13 08:06:07 KST 💵 청산 결과 정리 수량: 0.05 BTC 진입 → 청산: 82,566.50 USDT → 82,052.30 USDT 보유 시간: 40.4분 확정 순손익: 24.06 USDT • 시작 계좌 9,481.42 USDT 대비 +0.25% • 수수료 1.65 USDT · 펀딩 0.00 USDT 반영 💰 종료 후 순...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16000",
+            "content_sha256": "974d4c71d51a986d6a3aaf9339027ed516fd4cd399343958ff231df05a22052f",
+            "occurred_at": "2026-10-12T23:01:26+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16000",
+              "posted_at": "2026-10-12T23:01:26+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16000",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/13 08:01:22 KST 📦 보유량 0.025 BTC · 평단 82,566.50 USDT 💰 계좌 순자산: 9,497.80 USDT • 총 증거금 206.68 USDT(계좌 2.18%) · 10배 · 교차 🛡 손절 SL 82,800.00 → 82,660.00 USDT · 남은 전량 • 예상 손익: -2.34 USDT · 계좌 -0.02...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:15999",
+            "content_sha256": "2fb57e43f9137beb56638bb34f2e8c96eb5990b96477f4b93f00b029d3513baf",
+            "occurred_at": "2026-10-12T22:59:27+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "15999",
+              "posted_at": "2026-10-12T22:59:27+00:00",
+              "source_url": "https://t.me/stock_ai_agent/15999",
+              "preview": "✂️ BTC 데모 부분 청산 체결 · 숏 🕐 10/13 07:59:04 KST 사유: 부분 익절 🧾 이번 체결: 0.025 BTC · 82,257.30 USDT • 체결금액(명목): 2,056.43 USDT · 증거금 아님 • 이번 청산 가격손익: +7.73 USDT · 계좌 +0.08% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전체...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:15998",
+            "content_sha256": "ec6d3a27c34142ebc434cc112d05f7293974bfe60b404695cfa93fe502785607",
+            "occurred_at": "2026-10-12T22:26:26+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "15998",
+              "posted_at": "2026-10-12T22:26:26+00:00",
+              "source_url": "https://t.me/stock_ai_agent/15998",
+              "preview": "📌 BTC 데모 첫 진입 체결 · 숏 🕐 10/13 07:25:43 KST 🧾 이번 체결: 0.05 BTC · 82,566.50 USDT • 체결금액(명목): 4,128.32 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0.05 BTC · 관측 기준 • 평단 82,566.50 USDT 💰 계좌 순자산: 9,479.35 USDT • 총 증거금 415.45 USDT(계좌 4.38...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          }
+        ],
         "execution_eligible": false
       },
       "receipt_contract": {
@@ -2091,16 +2415,29 @@
             }
           },
           "prism": {
-            "source_health": "EMPTY",
-            "event_keys": [],
+            "source_health": "OK",
+            "event_keys": [
+              "stock_ai_agent:16007",
+              "stock_ai_agent:16006",
+              "stock_ai_agent:16009",
+              "stock_ai_agent:16008",
+              "stock_ai_agent:16005",
+              "stock_ai_agent:16004",
+              "stock_ai_agent:16003",
+              "stock_ai_agent:16002",
+              "stock_ai_agent:16001",
+              "stock_ai_agent:16000",
+              "stock_ai_agent:15999",
+              "stock_ai_agent:15998"
+            ],
             "coverage": {
-              "total_unique_events": 146,
-              "window_events": 0,
-              "transmitted_events": 0,
+              "total_unique_events": 158,
+              "window_events": 12,
+              "transmitted_events": 12,
               "truncated": false,
-              "oldest_occurred_at": null,
-              "newest_occurred_at": null,
-              "available_events_before_context_cap": 0,
+              "oldest_occurred_at": "2026-10-12T22:26:26+00:00",
+              "newest_occurred_at": "2026-10-13T01:04:25+00:00",
+              "available_events_before_context_cap": 12,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,
@@ -2116,10 +2453,10 @@
       "immediate_requires_row_mode": "IMMEDIATE",
       "market_data_asof": "2026-10-13T12:04:00+09:00",
       "valid_until": "2026-10-13T12:34:00+09:00",
-      "expired_at_build": false,
-      "decision_ready": true,
-      "conditional_strategy_ready": true,
-      "report_mode": "READY",
+      "expired_at_build": true,
+      "decision_ready": false,
+      "conditional_strategy_ready": false,
+      "report_mode": "OUTAGE",
       "required_rechecks": [
         "실시간 호가와 주문 가능 상태 재확인",
         "계좌 현금·미체결 주문 재확인",
