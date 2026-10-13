@@ -8,7 +8,8 @@ from stockstats import wrap
 from typing import Annotated
 import os
 from .config import get_config
-from .integrity import safe_symbol, session_date, validate_daily_bars, is_historical
+from .integrity import safe_symbol, session_date, is_historical
+from .kr_daily_history import validate_with_kr_fallback
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +92,6 @@ def load_ohlcv(symbol: str, curr_date: str) -> pd.DataFrame:
     # yfinance's ``end`` is exclusive. Use tomorrow as the download boundary so
     # a completed same-day bar is not silently omitted after the market close.
     end_str = (today_date + pd.DateOffset(days=1)).strftime("%Y-%m-%d")
-
     os.makedirs(config["data_cache_dir"], exist_ok=True)
     data_file = os.path.join(
         config["data_cache_dir"],
@@ -116,11 +116,13 @@ def load_ohlcv(symbol: str, curr_date: str) -> pd.DataFrame:
             auto_adjust=True,
         ))
         data = data.reset_index()
+    validated = validate_with_kr_fallback(data, symbol, start_str, curr_date)
+    # Validate before admitting a new Yahoo cache. A KIS replacement must never
+    # poison a Yahoo-labelled file or mix vendor adjustment bases.
+    if not use_cache and not validated.attrs.get("source"):
         data.to_csv(data_file, index=False)
 
-    data = validate_daily_bars(data, curr_date)
-
-    return data
+    return validated
 
 
 def filter_financials_by_date(data: pd.DataFrame, curr_date: str) -> pd.DataFrame:

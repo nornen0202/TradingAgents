@@ -8,7 +8,8 @@ import yfinance as yf
 import os
 from .stockstats_utils import StockstatsUtils, _clean_dataframe, yf_retry, load_ohlcv, filter_financials_by_date
 from .config import get_config
-from .integrity import safe_symbol, validate_daily_bars, is_historical
+from .integrity import safe_symbol, is_historical
+from .kr_daily_history import fallback_enabled, validate_with_kr_fallback, source_note
 
 
 def _build_yfinance_symbol_candidates(raw_ticker: str) -> list[str]:
@@ -79,13 +80,13 @@ def get_YFin_data_online(
     data = yf_retry(lambda: ticker.history(start=start_date, end=end_exclusive))
 
     # Check if data is empty
-    if data.empty:
+    if data.empty and not fallback_enabled(symbol):
         return (
             f"No data found for symbol '{symbol}' between {start_date} and {end_date}"
         )
 
     data.index.name = "Date"
-    data = validate_daily_bars(data.reset_index(), end_date).set_index("Date")
+    data = validate_with_kr_fallback(data.reset_index(), symbol, start_date, end_date).set_index("Date")
     data = data.loc[data.index >= pd.Timestamp(start_date)]
 
     # Round numerical values to 2 decimal places for cleaner display
@@ -99,6 +100,7 @@ def get_YFin_data_online(
 
     # Add header information
     header = f"# Stock data for {symbol.upper()} from {start_date} to {end_date}\n"
+    header += source_note(data)
     header += f"# Total records: {len(data)}\n"
     header += f"# Data retrieved on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
 
@@ -196,8 +198,10 @@ def get_stock_stats_indicators_window(
     before = curr_date_dt - relativedelta(days=look_back_days)
 
     # Optimized: Get stock data once and calculate indicators for all dates
+    provenance_note = ""
     try:
         indicator_data = _get_stock_stats_bulk(symbol, indicator, curr_date)
+        provenance_note = indicator_data.get("__source_note__", "")
         
         # Generate the date range we need
         current_dt = curr_date_dt
@@ -234,6 +238,7 @@ def get_stock_stats_indicators_window(
 
     result_str = (
         f"## {indicator} values from {before.strftime('%Y-%m-%d')} to {end_date}:\n\n"
+        + provenance_note
         + ind_string
         + "\n\n"
         + best_ind_params.get(indicator, "No description available.")
@@ -262,7 +267,7 @@ def _get_stock_stats_bulk(
     df[indicator]  # This triggers stockstats to calculate the indicator
     
     # Create a dictionary mapping date strings to indicator values
-    result_dict = {}
+    result_dict = {"__source_note__": source_note(data)}
     for _, row in df.iterrows():
         date_str = row["Date"]
         indicator_value = row[indicator]

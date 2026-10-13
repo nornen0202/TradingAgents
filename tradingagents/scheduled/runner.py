@@ -867,6 +867,22 @@ def resolve_trade_date(
         raise RuntimeError(f"Unexpected trade date index value for {ticker}: {last_index!r}")
     if expected_completed_date is not None:
         market = _trade_date_market(ticker=normalized_symbol, config=config)
+        if market == "KR" and last_date < expected_completed_date:
+            # The broker's actual completed bar can resolve a Yahoo outage;
+            # the calendar alone is never evidence of an available price.
+            from tradingagents.dataflows.kr_daily_history import load_kr_daily_bars, source_note
+
+            try:
+                broker_history = load_kr_daily_bars(
+                    normalized_symbol, expected_completed_date.isoformat(),
+                    expected_completed_date.isoformat(), require_end=True,
+                )
+            except Exception as exc:
+                broker_history = None
+                print(f"::warning::KR daily history fallback unavailable: {type(exc).__name__}")
+            if broker_history is not None:
+                print("::warning::" + source_note(broker_history).strip())
+                return expected_completed_date.isoformat()
         wait_seconds = max(0.0, config.run.latest_market_data_wait_minutes * 60.0)
         retry_interval = max(1.0, config.run.latest_market_data_retry_interval_seconds)
         waited_seconds = 0.0
