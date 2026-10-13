@@ -158,8 +158,15 @@ def reconcile(state, *, now=None, runner=subprocess.run):
 
 
 def reconcile_safely(archive, state):
+    from .advisory import queue_completed as queue_advisory_completed
+    # One unavailable advisory/API must not starve independent failures or
+    # already queued market completions of their notification dispatch.
+    for prepare in (queue_completed, queue_advisory_completed):
+        try:
+            prepare(archive, state)
+        except Exception as exc:
+            print(json.dumps({"notification_status": "PENDING", "error_type": type(exc).__name__}))
     try:
-        queue_completed(archive, state)
         reconcile(state)
     except Exception as exc:
         # Notification transport cannot terminate successful research/publication.
@@ -167,6 +174,9 @@ def reconcile_safely(archive, state):
 
 
 def compose(event, archive, state):
+    if event.get("kind") == "advisory_success":
+        from .advisory import compose as compose_advisory
+        return compose_advisory(event, archive, state)
     if event.get("kind") == "failure":
         if event.get("stage") not in {"launcher", "preflight", "analysis", "publish"}:
             raise NotificationError("Unknown local failure stage.")
