@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime, time
 from zoneinfo import ZoneInfo
 
 from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION
+from tradingagents.schemas.decision import explicit_price_range_conflicts
 from tradingagents.schemas import (
     ActionIfTriggered,
     BreakoutConfirmation,
@@ -38,6 +40,21 @@ def evaluate_execution_state(
     }
 
     staleness_seconds = int(max(0, (now - datetime.fromisoformat(market.asof)).total_seconds()))
+    # Overlay bootstrap can reuse an archived contract without re-parsing its
+    # decision. Validate that contract here without rewriting its source artifact.
+    range_conflicts = explicit_price_range_conflicts({
+        "execution_levels": {"levels": [level.to_dict() for level in contract.structured_levels]},
+        "risk_action_level": contract.risk_action_level.to_dict() if contract.risk_action_level else None,
+    })
+    if range_conflicts or "structured_price_range_conflict" in contract.reason_codes:
+        update = _build_update(
+            contract, market, now, staleness_seconds=staleness_seconds,
+            decision_state=DecisionState.DEGRADED, decision_now=DecisionNow.NONE,
+            reason_codes=("structured_price_range_conflict",), trigger_status=trigger_status,
+            data_health="UNAVAILABLE", refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=ExecutionTimingState.DEGRADED,
+        )
+        return replace(update, decision_if_triggered=ActionIfTriggered.NONE)
     data_quality = str(market.execution_data_quality or "").upper()
     market_session = str(market.market_session or "").strip().lower()
     execution_eligibility = str(getattr(market, "execution_eligibility", "") or "").upper()

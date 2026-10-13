@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 from typing import Any
 
+from tradingagents.schemas.decision import ExplicitPriceRangeConflictError
 from tradingagents.schemas import (
     ActionIfTriggered,
     BreakoutConfirmation,
@@ -24,6 +25,8 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
     decision_payload = analysis_payload.get("decision")
     analysis_asof = str(analysis_payload.get("finished_at") or analysis_payload.get("started_at") or datetime.now().isoformat())
     market_data_asof = str(analysis_payload.get("trade_date") or analysis_payload.get("analysis_date") or analysis_asof)
+    fallback_reasons = ("fallback_contract",)
+    fallback_notes = ("Structured decision unavailable; fail-closed watch mode.",)
 
     if isinstance(decision_payload, str) and decision_payload.strip().startswith("{"):
         try:
@@ -176,6 +179,11 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                 risk_action_reason_codes=decision.risk_action_reason_codes,
                 risk_action_level=decision.risk_action_level,
             )
+        except ExplicitPriceRangeConflictError as exc:
+            # Archived decisions stay immutable. Re-evaluation can continue in
+            # the existing watch-only fallback, with the precise blocker visible.
+            fallback_reasons += ("structured_price_range_conflict",)
+            fallback_notes += (str(exc),)
         except Exception:
             pass
 
@@ -191,8 +199,8 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
         setup_quality="DEVELOPING",
         confidence=0.4,
         action_if_triggered=ActionIfTriggered.NONE,
-        reason_codes=("fallback_contract",),
-        notes=("Structured decision unavailable; fail-closed watch mode.",),
+        reason_codes=fallback_reasons,
+        notes=fallback_notes,
         vwap_required=False,
         earliest_pilot_time_local="10:30",
         intraday_pilot_rule="Allow only a small pilot after confirmation; otherwise keep the idea on watch.",

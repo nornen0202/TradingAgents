@@ -14,6 +14,102 @@ class StructuredDecisionValidationError(ValueError):
     """Raised when a decision payload does not match the required schema."""
 
 
+class ExplicitPriceRangeConflictError(StructuredDecisionValidationError):
+    """A numeric range contradicts an unambiguous price range in its source."""
+
+
+_PRICE_RANGE_NUMBER = r"(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"
+_PRICE_UNIT = r"원|달러|KRW(?![A-Za-z])|USD(?![A-Za-z])"
+_EXPLICIT_RANGE_PAIR = re.compile(
+    rf"(?<![A-Za-z\d_.,+-])(?P<prefix>[$₩]?)\s*(?P<low>{_PRICE_RANGE_NUMBER})"
+    rf"\s*(?P<low_unit>{_PRICE_UNIT})?\s*[-–—~〜]\s*"
+    rf"(?P<second_prefix>[$₩]?)\s*(?P<high>{_PRICE_RANGE_NUMBER})(?![\d.,])"
+    rf"\s*(?P<unit>{_PRICE_UNIT})?",
+    re.IGNORECASE,
+)
+_EXPLICIT_PRICE = re.compile(
+    rf"(?<![A-Za-z\d_.,+-])(?P<prefix>[$₩]?)\s*(?P<price>{_PRICE_RANGE_NUMBER})(?![\d.,])"
+    rf"\s*(?P<unit>{_PRICE_UNIT})?",
+    re.IGNORECASE,
+)
+_PRICE_CURRENCIES = {"$": "USD", "USD": "USD", "달러": "USD", "₩": "KRW", "KRW": "KRW", "원": "KRW"}
+
+
+def explicit_price_range_conflicts(data: Mapping[str, Any]) -> list[str]:
+    """Check only finite numeric bounds against one literal, unit-marked range.
+
+    This is deliberately not a general prose/price parser. Partial/string/point
+    bounds, multiple price conditions, unknown units and indicators keep legacy behavior.
+    A numeric subrange is valid; neither stored bounds nor source text is repaired.
+    """
+    execution = data.get("execution_levels")
+    levels = execution.get("levels") if isinstance(execution, Mapping) else None
+    candidates = (
+        [(f"execution_levels.levels[{index}]", item) for index, item in enumerate(levels)]
+        if isinstance(levels, list) else []
+    )
+    candidates.append(("risk_action_level", data.get("risk_action_level")))
+    conflicts: list[str] = []
+    for path, item in candidates:
+        if not isinstance(item, Mapping):
+            continue
+        raw_bounds = (item.get("low"), item.get("high"))
+        if any(isinstance(value, bool) or not isinstance(value, (int, float)) for value in raw_bounds):
+            continue
+        try:
+            low, high = sorted(float(value) for value in raw_bounds)
+        except OverflowError:
+            continue
+        if low == high or not all(math.isfinite(value) for value in (low, high)):
+            continue
+        text = str(item.get("source_text") or "")
+        pairs = list(_EXPLICIT_RANGE_PAIR.finditer(text))
+        if len(pairs) != 1:
+            continue
+        pair = pairs[0]
+        units = {
+            _PRICE_CURRENCIES[value.upper()]
+            for field in ("prefix", "low_unit", "second_prefix", "unit")
+            if (value := pair[field])
+        }
+        if len(units) != 1:
+            continue
+        currency = next(iter(units))
+        raw_currency = str(item.get("currency") or "").upper()
+        if raw_currency and _PRICE_CURRENCIES.get(raw_currency) != currency:
+            continue
+        # Do not mistake a symbol-prefixed percentage or scaled shorthand for a
+        # literal price range. Explicit KRW/USD suffixes are already conclusive.
+        tail = text[pair.end("high"):]
+        if not pair["unit"] and (re.match(r"[%\w]", tail) or re.match(r"\s*%", tail)):
+            continue
+        if re.match(r"\s*(?:k|m|b|t|thousand|million|billion|trillion)\b", tail, re.IGNORECASE):
+            continue
+        source_low, source_high = sorted(
+            float(pair[field].replace(",", "")) for field in ("low", "high")
+        )
+        if not all(math.isfinite(value) for value in (source_low, source_high)):
+            continue
+        remainder = text[:pair.start()] + text[pair.end():]
+        other_prices = [
+            float(match["price"].replace(",", ""))
+            for match in _EXPLICIT_PRICE.finditer(remainder)
+            if currency in {_PRICE_CURRENCIES[value.upper()] for field in ("prefix", "unit") if (value := match[field])}
+        ]
+        if any(not source_low <= value <= source_high for value in other_prices):
+            continue  # A separate confirmation/stop price may be the intended bound.
+        if (
+            low < source_low and not math.isclose(low, source_low, rel_tol=1e-9, abs_tol=1e-9)
+        ) or (
+            high > source_high and not math.isclose(high, source_high, rel_tol=1e-9, abs_tol=1e-9)
+        ):
+            conflicts.append(
+                f"{path}: low/high [{low:g}, {high:g}] outside source_text "
+                f"[{source_low:g}, {source_high:g}] {currency}"
+            )
+    return conflicts
+
+
 class DecisionRating(str, Enum):
     BUY = "BUY"
     OVERWEIGHT = "OVERWEIGHT"
@@ -980,6 +1076,11 @@ def _parse_risk_action(
 
 def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDecision:
     data = _extract_json_object(payload)
+    # Validate raw rows before the legacy level parsers can drop a bad row or
+    # substitute another risk level. This enters the existing bounded repair.
+    conflicts = explicit_price_range_conflicts(data)
+    if conflicts:
+        raise ExplicitPriceRangeConflictError("structured_price_range_conflict: " + "; ".join(conflicts))
     missing_fields = {
         "rating",
         "confidence",
