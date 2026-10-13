@@ -21,11 +21,28 @@ try {
     $launcherErrorType = 'SourceFetchFailed'
     Push-Location $RepositoryRoot
     $locationPushed = $true
-    & git fetch fork main --quiet
-    if ($LASTEXITCODE -ne 0) { throw "Could not refresh fork/main." }
-    $launcherErrorType = 'SourceRevisionInvalid'
-    $revision = (& git rev-parse fork/main).Trim()
-    if ($revision -notmatch '^[0-9a-f]{40}$') { throw "Invalid source revision." }
+    # Both five-minute lanes share this checkout. Serialize the remote-ref update
+    # and revision selection before taking the immutable snapshot's own lock.
+    $repositoryIdentity = (Get-Location).ProviderPath.TrimEnd('\', '/').ToUpperInvariant()
+    $sha = [Security.Cryptography.SHA256]::Create()
+    try {
+        $repositoryKey = ([BitConverter]::ToString($sha.ComputeHash(
+            [Text.Encoding]::UTF8.GetBytes($repositoryIdentity)))).Replace('-', '').ToLowerInvariant()
+    } finally { $sha.Dispose() }
+    $fetchMutex = [Threading.Mutex]::new($false, "Local\TradingAgentsSourceFetch-$repositoryKey")
+    $fetchOwned = $false
+    try {
+        try { $fetchOwned = $fetchMutex.WaitOne(60000) } catch [Threading.AbandonedMutexException] { $fetchOwned = $true }
+        if (-not $fetchOwned) { throw "Source refresh is still active." }
+        & git fetch fork main --quiet
+        if ($LASTEXITCODE -ne 0) { throw "Could not refresh fork/main." }
+        $launcherErrorType = 'SourceRevisionInvalid'
+        $revision = (& git rev-parse fork/main).Trim()
+        if ($revision -notmatch '^[0-9a-f]{40}$') { throw "Invalid source revision." }
+    } finally {
+        if ($fetchOwned) { $fetchMutex.ReleaseMutex() }
+        $fetchMutex.Dispose()
+    }
     $launcherErrorType = 'SourceSnapshotUnavailable'
     $sourceRoot = Join-Path $stateRoot "source\$revision"
     $sourceMutex = [Threading.Mutex]::new($false, "Local\TradingAgentsSource-$revision")

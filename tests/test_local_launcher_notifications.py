@@ -2,6 +2,7 @@
 
 All external programs are local test executables; no GitHub or Telegram calls.
 """
+import hashlib
 import json
 import os
 import shutil
@@ -168,6 +169,103 @@ def test_real_wrapper_captures_fetch_failure_before_python(sandbox):
     assert local.read(path)["error_type"] == "SourceFetchFailed"
     calls = (tmp_path / "calls.txt").read_text().splitlines()
     assert calls[0] == "git fetch fork main --quiet" and calls[1].startswith("gh workflow run ")
+
+
+def test_concurrent_launchers_share_new_main_revision_without_fetch_race(sandbox):
+    tmp_path, env = sandbox
+    # Use real local Git repositories and a harmless worker; no remote service,
+    # account configuration, publication, or notification is contacted.
+    env["PATH"] = os.environ["PATH"]
+    remote, writer = tmp_path / "remote.git", tmp_path / "writer"
+    repo = Path(env["TA_TEST_REPO"])
+    def git(*args, cwd=None):
+        result = subprocess.run(["git", *map(str, args)], cwd=cwd, env=env,
+                                capture_output=True, text=True, timeout=15)
+        assert result.returncode == 0, result.stderr
+        return result.stdout.strip()
+    git("init", "--bare", remote)
+    git("init", "-b", "main", writer)
+    git("config", "user.name", "Isolated Fixture", cwd=writer)
+    git("config", "user.email", "fixture@example.invalid", cwd=writer)
+    (writer / "tracked.txt").write_text("base")
+    git("add", ".", cwd=writer)
+    git("commit", "-qm", "base", cwd=writer)
+    git("remote", "add", "fork", remote, cwd=writer)
+    git("push", "-q", "fork", "main", cwd=writer)
+    git("clone", "-q", "-b", "main", "--origin", "fork", remote, repo)
+    python = repo / ".venv/Scripts/python.exe"
+    python.parent.mkdir(parents=True)
+    results = tmp_path / "worker-results"
+    results.mkdir()
+    env["TA_TEST_RESULTS"] = str(results)
+    env["TA_TEST_EXE"] = str(python)
+    env["TA_TEST_SOURCE"] = r'''
+using System;
+using System.IO;
+class Worker {
+    static int Main(string[] args) {
+        File.WriteAllText(Path.Combine(Environment.GetEnvironmentVariable("TA_TEST_RESULTS"), args[3]),
+                          Environment.GetEnvironmentVariable("TRADINGAGENTS_SOURCE_SHA"));
+        return 0;
+    }
+}
+'''
+    compiled = ps("Add-Type -TypeDefinition $env:TA_TEST_SOURCE -OutputAssembly $env:TA_TEST_EXE -OutputType ConsoleApplication", env)
+    assert compiled.returncode == 0, compiled.stderr
+    for iteration in range(3):
+        (writer / "tracked.txt").write_text(str(iteration))
+        git("commit", "-qam", f"new main {iteration}", cwd=writer)
+        git("push", "-q", "fork", "main", cwd=writer)
+        expected = git("rev-parse", "HEAD", cwd=writer)
+        workers = [subprocess.Popen(
+            [POWERSHELL, "-NoProfile", "-NonInteractive", "-File", str(WRAPPER),
+             "-Command", command, "-RepositoryRoot", str(repo), "-DryRun"],
+            env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            for command in ("run-due", "publish")]
+        for worker in workers:
+            _, stderr = worker.communicate(timeout=30)
+            assert worker.returncode == 0, stderr
+        assert all((results / command).read_text() == expected for command in ("run-due", "publish"))
+        assert (repo / f".runtime/local-automation/source/{expected}/tracked.txt").read_text() == str(iteration)
+    assert not (repo / ".runtime/local-automation/notifications").exists()
+
+
+def test_source_fetch_lock_wait_is_bounded_and_does_not_start_git(sandbox):
+    tmp_path, env = sandbox
+    repo = Path(env["TA_TEST_REPO"])
+    python = repo / ".venv/Scripts/python.exe"
+    python.parent.mkdir(parents=True)
+    python.write_text("never executed")
+    repository_key = hashlib.sha256(str(repo.resolve()).rstrip("\\/").upper().encode()).hexdigest()
+    env["TA_TEST_MUTEX"] = "Local\\TradingAgentsSourceFetch-" + repository_key
+    env["TA_TEST_READY"] = str(tmp_path / "mutex-ready")
+    holder = subprocess.Popen(
+        [POWERSHELL, "-NoProfile", "-NonInteractive", "-Command",
+         "$m=[Threading.Mutex]::new($false,$env:TA_TEST_MUTEX); "
+         "$null=$m.WaitOne(); try { [IO.File]::WriteAllText($env:TA_TEST_READY,'ready'); "
+         "$null=[Console]::ReadLine() } finally {$m.ReleaseMutex(); $m.Dispose()}"],
+        env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    try:
+        deadline = time.monotonic() + 10
+        while not Path(env["TA_TEST_READY"]).exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert Path(env["TA_TEST_READY"]).exists(), "fixture mutex holder failed to start"
+        # Keep the production 60-second bound but shorten only this wait in the
+        # isolated fixture so the regression does not block for a full minute.
+        script = WRAPPER.read_text()
+        assert "$fetchMutex.WaitOne(60000)" in script
+        bounded = tmp_path / WRAPPER.name
+        bounded.write_text(script.replace("$fetchMutex.WaitOne(60000)", "$fetchMutex.WaitOne(200)"))
+        shutil.copyfile(HELPER, tmp_path / HELPER.name)
+        env["TA_TEST_WRAPPER"] = str(bounded)
+        started = time.monotonic()
+        result = ps("& $env:TA_TEST_WRAPPER -Command publish -RepositoryRoot $env:TA_TEST_REPO -DryRun", env)
+        assert result.returncode != 0
+        assert "Source refresh is still active" in result.stderr
+        assert time.monotonic() - started < 10
+        assert not (tmp_path / "calls.txt").exists()
+    finally:
+        holder.communicate("\n", timeout=10)
 
 
 def test_atomic_script_update_does_not_touch_schedule_or_runtime(sandbox):
