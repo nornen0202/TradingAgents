@@ -1,0 +1,334 @@
+{
+  "version": 4,
+  "video_id": "gknGDs_po98",
+  "title": "월가에서 현시점 마이크론이 저평가 됐다는 이유",
+  "url": "https://www.youtube.com/watch?v=gknGDs_po98",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/gknGDs_po98/maxresdefault.jpg",
+  "published_at": "2026-10-12T16:00:04+00:00",
+  "status": "unverified",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 2512,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 2512,
+    "segments": 113,
+    "duration_seconds": 168,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-13T11:09:39.437065+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 5,
+  "claim_status_summary": {
+    "partially_supported": 1,
+    "unverified": 10
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "마이크론의 10월 9일 종가는 129달러이고 1년간 5배 이상 상승했으며, 6월 말 1,200달러 초과·7~8월 800달러 미만·현재 약 1,000달러라는 가격 설명이 같은 종목과 가격 기준에 해당한다.",
+      "status": "partially_supported",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [
+        "M1"
+      ],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.35,
+      "numeric_parse": {
+        "claimed": "종가 129달러; 1년간 5배 이상; 6월 고가 >1,200달러; 7~8월 <800달러; 현재 약 1,000달러",
+        "observed": "M1: current_price 989.039978; 52주 고가 1,255; 저가 186.25. 개별 거래일 가격·연간 수익률·통화 및 조정 메타데이터는 미제공."
+      },
+      "investor_implication": "약 1,000 수준이라는 관측만 제한적으로 사용할 수 있으며, 역사적 수익률과 가격 경로는 투자 근거로 확정할 수 없다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "로젠블랫은 10월 1일 목표주가를 1,900달러로, 기관명이 불명확한 ‘검사는 데이비슨’은 10월 7일 3,000달러로 상향했으며 후자는 당시 주가의 거의 3배이다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "10월 1일 1,900달러; 10월 7일 3,000달러; 당시 주가의 거의 3배",
+        "observed": "해당 보고서 수치는 확인 불가. 주장된 3,000을 M1 가격 989.039978로 나누면 약 3.03배이나, 이는 발표 당시 가격이나 목표주가의 실재를 검증하지 않는 조건부 계산이다."
+      },
+      "investor_implication": "1,900달러와 3,000달러를 확인된 증권사 전망으로 인용하거나 기대수익률의 근거로 사용하기 어렵다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "9월 초 종료 분기 매출은 542억 달러로 전년 대비 4.8배, 순이익은 377억 달러로 12배이며 약 50조 원을 벌었다. 후반에는 50조 원을 매출로 표현한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "매출 542억 달러=54.2 billion USD; 순이익 377억 달러=37.7 billion USD; 각각 전년의 4.8배·12배; 약 50조 원",
+        "observed": "실제 손익과 환율 자료는 미제공. 표현 그대로 전년의 4.8배·12배라면 증가율은 각각 380%·1,100%라는 산술적 의미이며, 실제 성장률이 확인된 것은 아니다."
+      },
+      "investor_implication": "실적 급증이나 이를 이용한 밸류에이션 계산을 확정할 수 없다. 회사의 해당 분기 공시가 필요하다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "클라우드·데이터센터가 매출의 약 63%이며 AI 서버 증가로 메모리가 부족하다. DRAM 평균판매가격은 1년간 약 180% 상승했고 회사는 향후 2년 공급 부족이 심화된다고 전망했다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "클라우드·데이터센터 비중 약 63%; DRAM ASP 전년 대비 약 180% 상승; 향후 2년 공급 부족 심화",
+        "observed": "실측 비중·ASP·전망 원문은 미제공. 180% 상승은 기존 수준의 2.8배라는 뜻이며, 기존의 180% 수준이라는 표현과 다르다."
+      },
+      "investor_implication": "AI 수요 확대와 가격 상승을 확정된 이익 증가로 연결할 근거가 부족하다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "고객들이 수량과 가격 범위를 정한 다년 계약을 체결했으며, 아직 매출로 인식되지 않은 계약은 약 1,500억 달러·200조 원이다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "1,500억 달러=150 billion USD; 약 200조 원",
+        "observed": "계약 잔액의 실제 관측치는 미제공. 두 주장 금액의 환산에는 약 1,333.33원/달러가 내재하지만, 해당 환율의 적용 여부는 확인되지 않았다."
+      },
+      "investor_implication": "이 금액을 확정된 미래 매출·이익 또는 현금으로 취급할 수 없다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "2022년 12월 미국 반도체 보조금을 받은 뒤 2년간 상당량의 자사주 매입이 제한됐으며 12월 9일 제한이 해제된다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "2022년 12월 수령; 2년 제한; 연도 미상의 12월 9일 해제",
+        "observed": "제한 시작·종료일의 외부 증거는 미제공. 단순 기간 계산은 2022년 12월+2년=2024년 12월이다."
+      },
+      "investor_implication": "12월 9일을 확인된 정책 촉매나 매입 가능일로 전제할 수 없다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "10월 8일 이사회가 사상 최대인 351억 달러·약 47조 원의 자사주 매입 한도를 승인했고 12월 9일 프로그램이 시작된다. 한도는 회사 가치의 약 3%이다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "351억 달러=35.1 billion USD; 약 47조 원; 회사 가치의 약 3%; 10월 8일 승인·12월 9일 개시",
+        "observed": "승인 금액과 일정은 확인 불가. M1 시가총액도 USD라고 가정하면 35.1 billion/1,119.023 billion≈3.14%이다. 이는 미검증 금액과 조회 시점 시가총액을 사용한 조건부 계산이다."
+      },
+      "investor_implication": "47조 원이 특정 날짜부터 실제 시장 매수로 집행된다는 전제는 사용할 수 없다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "최근 3개월 공장 건설비 지출 후 남은 현금은 332억 달러이고, 직전 1년 매입액은 6억 5천만 달러이다. 새 한도는 50배 이상이며 거의 모든 수익을 매입에 사용할 수 있다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "현금 332억 달러=33.2 billion USD; 연간 매입액 6억 5천만 달러=0.65 billion USD; 새 한도는 50배 이상",
+        "observed": "재무 수치는 확인 불가. 주장된 한도와 매입액의 산술비는 35.1/0.65=54배이다. 주장된 현금 33.2 billion은 한도 35.1 billion보다 1.9 billion 적지만, 같은 기간·정의의 자금 비교인지는 알 수 없다."
+      },
+      "investor_implication": "이익, 현금잔액, 잉여현금흐름과 매입 한도를 구분하기 전에는 주주환원 여력을 추정하기 어렵다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "2018년 5월 마이크론이 100억 달러 매입계획을 발표한 뒤 그달 주가가 25% 이상 올랐으며 이는 이번 매입의 기대효과를 뒷받침한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "2018년 5월 100억 달러=10 billion USD 매입계획; 그달 주가 25% 이상 상승",
+        "observed": "발표일·승인액·월초 및 월말 가격·발표 전후 수익률은 미제공."
+      },
+      "investor_implication": "미확인 과거 사례로 이번 주가 상승이나 상승폭을 예측할 수 없다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "애플은 2024년 5월 아이폰 판매량이 전년 대비 10% 감소했지만 미국 사상 최대 매입을 발표해 다음 날 약 6% 상승했고, 이는 1년 반 최대 일일 상승이었다. 한도는 회사 가치의 약 4%였으며 당시 사업은 축소되고 있었다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.75,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "2024년 5월 아이폰 판매량 -10%; 발표 다음 날 주가 약 +6%; 약 18개월 최대 일일 상승; 한도/회사 가치 약 4%",
+        "observed": "해당 기간 판매지표·승인액·주가 수익률·시가총액 자료는 미제공."
+      },
+      "investor_implication": "애플 사례를 확인된 비교 근거로 인용하거나 마이크론의 예상 상승률에 대입하기 어렵다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "급증한 실적·계약과 자사주 매입으로 주식수가 줄고 주주가치가 높아지므로 마이크론은 저평가됐으며, 이러한 근거는 월가만 알고 개인투자자는 몰랐다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "정량 적정가치·투자기간·순주식수 감소율은 제시되지 않음",
+        "observed": "M1: forward PE 4.79343; trailing PE 13.3060665; 평균 목표주가 1,560.5652. 적정가치와 실제 순주식수 변화는 확인 불가."
+      },
+      "investor_implication": "저평가는 검증된 결론이 아니라 추가 확인이 필요한 투자 가설이다. 제공된 자료만으로 매수 판단을 확정하기 어렵다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "MU",
+      "name": "마이크론",
+      "status": "unverified",
+      "claims": [
+        "AI 발전과 서버 증가로 메모리 반도체 수요가 확대되고 실제 메모리 부족이 발생하고 있다는 주장.",
+        "주가가 급등한 뒤 횡보하고 6월 고점을 회복하지 못했지만, 월가 증권사들은 목표주가를 상향했다는 주장.",
+        "최근 분기 매출과 순이익이 급증했으며 클라우드·데이터센터가 매출의 주요 부분을 차지한다는 주장."
+      ],
+      "numeric_claims": [
+        "10월 9일 미국 증시 종가: 129달러, 1년 만에 5배 이상 상승했다는 발언. 연도는 명시되지 않음.",
+        "6월 말 주가가 1,200달러를 넘어 고점을 기록하고, 7~8월 800달러 아래로 하락했으며 현재 1,000달러 안팎이라는 발언.",
+        "10월 1일 로젠블랫 증권 목표주가: 1,900달러. 연도는 명시되지 않음."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "MU",
+        "as_of": "2026-10-13T02:26:06.182021+00:00",
+        "current_price": 989.0399780273438,
+        "market_cap": 1119022788736.1067,
+        "forward_pe": 4.79343,
+        "trailing_pe": 13.3060665,
+        "fifty_two_week_high": 1255.0,
+        "fifty_two_week_low": 186.25,
+        "average_target_price": 1560.5652,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "AAPL",
+      "name": "애플",
+      "status": "unverified",
+      "claims": [
+        "아이폰 판매 감소에도 대규모 자사주 매입 발표 후 주가가 상승한 사례를 마이크론의 주주환원 기대효과와 비교."
+      ],
+      "numeric_claims": [
+        "2024년 5월 아이폰 판매량이 전년 대비 10% 감소했다는 발언.",
+        "당시 미국 역사상 최대 규모 자사주 매입 발표 후 다음 날 주가가 약 6% 상승했다는 발언.",
+        "해당 상승이 지난 1년 반 동안 최대 일일 상승폭이었다는 발언."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "AAPL",
+        "as_of": "2026-10-13T02:26:10.094945+00:00",
+        "current_price": 340.9700012207031,
+        "market_cap": 4976177572415.161,
+        "forward_pe": 35.553448,
+        "trailing_pe": 39.102062,
+        "fifty_two_week_high": 345.34,
+        "fifty_two_week_low": 243.42,
+        "average_target_price": 328.09384,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "SNDK, MU, INTC, AMD, SKHY: Chip Stocks Extend Slide As AI Funding Concerns, China Competition Weigh On Sector",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/sndk-mu-intc-amd-skhy-014228210.html",
+      "publisher": "Stocktwits",
+      "published_at": "2026-10-13T01:42:28+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "SNDK, MU, INTC, AMD, SKHY: Chip Stocks Extend Slide As AI Funding Concerns, China Competition Weigh On Sector Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politic..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Dow Jones Futures: Micron, Nvidia Lead AI Trade Lower; Apple, Meta Rally Near Buy Points",
+      "source_url": "https://finance.yahoo.com/m/1b66e790-9e3e-3d5c-a8bf-167703811db3/dow-jones-futures%3A-micron%2C.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-13T01:11:19+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Dow Jones Futures: Micron, Nvidia Lead AI Trade Lower; Apple, Meta Rally Near Buy Points Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "S&P 500, Nasdaq 100 End Lower On Chipmaker Weakness, While Salesforce Gains Aid Dow — META, MSFT, BMBL, CRM, SNAP In Focus",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-100-end-231018478.html",
+      "publisher": "Stocktwits",
+      "published_at": "2026-10-12T23:10:18+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "S&P 500, Nasdaq 100 End Lower On Chipmaker Weakness, While Salesforce Gains Aid Dow — META, MSFT, BMBL, CRM, SNAP In Focus Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More Ne..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "JEPQ Pays 11.27%. This Lesser-Known Nasdaq ETF Is Paying 13.58% Monthly",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/jepq-pays-11-27-lesser-220337891.html",
+      "publisher": "24/7 Wall St.",
+      "published_at": "2026-10-12T22:03:37+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
