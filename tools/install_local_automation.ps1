@@ -3,13 +3,27 @@ param(
     [string] $RepositoryRoot = "C:\Projects\TradingAgents",
     [string] $ArchiveRoot = "C:\TradingAgentsData\archive",
     [string] $InstallRoot = "C:\TradingAgentsMaintenance",
+    [switch] $UpdateScriptsOnly,
     [switch] $NoStart
 )
 $ErrorActionPreference = "Stop"
 $installedScript = Join-Path $InstallRoot "run_local_automation.ps1"
 if ($PSCmdlet.ShouldProcess($installedScript, "Install independent local analysis and publication tasks")) {
     [IO.Directory]::CreateDirectory($InstallRoot) | Out-Null
-    Copy-Item -LiteralPath (Join-Path $PSScriptRoot "run_local_automation.ps1") -Destination $installedScript -Force
+    # Install the backward-compatible helper first, then atomically replace the
+    # entrypoint. Running workers keep their already loaded script and source.
+    foreach ($filename in @('local_automation_launcher_notifications.ps1', 'run_local_automation.ps1')) {
+        $destination = Join-Path $InstallRoot $filename
+        $temporary = "$destination.$([Guid]::NewGuid().ToString('N')).tmp"
+        try {
+            Copy-Item -LiteralPath (Join-Path $PSScriptRoot $filename) -Destination $temporary
+            if ([IO.File]::Exists($destination)) { [IO.File]::Replace($temporary, $destination, [NullString]::Value) }
+            else { [IO.File]::Move($temporary, $destination) }
+        } finally {
+            if ([IO.File]::Exists($temporary)) { [IO.File]::Delete($temporary) }
+        }
+    }
+    if ($UpdateScriptsOnly) { return }
     $stateRoot = Join-Path $RepositoryRoot ".runtime\local-automation"
     [IO.Directory]::CreateDirectory($stateRoot) | Out-Null
     $legacyTasks = @(Get-ScheduledTask -TaskPath "\TradingAgents\" -ErrorAction SilentlyContinue | Where-Object {

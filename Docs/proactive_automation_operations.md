@@ -54,6 +54,29 @@ backfilled only within 24 hours; historical overlays are not replayed. New overl
 after bridge activation retain completion notices. Work ACK/handoff success remains
 silent and never substitutes for a producer completion notice.
 
+The installed PowerShell launcher also records failures before Python is invoked,
+including a missing analysis runtime or failed source fetch/snapshot preparation.
+It writes the same credential-free, hash-bound outbox with stage `launcher`,
+preserving the first observation for each error category and KST day. It reserves
+one bootstrap dispatch under the Python reconciler's shared byte-range lock. The
+normal reconciler owns the remaining cumulative retry budget after recovery; the
+launcher never repeats that bootstrap attempt or duplicates Python-owned failures.
+The trusted notification workflow probes the analysis interpreter with an isolated,
+stdlib-only process before loading credentials. If it is absent, cannot launch,
+fails the probe, or exceeds ten seconds, the workflow sets up its own pinned Python,
+so reporting that failure does not require fixing the analysis runtime first.
+
+This does not detect a powered-off PC, a task that never launches, or failure to
+load the installed launcher/helper itself. If durable storage is unavailable or
+GitHub rejects the bootstrap while Python remains unavailable, delivery remains
+blocked and needs the independent operator. Preserve the failed/unknown dispatch
+receipt; do not label it sent or reset its budget. Installing this repair requires
+updating both launcher scripts; fetching a source snapshot alone does not update
+the installed PowerShell entrypoint. Do not reinstall schedules or interrupt an
+active worker to update the files. The existing installer accepts
+`-UpdateScriptsOnly` to atomically replace the helper and entrypoint without
+changing tasks, enabled markers, or active workers.
+
 `notifications/dispatches` records bounded attempts (three, fifteen-minute cooldown)
 and active workflow ownership. `DISPATCH_ACCEPTED` is pending. Only a corresponding
 `notifications/results` Telegram `SENT`/deduplicated `NOOP` receipt establishes

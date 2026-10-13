@@ -168,7 +168,7 @@ def reconcile_safely(archive, state):
 
 def compose(event, archive, state):
     if event.get("kind") == "failure":
-        if event.get("stage") not in {"preflight", "analysis", "publish"}:
+        if event.get("stage") not in {"launcher", "preflight", "analysis", "publish"}:
             raise NotificationError("Unknown local failure stage.")
         if not re.fullmatch(r"[A-Za-z0-9_]+", str(event.get("error_type", ""))):
             raise NotificationError("Unsafe local diagnostic.")
