@@ -44,6 +44,7 @@ def prepare_environment():
         if value:
             os.environ.setdefault(name, value)
     os.environ["TRADINGAGENTS_KIS_MARKET_CALENDAR_ENABLED"] = "1"
+    os.environ.setdefault("TRADINGAGENTS_KIS_RESEARCH_FALLBACK_ENABLED", "1")
     os.environ["TRADINGAGENTS_RECOVERY_SOURCE"] = "local_scheduler"
     os.environ["TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK"] = "0"
     os.environ["TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK"] = "0"

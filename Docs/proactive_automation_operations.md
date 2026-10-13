@@ -132,6 +132,30 @@ producer finishing after the last Work slot still needs its report published.
 
 ## Recovery decisions
 
+### Korean daily history provider gaps
+
+The local scheduler enables `TRADINGAGENTS_KIS_RESEARCH_FALLBACK_ENABLED=1`
+(an explicit `0` disables it). When Yahoo's requested KR daily bar is missing
+or invalid, the existing read-only KIS daily chart client supplies a complete
+independent series. Stock-data tools, indicator history and stale trade-date
+preflight use the same fallback. The exact completed session must have a real
+valid bar; a calendar date alone cannot release the freshness guard.
+
+KIS history uses KRX adjusted prices (`FID_ORG_ADJ_PRC=0`), as documented in the
+[official KIS example](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_daily_itemchartprice/inquire_daily_itemchartprice.py).
+Requests paginate backwards at most twenty times, validate every requested
+OHLCV row, and exclude future rows. The tool includes source, observation time
+and requested end date. Its five-minute process cache is separate from Yahoo's
+disk cache; the series are never spliced. Missing credentials or broker data
+cannot fabricate a completed bar. Retry and market-session budgets are unchanged.
+
+On October 13, Yahoo returned null OHLC for October 12 across the KR cohort;
+Alpha Vantage's fallback hit its subscription/rate limit. The four KR production
+attempts were exhausted. Broker reads independently verified the missing October
+12 history, while a bounded read-only check verified October 13 Yahoo bars for
+all thirty requested tickers. The closed October 13 session remains missed;
+provider recovery and a reference report do not count as new completed analysis.
+
 ### Require an outcome, not another observation
 
 The heartbeat is an operator, not an audit-only task. For each open incident,
