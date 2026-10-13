@@ -1,18 +1,64 @@
-<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PRISM Work 보고서</title><style>body{font:16px/1.65 system-ui;max-width:960px;margin:auto;padding:24px;overflow-wrap:anywhere}pre{white-space:pre-wrap;font:inherit}dt{font-weight:bold}dd{margin:0 0 14px}</style><body><main><h1>PRISM Work 보고서</h1><p>보고서 게시: 2026-10-12T10:56:49.405265+09:00</p><p>입력 시세 기준: 2026-10-12T10:56:49.176255+09:00</p><p>게시 시각은 입력 갱신 시각이 아닙니다. 아래 내용은 발행 당시 보고서이며 현재 주문 전에 다시 검증해야 합니다.</p><pre data-report-markdown># PRISM 운영 공지 — 2026년 10월 12일
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PRISM Work 보고서</title><style>body{font:16px/1.65 system-ui;max-width:960px;margin:auto;padding:24px;overflow-wrap:anywhere}pre{white-space:pre-wrap;font:inherit}dt{font-weight:bold}dd{margin:0 0 14px}</style><body><main><h1>PRISM Work 보고서</h1><p>보고서 게시: 2026-10-13T16:16:23.314683+09:00</p><p>입력 시세 기준: 2026-10-13T12:56:32.468186+09:00</p><p>게시 시각은 입력 갱신 시각이 아닙니다. 아래 내용은 발행 당시 보고서이며 현재 주문 전에 다시 검증해야 합니다.</p><pre data-report-markdown># PRISM 새 메시지 12개 — HPSP 위험 재검증, 시뮬레이터·BTC 데모 분리
 
-생산자 상태 정상. 09:30 KST 게시 공지를 10:42에 수집했습니다. **NO_ACTIONABLE_DELTA** — 새 주식 종목 신호는 없습니다.
+작성 2026-10-13 16:16:23 KST · source health **OK** · 연구 참고 전용
 
-[원문 공지](https://t.me/stock_ai_agent/15939), 사건 키 `stock_ai_agent:15939`는 시장 조정을 이유로 해당 채널이 오전 분석을 쉬고 종가 확인 시간대 하루 한 번 분석하겠다는 내용입니다. 보유 종목 손절·청산 모니터링을 지속한다는 설명도 채널 자체 주장으로, 실제 작동을 여기서 독립 검증하지 않았습니다.
+## 핵심 변화
 
-최근 24시간 창 1건, 전송 1건, 생략 0건, 신규 1건·수정 0건·중복 제외 0건입니다. 범위 잘림은 없습니다. 개별 종목·가격·목표·손절 신호는 0건이며 시뮬레이션 자료도 아닙니다.
+- 수집기는 2026-10-13 12:56 KST 성공, 현재 24시간 창의 새 메시지 12개를 모두 전달했습니다. 07:26~10:04 KST 게시물이며 수집 이후 새 소식의 존재 여부는 이번 packet에서 확인할 수 없습니다.
+- HPSP 손절 매도 주장 1건은 정규화 방향 UNKNOWN입니다. 실제 주식 주문으로 확정하지 않고 하방 위험의 공식 자료 재검증 우선순위를 높입니다.
+- 샘씨엔에스·팬오션 HOLD 2건은 명시적 시뮬레이터 스냅샷입니다. BTC 데모 기록 9개와 운영 공지 1개를 실제 주식 실행과 분리했습니다.
+- 실행 가능한 신규 지시는 없습니다. NO_ACTIONABLE_DELTA. KR·US 기존 시장·계좌·위험 제한을 유지합니다.
 
-이 공지를 TradingAgents의 작업 중단 명령이나 매도 신호로 해석하지 않습니다. KR·US 순위, 확신도, 비중 및 실행 상태를 바꿀 종목별 근거가 없으므로 기존 전략과 시장·계좌·위험 제한을 유지합니다. 외부 신호 공급 빈도 변화만 후속 확인 대상으로 남깁니다.
+## 범위와 신선도
 
-다음 정기 점검에서 후속 공지를 확인하고 종가 시간대 생산을 별도로 확인합니다. 새로운 종목 신호가 나오면 공식 공시·IR·거래소 자료와 대조합니다. ACK는 이 공지 처리 완료이며 외부 전달이나 채널 모니터링 정상의 증거가 아닙니다.
+정본 수집은 12:56:32 KST에 성공했습니다. 게시 시각은 오늘 07:26:26~10:04:25 KST이며 모두 응답 시점 24시간 이내입니다. 미래 시각·역전·파싱 오류가 없습니다. 새 이벤트 12, revision 0, 동일 이벤트 제외 0, 전송 12, 생략 0, 잘림 없음입니다. 이는 이번 packet의 24시간 창 전송 범위이며 채널 전체 이력이나 수집 후 현재까지의 전수 확인을 뜻하지 않습니다. 누적 고유 이력은 158개입니다.
 
-COVERAGE_RECEIPT {&quot;event_id&quot;: &quot;prism:5102c91d2e12e154db232e23094e97d0&quot;, &quot;status&quot;: &quot;COMPLETE&quot;, &quot;window_events&quot;: 1, &quot;transmitted_events&quot;: 1, &quot;truncated&quot;: false, &quot;new_events&quot;: 1, &quot;revised_events&quot;: 0}
+## 종목별 연구 영향
 
-MOBILE_HANDOFF {&quot;owner&quot;: &quot;external_github_notification_pipeline&quot;, &quot;status&quot;: &quot;PENDING_EXTERNAL_VERIFICATION&quot;, &quot;work_sent_notification&quot;: false}</pre></main><style>
+| 종목 | 신호와 구분 | 연구 반영 | 실행 |
+|---|---|---|---|
+| HPSP (403870.KQ) | 채널의 손절 매도 주장 / 정규화 UNKNOWN | 09:56 게시물은 손절선 이탈 매도를 주장하지만 정규화 방향은 UNKNOWN입니다. 실제 체결·포트폴리오 구분도 검증되지 않았으므로 매도 방향을 확정하지 않고 하방 위험 재검증 우선순위만 높입니다. | 연구 참고만 · 실제 매매 지시 없음 |
+| 샘씨엔에스 (252990.KS) | 시뮬레이터 HOLD | 시뮬레이터 보유 스냅샷의 HOLD이며 실제 사용자 보유나 주문 신호가 아닙니다. 종목 식별·거래소와 공식 시세를 확인할 연구 대상으로만 남깁니다. | 연구 참고만 · 실제 매매 지시 없음 |
+| 팬오션 (028670.KS) | 시뮬레이터 HOLD | 시뮬레이터 보유 스냅샷의 HOLD이며 다중 종목 메시지입니다. 가격·목표·손절의 종목별 매핑이 검증되지 않아 수치 조건으로 사용하지 않고 공식 공시·시세 재검증만 제안합니다. | 연구 참고만 · 실제 매매 지시 없음 |
+
+HPSP 게시물의 매수가 62,200원·매도가 59,100원·손절선 59,655원 및 장중 여유선 59,357원은 채널의 과거 주장입니다. 응답 시점 시세나 사용자 주문 가격이 아니며 공식 검증 전에는 현재 매매 조건으로 사용하지 않습니다. 가격 하락이나 실제 체결을 독립 확인한 결과로 표현하지 않습니다.
+
+샘씨엔에스·팬오션은 하나의 다중 종목 메시지에 포함됐습니다. 원본 canonical ticker를 그대로 보존했고 거래소 표기와 종목별 가격 매핑은 다음 검증 대상으로 남겼습니다. 시뮬레이션 수익률을 사용자의 실현 손익으로 취급하지 않습니다. 각 신호의 채널 점수 0.45는 독립 검증 신뢰도가 아닙니다.
+
+## 모든 새 메시지의 처리
+
+| 이벤트 | 게시 KST | 분류 | 확인한 변화·처리 |
+|---|---|---|---|
+| [stock_ai_agent:15998](https://t.me/stock_ai_agent/15998) | 10-13 07:26:26 | BTC 데모 진입 | 07:25 숏 데모 진입 기록. 실제 계좌 거래로 해석하지 않음. |
+| [stock_ai_agent:15999](https://t.me/stock_ai_agent/15999) | 10-13 07:59:27 | BTC 데모 부분 종료 | 부분 익절 및 수수료·펀딩 정산 미확정. 확정 손익으로 승격하지 않음. |
+| [stock_ai_agent:16000](https://t.me/stock_ai_agent/16000) | 10-13 08:01:26 | BTC 데모 보호 변경 | 숏 손절선 변경 기록. 주식 실행에서 제외. |
+| [stock_ai_agent:16001](https://t.me/stock_ai_agent/16001) | 10-13 08:06:25 | BTC 데모 종료 | 08:06 시나리오 종료·정산 주장. 실제 주식 손익과 분리. |
+| [stock_ai_agent:16002](https://t.me/stock_ai_agent/16002) | 10-13 08:46:25 | BTC 데모 진입 | 08:45 숏 데모 진입 기록. 실제 계좌 거래로 해석하지 않음. |
+| [stock_ai_agent:16003](https://t.me/stock_ai_agent/16003) | 10-13 09:26:26 | BTC 데모 보호 변경 | 숏 손절선 변경 기록. 주식 실행에서 제외. |
+| [stock_ai_agent:16004](https://t.me/stock_ai_agent/16004) | 10-13 09:30:12 | 채널 운영 공지 | 시장 조정을 이유로 오전 분석을 쉬고 종가 확인 시간대 하루 한 번 분석하겠다는 채널 계획. TradingAgents 일정은 변경하지 않음. |
+| [stock_ai_agent:16005](https://t.me/stock_ai_agent/16005) | 10-13 09:46:26 | BTC 데모 보호 변경 | 숏 보호선 변경 기록. 주식 실행에서 제외. |
+| [stock_ai_agent:16006](https://t.me/stock_ai_agent/16006) | 10-13 09:56:43 | 검증 전 주식 주장 | HPSP 손절선 이탈 매도 주장. 정규화 UNKNOWN 보존, 공식 하방 위험 재검증 우선. |
+| [stock_ai_agent:16007](https://t.me/stock_ai_agent/16007) | 10-13 09:56:48 | 주식 시뮬레이터 | 샘씨엔에스·팬오션 2개 HOLD 스냅샷. 실제 보유·가격 매핑 검증 전 연구 참고. |
+| [stock_ai_agent:16008](https://t.me/stock_ai_agent/16008) | 10-13 10:01:26 | BTC 데모 보호 변경 | 숏 보호선 변경 기록. 주식 매도·위험 한도로 전환하지 않음. |
+| [stock_ai_agent:16009](https://t.me/stock_ai_agent/16009) | 10-13 10:04:25 | BTC 데모 종료 | 10:03 시나리오 종료·정산 주장. 실제 주식 신호에서 제외. |
+
+BTC 9개 메시지는 원본 정규화의 simulation_only=false와 달리 요약 본문에 모두 ‘데모’가 명시돼 있습니다. 원본 값은 보존하면서 내용상 데모로 분리했습니다. HPSP의 실제·가상 계좌 구분 역시 이 packet만으로 단정하지 않습니다.
+
+## KR·US에 전달할 검증 항목
+
+- KR: HPSP 하방 위험의 공식 공시·거래소 가격 재검증을 우선합니다. 다음 정본 시장 packet의 종목 및 보유 여부를 확인한 뒤 연구 우선순위에만 반영하며, 현재 시장·계좌·위험 제한을 해제하지 않습니다.
+- KR: 시뮬레이터 2종목은 공식 종목 식별, 공시·기업 IR 및 실제 시장 자료를 확인할 연구 참고로만 보존합니다. 신뢰도·매수 규모를 올릴 근거로 사용하지 않습니다.
+- US: 매핑된 미국 주식 신호가 없습니다. BTC 데모를 US 주식 방향으로 투영하지 않으며 기존 논지와 위험 한도를 유지합니다.
+
+## 다음 확인
+
+2026-10-13 17:00 KST 다음 운영 점검에서 후속 수집 여부를 확인합니다. 종가 분석 예고는 채널의 계획이며 실행 보장이 아닙니다. 종목 판단 전에는 거래소 시세·공시·기업 IR 및 최신 계좌·시장·위험 gate를 다시 검증합니다.
+
+실행 가능한 신규 주식 행동: **NO_ACTIONABLE_DELTA**. ACK는 이 12개 이벤트를 보고서로 처리했다는 확인이며 생산 신선도·실제 외부 발송을 보증하지 않습니다.
+
+COVERAGE_RECEIPT {&quot;event_id&quot;:&quot;prism:f75da4b69832815ec00ee6982975e17c&quot;,&quot;status&quot;:&quot;COMPLETE&quot;,&quot;window_events&quot;:12,&quot;transmitted_events&quot;:12,&quot;truncated&quot;:false,&quot;new_events&quot;:12,&quot;revised_events&quot;:0}
+
+MOBILE_HANDOFF {&quot;owner&quot;:&quot;external_github_notification_pipeline&quot;,&quot;status&quot;:&quot;PENDING_EXTERNAL_VERIFICATION&quot;,&quot;work_sent_notification&quot;:false}</pre></main><style>
 .reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
 .reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
 .reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
