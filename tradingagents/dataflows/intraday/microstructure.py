@@ -165,11 +165,9 @@ class KISMicrostructureProvider:
         price_change_pct = _find_float(price_row, "prdy_ctrt", "change_rate", "rate")
         day_high = _find_float(price_row, "stck_hgpr", "high", default=_max_value(bars, ("stck_hgpr", "high", "hprc"))) or last_price
         day_low = _find_float(price_row, "stck_lwpr", "low", default=_min_value(bars, ("stck_lwpr", "low", "lprc"))) or last_price
-        session_vwap = _vwap_from_cumulative(price_row) or _vwap_from_bars(bars)
+        session_vwap = _kr_session_vwap(price_row, missing=missing)
         avg20_daily_volume = _avg_daily_volume(daily_rows)
         relative_volume = _relative_volume(volume, avg20_daily_volume, now_local, market="KR")
-        if session_vwap is None:
-            missing.setdefault("session_vwap", "minute_or_cumulative_traded_value_unavailable")
         if relative_volume is None:
             missing.setdefault("relative_volume", "avg20_daily_volume_unavailable")
 
@@ -682,6 +680,27 @@ def _vwap_from_cumulative(row: dict[str, Any]) -> float | None:
     return None
 
 
+def _kr_session_vwap(row: dict[str, Any], *, missing: dict[str, str]) -> float | None:
+    """Use one domestic quote's cumulative totals and its own daily range.
+
+    Domestic minute bars pair interval CNTG_VOL with cumulative ACML_TR_PBMN.
+    Their rolling window (which may be yesterday's) cannot supply session VWAP.
+    """
+    candidate = _vwap_from_cumulative(row)
+    if candidate is None:
+        missing["session_vwap"] = "cumulative_traded_value_or_volume_unavailable"
+        return None
+    low = _find_float(row, "stck_lwpr", "low")
+    high = _find_float(row, "stck_hgpr", "high")
+    if low is None or high is None:
+        missing["session_vwap"] = "source_vwap_price_range_unavailable"
+        return None
+    if not _price_inside_range(candidate, low, high):
+        missing["session_vwap"] = "source_vwap_price_range_inconsistent"
+        return None
+    return candidate
+
+
 def _us_session_bounds(now_local: datetime) -> tuple[datetime, datetime] | None:
     from tradingagents.scheduled.market_calendar import market_session_state
 
@@ -791,7 +810,8 @@ def _vwap_from_bars(rows: list[dict[str, Any]]) -> float | None:
         volume = _find_float(row, "evol", "cntg_vol", "volume", "tvol", "TVOL", "xymd_vol")
         if not volume or volume <= 0:
             continue
-        amount = _find_float(row, "eamt", "tr_pbmn", "acml_tr_pbmn", "tamt", "TAMT")
+        # ACML_TR_PBMN is cumulative, unlike a domestic bar's CNTG_VOL.
+        amount = _find_float(row, "eamt", "tr_pbmn", "tamt", "TAMT")
         if amount is None:
             high = _find_float(row, "stck_hgpr", "high", "HIGH", "hprc")
             low = _find_float(row, "stck_lwpr", "low", "LOW", "lprc")
