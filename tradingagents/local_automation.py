@@ -117,7 +117,28 @@ def drain_actions(state, *, dry_run=False):
     return active
 
 
-def completed_target(manifest, target):
+def local_target_window_start(target, *, now):
+    """Do not finish the early US cloud slot before its first execution checkpoint."""
+    start = target.window_start_kst
+    if target.workflow_file != "intraday-overlay-refresh.yml" or target.inputs.get("profile") != "us":
+        return start
+    from tradingagents.scheduled.config import load_scheduled_config
+    from tradingagents.scheduled.runner import _effective_execution_checkpoints, _execution_checkpoint_timezone
+
+    config = load_scheduled_config(ROOT / "config" / "scheduled_analysis.toml")
+    checkpoints = _effective_execution_checkpoints(config)
+    if not config.execution.execution_refresh_enabled or not checkpoints:
+        return start
+    checkpoint_zone = ZoneInfo(_execution_checkpoint_timezone(config))
+    # At 22:35 KST the cloud window can still name the previous 02:10 slot.
+    # The current market session, not that stale slot date, owns this checkpoint.
+    session_date = now.astimezone(checkpoint_zone).date()
+    first_clock = min(datetime.strptime(value, "%H:%M").time() for value in checkpoints)
+    first_checkpoint = datetime.combine(session_date, first_clock, tzinfo=checkpoint_zone)
+    return max(start, first_checkpoint.astimezone(start.tzinfo))
+
+
+def completed_target(manifest, target, *, window_start=None):
     """Gate on completed research coverage, independently of delivery status."""
     from tradingagents.scheduled.runner import _manifest_is_complete_overlay_baseline
 
@@ -132,7 +153,7 @@ def completed_target(manifest, target):
         finished = datetime.fromisoformat(manifest["finished_at"].replace("Z", "+00:00"))
     except (KeyError, TypeError, ValueError):
         return False
-    if started.tzinfo is None or finished.tzinfo is None or finished < started or started < target.window_start_kst:
+    if started.tzinfo is None or finished.tzinfo is None or finished < started or started < (window_start or target.window_start_kst):
         return False
     if mode == "full":
         return _manifest_is_complete_overlay_baseline(
@@ -153,7 +174,11 @@ def run_due(archive, state, *, now=None, dry_run=False):
     for target in targets:
         if target.workflow_file not in {"daily-codex-analysis.yml", "intraday-overlay-refresh.yml"}:
             continue
-        if any(completed_target(m, target) for m in manifests):
+        window_start = local_target_window_start(target, now=now)
+        if now < window_start:
+            decisions.append({"target": target.name, "status": "AWAITING_EXECUTION_CHECKPOINT"})
+            continue
+        if any(completed_target(m, target, window_start=window_start) for m in manifests):
             decisions.append({"target": target.name, "status": "RESEARCH_COMPLETE"})
             continue
         # Budget is per market/session, including Friday US work after KST midnight.
@@ -162,7 +187,13 @@ def run_due(archive, state, *, now=None, dry_run=False):
         receipt = read_json(receipt_path, {})
         attempts = int(receipt.get("attempts", 0))
         last = receipt.get("started_at")
-        if attempts >= target.max_failed_attempts or (last and now - datetime.fromisoformat(last) < timedelta(minutes=60)):
+        last_started = datetime.fromisoformat(last) if last else None
+        # Preserve the original slot key and cumulative budget. A legacy successful
+        # pre-checkpoint snapshot alone must not delay the first real refresh.
+        early_success = (window_start > target.window_start_kst and last_started
+                         and last_started < window_start and receipt.get("exit_code") == 0)
+        cooling_down = last_started and now - last_started < timedelta(minutes=60) and not early_success
+        if attempts >= target.max_failed_attempts or cooling_down:
             decisions.append({"target": target.name, "status": "RETRY_BUDGET_OR_COOLDOWN"})
             continue
         decisions.append({"target": target.name, "status": "DUE"})

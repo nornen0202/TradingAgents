@@ -157,6 +157,21 @@ official holidays, healthy in-progress jobs and closed-market expiry are not by
 themselves incidents. Publication time never refreshes the inputs. A recovered
 producer finishing after the last Work slot still needs its report published.
 
+The local US overlay lane delays the early 22:40 cloud slot until the first
+configured New York execution checkpoint (currently 10:00: 23:00 KST in daylight
+saving time, 00:00 KST in standard time). The former cloud start targeted a later
+deployment; a fast local run could finish before any checkpoint and incorrectly
+suppress a refresh before the 23:10 Work briefing. Before the checkpoint, local
+ticks report `AWAITING_EXECUTION_CHECKPOINT` without launching work or spending
+an attempt. A successful earlier snapshot does not cover the aligned window.
+The original slot identity and cumulative retry budget stay intact; only a
+successful pre-checkpoint attempt bypasses cooldown for its first real refresh.
+Failed attempts keep their cooldown and limits. Later 00:40/02:10 slots, market
+calendar holds and KR scheduling are unchanged. During standard time the 23:10
+Work slot is before the US open; retain its pre-open limitations rather than
+inventing live execution readiness. Research completion and publication never
+override stale quotes or execution gates.
+
 ## Recovery decisions
 
 ### Korean daily history provider gaps
