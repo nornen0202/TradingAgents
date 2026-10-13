@@ -54,6 +54,11 @@ backfilled only within 24 hours; historical overlays are not replayed. New overl
 after bridge activation retain completion notices. Work ACK/handoff success remains
 silent and never substitutes for a producer completion notice.
 
+Completion text distinguishes full investment research from an overlay's quote
+and account refresh. A verified strategy data publication does not establish a
+new Work briefing or a newly completed full analysis; overlay notices explicitly
+say that they reuse existing research.
+
 The installed PowerShell launcher also records failures before Python is invoked,
 including a missing analysis runtime or failed source fetch/snapshot preparation.
 It writes the same credential-free, hash-bound outbox with stage `launcher`,
