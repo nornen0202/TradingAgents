@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:df2edf53ba68af571ba9c22d0d4f3728",
+  "event_id": "us:418efe145063471bee6986e3361ff305",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "28ccef5622f4181bc3518b4a17864a5471d37a8b69183d84abc04a7aec734cbd",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "858e762f2a9456d02e9b0407eaef8552504dcade80dd28e73efdeedf425d30ec",
   "workflow_contract_sha256": "1214108b100a61193755513b3a7bc2a26a1b0659c1a3f2e31d8966b76e1d2754",
-  "source_sha256": "51ecd14bdfd7ba0e6cb1345a97a1455afb1fbadfed76ba42bd573dad646f9c7b",
+  "source_sha256": "bf68bc068c3e10915d32cb3d59f58fc0d1a5833be7c7d71b488f168fb8febd97",
   "body": {
     "kind": "market",
     "market": "US",
@@ -690,15 +690,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 354,
-          "window_events": 25,
+          "window_events": 22,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-10T03:00:25+00:00",
+          "oldest_occurred_at": "2026-10-10T09:00:19+00:00",
           "newest_occurred_at": "2026-10-12T00:15:45+00:00",
-          "available_events_before_context_cap": 25,
+          "available_events_before_context_cap": 22,
           "context_event_cap": 12,
-          "omitted_events": 13,
-          "omitted_due_to_context_cap": 13,
+          "omitted_events": 10,
+          "omitted_due_to_context_cap": 10,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -840,103 +840,6 @@
                 {
                   "ticker": "AAPL",
                   "name": "Apple·LG 관련 공급망",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "chUwfvCYbbM",
-            "content_sha256": "c2dc821018adcb1831ee5c13c4fe8152fdd4945aa5c18bb08007916dd10b3395",
-            "occurred_at": "2026-10-10T03:00:25+00:00",
-            "relevance": {
-              "tickers": [
-                "ORCL",
-                "AAPL",
-                "TSM"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "AAPL",
-                "TSM"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "chUwfvCYbbM",
-              "title": "투자자들이 꼭 봐야하는, 다음주 '미국 투자' 포인트(10.12~16)",
-              "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=chUwfvCYbbM",
-              "claim_status_summary": {
-                "unverified": 9,
-                "asr_uncertain": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "2026년 10월 12일 콜럼버스 데이에 미국 채권시장은 휴장하고 주식시장은 개장하며, 10월 16일 월간 옵션 만기로 장 막판 변동성이 커질 수 있다는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "시장별 공식 달력과 상품별 최종거래·결제 시각을 확인하기 전에는 확정된 거래 일정으로 사용하지 않는다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "10월 12일 ‘50 섬’으로 인식된 AI 데이터센터 행사가 시작되고 구글·메타·마이크로소프트·오라클이 참가하며, 2027년 추가 건설 발언이 AI 투자 지속의 단서라는 주장.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "원음으로 행사명을 식별한 뒤 공식 프로그램과 기업 발표를 확인하고, 건설 계획 발표와 실제 투자 집행을 구분한다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "JP모건·골드만삭스·웰스파고·시티가 10월 13일 한국시간 저녁에 3분기 실적을 발표하고, 카드 연체·충당금 증가가 소비자의 고금리 부담을 보여준다는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "네 은행의 발표일을 각각 확인하고 카드 연체율·순상각률·충당금 비용과 잔액을 구분해 비교한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "10월 13일 소기업 경기 전망과 ADP 고용 지표가 발표되고, 고용 약화가 이어지면 미국 경제의 고금리 감내 능력에 대한 우려가 커진다는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "NFIB·ADP의 정확한 지표명·주기·대상 기간과 수정치를 확인한 뒤 경기 해석에 반영한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "ORCL",
-                  "name": "오라클 및 구글·메타·마이크로소프트",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "AAPL",
-                  "name": "애플 및 LG전자·아마존·구글",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "Bloomberg/Morningstar 등 폐쇄형 출처 주장은 자동 검증하지 못했습니다."
-                  ]
-                },
-                {
-                  "ticker": "TSM",
-                  "name": "TSMC 및 엔비디아·브로드컴",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -1810,6 +1713,82 @@
                 }
               ]
             }
+          },
+          {
+            "event_key": "3YMQO1EjuOc",
+            "content_sha256": "28df966f860e0ff02142d12d12f74c0ebac5b6f4426db0644a9f206f71936d39",
+            "occurred_at": "2026-10-11T01:00:22+00:00",
+            "relevance": {
+              "tickers": [
+                "PLTR"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "video_id": "3YMQO1EjuOc",
+              "title": "월가에서 현시점, '팔란티어'를 몰래 '줍고' 있는 이유",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=3YMQO1EjuOc",
+              "claim_status_summary": {
+                "unverified": 9,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "지난 8일 AI 관련주 약세에도 PLTR은 2.4% 상승해 198.78달러에 마감했다. 주가는 작년 9월 말 무렵 182달러에서 올해 6월 말 116달러까지 하락했고, 현재 약 199달러는 1년 전과 비슷하며 작년 11월 최고가 약 207달러보다 낮다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.97,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "영상의 가격과 상승률을 현재 매매 기준으로 사용하기 전에 해당 거래일의 일별 가격과 실제 시세 기준시각을 확인해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "골드만삭스가 지난 8일 중립에서 매수로 상향하고 목표주가 230달러를 제시했으며, 바클레이즈는 같은 날 265달러로 분석을 개시하고 댄 아이브스는 하루 전 250달러로 분석을 개시했다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "개별 목표가와 매수 의견은 원문 확인 전 투자 근거로 확정할 수 없으며, 실제 기관 매수와도 구분해야 한다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "매수 추천 증권사가 작년 9월 말 3곳에서 주가 하락 중 18곳으로, 현재 19곳으로 늘었으며 이를 월가의 조용한 매집으로 해석한다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "추천 수 증가와 실제 자금 유입을 분리해서 판단해야 한다. 기관 매집 판단에는 비교 가능한 보유·거래 자료가 필요하다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "팔란티어는 분산 데이터를 통합해 AI가 업무를 수행하도록 하며, 고객사에 엔지니어를 파견해 맞춤형 구축 후 성공 사례를 제품화한다. 축적된 업무 방식과 판단 기준이 경쟁 장벽과 고객 이탈 방지 요인이라는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "제품 기능, 구축 방식, 고객 유지 효과를 각각 확인해야 하며 기능 설명만으로 지속적인 경쟁 우위를 확정할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "PLTR",
+                  "name": "팔란티어",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
           }
         ],
         "execution_eligible": false
@@ -1839,7 +1818,6 @@
             "source_health": "OK",
             "event_keys": [
               "TtFx3S0N_wM",
-              "chUwfvCYbbM",
               "NF5abNaJIic",
               "DLu-u4xo3Pc",
               "NAnTn_wV4Kw",
@@ -1849,19 +1827,20 @@
               "MoKFO8ZtQaU",
               "QFpEpQ7ag78",
               "QlDu4iUrAjg",
-              "jZFXszbt2tg"
+              "jZFXszbt2tg",
+              "3YMQO1EjuOc"
             ],
             "coverage": {
               "total_unique_events": 354,
-              "window_events": 25,
+              "window_events": 22,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-10T03:00:25+00:00",
+              "oldest_occurred_at": "2026-10-10T09:00:19+00:00",
               "newest_occurred_at": "2026-10-12T00:15:45+00:00",
-              "available_events_before_context_cap": 25,
+              "available_events_before_context_cap": 22,
               "context_event_cap": 12,
-              "omitted_events": 13,
-              "omitted_due_to_context_cap": 13,
+              "omitted_events": 10,
+              "omitted_due_to_context_cap": 10,
               "omitted_before_context_selection": 0
             }
           },
