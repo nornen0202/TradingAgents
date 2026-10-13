@@ -1,7 +1,8 @@
 """Run production and publication in independent local lanes without Actions.
 
 The launcher supplies an immutable checkout and persistent archive/state paths.
-No workflow dispatch, Actions artifacts, or hosted gates are required.
+Core production requires no workflow dispatch, Actions artifacts, or hosted gates.
+An idle production tick may recover the independent advisory collectors.
 """
 from __future__ import annotations
 
@@ -228,7 +229,10 @@ def run_due(archive, state, *, now=None, dry_run=False):
                 from tradingagents.notifications.local import queue_failure
                 queue_failure(state, stage=stage, source_key=key, error_type=error_type, finished_at=finished)
         # Re-evaluate calendars and archives on the next tick, after a long run.
-        break
+        return decisions
+    if not any(item["status"] == "DUE" for item in decisions):
+        from tradingagents.local_advisory_recovery import recover_due
+        decisions.extend(recover_due(archive, state, watchdog=watchdog, targets=targets, now=now, dry_run=dry_run))
     return decisions
 
 
