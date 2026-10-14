@@ -1,0 +1,406 @@
+{
+  "version": 4,
+  "video_id": "Mm-GvdfCgGc",
+  "title": "코스피 하락장은 도대체 언제 끝날까?!",
+  "url": "https://www.youtube.com/watch?v=Mm-GvdfCgGc",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/Mm-GvdfCgGc/maxresdefault.jpg",
+  "published_at": "2026-10-13T05:23:34+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1742,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 1742,
+    "segments": 92,
+    "duration_seconds": 151,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-13T16:13:15.374984+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 5,
+  "claim_status_summary": {
+    "partially_supported": 1,
+    "unverified": 8,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "코스피는 최고점 9,114 대비 약 30% 하락했고 6월에는 9,000선을 돌파했다. 2일 지수는 ASR상 '73포인트', 12일은 6,384포인트이며 4거래일 연속·8.85% 하락했고 13일도 하락 중이다. 반도체가 상승과 하락을 주도했다.",
+      "status": "partially_supported",
+      "confidence": 0.85,
+      "supporting_evidence_ids": [
+        "market_evidence[0].market_snapshot",
+        "market_evidence[1].external_context.company_news_excerpt"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "최고점 9,114; 6월 9,000 초과; 약 30% 하락; 2일 '73'; 12일 6,384; 4거래일·8.85% 하락; 13일 장중 하락.",
+        "observed": "2026-10-13 07:15 UTC 조회값 6,035.35, 52주 최고 9,385.59. 영상의 9,114와 6,384만 사용하면 낙폭은 약 29.95%로 산술상 일치하지만 두 입력값의 외부 검증은 아니다. 나머지 역사적 수치와 발화 시점 가격은 확인 불가."
+      },
+      "investor_implication": "당일 약세와 반도체주 하락은 관찰되지만, 정확한 고점 대비 낙폭이나 반도체의 지수 기여도를 근거로 반등 시점을 판단하기에는 자료가 부족하다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "외국인이 삼성전자를 9거래일, SK하이닉스를 12거래일 연속 매도했고 두 대형주의 매도가 코스피 하락에 부담을 줬다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "삼성전자 9거래일, SK하이닉스 12거래일 연속 외국인 매도.",
+        "observed": "연속 일수 산출에 필요한 일별 거래자료 없음. 12일 종가 기준인지 13일 장중 기준인지도 확인 불가."
+      },
+      "investor_implication": "9일·12일 연속 매도를 확인된 수급 신호로 사용하지 말고, 종료일을 고정한 거래소 순매매 자료로 재계산해야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "월가와 국내 증권사들이 삼성전자와 SK하이닉스의 내년 이익 전망을 올리고 있어 현재 하락을 기업 실적 붕괴로 보기 어렵다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "내년 이익 전망 상향. 게시일에 연결하면 잠정 2027년이며 구체적인 금액·상향률은 미제시.",
+        "observed": "수정 전후 영업이익·순이익·EPS 추정치 없음."
+      },
+      "investor_implication": "실적 전망이 주가를 지지한다는 논거는 아직 확인되지 않았다. 두 회사의 동일 기준 이익 추정치 변화를 확보해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "미국 고금리, 국제유가 부담과 AI 투자 우려가 외국인 매도 및 평가 배수 하락을 유발했고, 유가 상승은 물가 둔화와 금리 인하를 어렵게 한다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "고금리·유가 부담·평가 배수 하락. 구체적인 수준과 변화율은 미제시.",
+        "observed": "주장을 검증할 동시점 거시·수급·평가 배수 시계열 없음."
+      },
+      "investor_implication": "밸류에이션 하락 중심의 설명은 검증된 결론이 아니라 가설이다. 이익 전망 변화와 금리·환율·유가 요인을 분리해 확인해야 한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "미국 시간 14일에 9월 CPI가 발표되고 28일에는 미국 금리 결정과 마이크로소프트 실적 발표가 함께 예정돼 있다. 해당 날짜의 상승을 보장하지 않는다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "잠정 2026-10-14: 9월 CPI; 잠정 2026-10-28: 미국 금리 결정 및 MSFT 실적.",
+        "observed": "세 이벤트의 공식 날짜·시각 및 MSFT 해당 회계분기 모두 확인 불가."
+      },
+      "investor_implication": "14일과 28일을 확정된 매매 일정으로 사용하기 전에 세 기관의 공식 일정을 각각 확인해야 한다. 영상도 해당 날짜의 반등을 약속하지 않는다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "마이크로소프트는 올해 설비투자에 1,750억 달러 넘게 쓴다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.8,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "1,750억 달러 초과, 즉 USD 175 billion 초과. '올해'의 회계 기준은 불명확.",
+        "observed": "비교할 회사 발표 금액 없음. 단위 환산만 가능하며 투자 규모 자체는 확인 불가."
+      },
+      "investor_implication": "1,750억 달러 초과를 확정 집행액이나 검증된 연간 가이던스로 전제해 메모리 수요를 추정할 수 없다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "간밤 마이크로소프트가 내년에 자체 AI 칩을 100만 개 넘게 설치할 계획을 발표했으며 이는 AI 투자 지속과 메모리 수요의 신호다.",
+      "status": "asr_uncertain",
+      "confidence": 0.96,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.8,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "내년 자체 AI 칩 1,000,000개 초과 설치로 잠정 해석. 게시일 기준 내년은 잠정 2027년.",
+        "observed": "수량·배치 연도·발표일을 확인하는 외부 원문 없음. 정확한 발화 수량도 확정 불가."
+      },
+      "investor_implication": "100만 개를 확정 배치 물량으로 사용하거나 국내 메모리 업체의 확정 수주로 환산하지 말아야 한다. 원음과 회사 발표를 함께 확인해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "작년 1월 27일 딥시크 충격으로 엔비디아가 하루 약 17% 하락했고 3주 만에 낙폭을 모두 회복했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "게시일 기준 잠정 2025-01-27 하루 약 -17%; 이후 3주 내 낙폭 전부 회복.",
+        "observed": "당시 기준 가격·하락률·최초 회복일을 계산할 시계열 없음."
+      },
+      "investor_implication": "17% 하락과 3주 완전 회복을 검증된 선례로 인용할 수 없다. 해당 사례가 확인되더라도 코스피의 반등 시점을 보장하지 않는다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "딥시크 충격 이후 빅테크 네 곳이 총 3,200억 달러 설비투자 계획을 제시했고 AI 투자 우려 해소에 기여했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "빅테크 4곳 합계 3,200억 달러, 즉 USD 320 billion.",
+        "observed": "기업별 금액과 집계 기준 없음. 단위 환산 외에는 확인 불가."
+      },
+      "investor_implication": "3,200억 달러를 비교 가능한 기업별 투자 계획의 합계로 확정하거나, 이를 당시 반등의 확인된 원인으로 제시할 수 없다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "대신증권이 지난주 코스피 선행 PER을 5.26배로 계산했고 어제 종가로는 5배 미만이며, PER 6배 적용 시 7,700선이 가능하다고 제시했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "지난주 선행 PER 5.26배; 어제 종가 기준 5배 미만; PER 6배 적용 지수 7,700.",
+        "observed": "외부 검증값 없음. 조건부 산술로 7,700÷6은 선행 EPS 약 1,283.33이고, 동일 EPS에 영상의 6,384를 적용하면 PER 약 4.9745배다. 이는 가정 사이의 정합성만 보여준다."
+      },
+      "investor_implication": "7,700은 확인된 목표지수가 아니라 미검증 이익 가정과 평가 배수에 의존하는 시나리오다. 낮은 PER 주장만으로 상승 여력이나 반등 시점을 확정할 수 없다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피",
+      "status": "unverified",
+      "claims": [
+        "6월 지수를 끌어올렸던 반도체가 현재는 지수 하락을 주도한다는 주장이다.",
+        "현재 하락의 핵심은 갑작스러운 기업 수익성 붕괴보다 외국인 매도라는 해석이다.",
+        "미국 고금리와 국제유가 부담, AI 투자 우려가 주식에 부여하는 평가 배수를 낮추고 있다는 주장이다."
+      ],
+      "numeric_claims": [
+        "최고점 9,114 대비 현재 약 30% 하락했다고 발언한다.",
+        "6월 코스피가 9,000선 위에 있었다고 발언한다.",
+        "지난 2일 지수는 자동자막에 '73포인트'로 표기되어 정확한 수치를 식별할 수 없다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-13T07:15:15.902366+00:00",
+        "current_price": 6035.35009765625,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 3535.52,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "외국인 연속 매도가 지수에 부담을 주지만 삼성전자와 SK하이닉스의 내년 이익 전망은 오히려 올라가고 있다는 주장이다."
+      ],
+      "numeric_claims": [
+        "외국인이 삼성전자를 9거래일 연속 매도했다고 발언한다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-10-13T07:15:17.532940+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "외국인 연속 매도가 지수에 부담을 주지만 삼성전자와 SK하이닉스의 내년 이익 전망은 오히려 올라가고 있다는 주장이다."
+      ],
+      "numeric_claims": [
+        "외국인이 SK하이닉스를 12거래일 연속 매도했다고 발언한다. 자동자막은 '12거래 1일'로 표기한다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-10-13T07:15:21.259209+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "MSFT",
+      "name": "마이크로소프트",
+      "status": "unverified",
+      "claims": [
+        "설비투자 규모와 자체 AI 칩 배치 계획을 AI 투자가 유지되고 있다는 신호로 해석한다.",
+        "어느 회사의 AI 칩이든 메모리가 필요하므로 자체 칩 확대도 메모리 수요와 연결된다는 주장이다."
+      ],
+      "numeric_claims": [
+        "올해 설비투자에 1,750억 달러 넘게 쓴다고 발언한다.",
+        "간밤 발표에서 내년에 자체 AI 칩을 100만 개 넘게 설치할 계획을 밝혔다고 주장한다. 해당 문장에 자동자막 오류가 있다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "MSFT",
+        "as_of": "2026-10-13T07:15:23.929544+00:00",
+        "current_price": 541.1500244140625,
+        "market_cap": 4018334123742.382,
+        "forward_pe": 22.858334,
+        "trailing_pe": 30.147633,
+        "fifty_two_week_high": 553.72,
+        "fifty_two_week_low": 349.2,
+        "average_target_price": 589.59607,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "NVDA",
+      "name": "엔비디아",
+      "status": "unverified",
+      "claims": [
+        "작년 딥시크 충격 이후 빅테크의 대규모 설비투자 계획과 주가 회복 사례를 AI 투자 우려 해소의 선례로 제시한다."
+      ],
+      "numeric_claims": [
+        "작년 1월 27일 중국 딥시크 충격으로 엔비디아가 하루 만에 17% 하락했다고 발언한다.",
+        "이후 빅테크 4곳의 3,200억 달러 설비투자 계획이 제시됐다고 발언한다.",
+        "엔비디아가 3주 만에 낙폭을 모두 회복했다고 주장한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "NVDA",
+        "as_of": "2026-10-13T07:15:27.227574+00:00",
+        "current_price": 226.32000732421875,
+        "market_cap": 5464949216857.91,
+        "forward_pe": 14.220904,
+        "trailing_pe": 28.611885,
+        "fifty_two_week_high": 243.37,
+        "fifty_two_week_low": 164.27,
+        "average_target_price": 328.71695,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Press release: CMB.TECH fleet update",
+      "source_url": "https://finance.yahoo.com/energy/articles/press-release-cmb-tech-fleet-070800631.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-10-13T07:08:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Press release: CMB.TECH fleet update Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfolio N..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "BP Flags Up to $4.5 Billion in Impairments as Refining Margins Jump",
+      "source_url": "https://finance.yahoo.com/energy/articles/bp-flags-4-5-billion-063600505.html",
+      "publisher": "Oilprice.com",
+      "published_at": "2026-10-13T06:36:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "BP Flags Up to $4.5 Billion in Impairments as Refining Margins Jump Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather New..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "This Ultra-Rare Gas Could Become An Ace In Canada’s Hands",
+      "source_url": "https://finance.yahoo.com/energy/articles/ultra-rare-gas-could-become-000000924.html",
+      "publisher": "Oilprice.com",
+      "published_at": "2026-10-13T00:00:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "This Ultra-Rare Gas Could Become An Ace In Canada’s Hands Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters F..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C10",
+      "title": "Asia Stocks Battered as Semiconductor Stocks Dive",
+      "source_url": "https://finance.yahoo.com/m/462267b7-07f8-3129-a6dd-8911b185c04a/asia-stocks-battered-as.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-13T05:50:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

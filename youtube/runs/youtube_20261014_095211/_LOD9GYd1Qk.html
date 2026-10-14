@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 스페이스X의 반격 시작? 머스크의 호언장담 현실 될까</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261014_095211</p>
+    <h1>스페이스X의 반격 시작? 머스크의 호언장담 현실 될까</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=_LOD9GYd1Qk">원본 영상</a>
+    </div>
+  </header>
+  <h2>스페이스X·스타링크: 성장 시나리오와 검증 공백</h2>
+<p><strong>분석 대상:</strong> 소수몽키, <a href="https://www.youtube.com/watch?v=_LOD9GYd1Qk">스페이스X의 반격 시작? 머스크의 호언장담 현실 될까</a>, 2026년 10월 13일 게시, 16분 8초. 제공된 호스트 수집·검증 결과를 기준으로 작성했다.</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 상승 논리는 <strong>스타링크의 독자 이동통신 진출 → 통신 현금창출 확대 → 로켓·AI 인프라 투자 → 정책 지원에 따른 성장 가속</strong>이다. 그러나 개별 주장 검증 결과는 <strong>C1~C11 모두 미검증(unverified)</strong>이다. 이는 거짓이라는 판정이 아니라, 제공 자료로 사실 여부를 확정할 수 없다는 뜻이다.</p>
+<p>확인 가능한 것은 호스트의 일부 종목 가격 스냅샷과 영상 입력값에 따른 조건부 산술 계산이다. 스페이스X 상장·티커, 주파수 승인, 실내 통신 성능, 스타링크 실적, 정치적 수혜를 직접 입증하는 공식 자료는 제공되지 않았다. 따라서 현재 보고서의 중심은 확정된 성장 실적이 아니라 <strong>검증해야 할 투자 시나리오</strong>다.</p>
+<h3>2. 영상 주장과 확인된 사실/근거</h3>
+<p>아래 시각은 개별 발화의 정확한 위치가 아닌 자막 청크 시작 시각이다.</p>
+<p>| 주제·시각 | 영상 주장 | 확인된 사실/근거 및 판정 |</p>
+<p>|---|---|---|</p>
+<p>| 상장·수익률, 00:00 | 2026년 6월 상장 이후 약 +50%, 이후 -2%, 최근 +10%대 회복 | E1 기사 제목에 약 50% 상승이라는 표현만 있다. SEC 서류·거래소 공지·가격 이력은 없어 상장, 티커, 전체 수익률 경로 모두 미검증. |</p>
+<p>| 이동통신 진출, 00:00 | 새 주파수가 실내·지하 커버리지의 마지막 퍼즐이며 미국 제4 이동통신사로 진출, 2027년 말 서비스 목표 | 주파수 대역·거래 조건·FCC 승인·공식 일정·성능 시험 자료 없음. 주파수 확보와 전국 단독 서비스 실현은 별도 검증 대상. |</p>
+<p>| 스타링크 실적, 00:00 | 전체 매출의 절반 이상, 가입자 약 1,200만 명, 월평균 이용금액 66달러 | 입력값을 가정하면 분기 23.76억 달러가 계산된다. 가입자·ARPU·실제 매출·매출 비중은 미검증. 항공·해운·정부·군 수요 확대도 계약 자료 없음. |</p>
+<p>| 통신·우주·AI 시너지, 00:00·11:38 | 통신 현금흐름이 로켓 투자와 발사비 절감을 거쳐 AI·우주 데이터센터로 연결 | 소유 법인·연결 범위·사업별 현금흐름·투자·계약 자료 없음. 장기 구상과 현재 상업 운영을 구분할 수 없음. |</p>
+<p>| 머스크 전망, 05:43 | 세계 인터넷 점유율 50%, 스타링크가 유일한 대안, 스페이스X 가치가 지구 경제의 몇 배~수십 배 가능 | 원본 발언·발언일·점유율 정의·달성 시점 없음. E3 제목은 대담한 성장 발언이라는 일반적 단서에 그침. |</p>
+<p>| 통신 3사, 00:00 | 2025년 9월부터 하락 전환하며 스타링크 발표가 경쟁 우려를 자극 | TMUS·T·VZ 단일 가격 스냅샷만 확인. 추세 전환·발표별 급락·인과관계는 미검증. |</p>
+<p>| 통신사 협업, 00:00 | 미국 통신사 및 SK텔레콤·KT가 보조망·비상 문자와 수수료 공유에서 직접 경쟁으로 전환 | 회사별 계약·서비스 유형·수익배분·협업 종료 자료 없음. 모든 통신사를 같은 구조로 묶을 수 없음. |</p>
+<p>| 정치·정책, 05:43·11:38 | AI 대신 SI 사용 공식화, 머스크 표기 변경, 기업가 6명 훈장 수여, NASA 지원·규제 완화 | 정책 원문·변경 전후 게시물·행사 자료·NASA 및 FAA 문서 없음. 역사적 설명과 대통령 인용도 독립 확인 필요. |</p>
+<p>| 테슬라·팔란티어, 05:43·11:38 | 행정부 인적 관계와 중간선거 기대가 주가·사업 수혜로 연결 | TSLA·PLTR 가격 스냅샷만 확인. 정책실장 신원·피터 틸 관계·정부 계약·정치 사건별 수익률은 미검증. |</p>
+<h4>수집된 웹 근거의 실제 강도</h4>
+<p>가장 관련성이 높은 항목도 기사 <strong>본문이 아니라 제목 수준의 단서</strong>다.</p>
+<ul>
+<li><strong>E1:</strong> <a href="https://finance.yahoo.com/markets/stocks/articles/spacex-stock-climbed-50-6-233901246.html">Motley Fool의 스페이스X 약 50% 상승 관련 기사</a>. 제목은 영상 수치 일부와 닮았지만, 수집 본문이 오류 문구·메뉴로 대체돼 상승 기간과 기준 가격을 확인할 수 없다.</li>
+<li><strong>E3:</strong> <a href="https://finance.yahoo.com/technology/articles/elon-musk-makes-audacious-claim-220700334.html">TheStreet의 머스크 성장 발언 관련 기사</a>. 세계 인터넷 점유율 50%나 지구 경제 대비 가치 전망의 정확한 인용을 입증하지 못한다.</li>
+<li><strong>E2:</strong> <a href="https://finance.yahoo.com/markets/stocks/articles/p-500-ends-flat-while-233715763.html">Stocktwits의 시장 동향 기사</a>. 제목의 SPCX만으로 스페이스X 거래 티커를 확정할 수 없다.</li>
+<li><strong>E4:</strong> <a href="https://finance.yahoo.com/markets/article/bank-stocks-rise-on-jpmorgan-goldman-earnings-as-chip-stocks-fall-alphacheck-135541160.html">Yahoo Finance의 은행·반도체 동향 기사</a>. 스타링크 주파수·실내 통신 주장에 대한 직접 근거가 아니다.</li>
+</ul>
+<p>네 기사 모두 영상 게시 이후에 게시됐다. 후속 단서를 영상 제작 당시 이미 알려진 사실로 소급하지 않았다. 수집 결과의 <code>verified</code> 표시는 개별 영상 주장의 검증 완료를 뜻하지 않는다.</p>
+<h3>3. 시장 데이터: 관측값과 해석의 경계</h3>
+<p>호스트가 2026년 10월 13일 23:50 UTC경, 한국시간 10월 14일 08:50경 조회한 yfinance 값이다.</p>
+<p>| 종목 | 조회 가격 | 선행 PER | 후행 PER |</p>
+<p>|---|---:|---:|---:|</p>
+<p>| T모바일(TMUS) | 153.73 | 10.66 | 16.06 |</p>
+<p>| AT&amp;T(T) | 22.85 | 8.90 | 7.54 |</p>
+<p>| 버라이즌(VZ) | 43.53 | 8.26 | 11.34 |</p>
+<p>| 테슬라(TSLA) | 375.23 | 171.93 | 347.44 |</p>
+<p>| 팔란티어(PLTR) | 208.67 | 88.74 | 179.89 |</p>
+<p>가격은 소수 둘째 자리로 반올림했다. 통화 필드와 정확한 실거래 시각이 없으므로 <strong>확정 종가나 영상 게시 시점 가격이 아니다.</strong> PER의 이익 산정 기간·추정치 기준도 제공되지 않았다.</p>
+<p>스냅샷상 TSLA·PLTR의 이익배수는 통신 3사보다 높다. 이는 성장 기대가 실적으로 연결되는지 살펴볼 이유는 되지만, 적정가치나 향후 수익률을 확정하는 근거는 아니다. 통신사의 낮은 배수 역시 배당 안전성이나 저평가를 입증하지 않는다.</p>
+<p>뉴스 목록에는 AT&amp;T 사업 매각·등급 변경 등 자체 기업 이슈 제목도 포함돼 있다. 본문 확인 전 사실로 확정할 수는 없지만, 주가 변동을 스타링크 경쟁 하나로 설명해서는 안 된다는 대조 항목이다. 팔란티어 검색 결과에 나온 다른 기업의 계약액도 PLTR 수주로 전용할 수 없다.</p>
+<h3>4. 상승 논리가 성립하려면</h3>
+<h4>① 주파수에서 실제 고객 매출로 연결돼야 한다</h4>
+<p>영상의 경쟁 확대 논리가 힘을 얻으려면 주파수 거래와 승인이 확인되고, 일반 단말에서 서비스 품질·용량·가격이 입증돼야 한다. 실내·지하 사용성, 지상망 의존도, 고객 계약 주체가 핵심이다. 서비스 목표 발표만으로 기존 통신망 대체를 인정할 수 없다.</p>
+<h4>② 가입자 성장보다 현금창출을 확인해야 한다</h4>
+<p>영상 수치의 조건부 계산은 다음과 같다.</p>
+<p><strong>1,200만 명 × 월 66달러 × 3개월 = 23.76억 달러</strong></p>
+<p>계산 자체는 맞지만 실적 검증은 아니다. 기말 가입자를 분기 평균으로 사용했는지, 66달러가 실제 ARPU인지, 장비·기업·정부 매출을 어떻게 처리했는지 확인해야 한다. 매출이 늘더라도 설비·발사·운영 투자 후 다른 사업에 투입할 현금이 남는지는 별도 문제다. 원화 7만~8만 원 환산도 적용 환율과 날짜가 없어 검증되지 않았다.</p>
+<h4>③ 사업 시너지는 법인·계약·운영 자료로 보여야 한다</h4>
+<p>통신, 로켓, Grok 관련 AI 사업을 하나의 투자 논리로 묶으려면 소유·연결 범위와 자금 흐름이 먼저 확인돼야 한다. 발사비 절감, 컴퓨팅 임대, 우주 데이터센터가 각각 구상·시험·계약·상업 운영 중 어느 단계인지도 중요하다. 기대 시너지를 이미 발생한 연결 이익처럼 평가할 근거는 없다.</p>
+<h4>④ 정치적 관계가 경제적 성과로 전환돼야 한다</h4>
+<p>행정부의 칭찬이나 인적 친분과 계약 수주·규제 혜택·매출 인식은 서로 다르다. 스페이스X에는 NASA 계약과 FAA 조치, 팔란티어에는 정부 계약 금액·기간·실적 기여가 필요하다. 테슬라 역시 머스크 관련 정치 기대와 자체 사업 성과를 분리해야 한다.</p>
+<h3>5. 반론과 시나리오 무효화 조건</h3>
+<p>| 영상의 상승 가정 | 주요 반론 | 약화·무효화 판단에 필요한 관측 |</p>
+<p>|---|---|---|</p>
+<p>| 주파수가 실내·지하 문제를 해결 | 취득만으로 단말 성능과 네트워크 용량을 입증할 수 없음 | 공식 시험에서 목표 품질 미달, 지상망 의존 확인, 승인 제한·거래 무산 |</p>
+<p>| 2027년 말 독자 서비스 개시 | 일정은 아직 공식 자료로 확인되지 않음 | 공식 목표가 다르거나 지연·축소되고, 고객 모집·필수 승인이 진전되지 않음 |</p>
+<p>| 스타링크가 투자 재원을 공급 | 입력 숫자와 재무 자료가 없음 | 동일 기간 공시가 영상 수치를 반박하거나 투자 후 현금흐름이 가정에 미달 |</p>
+<p>| 통신사가 고객·수익을 잃음 | 협업 지속, 자체 실적·금리 등 대체 설명 가능 | 가입자·해지율·ARPU·가이던스에 경쟁 피해가 나타나지 않거나 협력 구조 유지 |</p>
+<p>| 정치적 관계가 사업 수혜로 연결 | 친분과 조달·규제 결과는 별개 | 실제 계약·예산·면허 효과가 기대와 다르거나 실적 기여가 확인되지 않음 |</p>
+<p>| 선거 기대가 최근 주가를 설명 | 가격 이력과 사건별 분석 없음 | 시장·금리·자체 실적을 통제한 뒤 정치 사건의 설명력이 약해짐 |</p>
+<p>이는 향후 확인할 조건이지 현재 발생했다는 주장이나 가격 기준의 매매 지침이 아니다. 자료가 없다는 이유만으로 상장·계약·정책의 부재를 단정해서도 안 된다.</p>
+<h3>6. 단기 체크포인트와 구체적 관찰 항목</h3>
+<p>1. <strong>거래 자산 식별:</strong> 스페이스X SEC 서류·거래소 공지·정식 티커를 먼저 확인한다. 이후 공모가, 첫 거래가, 연초 가격을 분리해 +50%·-2%·+10%대 수익률을 재계산한다.</p>
+<p>2. <strong>주파수·상용화:</strong> 대역·대역폭·거래 상대·FCC 문서 번호·승인 조건, 2027년 말 목표의 공식 원문을 확인한다. 실내·지하 시험은 단말·속도·지연·시험 환경·지상망 사용 조건까지 본다.</p>
+<p>3. <strong>다음 실적 자료:</strong> 같은 보고기간의 평균 가입자, ARPU, 사업별 매출, 영업현금흐름, 자본지출을 대조한다. 23.76억 달러 계산과 실제 매출의 차이를 설명할 수 있어야 한다.</p>
+<p>4. <strong>통신사 대응:</strong> TMUS·T·VZ와 SK텔레콤·KT의 계약을 각각 확인한다. 직접 휴대폰 연결, 전용 단말 인터넷, 백홀을 구분하고 고객 계약 주체·수익배분·협력 변경을 기록한다.</p>
+<p>5. <strong>경쟁의 실적 흔적:</strong> 통신사 가입자 순증·해지율·ARPU·가이던스와 배당을 뒷받침하는 현금흐름을 관찰한다. 주가 반응과 실제 고객 손실을 분리한다.</p>
+<p>6. <strong>정책·정부 계약:</strong> NASA·FAA 문서, 팔란티어 정부 계약의 금액·기간·확정 여부·매출 인식 일정을 확인한다. 정책실장 신원과 인적 관계도 공식 기록으로 대조한다.</p>
+<p>7. <strong>사건별 주가 분석:</strong> 공식 발표 시각과 수정 가격·거래량을 확보해 전후 1·3·5거래일 반응을 시장·업종·금리·자체 뉴스와 비교한다. 선거 일정과 이후 결과는 공식 자료로 확인하되 당시 알려진 정보와 구분한다.</p>
+<h3>7. 데이터 품질과 신뢰도 해석</h3>
+<ul>
+<li><strong>자막:</strong> <code>transcript_quality=good</code>, 점수 1.0이지만 한국어 자동자막의 수집 품질 지표다. 사실성이나 숫자 정확도를 보증하지 않으며 수동자막은 없다.</li>
+<li><strong>source_confidence:</strong> 주장 추출 단계의 0.93~0.96은 영상 내용을 추출한 확실성이다. 개별 검증 단계의 외부 증거 신뢰도는 0.00~0.15로 낮다. 동일 이름의 지표를 사실 확률로 혼용해서는 안 된다.</li>
+<li><strong>asr_confidence:</strong> 잠정적 발화 해석 확신도는 0.60~0.90이다. 특히 C5의 분기·머스크 인용은 0.60, C8의 AI/SI 표현은 0.65로 원음·화면 확인이 중요하다. C1·C2는 0.80, C3는 0.90이지만 숫자를 잘 읽었다는 것과 사실 검증은 별개다.</li>
+<li><strong>판정 confidence:</strong> 각 미검증 판정의 0.99는 증거 부족이라는 판정에 대한 확신이지 주장이 거짓일 확률이 아니다. 모든 점수는 통계적으로 보정된 확률이 아니다.</li>
+<li><strong>인식 오류:</strong> ‘2026년 EQ’를 Q2로 확정하지 않았다. AI/SI, 인명·직책·훈장 명칭과 회사 표기는 원문 대조가 필요하다.</li>
+<li><strong>수집 한계:</strong> 웹 근거는 4건이며 본문 수집이 부실하다. 공시 공급자 이용 불가와 VZ 뉴스 오류는 공시·계약·뉴스가 없다는 증거가 아니다.</li>
+<li><strong>폐쇄형 출처:</strong> 유료 텔레그램·월가 리포트·비공개 수익배분 조건은 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 원문도 제공되지 않았으므로 해당 출처에 의존하는 주장은 독립 검증 근거로 사용할 수 없다. 영상 그래프·캡처 역시 원본 링크와 데이터 확인이 필요하다.</li>
+</ul>
+<h3>결론</h3>
+<p>이 영상은 스타링크를 축으로 통신·우주·AI·정치를 연결하는 성장 시나리오를 제시한다. 하지만 제공 근거는 그 연결고리를 확정하기에 부족하다. 관찰 우선순위는 <strong>거래 자산 확인 → 주파수·성능·일정 → 실제 매출·현금흐름 → 법인 간 투자 연결 → 정책·계약의 실적 효과</strong>다. 통신사 경쟁 피해와 TSLA·PLTR의 정치 테마 설명도 별도의 시장·사업 데이터로 검증해야 한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;_LOD9GYd1Qk&quot;,
+  &quot;title&quot;: &quot;스페이스X의 반격 시작? 머스크의 호언장담 현실 될까&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=_LOD9GYd1Qk&quot;,
+  &quot;channel&quot;: &quot;소수몽키&quot;,
+  &quot;channel_id&quot;: &quot;UCC3yfxS5qC6PCwDzetUuEWg&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@sosumonkey/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/_LOD9GYd1Qk/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-13T11:11:49+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;USER_PRIMARY&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;HIGH&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;USER_ACCEPTED&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 8936,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 8936,
+    &quot;segments&quot;: 467,
+    &quot;duration_seconds&quot;: 968,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-14T08:48:46.717529+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 11
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;SpaceX가 2026년 6월 상장했고 상장 후 약 +50%, 이후 약 -2%, 최근 +10%대 수익률을 기록했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.1,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 6월 상장; 약 +50% → 약 -2% → +10%대&quot;,
+        &quot;observed&quot;: &quot;E1 제목에 약 50% 상승이라는 표현만 있다. 상장일·기준 가격·나머지 수익률은 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거래 자산과 수익률 기준을 확인하기 전에는 영상의 가격 흐름을 투자 판단에 적용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;새 주파수 확보가 미국 전역의 실내·지하 커버리지 문제를 해결할 마지막 퍼즐이며, 독자 제4 이동통신사 서비스 목표가 2027년 말이라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 제4 이동통신사; 2027년 말 서비스 목표&quot;,
+        &quot;observed&quot;: &quot;공식 목표 일정·면허·성능 시험 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;서비스 일정과 기술 성능이 확인되기 전에는 전국 단독 서비스나 기존 통신사 대체를 실현된 사업으로 평가할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;Starlink가 SpaceX 매출의 절반 이상을 차지하며 가입자 약 1,200만 명과 월평균 66달러를 곱한 분기 매출이 실제 실적과 거의 일치하고, 여러 고객군으로 수요가 확대된다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;매출 비중 50% 초과; 가입자 약 12,000,000명; 월평균 66달러; 약 7만~8만 원; 분기 실적과 거의 일치&quot;,
+        &quot;observed&quot;: &quot;조건부 계산은 분기 2,376,000,000달러. 실제 분기 매출·ARPU·가입자 수·환율은 미제공.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;단순 곱셈 결과를 공시 매출이나 현금흐름으로 간주해 기업가치를 산정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;통신 현금흐름이 로켓 투자와 발사비 절감을 거쳐 AI 컴퓨팅 임대·데이터센터·우주 데이터센터로 연결되는 사업 시너지가 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 투자액·비용 절감률·시너지 매출 수치 없음&quot;,
+        &quot;observed&quot;: &quot;대조 가능한 사업별 재무·운영 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장기 시너지 구상을 현재의 연결 매출·이익이나 확정 투자수익으로 반영할 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;머스크가 2026년 8월경 Starlink의 세계 인터넷 점유율 50%와 유일한 대안이라는 전망을 제시했고, 영상 해당 주에는 SpaceX 가치가 지구 경제의 몇 배~수십 배가 될 수 있다고 발언했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:43&quot;,
+      &quot;source_confidence&quot;: 0.05,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 8월경; 세계 인터넷 점유율 50%; 지구 경제의 몇 배~수십 배&quot;,
+        &quot;observed&quot;: &quot;정확한 인용·비교 단위·전망 기간 확인 불가. 2026년 EQ라는 자막의 분기는 미상.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;50% 점유율이나 극단적 가치 전망을 목표가·시장 규모·기대수익률의 검증된 가정으로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;T-Mobile·AT&amp;T·Verizon이 2025년 9월부터 하락 전환했고 Starlink 발표마다 급락하며, 경쟁 우려가 배당 투자에도 영향을 준다는 해석이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.15,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2025년 9월부터 하락 전환; Starlink 발표마다 급락&quot;,
+        &quot;observed&quot;: &quot;조회 시점 가격은 TMUS 153.73, T 22.85, VZ 43.53. 해당 기간 수익률과 발표 전후 변화는 계산 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;관측 가격만으로 Starlink가 하락 원인이라고 단정하거나 배당 지속성이 훼손됐다고 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;미국 통신사와 SK텔레콤·KT가 Starlink를 비상 문자·보조망으로 사용하며 수수료를 공유하다가 독자 서비스 때문에 경쟁 관계로 전환한다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수수료 공유 주장이나 배분율·계약액은 제시되지 않음&quot;,
+        &quot;observed&quot;: &quot;회사별 계약 조건·수익배분 수치 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;통신사들을 동일한 협력·경쟁 구조로 묶거나 미확인 수수료 손익을 실적에 반영할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;지난주 미국 행정부가 AI 대신 SI·Superintelligence 사용을 공식화했고 머스크가 회사 표기를 SpaceX AI에서 SI로 바꾸었다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:43&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;영상 기준 지난주; AI에서 SI로 변경&quot;,
+        &quot;observed&quot;: &quot;정확한 변경일·정책 시행일 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;용어 변경 주장을 규제 혜택이나 사업 가치 상승의 확정 근거로 삼을 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;대통령이 기업가 6명에게 훈장을 수여하고 머스크를 현대판 에디슨·국가적 보물로 칭찬했다는 주장이다. 삽입 연설은 SpaceX의 2002년 설립·민간 액체연료 로켓 최초 궤도 진입·NASA 해외 의존 해소와 Tesla의 75년 이상 만의 성공적인 신규 자동차 제조사라는 설명을 포함한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:43&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수상 기업가 6명; SpaceX 설립 2002년; Tesla 관련 75년 이상&quot;,
+        &quot;observed&quot;: &quot;수상자 수·설립연도·비교 기간을 대조할 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정치적 칭찬이나 역사적 서술을 현재의 계약 수주·재무 성과·주가 상승 근거로 연결할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;NASA·행정부 지원과 규제 완화가 SpaceX를 돕고, 행사에 등장한 과학기술정책실장이 피터 틸의 최측근이자 친머스크 인사여서 Palantir도 수혜주라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:38&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지원·규제 완화·계약 수혜의 구체적 금액은 제시되지 않음&quot;,
+        &quot;observed&quot;: &quot;지원액·계약액·실적 기여도 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정치적 친분과 실제 계약·매출 기여를 분리하고, 확인된 사업 수혜만 기업가치 평가에 반영해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;머스크·행정부 관계와 중간선거 기대가 SpaceX·Tesla·Palantir의 최근 주가 움직임을 설명하며, 선거 결과가 향후 주가 변수라는 해석이다. 금리·유가·지정학적 위험도 언급된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:43&quot;,
+      &quot;source_confidence&quot;: 0.1,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정치 기대에 따른 최근 주가 움직임; 구체적 수익률 없음&quot;,
+        &quot;observed&quot;: &quot;조회 시점 가격은 TSLA 375.23, PLTR 208.67. 기간 수익률·정치 사건 초과수익률·향후 선거 영향은 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정치 테마는 미검증 시나리오로 구분해야 하며, 제공 자료만으로 방향성 매매나 기대수익률을 정당화할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;TMUS&quot;,
+      &quot;name&quot;: &quot;T모바일&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;스타링크가 협력·보조망 제공자에서 직접 고객을 확보하는 경쟁자로 전환하면서 주가가 압박받는다고 해석하며, 배당 투자에서도 중장기 경쟁 심화를 고려해야 한다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;영상은 T모바일·AT&amp;T·버라이즌의 하락 전환 시점이 스타링크의 통신 사업 진출 및 주파수 확보 발표가 본격화된 2025년 9월과 겹친다고 설명한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TMUS&quot;,
+        &quot;as_of&quot;: &quot;2026-10-13T23:50:41.953067+00:00&quot;,
+        &quot;current_price&quot;: 153.72999572753906,
+        &quot;market_cap&quot;: 164901802483.54242,
+        &quot;forward_pe&quot;: 10.657739,
+        &quot;trailing_pe&quot;: 16.063742,
+        &quot;fifty_two_week_high&quot;: 230.65,
+        &quot;fifty_two_week_low&quot;: 147.9,
+        &quot;average_target_price&quot;: 236.84,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;T&quot;,
+      &quot;name&quot;: &quot;AT&amp;T&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;스타링크의 독자 이동통신 진출 기대가 기존 통신사인 AT&amp;T의 경쟁 확대 우려와 주가 하락 요인으로 작용한다고 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;T&quot;,
+        &quot;as_of&quot;: &quot;2026-10-13T23:50:44.883646+00:00&quot;,
+        &quot;current_price&quot;: 22.850000381469727,
+        &quot;market_cap&quot;: 156577014716.4777,
+        &quot;forward_pe&quot;: 8.89607,
+        &quot;trailing_pe&quot;: 7.5412545,
+        &quot;fifty_two_week_high&quot;: 29.44,
+        &quot;fifty_two_week_low&quot;: 19.89,
+        &quot;average_target_price&quot;: 28.76087,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;VZ&quot;,
+      &quot;name&quot;: &quot;버라이즌&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;스타링크의 직접 고객 대상 통신 사업 확대가 버라이즌의 경쟁 심화 우려를 키우며, 관련 발표 때 기존 통신사 주가가 민감하게 하락한다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;VZ&quot;,
+        &quot;as_of&quot;: &quot;2026-10-13T23:50:48.359293+00:00&quot;,
+        &quot;current_price&quot;: 43.529998779296875,
+        &quot;market_cap&quot;: 180857359471.31293,
+        &quot;forward_pe&quot;: 8.261419,
+        &quot;trailing_pe&quot;: 11.3359375,
+        &quot;fifty_two_week_high&quot;: 51.68,
+        &quot;fifty_two_week_low&quot;: 38.39,
+        &quot;average_target_price&quot;: 51.24091,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;TSLA&quot;,
+      &quot;name&quot;: &quot;테슬라&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;머스크와 트럼프의 관계를 근거로 스페이스X와 함께 선거 테마주로 묶일 수 있으며, 선거 관련 기대 변화가 주가에 영향을 줄 수 있다고 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSLA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-13T23:50:51.462737+00:00&quot;,
+        &quot;current_price&quot;: 375.2300109863281,
+        &quot;market_cap&quot;: 1481988712041.6436,
+        &quot;forward_pe&quot;: 171.93063,
+        &quot;trailing_pe&quot;: 347.43518,
+        &quot;fifty_two_week_high&quot;: 498.83,
+        &quot;fifty_two_week_low&quot;: 297.38,
+        &quot;average_target_price&quot;: 397.83212,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;PLTR&quot;,
+      &quot;name&quot;: &quot;팔란티어&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;피터 틸 측근으로 묘사된 과학기술정책실장과 행정부의 관계를 근거로 트럼프 행정부 수혜주라고 해석하며, 최근 주가 움직임에도 정치적 기대가 반영됐을 가능성을 제시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;PLTR&quot;,
+        &quot;as_of&quot;: &quot;2026-10-13T23:50:54.383593+00:00&quot;,
+        &quot;current_price&quot;: 208.6699981689453,
+        &quot;market_cap&quot;: 501446208621.4685,
+        &quot;forward_pe&quot;: 88.73759,
+        &quot;trailing_pe&quot;: 179.88794,
+        &quot;fifty_two_week_high&quot;: 212.94,
+        &quot;fifty_two_week_low&quot;: 106.37,
+        &quot;average_target_price&quot;: 205.27309,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;SpaceX Stock Has Climbed About 50% Through 6 Insider Share Unlocks. The Biggest Is Still Ahead.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/spacex-stock-climbed-50-6-233901246.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T23:39:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;SpaceX Stock Has Climbed About 50% Through 6 Insider Share Unlocks. The Biggest Is Still Ahead. Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech S...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;S&amp;P 500 Ends Flat, While Nasdaq Drops As Memory Chipmakers Sell Off — BAC, GME, SPCX, ARM, QCOM In Focus&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/p-500-ends-flat-while-233715763.html&quot;,
+      &quot;publisher&quot;: &quot;Stocktwits&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T23:37:15+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;S&amp;P 500 Ends Flat, While Nasdaq Drops As Memory Chipmakers Sell Off — BAC, GME, SPCX, ARM, QCOM In Focus Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics Wor...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Bank stocks rise on JPMorgan, Goldman earnings as chip stocks fall: AlphaCheck&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/article/bank-stocks-rise-on-jpmorgan-goldman-earnings-as-chip-stocks-fall-alphacheck-135541160.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T13:55:41+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Bank stocks rise on JPMorgan, Goldman earnings as chip stocks fall: AlphaCheck Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 반등 기다리는 K바이오…전문가들이 짚은 4분기 투자 기회</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261014_095211</p>
+    <h1>반등 기다리는 K바이오…전문가들이 짚은 4분기 투자 기회</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=mbF4a9KX_y8">원본 영상</a>
+    </div>
+  </header>
+  <h2>K바이오 4분기 기회 점검: 반등 기대보다 계약·임상·현금흐름</h2>
+<p><strong>분석 기준: 2026년 10월 14일 제공 자료</strong></p>
+<p>영상: <a href="https://www.youtube.com/watch?v=mbF4a9KX_y8">PLUS TV — 반등 기다리는 K바이오…전문가들이 짚은 4분기 투자 기회</a> · 업로드 2026년 10월 13일 · 길이 53:04</p>
+<h3>1. 핵심 결론</h3>
+<p>영상의 중심 논리는 <strong>특허 만료와 AI 활용이 장기 기회를 넓히더라도, 국내 바이오는 기술수출 최대 총액보다 비환급 선급금·개발 상대방·임상 경쟁력·실제 수익화를 따져야 한다</strong>는 것이다. 실적 기반 기업과 CDMO를 선호하고, 국내 바이오의 선별적 접근 가능성을 논의한다. 다만 ETF 활용에는 출연자 간 의견 차이가 있다.</p>
+<p><strong>이 논리를 뒷받침하는 관련 외부 근거는 이번 자료에서 확보되지 않았다.</strong> 주장 검증 결과 C1~C10은 모두 <code>unverified</code>이며, 확인된 사실 목록도 비어 있다. 이는 주장이 거짓이라는 판정이 아니라 <strong>공시·임상·시장 자료로 대조하지 못했다는 뜻</strong>이다. 따라서 아래 수치는 영상 주장으로만 취급하며, 반등이나 기업별 수익 증가의 확정 근거로 사용할 수 없다.</p>
+<h3>2. 확인된 사실/근거와 증거의 한계</h3>
+<p>제공된 외부 기사 4건은 모두 핵심 주장과 무관해 지지·반박 근거에서 제외됐다.</p>
+<ul>
+<li>E1·E2는 광업 기사다. 예를 들어 <a href="https://finance.yahoo.com/markets/commodities/articles/luda-technology-group-signed-non-130000341.html">Luda의 몽골 광업권 인수 검토 기사</a>는 특허 만료 규모나 릴리 거래 건수를 검증하지 못한다.</li>
+<li>E3는 미국 정치·사업 발표 기사다.</li>
+<li>E4는 <a href="https://finance.yahoo.com/energy/articles/oil-prices-rise-houthi-saudi-003118025.html">원유 공급 불확실성 기사</a>로, 엔비디아·릴리 투자나 FDA 정책과 관련이 없다.</li>
+</ul>
+<p>기사 발췌문도 오류 메시지와 사이트 탐색 문구가 대부분이었다. 수집 단계의 <code>verified</code> 표시는 투자 주장 검증 완료를 뜻하지 않는다. <strong>시장 증거는 빈 배열이고, 회사 공시·FDA 결정문·임상 등록·학회 초록·관세 원문도 제공되지 않았다.</strong> 관련성이 높은 외부 출처 링크를 제시할 수 없는 상태다.</p>
+<h3>3. 영상 주장별 투자 의미와 확인 과제</h3>
+<p>아래 시각은 개별 발언의 정확한 위치가 아닌 <strong>대표 자막 청크 시작 시각</strong>이다. <code>source_confidence</code>는 자막에서 주장을 추출한 확실성이며 사실 정확도가 아니다. 모든 항목은 미검증·수동 확인 필요 상태다.</p>
+<p>| 주제·대표 시각 | 영상 주장 | 확인된 사실/근거 및 투자상 쟁점 | source_confidence |</p>
+<p>|---|---|---|---:|</p>
+<p>| 특허 절벽·빅파마 · 00:00:00 | 2028년까지 1,800억 달러 규모 의약품이 특허 만료 영향을 받고, 릴리가 올해 상반기 10건 이상 거래 | 관련 근거 없음. 금액이 대상 약물 매출인지 손실 전망인지, 거래에 협력·지분투자가 포함됐는지 확인 필요. 국내 기업의 계약 성사로 자동 연결할 수 없음 | 0.94 |</p>
+<p>| AI 신약개발 · 00:06:24 | 엔비디아·릴리의 5년간 10억 달러 투자, 노보노디스크의 Claude 활용, FDA 전임상 간소화 | 공식 발표·정책 원문 없음. 연구 투자와 라이선스 수익은 구분해야 하며, 전임상 간소화를 임상·안전성 검증 면제로 해석할 수 없음 | 0.90 |</p>
+<p>| 비만치료제 · 00:12:26 | 경구제 전환과 미국 기업 우위 전망, 현재 상위 10대 제약회사가 모두 미국 기업이라는 발언 | 임상·순위 자료 없음. 과거 의약품 순위와 현재 회사 순위는 비교 대상이 다름. 체중감량과 근육 보존은 별도 지표 | 0.86 |</p>
+<p>| 모더나·머크 · 00:18:59 | 약 두 달 전 개인맞춤형 mRNA 항암치료 3상 결과 발표, ESMO 세부·암종 확장 데이터 기대 | 임상 단계·발표일·세션 선정 모두 미확인. 예상 가격 7억 원은 확정 가격이 아니며, 제조·보험 적용도 검증되지 않음 | 0.89 |</p>
+<p>| 기술수출·한미약품 · 00:32:02 | 국내 기술수출 21조 원 초과. UCN2 선급금 2,700억 원·총액 3.2조 원, GLP-2 선급금 1,100억 원·총액 1.9조 원 | 공시·집계표 없음. 상대방 법인, 통화, 환급 조건, 실제 수취액 및 개발 단계 확인 필요. 최대 총액과 확정 현금유입은 다름 | 0.93 |</p>
+<p>| CDMO·삼성바이오로직스 · 00:38:50 | CDMO 선호, 세계 1위 수준·6공장 건설 언급 및 10공장 확장 가능성 | 생산능력·공장 일정·수주 자료 없음. 착공·준공·가동·규제 승인을 구분해야 하며, 10공장은 확정 계획이 아닌 가능성 발언 | 0.90 |</p>
+<p>| 의약품 관세 · 00:38:50 | 한국산 의약품 15%, 일부 신약·API 0%, DS가 API로 분류되면 면제 가능 | 공식 세율·품목 분류·면제 요건 없음. DS라는 명칭만으로 0% 적용을 확정할 수 없음 | 0.90 |</p>
+<p>| 중국 경쟁 · 00:44:39 | 기술이전·인수합병 건수 매년 약 5배 증가, 총액 10조 원·선급금 1조 원 사례 | 거래 통계·기업명·계약일 없음. 법안·기업명도 자막상 불명확해 특정 기업의 정책 수혜로 연결할 수 없음 | 0.84 |</p>
+<p>| 주가·ETF · 00:38:50~00:51:38 | 모더나 170~177% 상승, 바이오 액티브 ETF 약 10개월간 30~40% 하락, 한미 바이오 연계 가능성 | 가격 시계열·ETF 상품명·상관계수 없음. 170%와 177%는 측정 구간 차이일 수 있으며, 낙폭이나 과거 상관관계가 반등을 보장하지 않음 | 0.95 |</p>
+<p>추가로 <strong>HLB의 FDA 허가 발언은 제품·적응증·신청 주체·결정일이 없어 승인 사실을 확인할 수 없다.</strong> 키트루다의 2028년 특허 만료도 국가·제형·권리별 자료 없이 일괄 만료로 적용해서는 안 된다. 국민연금·블랙록의 보유 지분과 아케로 인수 프리미엄 역시 해당 시점 공시 대조가 필요하다.</p>
+<h3>4. 상승 논리와 반론</h3>
+<h4>상승 논리 — 확인이 필요한 시나리오</h4>
+<ul>
+<li><strong>파이프라인 확보 수요:</strong> 특허 만료에 대응하는 빅파마의 거래가 늘고 국내 후보물질이 경쟁력을 입증한다면 기술이전 기회가 확대될 수 있다. 다만 대상 약물·거래 목록·계약 조건부터 확인해야 한다.</li>
+<li><strong>계약의 질 개선:</strong> 비환급 선급금과 후속 개발 투자가 확인되는 계약은 조건부 최대 총액 중심의 계약과 구분해 평가할 수 있다. 한미약품 사례가 이에 해당하는지는 공시 확인 전 유보한다.</li>
+<li><strong>제조 수요와 CDMO:</strong> 생산 수요 확대가 수주·가동률·현금흐름으로 연결된다면 제조 기반 기업의 논리가 강화될 수 있다. 공장 증설 자체만으로 수익성을 입증하지는 못한다.</li>
+<li><strong>AI의 연구 효율:</strong> 후보 선별·분석 개선이 반복 가능한 개발 성과로 이어질 가능성을 영상은 제시한다. 계약 발표보다 실제 개발 진척과 경제적 효과가 핵심이다.</li>
+</ul>
+<h4>주요 반론</h4>
+<ul>
+<li>임상에서 통계적 유효성이 나와도 기존 치료제 대비 효능·안전성·편의성·가격 경쟁력이 충분하지 않을 수 있다.</li>
+<li>기술수출 후에도 개발 지연·중단·권리 반환이 발생하면 조건부 마일스톤과 로열티 기대는 달라진다.</li>
+<li>적자 기업은 현금 소진과 추가 자금조달을 함께 봐야 한다. 주가 하락만으로 기업가치 개선이 입증되지는 않는다.</li>
+<li>개인맞춤형 항암치료는 임상 데이터 외에도 제조시간·공급능력·가격·보험 적용이 수익화의 관문이다.</li>
+<li>중국 경쟁 위험과 미국 정책 수혜는 별개다. 영상의 불명확한 법안명을 근거로 계약 경쟁 완화를 단정할 수 없다.</li>
+<li>기관 지분 보유만으로 적극적인 투자 의도나 섹터 전체 수급 개선을 추정할 수 없다. NewCo 매각 프리미엄도 원개발사 주주에게 그대로 귀속되는 것은 아니다.</li>
+</ul>
+<h3>5. 단기 체크포인트와 논리 무효화 조건</h3>
+<p>정확한 행사일·공시 예정일이 없어 특정 날짜를 촉매로 제시하지 않는다. 다음은 <strong>자료 공개 시 확인할 관찰 항목</strong>이다.</p>
+<p>| 관찰 대상 | 구체적으로 기록할 항목 | 상승 논리를 약화하거나 무효화할 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 한미약품·기술수출 기업 | 상대방 법인, 비환급 선급금, 지급·수취일, 조건부 금액, 후속 임상 진척 | 선급금·조건이 영상과 다르거나 개발 중단·권리 반환이 확인됨 |</p>
+<p>| 모더나·머크·비만 후보물질 | 등록번호, 임상 단계, 대조군, 평가변수, 효과 크기, 안전성, 실제 학회 발표 | 단계·발표 일정이 주장과 다르거나 비교 치료 대비 경쟁력을 입증하지 못함 |</p>
+<p>| HLB | FDA 결정문상 제품·적응증·신청 주체·결정 유형 | 허가가 아닌 신청·심사·보완 요구 등으로 확인됨 |</p>
+<p>| CDMO | 공장별 가동 상태, 수주, 가동률, 매출·현금흐름, 투자지출 | 증설 지연, 수주·가동률 부진 또는 투자 부담이 수익화 기대를 훼손함 |</p>
+<p>| 관세·미국 투자 | 시행일, HTS 코드, 원산지, 추가관세, 면제 조건, 비용 부담 주체 | 예상한 면제가 적용되지 않거나 비용 증가가 이익 개선 논리를 훼손함 |</p>
+<p>| 적자 바이오 | 현금·유동성, 분기 현금 소진, 예정 개발비, 조달 조건 | 핵심 결과 발표 전 자금 부족이나 불리한 추가 조달이 확인됨 |</p>
+<p>| ETF·한미 연계 | 상품명, 보유 종목, 집중도, 동일 기간 조정 수익률, 환율·시차를 반영한 상관관계 | 미국 바이오 개선이 국내 기업 실적·주가로 연결되지 않거나 괴리가 지속됨 |</p>
+<p>| 중국·NewCo·기관 지분 | 비교 후보 데이터·거래 조건, NewCo 지분·지급 권리, 기준일별 지분 공시 | 경쟁 후보가 우위를 보이거나 기대한 매각 대가·기관 보유가 확인되지 않음 |</p>
+<p>관찰 기록에는 <strong>발표일과 실제 발생일, 원통화와 환산액, 확정 지급액과 조건부 최대액</strong>을 각각 분리하는 것이 중요하다.</p>
+<h3>6. 데이터 품질과 비공개 출처</h3>
+<ul>
+<li><code>transcript_quality</code>는 자동 한국어 자막 기준 <code>good</code>, 점수 1.0이다. 이는 개별 숫자·고유명사·임상 단계의 정확도를 보장하지 않는다.</li>
+<li>주요 주제의 <code>source_confidence</code>는 0.84~0.95지만, 이는 추출 확실성이다. 외부 사실 검증 강도인 <code>confidence</code>는 모두 0.0으로, 관련 검증 근거 부재를 뜻한다.</li>
+<li><code>asr_confidence</code> 0.0은 독립적인 음성인식 신뢰도 평가가 없다는 표시이며, 인식 정확도 0%라는 의미가 아니다.</li>
+<li>특히 1상·3상, GLP-2, ESMO, 관세 관련 약어와 중국 법안·기업명은 원음 확인이 필요하다. BIOSECURE와 앱클론은 검색 가설이지 확인된 명칭이 아니다.</li>
+<li>녹화일은 미상이다. ‘올해·최근·두 달 전’을 업로드일만으로 확정 날짜로 변환할 수 없다. 마지막 약 9.36초도 제공 자막에 포함되지 않았다.</li>
+<li><strong>Bloomberg·Morningstar 자료는 제공되지 않아 미검증·수동 확인 필요다.</strong> 모더나가 비싸다는 익명 애널리스트 평가, 사노피의 내부 지원 수준, 빅파마의 개발 중단 동기 등 비공개·폐쇄형 출처 의존 주장도 동일하게 유보한다.</li>
+<li>러시아 병원체 유출 의심 발언은 원보도와 당국 확인이 없어 확정된 감염·사망 사건이나 시장 촉매로 취급하지 않는다.</li>
+</ul>
+<h3>7. 종합 판단</h3>
+<p>영상에서 투자자가 활용할 수 있는 핵심은 ‘바이오 반등’이라는 방향성보다 <strong>계약 현금화 → 임상 경쟁력 → 상용화·제조 → 현금흐름</strong>을 차례로 확인하는 평가 틀이다.</p>
+<p>현재 제공 자료로는 특정 기업의 저평가, 허가 완료, 계약 금액, 관세 혜택 또는 한미 바이오 동반 상승을 확인할 수 없다. 4분기 기회의 실체는 공식 공시·임상 결과·학회 자료·실제 가격 시계열이 공개되고 영상 주장과 대조될 때 판단 가능하다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;mbF4a9KX_y8&quot;,
+  &quot;title&quot;: &quot;반등 기다리는 K바이오…전문가들이 짚은 4분기 투자 기회&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=mbF4a9KX_y8&quot;,
+  &quot;channel&quot;: &quot;PLUS TV (플러스 TV)&quot;,
+  &quot;channel_id&quot;: &quot;UCuHUaZo43N9PgOCjs3Hg2Uw&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@plus_tv_official/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/mbF4a9KX_y8/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-13T08:00:03+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 26233,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 26233,
+    &quot;segments&quot;: 1420,
+    &quot;duration_seconds&quot;: 3184,
+    &quot;repeated_ngram_ratio&quot;: 0.005
+  },
+  &quot;generated_at&quot;: &quot;2026-10-14T09:52:11.502078+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;2028년까지 1,800억 달러 규모 의약품이 특허 만료의 영향을 받고, 올해 상반기 릴리가 기술이전·인수합병을 10건 이상 체결했으며 특허 절벽이 파이프라인 확보 수요를 늘린다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2028년까지 1,800억 달러; 올해 상반기 릴리 거래 10건 이상.&quot;,
+        &quot;observed&quot;: &quot;관련 전망 원자료와 거래 목록이 제공되지 않아 대조 수치가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;특허 절벽이라는 설명만으로 국내 기업의 계약 성사나 수익 증가를 예상하지 말고, 대상 약물과 실제 거래 목록을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;엔비디아·릴리의 5년간 10억 달러 투자, 노보노디스크의 Claude 활용, FDA의 AI·비동물시험 관련 전임상 간소화 및 AI 신약 상용화 이력에 관한 주장과 삼성전자 실적·제약시장·엔비디아 시가총액 비교.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:24&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;5년간 10억 달러, 약 1조 3천억 원; 삼성전자 107조 원; 세계 제약시장 2조 달러 미만이며 엔비디아 시가총액의 절반 미만.&quot;,
+        &quot;observed&quot;: &quot;공식 투자액·환산 환율·회계 실적·시장 규모·동일 시점 시가총액이 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI 협력 발표를 라이선스 수익이나 임상 성공으로 간주하지 말고, 투자 집행·개발 성과·수익화 조건을 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;비만치료제가 경구제로 이동하고 미국 기업의 연구 환경이 우월하다는 전망, 매출 상위 10대 제약회사가 모두 미국 기업이라는 주장 및 레타트루타이드의 체중·근육 효과와 경구제 투여 주기 설명.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:26&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;과거 상위 10대 의약품은 유럽·미국이 절반씩, 현재 상위 10대 제약회사는 미국 기업 100%; 경구제 투여 주기는 자막상 불명확.&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 순위표, 임상 수치 및 공식 투여 일정이 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;국적이나 투여 방식만으로 우위를 판단하지 말고, 후보물질별 임상 단계·효능·안전성·투여 편의성을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;모더나·머크의 개인맞춤형 mRNA 항암치료 3상 결과와 ESMO 세부·암종 확장 발표, 예상 가격 7억 원, 키트루다 2028년 특허 만료와 SC·병용 전략 및 HLB FDA 허가에 관한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:59&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 두 달 전 3상 결과 발표; 치료 가격 약 7억 원 가능성; 키트루다 약 2년 뒤 또는 2028년 특허 만료; AACR 4월·ASCO 6월·ESMO 9~10월.&quot;,
+        &quot;observed&quot;: &quot;임상 결과·공식 학회 일정·가격·특허·허가에 관한 대조 자료가 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;임상 단계와 실제 발표 내용을 확인하기 전에는 학회 기대감, 허가 발언, 추정 가격을 매출 전망에 반영할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;국내 기술수출 21조 원 초과, 한미약품 UCN2·GLP-2 계약 금액과 조건, 과거 계약의 성과, NewCo·아케로 인수 구조 및 국민연금·블랙록 보유 지분에 관한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:02&quot;,
+      &quot;source_confidence&quot;: 0.93,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;국내 기술수출 21조 원 초과; UCN2 선급금 약 2,700억 원·총액 약 3.2조 원; GLP-2 선급금 약 1,100억 원·총액 약 1.9조 원; 2015~2016년 계약 약 5조 원; 아케로 프리미엄 약 100%; 국민연금 한미약품 약 10% 및 에스티팜 등 5% 이상; 국내 기술이전은 주로 전임상·1상.&quot;,
+        &quot;observed&quot;: &quot;금액·계약 조건·인수 대가·지분율·개발 단계별 통계의 원자료가 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;계약 최대 총액보다 비환급 선급금, 실제 지급 조건과 후속 개발 상태를 확인하되, 영상의 개별 수치는 공시 대조 전 확정값으로 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;삼성바이오로직스의 CDMO 세계 1위 수준과 6공장 건설, 10공장 확장 가능성, 바이오시밀러·제네릭 가격 비율, 론자·산도스 밸류에이션 및 백신·TSMC 수익성 비교.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:38:50&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;CDMO 세계 1위 수준; 6공장 건설 및 10공장 가능성; 바이오시밀러 가격은 오리지널의 5~10%, 제네릭은 1%; 론자·산도스 밸류에이션 약 3배; 백신 관련 100조 원·마진 30%; TSMC 마진 55~60%.&quot;,
+        &quot;observed&quot;: &quot;생산능력·공장 상태·제품 가격·시장 배수·회계 실적에 관한 대조 수치가 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;CDMO 선호 의견을 시설 가동이나 수익성의 확인된 사실로 바꾸지 말고, 공식 투자 일정과 동일 기준의 실적·밸류에이션으로 판단해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;한국산 의약품 관세가 현재 15%이고 일부 신약·API는 0%이며, DS가 API로 분류되면 면제될 수 있다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:38:50&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;한국산 의약품 15%; 일부 신약·API 0%; DS는 API 분류 시 0% 가능성.&quot;,
+        &quot;observed&quot;: &quot;해당 시점 공식 세율표·면제 규정·분류 결정이 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공식 품목 분류와 적용 조건을 확인하기 전에는 15% 또는 0%를 기업별 비용·이익 추정의 확정 세율로 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;중국 기술이전·인수합병 건수의 매년 약 5배 증가, 총액 10조 원·선급금 1조 원 계약 사례, 미국을 넘어서는 수준의 항암 파이프라인 및 중국 관련 규제·기업 주가에 관한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:44:39&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기술이전·인수합병 건수 매년 약 5배; 계약 총액 약 10조 원·선급금 약 1조 원; 항암 파이프라인이 미국보다 많아지는 수준.&quot;,
+        &quot;observed&quot;: &quot;기간별 거래·계약·파이프라인·주가 관측값이 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;중국 경쟁 위험을 검토할 수는 있지만, 미확인 성장 배수나 법안명으로 국내 기업의 수혜·피해 및 주가 반응을 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;모더나 상승률, 미국 바이오 지수 신고가와 조정, 적자 바이오텍 급락, 코스닥 회복, 바이오 액티브 ETF 하락 및 한미 바이오 상관관계·금리 영향에 관한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:38:50&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;모더나 약 170~177% 상승; 미국 바이오 지수 신고가 후 약 한 달 조정; 적자 바이오텍 하루 30~50% 하락 사례; 코스닥 600선에서 900선 접근; 바이오 액티브 ETF 약 10개월간 30~40% 하락.&quot;,
+        &quot;observed&quot;: &quot;가격·분배금·지수·금리 시계열과 상관계수 계산 결과가 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미확인 낙폭이나 상관관계 회복 기대만으로 반등을 전제하지 말고, 개별 기업의 현금흐름·임상 경쟁력·계약 조건과 상품별 실제 수익률을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;러시아의 페스트 병원체 유출 의심과 사망 보도, 항생제 대응 가능성 및 제한적인 시장 위험에 관한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 발생일·감염자 수·사망자 수는 제시되지 않았다.&quot;,
+        &quot;observed&quot;: &quot;사건 관련 확인 자료와 수치가 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확인되지 않은 사건을 감염병 테마의 매매 근거로 삼거나, 치료 가능성 발언만으로 사건 위험이 없다고 단정할 근거가 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Luda Technology Group Signed Non-Binding MOU to Evaluate Proposed Acquisition of mining rights in the Jonsh Tolgoi Fluorspar Project in Mongolia&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/luda-technology-group-signed-non-130000341.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T13:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Luda Technology Group Signed Non-Binding MOU to Evaluate Proposed Acquisition of mining rights in the Jonsh Tolgoi Fluorspar Project in Mongolia Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;State Ceremony Officially Opens Ares Strategic Mining Lumps Plant, in Delta, Utah, USA&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/state-ceremony-officially-opens-ares-113000628.html&quot;,
+      &quot;publisher&quot;: &quot;NewMediaWire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T11:30:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;State Ceremony Officially Opens Ares Strategic Mining Lumps Plant, in Delta, Utah, USA Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Or...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Oil prices rise as Houthi-Saudi attacks spur supply uncertainty&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/oil-prices-rise-houthi-saudi-003118025.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-14T00:31:18+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Oil prices rise as Houthi-Saudi attacks spur supply uncertainty Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newslet...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 10월 13일 외국인이 한국인 몰래 매수한 종목 정체</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261014_095211</p>
+    <h1>10월 13일 외국인이 한국인 몰래 매수한 종목 정체</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=dzDBnAjcvHU">원본 영상</a>
+    </div>
+  </header>
+  <h2>HD현대중공업: 외국인 수급보다 실적·수주 전환의 확인이 우선</h2>
+<p>분석 기준: 2026년 10월 14일 제공 자료. 대상은 경제사냥꾼의 <a href="https://www.youtube.com/watch?v=dzDBnAjcvHU">2026년 10월 13일 영상</a>이다.</p>
+<h3>1. 핵심 판단</h3>
+<p>영상은 <strong>HD현대중공업의 단기 실적 둔화와 장기 성장 가능성을 구분</strong>한다. 시장 급락에도 외국인이 순매수했다는 수급 주장에 수주잔고 확대와 발전 엔진 투자를 연결해 장기 투자 기회라는 견해를 제시한다.</p>
+<p>그러나 제공 자료에서 독립적으로 뒷받침되는 내용은 <strong>코스피 급락 배경의 일부</strong>다. 핵심인 HD현대중공업의 외국인 순매수, IBK 보고서 전망, 수주잔고와 공장 투자 수치는 모두 미검증이다. 전체 주장 검증 결과도 <code>unverified</code>다. 이는 거짓으로 판명됐다는 뜻이 아니라, 투자 논리를 지지할 직접 근거가 부족하다는 의미다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>| 항목 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 시장 급락 | 10월 13일 코스피 -5.46%, 외국인 정규장 순매도 약 4.5조 원 | E11은 2026년 10월 13일 코스피가 348.89포인트 하락해 6,035.35로 마감했고 하락률이 5.46%였다고 보도한다. 제목의 외국인 매도는 ‘4조원대’다. 정확한 순매도액·정규장 범위는 미확인 |</p>
+<p>| 반도체 수급 | SK하이닉스 약 2조 3,613억 원 순매도·1위, 삼성전자 약 1조 3,595억 원·2위 | 종목별 거래대금과 순위표가 없어 미검증 |</p>
+<p>| HD현대중공업 수급 | 약 313억 원 순매수·2위, 외국인 6거래일 연속 순매수 | 해당 종목의 투자자별 거래 자료가 없어 미검증. 매수 동기와 ‘비밀 매집’도 확인 불가 |</p>
+<p>| 주가 조정 | 10월 1~12일 6거래일 연속 하락, 누적 약 -16% | 일별 종가·휴장일·계산 시작 가격이 없어 미검증 |</p>
+<p>| 3분기 전망 | IBK 보고서상 매출 전분기 대비 -7%, 영업이익 -11%; 근무일수·환율 영향 | 보고서 원문, 발행일, 비교 수치와 당시 컨센서스가 없어 미검증 |</p>
+<p>| 수주·가동률 | 수주잔고 56.4조 원→69.5조 원, 상반기 엔진 가동률 112.8% | 공식 표와 산식이 없어 미검증. 조선 부문 가동률은 자막에서 누락 |</p>
+<p>| 발전 엔진 성장 | 미국·유럽 데이터센터 문의 증가; 8,336억 원 투자, 2028년 5월까지 공장 건설 | 보고서 문구와 최초·정정 공시가 없어 미검증. 문의와 계약·매출은 별개 |</p>
+<p>| 4분기·장기 전망 | 4분기 영업이익 약 9,160억 원, 임금 협상 비용 제외; 연간 이익 3.790조 원→2028년 5.154조 원 | 전망표·비용 제외 문구·기준 연도 미확인. 제시값의 증가율 약 35.99%는 산술적으로 맞지만 입력값의 출처는 검증되지 않음 |</p>
+<p>가장 직접적인 외부 근거는 <a href="https://www.wikitree.co.kr/articles/1165907">코스피 급락 보도(E11, Wikitree 링크)</a>다. 수집 메타데이터에는 발행처가 Naver News로 표시되어 있어 원발행처 확인이 필요하며, 위 판단은 제공된 제목과 짧은 발췌에 한정한다.</p>
+<p>코스피 시장 스냅샷도 6,035.35로 기사 종가와 일치한다. 다만 조회 시각은 실제 거래 시각과 다르며, 전일 종가와 투자자별 거래대금이 없어 추가 검증에는 한계가 있다. 개별 주식 가격·티커·밸류에이션은 제공되지 않았다.</p>
+<h3>3. 상승 논리와 반론</h3>
+<h4>상승 논리: 전제가 확인될 경우</h4>
+<ul>
+<li><strong>단기 둔화의 일시성:</strong> 근무일수 감소 등이 주된 원인이고 수주·생산 기반이 유지된다면, 분기 이익 감소와 장기 경쟁력 약화를 구분할 여지가 있다.</li>
+<li><strong>수주잔고의 실적 전환:</strong> 영상의 잔고 수치가 동일 기준으로 확인되고 수익성 있는 인도로 이어진다면 중장기 매출·이익을 뒷받침할 수 있다.</li>
+<li><strong>발전 엔진의 성장 선택지:</strong> 데이터센터 문의가 실제 계약으로 연결되고 공장 투자가 계획대로 진행된다면 추가 성장 경로가 될 수 있다.</li>
+</ul>
+<h4>반론과 리스크</h4>
+<ul>
+<li>외국인 순매수는 확인되더라도 장기 성장에 대한 확신이나 향후 수익률을 입증하지 않는다.</li>
+<li>수주잔고는 이익이 아니다. 인도 일정, 계약 수익성, 원가와 제품 구성에 따라 실적 전환이 달라질 수 있다.</li>
+<li>달러 금액이 일정할 때 원/달러 환율 하락은 원화 환산액을 줄이지만, 회사 전체 손익은 달러 비용·환헤지·매출 인식 방식까지 확인해야 한다. 해당 분기 환율 하락 자체도 미검증이다.</li>
+<li>임금 협상 비용의 추가 부담은 비용 제외 여부와 인식 시점을 확인한 뒤 평가해야 한다. 이미 반영된 비용을 중복 차감해서는 안 된다.</li>
+<li>실적이 하향 전망을 충족해도 주가 상승의 충분조건은 아니다. 현재 가격과 밸류에이션 자료가 없어 ‘하락했으니 저평가’라는 결론은 도출할 수 없다.</li>
+<li>‘연말까지 실적 발표는 상승 촉매가 되기 어렵다’는 의견 역시 발표 당시 기대와 실제 결과에 좌우된다.</li>
+</ul>
+<h3>4. 가까운 확인 시점과 관찰 항목</h3>
+<p>정확한 실적 발표일은 제공되지 않았다. 아래 항목은 원문 확보 및 해당 실적·공시 발표 시점에 순차적으로 확인할 목록이다.</p>
+<p>| 확인 시점 | 구체적인 관찰 항목 | 판단에 필요한 구분 |</p>
+<p>|---|---|---|</p>
+<p>| 수급 원자료 확보 시 | KRX의 시장 범위·거래시간·외국인 분류를 맞춰 세 종목의 순매수·순매도 금액과 순위 확인 | 총매도대금과 순매도대금 구분 |</p>
+<p>| 일별 시계열 확보 시 | 9월 마지막 거래일부터 10월 13일까지 종가·외국인 수급·휴장일 대조 | 6거래일 연속 여부, -16%의 기준 가격과 가격 조정 여부 |</p>
+<p>| IBK 원문 확보 시 | 발행일·대상 법인·연결 범위·단위·기준 연도, 3·4분기 및 연간 전망표 확인 | 증권사 추정치와 회사 확정 실적 구분 |</p>
+<p>| 3분기 실적 발표 시 | 확인된 하향 전망 대비 매출·영업이익·이익률, 근무일수·환율 영향 설명 | 전망 충족 여부와 일회성 요인 제거 후 추세 |</p>
+<p>| 4분기 실적·임금 협상 공시 시 | 협상 비용의 금액·인식 분기·기존 전망 반영 여부 | 비용 전후 이익과 중복 계산 여부 |</p>
+<p>| 후속 사업보고서·IR 공개 시 | 수주잔고 증감, 인도 진척, 부문별 매출·이익률·현금흐름 | 잔고 증가와 실제 이익·현금 전환 구분 |</p>
+<p>| 투자 관련 공시 시 | 9월 10일 공시의 연도·투자 주체·금액·일정, 정정 내용과 집행 진척 | 투자 계획·완공·상업 가동 구분 |</p>
+<p>| 데이터센터 사업 업데이트 시 | 문의의 공식 근거, 계약 체결·수주 규모·매출 인식 여부 | 관심 표명과 확정 사업 성과 구분 |</p>
+<h3>5. 투자 논리의 무효화·약화 조건</h3>
+<p>다음은 이미 발생한 사실이 아니라, 향후 확인할 조건이다.</p>
+<ul>
+<li><strong>수급 전제 무효화:</strong> 동일 집계 범위의 공식 자료가 313억 원·2위 또는 연속 순매수 주장과 맞지 않을 경우, 영상의 핵심 수급 근거를 수정해야 한다.</li>
+<li><strong>일시적 둔화 설명 약화:</strong> 실제 실적이 확인된 하향 전망에도 못 미치고, 원인이 일회성이 아닌 지속적인 원가·생산·수익성 문제로 나타나는 경우다.</li>
+<li><strong>수주 전환 논리 약화:</strong> 인도 지연·취소 또는 이익률 악화로 잔고가 매출·이익·현금흐름으로 이어지지 않는 경우다.</li>
+<li><strong>발전 엔진 성장 논리 약화:</strong> 문의가 계약으로 연결되지 않거나 투자 일정 지연·비용 증가·가동 지연이 확인되는 경우다.</li>
+<li><strong>장기 회복 전망 약화:</strong> 원문 전망의 기준이 영상과 다르거나, 이후 실적과 전망 조정이 제시된 회복 경로에서 지속적으로 이탈하는 경우다.</li>
+</ul>
+<h3>6. 데이터 품질과 해석 범위</h3>
+<p>자동 한국어 자막의 <code>transcript_quality</code>는 <code>good</code>, 점수는 1.0이다. 이는 자막 수집 품질 지표이지 숫자·날짜·고유명사의 사실 정확도를 보증하지 않는다.</p>
+<p>영상 주장 식별의 <code>source_confidence</code>는 HD현대중공업 0.94, 코스피 0.96, SK하이닉스·삼성전자 각각 0.97이다. <strong>발언을 식별한 확신도</strong>이며 외부 근거의 신뢰도나 전망 실현 확률이 아니다. 개별 <code>asr_confidence</code>의 0.0은 미제공 표시로, 인식 정확도 0%를 의미하지 않는다.</p>
+<p>모든 주장 타임스탬프 <code>00:00:00</code>은 전체 청크의 시작 표시다. 청크는 약 00:00~02:28을 포함하지만 개별 발언 위치는 제공되지 않았다. 누락된 조선 가동률은 추정해 채울 수 없다. 업로드일과 시장 보도의 날짜가 일치해도 ‘올해·지난해·내년’ 및 보고서·공시 연도는 별도 확인이 필요하다.</p>
+<p>수집된 13건 중 직접 관련 근거는 E11뿐이다. 나머지는 관련 없는 제목, 빈 발췌 또는 오류·메뉴 중심 내용이어서 지지나 반박 증거로 사용하지 않았다. 수집 상태의 <code>verified</code>와 주장 검증 완료는 다른 의미다.</p>
+<p>IBK 원문은 공개 여부조차 미확인으로 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 자료는 제공되지 않았으며, 접근 불가능한 유료·폐쇄형 출처 주장 역시 <strong>미검증·수동 확인 필요</strong>로 남겨야 한다.</p>
+<h3>결론</h3>
+<p>이 영상은 HD현대중공업의 <strong>단기 실적 확인과 장기 수주·발전 엔진 성과 추적</strong>이라는 관찰 틀을 제시한다. 다만 현재 증거만으로 외국인의 장기 성장 기대나 투자 기회라는 결론을 지지할 수는 없다. 우선순위는 종목 수급과 인용 원문을 확인한 뒤, 수주잔고가 실제 이익·현금흐름으로 전환되는지 관찰하는 것이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;dzDBnAjcvHU&quot;,
+  &quot;title&quot;: &quot;10월 13일 외국인이 한국인 몰래 매수한 종목 정체&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=dzDBnAjcvHU&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/dzDBnAjcvHU/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-13T11:59:12+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 2207,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 2207,
+    &quot;segments&quot;: 110,
+    &quot;duration_seconds&quot;: 148,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-14T08:48:46.717529+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 13,
+  &quot;claim_status_summary&quot;: {
+    &quot;partially_supported&quot;: 1,
+    &quot;unverified&quot;: 11
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;10월 13일 코스피가 5.46% 하락하고 외국인이 정규 시장에서 약 4조 5천억 원을 순매도했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.65,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E11&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;코스피 -5.46%; 외국인 순매도 약 4,500,000,000,000원&quot;,
+        &quot;observed&quot;: &quot;E11: -5.46%, -348.89포인트, 종가 6035.35; 외국인 매도는 제목의 ‘4조원대’만 확인. 정확한 순매도액·정규장 범위는 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시장 급락 배경은 부분적으로 확인되지만, 외국인 순매도 규모와 집계 범위를 종목별 수급과 비교하려면 거래소 자료가 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;같은 날 외국인 순매도는 SK하이닉스 약 2조 3,613억 원으로 1위, 삼성전자 약 1조 3,595억 원으로 2위였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.97,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;SK하이닉스 2,361,300,000,000원·1위; 삼성전자 1,359,500,000,000원·2위&quot;,
+        &quot;observed&quot;: &quot;종목별 순매도 금액·순위 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;외국인 매도가 두 종목에 집중됐다는 판단은 동일 시장·거래시간 범위의 순매도 순위표 확인 전까지 유보해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;10월 13일 외국인이 HD현대중공업을 약 313억 원 순매수했으며 외국인 순매수 순위 2위였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;외국인 순매수 약 31,300,000,000원; 순매수 2위&quot;,
+        &quot;observed&quot;: &quot;해당 종목의 투자자별 거래대금·순위 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;영상의 핵심 수급 근거가 미확인 상태이므로 313억 원·2위라는 숫자를 매수 판단의 검증된 근거로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;10월 1~12일 주가가 6거래일 연속 하락하며 약 16% 떨어졌고, 외국인은 10월 2일부터 ‘오늘’까지 6거래일 연속 순매수했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;주가 6거래일 연속 하락·누적 약 -16%; 외국인 6거래일 연속 순매수&quot;,
+        &quot;observed&quot;: &quot;일별 시계열과 거래일 달력이 없어 연속일수·누적 수익률 계산 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;하락 중 연속 순매수라는 해석은 거래일별 가격·수급을 직접 대조한 뒤 평가해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;‘오늘 발표된’ IBK증권 보고서는 3분기 실적의 시장 기대치 하회, 매출 전분기 대비 약 7% 감소, 영업이익 약 11% 감소를 전망하고 근무일수 감소와 원/달러 환율 하락을 원인으로 제시했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3분기 매출 전분기 대비 약 -7%; 영업이익 약 -11%&quot;,
+        &quot;observed&quot;: &quot;분기별 기준 수치·전망치·컨센서스 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;단기 실적 둔화와 그 원인은 확인되지 않은 보고서 재인용이다. 원문 확인과 실제 실적 발표를 구분해 판단해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;수출 중심 사업의 선박 계약은 달러로 체결되므로 원/달러 환율 하락이 원화 환산 수익에 부담을 준다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 환율 수준·변동폭 미제시&quot;,
+        &quot;observed&quot;: &quot;분기 평균 환율과 회사 손익 민감도 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;환율 방향만으로 실적 영향을 단정하지 말고 계약·비용·헤지의 순노출과 회사 설명을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;유조선·컨테이너선·LNG선·군함·선박 엔진을 생산하며, 수주잔고는 지난해 말 약 56.4조 원에서 올해 6월 말 약 69.5조 원으로 증가했고 상반기 엔진 가동률은 112.8%였다. 영상은 이를 일감 부족이 실적 둔화 원인이 아니라는 근거로 해석한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연말 수주잔고 약 56.4조 원 → 6월 말 약 69.5조 원; 상반기 엔진 가동률 112.8%&quot;,
+        &quot;observed&quot;: &quot;공식 수주잔고·가동률 표 없음. 조선 부문 가동률은 제공 자막에서도 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;일감 부족이 아니라는 결론은 미검증이다. 수주잔고의 인도 일정·수익성 및 실제 실적 전환을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;회사는 발전 장비도 판매하며 분기보고서에 미국·유럽 데이터센터의 전력 관련 문의 증가가 기재되어 있다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;문의 증가; 증가율·건수 미제시&quot;,
+        &quot;observed&quot;: &quot;문의 집계·계약·매출 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;데이터센터 관련 성장 논리는 공식 문구와 실제 계약 전환을 각각 확인하기 전까지 투자 근거로 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;9월 10일 공시에서 2028년 5월까지 대용량 발전 엔진 전용 공장에 8,336억 원을 투자한다고 발표했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;투자액 833,600,000,000원; 9월 10일 공시; 2028년 5월까지 투자&quot;,
+        &quot;observed&quot;: &quot;투자금액·공시일·종료 예정일을 대조할 공식 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발전 엔진 생산 확대를 평가하려면 투자 공시와 변경 사항, 집행 진척을 먼저 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;같은 보고서의 4분기 영업이익 전망은 약 9,160억 원으로 3분기 전망보다 낮고 임금 협상 비용은 제외되어 추가 이익 감소 가능성이 있다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;4분기 영업이익 약 916,000,000,000원; 3분기보다 감소; 임금 협상 비용 제외&quot;,
+        &quot;observed&quot;: &quot;분기 전망표·비용 제외 근거 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;9,160억 원을 검증된 전망치로 사용하거나 임금 비용을 추가 차감하려면 원문과 비용 반영 범위를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;내년 3분기 영업이익이 올해 2분기 수준을 넘어설 것으로 예상되며, 연간 영업이익은 올해 약 3조 7,900억 원에서 2028년 약 5조 1,540억 원으로 2년 만에 약 36% 증가할 전망이라고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연간 영업이익 3.790조 원 → 2028년 5.154조 원; 2년간 약 +36%; 내년 3분기 회복&quot;,
+        &quot;observed&quot;: &quot;영상 제시값으로 계산한 증가율은 약 35.99%. 외부에서 확인된 전망 금액·기준 연도·회복 분기는 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;증가율 계산의 정합성만으로 장기 이익 성장 전망이 검증된 것은 아니다. 원문 전망과 실제 실적 추이를 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;연말까지 실적 발표는 상승 촉매가 되기 어렵지만 지금은 장기 투자자의 포지션 구축 기회이며, 3분기 하향 전망 충족과 수주잔고의 이익 전환이 주가 회복의 확인 조건이라는 견해를 제시한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;추가적인 정량 목표가·기대수익률 미제시&quot;,
+        &quot;observed&quot;: &quot;밸류에이션·발표일 가격 반응·실제 실적 전환 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;현 자료만으로 장기 매수 기회라는 결론을 지지할 수 없다. 제시된 조건은 확인 목록으로만 활용하고 투자 결론과 분리해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;코스피&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;10월 13일 시장 급락과 대규모 외국인 순매도를 HD현대중공업 순매수의 대비 배경으로 제시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;10월 13일 코스피 지수가 5.46% 급락했다고 발언한다.&quot;,
+        &quot;같은 날 외국인이 정규 시장에서만 약 4조 5천억 원을 순매도했다고 발언한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:06:14.935228+00:00&quot;,
+        &quot;current_price&quot;: 6035.35,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Stock market today: Dow, S&amp;P 500, Nasdaq slip as chip stocks fall, earnings roll in&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/live/stock-market-today-tuesday-october-13-dow-sp-500-nasdaq-chip-stocks-192419999.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T23:27:32+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Stock market today: Dow, S&amp;P 500, Nasdaq slip as chip stocks fall, earnings roll in Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Origi...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;China Spooked Memory Stocks. Investors Picked Their Losers.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/china-spooked-memory-stocks-investors-203322996.html&quot;,
+      &quot;publisher&quot;: &quot;Moby&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T20:33:22+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;China Spooked Memory Stocks. Investors Picked Their Losers. Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Record Tanker Rates Leave Heavy Crude Stranded in the Americas&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/record-tanker-rates-leave-heavy-230000211.html&quot;,
+      &quot;publisher&quot;: &quot;Oilprice.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T23:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Record Tanker Rates Leave Heavy Crude Stranded in the Americas Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newslett...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Erdene to Announce Zuun Mod Molybdenum-Copper Project Preliminary Economic Assessment Results on October 14, 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/erdene-announce-zuun-mod-molybdenum-220500125.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T22:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Marvell Is Up 214% in 2026 While Broadcom Is Only Up 3%: Take Profits on MRVL Stock, or Hold On for the Ride?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/marvell-214-2026-while-broadcom-190011776.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T19:00:11+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;U.S. Economy Faces New Shock as Americans Absorb $2,000 Hit&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/economy/articles/u-economy-faces-shock-americans-184317010.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T18:43:17+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Why Direxion Daily Semiconductor Bull 3X ETF Just Popped&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/why-direxion-daily-semiconductor-bull-155502191.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-09-21T15:55:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Why Direxion Daily Semiconductor Bull 3X ETF Dropped Today&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/why-direxion-daily-semiconductor-bull-174030964.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-09-14T17:40:30+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Stock Market Holds Up As Meta, AMD Lead Buys; ASML, CPI Inflation Due&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/02b2fe19-36e5-3f96-ac0e-2dc2cf84ceb1/dow-jones-futures%3A-stock.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T23:53:42+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E11&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;코스피 6035.35 마감…외국인 4조원대 투매에 348포인트 급락&quot;,
+      &quot;source_url&quot;: &quot;https://www.wikitree.co.kr/articles/1165907&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T15:48:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;10월 13일 국내 증시는 외국인 투자자의 대규모 매도 물량이 쏟아지며 코스피 지수가 5% 넘게... 유가증권시장에서 코스피 지수는 전 거래일보다 348.89 포인트 내린 6035.35에 장을 끝냈다. 하루 하락률은 5.46%...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E12&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Why BlackRock is suddenly more bearish on stocks&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/article/why-blackrock-is-suddenly-more-bearish-on-stocks-172414647.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T17:24:14+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

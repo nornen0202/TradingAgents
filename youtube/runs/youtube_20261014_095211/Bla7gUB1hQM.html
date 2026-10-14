@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 외국인이 코스피를 계속 팔고 있는 진짜 이유</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261014_095211</p>
+    <h1>외국인이 코스피를 계속 팔고 있는 진짜 이유</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=Bla7gUB1hQM">원본 영상</a>
+    </div>
+  </header>
+  <h2>외국인 코스피 매도: 반도체 비중 조정인가, 위험자산 이탈인가</h2>
+<p><strong>분석 기준: 2026년 10월 14일 제공 자료</strong></p>
+<p>영상: 경제사냥꾼, 2026년 10월 13일 게시 · <a href="https://www.youtube.com/watch?v=Bla7gUB1hQM">원영상</a></p>
+<h3>1. 핵심 판단</h3>
+<p>영상은 외국인 매도를 <strong>삼성전자·SK하이닉스 차익실현과 비중 조정, 높은 미국 장기금리, 반도체·AI 성장 지속성에 대한 의심</strong>이 겹친 결과로 해석한다. 자사주 매입과 투자 대기자금 감소가 매도 충격을 키웠다는 설명도 제시한다.</p>
+<p>그러나 <strong>제공된 주장 검증 결과는 C1~C10 모두 미검증</strong>이다. 한국거래소 수급 원자료, 기업 공시, 미국 금리·물가 공식 자료가 확보되지 않았다. 따라서 영상의 설명은 관찰 가능한 가설이지, 확인된 매도 원인이 아니다. 미검증은 거짓이라는 판정도 아니다.</p>
+<p>투자자가 우선 확인할 것은 외국인의 복귀 예상 시점보다 <strong>매도의 종목별 집중도, 실제 자사주 취득 종료 여부, 이익 전망 변화, 여러 거래일의 현물 수급</strong>이다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 시각은 개별 발언 시각이 아니라 해당 근거가 포함된 자막 청크의 시작이다. 모든 항목은 원자료 수동 확인이 필요하다.</p>
+<p>| 항목·근거 청크 | 영상 주장 | 확인된 사실/근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 수급 집중도 C1 · <a href="https://www.youtube.com/watch?v=Bla7gUB1hQM&amp;t=0s">00:00</a> | 연초~10월 12일 외국인 코스피 순매도 199조원. 삼성전자 86조원·SK하이닉스 87조원으로 약 87% 집중. 양사 시가총액 비중 약 51% | 86+87=173, 173÷199≈86.93%라는 <strong>산술만 일치</strong>한다. 실제 거래액·집중도·시가총액 비중은 미확인 |</p>
+<p>| 지수 C1 · 00:00 등 | 6월 22일 최고 종가 9,114에서 10월 12일 6,384로 약 30% 하락 | 입력값으로 계산하면 −29.95%. 두 종가와 최고 기록 자체는 미확인 |</p>
+<p>| 보유비중·환율 C2 · 00:00·05:20 | 양사 외국인 지분율은 하락했지만 시장 보유비중은 약 40%. 원화 강세와 선물 순매수는 전면 이탈이 아니라는 단서 | 관련 통계 없음. 1,350→1,335원은 표시값 기준 정확히 15원. 지분율과 시가평가액 비중은 다른 지표이며, 환율·선물만으로 자금 잔류를 입증할 수 없음 |</p>
+<p>| 삼성전자 C3 · 00:00 등 | 잠정 영업이익 107조원·전년 대비 783% 증가. 자사주 15조원 매입은 10월 6일 종료 | 실적·취득 결과 공시 없음. <strong>107조원·783%는 원음과 공시의 숫자·단위 우선 확인 대상</strong>이며 임의 교정하지 않음 |</p>
+<p>| SK하이닉스 C4 · <a href="https://www.youtube.com/watch?v=Bla7gUB1hQM&amp;t=628s">10:28</a> | 자사주 40조원 매입, 10월 7일 예정 주식 수 대비 약 82% 진행 | 공시 없음. 40조원 단위와 진행률 미확인. 주식 수 기준 82%를 금액 기준으로 적용할 수 없으며 종료 전망은 완료 사실과 다름 |</p>
+<p>| 매수 흡수력 C5 · 10:28 | 예탁금 약 140→100조원, 기타법인 매수와 자사주 매입이 하락을 방어하다 약화 | 약 40조원 차이는 입력값 계산일 뿐. 예탁금 원자료 없음. 기타법인 순매수 전체를 자사주 매입으로 볼 근거도 없음 |</p>
+<p>| 미국 금리·물가 C6 · <a href="https://www.youtube.com/watch?v=Bla7gUB1hQM&amp;t=320s">05:20</a> | 10년물 5.29% 장중 고점, 5.28→5.24% 공표치 하락. 9월 연준 인상, CPI 예상 3.7%, 인상 확률 22% | 공식 자료·컨센서스 출처 없음. 제시값 변화는 −4bp. 장중값과 일별 공표치는 구분 필요 |</p>
+<p>| 기관 배분·지정학 C7 · 05:20 | 기관의 주식 축소·채권 확대, 미국·이란 전쟁과 유가 상승이 위험자산 축소 배경 | 원보고서·전쟁 보도·유가 시계열 없음. 사실관계와 한국 주식 매도에 대한 인과 모두 미검증 |</p>
+<p>| OpenAI·AI C8 · 05:20 | 매출 기대 미달 보도와 집계 범위 차이 설명, 반도체지수 3% 초과 하락이 한국 시장에 전달 | 최초·후속 기사와 지수 시세 없음. 실제 매출 부진과 집계 범위 차이를 구분할 수 없고 국내 하락 원인도 확인되지 않음 |</p>
+<p>| 수출·이익 전망 C9 · 05:20 | 반도체 수출 122억달러, 2027년 순이익 추정치 4주간 1.5% 상향, EPS 성장 전망 237%·33%·6.3% | 관세청·증권사 원자료 없음. 수출 실적, 전망의 존재, 전망 실현 가능성은 각각 별도 확인 대상 |</p>
+<p>| 복귀 전망 C10 · 05:20·<a href="https://www.youtube.com/watch?v=Bla7gUB1hQM&amp;t=1247s">20:47</a> | 책임자 6명 모두 4분기 복귀 예상. Anthropic 상장 자금 수요가 매도 배경. 여러 날 순매수가 전환 신호 | 설문·인용·공식 상장 자료 없음. 연속 순매수는 관찰 기준이지 지속적 복귀의 충분조건이 아님 |</p>
+<h4>외부 증거의 실제 활용 범위</h4>
+<p>수집된 외부 기사 3건은 광업·미국 정치 기사다. 예를 들어 <a href="https://finance.yahoo.com/markets/commodities/articles/luda-technology-group-signed-non-130000341.html">Luda 광업권 관련 기사</a>는 코스피 수급을 입증하거나 반박하지 않는다. 나머지 기사도 관련성이 없고 발췌문은 오류·탐색 문구 위주여서, <strong>투자 논리를 지지하는 근거에서 모두 제외</strong>됐다. 핵심 주장에 직접 연결되는 강한 외부 근거 링크는 제공 자료에 없다.</p>
+<p>호스트의 yfinance 코스피 스냅샷에는 조회 시각 <strong>2026년 10월 14일 08:51 한국시간</strong>, 가격 6,035.35, 52주 최고 9,385.59가 기록돼 있다. 다만 실제 가격 기준 시각과 최고값의 관측 기준은 불명확하다. 영상의 10월 12일 종가·최고 종가와 직접 비교해 모순이라고 판단할 수 없다. 52주 최저 0.0은 유효성 확인이 필요해 제외했고, 비어 있는 지표도 0으로 해석하지 않았다.</p>
+<h3>3. 상승 논리와 반론</h3>
+<h4>상승 논리: 어떤 조건에서 설득력이 생기는가</h4>
+<ul>
+<li><strong>선별적 비중 조정:</strong> 매도가 실제로 양사에 집중되고 삼성전기·주성엔지니어링 등 부품·장비주나 코스닥에는 매수가 이어진다면, 한국 주식 전체에 대한 회피보다 업종·종목 재배분이라는 해석이 강해진다. 현재는 해당 수급 모두 미검증이다.</li>
+<li><strong>실적 신뢰 회복:</strong> 공식 수출과 기업 실적이 견조하고 2027~2028년 이익 전망이 유지된다면, 가격 하락과 이익 기반 약화를 구분할 여지가 생긴다. 높은 당기 실적만으로 장기 성장성을 입증하지는 못한다.</li>
+<li><strong>금리 부담 완화:</strong> 물가 발표 이후 장기금리가 안정되고 외국인 현물 매수가 여러 날 이어진다면, 위험자산 축소 압력이 완화됐다는 가설을 점검할 수 있다.</li>
+</ul>
+<h4>반론: 같은 자료가 다른 의미일 수 있다</h4>
+<ul>
+<li>대형 반도체주 집중 매도는 단순 차익실현이 아니라 <strong>산업의 미래 이익 위험을 반영한 재평가</strong>일 수 있다. 특히 영상이 주장하는 높은 지수 비중이 확인된다면 일부 종목의 위험도 시장 전체에 크게 전달된다.</li>
+<li>원화 강세는 주식 매도 대금이 국내에 남았다는 증거가 아니다. 선물 매수 역시 현물과 결합한 헤지·차익거래일 수 있어 방향성 베팅으로 단정하기 어렵다.</li>
+<li>금리가 내려도 매도가 계속되면 금리 단일 요인의 설명력은 약해진다. 이익 전망, 환율, 포지션 조정을 함께 봐야 한다.</li>
+<li>자사주 매입이 종료돼도 다른 투자자가 이를 대체할 수 있다. 반대로 예탁금이 늘어도 실제 주식 매수로 이어진다는 보장은 없다.</li>
+<li>AI 관련 보도가 사실이어도 매출 집계 차이와 수요 악화는 다르다. 반도체 수출 호조 역시 장기 가격·마진·증설 이후 수급을 보장하지 않는다.</li>
+</ul>
+<h3>4. 데이터 품질과 신뢰도</h3>
+<p>자동 한국어 자막은 683개 세그먼트이며 <code>transcript_quality</code>는 good·1.0이다. 이는 자막 처리 품질 표시이지 숫자와 고유명사의 정확성 보증이 아니다.</p>
+<ul>
+<li>주장 검증 단계의 <code>source_confidence</code>는 <strong>0.80~0.96</strong>이다. 영상에서 주장을 추출한 명확성이지 사실일 확률이 아니다.</li>
+<li><code>asr_confidence</code>는 <strong>0.50~0.90</strong>이며 원음 측정값이 아닌 오류 단서에 따른 정성 추정이다. 대만 비교 C2는 0.50, 삼성전자 수치 C3와 금융기관 인용 C10은 0.60으로 특히 주의가 필요하다.</li>
+<li>대만 순매도 금액, 일부 기관·매체명, 불완전한 지수 수준은 복원하지 않았다. 자막 종료 시각과 영상 길이에도 약 2초 차이가 있다.</li>
+<li>검증 상태의 확신도 0.99는 <strong>미검증 판정에 대한 확신</strong>이다. 주장 자체의 진실성에 대한 점수가 아니다. 상위 수집 상태의 verified 표기도 사실 검증을 대신하지 않는다.</li>
+</ul>
+<p><strong>접근 제한 자료:</strong> 골드만삭스 분석, 증권사 컨센서스, 스테이트스트리트 고객 자료, OpenAI 내부 매출, Anthropic 준비설·펀드별 매도 동기는 공개 원문 확보 전 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 원문이나 데이터도 제공되지 않았으므로 이를 확인 근거로 사용할 수 없다.</p>
+<h3>5. 단기 일정과 구체적인 관찰 항목</h3>
+<p>아래 날짜·시각은 <strong>영상이 제시한 미확인 예정 일정</strong>이다. 실제 발표 일정·결과는 제공되지 않았으며 공식 공지 확인이 선행돼야 한다.</p>
+<p>| 영상상 예정 일정 | 확인할 내용 |</p>
+<p>|---|---|</p>
+<p>| 10월 14일 ASML | 수주·가이던스, 고객 투자 계획, 수요가 이어질 기간 |</p>
+<p>| 10월 14일 21:30 한국시간 미국 CPI | 공식 일정·실제 발표값·출처가 명시된 예상치, 발표 전후 동일 기준 10년물 금리 |</p>
+<p>| 10월 15일 TSMC | 수요 전망, 가동률·마진, AI 수요와 투자 계획 |</p>
+<p>| 10월 27일 SK하이닉스 | 이익·현금흐름, 2027~2028년 수요·증설 가정, 자사주 실제 취득 내역 |</p>
+<p>| 10월 29일 삼성전자·한국시간 새벽 FOMC | 삼성전자 확정 실적·공급 전망, 연준 공식 금리 결정과 장기금리 반응 |</p>
+<p>수급은 하루의 큰 숫자보다 동일 기준의 흐름으로 기록할 필요가 있다.</p>
+<p>1. <strong>KRX 현물:</strong> 코스피·코스닥을 구분해 외국인 일별 및 5·20거래일 누적 순매수를 기록하고, 양사와 나머지 종목으로 나눈다. 외국인 분류와 보통주·우선주 범위를 고정한다.</p>
+<p>2. <strong>현물·선물 정합성:</strong> 선물 상품·만기·단위를 명시하고 현물과 같은 기간으로 비교한다. 선물 매수만으로 복귀를 선언하지 않는다.</p>
+<p>3. <strong>매수 흡수력:</strong> 회사별 일별 자사주 취득액, 실제 종료일, 기타법인·기관 수급, 금융투자협회 예탁금을 함께 확인한다.</p>
+<p>4. <strong>이익의 질:</strong> 동일 기업군의 2027·2028년 추정치 변화, 메모리 가격·출하·마진, AI 투자와 매출·현금흐름의 연결을 추적한다.</p>
+<p>5. <strong>수출·환율:</strong> 반도체 수출은 조업일·품목 범위를 맞추고, 환율은 동일 종가 기준으로 비교한다. 대만 비교는 기간·통화·시장 범위를 맞추기 전 배율을 사용하지 않는다.</p>
+<p>5·20거래일은 이 보고서의 관찰 창이지 검증된 예측 규칙이 아니다.</p>
+<h3>6. 논리의 무효화 조건</h3>
+<ul>
+<li><strong>‘선별적 비중 조정’ 가설:</strong> 양사 외 종목·코스닥까지 매도가 넓어지고 보유 감소가 확인되면 약해진다.</li>
+<li><strong>‘실적은 견조하고 수급만 약하다’ 가설:</strong> 공식 실적·가이던스와 중장기 이익 추정치가 하향되거나 공급 증가·마진 악화가 확인되면 약해진다.</li>
+<li><strong>‘금리 안정 후 복귀’ 가설:</strong> 금리 안정에도 여러 주간 현물 순매도가 지속되면 설명력이 낮아진다.</li>
+<li><strong>‘자사주 종료가 하락을 증폭’ 가설:</strong> 실제 종료·취득 감소가 확인되지 않거나 대체 매수세가 유지되면 재평가해야 한다.</li>
+</ul>
+<h3>결론</h3>
+<p>영상은 외국인 수급을 종목 집중도·금리·미래 이익·매수 흡수력으로 나누어 점검할 틀을 제공한다. 다만 핵심 숫자와 인과 설명을 뒷받침하는 관련 외부 근거는 아직 없다. <strong>원자료 확인 → 금리·실적 변화 점검 → 여러 거래일의 실제 수급 관찰</strong> 순서로 가설의 설명력을 평가하는 것이 현재 자료에서 가능한 결론이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;Bla7gUB1hQM&quot;,
+  &quot;title&quot;: &quot;외국인이 코스피를 계속 팔고 있는 진짜 이유&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=Bla7gUB1hQM&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/Bla7gUB1hQM/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-13T11:12:53+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 13151,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 13151,
+    &quot;segments&quot;: 683,
+    &quot;duration_seconds&quot;: 1285,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-14T08:48:46.717529+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 3,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;외국인 코스피 순매도는 2026년 10월 12일까지 199조원, 상반기 149조원, 9월 21.5조원, 10월 8.5조원이며 코스닥은 2.6조원 초과 순매수했다. 삼성전자·SK하이닉스 순매도 합계 173조원은 전체의 약 87%이고 두 회사의 시가총액 비중은 약 51%다. 10월 2일부터 5거래일 연속 매도했으며 코스피는 6월 22일 최고 종가 9,114에서 10월 12일 6,384로 약 30% 하락했다. 월별·연속 거래일 수급과 2008년 및 2024~20...&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;199조원; 149조원; 21.5조원; 8.5조원; 코스닥 +2.6조원 초과; 삼성전자 86조원·SK하이닉스 87조원; 합계 173조원·약 87%; 시가총액 비중 51%; 5거래일·마지막 3일 각각 2조원 초과·일평균 약 1.7조원; 10월 12일 개인 +1.5조원; 코스피 연초 약 4,300·6월 22일 9,114·10월 12일 6,384 및 −3.65%; 고점 대비 약 −30%; 5~6월 24거래일 매도·일평균 3조원대; 10월 2일 이후 약 −9%; 2008년 매도 약 34조원·지수 −40% 초과; 2024년 8월~2025년 4월 매도 38.5조원.&quot;,
+        &quot;observed&quot;: &quot;해당 기간별 원자료는 미제공. 별도 조회 스냅샷 가격은 6,035.35이며 주장 시점과 직접 대조 불가. 제시값의 내부 계산상 집중도 86.93%, 고점 대비 하락률 29.95%, 199÷34≈5.85배.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매도 규모와 반도체 집중도를 확정된 투자 근거로 사용하기 전에 동일 기간·시장·종목 범위의 KRX 자료를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자·SK하이닉스 외국인 지분율은 하락했지만 코스피 외국인 보유 시가총액 비중은 약 40%로 높아졌다. 미국·유럽 투자자 보유액 비중은 44%·30%이고, 원달러 환율은 1,350원에서 1,335원으로 하락했다. 현물 매도와 선물 매수가 병행됐으며 한국 매도 규모는 대만의 3~4배라는 취지다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.8,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;삼성전자 52%대→46%; SK하이닉스 약 55%→50% 미만; 코스피 외국인 보유비중 36%대→약 40%; 미국 44%·유럽 30%; 환율 1,350→1,335원 및 약 2년 최저; 한국 매도액은 대만의 3~4배라는 취지.&quot;,
+        &quot;observed&quot;: &quot;관련 외부 관측값 없음. 입력값 차이는 15원, 비중 합계는 74%. 대만 순매도 금액 및 정확한 배율은 복원 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;한국 전체 이탈 또는 국내 자금 잔류라는 결론을 유보하고 현물·선물·환전 자료의 기간과 분모를 맞춰야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자가 10월 8일 분기 잠정 영업이익 107조원과 전년 대비 783% 증가를 발표했고 분기 역대 최대였다. 15조원 자사주 매입은 10월 6일 종료됐으며 상세 실적 설명회는 10월 29일 예정이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-10-08 잠정 영업이익 107조원·전년 대비 +783%·분기 최대; 자사주 매입 15조원·2026-10-06 종료; 실적 설명회 2026-10-29.&quot;,
+        &quot;observed&quot;: &quot;대조 가능한 실적·공시·일정 자료 없음. 매출과 영업이익의 구분 및 금액 단위도 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;영업이익 규모·성장률과 자사주 매입 종료를 실적 평가나 수급 판단에 사용하기 전에 회사 IR 및 공시 원문을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;SK하이닉스의 40조원 자사주 매입은 10월 7일 예정 주식 수의 약 82%에 도달했고 영상 게시 주간 이후 종료될 것으로 전망됐다. 실적 발표 일정은 ASML 10월 14일, TSMC 15일, SK하이닉스 27일이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:28&quot;,
+      &quot;source_confidence&quot;: 0.8,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;자사주 매입 40조원; 2026-10-07 예정 주식 수 대비 약 82%; ASML 10월 14일·TSMC 10월 15일·SK하이닉스 10월 27일 발표.&quot;,
+        &quot;observed&quot;: &quot;매입액·진행률·완료일·발표 일정의 외부 관측값 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;자사주 매입의 남은 규모와 종료 시점, 실적 이벤트 일정은 공식 자료 확인 전 확정값으로 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;투자자예탁금은 6월 초 약 140조원에서 10월 8일 약 100조원으로 줄었다. 9월 개인은 14조원 초과 순매도, 기타법인은 31조원 초과 순매수했고 10월 개인·기타법인은 각각 4.6조원·5.6조원 순매수했다. 자사주 매입 종료와 대기자금 감소가 하락을 증폭시켰다는 해석이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:28&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;예탁금 약 140→100조원; 9월 개인 −14조원 초과·기타법인 +31조원 초과; 10월 개인 +4.6조원·기타법인 +5.6조원.&quot;,
+        &quot;observed&quot;: &quot;외부 잔액·수급 자료 없음. 입력값의 산술적 감소액만 약 40조원으로 확인 가능.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매수세 약화 여부는 예탁금뿐 아니라 실제 자사주 취득, 기관 수급과 기타 유동성 자료를 함께 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;미국 10년물 수익률은 9월 29일 장중 5.29%로 2007년 이후 최고였고 재무부 공표치는 10월 2일 5.28%에서 9일 5.24%로 하락했다. 연준은 9월 금리를 인상했다. CPI는 10월 14일 한국시간 21:30 발표, 예상 3.7%·직전 3.4%이며 FOMC 결과는 10월 29일 새벽, 인상 확률은 약 22%라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:20&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10년물 9월 29일 장중 5.29%, 10월 2일 5.28%, 10월 9일 5.24%; 9월 기준금리 인상; CPI 10월 14일 21:30 KST·예상 3.7%·직전 3.4%; FOMC 10월 29일 새벽 KST·인상 확률 약 22%.&quot;,
+        &quot;observed&quot;: &quot;공식 금리·정책·물가·일정·확률 자료 없음. 입력 수익률 간 차이만 −4bp로 계산 가능.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;금리·물가 이벤트에 대한 판단은 공식 일정과 실제 발표, 동일 기준 수익률 및 시각이 명시된 컨센서스를 확인한 뒤 해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;스테이트스트리트의 9월 자료에서 글로벌 기관이 주식 비중을 줄이고 단기국채를 제외한 채권 비중을 늘렸다. 미국·이란 전쟁 장기화와 유가 상승, 높은 장기금리가 위험자산 축소의 배경이었다는 해석이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:20&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 9월 기관의 주식 비중 축소·단기국채 제외 채권 비중 확대. 구체적인 비중과 유가 변동폭은 미제시.&quot;,
+        &quot;observed&quot;: &quot;원보고서, 자산 비중 및 유가 관측값 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지정학·유가·자산배분 설명은 검증된 매도 원인이 아닌 영상의 가설로 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;10월 8일 OpenAI 연환산 매출이 예상보다 작다는 보도와 이후 집계 범위 차이라는 설명이 나왔다. 당일 필라델피아 반도체지수는 3% 넘게 하락했고 한국의 10월 9일 휴장 때문에 충격이 12일에 반영됐다는 해석이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:20&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 현지 2026-10-08 보도·반도체지수 −3% 초과; 한국 10월 9일 휴장·10월 12일 충격 반영.&quot;,
+        &quot;observed&quot;: &quot;매출 수치, 기사 시각, 지수 수익률 및 휴장 달력의 외부 검증 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;OpenAI 매출 보도를 AI 수요 악화의 확정 근거로 사용하기 전에 원문·정정 여부·집계 범위와 시장 반응을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;유진투자증권은 국내 기업 EPS 성장률을 2026년 237%, 2027년 33%, 2028년 6.3%로 전망했다. 하나증권 집계상 국내 반도체의 2027년 순이익 추정치는 4주간 1.5% 상향됐고 10월 첫 10일 반도체 수출은 122억달러로 같은 기간 최대였다. 증설과 AI 수익성이 이익 지속성의 위험 요인으로 제시된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:20&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;EPS 성장 전망 237%·33%·6.3%; 2027년 반도체 순이익 추정치 4주간 +1.5%; 2026년 10월 1~10일 반도체 수출 122억달러.&quot;,
+        &quot;observed&quot;: &quot;해당 전망·추정치·수출액을 대조할 외부 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이익 전망과 수출 호조를 확인된 실적으로 혼용하지 말고 원보고서의 모집단·기저효과 및 기업별 수요·공급 가정을 점검해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;외국인 매도는 차익실현·비중 조정, 고금리 위험자산 축소와 반도체 성장 지속성 의심의 결합이라는 해석이다. 여러 금융기관 발언, 책임자 6명 전원의 4분기 매수 전환 전망, Anthropic 상장 자금 수요와 11월 이후 복귀 가능성, 미국 10년물 6% 가능성·5.5% 위험 경고를 인용한다. 7월 31일 대규모 매수와 지수 급등을 Microsoft·Amazon 실적에 연결하며 금리·실적 안정 뒤 여러 날 연속 매수를 전환 신호로 제시한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:20&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;설문 6명 전원 4분기 순매수 전환 전망; Anthropic 11월 이후 상장 전망; 10년물 6% 가능성·5.5% 위험 경고; 7월 30일까지 17조원 초과 매도 후 31일 오전 약 7조원 매수·코스피 장중 약 +17%.&quot;,
+        &quot;observed&quot;: &quot;인용·설문·상장 일정·금리 전망·당일 수급 및 장중 수익률의 확인 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매도 동기와 복귀 시점은 확인된 사실이 아닌 해석·전망으로 표시하고, 실제 연속 수급과 금리·이익 전망 변화를 별도로 관찰해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;코스피·외국인 수급&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;외국인 순매도는 한국 주식 전반보다 삼성전자·SK하이닉스에 집중됐으며, 일부 반도체 부품·장비주는 오히려 순매수했다는 주장이다.&quot;,
+        &quot;급등한 반도체 대형주의 차익실현과 포트폴리오 비중 조정이 매도 배경이며, 원화 강세와 선물 순매수를 고려하면 현물 매도를 전면적인 자금 이탈로 단정하기 어렵다는 해석이다.&quot;,
+        &quot;외국인 매도를 받아주던 자사주 매입과 투자 대기자금이 줄어 같은 매도에도 지수가 더 쉽게 하락한다는 분석이다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;2026년 1월~10월 12일 외국인 코스피 순매도 199조원, 상반기 149조원, 9월 21조5천억원, 10월 들어 8조5천억원이라는 수치가 제시됐다.&quot;,
+        &quot;10월 2일부터 5거래일 연속 순매도했으며 마지막 3거래일은 각각 2조원 초과, 해당 5거래일 하루 평균은 약 1조7천억원대라고 설명했다.&quot;,
+        &quot;10월 12일 외국인은 2조원 넘게 순매도하고 개인은 약 1조5천억원 순매수했지만 코스피는 3.65% 하락한 6,384로 마감해 약 2개월 만에 종가 6,400을 하회했다고 주장했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-13T23:51:01.052254+00:00&quot;,
+        &quot;current_price&quot;: 6035.35,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Luda Technology Group Signed Non-Binding MOU to Evaluate Proposed Acquisition of mining rights in the Jonsh Tolgoi Fluorspar Project in Mongolia&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/luda-technology-group-signed-non-130000341.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T13:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Luda Technology Group Signed Non-Binding MOU to Evaluate Proposed Acquisition of mining rights in the Jonsh Tolgoi Fluorspar Project in Mongolia Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;State Ceremony Officially Opens Ares Strategic Mining Lumps Plant, in Delta, Utah, USA&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/state-ceremony-officially-opens-ares-113000628.html&quot;,
+      &quot;publisher&quot;: &quot;NewMediaWire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T11:30:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;State Ceremony Officially Opens Ares Strategic Mining Lumps Plant, in Delta, Utah, USA Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Or...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

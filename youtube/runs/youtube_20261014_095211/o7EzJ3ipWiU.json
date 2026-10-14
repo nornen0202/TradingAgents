@@ -1,0 +1,379 @@
+{
+  "version": 4,
+  "video_id": "o7EzJ3ipWiU",
+  "title": "삼전닉스 중국한테 진짜 따라잡힐까?!",
+  "url": "https://www.youtube.com/watch?v=o7EzJ3ipWiU",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/o7EzJ3ipWiU/maxresdefault.jpg",
+  "published_at": "2026-10-13T02:55:42+00:00",
+  "status": "unverified",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1659,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 1659,
+    "segments": 87,
+    "duration_seconds": 141,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-13T16:13:15.374984+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 8,
+  "claim_status_summary": {
+    "unverified": 7,
+    "supported": 1,
+    "partially_supported": 2
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "삼성전자의 차세대 DRAM 양산 목표는 2028년인 반면 CXMT는 올해 안에 4F² DRAM 출시를 발표했으며, 성능과 대량 생산 일정은 공개하지 않았다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.2,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "삼성전자 2028년 양산 목표; CXMT 올해 안 출시.",
+        "observed": "두 일정 모두 확인 자료가 없다. 올해=2026년, 어제=2026-10-12는 영상 게시일에 따른 잠정 해석이다."
+      },
+      "investor_implication": "출시 예고만으로 양산 시점이나 기술 우위 역전을 판단할 수 없다. 양사의 동일 기술에 대한 개발·샘플·양산 일정을 구분해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "DRAM 셀 면적이 6F²에서 4F²로 줄면 같은 면적에 셀을 1.5배 배치할 수 있다.",
+      "status": "supported",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": false,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "6F²→4F²; 동일 면적의 셀 수 1.5배.",
+        "observed": "동일 F라는 조건에서 6/4=1.5로 산술적으로 성립한다. 실제 제품 적용과 밀도 측정치는 제공되지 않았다."
+      },
+      "investor_implication": "이론적 셀 면적 개선과 상용 제품의 원가·수율 개선을 구분해야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "CXMT 신제품 소식 때문에 주가가 하락했다.",
+      "status": "partially_supported",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [
+        "E6",
+        "E7"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.4,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "주가 하락; 종목·일자·하락률 미명시.",
+        "observed": "한 기사 발췌는 삼성전자 -7.39%·232,000원, SK하이닉스 -10.09%·1,443,000원으로 보도한다. 다른 발췌는 각각 -6.79%, -9.47%이며 E6 제목은 SK하이닉스 약 -9%다. 공식 시세로 대조되지 않았다."
+      },
+      "investor_implication": "하락 보도와 하락 원인의 입증은 구분해야 한다. 확정되지 않은 낙폭이나 단일 뉴스 원인으로 매매 판단을 정당화하기 어렵다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "서버 DRAM 시장은 삼성전자·SK하이닉스·마이크론이 장악해 왔고 판매에는 인텔·AMD 검증이 필요하며, CXMT 신제품은 아직 한 개도 팔리지 않았다.",
+      "status": "partially_supported",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.35,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "CXMT 해당 신제품 판매량 0개.",
+        "observed": "해당 제품의 실제 판매량은 제공되지 않았다."
+      },
+      "investor_implication": "기존 공급사의 시장 지위에 관한 보도는 있으나, 이를 CXMT의 판매 불가능이나 상용화 실패로 확대 해석할 수 없다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "CXMT의 DRAM 점유율이 1년 만에 4%에서 10%로 상승한 것은 한국 업체의 HBM 전환 때문이며, HBM은 같은 용량의 일반 DRAM보다 생산능력을 3배 소모해 일반 DRAM 부족과 가격 상승을 유발했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "1년간 DRAM 점유율 4%→10%; 동일 용량 HBM 생산능력 소모 3배.",
+        "observed": "점유율 원자료와 생산능력 비교 자료가 없다. 6%포인트·2.5배는 입력 숫자의 산술 결과일 뿐이다."
+      },
+      "investor_implication": "점유율 상승을 단순한 빈자리 충원으로 해석하거나 3배 계수를 공급·이익 추정에 확정적으로 적용해서는 안 된다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "올해 2분기 HBM 점유율은 SK하이닉스 50%, 삼성전자 33%, 마이크론 18%이며 한국 업체 합계는 80% 이상이고 중국 업체는 없다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "SK하이닉스 50%, 삼성전자 33%, 마이크론 18%; 한국 합계 80% 초과.",
+        "observed": "입력 숫자의 합은 전체 101%, 한국 업체 83%다. 실제 점유율은 확인되지 않았고, 2026년 2분기는 게시일에 따른 잠정 해석이다."
+      },
+      "investor_implication": "83%를 확정 시장점유율로 사용하거나 중국 업체의 경쟁 가능성을 배제하려면 동일 기준의 원자료가 필요하다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "삼성전자와 SK하이닉스는 6세대 HBM을 대량 생산하는 반면 CXMT는 9월에 한 세대 뒤인 5세대 HBM의 소량 생산을 시작했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "한국 업체 6세대 대량 생산; CXMT 5세대 9월 소량 생산.",
+        "observed": "세대·생산 단계·수량은 모두 확인되지 않았다. 9월을 2026년 9월로 확정할 근거도 없다."
+      },
+      "investor_implication": "한 세대 격차만으로 경쟁 우위를 확정할 수 없다. 동일 기준의 양산 규모와 고객 인증·유상 출하를 비교해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "SemiAnalysis는 CXMT의 앞세대 HBM을 네 개 만들면 세 개 폐기하는 수준으로 추정했으며, 적층 메모리는 한 층의 불량으로 전체 제품이 폐기된다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [
+        "E8"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.15,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "네 개 생산 중 세 개 폐기.",
+        "observed": "가정상 폐기율 3/4=75%, 잔존 비율 1/4=25%다. E8은 이 수치나 CXMT에 대한 적용을 확인하지 않는다."
+      },
+      "investor_implication": "25%를 확인된 CXMT 수율로 원가·경쟁력 평가에 사용하지 말아야 한다. 추정 대상과 시점이 확인돼야 비교가 가능하다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "미국 규제로 첨단 HBM 구매가 어려운 중국 기업들이 CXMT의 시험 고객이며 CXMT가 엔비디아 공급망에서 한국 업체를 대체하는 상황은 아니다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "정량 수치 없음; 첨단 HBM 규제와 고객·공급망 관계 주장.",
+        "observed": "규제의 정량 성능 기준과 고객·공급 물량 자료가 제공되지 않았다."
+      },
+      "investor_implication": "규제에 따른 고객 제약과 한국 업체의 공급망 지위가 유지된다는 결론은 별도로 검증해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "TrendForce는 4분기 일반 DRAM 가격의 추가 10~15% 상승을 전망했고, CXMT 증산에도 공급 부족이 지속돼 한국 업체 경쟁력이 지지된다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "4분기 일반 DRAM 가격 추가 10~15% 상승 전망.",
+        "observed": "해당 범위의 원전망은 제공되지 않았다. 2026년 4분기는 잠정 해석이며 비교 기준도 확인되지 않았다."
+      },
+      "investor_implication": "10~15%를 확정 가격 상승률이나 실적 증가율로 사용하지 말고, 제품별 실제 가격과 판매량·원가 변화를 대조해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "영상은 삼성전자가 차세대 DRAM 양산을 2028년 목표로 잡은 것으로 알려졌다고 설명한다.",
+        "삼성전자와 SK하이닉스가 AI 수요에 대응해 생산능력을 HBM으로 전환하면서 일반 DRAM 시장에 빈자리가 생겼다는 해석을 제시한다."
+      ],
+      "numeric_claims": [
+        "삼성전자 차세대 DRAM 양산 목표: 2028년으로 알려졌다는 발언.",
+        "영상이 제시한 올해 2분기 HBM 점유율: 삼성전자 33%."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-10-13T07:16:22.664843+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "영상은 삼성전자·SK하이닉스·마이크론이 기존 서버 DRAM 시장을 장악해 왔다고 설명한다.",
+        "삼성전자와 SK하이닉스가 HBM 시장의 대부분을 차지하며, 창신메모리보다 앞선 세대의 HBM을 대량 생산하고 있다고 주장한다."
+      ],
+      "numeric_claims": [
+        "영상이 제시한 올해 2분기 HBM 점유율: SK하이닉스 50%.",
+        "삼성전자와 SK하이닉스의 HBM 합산 점유율이 80%를 넘는다는 주장; 제시 수치의 합은 83%.",
+        "삼성전자·SK하이닉스가 6세대 HBM을 대량 생산한다는 발언."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-10-13T07:16:25.037271+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "MU",
+      "name": "마이크론",
+      "status": "unverified",
+      "claims": [
+        "영상은 마이크론을 기존 서버 DRAM 주요 업체이자 삼성전자·SK하이닉스와 함께 HBM 시장을 나눠 가진 업체로 제시한다."
+      ],
+      "numeric_claims": [
+        "영상이 제시한 올해 2분기 HBM 점유율: 마이크론 18%."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "MU",
+        "as_of": "2026-10-13T07:16:27.127497+00:00",
+        "current_price": 989.0399780273438,
+        "market_cap": 1119022788736.1067,
+        "forward_pe": 4.79343,
+        "trailing_pe": 12.789861,
+        "fifty_two_week_high": 1255.0,
+        "fifty_two_week_low": 186.25,
+        "average_target_price": 1560.5652,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Visa Wins Approval to Prepare for China Payments Business",
+      "source_url": "https://finance.yahoo.com/m/fe039483-ea43-3aeb-9f08-4b88d0958cb5/visa-wins-approval-to-prepare.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-13T05:00:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Visa Wins Approval to Prepare for China Payments Business Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters F..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "This Ultra-Rare Gas Could Become An Ace In Canada’s Hands",
+      "source_url": "https://finance.yahoo.com/energy/articles/ultra-rare-gas-could-become-000000924.html",
+      "publisher": "Oilprice.com",
+      "published_at": "2026-10-13T00:00:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "This Ultra-Rare Gas Could Become An Ace In Canada’s Hands Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters F..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Groupe Dynamite And 2 Canadian Undervalued Stocks To Own",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/groupe-dynamite-2-canadian-undervalued-013009230.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-13T01:30:09+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Groupe Dynamite And 2 Canadian Undervalued Stocks To Own Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Fi..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C4",
+      "title": "SPCX Stock Extends 2-Day Green Run As Elon Musk Calls SpaceX An 'Anomaly In The Matrix' Amid China’s RAM Push",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/spcx-stock-extends-2-day-033753575.html",
+      "publisher": "Stocktwits",
+      "published_at": "2026-10-13T03:37:53+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C7",
+      "title": "SK Hynix Plunges 9% on China DRAM Scare: “A Clear Trigger for the Selloff”",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/sk-hynix-plunges-9-china-061401801.html",
+      "publisher": "TIKR",
+      "published_at": "2026-10-13T06:14:01+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C7",
+      "title": "Asia Stocks Battered as Semiconductor Stocks Dive",
+      "source_url": "https://finance.yahoo.com/m/462267b7-07f8-3129-a6dd-8911b185c04a/asia-stocks-battered-as.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-13T05:50:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C8",
+      "title": "China's CXMT Is Set to Challenge DRAM Incumbents",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fnewsletter.semianalysis.com%2Fp%2Fchinas%2Dcxmt%2Dis%2Dset%2Dto%2Dchallenge%2Ddram&rut=384e8ef270a246f1b66d1051e5034143388d3250f26513923934427b6a118f2b",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "HBM stacking usually introduces significant technical hurdles, including thermal stress, die cracking, warpage, bonding defects, and yield loss across multiple stacked dies ."
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

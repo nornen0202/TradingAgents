@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 창신 메모리 때문만이 아니다? 삼전닉스 급락 뒤 숨겨진 &#x27;진부화 공포&#x27; | 김장열 유니스토리자산운용 리서치센터 센터장[글로벌 인터뷰]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261014_095211</p>
+    <h1>창신 메모리 때문만이 아니다? 삼전닉스 급락 뒤 숨겨진 &#x27;진부화 공포&#x27; | 김장열 유니스토리자산운용 리서치센터 센터장[글로벌 인터뷰]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=l3zLdeKBM9U">원본 영상</a>
+    </div>
+  </header>
+  <h2>삼성전자·SK하이닉스: 급락 원인보다 중요한 것은 경쟁 공급의 실체</h2>
+<h3>핵심 판단</h3>
+<p>영상의 중심 논지는 <strong>창신메모리의 기술 발표가 경쟁·진부화 우려를 자극했지만, 국내 수급과 투자 대안으로의 자금 이동이 낙폭을 증폭했을 수 있다</strong>는 해석이다. 단기 실적과 장기 경쟁력에 대한 평가를 구분한다는 점이 핵심이다.</p>
+<p>그러나 제공된 검증 결과는 <strong>전체 미검증(unverified)</strong>이다. 핵심 기술 발표, 국내외 등락률, 밸류에이션, 자금 이동을 직접 뒷받침하는 외부 자료가 확보되지 않았다. 따라서 현재 근거로는 ‘기술 위협이 확정됐다’거나 ‘수급 때문에 과도하게 하락했다’는 어느 쪽도 단정할 수 없다. 미검증은 거짓이라는 판정도 아니다.</p>
+<p>분석 대상은 <a href="https://www.youtube.com/watch?v=l3zLdeKBM9U">삼프로TV 영상</a>이며, 게시 시각은 한국시간 2026년 10월 14일 08:03이다. 녹화일은 미상이므로 영상의 ‘올해·내년·어제’를 특정 연도나 거래일로 확정하지 않는다.</p>
+<h3>1. 영상 주장과 확인된 근거</h3>
+<p>아래 시각은 개별 발화의 정확한 위치가 아니라 해당 주장을 포함하는 자막 청크 시작점이다.</p>
+<p>| 쟁점·영상 위치 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 창신메모리 발표·양산, 06:28 | 10월 11일경 상하이에서 4F² 기술과 연말 양산 계획을 발표했다. 서버 시장 영향은 내년 상반기 또는 2분기 이후이며 HBM과 직접 경쟁하지 않는다. | 발표문·행사 기록·제품 사양·양산량·고객 인증 자료가 없다. 일정과 제품 범위 모두 미검증이다. 자료 미확보를 양산 실패로 해석할 수 없다. |</p>
+<p>| 기술 경제성, 06:28 | 6F²→4F² 전환으로 셀 면적이 절반으로 줄고 칩 수가 약 35% 늘며 원가가 30% 이상 낮아질 수 있다. 식각 난도는 부담이다. | 동일 F 조건의 산술상 면적 감소는 33.3%, 이론적 셀 밀도 증가는 50%다. 실제 칩 수·원가·식각 경제성은 확인되지 않았다. |</p>
+<p>| 기존 업체 로드맵, 06:28·12:52 | 삼성전자·SK하이닉스는 비용과 HBM 우선순위 때문에 전환을 서두르지 않았다. 마이크론은 4F²를 건너뛰고 2030년경 3D로 전환한다. | 회사별 공식 로드맵과 전환 유보 이유를 확인할 자료가 없다. 기술 전략과 목표연도는 미검증이다. |</p>
+<p>| 국내외 주가·수급, 00:00·18:48 | 국내 메모리 낙폭은 미국 메모리보다 컸으며, 자사주 매입 종료와 미국 빅테크 등으로의 자금 이동이 영향을 줬다. | 유효한 종목별 비교 시세·투자자별 순매수·자사주 종료 공시·펀드 흐름이 없다. 상대적 과매도와 자금 이동은 확인되지 않았다. |</p>
+<p>| 실적·밸류에이션, 00:00·12:52 | PER 4~7배에는 이익 감소 우려가 반영돼 있으며, 가까운 분기의 메모리 가격·이익 하락 가능성은 작다. | 주가·EPS 기준일과 추정 출처가 없어 배수를 재현할 수 없다. 가격과 이익의 비하락은 출연자의 전망이다. |</p>
+<p>| 대안 업종, 18:48 | 소부장은 설비투자 수혜가 가능하고 ESS는 미국 정책의 보호를 받는다. 변압기는 진부화가 느리지만 가격 부담이 있다. | 실제 납품·수주, 정책 범위, ESS 미국 수요 90%의 분모, 기업별 밸류에이션 모두 미확인이다. |</p>
+<p>| 오라클 사례, 24:50 | 데이터센터 프로젝트·자금조달 우려에도 주가가 상승해 AI 투자 전체의 문제로 보기 어렵다. | ORCL 단일 가격 스냅샷만 확인된다. 프로젝트 중단, 금융상품 가격, 최근 주가 상승은 각각 미검증이다. |</p>
+<h3>2. 외부 증거가 실제로 말해주는 것</h3>
+<h4>핵심 주장에 직접 대응하는 증거는 부족하다</h4>
+<p>수집된 E1~E9 가운데 검증 결과가 핵심 주장의 지지·반박 근거로 채택한 자료는 없다.</p>
+<ul>
+<li><strong>E1~E3:</strong> 창신메모리 발표와 무관한 기사이며, 발췌는 오류 안내와 사이트 메뉴 중심이다.</li>
+<li><strong>E4~E5:</strong> 시장 기사 제목만 있어 회사별 기술 로드맵을 확인할 수 없다.</li>
+<li><strong>E6~E8:</strong> Fermi·AMD·IREN 등 다른 기업 기사로, 국내 메모리 등락률과 PER을 입증하지 못한다.</li>
+<li><strong>E9:</strong> <a href="https://finance.yahoo.com/markets/live/stock-market-today-tuesday-october-13-dow-sp-500-nasdaq-chip-stocks-192419999.html">미국 증시·반도체 약세 기사</a>의 제목이 제공됐다. 국내 소부장 반등이나 창신메모리 수주를 확인하는 자료는 아니다.</li>
+</ul>
+<p>호스트의 수집 상태가 ‘verified’라는 것은 개별 영상 주장이 검증됐다는 뜻과 구분해야 한다.</p>
+<h4>오라클 자료는 제한적인 대조 단서다</h4>
+<p>제공된 yfinance 스냅샷은 2026년 10월 14일 09:27 한국시간 조회 기준 ORCL 가격을 <strong>143.2</strong>로 보고한다. 비교일 가격과 실제 체결 시각이 없어 최근 상승 여부는 계산할 수 없다. 이 가격이나 ORCL의 PER을 메모리 업체 평가에 대신 사용할 수도 없다.</p>
+<p>뉴스 목록에는 오라클이 Project Jupiter 관련 뉴멕시코 가스관의 신속 처리를 FERC에 요청했다는 <a href="https://finance.yahoo.com/energy/articles/oracle-urges-ferc-expedite-mexico-215237380.html">기사 제목</a>이 있다. 이는 ‘프로젝트 중단’ 주장과 대조할 가치가 있는 단서다. 다만 제목만으로 프로젝트 전체의 정상 진행이나 중단을 판정할 수 없으며, 중단·지연·금융 참여 철회를 구별할 본문과 공시가 필요하다.</p>
+<h3>3. 4F²: 셀 면적과 실제 원가는 다르다</h3>
+<p><a href="https://www.youtube.com/watch?v=l3zLdeKBM9U&amp;t=388s">영상 06:28 부근</a>의 수치는 조건을 분리해 읽어야 한다.</p>
+<p>| 항목 | 제공 수치의 조건부 검산 | 투자 해석의 한계 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 셀 면적 | 동일 F라면 4/6=66.7%, 즉 33.3% 축소 | ‘절반 축소’와 맞지 않는다. F 변화나 다른 비교 기준은 미확인이다. |</p>
+<p>| 셀 밀도 | 동일 면적에서 6/4−1=50% 증가 | 주변회로·다이 구성·수율을 반영한 완제품 칩 수 증가율이 아니다. |</p>
+<p>| 식각 종횡비 | 주어진 200nm와 20nm·15nm를 적용하면 10:1·약 13.3:1 | 실제 구조의 치수와 장비 처리량은 미검증이다. |</p>
+<p>| 원가 | 30% 이상 감소는 검산할 비용 자료가 없다 | 면적 축소만으로 추가 공정비·장비비·불량 손실까지 알 수 없다. |</p>
+<p>따라서 경쟁력을 판단하는 순서는 <strong>설계상 밀도 → 양산 수율 → 판매 가능한 생산량 → 단위원가 → 고객 채택</strong>이다. 기술 발표나 양산 개시만으로 이 단계가 모두 충족됐다고 볼 수 없다. 반대로 공개 수율이 없다는 이유만으로 기술 실패를 확정해서도 안 된다.</p>
+<h3>4. 긍정적 논리와 반론</h3>
+<h4>긍정적 시나리오: 경쟁 공급이 예상보다 늦게 현실화되는 경우</h4>
+<p>출연자의 해석대로 신규 공정의 수율·비용·인증 문제가 크고 기존 업체의 가격·실적이 유지된다면, 경쟁 공포와 실제 이익 영향 사이에 간극이 생길 수 있다. 수급도 회복된다면 실적 악화보다 위험 프리미엄 상승이 하락을 설명하는 비중이 커질 가능성이 있다.</p>
+<p>다만 이를 뒷받침하려면 실제 양산 지연 또는 제한적인 생산량, 안정적인 계약가격·가이던스, 투자자별 매매 개선이 필요하다. 현재 번들에는 이런 확인 자료가 없다.</p>
+<h4>반론: 실적이 유지돼도 장기 가치 평가는 낮아질 수 있다</h4>
+<p>단기 가격·이익이 유지되는 것과 장기 경쟁력이 유지되는 것은 별개다. 창신메모리가 경쟁력 있는 수율과 서버 고객 인증을 확보한다면, 향후 공급 확대와 기존 업체의 가격 결정력 약화가 먼저 평가에 반영될 수 있다. 영상의 ‘HBM 비경쟁’ 설명도 제품 범위가 검증되기 전에는 HBM 사업의 안전성을 보장하지 않는다.</p>
+<p>또한 낮은 PER이 추가 하락을 제한한다는 결론은 성립하지 않는다. 같은 주가에서 이익이 30% 감소하면 PER은 약 1.43배, 50% 감소하면 2배가 된다. 이는 산술적 민감도 예시일 뿐, 실제 이익 감소 예측은 아니다.</p>
+<h4>수급·대안 업종 논리의 한계</h4>
+<p>한국 주가 하락과 미국 주가 상승만으로 같은 자금의 이동을 입증할 수 없다. 자사주 종료의 영향도 대상 회사·집행액·종료일 확인이 먼저다. 영상의 ‘80%’는 하락 원인의 기여도 추정치가 아니다.</p>
+<p>소부장 역시 일반적인 설비투자 가능성과 특정 기업의 확정 수주를 구분해야 한다. ESS 정책 수혜는 법령·제품·예외와 기업별 노출에 따라 달라지며, 대상과 분모가 없는 ‘미국 수요 90%’를 업종 전체에 적용할 수 없다.</p>
+<h3>5. 데이터 품질과 신뢰도</h3>
+<p>자동 자막의 transcript_quality는 <strong>good·1.0</strong>이다. 그러나 이는 고유명사·숫자·날짜가 정확하다는 보증이 아니다. source_confidence는 주장과 대상을 식별한 신뢰도이고, asr_confidence는 오인식 가능성에 근거한 잠정 평가다. 둘 다 주장 자체가 참일 확률이 아니다.</p>
+<p>| 검증 항목 | source_confidence / asr_confidence | 주의점 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 창신메모리 발표 | 0.87 / 0.70 | 행사명·날짜·목표연도 미확정 |</p>
+<p>| 4F² 경제성 | 0.87 / 0.60 | 기술 표기와 수치 간 정합성 문제 |</p>
+<p>| 국내외 주가 비교 | 0.87 / 0.65 | 거래일·종목·ADR 상품 미확정 |</p>
+<p>| 수급 해석 | 0.86 / 0.90 | 발언 식별이 명확해도 인과관계는 미검증 |</p>
+<p>| PER·실적 전망 | 0.86 / 0.60 | 기간·단위·EPS 출처 불명확 |</p>
+<p>| 중국 AI 투자 비율 | 0.87 / 0.15 | 핵심 비율 누락으로 수치 사용 불가 |</p>
+<p>| 컨퍼런스 발언 | 0.60 / 0.30 | 행사명·발언자 원문 확인 필요 |</p>
+<p>| 오라클 사례 | 0.67 / 0.40 | 프로젝트명·금융상품·가격 단위 확인 필요 |</p>
+<p>ORCL 외 기업은 티커가 UNAVAILABLE로 조회돼 유효 시세를 얻지 못했다. 공시 제공자도 unavailable이다. 조회 실패는 해당 기업의 시세·뉴스·공시가 실제로 없다는 증거가 아니다. 또한 일부 수집 시각은 검증 메타데이터의 생성 시각보다 늦으므로, 번들 전체를 동일 시점 자료로 간주하지 않는다.</p>
+<p><strong>Bloomberg·Morningstar 등 유료·폐쇄 출처의 원문이나 데이터는 제공되지 않았다.</strong> 내부 모델에서 나왔을 수 있는 PER·이익 추정치, 비공개 제조 수율·인증, 사모금융 가격, 비공개 컨퍼런스 발언은 미검증·수동 확인 필요다. 특히 100조·70조 등의 이익 수치는 기간·통화·이익 항목이 불명확해 확정 실적으로 사용하지 않는다.</p>
+<h3>6. 가까운 확인 시점과 구체적 관찰 항목</h3>
+<p>| 확인 시점 | 투자자가 관찰할 항목 | 판단에 필요한 구분 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 우선 확인 | 창신메모리 공식 발표문·행사 자료, 녹화일, 제품 사양 | 발표일과 양산 목표연도, 일반 DRAM·서버 DRAM·HBM 범위 |</p>
+<p>| 다음 가격·실적 업데이트 | 제품별 계약가격·현물가격, 출하량·재고·회사 가이던스 | 특정 제품의 가격과 기업 전체 이익을 구분 |</p>
+<p>| 거래일 확정 후 | 국내외 동일 정보 반영 구간의 수익률, 외국인·기관 순매수, 거래대금 | 장중·종가, 환율, 상품 차이를 맞춘 비교 |</p>
+<p>| 자사주 공시 확인 시 | 취득 결정·실제 집행·종료일 | 종료 사실과 실제 수급 영향은 별도 평가 |</p>
+<p>| 영상상 연말 목표 전후 | 양산 개시, 판매 가능한 생산량, 품질·서버 고객 인증 | 시험 생산·양산 선언·상업적 공급을 구분 |</p>
+<p>| 후속 기술·수주 발표 | 업체별 4F²·3D 로드맵, 소부장 계약·납품·매출 인식 | 개발 목표와 양산 확정, 기대 수혜와 실제 수주를 구분 |</p>
+<p>영상이 제시한 확인 기간 3~4개월과 서버 영향 시점도 검증된 일정이 아니다. 공식 발표의 날짜와 목표를 확보한 뒤 관찰 일정을 설정해야 한다.</p>
+<h4>시나리오가 약해지는 조건</h4>
+<ul>
+<li><strong>‘경쟁 우려가 앞섰다’는 긍정적 해석:</strong> 창신메모리의 높은 수율·대규모 상업 공급·서버 고객 채택이 확인되고, 기존 업체의 가격·물량·이익 전망이 악화되면 약해진다.</li>
+<li><strong>‘진부화가 급격히 진행된다’는 우려:</strong> 공식 일정 지연, 제한적인 생산량, 낮은 경제성이나 인증 지연이 확인되면 약해진다. 공개 자료가 없다는 것만으로는 충분하지 않다.</li>
+<li><strong>‘수급이 낙폭을 증폭했다’는 해석:</strong> 자사주 종료가 사건 시점과 맞지 않거나, 수급이 회복돼도 실적 전망 하향과 상대 약세가 지속되면 설명력이 낮아진다.</li>
+<li><strong>‘AI 전체가 아닌 메모리만의 문제’라는 해석:</strong> 주요 고객의 투자·자금조달·프로젝트 문제가 여러 기업으로 확산되는 증거가 나오면 재검토해야 한다.</li>
+</ul>
+<h3>결론</h3>
+<p>영상은 급락을 <strong>기술 경쟁, 장기 가치 평가, 국내 수급</strong>으로 나눠 보는 틀을 제시한다. 하지만 현재 증거는 어느 요인이 실제로 얼마나 작용했는지 확인하지 못한다.</p>
+<p>가장 중요한 관찰 대상은 창신메모리의 발표 자체가 아니라 <strong>판매 가능한 공급량·수율·고객 인증</strong>, 기존 업체의 <strong>제품별 가격과 실적 전망</strong>, 그리고 <strong>동일 거래일 기준의 수급·상대 수익률</strong>이다. 이 자료가 확보되기 전까지 기술 위협과 과도한 하락 모두 조건부 시나리오로 남는다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;l3zLdeKBM9U&quot;,
+  &quot;title&quot;: &quot;창신 메모리 때문만이 아니다? 삼전닉스 급락 뒤 숨겨진 &#x27;진부화 공포&#x27; | 김장열 유니스토리자산운용 리서치센터 센터장[글로벌 인터뷰]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=l3zLdeKBM9U&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/l3zLdeKBM9U/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-13T23:03:02+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 13930,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 13930,
+    &quot;segments&quot;: 772,
+    &quot;duration_seconds&quot;: 1623,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-14T08:48:46.717529+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 9,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 11,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;창신메모리가 10월 11일경 상하이에서 4F² 기술과 연말 양산 계획을 발표했으며, HBM과 직접 경쟁하지 않고 서버 시장 영향은 내년 상반기 또는 2분기 이후라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:28&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 11일경 발표, 연말 양산, 확인까지 3~4개월, 내년 상반기 또는 2분기 이후 영향&quot;,
+        &quot;observed&quot;: &quot;발표일·목표연도·양산 일정·영향 시점을 확인할 외부 자료는 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;양산 일정과 경쟁력 있는 실제 공급을 구분하고, 공급 증가 및 HBM 영향은 확인 전 조건부 시나리오로 취급해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;6F²에서 4F²로 전환하면 셀 면적이 절반으로 줄고 웨이퍼당 칩 수가 약 35% 증가하며 원가가 30% 이상 감소하지만, 식각 난도가 생산성을 저하시킬 수 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:28&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;6F²→4F², 셀 면적 50% 감소, 칩 수 약 35% 증가, 원가 30% 이상 감소, 깊이 200nm·폭 20nm 또는 15nm&quot;,
+        &quot;observed&quot;: &quot;동일 F 조건의 면적 감소 33.3%, 셀 밀도 증가 50%; 주어진 치수의 단순 종횡비는 10:1 또는 약 13.3:1. 실제 치수·다이 수·원가는 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;셀 면적 축소율을 제조원가 절감률이나 판매 가능한 생산량 증가율로 그대로 적용하면 경쟁 효과를 과대평가할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자와 SK하이닉스는 비용·생산성·HBM 우선순위 때문에 4F² 전환을 서두르지 않았고, 마이크론은 이를 건너뛰어 2030년경 3D DRAM으로 전환한다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:28&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;마이크론 2030년경 3D 전환; 3D 전환 노력 30배, 4F² 전환 노력 3~4배&quot;,
+        &quot;observed&quot;: &quot;공식 목표연도와 노력 배수의 정의·측정 자료는 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;업체별 기술 우열이나 투자 우선순위를 확정하기 전에 개발·시험 생산·양산 목표를 구분한 공식 로드맵이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;7월 말 창신메모리의 개선된 DUV 장비 확보 보도가 국내 메모리 하락을 촉발했고, EUV 장비는 확보하지 못했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:28&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;7월 30일 5,500, 7월 31일 상한가, 이후 6,500&quot;,
+        &quot;observed&quot;: &quot;연도·종목 또는 지수·통화·단위 및 대응 시세는 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장비 접근성과 주가 하락의 인과관계를 확인하기 전에는 기술 격차 축소를 확정 투자 근거로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;국내 메모리는 약 4%·10%, 마이크론과 하이닉스 ADR은 약 3% 하락했지만 일부 미국 반도체·빅테크는 비하락 또는 상승했고, 창신메모리도 하락했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;국내 약 −4%·−10%, 미국 메모리 약 −3%, 국내 낙폭 2~3배 이상&quot;,
+        &quot;observed&quot;: &quot;종목별 실제 수익률과 비교 배수는 unavailable; 제시된 근삿값을 계산해도 거래일·대상이 불명확해 시장 검증이 되지 않음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;같은 정보 반영 구간의 수익률을 확보하기 전에는 한국 메모리의 상대적 과매도나 미국 종목의 방어력을 단정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;창신메모리 이슈 외에도 국내 수급 취약성, 자사주 매입 종료, 미국 빅테크·미국 상장 메모리로의 자금 이동이 국내 메모리 급락을 증폭했다는 해석이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;창신메모리 이슈가 하락 원인의 80%인지 모르겠다는 발언&quot;,
+        &quot;observed&quot;: &quot;80%는 기여도 추정치가 아니라 기여도에 대한 의문이며, 실제 인과 기여율은 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;급락 원인에 관한 출연자의 가설로 유지하고, 수급 회복이나 자금 환류를 전제로 한 투자 판단은 추가 검증해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;메모리 PER 4~7배, 마이크론 약 5.5배, 샌디스크 약 6.4배에는 이익 30~50% 감소 우려가 반영됐으며, 올해 4분기·내년 1분기 가격과 이익 하락 가능성은 거의 없고 주가는 6~9개월 이상 선행한다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;PER 4~7배·5.5배·6.4배·대상 미상의 3.8배; 이익 감소 30~50%; 선행 6~9개월; 100조·70조 및 가정상 50조·40조&quot;,
+        &quot;observed&quot;: &quot;대응 주가·EPS·가격·이익 자료는 unavailable. 100조·70조 등의 기간·통화·이익 항목도 미확정&quot;
+      },
+      &quot;investor_implication&quot;: &quot;배수 비교는 동일 기준일·회계기간·이익 정의로 다시 계산하고, 이익 감소 시나리오를 별도로 점검해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;미국의 중국 배터리·ESS 경쟁사 제한이 국내 업체의 경쟁 부담을 줄였고, 관련 ESS 수요의 거의 90%가 미국에서 발생한다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:48&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;관련 ESS 수요 중 미국 비중 약 90%&quot;,
+        &quot;observed&quot;: &quot;대상 기업·집계 기간·수요 정의·분모 및 확인 가능한 비중은 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정책 수혜는 적용 범위와 기업별 미국 노출을 확인한 뒤 평가해야 하며, 90%를 국내 ESS 업종 전체에 적용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;중국 AI 투자 규모가 미국의 특정 비율에 해당하고 중국 내 메모리 대체 시장이 크다는 주장이나, 자막에는 미국의 1 정도로만 남아 있다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:48&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.15,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;중국 AI 투자는 미국의 1 정도&quot;,
+        &quot;observed&quot;: &quot;비율 unavailable; 1배·10%·특정 분수 중 어느 것으로도 확정할 수 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;누락된 비율을 복원하기 전에는 국가별 AI 투자 규모나 메모리 대체 수요 추정에 사용하면 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;주성엔지니어링·PSK·TSA와 2차전지는 장중 반등했고 창신메모리 투자에 따른 장비 수요가 대안 투자 논리를 제공했으며, 변압기는 진부화가 느리지만 밸류에이션 부담이 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:48&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;장 초반 하락 후 반등; 구체적 등락률·수주액·밸류에이션 배수는 제시되지 않음&quot;,
+        &quot;observed&quot;: &quot;해당 거래일 장중 가격과 기업별 계약·배수는 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;일반적인 설비투자 수혜 가능성을 특정 기업의 확정 수주나 실적 증가로 연결하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;인텔·브로드컴 CEO가 10월 12일 DBS 또는 도이치뱅크 컨퍼런스에서 AI 수요는 많지만 자금조달이 병목일 수 있다고 말했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:28&quot;,
+      &quot;source_confidence&quot;: 0.6,
+      &quot;asr_confidence&quot;: 0.3,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 12일 컨퍼런스 발언&quot;,
+        &quot;observed&quot;: &quot;연도·정확한 행사명·발언자·발언일은 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;자금조달 제약을 해당 기업 CEO의 확인된 발언이나 업계 수요 전망으로 인용하기 전에 원문을 확보해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;오라클 임차 데이터센터의 주피터 프로젝트가 중단되고 블루아울 관련 상품 가격이 액면 100에서 85센트로 떨어졌지만, 오라클 주가는 최근 상승했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:50&quot;,
+      &quot;source_confidence&quot;: 0.67,
+      &quot;asr_confidence&quot;: 0.4,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;액면 100 대비 85센트 및 오라클 최근 상승&quot;,
+        &quot;observed&quot;: &quot;ORCL 단일 스냅샷 143.2만 제공돼 기간 수익률은 unavailable. 같은 액면 기준의 100→85라면 산술상 15% 할인이나 실제 가격 하락·거래 사실은 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;프로젝트 운영 상태, 자금조달 사건, 금융상품 가격, ORCL 수익률을 각각 확인해야 하며, 이 사례만으로 AI 투자 전반의 위험을 배제할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;name&quot;: &quot;창신메모리&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자에 따르면 6F²에서 4F²로 전환하는 기술의 연말 양산 계획을 발표했으나, 실제 수율과 품질 인증을 검증할 데이터는 아직 없다.&quot;,
+        &quot;출연자는 미세공정 격차를 보완하고 서버 시장에 진입하려는 전략으로 해석한다. 성공하면 기존 업체의 경쟁 부담이 커지지만, 생산성이 기대에 못 미치면 오히려 메모리 공급 부담이 줄 수 있다고 본다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;발표 시점은 &#x27;10월 11일인가&#x27;로, 장소는 상하이의 기술 관련 행사로 언급됐다. 정확한 행사명은 불명확하다.&quot;,
+        &quot;양산 목표는 영상상 올해 연말이며, 결과 확인에 약 3~4개월이 필요하다고 언급했다.&quot;,
+        &quot;6F²→4F² 전환으로 같은 웨이퍼에서 칩 수가 약 35% 또는 &#x27;30몇%&#x27; 증가하고, 이론적으로 원가가 30% 이상 낮아질 수 있다고 주장했다. 별도로 셀 면적을 &#x27;반&#x27;으로 줄인다는 발언도 있어 수치 간 정합성 확인이 필요하다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:26:31.421702+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;name&quot;: &quot;삼성전자&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 창신메모리 이슈가 삼성전자 급락의 유일한 원인은 아니며, 이미 실적 악화 우려가 반영된 주가에 국내 수급 취약성과 대체 투자처로의 자금 이동이 추가로 작용했다고 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;국내 메모리 주가 하락을 &#x27;그저께 4%&#x27;, &#x27;어저께 10%&#x27; 수준으로 언급했으나 종목별 수치는 구분되지 않는다.&quot;,
+        &quot;삼성전자·SK하이닉스·마이크론의 핵심 반도체 가격과 이익이 영상상 올해 4분기 및 내년 1분기에 내려갈 가능성은 거의 없다는 출연자의 전망이다.&quot;,
+        &quot;주가는 실적보다 약 6~9개월 이상 선행한다고 설명했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:26:36.336005+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;name&quot;: &quot;SK하이닉스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 삼성전자와 SK하이닉스가 4F² 기술을 준비하지 않은 것이 아니라, 식각 비용·생산성 문제와 HBM 수요 등을 고려해 무리한 양산 전환을 서두르지 않았다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;마이크론과 &#x27;하이닉스 ADR&#x27;이 약 3%대 하락했고, 국내 주가는 그보다 2~3배 이상 하락했다는 비교가 제시됐다. ADR의 정확한 상품과 거래일은 불명확하다.&quot;,
+        &quot;이익이 향후 30~50% 감소할 수 있다는 두려움이 기존 메모리 주가에 이미 반영됐다는 해석이다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:26:39.256888+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;name&quot;: &quot;마이크론&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자에 따르면 마이크론은 중간 단계인 4F² 전환을 건너뛰고 기존 미세공정과 HBM 적용을 진행하면서 장기적으로 3D 전환을 추진한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;3D 전환 목표 시점으로 2030년쯤을 언급했다.&quot;,
+        &quot;영상상 내년 실적 기준 이익배수는 약 5.5배라고 제시했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:26:42.247170+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;name&quot;: &quot;샌디스크&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 미국 상장 메모리가 메모리 실적 상승 가능성에 대한 노출을 유지하려는 투자자의 대안으로 선택되면서 국내 메모리보다 상대적으로 덜 하락한다고 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;이익배수 약 6.4배가 제시됐으나 정확한 실적 기준연도와 산출 자료는 불명확하다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:26:45.736505+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;name&quot;: &quot;엔비디아&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 자체 신제품으로 시장을 확대하는 기술 발전과 경쟁자 등장으로 기존 제품 가치가 낮아지는 진부화를 구분하며, 엔비디아의 과거 고성장을 전자의 사례로 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;고성장 초기의 이익배수 예시로 30배·40배·50배를 들었다. 엔비디아의 특정 시점 실제 배수로 확정한 수치는 아니다.&quot;,
+        &quot;경쟁자 등장 시 2~3년 뒤 이익에 대한 불확실성이 멀티플을 낮출 수 있다고 설명했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:26:49.159175+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;name&quot;: &quot;TSMC&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 이번 매도가 AI·반도체 전체보다 메모리에 집중됐으며, 창신메모리 경쟁 우려와 직접 관계가 적은 TSMC 및 미국 빅테크가 대체 투자처로 선택됐다고 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:26:52.145469+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;name&quot;: &quot;2차전지·ESS 업종&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 2차전지도 기술 진부화 위험이 있지만, 미국의 중국 경쟁사 제한과 미국 중심 ESS 수요 때문에 이번에는 메모리와 다르게 취급되며 자금 이동의 대상이 됐다고 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;문맥상 국내 관련 업체의 ESS 수요가 미국에서 거의 90% 나온다고 주장했으나 대상 기업·기간은 명시되지 않는다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:26:54.899125+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;name&quot;: &quot;변압기 업종&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 변압기가 기술 진부화 속도가 상대적으로 느린 투자처지만 현재 밸류에이션은 아주 편하지 않으며, 추가 하락 시 가격 부담이 완화될 수 있다고 본다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:26:58.254041+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+      &quot;name&quot;: &quot;반도체 소재·부품·장비 업종&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 창신메모리의 성공 여부와 별개로 투자에 따른 장비·부품 수요가 생길 수 있어, 관련 소부장이 메모리 제조사와 다른 투자 논리로 선택됐다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNAVAILABLE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:27:01.526860+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ORCL&quot;,
+      &quot;name&quot;: &quot;오라클&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 오라클 관련 임차 데이터센터 프로젝트 중단과 자금조달 우려 사례가 있었는데도 오라클 주가는 최근 상승했다며, 이번 하락을 AI 투자 전반의 문제로만 설명하기 어렵다는 근거로 제시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;블루아울 관련 맥락에서 &#x27;액면가 100센트가 아니라 85센트&#x27;라는 가격 발언이 나오지만 해당 금융상품과 단위는 불명확하다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ORCL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-14T00:27:04.182932+00:00&quot;,
+        &quot;current_price&quot;: 143.2,
+        &quot;market_cap&quot;: 434110964536.8,
+        &quot;forward_pe&quot;: 13.019377,
+        &quot;trailing_pe&quot;: 22.44514,
+        &quot;fifty_two_week_high&quot;: 322.54,
+        &quot;fifty_two_week_low&quot;: 114.5,
+        &quot;average_target_price&quot;: 237.97415,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Marvell Is Up 214% in 2026 While Broadcom Is Only Up 3%: Take Profits on MRVL Stock, or Hold On for the Ride?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/marvell-214-2026-while-broadcom-190011776.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T19:00:11+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Marvell Is Up 214% in 2026 While Broadcom Is Only Up 3%: Take Profits on MRVL Stock, or Hold On for the Ride? Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politic...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;U.S. Economy Faces New Shock as Americans Absorb $2,000 Hit&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/economy/articles/u-economy-faces-shock-americans-184317010.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T18:43:17+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;U.S. Economy Faces New Shock as Americans Absorb $2,000 Hit Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Stock Market Holds Up As Meta, AMD Lead Buys; ASML, CPI Inflation Due&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/02b2fe19-36e5-3f96-ac0e-2dc2cf84ceb1/dow-jones-futures%3A-stock.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-14T00:14:32+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Stocks to Watch Recap: UnitedHealth, J&amp;J, JPMorgan, Micron&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/970b88dd-f7ff-3c76-ad72-aeb4453783b3/stocks-to-watch-recap%3A.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T21:45:27+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Stock Market Today, Oct. 13: Fermi Surges 14% on AMD Credit Support for Project Matador&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-13-211426384.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T21:14:26+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;AMD Stocks Slip 1.2% Although Sweden Deployment Broadens Its AI Reach&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/amd-stocks-slip-1-2-190816978.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T19:08:16+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;IREN Slides 5% as Anthropic Cloud Report Buzz Fades; Core Scientific Falls 3%&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/iren-slides-5-anthropic-cloud-134820183.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T13:48:20+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;Stock market today: Dow, S&amp;P 500, Nasdaq slip as chip stocks fall, earnings roll in&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/live/stock-market-today-tuesday-october-13-dow-sp-500-nasdaq-chip-stocks-192419999.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-13T23:27:32+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
