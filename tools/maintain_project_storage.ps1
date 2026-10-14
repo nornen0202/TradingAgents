@@ -15,6 +15,7 @@ param(
     [int]$RepositoryArtifactRetentionDays = 30,
     [ValidateRange(1, 3650)]
     [int]$CodexAttachmentRetentionDays = 30,
+    [string]$ExtendedPolicyPath = "",
     [string]$LogPath = "C:\TradingAgentsData\automation-logs\storage-maintenance.log",
     [switch]$Apply
 )
@@ -404,6 +405,26 @@ try {
                 Remove-ValidatedTree -Path $directory.FullName -Root $attachmentRoot -Reason "Codex attachment cache older than $CodexAttachmentRetentionDays days"
             }
         }
+    }
+
+    if ([string]::IsNullOrWhiteSpace($ExtendedPolicyPath)) {
+        $ExtendedPolicyPath = Join-Path $PSScriptRoot "storage-policy.json"
+    }
+    if (Test-Path -LiteralPath $ExtendedPolicyPath -PathType Leaf) {
+        $extendedConfig = Get-Content -LiteralPath $ExtendedPolicyPath -Raw | ConvertFrom-Json
+        $extendedScript = Join-Path $PSScriptRoot "maintain_codex_storage_policy.py"
+        if (-not (Test-Path -LiteralPath $extendedScript -PathType Leaf)) {
+            throw "Configured Codex storage policy helper is missing."
+        }
+        $extendedArguments = @($extendedScript, "--config", $ExtendedPolicyPath)
+        if ($Apply) { $extendedArguments += "--apply" }
+        $extendedOutput = & $extendedConfig.python_executable @extendedArguments
+        $extendedExitCode = $LASTEXITCODE
+        foreach ($line in @($extendedOutput)) {
+            Write-Output $line
+            Write-MaintenanceLog "CODEX_STORAGE $line"
+        }
+        if ($extendedExitCode -ne 0) { throw "Codex storage policy failed; originals without verified backups were preserved." }
     }
 
     $summary = "SUMMARY time=$($startedAt.ToString('s')) mode=$(if ($Apply) {'apply'} else {'dry-run'}) planned_items=$script:plannedItems planned_bytes=$script:plannedBytes removed_items=$script:removedItems removed_bytes=$script:removedBytes runner_busy=$runnerBusy"

@@ -1,0 +1,20 @@
+{
+  "enabled": false,
+  "python_executable": "C:\\Path\\To\\python.exe",
+  "system_drive": "C:\\",
+  "warning_free_bytes": 32212254720,
+  "backup_root": "L:\\CodexBackups\\storage-policy",
+  "journal_root": "G:\\CodexData\\storage-policy-journal",
+  "volumes": {"G:\\": "REPLACE_WITH_SERIAL", "L:\\": "REPLACE_WITH_SERIAL"},
+  "documents": {
+    "root": "C:\\Users\\YOUR_USER\\Documents\\Codex",
+    "destination_root": "G:\\CodexData\\Documents\\Codex",
+    "retention_days": 7
+  },
+  "archive_roots": ["C:\\TradingAgentsData\\archive\\runs"],
+  "workers": [
+    {"id": "live-workers", "root": "G:\\TradingAgentsRuntime\\codex-workspace\\workers", "retention_days": 7, "keep_latest": 2}
+  ],
+  "crash_dumps": {"root": "C:\\Users\\YOUR_USER\\AppData\\Local\\CrashDumps", "retention_days": 7, "keep_latest": 2},
+  "uv_cache": {"executable": "C:\\Path\\To\\uv.exe", "root": "G:\\CodexData\\uv-cache"}
+}
