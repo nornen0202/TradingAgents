@@ -1223,7 +1223,7 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
             raise StructuredDecisionValidationError("Conditional buying requires timezone-aware valid_until") from exc
         valid_until = expires.isoformat()
 
-    return StructuredDecision(
+    decision = StructuredDecision(
         rating=rating,
         portfolio_stance=portfolio_stance,
         entry_action=entry_action,
@@ -1253,6 +1253,13 @@ def parse_structured_decision(payload: str | Mapping[str, Any]) -> StructuredDec
         risk_action_level=risk_action_level,
         profit_taking_plan=profit_taking_plan,
     )
+    # String/partial bounds can become numeric only during normalization. Check
+    # that representation before returning it, while bounded LLM repair still
+    # owns validation failures rather than a later signal/artifact consumer.
+    conflicts = explicit_price_range_conflicts(decision.to_dict())
+    if conflicts:
+        raise ExplicitPriceRangeConflictError("structured_price_range_conflict: " + "; ".join(conflicts))
+    return decision
 
 
 def ensure_structured_decision_json(payload: str | Mapping[str, Any]) -> str:

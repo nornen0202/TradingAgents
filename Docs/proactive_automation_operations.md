@@ -174,6 +174,30 @@ override stale quotes or execution gates.
 
 ## Recovery decisions
 
+### A normalized decision fails price-range validation at final signal extraction
+
+The October 15 KR run `20261015T055359_local-scheduler-kr-full` rejected
+`010140.KS` at final signal extraction: normalized bounds `[19, 19160]`
+contradicted the literal `19,160~19,570원` range. Its error artifact did not retain
+the original LLM response, so do not infer its original bound types. A regression
+reproduces this validation escape with string or partially populated bounds:
+raw validation skips them, normalization creates numeric bounds, and a subsequent
+parse rejects them. Validate the normalized representation inside the original
+parser as well, so the existing bounded decision repair handles that failure.
+Keep the literal-price guard and retry limit; never repair the stored prices by
+guessing or relax the execution gate.
+
+Leave healthy ticker workers running. After the producer finishes, inspect its
+immutable manifest and recover only failed tickers with a compatible source,
+reusing successful research. A code fix or a partially completed run alone does
+not establish full coverage, publication, or delivery.
+
+The local scheduler now passes its newest terminal partial cohort from the same
+market/production window to `--resume-from-run`. The existing runner validates
+exact research settings, loaded account, selected coverage and successful
+artifacts before reuse. An incompatible source fails closed within the existing
+cumulative attempt budget; it does not silently become another full analysis.
+
 ### Local storage exhaustion after completed ticker research
 
 On October 14, all thirty KR ticker workers completed, but postprocessing failed

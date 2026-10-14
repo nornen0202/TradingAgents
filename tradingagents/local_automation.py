@@ -213,6 +213,33 @@ def completed_target(manifest, target, *, window_start=None):
     return manifest.get("status") == "success" and int((manifest.get("summary") or {}).get("failed_tickers", 0)) == 0
 
 
+def partial_target_source(manifests, target, *, window_start, now):
+    """Select a terminal local partial cohort; the runner validates reuse strictly."""
+    if target.workflow_file != "daily-codex-analysis.yml":
+        return None
+    profile = target.inputs["profile"]
+    for manifest in manifests:  # Canonical iterator is newest first.
+        settings = manifest.get("settings") or {}
+        summary = manifest.get("summary") or {}
+        if (manifest.get("label") != f"local-scheduler-{profile}-full"
+                or str(settings.get("market", "")).lower() != profile
+                or settings.get("run_mode") != "full" or settings.get("analysis_mode", "full") != "full"
+                or manifest.get("status") not in {"partial_failure", "failed"}
+                or not summary.get("successful_tickers") or not summary.get("failed_tickers")):
+            continue
+        try:
+            started = datetime.fromisoformat(manifest["started_at"].replace("Z", "+00:00"))
+            finished = datetime.fromisoformat(manifest["finished_at"].replace("Z", "+00:00"))
+        except (KeyError, TypeError, ValueError, AttributeError):
+            continue
+        if started.tzinfo and finished.tzinfo and window_start <= started <= finished <= now:
+            source = manifest.get("run_id")
+            if not isinstance(source, str) or not source:
+                raise ValueError("Partial local research has no recovery source run ID")
+            return source
+    return None
+
+
 def run_due(archive, state, *, now=None, dry_run=False):
     from tradingagents.scheduled.automation_calendar import automated_market_session_status
     from tradingagents.scheduled.runner import _iter_run_manifests_desc
@@ -270,6 +297,11 @@ def run_due(archive, state, *, now=None, dry_run=False):
             workspace = load_scheduled_config(config).llm.codex_workspace_dir
             require_storage_headroom(archive, state, workspace)
             if mode == "full":
+                source = partial_target_source(manifests, target, window_start=window_start, now=now)
+                if source:
+                    # Never fall back to full research if source compatibility
+                    # or artifact validation rejects this failed-only recovery.
+                    args.extend(["--resume-from-run", source])
                 preflight(config)
             stage = "analysis"
             result = subprocess.run(args, cwd=ROOT, check=False, timeout=12 * 3600)
