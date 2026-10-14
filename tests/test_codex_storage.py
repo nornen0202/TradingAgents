@@ -134,6 +134,17 @@ def test_partial_date_does_not_overwrite_existing_destination(tmp_path):
     assert Path(items[0]["source"]).name == "closed-chat"
 
 
+def test_partial_date_preserves_another_transactions_staged_original(tmp_path):
+    root, destination = tmp_path / "documents", tmp_path / "offloaded"
+    date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+    stage = root / date / "closed-chat.storage-original"
+    stage.mkdir(parents=True)
+    (stage / "payload.txt").write_text("owned by another migration")
+    (destination / date).mkdir(parents=True)
+    assert policy.candidates({"documents": {"root": str(root), "destination_root": str(destination)}}) == []
+    assert (stage / "payload.txt").read_text() == "owned by another migration"
+
+
 def test_wrong_volume_blocks_changes(monkeypatch):
     monkeypatch.setattr(storage, "volume_serial", lambda path: "WRONG")
     with pytest.raises(RuntimeError, match="not mounted"):
