@@ -1,8 +1,8 @@
 {
   "schema": "tradingagents.work-report/v1",
   "surface": "prism",
-  "event_id": "prism:f75da4b69832815ec00ee6982975e17c",
-  "source_sha256": "ad843ce394823bc3bc033e233df5410db95d44247b9ebf7a933a601723206b09",
+  "event_id": "prism:384f4006dbdb9dac33a107ddee373772",
+  "source_sha256": "5391047dc2950527b81767f235ff50f594f1e474359c57a5b3917bbf0358c3b0",
   "prompt_contract_version": "prism-work-v5",
   "workflow_contract_sha256": "affa33ed518a96ac60bff25950a3fe646a7ff652ceb8d1ab5a9f50dde0362c75",
   "policy": {
@@ -17,202 +17,339 @@
     "external_evidence_may_bypass_execution_gate": false,
     "thesis_is_independent_from_execution_readiness": true
   },
-  "report_markdown": "# PRISM 새 메시지 12개 — HPSP 위험 재검증, 시뮬레이터·BTC 데모 분리\n\n작성 2026-10-13 16:16:23 KST · source health **OK** · 연구 참고 전용\n\n## 핵심 변화\n\n- 수집기는 2026-10-13 12:56 KST 성공, 현재 24시간 창의 새 메시지 12개를 모두 전달했습니다. 07:26~10:04 KST 게시물이며 수집 이후 새 소식의 존재 여부는 이번 packet에서 확인할 수 없습니다.\n- HPSP 손절 매도 주장 1건은 정규화 방향 UNKNOWN입니다. 실제 주식 주문으로 확정하지 않고 하방 위험의 공식 자료 재검증 우선순위를 높입니다.\n- 샘씨엔에스·팬오션 HOLD 2건은 명시적 시뮬레이터 스냅샷입니다. BTC 데모 기록 9개와 운영 공지 1개를 실제 주식 실행과 분리했습니다.\n- 실행 가능한 신규 지시는 없습니다. NO_ACTIONABLE_DELTA. KR·US 기존 시장·계좌·위험 제한을 유지합니다.\n\n## 범위와 신선도\n\n정본 수집은 12:56:32 KST에 성공했습니다. 게시 시각은 오늘 07:26:26~10:04:25 KST이며 모두 응답 시점 24시간 이내입니다. 미래 시각·역전·파싱 오류가 없습니다. 새 이벤트 12, revision 0, 동일 이벤트 제외 0, 전송 12, 생략 0, 잘림 없음입니다. 이는 이번 packet의 24시간 창 전송 범위이며 채널 전체 이력이나 수집 후 현재까지의 전수 확인을 뜻하지 않습니다. 누적 고유 이력은 158개입니다.\n\n## 종목별 연구 영향\n\n| 종목 | 신호와 구분 | 연구 반영 | 실행 |\n|---|---|---|---|\n| HPSP (403870.KQ) | 채널의 손절 매도 주장 / 정규화 UNKNOWN | 09:56 게시물은 손절선 이탈 매도를 주장하지만 정규화 방향은 UNKNOWN입니다. 실제 체결·포트폴리오 구분도 검증되지 않았으므로 매도 방향을 확정하지 않고 하방 위험 재검증 우선순위만 높입니다. | 연구 참고만 · 실제 매매 지시 없음 |\n| 샘씨엔에스 (252990.KS) | 시뮬레이터 HOLD | 시뮬레이터 보유 스냅샷의 HOLD이며 실제 사용자 보유나 주문 신호가 아닙니다. 종목 식별·거래소와 공식 시세를 확인할 연구 대상으로만 남깁니다. | 연구 참고만 · 실제 매매 지시 없음 |\n| 팬오션 (028670.KS) | 시뮬레이터 HOLD | 시뮬레이터 보유 스냅샷의 HOLD이며 다중 종목 메시지입니다. 가격·목표·손절의 종목별 매핑이 검증되지 않아 수치 조건으로 사용하지 않고 공식 공시·시세 재검증만 제안합니다. | 연구 참고만 · 실제 매매 지시 없음 |\n\nHPSP 게시물의 매수가 62,200원·매도가 59,100원·손절선 59,655원 및 장중 여유선 59,357원은 채널의 과거 주장입니다. 응답 시점 시세나 사용자 주문 가격이 아니며 공식 검증 전에는 현재 매매 조건으로 사용하지 않습니다. 가격 하락이나 실제 체결을 독립 확인한 결과로 표현하지 않습니다.\n\n샘씨엔에스·팬오션은 하나의 다중 종목 메시지에 포함됐습니다. 원본 canonical ticker를 그대로 보존했고 거래소 표기와 종목별 가격 매핑은 다음 검증 대상으로 남겼습니다. 시뮬레이션 수익률을 사용자의 실현 손익으로 취급하지 않습니다. 각 신호의 채널 점수 0.45는 독립 검증 신뢰도가 아닙니다.\n\n## 모든 새 메시지의 처리\n\n| 이벤트 | 게시 KST | 분류 | 확인한 변화·처리 |\n|---|---|---|---|\n| [stock_ai_agent:15998](https://t.me/stock_ai_agent/15998) | 10-13 07:26:26 | BTC 데모 진입 | 07:25 숏 데모 진입 기록. 실제 계좌 거래로 해석하지 않음. |\n| [stock_ai_agent:15999](https://t.me/stock_ai_agent/15999) | 10-13 07:59:27 | BTC 데모 부분 종료 | 부분 익절 및 수수료·펀딩 정산 미확정. 확정 손익으로 승격하지 않음. |\n| [stock_ai_agent:16000](https://t.me/stock_ai_agent/16000) | 10-13 08:01:26 | BTC 데모 보호 변경 | 숏 손절선 변경 기록. 주식 실행에서 제외. |\n| [stock_ai_agent:16001](https://t.me/stock_ai_agent/16001) | 10-13 08:06:25 | BTC 데모 종료 | 08:06 시나리오 종료·정산 주장. 실제 주식 손익과 분리. |\n| [stock_ai_agent:16002](https://t.me/stock_ai_agent/16002) | 10-13 08:46:25 | BTC 데모 진입 | 08:45 숏 데모 진입 기록. 실제 계좌 거래로 해석하지 않음. |\n| [stock_ai_agent:16003](https://t.me/stock_ai_agent/16003) | 10-13 09:26:26 | BTC 데모 보호 변경 | 숏 손절선 변경 기록. 주식 실행에서 제외. |\n| [stock_ai_agent:16004](https://t.me/stock_ai_agent/16004) | 10-13 09:30:12 | 채널 운영 공지 | 시장 조정을 이유로 오전 분석을 쉬고 종가 확인 시간대 하루 한 번 분석하겠다는 채널 계획. TradingAgents 일정은 변경하지 않음. |\n| [stock_ai_agent:16005](https://t.me/stock_ai_agent/16005) | 10-13 09:46:26 | BTC 데모 보호 변경 | 숏 보호선 변경 기록. 주식 실행에서 제외. |\n| [stock_ai_agent:16006](https://t.me/stock_ai_agent/16006) | 10-13 09:56:43 | 검증 전 주식 주장 | HPSP 손절선 이탈 매도 주장. 정규화 UNKNOWN 보존, 공식 하방 위험 재검증 우선. |\n| [stock_ai_agent:16007](https://t.me/stock_ai_agent/16007) | 10-13 09:56:48 | 주식 시뮬레이터 | 샘씨엔에스·팬오션 2개 HOLD 스냅샷. 실제 보유·가격 매핑 검증 전 연구 참고. |\n| [stock_ai_agent:16008](https://t.me/stock_ai_agent/16008) | 10-13 10:01:26 | BTC 데모 보호 변경 | 숏 보호선 변경 기록. 주식 매도·위험 한도로 전환하지 않음. |\n| [stock_ai_agent:16009](https://t.me/stock_ai_agent/16009) | 10-13 10:04:25 | BTC 데모 종료 | 10:03 시나리오 종료·정산 주장. 실제 주식 신호에서 제외. |\n\nBTC 9개 메시지는 원본 정규화의 simulation_only=false와 달리 요약 본문에 모두 ‘데모’가 명시돼 있습니다. 원본 값은 보존하면서 내용상 데모로 분리했습니다. HPSP의 실제·가상 계좌 구분 역시 이 packet만으로 단정하지 않습니다.\n\n## KR·US에 전달할 검증 항목\n\n- KR: HPSP 하방 위험의 공식 공시·거래소 가격 재검증을 우선합니다. 다음 정본 시장 packet의 종목 및 보유 여부를 확인한 뒤 연구 우선순위에만 반영하며, 현재 시장·계좌·위험 제한을 해제하지 않습니다.\n- KR: 시뮬레이터 2종목은 공식 종목 식별, 공시·기업 IR 및 실제 시장 자료를 확인할 연구 참고로만 보존합니다. 신뢰도·매수 규모를 올릴 근거로 사용하지 않습니다.\n- US: 매핑된 미국 주식 신호가 없습니다. BTC 데모를 US 주식 방향으로 투영하지 않으며 기존 논지와 위험 한도를 유지합니다.\n\n## 다음 확인\n\n2026-10-13 17:00 KST 다음 운영 점검에서 후속 수집 여부를 확인합니다. 종가 분석 예고는 채널의 계획이며 실행 보장이 아닙니다. 종목 판단 전에는 거래소 시세·공시·기업 IR 및 최신 계좌·시장·위험 gate를 다시 검증합니다.\n\n실행 가능한 신규 주식 행동: **NO_ACTIONABLE_DELTA**. ACK는 이 12개 이벤트를 보고서로 처리했다는 확인이며 생산 신선도·실제 외부 발송을 보증하지 않습니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:f75da4b69832815ec00ee6982975e17c\",\"status\":\"COMPLETE\",\"window_events\":12,\"transmitted_events\":12,\"truncated\":false,\"new_events\":12,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "report_markdown": "# PRISM 신규 15건 — US 세 종목 미진입과 시장 국면 재검증\n\n작성 2026-10-14 10:40 KST · source health **OK** · 연구 참고 전용\n\n## 핵심 델타\n\n- PRISM 정본 수집은 10:23 KST 성공. 새 메시지 15개가 24시간 창에서 15/15 전송됐고 수정·누락·잘림은 없습니다.\n- SLS·BBVA·INTR은 초기 관심 신호 뒤 각각 미진입으로 바뀌었습니다. 세 종목의 유리한 순위·확신도 상향을 보류하고 공식 위험 검증 우선순위를 높입니다.\n- 09:30 KST 조정 공지는 03:48 KST 강세 설명과 충돌합니다. 시장 국면은 최신 정본 시장 자료로 재확인해야 합니다.\n- 6종목 보유 메시지는 프리즘 US 시뮬레이터입니다. 실제 계좌·주문·포지션 크기로 해석하지 않습니다.\n- 새 실행 지시는 없습니다. KR 직접 종목 신호도 없으며 시장·계좌·위험 gate는 그대로 적용됩니다.\n\n## 범위·신선도\n\n수집기 성공 2026-10-14 10:23:07 KST. 게시 시각은 2026-10-14 03:48:14~09:30:13 KST이며 응답 시점 기준 모두 24시간 안입니다. 미래 시각·역전·파싱 오류는 없습니다. 새 15, 수정 0, 중복 제외 0, 전송 15/15, 생략 0, 잘림 없음입니다. 누적 고유 이력 173건은 현 창의 신규 건수와 구분합니다. 수집 이후 새 게시물의 존재 여부는 이 패킷으로 알 수 없습니다.\n\n## 종목별 연구 영향\n\n| 종목 | 초기→후속 | 후속 브리핑 반영 | 실행 |\n|---|---|---|---|\n| INTR | WATCH→미진입 | 최근 두 분기 영업이익 검증 불가·확정 촉매 부재. 유리한 순위·확신도 상향 보류, 공식 근거 확인 우선 | 연구 전용; 신규 진입 지시 없음 |\n| BBVA | WATCH→미진입 | 채널 기준 50일선 아래·하락 추세 차단. 유리한 순위·확신도 상향 보류, 공식 근거 확인 우선 | 연구 전용; 신규 진입 지시 없음 |\n| SLS | WATCH→미진입 | 채널 기준 50일선 아래·임상 촉매 검증 필요. 유리한 순위·확신도 상향 보류, 공식 근거 확인 우선 | 연구 전용; 신규 진입 지시 없음 |\n\n초기 관심 16045의 강세장 문구와 후속 16059의 조정 공지는 같은 시점의 독립 시장 판정이 아닙니다. 후속 시장 패킷에서 국면을 재확인해야 합니다. 채널 점수 0.2·0.45·0.82는 독립 신뢰도나 포지션 크기가 아닙니다. 현재 가격·50일선·수익성·임상 촉매를 이 패킷만으로 확정하지 않습니다.\n\n## 시뮬레이션·기타 자료\n\n16058의 FRO·NVDA·FRSH·BKH·IOVA·BP HOLD는 **프리즘 US 시뮬레이터**의 가상 보유입니다. 실제 사용자 계좌나 주문 상태가 아닙니다. FRSH·BKH·IOVA·BP의 목표·손절은 다중 종목 게시물에서 매핑 재검증 전 실행 조건으로 사용하지 않습니다. 16049~16051 PDF는 보관 본문이 없고 16052~16054는 차트 안내 문구만 있어 피벗·RS를 검증할 수 없습니다.\n\n## 새 이벤트 15건 처리\n\n| 이벤트 | 게시 KST | 분류·처리 |\n|---|---|---|\n| [stock_ai_agent:16045](https://t.me/stock_ai_agent/16045) | 10-14 03:48:14 | US 오후 관심종목 SLS·BBVA·INTR WATCH; 강세장 설명은 후속 공지와 충돌 |\n| [stock_ai_agent:16046](https://t.me/stock_ai_agent/16046) | 10-14 03:54:47 | SLS 소개·관측값; 확정 종가 및 임상 근거 미검증 |\n| [stock_ai_agent:16047](https://t.me/stock_ai_agent/16047) | 10-14 03:54:51 | BBVA 소개·관측값; 확정 종가 및 추세 미검증 |\n| [stock_ai_agent:16048](https://t.me/stock_ai_agent/16048) | 10-14 03:54:58 | INTR 소개·관측값; 수익성·신용위험 공식 검증 필요 |\n| [stock_ai_agent:16049](https://t.me/stock_ai_agent/16049) | 10-14 03:55:04 | SLS PDF 메타데이터만 전달; 본문 없음 |\n| [stock_ai_agent:16050](https://t.me/stock_ai_agent/16050) | 10-14 03:55:08 | BBVA PDF 메타데이터만 전달; 본문 없음 |\n| [stock_ai_agent:16051](https://t.me/stock_ai_agent/16051) | 10-14 03:55:14 | INTR PDF 메타데이터만 전달; 본문 없음 |\n| [stock_ai_agent:16052](https://t.me/stock_ai_agent/16052) | 10-14 03:55:28 | SLS 차트 주석 안내; 원본 수치 미검증 |\n| [stock_ai_agent:16053](https://t.me/stock_ai_agent/16053) | 10-14 03:55:42 | BBVA 차트 주석 안내; 원본 수치 미검증 |\n| [stock_ai_agent:16054](https://t.me/stock_ai_agent/16054) | 10-14 03:55:56 | INTR 차트 주석 안내; 원본 수치 미검증 |\n| [stock_ai_agent:16055](https://t.me/stock_ai_agent/16055) | 10-14 04:20:36 | SLS 미진입; 채널 기준 50일선 아래 |\n| [stock_ai_agent:16056](https://t.me/stock_ai_agent/16056) | 10-14 04:20:39 | BBVA 미진입; 채널 기준 50일선 아래 |\n| [stock_ai_agent:16057](https://t.me/stock_ai_agent/16057) | 10-14 04:20:42 | INTR 미진입; 최근 두 분기 영업이익 검증 불가 |\n| [stock_ai_agent:16058](https://t.me/stock_ai_agent/16058) | 10-14 04:20:44 | US 가상 포트폴리오 6종목 HOLD; 실제 보유 아님 |\n| [stock_ai_agent:16059](https://t.me/stock_ai_agent/16059) | 10-14 09:30:13 | 시장 조정 공지; 오전 분석 축소 계획, 실제 시장 국면 미검증 |\n\n## KR·US 전달 및 다음 확인\n\n- KR: 직접 종목 근거가 없습니다. 미국 조정 공지는 다음 KR 시장 국면 확인의 보조 신호이며, KR 종목 순위·확신도·크기를 바꾸지 않습니다.\n- US: INTR 영업이익·촉매, BBVA/SLS 추세, SLS 임상·공시를 공식 거래소·IR·공시로 검증합니다. 그 전에는 세 종목의 유리한 순위와 thesis 확신도를 높이지 않습니다.\n- 시장·계좌·위험 제한과 최신 가격·시장 세션을 다시 확인하기 전에는 진입·청산 지시를 만들지 않습니다. 기존 위험 한도 내 크기도 이번 채널 자료만으로 변경하지 않습니다.\n\n다음 성공한 sanitized producer run에서 후속 이벤트를 확인합니다. 가장 오래된 현 창 이벤트는 2026-10-15 03:48:14 KST에 24시간 범위를 벗어납니다. 공식 시세·공시·IR과 최신 시장·계좌·위험 gate를 별도 확인합니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:384f4006dbdb9dac33a107ddee373772\",\"status\":\"COMPLETE\",\"window_events\":15,\"transmitted_events\":15,\"truncated\":false,\"new_events\":15,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
   "structured_report": {
     "schema": "tradingagents.work-report/v1",
     "binding": {
       "surface": "prism",
-      "event_id": "prism:f75da4b69832815ec00ee6982975e17c",
-      "source_sha256": "ad843ce394823bc3bc033e233df5410db95d44247b9ebf7a933a601723206b09"
+      "event_id": "prism:384f4006dbdb9dac33a107ddee373772",
+      "source_sha256": "5391047dc2950527b81767f235ff50f594f1e474359c57a5b3917bbf0358c3b0"
     },
-    "title": "PRISM 새 메시지 12개 — HPSP 위험 재검증, 시뮬레이터·BTC 데모 분리",
-    "generated_at": "2026-10-13T16:16:23.067571+09:00",
-    "as_of": "2026-10-13T12:56:32.468186+09:00",
+    "title": "PRISM 신규 15건 — US 세 종목 미진입과 시장 국면 재검증",
+    "generated_at": "2026-10-14T10:40:11.458998+09:00",
+    "as_of": "2026-10-14T10:23:07.543003+09:00",
     "source_health": "OK",
     "report_mode": "RESEARCH_DELTA",
     "summary": [
-      "수집기는 2026-10-13 12:56 KST 성공, 현재 24시간 창의 새 메시지 12개를 모두 전달했습니다. 07:26~10:04 KST 게시물이며 수집 이후 새 소식의 존재 여부는 이번 packet에서 확인할 수 없습니다.",
-      "HPSP 손절 매도 주장 1건은 정규화 방향 UNKNOWN입니다. 실제 주식 주문으로 확정하지 않고 하방 위험의 공식 자료 재검증 우선순위를 높입니다.",
-      "샘씨엔에스·팬오션 HOLD 2건은 명시적 시뮬레이터 스냅샷입니다. BTC 데모 기록 9개와 운영 공지 1개를 실제 주식 실행과 분리했습니다.",
-      "실행 가능한 신규 지시는 없습니다. NO_ACTIONABLE_DELTA. KR·US 기존 시장·계좌·위험 제한을 유지합니다."
+      "PRISM 정본 수집은 10:23 KST 성공. 새 메시지 15개가 24시간 창에서 15/15 전송됐고 수정·누락·잘림은 없습니다.",
+      "SLS·BBVA·INTR은 초기 관심 신호 뒤 각각 미진입으로 바뀌었습니다. 세 종목의 유리한 순위·확신도 상향을 보류하고 공식 위험 검증 우선순위를 높입니다.",
+      "09:30 KST 조정 공지는 03:48 KST 강세 설명과 충돌합니다. 시장 국면은 최신 정본 시장 자료로 재확인해야 합니다.",
+      "6종목 보유 메시지는 프리즘 US 시뮬레이터입니다. 실제 계좌·주문·포지션 크기로 해석하지 않습니다.",
+      "새 실행 지시는 없습니다. KR 직접 종목 신호도 없으며 시장·계좌·위험 gate는 그대로 적용됩니다."
     ],
     "top_actions": [
       {
-        "action": "RESEARCH_PRIORITY",
+        "action": "RISK_RESEARCH_PRIORITY",
         "tickers": [
-          "403870.KQ"
+          "INTR",
+          "BBVA",
+          "SLS"
         ],
-        "reason": "HPSP 손절 매도 주장 1건은 정규화 방향 UNKNOWN입니다. 실제 주식 주문으로 확정하지 않고 하방 위험의 공식 자료 재검증 우선순위를 높입니다.",
+        "reason": "초기 WATCH보다 최신인 종목별 미진입 사유를 공식 근거로 재검증합니다. 유리한 순위·확신도 상향은 보류합니다.",
         "event_keys": [
-          "stock_ai_agent:16006"
+          "stock_ai_agent:16057",
+          "stock_ai_agent:16056",
+          "stock_ai_agent:16055"
+        ]
+      },
+      {
+        "action": "MARKET_REGIME_RECHECK",
+        "tickers": [],
+        "reason": "초기 강세 설명과 후속 조정 공지가 충돌합니다.",
+        "event_keys": [
+          "stock_ai_agent:16045",
+          "stock_ai_agent:16059"
         ]
       },
       {
         "action": "SIMULATION_REFERENCE_ONLY",
         "tickers": [
-          "252990.KS",
-          "028670.KS"
+          "FRO",
+          "NVDA",
+          "FRSH",
+          "BKH",
+          "IOVA",
+          "BP"
         ],
-        "reason": "시뮬레이터 스냅샷이며 수치 매핑 검증 전에는 실행에 사용하지 않습니다.",
+        "reason": "여섯 보유 종목은 가상 포트폴리오입니다. 다중 종목 가격·목표·손절의 매핑은 검증되지 않았습니다.",
         "event_keys": [
-          "stock_ai_agent:16007"
-        ]
-      },
-      {
-        "action": "NO_ACTIONABLE_DELTA",
-        "tickers": [],
-        "reason": "BTC 데모 및 채널 운영 공지는 실제 주식 실행 근거가 아닙니다.",
-        "event_keys": [
-          "stock_ai_agent:16009",
-          "stock_ai_agent:16008",
-          "stock_ai_agent:16005",
-          "stock_ai_agent:16004",
-          "stock_ai_agent:16003",
-          "stock_ai_agent:16002",
-          "stock_ai_agent:16001",
-          "stock_ai_agent:16000",
-          "stock_ai_agent:15999",
-          "stock_ai_agent:15998"
+          "stock_ai_agent:16058"
         ]
       }
     ],
     "strategies": [
       {
-        "ticker": "403870.KQ",
-        "display_name": "HPSP",
+        "ticker": "INTR",
         "rank": 1,
         "thesis": {
           "stance": "RESEARCH",
-          "research_priority": "HIGH",
-          "rationale": "09:56 게시물은 손절선 이탈 매도를 주장하지만 정규화 방향은 UNKNOWN입니다. 실제 체결·포트폴리오 구분도 검증되지 않았으므로 매도 방향을 확정하지 않고 하방 위험 재검증 우선순위만 높입니다.",
-          "data_needed_reason": "공식 공시·기업 IR·거래소 시세, 정확한 종목 및 계좌 보유 여부가 필요합니다. 채널의 0.45 점수는 독립 검증 확률이 아닙니다.",
-          "invalidation_action": "공식 자료로 검증하지 못하면 종목 실행 전략에 반영하지 않고 연구 참고 상태로 유지합니다."
+          "research_priority": "HIGH_RISK_RECHECK",
+          "rationale": "초기 WATCH 뒤 INTR 미진입 신호가 나왔습니다. 최근 두 분기 영업이익 검증 불가·확정 촉매 부재. 유리한 순위·확신도 상향을 보류하고 공식 근거 확인을 앞당깁니다.",
+          "data_needed_reason": "거래소 확정 시세·50일선과 기업 IR/공시, 촉매 및 시장 국면을 독립 확인해야 합니다. 채널 점수는 독립 검증 확률이 아닙니다.",
+          "invalidation_action": "공식 자료가 채널의 미진입 사유를 반박하거나 새로운 근거가 없으면 우선순위를 재평가하고 실행 판단에는 반영하지 않습니다.",
+          "horizon": "다음 공식 자료·정규장 확인 시점까지",
+          "sizing": "실행 자격 없음; 기존 위험 한도 내 크기 변경 제안 없음"
         },
         "execution": {
           "readiness": "RESEARCH_ONLY",
-          "as_of": "2026-10-13T00:56:43+00:00",
+          "as_of": "2026-10-13T19:20:42+00:00",
           "valid_until": null,
           "action_now": null,
           "action_if_triggered": null,
           "required_rechecks": [
-            "공식 종목 식별 및 거래소",
-            "최근 공식 공시와 기업 IR",
-            "당일 공식 시세와 시장 세션",
-            "사용자 계좌·포트폴리오·위험 gate"
+            "공식 시세와 시장 세션",
+            "기업 IR·공시 및 종목별 미진입 사유",
+            "최신 시장·계좌·위험 gate"
           ],
           "blockers": [
             "ADVISORY_ONLY",
             "UNVERIFIED_CHANNEL_SIGNAL",
-            "NORMALIZED_ACTION_UNKNOWN"
+            "NO_ENTRY",
+            "MARKET_REGIME_CONFLICT"
           ]
         },
         "source_contributions": [
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16006",
-            "content_sha256": "493668b120432a1acef992e650dcda2237f8fec019ad237e3d26e52e05278852",
+            "event_key": "stock_ai_agent:16045",
+            "content_sha256": "8d31176f35b9a98264dada374f712a97c942fa32b14c69a513be6f5e2f79a55b",
             "affected_field": "research_priority",
-            "direction": "INCREASE",
-            "reason": "09:56 게시물은 손절선 이탈 매도를 주장하지만 정규화 방향은 UNKNOWN입니다. 실제 체결·포트폴리오 구분도 검증되지 않았으므로 매도 방향을 확정하지 않고 하방 위험 재검증 우선순위만 높입니다.",
+            "direction": "WATCH_UNCONFIRMED",
+            "reason": "초기 관심종목 선정; 채널 주장으로 독립 검증 전입니다.",
             "evidence_weight": "LOW_LABELED",
-            "validation_status": "UNVERIFIED"
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16048",
+            "content_sha256": "fff150501537994eedd464f262db1142f47a7b54dc545deedba1e5ed4f4722b5",
+            "affected_field": "research_priority",
+            "direction": "CONTEXT_UNVERIFIED",
+            "reason": "종목 설명과 장중 관측치이며 확정 종가·공식 기업 근거는 검증되지 않았습니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16051",
+            "content_sha256": "0368f49e08ce69f207e74f8b94d10e595eb3c8d9f843c04949994fa8ebce9e39",
+            "affected_field": "research_priority",
+            "direction": "NO_PDF_BODY",
+            "reason": "PDF 신호 메타데이터만 있어 본문 주장을 검증할 수 없습니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16054",
+            "content_sha256": "699812ffaeae524c0f3693698bda620005097048ef24fe018d2876876cc7d55f",
+            "affected_field": "research_priority",
+            "direction": "RETAIN_RESEARCH_ONLY",
+            "reason": "차트 주석 안내만 전달됐고 피벗·상대강도 원본은 검증되지 않았습니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16057",
+            "content_sha256": "46aa0441a482c78bcd600135d5be30e5b4d8535f963d2cf5ece0b85b9ef5d82e",
+            "affected_field": "research_priority",
+            "direction": "INCREASE_RISK_RECHECK",
+            "reason": "후속 미진입 사유: 최근 두 분기 영업이익 검증 불가·확정 촉매 부재. 초기 WATCH보다 최신입니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
           }
         ]
       },
       {
-        "ticker": "252990.KS",
-        "display_name": "샘씨엔에스",
+        "ticker": "BBVA",
         "rank": 2,
         "thesis": {
           "stance": "RESEARCH",
-          "research_priority": "NORMAL",
-          "rationale": "시뮬레이터 보유 스냅샷의 HOLD이며 실제 사용자 보유나 주문 신호가 아닙니다. 종목 식별·거래소와 공식 시세를 확인할 연구 대상으로만 남깁니다.",
-          "data_needed_reason": "공식 공시·기업 IR·거래소 시세, 정확한 종목 및 계좌 보유 여부가 필요합니다. 채널의 0.45 점수는 독립 검증 확률이 아닙니다.",
-          "invalidation_action": "공식 자료로 검증하지 못하면 종목 실행 전략에 반영하지 않고 연구 참고 상태로 유지합니다."
+          "research_priority": "HIGH_RISK_RECHECK",
+          "rationale": "초기 WATCH 뒤 BBVA 미진입 신호가 나왔습니다. 채널 기준 50일선 아래·하락 추세 차단. 유리한 순위·확신도 상향을 보류하고 공식 근거 확인을 앞당깁니다.",
+          "data_needed_reason": "거래소 확정 시세·50일선과 기업 IR/공시, 촉매 및 시장 국면을 독립 확인해야 합니다. 채널 점수는 독립 검증 확률이 아닙니다.",
+          "invalidation_action": "공식 자료가 채널의 미진입 사유를 반박하거나 새로운 근거가 없으면 우선순위를 재평가하고 실행 판단에는 반영하지 않습니다.",
+          "horizon": "다음 공식 자료·정규장 확인 시점까지",
+          "sizing": "실행 자격 없음; 기존 위험 한도 내 크기 변경 제안 없음"
         },
         "execution": {
           "readiness": "RESEARCH_ONLY",
-          "as_of": "2026-10-13T00:56:48+00:00",
+          "as_of": "2026-10-13T19:20:39+00:00",
           "valid_until": null,
           "action_now": null,
           "action_if_triggered": null,
           "required_rechecks": [
-            "공식 종목 식별 및 거래소",
-            "최근 공식 공시와 기업 IR",
-            "당일 공식 시세와 시장 세션",
-            "사용자 계좌·포트폴리오·위험 gate"
+            "공식 시세와 시장 세션",
+            "기업 IR·공시 및 종목별 미진입 사유",
+            "최신 시장·계좌·위험 gate"
           ],
           "blockers": [
             "ADVISORY_ONLY",
             "UNVERIFIED_CHANNEL_SIGNAL",
-            "SIMULATION_ONLY",
-            "MULTI_TICKER_PRICE_MAPPING_UNVERIFIED"
+            "NO_ENTRY",
+            "MARKET_REGIME_CONFLICT"
           ]
         },
         "source_contributions": [
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16007",
-            "content_sha256": "7b4779f8fea4ed62238a6b9975c8ae93d5c27f2d8158744f18675a11450cc604",
+            "event_key": "stock_ai_agent:16045",
+            "content_sha256": "8d31176f35b9a98264dada374f712a97c942fa32b14c69a513be6f5e2f79a55b",
+            "affected_field": "research_priority",
+            "direction": "WATCH_UNCONFIRMED",
+            "reason": "초기 관심종목 선정; 채널 주장으로 독립 검증 전입니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16047",
+            "content_sha256": "fe5214ffda9dcd499f7c6c560cdf29d58bf51b775b5f68738a93b6af4fc35c40",
+            "affected_field": "research_priority",
+            "direction": "CONTEXT_UNVERIFIED",
+            "reason": "종목 설명과 장중 관측치이며 확정 종가·공식 기업 근거는 검증되지 않았습니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16050",
+            "content_sha256": "37638095fbb674a1f1ac712fad6fb02bba2ab486fff3a28e5946baa4d34a9a4e",
+            "affected_field": "research_priority",
+            "direction": "NO_PDF_BODY",
+            "reason": "PDF 신호 메타데이터만 있어 본문 주장을 검증할 수 없습니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16053",
+            "content_sha256": "0513f029cf62b765937c051972f18a85d75f7f4980bccb1d5cde580bad4c22dc",
             "affected_field": "research_priority",
             "direction": "RETAIN_RESEARCH_ONLY",
-            "reason": "시뮬레이터 보유 스냅샷의 HOLD이며 실제 사용자 보유나 주문 신호가 아닙니다. 종목 식별·거래소와 공식 시세를 확인할 연구 대상으로만 남깁니다.",
+            "reason": "차트 주석 안내만 전달됐고 피벗·상대강도 원본은 검증되지 않았습니다.",
             "evidence_weight": "LOW_LABELED",
-            "validation_status": "UNVERIFIED"
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16056",
+            "content_sha256": "7a22d7b7007ddff297aad1425e648a2108cad48b269ffcb2447bf2ae3cb43dc6",
+            "affected_field": "research_priority",
+            "direction": "INCREASE_RISK_RECHECK",
+            "reason": "후속 미진입 사유: 채널 기준 50일선 아래·하락 추세 차단. 초기 WATCH보다 최신입니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
           }
         ]
       },
       {
-        "ticker": "028670.KS",
-        "display_name": "팬오션",
+        "ticker": "SLS",
         "rank": 3,
         "thesis": {
           "stance": "RESEARCH",
-          "research_priority": "NORMAL",
-          "rationale": "시뮬레이터 보유 스냅샷의 HOLD이며 다중 종목 메시지입니다. 가격·목표·손절의 종목별 매핑이 검증되지 않아 수치 조건으로 사용하지 않고 공식 공시·시세 재검증만 제안합니다.",
-          "data_needed_reason": "공식 공시·기업 IR·거래소 시세, 정확한 종목 및 계좌 보유 여부가 필요합니다. 채널의 0.45 점수는 독립 검증 확률이 아닙니다.",
-          "invalidation_action": "공식 자료로 검증하지 못하면 종목 실행 전략에 반영하지 않고 연구 참고 상태로 유지합니다."
+          "research_priority": "HIGH_RISK_RECHECK",
+          "rationale": "초기 WATCH 뒤 SLS 미진입 신호가 나왔습니다. 채널 기준 50일선 아래·임상 촉매 검증 필요. 유리한 순위·확신도 상향을 보류하고 공식 근거 확인을 앞당깁니다.",
+          "data_needed_reason": "거래소 확정 시세·50일선과 기업 IR/공시, 촉매 및 시장 국면을 독립 확인해야 합니다. 채널 점수는 독립 검증 확률이 아닙니다.",
+          "invalidation_action": "공식 자료가 채널의 미진입 사유를 반박하거나 새로운 근거가 없으면 우선순위를 재평가하고 실행 판단에는 반영하지 않습니다.",
+          "horizon": "다음 공식 자료·정규장 확인 시점까지",
+          "sizing": "실행 자격 없음; 기존 위험 한도 내 크기 변경 제안 없음"
         },
         "execution": {
           "readiness": "RESEARCH_ONLY",
-          "as_of": "2026-10-13T00:56:48+00:00",
+          "as_of": "2026-10-13T19:20:36+00:00",
           "valid_until": null,
           "action_now": null,
           "action_if_triggered": null,
           "required_rechecks": [
-            "공식 종목 식별 및 거래소",
-            "최근 공식 공시와 기업 IR",
-            "당일 공식 시세와 시장 세션",
-            "사용자 계좌·포트폴리오·위험 gate"
+            "공식 시세와 시장 세션",
+            "기업 IR·공시 및 종목별 미진입 사유",
+            "최신 시장·계좌·위험 gate"
           ],
           "blockers": [
             "ADVISORY_ONLY",
             "UNVERIFIED_CHANNEL_SIGNAL",
-            "SIMULATION_ONLY",
-            "MULTI_TICKER_PRICE_MAPPING_UNVERIFIED"
+            "NO_ENTRY",
+            "MARKET_REGIME_CONFLICT"
           ]
         },
         "source_contributions": [
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16007",
-            "content_sha256": "7b4779f8fea4ed62238a6b9975c8ae93d5c27f2d8158744f18675a11450cc604",
+            "event_key": "stock_ai_agent:16045",
+            "content_sha256": "8d31176f35b9a98264dada374f712a97c942fa32b14c69a513be6f5e2f79a55b",
+            "affected_field": "research_priority",
+            "direction": "WATCH_UNCONFIRMED",
+            "reason": "초기 관심종목 선정; 채널 주장으로 독립 검증 전입니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16046",
+            "content_sha256": "76131915fed861cbd05569257473f00d8a9bc6796a92a2fee6655e6eb81b69a2",
+            "affected_field": "research_priority",
+            "direction": "CONTEXT_UNVERIFIED",
+            "reason": "종목 설명과 장중 관측치이며 확정 종가·공식 기업 근거는 검증되지 않았습니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16049",
+            "content_sha256": "67b66f60cd5d21415d08bc0e612755befd129bbb19736c554ef085de34c509f3",
+            "affected_field": "research_priority",
+            "direction": "NO_PDF_BODY",
+            "reason": "PDF 신호 메타데이터만 있어 본문 주장을 검증할 수 없습니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16052",
+            "content_sha256": "60af35b71600b28fa7113a7ba5cca993f5ae926ae9c30afeb38322ae52cc558b",
             "affected_field": "research_priority",
             "direction": "RETAIN_RESEARCH_ONLY",
-            "reason": "시뮬레이터 보유 스냅샷의 HOLD이며 다중 종목 메시지입니다. 가격·목표·손절의 종목별 매핑이 검증되지 않아 수치 조건으로 사용하지 않고 공식 공시·시세 재검증만 제안합니다.",
+            "reason": "차트 주석 안내만 전달됐고 피벗·상대강도 원본은 검증되지 않았습니다.",
             "evidence_weight": "LOW_LABELED",
-            "validation_status": "UNVERIFIED"
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16055",
+            "content_sha256": "e34a639c41c650690803e6332dc339d312dff38c3faf3d641d2a612ac57eee9e",
+            "affected_field": "research_priority",
+            "direction": "INCREASE_RISK_RECHECK",
+            "reason": "후속 미진입 사유: 채널 기준 50일선 아래·임상 촉매 검증 필요. 초기 WATCH보다 최신입니다.",
+            "evidence_weight": "LOW_LABELED",
+            "validation_status": "UNVERIFIED",
+            "execution_gate_override": false
           }
         ]
       }
     ],
     "coverage_receipt": {
-      "event_id": "prism:f75da4b69832815ec00ee6982975e17c",
+      "event_id": "prism:384f4006dbdb9dac33a107ddee373772",
       "status": "COMPLETE",
-      "window_events": 12,
-      "transmitted_events": 12,
+      "window_events": 15,
+      "transmitted_events": 15,
       "truncated": false,
-      "new_events": 12,
+      "new_events": 15,
       "revised_events": 0
     },
     "model_receipt": {
@@ -229,167 +366,346 @@
       }
     },
     "source_summary": {
-      "producer_run_id": "prism_telegram_20261013_125627",
-      "producer_last_run_at": "2026-10-13T12:56:32.468186+09:00",
+      "producer_run_id": "prism_telegram_20261014_102250",
+      "producer_last_run_at": "2026-10-14T10:23:07.543003+09:00",
       "producer_status": "success",
       "window_hours": 24,
-      "new_events": 12,
+      "new_events": 15,
       "revised_events": 0,
       "unchanged_events": 0,
       "omitted_events": 0,
       "event_manifest": [
         {
-          "event_key": "stock_ai_agent:16009",
-          "content_sha256": "37d959d4d1027afaeef0e7ab828d708d64504a0129e02e06217fe080ac760866",
-          "occurred_at": "2026-10-13T01:04:25+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16009",
+          "event_key": "stock_ai_agent:16059",
+          "content_sha256": "c551f66cf2fad9bec20a294c081ac46cdc6ad10b31f5a84987020149c0708be1",
+          "occurred_at": "2026-10-14T00:30:13+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16059",
           "normalized_signal_count": 0,
           "packet_simulation_only": false
         },
         {
-          "event_key": "stock_ai_agent:16008",
-          "content_sha256": "f611d49b1181b569499bb7adf9eab59515bacf04b95403b325c646ac7892fbd2",
-          "occurred_at": "2026-10-13T01:01:26+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16008",
-          "normalized_signal_count": 0,
-          "packet_simulation_only": false
-        },
-        {
-          "event_key": "stock_ai_agent:16007",
-          "content_sha256": "7b4779f8fea4ed62238a6b9975c8ae93d5c27f2d8158744f18675a11450cc604",
-          "occurred_at": "2026-10-13T00:56:48+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16007",
-          "normalized_signal_count": 2,
+          "event_key": "stock_ai_agent:16058",
+          "content_sha256": "32f5b88a27a1c1e950b2233459d89a80a057514fae11184961420d04ee8a855d",
+          "occurred_at": "2026-10-13T19:20:44+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16058",
+          "normalized_signal_count": 6,
           "packet_simulation_only": true
         },
         {
-          "event_key": "stock_ai_agent:16006",
-          "content_sha256": "493668b120432a1acef992e650dcda2237f8fec019ad237e3d26e52e05278852",
-          "occurred_at": "2026-10-13T00:56:43+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16006",
+          "event_key": "stock_ai_agent:16057",
+          "content_sha256": "46aa0441a482c78bcd600135d5be30e5b4d8535f963d2cf5ece0b85b9ef5d82e",
+          "occurred_at": "2026-10-13T19:20:42+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16057",
           "normalized_signal_count": 1,
           "packet_simulation_only": false
         },
         {
-          "event_key": "stock_ai_agent:16005",
-          "content_sha256": "57e2fa7b6a719510e799f34ec425ce272f7d044119f6c01fa269dc8fe82f51da",
-          "occurred_at": "2026-10-13T00:46:26+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16005",
-          "normalized_signal_count": 0,
+          "event_key": "stock_ai_agent:16056",
+          "content_sha256": "7a22d7b7007ddff297aad1425e648a2108cad48b269ffcb2447bf2ae3cb43dc6",
+          "occurred_at": "2026-10-13T19:20:39+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16056",
+          "normalized_signal_count": 1,
           "packet_simulation_only": false
         },
         {
-          "event_key": "stock_ai_agent:16004",
-          "content_sha256": "170954e11ed7c56df136817308a9dd6280163ac668f3b207c38d35ec61dd569c",
-          "occurred_at": "2026-10-13T00:30:12+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16004",
-          "normalized_signal_count": 0,
+          "event_key": "stock_ai_agent:16055",
+          "content_sha256": "e34a639c41c650690803e6332dc339d312dff38c3faf3d641d2a612ac57eee9e",
+          "occurred_at": "2026-10-13T19:20:36+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16055",
+          "normalized_signal_count": 1,
           "packet_simulation_only": false
         },
         {
-          "event_key": "stock_ai_agent:16003",
-          "content_sha256": "815eb28d7b57cc8ed131cc2f9e4a609f28acd42dd131d4bd5b915bc048122bc2",
-          "occurred_at": "2026-10-13T00:26:26+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16003",
-          "normalized_signal_count": 0,
+          "event_key": "stock_ai_agent:16054",
+          "content_sha256": "699812ffaeae524c0f3693698bda620005097048ef24fe018d2876876cc7d55f",
+          "occurred_at": "2026-10-13T18:55:56+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16054",
+          "normalized_signal_count": 1,
           "packet_simulation_only": false
         },
         {
-          "event_key": "stock_ai_agent:16002",
-          "content_sha256": "1a91e9e46fe94fe8c2b73a531253db2ea246383d6329adc4820bf16e3e914a3c",
-          "occurred_at": "2026-10-12T23:46:25+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16002",
-          "normalized_signal_count": 0,
+          "event_key": "stock_ai_agent:16053",
+          "content_sha256": "0513f029cf62b765937c051972f18a85d75f7f4980bccb1d5cde580bad4c22dc",
+          "occurred_at": "2026-10-13T18:55:42+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16053",
+          "normalized_signal_count": 1,
           "packet_simulation_only": false
         },
         {
-          "event_key": "stock_ai_agent:16001",
-          "content_sha256": "00936e0f87a4f01f839629f9121e7dd279816b7ccaf162578851d60af31934ba",
-          "occurred_at": "2026-10-12T23:06:25+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16001",
-          "normalized_signal_count": 0,
+          "event_key": "stock_ai_agent:16052",
+          "content_sha256": "60af35b71600b28fa7113a7ba5cca993f5ae926ae9c30afeb38322ae52cc558b",
+          "occurred_at": "2026-10-13T18:55:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16052",
+          "normalized_signal_count": 1,
           "packet_simulation_only": false
         },
         {
-          "event_key": "stock_ai_agent:16000",
-          "content_sha256": "974d4c71d51a986d6a3aaf9339027ed516fd4cd399343958ff231df05a22052f",
-          "occurred_at": "2026-10-12T23:01:26+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16000",
-          "normalized_signal_count": 0,
+          "event_key": "stock_ai_agent:16051",
+          "content_sha256": "0368f49e08ce69f207e74f8b94d10e595eb3c8d9f843c04949994fa8ebce9e39",
+          "occurred_at": "2026-10-13T18:55:14+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16051",
+          "normalized_signal_count": 1,
           "packet_simulation_only": false
         },
         {
-          "event_key": "stock_ai_agent:15999",
-          "content_sha256": "2fb57e43f9137beb56638bb34f2e8c96eb5990b96477f4b93f00b029d3513baf",
-          "occurred_at": "2026-10-12T22:59:27+00:00",
-          "source_url": "https://t.me/stock_ai_agent/15999",
-          "normalized_signal_count": 0,
+          "event_key": "stock_ai_agent:16050",
+          "content_sha256": "37638095fbb674a1f1ac712fad6fb02bba2ab486fff3a28e5946baa4d34a9a4e",
+          "occurred_at": "2026-10-13T18:55:08+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16050",
+          "normalized_signal_count": 1,
           "packet_simulation_only": false
         },
         {
-          "event_key": "stock_ai_agent:15998",
-          "content_sha256": "ec6d3a27c34142ebc434cc112d05f7293974bfe60b404695cfa93fe502785607",
-          "occurred_at": "2026-10-12T22:26:26+00:00",
-          "source_url": "https://t.me/stock_ai_agent/15998",
-          "normalized_signal_count": 0,
+          "event_key": "stock_ai_agent:16049",
+          "content_sha256": "67b66f60cd5d21415d08bc0e612755befd129bbb19736c554ef085de34c509f3",
+          "occurred_at": "2026-10-13T18:55:04+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16049",
+          "normalized_signal_count": 1,
+          "packet_simulation_only": false
+        },
+        {
+          "event_key": "stock_ai_agent:16048",
+          "content_sha256": "fff150501537994eedd464f262db1142f47a7b54dc545deedba1e5ed4f4722b5",
+          "occurred_at": "2026-10-13T18:54:58+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16048",
+          "normalized_signal_count": 1,
+          "packet_simulation_only": false
+        },
+        {
+          "event_key": "stock_ai_agent:16047",
+          "content_sha256": "fe5214ffda9dcd499f7c6c560cdf29d58bf51b775b5f68738a93b6af4fc35c40",
+          "occurred_at": "2026-10-13T18:54:51+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16047",
+          "normalized_signal_count": 1,
+          "packet_simulation_only": false
+        },
+        {
+          "event_key": "stock_ai_agent:16046",
+          "content_sha256": "76131915fed861cbd05569257473f00d8a9bc6796a92a2fee6655e6eb81b69a2",
+          "occurred_at": "2026-10-13T18:54:47+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16046",
+          "normalized_signal_count": 1,
+          "packet_simulation_only": false
+        },
+        {
+          "event_key": "stock_ai_agent:16045",
+          "content_sha256": "8d31176f35b9a98264dada374f712a97c942fa32b14c69a513be6f5e2f79a55b",
+          "occurred_at": "2026-10-13T18:48:14+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16045",
+          "normalized_signal_count": 3,
           "packet_simulation_only": false
         }
       ],
       "source_contributions": [
         {
           "source": "prism",
-          "event_key": "stock_ai_agent:16006",
-          "content_sha256": "493668b120432a1acef992e650dcda2237f8fec019ad237e3d26e52e05278852",
+          "event_key": "stock_ai_agent:16045",
+          "content_sha256": "8d31176f35b9a98264dada374f712a97c942fa32b14c69a513be6f5e2f79a55b",
           "affected_field": "research_priority",
-          "direction": "INCREASE",
-          "reason": "09:56 게시물은 손절선 이탈 매도를 주장하지만 정규화 방향은 UNKNOWN입니다. 실제 체결·포트폴리오 구분도 검증되지 않았으므로 매도 방향을 확정하지 않고 하방 위험 재검증 우선순위만 높입니다.",
+          "direction": "WATCH_UNCONFIRMED",
+          "reason": "초기 관심종목 선정; 채널 주장으로 독립 검증 전입니다.",
           "evidence_weight": "LOW_LABELED",
-          "validation_status": "UNVERIFIED"
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
         },
         {
           "source": "prism",
-          "event_key": "stock_ai_agent:16007",
-          "content_sha256": "7b4779f8fea4ed62238a6b9975c8ae93d5c27f2d8158744f18675a11450cc604",
+          "event_key": "stock_ai_agent:16048",
+          "content_sha256": "fff150501537994eedd464f262db1142f47a7b54dc545deedba1e5ed4f4722b5",
           "affected_field": "research_priority",
-          "direction": "RETAIN_RESEARCH_ONLY",
-          "reason": "시뮬레이터 보유 스냅샷의 HOLD이며 실제 사용자 보유나 주문 신호가 아닙니다. 종목 식별·거래소와 공식 시세를 확인할 연구 대상으로만 남깁니다.",
+          "direction": "CONTEXT_UNVERIFIED",
+          "reason": "종목 설명과 장중 관측치이며 확정 종가·공식 기업 근거는 검증되지 않았습니다.",
           "evidence_weight": "LOW_LABELED",
-          "validation_status": "UNVERIFIED"
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
         },
         {
           "source": "prism",
-          "event_key": "stock_ai_agent:16007",
-          "content_sha256": "7b4779f8fea4ed62238a6b9975c8ae93d5c27f2d8158744f18675a11450cc604",
+          "event_key": "stock_ai_agent:16051",
+          "content_sha256": "0368f49e08ce69f207e74f8b94d10e595eb3c8d9f843c04949994fa8ebce9e39",
+          "affected_field": "research_priority",
+          "direction": "NO_PDF_BODY",
+          "reason": "PDF 신호 메타데이터만 있어 본문 주장을 검증할 수 없습니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16054",
+          "content_sha256": "699812ffaeae524c0f3693698bda620005097048ef24fe018d2876876cc7d55f",
           "affected_field": "research_priority",
           "direction": "RETAIN_RESEARCH_ONLY",
-          "reason": "시뮬레이터 보유 스냅샷의 HOLD이며 다중 종목 메시지입니다. 가격·목표·손절의 종목별 매핑이 검증되지 않아 수치 조건으로 사용하지 않고 공식 공시·시세 재검증만 제안합니다.",
+          "reason": "차트 주석 안내만 전달됐고 피벗·상대강도 원본은 검증되지 않았습니다.",
           "evidence_weight": "LOW_LABELED",
-          "validation_status": "UNVERIFIED"
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16057",
+          "content_sha256": "46aa0441a482c78bcd600135d5be30e5b4d8535f963d2cf5ece0b85b9ef5d82e",
+          "affected_field": "research_priority",
+          "direction": "INCREASE_RISK_RECHECK",
+          "reason": "후속 미진입 사유: 최근 두 분기 영업이익 검증 불가·확정 촉매 부재. 초기 WATCH보다 최신입니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16045",
+          "content_sha256": "8d31176f35b9a98264dada374f712a97c942fa32b14c69a513be6f5e2f79a55b",
+          "affected_field": "research_priority",
+          "direction": "WATCH_UNCONFIRMED",
+          "reason": "초기 관심종목 선정; 채널 주장으로 독립 검증 전입니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16047",
+          "content_sha256": "fe5214ffda9dcd499f7c6c560cdf29d58bf51b775b5f68738a93b6af4fc35c40",
+          "affected_field": "research_priority",
+          "direction": "CONTEXT_UNVERIFIED",
+          "reason": "종목 설명과 장중 관측치이며 확정 종가·공식 기업 근거는 검증되지 않았습니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16050",
+          "content_sha256": "37638095fbb674a1f1ac712fad6fb02bba2ab486fff3a28e5946baa4d34a9a4e",
+          "affected_field": "research_priority",
+          "direction": "NO_PDF_BODY",
+          "reason": "PDF 신호 메타데이터만 있어 본문 주장을 검증할 수 없습니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16053",
+          "content_sha256": "0513f029cf62b765937c051972f18a85d75f7f4980bccb1d5cde580bad4c22dc",
+          "affected_field": "research_priority",
+          "direction": "RETAIN_RESEARCH_ONLY",
+          "reason": "차트 주석 안내만 전달됐고 피벗·상대강도 원본은 검증되지 않았습니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16056",
+          "content_sha256": "7a22d7b7007ddff297aad1425e648a2108cad48b269ffcb2447bf2ae3cb43dc6",
+          "affected_field": "research_priority",
+          "direction": "INCREASE_RISK_RECHECK",
+          "reason": "후속 미진입 사유: 채널 기준 50일선 아래·하락 추세 차단. 초기 WATCH보다 최신입니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16045",
+          "content_sha256": "8d31176f35b9a98264dada374f712a97c942fa32b14c69a513be6f5e2f79a55b",
+          "affected_field": "research_priority",
+          "direction": "WATCH_UNCONFIRMED",
+          "reason": "초기 관심종목 선정; 채널 주장으로 독립 검증 전입니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16046",
+          "content_sha256": "76131915fed861cbd05569257473f00d8a9bc6796a92a2fee6655e6eb81b69a2",
+          "affected_field": "research_priority",
+          "direction": "CONTEXT_UNVERIFIED",
+          "reason": "종목 설명과 장중 관측치이며 확정 종가·공식 기업 근거는 검증되지 않았습니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16049",
+          "content_sha256": "67b66f60cd5d21415d08bc0e612755befd129bbb19736c554ef085de34c509f3",
+          "affected_field": "research_priority",
+          "direction": "NO_PDF_BODY",
+          "reason": "PDF 신호 메타데이터만 있어 본문 주장을 검증할 수 없습니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16052",
+          "content_sha256": "60af35b71600b28fa7113a7ba5cca993f5ae926ae9c30afeb38322ae52cc558b",
+          "affected_field": "research_priority",
+          "direction": "RETAIN_RESEARCH_ONLY",
+          "reason": "차트 주석 안내만 전달됐고 피벗·상대강도 원본은 검증되지 않았습니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16055",
+          "content_sha256": "e34a639c41c650690803e6332dc339d312dff38c3faf3d641d2a612ac57eee9e",
+          "affected_field": "research_priority",
+          "direction": "INCREASE_RISK_RECHECK",
+          "reason": "후속 미진입 사유: 채널 기준 50일선 아래·임상 촉매 검증 필요. 초기 WATCH보다 최신입니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16058",
+          "content_sha256": "32f5b88a27a1c1e950b2233459d89a80a057514fae11184961420d04ee8a855d",
+          "affected_field": "simulation_context",
+          "direction": "REFERENCE_ONLY",
+          "reason": "가상 보유 메시지이며 사용자 계좌 근거가 아닙니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16059",
+          "content_sha256": "c551f66cf2fad9bec20a294c081ac46cdc6ad10b31f5a84987020149c0708be1",
+          "affected_field": "market_regime_research_priority",
+          "direction": "INCREASE_RECHECK",
+          "reason": "후속 조정 공지가 앞선 강세 설명과 충돌합니다.",
+          "evidence_weight": "LOW_LABELED",
+          "validation_status": "UNVERIFIED",
+          "execution_gate_override": false
         }
       ],
-      "normalized_signal_count": 3,
-      "normalized_signal_events": 2,
+      "normalized_signal_count": 21,
       "classification": {
-        "unverified_stock_signal_messages": 1,
+        "stock_research_message_count": 13,
         "simulator_snapshot_messages": 1,
-        "crypto_demo_messages": 9,
         "operating_notice_messages": 1
       },
-      "normalization_caveat": "BTC 데모 문구가 있는 9개 메시지는 packet simulation_only=false이지만 본문 의미에 따라 암호자산 데모로 별도 분류했습니다. 원본 flag나 정규화 신호는 수정하지 않았습니다. HPSP UNKNOWN을 SELL로 바꾸지 않았습니다.",
-      "balanced_external_effect": "HPSP risk research priority HIGH; simulation tickers remain NORMAL. No stance, confidence, position size, or market execution promotion. All channel signals unverified; channel score0.45 is not independent confidence.",
-      "kr_handoff": "HPSP 실제 손절 주장과 공식 시세·공시를 대조하고, 해당 종목이 다음 정본 market packet에 있을 때만 연구 우선순위에 반영합니다. 시뮬레이터 종목을 사용자 보유로 가정하지 않습니다.",
-      "us_handoff": "매핑된 미국 주식 신호가 없어 US 종목 방향·위험 한도 변경 근거가 없습니다. BTC 데모를 미국 주식 신호로 투영하지 않습니다.",
+      "normalization_caveat": "PDF 본문 3건은 NO_ARCHIVED_TEXT이며 차트 메시지 3건은 주석 안내만 있습니다. 신호 가격은 응답 시점 시세가 아닙니다. 시뮬레이터 다중 종목 가격 매핑은 실행에 사용하지 않습니다.",
+      "balanced_external_effect": "세 종목의 위험 검증 연구 우선순위 상향, 유리한 순위·thesis confidence 상향 보류. 기존 위험 한도 내 크기 변경 및 시장 실행 승격 없음.",
+      "kr_handoff": "직접 KR 종목 근거 없음. US 조정 공지는 시장 국면 재확인 필요성으로만 전달합니다.",
+      "us_handoff": "INTR 수익성, BBVA·SLS 추세 및 SLS 임상 촉매를 공식 자료로 확인. 후속 미진입을 초기 WATCH보다 우선 검토하고 기존 실행 gate를 유지합니다.",
       "external_delivery_verified": false,
       "execution_eligible": false
     },
-    "next_checkpoint": "2026-10-13 17:00 KST 다음 운영 점검에서 후속 수집 여부를 확인합니다. 종가 분석 예고는 채널의 계획이며 실행 보장이 아닙니다. 종목 판단 전에는 거래소 시세·공시·기업 IR 및 최신 계좌·시장·위험 gate를 다시 검증합니다.",
+    "next_checkpoint": "다음 성공한 sanitized producer run에서 후속 이벤트를 확인합니다. 가장 오래된 현 창 이벤트는 2026-10-15 03:48:14 KST에 24시간 범위를 벗어납니다. 공식 시세·공시·IR과 최신 시장·계좌·위험 gate를 별도 확인합니다.",
     "mobile_handoff": {
       "owner": "external_github_notification_pipeline",
       "status": "PENDING_EXTERNAL_VERIFICATION",
       "work_sent_notification": false
     }
   },
-  "report_id": "prism:bd7f315ffaad52f0892b4617ed5bde4c",
-  "report_sha256": "bd7f315ffaad52f0892b4617ed5bde4cea503680b20364014a5af9efacdb97d7",
-  "published_at": "2026-10-13T16:16:23.314683+09:00"
+  "report_id": "prism:295bd86b774632d753698055607557ca",
+  "report_sha256": "295bd86b774632d753698055607557ca65b63cf8a91cf8b95dd2c7324c34d7e4",
+  "published_at": "2026-10-14T10:40:17.124886+09:00"
 }
