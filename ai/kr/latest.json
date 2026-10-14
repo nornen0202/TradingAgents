@@ -1,7 +1,7 @@
 {
   "schema": "tradingagents.ai-context/v1",
   "market": "kr",
-  "generated_at": "2026-10-14T06:06:00.002010+00:00",
+  "generated_at": "2026-10-14T07:35:43.051827+00:00",
   "freshness_receipt": {
     "producer_run_id": "20261014T145939_local-scheduler-kr-live-recheck-overlay_only",
     "producer_finished_at": "2026-10-14T15:01:38.102910+09:00",
@@ -12,7 +12,7 @@
     "analysis_lineage_status": "RESOLVED",
     "market_data_oldest_at": "2026-10-14T15:00:00+09:00",
     "market_data_latest_at": "2026-10-14T15:00:00+09:00",
-    "market_data_status": "FRESH"
+    "market_data_status": "STALE"
   },
   "account": {
     "status": "available",
@@ -174,8 +174,8 @@
       "ticker": "403870.KQ",
       "display_name": "HPSP",
       "is_held": true,
-      "strategy_code": "REDUCE",
-      "strategy_ko": "비중 축소 검토",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 56800.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 58755.93912682588,
@@ -185,30 +185,32 @@
       "day_low": 56500.0,
       "execution_condition_ko": "위험 대응 조건: 57,400 이하 하락, 2개 봉 확인 후 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
       "risk_condition_ko": "57,400 이하 하락, 2개 봉 확인 후 리스크 축소",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "REDUCE",
+        "strategy_ko": "비중 축소 검토",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "083450.KQ",
       "display_name": "GST",
       "is_held": true,
-      "strategy_code": "REDUCE",
-      "strategy_ko": "비중 축소 검토",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 50300.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 51929.58165977109,
@@ -218,30 +220,32 @@
       "day_low": 50000.0,
       "execution_condition_ko": "위험 대응 조건: 52,950 이하 하락, 종가 확인 후 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
       "risk_condition_ko": "52,950 이하 하락, 종가 확인 후 리스크 축소",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "REDUCE",
+        "strategy_ko": "비중 축소 검토",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "278470.KS",
       "display_name": "에이피알",
       "is_held": true,
-      "strategy_code": "HOLD",
-      "strategy_ko": "보유 유지",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 291000.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 286270.6877282843,
@@ -251,30 +255,32 @@
       "day_low": 266500.0,
       "execution_condition_ko": "실제 거래일·정규장·거래정지 여부와 최신 가격·호가·체결량을 먼저 검증한다. 전일 봉으로 표시된 장중 자료, 거래량 0, 비정상 거래량가중평균가격은 실행 판단에서 제외한다. / 279000원 방어, 저점 상승, 재하락 시 매도 압력 둔화와 321500~331500원 회복·재시험은 관찰 강화 조건이지 자동 매수 조건이 아니다.",
       "risk_condition_ko": "279,000 이하 하락, 종가 확인 후 (위험축소에 거래량 증가를 필수로 요구하지 않는다.) 리스크 축소",
-      "decision_state_ko": "조건 충족 전 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "HOLD",
+        "strategy_ko": "보유 유지",
+        "decision_state_ko": "조건 충족 전 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "267260.KS",
       "display_name": "HD현대일렉트릭",
       "is_held": true,
-      "strategy_code": "HOLD",
-      "strategy_ko": "보유 유지",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 536000.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 547040.9294006613,
@@ -284,30 +290,32 @@
       "day_low": 535000.0,
       "execution_condition_ko": "267260.KS의 실제 거래일·정규장 상태, 최신 호가·체결·스프레드·거래량 및 정상 세션 거래량가중평균가격 확보가 실행 검토의 선행 조건이다. / 267260.KS의 531,000 재시험에서 저점 상승과 매도 압력 둔화를 확인한다. 단순 접촉이나 아래꼬리만으로 지지를 확정하지 않는다.",
       "risk_condition_ko": "531,000 이하 하락, 2개 봉 확인 후 (손절에 거래량 하한을 요구하지 않는다.) 리스크 축소",
-      "decision_state_ko": "조건 충족 전 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "HOLD",
+        "strategy_ko": "보유 유지",
+        "decision_state_ko": "조건 충족 전 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "010140.KS",
       "display_name": "삼성중공업",
       "is_held": true,
-      "strategy_code": "HOLD",
-      "strategy_ko": "보유 유지",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 18910.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 19060.72013807064,
@@ -317,30 +325,32 @@
       "day_low": 17780.0,
       "execution_condition_ko": "010140.KS의 실제 거래 가능 상태, 최신 정규장 호가·체결·정상 거래량가중평균가격과 계좌 노출 확보. / 18,440원 위 연속 5분봉 두 개 마감, 재시험 지지, 동시간대 상대거래량 1.2배 이상은 재평가 신호다. 전일 일평균 대비 1.72배로 대체하지 않는다.",
       "risk_condition_ko": "17,910 이하 하락, 종가 확인 후 리스크 축소",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "HOLD",
+        "strategy_ko": "보유 유지",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "353200.KS",
       "display_name": "대덕전자",
       "is_held": true,
-      "strategy_code": "HOLD",
-      "strategy_ko": "보유 유지",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 142900.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 147154.85902819436,
@@ -350,22 +360,24 @@
       "day_low": 141100.0,
       "execution_condition_ko": "판단시각은 2026-10-14T06:59:31.190292+09:00이며 제공된 세계협정시 시각과 같은 순간이다. 제안된 10:30 최초 관찰시각 이전이지만 실제 거래일·정규장 운영·거래정지·시세 신선도는 미확인이다. 10:30은 만료시각이 아니며 확인된 주문 만료시각도 없어 다음 거래일로 자동 연장하지 않는다. / 142,400~144,100원 안정, 144,100원 회복·두 개 5분봉 재시험, 정상 거래량가중평균가격 상회와 동시간대 상대거래량 1.2 이상을 관찰한다. 기술 조건 충족만으로 현재의 손익비 미달이 해소되지는 않는다.",
       "risk_condition_ko": "151,400 이상 도달, 장중 확인 시 (매도에 최소 상대거래량 조건 없음) 리스크 축소",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "HOLD",
+        "strategy_ko": "보유 유지",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
@@ -396,9 +408,10 @@
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
         "provider_blockers": [
+          "work_packet_row_expired",
           "structured_price_range_conflict"
         ]
       }
@@ -407,8 +420,8 @@
       "ticker": "000660.KS",
       "display_name": "SK하이닉스",
       "is_held": true,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 1415000.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 1459880.9932582236,
@@ -418,30 +431,32 @@
       "day_low": 1411000.0,
       "execution_condition_ko": "000660.KS의 실제 거래일·정상 세션·거래 제한·최신 체결시각·호가·거래량·유효한 세션 거래량가중평균가격을 확인한다. 전일 20:00 시세, 거래량 0 및 비정상 평균가격은 실행 근거에서 제외한다. / 기준시각 2026-10-14T06:09:26.976617+09:00은 향후 소액진입 검토 시각 10:30보다 이르다. 10:30은 최초 검토 가능 시각이지 만료가 아니며 현재 활성 매수계획은 없다. 이 시계만으로 거래일·세션·조건 충족을 인정하거나 날짜를 이월하지 않는다.",
       "risk_condition_ko": "1,425,000 이하 하락, 종가 확인 후 (손절에 거래량 증가를 요구하지 않는다.) 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "005930.KS",
       "display_name": "삼성전자",
       "is_held": true,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 231500.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 236841.0537774638,
@@ -451,30 +466,32 @@
       "day_low": 230500.0,
       "execution_condition_ko": "실제 KRX 거래일·정규장·거래정지 상태와 최신 호가·체결·거래량을 확인한다. 이전 야간 가격은 현재 매매 조건 충족의 증거가 아니다. / 228,000~230,100원 방어, 237,900원 초기 회복, 243,000원 기존 지지 회복, 244,000원 돌파·재시험을 관찰한다. 단순 가격 접촉은 매수 신호가 아니다.",
       "risk_condition_ko": "243,000 이하 하락, 종가 확인 후 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "010120.KS",
       "display_name": "LS ELECTRIC",
       "is_held": true,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 175300.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 178676.21285404047,
@@ -484,30 +501,32 @@
       "day_low": 175300.0,
       "execution_condition_ko": "010120.KS의 173100원 유지, 183740원 회복·재시험 지지, 상대강도지수 40 회복과 이동평균 수렴·확산 지표의 음의 막대 축소를 관찰한다. 현재 매수 조건 충족으로 간주하지 않는다. / 188000원 재탈환과 192100~195500원 저항 통과를 확인한다. 202540원은 2026-10-13 거래량가중이동평균 참고값이며 고정 목표가가 아니다. 회복 후에도 진입가격 상승에 따른 손익비 악화를 다시 점검한다.",
       "risk_condition_ko": "188,000 이하 하락, 종가 확인 후 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "058470.KQ",
       "display_name": "리노공업",
       "is_held": true,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 76000.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 78130.42237183565,
@@ -517,30 +536,32 @@
       "day_low": 75900.0,
       "execution_condition_ko": "058470.KQ 판단 시각은 2026-10-14T06:33:06.804616+09:00, 일봉 가격 기준일은 2026-10-13이다. 실제 거래일·정상 세션·휴장 또는 단축장 여부와 최신 시세·호가·거래량의 시각을 별도로 확인한다. / 058470.KQ의 77,600~78,100원 시험 후 회복, 시험 때 매도량 감소와 회복 때 참여 증가를 관찰한다. 80,700원 돌파를 이 지지 회복형의 동시 필수조건으로 삼지 않는다.",
       "risk_condition_ko": "77,600 이하 하락, 종가 확인 후 (거래량 증가를 필수조건으로 두지 않는다.) 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "042700.KS",
       "display_name": "한미반도체",
       "is_held": true,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 216250.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 223247.99368292134,
@@ -550,30 +571,32 @@
       "day_low": 215500.0,
       "execution_condition_ko": "제공된 결정 시각은 2026-10-14T06:35:02.062028+09:00이다. 이 시각만으로 실제 거래일·정규장 운영·거래정지·시장경보·변동성 완화장치 상태나 호가 신선도를 확정하지 않는다. 거래 가능 상태와 시세 타임스탬프를 먼저 확인한다. / 전일 20:00 야간 봉의 거래량 0과 비정상 거래량가중평균가격 986,427,009.44원은 진입 판단에서 제외한다. 유효한 당일 정규장 체결·호가·세션 거래량가중평균가격을 새로 확인해야 한다.",
       "risk_condition_ko": "227,180 이하 하락, 종가 확인 후 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "035420.KS",
       "display_name": "NAVER",
       "is_held": true,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 179200.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 181153.21341284798,
@@ -583,30 +606,32 @@
       "day_low": 178000.0,
       "execution_condition_ko": "035420.KS 결정시각은 2026-10-14T06:33:09.469024+09:00, 일봉 기준일은 2026-10-13이다. 실제 거래일·휴장·조기종료 여부, 정규장 상태, 현재 체결시각과 호가 유동성은 미검증이다. 이 시계만으로 당일 진입·매도 신호 발생을 선언하지 않는다. / 035420.KS의 179,500~180,500원 회복·재시험 유지, 저점 하락 중단, 상대강도지수 30 재돌파와 이동평균 수렴·확산 히스토그램 음의 폭 축소를 관찰한다. 전일 거래량의 20일 평균 대비 약 1.18배를 당일 동일 경과시간 상대거래량으로 대체하지 않는다.",
       "risk_condition_ko": "180,500 이하 하락, 2개 봉 확인 후 (위험 축소에는 최소 상대거래량 조건을 적용하지 않음) 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "096770.KS",
       "display_name": "096770",
       "is_held": false,
-      "strategy_code": "BUY_ON_CONFIRMATION",
-      "strategy_ko": "조건 확인 후 분할매수 검토",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 162500.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 163279.55968159312,
@@ -616,30 +641,32 @@
       "day_low": 159800.0,
       "execution_condition_ko": "096770.KS의 최신 정규장 호가, 5분봉, 거래량가중평균가격, 호가차이·잔량, 같은 경과시간 기준 상대거래량 및 거래 상태를 확보한다. / 096770.KS의 150000–150800원과 152800–153143원 구간에서 매도 거래량 감소, 상단 위 두 차례 5분봉 마감과 재시험 성공을 관찰한다. 현재 목표·손절 구조로는 자동 매수하지 않는다.",
       "risk_condition_ko": "150,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "BUY_ON_CONFIRMATION",
+        "strategy_ko": "조건 확인 후 분할매수 검토",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "010950.KS",
       "display_name": "S-Oil",
       "is_held": false,
-      "strategy_code": "BUY_ON_CONFIRMATION",
-      "strategy_ko": "조건 확인 후 분할매수 검토",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 161000.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 160643.18577815138,
@@ -649,30 +676,32 @@
       "day_low": 156800.0,
       "execution_condition_ko": "010950.KS의 판단 기준은 2026-10-14T07:55:53.688721+09:00이고 일봉 가격 기준일은 2026-10-13이다. 실제 거래 캘린더·정규장 상태·거래정지 여부·최신 호가와 거래량은 별도 확인한다. / 010950.KS의 152700~154300 재시험 후 저점 상승, 지지 회복, 유효 세션 거래량가중평균가격 상회, 검증된 동시각 상대거래량 1.2 이상 및 비용 후 손익비 2 이상을 함께 확인한다.",
       "risk_condition_ko": "152,700 이하 하락, 2개 봉 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "BUY_ON_CONFIRMATION",
+        "strategy_ko": "조건 확인 후 분할매수 검토",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "018260.KS",
       "display_name": "삼성SDS",
       "is_held": false,
-      "strategy_code": "BUY_ON_CONFIRMATION",
-      "strategy_ko": "조건 확인 후 분할매수 검토",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 202000.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 202532.662040872,
@@ -682,30 +711,32 @@
       "day_low": 196000.0,
       "execution_condition_ko": "018260.KS의 실제 거래일·정규장 상태, 시각이 표시된 최신 호가, 매수·매도 호가 차이와 유효한 세션 거래량가중평균가격을 확보한다. / 194000~195500원 회복 후 높아진 저점의 재시험, 모멘텀 개선과 동일 시각 기준 상대거래량 1.2 이상을 관찰한다. 1.2는 제안 기준이지 관측값이 아니다.",
       "risk_condition_ko": "193,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "BUY_ON_CONFIRMATION",
+        "strategy_ko": "조건 확인 후 분할매수 검토",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "033780.KS",
       "display_name": "033780",
       "is_held": false,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 182400.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 181926.02624600023,
@@ -715,30 +746,32 @@
       "day_low": 179900.0,
       "execution_condition_ko": "033780.KS의 거래소 일정·거래정지·시장경보, 시각이 확인되는 실제 체결·호가, 정상적인 당일 거래량가중평균가격과 동시간대 비교 거래량을 확보한다. / 033780.KS의 177700~177900원 지지 후 회복과 동시간대 상대거래량 1.2 이상을 관찰한다. 첫 현실적 저항까지 비용 후 보상과 청산 시나리오가 정당화되지 않으면 시세가 정상이어도 매수 대기를 유지한다.",
       "risk_condition_ko": "177,700 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "018880.KS",
       "display_name": "018880",
       "is_held": false,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 3905.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 3969.4255648291237,
@@ -748,30 +781,32 @@
       "day_low": 3785.0,
       "execution_condition_ko": "3735원 방어 후 3740원 회복 또는 3675원 방어 후 3680원 회복을 최신 5분봉으로 확인한다. 회복 자체가 매수 허가는 아니다. / 깊은 눌림 이후에는 3735~3740원과 3790~3805원이 실제 저항으로 바뀌는지 확인하고 가장 가까운 유효 저항으로 손익비를 다시 계산한다.",
       "risk_condition_ko": "3,880.73 이상 도달, 종가 확인 후 (위험 축소에 매수용 거래량 조건을 요구하지 않음) 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "095340.KQ",
       "display_name": "ISC",
       "is_held": false,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 172600.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 177286.50567425796,
@@ -781,30 +816,32 @@
       "day_low": 172600.0,
       "execution_condition_ko": "095340.KQ의 판단 기준 시각은 2026-10-14T08:35:51.466910+09:00이며 일봉 가격 기준일은 2026-10-13이다. 10:30은 제안된 최소 관찰시각이지 만료시각이 아니다. 실제 거래일·정규장 운영·신선한 체결·정상 거래량가중평균가격과 동시간대 비교 거래량은 별도 확인한다. 검증된 만료시각이 없어 다음 거래일로 주문을 자동 이월하지 않는다. / 095340.KQ의 179,300원·174,600원 지지 반응과 172,900원 종가 유지 여부를 관찰한다. 지지 접촉이나 장중 반등만으로 바닥을 확정하지 않는다.",
       "risk_condition_ko": "179,300 이하 하락, 종가 확인 후 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "105560.KS",
       "display_name": "105560",
       "is_held": false,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 159400.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 160813.96601507842,
@@ -814,30 +851,32 @@
       "day_low": 159000.0,
       "execution_condition_ko": "105560.KS의 실제 거래일·정규장 여부·거래정지·시장경보·최신 봉 시각·호가 간격·거래량과 계좌 노출을 확인한다. / 105560.KS의 162,800원 회복·재시험 지지, 두 개 5분봉 확인, 정상 당일 거래량가중평균가격 상회와 동시간대 상대거래량 1.2 이상을 감시한다. 충족만으로 자동매수하지 않는다.",
       "risk_condition_ko": "160,300 이하 하락, 종가 확인 후 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "180640.KS",
       "display_name": "180640",
       "is_held": false,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 123300.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 126290.80210815104,
@@ -847,30 +886,32 @@
       "day_low": 122600.0,
       "execution_condition_ko": "129000~129600 회복·유지와 저점 상승, 이어지는 132200 회복을 확인한다. 133500의 가까운 저항을 무시하지 않는다. / 135900 위 정규장 종가·재시험 지지, 상대강도지수 50 이상, 이동평균 수렴·확산 지표의 히스토그램 개선과 거래량 증가를 확인한다. 기초체력과 손익비 재심사는 별도다.",
       "risk_condition_ko": "129,562 이하 하락, 종가 확인 후 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "093370.KS",
       "display_name": "093370",
       "is_held": false,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 13960.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 14447.887209139308,
@@ -880,30 +921,32 @@
       "day_low": 13810.0,
       "execution_condition_ko": "093370.KS 13330~13610원 지지 후보 구간에서 최신 완료 5분봉의 저점 상승 여부를 확인한다. 유지 자체는 매수 승인이 아니다. / 093370.KS 14100원 회복 후 14240~14310원 재지지, 정상 세션 거래량가중평균가격 상회와 동일 시간대 상대거래량 1.2 이상을 확인한다.",
       "risk_condition_ko": "14,240 이하 하락, 종가 확인 후 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "000810.KS",
       "display_name": "000810",
       "is_held": false,
-      "strategy_code": "WAIT_CLOSE",
-      "strategy_ko": "종가 확인 후 판단",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 581000.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 589137.967384678,
@@ -913,30 +956,32 @@
       "day_low": 580000.0,
       "execution_condition_ko": "000810.KS의 실제 거래소 일정·세션·거래정지·시장경보와 최신 정규장 가격·호가·체결량을 먼저 확인한다. / 607,000~612,000원 공방과 595,000원 방어를 관찰한다. 584,000~587,000원과 571,000원은 과거 가격 참고 수준이며 자동 매수선이나 확정 하락 목표가 아니다.",
       "risk_condition_ko": "595,000 이하 하락, 종가 확인 후 (위험 축소에는 거래량 증가를 요구하지 않음) 리스크 축소",
-      "decision_state_ko": "조건 충족, 종가 확인 대기",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT_CLOSE",
+        "strategy_ko": "종가 확인 후 판단",
+        "decision_state_ko": "조건 충족, 종가 확인 대기",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "373220.KS",
       "display_name": "LG에너지솔루션",
       "is_held": false,
-      "strategy_code": "WAIT",
-      "strategy_ko": "조건 충족 전 대기",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 421000.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 421779.4559312755,
@@ -946,30 +991,32 @@
       "day_low": 409000.0,
       "execution_condition_ko": "373220.KS의 실제 거래 가능 세션·휴장·조기종료·거래정지·변동성완화장치·시장경보와 최신 체결시각·호가부터 확인한다. 전일 야간 지연 자료, 거래량 0, 가격 범위와 맞지 않는 거래량가중평균가격은 진입 확인에서 제외한다. / 373220.KS의 385,400~386,100원 재시험과 386,100원 회복을 우선 관찰한다. 하락 거래량 감소·반등 체결 증가·실제 손익비 확인이 필요하며 단순 접촉은 매수 신호가 아니다.",
       "risk_condition_ko": "385,400 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT",
+        "strategy_ko": "조건 충족 전 대기",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "062040.KS",
       "display_name": "062040",
       "is_held": false,
-      "strategy_code": "WAIT",
-      "strategy_ko": "조건 충족 전 대기",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 209500.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 214498.45247431478,
@@ -979,30 +1026,32 @@
       "day_low": 208500.0,
       "execution_condition_ko": "보유수량·순자산·현금·상관 업종 노출과 최신 실행 가능 가격을 확인한다. 실제 손실·집중도 한도 위반이 드러나면 지지선 이탈을 기다리지 않고 초과분을 감축한다. / 199800~205500원에서 지지 안정과 상승하는 5분봉 저점을 관찰한다. 2026-10-13의 아래꼬리는 과거 매수 반응이지 현재 지지 확인이 아니다.",
       "risk_condition_ko": "199,800 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT",
+        "strategy_ko": "조건 충족 전 대기",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "006400.KS",
       "display_name": "삼성SDI",
       "is_held": false,
-      "strategy_code": "WAIT",
-      "strategy_ko": "조건 충족 전 대기",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 589000.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 589259.7803099195,
@@ -1012,30 +1061,32 @@
       "day_low": 559000.0,
       "execution_condition_ko": "판단 기준은 2026-10-14T07:45:03.028649+09:00이고 가격 기준은 2026-10-13 일봉이다. 이 시각만으로 실제 거래 가능 세션이나 최신 가격을 확정하지 않는다. / 546000~550000 접근 후 550000 회복·재시험 지지, 정상 당일 거래량가중평균가격 상회, 같은 시간대 상대거래량 1.2 이상을 확인한다. 이 조건만으로 매수하지 않으며 비용 후 보상·위험 비율도 충족해야 한다.",
       "risk_condition_ko": "546,000 이하 하락, 다음 거래일 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "WAIT",
+        "strategy_ko": "조건 충족 전 대기",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "222800.KQ",
       "display_name": "심텍",
       "is_held": false,
-      "strategy_code": "AVOID",
-      "strategy_ko": "신규 매수 회피",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 139000.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 143874.89490771978,
@@ -1045,30 +1096,32 @@
       "day_low": 138500.0,
       "execution_condition_ko": "위험 대응 조건: 154,900 이상 도달, 2개 봉 확인 후 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
       "risk_condition_ko": "154,900 이상 도달, 2개 봉 확인 후 리스크 축소",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "AVOID",
+        "strategy_ko": "신규 매수 회피",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "086790.KS",
       "display_name": "086790",
       "is_held": false,
-      "strategy_code": "AVOID",
-      "strategy_ko": "신규 매수 회피",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 121900.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 122047.79393530717,
@@ -1078,30 +1131,32 @@
       "day_low": 120600.0,
       "execution_condition_ko": "위험 대응 조건: 126,900 이상 도달, 2개 봉 확인 후 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
       "risk_condition_ko": "126,900 이상 도달, 2개 봉 확인 후 리스크 축소",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "AVOID",
+        "strategy_ko": "신규 매수 회피",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "475150.KS",
       "display_name": "475150",
       "is_held": false,
-      "strategy_code": "AVOID",
-      "strategy_ko": "신규 매수 회피",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 43250.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 44076.21483496939,
@@ -1111,30 +1166,32 @@
       "day_low": 43200.0,
       "execution_condition_ko": "위험 대응 조건: 42,150 이하 하락, 2개 봉 확인 후 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
       "risk_condition_ko": "42,150 이하 하락, 2개 봉 확인 후 리스크 축소",
-      "decision_state_ko": "실행 조건 감시 중",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "AVOID",
+        "strategy_ko": "신규 매수 회피",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     },
     {
       "ticker": "010580.KS",
       "display_name": "010580",
       "is_held": false,
-      "strategy_code": "AVOID",
-      "strategy_ko": "신규 매수 회피",
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
       "last_price": 2670.0,
       "market_data_asof": "2026-10-14T15:00:00+09:00",
       "session_vwap": 2420.1812979245096,
@@ -1144,22 +1201,24 @@
       "day_low": 2025.0,
       "execution_condition_ko": "위험 대응 조건: 1,994 이하 하락, 2개 봉 확인 후 (거래량 급증을 필수 조건으로 요구하지 않음) 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
       "risk_condition_ko": "1,994 이하 하락, 2개 봉 확인 후 (거래량 급증을 필수 조건으로 요구하지 않음) 리스크 축소",
-      "decision_state_ko": "지금 실행 검토 가능",
-      "data_status_ko": "현재 세션 데이터 사용 가능",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 유효기간 만료",
       "reference_strategy": {
-        "strategy_code": null,
-        "strategy_ko": null,
-        "decision_state_ko": null,
-        "market_data_asof": null
+        "strategy_code": "AVOID",
+        "strategy_ko": "신규 매수 회피",
+        "decision_state_ko": "지금 실행 검토 가능",
+        "market_data_asof": "2026-10-14T15:00:00+09:00"
       },
       "quality_at_build": {
-        "execution_ready": true,
-        "current_execution_promotion": "POSSIBLE",
+        "execution_ready": false,
+        "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
         "row_valid_until": "2026-10-14T15:30:00+09:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "provider_limitations": [],
-        "provider_blockers": null
+        "provider_blockers": [
+          "work_packet_row_expired"
+        ]
       }
     }
   ],
