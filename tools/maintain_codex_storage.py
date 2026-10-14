@@ -92,15 +92,17 @@ def snapshot(root: Path) -> tuple[dict, list[str]]:
     return files, directories
 
 
-def sha256(path: Path) -> str:
+def sha256(path: Path, *, buffer: bytearray | None = None) -> str:
     with open(native(path), "rb") as handle:
-        return stream_sha256(handle)
+        return stream_sha256(handle, buffer=buffer)
 
 
-def stream_sha256(handle) -> str:
+def stream_sha256(handle, *, buffer: bytearray | None = None) -> str:
     digest = hashlib.sha256()
-    while block := handle.read(4 * 1024 * 1024):
-        digest.update(block)
+    buffer = buffer if buffer is not None else bytearray(256 * 1024)
+    view = memoryview(buffer)
+    while count := handle.readinto(buffer):
+        digest.update(view[:count])
     return digest.hexdigest()
 
 
@@ -209,18 +211,20 @@ def verify_tree(root: Path, manifest: dict) -> None:
     current, _ = snapshot(root)
     if current.keys() != manifest.keys():
         raise RuntimeError(f"File set changed: {root}")
+    buffer = bytearray(256 * 1024)
     for relative, expected in manifest.items():
-        if current[relative]["bytes"] != expected["bytes"] or sha256(root / relative) != expected["sha256"]:
+        if current[relative]["bytes"] != expected["bytes"] or sha256(root / relative, buffer=buffer) != expected["sha256"]:
             raise RuntimeError(f"File verification failed: {root / relative}")
 
 
 def verify_zip(archive: Path, manifest: dict) -> None:
+    buffer = bytearray(256 * 1024)
     with zipfile.ZipFile(native(archive)) as saved:
         if set(saved.namelist()) != set(manifest):
             raise RuntimeError("Backup archive file set mismatch")
         for relative, expected in manifest.items():
             with saved.open(relative) as handle:
-                if stream_sha256(handle) != expected["sha256"]:
+                if stream_sha256(handle, buffer=buffer) != expected["sha256"]:
                     raise RuntimeError(f"Backup hash mismatch: {relative}")
 
 
@@ -288,6 +292,8 @@ def prepare(item: dict, backup_root: Path, journal_root: Path, *, apply: bool, p
         for relative in directories:
             os.makedirs(native(destination / relative), exist_ok=True)
     manifest = {}
+    copy_buffer = bytearray(256 * 1024)
+    copy_view = memoryview(copy_buffer)
     start = last_report = time.monotonic()
     with open(native(archive), "xb", buffering=8 * 1024 * 1024) as archive_handle, zipfile.ZipFile(
         ForwardOnlyArchive(archive_handle), "w", compression=zipfile.ZIP_DEFLATED,
@@ -299,7 +305,8 @@ def prepare(item: dict, backup_root: Path, journal_root: Path, *, apply: bool, p
             with open(native(original), "rb") as read, saved.open(relative, "w", force_zip64=True) as archived:
                 target = open(native(destination / relative), "xb") if destination else None
                 try:
-                    while block := read.read(4 * 1024 * 1024):
+                    while count := read.readinto(copy_buffer):
+                        block = copy_view[:count]
                         digest.update(block); archived.write(block)
                         if target:
                             target.write(block)

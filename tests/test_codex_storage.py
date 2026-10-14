@@ -7,6 +7,8 @@ import time
 import sys
 from datetime import datetime, timedelta, timezone
 import zipfile
+import io
+import hashlib
 
 import pytest
 
@@ -148,3 +150,11 @@ def test_forward_archive_has_standard_readable_data_descriptors(tmp_path):
         assert saved.read("first.txt") == b"first"
         assert saved.read("second.txt") == b"second"
         assert all(item.flag_bits & 8 for item in saved.infolist())
+
+
+@pytest.mark.parametrize("size", [0, 1, 65537, 300001])
+def test_reused_hash_buffer_handles_short_reads_and_empty_files(size):
+    payload = (b"checksums remain exact" * ((size // 22) + 1))[:size]
+    reusable = bytearray(256 * 1024)
+    assert storage.stream_sha256(io.BytesIO(payload), buffer=reusable) == hashlib.sha256(payload).hexdigest()
+    assert storage.stream_sha256(io.BytesIO(b"next file"), buffer=reusable) == hashlib.sha256(b"next file").hexdigest()
