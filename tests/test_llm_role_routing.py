@@ -85,7 +85,7 @@ def test_default_portfolio_judges_use_astra_with_existing_effort():
             factory(LLMSettings())
 
         assert create_client.call_args.kwargs["model"] == "gpt-6-astra"
-        assert create_client.call_args.kwargs["codex_reasoning_effort"] == "xhigh"
+        assert create_client.call_args.kwargs["codex_reasoning_effort"] == "high"
         assert create_client.call_args.kwargs["model_role"] == "judge"
 
 

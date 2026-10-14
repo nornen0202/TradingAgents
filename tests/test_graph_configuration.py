@@ -99,7 +99,7 @@ class GraphConfigurationTests(unittest.TestCase):
         self.assertEqual([call.kwargs["model_role"] for call in calls], ["deep", "quick", "output"])
         self.assertEqual(
             [call.kwargs["codex_reasoning_effort"] for call in calls],
-            ["xhigh", "high", "medium"],
+            ["high", "medium", "medium"],
         )
 
 
