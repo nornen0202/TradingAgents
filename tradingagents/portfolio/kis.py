@@ -16,13 +16,20 @@ import requests
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.dataflows.api_keys import get_api_key
 
-from .account_models import AccountSnapshot, PendingOrder, PortfolioProfile, Position
-from .instrument_identity import resolve_identity
+from .account_models import AccountSnapshot, InstrumentIdentity, PendingOrder, PortfolioProfile, Position
 
 
 REAL_BASE_URL = "https://openapi.koreainvestment.com:9443"
 DEMO_BASE_URL = "https://openapivts.koreainvestment.com:29443"
 _TRANSIENT_HTTP_STATUS_CODES = {429, 500, 502, 503, 504}
+
+
+def resolve_identity(broker_symbol: str, display_name: str | None = None) -> InstrumentIdentity:
+    # Symbol resolution loads the agents package; token-only calendar gates do
+    # not need it. Keep the account reader's existing resolver seam unchanged.
+    from .instrument_identity import resolve_identity as resolve
+
+    return resolve(broker_symbol, display_name)
 
 # Exact GET path/TR pairs used by the quote, account and performance readers.
 # New broker APIs require an explicit review here; this client cannot send orders.
