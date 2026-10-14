@@ -1,11 +1,11 @@
 {
   "schema": "tradingagents.mobile-strategy/v1",
-  "generated_at": "2026-10-15T03:15:21.256386+09:00",
+  "generated_at": "2026-10-15T07:35:25.250051+09:00",
   "privacy": "PLAINTEXT_ACTION_DATA_NO_RAW_ACCOUNT_IDENTIFIERS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:7e852706ce79db20dc21d0813d8586de",
+      "event_id": "kr:684121e4db68644cc24deb1c0a6bad76",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261014T145939_local-scheduler-kr-live-recheck-overlay_only",
@@ -34,15 +34,12 @@
       },
       "latest_attempt": {
         "schema": "tradingagents.analysis-attempt/v1",
-        "run_id": "20261014T102112_local-scheduler-kr-full-finalization",
+        "run_id": "20261015T055359_local-scheduler-kr-full",
         "market": "KR",
         "run_mode": "full",
-        "started_at": "2026-10-14T10:21:12.085455+09:00",
-        "status": "SUCCESS",
-        "heartbeat_at": "2026-10-14T01:58:10.811276+00:00",
-        "finished_at": "2026-10-14T01:58:10.811264+00:00",
-        "completed_tickers": 30,
-        "error_type": null
+        "started_at": "2026-10-15T05:53:59.005331+09:00",
+        "status": "RUNNING",
+        "heartbeat_at": "2026-10-14T22:35:01.064990+00:00"
       },
       "latest_completed_analysis": {
         "run_id": "20261014T102112_local-scheduler-kr-full-finalization",
@@ -20639,7 +20636,7 @@
     },
     "us": {
       "market": "US",
-      "event_id": "us:e7673dea346f5841848f73a042359d35",
+      "event_id": "us:696b159f98b6b075f91bafd64a71e4ea",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261015T021357_local-scheduler-us-overlay_only",
@@ -33808,36 +33805,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             },
@@ -34123,36 +34090,6 @@
                     "reason": "소수몽키의 AI투자 판도 조용히 바뀌는 중? 부진했던 빅테크, 팔란티어의 수상한 신고가에서 CEG 직접 언급을 검증 연구 우선순위에 반영. 근거 상태 {'unverified': 10}; 공식 공시·실적·가격과 대조 전 신뢰도·비중·실행 관문은 상향하지 않음."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:15:00-04:00",
-                "valid_until": "2026-10-14T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [
                 {
@@ -34494,36 +34431,6 @@
                     "reason": "prism의 📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-14 04:20) 🔸 현재 보유: 6/10개 🔸 사용 비중: 4.44/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Frontline Plc(FRO) +7.94에서 NVDA 직접 언급을 검증 연구 우선순위에 반영. 근거 상태 시뮬레이션 전용; 공식 공시·실적·가격과 대조 전 신뢰도·비중·실행 관문은 상향하지 않음."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [
                 {
@@ -34880,36 +34787,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -35248,36 +35125,6 @@
                     "reason": "삼프로TV 3PROTV의 코스피 6,000 깨졌다, 이유없이 흐르는 장…이럴 때 봐야하는 기업은? | 여도은, 허재무, 박지훈, 노영래 [아침N투자]에서 AVGO 직접 언급을 검증 연구 우선순위에 반영. 근거 상태 {'unverified': 10}; 공식 공시·실적·가격과 대조 전 신뢰도·비중·실행 관문은 상향하지 않음."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [
                 {
@@ -35631,36 +35478,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -35962,36 +35779,6 @@
                     "reason": "경제사냥꾼의 월가에서 현시점 마이크론이 저평가 됐다는 이유에서 AAPL 직접 언급을 검증 연구 우선순위에 반영. 근거 상태 {'partially_supported': 1, 'unverified': 10}; 공식 공시·실적·가격과 대조 전 신뢰도·비중·실행 관문은 상향하지 않음."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [
                 {
@@ -36334,36 +36121,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [
                 {
                   "source": "youtube",
@@ -36604,36 +36361,6 @@
                     "reason": "공격적 분석가가 제시한 단기금리 유지 시 재투자 수익 지지 가능성. 다만 최신 금리와 물가 결과가 없어 유리한 시나리오를 기본값으로 삼지 않는다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -36913,36 +36640,6 @@
                     "reason": "공식 자료에서 확정 수주의 수익성 있는 매출 전환, 지속 가능한 영업마진 개선과 운전자본 유입에 덜 의존하는 현금창출력이 확인되는 경우 강세 신뢰도를 높인다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -37238,36 +36935,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             },
@@ -37552,36 +37219,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             },
@@ -37851,36 +37488,6 @@
                     "reason": "공격적 분석가가 제시한 359.44 지지 전환과 거래 참여 증가, 이후 364.17 종가 돌파 및 후속 지지 유지."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -38179,36 +37786,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             },
@@ -38497,36 +38074,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             },
@@ -38785,36 +38332,6 @@
                     "reason": "83.11 돌파와 지지 재시험, 정규장 거래량가중평균가격 상회, 동시간대 상대거래량 1.2 이상이 확인되면 반등 근거가 강화된다. 상대강도지수 50 회복은 추가 확인 요소다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -39089,36 +38606,6 @@
                     "reason": "공격적 분석가의 성장 가설을 공식 수주·출하·사업부 이익·현금 전환 자료가 뒷받침하는 경우."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -39415,36 +38902,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             },
@@ -39701,36 +39158,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             },
@@ -39981,36 +39408,6 @@
                     "reason": "공격적 분석가가 제시한 생산 회복은 판매량 개선 가능성이 있으나, 보수적·중립 분석가가 지적한 복구비와 손실 생산량을 포함한 공식 확인이 필요하다. 확인 일정은 미제공이다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:15:00-04:00",
-                "valid_until": "2026-10-14T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -40271,36 +39668,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:15:00-04:00",
-                "valid_until": "2026-10-14T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             },
@@ -40552,36 +39919,6 @@
                     "reason": "공격적 분석가가 제시한 통합가스 전망 개선의 공식 확인과 대상 지표·규모·현금흐름 영향 검증. 현재는 기사 수준의 근거다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:15:00-04:00",
-                "valid_until": "2026-10-14T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -40853,36 +40190,6 @@
                     "reason": "공격적 분석이 제시한 Skyrizi·Rinvoq·Vraylar의 성장 가능성을 실제 제품 실적과 회사 전망이 뒷받침하는지 확인한다. 다음 실적 발표일은 미확인이다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -41189,36 +40496,6 @@
                     "reason": "공격적 분석가가 제시한 SpaceX 관련 기회가 AMT의 공식 임대 계약이나 수익성 있는 확약으로 구체화되는 경우. 현재는 선택적 성장 가능성이지 확인된 매출이 아니다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:15:00-04:00",
-                "valid_until": "2026-10-14T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -41532,36 +40809,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             },
@@ -41833,36 +41080,6 @@
                     "reason": "149.70~150.80 지지 재시험에서 매도 거래량 감소와 반등 참여 회복. 154.75 돌파·재시험 성공도 관찰하되 불리한 손익비를 별도로 해소해야 한다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -42164,36 +41381,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             },
@@ -42476,36 +41663,6 @@
                     "reason": "MiniMed 최종 배정·완료와 잔존 주식 수, 이익 이탈, 분리 비용 공개. 논쟁에 제시된 2026-10-07 교환비율 발표와 2026-10-12 예비 결과는 절차 진전이지 주당 가치 개선의 확정 증거가 아니다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -42806,36 +41963,6 @@
                     "reason": "AI 모델 출시와 과학 활용 보도의 공식 확인 및 유료 채택·고객 유지·단위경제성 개선 자료. 토론에 나온 과학자 200명 지원은 유료 계약 증거가 아니다."
                   }
                 ]
-              },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:15:00-04:00",
-                "valid_until": "2026-10-14T13:45:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
               },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
@@ -43163,36 +42290,6 @@
                   }
                 ]
               },
-              "execution": {
-                "readiness": "NEEDS_LIVE_RECHECK",
-                "source_row_mode": "CONDITIONAL",
-                "as_of": "2026-10-14T13:10:00-04:00",
-                "valid_until": "2026-10-14T13:40:00-04:00",
-                "action_now": null,
-                "action_if_triggered": null,
-                "required_rechecks": [
-                  "실시간 시세와 주문 가능 상태 재확인",
-                  "실시간 시세·호가·계좌·위험한도와 중단 상태 재확인",
-                  "실시간 호가와 주문 가능 상태 재확인",
-                  "계좌 현금·미체결 주문 재확인",
-                  "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
-                ],
-                "blockers": [
-                  "work_packet_row_expired",
-                  "account_observation_expired",
-                  "market_data_stale_or_unavailable",
-                  "delayed_or_invalid_market_data",
-                  "limited_execution_strength",
-                  "limited_halt_status",
-                  "limited_orderbook",
-                  "status_unavailable:luld_status",
-                  "status_unavailable:reg_sho_status",
-                  "status_unavailable:news_halt_status",
-                  "feed_limited:execution_strength",
-                  "feed_limited:orderbook"
-                ],
-                "source_readiness": "WAIT_FOR_TRIGGER"
-              },
               "source_contributions": [],
               "no_relevant_evidence_reason": "정상 외부 이벤트는 있으나 해당 전송 종목의 직접 일치 event key가 없다."
             }
@@ -43455,16 +42552,17 @@
           "next_checkpoint": "실시간 시세·호가·계좌·위험한도, LULD·뉴스 중단, 공식 기업 자료를 확인해 별도 실행 판단. 원래 유효시각을 연장하지 않음."
         },
         "lineage": {
-          "status": "CURRENT_PACKET",
+          "status": "CURRENT_ANALYSIS_LINEAGE",
           "current_action_cards_enriched": true,
-          "reason": "event_source_and_ticker_coverage_match",
+          "reason": "analysis_source_run_and_ticker_coverage_match",
           "workflow_contract_matches": true,
           "ticker_coverage_matches": true,
           "report_ticker_count": 30,
           "current_ticker_count": 30,
           "report_source_run_id": "20261015T021357_local-scheduler-us-overlay_only",
           "current_analysis_source_run_id": "20261015T004404_local-scheduler-us-overlay_only"
-        }
+        },
+        "analysis_only": true
       },
       "role_counts": {
         "HOLDING": 14,
