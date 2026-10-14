@@ -11,6 +11,25 @@ from tradingagents import local_automation as local
 from tradingagents.atomic_io import interprocess_file_lock
 
 
+@pytest.fixture(autouse=True)
+def ample_test_storage(monkeypatch):
+    monkeypatch.setattr(local, "require_storage_headroom", lambda *paths: None)
+
+
+@pytest.mark.parametrize("free,passes", [(4 * 1024**3, True), (4 * 1024**3 - 1, False)])
+def test_local_output_reserve_blocks_full_disk_before_auth(tmp_path, monkeypatch, free, passes):
+    from importlib import util
+    spec = util.spec_from_file_location("local_storage_test", Path(local.__file__))
+    unpatched = util.module_from_spec(spec)
+    spec.loader.exec_module(unpatched)
+    monkeypatch.setattr(unpatched.shutil, "disk_usage", lambda path: SimpleNamespace(free=free))
+    if passes:
+        unpatched.require_storage_headroom(tmp_path / "not-created")
+    else:
+        with pytest.raises(unpatched.LocalStorageHeadroomError):
+            unpatched.require_storage_headroom(tmp_path / "not-created")
+
+
 def target():
     return SimpleNamespace(name="daily-codex-us", workflow_file="daily-codex-analysis.yml", inputs={"profile": "us"},
                            window_start_kst=datetime(2026, 10, 9, 8, 45, tzinfo=timezone.utc), max_failed_attempts=2)

@@ -11,6 +11,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -23,6 +24,21 @@ from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = "nornen0202/TradingAgents"
 PUBLIC_BASE = "https://nornen0202.github.io/TradingAgents"
+
+
+class LocalStorageHeadroomError(RuntimeError):
+    """Insufficient local output reserve; this is not a login failure."""
+
+
+def require_storage_headroom(*paths):
+    # The hosted Windows lane already reserves 4 GiB. Apply the same output
+    # reserve locally, including a separately configured scratch volume.
+    for path in paths:
+        candidate = Path(path).resolve()
+        while not candidate.exists():
+            candidate = candidate.parent
+        if shutil.disk_usage(candidate).free < 4 * 1024**3:
+            raise LocalStorageHeadroomError("Local analysis needs at least 4 GiB of free output storage.")
 
 
 def script(name):
@@ -212,6 +228,9 @@ def run_due(archive, state, *, now=None, dry_run=False):
         stage = "preflight" if mode == "full" else "analysis"
         exit_code, error_type = 1, "WorkerInterrupted"
         try:
+            from tradingagents.scheduled.config import load_scheduled_config
+            workspace = load_scheduled_config(config).llm.codex_workspace_dir
+            require_storage_headroom(archive, state, workspace)
             if mode == "full":
                 preflight(config)
             stage = "analysis"

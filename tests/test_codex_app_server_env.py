@@ -1,8 +1,10 @@
 ﻿import os
 from pathlib import Path
 from unittest.mock import patch
+import errno
+import pytest
 
-from tradingagents.llm_clients.codex_app_server import CodexAppServerSession
+from tradingagents.llm_clients.codex_app_server import CodexAppServerSession, CodexAppServerStorageError, CodexAppServerAuthError
 
 
 def test_codex_app_server_sets_isolated_codex_home(tmp_path: Path):
@@ -91,3 +93,34 @@ def test_codex_app_server_prunes_isolated_home_logs_on_close(tmp_path: Path):
     assert not (isolated_home / "logs_2.sqlite").exists()
     assert not (isolated_home / "logs_2.sqlite-wal").exists()
     assert (isolated_home / "auth.json").exists()
+
+
+def test_full_disk_preserves_auth_and_is_not_a_login_error(tmp_path):
+    source, home = tmp_path / "source", tmp_path / "workspace" / ".codex-home"
+    source.mkdir()
+    home.mkdir(parents=True)
+    (source / "auth.json").write_text('{"auth":"source"}')
+    (home / "auth.json").write_text('{"auth":"previous"}')
+    session = CodexAppServerSession(codex_binary="codex", request_timeout=30,
+                                    workspace_dir=str(home.parent), cleanup_threads=True)
+    with patch.object(session, "_source_codex_home", return_value=source), patch(
+            "tradingagents.llm_clients.codex_app_server.shutil.copyfile",
+            side_effect=OSError(errno.ENOSPC, "disk full")):
+        with pytest.raises(CodexAppServerStorageError):
+            session._seed_codex_home(home)
+    assert (home / "auth.json").read_text() == '{"auth":"previous"}'
+    assert (source / "auth.json").read_text() == '{"auth":"source"}'
+    assert not list(home.glob("*.tmp"))
+
+
+def test_auth_copy_permission_failure_remains_an_auth_error(tmp_path):
+    source, home = tmp_path / "source", tmp_path / "home"
+    source.mkdir()
+    home.mkdir()
+    (source / "auth.json").write_text("{}")
+    session = CodexAppServerSession(codex_binary="codex", request_timeout=30,
+                                    workspace_dir=str(home), cleanup_threads=True)
+    with patch.object(session, "_source_codex_home", return_value=source), patch(
+            "tradingagents.llm_clients.codex_app_server.shutil.copyfile", side_effect=PermissionError("denied")):
+        with pytest.raises(CodexAppServerAuthError):
+            session._seed_codex_home(home)
