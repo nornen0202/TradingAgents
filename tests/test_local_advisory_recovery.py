@@ -101,6 +101,24 @@ def test_prism_reuses_original_lookback_and_message_cap(tmp_path, watchdog):
     assert client.dispatched == [(PRISM, {"lookback_minutes": "445", "max_messages": "80", "recovery_source": "local_watchdog"})]
 
 
+@pytest.mark.parametrize("clock", ["13:00", "14:30", "14:59"])
+def test_late_overlap_reserves_time_for_prism_before_youtube(tmp_path, watchdog, clock):
+    now = datetime.fromisoformat(f"2026-10-14T{clock}:00+09:00")
+    client = Client()
+    assert recover(tmp_path, watchdog, client, now=now)[-1]["status"] == "ADVISORY_DISPATCH_ACCEPTED"
+    assert len(client.dispatched) == 1 and client.dispatched[0][0] == PRISM
+
+
+def test_late_prism_hold_does_not_starve_ready_youtube(tmp_path, watchdog):
+    now = datetime.fromisoformat("2026-10-14T14:30:00+09:00")
+    a = run_record("prism", run_id=10, conclusion="failure")
+    b = run_record("prism", run_id=11, conclusion="failure")
+    client = Client({PRISM: [a, b]}, {i: [build("prism", collection="failure", stamp="skipped", conclusion="failure")]
+                                   for i in (10, 11)})
+    recover(tmp_path, watchdog, client, now=now)
+    assert len(client.dispatched) == 1 and client.dispatched[0][0] == YT
+
+
 @pytest.mark.parametrize("error", [None, TimeoutError("secret-token in transport error")])
 def test_unknown_or_accepted_dispatch_never_repeats_without_visible_run(tmp_path, watchdog, error):
     client = Client()

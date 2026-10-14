@@ -56,6 +56,32 @@ def test_alignment_reads_effective_config_and_leaves_other_targets_unchanged(mon
         assert local.local_target_window_start(target, now=now) == target.window_start_kst
 
 
+@pytest.mark.parametrize("now,clocks,expected", [
+    ("2026-10-13T22:54:00", ["23:00", "00:00", "01:00"], "2026-10-13T23:00:00"),
+    ("2026-10-14T00:20:00", ["23:00", "00:00", "01:00"], "2026-10-13T23:00:00"),
+    ("2026-11-06T23:54:00", ["00:00", "01:00"], "2026-11-07T00:00:00"),
+    ("2026-11-07T00:03:00", ["00:00", "01:00"], "2026-11-07T00:00:00"),
+    ("2026-10-13T22:54:00", ["broken", "23:00", "24:90", "00:00"], "2026-10-13T23:00:00"),
+])
+def test_legacy_clocks_keep_session_order_and_skip_invalid_entries(monkeypatch, now, clocks, expected):
+    execution = SimpleNamespace(execution_refresh_enabled=True, execution_refresh_checkpoints_local=[],
+                               execution_refresh_checkpoints_kst=clocks, execution_checkpoint_timezone="America/New_York")
+    monkeypatch.setattr(config_module, "load_scheduled_config", lambda _: SimpleNamespace(execution=execution))
+    now = kst(now)
+    assert local.local_target_window_start(us_target(now), now=now) == kst(expected)
+
+
+@pytest.mark.parametrize("clocks,expected", [(["broken", "10:00", "24:90"], "2026-10-13T23:00:00"),
+                                           (["broken", "24:90"], None)])
+def test_invalid_local_clocks_do_not_abort_scheduler(monkeypatch, clocks, expected):
+    execution = SimpleNamespace(execution_refresh_enabled=True, execution_refresh_checkpoints_local=clocks,
+                               execution_refresh_checkpoints_kst=[], execution_checkpoint_timezone="America/New_York")
+    monkeypatch.setattr(config_module, "load_scheduled_config", lambda _: SimpleNamespace(execution=execution))
+    now = kst("2026-10-13T22:54:00")
+    target = us_target(now)
+    assert local.local_target_window_start(target, now=now) == (kst(expected) if expected else target.window_start_kst)
+
+
 def overlay_manifest(started="2026-10-13T22:54:00+09:00", finished="2026-10-13T22:55:00+09:00"):
     return {"settings": {"market": "US", "run_mode": "overlay_only"}, "status": "success",
             "summary": {"total_tickers": 30, "failed_tickers": 0},
@@ -126,6 +152,27 @@ def test_completed_real_refresh_suppresses_duplicate_even_when_publication_is_pe
     wire_overlay_only(monkeypatch, [overlay_manifest(), manifest])
     monkeypatch.setattr(local.subprocess, "run", lambda *a, **k: pytest.fail("duplicate overlay"))
     assert local.run_due(tmp_path / "archive", tmp_path / "state", now=kst("2026-10-13T23:08:00"))[0]["status"] == "RESEARCH_COMPLETE"
+
+
+@pytest.mark.parametrize("asof,selected,expected", [
+    ("2026-10-13T23:02:00+09:00", ["10:00"], True),
+    ("2026-10-13T22:58:00+09:00", ["10:00"], False),
+    ("2026-10-13T23:02:00+09:00", [], False),
+    ("2026-10-12T23:02:00+09:00", ["10:00"], False),
+    ("2026-10-13T23:12:00+09:00", ["10:00"], False),
+    ("2026-10-13T23:02:00", ["10:00"], False),
+])
+def test_crossing_checkpoint_completion_uses_execution_observation(asof, selected, expected, tmp_path, monkeypatch):
+    manifest = overlay_manifest("2026-10-13T22:54:00+09:00", "2026-10-13T23:04:00+09:00")
+    manifest["execution"] = {"refresh_checkpoint": "10:00", "execution_asof": asof,
+                             "overlay_phase": {"selected_checkpoints": selected}}
+    now = kst("2026-10-13T23:08:00")
+    target = us_target(now)
+    assert local.completed_target(manifest, target, window_start=kst("2026-10-13T23:00:00")) is expected
+    if expected:
+        wire_overlay_only(monkeypatch, [manifest])
+        monkeypatch.setattr(local.subprocess, "run", lambda *a, **k: pytest.fail("duplicate after completed observation"))
+        assert local.run_due(tmp_path / "archive", tmp_path / "state", now=now)[0]["status"] == "RESEARCH_COMPLETE"
 
 
 @pytest.mark.parametrize("is_session", [False, None])

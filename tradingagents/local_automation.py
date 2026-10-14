@@ -131,11 +131,26 @@ def local_target_window_start(target, *, now):
     if not config.execution.execution_refresh_enabled or not checkpoints:
         return start
     checkpoint_zone = ZoneInfo(_execution_checkpoint_timezone(config))
-    # At 22:35 KST the cloud window can still name the previous 02:10 slot.
-    # The current market session, not that stale slot date, owns this checkpoint.
-    session_date = now.astimezone(checkpoint_zone).date()
-    first_clock = min(datetime.strptime(value, "%H:%M").time() for value in checkpoints)
-    first_checkpoint = datetime.combine(session_date, first_clock, tzinfo=checkpoint_zone)
+    clocks = []
+    for value in checkpoints:
+        try:
+            clocks.append(datetime.strptime(value, "%H:%M").time())
+        except (TypeError, ValueError):
+            continue
+    if not clocks:
+        return start
+    # Legacy KST clocks are session-ordered, e.g. 23:00, 00:00 during DST.
+    # Anchor all clocks to the New York session even after KST midnight.
+    market_zone = ZoneInfo("America/New_York")
+    session_start = datetime.combine(now.astimezone(market_zone).date(), datetime.min.time(), tzinfo=market_zone)
+    session_date = session_start.astimezone(checkpoint_zone).date()
+    candidates = []
+    for clock in clocks:
+        checkpoint = datetime.combine(session_date, clock, tzinfo=checkpoint_zone)
+        if checkpoint < session_start:
+            checkpoint += timedelta(days=1)
+        candidates.append(checkpoint)
+    first_checkpoint = min(candidates) if config.execution.execution_refresh_checkpoints_local else candidates[0]
     return max(start, first_checkpoint.astimezone(start.tzinfo))
 
 
@@ -154,12 +169,31 @@ def completed_target(manifest, target, *, window_start=None):
         finished = datetime.fromisoformat(manifest["finished_at"].replace("Z", "+00:00"))
     except (KeyError, TypeError, ValueError):
         return False
-    if started.tzinfo is None or finished.tzinfo is None or finished < started or started < (window_start or target.window_start_kst):
+    if started.tzinfo is None or finished.tzinfo is None or finished < started:
         return False
+    boundary = window_start or target.window_start_kst
     if mode == "full":
+        if started < boundary:
+            return False
         return _manifest_is_complete_overlay_baseline(
             manifest, market=target.inputs["profile"], requested_tickers=None, required_holding_tickers=None,
         )
+    execution = manifest.get("execution")
+    if isinstance(execution, dict):
+        phase = execution.get("overlay_phase") or {}
+        if not isinstance(phase, dict):
+            return False
+        selected = phase.get("selected_checkpoints") or []
+        if not isinstance(selected, list) or not selected or execution.get("refresh_checkpoint") not in selected:
+            return False
+        try:
+            observed = datetime.fromisoformat(execution["execution_asof"].replace("Z", "+00:00"))
+        except (KeyError, TypeError, ValueError, AttributeError):
+            return False
+        if observed.tzinfo is None or not started <= observed <= finished or observed < boundary:
+            return False
+    elif started < boundary:
+        return False  # Older manifests have no execution observation receipt.
     return manifest.get("status") == "success" and int((manifest.get("summary") or {}).get("failed_tickers", 0)) == 0
 
 

@@ -46,6 +46,11 @@ on:
           - "true"
           - "false"
 
+# Serialize preparation too: its cleanup must never delete an active producer.
+concurrency:
+  group: daily-prism-telegram-reports-self-hosted-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   prepare_self_hosted_runner:
     if: ${{ github.ref == 'refs/heads/main' }}
@@ -123,6 +128,7 @@ jobs:
       contents: read
     outputs:
       pages_snapshot_generated_epoch_ms: ${{ steps.stamp_pages_snapshot.outputs.generated_epoch_ms }}
+      did_build: ${{ steps.runtime_gate.outputs.should_run }}
     defaults:
       run:
         shell: python {0}
@@ -169,7 +175,18 @@ jobs:
           subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
           subprocess.check_call([sys.executable, "-m", "pip", "install", "-e", ".[telegram]"])
 
+      - name: Recheck PRISM session coverage before collection
+        id: runtime_gate
+        working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
+        env:
+          GH_EVENT_NAME: ${{ github.event_name }}
+          RECOVERY_SOURCE: ${{ inputs.recovery_source || 'native' }}
+        run: |
+          from tradingagents.prism_telegram.collection_gate import main
+          main()
+
       - name: Rebuild base scheduled site
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import os
@@ -193,6 +210,7 @@ jobs:
           subprocess.check_call(args)
 
       - name: Run PRISM Telegram report collection
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         timeout-minutes: 45
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
@@ -229,6 +247,7 @@ jobs:
           subprocess.check_call(args)
 
       - name: Rebuild merged site and Work context after PRISM collection
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import os
@@ -252,6 +271,7 @@ jobs:
           subprocess.check_call(args)
 
       - name: Stamp rollback-resistant Pages snapshot
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         id: stamp_pages_snapshot
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
@@ -281,7 +301,7 @@ jobs:
           )
 
       - name: Add Git Bash to PATH for Pages packaging
-        if: runner.os == 'Windows'
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' && runner.os == 'Windows' }}
         shell: python {0}
         run: |
           import os
@@ -301,13 +321,14 @@ jobs:
               )
 
       - name: Verify Pages packaging tools
-        if: runner.os == 'Windows'
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' && runner.os == 'Windows' }}
         shell: bash
         run: |
           bash --version
           tar --version
 
       - name: Upload GitHub Pages artifact
+        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-prism-telegram
@@ -353,7 +374,7 @@ jobs:
 
   deploy:
     needs: build_prism_telegram_pages
-    if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && needs.build_prism_telegram_pages.result == 'success' }}
+    if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && needs.build_prism_telegram_pages.result == 'success' && needs.build_prism_telegram_pages.outputs.did_build == 'true' }}
     runs-on: ubuntu-latest
     concurrency:
       group: tradingagents-pages-deploy

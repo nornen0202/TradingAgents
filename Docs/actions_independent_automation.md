@@ -35,6 +35,12 @@ every five minutes and at logon, with separate OS locks:
   files and does not wait for the Pages CDN or an Actions event.
 
 Successful research suppresses duplicate analysis even if publication failed.
+For the first local US overlay, the scheduler waits for the configured execution
+checkpoint on the current New York session date. Legacy KST checkpoint lists
+retain their session order across midnight; malformed clock entries are skipped.
+A completed overlay's selected checkpoint and execution as-of receipt establish
+coverage even if the process started before that boundary. Older manifests
+without an execution receipt retain the process-start fallback.
 Publication retains a durable pending receipt and retries delivery separately.
 A Git push or accepted handoff is not a delivery receipt: the publisher checks
 the live snapshot marker plus exact strategy and KR/US Work-report bytes before

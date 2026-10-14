@@ -20,19 +20,41 @@ class ExplicitPriceRangeConflictError(StructuredDecisionValidationError):
 
 _PRICE_RANGE_NUMBER = r"(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"
 _PRICE_UNIT = r"원|달러|KRW(?![A-Za-z])|USD(?![A-Za-z])"
+_PRICE_PREFIX = r"[$₩]|(?:KRW|USD)(?![A-Za-z])"
 _EXPLICIT_RANGE_PAIR = re.compile(
-    rf"(?<![A-Za-z\d_.,+-])(?P<prefix>[$₩]?)\s*(?P<low>{_PRICE_RANGE_NUMBER})"
+    rf"(?<![A-Za-z\d_.,+-])(?P<prefix>{_PRICE_PREFIX})?\s*(?P<low>{_PRICE_RANGE_NUMBER})"
     rf"\s*(?P<low_unit>{_PRICE_UNIT})?\s*[-–—~〜]\s*"
-    rf"(?P<second_prefix>[$₩]?)\s*(?P<high>{_PRICE_RANGE_NUMBER})(?![\d.,])"
+    rf"(?P<second_prefix>{_PRICE_PREFIX})?\s*(?P<high>{_PRICE_RANGE_NUMBER})(?![\d.,])"
     rf"\s*(?P<unit>{_PRICE_UNIT})?",
     re.IGNORECASE,
 )
 _EXPLICIT_PRICE = re.compile(
-    rf"(?<![A-Za-z\d_.,+-])(?P<prefix>[$₩]?)\s*(?P<price>{_PRICE_RANGE_NUMBER})(?![\d.,])"
+    rf"(?<![A-Za-z\d_.,+-])(?P<prefix>{_PRICE_PREFIX})?\s*(?P<price>{_PRICE_RANGE_NUMBER})(?![\d.,])"
     rf"\s*(?P<unit>{_PRICE_UNIT})?",
     re.IGNORECASE,
 )
 _PRICE_CURRENCIES = {"$": "USD", "USD": "USD", "달러": "USD", "₩": "KRW", "KRW": "KRW", "원": "KRW"}
+_RANGE_INDICATOR = r"(?:RSI|RVOL|ADX|MACD|ATR|ROC|CCI|stochastic)"
+
+
+def _non_price_range(text: str, pair: re.Match[str]) -> bool:
+    tail = text[pair.end("high"):]
+    if pair["unit"]:
+        return False  # A literal currency suffix is conclusive, including tight prose.
+    if re.match(r"\s*(?:[%％]|(?:퍼센트|주|분|시간|초|일|개월|년)(?![가-힣])|shares?\b|minutes?\b|hours?\b)", tail, re.IGNORECASE):
+        return True
+    if re.match(r"\s*(?:(?:천|만|억|조)(?:원|달러)|k\b|m\b|b\b|t\b|thousand\b|million\b|billion\b|trillion\b)", tail, re.IGNORECASE):
+        return True  # Scaled notation is outside this literal-price validator.
+    marked = any(pair[field] for field in ("prefix", "low_unit", "second_prefix", "unit"))
+    if marked:
+        # Do not interpret an unknown attached ASCII unit as price prose.
+        return bool(re.match(r"[A-Za-z]", tail))
+    return any((
+        text[:pair.start()].rstrip().endswith(":"), tail.lstrip().startswith(":"),
+        re.match(r"\d{4}-\d{1,2}-\d{1,2}\b", text[pair.start():].lstrip()),
+        re.search(rf"\b{_RANGE_INDICATOR}\s*[:=]?\s*$", text[:pair.start()], re.IGNORECASE),
+        re.match(rf"\s*{_RANGE_INDICATOR}\b", tail, re.IGNORECASE),
+    ))
 
 
 def explicit_price_range_conflicts(data: Mapping[str, Any]) -> list[str]:
@@ -63,7 +85,7 @@ def explicit_price_range_conflicts(data: Mapping[str, Any]) -> list[str]:
         if low == high or not all(math.isfinite(value) for value in (low, high)):
             continue
         text = str(item.get("source_text") or "")
-        pairs = list(_EXPLICIT_RANGE_PAIR.finditer(text))
+        pairs = [pair for pair in _EXPLICIT_RANGE_PAIR.finditer(text) if not _non_price_range(text, pair)]
         if len(pairs) != 1:
             continue
         pair = pairs[0]
@@ -77,13 +99,6 @@ def explicit_price_range_conflicts(data: Mapping[str, Any]) -> list[str]:
         currency = next(iter(units))
         raw_currency = str(item.get("currency") or "").upper()
         if raw_currency and _PRICE_CURRENCIES.get(raw_currency) != currency:
-            continue
-        # Do not mistake a symbol-prefixed percentage or scaled shorthand for a
-        # literal price range. Explicit KRW/USD suffixes are already conclusive.
-        tail = text[pair.end("high"):]
-        if not pair["unit"] and (re.match(r"[%\w]", tail) or re.match(r"\s*%", tail)):
-            continue
-        if re.match(r"\s*(?:k|m|b|t|thousand|million|billion|trillion)\b", tail, re.IGNORECASE):
             continue
         source_low, source_high = sorted(
             float(pair[field].replace(",", "")) for field in ("low", "high")

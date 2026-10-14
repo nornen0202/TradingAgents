@@ -267,6 +267,11 @@ def recover_due(archive, state, *, watchdog, targets, now, dry_run=False, client
     targets = [target for target in targets if target.workflow_file in WORKFLOWS]
     if not targets:
         return []
+    # YouTube can spend three hours collecting. Reserve one further hour for
+    # setup and PRISM's 45-minute collector before its 17:00 admission cutoff.
+    prism_deadline = now.replace(hour=17, minute=0, second=0, microsecond=0)
+    if now + timedelta(hours=4) >= prism_deadline:
+        targets.sort(key=lambda target: target.workflow_file != SPECS["prism"][0])
     decisions = []
     root = state / "advisory-recovery"
     admission_path = root / "admission.json"

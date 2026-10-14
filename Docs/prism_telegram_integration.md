@@ -106,3 +106,7 @@ GitHub Actions workflow:
 ```
 
 Use repository secrets for `TELEGRAM_BOT_TOKEN`, `TELEGRAM_API_ID`, `TELEGRAM_API_HASH`, and `TELEGRAM_SESSION_STRING`. The daily workflow defaults to `user_session` mode and PDF downloads, but can be overridden with repository variables `PRISM_TELEGRAM_MODE` and `PRISM_TELEGRAM_DOWNLOAD_PDFS` or by manual workflow inputs.
+
+The workflow serializes preparation, collection, and publication. Native schedules and `cloud_watchdog`/`local_watchdog` recovery recheck the configured archive immediately before collection. A successful collection for the configured channel since 07:35 KST covers that session, including a successful empty result; a delayed automatic run skips collection and publication. Before 07:35, the gate uses the previous day's session. Explicit manual dispatch remains available for an intentional new collection. Corrupt or inconsistent current-session success evidence stops automatic collection and is preserved for diagnosis.
+
+Local recovery normally keeps YouTube first. From 13:00 KST in the overlapping recovery window, it tries PRISM first, reserving time for the three-hour YouTube collector and PRISM's 45-minute collector before PRISM's 17:00 cutoff. If PRISM is covered or held, eligible YouTube recovery can still proceed on the same tick.

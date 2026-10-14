@@ -77,6 +77,32 @@ def test_point_bounds_outside_source_range_remain_a_legacy_threshold():
     assert explicit_price_range_conflicts(_decision(level)) == []
 
 
+@pytest.mark.parametrize("text,currency,low,high", [
+    ("75,200원~75,700구간", "KRW", 75, 75200),
+    ("KRW 75,200~75,700 구간", "KRW", 75, 75200),
+    ("USD 75~80 confirmed", "USD", 7.5, 75),
+    ("usd75~USD80 confirmed", "USD", 7.5, 75),
+    ("75,200~75,700원 접근 후 보유분 20~35% 축소", "KRW", 75, 75200),
+    ("RSI 60~70, 75,200~75,700원 접근 후 RVOL 1~2 확인", "KRW", 75, 75200),
+    ("09:00~10:00, 75,200~75,700원 구간에서 5~10분 관찰", "KRW", 75, 75200),
+    ("75,200~75,700원 접근 후 20~35주 축소", "KRW", 75, 75200),
+    ("2026-10-14, 75,200~75,700원 및 60~70 RSI 확인", "KRW", 75, 75200),
+    ("USD75~80 분할 매수", "USD", 7.5, 75),
+    ("75,200원~75,700 주가 구간", "KRW", 75, 75200),
+])
+def test_currency_prices_are_validated_independently_of_non_price_ranges(text, currency, low, high):
+    level = _level(source_text=text, currency=currency, low=low, high=high)
+    with pytest.raises(ExplicitPriceRangeConflictError):
+        parse_structured_decision(_decision(level))
+    level.update(low=75200 if currency == "KRW" else 75, high=75700 if currency == "KRW" else 80)
+    assert explicit_price_range_conflicts(_decision(level)) == []
+
+
+def test_iso_prefixed_separate_confirmation_price_preserves_threshold_bounds():
+    level = _level(source_text="KRW 75,200~75,700 접근 후 KRW 74,000 아래 확인", low=74000, high=74100)
+    assert explicit_price_range_conflicts(_decision(level)) == []
+
+
 @pytest.mark.parametrize("text", ["$0.75–$0.80 confirmed", "0.75~0.80 USD 확인", "0.75달러~0.80달러 확인"])
 def test_sub_dollar_us_ranges_are_not_rejected_by_absolute_price_heuristics(text):
     level = _level(price=0.78, low=0.75, high=0.80, currency="USD", source_text=text)
@@ -88,6 +114,9 @@ def test_sub_dollar_us_ranges_are_not_rejected_by_absolute_price_heuristics(text
 
 @pytest.mark.parametrize("overrides", [
     {"source_text": "75,200~75,700원 또는 73,000~74,000원"},
+    {"source_text": "75,200~75,700원 또는 73,000~74,000"},
+    {"source_text": "USD75~80 또는 USD70~72", "currency": "USD"},
+    {"source_text": "KRW 75,200~USD 75,700"},
     {"source_text": "75,200~75,700"},
     {"source_text": "RSI 75~80 및 RVOL 1~2 확인"},
     {"source_text": "75~80% 축소"},
@@ -159,12 +188,16 @@ def test_saved_decision_rebuild_uses_observable_watch_only_fallback_without_thro
 
 
 @pytest.mark.parametrize("location", ["structured_levels", "risk_action_level"])
-def test_copied_legacy_contract_is_blocked_even_with_fresh_quote(location):
+@pytest.mark.parametrize("source_text", [
+    _level()["source_text"], "75,200원~75,700구간", "KRW 75,200~75,700 구간",
+    "75,200~75,700원 접근 후 보유분 20~35% 축소",
+])
+def test_copied_legacy_contract_is_blocked_even_with_fresh_quote(location, source_text):
     from tradingagents.scheduled.runner import _ExecutionContractShim
 
     payload = {"decision": json.dumps(_decision(_level(low=75200, high=75700)))}
     contract = build_execution_contract(ticker="034020.KS", analysis_payload=payload)
-    bad_level = PriceLevel(**_level())
+    bad_level = PriceLevel(**_level(source_text=source_text))
     contract = replace(contract, action_if_triggered=ActionIfTriggered.STARTER,
                        **{location: (bad_level,) if location == "structured_levels" else bad_level})
     archived = contract.to_dict()
