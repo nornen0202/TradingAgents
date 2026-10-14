@@ -76,11 +76,11 @@ class LLMSettings:
     writer_model: str = "gpt-6.1-sol"
     judge_model: str = "gpt-6-astra"
     codex_reasoning_effort: str = "medium"
-    codex_quick_reasoning_effort: str = "high"
-    codex_deep_reasoning_effort: str = "xhigh"
+    codex_quick_reasoning_effort: str = "medium"
+    codex_deep_reasoning_effort: str = "high"
     codex_output_reasoning_effort: str = "medium"
-    codex_writer_reasoning_effort: str = "high"
-    codex_judge_reasoning_effort: str = "xhigh"
+    codex_writer_reasoning_effort: str = "medium"
+    codex_judge_reasoning_effort: str = "high"
     codex_execution_summary_reasoning_effort: str = "medium"
     codex_summary: str = "none"
     codex_personality: str = "none"
@@ -497,25 +497,25 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             or "gpt-6-astra",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_quick_reasoning_effort=str(
-                llm_raw.get("codex_quick_reasoning_effort", "high")
+                llm_raw.get("codex_quick_reasoning_effort", "medium")
+            ).strip()
+            or "medium",
+            codex_deep_reasoning_effort=str(
+                llm_raw.get("codex_deep_reasoning_effort", "high")
             ).strip()
             or "high",
-            codex_deep_reasoning_effort=str(
-                llm_raw.get("codex_deep_reasoning_effort", "xhigh")
-            ).strip()
-            or "xhigh",
             codex_output_reasoning_effort=str(
                 llm_raw.get("codex_output_reasoning_effort", "medium")
             ).strip()
             or "medium",
             codex_writer_reasoning_effort=str(
-                llm_raw.get("codex_writer_reasoning_effort", "high")
+                llm_raw.get("codex_writer_reasoning_effort", "medium")
+            ).strip()
+            or "medium",
+            codex_judge_reasoning_effort=str(
+                llm_raw.get("codex_judge_reasoning_effort", "high")
             ).strip()
             or "high",
-            codex_judge_reasoning_effort=str(
-                llm_raw.get("codex_judge_reasoning_effort", "xhigh")
-            ).strip()
-            or "xhigh",
             codex_execution_summary_reasoning_effort=str(
                 llm_raw.get("codex_execution_summary_reasoning_effort", "medium")
             ).strip()

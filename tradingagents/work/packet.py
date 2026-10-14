@@ -397,8 +397,8 @@ def _work_synthesis_model_contract(surface: str) -> dict[str, Any]:
     )
     return {
         "execution_mode": manifest.get("execution_mode"),
-        "requested_model": manifest.get("model"),
-        "requested_reasoning_effort": manifest.get("reasoning_effort"),
+        "requested_model": task.get("model") or manifest.get("model"),
+        "requested_reasoning_effort": task.get("reasoning_effort") or manifest.get("reasoning_effort"),
         "task_id": task.get("id"),
         "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
         "observed_model": None,

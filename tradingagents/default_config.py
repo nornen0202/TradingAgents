@@ -34,8 +34,8 @@ DEFAULT_CONFIG = {
     "anthropic_effort": None,           # "high", "medium", "low"
     "codex_binary": os.getenv("CODEX_BINARY"),
     "codex_reasoning_effort": "medium",
-    "codex_quick_reasoning_effort": "high",
-    "codex_deep_reasoning_effort": "xhigh",
+    "codex_quick_reasoning_effort": "medium",
+    "codex_deep_reasoning_effort": "high",
     "codex_output_reasoning_effort": "medium",
     "codex_summary": "none",
     "codex_personality": "none",

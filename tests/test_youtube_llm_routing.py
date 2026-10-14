@@ -11,15 +11,15 @@ from tradingagents.youtube.verifier import (
 )
 
 
-def test_youtube_config_uses_astra_for_judgment_and_sol_for_extraction_and_writing():
+def test_youtube_config_uses_sol_with_role_specific_effort():
     settings = load_youtube_config("config/youtube_daily.toml").llm
 
     assert settings.quick_model == "gpt-6.1-sol"
-    assert settings.deep_model == "gpt-6-astra"
+    assert settings.deep_model == "gpt-6.1-sol"
     assert settings.output_model == "gpt-6.1-sol"
-    assert settings.synthesis_model == "gpt-6-astra"
-    assert settings.codex_quick_reasoning_effort == "high"
-    assert settings.codex_deep_reasoning_effort == "xhigh"
+    assert settings.synthesis_model == "gpt-6.1-sol"
+    assert settings.codex_quick_reasoning_effort == "medium"
+    assert settings.codex_deep_reasoning_effort == "high"
     assert settings.codex_output_reasoning_effort == "medium"
     assert settings.codex_synthesis_reasoning_effort == "high"
     assert settings.codex_synthesis_request_timeout == 900.0
@@ -29,7 +29,7 @@ def test_youtube_missing_config_uses_role_specific_codex_defaults(tmp_path):
     settings = load_youtube_config(tmp_path / "missing.toml").llm
 
     assert settings.quick_model == settings.output_model == "gpt-6.1-sol"
-    assert settings.deep_model == settings.synthesis_model == "gpt-6-astra"
+    assert settings.deep_model == settings.synthesis_model == "gpt-6.1-sol"
 
 
 def test_youtube_blank_environment_overrides_keep_role_defaults(tmp_path, monkeypatch):
@@ -43,7 +43,7 @@ def test_youtube_blank_environment_overrides_keep_role_defaults(tmp_path, monkey
         monkeypatch.setenv(key, " ")
     settings = load_youtube_config(tmp_path / "missing.toml").llm
     assert settings.quick_model == settings.output_model == "gpt-6.1-sol"
-    assert settings.deep_model == settings.synthesis_model == "gpt-6-astra"
+    assert settings.deep_model == settings.synthesis_model == "gpt-6.1-sol"
 
 
 def test_youtube_config_accepts_workflow_resolved_role_models(monkeypatch):
@@ -81,8 +81,8 @@ def test_youtube_role_clients_receive_stage_model_effort_and_telemetry_role():
         (model, kwargs["codex_reasoning_effort"], kwargs["model_role"])
         for _, model, kwargs in calls
     ] == [
-        ("gpt-6.1-sol", "high", "quick"),
-        ("gpt-6-astra", "xhigh", "judge"),
+        ("gpt-6.1-sol", "medium", "quick"),
+        ("gpt-6.1-sol", "high", "judge"),
         ("gpt-6.1-sol", "medium", "writer"),
     ]
 
@@ -105,7 +105,7 @@ def test_youtube_role_clients_are_closed_once_after_each_video():
     assert judge.close_calls == 1
 
 
-def test_youtube_synthesis_client_receives_astra_and_preserves_effort():
+def test_youtube_synthesis_client_receives_sol_and_preserves_effort():
     settings = load_youtube_config("config/youtube_daily.toml").llm
     with patch(
         "tradingagents.youtube.synthesis.create_llm_client",
@@ -113,7 +113,7 @@ def test_youtube_synthesis_client_receives_astra_and_preserves_effort():
     ) as create:
         assert _create_synthesis_llm(settings) is not None
     assert create.call_args.kwargs["provider"] == "codex"
-    assert create.call_args.kwargs["model"] == "gpt-6-astra"
+    assert create.call_args.kwargs["model"] == "gpt-6.1-sol"
     assert create.call_args.kwargs["model_role"] == "youtube_synthesis"
     assert create.call_args.kwargs["codex_reasoning_effort"] == "high"
     assert create.call_args.kwargs["codex_request_timeout"] == 900.0
@@ -126,8 +126,7 @@ def test_youtube_workflow_preflights_and_exports_every_role_model():
 
     assert 'TRADINGAGENTS_CODEX_ALLOW_MODEL_FALLBACK: "0"' in workflow
     assert 'TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK: "0"' in workflow
-    assert workflow.count('model="gpt-6-astra"') == 1
-    assert workflow.count('model="gpt-6.1-sol"') == 2
+    assert workflow.count('model="gpt-6.1-sol"') == 3
     assert 'codex_preflight_fallback_models("judge")' in workflow
     assert 'codex_preflight_fallback_models("quick")' in workflow
     assert 'codex_preflight_fallback_models("writer")' in workflow

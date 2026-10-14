@@ -686,7 +686,8 @@ def test_market_packet_distinguishes_runtime_observed_analysis_from_configured_w
     assert provenance["market_analysis"]["verification_status"] == "RUNTIME_USAGE_OBSERVED"
     assert provenance["market_analysis"]["observed_calls"] == 9
     assert "gpt-5.6-sol" in provenance["market_analysis"]["observed_models"]
-    assert provenance["work_synthesis"]["requested_model"] == "gpt-6.1-sol"
+    assert provenance["work_synthesis"]["requested_model"] == "gpt-6-astra"
+    assert provenance["work_synthesis"]["requested_reasoning_effort"] == "high"
     assert provenance["work_synthesis"]["verification_status"] == "CONFIGURED_NOT_RUNTIME_VERIFIED"
     assert provenance["work_synthesis"]["observed_model"] is None
 
@@ -2788,7 +2789,11 @@ def test_scheduled_work_task_manifest_uses_gpt6_local_mode_and_unique_surfaces()
 
     assert manifest["execution_mode"] == "local"
     assert manifest["model"] == "gpt-6.1-sol"
-    assert manifest["reasoning_effort"] == "xhigh"
+    assert manifest["reasoning_effort"] == "medium"
+    for task in manifest["tasks"]:
+        strategy = task["surface"] in {"kr", "us"}
+        assert task["model"] == ("gpt-6-astra" if strategy else "gpt-6.1-sol")
+        assert task["reasoning_effort"] == ("high" if strategy else "medium")
     boundary = manifest["capability_boundary"]
     assert boundary["local_archives_require_local_host"] is True
     assert boundary["chatgpt_web_direct_local_file_access"] is False

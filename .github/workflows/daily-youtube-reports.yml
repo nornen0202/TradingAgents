@@ -456,7 +456,7 @@ jobs:
           try:
               judge_result = run_codex_preflight(
                   codex_binary=os.environ.get("CODEX_BINARY") or None,
-                  model="gpt-6-astra",
+                  model="gpt-6.1-sol",
                   request_timeout=30.0,
                   workspace_dir=Path(os.environ["TRADINGAGENTS_CODEX_WORKSPACE_DIR"]),
                   cleanup_threads=True,
@@ -483,10 +483,10 @@ jobs:
           except CodexAppServerBinaryError as exc:
               raise SystemExit(f"Codex binary is not usable: {exc}") from exc
           except CodexModelUnavailableError as exc:
-              raise SystemExit(f"A required Codex role model (gpt-6-astra or gpt-6.1-sol) is unavailable; automatic model fallback is disabled: {exc}") from exc
+              raise SystemExit(f"A required Codex role model (gpt-6.1-sol) is unavailable; automatic model fallback is disabled: {exc}") from exc
 
           for role, result, expected_model in (
-              ("judge/synthesis", judge_result, "gpt-6-astra"),
+              ("judge/synthesis", judge_result, "gpt-6.1-sol"),
               ("extraction/research", quick_result, "gpt-6.1-sol"),
               ("writer", writer_result, "gpt-6.1-sol"),
           ):
