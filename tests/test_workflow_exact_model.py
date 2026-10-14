@@ -25,7 +25,7 @@ SCRIPTS = [
     ("gpt-6-sol", True), ("gpt-6-sol", False), ("gpt-6.1-sol", True),
     ("gpt-6.1-sol", False), ("gpt-6-astra", False),
 ])
-def test_workflow_rejects_model_substitution_before_export(tmp_path, monkeypatch, script, resolved, fallback):
+def test_workflow_enforces_exact_model_before_export(tmp_path, monkeypatch, script, resolved, fallback):
     env_file = tmp_path / "github-env"
     monkeypatch.setenv("GITHUB_ENV", str(env_file))
     monkeypatch.setenv("GITHUB_WORKSPACE", str(tmp_path))
@@ -37,15 +37,22 @@ def test_workflow_rejects_model_substitution_before_export(tmp_path, monkeypatch
 
     def preflight(**kwargs):
         calls.append(kwargs)
-        return SimpleNamespace(requested_model=kwargs["model"], resolved_model=resolved, fallback_used=fallback)
+        return SimpleNamespace(requested_model=kwargs["model"], resolved_model=resolved,
+                               fallback_used=fallback, account="test-account", models=[resolved])
 
     monkeypatch.setattr(codex_preflight, "run_codex_preflight", preflight)
-    with pytest.raises(SystemExit, match="model fallback is disabled"):
+    expected_models = (["gpt-6.1-sol"] * 3 if script == SCRIPTS[2]
+                       else ["gpt-6-astra", "gpt-6.1-sol", "gpt-6.1-sol"])
+    exact_match = not fallback and all(model == resolved for model in expected_models)
+    if exact_match:
         exec(compile(script, "workflow-preflight", "exec"), {})
+    else:
+        with pytest.raises(SystemExit, match="model fallback is disabled"):
+            exec(compile(script, "workflow-preflight", "exec"), {})
     assert len(calls) == 3
-    assert [call["model"] for call in calls] == ["gpt-6-astra", "gpt-6.1-sol", "gpt-6.1-sol"]
+    assert [call["model"] for call in calls] == expected_models
     assert all(not call["fallback_models"] for call in calls)
-    assert not env_file.exists()
+    assert env_file.exists() == exact_match
 
 
 @pytest.mark.parametrize("script", SCRIPTS, ids=["us", "kr", "youtube"])
@@ -66,9 +73,9 @@ def test_workflow_exports_exact_target_for_each_active_role(tmp_path, monkeypatc
     models = [line for line in exported if "_MODEL=" in line]
     assert len(models) in (4, 5)
     for line in models:
-        expected = "gpt-6-astra" if any(role in line for role in ("_DEEP_", "_JUDGE_", "_SYNTHESIS_")) else "gpt-6.1-sol"
+        expected = "gpt-6-astra" if script != SCRIPTS[2] and any(role in line for role in ("_DEEP_", "_JUDGE_", "_SYNTHESIS_")) else "gpt-6.1-sol"
         assert line.endswith(f"={expected}")
-    assert len([line for line in models if line.endswith("=gpt-6-astra")]) == 2
+    assert len([line for line in models if line.endswith("=gpt-6-astra")]) == (0 if script == SCRIPTS[2] else 2)
     assert "TRADINGAGENTS_CODEX_PREFLIGHT_OK=1" in exported
 
 
