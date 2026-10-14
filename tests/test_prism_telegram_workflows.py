@@ -51,3 +51,20 @@ def test_daily_codex_pages_job_preserves_prism_telegram_archive_location() -> No
     build_pages = workflow.split("  build_pages:", 1)[1].split("  deploy:", 1)[0]
 
     assert "TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR: ${{ vars.TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR }}" in build_pages
+
+
+def test_prism_serializes_cleanup_and_gates_collection_publication_and_deployment():
+    import yaml
+    workflow = yaml.safe_load((ROOT / ".github/workflows/daily-prism-telegram-reports.yml").read_text(encoding="utf-8"))
+    assert workflow["concurrency"] == {"group": "daily-prism-telegram-reports-self-hosted-${{ github.ref }}",
+                                       "cancel-in-progress": False}
+    build = workflow["jobs"]["build_prism_telegram_pages"]
+    assert build["outputs"]["did_build"] == "${{ steps.runtime_gate.outputs.should_run }}"
+    steps = build["steps"]
+    gate_index = next(i for i, step in enumerate(steps) if step.get("id") == "runtime_gate")
+    for step in steps[gate_index + 1:]:
+        if step["name"] == "Clean run-scoped PRISM files":
+            assert step["if"] == "${{ always() }}"
+        else:
+            assert "steps.runtime_gate.outputs.should_run == 'true'" in step["if"]
+    assert "outputs.did_build == 'true'" in workflow["jobs"]["deploy"]["if"]
