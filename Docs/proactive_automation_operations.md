@@ -198,6 +198,24 @@ exact research settings, loaded account, selected coverage and successful
 artifacts before reuse. An incompatible source fails closed within the existing
 cumulative attempt budget; it does not silently become another full analysis.
 
+### Failed holding analysis makes an intact selection appear incomplete
+
+The October 15 partial KR source completed 29/30 ticker analyses. Fresh portfolio
+reconciliation also marked selection incomplete because the failed ticker was a
+holding, although all thirty rows were selected and retained. This blocked the
+07:58 failed-only retry before research started. Preserve that failed attempt and
+its cooldown; it still counts toward the market/session budget.
+
+Recovery may derive a selection view only when a verified fresh account receipt
+shows that every reported holding gap is a failed/skipped row, and the original
+`universe_selection.json` proves complete selection with exactly matching mode,
+required holdings/watchlist, ordered selected tickers and count. Bind its hash
+alongside the terminal manifest, and recheck both before copying successful
+artifacts. Missing proof, real selection gaps, changed holdings or settings,
+unverified accounts and modified artifacts still fail closed. Do not edit the
+partial source or mark its analysis complete. The new cohort must retry the
+failed ticker and recompute complete coverage before publication.
+
 ### Local storage exhaustion after completed ticker research
 
 On October 14, all thirty KR ticker workers completed, but postprocessing failed

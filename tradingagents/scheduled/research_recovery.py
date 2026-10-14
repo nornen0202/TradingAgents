@@ -70,6 +70,40 @@ def recovery_preflight_models(*, archive_dir: Path, source_run_id: str, now: dat
     return tuple(models[:3])
 
 
+def _failed_holding_selection_proof(source_dir, active, rows):
+    """Prove selection separately from failed held-position research.
+
+    Fresh portfolio reconciliation can mark selection incomplete when a selected
+    holding's analysis failed. Only the intact opening selection and matching
+    terminal rows can establish that this is a retryable analysis gap.
+    """
+    failed = {row.get("ticker") for row in rows if row.get("status") in {"failed", "skipped"}}
+    successful = {row.get("ticker") for row in rows if row.get("status") == "success"}
+    holdings = set(_tickers(active.get("expected_holding_tickers")))
+    missing = set(_tickers(active.get("missing_holding_tickers")))
+    if (not missing or missing != holdings - successful or not missing <= failed
+            or active.get("missing_watchlist_tickers")
+            or active.get("account_snapshot_status") != "loaded"
+            or (active.get("fresh_snapshot_drift") or {}).get("status") != "VERIFIED"
+            or (active.get("coverage") or {}).get("fresh_snapshot_complete") is not True):
+        raise ValueError("Recovery source lacks a proven failed-holding selection contract")
+    path = source_dir / "universe_selection.json"
+    if not path.resolve().is_relative_to(source_dir) or not path.is_file():
+        raise ValueError("Recovery source selection proof is missing or escapes source")
+    raw = path.read_bytes()
+    selection = json.loads(raw)
+    selected = _tickers(selection.get("selected_tickers"))
+    required = holdings | set(_tickers(active.get("expected_watchlist_tickers")))
+    if (any(selection.get(key) != active.get(key) for key in (
+            "mode", "active_count", "selected_tickers", "expected_holding_tickers", "expected_watchlist_tickers"))
+            or selected != [row.get("ticker") for row in rows] or not required <= set(selected)
+            or len(selected) != selection.get("active_count")
+            or (selection.get("coverage") or {}).get("complete") is not True
+            or selection.get("missing_holding_tickers") or selection.get("missing_watchlist_tickers")):
+        raise ValueError("Recovery source selection proof does not match the terminal cohort")
+    return hashlib.sha256(raw).hexdigest()
+
+
 def load_recovery_source(*, archive_dir: Path, source_run_id: str, settings: dict,
                          now: datetime, holding_tickers: list[str], account_status: str):
     source, source_dir = _load_terminal_source(archive_dir=archive_dir, source_run_id=source_run_id, now=now)
@@ -90,13 +124,20 @@ def load_recovery_source(*, archive_dir: Path, source_run_id: str, settings: dic
         raise ValueError("Recovery cannot reuse a cohort allowing model fallbacks")
     active = deepcopy(source.get("active_universe") or {})
     coverage = active.get("coverage") or {}
-    if active.get("mode") not in {"full_required_coverage", "adaptive_required_coverage"} or coverage.get("selection_complete") is not True:
+    if active.get("mode") not in {"full_required_coverage", "adaptive_required_coverage"}:
         raise ValueError("Recovery source lacks a complete required-universe selection contract")
     expected = set(_tickers(active.get("expected_holding_tickers"))) | set(_tickers(active.get("expected_watchlist_tickers")))
     rows = source.get("tickers") or []
     tickers = _tickers([row.get("ticker") for row in rows])
     if not tickers or not expected <= set(tickers) or len(tickers) != active.get("active_count"):
         raise ValueError("Recovery source is missing required ticker rows")
+    source_selection_sha256 = None
+    if coverage.get("selection_complete") is not True:
+        source_selection_sha256 = _failed_holding_selection_proof(source_dir, active, rows)
+        # Derive only the new cohort's selection view. Stored source coverage,
+        # analysis failures and original observations remain unchanged.
+        active["coverage"]["selection_complete"] = True
+        active["missing_holding_tickers"] = []
     if any(active.get(k) for k in ("missing_holding_tickers", "missing_watchlist_tickers", "missing_analysis_tickers", "unexpected_analysis_tickers", "duplicate_analysis_tickers")):
         raise ValueError("Recovery source contains coverage gaps beyond failed ticker analyses")
     if not set(holding_tickers) <= set(tickers):
@@ -123,7 +164,8 @@ def load_recovery_source(*, archive_dir: Path, source_run_id: str, settings: dic
     active["recovery_source_run_id"] = source_run_id
     return {"source": source, "source_dir": source_dir, "tickers": tickers,
             "successful_rows": success, "retry_tickers": retry, "active_universe": active,
-            "trade_date": trade_date, "source_manifest_sha256": hashlib.sha256((source_dir / "run.json").read_bytes()).hexdigest()}
+            "trade_date": trade_date, "source_manifest_sha256": hashlib.sha256((source_dir / "run.json").read_bytes()).hexdigest(),
+            "source_selection_sha256": source_selection_sha256}
 
 
 def copy_recovered_research(plan: dict, *, run_dir: Path):
@@ -137,6 +179,9 @@ def copy_recovered_research(plan: dict, *, run_dir: Path):
                 raise ValueError("Finalization source changed after validation")
     elif hashlib.sha256((source_dir / "run.json").read_bytes()).hexdigest() != plan["source_manifest_sha256"]:
         raise ValueError("Recovery source changed or destination would overwrite it")
+    if (plan.get("source_selection_sha256") and hashlib.sha256((source_dir / "universe_selection.json").read_bytes()).hexdigest()
+            != plan["source_selection_sha256"]):
+        raise ValueError("Recovery source selection changed after validation")
     prepared = []
     for row in plan["successful_rows"]:
         artifacts = row.get("artifacts") or {}
@@ -201,6 +246,7 @@ def copy_recovered_research(plan: dict, *, run_dir: Path):
         receipts[row["ticker"]] = receipt
     return summaries, {"schema": "tradingagents.research-recovery/v1", "source_run_id": source["run_id"],
                        "source_manifest_sha256": plan.get("source_manifest_sha256"),
+                       "source_selection_sha256": plan.get("source_selection_sha256"),
                        "finalization_only": bool(plan.get("finalization_only")),
                        "source_file_sha256": plan.get("source_file_sha256"),
                        "source_config_sha256": plan.get("source_config_sha256"),

@@ -148,6 +148,73 @@ def test_recovery_copies_original_bytes_and_times_without_recounting_calls(recov
     assert (recovery["root"] / "run.json").read_bytes() == source_bytes
 
 
+def failed_holding_source(fixture):
+    active = fixture["source"]["active_universe"]
+    active.update(expected_holding_tickers=["XOM"], expected_watchlist_tickers=["AAPL"],
+                  selected_tickers=["AAPL", "XOM"], holding_tickers=[], missing_holding_tickers=["XOM"],
+                  account_snapshot_status="loaded", fresh_snapshot_drift={"status": "VERIFIED"})
+    active["coverage"].update(selection_complete=False, fresh_snapshot_complete=True)
+    selection = {key: deepcopy(active[key]) for key in (
+        "mode", "active_count", "expected_holding_tickers", "expected_watchlist_tickers", "selected_tickers")}
+    selection.update(coverage={"complete": True}, missing_holding_tickers=[], missing_watchlist_tickers=[])
+    write(fixture["root"] / "run.json", fixture["source"])
+    write(fixture["root"] / "universe_selection.json", selection)
+    return selection
+
+
+def test_failed_holding_recovery_uses_bound_original_selection_without_mutating_source(recovery):
+    failed_holding_source(recovery)
+    before = {name: (recovery["root"] / name).read_bytes() for name in ("run.json", "universe_selection.json")}
+    plan = load(recovery, holding_tickers=["XOM"], account_status="loaded")
+    summaries, receipt = copy_recovered_research(plan, run_dir=recovery["destination"])
+    assert plan["retry_tickers"] == ["XOM"]
+    assert [row["ticker"] for row in summaries] == ["AAPL"]
+    assert plan["active_universe"]["coverage"]["selection_complete"] is True
+    assert plan["active_universe"]["coverage"]["analysis_complete"] is False
+    assert receipt["source_selection_sha256"] == hashlib.sha256(before["universe_selection.json"]).hexdigest()
+    assert all((recovery["root"] / name).read_bytes() == data for name, data in before.items())
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda s: s["coverage"].update(complete=False),
+    lambda s: s.update(selected_tickers=["AAPL"]),
+    lambda s: s.update(expected_holding_tickers=[]),
+    lambda s: s.update(expected_watchlist_tickers=["AAPL", "OTHER"]),
+    lambda s: s.update(active_count=3),
+    lambda s: s.update(missing_holding_tickers=["XOM"]),
+])
+def test_failed_holding_recovery_rejects_unproven_selection(recovery, mutate):
+    selection = failed_holding_source(recovery)
+    mutate(selection)
+    write(recovery["root"] / "universe_selection.json", selection)
+    with pytest.raises(ValueError):
+        load(recovery, holding_tickers=["XOM"], account_status="loaded")
+    assert not recovery["destination"].exists()
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda a: a.update(missing_holding_tickers=["AAPL"]),
+    lambda a: a.update(account_snapshot_status="unavailable"),
+    lambda a: a.update(fresh_snapshot_drift={"status": "FAILED"}),
+    lambda a: a["coverage"].update(fresh_snapshot_complete=False),
+])
+def test_failed_holding_recovery_rejects_unverified_fresh_snapshot_or_false_gap(recovery, mutate):
+    failed_holding_source(recovery)
+    mutate(recovery["source"]["active_universe"])
+    write(recovery["root"] / "run.json", recovery["source"])
+    with pytest.raises(ValueError):
+        load(recovery, holding_tickers=["XOM"], account_status="loaded")
+
+
+def test_changed_selection_after_preflight_cannot_write_reused_artifacts(recovery):
+    failed_holding_source(recovery)
+    plan = load(recovery, holding_tickers=["XOM"], account_status="loaded")
+    (recovery["root"] / "universe_selection.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError, match="selection changed"):
+        copy_recovered_research(plan, run_dir=recovery["destination"])
+    assert not recovery["destination"].exists()
+
+
 @pytest.mark.parametrize("mutate", [
     lambda s: s.update(status="success"),
     lambda s: s["settings"].update(analysis_mode="smoke"),
