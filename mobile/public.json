@@ -1,6 +1,6 @@
 {
   "schema": "tradingagents.mobile-dashboard/v1",
-  "generated_at": "2026-10-15T02:30:58.773008+09:00",
+  "generated_at": "2026-10-15T03:15:21.256386+09:00",
   "privacy": "PUBLIC_RESEARCH_ONLY_NO_PORTFOLIO_MEMBERSHIP_OR_ACTIONS",
   "markets": {
     "kr": {
@@ -853,9 +853,9 @@
     },
     "us": {
       "market": "US",
-      "event_id": "us:83f1a39ea3b71698d7b76e7a0071adaf",
-      "source_health": "OK",
-      "report_mode": "CONDITIONAL",
+      "event_id": "us:265f4b48c36b535783ad4f569c2e2835",
+      "source_health": "STALE",
+      "report_mode": "OUTAGE",
       "run_id": "20261015T021357_local-scheduler-us-overlay_only",
       "started_at": "2026-10-15T02:13:57.819618+09:00",
       "source": {
@@ -865,15 +865,15 @@
       },
       "guardrails": {
         "valid_until": "2026-10-14T13:40:00-04:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "decision_ready": false,
-        "conditional_strategy_ready": true,
-        "report_mode": "CONDITIONAL"
+        "conditional_strategy_ready": false,
+        "report_mode": "OUTAGE"
       },
       "quality": {
-        "report_mode": "CONDITIONAL",
+        "report_mode": "OUTAGE",
         "decision_ready": false,
-        "conditional_strategy_ready": true,
+        "conditional_strategy_ready": false,
         "quality_label_ko": "장중 조건부 전략 가능, 주문 전 재확인",
         "fresh_row_ratio": 0.0,
         "conditional_row_ratio": 1.0
@@ -894,19 +894,19 @@
           "day_high": 997.665,
           "day_low": 929.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -924,19 +924,19 @@
           "day_high": 259.65,
           "day_low": 254.085,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -954,19 +954,19 @@
           "day_high": 1216.714,
           "day_low": 1174.24,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -984,19 +984,19 @@
           "day_high": 440.39,
           "day_low": 430.24,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1014,19 +1014,19 @@
           "day_high": 354.25,
           "day_low": 346.12,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1044,19 +1044,19 @@
           "day_high": 359.4,
           "day_low": 349.135,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1074,19 +1074,19 @@
           "day_high": 425.025,
           "day_low": 407.71,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1104,19 +1104,19 @@
           "day_high": 91.37,
           "day_low": 90.515,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1134,19 +1134,19 @@
           "day_high": 396.0,
           "day_low": 391.01,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1164,19 +1164,19 @@
           "day_high": 222.2,
           "day_low": 218.54,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1194,19 +1194,19 @@
           "day_high": 177.355,
           "day_low": 174.53,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1224,19 +1224,19 @@
           "day_high": 761.48,
           "day_low": 734.2865,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1254,19 +1254,19 @@
           "day_high": 103.77,
           "day_low": 103.04,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1284,19 +1284,19 @@
           "day_high": 284.635,
           "day_low": 275.97,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1314,19 +1314,19 @@
           "day_high": 591.88,
           "day_low": 567.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1344,19 +1344,19 @@
           "day_high": 179.43,
           "day_low": 176.42,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1374,19 +1374,19 @@
           "day_high": 284.82,
           "day_low": 270.76,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1404,19 +1404,19 @@
           "day_high": 155.7225,
           "day_low": 154.285,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1434,19 +1434,19 @@
           "day_high": 15.44,
           "day_low": 14.765,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1464,19 +1464,19 @@
           "day_high": 93.38,
           "day_low": 92.16,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1494,19 +1494,19 @@
           "day_high": 294.5,
           "day_low": 280.25,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1524,19 +1524,19 @@
           "day_high": 355.25,
           "day_low": 344.94,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1554,19 +1554,19 @@
           "day_high": 233.28,
           "day_low": 229.1,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1584,19 +1584,19 @@
           "day_high": 1300.76,
           "day_low": 1245.3,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1614,19 +1614,19 @@
           "day_high": 347.07,
           "day_low": 343.5,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1644,19 +1644,19 @@
           "day_high": 226.0,
           "day_low": 221.12,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1674,19 +1674,19 @@
           "day_high": 547.17,
           "day_low": 505.53,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         }
       ],

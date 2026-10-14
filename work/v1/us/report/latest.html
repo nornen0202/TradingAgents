@@ -1,96 +1,96 @@
-<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>US Work 보고서</title><style>body{font:16px/1.65 system-ui;max-width:960px;margin:auto;padding:24px;overflow-wrap:anywhere}pre{white-space:pre-wrap;font:inherit}dt{font-weight:bold}dd{margin:0 0 14px}</style><body><main><h1>US Work 보고서</h1><p>보고서 게시: 2026-10-15T01:11:16.956556+09:00</p><p>입력 시세 기준: 2026-10-14T11:45:00-04:00</p><p>게시 시각은 입력 갱신 시각이 아닙니다. 아래 내용은 발행 당시 보고서이며 현재 주문 전에 다시 검증해야 합니다.</p><pre data-report-markdown># 미국 투자 브리핑 | 조건부 연구와 실행 관문
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>US Work 보고서</title><style>body{font:16px/1.65 system-ui;max-width:960px;margin:auto;padding:24px;overflow-wrap:anywhere}pre{white-space:pre-wrap;font:inherit}dt{font-weight:bold}dd{margin:0 0 14px}</style><body><main><h1>US Work 보고서</h1><p>보고서 게시: 2026-10-15T03:12:36.918527+09:00</p><p>입력 시세 기준: 2026-10-14T13:10:00-04:00</p><p>게시 시각은 입력 갱신 시각이 아닙니다. 아래 내용은 발행 당시 보고서이며 현재 주문 전에 다시 검증해야 합니다.</p><pre data-report-markdown># 미국 투자 브리핑 | 조건부 연구와 실행 관문
 
-- 보고서 작성: 2026-10-15T01:11:16.685477+09:00
+- 보고서 작성: 2026-10-15T03:12:28.200949+09:00
 - 원분석 기준 거래일: 2026-10-13~2026-10-13 (ET)
-- 시세 관측: 2026-10-14T11:45:00-04:00~2026-10-14T11:45:00-04:00 (최고령 26.3분)
-- 계좌 기준: 2026-10-15T00:47:24.554763+09:00 (23.9분 경과); 시세 확보 30/30, 누락 0
+- 시세 관측: 2026-10-14T13:10:00-04:00~2026-10-14T13:15:00-04:00 (최고령 62.5분)
+- 계좌 기준: 2026-10-15T02:16:47.598014+09:00 (55.7분 경과); 시세 확보 30/30, 누락 0
 - 분석 시도: 20261014T175403_local-scheduler-us-full / SUCCESS; 완료 분석: 20261014T175403_local-scheduler-us-full / success
-- 별도 overlay 생산: 20261015T004404_local-scheduler-us-overlay_only / 2026-10-15T00:47:31.072484+09:00; 패킷 유효시각: 2026-10-14T12:15:00-04:00
-- 세션 US:2026-10-14 · 모드 CONDITIONAL · event us:5ff6c434d56f453cb34668fae8b13819 · 소스 OK · 조건부 관찰; 실시간 주문 관문 미통과
+- 별도 overlay 생산: 20261015T021357_local-scheduler-us-overlay_only / 2026-10-15T02:16:53.381900+09:00; 패킷 유효시각: 2026-10-14T13:40:00-04:00
+- 세션 US:2026-10-14 · 모드 OUTAGE · event us:e7673dea346f5841848f73a042359d35 · 소스 STALE · 만료·실시간 재검증 필요
 
 원분석 논지와 현재 실행 가능성은 별개입니다. 제공된 시세는 지연된 조건부 관측이며 주문 가능 호가, 중단 상태, 계좌 위험을 실시간 확인해야 합니다. 게시 시각은 입력 자료의 시각을 갱신하지 않습니다.
 
 ## 지금 볼 것
 ### MPWR · Monolithic Power Systems
-원분석 HOLD / REDUCE_RISK · 실행 WAIT_FOR_TRIGGER. 전술 보유분 20% 감축 계획의 조건과 현재 위험을 우선 재검증. 발동 점검: 원분석 BREAKOUT $1322.4·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 무효화 점검: 원분석 STOP_LOSS $1283.81·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 가격 관측 2026-10-14T11:45:00-04:00; 행 유효 2026-10-14T12:15:00-04:00.
+원분석 HOLD / REDUCE_RISK · 실행: 실시간 재확인 필요. 전술 보유분 20% 감축 계획의 조건과 현재 위험을 우선 재검증. 발동 점검: 원분석 BREAKOUT $1322.4·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 무효화 점검: 원분석 STOP_LOSS $1283.81·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 가격 관측 2026-10-14T13:10:00-04:00; 행 유효 2026-10-14T13:40:00-04:00.
 
 ### CEG · Constellation Energy
-원분석 HOLD / HOLD · 실행 WAIT_FOR_TRIGGER. 외부 근거를 공식 자료로 대조하고 신규 배정은 보류. 발동 점검: 원분석 PULLBACK $286.4·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 무효화 점검: 원분석 STOP_LOSS $280.16·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 가격 관측 2026-10-14T11:45:00-04:00; 행 유효 2026-10-14T12:15:00-04:00.
+원분석 HOLD / HOLD · 실행: 실시간 재확인 필요. 외부 근거를 공식 자료로 대조하고 신규 배정은 보류. 발동 점검: 원분석 PULLBACK $286.4·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 무효화 점검: 원분석 STOP_LOSS $280.16·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 가격 관측 2026-10-14T13:15:00-04:00; 행 유효 2026-10-14T13:45:00-04:00.
 
 ### NVDA · NVIDIA
-원분석 HOLD / HOLD · 실행 WAIT_FOR_TRIGGER. 외부 근거를 공식 자료로 대조하고 신규 배정은 보류. 발동 점검: 원분석 PULLBACK $224.9·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 무효화 점검: 원분석 TRIM $231.55·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 가격 관측 2026-10-14T11:45:00-04:00; 행 유효 2026-10-14T12:15:00-04:00.
+원분석 HOLD / HOLD · 실행: 실시간 재확인 필요. 외부 근거를 공식 자료로 대조하고 신규 배정은 보류. 발동 점검: 원분석 PULLBACK $224.9·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 무효화 점검: 원분석 TRIM $231.55·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증. 가격 관측 2026-10-14T13:10:00-04:00; 행 유효 2026-10-14T13:40:00-04:00.
 
 ## 커버리지 영수증
 생산 COMPLETE: 보유 14개 모두 전송, 필수 관심 27개 모두 전송, 분석 30/30 성공. 관심목록과 보유의 중복은 하나의 전략 행으로 표시합니다. 신규 탐색 후보는 0개입니다.
-COVERAGE_RECEIPT {&quot;event_id&quot;:&quot;us:5ff6c434d56f453cb34668fae8b13819&quot;,&quot;status&quot;:&quot;COMPLETE&quot;,&quot;holdings&quot;:{&quot;expected&quot;:14,&quot;missing_count&quot;:0,&quot;missing&quot;:[]},&quot;watchlist&quot;:{&quot;expected&quot;:27,&quot;missing_count&quot;:0,&quot;missing&quot;:[],&quot;all_rendered&quot;:true},&quot;analysis&quot;:{&quot;total&quot;:30,&quot;successful&quot;:30,&quot;failed&quot;:0,&quot;failed_tickers&quot;:[]},&quot;response_scanner_limit&quot;:10}
+COVERAGE_RECEIPT {&quot;event_id&quot;:&quot;us:e7673dea346f5841848f73a042359d35&quot;,&quot;status&quot;:&quot;COMPLETE&quot;,&quot;holdings&quot;:{&quot;expected&quot;:14,&quot;missing_count&quot;:0,&quot;missing&quot;:[]},&quot;watchlist&quot;:{&quot;expected&quot;:27,&quot;missing_count&quot;:0,&quot;missing&quot;:[],&quot;all_rendered&quot;:true},&quot;analysis&quot;:{&quot;total&quot;:30,&quot;successful&quot;:30,&quot;failed&quot;:0,&quot;failed_tickers&quot;:[]},&quot;response_scanner_limit&quot;:10}
 
 ## 보유·관심 전략 30종목
 |순위|종목·역할|원분석 논지/계획|현재 실행|진입 확인·무효화 점검|신뢰도|외부 근거|
 |---:|---|---|---|---|---:|---|
-|1|MPWR Monolithic Power Systems · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 REDUCE_RISK (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 BREAKOUT $1322.4·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $1283.81·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.55|직접 일치 없음|
-|2|CEG Constellation Energy · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $286.4·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $280.16·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.55|youtube:ILs31CN-_VA|
-|3|NVDA NVIDIA · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $224.9·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 TRIM $231.55·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.58|youtube:lD0frse8o_U, youtube:PbYewoijHjE, youtube:4q1LijREraU, youtube:Mm-GvdfCgGc, prism:stock_ai_agent:16058|
-|4|AMD Advanced Micro Devices · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $594.24·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $570.6·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|youtube:PbYewoijHjE, youtube:4q1LijREraU, youtube:1nGvSpFUXvg|
-|5|AVGO Broadcom · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 BREAKOUT $360.69·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $335.2·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.55|youtube:lD0frse8o_U, youtube:deJpw1Q8hm0, youtube:e3ebAvQ-3yY, youtube:oCdGN001nZk|
-|6|META Meta Platforms · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $734.33·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $711.68·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.61|youtube:lD0frse8o_U, youtube:PbYewoijHjE, youtube:deJpw1Q8hm0|
-|7|AAPL Apple · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $337.38·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $325.81·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.63|youtube:PbYewoijHjE, youtube:gknGDs_po98|
-|8|TSM Taiwan Semiconductor Manufacturing · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 BREAKOUT $445.5·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $433.38·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.56|youtube:btxXzulHHAY|
-|9|SGOV iShares 0-3 Month Treasury Bond ETF · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $100.5·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $100.53·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
-|10|GEV GE Vernova · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $992.49·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $963.29·next_day 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.58|직접 일치 없음|
-|11|AMZN Amazon · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $254.06·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $242.42·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.57|직접 일치 없음|
-|12|LLY Eli Lilly · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $1143·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $1113·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.57|직접 일치 없음|
-|13|GOOGL Alphabet · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $346.53·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $335.51·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.56|직접 일치 없음|
-|14|RSP Invesco S&amp;P 500 Equal Weight ETF · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $212.21·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $207.16·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
-|15|ETN Eaton · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $420·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $417·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.54|직접 일치 없음|
-|16|GLDM SPDR Gold MiniShares Trust · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 BREAKOUT $83.11·volume_confirmed 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $80.75·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.65|직접 일치 없음|
-|17|DELL Dell Technologies · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $568.51·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $548.4·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.56|직접 일치 없음|
-|18|SPYM SPDR Portfolio S&amp;P 500 ETF · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $91.1·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $90.4·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.64|직접 일치 없음|
-|19|V Visa · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $390.69·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $384.5·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.64|직접 일치 없음|
-|20|CVX Chevron · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $215.95·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $210.89·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.62|직접 일치 없음|
-|21|XOM Exxon Mobil · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $172.3·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $168.8·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.62|직접 일치 없음|
-|22|SHEL Shell · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 TAKE_PROFIT (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $102.47·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $101.27·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.61|직접 일치 없음|
-|23|ABBV AbbVie · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $271.35·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $260.08·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
-|24|AMT American Tower · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $177.88·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $175.02·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
-|25|DDOG Datadog · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 TAKE_PROFIT (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $277.65·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $269.38·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
-|26|PG Procter &amp; Gamble · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $149.7·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $147.5·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
-|27|NU Nu Holdings · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $15.2·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $14.43·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.59|직접 일치 없음|
-|28|MDT Medtronic · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $90.2·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $89.27·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.57|직접 일치 없음|
-|29|GOOG Alphabet · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $343·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $337.5·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.55|직접 일치 없음|
-|30|WELL Welltower · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|WAIT_FOR_TRIGGER|원분석 PULLBACK $228.63·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $222.8·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.54|직접 일치 없음|
+|1|MPWR Monolithic Power Systems · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 REDUCE_RISK (현재 주문 아님)|실시간 재확인 필요|원분석 BREAKOUT $1322.4·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $1283.81·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.55|직접 일치 없음|
+|2|CEG Constellation Energy · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $286.4·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $280.16·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.55|youtube:ILs31CN-_VA|
+|3|NVDA NVIDIA · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $224.9·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 TRIM $231.55·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.58|youtube:lD0frse8o_U, youtube:PbYewoijHjE, youtube:4q1LijREraU, youtube:Mm-GvdfCgGc, prism:stock_ai_agent:16058|
+|4|AMD Advanced Micro Devices · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $594.24·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $570.6·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|youtube:PbYewoijHjE, youtube:4q1LijREraU, youtube:1nGvSpFUXvg|
+|5|AVGO Broadcom · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 BREAKOUT $360.69·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $335.2·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.55|youtube:lD0frse8o_U, youtube:deJpw1Q8hm0, youtube:e3ebAvQ-3yY, youtube:oCdGN001nZk|
+|6|META Meta Platforms · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $734.33·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $711.68·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.61|youtube:lD0frse8o_U, youtube:PbYewoijHjE, youtube:deJpw1Q8hm0|
+|7|AAPL Apple · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $337.38·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $325.81·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.63|youtube:PbYewoijHjE, youtube:gknGDs_po98|
+|8|TSM Taiwan Semiconductor Manufacturing · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 BREAKOUT $445.5·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $433.38·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.56|youtube:btxXzulHHAY|
+|9|SGOV iShares 0-3 Month Treasury Bond ETF · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $100.5·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $100.53·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
+|10|GEV GE Vernova · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $992.49·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $963.29·next_day 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.58|직접 일치 없음|
+|11|AMZN Amazon · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $254.06·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $242.42·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.57|직접 일치 없음|
+|12|LLY Eli Lilly · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $1143·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $1113·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.57|직접 일치 없음|
+|13|GOOGL Alphabet · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $346.53·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $335.51·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.56|직접 일치 없음|
+|14|RSP Invesco S&amp;P 500 Equal Weight ETF · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $212.21·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $207.16·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
+|15|ETN Eaton · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $420·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $417·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.54|직접 일치 없음|
+|16|GLDM SPDR Gold MiniShares Trust · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 BREAKOUT $83.11·volume_confirmed 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $80.75·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.65|직접 일치 없음|
+|17|DELL Dell Technologies · 보유|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $568.51·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $548.4·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.56|직접 일치 없음|
+|18|SPYM SPDR Portfolio S&amp;P 500 ETF · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $91.1·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $90.4·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.64|직접 일치 없음|
+|19|V Visa · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $390.69·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $384.5·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.64|직접 일치 없음|
+|20|CVX Chevron · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $215.95·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $210.89·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.62|직접 일치 없음|
+|21|XOM Exxon Mobil · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $172.3·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $168.8·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.62|직접 일치 없음|
+|22|SHEL Shell · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 TAKE_PROFIT (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $102.47·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $101.27·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.61|직접 일치 없음|
+|23|ABBV AbbVie · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $271.35·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 INVALIDATION $260.08·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
+|24|AMT American Tower · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $177.88·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $175.02·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
+|25|DDOG Datadog · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 TAKE_PROFIT (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $277.65·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $269.38·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
+|26|PG Procter &amp; Gamble · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $149.7·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $147.5·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.60|직접 일치 없음|
+|27|NU Nu Holdings · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $15.2·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $14.43·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.59|직접 일치 없음|
+|28|MDT Medtronic · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $90.2·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $89.27·close 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.57|직접 일치 없음|
+|29|GOOG Alphabet · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $343·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $337.5·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.55|직접 일치 없음|
+|30|WELL Welltower · 관심|HOLD / 원분석 조건부 진입 별도 승인 전 미설정 / 위험계획 HOLD (현재 주문 아님)|실시간 재확인 필요|원분석 PULLBACK $228.63·two_bar 확인; 세부 원문 조건 및 거래량·위험한도 재검증; 원분석 STOP_LOSS $222.8·intraday 확인; 세부 원문 조건 및 거래량·위험한도 재검증|0.54|직접 일치 없음|
 
 ## 시세·미시구조 관측
 |종목|가격·관측시각|VWAP / RVOL|feed·spread·중단 상태|행 유효시각|
 |---|---|---|---|---|
-|MPWR|$1253.94 · 2026-10-14T11:45:00-04:00|1272.4889031020148 / 0.395260268837205|지연 12.0초; spread 10.914551806279599bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|CEG|$281.07 · 2026-10-14T11:45:00-04:00|284.0871215591469 / 0.7497999943403914|지연 37.0초; spread 5.326231691077755bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|NVDA|$222.58 · 2026-10-14T11:45:00-04:00|224.42030160755021 / 0.5892362345761453|지연 13.0초; spread 0.4486417371416733bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|AMD|$578.1 · 2026-10-14T11:45:00-04:00|585.3940169457916 / 0.560847542678922|지연 19.0초; spread 8.959338387318777bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|AVGO|$347.7 · 2026-10-14T11:45:00-04:00|350.59218622656886 / 0.5710535207925398|지연 0.0초; spread 1.721022287238685bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|META|$740.25 · 2026-10-14T11:45:00-04:00|748.5470057732819 / 0.8005746421663227|지연 27.0초; spread 1.8848111150002202bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|AAPL|$345.98 · 2026-10-14T11:45:00-04:00|345.47156498334215 / 0.8746604744480034|지연 0.0초; spread 0.867164804671982bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|TSM|$434.323 · 2026-10-14T11:45:00-04:00|437.02716303530224 / 0.5874238916668748|지연 16.0초; spread 2.9909466346097493bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|SGOV|$100.54 · 2026-10-14T11:45:00-04:00|100.53526960964564 / 1.119576662767402|지연 15.0초; spread 0.9946784701850218bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|GEV|$931.714 · 2026-10-14T11:45:00-04:00|951.7775923983857 / 1.184712283689185|지연 6.0초; spread 7.942215019372663bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|AMZN|$255.57 · 2026-10-14T11:45:00-04:00|257.14326458905003 / 0.6428693824075544|지연 0.0초; spread 1.5617069456902206bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|LLY|$1212.96 · 2026-10-14T11:45:00-04:00|1206.7243366885518 / 0.7063605291426319|지연 11.0초; spread 8.3198444765705bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|GOOGL|$352.905 · 2026-10-14T11:45:00-04:00|355.44038787923597 / 0.5794662291481599|지연 8.0초; spread 1.6936235074943484bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|RSP|$211.25 · 2026-10-14T11:45:00-04:00|211.87406683169849 / 0.789200959243703|지연 14.0초; spread 0.47302570894685103bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|ETN|$409.965 · 2026-10-14T11:45:00-04:00|416.9609818123064 / 0.8182681399497347|지연 5.0초; spread 12.879238909881115bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|GLDM|$80.804 · 2026-10-14T11:45:00-04:00|81.01923504985301 / 0.48076549922237505|지연 8.0초; spread 1.235559399517008bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|DELL|$512.68 · 2026-10-14T11:45:00-04:00|528.4474304392311 / 1.1277915667095306|지연 0.0초; spread 14.274966723895313bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|SPYM|$90.6895 · 2026-10-14T11:45:00-04:00|91.03003529259013 / 0.7311292874262146|지연 28.0초; spread 1.101260943781192bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|V|$392.95 · 2026-10-14T11:45:00-04:00|393.20499475267616 / 0.5928100379907824|지연 27.0초; spread 5.345891936612475bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|CVX|$219.81 · 2026-10-14T11:45:00-04:00|220.08479469456765 / 0.605178995836497|지연 33.0초; spread 2.7199782401741817bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|XOM|$175.86 · 2026-10-14T11:45:00-04:00|175.42885311768177 / 0.37816127143644845|지연 33.0초; spread 2.8411512344792422bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|SHEL|$103.34 · 2026-10-14T11:45:00-04:00|103.33111963656745 / 0.7403404140998155|지연 39.0초; spread 1.9370460048436058bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|ABBV|$283.58 · 2026-10-14T11:45:00-04:00|282.0269299539773 / 0.35718243875658845|지연 32.0초; spread 7.404664938910792bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|AMT|$178.09 · 2026-10-14T11:45:00-04:00|177.4768419716572 / 0.3130406413022523|지연 40.0초; spread 3.3711652994719787bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|DDOG|$271.89 · 2026-10-14T11:45:00-04:00|277.24805332313736 / 0.2961253266758092|지연 20.0초; spread 30.876677081420027bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|PG|$155.31 · 2026-10-14T11:45:00-04:00|154.87606161663413 / 0.5108486060794861|지연 24.0초; spread 2.574665293511331bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|NU|$14.96 · 2026-10-14T11:45:00-04:00|15.005817679171935 / 0.5086622103281475|지연 28.0초; spread 6.65557404326109bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|MDT|$92.94 · 2026-10-14T11:45:00-04:00|92.59790083323658 / 0.7198090955489729|지연 23.0초; spread 2.1540118470647305bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|GOOG|$348.54 · 2026-10-14T11:45:00-04:00|351.33610135936516 / 0.5255408644432141|지연 33.0초; spread 1.999914289387403bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
-|WELL|$231.88 · 2026-10-14T11:45:00-04:00|230.62000228560234 / 0.16935344263996457|지연 22.0초; spread 18.55647858452937bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T12:15:00-04:00|
+|MPWR|$1254.08 · 2026-10-14T13:10:00-04:00|1264.384029835496 / 0.4094759163106692|지연 280.0초; spread 13.754337983041761bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|CEG|$281.68 · 2026-10-14T13:15:00-04:00|283.3068933375659 / 0.42013729310226994|지연 3.0초; spread 14.906832298135194bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:45:00-04:00|
+|NVDA|$222.39 · 2026-10-14T13:10:00-04:00|223.73097603723863 / 0.5103661414778387|지연 281.0초; spread 0.8981901468545483bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|AMD|$573.36 · 2026-10-14T13:10:00-04:00|581.0293648110068 / 0.5186889424791287|지연 286.0초; spread 5.925616089791068bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|AVGO|$347.125 · 2026-10-14T13:10:00-04:00|349.7430943330845 / 0.4775283775735117|지연 270.0초; spread 4.021486226409283bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|META|$736.559 · 2026-10-14T13:10:00-04:00|745.4797965944074 / 0.6584894344235833|지연 294.0초; spread 2.576463329467837bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|AAPL|$343.894 · 2026-10-14T13:10:00-04:00|345.2377627020077 / 0.7242153799995648|지연 270.0초; spread 0.8715989482698097bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|TSM|$432.075 · 2026-10-14T13:10:00-04:00|435.61279832805263 / 0.5108235444600964|지연 285.0초; spread 1.8485569702147582bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|SGOV|$100.535 · 2026-10-14T13:10:00-04:00|100.53537375175182 / 1.0487318095502676|지연 284.0초; spread 0.9946784701850218bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|GEV|$935 · 2026-10-14T13:10:00-04:00|946.8925431199262 / 0.7714158168942284|지연 275.0초; spread 13.644600788828193bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|AMZN|$254.21 · 2026-10-14T13:10:00-04:00|256.51833122848245 / 0.5282094415089275|지연 270.0초; spread 1.1798249926261386bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|LLY|$1211.12 · 2026-10-14T13:10:00-04:00|1208.4148990466304 / 0.5721883134085934|지연 279.0초; spread 5.281922619834447bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|GOOGL|$349.64 · 2026-10-14T13:10:00-04:00|354.32385304801267 / 0.4808539306173452|지연 278.0초; spread 1.427042454511724bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|RSP|$211.37 · 2026-10-14T13:10:00-04:00|211.7758277184448 / 0.5918093954095779|지연 284.0초; spread 0.47273500839061644bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|ETN|$410.55 · 2026-10-14T13:10:00-04:00|413.44939912500985 / 1.1615145521131425|지연 275.0초; spread 8.000484877871001bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|GLDM|$80.69 · 2026-10-14T13:10:00-04:00|80.88526674119994 / 0.47824025730358255|지연 276.0초; spread 1.238006809038083bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|DELL|$506.48 · 2026-10-14T13:10:00-04:00|522.4854240325261 / 1.0191936297373747|지연 270.0초; spread 5.097239648682382bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|SPYM|$90.56 · 2026-10-14T13:10:00-04:00|90.89256268030185 / 0.6617055137772292|지연 295.0초; spread 1.1030831173118862bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|V|$392.885 · 2026-10-14T13:10:00-04:00|393.20375661375664 / 0.4816095200013419|지연 293.0초; spread 0.7632713811403163bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|CVX|$222.04 · 2026-10-14T13:15:00-04:00|220.60341789766565 / 0.49002169617409624|지연 0.0초; spread 2.251390233469679bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:45:00-04:00|
+|XOM|$177.11 · 2026-10-14T13:15:00-04:00|175.91153246608795 / 0.3639169437665216|지연 2.0초; spread 2.823502837620994bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:45:00-04:00|
+|SHEL|$103.65 · 2026-10-14T13:15:00-04:00|103.36882840599536 / 0.5270463465743567|지연 3.0초; spread 0.9651112290696439bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:45:00-04:00|
+|ABBV|$284.37 · 2026-10-14T13:10:00-04:00|282.6746251541168 / 0.3980213886279064|지연 298.0초; spread 4.221338867977787bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|AMT|$178.37 · 2026-10-14T13:15:00-04:00|177.9183139055693 / 0.3547322821542257|지연 6.0초; spread 7.286791289481542bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:45:00-04:00|
+|DDOG|$274.82 · 2026-10-14T13:10:00-04:00|276.2287075552606 / 0.24715825090754226|지연 288.0초; spread 15.281062397672034bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|PG|$155.69 · 2026-10-14T13:10:00-04:00|155.07653283608892 / 0.4840606578196086|지연 292.0초; spread 2.5701985478373093bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|NU|$15.04 · 2026-10-14T13:10:00-04:00|15.014673203247705 / 0.5565368122781069|지연 296.0초; spread 6.6511473229130615bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|MDT|$93.02 · 2026-10-14T13:10:00-04:00|92.72609666091414 / 0.6556013398522632|지연 291.0초; spread 1.0767160161497609bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
+|GOOG|$345.5 · 2026-10-14T13:15:00-04:00|350.23204832193755 / 0.5712279589392519|지연 0.0초; spread 2.3106027784993812bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:45:00-04:00|
+|WELL|$232.84 · 2026-10-14T13:10:00-04:00|231.4734502291769 / 0.20121009556400266|지연 289.0초; spread 9.03167537578255bp; halt unknown, LULD not_available_by_provider, 뉴스 not_available_by_provider|2026-10-14T13:40:00-04:00|
 
 ## 근거·반대 근거와 다음 확인
 
@@ -345,7 +345,11 @@ MOBILE_HANDOFF {&quot;owner&quot;:&quot;external_github_notification_pipeline&qu
 - 무효화 시 조치: 기존 WELL은 먼저 집중도와 계획 손실한도를 점검하고, 검증된 초과분은 위험 축소한다. 정규장 종가가 227.65 아래이면 전술 보유분의 50%를 매도한다. 실제 돌파 이후 234.82와 당일 거래량가중평균가격 모두 아래에서 5분봉 두 개가 연속 마감하고 회복 재시험도 실패하면 돌파 매수분의 50%를 축소한다. 종가가…
 - 규모·위험 한도: 신규 배정은 0이다. 채택하는 상한은 WELL 총 평가액이 순자산의 4%, 시험 매수가 계획한 최종 WELL 배정액의 25% 이내이면서 순자산의 1% 이내다. 이는 목표 비중이 아니라 최대 한도다. 시험 매수의 계획 손실은 순자산의 0.125%, WELL 전체 계획 손실은 0.5% 이내로 제한한다. 주당 위험은 실제 매수…
 
-PRISM stock_ai_agent:16059의 시장 조정 운영 알림은 개별 매도 신호가 아닙니다. stock_ai_agent:16058의 NVDA 보유 시뮬레이션과 함께 참고합니다. 연구 순위는 기대수익 순위나 주문 승인을 뜻하지 않습니다.</pre></main><style>
+PRISM stock_ai_agent:16059의 시장 조정 운영 알림은 개별 매도 신호가 아닙니다. stock_ai_agent:16058의 NVDA 보유 시뮬레이션과 함께 참고합니다. 연구 순위는 기대수익 순위나 주문 승인을 뜻하지 않습니다.
+
+외부 근거 범위: YouTube 기간 내 70건 중 12건 전송, 58건 생략. PRISM 기간 내 15건 모두 전송. 전송 밖 내용을 분석했다고 간주하지 않습니다. 사용자 우선 CEG의 조사 순위는 28위에서 2위로 높였고 신뢰도 0.55와 원래 규모 제한은 유지했습니다.
+출처 한계: 기업분석 생산 성공은 공시·거시·감성의 완전 수집을 뜻하지 않습니다. NOT_COLLECTED는 미수집, UNAVAILABLE은 이용 불가, missing_configuration은 설정 누락, NEWS_DERIVED는 뉴스 유래 감성이며 독립 소셜 근거가 아닙니다. 공시 기간 종료일은 발표·접수일이나 과거 시점 검증을 대신하지 않습니다.
+모델 영수증: Work 합성은 CONFIGURED_NOT_RUNTIME_VERIFIED로, 실제 Chat/Pro 모드 검증 영수증이 아닙니다. 원분석 모델 사용량과 이번 overlay 실행은 구분합니다.</pre></main><style>
 .reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
 .reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
 .reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
