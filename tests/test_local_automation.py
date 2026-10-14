@@ -91,6 +91,67 @@ def test_incomplete_or_wrong_cohort_never_suppresses_new_research(change):
     assert not local.completed_target(manifest, target())
 
 
+def partial_manifest():
+    manifest = full_manifest()
+    manifest.update(run_id="20261009T090000_local-scheduler-us-full", status="partial_failure")
+    manifest["summary"].update(successful_tickers=1, failed_tickers=1)
+    manifest["tickers"][1]["status"] = "failed"
+    return manifest
+
+
+@pytest.mark.parametrize("change", [
+    lambda m: m["settings"].update(market="KR"),
+    lambda m: m["settings"].update(run_mode="overlay_only"),
+    lambda m: m["settings"].update(analysis_mode="smoke"),
+    lambda m: m.update(label="manual-us"),
+    lambda m: m.update(started_at="2026-10-08T09:00:00+00:00"),
+    lambda m: m.update(finished_at=None),
+    lambda m: m.update(finished_at="2026-10-09T13:00:00+00:00"),
+    lambda m: m.update(started_at="2026-10-09T09:00:00"),
+    lambda m: m.update(status="running"),
+    lambda m: m["summary"].update(successful_tickers=0),
+    lambda m: m["summary"].update(failed_tickers=0),
+])
+def test_partial_recovery_never_selects_another_session_or_active_worker(change):
+    manifest = partial_manifest()
+    change(manifest)
+    assert local.partial_target_source([manifest], target(), window_start=target().window_start_kst,
+                                       now=datetime(2026, 10, 9, 12, tzinfo=timezone.utc)) is None
+
+
+@pytest.mark.parametrize("exit_code", [0, 1])
+def test_partial_local_retry_uses_failed_only_runner_and_preserves_budget(tmp_path, monkeypatch, exit_code):
+    import hashlib
+    from tradingagents.scheduled import runner
+    from tradingagents.notifications import local as notifications
+
+    item = target()
+    now = datetime(2026, 10, 9, 12, tzinfo=timezone.utc)
+    manifest = partial_manifest()
+    older = partial_manifest()
+    older["run_id"] = "20261009T085000_local-scheduler-us-full"
+    monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **k: [item]))
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [(manifest, None), (older, None)])
+    monkeypatch.setattr(local, "preflight", lambda _: None)
+    calls, failures = [], []
+    monkeypatch.setattr(local.subprocess, "run", lambda args, **kw: calls.append(args) or SimpleNamespace(returncode=exit_code))
+    monkeypatch.setattr(notifications, "queue_failure", lambda *a, **kw: failures.append(kw))
+    key = hashlib.sha256(f"{item.name}:{item.window_start_kst.isoformat()}".encode()).hexdigest()
+    receipt = tmp_path / "attempts" / f"{key}.json"
+    receipt.parent.mkdir()
+    receipt.write_text(json.dumps({"attempts": 1, "started_at": item.window_start_kst.isoformat(), "exit_code": 1}))
+    before = json.dumps(manifest, sort_keys=True)
+    assert local.run_due(tmp_path / "archive", tmp_path, now=now) == [{"target": item.name, "status": "DUE"}]
+    assert len(calls) == 1  # A rejected source cannot trigger a fallback full run.
+    assert calls[0][calls[0].index("--resume-from-run") + 1] == manifest["run_id"]
+    assert "--strict" in calls[0]
+    assert json.loads(receipt.read_text())["attempts"] == 2
+    assert len(failures) == exit_code
+    assert json.dumps(manifest, sort_keys=True) == before
+    monkeypatch.setattr(local.subprocess, "run", lambda *a, **k: pytest.fail("exhausted budget"))
+    assert local.run_due(tmp_path / "archive", tmp_path, now=now)[0]["status"] == "RETRY_BUDGET_OR_COOLDOWN"
+
+
 def test_producer_lock_does_not_block_publication(tmp_path):
     with interprocess_file_lock(tmp_path / "run-due.lock", timeout=0):
         with interprocess_file_lock(tmp_path / "publish.lock", timeout=0):

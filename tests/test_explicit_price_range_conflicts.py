@@ -164,6 +164,57 @@ def test_conflict_repair_exhaustion_is_no_trade_with_original_retry_budget():
     assert not decision["execution_levels"]["levels"]
 
 
+@pytest.mark.parametrize("bounds", [
+    {"low": "19", "high": "19,160"},
+    {"low": 19, "high": None, "label": "19,160~19,570원 저항 구간"},
+])
+def test_normalization_cannot_emit_a_range_rejected_on_next_parse(bounds):
+    decision = _decision(_level(
+        price=19160, source_text="19,160~19,570원 저항 구간", **bounds,
+    ))
+    original = copy.deepcopy(decision)
+    assert explicit_price_range_conflicts(decision) == []
+    with pytest.raises(ExplicitPriceRangeConflictError, match="19, .*19160, 19570"):
+        parse_structured_decision(decision)
+    assert decision == original
+
+
+def test_normalized_conflict_enters_bounded_repair_before_final_signal():
+    invalid = _decision(_level(low="19", high="19,160", price=19160,
+                              source_text="19,160~19,570원 저항 구간"))
+    valid = _decision(_level(low=19160, high=19570, price=19160,
+                            source_text="19,160~19,570원 저항 구간"))
+    llm = _LLM([invalid, valid])
+    _, result = invoke_structured_decision_with_retry(llm, "Return JSON", context="final decision")
+    assert len(llm.calls) == 2
+    assert "structured_price_range_conflict" in llm.calls[1]
+    assert parse_structured_decision(result).execution_levels.levels[0].low == 19160
+
+
+def test_normalized_risk_range_is_validated_too():
+    decision = _decision(_level(low=75200, high=75700))
+    decision.update(risk_action="REDUCE_RISK", risk_action_level=_level(low="75", high="75,200"))
+    assert explicit_price_range_conflicts(decision) == []
+    with pytest.raises(ExplicitPriceRangeConflictError, match="risk_action_level"):
+        parse_structured_decision(decision)
+
+
+def test_compatible_string_bounds_still_round_trip():
+    decision = _decision(_level(low="75,200", high="75,700"))
+    parsed = parse_structured_decision(decision)
+    assert parse_structured_decision(parsed.to_json()).execution_levels == parsed.execution_levels
+
+
+def test_normalized_conflict_exhaustion_preserves_retry_limit_and_safe_fallback():
+    invalid = _decision(_level(low="75", high="75,200"))
+    llm = _LLM([invalid] * 4)
+    _, result = invoke_structured_decision_with_retry(llm, "Return JSON", context="final decision")
+    parsed = parse_structured_decision(result)
+    assert len(llm.calls) == 4
+    assert parsed.entry_action.value == "WAIT"
+    assert not parsed.execution_levels.levels
+
+
 def _market(now):
     return IntradayMarketSnapshot(
         ticker="034020.KS", asof=now.isoformat(), provider="kis_quote", interval="5m",
