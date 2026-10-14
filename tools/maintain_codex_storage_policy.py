@@ -48,7 +48,8 @@ def candidates(config: dict, now: datetime | None = None) -> list[dict]:
                 # chat folders, without traversing the existing child junctions.
                 sources = [(folder, root, target)] if not target.exists() else [
                     (child, folder, target / child.name) for child in folder.iterdir()
-                    if child.is_dir() and not storage.is_reparse(child) and not (target / child.name).exists()
+                    if child.is_dir() and not child.name.endswith(".storage-original")
+                    and not storage.is_reparse(child) and not (target / child.name).exists()
                 ]
                 for source, bound, target in sources:
                     key = re.sub(r"[^A-Za-z0-9_.-]", "-", str(source.relative_to(root)))
