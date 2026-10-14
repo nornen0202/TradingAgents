@@ -30,17 +30,307 @@
       <div class="hero-card">
         <div class="status success">success</div>
         <p><strong>기준 시각</strong><span>2026-10-07 분석 / 2026-10-06 거래일</span></p>
-        <p><strong>투자판단</strong><span>보유</span></p>
-        <p><strong>중기 리서치 관점</strong><span>보유</span></p>
-        <p><strong>오늘 할 일</strong><span>추격 매수보다 조건 확인 우선: 다음 정규장 운영 여부와 105560.KS의 시세·거래량 신선도 확인</span></p>
-        <p><strong>장중 pilot 조건</strong><span>10:30 이후 다음 정규장 운영 여부와 105560.KS의 시세·거래량 신선도 확인 + VWAP 위 + 거래량 확인 시 소액 starter만 검토</span></p>
-        <p><strong>종가 확인 시 할 일</strong><span>종가에서 다음 정규장 운영 여부와 105560.KS의 시세·거래량 신선도 확인 재확인</span></p>
-        <p><strong>내일 follow-through</strong><span>다음 거래일 첫 30~60분 동안 다음 정규장 운영 여부와 105560.KS의 시세·거래량 신선도 확인 재이탈이 없는지 확인</span></p>
+        <p><strong>투자판단</strong><span>{
+  &quot;rating&quot;: &quot;hold&quot;,
+  &quot;portfolio stance&quot;: &quot;bullish&quot;,
+  &quot;entry action&quot;: &quot;wait&quot;,
+  &quot;conditional entry action&quot;: &quot;none&quot;,
+  &quot;conditional entry valid until&quot;: null,
+  &quot;setup quality&quot;: &quot;developing&quot;,
+  &quot;confidence&quot;: 0.58,
+  &quot;time horizon&quot;: &quot;medium&quot;,
+  &quot;entry logic&quot;: &quot;105560.ks는 약세 시장에서 2026-10-07에 0.96% 상승했다는 상대적 강세와 상승 중인 200일선이 있어 관찰할 만하다. 그러나 하루의 강세와 미체결 여부가 불명확한 자사주 매수 신청만으로 매수하지 않는다. 170,700원 돌파 후 가까운 173,986원까지는 약 1.9%인 반면 165,300원까지는 약 3.2% 하락할 수 있어 181,600원 재도달을 확정 목표로 보지 않는다. 현재 주문의 유효 만료시각과 다음 정규장·시세 신선도가 확인되지 않아 조건부 진입 지시는 발행하지 않는다. 이를 확인한 뒤에만 소규모 선행 매수를 검토할 수 있다.&quot;,
+  &quot;exit logic&quot;: &quot;105560.ks가 165,300원 아래로 종가를 형성하면 신규 매수를 중단하고 다음 실행 가능 시점에 보유분을 위험 축소한다. 돌파 뒤 170,600원 또는 해당 장의 거래량가중평균가격을 다시 잃으면 추가 매수를 막고, 실패가 확인돼 하방 위험이 커지면 보유분도 축소한다. 자본적정성·자산건전성 악화나 불리한 증권 발행 조건이 확인되면 가격과 별개로 재평가한다.&quot;,
+  &quot;position sizing&quot;: &quot;지금은 신규 매수 0주다. 향후 확인된 정규장의 선행 매수는 허용 증분 비중의 최대 25%, 전체 발행사 비중은 순자산가치의 최대 5%로 제한한다. 170,700원 진입과 165,300원 이탈 간 5,400원 차이를 기준으로 전체 계획손실은 순자산가치의 0.15%, 선행 매수 계획손실은 0.0375% 이내로 제한한다. 기존 보유량·현금·수수료·미끄러짐을 반영해 허용 주수를 다시 계산한다. 계획손실은 가격 공백을 포함한 실제 손실의 상한이 아니다.&quot;,
+  &quot;risk limits&quot;: &quot;2026-10-07 16:21 한국시간이라는 실행 시각만으로 실제 장 운영, 시세 신선도 또는 진입 조건 충족을 판정하지 않는다. 일별 기준 가격 날짜는 2026-10-06이며 2026-10-07 16:14 보고 가격은 실시간 진입 신호가 아니다. 보고된 평균진폭 5,138원은 계획된 5,400원 손절 간격에 근접한다. 원문 재무제표의 표시통화·단위·주식 기준 및 해당 주식예탁증서 전환비율이 확인되지 않아 금액·주당이익 비교와 확정적 가치평가에 사용하지 않는다.&quot;,
+  &quot;catalysts&quot;: [
+    &quot;105560.ks의 170,700원 거래량 동반 회복과 173,986원 추가 회복&quot;,
+    &quot;자사주 매수 신청분의 실제 체결 확인&quot;,
+    &quot;은행 자본적정성·자산건전성 및 증권 발행 조건의 원문 확인&quot;
+  ],
+  &quot;invalidators&quot;: [
+    &quot;165,300원 아래 종가로 지지 실패&quot;,
+    &quot;돌파 후 170,600원 또는 해당 장의 거래량가중평균가격 재이탈&quot;,
+    &quot;자본적정성·부실채권·대손비용 악화 또는 불리한 발행 조건 확인&quot;
+  ],
+  &quot;watchlist triggers&quot;: [
+    &quot;다음 정규장 운영 여부와 105560.ks의 시세·거래량 신선도 확인&quot;,
+    &quot;170,000원 회복 뒤 170,700원 상회, 시간대 보정 상대거래량 1.2배 이상 및 해당 장의 거래량가중평균가격 상회 확인&quot;,
+    &quot;170,700원 위 종가와 다음 거래일 첫 30~60분 지지 또는 재돌파 확인&quot;,
+    &quot;165,300~165,600원 지지 재시험과 자사주 실제 체결 공시 확인&quot;
+  ],
+  &quot;data coverage&quot;: {
+    &quot;company news count&quot;: 2,
+    &quot;disclosures count&quot;: 3,
+    &quot;social source&quot;: &quot;news derived&quot;,
+    &quot;macro items count&quot;: 0
+  },
+  &quot;execution levels&quot;: {
+    &quot;intraday pilot rule&quot;: &quot;다음으로 운영이 확인된 정규장에서 한국시간 10:30 이후 170,700원 상회, 해당 장의 거래량가중평균가격 상회, 시간대 보정 상대거래량 1.2배 이상을 모두 확인하면 소규모 선행 매수만 검토한다. 현재 유효 주문은 없다.&quot;,
+    &quot;close confirm rule&quot;: &quot;170,700원 위 종가와 거래량 확인 전에는 본격 진입이나 추가 매수를 하지 않는다.&quot;,
+    &quot;next day followthrough rule&quot;: &quot;돌파 종가 다음으로 확인된 거래일의 첫 30~60분에 170,600~170,700원 지지 또는 재돌파를 확인한 뒤 추가 매수를 검토한다.&quot;,
+    &quot;failed breakout rule&quot;: &quot;돌파 후 170,600원 또는 해당 장의 거래량가중평균가격을 잃으면 신규 매수를 중단하고, 실패가 확인돼 하방 위험이 증가하면 보유분을 축소한다.&quot;,
+    &quot;trim rule&quot;: &quot;165,300원 아래 종가면 보유분을 위험 축소한다. 단순 자금 조달용 축소나 현 시점의 차익 실현은 권고하지 않는다.&quot;,
+    &quot;levels&quot;: [
+      {
+        &quot;label&quot;: &quot;초기 저항 170,000원&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 170000.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: null,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;&quot;,
+        &quot;source text&quot;: &quot;2026-10-07 보고 고가&quot;,
+        &quot;reason code&quot;: &quot;initial resistance&quot;
+      },
+      {
+        &quot;label&quot;: &quot;돌파 구간 170,600~170,700원&quot;,
+        &quot;level type&quot;: &quot;breakout&quot;,
+        &quot;price&quot;: 170700.0,
+        &quot;low&quot;: 170600.0,
+        &quot;high&quot;: 170700.0,
+        &quot;currency&quot;: null,
+        &quot;confirmation&quot;: &quot;volume confirmed&quot;,
+        &quot;volume rule&quot;: &quot;시간대 보정 상대거래량 1.2배 이상 및 해당 장의 거래량가중평균가격 상회&quot;,
+        &quot;source text&quot;: &quot;2026-10-06 기준 10일·50일 이동평균 부근의 저항&quot;,
+        &quot;reason code&quot;: &quot;breakout trigger&quot;
+      },
+      {
+        &quot;label&quot;: &quot;지지 구간 165,300~165,600원&quot;,
+        &quot;level type&quot;: &quot;support&quot;,
+        &quot;price&quot;: 165600.0,
+        &quot;low&quot;: 165300.0,
+        &quot;high&quot;: 165600.0,
+        &quot;currency&quot;: null,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;&quot;,
+        &quot;source text&quot;: &quot;2026-10-06 저가와 하단 가격대 부근&quot;,
+        &quot;reason code&quot;: &quot;support test&quot;
+      },
+      {
+        &quot;label&quot;: &quot;165,300원 지지 실패&quot;,
+        &quot;level type&quot;: &quot;invalidation&quot;,
+        &quot;price&quot;: 165300.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: null,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;&quot;,
+        &quot;source text&quot;: &quot;종가 이탈 시 신규 매수 중단 및 보유 위험 축소&quot;,
+        &quot;reason code&quot;: &quot;support broken&quot;
+      },
+      {
+        &quot;label&quot;: &quot;추가 회복 확인선 173,986원&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 173986.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: null,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;&quot;,
+        &quot;source text&quot;: &quot;보고된 거래량가중이동평균; 다음 장의 당일 거래량가중평균가격과 별개&quot;,
+        &quot;reason code&quot;: &quot;trend confirmation&quot;
+      }
+    ],
+    &quot;min relative volume&quot;: 1.2,
+    &quot;vwap required&quot;: true,
+    &quot;earliest pilot time local&quot;: &quot;10:30&quot;,
+    &quot;funding priority&quot;: &quot;low&quot;,
+    &quot;entry window&quot;: &quot;mid&quot;,
+    &quot;trigger quality&quot;: &quot;weak&quot;
+  },
+  &quot;risk action&quot;: &quot;hold&quot;,
+  &quot;risk action reason&quot;: &quot;105560.ks의 상승 중인 200일선과 165,300원 지지는 아직 유지돼 기존 보유분은 유지한다. 다만 168,300원이라는 2026-10-07 사후 보고 가격은 단기 이동평균과 당일 거래량가중평균가격 아래이고 거래량은 20일 평균의 59.3%에 그쳐 신규 매수 근거가 부족하다. 지지 이탈이나 확인된 돌파 실패 시 자금 조달 목적이 아닌 위험 축소로 전환한다.&quot;,
+  &quot;risk action reason codes&quot;: [
+    &quot;support intact&quot;,
+    &quot;breakout unconfirmed&quot;
+  ],
+  &quot;risk action confidence&quot;: 0.7,
+  &quot;risk action level&quot;: {
+    &quot;label&quot;: &quot;165,300원 종가 이탈&quot;,
+    &quot;level type&quot;: &quot;support&quot;,
+    &quot;price&quot;: 165300.0,
+    &quot;low&quot;: 165.0,
+    &quot;high&quot;: 165300.0,
+    &quot;currency&quot;: null,
+    &quot;confirmation&quot;: &quot;close&quot;,
+    &quot;volume rule&quot;: &quot;&quot;,
+    &quot;source text&quot;: &quot;2026-10-06 저가와 165,300~165,600원 지지 구간의 하단; 종가 이탈 시 보유 위험 축소&quot;,
+    &quot;reason code&quot;: &quot;support broken&quot;
+  },
+  &quot;profit taking plan&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;stage 1 price&quot;: null,
+    &quot;stage 1 fraction&quot;: null,
+    &quot;stage 2 price&quot;: null,
+    &quot;stage 2 fraction&quot;: null,
+    &quot;trailing stop price&quot;: null,
+    &quot;trailing stop fraction&quot;: null,
+    &quot;keep core fraction&quot;: null,
+    &quot;reentry condition&quot;: &quot;&quot;,
+    &quot;reason codes&quot;: [
+      &quot;support intact&quot;,
+      &quot;breakout unconfirmed&quot;,
+      &quot;support broken&quot;
+    ]
+  }
+}</span></p>
+        <p><strong>중기 리서치 관점</strong><span>{
+  &quot;rating&quot;: &quot;hold&quot;,
+  &quot;portfolio stance&quot;: &quot;bullish&quot;,
+  &quot;entry action&quot;: &quot;wait&quot;,
+  &quot;conditional entry action&quot;: &quot;none&quot;,
+  &quot;conditional entry valid until&quot;: null,
+  &quot;setup quality&quot;: &quot;developing&quot;,
+  &quot;confidence&quot;: 0.58,
+  &quot;time horizon&quot;: &quot;medium&quot;,
+  &quot;entry logic&quot;: &quot;105560.ks는 약세 시장에서 2026-10-07에 0.96% 상승했다는 상대적 강세와 상승 중인 200일선이 있어 관찰할 만하다. 그러나 하루의 강세와 미체결 여부가 불명확한 자사주 매수 신청만으로 매수하지 않는다. 170,700원 돌파 후 가까운 173,986원까지는 약 1.9%인 반면 165,300원까지는 약 3.2% 하락할 수 있어 181,600원 재도달을 확정 목표로 보지 않는다. 현재 주문의 유효 만료시각과 다음 정규장·시세 신선도가 확인되지 않아 조건부 진입 지시는 발행하지 않는다. 이를 확인한 뒤에만 소규모 선행 매수를 검토할 수 있다.&quot;,
+  &quot;exit logic&quot;: &quot;105560.ks가 165,300원 아래로 종가를 형성하면 신규 매수를 중단하고 다음 실행 가능 시점에 보유분을 위험 축소한다. 돌파 뒤 170,600원 또는 해당 장의 거래량가중평균가격을 다시 잃으면 추가 매수를 막고, 실패가 확인돼 하방 위험이 커지면 보유분도 축소한다. 자본적정성·자산건전성 악화나 불리한 증권 발행 조건이 확인되면 가격과 별개로 재평가한다.&quot;,
+  &quot;position sizing&quot;: &quot;지금은 신규 매수 0주다. 향후 확인된 정규장의 선행 매수는 허용 증분 비중의 최대 25%, 전체 발행사 비중은 순자산가치의 최대 5%로 제한한다. 170,700원 진입과 165,300원 이탈 간 5,400원 차이를 기준으로 전체 계획손실은 순자산가치의 0.15%, 선행 매수 계획손실은 0.0375% 이내로 제한한다. 기존 보유량·현금·수수료·미끄러짐을 반영해 허용 주수를 다시 계산한다. 계획손실은 가격 공백을 포함한 실제 손실의 상한이 아니다.&quot;,
+  &quot;risk limits&quot;: &quot;2026-10-07 16:21 한국시간이라는 실행 시각만으로 실제 장 운영, 시세 신선도 또는 진입 조건 충족을 판정하지 않는다. 일별 기준 가격 날짜는 2026-10-06이며 2026-10-07 16:14 보고 가격은 실시간 진입 신호가 아니다. 보고된 평균진폭 5,138원은 계획된 5,400원 손절 간격에 근접한다. 원문 재무제표의 표시통화·단위·주식 기준 및 해당 주식예탁증서 전환비율이 확인되지 않아 금액·주당이익 비교와 확정적 가치평가에 사용하지 않는다.&quot;,
+  &quot;catalysts&quot;: [
+    &quot;105560.ks의 170,700원 거래량 동반 회복과 173,986원 추가 회복&quot;,
+    &quot;자사주 매수 신청분의 실제 체결 확인&quot;,
+    &quot;은행 자본적정성·자산건전성 및 증권 발행 조건의 원문 확인&quot;
+  ],
+  &quot;invalidators&quot;: [
+    &quot;165,300원 아래 종가로 지지 실패&quot;,
+    &quot;돌파 후 170,600원 또는 해당 장의 거래량가중평균가격 재이탈&quot;,
+    &quot;자본적정성·부실채권·대손비용 악화 또는 불리한 발행 조건 확인&quot;
+  ],
+  &quot;watchlist triggers&quot;: [
+    &quot;다음 정규장 운영 여부와 105560.ks의 시세·거래량 신선도 확인&quot;,
+    &quot;170,000원 회복 뒤 170,700원 상회, 시간대 보정 상대거래량 1.2배 이상 및 해당 장의 거래량가중평균가격 상회 확인&quot;,
+    &quot;170,700원 위 종가와 다음 거래일 첫 30~60분 지지 또는 재돌파 확인&quot;,
+    &quot;165,300~165,600원 지지 재시험과 자사주 실제 체결 공시 확인&quot;
+  ],
+  &quot;data coverage&quot;: {
+    &quot;company news count&quot;: 2,
+    &quot;disclosures count&quot;: 3,
+    &quot;social source&quot;: &quot;news derived&quot;,
+    &quot;macro items count&quot;: 0
+  },
+  &quot;execution levels&quot;: {
+    &quot;intraday pilot rule&quot;: &quot;다음으로 운영이 확인된 정규장에서 한국시간 10:30 이후 170,700원 상회, 해당 장의 거래량가중평균가격 상회, 시간대 보정 상대거래량 1.2배 이상을 모두 확인하면 소규모 선행 매수만 검토한다. 현재 유효 주문은 없다.&quot;,
+    &quot;close confirm rule&quot;: &quot;170,700원 위 종가와 거래량 확인 전에는 본격 진입이나 추가 매수를 하지 않는다.&quot;,
+    &quot;next day followthrough rule&quot;: &quot;돌파 종가 다음으로 확인된 거래일의 첫 30~60분에 170,600~170,700원 지지 또는 재돌파를 확인한 뒤 추가 매수를 검토한다.&quot;,
+    &quot;failed breakout rule&quot;: &quot;돌파 후 170,600원 또는 해당 장의 거래량가중평균가격을 잃으면 신규 매수를 중단하고, 실패가 확인돼 하방 위험이 증가하면 보유분을 축소한다.&quot;,
+    &quot;trim rule&quot;: &quot;165,300원 아래 종가면 보유분을 위험 축소한다. 단순 자금 조달용 축소나 현 시점의 차익 실현은 권고하지 않는다.&quot;,
+    &quot;levels&quot;: [
+      {
+        &quot;label&quot;: &quot;초기 저항 170,000원&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 170000.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: null,
+        &quot;confirmation&quot;: &quot;intraday&quot;,
+        &quot;volume rule&quot;: &quot;&quot;,
+        &quot;source text&quot;: &quot;2026-10-07 보고 고가&quot;,
+        &quot;reason code&quot;: &quot;initial resistance&quot;
+      },
+      {
+        &quot;label&quot;: &quot;돌파 구간 170,600~170,700원&quot;,
+        &quot;level type&quot;: &quot;breakout&quot;,
+        &quot;price&quot;: 170700.0,
+        &quot;low&quot;: 170600.0,
+        &quot;high&quot;: 170700.0,
+        &quot;currency&quot;: null,
+        &quot;confirmation&quot;: &quot;volume confirmed&quot;,
+        &quot;volume rule&quot;: &quot;시간대 보정 상대거래량 1.2배 이상 및 해당 장의 거래량가중평균가격 상회&quot;,
+        &quot;source text&quot;: &quot;2026-10-06 기준 10일·50일 이동평균 부근의 저항&quot;,
+        &quot;reason code&quot;: &quot;breakout trigger&quot;
+      },
+      {
+        &quot;label&quot;: &quot;지지 구간 165,300~165,600원&quot;,
+        &quot;level type&quot;: &quot;support&quot;,
+        &quot;price&quot;: 165600.0,
+        &quot;low&quot;: 165300.0,
+        &quot;high&quot;: 165600.0,
+        &quot;currency&quot;: null,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;&quot;,
+        &quot;source text&quot;: &quot;2026-10-06 저가와 하단 가격대 부근&quot;,
+        &quot;reason code&quot;: &quot;support test&quot;
+      },
+      {
+        &quot;label&quot;: &quot;165,300원 지지 실패&quot;,
+        &quot;level type&quot;: &quot;invalidation&quot;,
+        &quot;price&quot;: 165300.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: null,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;&quot;,
+        &quot;source text&quot;: &quot;종가 이탈 시 신규 매수 중단 및 보유 위험 축소&quot;,
+        &quot;reason code&quot;: &quot;support broken&quot;
+      },
+      {
+        &quot;label&quot;: &quot;추가 회복 확인선 173,986원&quot;,
+        &quot;level type&quot;: &quot;resistance&quot;,
+        &quot;price&quot;: 173986.0,
+        &quot;low&quot;: null,
+        &quot;high&quot;: null,
+        &quot;currency&quot;: null,
+        &quot;confirmation&quot;: &quot;close&quot;,
+        &quot;volume rule&quot;: &quot;&quot;,
+        &quot;source text&quot;: &quot;보고된 거래량가중이동평균; 다음 장의 당일 거래량가중평균가격과 별개&quot;,
+        &quot;reason code&quot;: &quot;trend confirmation&quot;
+      }
+    ],
+    &quot;min relative volume&quot;: 1.2,
+    &quot;vwap required&quot;: true,
+    &quot;earliest pilot time local&quot;: &quot;10:30&quot;,
+    &quot;funding priority&quot;: &quot;low&quot;,
+    &quot;entry window&quot;: &quot;mid&quot;,
+    &quot;trigger quality&quot;: &quot;weak&quot;
+  },
+  &quot;risk action&quot;: &quot;hold&quot;,
+  &quot;risk action reason&quot;: &quot;105560.ks의 상승 중인 200일선과 165,300원 지지는 아직 유지돼 기존 보유분은 유지한다. 다만 168,300원이라는 2026-10-07 사후 보고 가격은 단기 이동평균과 당일 거래량가중평균가격 아래이고 거래량은 20일 평균의 59.3%에 그쳐 신규 매수 근거가 부족하다. 지지 이탈이나 확인된 돌파 실패 시 자금 조달 목적이 아닌 위험 축소로 전환한다.&quot;,
+  &quot;risk action reason codes&quot;: [
+    &quot;support intact&quot;,
+    &quot;breakout unconfirmed&quot;
+  ],
+  &quot;risk action confidence&quot;: 0.7,
+  &quot;risk action level&quot;: {
+    &quot;label&quot;: &quot;165,300원 종가 이탈&quot;,
+    &quot;level type&quot;: &quot;support&quot;,
+    &quot;price&quot;: 165300.0,
+    &quot;low&quot;: 165.0,
+    &quot;high&quot;: 165300.0,
+    &quot;currency&quot;: null,
+    &quot;confirmation&quot;: &quot;close&quot;,
+    &quot;volume rule&quot;: &quot;&quot;,
+    &quot;source text&quot;: &quot;2026-10-06 저가와 165,300~165,600원 지지 구간의 하단; 종가 이탈 시 보유 위험 축소&quot;,
+    &quot;reason code&quot;: &quot;support broken&quot;
+  },
+  &quot;profit taking plan&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;stage 1 price&quot;: null,
+    &quot;stage 1 fraction&quot;: null,
+    &quot;stage 2 price&quot;: null,
+    &quot;stage 2 fraction&quot;: null,
+    &quot;trailing stop price&quot;: null,
+    &quot;trailing stop fraction&quot;: null,
+    &quot;keep core fraction&quot;: null,
+    &quot;reentry condition&quot;: &quot;&quot;,
+    &quot;reason codes&quot;: [
+      &quot;support intact&quot;,
+      &quot;breakout unconfirmed&quot;,
+      &quot;support broken&quot;
+    ]
+  }
+}</span></p>
+        <p><strong>오늘 할 일</strong><span>보유/관찰 유지: 조건 확인</span></p>
+        <p><strong>장중 pilot 조건</strong><span>10:30 이후 조건 확인 + VWAP 위 + 거래량 확인 시 소액 starter만 검토</span></p>
+        <p><strong>종가 확인 시 할 일</strong><span>종가에서 조건 확인 재확인</span></p>
+        <p><strong>내일 follow-through</strong><span>다음 거래일 첫 30~60분 동안 조건 확인 재이탈이 없는지 확인</span></p>
         <p><strong>리서치 기준</strong><span>리서치 본문은 2026-10-06 일봉 기준</span></p>
         <p><strong>실행 기준</strong><span>장중 실행 스냅샷 미갱신</span></p>
-        <p><strong>핵심 가격대</strong><span>다음 정규장 운영 여부와 105560.KS의 시세·거래량 신선도 확인</span></p>
-        <p><strong>위험 요약</strong><span>165,300원 아래 종가로 지지 실패</span></p>
-        <p><strong>왜 이 종목인가</strong><span>105560.KS의 170,700원 거래량 동반 회복과 173,986원 추가 회복</span></p>
+        <p><strong>핵심 가격대</strong><span>조건 확인</span></p>
+        <p><strong>위험 요약</strong><span>위험 조건 확인 필요</span></p>
+        <p><strong>왜 이 종목인가</strong><span>근거 요약 생성 실패: 원문은 투자자 화면에서 숨깁니다.</span></p>
         
       </div>
     </section>
@@ -73,7 +363,7 @@
       <article class="run-card">
         <p><strong>비교 run</strong><span>20261007T171515_github-actions-kr</span></p>
         <p><strong>판단 상태</strong><span>WAIT (not refreshed) → WAIT (not refreshed)</span></p>
-        <p class="long-field"><strong>Today 변화</strong><span>추격 매수보다 조건 확인 우선: 다음 정규장 운영 여부와 105560.KS의 시세·거래량 신선도 확인 → 추격 매수보다 조건 확인 우선: 다음 정규장 운영 여부와 105560.KS의 시세·거래량 신선도 확인</span></p>
+        <p class="long-field"><strong>Today 변화</strong><span>보유/관찰 유지: 조건 확인 → 보유/관찰 유지: 조건 확인</span></p>
       </article>
     </section>
     
