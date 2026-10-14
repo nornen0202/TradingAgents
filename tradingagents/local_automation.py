@@ -203,6 +203,10 @@ def run_due(archive, state, *, now=None, dry_run=False):
         receipt_path = state / "attempts" / f"{key}.json"
         receipt = read_json(receipt_path, {})
         attempts = int(receipt.get("attempts", 0))
+        manual_receipt = read_json(state / "finalization-recovery" / f"{key}.json", {})
+        manual_attempts = manual_receipt.get("attempts", 0)
+        if isinstance(manual_attempts, bool) or not isinstance(manual_attempts, int) or manual_attempts < 0:
+            raise ValueError("Invalid finalization recovery attempt budget")
         last = receipt.get("started_at")
         last_started = datetime.fromisoformat(last) if last else None
         # Preserve the original slot key and cumulative budget. A legacy successful
@@ -210,7 +214,7 @@ def run_due(archive, state, *, now=None, dry_run=False):
         early_success = (window_start > target.window_start_kst and last_started
                          and last_started < window_start and receipt.get("exit_code") == 0)
         cooling_down = last_started and now - last_started < timedelta(minutes=60) and not early_success
-        if attempts >= target.max_failed_attempts or cooling_down:
+        if attempts + manual_attempts >= target.max_failed_attempts or cooling_down:
             decisions.append({"target": target.name, "status": "RETRY_BUDGET_OR_COOLDOWN"})
             continue
         decisions.append({"target": target.name, "status": "DUE"})
