@@ -6,6 +6,7 @@ from pathlib import Path
 import time
 import sys
 from datetime import datetime, timedelta, timezone
+import zipfile
 
 import pytest
 
@@ -135,3 +136,15 @@ def test_wrong_volume_blocks_changes(monkeypatch):
     monkeypatch.setattr(storage, "volume_serial", lambda path: "WRONG")
     with pytest.raises(RuntimeError, match="not mounted"):
         storage.validate_volumes({"volumes": {"G:\\": "EXPECTED"}})
+
+
+def test_forward_archive_has_standard_readable_data_descriptors(tmp_path):
+    path = tmp_path / "stream.zip"
+    with path.open("xb", buffering=1024 * 1024) as handle, zipfile.ZipFile(storage.ForwardOnlyArchive(handle), "w") as saved:
+        saved.writestr("first.txt", b"first")
+        saved.writestr("second.txt", b"second")
+    with zipfile.ZipFile(path) as saved:
+        assert saved.testzip() is None
+        assert saved.read("first.txt") == b"first"
+        assert saved.read("second.txt") == b"second"
+        assert all(item.flag_bits & 8 for item in saved.infolist())

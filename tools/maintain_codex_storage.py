@@ -17,6 +17,26 @@ import zipfile
 REPARSE = 0x400
 
 
+class ForwardOnlyArchive:
+    """Avoid a header rewrite/seek for every file on external backup drives."""
+
+    def __init__(self, handle):
+        self.handle = handle
+        self.position = 0
+
+    def write(self, block):
+        written = self.handle.write(block)
+        self.position += written
+        return written
+
+    def tell(self):
+        return self.position
+
+    def flush(self):
+        self.handle.flush()
+        os.fsync(self.handle.fileno())
+
+
 def native(path: Path | str) -> str:
     value = os.path.abspath(path)
     return "\\\\?\\" + value if os.name == "nt" else value
@@ -269,7 +289,10 @@ def prepare(item: dict, backup_root: Path, journal_root: Path, *, apply: bool, p
             os.makedirs(native(destination / relative), exist_ok=True)
     manifest = {}
     start = last_report = time.monotonic()
-    with zipfile.ZipFile(native(archive), "x", compression=zipfile.ZIP_DEFLATED, compresslevel=1, allowZip64=True) as saved:
+    with open(native(archive), "xb", buffering=8 * 1024 * 1024) as archive_handle, zipfile.ZipFile(
+        ForwardOnlyArchive(archive_handle), "w", compression=zipfile.ZIP_DEFLATED,
+        compresslevel=1, allowZip64=True,
+    ) as saved:
         for index, (relative, metadata) in enumerate(files.items(), 1):
             original = source / relative
             digest = hashlib.sha256()
