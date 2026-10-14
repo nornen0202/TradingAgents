@@ -20,6 +20,9 @@ $installedScript = Join-Path $resolvedInstallRoot "maintain_project_storage.ps1"
 if ($PSCmdlet.ShouldProcess($installedScript, "Install TradingAgents storage maintenance")) {
     [IO.Directory]::CreateDirectory($resolvedInstallRoot) | Out-Null
     Copy-Item -LiteralPath $source -Destination $installedScript -Force
+    foreach ($helperName in @("maintain_codex_storage.py", "maintain_codex_storage_policy.py")) {
+        Copy-Item -LiteralPath (Join-Path $PSScriptRoot $helperName) -Destination (Join-Path $resolvedInstallRoot $helperName) -Force
+    }
 }
 
 $arguments = "-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $installedScript -Apply"
