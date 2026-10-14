@@ -85,7 +85,7 @@ jobs:
           restore-keys: |
             tradingagents-official-market-calendar-v1-
       - name: Install exchange calendar gate dependency
-        run: python -m pip install --disable-pip-version-check "exchange-calendars>=4.13.2"
+        run: python -m pip install --disable-pip-version-check "exchange-calendars>=4.13.2" "requests>=2.32,<3"
       - name: Require a successful research baseline from the last 24 hours
         id: gate
         env:

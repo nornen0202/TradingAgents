@@ -6,6 +6,8 @@ from datetime import datetime
 import json
 from zoneinfo import ZoneInfo
 
+import pytest
+
 from tradingagents.scheduled.automation_calendar import (
     CACHE_SCHEMA,
     MarketSessionStatus,
@@ -14,6 +16,15 @@ from tradingagents.scheduled.automation_calendar import (
 
 
 SEOUL = ZoneInfo("Asia/Seoul")
+
+
+@pytest.fixture(autouse=True)
+def shared_calendar_token(monkeypatch):
+    # Token persistence/coordination is exercised with the real client separately.
+    monkeypatch.setattr(
+        "tradingagents.scheduled.automation_calendar._shared_kis_access_token",
+        lambda *_args, **_kwargs: "sensitive-token",
+    )
 
 
 class _Response:
@@ -93,7 +104,6 @@ def test_previous_day_forecast_is_revalidated_for_ad_hoc_closure(
     monkeypatch.setenv("KIS_APP_SECRET", "secret")
     responses = iter(
         [
-            _Response({"access_token": "temporary-token"}),
             _Response(
                 {
                     "rt_cd": "0",
@@ -166,8 +176,7 @@ def test_kis_response_is_cached_without_storing_credentials(
 
     def opener(request, **_kwargs):
         calls.append(request.full_url)
-        if request.full_url.endswith("/oauth2/tokenP"):
-            return _Response({"access_token": "sensitive-token"})
+        assert request.get_method() == "GET"
         assert request.get_header("Custtype") == "P"
         return _Response(
             {
@@ -194,7 +203,7 @@ def test_kis_response_is_cached_without_storing_credentials(
         "kis_official_cache",
         "KIS chk-holiday opnd_yn",
     )
-    assert len(calls) == 2
+    assert len(calls) == 1
     assert "sensitive" not in serialized
 
 def test_calendar_reason_matches_gate_contract():
@@ -214,7 +223,7 @@ def test_missing_date_in_fresh_response_does_not_revalidate_old_forecast(tmp_pat
     monkeypatch.setenv("TRADINGAGENTS_KIS_MARKET_CALENDAR_ENABLED", "1")
     monkeypatch.setenv("KIS_APP_KEY", "key")
     monkeypatch.setenv("KIS_APP_SECRET", "secret")
-    responses = iter([_Response({"access_token": "token"}), _Response({
+    responses = iter([_Response({
         "rt_cd": "0", "output": [{"bass_dt": "20260819", "opnd_yn": "Y"}]
     })])
     status = automated_market_session_status(
@@ -243,7 +252,7 @@ def test_workflow_env_aliases_timeout_and_response_cleanup(tmp_path, monkeypatch
         def close(self):
             closed.append(True)
 
-    responses = iter([Response({"access_token": "token"}), Response({
+    responses = iter([Response({
         "rt_cd": "0", "output": [{"bass_dt": "20260818", "opnd_yn": "Y"}]
     })])
     def opener(request, timeout):
@@ -252,7 +261,7 @@ def test_workflow_env_aliases_timeout_and_response_cleanup(tmp_path, monkeypatch
 
     now = datetime(2026, 8, 18, 10, tzinfo=SEOUL)
     assert automated_market_session_status("kr", now, opener=opener).is_session is True
-    assert len(closed) == 2
+    assert len(closed) == 1
     assert module._cache_was_fetched_on(json.loads(path.read_text()), now.date())
     assert automated_market_session_status("kr", now, opener=lambda *_a, **_k: 1/0).is_session is True
 

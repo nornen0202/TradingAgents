@@ -222,22 +222,9 @@ def _fetch_kis_calendar(
     )
     if not math.isfinite(timeout) or not 0 < timeout <= 60:
         raise ValueError("KIS calendar timeout must be between 0 and 60 seconds")
-    token_request = urllib.request.Request(
-        f"{base_url}/oauth2/tokenP",
-        data=json.dumps(
-            {
-                "grant_type": "client_credentials",
-                "appkey": app_key,
-                "appsecret": app_secret,
-            }
-        ).encode("utf-8"),
-        headers={"content-type": "application/json; charset=utf-8"},
-        method="POST",
-    )
-    token_payload = _read_json_response(opener(token_request, timeout=timeout))
-    access_token = str(token_payload.get("access_token", "")).strip()
-    if not access_token:
-        raise ValueError("KIS token response did not include access_token")
+    if base_url != DEFAULT_KIS_BASE_URL:
+        raise ValueError("Official KIS calendar requires the real KIS endpoint")
+    access_token = _shared_kis_access_token(credentials, timeout=timeout)
 
     query = urllib.parse.urlencode(
         {
@@ -282,6 +269,25 @@ def _fetch_kis_calendar(
             "detail": "KIS chk-holiday opnd_yn",
         }
     return parsed
+
+
+def _shared_kis_access_token(credentials: tuple[str, str], *, timeout: float) -> str:
+    # The calendar runs immediately before account collection. Independent token
+    # issuance can exhaust KIS' one-per-minute limit as the account cache expires.
+    # Reuse the account client's interprocess refresh lock and atomic token cache.
+    from tradingagents.portfolio.kis import KisApiError, KisClient
+
+    app_key, app_secret = credentials
+    try:
+        return KisClient(
+            app_key=app_key,
+            app_secret=app_secret,
+            environment="real",
+            timeout_seconds=timeout,
+        ).ensure_access_token()
+    except KisApiError as exc:
+        # Coordination/storage failures must keep the calendar gate closed too.
+        raise ValueError("KIS shared calendar token unavailable") from exc
 
 
 def _read_json_response(response: object) -> dict[str, object]:

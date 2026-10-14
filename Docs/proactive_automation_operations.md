@@ -202,6 +202,28 @@ existing `run-due.lock` throughout operator finalization to exclude a scheduled
 full rerun. Verify the new manifest, publication, report handoff and Telegram
 receipt independently; recovered postprocessing is not newly generated research.
 
+### KIS calendar and account token coordination
+
+On October 15, KR production stopped before ticker research with
+`ADAPTIVE_ACCOUNT_UNAVAILABLE` after the account token endpoint returned HTTP 403.
+The official calendar had just issued an independent token, while the account
+client's stored token had entered its twenty-minute refresh window. The original
+403 response body was not retained. A read-only account probe at 05:00 recovered
+all thirteen holdings. The same calendar-then-account ordering reproduces a second
+token request and HTTP 403 under the broker's documented
+[one-token-issue-per-minute limit](https://github.com/koreainvestment/open-trading-api#5-%EB%AC%B8%EC%A0%9C-%ED%95%B4%EA%B2%B0-%EA%B0%80%EC%9D%B4%EB%93%9C).
+
+The calendar now obtains its token through the existing real KIS client's shared
+refresh lock and atomic private cache. Its official holiday GET and same-day
+calendar cache remain separate from token storage; no token enters a calendar
+receipt. A failed refresh, lock or token-cache write keeps the session gate
+closed. Do not force token issuance, bypass mandatory holdings coverage, reset
+the original attempt count or shorten its cooldown. Verify a current read-only
+account snapshot, then let the existing scheduler resume within its remaining
+budget. Before that worker starts, classify production recovery separately from
+the merged preventive repair; a successful account probe is not a completed
+daily analysis.
+
 ### Korean session VWAP source consistency
 
 The October 14 pre-open audit reproduced an invalid KR VWAP: a domestic quote
