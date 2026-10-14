@@ -11,6 +11,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -23,6 +24,21 @@ from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = "nornen0202/TradingAgents"
 PUBLIC_BASE = "https://nornen0202.github.io/TradingAgents"
+
+
+class LocalStorageHeadroomError(RuntimeError):
+    """Insufficient local output reserve; this is not a login failure."""
+
+
+def require_storage_headroom(*paths):
+    # The hosted Windows lane already reserves 4 GiB. Apply the same output
+    # reserve locally, including a separately configured scratch volume.
+    for path in paths:
+        candidate = Path(path).resolve()
+        while not candidate.exists():
+            candidate = candidate.parent
+        if shutil.disk_usage(candidate).free < 4 * 1024**3:
+            raise LocalStorageHeadroomError("Local analysis needs at least 4 GiB of free output storage.")
 
 
 def script(name):
@@ -221,6 +237,10 @@ def run_due(archive, state, *, now=None, dry_run=False):
         receipt_path = state / "attempts" / f"{key}.json"
         receipt = read_json(receipt_path, {})
         attempts = int(receipt.get("attempts", 0))
+        manual_receipt = read_json(state / "finalization-recovery" / f"{key}.json", {})
+        manual_attempts = manual_receipt.get("attempts", 0)
+        if isinstance(manual_attempts, bool) or not isinstance(manual_attempts, int) or manual_attempts < 0:
+            raise ValueError("Invalid finalization recovery attempt budget")
         last = receipt.get("started_at")
         last_started = datetime.fromisoformat(last) if last else None
         # Preserve the original slot key and cumulative budget. A legacy successful
@@ -228,7 +248,7 @@ def run_due(archive, state, *, now=None, dry_run=False):
         early_success = (window_start > target.window_start_kst and last_started
                          and last_started < window_start and receipt.get("exit_code") == 0)
         cooling_down = last_started and now - last_started < timedelta(minutes=60) and not early_success
-        if attempts >= target.max_failed_attempts or cooling_down:
+        if attempts + manual_attempts >= target.max_failed_attempts or cooling_down:
             decisions.append({"target": target.name, "status": "RETRY_BUDGET_OR_COOLDOWN"})
             continue
         decisions.append({"target": target.name, "status": "DUE"})
@@ -246,6 +266,9 @@ def run_due(archive, state, *, now=None, dry_run=False):
         stage = "preflight" if mode == "full" else "analysis"
         exit_code, error_type = 1, "WorkerInterrupted"
         try:
+            from tradingagents.scheduled.config import load_scheduled_config
+            workspace = load_scheduled_config(config).llm.codex_workspace_dir
+            require_storage_headroom(archive, state, workspace)
             if mode == "full":
                 preflight(config)
             stage = "analysis"

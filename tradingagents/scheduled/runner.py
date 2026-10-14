@@ -210,9 +210,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--label", default="github-actions", help="Run label for archived metadata.")
     parser.add_argument("--resume-from-run", help="Recover failed tickers from a completed full run into a new cohort, preserving successful research provenance.")
+    parser.add_argument("--finalize-from-run", help="Reuse a fully completed ticker phase after interrupted postprocessing, without running research again.")
+    parser.add_argument("--finalization-source-config", type=Path, help="Original config in its immutable Git source snapshot.")
     args = parser.parse_args(argv)
     if args.resume_from_run and (args.site_only or args.tickers or args.trade_date):
         parser.error("--resume-from-run cannot be combined with site-only, ticker or trade-date overrides")
+    if bool(args.finalize_from_run) != bool(args.finalization_source_config):
+        parser.error("Finalization requires both source run and original pinned source config")
+    if args.finalize_from_run and (args.resume_from_run or args.site_only or args.tickers or args.trade_date):
+        parser.error("Finalization cannot be combined with research recovery, site-only, ticker or date overrides")
 
     config = with_overrides(
         load_scheduled_config(args.config),
@@ -237,6 +243,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     recovery_args = {"resume_from_run": args.resume_from_run} if args.resume_from_run else {}
+    if args.finalize_from_run:
+        recovery_args = {"finalize_from_run": args.finalize_from_run,
+                         "finalization_source_config": args.finalization_source_config}
     manifest = execute_scheduled_run(config, run_label=args.label, skip_site_build=args.skip_site_build, **recovery_args)
     print(
         f"Completed run {manifest['run_id']} with status {manifest['status']} "
@@ -259,6 +268,8 @@ def execute_scheduled_run(
     run_label: str = "manual",
     skip_site_build: bool = False,
     resume_from_run: str | None = None,
+    finalize_from_run: str | None = None,
+    finalization_source_config: Path | None = None,
 ) -> dict[str, Any]:
     tz = ZoneInfo(config.run.timezone)
     started_at = datetime.now(tz)
@@ -271,11 +282,14 @@ def execute_scheduled_run(
                     run_mode=str(config.run.run_mode or "full"), started_at=started_at):
         return _execute_run_body(config, run_label=run_label, skip_site_build=skip_site_build,
                                  tz=tz, started_at=started_at, run_timer_start=run_timer_start,
-                                 run_id=run_id, run_dir=run_dir, resume_from_run=resume_from_run)
+                                 run_id=run_id, run_dir=run_dir, resume_from_run=resume_from_run,
+                                 finalize_from_run=finalize_from_run,
+                                 finalization_source_config=finalization_source_config)
 
 
 def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
-                      run_timer_start, run_id, run_dir, resume_from_run=None):
+                      run_timer_start, run_id, run_dir, resume_from_run=None,
+                      finalize_from_run=None, finalization_source_config=None):
     reset_llm_usage()
 
     run_mode = str(config.run.run_mode or "full").strip().lower()
@@ -293,6 +307,8 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     recovery_receipt = None
     if resume_from_run and run_mode != "full":
         raise ValueError("Research recovery requires run_mode=full")
+    if finalize_from_run and (run_mode != "full" or resume_from_run or not finalization_source_config):
+        raise ValueError("Finalization requires full mode, an original source config and no research recovery")
     if portfolio_only:
         run_tickers: list[str] = []
         scanner_status = None
@@ -300,7 +316,18 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         resolved_universe = _resolve_run_ticker_universe(config)
         selection_universe = resolved_universe
         base_run_tickers = list(resolved_universe.tickers)
-        if resume_from_run:
+        if finalize_from_run:
+            from .research_recovery import load_finalization_source
+            recovery_plan = load_finalization_source(
+                archive_dir=config.storage.archive_dir, source_run_id=finalize_from_run,
+                settings=_settings_snapshot(config), now=started_at,
+                holding_tickers=list(resolved_universe.holding_tickers),
+                account_status=resolved_universe.account_snapshot_status,
+                source_config_path=finalization_source_config,
+            )
+            run_tickers = recovery_plan["tickers"]
+            scanner_status = None
+        elif resume_from_run:
             from .research_recovery import load_recovery_source
             recovery_plan = load_recovery_source(
                 archive_dir=config.storage.archive_dir, source_run_id=resume_from_run,
@@ -347,7 +374,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     if recovery_plan:
         active_universe_metadata = recovery_plan["active_universe"]
         _write_json(run_dir / "universe_selection.json", active_universe_metadata)
-        run_warnings.append(f"research_recovery:{resume_from_run}:successful_research_reused_without_clock_or_usage_refresh")
+        run_warnings.append(f"research_recovery:{resume_from_run or finalize_from_run}:successful_research_reused_without_clock_or_usage_refresh")
     elif run_mode in {"full", "overlay_only"}:
         selection_limit = active_ticker_limit if run_mode == "full" else 0
         run_tickers, omitted, active_universe_metadata = _select_daily_active_tickers(

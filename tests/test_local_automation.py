@@ -11,6 +11,48 @@ from tradingagents import local_automation as local
 from tradingagents.atomic_io import interprocess_file_lock
 
 
+@pytest.fixture(autouse=True)
+def ample_test_storage(monkeypatch):
+    monkeypatch.setattr(local, "require_storage_headroom", lambda *paths: None)
+
+
+@pytest.mark.parametrize("free,passes", [(4 * 1024**3, True), (4 * 1024**3 - 1, False)])
+def test_local_output_reserve_blocks_full_disk_before_auth(tmp_path, monkeypatch, free, passes):
+    from importlib import util
+    spec = util.spec_from_file_location("local_storage_test", Path(local.__file__))
+    unpatched = util.module_from_spec(spec)
+    spec.loader.exec_module(unpatched)
+    monkeypatch.setattr(unpatched.shutil, "disk_usage", lambda path: SimpleNamespace(free=free))
+    if passes:
+        unpatched.require_storage_headroom(tmp_path / "not-created")
+    else:
+        with pytest.raises(unpatched.LocalStorageHeadroomError):
+            unpatched.require_storage_headroom(tmp_path / "not-created")
+
+
+def test_manual_finalization_counts_against_existing_budget_without_rewriting_history(tmp_path, monkeypatch):
+    import hashlib
+    from tradingagents.scheduled import runner
+    from tradingagents import local_advisory_recovery
+    now = datetime(2026, 10, 9, 12, 0, tzinfo=timezone.utc)
+    item = target()
+    watchdog = SimpleNamespace(due_targets=lambda *a, **k: [item])
+    monkeypatch.setattr(local, "script", lambda _: watchdog)
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(local_advisory_recovery, "recover_due", lambda *a, **k: [])
+    key = hashlib.sha256(f"{item.name}:{item.window_start_kst.isoformat()}".encode()).hexdigest()
+    original = tmp_path / "attempts" / f"{key}.json"
+    original.parent.mkdir()
+    original.write_text(json.dumps({"attempts": 1, "started_at": item.window_start_kst.isoformat(), "exit_code": 1}))
+    manual = tmp_path / "finalization-recovery" / f"{key}.json"
+    manual.parent.mkdir()
+    manual.write_text(json.dumps({"attempts": 1, "status": "FAILED"}))
+    before = original.read_bytes()
+    assert local.run_due(tmp_path / "archive", tmp_path, now=now) == [
+        {"target": item.name, "status": "RETRY_BUDGET_OR_COOLDOWN"}]
+    assert original.read_bytes() == before
+
+
 def target():
     return SimpleNamespace(name="daily-codex-us", workflow_file="daily-codex-analysis.yml", inputs={"profile": "us"},
                            window_start_kst=datetime(2026, 10, 9, 8, 45, tzinfo=timezone.utc), max_failed_attempts=2)

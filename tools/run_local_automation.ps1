@@ -70,6 +70,16 @@ try {
     $env:TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR = Join-Path $ArchiveRoot "youtube-archive"
     $env:TRADINGAGENTS_MARKET_CALENDAR_CACHE_PATH = Join-Path $stateRoot "market-calendar.json"
     $env:TRADINGAGENTS_AUTOMATION_BACKEND = "local"
+    $runtimeSettingsPath = Join-Path $stateRoot 'runtime-settings.json'
+    if (Test-Path -LiteralPath $runtimeSettingsPath) {
+        $runtimeSettings = Get-Content -LiteralPath $runtimeSettingsPath -Raw | ConvertFrom-Json
+        if ($runtimeSettings.codex_workspace_dir) {
+            $workspacePath = [string]$runtimeSettings.codex_workspace_dir
+            if (-not [IO.Path]::IsPathRooted($workspacePath)) { throw 'Codex workspace must be an absolute local path.' }
+            [IO.Directory]::CreateDirectory($workspacePath) | Out-Null
+            $env:TRADINGAGENTS_CODEX_WORKSPACE_DIR = [IO.Path]::GetFullPath($workspacePath)
+        }
+    }
     Set-Location $sourceRoot
     $logPath = Join-Path $stateRoot "$Command.log"
     $arguments = @("-u", "-m", "tradingagents.local_automation", $Command,

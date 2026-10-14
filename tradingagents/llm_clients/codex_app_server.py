@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import json
+import errno
 import os
 import queue
 import shutil
 import subprocess
 import threading
 import time
+import tempfile
 import uuid
 from collections import deque
 from dataclasses import dataclass
@@ -26,6 +28,10 @@ class CodexAppServerTimeoutError(CodexAppServerError):
 
 class CodexAppServerAuthError(CodexAppServerError):
     """Raised when Codex login is missing or unusable."""
+
+
+class CodexAppServerStorageError(CodexAppServerError):
+    """Local storage failed before authentication could be checked."""
 
 
 class CodexAppServerBinaryError(CodexAppServerError):
@@ -156,14 +162,26 @@ class CodexAppServerSession:
             if not source.is_file():
                 continue
             destination = codex_home / filename
+            temporary = None
             try:
-                shutil.copyfile(source, destination)
+                fd, name = tempfile.mkstemp(prefix=f".{filename}.", suffix=".tmp", dir=codex_home)
+                os.close(fd)
+                temporary = Path(name)
+                shutil.copyfile(source, temporary)
+                os.replace(temporary, destination)
             except OSError as exc:
+                if exc.errno == errno.ENOSPC or getattr(exc, "winerror", None) in {39, 112}:
+                    raise CodexAppServerStorageError(
+                        "Codex isolated workspace could not be written: local storage is full."
+                    ) from exc
                 if filename == "auth.json":
                     raise CodexAppServerAuthError(
                         f"Failed to seed Codex auth from '{source}' to isolated CODEX_HOME "
                         f"'{codex_home}': {exc}"
                     ) from exc
+            finally:
+                if temporary is not None:
+                    temporary.unlink(missing_ok=True)
 
     @staticmethod
     def _source_codex_home() -> Path | None:

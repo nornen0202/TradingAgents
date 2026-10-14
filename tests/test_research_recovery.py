@@ -268,3 +268,112 @@ def test_runner_retries_only_failed_ticker_and_recomputes_full_coverage(recovery
     assert runner._strict_required_coverage_failed(manifest) is (retry_status != "success")
     assert manifest["research_recovery"]["reused_tickers"] == ["AAPL"]
     assert manifest["llm_usage"]["calls"] == 0  # no provider calls in this fixture
+
+
+@pytest.fixture
+def finalization(recovery, tmp_path, monkeypatch):
+    source = recovery["source"]
+    root = recovery["root"]
+    (root / "run.json").unlink()
+    write(root / "attempt.json", {"run_id": source["run_id"], "status": "FAILED", "market": "US",
+                                   "run_mode": "full", "started_at": source["started_at"],
+                                   "finished_at": source["finished_at"], "error_type": "OSError"})
+    selection = deepcopy(source["active_universe"])
+    selection.update(selected_tickers=["AAPL", "XOM"])
+    selection["coverage"]["complete"] = True
+    write(root / "universe_selection.json", selection)
+    rows = []
+    for ticker in ("AAPL", "XOM"):
+        row = deepcopy(source["tickers"][0])
+        row["ticker"] = ticker
+        row["artifacts"] = {k: value.replace("AAPL", ticker) for k, value in row["artifacts"].items()}
+        for key, relative in row["artifacts"].items():
+            original = root / source["tickers"][0]["artifacts"][key]
+            data = original.read_text(encoding="utf-8").replace("AAPL", ticker)
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(data, encoding="utf-8")
+        analysis_path = root / row["artifacts"]["analysis_json"]
+        analysis = json.loads(analysis_path.read_text())
+        analysis.update(provider="codex", models={f"{role}_model": source["settings"][f"{role}_model"]
+                                                for role in ("quick", "deep", "output")})
+        write(analysis_path, analysis)
+        write(root / "worker-summaries" / f"{ticker}.json", row)
+        rows.append(row)
+    sha = "1" * 40
+    snapshot = tmp_path / sha
+    source_config = snapshot / "config" / "original.toml"
+    source_config.parent.mkdir(parents=True)
+    original_config = (tmp_path / "config.toml").read_bytes()
+    source_config.write_bytes(original_config)
+    (snapshot / ".source-ready").write_text(sha)
+    monkeypatch.setattr("subprocess.check_output", lambda *args, **kwargs: original_config)
+    return {**recovery, "source_config": source_config, "rows": rows}
+
+
+def finalization_plan(fixture, **overrides):
+    from tradingagents.scheduled.research_recovery import load_finalization_source
+    return load_finalization_source(**{
+        "archive_dir": fixture["config"].storage.archive_dir, "source_run_id": fixture["source"]["run_id"],
+        "settings": runner._settings_snapshot(fixture["config"]), "now": fixture["now"],
+        "holding_tickers": [], "account_status": "disabled", "source_config_path": fixture["source_config"],
+        **overrides})
+
+
+def test_completed_research_finalization_runs_no_graph_and_preserves_source(finalization, monkeypatch):
+    root = finalization["root"]
+    original = {p.relative_to(root).as_posix(): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+    monkeypatch.setattr(runner, "_run_single_ticker", lambda **_: pytest.fail("Completed research must not rerun"))
+    monkeypatch.setattr(runner, "_augment_run_tickers_with_scanner", lambda **_: pytest.fail("Frozen selection must not rerun"))
+    monkeypatch.setattr(runner, "collect_event_signals", lambda **_: {})
+    monkeypatch.setattr(runner, "build_live_context_delta", lambda **_: {})
+    monkeypatch.setattr(runner, "build_and_write_decision_bundle", lambda **_: {})
+    manifest = runner.execute_scheduled_run(finalization["config"], skip_site_build=True,
+        run_label="finalization-test", finalize_from_run=finalization["source"]["run_id"],
+        finalization_source_config=finalization["source_config"])
+    assert manifest["status"] == "success"
+    assert manifest["summary"]["successful_tickers"] == 2
+    assert manifest["active_universe"]["coverage"]["complete"] is True
+    assert manifest["research_recovery"]["finalization_only"] is True
+    assert manifest["research_recovery"]["retry_tickers"] == []
+    assert manifest["parallel_ticker_execution"]["requested_new_research_count"] == 0
+    assert manifest["llm_usage"]["calls"] == 0
+    assert original == {p.relative_to(root).as_posix(): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+    assert not (root / "run.json").exists()
+
+
+@pytest.mark.parametrize("change", ["active", "missing_worker", "failed_worker", "wrong_model", "bad_config", "new_holding"])
+def test_finalization_refuses_unverified_or_incomplete_source(finalization, change):
+    root = finalization["root"]
+    overrides = {}
+    if change == "active":
+        attempt = json.loads((root / "attempt.json").read_text())
+        attempt["status"] = "RUNNING"
+        write(root / "attempt.json", attempt)
+    elif change == "missing_worker":
+        (root / "worker-summaries/XOM.json").unlink()
+    elif change == "failed_worker":
+        row = deepcopy(finalization["rows"][1])
+        row["status"] = "failed"
+        write(root / "worker-summaries/XOM.json", row)
+    elif change == "wrong_model":
+        path = root / "tickers/XOM/analysis.json"
+        analysis = json.loads(path.read_text())
+        analysis["models"]["deep_model"] = "different"
+        write(path, analysis)
+    elif change == "bad_config":
+        finalization["source_config"].write_text('model="tampered"')
+    else:
+        overrides["holding_tickers"] = ["NEW"]
+    with pytest.raises(ValueError):
+        finalization_plan(finalization, **overrides)
+    assert not finalization["destination"].exists()
+
+
+def test_finalization_rechecks_hashes_before_copying(finalization):
+    plan = finalization_plan(finalization)
+    path = finalization["root"] / "tickers/XOM/report.md"
+    path.write_text("changed")
+    with pytest.raises(ValueError, match="source changed"):
+        copy_recovered_research(plan, run_dir=finalization["destination"])
+    assert not finalization["destination"].exists()

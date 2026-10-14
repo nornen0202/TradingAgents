@@ -174,6 +174,34 @@ override stale quotes or execution gates.
 
 ## Recovery decisions
 
+### Local storage exhaustion after completed ticker research
+
+On October 14, all thirty KR ticker workers completed, but postprocessing failed
+with `ENOSPC` before a final manifest was published. A subsequent auth-file copy
+also failed with `ENOSPC` and was reported as `CodexAppServerAuthError`; this did
+not establish an expired login. Isolated per-ticker plugin caches had accumulated
+about 14 GB in the local scratch workspace. Auth seeding now replaces a complete
+temporary file atomically and reports full storage as `CodexAppServerStorageError`.
+Local production checks the same 4 GiB output reserve used by the Windows lane.
+
+The installed launcher accepts `codex_workspace_dir` in
+`.runtime/local-automation/runtime-settings.json`, using the existing
+`TRADINGAGENTS_CODEX_WORKSPACE_DIR` override. This changes future scratch output;
+it does not move canonical archives or existing workspaces. Keep the scratch root
+private to the Windows user. Do not delete or move a workspace after an approval
+rejection. NTFS compression can preserve inactive files while recovering space.
+
+For a terminal failed full attempt with every ticker successfully archived, use
+`--finalize-from-run` with `--finalization-source-config` pointing to its original
+immutable Git configuration. The loader verifies that config against Git, checks
+the frozen universe/current holdings, exact models, all research artifacts and
+hashes, and runs no ticker graph. It writes a new cohort with explicit research
+reuse provenance and original research/quote timestamps. The interrupted source,
+its failed attempt and missing/corrupt final outputs remain intact. Hold the
+existing `run-due.lock` throughout operator finalization to exclude a scheduled
+full rerun. Verify the new manifest, publication, report handoff and Telegram
+receipt independently; recovered postprocessing is not newly generated research.
+
 ### Korean session VWAP source consistency
 
 The October 14 pre-open audit reproduced an invalid KR VWAP: a domestic quote
