@@ -1,20 +1,20 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:d3be0767c1b42412c9e8bf84a4f24112",
+  "event_id": "youtube:f8efdb733d35122625da5c2cdea393bd",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "6b9df2c8a1b360d224f0476d3b90b501e82aeae61312d21d886d1217b50382ec",
-  "source_sha256": "3c0f7014fde9dedaef2b3978f6164a5be79c797c9824685658d40f01a4ad3914",
+  "source_sha256": "977b4b4a7e95026545d05bb998e4cdca86df0e95a1f3d77d72e267ed39c9a99e",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
     "source": {
       "health": "OK",
-      "run_id": "youtube_20261015_080634",
-      "last_run_at": "2026-10-15T09:06:17.342000+09:00",
+      "run_id": "youtube_20261015_091141",
+      "last_run_at": "2026-10-15T09:22:52.563697+09:00",
       "status": "success",
       "stale_after_hours": 36
     },
@@ -43,12 +43,12 @@
       "may_bypass_market_or_portfolio_execution_gate": false
     },
     "coverage": {
-      "total_unique_events": 380,
+      "total_unique_events": 381,
       "window_events": 101,
       "transmitted_events": 24,
       "truncated": true,
       "oldest_occurred_at": "2026-10-12T11:30:18+00:00",
-      "newest_occurred_at": "2026-10-14T23:01:10+00:00",
+      "newest_occurred_at": "2026-10-14T23:47:30+00:00",
       "omitted_due_to_packet_budget": 36
     },
     "events": [
@@ -974,6 +974,174 @@
               "source_url": "https://finance.yahoo.com/m/56e2d433-7044-309b-afe9-3c09e12087f4/stocks-to-watch-recap%3A.html",
               "publisher": "The Wall Street Journal",
               "published_at": "2026-10-12T20:50:38+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "RvIxnUqv-DU",
+        "content_sha256": "e01535dca2c1d1620ad7fac3af32ed7ee9e89375885d516eaee011b9c5c7aee4",
+        "occurred_at": "2026-10-14T23:47:30+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "RvIxnUqv-DU",
+          "title": "트럼프 \"한국 500억 투자·구매 약속\" | '제2도약' 현대차 푸네에 신공장…인도서 연간 100만대 생산 체제 | 권순우 삼프로TV 취재팀장 [뉴스3]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=RvIxnUqv-DU",
+          "published_at": "2026-10-14T23:47:30+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 17496,
+            "segments": 1025,
+            "duration_seconds": 2139,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 11,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "예상보다 높은 미국 CPI 이후 국채금리가 상승하고 미국 증시가 하락했으며, 10월 금리 인상 확률 약 50%·12월 약 96%가 언급됐다. 한국 증시 추가 하락은 출연자의 전망이다.",
+              "status": "unverified",
+              "confidence": 0.15,
+              "supporting_evidence_ids": [
+                "E7"
+              ],
+              "manual_check_required": true,
+              "investor_implication": "50%·96%를 검증된 정책 확률로 사용하거나 한국 증시 하락을 확정적으로 해석해서는 안 된다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "FT 투자자 미팅 보도를 인용해 앤트로픽의 3분기 매출 168억 달러와 전년 연간 매출 약 100억 달러를 언급했다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "두 수치를 직접 비교해 성장률이나 기술주 투자심리 반전 가능성을 평가할 근거가 부족하다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "트럼프는 한국의 알래스카 LNG 500억 달러 투자 약속을 주장했지만, 출연자는 투자 확정이 아니라 협상 추진 합의라고 반박했다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "500억 달러를 확정 투자액이나 국내 기업의 확정 수주 기반으로 반영할 수 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "대만의 알래스카 LNG 지분 투자 44억 달러와 구매 약정 700억~800억 달러, 20년간 공급량 30%가 언급됐다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "해당 금액을 확정 자금조달이나 보장된 장기 매출로 간주할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "밴스가 정부 교체와 관계없는 알래스카 LNG 추진 의지를 밝혔으며, 캐나다 LNG 경쟁과 알래스카의 높은 건설비가 위험으로 제시됐다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정치적 추진 의지를 사업성·금융종결·완공의 보장으로 해석해서는 안 된다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "글로벌파운드리스가 뉴욕 몰타 신규 시설 2개에 210억 달러를 투자하고 일본 자금 조달과 미국 정부 지분 참여가 동반된다고 소개됐다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "발표 규모를 집행 완료 투자나 확정된 정부 출자로 반영할 수 없다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "미국 금리·한국 증시",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Dow Jones Futures: Techs Fall On Anthropic News After Dell, AMD, CoreWeave Dive In AI-Led Sell-Off",
+              "source_url": "https://finance.yahoo.com/m/aa652aec-f2fc-3be9-a055-a0a4183cba67/dow-jones-futures%3A-techs-fall.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-10-15T00:02:28+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "West Coast Community Bancorp Rings Nasdaq Closing Bell",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/west-coast-community-bancorp-rings-231600413.html",
+              "publisher": "GlobeNewswire",
+              "published_at": "2026-10-14T23:16:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Invesco QQQ Doesn't Own a Single Bank, and That's Not the Only Thing the Nasdaq-100 Leaves Out",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/invesco-qqq-doesnt-own-single-234301632.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-10-14T23:43:01+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C2",
+              "title": "Super Micro Is Up 22% in 2026 but It’s Down Today: Take Profits, or Hold On for the Ride?",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/super-micro-22-2026-down-190731752.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-10-14T19:07:31+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C3",
+              "title": "S&P 500, Nasdaq See Worst Day In Over Two Months As Chipmaker Rout Deepens, CPI Data Comes In Hot — AAPL, SPCX, DRAM, SOXX In Focus",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-see-worst-000726391.html",
+              "publisher": "Stocktwits",
+              "published_at": "2026-10-15T00:07:26+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E8",
+              "claim_id": "C7",
+              "title": "JPMorgan upgrades EMEA Metals & Mining stocks, names top picks into Q3 results",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/jpmorgan-upgrades-emea-metals-mining-105959458.html",
+              "publisher": "Investing.com",
+              "published_at": "2026-10-14T10:59:59+00:00",
               "source_tier": "news"
             }
           ]
@@ -3995,158 +4163,6 @@
               "source_url": "https://finance.yahoo.com/m/9c369c61-bc34-3a4f-8ce7-4a67a02db5a4/stocks-to-watch-recap%3A-bank.html",
               "publisher": "The Wall Street Journal",
               "published_at": "2026-10-14T21:25:05+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "W_MGWBS0nZQ",
-        "content_sha256": "825a332b76ad837639dbc0b269d46d0c3d2c94168a0f884dc428e378557758da",
-        "occurred_at": "2026-10-14T07:00:08+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "title_and_claim_context"
-        },
-        "strategy_source_tier": "STANDARD",
-        "strategy_evidence_weight": "STANDARD",
-        "summary": {
-          "video_id": "W_MGWBS0nZQ",
-          "title": "반도체보다 이익 증가율 높아진다? 2차전지주 다시 봐야 하는 이유 / 조선·방산·원전 지금 팔까? | 김민수 대표",
-          "channel": "815Money talk",
-          "source_url": "https://www.youtube.com/watch?v=W_MGWBS0nZQ",
-          "published_at": "2026-10-14T07:00:08+00:00",
-          "status": "unverified",
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD",
-          "strategy_validation_policy": "STANDARD_REVIEW",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 10155,
-            "segments": 517,
-            "duration_seconds": 1109,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 10
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "한화증권이 내년 2차전지 이익 증가율을 반도체보다 높게 전망했다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "업종 투자 우선순위의 근거로 확정하지 말고 동일 기준 이익 전망과 기저효과를 확인해야 한다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "LG에너지솔루션 실적이 약 7,800억 원이고 AMPC 기여가 절반 이상이라는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "AMPC 제외 본업 이익과 현금흐름을 확인하기 전 실적 회복의 강도를 판단하기 어렵다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "유럽·북미 전기차 성장, 중국산 자동차 35만 대 쿼터, 미국 ESS 중국산 배터리 점유율 50% 이상과 정책 변화가 한국 업체의 대체 기회를 만든다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "정책상 기회와 실제 계약·납품·이익 증가를 구분해야 한다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "LG에너지솔루션의 40만 원 아래 급등과 장기 이동평균선 돌파, 조선 3사 외국인 순매수, 지지선 이탈 및 하반기 LNG선 관련 지표 감소 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "과매도나 반등을 확인된 사실로 간주할 수 없으며 가격·수급·수주를 각각 대조해야 한다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "미국 원전 투자 후속 조치 부재가 원전주 부진의 배경이며 안정적 전력 공급에는 원전이 필요하다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "장기 전력 수요 논리를 개별 원전주의 단기 반등이나 수주 확정으로 연결할 수 없다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "한화그룹의 2028년 재사용 발사체 사용 계획, 한화시스템의 양호한 실적과 DSME 지분 매각 자금 활용, SpaceX 가격 상승 및 방산주 지지선 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "사업 일정과 매각 대금을 확인하기 전 신규 사업 재원이나 기업가치 상승을 확정할 수 없다."
-            }
-          ],
-          "entities": [],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Voyager Technologies (VOYG) Cleared Griffin 1 Acceptance Testing Ahead Of 2026 Launch",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/voyager-technologies-voyg-cleared-griffin-221907838.html",
-              "publisher": "Simply Wall St.",
-              "published_at": "2026-10-14T22:19:07+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C2",
-              "title": "Why CoreWeave Stock Tumbled Today",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/why-coreweave-stock-tumbled-today-180109337.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-14T18:01:09+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E3",
-              "claim_id": "C2",
-              "title": "Why Gartner AI Outlook Sent CoreWeave Stock, Neoclouds Reeling",
-              "source_url": "https://finance.yahoo.com/m/e7396a5f-59db-30ad-b0ed-49dbca81119f/why-gartner-ai-outlook-sent.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-10-14T17:06:16+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C3",
-              "title": "Bank of America’s $1.2 Billion Problem Doesn’t End With Its Consent Order",
-              "source_url": "https://finance.yahoo.com/m/453259ee-c15b-3717-8681-d34a7ac7a83d/bank-of-america%E2%80%99s-%241.2.html",
-              "publisher": "Barrons.com",
-              "published_at": "2026-10-14T22:53:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C5",
-              "title": "Dow Jones Futures: Techs Fall On Anthropic News After Dell, AMD, CoreWeave Dive In AI-Led Sell-Off",
-              "source_url": "https://finance.yahoo.com/m/aa652aec-f2fc-3be9-a055-a0a4183cba67/dow-jones-futures%3A-techs-fall.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-10-14T23:24:53+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C7",
-              "title": "No One Owns A Stock That Beat The S&P 500 Every Year",
-              "source_url": "https://finance.yahoo.com/m/f91ee253-4e9b-3d11-9d63-69583ab32143/no-one-owns-a-stock-that-beat.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-10-14T12:00:53+00:00",
               "source_tier": "news"
             }
           ]
