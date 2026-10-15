@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:834afc263367ed990e24bf9a830281c6",
+  "event_id": "youtube:d37b60035509f4d099d78b0a85fdfaf6",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "6b9df2c8a1b360d224f0476d3b90b501e82aeae61312d21d886d1217b50382ec",
-  "source_sha256": "1f7b3e78af8071f8c4a17f47e01237d7b0fd687693223a8af6730b696fcd434e",
+  "source_sha256": "4002c078813d91b0e31619a37bd0ec69529d58d6ddcfa6085d0388ce95425a1e",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 381,
-      "window_events": 92,
+      "window_events": 86,
       "transmitted_events": 24,
       "truncated": true,
-      "oldest_occurred_at": "2026-10-12T12:12:03+00:00",
+      "oldest_occurred_at": "2026-10-13T08:00:40+00:00",
       "newest_occurred_at": "2026-10-14T23:47:30+00:00",
       "omitted_due_to_packet_budget": 36
     },
@@ -599,216 +599,6 @@
               "publisher": "Yahoo Finance",
               "published_at": "2026-10-13T13:55:41+00:00",
               "source_tier": "market_or_news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "ILs31CN-_VA",
-        "content_sha256": "8df6b501d7a256bd1f07acfce0e3b31b6fdb12a7cd93c7225f056337a241da4e",
-        "occurred_at": "2026-10-12T12:12:03+00:00",
-        "relevance": {
-          "tickers": [
-            "PLTR",
-            "MSFT",
-            "CEG",
-            "VST",
-            "MRVL",
-            "LITE"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "verified_entities"
-        },
-        "strategy_source_tier": "USER_PRIMARY",
-        "strategy_evidence_weight": "HIGH",
-        "summary": {
-          "video_id": "ILs31CN-_VA",
-          "title": "AI투자 판도 조용히 바뀌는 중? 부진했던 빅테크, 팔란티어의 수상한 신고가",
-          "channel": "소수몽키",
-          "source_url": "https://www.youtube.com/watch?v=ILs31CN-_VA",
-          "published_at": "2026-10-12T12:12:03+00:00",
-          "status": "unverified",
-          "strategy_source_tier": "USER_PRIMARY",
-          "strategy_evidence_weight": "HIGH",
-          "strategy_validation_policy": "USER_ACCEPTED",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean (Original)",
-            "model_or_format": "json3",
-            "chars": 14951,
-            "segments": 776,
-            "duration_seconds": 1597,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 10
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "하반기 소프트웨어·보안·빅테크가 반도체 대비 강세를 보였고, PLTR은 약 10개월·50% 이상 조정 후 신고가에 복귀했으며 MSFT는 신고가까지 3~4% 남았다는 주장.",
-              "status": "unverified",
-              "confidence": 0.98,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "고점 근접이라는 후속 관측을 하반기 업종 순환이나 영상 당시 신고가의 확인으로 확대하지 않는다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "PLTR의 8월 실적 서프라이즈, 보안 기업의 실적과 AI 에이전트 보안 수요, MSFT의 우려 해소가 하반기 재평가를 뒷받침했다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "실적 개선, 예상치 상회, 주가 상승의 인과관계를 각각 확인하기 전에는 재평가 논리를 확정하지 않는다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "앤트로픽이 90% 저렴한 모델을 공개하고 오픈AI가 최신 모델을 무료 이용자에게 개방했으며, 비용 하락이 빅테크 마진과 클라우드 수익화에 도움이 된다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "가격·성능·사용량 조건과 실제 클라우드 매출·현금흐름·마진을 확인하기 전에는 수익성 개선을 전제하지 않는다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "프레드 윌슨이 AI 시장을 2003년 인터넷 시장에 비유하고 1995년 인프라 붐 이후 킬러 앱 기회를 강조했으며 AI 관련 펀드를 모집했다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "유명 투자자의 발언과 펀드 모집 사실을 확인하기 전에는 이를 독립적인 투자 근거로 사용하지 않는다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "CEG·VST의 빅테크 장기 전력 계약, 약 2년 내 원전 추가 공급, 정부 저금리 대출과 내부자·유명 투자자 매수가 주가 회복을 뒷받침한다는 주장.",
-              "status": "unverified",
-              "confidence": 0.98,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "계약의 경제적 조건, 인허가·증설 일정, 대출 집행 단계와 거래 공시를 확인한 뒤 회복 논리를 평가한다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "마벨이 5년 뒤 매출 10배와 연평균 50~60% 성장을 전망했고, 젠슨 황이 2026년 6월 행사에서 다음 1조 달러 회사라고 말했다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "전망의 사업 범위와 기준연도를 확인하기 전에는 10배 성장을 회사 전체 실적이나 목표 기업가치에 적용하지 않는다."
-            }
-          ],
-          "entities": [
-            {
-              "ticker": "PLTR",
-              "name": "팔란티어",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "MSFT",
-              "name": "마이크로소프트",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "CEG",
-              "name": "컨스텔레이션 에너지",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "VST",
-              "name": "비스트라",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "MRVL",
-              "name": "마벨 테크놀로지",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "LITE",
-              "name": "루멘텀",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            }
-          ],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Gold slips near $4,160 as Middle East tensions fuel rate-hike concerns",
-              "source_url": "https://finance.yahoo.com/markets/commodities/articles/gold-slips-near-4-160-015039835.html",
-              "publisher": "Investing.com",
-              "published_at": "2026-10-13T01:50:39+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "Asian stocks dive as focus on earnings, geopolitics",
-              "source_url": "https://finance.yahoo.com/markets/world-indices/articles/asian-stocks-dive-focus-earnings-015003210.html",
-              "publisher": "Reuters",
-              "published_at": "2026-10-13T01:50:03+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C2",
-              "title": "This Ultra-Rare Gas Could Become An Ace In Canada’s Hands",
-              "source_url": "https://finance.yahoo.com/energy/articles/ultra-rare-gas-could-become-000000924.html",
-              "publisher": "Oilprice.com",
-              "published_at": "2026-10-13T00:00:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C4",
-              "title": "Broadcom vs. Qualcomm: Which Chip Stock Is a Better Buy in 2026?",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/broadcom-vs-qualcomm-chip-stock-225101810.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-12T22:51:01+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C7",
-              "title": "Once Wall Street’s Darling, Cerebras Stock Is Struggling",
-              "source_url": "https://finance.yahoo.com/m/75edfda6-e7aa-3648-bb1a-b24be9a5c218/once-wall-street%E2%80%99s-darling%2C.html",
-              "publisher": "Barrons.com",
-              "published_at": "2026-10-12T18:08:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E7",
-              "claim_id": "C9",
-              "title": "JEPQ Pays 11.27%. This Lesser-Known Nasdaq ETF Is Paying 13.58% Monthly",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/jepq-pays-11-27-lesser-220337891.html",
-              "publisher": "24/7 Wall St.",
-              "published_at": "2026-10-12T22:03:37+00:00",
-              "source_tier": "news"
             }
           ]
         }
@@ -4149,6 +3939,161 @@
               "source_url": "https://finance.yahoo.com/m/f91ee253-4e9b-3d11-9d63-69583ab32143/no-one-owns-a-stock-that-beat.html",
               "publisher": "Investor's Business Daily",
               "published_at": "2026-10-14T12:00:53+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "x7QERWYw9KA",
+        "content_sha256": "5d7dac38b515432e4638d348099296dee6dc52152a906cd2c32c036bf3c6291b",
+        "occurred_at": "2026-10-14T06:58:46+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "title_and_claim_context"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "x7QERWYw9KA",
+          "title": "이재용이 폭락장에 삼성전자 '지분' 늘린 진짜 이유",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=x7QERWYw9KA",
+          "published_at": "2026-10-14T06:58:46+00:00",
+          "status": "contradicted",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 2297,
+            "segments": 117,
+            "duration_seconds": 155,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 7,
+            "contradicted": 1,
+            "asr_uncertain": 1,
+            "partially_supported": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "이재용이 12일 홍라희에게서 삼성전자 766만7000주를 약 1조9000억원, 주당 23만2500원에 매입했으며 거래는 9월 공개됐다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "매입 사실과 가격을 내부자의 투자 판단 신호로 사용하기 전에 원공시를 확인해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "13일 발표된 계획에 따라 11월 12일 약 2조6000억원의 삼성전자 주식을 증여하며 매입·증여 완료 후 이재용 지분율이 1.58%에서 1.75%로 증가한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "예정 증여와 실제 이행을 구분하고 변경·철회 여부 및 지분율 분모를 확인해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "지난 1월에도 삼성물산 주식이 이전됐으며 이번 거래는 가족 지분 이전의 연속이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "확인되지 않은 과거 거래를 근거로 승계 일정이나 연속적인 지분 확대 전략을 확정할 수 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "상장주식 증여세는 증여일 전후 2개월 평균 주가로 평가하며 11월 12일 증여의 평가 기간은 9월 12일~다음 해 1월 12일이고 최대주주 할증 20%와 세율 50%가 적용된다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "2027년 1월 12일을 확정적인 절세 평가 종료일이나 투자 일정으로 사용하기에는 근거가 부족하다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "평균 주가가 1만원 하락하면 평가액이 약 116억원 감소하고 할증 20%와 세율 50%를 적용하면 세금이 약 67억원 감소한다.",
+              "status": "contradicted",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "제시된 절세액을 거래 동기나 주가 하락의 경제적 효과를 정량화하는 근거로 사용할 수 없다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "약 12조원의 상속세를 5년에 걸쳐 납부해 지난 4월 완납했고, 12일 주식 매각은 부채 상환용이며 13일이 증여 발표가 가능한 첫날이었다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "부채 정리가 지분 이전 시점을 결정했다는 설명은 확인된 사실이 아니라 미검증 해석으로 취급해야 한다."
+            }
+          ],
+          "entities": [],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Vosik Launches Intelligent Purchasing Software as Building Material Tariffs Worsen Housing Affordability",
+              "source_url": "https://finance.yahoo.com/real-estate/articles/vosik-launches-intelligent-purchasing-software-145300514.html",
+              "publisher": "Business Wire",
+              "published_at": "2026-10-14T14:53:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "JPMorgan upgrades EMEA Metals & Mining stocks, names top picks into Q3 results",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/jpmorgan-upgrades-emea-metals-mining-105959458.html",
+              "publisher": "Investing.com",
+              "published_at": "2026-10-14T10:59:59+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Sugar Prices Erase Early Gains on Dollar Strength",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/sugar-prices-erase-early-gains-162257554.html",
+              "publisher": "Barchart",
+              "published_at": "2026-10-14T16:22:57+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C4",
+              "title": "Voyager Technologies (VOYG) Cleared Griffin 1 Acceptance Testing Ahead Of 2026 Launch",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/voyager-technologies-voyg-cleared-griffin-221907838.html",
+              "publisher": "Simply Wall St.",
+              "published_at": "2026-10-14T22:19:07+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C4",
+              "title": "Why Is Kroger (KR) Cutting 3,000 Jobs While Facing A $9 Billion Lawsuit?",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/why-kroger-kr-cutting-3-221427368.html",
+              "publisher": "Simply Wall St.",
+              "published_at": "2026-10-14T22:14:27+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C6",
+              "title": "Gas has now topped $4 a gallon for a record 158 days: Chart of the Day",
+              "source_url": "https://finance.yahoo.com/markets/article/gas-has-now-topped-4-a-gallon-for-a-record-158-days-chart-of-the-day-100000942.html",
+              "publisher": "Yahoo Finance",
+              "published_at": "2026-10-14T12:52:41+00:00",
               "source_tier": "news"
             }
           ]
