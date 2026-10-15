@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.mobile-dashboard/v1",
-  "generated_at": "2026-10-15T10:15:20.879159+09:00",
+  "generated_at": "2026-10-15T10:50:21.154321+09:00",
   "privacy": "PUBLIC_RESEARCH_ONLY_NO_PORTFOLIO_MEMBERSHIP_OR_ACTIONS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:ac560a37a4068f62e4c41a66ba727260",
-      "source_health": "OK",
-      "report_mode": "READY",
+      "event_id": "kr:7deccedb3523e7f56a3c7a843725a7b4",
+      "source_health": "STALE",
+      "report_mode": "OUTAGE",
       "run_id": "20261015T100855_local-scheduler-kr-overlay_only",
       "started_at": "2026-10-15T10:08:55.351489+09:00",
       "source": {
@@ -17,15 +17,15 @@
       },
       "guardrails": {
         "valid_until": "2026-10-15T10:39:00+09:00",
-        "expired_at_build": false,
-        "decision_ready": true,
-        "conditional_strategy_ready": true,
-        "report_mode": "READY"
+        "expired_at_build": true,
+        "decision_ready": false,
+        "conditional_strategy_ready": false,
+        "report_mode": "OUTAGE"
       },
       "quality": {
-        "report_mode": "READY",
-        "decision_ready": true,
-        "conditional_strategy_ready": true,
+        "report_mode": "OUTAGE",
+        "decision_ready": false,
+        "conditional_strategy_ready": false,
         "quality_label_ko": "장중 투자 판단 가능",
         "fresh_row_ratio": 0.9667,
         "conditional_row_ratio": 1.0
@@ -46,19 +46,19 @@
           "day_high": 4775.0,
           "day_low": 4605.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "intraday invalidation breached"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -76,19 +76,19 @@
           "day_high": 573000.0,
           "day_low": 538000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "intraday invalidation breached"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -106,19 +106,19 @@
           "day_high": 221500.0,
           "day_low": 212000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action level triggered"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -136,19 +136,19 @@
           "day_high": 138200.0,
           "day_low": 126500.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -166,19 +166,19 @@
           "day_high": 191000.0,
           "day_low": 184000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "pilot window not open"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -196,21 +196,21 @@
           "day_high": 166100.0,
           "day_low": 157600.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "돌파 후 안착 실패",
             "vwap unconfirmed",
             "pilot window not open"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -228,19 +228,19 @@
           "day_high": 294000.0,
           "day_low": 278500.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "waiting for trigger"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -258,19 +258,19 @@
           "day_high": 1332000.0,
           "day_low": 1265000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -288,19 +288,19 @@
           "day_high": 165600.0,
           "day_low": 158100.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -318,19 +318,19 @@
           "day_high": 523000.0,
           "day_low": 492500.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -348,19 +348,19 @@
           "day_high": 72700.0,
           "day_low": 69100.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -378,19 +378,19 @@
           "day_high": 205000.0,
           "day_low": 191300.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -408,19 +408,19 @@
           "day_high": 176100.0,
           "day_low": 172300.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -438,19 +438,19 @@
           "day_high": 66300.0,
           "day_low": 63800.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -468,19 +468,19 @@
           "day_high": 166000.0,
           "day_low": 152000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -498,19 +498,19 @@
           "day_high": 5130.0,
           "day_low": 4850.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -528,19 +528,19 @@
           "day_high": 171500.0,
           "day_low": 166100.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -558,19 +558,19 @@
           "day_high": 5330.0,
           "day_low": 5100.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action close confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -588,19 +588,19 @@
           "day_high": 3900.0,
           "day_low": 3740.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "risk action confirmation required"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -618,19 +618,19 @@
           "day_high": 412000.0,
           "day_low": 399000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -648,19 +648,19 @@
           "day_high": 163000.0,
           "day_low": 157000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -678,19 +678,19 @@
           "day_high": 197000.0,
           "day_low": 180300.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -708,19 +708,19 @@
           "day_high": 13310.0,
           "day_low": 12360.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -738,19 +738,19 @@
           "day_high": 159000.0,
           "day_low": 154800.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "waiting for trigger"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -768,19 +768,19 @@
           "day_high": 3840.0,
           "day_low": 3705.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "support zone failed"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -798,19 +798,19 @@
           "day_high": 122100.0,
           "day_low": 118300.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 데이터 사용 가능",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "waiting for trigger"
           ],
           "quality": {
-            "execution_ready": true,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "POSSIBLE",
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "LIVE_CHECKPOINT",
             "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "READY",
-            "investor_label": "실시간 조건 확인"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -828,19 +828,19 @@
           "day_high": 166300.0,
           "day_low": 158800.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         }
       ],
