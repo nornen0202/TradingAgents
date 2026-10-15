@@ -1,0 +1,288 @@
+{
+  "version": 4,
+  "video_id": "0oR5qDA6zJM",
+  "title": "10월 14일 우리가 꼭 알고 있어야 할, 저평가 'AI 데이터센터' 소형주",
+  "url": "https://www.youtube.com/watch?v=0oR5qDA6zJM",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/0oR5qDA6zJM/maxresdefault.jpg",
+  "published_at": "2026-10-14T08:06:54+00:00",
+  "status": "contradicted",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 2131,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 2131,
+    "segments": 92,
+    "duration_seconds": 150,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-15T08:06:34.763997+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 4,
+  "claim_status_summary": {
+    "unverified": 6,
+    "asr_uncertain": 2,
+    "contradicted": 1,
+    "partially_supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "림바흐는 냉난방·전기·배관 설치와 유지보수 사업을 운영하며 AI 데이터센터 냉각·수냉식 개조 수요가 성장 기회다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "관련 사업 공시 및 프로젝트 증거 미제공"
+      },
+      "investor_implication": "데이터센터 산업의 성장 가능성을 림바흐의 확정 수주·매출로 간주할 근거가 없다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "연초 데이터센터 매출 비중은 5% 미만이며, 1분기 신규 계약 2억900만 달러 중 27%가 데이터센터 관련이고 이후 매출 비중이 상승한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "매출 비중 <5%; 신규 계약 $209,000,000; 데이터센터 계약 비중 27%",
+        "observed": "외부 관측값 없음. 주장값의 조건부 계산상 $209,000,000×27%=$56,430,000이며 실제 데이터센터 계약액은 미검증"
+      },
+      "investor_implication": "계약의 수행 일정과 실제 매출 인식, 취소·변경 여부를 확인해야 성장 추정에 사용할 수 있다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "8월 인수한 ‘심코어’가 고객 건설 예산 80억 달러를 관리하며 계획 업무가 후속 설비 수주로 연결된다. 후반에는 같은 규모를 ‘10조 달러’로 표현한다.",
+      "status": "asr_uncertain",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "$8,000,000,000; 원화 10조 원 이상; 후반 $10,000,000,000,000",
+        "observed": "외부 관측값 없음. 두 달러 표현은 산술적으로 1,250배 차이이며 환율 자료도 없음"
+      },
+      "investor_implication": "고객의 건설 예산을 림바흐의 매출·수주잔고로 계산하면 성장 규모를 과대평가할 수 있다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "지난 한 해 병원 건설 관리에서 300만 달러를 벌고 연계 건설 계약 6,000만 달러를 확보해 관리 사업 1달러당 건설 사업 20달러를 창출했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "관리 금액 $3,000,000; 연계 건설 계약 $60,000,000; 비율 20배",
+        "observed": "외부 관측값 없음. 주장값의 산술 비율 $60,000,000/$3,000,000=20은 일치하나 금액 자체와 회계적 정의는 미검증"
+      },
+      "investor_implication": "20배를 이익률이나 반복 가능한 수익 배수로 사용해서는 안 된다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "지난여름 주가가 130달러를 넘었지만 10월 13일 종가는 51.27달러로 이전 가격의 절반 미만이다.",
+      "status": "contradicted",
+      "confidence": 0.8,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:03",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "여름 고점 >$130; 10월 13일 종가 $51.27; 고점의 절반 미만",
+        "observed": "스냅샷 현재가 약 $47.88; 52주 최고가 $114.95. 주장 종가 $51.27을 가정하면 $114.95의 약 44.60%이나 해당 종가는 미검증"
+      },
+      "investor_implication": "고점 대비 하락률을 투자 근거로 쓰기 전에 거래일·연도·조정주가 기준을 통일해야 한다. 가격 하락 자체는 저평가의 증거가 아니다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "컴포트 시스템즈는 1년간 주가가 두 배 이상 상승하고 순이익 대비 40배에 거래되며 림바흐는 동일 이익 기준 절반 가격이다. 림바흐의 ‘20배나 더 많습니다’라는 표현은 불명확하다.",
+      "status": "asr_uncertain",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:03",
+      "source_confidence": 0.4,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "컴포트 시스템즈 1년 주가 >2배; PER 40배; 림바흐 배수 불명확; 동일 이익 기준 절반 가격",
+        "observed": "LMB trailing_pe 19.075697; forward_pe 10.194132; 비교 회사 관측값 없음"
+      },
+      "investor_implication": "같은 날짜의 후행·선행 및 GAAP·조정 이익 기준을 맞춘 비교 전에는 상대적 저평가를 판단할 수 없다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "2021년 말 인수한 회사의 이익률을 13.4%에서 28% 이상으로 높였으며 최근 인수 기업에도 수익성 개선을 적용할 수 있다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "이익률 13.4%→28% 이상",
+        "observed": "외부 관측값 없음. 주장값이 동일 기준이라면 상승 폭은 최소 14.6%포인트"
+      },
+      "investor_implication": "신규 인수 기업별 실제 마진과 통합 비용을 확인하기 전에는 과거 마진을 그대로 적용할 수 없다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "9월 인수한 ‘중서부 시설’의 내년 매출 전망은 1억4,000만 달러이며 림바흐 올해 전체 매출 전망의 거의 4분의 1이다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "차년도 매출 $140,000,000; 당해 회사 매출 전망의 약 25%",
+        "observed": "외부 관측값 없음. 정확히 25%라면 암묵적 분모는 $560,000,000이나 실제 가이던스는 미제공"
+      },
+      "investor_implication": "인수 규모와 실제 연결 매출 기여를 구분하고, 전망치에 이미 반영된 금액인지 확인해야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "월가 평균 목표주가는 70달러대로 10월 13일 종가 51.27달러보다 거의 40% 높아 저평가를 뒷받침한다.",
+      "status": "partially_supported",
+      "confidence": 0.92,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:03",
+      "source_confidence": 0.6,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "평균 목표가 $70대; 종가 $51.27; 상승 여력 거의 40%",
+        "observed": "스냅샷 평균 목표가 $75; 현재가 약 $47.88. $75/$51.27−1≈46.28%는 미검증 종가를 사용한 조건부 계산이며, 스냅샷 현재가 대비는 약 56.64%"
+      },
+      "investor_implication": "목표주가가 현재가보다 높다는 점은 참고 의견일 뿐 객관적 저평가나 수익 실현을 입증하지 않는다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "3분기 실적은 11월 초 발표되며 인수 기업 마진과 데이터센터 프로젝트 증가를 확인할 수 있고, 시장은 인수 효과가 미반영된 2분기 실적만으로 회사를 평가한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "3분기 실적 발표 11월 초; 시장 평가 기준은 2분기",
+        "observed": "공식 일정·분기 공시·시장 추정치 미제공"
+      },
+      "investor_implication": "공식 발표 일정과 공개 지표를 먼저 확인하고, 인수 효과의 미반영을 전제로 실적 재평가를 단정하지 않아야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "LMB",
+      "name": "림바흐 홀딩스",
+      "status": "unverified",
+      "claims": [
+        "건물 냉난방·전기·배관 설비 설치와 유지보수로 수익을 창출하며, AI 데이터센터의 냉각 설비 확충과 수냉식 개조 수요가 성장 기회라고 주장한다.",
+        "데이터센터 관련 신규 계약이 향후 매출로 전환되면서 데이터센터 매출 비중이 증가할 것이라고 전망한다.",
+        "8월 인수한 심코어의 건설 예산·일정 계획 업무가 림바흐의 후속 설비 공사 수주로 이어질 수 있으며, 병원 분야에서 활용했던 방식을 데이터센터에 적용한다고 설명한다."
+      ],
+      "numeric_claims": [
+        "올해 초 데이터센터 매출 비중은 전체 매출의 5% 미만이었다고 발언한다.",
+        "1분기 신규 계약 2억 900만 달러 중 27%가 데이터센터 관련 사업이라고 발언한다.",
+        "지난 한 해 병원 건설 관리에서 300만 달러를 벌고 이를 통해 6,000만 달러 규모의 건설 계약을 확보했다고 설명하며, 이를 관리 사업 1달러당 건설 사업 20달러로 표현한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "LMB",
+        "as_of": "2026-10-14T23:18:09.241032+00:00",
+        "current_price": 47.880001068115234,
+        "market_cap": 570968677.5772667,
+        "forward_pe": 10.194132,
+        "trailing_pe": 19.075697,
+        "fifty_two_week_high": 114.95,
+        "fifty_two_week_low": 40.74,
+        "average_target_price": 75.0,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Stocks to Watch Recap: Bank of America, Skydance, Aramco, Bending Spoons",
+      "source_url": "https://finance.yahoo.com/m/9c369c61-bc34-3a4f-8ce7-4a67a02db5a4/stocks-to-watch-recap%3A-bank.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-14T21:25:05+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Stocks to Watch Recap: Bank of America, Skydance, Aramco, Bending Spoons Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weathe..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C9",
+      "title": "10-year Treasury yield rises following hot inflation data: AlphaCheck",
+      "source_url": "https://finance.yahoo.com/markets/article/10-year-treasury-yield-rises-following-hot-inflation-data-alphacheck-135815482.html",
+      "publisher": "Yahoo Finance",
+      "published_at": "2026-10-14T13:58:15+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E3",
+      "claim_id": "C10",
+      "title": "Voyager Technologies (VOYG) Cleared Griffin 1 Acceptance Testing Ahead Of 2026 Launch",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/voyager-technologies-voyg-cleared-griffin-221907838.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-14T22:19:07+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C10",
+      "title": "Why Is Kroger (KR) Cutting 3,000 Jobs While Facing A $9 Billion Lawsuit?",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/why-kroger-kr-cutting-3-221427368.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-14T22:14:27+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
