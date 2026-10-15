@@ -1,7 +1,7 @@
 # TradingAgents KR 최신 공개 입력
 
 schema: tradingagents.ai-context/v1
-문서 생성: 2026-10-15T00:25:29.516519+00:00
+문서 생성: 2026-10-15T00:30:23.965489+00:00
 
 이 문서는 이미 공개된 자료의 축약 전사이며 새 분석·주문 승인이 아닙니다. 원분석 거래일(완료 일봉), 분석 완료, 장중 시세, 계좌 관측, 문서 생성은 서로 다른 시각입니다. 휴장·주말의 마지막 완료 거래일을 장애로 단정하지 마세요. null은 미확인이지 0이 아닙니다. 빌드 당시 실행 상태는 현재 상태가 아니며 row_valid_until과 현재 세션을 다시 확인해야 합니다. 현재 문서를 읽지 못하면 과거 대화의 계좌·한도를 최신 사실로 재사용하지 마세요.
 
@@ -16,15 +16,15 @@ schema: tradingagents.ai-context/v1
 ## 원분석·시세 시각
 ```json
 {
-  "producer_run_id": "20261015T055359_local-scheduler-kr-full",
-  "producer_finished_at": "2026-10-15T07:55:28.373485+09:00",
-  "analysis_run_id": "20261015T055359_local-scheduler-kr-full",
-  "analysis_completed_at": "2026-10-15T07:45:21.350231+09:00",
+  "producer_run_id": "20261015T090358_local-scheduler-kr-full",
+  "producer_finished_at": "2026-10-15T09:27:21.262487+09:00",
+  "analysis_run_id": "20261015T090358_local-scheduler-kr-full",
+  "analysis_completed_at": "2026-10-15T09:15:38.399670+09:00",
   "analysis_trade_date_oldest": "2026-10-14",
   "analysis_trade_date_latest": "2026-10-14",
   "analysis_lineage_status": "RESOLVED",
   "market_data_oldest_at": "2026-10-14T20:00:00+09:00",
-  "market_data_latest_at": "2026-10-14T20:00:00+09:00",
+  "market_data_latest_at": "2026-10-15T09:04:00+09:00",
   "market_data_status": "STALE"
 }
 ```
@@ -33,25 +33,25 @@ schema: tradingagents.ai-context/v1
 ```json
 {
   "status": "available",
-  "as_of": "2026-10-15T07:45:45.464259+09:00",
+  "as_of": "2026-10-15T09:16:06.015740+09:00",
   "snapshot_health": "VALID",
   "currency": "KRW",
   "latest_attempt": {
     "status": "VALID",
-    "account_as_of": "2026-10-15T07:45:45.464259+09:00",
-    "run_started_at": "2026-10-15T05:53:59.005331+09:00",
-    "run_finished_at": "2026-10-15T07:55:28.373485+09:00",
+    "account_as_of": "2026-10-15T09:16:06.015740+09:00",
+    "run_started_at": "2026-10-15T09:03:58.446938+09:00",
+    "run_finished_at": "2026-10-15T09:27:21.262487+09:00",
     "selected_for_public_account": true
   },
   "summary": {
     "position_count": 13,
     "total_purchase_amount_krw": 14944236,
-    "total_market_value_krw": 9221800,
-    "total_unrealized_pnl_krw": -5722436,
+    "total_market_value_krw": 8555420,
+    "total_unrealized_pnl_krw": -6388816,
     "settled_cash_krw": 976652,
     "available_cash_krw": 976652,
     "buying_power_krw": 976652,
-    "total_equity_krw": 10198452
+    "total_equity_krw": 9532072
   },
   "positions": [
     {
@@ -60,9 +60,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 2.0,
       "sellable_quantity": 2.0,
       "average_cost_krw": 2717500,
-      "current_price_krw": 1419000,
-      "market_value_krw": 2838000,
-      "unrealized_pnl_krw": -2597000
+      "current_price_krw": 1295000,
+      "market_value_krw": 2590000,
+      "unrealized_pnl_krw": -2845000
     },
     {
       "ticker": "005930.KS",
@@ -70,9 +70,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 10.0,
       "sellable_quantity": 10.0,
       "average_cost_krw": 332385,
-      "current_price_krw": 232000,
-      "market_value_krw": 2320000,
-      "unrealized_pnl_krw": -1003851
+      "current_price_krw": 216000,
+      "market_value_krw": 2160000,
+      "unrealized_pnl_krw": -1163851
     },
     {
       "ticker": "278470.KS",
@@ -80,9 +80,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 5.0,
       "sellable_quantity": 5.0,
       "average_cost_krw": 414928,
-      "current_price_krw": 294500,
-      "market_value_krw": 1472500,
-      "unrealized_pnl_krw": -602143
+      "current_price_krw": 282000,
+      "market_value_krw": 1410000,
+      "unrealized_pnl_krw": -664643
     },
     {
       "ticker": "010120.KS",
@@ -90,9 +90,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 4.0,
       "sellable_quantity": 4.0,
       "average_cost_krw": 243750,
-      "current_price_krw": 177200,
-      "market_value_krw": 708800,
-      "unrealized_pnl_krw": -266200
+      "current_price_krw": 161100,
+      "market_value_krw": 644400,
+      "unrealized_pnl_krw": -330600
     },
     {
       "ticker": "267260.KS",
@@ -100,9 +100,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 1153000,
-      "current_price_krw": 543000,
-      "market_value_krw": 543000,
-      "unrealized_pnl_krw": -610000
+      "current_price_krw": 500000,
+      "market_value_krw": 500000,
+      "unrealized_pnl_krw": -653000
     },
     {
       "ticker": "010140.KS",
@@ -110,9 +110,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 18.0,
       "sellable_quantity": 18.0,
       "average_cost_krw": 31573,
-      "current_price_krw": 18950,
-      "market_value_krw": 341100,
-      "unrealized_pnl_krw": -227215
+      "current_price_krw": 18290,
+      "market_value_krw": 329220,
+      "unrealized_pnl_krw": -239095
     },
     {
       "ticker": "058470.KQ",
@@ -120,9 +120,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 3.0,
       "sellable_quantity": 3.0,
       "average_cost_krw": 100000,
-      "current_price_krw": 76000,
-      "market_value_krw": 228000,
-      "unrealized_pnl_krw": -72000
+      "current_price_krw": 71100,
+      "market_value_krw": 213300,
+      "unrealized_pnl_krw": -86700
     },
     {
       "ticker": "042700.KS",
@@ -130,9 +130,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 374167,
-      "current_price_krw": 217500,
-      "market_value_krw": 217500,
-      "unrealized_pnl_krw": -156667
+      "current_price_krw": 193900,
+      "market_value_krw": 193900,
+      "unrealized_pnl_krw": -180267
     },
     {
       "ticker": "035420.KS",
@@ -140,9 +140,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 282334,
-      "current_price_krw": 179400,
-      "market_value_krw": 179400,
-      "unrealized_pnl_krw": -102934
+      "current_price_krw": 175000,
+      "market_value_krw": 175000,
+      "unrealized_pnl_krw": -107334
     },
     {
       "ticker": "353200.KS",
@@ -150,9 +150,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 172300,
-      "current_price_krw": 145000,
-      "market_value_krw": 145000,
-      "unrealized_pnl_krw": -27300
+      "current_price_krw": 131200,
+      "market_value_krw": 131200,
+      "unrealized_pnl_krw": -41100
     },
     {
       "ticker": "083450.KQ",
@@ -160,9 +160,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 2.0,
       "sellable_quantity": 2.0,
       "average_cost_krw": 59100,
-      "current_price_krw": 51000,
-      "market_value_krw": 102000,
-      "unrealized_pnl_krw": -16200
+      "current_price_krw": 46200,
+      "market_value_krw": 92400,
+      "unrealized_pnl_krw": -25800
     },
     {
       "ticker": "034020.KS",
@@ -170,9 +170,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 112931,
-      "current_price_krw": 69400,
-      "market_value_krw": 69400,
-      "unrealized_pnl_krw": -43531
+      "current_price_krw": 64600,
+      "market_value_krw": 64600,
+      "unrealized_pnl_krw": -48331
     },
     {
       "ticker": "403870.KQ",
@@ -180,9 +180,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 54500,
-      "current_price_krw": 57100,
-      "market_value_krw": 57100,
-      "unrealized_pnl_krw": 2600
+      "current_price_krw": 51400,
+      "market_value_krw": 51400,
+      "unrealized_pnl_krw": -3100
     }
   ]
 }
@@ -211,6 +211,10 @@ schema: tradingagents.ai-context/v1
 ```
 
 ```json
+{"ticker":"010140.KS","display_name":"삼성중공업","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":18330.0,"market_data_asof":"2026-10-15T09:04:00+09:00","session_vwap":18209.098133725638,"relative_volume":1.6973914806775996,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"18,410 돌파 후 완성된 5분봉 두 개의 재지지, 최신 당일 거래량가중평균가격 상회, 동일 시간대 거래량과 매수 체결 개선을 함께 확인한다. 이는 매수 승인이 아닌 재평가 조건이다. / 18,950 및 19,197.70~19,347.69 저항 회복을 관찰하고 19,570과 최신 50일 평균 유지로 확인 범위를 확장한다.","risk_condition_ko":"18,950 이상 도달, 2개 봉 확인 후 리스크 축소","decision_state_ko":"-","data_status_ko":"분석 당시 관측 시세 · 실행 재확인 필요","reference_strategy":{"strategy_code":null,"strategy_ko":null,"decision_state_ko":null,"market_data_asof":null},"quality_at_build":{"execution_ready":false,"current_execution_promotion":null,"generated_in_current_run":false,"row_valid_until":"2026-10-15T09:34:00+09:00","expired_at_build":false,"provider_limitations":[],"provider_blockers":null}}
+```
+
+```json
 {"ticker":"058470.KQ","display_name":"리노공업","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":76000.0,"market_data_asof":"2026-10-14T20:00:00+09:00","session_vwap":null,"relative_volume":0.0,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"058470.KQ 최신 정규장 자료에서 75,000~75,300원 지지와 위험예산 준수 여부 확인. / 058470.KQ 79,700원 회복 및 79,200~79,700원 재시험 후 가까운 저항과 비용을 반영한 손익비 재산정. 목표 상향이나 부당하게 좁은 손절로 기준을 맞추지 않는다.","risk_condition_ko":"75,000 이하 하락, 2개 봉 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-14T20:00:00+09:00"},"quality_at_build":{"execution_ready":false,"current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-14T20:30:00+09:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
@@ -223,6 +227,10 @@ schema: tradingagents.ai-context/v1
 ```
 
 ```json
+{"ticker":"353200.KS","display_name":"대덕전자","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":145000.0,"market_data_asof":"2026-10-14T20:00:00+09:00","session_vwap":null,"relative_volume":0.0,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"353200.KS의 142,800~144,100원 지지와 최신 5분봉 두 개의 유지, 거래량가중평균가격 상회 및 동일 시간대 상대거래량 1.2 이상을 관찰한다. 이 조건만으로 신규 매수하지 않는다. / 353200.KS의 141,100원 장중 이탈 후 회복 실패는 위험 재점검 신호이고 단독 전량 청산 조건은 아니다.","risk_condition_ko":"145,000 이상 도달, 장중 확인 시 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-14T20:00:00+09:00"},"quality_at_build":{"execution_ready":false,"current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-14T20:30:00+09:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+```
+
+```json
 {"ticker":"403870.KQ","display_name":"HPSP","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":57100.0,"market_data_asof":"2026-10-14T20:00:00+09:00","session_vwap":null,"relative_volume":0.0,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"403870.KQ 56,000~56,100원 방어 후 57,400원 재돌파·재지지, 거래량가중평균가격 상회 및 동일 시간대 상대거래량 1.2 이상 / 403870.KQ 61,000~61,600원 회복, 62,700원 위 종가 및 다음 실제 거래일 재지지","risk_condition_ko":"56,000 이하 하락, 종가 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-14T20:00:00+09:00"},"quality_at_build":{"execution_ready":false,"current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-14T20:30:00+09:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
@@ -231,15 +239,7 @@ schema: tradingagents.ai-context/v1
 ```
 
 ```json
-{"ticker":"353200.KS","display_name":"대덕전자","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":145000.0,"market_data_asof":"2026-10-14T20:00:00+09:00","session_vwap":null,"relative_volume":0.0,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"353200.KS의 142,800~144,100원 지지와 최신 5분봉 두 개의 유지, 거래량가중평균가격 상회 및 동일 시간대 상대거래량 1.2 이상을 관찰한다. 이 조건만으로 신규 매수하지 않는다. / 353200.KS의 141,100원 장중 이탈 후 회복 실패는 위험 재점검 신호이고 단독 전량 청산 조건은 아니다.","risk_condition_ko":"145,000 이상 도달, 장중 확인 시 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-14T20:00:00+09:00"},"quality_at_build":{"execution_ready":false,"current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-14T20:30:00+09:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
-```
-
-```json
 {"ticker":"083450.KQ","display_name":"GST","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":51000.0,"market_data_asof":"2026-10-14T20:00:00+09:00","session_vwap":null,"relative_volume":0.0,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"판단 시각은 2026-10-15T06:31:50.537744+09:00이다. 이 시각만으로 실제 거래일, 장 운영 상태, 호가 신선도를 확인할 수 없다. 최신 제공 장중 자료는 2026-10-14 20:00으로 표기되어 있으며 시간대와 거래 구분도 재확인해야 한다. / 10:30은 검증된 거래일의 최초 시험 매수 검토 가능 시각이지 만료 시각이 아니다. 활성 조건부 주문이나 확인된 만료 시각이 없어 다음 거래일로 임의 이월하지 않는다.","risk_condition_ko":"49,800 이하 하락, 장중 확인 시 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-14T20:00:00+09:00"},"quality_at_build":{"execution_ready":false,"current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-14T20:30:00+09:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
-```
-
-```json
-{"ticker":"010140.KS","display_name":"삼성중공업","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":18950.0,"market_data_asof":"2026-10-14T20:00:00+09:00","session_vwap":null,"relative_volume":0.0,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-14T20:00:00+09:00"},"quality_at_build":{"execution_ready":false,"current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-14T20:30:00+09:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
