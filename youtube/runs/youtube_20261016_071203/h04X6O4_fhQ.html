@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 미국이 금리를 또 올리면 코스피는 어떻게 될까?!</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261016_071203</p>
+    <h1>미국이 금리를 또 올리면 코스피는 어떻게 될까?!</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=h04X6O4_fhQ">원본 영상</a>
+    </div>
+  </header>
+  <h2>미국 추가 금리 인상과 코스피: 정책 경로보다 먼저 확인할 근거</h2>
+<p><a href="https://www.youtube.com/watch?v=h04X6O4_fhQ">경제사냥꾼 영상</a> · 업로드 2026년 10월 15일 · 분석 기준: 제공된 검증·시장자료</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 핵심은 <strong>추가 인상 자체보다 예상 밖의 인상 시점과 후속 긴축 경로가 코스피 충격을 좌우할 수 있다</strong>는 조건부 분석이다. 에너지 가격 상승이 근원물가로 확산되면 미국 금리·달러·외국인 수급을 통해 한국 주식에 부담이 전달될 수 있다는 설명이다.</p>
+<p>그러나 제공된 증거로는 이 설명의 출발점인 정책금리, 물가, 금리선물 확률, 외국인 순매도 수치를 확인하지 못했다. <strong>C1~C8·C10은 미검증, C9는 ETF 식별에 자막 불확실성이 있는 상태</strong>다. 반증됐다는 뜻은 아니지만, 확인된 시장 진단이나 코스피 방향 예측으로 사용할 단계도 아니다.</p>
+<h3>2. 영상 주장과 확인된 사실/근거</h3>
+<p>아래 시각은 정확한 발언 위치가 아니라 관련 자막 청크의 시작점이다.</p>
+<p>| 항목·관련 시각 | 영상 주장 | 확인된 사실/근거와 판정 |</p>
+<p>|---|---|---|</p>
+<p>| 연준·한미 금리차 · 00:00, 05:13, 15:34 | 미국 목표금리 3.75~4.00%, 9월 0.25%포인트 인상, 연말 추가 인상 지지, 한미 금리차 1%포인트 | 해당 연도 연준 결정문·점도표·한국은행 결정문이 없다. 금리 수준·방향·표결·금리차 모두 <strong>미검증</strong>이다. 점도표 참가자와 투표위원도 구분해야 한다. |</p>
+<p>| 인상 확률 · 00:00, 05:13, 10:27 | 10월 인상 확률이 물가 발표 전 20% 초반에서 약 44%로 오른 뒤 32.7%로 낮아졌다고 설명 | 과거 FedWatch 화면, 관측 시각, 계약·목표범위가 없다. <strong>미검증</strong>이며, 선물 확률만으로 주식시장의 선반영 정도를 단정할 수 없다. |</p>
+<p>| CPI·고용 · 00:00, 05:13, 10:27 | 9월 전체 CPI 전년비 3.7%, 근원 전월비 0.3%로 예상 0.2% 상회, 신규 고용 2만9,000명 | BLS 원표와 발표 전 컨센서스가 없어 <strong>미검증</strong>이다. 근원물가 재상승과 고용 둔화라는 두 정책 전제가 모두 확인되지 않았다. |</p>
+<p>| 에너지 공급·가격 · 10:27 | 휘발유가 월간 CPI 상승분의 절반 이상을 차지하고, 중동 공급 제약·재고 감소가 고유가를 지속시킬 수 있다고 설명 | EIA·IEA 원표와 베이지북 본문이 없다. 전쟁 시점·통항 차질·공급량·재고 수치도 <strong>미검증</strong>이다. 4분기 105달러·다음 해 84달러는 영상이 인용한 전망이지 실현 가격이 아니다. |</p>
+<p>| 코스피·외국인 · 00:00, 05:13, 10:27, 15:34 | 10월 14일 6,000선 유지, 외국인 연초 이후 200조원 이상 순매도, 연속 하락·순매도 | KRX 일별·월별 원자료가 없어 <strong>미검증</strong>이다. 현물·선물, 시장 범위, 금액 단위를 먼저 확인해야 한다. |</p>
+<p>| 미국 시장·역사 비교 · 00:00, 05:13, 15:34 | 장기금리 하락과 달러 강세·기술주 하락이 공존했으며, 과거에도 예상된 인상 뒤 주가가 반전했다고 설명 | 만기별 금리·지수 종가·당시 보도와 과거 정책 원문이 없다. 수치와 원인 설명 모두 <strong>미검증</strong>이다. |</p>
+<p>| 코어위브·한국 ETF · 00:00, 05:13, 15:34 | 코어위브 약 15% 하락, 한국 주식 ETF로 소개한 ‘EWI’ 4% 이상 하락 | 회사 주가·부채 공시가 없고 ETF 정체도 불명확하다. <strong>회사 주장은 미검증, ETF는 자막 식별 불확실</strong>이다. 후보 티커로 임의 교체할 수 없다. |</p>
+<h4>제한적으로 확인되는 내용</h4>
+<ul>
+<li>호스트의 yfinance 조회 결과는 <strong>2026년 10월 15일 22:13:52 UTC에 CL=F 약 96.14</strong>를 반환했다. 이는 조회 결과이며, 휘발유 소매가격이나 EIA 분기 평균 전망을 검증하는 자료가 아니다.</li>
+<li>같은 방식으로 <strong>22:13:53 UTC에 코스피 기호 ^KS11 값 5,554.22</strong>가 반환됐다. 대응 거래일이 명확하지 않아 영상의 10월 14일 6,000선 주장과 직접 비교할 수 없다. 함께 반환된 52주 최저값 0.0은 재확인이 필요한 이상 필드다.</li>
+<li>환헤지하지 않은 투자의 달러 수익률은 다음 산술관계로 표현할 수 있다. 원/달러는 달러당 원화 가격이다.</li>
+</ul>
+<p><strong>달러 수익률 = (1 + 원화 주가수익률) × 기초 원/달러 ÷ 기말 원/달러 − 1</strong></p>
+<p>따라서 주가가 같아도 원화가 약해지면 달러 환산 수익은 감소한다. 다만 이 관계가 실제 외국인 순매도나 코스피 하락의 원인을 입증하지는 않는다.</p>
+<h4>외부 링크의 증거력</h4>
+<p>직접 관련된 공식 원문 링크는 이번 증거 묶음에서 확보되지 않았다. 수집된 링크를 근거처럼 과대평가해서는 안 된다.</p>
+<ul>
+<li>E1의 <a href="https://finance.yahoo.com/m/431e6ee5-c020-3143-a775-7434e1b72d3f/alcoa-earnings-were-a-relief%2C.html">알코아 실적 기사</a>는 제목부터 FedWatch 주장과 다르며, 수집 본문도 오류·메뉴 중심이다. E1~E3은 인상 확률이나 기관 발언의 근거로 사용할 수 없다.</li>
+<li>E4~E9는 본문 발췌가 없고 제목도 목표 주장과 직접 연결되지 않는다.</li>
+<li>E10의 <a href="https://www.sedaily.com/NewsView/2GZDO6BNFJ">서울경제 기사</a>는 <strong>2025년 10월 30일 자료</strong>다. 잠정적으로 2026년으로 해석한 영상의 회의·통계 발표 일정을 확인하거나 반박하는 자료가 아니다.</li>
+</ul>
+<p>증거 수집 결과의 <code>verified</code> 표시는 실행·수집 상태이며, 영상 주장이 입증됐다는 의미가 아니다.</p>
+<h3>3. 상승 논리와 반론</h3>
+<h4>부담 완화·반등을 설명할 수 있는 조건</h4>
+<p>영상의 논리를 긍정적으로 해석하면, 다음 조건에서 추가 인상의 충격이 제한될 가능성을 검토할 수 있다.</p>
+<p>1. 정책 결정이 실제 시장 예상 범위에 있고 후속 금리 경로도 더 높아지지 않는다.</p>
+<p>2. 에너지 가격 안정이 지속되고 근원 서비스 물가까지 둔화한다.</p>
+<p>3. 고용 둔화가 연준의 대기를 뒷받침하되 기업이익 급감으로 이어지지 않는다.</p>
+<p>4. 달러·원/달러 상승 압력이 완화되고 외국인 현물 수급과 반도체 주가가 안정된다.</p>
+<p>이는 <strong>검증된 전망이 아니라 관찰할 조건</strong>이다. 현재 자료로는 조건 충족 여부를 판단할 수 없다.</p>
+<h4>핵심 반론</h4>
+<ul>
+<li><strong>예상된 인상도 부담이 될 수 있다.</strong> 결정 자체가 예상과 같더라도 향후 금리 전망이나 긴축 유지 기간이 상향되면 재평가가 발생할 수 있다.</li>
+<li><strong>유가 하락만으로 근원물가 둔화를 확정할 수 없다.</strong> 주거비·서비스 가격은 별도로 확인해야 한다.</li>
+<li><strong>장기금리 하락이 항상 호재는 아니다.</strong> 성장 우려·안전자산 수요에 따른 하락이라면 주식 약세와 공존할 수 있다. 다만 영상의 해당 거래일 설명은 미검증이다.</li>
+<li><strong>한미 금리차만으로 수급을 설명하기 어렵다.</strong> 환율 기대, 실적, 업종 구성, 위험선호 등을 함께 비교해야 한다. 영상이 제시한 중국 메모리 경쟁·AI 기업 금융부담도 아직 확인되지 않은 대체 설명이다.</li>
+<li><strong>미국 상장 ETF의 하락은 다음 코스피 하락을 보장하지 않는다.</strong> 우선 ETF 정체부터 확인해야 하며 거래시간·환율·구성 차이도 분리해야 한다.</li>
+</ul>
+<h3>4. 단기 체크포인트와 구체적 관찰 항목</h3>
+<p>| 우선순위 | 확보할 자료 | 확인할 항목 |</p>
+<p>|---|---|---|</p>
+<p>| 1. 사건 날짜 고정 | 연준·한국은행·BLS·Census 공식 캘린더 | 사건 연도, 발화일, 미국 발표 시각, 한국시간 환산, 한국시장 최초 반영 거래일 |</p>
+<p>| 2. 정책 서프라이즈 | 연준 결정문·SEP와 시각이 있는 FedWatch 과거 화면 | 결정 직전 예상과 실제 결정의 차이, 결정 후 다음 회의·연말 경로 변화 |</p>
+<p>| 3. 물가·고용 | BLS CPI·고용 원표와 발표 전 예상치 | 근원 CPI 월간 추세, 서비스·주거비, 휘발유 기여도, 고용 초도치·수정치 |</p>
+<p>| 4. 에너지 전가 | EIA 동일 계열 주간 가격·전후 전망, IEA 통계, 베이지북 | 소매가격과 원유가격 구분, Brent·WTI 구분, 원유·제품 공급 및 비용 전가 범위 |</p>
+<p>| 5. 한국시장 반응 | KRX 지수·투자자별 거래와 동일 시각 환율 | 외국인 현물 순매수의 일·월·연 누계, 선물 분리, 원/달러·반도체·시장 전반의 동반 변화 |</p>
+<p>| 6. 기업·ETF 식별 | 회사 공시·IR, ETF 운용사 정보와 원영상 화면 | 정확한 법인·티커, 정규장 등락률, 부채·금융비용, ETF 국가 노출과 시장가격·NAV 구분 |</p>
+<p>영상이 제시한 <strong>10월 22일 한국은행 회의, 10월 27~28일 FOMC와 한국시간 29일 03시 발표, 11월 10일 CPI</strong>는 모두 공식 일정이 확인되지 않았다. 확정 일정으로 사용하지 말고 먼저 공식 캘린더와 대조해야 한다. ‘오늘 밤’ PPI·소매판매도 업로드일을 발화일로 간주해 날짜를 정할 수 없다.</p>
+<h3>5. 시나리오 무효화·수정 조건</h3>
+<ul>
+<li><strong>기초 사실 오류:</strong> 정책 방향·금리 수준·물가·수급 수치 또는 사건 연도가 원자료와 다르면 해당 사례 분석을 다시 구성해야 한다.</li>
+<li><strong>물가 전가 약화:</strong> 에너지 안정과 근원물가 둔화가 함께 확인되고 예상 금리 경로가 높아지지 않으면 ‘지속적 에너지발 추가 긴축’ 시나리오는 약해진다.</li>
+<li><strong>전달경로 불일치:</strong> 미국 금리·달러 상승에도 원화·외국인 수급·코스피가 안정되면 금리 중심 설명의 비중을 낮춰야 한다.</li>
+<li><strong>대체 원인 우세:</strong> 반도체·실적·기업 금융 이슈가 시장 반응을 더 잘 설명한다면 코스피 하락을 미국 금리 탓으로 단정할 수 없다.</li>
+<li><strong>긍정 시나리오 훼손:</strong> 후속 긴축 예상 강화, 근원물가 지속, 원화 약세와 외국인 순매도가 함께 확인되면 충격 제한 논리를 재검토해야 한다.</li>
+</ul>
+<h3>6. 자막·출처 신뢰도와 최종 해석</h3>
+<p>자동자막은 644개 세그먼트이며 <code>transcript_quality</code>는 <code>good</code>, 점수는 1.0이다. 이는 자막 수집·형식 품질 지표이지 경제적 사실이나 숫자의 정확도를 보증하는 점수가 아니다.</p>
+<p>추출 단계의 엔터티별 <code>source_confidence</code>는 0.76~0.95지만, 이는 외부 사실 검증과 구분해야 한다. 최종 주장 검증의 <code>source_confidence</code>는 모두 0.0으로, 직접 대조할 근거가 없다는 뜻이다. <code>asr_confidence</code> 0.0도 개별 음성을 확인하지 않아 추정할 수 없다는 의미이며, 자막이 반드시 틀렸다는 뜻은 아니다. 검증 <code>confidence</code> 0.98~0.99는 <strong>미검증·식별 불확실 판정에 대한 확신</strong>이지 영상 주장이 참일 확률이 아니다.</p>
+<p>특히 휘발유 기여도의 수치·단위, 유가 전망 발표일, 국채 만기, ETF 티커, 외국인 순매도 금액은 원영상 화면과 원자료 확인이 필요하다. 청크 시작 시각 00:00·05:13·10:27·15:34는 탐색 기준일 뿐 정밀한 인용 시점이 아니다.</p>
+<p>Bloomberg·Morningstar 자료는 제공되지 않았다. 해당 출처를 통한 확인은 주장할 수 없으며 <strong>미검증·수동 확인 필요</strong>다. Reuters·금융회사 비공개 자료, IEA 구독 전용 세부표도 원문 확보 전에는 같은 상태로 남는다.</p>
+<p><strong>결론:</strong> 이 영상은 정책 예상과 실제 결정의 차이, 에너지의 근원물가 전가, 금리·환율·수급의 동반 변화를 점검하는 틀을 제시한다. 다만 현재 증거는 그 틀을 실제 사건에 적용할 핵심 수치를 뒷받침하지 못한다. 우선순위는 코스피 방향을 단정하는 것이 아니라 공식 날짜와 원자료를 확정하고 전달경로가 실제로 나타나는지 관찰하는 데 있다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;h04X6O4_fhQ&quot;,
+  &quot;title&quot;: &quot;미국이 금리를 또 올리면 코스피는 어떻게 될까?!&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=h04X6O4_fhQ&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/h04X6O4_fhQ/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-15T10:41:39+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 12487,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 12487,
+    &quot;segments&quot;: 644,
+    &quot;duration_seconds&quot;: 1215,
+    &quot;repeated_ngram_ratio&quot;: 0.008
+  },
+  &quot;generated_at&quot;: &quot;2026-10-16T07:12:03.681850+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;美国目标利率、9月加息和点阵图所述数字，以及韩美利差。&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;目标利率3.75%–4.00%；9月16日加息0.25个百分点、12票一致通过；2023年7月以来首次加息；18名SEP参与者中16名支持年底前进一步加息；韩美利差1个百分点，条件情景下扩大至1.25个百分点。&quot;,
+        &quot;observed&quot;: &quot;缺少对应决定、历史政策序列和韩国基准利率，无法核对。&quot;
+      },
+      &quot;investor_implication&quot;: &quot;不能将所述利率水平、加息方向及利差作为已核实的投资前提。&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;FedWatch加息概率的历次变化、2027年底累计加息定价及官员和金融机构引述。&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10月加息概率约70%→50%→17%→20%出头→44%→32.7%；不变67.3%；8月底9月加息概率57%；10月8日12月加息概率约70%；至2027年底额外加息约0.8个百分点。&quot;,
+        &quot;observed&quot;: &quot;没有相应历史快照、期货价格或可核对的报道正文。&quot;
+      },
+      &quot;investor_implication&quot;: &quot;不能据这些概率认定10月加息意外程度或股价已经充分反映政策。&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;2016年12月及2022年3月至5月加息与美韩股市反应的历史比较。&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:13&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2016年12月S&amp;P约跌18点并指向次年三次加息；2022年3月加息0.25个百分点、5月加息0.5个百分点；5月公布当天美股约涨3%、次日跌逾3%；5月6日KOSPI跌逾1.2%。&quot;,
+        &quot;observed&quot;: &quot;缺少对应历史决定、SEP及指数数据。&quot;
+      },
+      &quot;investor_implication&quot;: &quot;不能将尚未核实的历史涨跌幅用于推断本次加息后的市场方向。&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;9月整体及核心CPI、汽油贡献、分项价格与就业数据。&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;整体CPI同比3.7%、环比0.6%；核心环比0.3%、预期0.2%，前月亦0.3%；核心同比2.4%→2.6%；汽油环比逾9%、权重不足4%、贡献月涨幅一半以上；年度贡献转写为‘13 가까이’；机票同比逾22%；食品环比持平；二手车及车险同比下降；新增就业29,000、失业率上升。&quot;,
+        &quot;observed&quot;: &quot;所有目标统计值及比较期均缺少可核对原始资料；汽油年度贡献的数值与单位不可解析。&quot;
+      },
+      &quot;investor_implication&quot;: &quot;核心通胀意外和就业疲弱这两个政策判断前提均未获得证据支持。&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;美国汽油价格的两周及年度变化、韩元换算，以及EIA季度和年度油价预测。&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:27&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;汽油两周约跌3%、同比约涨41%；按10月14日汇率约1,500韩元/升、同比增加约450韩元；四季度油价预测105美元、上修14美元，次年平均84美元。&quot;,
+        &quot;observed&quot;: &quot;仅有不同口径的CL=F单点价格约96.14；缺少汽油历史价格、当时换算汇率及两期EIA预测表。&quot;
+      },
+      &quot;investor_implication&quot;: &quot;96.14的快照既不能证实也不能否定105美元预测；汽油涨幅和韩元成本尚不能用于推算通胀压力。&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;中东战争、霍尔木兹通行受阻、IEA石油流量和库存数字，以及褐皮书中的油价传导。&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:27&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2月底战争后海峡油轮通行几乎停顿；9月石油流量环比增加370万桶/日；中东成品油出口190万桶/日、不及战前一半；全球库存减少逾5亿桶；褐皮书信息截至10月5日，12个地区均提及油价影响。&quot;,
+        &quot;observed&quot;: &quot;没有可核对的事件记录、IEA原表或褐皮书正文。&quot;
+      },
+      &quot;investor_implication&quot;: &quot;供应约束、库存消耗与成本转嫁目前不能作为已证实的持续通胀依据。&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;KOSPI历史涨跌、外资年度及单日净卖出、人民币以外的韩元汇率观察值，以及中国存储器竞争的市场影响。&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10月14日小跌并守6,000点；13日跌逾5%；连跌6日、10月6日起跌逾14%；外资年内净卖出逾200万亿韩元、9月逾21万亿且连续5个月、13日约4.5万亿、14日逾1万亿且连续7日；首次反映9月加息时跌0.04%；14日15:30美元兑韩元1,338、下降6.8。&quot;,
+        &quot;observed&quot;: &quot;仅有不同观察时点的指数快照5,554.22；目标日期价格、净卖出及汇率均不可核对。&quot;
+      },
+      &quot;investor_implication&quot;: &quot;外资抛售规模及下跌原因未核实；不能据此确认资金持续流出或量化利率冲击。&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;美国长短期国债收益率、美元、纳斯达克、半导体指数与10年盈亏平衡通胀率的同步变化。&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10月14日10年收益率盘中升但官方日值下降且为月内最低，2年略升；9月29日10年盘中创2007年以来最高；纳斯达克约跌2%、为7月23日以来最大跌幅；半导体指数跌逾4%；美元盘中创2025年4月以来最高；10年盈亏平衡通胀率约2.4%。&quot;,
+        &quot;observed&quot;: &quot;没有相应期限、指数、时间点和比较区间的行情序列。&quot;
+      },
+      &quot;investor_implication&quot;: &quot;不能据此确认通胀公布后的跨资产反应，也不能判定收益率下降源于避险需求。&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;CoreWeave下跌约15%，以及被介绍为韩国股票ETF的‘EWI’在两个交易日的涨跌。&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;CoreWeave于10月14日约跌15%；所谓韩国ETF‘EWI’于9月17日约涨4%、10月14日跌逾4%。&quot;,
+        &quot;observed&quot;: &quot;没有可识别ETF的官方资料或对应价格记录；CoreWeave当日跌幅也无独立证据。&quot;
+      },
+      &quot;investor_implication&quot;: &quot;在ETF身份确认前，不宜将其涨跌作为韩国股票次日表现的信号；公司跌幅和债务解释亦未核实。&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;意外加息时点和后续路径比加息本身更重要；能源向核心通胀传导可能经美国利率、美元和外资流动压制韩国股票，但利差不是唯一决定因素。&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;没有独立的点位或收益率预测；主张是政策意外、通胀传导与跨境资金的条件关系。&quot;,
+        &quot;observed&quot;: &quot;可检验汇率换算的算术方向，但缺少验证整条实际传导链的资料。&quot;
+      },
+      &quot;investor_implication&quot;: &quot;应将该观点保留为待验证的条件情景，而非已经验证的因果结论或方向预测。&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;CL=F&quot;,
+      &quot;name&quot;: &quot;원유·휘발유·중동 에너지 공급&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;휘발유가 전체 물가 상승을 크게 견인했으며 최근 소매가격 하락에도 공급 제약과 재고 감소로 연말까지 높은 가격이 지속될 수 있다고 주장한다.&quot;,
+        &quot;유가가 연료 할증료와 운송 원가를 통해 다른 상품·서비스 가격으로 전이되는지가 향후 근원물가의 핵심 변수라고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;9월 휘발유 가격은 전월 대비 9% 넘게 상승했고 CPI 내 비중은 4% 미만이지만 월간 CPI 상승분의 절반 넘게를 차지했다고 한다.&quot;,
+        &quot;전년 대비 CPI 상승률 3.7% 가운데 휘발유 기여도는 자막상 &#x27;13 가까이&#x27;이고 근원물가 기여는 절반 넘게라고 한다. &#x27;13&#x27;의 단위·표기는 불명확하다.&quot;,
+        &quot;미국 휘발유 조사 가격은 9월 마지막 주부터 2주 연속 약 3% 하락했지만 전년 대비 약 41% 높다고 한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CL=F&quot;,
+        &quot;as_of&quot;: &quot;2026-10-15T22:13:52.328391+00:00&quot;,
+        &quot;current_price&quot;: 96.13999938964844,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 119.48,
+        &quot;fifty_two_week_low&quot;: 54.98,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;코스피·외국인 수급·원화&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;미국 금리 상승은 달러 자산의 상대 매력을 높여 한국 주식과 외국인 수급에 부담을 줄 수 있지만 환율과 수급이 금리 하나로 결정되지는 않는다고 주장한다.&quot;,
+        &quot;최근 코스피 하락은 금리 외에 중국 메모리 업체 추격 우려도 작용했으며, 앞으로 미국 장기금리와 달러의 동반 상승 여부가 중요하다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;10월 14일 코스피는 소폭 하락했지만 6,000선을 지켰으며 오후 3시 30분 폐장해 같은 날 밤 미국 CPI 발표를 아직 반영하지 않았다고 한다.&quot;,
+        &quot;9월 첫 인상 소식을 처음 반영한 날 코스피 하락률은 0.04%였다고 한다.&quot;,
+        &quot;외국인은 연초 이후 코스피에서 200조원 넘게 순매도했고 10월 13일 하루 약 4조5,000억원, 14일 1조원 넘게 순매도했다고 한다. 13일 금액은 자막 &#x27;4주 5천억 원&#x27;을 문맥상 해석한 값이다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-15T22:13:53.107170+00:00&quot;,
+        &quot;current_price&quot;: 5554.22,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Alcoa Earnings Were a Relief, and the Stock Looks Cheap&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/431e6ee5-c020-3143-a775-7434e1b72d3f/alcoa-earnings-were-a-relief%2C.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-15T21:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Alcoa Earnings Were a Relief, and the Stock Looks Cheap Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Fin...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Energy Transfer LP (ET) Stock Drops Despite Market Gains: Important Facts to Note&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/energy-transfer-lp-et-stock-204505710.html&quot;,
+      &quot;publisher&quot;: &quot;Zacks&quot;,
+      &quot;published_at&quot;: &quot;2026-10-15T20:45:05+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Energy Transfer LP (ET) Stock Drops Despite Market Gains: Important Facts to Note Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Origina...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Basic Materials Roundup: Market Talk&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/9132dd09-0638-33cc-9a5b-b8508a5a4ab9/basic-materials-roundup%3A.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-15T21:03:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;5 Copper and Precious Metals Stocks Likely to Beat Q3 Estimates&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/5-copper-precious-metals-stocks-140600623.html&quot;,
+      &quot;publisher&quot;: &quot;Zacks&quot;,
+      &quot;published_at&quot;: &quot;2026-10-15T14:06:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Rio Tinto Reports 2% Y/Y Increase in Q3 Iron Ore Shipments&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/rio-tinto-reports-2-y-154600452.html&quot;,
+      &quot;publisher&quot;: &quot;Zacks&quot;,
+      &quot;published_at&quot;: &quot;2026-10-15T15:46:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Energy &amp; Utilities Roundup: Market Talk&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/cc8fc7dd-b2d5-3e42-8dfc-e4ab27cdb683/energy-%26-utilities-roundup%3A.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-15T21:04:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Compania de Minas Buenaventura Q3 Gold Production Falls&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/compania-minas-buenaventura-q3-gold-213130284.html&quot;,
+      &quot;publisher&quot;: &quot;MT Newswires&quot;,
+      &quot;published_at&quot;: &quot;2026-10-15T21:31:30+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Gold prices muted amid firmer dollar and rising oil, ahead of CPI this week&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/gold-edges-higher-near-4-014728122.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-12T01:47:28+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;[트럼프 스톡커] 美 12월부터 달러 푼다면서, 금리 결정엔 &#x27;내분&#x27;&quot;,
+      &quot;source_url&quot;: &quot;https://www.sedaily.com/NewsView/2GZDO6BNFJ&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2025-10-30T08:02:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;올해 FOMC 회의는 12월 9∼10일, 한국은행 금융통화위위원회는 11월 27일 한 차례씩 더 개최한다. 연준은 이와... CPI마저도 원래 15일에 발표 예정이었다가 아흐레 더 늦춰 공개됐다. 소비자물가와 함께 노동통계국(BLS)이...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
