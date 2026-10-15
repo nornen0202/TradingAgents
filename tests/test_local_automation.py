@@ -73,6 +73,44 @@ def test_coverage_is_independent_of_failed_delivery():
     assert local.completed_target(manifest, target())
 
 
+@pytest.mark.parametrize("clock,expected", [
+    ("10:29", None), ("10:30", "1030"), ("13:29", "1030"),
+    ("13:30", "1330"), ("14:29", "1330"), ("14:30", "1430"),
+    ("14:50", "1430"), ("14:51", None),
+])
+def test_local_kr_refreshes_precede_all_three_work_briefings(tmp_path, monkeypatch, clock, expected):
+    from tradingagents.scheduled import runner, automation_calendar
+    from tradingagents import local_advisory_recovery
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(automation_calendar, "automated_market_session_status",
+                        lambda **kwargs: SimpleNamespace(is_session=True))
+    monkeypatch.setattr(local_advisory_recovery, "recover_due", lambda *a, **k: [])
+    now = datetime.fromisoformat(f"2026-10-15T{clock}:00+09:00")
+    decisions = local.run_due(tmp_path / "archive", tmp_path, now=now, dry_run=True)
+    overlays = [d for d in decisions if d["target"].startswith("intraday-overlay-kr-")]
+    assert overlays == ([] if expected is None else [
+        {"target": f"intraday-overlay-kr-{expected}", "status": "DUE"}])
+
+
+def test_old_kr_refresh_does_not_cover_pre_work_refresh_and_calendar_still_holds():
+    watchdog = local.script("scheduled_actions_watchdog")
+    now = datetime.fromisoformat("2026-10-15T10:40:00+09:00")
+    targets = watchdog.due_targets(now, kr_overlay_checkpoints=local.KR_WORK_OVERLAY_CHECKPOINTS)
+    target = next(t for t in targets if t.name == "intraday-overlay-kr-1030")
+    manifest = {"settings": {"market": "KR", "run_mode": "overlay_only"}, "status": "success",
+                "started_at": "2026-10-15T10:08:55+09:00", "finished_at": "2026-10-15T10:10:59+09:00",
+                "summary": {"failed_tickers": 0},
+                "execution": {"overlay_phase": {"selected_checkpoints": ["09:35"]},
+                              "refresh_checkpoint": "09:35", "execution_asof": "2026-10-15T10:09:00+09:00"}}
+    assert not local.completed_target(manifest, target)
+    manifest.update(started_at="2026-10-15T10:33:55+09:00", finished_at="2026-10-15T10:36:00+09:00")
+    manifest["execution"]["execution_asof"] = "2026-10-15T10:34:00+09:00"
+    assert local.completed_target(manifest, target)
+    held = watchdog.due_targets(now, kr_overlay_checkpoints=local.KR_WORK_OVERLAY_CHECKPOINTS,
+        market_status_resolver=lambda **kwargs: SimpleNamespace(is_session=False))
+    assert not any(t.name.startswith("intraday-overlay-kr-") for t in held)
+
+
 @pytest.mark.parametrize("change", [
     lambda m: m.update(status="partial_failure"),
     lambda m: m["summary"].update(failed_tickers=1),
