@@ -1,0 +1,239 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "prism",
+  "event_id": "prism:891d11e5de40e6302897137730da9e6a",
+  "prompt_contract_version": "prism-work-v5",
+  "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
+  "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
+  "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
+  "workflow_contract_sha256": "05ffe3c27643170e667793aae6b43a3e286c08386bfad7a76ca7d4b155437aea",
+  "source_sha256": "bf8197bd38f8d453538292a9da10b0667109b464df5f76d2ee49a1735c5586d8",
+  "body": {
+    "kind": "prism",
+    "source_health": "OK",
+    "source": {
+      "health": "OK",
+      "run_id": "prism_telegram_20261015_093210",
+      "last_run_at": "2026-10-15T09:32:23.629608+09:00",
+      "status": "success",
+      "stale_after_hours": 30
+    },
+    "window_hours": 24,
+    "execution_eligible": false,
+    "evidence_policy": {
+      "profile": "balanced_external",
+      "material_thesis_effects": [
+        "ranking",
+        "confidence",
+        "position_size_within_existing_risk_limits",
+        "research_priority"
+      ],
+      "supported_evidence_weight": "MEDIUM",
+      "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+      "unverified_evidence_weight": "LOW_LABELED",
+      "user_primary_channels": [
+        "@kpunch",
+        "@sosumonkey"
+      ],
+      "user_primary_source_tier": "USER_PRIMARY",
+      "user_primary_evidence_weight": "HIGH",
+      "user_primary_validation_policy": "USER_ACCEPTED",
+      "matching_multi_source_signal_may_raise_thesis_priority": true,
+      "conflicting_signal_must_be_visible": true,
+      "may_bypass_market_or_portfolio_execution_gate": false
+    },
+    "coverage": {
+      "total_unique_events": 166,
+      "window_events": 4,
+      "transmitted_events": 4,
+      "truncated": false,
+      "oldest_occurred_at": "2026-10-14T23:19:27+00:00",
+      "newest_occurred_at": "2026-10-15T00:30:12+00:00"
+    },
+    "events": [
+      {
+        "event_key": "stock_ai_agent:16115",
+        "content_sha256": "56a0d34cbee23884ff89020d042e08a6d21cb804f2d83446645e5ed8a86a1b35",
+        "occurred_at": "2026-10-15T00:30:12+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16115",
+          "posted_at": "2026-10-15T00:30:12+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16115",
+          "preview": "📉 시장 조정 구간 감지 — 이번 오전 분석은 쉬어갑니다. 시장이 고점 대비 크게 하락한 조정 구간이라, 무리한 신규 진입을 줄이기 위해 오늘은 하루 한 번(종가 확인 시간대)만 분석을 진행합니다. 보유 종목의 손절·청산 모니터링은 평소처럼 계속 가동 중입니다. 시장 회복 신호가 확인되면 자동으로 재개됩니다. 🙏",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 176,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16114",
+        "content_sha256": "9896c164a5cafffba543a7c75ad8508f6c435d1b6e72129a10c522e3b45db081",
+        "occurred_at": "2026-10-15T00:00:57+00:00",
+        "relevance": {
+          "tickers": [
+            "028670.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16114",
+          "posted_at": "2026-10-15T00:00:57+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16114",
+          "preview": "📊 프리즘 시뮬레이터 | 실시간 포트폴리오 (2026-10-15 09:00) 🔸 현재 보유: 1/10개 🔸 사용 비중: 0.57/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: 팬오션(028670) +10.08% ⚠️ 최저 수익: 팬오션(028670) +10.08% 🔸 보유 종목: - 팬오션(028670) [운송·창고] 매수가: 6,450원 / 현재가: 7,100원 목표가: 7,...",
+          "signals": [
+            {
+              "canonical_ticker": "028670.KS",
+              "display_name": "팬오션",
+              "market": "KR",
+              "source_asof": "2026-10-15T00:00:57+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 6745.0,
+              "target_price": 7740.0,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 535,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16113",
+        "content_sha256": "d6e79336436c872aab93e79841a1649fbfff697bc568a2cb4056d66b3c06a9f8",
+        "occurred_at": "2026-10-15T00:00:52+00:00",
+        "relevance": {
+          "tickers": [
+            "252990.KS"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16113",
+          "posted_at": "2026-10-15T00:00:52+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16113",
+          "preview": "📉 매도: 샘씨엔에스(252990) 매수가: 15,780원 매도가: 15,350원 수익률: ⬇️ -2.72% 보유기간: 33일 매도이유: 손절선 이탈 — 손절선 15,780원(장중 0.5% 여유 15,701원) 아래로 내려가 15,350원에 매도했습니다. 🏃 주도주 보유 규칙 적용 종목: 매수 후 9거래일 +26.4%로 주도주 판정, 보유 기한 ~11/13 📡 전략 원장 거래: 43건,...",
+          "signals": [
+            {
+              "canonical_ticker": "252990.KS",
+              "display_name": "매도: 샘씨엔에스",
+              "market": "KR",
+              "source_asof": "2026-10-15T00:00:52+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 275,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16112",
+        "content_sha256": "216cbb7b6f6e44137146fb948894b6ed3ed47ec6c9f30d64b4ee81a9fda036c7",
+        "occurred_at": "2026-10-14T23:19:27+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16112",
+          "posted_at": "2026-10-14T23:19:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16112",
+          "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/14 22:59:48 KST 💵 청산 결과 정리 수량: 0.02 BTC 진입 → 청산: 82,630.00 USDT → 82,327.30 USDT 보유 시간: 52.1분 확정 순손익: 5.39 USDT • 시작 계좌 9,456.19 USDT 대비 +0.06% • 수수료 0.66 USDT · 펀딩 0.00 USDT 반영 💰 종료 후 순자...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 224,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      }
+    ],
+    "guardrails": {
+      "untrusted_content": true,
+      "advisory_only": true,
+      "may_promote_market_execution": false,
+      "multi_ticker_message_prices_require_recheck": true
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    }
+  }
+}

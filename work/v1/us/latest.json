@@ -1,24 +1,24 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:38ef33c40491b61c52ea972d2b47b639",
+  "event_id": "us:195984e8176dd2d630429831cb5abe35",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "28ccef5622f4181bc3518b4a17864a5471d37a8b69183d84abc04a7aec734cbd",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "2ac26bd3a2d88b7831816b736f760301d9d2d9a97fc10338fe72baf3917848cd",
-  "source_sha256": "fbf64fd344a623d99ed26b44af6b4dccfc60b80ff6ecb707d18e02b0dd9daefd",
+  "source_sha256": "a5e0d547d7304c0c3c7a88ca9717bed44ca82572708ae16dd020a72295f95813",
   "body": {
     "kind": "market",
     "market": "US",
     "session_id": "US:2026-10-15",
-    "source_health": "OK",
+    "source_health": "STALE",
     "source": {
       "run_id": "20261016T030355_local-scheduler-us-overlay_only",
       "last_run_at": "2026-10-16T03:06:42.484444+09:00",
       "status": "success"
     },
-    "report_mode": "CONDITIONAL",
+    "report_mode": "OUTAGE",
     "current": {
       "run_id": "20261016T030355_local-scheduler-us-overlay_only",
       "started_at": "2026-10-16T03:03:55.675093+09:00",
@@ -35,7 +35,7 @@
         "analysis_trade_date_latest": "2026-10-14",
         "market_data_oldest_at": "2026-10-15T14:00:00-04:00",
         "market_data_latest_at": "2026-10-15T14:00:00-04:00",
-        "market_data_status": "FRESH",
+        "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true
       },
       "latest_attempt": {
@@ -70,9 +70,9 @@
         "checkpoint": "14:00",
         "checkpoint_timezone": "America/New_York",
         "quality": {
-          "report_mode": "CONDITIONAL",
+          "report_mode": "OUTAGE",
           "decision_ready": false,
-          "conditional_strategy_ready": true,
+          "conditional_strategy_ready": false,
           "quality_label_ko": "장중 조건부 전략 가능, 주문 전 재확인",
           "fresh_row_ratio": 0.0,
           "conditional_row_ratio": 1.0,
@@ -94,15 +94,15 @@
             "day_high": 1245.17,
             "day_low": 1195.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -124,15 +124,15 @@
             "day_high": 1275.88,
             "day_low": 1230.74,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -154,15 +154,15 @@
             "day_high": 347.85,
             "day_low": 342.56,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -184,15 +184,15 @@
             "day_high": 254.9197,
             "day_low": 248.65,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -214,15 +214,15 @@
             "day_high": 352.13,
             "day_low": 340.61,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -244,15 +244,15 @@
             "day_high": 223.4605,
             "day_low": 219.27,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -274,15 +274,15 @@
             "day_high": 178.585,
             "day_low": 174.375,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -304,15 +304,15 @@
             "day_high": 291.33,
             "day_low": 286.2,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -334,15 +334,15 @@
             "day_high": 90.84,
             "day_low": 89.98,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -364,15 +364,15 @@
             "day_high": 104.67,
             "day_low": 103.58,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -394,15 +394,15 @@
             "day_high": 401.965,
             "day_low": 395.26,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -424,15 +424,15 @@
             "day_high": 743.97,
             "day_low": 715.58,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -454,15 +454,15 @@
             "day_high": 159.95,
             "day_low": 157.465,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -484,15 +484,15 @@
             "day_high": 95.945,
             "day_low": 93.9588,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -514,15 +514,15 @@
             "day_high": 421.07,
             "day_low": 407.15,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -544,15 +544,15 @@
             "day_high": 218.4692,
             "day_low": 212.85,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -574,15 +574,15 @@
             "day_high": 401.18,
             "day_low": 386.01,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -604,15 +604,15 @@
             "day_high": 921.19,
             "day_low": 871.155,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -634,15 +634,15 @@
             "day_high": 482.0,
             "day_low": 452.4201,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -664,15 +664,15 @@
             "day_high": 342.35,
             "day_low": 334.61,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -694,15 +694,15 @@
             "day_high": 184.69,
             "day_low": 181.28,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -724,15 +724,15 @@
             "day_high": 4.1379,
             "day_low": 3.9801,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -754,15 +754,15 @@
             "day_high": 15.065,
             "day_low": 14.4,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -784,15 +784,15 @@
             "day_high": 242.29,
             "day_low": 217.0221,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -814,15 +814,15 @@
             "day_high": 348.3982,
             "day_low": 336.82,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -844,15 +844,15 @@
             "day_high": 210.3499,
             "day_low": 203.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -874,15 +874,15 @@
             "day_high": 266.91,
             "day_low": 256.22,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "delayed or invalid market data"
             ],
             "quality": {
-              "row_mode": "CONDITIONAL",
+              "row_mode": "MISSING",
               "execution_ready": false,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "DELAYED_CHECKPOINT",
               "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
@@ -936,16 +936,16 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 381,
-          "window_events": 83,
+          "window_events": 81,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-13T09:15:30+00:00",
           "newest_occurred_at": "2026-10-14T23:47:30+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 71,
+          "omitted_events": 69,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 23
+          "omitted_before_context_selection": 21
         },
         "events": [
           {
@@ -2262,742 +2262,18 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 166,
-          "window_events": 18,
-          "transmitted_events": 18,
+          "window_events": 4,
+          "transmitted_events": 4,
           "truncated": false,
-          "oldest_occurred_at": "2026-10-14T18:36:31+00:00",
+          "oldest_occurred_at": "2026-10-14T23:19:27+00:00",
           "newest_occurred_at": "2026-10-15T00:30:12+00:00",
-          "available_events_before_context_cap": 18,
+          "available_events_before_context_cap": 4,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
           "omitted_before_context_selection": 0
         },
         "events": [
-          {
-            "event_key": "stock_ai_agent:16111",
-            "content_sha256": "c700bf6fe2630bc17d5a125bee7460af4169258d94806cd9c7d3fde742687aa2",
-            "occurred_at": "2026-10-14T19:04:16+00:00",
-            "relevance": {
-              "tickers": [
-                "FRO",
-                "IOVA",
-                "FRSH",
-                "BKH",
-                "BP",
-                "HALO"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16111",
-              "posted_at": "2026-10-14T19:04:16+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16111",
-              "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-15 04:04) 🔸 현재 보유: 6/10개 🔸 사용 비중: 4.24/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Frontline Plc(FRO) +3.10% ⚠️ 최저 수익: Iovance Biotherapeutics, Inc.(IOVA) -3.28% 🔸 보유 종목: - Freshworks Inc.(FRSH)...",
-              "signals": [
-                {
-                  "canonical_ticker": "FRO",
-                  "display_name": "Frontline Plc",
-                  "market": "US",
-                  "source_asof": "2026-10-14T19:04:16+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "IOVA",
-                  "display_name": "Iovance Biotherapeutics, Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T19:04:16+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "FRSH",
-                  "display_name": "Freshworks Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T19:04:16+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 13.15,
-                  "target_price": 16.43,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                },
-                {
-                  "canonical_ticker": "BKH",
-                  "display_name": "Black Hills Corporation",
-                  "market": "US",
-                  "source_asof": "2026-10-14T19:04:16+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 73.5,
-                  "target_price": 91.88,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                },
-                {
-                  "canonical_ticker": "BP",
-                  "display_name": "BP p.l.c.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T19:04:16+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 46.08,
-                  "target_price": 58.12,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                },
-                {
-                  "canonical_ticker": "HALO",
-                  "display_name": "Halozyme Therapeutics, Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T19:04:16+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 111.5,
-                  "target_price": 141.53,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                }
-              ],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16110",
-            "content_sha256": "d452cc08066894bfa8554ade7416a825cf220c3e14c70eae4f739f0d71361e2b",
-            "occurred_at": "2026-10-14T19:04:13+00:00",
-            "relevance": {
-              "tickers": [
-                "GFS"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16110",
-              "posted_at": "2026-10-14T19:04:13+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16110",
-              "preview": "⚠️ 매수 보류: GlobalFoundries Inc.(GFS) 현재가: $48.61 매수 점수: 7/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Technology 보류 사유: AI 판단: 미진입 — AI 사유: R — 손익비 하한 미달입니다./R floor 미달입니다. 판단 가격 48.61달러에서 첫 저항 50.11달러까지는 +3.09%이므로, 3% 이내 저항을 증액 조건으...",
-              "signals": [
-                {
-                  "canonical_ticker": "GFS",
-                  "display_name": "GlobalFoundries Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T19:04:13+00:00",
-                  "signal_action": "NO_ENTRY",
-                  "trigger_type": "telegram_buy_skip",
-                  "trigger_score": 0.7,
-                  "composite_score": 0.7,
-                  "confidence": 0.7,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16109",
-            "content_sha256": "9a77d2e2bb8cddc6393505d60d730f5c79f20e5a051607b1525d52f620890709",
-            "occurred_at": "2026-10-14T19:04:11+00:00",
-            "relevance": {
-              "tickers": [
-                "FAST"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16109",
-              "posted_at": "2026-10-14T19:04:11+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16109",
-              "preview": "⚠️ 매수 보류: Fastenal Company(FAST) 현재가: $51.87 매수 점수: 8/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Industrials 보류 사유: AI 판단: 미진입 — AI 사유: R — 손익비 하한 미달입니다./R floor 미달입니다. 분할 기준에 따라 첫 확정 저항 52.38은 증액 조건으로 분류하고 다음 확정 저항 52.92까지 거리의 80...",
-              "signals": [
-                {
-                  "canonical_ticker": "FAST",
-                  "display_name": "Fastenal Company",
-                  "market": "US",
-                  "source_asof": "2026-10-14T19:04:11+00:00",
-                  "signal_action": "NO_ENTRY",
-                  "trigger_type": "telegram_buy_skip",
-                  "trigger_score": 0.8,
-                  "composite_score": 0.8,
-                  "confidence": 0.8,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16108",
-            "content_sha256": "8bd63a6d3a0c87dd2b63432fa1121687f2fa144a6ad4dff7126f56bafcf6b8bd",
-            "occurred_at": "2026-10-14T19:04:08+00:00",
-            "relevance": {
-              "tickers": [
-                "HALO"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16108",
-              "posted_at": "2026-10-14T19:04:08+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16108",
-              "preview": "📈 신규 매수 | Halozyme Therapeutics, Inc. (HALO) 💵 매수가 $117.97 🎯 목표가 $141.53 (+20.0%) ⛔ 손절가 $111.50 (-5.5%, 장중 이탈 시 즉시 매도) 🏷 업종 미확인 · 중기 🧩 분할 매수: 1슬롯의 80%로 시작, 조건 확인 시 증액 • 돌파 $119.21 → 95% • 눌림 회복 $118.28 → 95% • 종가 신고가...",
-              "signals": [
-                {
-                  "canonical_ticker": "HALO",
-                  "display_name": "신규 매수 | Halozyme Therapeutics, Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T19:04:08+00:00",
-                  "signal_action": "BUY",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 111.5,
-                  "target_price": 141.53,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16107",
-            "content_sha256": "70d0eada553304da4f2992e221705605ec82fd19609842e3ac6cb9e5d030a261",
-            "occurred_at": "2026-10-14T18:43:38+00:00",
-            "relevance": {
-              "tickers": [
-                "GFS"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16107",
-              "posted_at": "2026-10-14T18:43:38+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16107",
-              "preview": "📊 GlobalFoundries Inc. (GFS) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
-              "signals": [
-                {
-                  "canonical_ticker": "GFS",
-                  "display_name": "GlobalFoundries Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:43:38+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_oneil_insight",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16106",
-            "content_sha256": "93a9a958bfca1edb2157d6e9758574cbe6a6ce33e2a8c3056fd6c20e28bfeef7",
-            "occurred_at": "2026-10-14T18:43:21+00:00",
-            "relevance": {
-              "tickers": [
-                "FAST"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16106",
-              "posted_at": "2026-10-14T18:43:21+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16106",
-              "preview": "📊 Fastenal Company (FAST) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
-              "signals": [
-                {
-                  "canonical_ticker": "FAST",
-                  "display_name": "Fastenal Company",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:43:21+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_oneil_insight",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16105",
-            "content_sha256": "8e12ba29ff2957be80692b0e40e0e6efc2e4a75de11119562b994ffd1da0c878",
-            "occurred_at": "2026-10-14T18:43:07+00:00",
-            "relevance": {
-              "tickers": [
-                "HALO"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16105",
-              "posted_at": "2026-10-14T18:43:07+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16105",
-              "preview": "📊 Halozyme Therapeutics, Inc. (HALO) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
-              "signals": [
-                {
-                  "canonical_ticker": "HALO",
-                  "display_name": "Halozyme Therapeutics, Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:43:07+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_oneil_insight",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16104",
-            "content_sha256": "be81a2c75c8e87fd0ee6a3849206f17d3628fc8e3b6bda5748c6e1d4df99a3f8",
-            "occurred_at": "2026-10-14T18:42:49+00:00",
-            "relevance": {
-              "tickers": [
-                "GFS",
-                "TSEM"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16104",
-              "posted_at": "2026-10-14T18:42:49+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16104",
-              "preview": "",
-              "signals": [
-                {
-                  "canonical_ticker": "GFS",
-                  "display_name": "GlobalFoundries Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:42:49+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "TSEM",
-                  "display_name": "경쟁사와 비교하면 — 비교표상 GFS의 최근 분기 매출 성장률은 5.8%로 Tower Semiconductor",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:42:49+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16103",
-            "content_sha256": "cd8a4e68bf21607e1987768274670818cdd9a12aa29bac9a75ff939310de0c65",
-            "occurred_at": "2026-10-14T18:42:45+00:00",
-            "relevance": {
-              "tickers": [
-                "FAST",
-                "GWW",
-                "MSM"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16103",
-              "posted_at": "2026-10-14T18:42:45+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16103",
-              "preview": "",
-              "signals": [
-                {
-                  "canonical_ticker": "FAST",
-                  "display_name": "Fastenal Company",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:42:45+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "GWW",
-                  "display_name": "경쟁사와 비교하면 — W.W. Grainger",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:42:45+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "MSM",
-                  "display_name": "MSC Industrial Direct",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:42:45+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16102",
-            "content_sha256": "30119c71a9d2956b5b0ad415ea1598ac5c7b7c65013fce9e75d6f6dd106ea3c0",
-            "occurred_at": "2026-10-14T18:42:38+00:00",
-            "relevance": {
-              "tickers": [
-                "HALO"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16102",
-              "posted_at": "2026-10-14T18:42:38+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16102",
-              "preview": "",
-              "signals": [
-                {
-                  "canonical_ticker": "HALO",
-                  "display_name": "Halozyme Therapeutics,  Inc",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:42:38+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16101",
-            "content_sha256": "1e2ffd3496c794f27c148dcc66f73ff207b6b993a0b4061f7f3d51fa96e349fe",
-            "occurred_at": "2026-10-14T18:42:29+00:00",
-            "relevance": {
-              "tickers": [
-                "GFS"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16101",
-              "posted_at": "2026-10-14T18:42:29+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16101",
-              "preview": "📊 GlobalFoundries (GFS) — 고객 설계에 따라 반도체를 생산하는 파운드리 기업입니다. 뉴욕주 공장 2곳 건설 계획이 장기 성장 기대를 높였지만, 아직 실행·수익성이 확인되지 않은 단계입니다. 💵 현재가: 약 $48.72 (10/14 관측값, 확정 종가 미확인) 📈 전일 대비: 약 +4.3% ($46.70 기준) 🔊 거래량: 약 944.7만 주로 증가. 최근에도 거래량...",
-              "signals": [
-                {
-                  "canonical_ticker": "GFS",
-                  "display_name": "GlobalFoundries",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:42:29+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16100",
-            "content_sha256": "924729b9361fe272efe980ca945b10562acafa86b5e51df6e7873684fcaa8ebf",
-            "occurred_at": "2026-10-14T18:42:25+00:00",
-            "relevance": {
-              "tickers": [
-                "FAST"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16100",
-              "posted_at": "2026-10-14T18:42:25+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16100",
-              "preview": "📊 Fastenal Company (FAST) 산업용 체결 부품과 MRO 자재를 공급하며, 고객사 현장 재고관리·디지털 주문 서비스도 제공하는 산업재 유통업체입니다. 💰 거래 현황 (2026.10.14 관측치; 최종 마감 확정 여부 미확인) • 가격: $51.73 • 전일 대비 등락률: 자료에서 확인되지 않음 • 거래량: 약 1,622만 주, 전 거래일 약 1,006만 주보다 약 61%...",
-              "signals": [
-                {
-                  "canonical_ticker": "FAST",
-                  "display_name": "Fastenal Company",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:42:25+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16099",
-            "content_sha256": "e74bbed4feb730487614c9366ecafc089a4d674fa2e0b8e899493f2d2801ab8c",
-            "occurred_at": "2026-10-14T18:42:21+00:00",
-            "relevance": {
-              "tickers": [
-                "HALO",
-                "SMA20"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16099",
-              "posted_at": "2026-10-14T18:42:21+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16099",
-              "preview": "📊 Halozyme Therapeutics (HALO) 약물 전달 기술 ENHANZE를 보유한 바이오기업으로, 파트너 의약품의 피하주사 전환을 지원합니다. 매출의 큰 축은 파트너 제품 판매에 연동되는 로열티입니다. 💰 주가·거래: 2026년 10월 14일 장중 관측가 $118.24(정규장 관측가 $118.28), 전일 종가 $109.62 대비 약 +7.9%입니다. 거래량은 241.6만...",
-              "signals": [
-                {
-                  "canonical_ticker": "HALO",
-                  "display_name": "Halozyme Therapeutics",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:42:21+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "SMA20",
-                  "display_name": "📍 주요 가격대: $111.50 부근",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:42:21+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "target_price": 104.89,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16098",
-            "content_sha256": "d3a7a3ed69de8945f3a94c796fcbaa1e8ce844b5e7b0fef741b00a2792900bda",
-            "occurred_at": "2026-10-14T18:36:31+00:00",
-            "relevance": {
-              "tickers": [
-                "HALO",
-                "FAST",
-                "GFS"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16098",
-              "posted_at": "2026-10-14T18:36:31+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16098",
-              "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.10.14 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 강세 | 스윙: 횡보·숨고르기 | 실행기준: 온건 강세 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마...",
-              "signals": [
-                {
-                  "canonical_ticker": "HALO",
-                  "display_name": "Halozyme Therapeutics, Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:36:31+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_signal_alert",
-                  "trigger_score": 0.97,
-                  "composite_score": 0.97,
-                  "confidence": 0.97,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "FAST",
-                  "display_name": "Fastenal Company",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:36:31+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_signal_alert",
-                  "trigger_score": 0.69,
-                  "composite_score": 0.69,
-                  "confidence": 0.69,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "GFS",
-                  "display_name": "GlobalFoundries Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T18:36:31+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_signal_alert",
-                  "trigger_score": 0.72,
-                  "composite_score": 0.72,
-                  "confidence": 0.72,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
           {
             "event_key": "stock_ai_agent:16115",
             "content_sha256": "56a0d34cbee23884ff89020d042e08a6d21cb804f2d83446645e5ed8a86a1b35",
@@ -3150,35 +2426,21 @@
             ],
             "coverage": {
               "total_unique_events": 381,
-              "window_events": 83,
+              "window_events": 81,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-13T09:15:30+00:00",
               "newest_occurred_at": "2026-10-14T23:47:30+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 71,
+              "omitted_events": 69,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 23
+              "omitted_before_context_selection": 21
             }
           },
           "prism": {
             "source_health": "OK",
             "event_keys": [
-              "stock_ai_agent:16111",
-              "stock_ai_agent:16110",
-              "stock_ai_agent:16109",
-              "stock_ai_agent:16108",
-              "stock_ai_agent:16107",
-              "stock_ai_agent:16106",
-              "stock_ai_agent:16105",
-              "stock_ai_agent:16104",
-              "stock_ai_agent:16103",
-              "stock_ai_agent:16102",
-              "stock_ai_agent:16101",
-              "stock_ai_agent:16100",
-              "stock_ai_agent:16099",
-              "stock_ai_agent:16098",
               "stock_ai_agent:16115",
               "stock_ai_agent:16114",
               "stock_ai_agent:16113",
@@ -3186,12 +2448,12 @@
             ],
             "coverage": {
               "total_unique_events": 166,
-              "window_events": 18,
-              "transmitted_events": 18,
+              "window_events": 4,
+              "transmitted_events": 4,
               "truncated": false,
-              "oldest_occurred_at": "2026-10-14T18:36:31+00:00",
+              "oldest_occurred_at": "2026-10-14T23:19:27+00:00",
               "newest_occurred_at": "2026-10-15T00:30:12+00:00",
-              "available_events_before_context_cap": 18,
+              "available_events_before_context_cap": 4,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,
@@ -3207,10 +2469,10 @@
       "immediate_requires_row_mode": "IMMEDIATE",
       "market_data_asof": "2026-10-15T14:00:00-04:00",
       "valid_until": "2026-10-15T14:30:00-04:00",
-      "expired_at_build": false,
+      "expired_at_build": true,
       "decision_ready": false,
-      "conditional_strategy_ready": true,
-      "report_mode": "CONDITIONAL",
+      "conditional_strategy_ready": false,
+      "report_mode": "OUTAGE",
       "required_rechecks": [
         "실시간 호가와 주문 가능 상태 재확인",
         "계좌 현금·미체결 주문 재확인",

@@ -1,22 +1,22 @@
 {
   "schema": "tradingagents.mobile-dashboard/v1",
-  "generated_at": "2026-10-16T03:15:28.813534+09:00",
+  "generated_at": "2026-10-16T07:11:23.269473+09:00",
   "privacy": "PUBLIC_RESEARCH_ONLY_NO_PORTFOLIO_MEMBERSHIP_OR_ACTIONS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:6bec7725db3bc416783fb813e2aadf82",
+      "event_id": "kr:d7f56dee1d40ce8bd319a451dcb8b986",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
-      "run_id": "20261015T143355_local-scheduler-kr-overlay_only",
-      "started_at": "2026-10-15T14:33:55.040397+09:00",
+      "run_id": "20261016T044900_local-scheduler-kr-full",
+      "started_at": "2026-10-16T04:49:00.080893+09:00",
       "source": {
-        "run_id": "20261015T143355_local-scheduler-kr-overlay_only",
-        "last_run_at": "2026-10-15T14:36:05.747827+09:00",
+        "run_id": "20261016T044900_local-scheduler-kr-full",
+        "last_run_at": "2026-10-16T07:03:55.885269+09:00",
         "status": "success"
       },
       "guardrails": {
-        "valid_until": "2026-10-15T15:04:00+09:00",
+        "valid_until": "2026-10-15T20:30:00+09:00",
         "expired_at_build": true,
         "decision_ready": false,
         "conditional_strategy_ready": false,
@@ -26,820 +26,542 @@
         "report_mode": "OUTAGE",
         "decision_ready": false,
         "conditional_strategy_ready": false,
-        "quality_label_ko": "장중 투자 판단 가능",
-        "fresh_row_ratio": 0.9667,
-        "conditional_row_ratio": 1.0
+        "quality_label_ko": "연구 자료만 제공, 장중 데이터 대기",
+        "fresh_row_ratio": 0.0,
+        "conditional_row_ratio": 0.0
       },
       "rows": [
         {
-          "ticker": "006400.KS",
-          "display_name": "삼성SDI",
-          "last_price": 539000.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 550324.0219549572,
-          "vwap_distance_pct": -2.0577008277287256,
-          "vwap_position_ko": "VWAP 아래 -2.06%",
-          "relative_volume": 1.8895119426038256,
-          "trading_value": 369172763000.0,
-          "price_change_pct": -8.8,
-          "spread_bps": 18.535681186283597,
-          "day_high": 573000.0,
-          "day_low": 536000.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "ticker": "000660.KS",
+          "display_name": "SK하이닉스",
+          "last_price": 1238000.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "session_vwap": 1271449.8830355224,
+          "vwap_distance_pct": -2.6308455788805807,
+          "vwap_position_ko": "VWAP 아래 -2.63%",
+          "relative_volume": 35.354320495413575,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "intraday invalidation breached"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "005930.KS",
           "display_name": "삼성전자",
-          "last_price": 206250.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 212524.17335262668,
-          "vwap_distance_pct": -2.95221633080599,
-          "vwap_position_ko": "VWAP 아래 -2.95%",
-          "relative_volume": 1.6184551041656914,
-          "trading_value": 5177248256000.0,
-          "price_change_pct": -11.1,
-          "spread_bps": 24.242424242424242,
-          "day_high": 221500.0,
-          "day_low": 206000.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 207500.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "session_vwap": 211141.10805079964,
+          "vwap_distance_pct": -1.724490358326436,
+          "vwap_position_ko": "VWAP 아래 -1.72%",
+          "relative_volume": 38.03204952823545,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action level triggered"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
-          }
-        },
-        {
-          "ticker": "353200.KS",
-          "display_name": "대덕전자",
-          "last_price": 127000.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 128541.80740885202,
-          "vwap_distance_pct": -1.1994598799657474,
-          "vwap_position_ko": "VWAP 아래 -1.20%",
-          "relative_volume": 1.019261646224186,
-          "trading_value": 125230570450.0,
-          "price_change_pct": -12.41,
-          "spread_bps": 15.760441292356187,
-          "day_high": 138200.0,
-          "day_low": 121900.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "support zone failed"
-          ],
-          "quality": {
-            "execution_ready": false,
-            "conditional_strategy_ready": false,
-            "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "278470.KS",
           "display_name": "에이피알",
-          "last_price": 293500.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 290411.21314485726,
-          "vwap_distance_pct": 1.0635907689976243,
-          "vwap_position_ko": "VWAP 위 +1.06%",
-          "relative_volume": 1.1885080299433644,
-          "trading_value": 92676316750.0,
-          "price_change_pct": -0.34,
-          "spread_bps": 17.050298380221655,
-          "day_high": 301000.0,
-          "day_low": 278500.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 294000.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "session_vwap": 291121.0797347417,
+          "vwap_distance_pct": 0.9889082123085924,
+          "vwap_position_ko": "VWAP 위 +0.99%",
+          "relative_volume": 26.014360253130416,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "돌파 후 안착 실패"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
-          }
-        },
-        {
-          "ticker": "000660.KS",
-          "display_name": "SK하이닉스",
-          "last_price": 1254000.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 1278131.802259237,
-          "vwap_distance_pct": -1.8880527201170838,
-          "vwap_position_ko": "VWAP 아래 -1.89%",
-          "relative_volume": 1.4796876664061551,
-          "trading_value": 5266549760000.0,
-          "price_change_pct": -11.63,
-          "spread_bps": 7.9776625448743514,
-          "day_high": 1332000.0,
-          "day_low": 1251000.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action confirmation required"
-          ],
-          "quality": {
-            "execution_ready": false,
-            "conditional_strategy_ready": false,
-            "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "010120.KS",
           "display_name": "LS ELECTRIC",
-          "last_price": 152700.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 157938.66784440633,
-          "vwap_distance_pct": -3.3169001080642357,
-          "vwap_position_ko": "VWAP 아래 -3.32%",
-          "relative_volume": 1.5959277920629464,
-          "trading_value": 100488003600.0,
-          "price_change_pct": -13.83,
-          "spread_bps": 6.546644844517186,
-          "day_high": 165600.0,
-          "day_low": 152500.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 151100.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "session_vwap": 156861.55921540395,
+          "vwap_distance_pct": -3.6730217678711874,
+          "vwap_position_ko": "VWAP 아래 -3.67%",
+          "relative_volume": 35.31714079230288,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action close confirmation required"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "267260.KS",
           "display_name": "HD현대일렉트릭",
-          "last_price": 480500.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 493200.5165802344,
-          "vwap_distance_pct": -2.5751223190716765,
-          "vwap_position_ko": "VWAP 아래 -2.58%",
-          "relative_volume": 1.8399097208969812,
-          "trading_value": 110224890250.0,
-          "price_change_pct": -11.51,
-          "spread_bps": 10.41124414367517,
-          "day_high": 523000.0,
-          "day_low": 479000.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 475000.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "session_vwap": 490139.2221899168,
+          "vwap_distance_pct": -3.0887595818746227,
+          "vwap_position_ko": "VWAP 아래 -3.09%",
+          "relative_volume": 42.42422165862965,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action close confirmation required"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "058470.KQ",
           "display_name": "리노공업",
-          "last_price": 66800.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 69350.54021883142,
-          "vwap_distance_pct": -3.67775104675947,
-          "vwap_position_ko": "VWAP 아래 -3.68%",
-          "relative_volume": 0.8649979830219396,
-          "trading_value": 53076603750.0,
-          "price_change_pct": -12.11,
-          "spread_bps": 14.958863126402393,
-          "day_high": 72700.0,
-          "day_low": 66700.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 65700.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "session_vwap": 68666.3869432314,
+          "vwap_distance_pct": -4.31999858341724,
+          "vwap_position_ko": "VWAP 아래 -4.32%",
+          "relative_volume": 20.192370598484235,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action confirmation required"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "042700.KS",
           "display_name": "한미반도체",
-          "last_price": 192400.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 196806.17575222548,
-          "vwap_distance_pct": -2.2388401864851804,
-          "vwap_position_ko": "VWAP 아래 -2.24%",
-          "relative_volume": 1.8395039444411487,
-          "trading_value": 183475903050.0,
-          "price_change_pct": -11.54,
-          "spread_bps": 5.198856251624642,
-          "day_high": 205000.0,
-          "day_low": 191300.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 186700.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "session_vwap": 195038.2090238603,
+          "vwap_distance_pct": -4.275166935541463,
+          "vwap_position_ko": "VWAP 아래 -4.28%",
+          "relative_volume": 42.996646115554526,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action close confirmation required"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "035420.KS",
           "display_name": "NAVER",
-          "last_price": 172500.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 173736.12517011643,
-          "vwap_distance_pct": -0.7114957634205665,
-          "vwap_position_ko": "VWAP 아래 -0.71%",
-          "relative_volume": 1.2267741315719285,
-          "trading_value": 117191618400.0,
-          "price_change_pct": -3.85,
-          "spread_bps": 5.798782255726297,
-          "day_high": 176100.0,
-          "day_low": 172000.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 171400.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "session_vwap": 173367.5868854973,
+          "vwap_distance_pct": -1.1349220006141136,
+          "vwap_position_ko": "VWAP 아래 -1.13%",
+          "relative_volume": 28.69760942134047,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action close confirmation required"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
+          }
+        },
+        {
+          "ticker": "353200.KS",
+          "display_name": "대덕전자",
+          "last_price": 122700.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "session_vwap": 128202.04928976357,
+          "vwap_distance_pct": -4.291701513544288,
+          "vwap_position_ko": "VWAP 아래 -4.29%",
+          "relative_volume": 23.547011215145897,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+          "data_status_ko": "시세 유효기간 만료",
+          "reason_codes_ko": [],
+          "quality": {
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "034020.KS",
           "display_name": "두산에너빌리티",
-          "last_price": 62600.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 63914.62336098502,
-          "vwap_distance_pct": -2.056842850438345,
-          "vwap_position_ko": "VWAP 아래 -2.06%",
-          "relative_volume": 1.1479554788426753,
-          "trading_value": 157430729300.0,
-          "price_change_pct": -9.8,
-          "spread_bps": 15.987210231814547,
-          "day_high": 66300.0,
-          "day_low": 62500.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 61400.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "session_vwap": 63510.04474925738,
+          "vwap_distance_pct": -3.3223795662371214,
+          "vwap_position_ko": "VWAP 아래 -3.32%",
+          "relative_volume": 26.77130923792805,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action close confirmation required"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
-          "ticker": "105560.KS",
-          "display_name": "105560",
-          "last_price": 156500.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 157191.44295655508,
-          "vwap_distance_pct": -0.43987315311189157,
-          "vwap_position_ko": "VWAP 아래 -0.44%",
-          "relative_volume": 1.2287131909547058,
-          "trading_value": 149220893650.0,
-          "price_change_pct": -1.7,
-          "spread_bps": 6.391818472355385,
-          "day_high": 159000.0,
-          "day_low": 154800.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "ticker": "006400.KS",
+          "display_name": "삼성SDI",
+          "last_price": 540000.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action confirmation required"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
-          }
-        },
-        {
-          "ticker": "095340.KQ",
-          "display_name": "ISC",
-          "last_price": 144600.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 151923.95196534533,
-          "vwap_distance_pct": -4.820801375030026,
-          "vwap_position_ko": "VWAP 아래 -4.82%",
-          "relative_volume": 1.2007301732048539,
-          "trading_value": 23708340400.0,
-          "price_change_pct": -16.99,
-          "spread_bps": 13.831258644536653,
-          "day_high": 166000.0,
-          "day_low": 144400.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action confirmation required"
-          ],
-          "quality": {
-            "execution_ready": false,
-            "conditional_strategy_ready": false,
-            "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
-          }
-        },
-        {
-          "ticker": "452190.KQ",
-          "display_name": "452190",
-          "last_price": 4835.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 4934.057989327212,
-          "vwap_distance_pct": -2.0076373147920656,
-          "vwap_position_ko": "VWAP 아래 -2.01%",
-          "relative_volume": 0.17002312017709026,
-          "trading_value": 2553759866.0,
-          "price_change_pct": -10.46,
-          "spread_bps": 30.975735673722248,
-          "day_high": 5130.0,
-          "day_low": 4820.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action confirmation required"
-          ],
-          "quality": {
-            "execution_ready": false,
-            "conditional_strategy_ready": false,
-            "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
-          }
-        },
-        {
-          "ticker": "088350.KS",
-          "display_name": "088350",
-          "last_price": 4620.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 4668.506700434186,
-          "vwap_distance_pct": -1.0390196169082322,
-          "vwap_position_ko": "VWAP 아래 -1.04%",
-          "relative_volume": 0.726533547098695,
-          "trading_value": 8210465386.0,
-          "price_change_pct": -2.74,
-          "spread_bps": 10.828370330265296,
-          "day_high": 4775.0,
-          "day_low": 4595.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action close confirmation required"
-          ],
-          "quality": {
-            "execution_ready": false,
-            "conditional_strategy_ready": false,
-            "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
-          }
-        },
-        {
-          "ticker": "041190.KQ",
-          "display_name": "041190",
-          "last_price": 4920.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 5083.892787983877,
-          "vwap_distance_pct": -3.223765622501884,
-          "vwap_position_ko": "VWAP 아래 -3.22%",
-          "relative_volume": 0.5121987109512851,
-          "trading_value": 6728811719.0,
-          "price_change_pct": -11.19,
-          "spread_bps": 10.167768174885612,
-          "day_high": 5330.0,
-          "day_low": 4905.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action close confirmation required"
-          ],
-          "quality": {
-            "execution_ready": false,
-            "conditional_strategy_ready": false,
-            "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
-          }
-        },
-        {
-          "ticker": "066570.KS",
-          "display_name": "LG전자",
-          "last_price": 167600.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 168781.97233579843,
-          "vwap_distance_pct": -0.7002953688957092,
-          "vwap_position_ko": "VWAP 아래 -0.70%",
-          "relative_volume": 0.942902151834747,
-          "trading_value": 110051584550.0,
-          "price_change_pct": -5.52,
-          "spread_bps": 5.96836765144733,
-          "day_high": 171500.0,
-          "day_low": 166100.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action close confirmation required"
-          ],
-          "quality": {
-            "execution_ready": false,
-            "conditional_strategy_ready": false,
-            "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
-          }
-        },
-        {
-          "ticker": "069540.KQ",
-          "display_name": "069540",
-          "last_price": 3885.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 3878.2901584880983,
-          "vwap_distance_pct": 0.1730103019037088,
-          "vwap_position_ko": "VWAP 위 +0.17%",
-          "relative_volume": 0.44345076484042695,
-          "trading_value": 28727685839.0,
-          "price_change_pct": -6.61,
-          "spread_bps": 12.8783000643915,
-          "day_high": 4085.0,
-          "day_low": 3740.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "risk action confirmation required"
-          ],
-          "quality": {
-            "execution_ready": false,
-            "conditional_strategy_ready": false,
-            "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "033780.KS",
           "display_name": "033780",
-          "last_price": 188700.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 188513.23484464115,
-          "vwap_distance_pct": 0.0990727019844373,
-          "vwap_position_ko": "VWAP 위 +0.10%",
-          "relative_volume": 1.648228341298288,
-          "trading_value": 61677383150.0,
-          "price_change_pct": 3.8,
-          "spread_bps": 5.3008216273522395,
-          "day_high": 191000.0,
-          "day_low": 184000.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+          "last_price": 189000.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "pilot ready"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
-          }
-        },
-        {
-          "ticker": "373220.KS",
-          "display_name": "LG에너지솔루션",
-          "last_price": 402000.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 403254.38340717496,
-          "vwap_distance_pct": -0.3110650395356962,
-          "vwap_position_ko": "VWAP 아래 -0.31%",
-          "relative_volume": 1.2667620927368637,
-          "trading_value": 156277607000.0,
-          "price_change_pct": -4.74,
-          "spread_bps": 24.87562189054726,
-          "day_high": 412000.0,
-          "day_low": 396000.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
-          "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "support zone failed"
-          ],
-          "quality": {
-            "execution_ready": false,
-            "conditional_strategy_ready": false,
-            "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "096770.KS",
           "display_name": "096770",
-          "last_price": 154500.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 157714.17593003088,
-          "vwap_distance_pct": -2.0379752873050716,
-          "vwap_position_ko": "VWAP 아래 -2.04%",
-          "relative_volume": 1.0798798678529349,
-          "trading_value": 125577862300.0,
-          "price_change_pct": -5.33,
-          "spread_bps": 6.474587245063128,
-          "day_high": 163000.0,
-          "day_low": 153000.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 155000.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "support zone failed"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
-          "ticker": "062040.KS",
-          "display_name": "062040",
-          "last_price": 175200.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 180771.81133879744,
-          "vwap_distance_pct": -3.0822346125386257,
-          "vwap_position_ko": "VWAP 아래 -3.08%",
-          "relative_volume": 1.5884883527724936,
-          "trading_value": 69188422300.0,
-          "price_change_pct": -17.36,
-          "spread_bps": 5.706134094151213,
-          "day_high": 197000.0,
-          "day_low": 174200.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "ticker": "373220.KS",
+          "display_name": "LG에너지솔루션",
+          "last_price": 402500.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "support zone failed"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "010950.KS",
           "display_name": "S-Oil",
-          "last_price": 157000.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 160297.07809200342,
-          "vwap_distance_pct": -2.0568547669415627,
-          "vwap_position_ko": "VWAP 아래 -2.06%",
-          "relative_volume": 0.9438945562440243,
-          "trading_value": 43797810350.0,
-          "price_change_pct": -3.38,
-          "spread_bps": 6.367398917542184,
-          "day_high": 166100.0,
-          "day_low": 157000.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 159400.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "돌파 후 안착 실패",
-            "support zone failed"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
-          "ticker": "093370.KS",
-          "display_name": "093370",
-          "last_price": 12050.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 12475.301952570393,
-          "vwap_distance_pct": -3.409151571539837,
-          "vwap_position_ko": "VWAP 아래 -3.41%",
-          "relative_volume": 0.5501616814896622,
-          "trading_value": 26623666650.0,
-          "price_change_pct": -14.3,
-          "spread_bps": 8.295313148071338,
-          "day_high": 13310.0,
-          "day_low": 12030.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "ticker": "018260.KS",
+          "display_name": "삼성SDS",
+          "last_price": 194300.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "support zone failed"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
-          "ticker": "018880.KS",
-          "display_name": "018880",
-          "last_price": 3730.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 3741.5543985644417,
-          "vwap_distance_pct": -0.30881279098534664,
-          "vwap_position_ko": "VWAP 아래 -0.31%",
-          "relative_volume": 0.829869135907067,
-          "trading_value": 20888260099.0,
-          "price_change_pct": -4.85,
-          "spread_bps": 13.41381623071764,
-          "day_high": 3840.0,
-          "day_low": 3670.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "ticker": "062040.KS",
+          "display_name": "062040",
+          "last_price": 177500.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "support zone failed"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
           "ticker": "086790.KS",
           "display_name": "086790",
-          "last_price": 121400.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 121225.70684972621,
-          "vwap_distance_pct": 0.14377573437442948,
-          "vwap_position_ko": "VWAP 위 +0.14%",
-          "relative_volume": 1.1471449458299354,
-          "trading_value": 82397840300.0,
-          "price_change_pct": -0.16,
-          "spread_bps": 8.240626287597857,
-          "day_high": 122300.0,
-          "day_low": 118300.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "last_price": 122400.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "waiting for trigger"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "LIVE_CHECKPOINT",
-            "execution_eligibility": "LIVE_EXECUTION_READY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         },
         {
-          "ticker": "005935.KS",
-          "display_name": "005935",
-          "last_price": 155400.0,
-          "market_data_asof": "2026-10-15T14:34:00+09:00",
-          "session_vwap": 159934.86772188314,
-          "vwap_distance_pct": -2.8354465705183185,
-          "vwap_position_ko": "VWAP 아래 -2.84%",
-          "relative_volume": 1.5230088219319757,
-          "trading_value": 850588004400.0,
-          "price_change_pct": -10.48,
-          "spread_bps": 6.43707756678468,
-          "day_high": 166300.0,
-          "day_low": 155200.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "ticker": "018880.KS",
+          "display_name": "018880",
+          "last_price": 3755.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "data_status_ko": "시세 유효기간 만료",
-          "reason_codes_ko": [
-            "delayed or invalid market data"
-          ],
+          "reason_codes_ko": [],
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
             "current_execution_promotion": "BLOCKED",
-            "generated_in_current_run": true,
-            "freshness_class": "DELAYED_CHECKPOINT",
-            "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "UNAVAILABLE",
-            "investor_label": "데이터 재확인"
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
+          }
+        },
+        {
+          "ticker": "131290.KQ",
+          "display_name": "티에스이",
+          "last_price": 271500.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+          "data_status_ko": "시세 유효기간 만료",
+          "reason_codes_ko": [],
+          "quality": {
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
+          }
+        },
+        {
+          "ticker": "419050.KQ",
+          "display_name": "419050",
+          "last_price": 2020.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+          "data_status_ko": "시세 유효기간 만료",
+          "reason_codes_ko": [],
+          "quality": {
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
+          }
+        },
+        {
+          "ticker": "069540.KQ",
+          "display_name": "069540",
+          "last_price": 3920.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+          "data_status_ko": "시세 유효기간 만료",
+          "reason_codes_ko": [],
+          "quality": {
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
+          }
+        },
+        {
+          "ticker": "036930.KQ",
+          "display_name": "주성엔지니어링",
+          "last_price": 204500.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+          "data_status_ko": "시세 유효기간 만료",
+          "reason_codes_ko": [],
+          "quality": {
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
+          }
+        },
+        {
+          "ticker": "093370.KS",
+          "display_name": "093370",
+          "last_price": 12180.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+          "data_status_ko": "시세 유효기간 만료",
+          "reason_codes_ko": [],
+          "quality": {
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
+          }
+        },
+        {
+          "ticker": "033790.KQ",
+          "display_name": "033790",
+          "last_price": 8920.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+          "data_status_ko": "시세 유효기간 만료",
+          "reason_codes_ko": [],
+          "quality": {
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
+          }
+        },
+        {
+          "ticker": "036540.KQ",
+          "display_name": "036540",
+          "last_price": 9060.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+          "data_status_ko": "시세 유효기간 만료",
+          "reason_codes_ko": [],
+          "quality": {
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
+          }
+        },
+        {
+          "ticker": "452190.KQ",
+          "display_name": "452190",
+          "last_price": 4890.0,
+          "market_data_asof": "2026-10-15T20:00:00+09:00",
+          "vwap_position_ko": "VWAP 미확인",
+          "relative_volume": 0.0,
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+          "data_status_ko": "시세 유효기간 만료",
+          "reason_codes_ko": [],
+          "quality": {
+            "execution_ready": false,
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
+            "generated_in_current_run": false,
+            "investor_state": "RECHECK",
+            "investor_label": "주문 전 재확인"
           }
         }
       ],
@@ -851,9 +573,9 @@
     },
     "us": {
       "market": "US",
-      "event_id": "us:38ef33c40491b61c52ea972d2b47b639",
-      "source_health": "OK",
-      "report_mode": "CONDITIONAL",
+      "event_id": "us:195984e8176dd2d630429831cb5abe35",
+      "source_health": "STALE",
+      "report_mode": "OUTAGE",
       "run_id": "20261016T030355_local-scheduler-us-overlay_only",
       "started_at": "2026-10-16T03:03:55.675093+09:00",
       "source": {
@@ -863,15 +585,15 @@
       },
       "guardrails": {
         "valid_until": "2026-10-15T14:30:00-04:00",
-        "expired_at_build": false,
+        "expired_at_build": true,
         "decision_ready": false,
-        "conditional_strategy_ready": true,
-        "report_mode": "CONDITIONAL"
+        "conditional_strategy_ready": false,
+        "report_mode": "OUTAGE"
       },
       "quality": {
-        "report_mode": "CONDITIONAL",
+        "report_mode": "OUTAGE",
         "decision_ready": false,
-        "conditional_strategy_ready": true,
+        "conditional_strategy_ready": false,
         "quality_label_ko": "장중 조건부 전략 가능, 주문 전 재확인",
         "fresh_row_ratio": 0.0,
         "conditional_row_ratio": 1.0
@@ -892,19 +614,19 @@
           "day_high": 1245.17,
           "day_low": 1195.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -922,19 +644,19 @@
           "day_high": 1275.88,
           "day_low": 1230.74,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -952,19 +674,19 @@
           "day_high": 347.85,
           "day_low": 342.56,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -982,19 +704,19 @@
           "day_high": 254.9197,
           "day_low": 248.65,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1012,19 +734,19 @@
           "day_high": 352.13,
           "day_low": 340.61,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1042,19 +764,19 @@
           "day_high": 223.4605,
           "day_low": 219.27,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1072,19 +794,19 @@
           "day_high": 178.585,
           "day_low": 174.375,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1102,19 +824,19 @@
           "day_high": 291.33,
           "day_low": 286.2,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1132,19 +854,19 @@
           "day_high": 90.84,
           "day_low": 89.98,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1162,19 +884,19 @@
           "day_high": 104.67,
           "day_low": 103.58,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1192,19 +914,19 @@
           "day_high": 401.965,
           "day_low": 395.26,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1222,19 +944,19 @@
           "day_high": 743.97,
           "day_low": 715.58,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1252,19 +974,19 @@
           "day_high": 159.95,
           "day_low": 157.465,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1282,19 +1004,19 @@
           "day_high": 95.945,
           "day_low": 93.9588,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1312,19 +1034,19 @@
           "day_high": 421.07,
           "day_low": 407.15,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1342,19 +1064,19 @@
           "day_high": 218.4692,
           "day_low": 212.85,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1372,19 +1094,19 @@
           "day_high": 401.18,
           "day_low": 386.01,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1402,19 +1124,19 @@
           "day_high": 921.19,
           "day_low": 871.155,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1432,19 +1154,19 @@
           "day_high": 482.0,
           "day_low": 452.4201,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1462,19 +1184,19 @@
           "day_high": 342.35,
           "day_low": 334.61,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1492,19 +1214,19 @@
           "day_high": 184.69,
           "day_low": 181.28,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1522,19 +1244,19 @@
           "day_high": 4.1379,
           "day_low": 3.9801,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1552,19 +1274,19 @@
           "day_high": 15.065,
           "day_low": 14.4,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1582,19 +1304,19 @@
           "day_high": 242.29,
           "day_low": 217.0221,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1612,19 +1334,19 @@
           "day_high": 348.3982,
           "day_low": 336.82,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1642,19 +1364,19 @@
           "day_high": 210.3499,
           "day_low": 203.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         },
         {
@@ -1672,19 +1394,19 @@
           "day_high": 266.91,
           "day_low": 256.22,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-          "data_status_ko": "현재 세션 조건부 데이터, 주문 전 호가·상태 재확인",
+          "data_status_ko": "시세 유효기간 만료",
           "reason_codes_ko": [
             "delayed or invalid market data"
           ],
           "quality": {
             "execution_ready": false,
-            "conditional_strategy_ready": true,
-            "current_execution_promotion": "RECHECK_REQUIRED",
+            "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": true,
             "freshness_class": "DELAYED_CHECKPOINT",
             "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-            "investor_state": "CONDITIONAL",
-            "investor_label": "조건 확인 필요"
+            "investor_state": "UNAVAILABLE",
+            "investor_label": "데이터 재확인"
           }
         }
       ],
