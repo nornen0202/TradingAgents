@@ -1,40 +1,40 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:bb2660b4dada560c1b27befe6438b79d",
+  "event_id": "kr:eca54d8ec500bdcb089f112140f10a44",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "c8841b735958409f8713a6ad25339e660992c3937436b9c8a56f6db16de44607",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "331fbacec805e278747da999980cf5a224f49874e457a74f3a10be4532a85414",
-  "source_sha256": "3edba78ea7112fa8848c7531c6232df1b98838eb1703c952d8be6799fa014018",
+  "source_sha256": "f8159a04af2025a3ea9172df4787ac80fac43d58a1bc6e5af1d8929e240cfee6",
   "body": {
     "kind": "market",
     "market": "KR",
-    "session_id": "KR:2026-10-14",
+    "session_id": "KR:2026-10-15",
     "source_health": "STALE",
     "source": {
-      "run_id": "20261015T055359_local-scheduler-kr-full",
-      "last_run_at": "2026-10-15T07:55:28.373485+09:00",
-      "status": "partial_failure"
+      "run_id": "20261015T090358_local-scheduler-kr-full",
+      "last_run_at": "2026-10-15T09:27:21.262487+09:00",
+      "status": "success"
     },
     "report_mode": "OUTAGE",
     "current": {
-      "run_id": "20261015T055359_local-scheduler-kr-full",
-      "started_at": "2026-10-15T05:53:59.005331+09:00",
+      "run_id": "20261015T090358_local-scheduler-kr-full",
+      "started_at": "2026-10-15T09:03:58.446938+09:00",
       "run_mode": "full",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261015T055359_local-scheduler-kr-full",
-        "producer_started_at": "2026-10-15T05:53:59.005331+09:00",
-        "producer_finished_at": "2026-10-15T07:55:28.373485+09:00",
-        "analysis_run_id": "20261015T055359_local-scheduler-kr-full",
+        "producer_run_id": "20261015T090358_local-scheduler-kr-full",
+        "producer_started_at": "2026-10-15T09:03:58.446938+09:00",
+        "producer_finished_at": "2026-10-15T09:27:21.262487+09:00",
+        "analysis_run_id": "20261015T090358_local-scheduler-kr-full",
         "analysis_lineage_status": "RESOLVED",
-        "analysis_completed_at": "2026-10-15T07:45:21.350231+09:00",
+        "analysis_completed_at": "2026-10-15T09:15:38.399670+09:00",
         "analysis_trade_date_oldest": "2026-10-14",
         "analysis_trade_date_latest": "2026-10-14",
         "market_data_oldest_at": "2026-10-14T20:00:00+09:00",
-        "market_data_latest_at": "2026-10-14T20:00:00+09:00",
+        "market_data_latest_at": "2026-10-15T09:04:00+09:00",
         "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true
       },
@@ -44,25 +44,35 @@
         "market": "KR",
         "run_mode": "full",
         "started_at": "2026-10-15T09:03:58.446938+09:00",
-        "status": "RUNNING",
-        "heartbeat_at": "2026-10-15T00:24:58.805354+00:00"
+        "status": "SUCCESS",
+        "heartbeat_at": "2026-10-15T00:27:21.340365+00:00",
+        "finished_at": "2026-10-15T00:27:21.340353+00:00",
+        "completed_tickers": 30,
+        "error_type": null
       },
       "latest_completed_analysis": {
-        "run_id": "20261015T055359_local-scheduler-kr-full",
-        "status": "partial_failure",
-        "finished_at": "2026-10-15T07:55:28.373485+09:00"
+        "run_id": "20261015T090358_local-scheduler-kr-full",
+        "status": "success",
+        "finished_at": "2026-10-15T09:27:21.262487+09:00"
       },
       "analysis_receipt": {
-        "analysis_run_id": "20261015T055359_local-scheduler-kr-full",
-        "decisions": {}
+        "analysis_run_id": "20261015T090358_local-scheduler-kr-full",
+        "decisions": {},
+        "research_recovery": {
+          "schema": "tradingagents.research-recovery/v1",
+          "source_run_id": "20261015T055359_local-scheduler-kr-full",
+          "source_manifest_sha256": "874104309c6c017b83444430cc70eab61d7476c7fe098b7361b6b27c09f4ef3c",
+          "source_status": "partial_failure",
+          "usage_scope": "This run's LLM usage excludes reused source calls; original per-ticker artifacts and source_llm_usage preserve them."
+        }
       },
       "bundle": {
         "artifact_type": "decision_bundle",
         "version": 2,
-        "run_id": "20261015T055359_local-scheduler-kr-full",
+        "run_id": "20261015T090358_local-scheduler-kr-full",
         "market": "KR",
-        "generated_at": "2026-10-15T07:55:06.738227+09:00",
-        "analysis_source_run_id": "20261015T055359_local-scheduler-kr-full",
+        "generated_at": "2026-10-15T09:27:03.936473+09:00",
+        "analysis_source_run_id": "20261015T090358_local-scheduler-kr-full",
         "quality": {
           "report_mode": "OUTAGE",
           "decision_ready": false,
@@ -226,9 +236,9 @@
             "display_priority": 8
           },
           {
-            "ticker": "034020.KS",
-            "display_name": "두산에너빌리티",
-            "last_price": 69400.0,
+            "ticker": "353200.KS",
+            "display_name": "대덕전자",
+            "last_price": 145000.0,
             "market_data_asof": "2026-10-14T20:00:00+09:00",
             "vwap_position_ko": "VWAP 미확인",
             "relative_volume": 0.0,
@@ -245,9 +255,9 @@
             "display_priority": 9
           },
           {
-            "ticker": "353200.KS",
-            "display_name": "대덕전자",
-            "last_price": 145000.0,
+            "ticker": "034020.KS",
+            "display_name": "두산에너빌리티",
+            "last_price": 69400.0,
             "market_data_asof": "2026-10-14T20:00:00+09:00",
             "vwap_position_ko": "VWAP 미확인",
             "relative_volume": 0.0,
@@ -596,9 +606,9 @@
         }
       },
       "universe_coverage": {
-        "status": "INCOMPLETE",
-        "complete": false,
-        "source_run_id": "20261015T055359_local-scheduler-kr-full",
+        "status": "COMPLETE",
+        "complete": true,
+        "source_run_id": "20261015T090358_local-scheduler-kr-full",
         "ticker_universe_mode": "config_plus_account",
         "expected_watchlist_count": 27,
         "missing_watchlist_count": 0,
@@ -609,7 +619,7 @@
       "run_id": "20261014T145939_local-scheduler-kr-live-recheck-overlay_only",
       "started_at": "2026-10-14T14:59:39.447986+09:00",
       "same_as_current": false,
-      "same_session": true,
+      "same_session": false,
       "reference_only": true
     },
     "supporting_context": {
@@ -2052,7 +2062,7 @@
         "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
       },
       "market_analysis": {
-        "source_run_id": "20261015T055359_local-scheduler-kr-full",
+        "source_run_id": "20261015T090358_local-scheduler-kr-full",
         "provider": "codex",
         "requested_models": {
           "quick": "gpt-6.1-sol",
@@ -2070,25 +2080,25 @@
           "judge": "high"
         },
         "verification_status": "RUNTIME_USAGE_OBSERVED",
-        "observed_calls": 619,
+        "observed_calls": 49,
         "observed_models": {
           "gpt-6.1-sol": {
-            "calls": 498,
-            "input_tokens": 12957936,
-            "output_tokens": 819797,
-            "total_tokens": 13777733
+            "calls": 15,
+            "input_tokens": 409080,
+            "output_tokens": 25234,
+            "total_tokens": 434314
           },
           "gpt-6-astra": {
-            "calls": 121,
-            "input_tokens": 4378882,
-            "output_tokens": 322367,
-            "total_tokens": 4701249
+            "calls": 34,
+            "input_tokens": 1572001,
+            "output_tokens": 28896,
+            "total_tokens": 1600897
           }
         },
         "usage_available": true
       },
       "overlay": {
-        "source_run_id": "20261015T055359_local-scheduler-kr-full",
+        "source_run_id": "20261015T090358_local-scheduler-kr-full",
         "provider": null,
         "requested_models": {},
         "requested_reasoning_effort": {},

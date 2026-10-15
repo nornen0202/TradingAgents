@@ -1,18 +1,18 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "prism",
-  "event_id": "prism:d464c71149da1ab910f297e2625aae5f",
+  "event_id": "prism:bef74cc1f65015e5cc604d37078b08b5",
   "prompt_contract_version": "prism-work-v5",
   "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "05ffe3c27643170e667793aae6b43a3e286c08386bfad7a76ca7d4b155437aea",
-  "source_sha256": "eb8f5c2805146be8aab6f332d8939168f2ccb70329ba7a2276e8a118d6b2c99a",
+  "source_sha256": "91943ba1caaeaa42cbc7e7b91bc2ec369763296beb7e3a88135ab51b73cd2c76",
   "body": {
     "kind": "prism",
-    "source_health": "OK",
+    "source_health": "EMPTY",
     "source": {
-      "health": "OK",
+      "health": "EMPTY",
       "run_id": "prism_telegram_20261014_102250",
       "last_run_at": "2026-10-14T10:23:07.543003+09:00",
       "status": "success",
@@ -44,46 +44,13 @@
     },
     "coverage": {
       "total_unique_events": 146,
-      "window_events": 1,
-      "transmitted_events": 1,
+      "window_events": 0,
+      "transmitted_events": 0,
       "truncated": false,
-      "oldest_occurred_at": "2026-10-14T00:30:13+00:00",
-      "newest_occurred_at": "2026-10-14T00:30:13+00:00"
+      "oldest_occurred_at": null,
+      "newest_occurred_at": null
     },
-    "events": [
-      {
-        "event_key": "stock_ai_agent:16059",
-        "content_sha256": "c551f66cf2fad9bec20a294c081ac46cdc6ad10b31f5a84987020149c0708be1",
-        "occurred_at": "2026-10-14T00:30:13+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "message_context"
-        },
-        "summary": {
-          "channel": "stock_ai_agent",
-          "message_id": "16059",
-          "posted_at": "2026-10-14T00:30:13+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16059",
-          "preview": "📉 시장 조정 구간 감지 — 이번 오전 분석은 쉬어갑니다. 시장이 고점 대비 크게 하락한 조정 구간이라, 무리한 신규 진입을 줄이기 위해 오늘은 하루 한 번(종가 확인 시간대)만 분석을 진행합니다. 보유 종목의 손절·청산 모니터링은 평소처럼 계속 가동 중입니다. 시장 회복 신호가 확인되면 자동으로 재개됩니다. 🙏",
-          "signals": [],
-          "signals_total": 0,
-          "signals_transmitted": 0,
-          "signals_truncated": false,
-          "simulation_only": false,
-          "actionability": "research_only",
-          "normalization": {
-            "version": "prism-telegram/v3",
-            "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 176,
-            "text_source": "public_metadata",
-            "action_changes": [],
-            "recovered_tickers": []
-          }
-        }
-      }
-    ],
+    "events": [],
     "guardrails": {
       "untrusted_content": true,
       "advisory_only": true,
