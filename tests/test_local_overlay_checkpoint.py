@@ -176,10 +176,70 @@ def test_crossing_checkpoint_completion_uses_execution_observation(asof, selecte
 
 
 @pytest.mark.parametrize("is_session", [False, None])
-def test_closed_or_unknown_market_never_creates_a_local_overlay(tmp_path, monkeypatch, is_session):
+@pytest.mark.parametrize("clock", ["23:08", "01:10", "03:10"])
+def test_closed_or_unknown_market_never_creates_a_local_overlay(tmp_path, monkeypatch, is_session, clock):
     wire_overlay_only(monkeypatch)
     monkeypatch.setattr(automation_calendar, "automated_market_session_status",
                         lambda market, now: SimpleNamespace(is_session=is_session))
     monkeypatch.setattr(local.subprocess, "run", lambda *a, **k: pytest.fail("closed-market worker"))
-    assert local.run_due(tmp_path / "archive", tmp_path / "state", now=kst("2026-10-13T23:08:00")) == []
+    assert local.run_due(tmp_path / "archive", tmp_path / "state", now=kst(f"2026-10-13T{clock}:00")) == []
     assert not (tmp_path / "state").exists()
+
+
+@pytest.mark.parametrize("clock,expected", [
+    ("00:43", "1015-2240"), ("00:59", "1015-2240"),
+    ("01:00", "1016-0100"), ("01:10", "1016-0100"),
+    ("02:13", "1016-0100"), ("02:59", "1016-0100"),
+    ("03:00", "1016-0300"), ("03:10", "1016-0300"),
+    ("03:29", "1016-0300"), ("03:30", None), ("03:31", None),
+])
+def test_local_us_late_refreshes_precede_work_without_changing_cloud_clocks(tmp_path, monkeypatch, clock, expected):
+    wire_overlay_only(monkeypatch)
+    now = kst(f"2026-10-16T{clock}:00")
+    decisions = local.run_due(tmp_path / "archive", tmp_path / "state", now=now, dry_run=True)
+    assert decisions == ([] if expected is None else [
+        {"target": f"intraday-overlay-us-{expected}", "status": "DUE"}])
+    if clock in {"00:43", "02:13"}:
+        cloud = us_target(now)
+        assert cloud.window_start_kst.strftime("%H%M") == ("0040" if clock == "00:43" else "0210")
+
+
+@pytest.mark.parametrize("date,clock,previous,checkpoint", [
+    ("2026-10-16", "01:10", "00:44", "12:00"),
+    ("2026-10-16", "03:10", "02:13", "14:00"),
+    ("2026-11-07", "01:10", "00:44", "11:00"),
+    ("2026-11-07", "03:10", "02:13", "13:00"),
+])
+def test_later_us_slot_rejects_old_refresh_across_dst_and_friday_session(
+    tmp_path, monkeypatch, date, clock, previous, checkpoint,
+):
+    now = kst(f"{date}T{clock}:00")
+    start = now.replace(minute=0)
+    old_start = kst(f"{date}T{previous}:00")
+    manifest = overlay_manifest(old_start.isoformat(), old_start.replace(minute=old_start.minute + 2).isoformat())
+    wire_overlay_only(monkeypatch, [manifest])
+    decisions = local.run_due(tmp_path / "archive", tmp_path / "state", now=now, dry_run=True)
+    assert decisions == [{"target": f"intraday-overlay-us-{start.strftime('%m%d-%H%M')}", "status": "DUE"}]
+    manifest.update(started_at=start.replace(minute=3).isoformat(), finished_at=start.replace(minute=6).isoformat())
+    manifest["execution"] = {"refresh_checkpoint": checkpoint,
+                             "execution_asof": start.replace(minute=4).isoformat(),
+                             "overlay_phase": {"selected_checkpoints": [checkpoint]}}
+    assert local.run_due(tmp_path / "archive", tmp_path / "state", now=now, dry_run=True) == [
+        {"target": decisions[0]["target"], "status": "RESEARCH_COMPLETE"}]
+
+
+@pytest.mark.parametrize("clock", ["01:10", "03:10"])
+def test_late_us_slot_keeps_exhausted_attempt_budget(tmp_path, monkeypatch, clock):
+    now = kst(f"2026-10-16T{clock}:00")
+    watchdog = local.script("scheduled_actions_watchdog")
+    target = next(t for t in watchdog.due_targets(now, us_overlay_checkpoints=local.US_WORK_OVERLAY_CHECKPOINTS)
+                  if t.name.startswith("intraday-overlay-us-"))
+    state = tmp_path / "state"
+    path = write_receipt(state, target, attempts=target.max_failed_attempts, exit_code=1,
+                         started_at=target.window_start_kst.isoformat())
+    before = path.read_bytes()
+    wire_overlay_only(monkeypatch)
+    monkeypatch.setattr(local.subprocess, "run", lambda *a, **k: pytest.fail("late slot budget bypass"))
+    assert local.run_due(tmp_path / "archive", state, now=now) == [
+        {"target": target.name, "status": "RETRY_BUDGET_OR_COOLDOWN"}]
+    assert path.read_bytes() == before
