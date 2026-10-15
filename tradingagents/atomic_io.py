@@ -20,6 +20,7 @@ from typing import Any, Iterator
 
 _THREAD_LOCKS: dict[str, threading.Lock] = {}
 _THREAD_LOCKS_GUARD = threading.Lock()
+_WINDOWS_REPLACE_RETRY_DELAYS = (0.05, 0.1, 0.2, 0.4, 0.8, 1.0)
 
 
 def atomic_write_json(
@@ -34,6 +35,9 @@ def atomic_write_json(
 The old file is retained if serialization, writing, or replacement fails. Local
 producer state can include account/error data, so every replacement is owner-only
 even if the previous file had broader permissions. Windows ACLs remain OS-managed.
+Windows reader handles can briefly prevent replacement. Retry only that operation
+for native access/sharing/lock denials, for at most 2.55 seconds of backoff; a
+persistent denial still fails without deleting or changing the destination.
 """
     if mode not in (None, 0o600):
         raise ValueError("Shared producer JSON must use owner-only permissions.")
@@ -48,7 +52,15 @@ even if the previous file had broader permissions. Windows ACLs remain OS-manage
             stream.flush()
             os.fsync(stream.fileno())
         os.chmod(temporary, 0o600)
-        os.replace(temporary, destination)
+        for attempt in range(len(_WINDOWS_REPLACE_RETRY_DELAYS) + 1):
+            try:
+                os.replace(temporary, destination)
+                break
+            except OSError as exc:
+                if (getattr(exc, "winerror", None) not in {5, 32, 33}
+                        or attempt == len(_WINDOWS_REPLACE_RETRY_DELAYS)):
+                    raise
+                time.sleep(_WINDOWS_REPLACE_RETRY_DELAYS[attempt])
     finally:
         temporary.unlink(missing_ok=True)
 
