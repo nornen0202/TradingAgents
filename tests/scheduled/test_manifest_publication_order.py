@@ -127,6 +127,34 @@ def test_identical_publication_is_idempotent(tmp_path):
     assert read_latest(tmp_path) == payload
 
 
+def test_completed_archive_advances_index_after_transient_windows_reader(monkeypatch, tmp_path):
+    from tradingagents import atomic_io
+
+    old = manifest("old", "2026-10-01T14:00:00Z", "2026-10-01T14:01:00Z")
+    new = manifest("new", "2026-10-01T15:00:00Z", "2026-10-01T15:01:00Z", mode="overlay_only")
+    publish(tmp_path, old)
+    replace = atomic_io.os.replace
+    denied = []
+
+    def reader_blocks_index(source, destination):
+        if Path(destination) == tmp_path / "latest-run.json" and len(denied) < 2:
+            denied.append(source)
+            # Completed research is already immutable even while its index is locked.
+            archived = tmp_path / "runs/2026/new/run.json"
+            assert json.loads(archived.read_text(encoding="utf-8")) == new
+            assert read_latest(tmp_path) == old
+            error = PermissionError("synthetic reader sharing conflict")
+            error.winerror = 5
+            raise error
+        replace(source, destination)
+
+    monkeypatch.setattr(atomic_io.os, "replace", reader_blocks_index)
+    monkeypatch.setattr(atomic_io.time, "sleep", lambda _seconds: None)
+    assert publish(tmp_path, new)
+    assert len(denied) == 2
+    assert read_latest(tmp_path) == new
+
+
 def test_late_full_thesis_is_not_hidden_by_newer_overlay_index(tmp_path):
     old = manifest("old-full", "2026-10-01T10:00:00Z", "2026-10-01T10:10:00Z")
     overlay = manifest("later-overlay", "2026-10-01T14:00:00Z", "2026-10-01T14:05:00Z", mode="overlay_only")

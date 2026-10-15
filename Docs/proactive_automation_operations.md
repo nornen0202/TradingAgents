@@ -288,6 +288,25 @@ budget. Before that worker starts, classify production recovery separately from
 the merged preventive repair; a successful account probe is not a completed
 daily analysis.
 
+### Windows readers temporarily blocking archive replacement
+
+The October 16 01:00 US overlay archived a successful 30/30 manifest, then failed
+while replacing `latest-run.json` with Windows error 5. A reader holding the file
+without delete sharing reproduces this exact failure. The immutable run remained
+valid and the publication archive fallback delivered the current Work report;
+the failed attempt and its failure notification remain historical evidence.
+
+The shared atomic JSON writer now retries only the replacement operation for
+native Windows errors 5, 32 and 33: seven attempts with at most 2.55 seconds of
+backoff. It reuses the same complete, flushed temporary file under the caller's
+existing lock. Other write failures and persistent denials still fail closed;
+it never deletes the destination, changes ACLs, rewrites observations, or reruns
+research. A completed immutable manifest can advance a lagging discovery pointer
+through the existing idempotent publication function, which refuses to replace
+a newer run or an unverifiable/corrupt pointer. Do not change the failed attempt
+to success or replay its notification. Verify exact Work/Pages/mobile lineage
+and the existing success notification independently.
+
 ### Korean session VWAP source consistency
 
 The October 14 pre-open audit reproduced an invalid KR VWAP: a domestic quote
