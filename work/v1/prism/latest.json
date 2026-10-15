@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "prism",
-  "event_id": "prism:43d359d96e6d07a17eec8c67c35754bd",
+  "event_id": "prism:6ac57f08131156ed4f1c01c0f04391e7",
   "prompt_contract_version": "prism-work-v5",
   "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "05ffe3c27643170e667793aae6b43a3e286c08386bfad7a76ca7d4b155437aea",
-  "source_sha256": "3f06cf60eb3a054dbfd5ea069fe21d84ff02dc050eb0ab940b5d9bfd8a8a7a27",
+  "source_sha256": "e34a94efbb2dc44a2af7939cc77f401928624eeb99fd617b2ceb60cd76a61352",
   "body": {
     "kind": "prism",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 166,
-      "window_events": 20,
-      "transmitted_events": 20,
+      "window_events": 18,
+      "transmitted_events": 18,
       "truncated": false,
-      "oldest_occurred_at": "2026-10-14T17:38:46+00:00",
+      "oldest_occurred_at": "2026-10-14T18:36:31+00:00",
       "newest_occurred_at": "2026-10-15T00:30:12+00:00"
     },
     "events": [
@@ -1047,168 +1047,6 @@
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
             "text_chars": 1021,
-            "text_source": "public_metadata",
-            "action_changes": [],
-            "recovered_tickers": []
-          }
-        }
-      },
-      {
-        "event_key": "stock_ai_agent:16097",
-        "content_sha256": "0304e8110e6589b271e705dc265a072b8cf6e33ac08604d04f7fcdc246993797",
-        "occurred_at": "2026-10-14T17:38:51+00:00",
-        "relevance": {
-          "tickers": [
-            "FRO",
-            "IOVA",
-            "FRSH",
-            "BKH",
-            "BP"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "normalized_prism_signals"
-        },
-        "summary": {
-          "channel": "stock_ai_agent",
-          "message_id": "16097",
-          "posted_at": "2026-10-14T17:38:51+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16097",
-          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-15 02:38) 🔸 현재 보유: 5/10개 🔸 사용 비중: 3.44/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Frontline Plc(FRO) +1.38% ⚠️ 최저 수익: Iovance Biotherapeutics, Inc.(IOVA) -2.91% 🔸 보유 종목: - Freshworks Inc.(FRSH)...",
-          "signals": [
-            {
-              "canonical_ticker": "FRO",
-              "display_name": "Frontline Plc",
-              "market": "US",
-              "source_asof": "2026-10-14T17:38:51+00:00",
-              "signal_action": "HOLD",
-              "trigger_type": "telegram_portfolio_snapshot",
-              "trigger_score": 0.45,
-              "composite_score": 0.45,
-              "confidence": 0.45,
-              "warnings": []
-            },
-            {
-              "canonical_ticker": "IOVA",
-              "display_name": "Iovance Biotherapeutics, Inc.",
-              "market": "US",
-              "source_asof": "2026-10-14T17:38:51+00:00",
-              "signal_action": "HOLD",
-              "trigger_type": "telegram_portfolio_snapshot",
-              "trigger_score": 0.45,
-              "composite_score": 0.45,
-              "confidence": 0.45,
-              "warnings": []
-            },
-            {
-              "canonical_ticker": "FRSH",
-              "display_name": "Freshworks Inc.",
-              "market": "US",
-              "source_asof": "2026-10-14T17:38:51+00:00",
-              "signal_action": "HOLD",
-              "trigger_type": "telegram_portfolio_snapshot",
-              "trigger_score": 0.45,
-              "composite_score": 0.45,
-              "stop_loss_price": 13.15,
-              "target_price": 16.43,
-              "confidence": 0.45,
-              "warnings": [
-                "multi_ticker_prices_scoped_to_mention_block"
-              ]
-            },
-            {
-              "canonical_ticker": "BKH",
-              "display_name": "Black Hills Corporation",
-              "market": "US",
-              "source_asof": "2026-10-14T17:38:51+00:00",
-              "signal_action": "HOLD",
-              "trigger_type": "telegram_portfolio_snapshot",
-              "trigger_score": 0.45,
-              "composite_score": 0.45,
-              "stop_loss_price": 73.5,
-              "target_price": 91.88,
-              "confidence": 0.45,
-              "warnings": [
-                "multi_ticker_prices_scoped_to_mention_block"
-              ]
-            },
-            {
-              "canonical_ticker": "BP",
-              "display_name": "BP p.l.c.",
-              "market": "US",
-              "source_asof": "2026-10-14T17:38:51+00:00",
-              "signal_action": "HOLD",
-              "trigger_type": "telegram_portfolio_snapshot",
-              "trigger_score": 0.45,
-              "composite_score": 0.45,
-              "stop_loss_price": 46.08,
-              "target_price": 58.12,
-              "confidence": 0.45,
-              "warnings": [
-                "multi_ticker_prices_scoped_to_mention_block"
-              ]
-            }
-          ],
-          "signals_total": 5,
-          "signals_transmitted": 5,
-          "signals_truncated": false,
-          "simulation_only": true,
-          "actionability": "research_only",
-          "normalization": {
-            "version": "prism-telegram/v3",
-            "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 1200,
-            "text_source": "public_metadata",
-            "action_changes": [],
-            "recovered_tickers": []
-          }
-        }
-      },
-      {
-        "event_key": "stock_ai_agent:16096",
-        "content_sha256": "e4a0f5bd358608c48ade4d5c40c74ab5ce62814e66402a4c19378e60d2d2ca86",
-        "occurred_at": "2026-10-14T17:38:46+00:00",
-        "relevance": {
-          "tickers": [
-            "NVDA"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "normalized_prism_signals"
-        },
-        "summary": {
-          "channel": "stock_ai_agent",
-          "message_id": "16096",
-          "posted_at": "2026-10-14T17:38:46+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16096",
-          "preview": "📉 매도: NVIDIA Corporation(NVDA) 매수가: $231.10 매도가: $221.15 수익률(전략 기준): ⬇️ -4.31% 시뮬레이터 가격 기준이며 증권사 확정 실현손익이 아닙니다 보유기간: 14일 매도이유: 손절선 이탈 — 손절선 $222.38(장중 0.5% 여유 $221.27) 아래로 내려가 $221.15에 매도했습니다. 📡 전략 원장 거래: 19건, 승률 32%,...",
-          "signals": [
-            {
-              "canonical_ticker": "NVDA",
-              "display_name": "매도: NVIDIA Corporation",
-              "market": "US",
-              "source_asof": "2026-10-14T17:38:46+00:00",
-              "signal_action": "UNKNOWN",
-              "trigger_type": "telegram_message",
-              "trigger_score": 0.45,
-              "composite_score": 0.45,
-              "confidence": 0.45,
-              "warnings": []
-            }
-          ],
-          "signals_total": 1,
-          "signals_transmitted": 1,
-          "signals_truncated": false,
-          "simulation_only": true,
-          "actionability": "research_only",
-          "normalization": {
-            "version": "prism-telegram/v3",
-            "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 267,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []

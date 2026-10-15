@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:0adf49aa3b9f64d98e41031b8df56d6b",
+  "event_id": "kr:6bec7725db3bc416783fb813e2aadf82",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "c8841b735958409f8713a6ad25339e660992c3937436b9c8a56f6db16de44607",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "331fbacec805e278747da999980cf5a224f49874e457a74f3a10be4532a85414",
-  "source_sha256": "122b31b18469f4ab2c6ab19e0b4b6bb84b233e6e887664c70781b4c756f67380",
+  "source_sha256": "a09c3476ce7c7ae889b7ab3ce31fe4e5390f7c3a7d0c911f5dd6bd2a2a5716b9",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -950,16 +950,16 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 381,
-          "window_events": 84,
+          "window_events": 83,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-13T09:30:25+00:00",
           "newest_occurred_at": "2026-10-14T23:47:30+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 72,
+          "omitted_events": 71,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 24
+          "omitted_before_context_selection": 23
         },
         "events": [
           {
@@ -2217,12 +2217,12 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 166,
-          "window_events": 20,
-          "transmitted_events": 20,
+          "window_events": 18,
+          "transmitted_events": 18,
           "truncated": false,
-          "oldest_occurred_at": "2026-10-14T17:38:46+00:00",
+          "oldest_occurred_at": "2026-10-14T18:36:31+00:00",
           "newest_occurred_at": "2026-10-15T00:30:12+00:00",
-          "available_events_before_context_cap": 20,
+          "available_events_before_context_cap": 18,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
@@ -3080,150 +3080,6 @@
               "simulation_only": false,
               "actionability": "research_only"
             }
-          },
-          {
-            "event_key": "stock_ai_agent:16097",
-            "content_sha256": "0304e8110e6589b271e705dc265a072b8cf6e33ac08604d04f7fcdc246993797",
-            "occurred_at": "2026-10-14T17:38:51+00:00",
-            "relevance": {
-              "tickers": [
-                "FRO",
-                "IOVA",
-                "FRSH",
-                "BKH",
-                "BP"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "16097",
-              "posted_at": "2026-10-14T17:38:51+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16097",
-              "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-15 02:38) 🔸 현재 보유: 5/10개 🔸 사용 비중: 3.44/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Frontline Plc(FRO) +1.38% ⚠️ 최저 수익: Iovance Biotherapeutics, Inc.(IOVA) -2.91% 🔸 보유 종목: - Freshworks Inc.(FRSH)...",
-              "signals": [
-                {
-                  "canonical_ticker": "FRO",
-                  "display_name": "Frontline Plc",
-                  "market": "US",
-                  "source_asof": "2026-10-14T17:38:51+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "IOVA",
-                  "display_name": "Iovance Biotherapeutics, Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T17:38:51+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "FRSH",
-                  "display_name": "Freshworks Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T17:38:51+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 13.15,
-                  "target_price": 16.43,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                },
-                {
-                  "canonical_ticker": "BKH",
-                  "display_name": "Black Hills Corporation",
-                  "market": "US",
-                  "source_asof": "2026-10-14T17:38:51+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 73.5,
-                  "target_price": 91.88,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                },
-                {
-                  "canonical_ticker": "BP",
-                  "display_name": "BP p.l.c.",
-                  "market": "US",
-                  "source_asof": "2026-10-14T17:38:51+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 46.08,
-                  "target_price": 58.12,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                }
-              ],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16096",
-            "content_sha256": "e4a0f5bd358608c48ade4d5c40c74ab5ce62814e66402a4c19378e60d2d2ca86",
-            "occurred_at": "2026-10-14T17:38:46+00:00",
-            "relevance": {
-              "tickers": [
-                "NVDA"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "16096",
-              "posted_at": "2026-10-14T17:38:46+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16096",
-              "preview": "📉 매도: NVIDIA Corporation(NVDA) 매수가: $231.10 매도가: $221.15 수익률(전략 기준): ⬇️ -4.31% 시뮬레이터 가격 기준이며 증권사 확정 실현손익이 아닙니다 보유기간: 14일 매도이유: 손절선 이탈 — 손절선 $222.38(장중 0.5% 여유 $221.27) 아래로 내려가 $221.15에 매도했습니다. 📡 전략 원장 거래: 19건, 승률 32%,...",
-              "signals": [
-                {
-                  "canonical_ticker": "NVDA",
-                  "display_name": "매도: NVIDIA Corporation",
-                  "market": "US",
-                  "source_asof": "2026-10-14T17:38:46+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
           }
         ],
         "execution_eligible": false
@@ -3249,16 +3105,16 @@
             ],
             "coverage": {
               "total_unique_events": 381,
-              "window_events": 84,
+              "window_events": 83,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-13T09:30:25+00:00",
               "newest_occurred_at": "2026-10-14T23:47:30+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 72,
+              "omitted_events": 71,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 24
+              "omitted_before_context_selection": 23
             }
           },
           "prism": {
@@ -3281,18 +3137,16 @@
               "stock_ai_agent:16101",
               "stock_ai_agent:16100",
               "stock_ai_agent:16099",
-              "stock_ai_agent:16098",
-              "stock_ai_agent:16097",
-              "stock_ai_agent:16096"
+              "stock_ai_agent:16098"
             ],
             "coverage": {
               "total_unique_events": 166,
-              "window_events": 20,
-              "transmitted_events": 20,
+              "window_events": 18,
+              "transmitted_events": 18,
               "truncated": false,
-              "oldest_occurred_at": "2026-10-14T17:38:46+00:00",
+              "oldest_occurred_at": "2026-10-14T18:36:31+00:00",
               "newest_occurred_at": "2026-10-15T00:30:12+00:00",
-              "available_events_before_context_cap": 20,
+              "available_events_before_context_cap": 18,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,
