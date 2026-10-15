@@ -16,7 +16,7 @@ from pathlib import Path
 import subprocess
 import sys
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, time as wall_time, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
@@ -24,6 +24,7 @@ from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = "nornen0202/TradingAgents"
 PUBLIC_BASE = "https://nornen0202.github.io/TradingAgents"
+KR_WORK_OVERLAY_CHECKPOINTS = (wall_time(10, 30), wall_time(13, 30), wall_time(14, 30))
 
 
 class LocalStorageHeadroomError(RuntimeError):
@@ -246,7 +247,13 @@ def run_due(archive, state, *, now=None, dry_run=False):
 
     now = now or datetime.now(ZoneInfo("Asia/Seoul"))
     watchdog = script("scheduled_actions_watchdog")
-    targets = watchdog.due_targets(now, market_status_resolver=automated_market_session_status)
+    # A fast local overlay at 10:05 expires before the 10:40 Work report.
+    # Refresh ten minutes before each KR briefing, leaving time for the normal
+    # five-minute launcher tick and collection without extending input validity.
+    targets = watchdog.due_targets(
+        now, market_status_resolver=automated_market_session_status,
+        kr_overlay_checkpoints=KR_WORK_OVERLAY_CHECKPOINTS,
+    )
     manifests = [m for m, _ in _iter_run_manifests_desc(archive)]
     decisions = []
     for target in targets:

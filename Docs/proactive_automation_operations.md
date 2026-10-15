@@ -172,6 +172,17 @@ Work slot is before the US open; retain its pre-open limitations rather than
 inventing live execution readiness. Research completion and publication never
 override stale quotes or execution gates.
 
+The local KR lane refreshes at 10:30, 13:30 and 14:30 KST, ten minutes before
+the corresponding Work briefings. The legacy cloud slots (10:05, 12:00, 13:20)
+could finish quickly enough that their thirty-minute observations expired before
+Work prepared a report; the last slot also left 14:40 without a fresh cohort.
+Only local due-target clocks change. The official market calendar, configured
+execution checkpoints, frozen research universe, per-slot attempt budgets and
+source validity remain enforced. An earlier successful snapshot does not cover
+the later pre-briefing window. Historical receipts retain their original slots.
+Long collection or rendering can still exhaust validity; keep live recheck
+requirements when that happens rather than extending timestamps.
+
 ## Recovery decisions
 
 ### A normalized decision fails price-range validation at final signal extraction

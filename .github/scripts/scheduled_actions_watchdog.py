@@ -685,10 +685,13 @@ def _us_intraday_overlay_due(now_kst: datetime) -> bool:
     return utc_now.weekday() < 5 and _time_between(utc_now.time(), time(13, 35), time(18, 30))
 
 
-def _latest_overlay_checkpoint(profile: str, now_kst: datetime) -> datetime | None:
+def _latest_overlay_checkpoint(
+    profile: str, now_kst: datetime, *,
+    kr_checkpoints: tuple[time, ...] = (time(10, 5), time(12, 0), time(13, 20)),
+) -> datetime | None:
     candidates: list[datetime] = []
     if profile == "kr":
-        checkpoint_times = (time(10, 5), time(12, 0), time(13, 20))
+        checkpoint_times = kr_checkpoints
         day_offsets = (0,)
     elif profile == "us":
         checkpoint_times = (time(0, 40), time(2, 10), time(22, 40))
@@ -774,6 +777,7 @@ def due_targets(
     *,
     market_status_resolver: Any | None = None,
     diagnostics: list[str] | None = None,
+    kr_overlay_checkpoints: tuple[time, ...] = (time(10, 5), time(12, 0), time(13, 20)),
 ) -> list[WatchdogTarget]:
     targets: list[WatchdogTarget] = []
     kst_date = now_kst.date()
@@ -865,8 +869,12 @@ def due_targets(
                 )
             )
 
-        if _time_between(kst_time, time(10, 0), time(13, 40)):
-            kr_checkpoint = _latest_overlay_checkpoint("kr", now_kst)
+        # Local production supplies clocks aligned with Work briefings. Keep
+        # the cloud default and the existing calendar/attempt guards intact.
+        kr_overlay_start = datetime.combine(kst_date, min(kr_overlay_checkpoints), tzinfo=KST) - timedelta(minutes=5)
+        kr_overlay_end = datetime.combine(kst_date, max(kr_overlay_checkpoints), tzinfo=KST) + timedelta(minutes=20)
+        if kr_overlay_start <= now_kst <= kr_overlay_end:
+            kr_checkpoint = _latest_overlay_checkpoint("kr", now_kst, kr_checkpoints=kr_overlay_checkpoints)
             if kr_checkpoint is None:
                 return targets
             targets.append(
