@@ -1,20 +1,20 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:b559dd44cd7ab3ebbef3f052f06c7cbc",
+  "event_id": "youtube:66040836f2d595cccfba12e1441aedc4",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "6b9df2c8a1b360d224f0476d3b90b501e82aeae61312d21d886d1217b50382ec",
-  "source_sha256": "dfa45cba3e727192d6c7534720ea3370c0efec73a9ee6516435fc9b132192c5b",
+  "source_sha256": "960e22666843bb998fde5476c48acae53bbf3af29085e1746a91fc1135dea9bb",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
     "source": {
       "health": "OK",
-      "run_id": "youtube_20261016_071203",
-      "last_run_at": "2026-10-16T08:00:05.898115+09:00",
+      "run_id": "youtube_20261016_081229",
+      "last_run_at": "2026-10-16T08:24:34.178643+09:00",
       "status": "success",
       "stale_after_hours": 36
     },
@@ -43,13 +43,13 @@
       "may_bypass_market_or_portfolio_execution_gate": false
     },
     "coverage": {
-      "total_unique_events": 409,
-      "window_events": 107,
-      "transmitted_events": 25,
+      "total_unique_events": 411,
+      "window_events": 109,
+      "transmitted_events": 24,
       "truncated": true,
       "oldest_occurred_at": "2026-10-13T11:11:49+00:00",
-      "newest_occurred_at": "2026-10-15T13:00:36+00:00",
-      "omitted_due_to_packet_budget": 35
+      "newest_occurred_at": "2026-10-15T23:02:29+00:00",
+      "omitted_due_to_packet_budget": 36
     },
     "events": [
       {
@@ -599,6 +599,394 @@
               "publisher": "Yahoo Finance",
               "published_at": "2026-10-13T13:55:41+00:00",
               "source_tier": "market_or_news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "Y9wDXyYLGeQ",
+        "content_sha256": "d80cf9e5986db06951cb4e398a038597e8bf267bbb258ec9d35ad15d99c5d90e",
+        "occurred_at": "2026-10-15T23:02:29+00:00",
+        "relevance": {
+          "tickers": [
+            "SPX",
+            "^KS11",
+            "TSM",
+            "CRWV"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "Y9wDXyYLGeQ",
+          "title": "연말까지 미국 증시 신고가 전망…한국 증시 반등 가능성은? | 문남중 대신증권 리서치센터 수석연구위원 [글로벌 인터뷰]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=Y9wDXyYLGeQ",
+          "published_at": "2026-10-15T23:02:29+00:00",
+          "status": "contradicted",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 15865,
+            "segments": 907,
+            "duration_seconds": 1953,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 11,
+            "contradicted": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "S&P 500은 10월 6일 신고가를 기록했고 10월 +0.95%, 연초 이후 약 +15%, 현재 7,800~7,900이며, 연말까지 신고가와 내년 6월 이전 우호적 투자환경이 이어진다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "제시된 지수·수익률 및 상승 전망을 검증된 투자 근거로 사용하지 않는다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "코스피는 10월 -18.8% 또는 약 -19%, 연초 이후 +40%이며, 7월 29일 5,200선에서 반등하는 과정에서 SK하이닉스가 상한가를 기록했고 미국 증시·TSMC 실적으로 다시 반등할 가능성이 높다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "과거 급락·상한가 사례와 현재 반등 가능성을 구분하고 KRX 원시세를 먼저 확인한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "S&P 500 3분기 EPS 성장률 전망이 26.7%에서 29.5%로 상향됐고 3개 분기 연속 25% 이상·8개 분기 연속 두 자릿수 성장했으며, 금융업종 전망도 현재 약 3%로 상향됐다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "같은 기관·정의·기준일의 자료로 실적 상향을 확인하기 전에는 이익 성장 수치를 투자 판단에 반영하지 않는다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "TSMC 3분기 매출·EPS 예상 상회, 순이익 +68.7%, 6개 분기 연속 사상 최대, 영업이익률 58.7%·가이던스 58% 초과, 4분기 매출 QoQ +14%·YoY +8%, 연간 전망 상향 및 2026~2028년 설비투자 확대라는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "마진·성장률·설비투자를 공식 IR 원문과 대조하기 전에는 반도체 수요나 한국 주가 안정의 확인된 근거로 사용하지 않는다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "9월 CPI는 전월·예상보다 높고 고용 증가폭은 둔화했으며, 6~7월에는 정책금리 3.75%보다 PCE 3.8% 이상이 높았지만 최근 3개월은 PCE가 정책금리보다 낮다는 주장과 금리 기대 해석.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "공식 발표일·관측월·지표 정의와 실제 금리 기대 변화를 확인한 뒤 거시 시나리오를 판단한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "미국 10년물 금리가 최근 5.3%를 넘었다가 5.07%로 하락했으며 전쟁·재정지출·국채 발행과 기관의 기계적 매도가 원인이고, 종전 공식 합의 이후 금리가 안정될 것이라는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "5.3%·5.07%를 확인된 금리로 인용하지 않고, 종전 여부만으로 장기채 진입 시점을 결정하지 않는다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "SPX",
+              "name": "미국 증시·S&P 500",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "^KS11",
+              "name": "한국 증시·코스피",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "TSM",
+              "name": "TSMC",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "CRWV",
+              "name": "코어위브",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "DLP Resources Files NI 43-101 Technical Report for the Aurora PEA",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/dlp-resources-files-ni-43-212600122.html",
+              "publisher": "TMX Newsfile",
+              "published_at": "2026-10-15T21:26:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Basic Materials Roundup: Market Talk",
+              "source_url": "https://finance.yahoo.com/m/9132dd09-0638-33cc-9a5b-b8508a5a4ab9/basic-materials-roundup%3A.html",
+              "publisher": "The Wall Street Journal",
+              "published_at": "2026-10-15T21:03:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "What Alcoa (AA) Said on Its Q3 Earnings Call",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/alcoa-aa-said-q3-earnings-230242270.html",
+              "publisher": "MarketBeat",
+              "published_at": "2026-10-15T23:02:42+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C2",
+              "title": "Alcoa Earnings Were a Relief, and the Stock Looks Cheap",
+              "source_url": "https://finance.yahoo.com/m/431e6ee5-c020-3143-a775-7434e1b72d3f/alcoa-earnings-were-a-relief%2C.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-10-15T21:05:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C6",
+              "title": "Stock Market Today, Oct. 15: Iren Stock Recovers, but Still Slides on Concerns Over Neocloud Provider Viability",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-15-212336081.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-10-15T21:23:36+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C9",
+              "title": "ORVANA REPORTS FOURTH QUARTER AND FISCAL 2026 PRODUCTION RESULTS - Spain Annual Gold Production Exceeds Guidance",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/orvana-reports-fourth-quarter-fiscal-230000732.html",
+              "publisher": "PR Newswire",
+              "published_at": "2026-10-15T23:00:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "v2N5urNCy38",
+        "content_sha256": "370c89c0d285273612cf728e8bc4b0d1bab82967a6ba65bd7dec8476b6c03557",
+        "occurred_at": "2026-10-15T22:04:13+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11",
+            "000660",
+            "005930",
+            "128940"
+          ],
+          "markets": [
+            "US",
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "v2N5urNCy38",
+          "title": "10월 16일 투자자들이 꼭 알아야 하는 투자 포인트",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=v2N5urNCy38",
+          "published_at": "2026-10-15T22:04:13+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean (Original)",
+            "model_or_format": "json3",
+            "chars": 1514,
+            "segments": 79,
+            "duration_seconds": 126,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 1,
+            "partially_supported": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "전일 코스피가 7% 넘게 하락하고 외국인이 3조7000억 원 넘게 순매도했지만 롯데쇼핑·신세계·현대백화점·알테오젠·파마리서치는 외국인 순매수였다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "시장 급락 규모와 외국인의 선별 매수를 확인된 사실로 사용하지 말고 종목별 수급을 별도로 확인해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "코어위브 재무 우려가 SK하이닉스 하락 요인이었고 젠슨 황의 자금조달 비용 하락 발언 이후 코어위브 낙폭이 2%대로 줄었다는 주장.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "AI 고객사의 자금조달 개선이나 그에 따른 SK하이닉스 반등을 확정적 투자 근거로 삼기 어렵다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "미국에서 거래되는 SK하이닉스 ADR이 정규장에 0.98% 하락하고 시간외에 0.62% 상승했다는 주장.",
+              "status": "asr_uncertain",
+              "confidence": 0.97,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "상품과 거래 세션이 확인되기 전에는 국내 SK하이닉스의 개장 방향을 판단하는 신호로 사용하기 어렵다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "삼성전자가 전일 9.48% 하락해 21만 원에 마감했다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "낙폭과 가격대를 근거로 저가 매수 여부를 판단하기 전에 공식 일별 시세를 확인해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "애플 CEO가 메모리 부족을 절대적 위기로 표현하고 중국산 사용 가능성을 열어뒀지만 아직 계약은 아니라는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "공급자 가격 결정권 강화와 고객 이탈은 모두 미확인 발언에 기초한 시나리오로 구분해야 한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "빅테크가 NVIDIA 대신 자체 AI 칩을 늘려도 HBM 수요가 발생해 메모리 시장이 확대될 수 있다는 조건부 전망.",
+              "status": "unverified",
+              "confidence": 0.97,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "메모리 수요 확대 가능성은 제품별 탑재량·출하량과 대체 효과를 확인한 뒤 평가해야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "코스피",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "000660",
+              "name": "SK하이닉스",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "005930",
+              "name": "삼성전자",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "128940",
+              "name": "한미약품",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "What Alcoa (AA) Said on Its Q3 Earnings Call",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/alcoa-aa-said-q3-earnings-230242270.html",
+              "publisher": "MarketBeat",
+              "published_at": "2026-10-15T23:02:42+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Alcoa Earnings Were a Relief, and the Stock Looks Cheap",
+              "source_url": "https://finance.yahoo.com/m/431e6ee5-c020-3143-a775-7434e1b72d3f/alcoa-earnings-were-a-relief%2C.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-10-15T21:05:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "CoreWeave Founders Sell $3.3 Billion in Shares Since IPO",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/coreweave-founders-sell-3-3-230551059.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-10-15T23:05:51+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C10",
+              "title": "[Who Is ?] 곽달원 HK이노엔 대표이사 사장",
+              "source_url": "https://www.businesspost.co.kr/BP?command=article_view&num=420677",
+              "publisher": "Naver News",
+              "published_at": "2025-11-20T07:38:00+09:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C11",
+              "title": "EIA Boosts Oil Price Forecast by $5 in 2026, $10 in 2027",
+              "source_url": "https://finance.yahoo.com/energy/articles/eia-boosts-oil-price-forecast-173246436.html",
+              "publisher": "Rigzone.com",
+              "published_at": "2026-10-08T17:32:46+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C11",
+              "title": "Dubai International Electric Vehicles Exhibition and Conference (EV World 2026), 10–12 November 2026, Positions Dubai as a Global EV Investment Hub",
+              "source_url": "https://finance.yahoo.com/energy/articles/dubai-international-electric-vehicles-exhibition-140800385.html",
+              "publisher": "GlobeNewswire",
+              "published_at": "2026-09-28T14:08:00+00:00",
+              "source_tier": "news"
             }
           ]
         }
@@ -3759,479 +4147,6 @@
               "source_url": "https://finance.yahoo.com/markets/live/stock-market-today-dow-sp-500-rise-nasdaq-trims-losses-as-treasury-yields-sink-153611834.html",
               "publisher": "Yahoo Finance",
               "published_at": "2026-10-15T20:03:35+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "XzQNRYmLIts",
-        "content_sha256": "6b626f92ff474e38555dc7ec401966da3d78f54ce83d33e019130149d19c12f4",
-        "occurred_at": "2026-10-15T03:32:32+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "title_and_claim_context"
-        },
-        "strategy_source_tier": "STANDARD",
-        "strategy_evidence_weight": "STANDARD",
-        "summary": {
-          "video_id": "XzQNRYmLIts",
-          "title": "토큰화 주식, 새로운 투자 인프라로 자리 잡을 수 있을까 | 김동환, 박지원, 최윤영 한화투자증권 팀장 [크립토 PLUS]",
-          "channel": "삼프로TV 3PROTV",
-          "source_url": "https://www.youtube.com/watch?v=XzQNRYmLIts",
-          "published_at": "2026-10-15T03:32:32+00:00",
-          "status": "asr_uncertain",
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD",
-          "strategy_validation_policy": "STANDARD_REVIEW",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 13947,
-            "segments": 754,
-            "duration_seconds": 1748,
-            "repeated_ngram_ratio": 0.001
-          },
-          "claim_status_summary": {
-            "unverified": 11,
-            "asr_uncertain": 1
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "IMF가 토큰화를 별도 장에서 분석했으며 토큰화 주식 규모는 약 33억 달러이고 소수 사업자에 집중되어 있다. 5개 상품·11개 거래소·1년 분석에서 거래량 약 절반은 미국 정규장 밖, 거래 건수 80% 이상은 한 주 미만이다. 미국채 대비 비중은 자막상 0.2%와 2%가 혼재한다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "시장 규모와 이용 수요 통계를 투자 판단의 확정 근거로 사용하지 않는다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "가격 추종형 토큰 취득은 실제 주주 지위와 다를 수 있고 상품별 권리·파산 보호가 다르다. 초기 유동성 부족, 정규장 밖 가격 괴리, 플랫폼 간 유동성 분산 및 국내 접근 제한이 존재한다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "매수 전 상품별 법적 권리, 상환 조건, 파산 시 청구권과 실제 호가를 확인해야 한다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "공유 원장은 장부 대조 비용을 줄이고 주식 담보 스테이블코인 대출을 쉽게 할 수 있지만, 건별 즉시결제는 네팅 효과를 약화시키고 MMF 환매 충격·오라클 위험 전달을 빠르게 할 수 있다. 미국의 자금 유치 목적이라는 해석도 제시된다.",
-              "status": "unverified",
-              "confidence": 0.98,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "효율 개선과 위험 전달은 검증할 구조적 가설로 취급하고 실제 결제 설계·담보·청산 조건을 확인한다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "SEC 혁신면제가 5년간 적용되며 주주 권리형 토큰, 미국 법인, 고객확인, 발행사 사전통지·이의제기 및 지갑·유동성 풀 거래 요건을 포함한다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "5년 면제나 주주 권리 보장을 확정 제도로 전제해 투자하거나 사업 일정을 산정하지 않는다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "국내 금융 가이드라인이 3단계를 거쳐 온체인 결제로 향한다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "국내 온체인 결제 도입 경로와 시점을 확정된 정책 일정으로 반영하지 않는다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "DTC 서비스와 뉴욕증권거래소·OKX 관련 사업이 올해 말 진행될 예정이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "연말 출시를 확정 촉매로 간주하지 말고 사업별 공식 일정과 승인 조건을 확인한다."
-            }
-          ],
-          "entities": [],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Alcoa Earnings Were a Relief, and the Stock Looks Cheap",
-              "source_url": "https://finance.yahoo.com/m/431e6ee5-c020-3143-a775-7434e1b72d3f/alcoa-earnings-were-a-relief%2C.html",
-              "publisher": "Barrons.com",
-              "published_at": "2026-10-15T21:05:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "Alcoa Posts Higher Third-Quarter Profit, Sales on Increased Production",
-              "source_url": "https://finance.yahoo.com/m/81226a45-96eb-3729-bd54-52985ebbd566/alcoa-posts-higher.html",
-              "publisher": "The Wall Street Journal",
-              "published_at": "2026-10-15T20:43:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C2",
-              "title": "Cathie Wood-Backed Biotech IPO Pops in Debut",
-              "source_url": "https://finance.yahoo.com/m/dc6c9af3-cf9a-33b2-9176-32e37766e57f/cathie-wood-backed-biotech.html",
-              "publisher": "Barrons.com",
-              "published_at": "2026-10-15T17:38:51+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C4",
-              "title": "XCENA Showcases CXL Memory Innovations for AI Inference at OCP Global Summit 2026",
-              "source_url": "https://finance.yahoo.com/technology/ai/articles/xcena-showcases-cxl-memory-innovations-180000292.html",
-              "publisher": "Business Wire",
-              "published_at": "2026-10-15T18:00:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C5",
-              "title": "IFF to Release Third Quarter 2026 Results on November 3, 2026",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/iff-release-third-quarter-2026-201500848.html",
-              "publisher": "Business Wire",
-              "published_at": "2026-10-13T20:15:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E7",
-              "claim_id": "C5",
-              "title": "The Hackett Group, Inc. Invites You to Participate in the 2026 Third Quarter Earnings Conference Call on Tuesday, November 3, 2026",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/hackett-group-inc-invites-participate-201500838.html",
-              "publisher": "Business Wire",
-              "published_at": "2026-10-13T20:15:00+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "OOhtu0gFXfE",
-        "content_sha256": "d8a64ba521fe17bfc0c1119fde5928c8f1144e415ec27a7ec66264d4a3af397a",
-        "occurred_at": "2026-10-15T03:15:08+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "title_and_claim_context"
-        },
-        "strategy_source_tier": "STANDARD",
-        "strategy_evidence_weight": "STANDARD",
-        "summary": {
-          "video_id": "OOhtu0gFXfE",
-          "title": "삼성전자는 '1월 주주환원' 전까지 못 오를까?!",
-          "channel": "경제사냥꾼",
-          "source_url": "https://www.youtube.com/watch?v=OOhtu0gFXfE",
-          "published_at": "2026-10-15T03:15:08+00:00",
-          "status": "unverified",
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD",
-          "strategy_validation_policy": "STANDARD_REVIEW",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 1991,
-            "segments": 93,
-            "duration_seconds": 132,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 6,
-            "partially_supported": 4
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "모친이 11월 12일 이재용에게 삼성전자 주식 1천만 주 이상을 증여하며, 완료 후 직접 지분은 1.75%다. 이러한 소유권 이전은 같은 규모의 신규 시장 매수가 아니다.",
-              "status": "unverified",
-              "confidence": 0.15,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "증여 예정 물량을 신규 매수 수요로 계산하거나 확인되지 않은 지분율로 주가 통제 가능성을 판단하지 않는다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "증여세는 내년 1월 중순까지의 평균 주가로 산정되며 낮은 주가가 수증자의 세금 부담에 유리하다.",
-              "status": "unverified",
-              "confidence": 0.15,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "1월 중순을 세금상 확정 분기점이나 주가 상승 개시일로 사용하지 않는다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "이건희 사망 당시 상속주식은 전후 각 2개월 평균으로 평가됐고, 주가가 54,000원에서 73,900원으로 올라 가족의 상속세 부담이 4천억 원 증가했다.",
-              "status": "unverified",
-              "confidence": 0.1,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "과거 세액 증가 사례를 현재 주가 억제설의 실증 근거로 사용하기 어렵다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "지난 8일 삼성전자가 3분기 영업이익 10조 7천억 원을 발표했으며 10월 29일 상세 실적 설명이 예정됐다.",
-              "status": "unverified",
-              "confidence": 0.1,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "실적 수치와 발표 일정을 회사 IR에서 확인하기 전에는 해당 이벤트를 전제로 투자 일정을 확정하지 않는다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "삼성전자 주가는 영업이익 발표 당일에도 하락했다.",
-              "status": "unverified",
-              "confidence": 0.1,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "확인되지 않은 당일 하락을 실적 무용론이나 특정인의 주가 억제 증거로 해석하지 않는다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "올해 예상 주주환원은 90조~110조 원이며 약 3조 원을 3분기 배당으로 지급하고 10월 말 배당을 결정한다.",
-              "status": "partially_supported",
-              "confidence": 0.4,
-              "supporting_evidence_ids": [
-                "E3"
-              ],
-              "manual_check_required": true,
-              "investor_implication": "다년 누적 환원 규모를 연간 배당 재원이나 확정 지급액으로 계산하지 않는다."
-            }
-          ],
-          "entities": [],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C4",
-              "title": "Alcoa Earnings Were a Relief, and the Stock Looks Cheap",
-              "source_url": "https://finance.yahoo.com/m/431e6ee5-c020-3143-a775-7434e1b72d3f/alcoa-earnings-were-a-relief%2C.html",
-              "publisher": "Barrons.com",
-              "published_at": "2026-10-15T21:05:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C7",
-              "title": "Samsung bets on dividends over buybacks in record shareholder return plan",
-              "source_url": "https://www.mk.co.kr/article/12134516",
-              "publisher": "Naver News",
-              "published_at": "2026-08-24T10:37:00+09:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E3",
-              "claim_id": "C7",
-              "title": "Samsung Electronics Pledges Up to 110 Trillion Won in Record Shareholder ...",
-              "source_url": "https://www.businesskorea.co.kr/news/articleView.html?idxno=275304",
-              "publisher": "Naver News",
-              "published_at": "2026-08-22T09:48:00+09:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C9",
-              "title": "Dow Jones Futures: Disney, Salesforce Lead New Buys After Wild Session; Tesla Roadster On Tap",
-              "source_url": "https://finance.yahoo.com/m/2cd5e2a7-a743-35dd-994e-11a2ba3c6d46/dow-jones-futures%3A-disney%2C.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-10-15T22:03:51+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C10",
-              "title": "삼성전자 자사주 소각, 누가 막고 있나",
-              "source_url": "https://vop.co.kr/A00001696371.html",
-              "publisher": "Naver News",
-              "published_at": "2026-08-26T11:38:00+09:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E7",
-              "claim_id": "C10",
-              "title": "삼성전자, 14,999,999,992,000원 자기주식 취득 결정…8월 24일부터 매입",
-              "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Feconomyreports.com%2Ffilings%2F20260821%2Dsamsung%2Delectronics%2Dcoltd%2Dbuyback%2D20260821000616&rut=4b02fd28bcf2434366589d71c682f90aee07201cdf10f6657eca0bda1709202d",
-              "publisher": "duckduckgo.com",
-              "source_tier": "web"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "1CP0dFMYunw",
-        "content_sha256": "10c54c5200f4d86a488380b99f6780c50d9da3b4ecb89559175421542190c833",
-        "occurred_at": "2026-10-15T03:02:21+00:00",
-        "relevance": {
-          "tickers": [
-            "BTC"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "verified_entities"
-        },
-        "strategy_source_tier": "STANDARD",
-        "strategy_evidence_weight": "STANDARD",
-        "summary": {
-          "video_id": "1CP0dFMYunw",
-          "title": "미국 CPI 예상치 상회, 금리 인상 우려에 비트코인·뉴욕증시 동반 하락 | 김동환, 박지원, 박현영 뉴스1 기자 [크립토 PLUS]",
-          "channel": "삼프로TV 3PROTV",
-          "source_url": "https://www.youtube.com/watch?v=1CP0dFMYunw",
-          "published_at": "2026-10-15T03:02:21+00:00",
-          "status": "asr_uncertain",
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD",
-          "strategy_validation_policy": "STANDARD_REVIEW",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 14761,
-            "segments": 823,
-            "duration_seconds": 1785,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 9,
-            "asr_uncertain": 3
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "근원 CPI가 전월 대비 예상 0.2%를 웃돈 0.3%였고 휘발유가 전체 물가 상승분의 절반 이상을 차지했다는 주장과 연준 2% 목표 비교.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "물가 충격의 크기나 금리 방향을 판단하는 확정 근거로 사용할 수 없다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "FedWatch상 이번 달 금리 인상 확률이 약 53%에서 32%로 낮아졌고 10월 동결·12월 인상 전망이 제시됐다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "확률 수치를 금리 포지션이나 위험자산 매매의 근거로 사용하기 어렵다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "미국 주요 주가지수와 국내 지수가 하락했고 만기 불명 국채 금리가 최고치 부근에서 5.23%로 내려가 주식에서 국채로 자금이 이동했다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "국내 증시 추가 매도나 채권 유입을 확인된 시장 흐름으로 단정할 수 없다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "정제유 가격 상승과 호르무즈 상황이 물가 위험이며 미국이 러시아산 경유 조달을 위해 제재를 완화하고 이란 그림자 선단 단속도 느슨하게 하려 한다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "원유·정제유 및 지정학 관련 포지션에 적용하기 전에 정책과 가격 사실을 확인해야 한다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "CPI 직후 비트코인이 83,000달러 아래에서 82,000달러 아래와 81,000달러대로 하락했고 낙폭은 약 1~2%로 국내 증시보다 작았다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "제시된 가격 수준을 지지선·손절선으로 활용하거나 상대적 방어력을 확정하기 어렵다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "비트코인 거래소 보유량이 9월 중순 대비 약 1.7% 줄고 고래가 보유를 지속해 매도 압력이 약하며 10월 반등 가능성이 있다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "온체인 수치와 계절성을 반등 신호로 확정하지 말고 지표 정의와 가격 반응을 별도로 확인해야 한다."
-            }
-          ],
-          "entities": [
-            {
-              "ticker": "BTC",
-              "name": "비트코인",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            }
-          ],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "VGT Returned 799.70% and VOO Returned 324.46% Over a Decade. Adding VUG Does Not Make It Diversified",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/vgt-returned-799-70-voo-220310440.html",
-              "publisher": "24/7 Wall St.",
-              "published_at": "2026-10-15T22:03:10+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C3",
-              "title": "Cathie Wood-Backed Biotech IPO Pops in Debut",
-              "source_url": "https://finance.yahoo.com/m/dc6c9af3-cf9a-33b2-9176-32e37766e57f/cathie-wood-backed-biotech.html",
-              "publisher": "Barrons.com",
-              "published_at": "2026-10-15T17:38:51+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E3",
-              "claim_id": "C6",
-              "title": "Stock Market Today: Dow Pops 550 Points As Yields Sink; Dell Sets Off Sell Signals",
-              "source_url": "https://finance.yahoo.com/m/27f9f9ee-5b06-3a78-a91a-ddc2a33bd2d2/stock-market-today%3A-dow-pops.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-10-15T20:30:16+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C7",
-              "title": "Alcoa Earnings Were a Relief, and the Stock Looks Cheap",
-              "source_url": "https://finance.yahoo.com/m/431e6ee5-c020-3143-a775-7434e1b72d3f/alcoa-earnings-were-a-relief%2C.html",
-              "publisher": "Barrons.com",
-              "published_at": "2026-10-15T21:05:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C9",
-              "title": "Rio Tinto Reports 2% Y/Y Increase in Q3 Iron Ore Shipments",
-              "source_url": "https://finance.yahoo.com/markets/commodities/articles/rio-tinto-reports-2-y-154600452.html",
-              "publisher": "Zacks",
-              "published_at": "2026-10-15T15:46:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C10",
-              "title": "Dow Jones Futures: Disney, Salesforce Lead New Buys After Wild Session; Tesla Roadster On Tap",
-              "source_url": "https://finance.yahoo.com/m/2cd5e2a7-a743-35dd-994e-11a2ba3c6d46/dow-jones-futures%3A-disney%2C.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-10-15T22:32:57+00:00",
               "source_tier": "news"
             }
           ]

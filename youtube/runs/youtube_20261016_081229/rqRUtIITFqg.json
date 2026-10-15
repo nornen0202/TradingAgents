@@ -1,0 +1,318 @@
+{
+  "version": 4,
+  "video_id": "rqRUtIITFqg",
+  "title": "국민연금이 '외국인 ATM' 소리 듣는 진짜 이유",
+  "url": "https://www.youtube.com/watch?v=rqRUtIITFqg",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/rqRUtIITFqg/maxresdefault.jpg",
+  "published_at": "2026-10-15T11:00:31+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 2119,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 2119,
+    "segments": 100,
+    "duration_seconds": 133,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-16T07:12:03.681850+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 12,
+  "claim_status_summary": {
+    "partially_supported": 2,
+    "unverified": 5,
+    "asr_uncertain": 2
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "국내주식 비중 초과분을 점진적으로 매도하는 리밸런싱 규칙을 1월부터 6월 말까지 유예하고, 7월 재개하면서 실행 강도를 낮췄다.",
+      "status": "partially_supported",
+      "confidence": 0.93,
+      "supporting_evidence_ids": [
+        "E4",
+        "E11",
+        "E12"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "1월~6월 말 유예, 7월 재개 및 강도 축소",
+        "observed": "보도에서 1월 26일 조정·6월까지 유예·7월 재개 확인; 강도 축소는 미확인"
+      },
+      "investor_implication": "정책 변경은 보도상 확인되지만 실제 매도 축소 규모와 성과 효과는 별도로 검증해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "5월 국내주식 목표 비중을 14.9%에서 20.8%로 높였으며 관련 규모는 약 110조 원이다.",
+      "status": "partially_supported",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [
+        "E4",
+        "E5",
+        "E10",
+        "E11"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.8,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "14.9%→20.8%, 약 110조 원",
+        "observed": "보도상 14.9%→20.8% 확인; +5.9%포인트; 110조 원은 미확인"
+      },
+      "investor_implication": "목표 비중 변경과 실제 자금 유입을 구분해야 하며, 110조 원을 확정 매수액으로 사용하면 안 된다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "국내 적립금이 6월 말 543조 원에서 7월 말 419조 원으로 약 125조 원 감소했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "543조 원→419조 원, 약 125조 원 감소",
+        "observed": "제시 숫자의 산술 차이는 124조 원; 실제 잔액과 자산 범주는 확인 불가"
+      },
+      "investor_implication": "124조 원 또는 125조 원을 검증된 투자손실이나 현금 유출액으로 인용하지 않아야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "국내주식 누적 투자수익이 6월 말 283조 원에서 7월 말 158조 원으로 125조 원 줄었고, 상반기 이익 대부분은 미실현 평가이익이었다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "283조 원→158조 원, 125조 원 감소",
+        "observed": "산술 차이 125조 원; 월별 수익금과 미실현 비중은 확인 불가"
+      },
+      "investor_implication": "125조 원이라는 차이가 맞더라도 실제 손익이나 실현손실이 검증된 것은 아니다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "국민연금 이사장이 국정감사에서 규정대로 매도하면 하루 8억 원 이상이 시장에 나와 충격을 주며, 매도 유예가 수익 증대에 기여했다고 말했다.",
+      "status": "asr_uncertain",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "예상 매도액 하루 8억 원 이상",
+        "observed": "원문 금액 확인 불가; 대체 숫자도 확정 불가"
+      },
+      "investor_implication": "일일 예상 매도액과 수익 증대 효과를 확정 사실이나 정책 정당화 근거로 사용하지 않아야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "5월 7~14일 6거래일 동안 외국인이 코스피 주식을 26조 원 넘게 순매도했고, 그중 5일 사상 최고치를 경신했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "6거래일, 순매도 26조 원 초과, 최고치 경신 5일",
+        "observed": "세 항목 모두 해당 기간 원자료 없음"
+      },
+      "investor_implication": "외국인 순매도 규모와 최고치 경신 횟수는 검증 전까지 투자 판단의 정량 근거에서 제외해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "외국인 하루 평균 순매도 4조 원 이상은 국민연금 하루 8억 원의 5배 이상이며, 시장은 추가 매도를 흡수할 수 있었다.",
+      "status": "asr_uncertain",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "하루 4조 원 이상 대 하루 8억 원, 5배 이상",
+        "observed": "제시 기준값의 비율은 5000배; 26÷6은 약 4.33조 원; 입력값의 사실성은 미확인"
+      },
+      "investor_implication": "배수 비교와 시장 흡수력 추론은 원음·금액 단위·유동성 자료 확인 전까지 유보해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "외국인이 고점에서 파는 동안 국민연금이 물량을 받아 수익 실현을 놓쳤고, 리밸런싱 유예와 약한 재개가 125조 원 감소를 초래했다. 사전 매도했다면 하락 노출이 작았을 것이다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "유예와 집행 축소 때문에 125조 원 감소",
+        "observed": "감소액 자체와 정책의 인과적 기여액 모두 확인 불가"
+      },
+      "investor_implication": "외국인 ATM이라는 표현은 입증된 거래 관계나 성과 평가가 아닌 해석으로 구분해야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "주가 하락으로 평가이익이 줄어든 것은 가입자가 납부한 세금이 사라진 것이다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.45,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "납부한 세금 약 125조 원 소멸이라는 해석",
+        "observed": "해당 금액의 납부 원금 소멸 자료 없음; E9는 재원을 보험료·운용수익 등으로 설명"
+      },
+      "investor_implication": "평가이익 감소, 실현손실, 보험료 원금 손실과 현금 유출을 구분해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피·외국인 투자자",
+      "status": "unverified",
+      "claims": [
+        "외국인이 대규모 순매도하는 동안에도 코스피가 사상 최고치를 경신했으며, 영상은 이를 국민연금의 매도 유예 논리에 대한 반론으로 제시한다."
+      ],
+      "numeric_claims": [
+        "5월 7일부터 14일까지 6거래일 동안 외국인의 코스피 상장 주식 순매도가 26조 원을 넘었다는 주장.",
+        "해당 6거래일 중 5일에 코스피가 사상 최고치를 경신했다는 주장.",
+        "외국인 하루 평균 매도액이 4조 원을 넘었고, 시장이 국민연금의 하루 8억 원보다 5배 이상 많은 거래량을 흡수했다는 비교."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-15T22:13:02.841452+00:00",
+        "current_price": 5554.22,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Alcoa Earnings Were a Relief, and the Stock Looks Cheap",
+      "source_url": "https://finance.yahoo.com/m/431e6ee5-c020-3143-a775-7434e1b72d3f/alcoa-earnings-were-a-relief%2C.html",
+      "publisher": "Barrons.com",
+      "published_at": "2026-10-15T21:05:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Alcoa Earnings Were a Relief, and the Stock Looks Cheap Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Fin..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Alcoa Posts Higher Third-Quarter Profit, Sales on Increased Production",
+      "source_url": "https://finance.yahoo.com/m/81226a45-96eb-3729-bd54-52985ebbd566/alcoa-posts-higher.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-15T20:43:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Alcoa Posts Higher Third-Quarter Profit, Sales on Increased Production Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "[친절한 경제] \"증시 부양 펀드냐\"…국민연금에 질타 세례",
+      "source_url": "https://news.sbs.co.kr/news/endPage.do?news_id=N1008798199&plink=ORI&cooper=NAVER",
+      "publisher": "Naver News",
+      "published_at": "2026-10-15T09:23:00+09:00",
+      "source_tier": "market_or_news",
+      "excerpt": "그런데 올해 증시가 뜨거워지자, 국민연금은 이 브레이크를 풀었습니다. 코스피가 5천을 넘보던 1월 말, 목표치를 넘어가도 6월까지는 팔지 않기로 했고요. 5월 말에는 아예 국내 주식 목표 비중을 14.9%에서 20.8%로 올리고... [친절한 경제] \"증시 부양 펀드냐\"…국민연금에 질타 세례 --> 뉴스 뉴스 본문 바로가기 전체 메뉴 바로가기 기사 검색창 바로가기 배너 닫기 SBS뉴스 2026년 10월 16일(금) ENG 로그인 회원가입 SBS SBS뉴스..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "막대한 경상수지 흑자에도 환율 고공행진…범인은 국민연금?",
+      "source_url": "https://www.hani.co.kr/arti/economy/economy_general/1265030.html",
+      "publisher": "Naver News",
+      "published_at": "2026-06-24T09:36:00+09:00",
+      "source_tier": "news",
+      "excerpt": "코스피 주가지수는 연초 이후 6월19일까지 약 2배 높아졌는데, 그 과정에서 외국인은 국내주식을 약 110조 원... 따라서 국민연금은 5월28일 기금운용위원회에서 국내주식의 목표비중을 기존의 14.9%에서 20.8%로, 전략적..."
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C9",
+      "title": "Nps 국민연금공단 - 국민을 든든하게 연금을 튼튼하게",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.nps.or.kr%2Fpnsinfo%2Fstatistics%2FgetOHAF0118M0.do&rut=6d8d2a7913fed06624a98573278a963132cdfa0830449c3ebfd178107030d91a",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "국민연금 홈페이지 연도별 수익률 (수익금)현황 (단위 : %, 억원) A전체 수익률 B전체 수익금 (단위 : %, 억원)"
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C9",
+      "title": "국민연금기금운용본부 > 운용현황 > 운용성과 > 성과 현황",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Ffund.nps.or.kr%2Foprtprcn%2Foprtotcm%2FgetOHED0010M0.do%3FmenuId%3DMN24000623&rut=febabd20942abeeee67c9a99482fc29e7a1d83319b24192dd6bb402f81cfb695",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "기금운용본부는 글로벌 금융시장의 불확실성이 높아지는 상황에서도 국민연금기금 재정의 장기적인 안정을 유지하기 위해 운용성과를 높일 수 있도록 노력하고 있습니다."
+    },
+    {
+      "evidence_id": "E10",
+      "claim_id": "GLOBAL",
+      "title": "[사설] 국민연금 정략적 이용 의혹, 반드시 규명하고 처벌해야",
+      "source_url": "https://www.imaeil.com/page/view/2026101516411780586",
+      "publisher": "Naver News",
+      "published_at": "2026-10-16T05:00:00+09:00",
+      "source_tier": "news",
+      "excerpt": "그러나 국민연금은 \"연기금의 국내 주식 투자 비중이 너무 낮다\"는 취지의 이재명 대통령 발언 이후, 올해 1월 국내 주식 투자 목표 비중을 14.4%에서 14.9%로 인상한 데 이어, 5월에는 20.8%까지 대폭 확대했다. 리밸런싱(자산..."
+    },
+    {
+      "evidence_id": "E11",
+      "claim_id": "GLOBAL",
+      "title": "[사설]주식 비중 너무 키워 증시에 손발 묶인 국민연금",
+      "source_url": "https://www.donga.com/news/Opinion/article/all/20261015/134851573/2",
+      "publisher": "Naver News",
+      "published_at": "2026-10-15T23:28:00+09:00",
+      "source_tier": "news",
+      "excerpt": "문제는 그 후 코스피 상승 폭이 더 커지자 국민연금이 5월 국내 주식 비중 목표를 20.8%로 또 높였다는 점이다.... 국민연금 리밸런싱은 일단 7월부터 재개된 상태다. 하지만 7월 말 기준 국민연금의 국내 주식 비중은 24.9%로..."
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

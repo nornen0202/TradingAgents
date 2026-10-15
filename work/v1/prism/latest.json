@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "prism",
-  "event_id": "prism:9ab0e1f39743fb94f65d47141b300d53",
+  "event_id": "prism:ccaa33d007855fb0a3a7afbe9b5f00ef",
   "prompt_contract_version": "prism-work-v5",
   "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "05ffe3c27643170e667793aae6b43a3e286c08386bfad7a76ca7d4b155437aea",
-  "source_sha256": "9795a7a88511f1e1f08d636194ccebbb07dc2111faa4dd0c914e99964ba40dd4",
+  "source_sha256": "4fcecaa14163ab807b19509aca10e1d9e2ecd6d34921a84ada3304035d9ca67e",
   "body": {
     "kind": "prism",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 180,
-      "window_events": 18,
-      "transmitted_events": 18,
+      "window_events": 17,
+      "transmitted_events": 17,
       "truncated": false,
-      "oldest_occurred_at": "2026-10-14T23:19:27+00:00",
+      "oldest_occurred_at": "2026-10-15T00:00:52+00:00",
       "newest_occurred_at": "2026-10-15T18:52:58+00:00"
     },
     "events": [
@@ -1012,38 +1012,6 @@
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
             "text_chars": 275,
-            "text_source": "public_metadata",
-            "action_changes": [],
-            "recovered_tickers": []
-          }
-        }
-      },
-      {
-        "event_key": "stock_ai_agent:16112",
-        "content_sha256": "216cbb7b6f6e44137146fb948894b6ed3ed47ec6c9f30d64b4ee81a9fda036c7",
-        "occurred_at": "2026-10-14T23:19:27+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "message_context"
-        },
-        "summary": {
-          "channel": "stock_ai_agent",
-          "message_id": "16112",
-          "posted_at": "2026-10-14T23:19:27+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16112",
-          "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/14 22:59:48 KST 💵 청산 결과 정리 수량: 0.02 BTC 진입 → 청산: 82,630.00 USDT → 82,327.30 USDT 보유 시간: 52.1분 확정 순손익: 5.39 USDT • 시작 계좌 9,456.19 USDT 대비 +0.06% • 수수료 0.66 USDT · 펀딩 0.00 USDT 반영 💰 종료 후 순자...",
-          "signals": [],
-          "signals_total": 0,
-          "signals_transmitted": 0,
-          "signals_truncated": false,
-          "simulation_only": false,
-          "actionability": "research_only",
-          "normalization": {
-            "version": "prism-telegram/v3",
-            "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 224,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []

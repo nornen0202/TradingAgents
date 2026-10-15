@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:7ddbdd0d04860343a3350e0575c0e72d",
+  "event_id": "us:6107cd8d74a9f4d4badd7585c694bdf8",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "28ccef5622f4181bc3518b4a17864a5471d37a8b69183d84abc04a7aec734cbd",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "2ac26bd3a2d88b7831816b736f760301d9d2d9a97fc10338fe72baf3917848cd",
-  "source_sha256": "9fc4b3d9630a15249c43876ac286e8323c25cda1c93f6218d2b766a0d1584a9c",
+  "source_sha256": "5580c52a8b744e37bba1e929f7b26c2e46f016cc8b9290fae242a50816090381",
   "body": {
     "kind": "market",
     "market": "US",
@@ -935,17 +935,17 @@
       "youtube": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 409,
-          "window_events": 107,
+          "total_unique_events": 411,
+          "window_events": 109,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-14T05:00:51+00:00",
-          "newest_occurred_at": "2026-10-15T11:00:38+00:00",
+          "newest_occurred_at": "2026-10-15T23:02:29+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 95,
+          "omitted_events": 97,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 47
+          "omitted_before_context_selection": 49
         },
         "events": [
           {
@@ -1816,14 +1816,15 @@
             }
           },
           {
-            "event_key": "3E-pgHrkpng",
-            "content_sha256": "536f4ce61bf7f1a8cb47e0efdb77e90ca62a36ef6b3eb04ce77f45d43c751747",
-            "occurred_at": "2026-10-15T06:02:39+00:00",
+            "event_key": "Y9wDXyYLGeQ",
+            "content_sha256": "d80cf9e5986db06951cb4e398a038597e8bf267bbb258ec9d35ad15d99c5d90e",
+            "occurred_at": "2026-10-15T23:02:29+00:00",
             "relevance": {
               "tickers": [
+                "SPX",
                 "^KS11",
-                "CRWV",
-                "TSM"
+                "TSM",
+                "CRWV"
               ],
               "markets": [
                 "US"
@@ -1837,64 +1838,64 @@
               "score": 120
             },
             "summary": {
-              "video_id": "3E-pgHrkpng",
-              "title": "“악재는 하나만 오지 않는다” AI 의구심이 흔든 투심…코어위브 회사채 15%가 던진 경고ㅣ권다영, 차영주 와이즈경제연구소 소장 [2시 마켓워치]",
+              "video_id": "Y9wDXyYLGeQ",
+              "title": "연말까지 미국 증시 신고가 전망…한국 증시 반등 가능성은? | 문남중 대신증권 리서치센터 수석연구위원 [글로벌 인터뷰]",
               "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=3E-pgHrkpng",
+              "source_url": "https://www.youtube.com/watch?v=Y9wDXyYLGeQ",
               "claim_status_summary": {
-                "unverified": 10,
-                "asr_uncertain": 1
+                "unverified": 11,
+                "contradicted": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "방송 중 코스피·코스닥 급락, 외국인 순매도 4조 원 초과 및 7거래일 연속 매도, 최근 약 20% 하락과 과거 위기별 낙폭·7월 29일 저점을 주장한다.",
+                  "claim_text": "S&P 500은 10월 6일 신고가를 기록했고 10월 +0.95%, 연초 이후 약 +15%, 현재 7,800~7,900이며, 연말까지 신고가와 내년 6월 이전 우호적 투자환경이 이어진다는 주장.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "급락 규모와 외국인 매도를 확인된 사실로 인용하거나 이를 근거로 지지선을 확정하기 어렵다."
+                  "investor_implication": "제시된 지수·수익률 및 상승 전망을 검증된 투자 근거로 사용하지 않는다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "한국·일본 반도체주 급락과 CRWV·마이크론·TSMC ADR의 방송 중 또는 오버나이트 하락을 주장한다.",
+                  "claim_text": "코스피는 10월 -18.8% 또는 약 -19%, 연초 이후 +40%이며, 7월 29일 5,200선에서 반등하는 과정에서 SK하이닉스가 상한가를 기록했고 미국 증시·TSMC 실적으로 다시 반등할 가능성이 높다는 주장.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "여러 시장의 하락률을 같은 시점의 동반 급락으로 제시하기 전에 종목·시간대·세션을 맞춰야 한다."
+                  "investor_implication": "과거 급락·상한가 사례와 현재 반등 가능성을 구분하고 KRX 원시세를 먼저 확인한다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "신용잔고가 약 33조~34조 원이며 과거와 현재의 잔고 변화 및 반대매매·펀드 로스컷의 매도 증폭을 주장한다.",
+                  "claim_text": "S&P 500 3분기 EPS 성장률 전망이 26.7%에서 29.5%로 상향됐고 3개 분기 연속 25% 이상·8개 분기 연속 두 자릿수 성장했으며, 금융업종 전망도 현재 약 3%로 상향됐다는 주장.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "잔고 규모만으로 강제청산의 잔여 물량이나 종료 시점을 판단할 수 없다."
+                  "investor_implication": "같은 기관·정의·기준일의 자료로 실적 상향을 확인하기 전에는 이익 성장 수치를 투자 판단에 반영하지 않는다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "코어위브 회사채 발행금리 9.8%와 거래수익률 14.8%를 국채금리 하락과 비교해 고유 신용위험 경고로 해석한다.",
+                  "claim_text": "TSMC 3분기 매출·EPS 예상 상회, 순이익 +68.7%, 6개 분기 연속 사상 최대, 영업이익률 58.7%·가이던스 58% 초과, 4분기 매출 QoQ +14%·YoY +8%, 연간 전망 상향 및 2026~2028년 설비투자 확대라는 주장.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "약 15%라는 발언을 확인된 채권수익률이나 확정적 부도 신호로 전달해서는 안 된다."
+                  "investor_implication": "마진·성장률·설비투자를 공식 IR 원문과 대조하기 전에는 반도체 수요나 한국 주가 안정의 확인된 근거로 사용하지 않는다."
                 }
               ],
               "entities": [
                 {
-                  "ticker": "^KS11",
-                  "name": "한국 증시·글로벌 시장",
+                  "ticker": "SPX",
+                  "name": "미국 증시·S&P 500",
                   "status": "unverified",
                   "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 },
                 {
-                  "ticker": "CRWV",
-                  "name": "코어위브",
+                  "ticker": "^KS11",
+                  "name": "한국 증시·코스피",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -1903,6 +1904,14 @@
                 {
                   "ticker": "TSM",
                   "name": "TSMC",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "CRWV",
+                  "name": "코어위브",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2133,74 +2142,93 @@
             }
           },
           {
-            "event_key": "IxbjbYQo4EY",
-            "content_sha256": "90b49fe08ed3c228d297e28b996f0ddc2e6f9d0003dbaaa0c94bf58f906733d4",
-            "occurred_at": "2026-10-15T11:00:38+00:00",
+            "event_key": "3E-pgHrkpng",
+            "content_sha256": "536f4ce61bf7f1a8cb47e0efdb77e90ca62a36ef6b3eb04ce77f45d43c751747",
+            "occurred_at": "2026-10-15T06:02:39+00:00",
             "relevance": {
               "tickers": [
-                "ORCL"
+                "^KS11",
+                "CRWV",
+                "TSM"
               ],
               "markets": [
                 "US"
               ],
               "themes": [],
               "match_basis": "verified_entities",
-              "matched_tickers": [],
+              "matched_tickers": [
+                "TSM"
+              ],
               "market_match": true,
-              "score": 20
+              "score": 120
             },
             "summary": {
-              "video_id": "IxbjbYQo4EY",
-              "title": "AI 사이클 끝난 건 아니지만 지금은 매수보다 생존…급락장에서 현금을 남겨야 하는 이유ㅣ명민준, 박가영, 유영화 [주린이 구조대]",
+              "video_id": "3E-pgHrkpng",
+              "title": "“악재는 하나만 오지 않는다” AI 의구심이 흔든 투심…코어위브 회사채 15%가 던진 경고ㅣ권다영, 차영주 와이즈경제연구소 소장 [2시 마켓워치]",
               "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=IxbjbYQo4EY",
+              "source_url": "https://www.youtube.com/watch?v=3E-pgHrkpng",
               "claim_status_summary": {
-                "unverified": 7,
-                "asr_uncertain": 4,
-                "partially_supported": 1
+                "unverified": 10,
+                "asr_uncertain": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "근원 CPI가 예상치를 웃돌았고 UBS가 주거비 고착 전망을 내년 5월까지로 수정했으며, 물가가 연준의 지원 여력을 제약한다는 주장.",
+                  "claim_text": "방송 중 코스피·코스닥 급락, 외국인 순매도 4조 원 초과 및 7거래일 연속 매도, 최근 약 20% 하락과 과거 위기별 낙폭·7월 29일 저점을 주장한다.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "확인되지 않은 물가 서프라이즈와 UBS 전망을 현금 확대의 확정적 근거로 제시할 수 없다."
+                  "investor_implication": "급락 규모와 외국인 매도를 확인된 사실로 인용하거나 이를 근거로 지지선을 확정하기 어렵다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "CPI 이후 이번 달 금리 인상 확률이 60%에서 20~30%대로 또는 40%에서 33%로 하락했다는 주장.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.98,
+                  "claim_text": "한국·일본 반도체주 급락과 CRWV·마이크론·TSMC ADR의 방송 중 또는 오버나이트 하락을 주장한다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "정책 방향과 확률을 확인하기 전에는 금리 전망에 근거한 매매 신호로 사용하지 않아야 한다."
+                  "investor_implication": "여러 시장의 하락률을 같은 시점의 동반 급락으로 제시하기 전에 종목·시간대·세션을 맞춰야 한다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "미국 10년물 금리가 5.3%에서 5.1%로 하락하고 일본 국채금리 하락, 달러 강세·원화 약세, 일본 증시 약 4% 하락이 나타났으며 이는 안전자산 이동이라는 주장.",
+                  "claim_text": "신용잔고가 약 33조~34조 원이며 과거와 현재의 잔고 변화 및 반대매매·펀드 로스컷의 매도 증폭을 주장한다.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "여러 시장의 위험회피가 확인됐다고 단정하지 말고 동일 시점의 원자료를 먼저 대조해야 한다."
+                  "investor_implication": "잔고 규모만으로 강제청산의 잔여 물량이나 종료 시점을 판단할 수 없다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "당일 국내 주식시장에서 외국인이 거의 4조 원을 매도했다는 주장.",
+                  "claim_text": "코어위브 회사채 발행금리 9.8%와 거래수익률 14.8%를 국채금리 하락과 비교해 고유 신용위험 경고로 해석한다.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "4조 원을 외국인 현물 순매도 확정치로 인용하거나 재진입 기준의 기준값으로 사용할 수 없다."
+                  "investor_implication": "약 15%라는 발언을 확인된 채권수익률이나 확정적 부도 신호로 전달해서는 안 된다."
                 }
               ],
               "entities": [
                 {
-                  "ticker": "ORCL",
-                  "name": "오라클",
+                  "ticker": "^KS11",
+                  "name": "한국 증시·글로벌 시장",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "CRWV",
+                  "name": "코어위브",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "TSM",
+                  "name": "TSMC",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2210,15 +2238,19 @@
             }
           },
           {
-            "event_key": "rqRUtIITFqg",
-            "content_sha256": "7260ceb72510537b09736de4b6c5e0602b4d2edacb335f8f31b05f904c7bd429",
-            "occurred_at": "2026-10-15T11:00:31+00:00",
+            "event_key": "v2N5urNCy38",
+            "content_sha256": "370c89c0d285273612cf728e8bc4b0d1bab82967a6ba65bd7dec8476b6c03557",
+            "occurred_at": "2026-10-15T22:04:13+00:00",
             "relevance": {
               "tickers": [
-                "^KS11"
+                "^KS11",
+                "000660",
+                "005930",
+                "128940"
               ],
               "markets": [
-                "US"
+                "US",
+                "KR"
               ],
               "themes": [],
               "match_basis": "verified_entities",
@@ -2227,69 +2259,84 @@
               "score": 20
             },
             "summary": {
-              "video_id": "rqRUtIITFqg",
-              "title": "국민연금이 '외국인 ATM' 소리 듣는 진짜 이유",
+              "video_id": "v2N5urNCy38",
+              "title": "10월 16일 투자자들이 꼭 알아야 하는 투자 포인트",
               "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=rqRUtIITFqg",
+              "source_url": "https://www.youtube.com/watch?v=v2N5urNCy38",
               "claim_status_summary": {
-                "partially_supported": 2,
-                "unverified": 5,
-                "asr_uncertain": 2
+                "unverified": 9,
+                "asr_uncertain": 1,
+                "partially_supported": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "국내주식 비중 초과분을 점진적으로 매도하는 리밸런싱 규칙을 1월부터 6월 말까지 유예하고, 7월 재개하면서 실행 강도를 낮췄다.",
-                  "status": "partially_supported",
-                  "confidence": 0.93,
-                  "supporting_evidence_ids": [
-                    "E4",
-                    "E11",
-                    "E12"
-                  ],
+                  "claim_text": "전일 코스피가 7% 넘게 하락하고 외국인이 3조7000억 원 넘게 순매도했지만 롯데쇼핑·신세계·현대백화점·알테오젠·파마리서치는 외국인 순매수였다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "정책 변경은 보도상 확인되지만 실제 매도 축소 규모와 성과 효과는 별도로 검증해야 한다."
+                  "investor_implication": "시장 급락 규모와 외국인의 선별 매수를 확인된 사실로 사용하지 말고 종목별 수급을 별도로 확인해야 한다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "5월 국내주식 목표 비중을 14.9%에서 20.8%로 높였으며 관련 규모는 약 110조 원이다.",
-                  "status": "partially_supported",
-                  "confidence": 0.97,
-                  "supporting_evidence_ids": [
-                    "E4",
-                    "E5",
-                    "E10",
-                    "E11"
-                  ],
+                  "claim_text": "코어위브 재무 우려가 SK하이닉스 하락 요인이었고 젠슨 황의 자금조달 비용 하락 발언 이후 코어위브 낙폭이 2%대로 줄었다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "목표 비중 변경과 실제 자금 유입을 구분해야 하며, 110조 원을 확정 매수액으로 사용하면 안 된다."
+                  "investor_implication": "AI 고객사의 자금조달 개선이나 그에 따른 SK하이닉스 반등을 확정적 투자 근거로 삼기 어렵다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "국내 적립금이 6월 말 543조 원에서 7월 말 419조 원으로 약 125조 원 감소했다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
+                  "claim_text": "미국에서 거래되는 SK하이닉스 ADR이 정규장에 0.98% 하락하고 시간외에 0.62% 상승했다는 주장.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.97,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "124조 원 또는 125조 원을 검증된 투자손실이나 현금 유출액으로 인용하지 않아야 한다."
+                  "investor_implication": "상품과 거래 세션이 확인되기 전에는 국내 SK하이닉스의 개장 방향을 판단하는 신호로 사용하기 어렵다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "국내주식 누적 투자수익이 6월 말 283조 원에서 7월 말 158조 원으로 125조 원 줄었고, 상반기 이익 대부분은 미실현 평가이익이었다.",
+                  "claim_text": "삼성전자가 전일 9.48% 하락해 21만 원에 마감했다는 주장.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "125조 원이라는 차이가 맞더라도 실제 손익이나 실현손실이 검증된 것은 아니다."
+                  "investor_implication": "낙폭과 가격대를 근거로 저가 매수 여부를 판단하기 전에 공식 일별 시세를 확인해야 한다."
                 }
               ],
               "entities": [
                 {
                   "ticker": "^KS11",
-                  "name": "코스피·외국인 투자자",
+                  "name": "코스피",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "128940",
+                  "name": "한미약품",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 }
               ]
@@ -2302,12 +2349,12 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 180,
-          "window_events": 18,
-          "transmitted_events": 18,
+          "window_events": 17,
+          "transmitted_events": 17,
           "truncated": false,
-          "oldest_occurred_at": "2026-10-14T23:19:27+00:00",
+          "oldest_occurred_at": "2026-10-15T00:00:52+00:00",
           "newest_occurred_at": "2026-10-15T18:52:58+00:00",
-          "available_events_before_context_cap": 18,
+          "available_events_before_context_cap": 17,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
@@ -3151,29 +3198,6 @@
               "simulation_only": false,
               "actionability": "research_only"
             }
-          },
-          {
-            "event_key": "stock_ai_agent:16112",
-            "content_sha256": "216cbb7b6f6e44137146fb948894b6ed3ed47ec6c9f30d64b4ee81a9fda036c7",
-            "occurred_at": "2026-10-14T23:19:27+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "16112",
-              "posted_at": "2026-10-14T23:19:27+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16112",
-              "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/14 22:59:48 KST 💵 청산 결과 정리 수량: 0.02 BTC 진입 → 청산: 82,630.00 USDT → 82,327.30 USDT 보유 시간: 52.1분 확정 순손익: 5.39 USDT • 시작 계좌 9,456.19 USDT 대비 +0.06% • 수수료 0.66 USDT · 펀딩 0.00 USDT 반영 💰 종료 후 순자...",
-              "signals": [],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
           }
         ],
         "execution_eligible": false
@@ -3191,24 +3215,24 @@
               "xvBCcCtChJU",
               "ysvA5mzUlRY",
               "quVHobnh6PM",
-              "3E-pgHrkpng",
+              "Y9wDXyYLGeQ",
               "e66Ec943kiM",
               "UMIka6hqIEc",
-              "IxbjbYQo4EY",
-              "rqRUtIITFqg"
+              "3E-pgHrkpng",
+              "v2N5urNCy38"
             ],
             "coverage": {
-              "total_unique_events": 409,
-              "window_events": 107,
+              "total_unique_events": 411,
+              "window_events": 109,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-14T05:00:51+00:00",
-              "newest_occurred_at": "2026-10-15T11:00:38+00:00",
+              "newest_occurred_at": "2026-10-15T23:02:29+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 95,
+              "omitted_events": 97,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 47
+              "omitted_before_context_selection": 49
             }
           },
           "prism": {
@@ -3230,17 +3254,16 @@
               "stock_ai_agent:16166",
               "stock_ai_agent:16115",
               "stock_ai_agent:16114",
-              "stock_ai_agent:16113",
-              "stock_ai_agent:16112"
+              "stock_ai_agent:16113"
             ],
             "coverage": {
               "total_unique_events": 180,
-              "window_events": 18,
-              "transmitted_events": 18,
+              "window_events": 17,
+              "transmitted_events": 17,
               "truncated": false,
-              "oldest_occurred_at": "2026-10-14T23:19:27+00:00",
+              "oldest_occurred_at": "2026-10-15T00:00:52+00:00",
               "newest_occurred_at": "2026-10-15T18:52:58+00:00",
-              "available_events_before_context_cap": 18,
+              "available_events_before_context_cap": 17,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,
