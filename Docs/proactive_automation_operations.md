@@ -166,9 +166,9 @@ ticks report `AWAITING_EXECUTION_CHECKPOINT` without launching work or spending
 an attempt. A successful earlier snapshot does not cover the aligned window.
 The original slot identity and cumulative retry budget stay intact; only a
 successful pre-checkpoint attempt bypasses cooldown for its first real refresh.
-Failed attempts keep their cooldown and limits. Later 00:40/02:10 slots, market
-calendar holds and KR scheduling are unchanged. During standard time the 23:10
-Work slot is before the US open; retain its pre-open limitations rather than
+Failed attempts keep their cooldown and limits. Market calendar holds remain
+unchanged. During standard time the 23:10 Work slot is before the US open;
+retain its pre-open limitations rather than
 inventing live execution readiness. Research completion and publication never
 override stale quotes or execution gates.
 
@@ -182,6 +182,17 @@ source validity remain enforced. An earlier successful snapshot does not cover
 the later pre-briefing window. Historical receipts retain their original slots.
 Long collection or rendering can still exhaust validity; keep live recheck
 requirements when that happens rather than extending timestamps.
+
+The later local US refreshes run at 01:00 and 03:00 KST before Work at 01:10
+and 03:10. The former 00:40/02:10 clocks could leave thirty-minute quotes
+expired while the US market was still open: the October 15 03:12 report used
+02:10–02:15 KST observations. The cloud clocks remain unchanged, as do the
+first US slot's New York checkpoint alignment, session/calendar checks,
+per-slot retry limits and immutable observations. A successful earlier refresh
+does not cover a later Work-aligned slot. KR and US Work prompts also require
+the actual intended briefing time and a completed producer before prepare,
+so an early app wakeup cannot freeze the previous cohort. Long-running
+producers retain ownership and all stale-execution gates remain enforced.
 
 ## Recovery decisions
 

@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = "nornen0202/TradingAgents"
 PUBLIC_BASE = "https://nornen0202.github.io/TradingAgents"
 KR_WORK_OVERLAY_CHECKPOINTS = (wall_time(10, 30), wall_time(13, 30), wall_time(14, 30))
+US_WORK_OVERLAY_CHECKPOINTS = (wall_time(1, 0), wall_time(3, 0), wall_time(22, 40))
 
 
 class LocalStorageHeadroomError(RuntimeError):
@@ -247,12 +248,13 @@ def run_due(archive, state, *, now=None, dry_run=False):
 
     now = now or datetime.now(ZoneInfo("Asia/Seoul"))
     watchdog = script("scheduled_actions_watchdog")
-    # A fast local overlay at 10:05 expires before the 10:40 Work report.
-    # Refresh ten minutes before each KR briefing, leaving time for the normal
-    # five-minute launcher tick and collection without extending input validity.
+    # Refresh before Work, leaving time for the five-minute launcher tick and
+    # collection without extending input validity. The first US cloud slot
+    # retains its separate New York execution-checkpoint alignment below.
     targets = watchdog.due_targets(
         now, market_status_resolver=automated_market_session_status,
         kr_overlay_checkpoints=KR_WORK_OVERLAY_CHECKPOINTS,
+        us_overlay_checkpoints=US_WORK_OVERLAY_CHECKPOINTS,
     )
     manifests = [m for m, _ in _iter_run_manifests_desc(archive)]
     decisions = []

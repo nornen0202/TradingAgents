@@ -688,13 +688,14 @@ def _us_intraday_overlay_due(now_kst: datetime) -> bool:
 def _latest_overlay_checkpoint(
     profile: str, now_kst: datetime, *,
     kr_checkpoints: tuple[time, ...] = (time(10, 5), time(12, 0), time(13, 20)),
+    us_checkpoints: tuple[time, ...] = (time(0, 40), time(2, 10), time(22, 40)),
 ) -> datetime | None:
     candidates: list[datetime] = []
     if profile == "kr":
         checkpoint_times = kr_checkpoints
         day_offsets = (0,)
     elif profile == "us":
-        checkpoint_times = (time(0, 40), time(2, 10), time(22, 40))
+        checkpoint_times = us_checkpoints
         day_offsets = (-1, 0)
     else:
         raise ValueError(f"Unsupported overlay checkpoint profile: {profile}")
@@ -778,6 +779,7 @@ def due_targets(
     market_status_resolver: Any | None = None,
     diagnostics: list[str] | None = None,
     kr_overlay_checkpoints: tuple[time, ...] = (time(10, 5), time(12, 0), time(13, 20)),
+    us_overlay_checkpoints: tuple[time, ...] = (time(0, 40), time(2, 10), time(22, 40)),
 ) -> list[WatchdogTarget]:
     targets: list[WatchdogTarget] = []
     kst_date = now_kst.date()
@@ -902,7 +904,7 @@ def due_targets(
             )
 
     if us_intraday_overlay_due:
-        us_checkpoint = _latest_overlay_checkpoint("us", now_kst)
+        us_checkpoint = _latest_overlay_checkpoint("us", now_kst, us_checkpoints=us_overlay_checkpoints)
         if us_checkpoint is None:
             return targets
         targets.append(
