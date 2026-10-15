@@ -1,7 +1,7 @@
 # TradingAgents KR 최신 공개 입력
 
 schema: tradingagents.ai-context/v1
-문서 생성: 2026-10-15T00:30:23.965489+00:00
+문서 생성: 2026-10-15T00:35:25.005190+00:00
 
 이 문서는 이미 공개된 자료의 축약 전사이며 새 분석·주문 승인이 아닙니다. 원분석 거래일(완료 일봉), 분석 완료, 장중 시세, 계좌 관측, 문서 생성은 서로 다른 시각입니다. 휴장·주말의 마지막 완료 거래일을 장애로 단정하지 마세요. null은 미확인이지 0이 아닙니다. 빌드 당시 실행 상태는 현재 상태가 아니며 row_valid_until과 현재 세션을 다시 확인해야 합니다. 현재 문서를 읽지 못하면 과거 대화의 계좌·한도를 최신 사실로 재사용하지 마세요.
 
@@ -211,7 +211,7 @@ schema: tradingagents.ai-context/v1
 ```
 
 ```json
-{"ticker":"010140.KS","display_name":"삼성중공업","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":18330.0,"market_data_asof":"2026-10-15T09:04:00+09:00","session_vwap":18209.098133725638,"relative_volume":1.6973914806775996,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"18,410 돌파 후 완성된 5분봉 두 개의 재지지, 최신 당일 거래량가중평균가격 상회, 동일 시간대 거래량과 매수 체결 개선을 함께 확인한다. 이는 매수 승인이 아닌 재평가 조건이다. / 18,950 및 19,197.70~19,347.69 저항 회복을 관찰하고 19,570과 최신 50일 평균 유지로 확인 범위를 확장한다.","risk_condition_ko":"18,950 이상 도달, 2개 봉 확인 후 리스크 축소","decision_state_ko":"-","data_status_ko":"분석 당시 관측 시세 · 실행 재확인 필요","reference_strategy":{"strategy_code":null,"strategy_ko":null,"decision_state_ko":null,"market_data_asof":null},"quality_at_build":{"execution_ready":false,"current_execution_promotion":null,"generated_in_current_run":false,"row_valid_until":"2026-10-15T09:34:00+09:00","expired_at_build":false,"provider_limitations":[],"provider_blockers":null}}
+{"ticker":"010140.KS","display_name":"삼성중공업","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":18330.0,"market_data_asof":"2026-10-15T09:04:00+09:00","session_vwap":18209.098133725638,"relative_volume":1.6973914806775996,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"18,410 돌파 후 완성된 5분봉 두 개의 재지지, 최신 당일 거래량가중평균가격 상회, 동일 시간대 거래량과 매수 체결 개선을 함께 확인한다. 이는 매수 승인이 아닌 재평가 조건이다. / 18,950 및 19,197.70~19,347.69 저항 회복을 관찰하고 19,570과 최신 50일 평균 유지로 확인 범위를 확장한다.","risk_condition_ko":"18,950 이상 도달, 2개 봉 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-15T09:04:00+09:00"},"quality_at_build":{"execution_ready":false,"current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-15T09:34:00+09:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json

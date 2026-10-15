@@ -1,11 +1,11 @@
 {
   "schema": "tradingagents.mobile-strategy/v1",
-  "generated_at": "2026-10-15T09:30:16.792930+09:00",
+  "generated_at": "2026-10-15T09:35:18.636074+09:00",
   "privacy": "PLAINTEXT_ACTION_DATA_NO_RAW_ACCOUNT_IDENTIFIERS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:21ce7ef5b6d2df8c4896de8ae524f860",
+      "event_id": "kr:e9865d3145f308e1028312618c27ed1d",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261015T090358_local-scheduler-kr-full",
@@ -2084,6 +2084,12 @@
           "universe_role": "HOLDING"
         },
         {
+          "reference_strategy": {
+            "strategy_code": "DATA_CHECK",
+            "strategy_ko": "데이터 확인 전 대기",
+            "decision_state_ko": "-",
+            "market_data_asof": "2026-10-15T09:04:00+09:00"
+          },
           "thesis": {
             "stance": "REDUCE",
             "rating": "UNDERWEIGHT",
@@ -2324,8 +2330,13 @@
             "valid_until": "2026-10-15T09:34:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
-            "required_rechecks": [],
-            "blockers": []
+            "required_rechecks": [
+              "실시간 시세와 주문 가능 상태 재확인"
+            ],
+            "blockers": [
+              "work_packet_row_expired"
+            ],
+            "source_readiness": "NEEDS_LIVE_RECHECK"
           },
           "portfolio_role": "holding",
           "ticker": "010140.KS",
@@ -2342,8 +2353,8 @@
           "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
           "execution_condition_ko": "18,410 돌파 후 완성된 5분봉 두 개의 재지지, 최신 당일 거래량가중평균가격 상회, 동일 시간대 거래량과 매수 체결 개선을 함께 확인한다. 이는 매수 승인이 아닌 재평가 조건이다. / 18,950 및 19,197.70~19,347.69 저항 회복을 관찰하고 19,570과 최신 50일 평균 유지로 확인 범위를 확장한다.",
           "risk_condition_ko": "18,950 이상 도달, 2개 봉 확인 후 리스크 축소",
-          "data_status_ko": "분석 당시 관측 시세 · 실행 재확인 필요",
-          "decision_state_ko": "-",
+          "data_status_ko": "시세 유효기간 만료",
+          "decision_state_ko": "데이터 확인 전 대기",
           "execution_timing_ko": "-",
           "display_priority": 6,
           "table_priority": 6,
@@ -2352,10 +2363,14 @@
           "quality": {
             "execution_ready": false,
             "conditional_strategy_ready": false,
+            "current_execution_promotion": "BLOCKED",
             "generated_in_current_run": false,
             "provider_limitations": [],
+            "provider_blockers": [
+              "work_packet_row_expired"
+            ],
             "row_valid_until": "2026-10-15T09:34:00+09:00",
-            "expired_at_build": false,
+            "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
           },
@@ -20163,7 +20178,7 @@
     },
     "us": {
       "market": "US",
-      "event_id": "us:770638ee1e66153288d11503db8c5208",
+      "event_id": "us:547782b3de99dd26ef15e46927f28bbd",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261015T021357_local-scheduler-us-overlay_only",
