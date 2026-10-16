@@ -73,6 +73,7 @@ def wired(tmp_path, monkeypatch):
     runtime = SimpleNamespace(prepare=lambda *a, **kw: prepared.append(kw) or {"result": "NEW", "event_id": "new"})
 
     def execute(config, **kw):
+        print("Broker collection progress")
         configs.append(config)
         return {"run_id": "refreshed", "status": "success"}
 
@@ -89,13 +90,15 @@ def wired(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("surface", ["kr", "us"])
-def test_refresh_before_prepare_preserves_models_and_does_not_rerun_research(wired, tmp_path, surface):
+def test_refresh_before_prepare_preserves_models_and_does_not_rerun_research(wired, tmp_path, surface, capsys):
     runtime, prepared, configs = wired
     result = pre.prepare_market_report(runtime, surface, producer_state_dir=tmp_path)
     assert result["result"] == "NEW"
     assert result["pre_report_refresh"]["status"] == "REFRESHED"
     assert result["pre_report_refresh"]["event_created"] is True
     assert len(prepared) == len(configs) == 1
+    assert capsys.readouterr().out == ""
+    assert "Broker collection progress" in (tmp_path / "pre-report" / f"{surface}-worker.log").read_text()
     config = configs[0]
     assert config.run.run_mode == "overlay_only"
     assert config.llm.deep_model == config.llm.judge_model == "gpt-6.1-sol"

@@ -6,7 +6,7 @@ reruns company research. Publication timestamps cannot renew input validity.
 from __future__ import annotations
 
 from dataclasses import replace
-from contextlib import contextmanager
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -139,7 +139,12 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
                     execution_refresh_checkpoints_kst=(), execution_refresh_checkpoints_local=(checkpoint,),
                     execution_session_gate_enabled=True, execution_selective_rerun_enabled=False),
             )
-            manifest = execute_scheduled_run(config, run_label=f"pre-report-{surface}-overlay", skip_site_build=True)
+            # Preserve the Work CLI's single JSON response. Producer progress
+            # belongs in local maintenance logs, not the consumer packet/output.
+            receipt_path.parent.mkdir(parents=True, exist_ok=True)
+            with (receipt_path.parent / f"{surface}-worker.log").open("a", encoding="utf-8") as log:
+                with redirect_stdout(log), redirect_stderr(log):
+                    manifest = execute_scheduled_run(config, run_label=f"pre-report-{surface}-overlay", skip_site_build=True)
             now = datetime.now(timezone.utc)
             packet = build_surface_packet(surface, archive_dir=archive,
                 youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, now=now)
