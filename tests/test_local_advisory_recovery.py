@@ -165,6 +165,25 @@ def test_successful_canonical_collection_covers_local_skipped_deploy(tmp_path, m
     assert not client.dispatched
 
 
+@pytest.mark.parametrize("surface", ["youtube", "prism"])
+@pytest.mark.parametrize("end_offset,expected", [(".117583", "ADVISORY_COVERED_OR_HELD"),
+                                                 (".999999", "ADVISORY_COVERED_OR_HELD"),
+                                                 ("+1", "ADVISORY_DIAGNOSTIC_REQUIRED")])
+def test_canonical_completion_matches_only_the_github_end_second(
+        tmp_path, monkeypatch, watchdog, surface, end_offset, expected):
+    monkeypatch.delenv(recovery.SPECS[surface][4], raising=False)
+    path = write_manifest(tmp_path / "archive", surface)
+    value = json.loads(path.read_text())
+    end = "2026-10-14T08:10:01+09:00" if end_offset == "+1" else f"2026-10-14T08:10:00{end_offset}+09:00"
+    value["finished_at"] = end
+    path.write_text(json.dumps(value), encoding="utf-8")
+    workflow = recovery.SPECS[surface][0]
+    client = Client({workflow: [run_record(surface)]}, {10: [build(surface), {"name": "deploy", "conclusion": "skipped"}]})
+    targets = [target for target in watchdog.due_targets(NOW) if target.workflow_file == workflow]
+    assert recover(tmp_path, watchdog, client, targets=targets)[0]["status"] == expected
+    assert not client.dispatched
+
+
 @pytest.mark.parametrize("canonical_exists,stamp,conclusion", [(False, "success", "success"), (True, "failure", "failure"),
                                                                (True, "skipped", "success")])
 def test_collection_success_with_missing_canonical_or_publication_requires_diagnosis_not_reanalysis(

@@ -84,6 +84,7 @@ jobs:
           WORKFLOW_FILE: daily-youtube-reports.yml
           EVENT_SCHEDULE: ${{ github.event.schedule }}
           MANUAL_DEFAULT_PROFILE: ""
+          TRADINGAGENTS_AUTOMATION_BACKEND: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND }}
           SCHEDULE_GATE_TARGETS_JSON: >-
             {
               "20 20 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "youtube_coverage"], "blockers": [{"name": "daily-codex-us-pages", "workflow_file": "daily-codex-analysis.yml", "window_start": "17:45", "target_jobs": ["analyze_us", "build_pages"]}, {"name": "intraday-overlay-us-publish", "workflow_file": "intraday-overlay-refresh.yml", "window_start": "22:30", "target_jobs": ["overlay_refresh_us", "publish_overlay_site", "deploy_overlay"]}]},
@@ -185,6 +186,7 @@ jobs:
           EVENT_SCHEDULE: ${{ github.event.schedule }}
           MANUAL_DEFAULT_PROFILE: ""
           SCHEDULE_GATE_SKIP_BLOCKERS: "1"
+          TRADINGAGENTS_AUTOMATION_BACKEND: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND }}
           SCHEDULE_GATE_TARGETS_JSON: >-
             {
               "20 20 * * *": {"profile": "youtube", "window_start": "05:00", "target_jobs": ["build_youtube_pages", "youtube_coverage"]},
