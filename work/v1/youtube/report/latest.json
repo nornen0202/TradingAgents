@@ -1,10 +1,10 @@
 {
   "schema": "tradingagents.work-report/v1",
   "surface": "youtube",
-  "event_id": "youtube:b038961eb14573d92aea180d8fabf646",
-  "source_sha256": "adc1982116ea0522856c64814a6737fbb01e4e8cf2dae994c1dd72fb4d7ba2ee",
+  "event_id": "youtube:c64dee593acdf26517d11f9a54448fc3",
+  "source_sha256": "76c5753c46bb3a0b2f302f18d796afc6e6058b6391d480eba0951f722aa4327e",
   "prompt_contract_version": "youtube-work-v5",
-  "workflow_contract_sha256": "6b9df2c8a1b360d224f0476d3b90b501e82aeae61312d21d886d1217b50382ec",
+  "workflow_contract_sha256": "4982d0db0e5a97f3b0f392bdff489a6940be0d2d88e7ea94533edbdb009b4556",
   "policy": {
     "visibility": "investor_safe_no_credentials",
     "external_evidence_profile": "balanced_external",
@@ -17,72 +17,32 @@
     "external_evidence_may_bypass_execution_gate": false,
     "thesis_is_independent_from_execution_readiness": true
   },
-  "report_markdown": "# YouTube 검증 델타 · 10월 16일 09:35 KST\n\n소스 정상 · 연구 전용 · 부분 범위\n\n- **반등 확정 근거 없음.** 신규 영상 1건의 외국인 수급·야간선물 대조를 후속 KR 연구 우선순위로 상향한다. 미검증 가중치 LOW_LABELED이며 상승 확신·비중은 변경하지 않는다.\n- **현재 주문 판단 보류.** 시장·계좌·위험 게이트와 실시간 가격을 별도로 확인해야 한다.\n- **범위 제한:** 신규 1·수정 0·중복 제외 59건. 72시간 범위 108건 중 60건 전송, 48건 생략. 전수 검증이 아니다.\n\n생산자 youtube_20261016_084558는 08:55:59 KST 성공. 작성 시각 2026-10-16T09:34:59.423705+09:00 기준 생산자 36시간 및 범위 72시간 한도 안이며 생산자·범위·신규 이벤트 시각은 파싱 가능하고 미래·역전 없음. 신규 영상은 08:21:39 KST 게시. 가장 이른 신선도 경계는 오늘 20:11:49 KST다. 개별 시장 시세·유효기간은 제공되지 않아 현재 실행 근거로 사용할 수 없다.\n\n## 신규 영상 검증\n\n[경제사냥꾼 — 10월 16일 오늘 코스피 어떻게 흘러갈까?](https://www.youtube.com/watch?v=ZdhaDE9YxfQ)\n\n이벤트 `ZdhaDE9YxfQ` · 콘텐츠 `e9b6636b481e816be9ef9d86cd5ece2a83cba8be787679e82da19b2a4d7f6297`. STANDARD 소스이며 USER_PRIMARY/HIGH에 해당하지 않는다. 패킷 상태 집계는 미검증 7·ASR 불확실 3이다. 실제 전달된 상세 주장은 C1~C6만 있으며 나머지 주장을 복원하지 않는다. claim confidence 수치는 사실 검증 완료나 투자 확률을 뜻하지 않는다.\n\n| 주장 | 검증 결과와 처리 |\n|---|---|\n| C1 전일 7% 초과 하락·오늘 반등 전망 | 미검증. 연결된 E1/E2는 Alcoa 기사로 코스피 직접 근거가 아니다. 전망을 확정 사실로 사용하지 않는다. |\n| C2 야간선물 3.9% 초과 상승 마감 | 미검증. 상품·계약월·기준가격·거래일 확인 필요. |\n| C3 ±1.5%·최근 10일·상승 약 60% 통계 | ASR 불확실. 표본·기간·정의가 없어 당일 상승 확률로 사용하지 않는다. |\n| C4 외국인 8일·누적 18조·전일 3.7조 초과 순매도 | 미검증. 확정치·장중 추정치를 분리하고 KRX 일별 합산 필요. |\n| C5 공포지수 50 초과 | 미검증. E4/E5는 6월 자료로 10월 VKOSPI 수치를 입증하지 않는다. |\n| C6 하이닉스 ADR 장전 -7%·종가 -0.98% | ASR 불확실. 상품·티커·거래소 식별 전 국내 주가 선행 신호에서 제외. |\n\n[KRX 공식 파생상품 통계](https://data.krx.co.kr/contents/MDC/EASY/main/MDCEASY012.jsp)에 접근했지만 날짜별 수치가 표시되지 않아 위 수치의 공식 검증은 미완료다. KRX 안내상 자체 야간거래 조회는 종료일(T+1) 기준이다. 따라서 해당 세션은 10월 16일 기준으로 다시 조회해야 한다. [KRX 데이터 포털](https://data.krx.co.kr/contents/MDC/MAIN/main/index.cmd?vsView=Y)에서도 이번 조회로 확정 수급·종가 자료를 확보하지 못했다. 검색에 나타난 2차 기사 수치를 공식 검증값으로 대체하지 않았다.\n\n## KR·US 영향과 다음 검증\n\n`^KS11`은 내용상 KR 코스피 관련이나 패킷 relevance.markets는 US로 기재되어 있다. 이 불일치를 보존해 표시하고 US 자산 신호로 확대하지 않는다. 종목별 신규 근거가 없으므로 SK하이닉스 등 개별 종목에 전략을 새로 만들지 않는다.\n\nbalanced_external 반영: `ZdhaDE9YxfQ`를 LOW_LABELED로 묶어 **KR 수급·야간선물 공식 확인의 연구 순위만 상향(UPGRADE_RESEARCH)** 한다. 종목 투자순위·thesis confidence·위험 한도 내 비중에는 변경 근거가 부족하다. 미검증 주장을 반복 신호로 중복 가산하지 않으며 기존 시장·계좌·위험 실행 게이트를 유지한다.\n\n다음 과제는 KRX 10월 15일 확정 종가와 외국인 순매매, 10월 16일 종료 야간선물 계약·기준가, 전일 VKOSPI, ADR 상품 실재·식별이다. 자료가 없거나 오래되면 실행 판단을 계속 보류한다. 기존 59건은 이번에 재분석·재검증하지 않았다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:b038961eb14573d92aea180d8fabf646\",\"status\":\"PARTIAL\",\"window_events\":108,\"transmitted_events\":60,\"truncated\":true,\"new_events\":1,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}\n\n로컬 보고서 보관 및 ACK는 외부 발송 증거가 아니다. Telegram·Pages 전달은 외부 영수증 확인 대기다.",
+  "report_markdown": "# YouTube 검증 델타 · 2026-10-17 07:28 KST\n\n**추가 전략 변화 없음 — NO_ACTIONABLE_DELTA**\n\n- 신규 0건·수정 0건. 기존 60건은 재분석하지 않았다.\n- 소스 정상(OK). 마지막 성공 수집: 2026-10-16 08:55:59 KST. 확인 시각: 2026-10-17 07:28:04 KST.\n- 전송 범위는 부분이다. 72시간 창 72건 중 60건 전송·12건 생략으로 전수 검증을 의미하지 않는다.\n\n| 확인 항목 | 결과 |\n|---|---|\n| 수집기 경과 | 22.535시간 / 허용 36시간 |\n| 범위 최장 경과 | 66.708시간 / 허용 72시간 |\n| 범위 시작·끝 | 10월 14일 12:45:35 ~ 10월 16일 08:21:39 KST |\n| 시각 검증 | 수집·범위 및 전송 60건 발생/게시 시각 파싱, 순서·미래 시각 검증 통과 |\n| 중복 제외 | 60건; 새 주장 공식 검증 대상 없음 |\n\n준비 패킷에 기존 이벤트 키 60개가 다시 포함됐으나, delta의 신규·수정 수는 모두 0이다. 재전송을 새 근거로 세지 않으며 과거 주장이나 검증 결과를 이번 실행에서 재확인했다고 간주하지 않는다.\n\n**KR·US 영향:** balanced_external의 신규 기여가 없어 종목 순위, thesis confidence, 기존 위험 한도 내 비중, 연구 우선순위를 추가로 변경하지 않는다. 기존 USER_PRIMARY/HIGH 가중치를 중복 가산하지 않는다. 허용 결과는 NO_ACTIONABLE_DELTA이며 실행 상태는 RESEARCH_ONLY다. 시장·계좌·위험 게이트와 최신 가격 재확인 요구를 유지한다.\n\n**다음 확인:** 새 성공 수집과 새 video_id + content_sha256 또는 수정 이벤트를 기다린다. 생략 12건은 검증 완료로 취급하지 않는다. 현재 패킷의 첫 신선도 경계는 2026-10-17 12:45:35 KST이며 이후에는 새 소스를 확인해야 한다. 오래된 매수·매도 표현, 미검증 숫자, ASR 오류를 현재 주문으로 승격하지 않는다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:c64dee593acdf26517d11f9a54448fc3\",\"status\":\"PARTIAL\",\"window_events\":72,\"transmitted_events\":60,\"truncated\":true,\"new_events\":0,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}\n\n외부 전달은 확인되지 않았다. 로컬 발행·ACK는 Telegram 또는 Pages 전달 완료 증거가 아니다.",
   "structured_report": {
     "binding": {
       "surface": "youtube",
-      "event_id": "youtube:b038961eb14573d92aea180d8fabf646",
-      "source_sha256": "adc1982116ea0522856c64814a6737fbb01e4e8cf2dae994c1dd72fb4d7ba2ee"
+      "event_id": "youtube:c64dee593acdf26517d11f9a54448fc3",
+      "source_sha256": "76c5753c46bb3a0b2f302f18d796afc6e6058b6391d480eba0951f722aa4327e"
     },
-    "title": "YouTube 검증 델타 2026-10-16 09:35 KST",
-    "generated_at": "2026-10-16T09:34:59.423705+09:00",
+    "title": "YouTube 검증 델타 2026-10-17 07:28 KST",
+    "generated_at": "2026-10-17T07:28:04.912795+09:00",
     "as_of": "2026-10-16T08:55:59.857690+09:00",
     "source_health": "OK",
-    "report_mode": "RESEARCH_ONLY",
+    "report_mode": "NO_ACTIONABLE_DELTA",
     "summary": [
-      "신규 1건·수정 0건, 중복 59건 제외. 소스 정상, 실행은 연구 전용이다.",
-      "코스피 반등 전망은 미검증. 수급·야간선물 공식 대조를 연구 우선순위로 상향한다.",
-      "108건 중 60건 전송·48건 생략으로 72시간 전수 검증이 아니다."
+      "NO_ACTIONABLE_DELTA: 신규 0건·수정 0건, 기존 60건 중복 분석 제외.",
+      "소스 정상: 마지막 성공 수집 10월 16일 08:55 KST. 현재 주문 근거로 사용할 수 없다.",
+      "72시간 범위 72건 중 60건 전송·12건 생략으로 부분 범위다."
     ],
-    "top_actions": [
-      {
-        "ticker": "^KS11",
-        "action": "UPGRADE_RESEARCH",
-        "readiness": "RESEARCH_ONLY",
-        "rationale": "코스피 외국인 확정 수급·야간선물 상품 및 거래일 검증을 후속 KR 연구 우선순위로 상향; 반등 방향·thesis confidence·비중 변경은 보류"
-      }
-    ],
-    "strategies": [
-      {
-        "ticker": "^KS11",
-        "research_rank": 1,
-        "action": "UPGRADE_RESEARCH",
-        "research_impact": "코스피 외국인 확정 수급·야간선물 상품 및 거래일 검증을 후속 KR 연구 우선순위로 상향; 반등 방향·thesis confidence·비중 변경은 보류",
-        "confidence_effect": "미검증 및 ASR 불확실 주장으로 상승 thesis confidence 상향 없음",
-        "position_sizing_effect": "기존 위험 한도 유지; 비중 변경 없음",
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "REQUIRES_PRIMARY_VERIFICATION",
-          "blockers": [
-            "YouTube 패킷 실행 불가",
-            "시장·계좌·위험 게이트 미검증",
-            "핵심 수치 공식 검증 미완료"
-          ],
-          "required_rechecks": [
-            "KRX 전일 종가·외국인 확정 순매매",
-            "2026-10-16 종료 야간선물 상품·수익률 기준",
-            "최신 시장 패킷·계좌·위험 한도"
-          ]
-        },
-        "source_contributions": [
-          {
-            "event_key": "ZdhaDE9YxfQ",
-            "content_sha256": "e9b6636b481e816be9ef9d86cd5ece2a83cba8be787679e82da19b2a4d7f6297",
-            "affected_field": "research_priority",
-            "evidence_weight": "LOW_LABELED",
-            "rationale": "코스피 외국인 확정 수급·야간선물 상품 및 거래일 검증을 후속 KR 연구 우선순위로 상향; 반등 방향·thesis confidence·비중 변경은 보류",
-            "execution_gate_override": false
-          }
-        ]
-      }
-    ],
+    "top_actions": [],
+    "strategies": [],
     "coverage_receipt": {
-      "event_id": "youtube:b038961eb14573d92aea180d8fabf646",
+      "event_id": "youtube:c64dee593acdf26517d11f9a54448fc3",
       "status": "PARTIAL",
-      "window_events": 108,
+      "window_events": 72,
       "transmitted_events": 60,
       "truncated": true,
-      "new_events": 1,
+      "new_events": 0,
       "revised_events": 0
     },
     "model_receipt": {
@@ -107,35 +67,80 @@
         "stale_after_hours": 36
       },
       "coverage": {
-        "total_unique_events": 412,
-        "window_events": 108,
+        "total_unique_events": 379,
+        "window_events": 72,
         "transmitted_events": 60,
         "truncated": true,
-        "oldest_occurred_at": "2026-10-13T11:11:49+00:00",
+        "oldest_occurred_at": "2026-10-14T03:45:35+00:00",
         "newest_occurred_at": "2026-10-15T23:21:39+00:00"
       },
       "delta": {
-        "new_events": 1,
+        "new_events": 0,
         "revised_events": 0,
-        "unchanged_events": 59,
+        "unchanged_events": 60,
         "delivered_event_keys": [
-          "ZdhaDE9YxfQ"
+          "PrEHp2DoRVU",
+          "idn71TczNok",
+          "ZdhaDE9YxfQ",
+          "Y9wDXyYLGeQ",
+          "v2N5urNCy38",
+          "OdH29V5o4do",
+          "d4sOSnhQE0s",
+          "anzUtqJai9E",
+          "IxbjbYQo4EY",
+          "rqRUtIITFqg",
+          "mgup71sy8Gs",
+          "h04X6O4_fhQ",
+          "W3GNRynkE7w",
+          "AUug7VB1_rQ",
+          "Fqd7VyoFqxM",
+          "-xghzjRtroI",
+          "V4mCCBmoCdc",
+          "tH_TYVwAmic",
+          "9NIk_TZKuS0",
+          "x0o1rvz9gTI",
+          "3E-pgHrkpng",
+          "0C4J2SPhsDA",
+          "05nQVoi86x0",
+          "ysvA5mzUlRY",
+          "XzQNRYmLIts",
+          "OOhtu0gFXfE",
+          "1CP0dFMYunw",
+          "OtjY9__0jTM",
+          "p9wp0oGdPJ0",
+          "yArnP5IVtj4",
+          "pCOLlkEKj_4",
+          "E58_gcxkhq8",
+          "GFc72FChxdQ",
+          "RvIxnUqv-DU",
+          "epd420GTwe8",
+          "quVHobnh6PM",
+          "9XDu4_bPwdA",
+          "e66Ec943kiM",
+          "hQs7h5bNy-Y",
+          "j92xugSdcQo",
+          "U6SoT3GAIMk",
+          "UMIka6hqIEc",
+          "Y1vFnPjlTlM",
+          "73d2_Ubt7Cg",
+          "HYH2_mXSgnc",
+          "5OMTQD4L_sU",
+          "HMUYD3fGTBE",
+          "bdc6CC7pdXw",
+          "4_kIgua4ZA0",
+          "y6GEyRfUHyQ",
+          "0oR5qDA6zJM",
+          "OvrJZQEFnuE",
+          "W_MGWBS0nZQ",
+          "x7QERWYw9KA",
+          "kHN-0G2MBxw",
+          "EuncMmX6pKg",
+          "0htt1I_btRQ",
+          "xvBCcCtChJU",
+          "41lO-d6V0Eg",
+          "4TKakIsMqcI"
         ]
       },
-      "events": [
-        {
-          "event_key": "ZdhaDE9YxfQ",
-          "content_sha256": "e9b6636b481e816be9ef9d86cd5ece2a83cba8be787679e82da19b2a4d7f6297",
-          "occurred_at": "2026-10-15T23:21:39+00:00",
-          "published_at": "2026-10-15T23:21:39+00:00",
-          "claim_status_summary": {
-            "unverified": 7,
-            "asr_uncertain": 3
-          },
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD"
-        }
-      ],
       "evidence_policy": {
         "profile": "balanced_external",
         "material_thesis_effects": [
@@ -159,29 +164,22 @@
         "may_bypass_market_or_portfolio_execution_gate": false
       },
       "execution_eligible": false,
-      "freshness_checked_at": "2026-10-16T09:34:59.423705+09:00",
-      "earliest_freshness_boundary": "2026-10-16T11:11:49+00:00",
-      "official_verification": [
-        {
-          "event_key": "ZdhaDE9YxfQ",
-          "claim_ids": [
-            "C1",
-            "C2",
-            "C3",
-            "C4",
-            "C5",
-            "C6"
-          ],
-          "status": "REQUIRES_PRIMARY_VERIFICATION",
-          "source_url": "https://data.krx.co.kr/contents/MDC/EASY/main/MDCEASY012.jsp",
-          "scope": "공식 페이지 접근 성공; 해당 날짜 수치 미표시. 야간거래는 종료일 T+1 기준임을 확인. 개별 주장 수치는 검증하지 못함"
-        }
-      ],
+      "freshness_checked_at": "2026-10-17T07:28:04.912795+09:00",
+      "earliest_freshness_boundary": "2026-10-17T03:45:35+00:00",
+      "validated_event_clock_count": 60,
+      "new_or_revised_events": [],
+      "no_relevant_evidence_reason": "신규·수정 이벤트가 없어 기존 60건의 주장 및 HIGH 가중치를 재반영하지 않음",
+      "incremental_effects": {
+        "ranking": "NONE",
+        "confidence": "NONE",
+        "position_size_within_existing_risk_limits": "NONE",
+        "research_priority": "NONE"
+      },
       "external_delivery_verified": false
     },
-    "next_checkpoint": "KRX 10월 15일 확정 종가·외국인 수급, 10월 16일 종료 야간선물, VKOSPI 및 ADR 상품 식별 후 재평가. 소스는 20:11:49 KST 이전 재확인"
+    "next_checkpoint": "새 성공 수집 및 신규·수정 키 확인. 현재 패킷 첫 신선도 경계 2026-10-17T03:45:35+00:00"
   },
-  "report_id": "youtube:b392278da280c8edf04ed2ab291cb6e7",
-  "report_sha256": "b392278da280c8edf04ed2ab291cb6e763b6b73b9798ecb61065e9c1b01c81d2",
-  "published_at": "2026-10-16T09:34:59.639595+09:00"
+  "report_id": "youtube:cde35b25b71a97451201a9331d9d9157",
+  "report_sha256": "cde35b25b71a97451201a9331d9d9157e2163bd65866e159d3bbd122026a9135",
+  "published_at": "2026-10-17T07:28:16.304103+09:00"
 }

@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:01a5933220625c7c08c967f4a29204ca",
+  "event_id": "youtube:8522c822d5a94d1453f0935ec54eb08b",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
-  "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
-  "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
-  "workflow_contract_sha256": "6b9df2c8a1b360d224f0476d3b90b501e82aeae61312d21d886d1217b50382ec",
-  "source_sha256": "88cbe6d3ab51ddd925d2dae036b3079efc3456581b6793a34a5a83d9749b1a72",
+  "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
+  "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
+  "workflow_contract_sha256": "4982d0db0e5a97f3b0f392bdff489a6940be0d2d88e7ea94533edbdb009b4556",
+  "source_sha256": "87b808263116d9bf3bd06061177a278dfd0036606fc4e445c9ecb1ec34da4731",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -43,11 +43,11 @@
       "may_bypass_market_or_portfolio_execution_gate": false
     },
     "coverage": {
-      "total_unique_events": 412,
-      "window_events": 106,
+      "total_unique_events": 379,
+      "window_events": 72,
       "transmitted_events": 24,
       "truncated": true,
-      "oldest_occurred_at": "2026-10-13T11:11:49+00:00",
+      "oldest_occurred_at": "2026-10-14T03:45:35+00:00",
       "newest_occurred_at": "2026-10-15T23:21:39+00:00",
       "omitted_due_to_packet_budget": 36
     },
@@ -425,180 +425,6 @@
               "publisher": "Investor's Business Daily",
               "published_at": "2026-10-14T22:59:36+00:00",
               "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "_LOD9GYd1Qk",
-        "content_sha256": "80c0213c79b317e9e0a5164d99224dc16aeea19087b38ffe4c184f26bd1972e4",
-        "occurred_at": "2026-10-13T11:11:49+00:00",
-        "relevance": {
-          "tickers": [
-            "TMUS",
-            "T",
-            "VZ",
-            "TSLA",
-            "PLTR"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "verified_entities"
-        },
-        "strategy_source_tier": "USER_PRIMARY",
-        "strategy_evidence_weight": "HIGH",
-        "summary": {
-          "video_id": "_LOD9GYd1Qk",
-          "title": "스페이스X의 반격 시작? 머스크의 호언장담 현실 될까",
-          "channel": "소수몽키",
-          "source_url": "https://www.youtube.com/watch?v=_LOD9GYd1Qk",
-          "published_at": "2026-10-13T11:11:49+00:00",
-          "status": "unverified",
-          "strategy_source_tier": "USER_PRIMARY",
-          "strategy_evidence_weight": "HIGH",
-          "strategy_validation_policy": "USER_ACCEPTED",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean (Original)",
-            "model_or_format": "json3",
-            "chars": 8936,
-            "segments": 467,
-            "duration_seconds": 968,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 11
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "SpaceX가 2026년 6월 상장했고 상장 후 약 +50%, 이후 약 -2%, 최근 +10%대 수익률을 기록했다는 주장이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "거래 자산과 수익률 기준을 확인하기 전에는 영상의 가격 흐름을 투자 판단에 적용할 수 없다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "새 주파수 확보가 미국 전역의 실내·지하 커버리지 문제를 해결할 마지막 퍼즐이며, 독자 제4 이동통신사 서비스 목표가 2027년 말이라는 주장이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "서비스 일정과 기술 성능이 확인되기 전에는 전국 단독 서비스나 기존 통신사 대체를 실현된 사업으로 평가할 수 없다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "Starlink가 SpaceX 매출의 절반 이상을 차지하며 가입자 약 1,200만 명과 월평균 66달러를 곱한 분기 매출이 실제 실적과 거의 일치하고, 여러 고객군으로 수요가 확대된다는 주장이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "단순 곱셈 결과를 공시 매출이나 현금흐름으로 간주해 기업가치를 산정할 수 없다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "통신 현금흐름이 로켓 투자와 발사비 절감을 거쳐 AI 컴퓨팅 임대·데이터센터·우주 데이터센터로 연결되는 사업 시너지가 있다는 주장이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "장기 시너지 구상을 현재의 연결 매출·이익이나 확정 투자수익으로 반영할 근거가 없다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "머스크가 2026년 8월경 Starlink의 세계 인터넷 점유율 50%와 유일한 대안이라는 전망을 제시했고, 영상 해당 주에는 SpaceX 가치가 지구 경제의 몇 배~수십 배가 될 수 있다고 발언했다는 주장이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "50% 점유율이나 극단적 가치 전망을 목표가·시장 규모·기대수익률의 검증된 가정으로 사용할 수 없다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "T-Mobile·AT&T·Verizon이 2025년 9월부터 하락 전환했고 Starlink 발표마다 급락하며, 경쟁 우려가 배당 투자에도 영향을 준다는 해석이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "관측 가격만으로 Starlink가 하락 원인이라고 단정하거나 배당 지속성이 훼손됐다고 판단할 수 없다."
-            }
-          ],
-          "entities": [
-            {
-              "ticker": "TMUS",
-              "name": "T모바일",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "T",
-              "name": "AT&T",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "VZ",
-              "name": "버라이즌",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "TSLA",
-              "name": "테슬라",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "PLTR",
-              "name": "팔란티어",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            }
-          ],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "SpaceX Stock Has Climbed About 50% Through 6 Insider Share Unlocks. The Biggest Is Still Ahead.",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/spacex-stock-climbed-50-6-233901246.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-13T23:39:01+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "S&P 500 Ends Flat, While Nasdaq Drops As Memory Chipmakers Sell Off — BAC, GME, SPCX, ARM, QCOM In Focus",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/p-500-ends-flat-while-233715763.html",
-              "publisher": "Stocktwits",
-              "published_at": "2026-10-13T23:37:15+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C2",
-              "title": "Bank stocks rise on JPMorgan, Goldman earnings as chip stocks fall: AlphaCheck",
-              "source_url": "https://finance.yahoo.com/markets/article/bank-stocks-rise-on-jpmorgan-goldman-earnings-as-chip-stocks-fall-alphacheck-135541160.html",
-              "publisher": "Yahoo Finance",
-              "published_at": "2026-10-13T13:55:41+00:00",
-              "source_tier": "market_or_news"
             }
           ]
         }
@@ -4077,6 +3903,236 @@
               "source_url": "https://finance.yahoo.com/m/081df461-1aad-35be-b9f3-31f5a7d5a845/investors-have-poured-%242.15.html",
               "publisher": "Barrons.com",
               "published_at": "2026-10-15T18:08:29+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "ysvA5mzUlRY",
+        "content_sha256": "7f6f4cc4dd140d5553d2572d1ec606fc0553642f6d81ce504e47831ccbafaed9",
+        "occurred_at": "2026-10-15T04:17:09+00:00",
+        "relevance": {
+          "tickers": [
+            "CRWV",
+            "ORCL",
+            "NVDA",
+            "011200",
+            "042660",
+            "033780",
+            "005930",
+            "^KS11"
+          ],
+          "markets": [
+            "US",
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "ysvA5mzUlRY",
+          "title": "코스피 5,500선이 무너지면 위험하다? / AI 데이터센터 ‘부채 폭탄’ 터지나… 증시 진짜 위기는 지금부터? ㅣ이권희 대표",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=ysvA5mzUlRY",
+          "published_at": "2026-10-15T04:17:09+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 12964,
+            "segments": 723,
+            "duration_seconds": 1485,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 10,
+            "asr_uncertain": 2
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "CPI·근원 CPI가 예상보다 각각 0.1 높고 주거비 비중은 38~40%이며, 10월 금리 인상 확률은 약 50%, 미국 10년물 금리는 5.3~5.35%에서 5.172%로 하락했다. 뉴욕 연은 총재는 한 차례 인상을 언급했다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "물가 충격과 금리 상승을 확인된 매도 원인으로 제시할 수 없다. 금리 하락에 따른 반등은 조건부 해석으로 구분해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "앤스로픽으로 인식된 기업의 성장률이 2분기 116%에서 3분기 46%로 둔화했으며, 실적 발표와 토큰 가격 경쟁으로 관련주가 추가 하락했다.",
+              "status": "asr_uncertain",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "기업명과 지표를 확인하기 전에는 특정 AI 기업의 성장 둔화를 투자 판단 근거로 사용할 수 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "CPI 충격과 브로드컴 CEO의 공급 발언 이후 삼성전자·SK하이닉스·마이크론·시게이트·샌디스크가 동반 하락했다. DRAM 가격 하락 시 국내 지수가 5% 이상 하락할 수 있다.",
+              "status": "unverified",
+              "confidence": 0.97,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "동반 하락의 정확한 규모와 원인은 미확인이다. DRAM과 지수 5% 하락의 연결은 검증된 결과가 아닌 시나리오다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "CoreWeave 주가가 15% 하락했고 차입금리는 3~4%부터 14~15%까지이며, CEO는 수익성과 사업에 문제가 없다고 반박했다.",
+              "status": "unverified",
+              "confidence": 0.97,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "차입금리와 자금조달 부담을 정량 평가할 수 없다. 3~4%가 총금리인지 가산금리인지 확인해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "Oracle 주가가 장중 최대 9%, 고점 대비 60% 이상 하락했으며 CDS 상승과 AI 데이터센터 차입으로 신용위험 우려가 커졌다. 출연자는 약 40주 매수를 밝혔다.",
+              "status": "unverified",
+              "confidence": 0.96,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "큰 폭의 고점 대비 하락은 관측되지만 60% 이상·장중 9%·부도 위험이라는 구체적 주장은 미확인이다. 출연자 매수는 독립 검증되지 않은 자기보고다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "NVIDIA는 3~4% 하락했지만 주봉 추세와 일봉 저점 상승이 유지된다. 200달러 하회는 판단 재검토 기준이며, 30% 급락은 AI 생태계 붕괴를 가정한 시나리오다.",
+              "status": "unverified",
+              "confidence": 0.97,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "200달러는 출연자의 기술적 기준이지 검증된 안전선이 아니다. 30% 하락을 확정 전망이나 관측 결과로 제시하면 안 된다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "CRWV",
+              "name": "CoreWeave",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "ORCL",
+              "name": "Oracle",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "NVDA",
+              "name": "NVIDIA",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "011200",
+              "name": "HMM",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "042660",
+              "name": "한화오션·조선업",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "033780",
+              "name": "KT&G",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "005930",
+              "name": "삼성전자",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "^KS11",
+              "name": "코스피·코스닥 및 외국인 수급",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "VGT Returned 799.70% and VOO Returned 324.46% Over a Decade. Adding VUG Does Not Make It Diversified",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/vgt-returned-799-70-voo-220310440.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-10-15T22:03:10+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Here Are the 3 Magnificent Seven Stocks I'd Buy Today",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/3-magnificent-seven-stocks-id-220100542.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-10-15T22:01:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C4",
+              "title": "Dow Jones Futures: Disney, Salesforce Lead New Buys After Wild Session; Tesla Roadster On Tap",
+              "source_url": "https://finance.yahoo.com/m/2cd5e2a7-a743-35dd-994e-11a2ba3c6d46/dow-jones-futures%3A-disney%2C.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-10-15T22:03:51+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C4",
+              "title": "CoreWeave three co-founders sold $3.3 billion in shares since IPO",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/coreweave-three-co-founders-sold-211703590.html",
+              "publisher": "Investing.com",
+              "published_at": "2026-10-15T21:17:03+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C7",
+              "title": "Why Direxion Daily Semiconductor Bull 3X ETF Crashed Today",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/why-direxion-daily-semiconductor-bull-155519685.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-10-15T15:55:19+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E8",
+              "claim_id": "C12",
+              "title": "Stock market today: Dow jumps, S&P 500, Nasdaq gain as AI jitters fade",
+              "source_url": "https://finance.yahoo.com/markets/live/stock-market-today-dow-sp-500-rise-nasdaq-trims-losses-as-treasury-yields-sink-153611834.html",
+              "publisher": "Yahoo Finance",
+              "published_at": "2026-10-15T20:03:35+00:00",
               "source_tier": "news"
             }
           ]
