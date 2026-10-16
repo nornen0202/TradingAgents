@@ -1,10 +1,10 @@
 {
   "schema": "tradingagents.work-report/v1",
   "surface": "prism",
-  "event_id": "prism:89b08720d25e025de04cd76f41fa4c12",
-  "source_sha256": "18da0aeaf8b07cd1055bf7ca39d00b1a41ad4debc327028b20eeb9351a5c70fc",
+  "event_id": "prism:07695789d799c17bc491f114f270f84b",
+  "source_sha256": "017b705138b668aa6d362a9c49499165d5dff56fd045300f468606d80894c1ef",
   "prompt_contract_version": "prism-work-v5",
-  "workflow_contract_sha256": "05ffe3c27643170e667793aae6b43a3e286c08386bfad7a76ca7d4b155437aea",
+  "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
   "policy": {
     "visibility": "investor_safe_no_credentials",
     "external_evidence_profile": "balanced_external",
@@ -17,536 +17,214 @@
     "external_evidence_may_bypass_execution_gate": false,
     "thesis_is_independent_from_execution_readiness": true
   },
-  "report_markdown": "# PRISM 리서치 델타 · 2026-10-16\n\n기준 2026-10-16T08:34:29+09:00 · 원천 정상(OK) · 연구 전용\n\n- **PAG:** 초기 관심 뒤 손익비 미달로 매수 보류. 인수 계약의 공식 조건 검증을 우선한다.\n- **CRCL:** 초기 관심 뒤 재무 건전성·확정 수익 촉매 부족으로 미진입. 재무 검증 우선순위를 높인다.\n- **MRNA:** 초기 관심 뒤 수익성·성장성 기준 미달로 미진입. 임상·현금흐름과 집중 위험 확인을 우선한다.\n- **실행:** 긍정적 순위·thesis 신뢰도·비중 상향 없음. 시장·계좌·위험 게이트를 그대로 적용한다.\n- **가상 보유:** HALO·IOVA·FRSH·BKH·BP·LLY는 시뮬레이터 참고이며 실제 보유 증거가 아니다.\n\n## 범위와 신선도\n\n새 이벤트 14건, 수정 0건, 변경 없는 3건은 반복 분석에서 제외했다. 최근 24시간 17건 중 17건 전송, 생략 0건, truncation 없음. 이번 delta 본문은 신규 14건만 포함한다. 전체 archive 고유 180건을 전수 분석했다는 뜻은 아니다.\n\n성공 producer: 2026-10-16 08:07:41 KST. 현재 window: 10월 15일 09:00:52부터 10월 16일 03:52:58 KST. 응답 기준 producer는 30시간 이내, 모든 전달 이벤트·signal source_asof와 범위 양끝은 미래·역전 없이 24시간 이내임을 확인했다. 수집 신선도는 실시간 가격·공시의 정확성을 보증하지 않는다. 별도 live 가격·계좌·valid_until 자료가 없어 현재 주문 근거로 사용하지 않는다.\n\n## 주식 관련 연구 영향\n\n| 종목 | 변화와 충돌 | 후속 종합에 반영 | 핵심 event key |\n|---|---|---|---|\n| PAG | 초기 WATCH·차트 후 NO_ENTRY. 높은 원천 점수와 손익비 미달을 함께 표시 | 인수·손익비 위험 검증 우선순위 상향; 우호적 순위·신뢰도·비중 상향 보류 | stock_ai_agent:16164, 16167, 16170, 16173, 16176 |\n| CRCL | 초기 WATCH 뒤 재무 기준 미달·촉매 부족으로 NO_ENTRY | 준비금 수익·재무 검증 우선순위 상향; 상승 서술만으로 신뢰도 상향 금지 | stock_ai_agent:16164, 16166, 16169, 16172, 16175 |\n| MRNA | 초기 WATCH 뒤 수익성·성장성 미달과 업종 집중 경고로 NO_ENTRY | 현금흐름·공식 임상 근거·집중 위험 검증 우선순위 상향 | stock_ai_agent:16164, 16165, 16168, 16171, 16174 |\n\n위 표의 축약 숫자도 모두 stock_ai_agent 채널의 event key다. 각 기여는 structured report에서 content hash와 정확히 결합했다. 세 종목 모두 `balanced_external`의 **LOW_LABELED**를 적용했다. 같은 채널의 연속 메시지는 독립 다중 출처 확인이 아니며, 원천 score/confidence는 독립 검증 신뢰도가 아니다. 현재 자료는 관심→보류의 시간 순서와 검증 과제를 보여 주므로 리서치 우선순위에 반영하되 매수 논지나 기존 위험 한도를 확대하지 않는다.\n\nPAG의 주당 212달러 인수 주장은 원천 preview의 미검증 서술이다. 16176의 가격·목표·손절은 단일 ticker로 매핑돼 있지만 과거 관측값이며 주문 가격으로 재사용하지 않는다. MRNA의 업종 40%·한도 30%도 원천 운용 맥락이며 실제 계좌 수치로 옮기지 않는다. 원천의 온건 강세·횡보 표현은 시장 확정 판정이 아니다.\n\n## 시뮬레이션과 기타 자료\n\n- stock_ai_agent:16177: HALO·IOVA·FRSH·BKH·BP·LLY의 HOLD snapshot, 가상 보유 6/10개·사용 4.24/10 슬롯. 실제 계좌 보유·가용 자금·주문 권한을 의미하지 않는다. 다중 종목 가격은 독립 재검증하지 않았으므로 표적·손절 수치를 채택하지 않았다.\n- stock_ai_agent:16168~16170: PDF의 archived text 없음. PYPL·COIN은 CRCL 비교 문맥, PFE·NVAX는 MRNA 비교 문맥으로 추출된 이름이므로 독립 추천·새 주식 신호로 승격하지 않는다. 본문·첨부를 확인한 것으로 표현하지 않는다.\n- stock_ai_agent:16171~16173: 차트 참고 안내만으로 피벗·RS·베이스를 검증할 수 없다. 추가 기술적 확신은 부여하지 않는다.\n\n## KR·US 인계와 다음 확인\n\nUS 후속 종합은 PAG의 SEC/기업 IR 계약 원문과 종결·실패 조건, CRCL의 공식 실적·USDC 준비금 수익·확정 촉매, MRNA의 실적·현금흐름·공식 파이프라인 발표를 우선 확인한다. 확인 전 신규 매수·증액 판단은 보류하고 기존 thesis 방향을 임의로 변경하지 않는다. 공식 근거가 원천 주장을 부인하면 해당 외부 기여를 제거하고 연구 우선순위를 재평가한다. 이후 진입 판단에는 최신 가격·유동성·실제 계좌·업종 한도·위험 한도 재검증이 필요하다.\n\nKR 직접 ticker 근거는 없다. 미국 개별주나 시뮬레이터 신호를 KR 종목으로 전이하지 않는다. 기존 위험 한도 안의 sizing 변경도 이번 근거만으로는 하지 않는다.\n\n다음 확인: 2026-10-16T09:00:52+09:00 또는 다음 성공한 sanitized producer run 중 먼저 도래하는 시점. source·이벤트가 만료되거나 producer가 실패하면 현재 근거 사용을 중단하고 재수집을 기다린다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:89b08720d25e025de04cd76f41fa4c12\",\"status\":\"COMPLETE\",\"window_events\":17,\"transmitted_events\":17,\"truncated\":false,\"new_events\":14,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}\n\n외부 전달 영수증 없음. Telegram·Pages 전달 상태는 외부 검증 대기다.",
+  "report_markdown": "# PRISM 리서치 델타 · 2026-10-17\n\n기준: 08:39 KST 이후 로컬 검증. 소스 정상(OK), 생산자 성공 08:03:38 KST. 분석 대상 발생 범위 01:37:30~03:56:36 KST, 모두 최근 24시간 이내. 장중 관측 가격은 현재 주문 가격이 아닙니다.\n\n- **TALO: 높은 점수보다 손익비 검증 우선.** 초기 WATCH 뒤 03:56 미진입. 8/10은 독립 검증 신뢰도가 아닙니다. 확정 지지·저항과 비용 반영 손익비를 다시 계산할 연구 우선순위를 높입니다.\n- **VRNS: 실적·부채 확인 우선.** 초기 WATCH 뒤 횡보장 펀더멘털 미달로 미진입. GAAP 적자·부채 및 이례적 거래량 주장은 기업 IR/SEC·거래소 자료 확인 전 미검증입니다.\n- **CRGY: 추세·인수 부담 확인 우선.** 초기 WATCH 뒤 50일선 하회로 미진입. 인수·자금조달 조건과 최신 수정주가 추세를 검증합니다.\n- **가상 운용과 BTC 데모는 별도 참고.** 실제 계좌 보유·매수·매도 지시로 전환하지 않습니다.\n\n신규 18건 / 수정 0건 / 중복·변경 없음 제외 0건. 현재 창 18건 중 18건 전송, 생략 0건, 잘림 없음. 이 완전성은 로컬 정제 이벤트 창 기준이며 PDF·차트 원본 검증 완료를 뜻하지 않습니다.\n\n| 종목 | 근거 이벤트 | 후속 연구 영향 |\n|---|---|---|\n| TALO | stock_ai_agent:16233 → 16245 | WATCH → NO_ENTRY; 손익비 확인 우선 |\n| VRNS | stock_ai_agent:16233 → 16244 | WATCH → NO_ENTRY; 손익·부채 확인 우선 |\n| CRGY | stock_ai_agent:16233 → 16243 | WATCH → NO_ENTRY; 추세·인수조건 확인 우선 |\n\nbalanced_external: 공식 독립 검증이 없어 LOW_LABELED로 반영합니다. 세 종목의 위험 검증 우선순위를 높이고, 유리한 매수 순위·thesis confidence·배분 크기 상향은 보류합니다. 같은 채널의 요약·차트·PDF를 독립된 다중 출처로 세지 않습니다. 관찰 목록이 실제 시장 전략의 stance 변경을 뜻하지 않습니다. 현재 실행은 연구 전용이며 시장·계좌·위험 게이트를 유지합니다.\n\n가상 주식: stock_ai_agent:16246의 BP·FRSH·BKH·HALO·LLY 5개 보유는 시뮬레이터 스냅샷입니다. 기존 실제 계좌와 비교하지 않으며 다중 종목 목표·손절은 재매핑·시세 확인 전 사용하지 않습니다.\n\n기타 자료: 16240~16242는 차트 안내로 이미지 근거를 검증하지 못했습니다. 16237~16239는 본문이 없는 PDF 정규화 메타데이터이며 MUR·KOS·RBRK·NTSK·MTDR·SM·NOG 비교 언급을 신규 추천으로 승격하지 않습니다. 16234~16236 요약의 가격·거래량·기업 주장은 장중 과거 관측과 미검증 주장으로 남깁니다.\n\nBTC 데모: 16229~16230 보호 변경 → 16231 부분 청산 → 16232 종료·정산 통지 순서입니다. 정규화 simulation_only=false와 본문의 '데모' 표기가 달라 보수적으로 데모로 분류합니다. 부분 청산 가격손익을 확정 순손익으로 합산하지 않으며 정산 통지도 독립 검증된 성과가 아닙니다. 주식 배분·신뢰도에 반영하지 않습니다.\n\nUS 후속: TALO 손익비, VRNS 실적·부채, CRGY 인수·조달·추세를 먼저 확인합니다. 최신 시세·VWAP·RVOL·유동성과 계좌·위험 심사를 통과하기 전 신규 배분은 없습니다. 공식 자료와 충돌하거나 최신 자료를 확보하지 못하면 신규 검토를 보류하고 재분석합니다.\n\nKR 후속: 직접 한국 종목 근거가 없습니다. 에너지·보안 테마만으로 한국 후보를 상향하지 않습니다.\n\n다음 확인: 다음 성공한 정제 생산자 실행 또는 신규·수정 이벤트 때. 이번 이벤트의 첫 24시간 만료는 2026-10-18 01:37:30 KST입니다. 공식 검증은 다음 US 브리핑 전에 필요합니다. 모델 기록은 CONFIGURED_NOT_RUNTIME_VERIFIED입니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:07695789d799c17bc491f114f270f84b\",\"status\":\"COMPLETE\",\"window_events\":18,\"transmitted_events\":18,\"truncated\":false,\"new_events\":18,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
   "structured_report": {
     "schema": "tradingagents.work-report/v1",
     "binding": {
       "surface": "prism",
-      "event_id": "prism:89b08720d25e025de04cd76f41fa4c12",
-      "source_sha256": "18da0aeaf8b07cd1055bf7ca39d00b1a41ad4debc327028b20eeb9351a5c70fc"
+      "event_id": "prism:07695789d799c17bc491f114f270f84b",
+      "source_sha256": "017b705138b668aa6d362a9c49499165d5dff56fd045300f468606d80894c1ef"
     },
-    "title": "PRISM 리서치 델타 · 관심 신호 뒤 매수 보류",
-    "generated_at": "2026-10-16T08:34:29.550445+09:00",
-    "as_of": "2026-10-16T08:34:29.550445+09:00",
+    "title": "PRISM 리서치 델타 · 신규 18건, 세 종목 위험 검증 우선",
+    "generated_at": "2026-10-16T23:40:15.454185+00:00",
+    "as_of": "2026-10-16T18:56:36+00:00",
     "source_health": "OK",
     "report_mode": "RESEARCH",
-    "summary": [
-      "신규 14·수정 0; unchanged 3 제외",
-      "PAG·CRCL·MRNA 위험 검증 우선순위 상향",
-      "우호적 순위·신뢰도·비중 상향 없음; 실행 게이트 유지"
-    ],
+    "summary": "TALO·VRNS·CRGY WATCH 이후 NO_ENTRY. LOW_LABELED 위험 검증 우선순위 상향, 매수·배분 상향 보류.",
     "top_actions": [
       {
-        "ticker": "PAG",
-        "action": "NO_ENTRY",
+        "ticker": "TALO",
         "readiness": "RESEARCH_ONLY",
-        "research_priority": "인수 조건·손익비 검증 우선순위 상향"
+        "action": "최신 가격·확정 지지/저항과 비용 반영 손익비 재계산"
       },
       {
-        "ticker": "CRCL",
-        "action": "NO_ENTRY",
+        "ticker": "VRNS",
         "readiness": "RESEARCH_ONLY",
-        "research_priority": "재무 건전성·수익 촉매 검증 우선순위 상향"
+        "action": "기업 IR/SEC 최신 공시로 GAAP 영업손익·총부채 및 거래량 이상 여부 확인"
       },
       {
-        "ticker": "MRNA",
-        "action": "NO_ENTRY",
+        "ticker": "CRGY",
         "readiness": "RESEARCH_ONLY",
-        "research_priority": "수익성·성장성·집중 위험 검증 우선순위 상향"
+        "action": "공식 인수 공시·자금조달 조건과 최신 수정주가 50일선 재계산"
       }
     ],
     "strategies": [
       {
-        "ticker": "PAG",
-        "research_impact": "인수 조건·손익비 검증 우선순위 상향",
-        "rationale": "매수 보류. 7/10 점수보다 손익비 미달을 우선한다. 16167의 주당 212달러 인수 주장은 공식 공시 확인 전 미검증이다.",
-        "evidence_weight": "LOW_LABELED",
-        "thesis_effects": {
-          "research_priority": "INCREASE_RISK_VERIFICATION",
-          "ranking": "NO_FAVORABLE_CHANGE",
-          "confidence": "NO_UPGRADE",
-          "position_size_within_existing_risk_limits": "NO_INCREASE"
+        "ticker": "TALO",
+        "rank": 1,
+        "rank_basis": "위험 검증 리서치 순서; 매수 순위 아님",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.25,
+          "confidence_basis": "작성자의 미검증 근거 평가; 원문 점수와 독립",
+          "horizon": "다음 US 브리핑 전 공식 근거 확인",
+          "rationale": "손익비 하한 미달이라는 후속 미진입 판단. 8/10 점수를 검증 신뢰도로 해석하지 않는다.",
+          "entry_conditions": [
+            "최신 가격·확정 지지/저항과 비용 반영 손익비 재계산 후 별도 시장·계좌·위험 심사 통과"
+          ],
+          "invalidation_conditions": [
+            "공식 자료가 원문 주장과 불일치하거나 최신 시세를 확보하지 못함"
+          ],
+          "invalidation_action": "신규 매수 검토를 보류하고 근거 오류를 표시한 뒤 재분석",
+          "position_sizing": "이 델타로 신규 배분·증액 없음; 기존 위험 한도 및 실행 심사 유지",
+          "research_priority": "HIGH: 위험 검증 우선",
+          "data_needed_reason": "최신 가격·확정 지지/저항과 비용 반영 손익비 재계산"
         },
         "execution": {
           "readiness": "RESEARCH_ONLY",
-          "action": "NO_ENTRY",
+          "as_of": "2026-10-16T18:56:36+00:00",
+          "valid_until": null,
+          "required_rechecks": [
+            "최신 가격·확정 지지/저항과 비용 반영 손익비 재계산",
+            "현재가·유동성·VWAP·RVOL·시장·계좌·위험 게이트"
+          ],
           "blockers": [
             "advisory_only",
-            "official_evidence_unverified",
-            "live_market_account_risk_gates_required"
-          ],
-          "required_rechecks": [
-            "SEC 공시·기업 IR의 계약 가격, 종결 조건, 실패 위험 및 최신 시세 확인"
+            "execution_eligible=false",
+            "공식 근거 및 실시간 시장·계좌 검증 미실시"
           ]
         },
         "source_contributions": [
           {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16176",
-            "content_sha256": "b5855810a0d7dff7b18bf62c85e0522ce10ad368efaad1a39eeaf27f151b77dc",
+            "source": "prism",
+            "event_key": "stock_ai_agent:16245",
+            "content_sha256": "1f83b401422bba41c322a1a0b3c00ebd7f1d2d7b025f79efbe524cbc7962f714",
             "affected_field": "research_priority",
-            "effect": "인수 조건·손익비 검증 우선순위 상향",
+            "direction": "INCREASE_RISK_VERIFICATION",
             "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
+            "reason": "손익비 하한 미달이라는 후속 미진입 판단. 8/10 점수를 검증 신뢰도로 해석하지 않는다."
           },
           {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16173",
-            "content_sha256": "3b60af4dd7d594f977ff65446551ccf19d31dfbdd17f724029a73e3035b0ca6c",
+            "source": "prism",
+            "event_key": "stock_ai_agent:16233",
+            "content_sha256": "45491295b0dbdd5ed1fcfbcbedab704d08104592069fa5f5be4ba7f4ec08c27f",
             "affected_field": "research_priority",
-            "effect": "인수 조건·손익비 검증 우선순위 상향",
+            "direction": "INCREASE_RISK_VERIFICATION",
             "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          },
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16170",
-            "content_sha256": "6dab11e4db346545969f2ee80133c1bad8c5837f95f5cef0a985637b78de8d95",
-            "affected_field": "research_priority",
-            "effect": "인수 조건·손익비 검증 우선순위 상향",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          },
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16167",
-            "content_sha256": "c63b32d2e59e059239478b0580f520ac15ef604ddaa62d47122d20e1da3587df",
-            "affected_field": "research_priority",
-            "effect": "인수 조건·손익비 검증 우선순위 상향",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          },
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16164",
-            "content_sha256": "fe156d9ce4682c68f7cec5db305b5229b0322de9fa6d1cf20b3e0001ef456945",
-            "affected_field": "research_priority",
-            "effect": "인수 조건·손익비 검증 우선순위 상향",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
+            "reason": "초기 WATCH와 후속 NO_ENTRY의 충돌을 가시화. 같은 채널 반복은 독립 다중 출처가 아님."
           }
         ]
       },
       {
-        "ticker": "CRCL",
-        "research_impact": "재무 건전성·수익 촉매 검증 우선순위 상향",
-        "rationale": "관심 신호 후 재무 기준 미달로 미진입. 가격 상승 서술을 thesis 신뢰도 상승으로 전환하지 않는다.",
-        "evidence_weight": "LOW_LABELED",
-        "thesis_effects": {
-          "research_priority": "INCREASE_RISK_VERIFICATION",
-          "ranking": "NO_FAVORABLE_CHANGE",
-          "confidence": "NO_UPGRADE",
-          "position_size_within_existing_risk_limits": "NO_INCREASE"
+        "ticker": "VRNS",
+        "rank": 2,
+        "rank_basis": "위험 검증 리서치 순서; 매수 순위 아님",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.25,
+          "confidence_basis": "작성자의 미검증 근거 평가; 원문 점수와 독립",
+          "horizon": "다음 US 브리핑 전 공식 근거 확인",
+          "rationale": "횡보 국면 펀더멘털 미달이라는 후속 미진입 판단. GAAP 적자·부채 주장은 미검증.",
+          "entry_conditions": [
+            "기업 IR/SEC 최신 공시로 GAAP 영업손익·총부채 및 거래량 이상 여부 확인 후 별도 시장·계좌·위험 심사 통과"
+          ],
+          "invalidation_conditions": [
+            "공식 자료가 원문 주장과 불일치하거나 최신 시세를 확보하지 못함"
+          ],
+          "invalidation_action": "신규 매수 검토를 보류하고 근거 오류를 표시한 뒤 재분석",
+          "position_sizing": "이 델타로 신규 배분·증액 없음; 기존 위험 한도 및 실행 심사 유지",
+          "research_priority": "HIGH: 위험 검증 우선",
+          "data_needed_reason": "기업 IR/SEC 최신 공시로 GAAP 영업손익·총부채 및 거래량 이상 여부 확인"
         },
         "execution": {
           "readiness": "RESEARCH_ONLY",
-          "action": "NO_ENTRY",
+          "as_of": "2026-10-16T18:56:36+00:00",
+          "valid_until": null,
+          "required_rechecks": [
+            "기업 IR/SEC 최신 공시로 GAAP 영업손익·총부채 및 거래량 이상 여부 확인",
+            "현재가·유동성·VWAP·RVOL·시장·계좌·위험 게이트"
+          ],
           "blockers": [
             "advisory_only",
-            "official_evidence_unverified",
-            "live_market_account_risk_gates_required"
-          ],
-          "required_rechecks": [
-            "최신 공시의 준비금 수익, USDC 유통량, 수익성·확정 촉매 확인"
+            "execution_eligible=false",
+            "공식 근거 및 실시간 시장·계좌 검증 미실시"
           ]
         },
         "source_contributions": [
           {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16175",
-            "content_sha256": "7834684d25b3f36d75d5285c60de48ce698bdbee6bfd4497370067c2c469c185",
+            "source": "prism",
+            "event_key": "stock_ai_agent:16244",
+            "content_sha256": "eb6119b77be9ca09650a40dca7706339b6f5fd44e617863e00da57809dd5ae28",
             "affected_field": "research_priority",
-            "effect": "재무 건전성·수익 촉매 검증 우선순위 상향",
+            "direction": "INCREASE_RISK_VERIFICATION",
             "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
+            "reason": "횡보 국면 펀더멘털 미달이라는 후속 미진입 판단. GAAP 적자·부채 주장은 미검증."
           },
           {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16172",
-            "content_sha256": "42ac0bab9708919c2d330daa02fd4677a48166633463880fd5e493704947d705",
+            "source": "prism",
+            "event_key": "stock_ai_agent:16233",
+            "content_sha256": "45491295b0dbdd5ed1fcfbcbedab704d08104592069fa5f5be4ba7f4ec08c27f",
             "affected_field": "research_priority",
-            "effect": "재무 건전성·수익 촉매 검증 우선순위 상향",
+            "direction": "INCREASE_RISK_VERIFICATION",
             "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          },
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16169",
-            "content_sha256": "8615c170dbe31dd439e8a8e61c3eb504a1da61929d4d4753b4f6ee45e0eef076",
-            "affected_field": "research_priority",
-            "effect": "재무 건전성·수익 촉매 검증 우선순위 상향",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          },
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16166",
-            "content_sha256": "9905f2b3ef79d3901f89155a8485acce131e5ad294e7aa602fb2638b7c616d37",
-            "affected_field": "research_priority",
-            "effect": "재무 건전성·수익 촉매 검증 우선순위 상향",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          },
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16164",
-            "content_sha256": "fe156d9ce4682c68f7cec5db305b5229b0322de9fa6d1cf20b3e0001ef456945",
-            "affected_field": "research_priority",
-            "effect": "재무 건전성·수익 촉매 검증 우선순위 상향",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
+            "reason": "초기 WATCH와 후속 NO_ENTRY의 충돌을 가시화. 같은 채널 반복은 독립 다중 출처가 아님."
           }
         ]
       },
       {
-        "ticker": "MRNA",
-        "research_impact": "수익성·성장성·집중 위험 검증 우선순위 상향",
-        "rationale": "관심 신호 후 펀더멘털 기준 미달로 미진입. 메시지의 업종 40%·한도 30%는 원천 운용 맥락이며 실제 계좌 수치로 전용하지 않는다.",
-        "evidence_weight": "LOW_LABELED",
-        "thesis_effects": {
-          "research_priority": "INCREASE_RISK_VERIFICATION",
-          "ranking": "NO_FAVORABLE_CHANGE",
-          "confidence": "NO_UPGRADE",
-          "position_size_within_existing_risk_limits": "NO_INCREASE"
+        "ticker": "CRGY",
+        "rank": 3,
+        "rank_basis": "위험 검증 리서치 순서; 매수 순위 아님",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.25,
+          "confidence_basis": "작성자의 미검증 근거 평가; 원문 점수와 독립",
+          "horizon": "다음 US 브리핑 전 공식 근거 확인",
+          "rationale": "50일선 하회라는 후속 미진입 판단. 자산 인수·자금조달 부담 주장도 공식 확인 필요.",
+          "entry_conditions": [
+            "공식 인수 공시·자금조달 조건과 최신 수정주가 50일선 재계산 후 별도 시장·계좌·위험 심사 통과"
+          ],
+          "invalidation_conditions": [
+            "공식 자료가 원문 주장과 불일치하거나 최신 시세를 확보하지 못함"
+          ],
+          "invalidation_action": "신규 매수 검토를 보류하고 근거 오류를 표시한 뒤 재분석",
+          "position_sizing": "이 델타로 신규 배분·증액 없음; 기존 위험 한도 및 실행 심사 유지",
+          "research_priority": "HIGH: 위험 검증 우선",
+          "data_needed_reason": "공식 인수 공시·자금조달 조건과 최신 수정주가 50일선 재계산"
         },
         "execution": {
           "readiness": "RESEARCH_ONLY",
-          "action": "NO_ENTRY",
+          "as_of": "2026-10-16T18:56:36+00:00",
+          "valid_until": null,
+          "required_rechecks": [
+            "공식 인수 공시·자금조달 조건과 최신 수정주가 50일선 재계산",
+            "현재가·유동성·VWAP·RVOL·시장·계좌·위험 게이트"
+          ],
           "blockers": [
             "advisory_only",
-            "official_evidence_unverified",
-            "live_market_account_risk_gates_required"
-          ],
-          "required_rechecks": [
-            "최신 실적·현금흐름·파이프라인 공식 발표 및 실제 계좌 업종 한도 확인"
+            "execution_eligible=false",
+            "공식 근거 및 실시간 시장·계좌 검증 미실시"
           ]
         },
         "source_contributions": [
           {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16174",
-            "content_sha256": "a841e0fe67ba675c4602e3688bc27d13d8b61db8d1d5610d5314f3a1f2665905",
+            "source": "prism",
+            "event_key": "stock_ai_agent:16243",
+            "content_sha256": "bb9e6c1b570b91faca6591ddac1d2b6030ad896cadc46b687d49ef1ec618efb4",
             "affected_field": "research_priority",
-            "effect": "수익성·성장성·집중 위험 검증 우선순위 상향",
+            "direction": "INCREASE_RISK_VERIFICATION",
             "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
+            "reason": "50일선 하회라는 후속 미진입 판단. 자산 인수·자금조달 부담 주장도 공식 확인 필요."
           },
           {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16171",
-            "content_sha256": "eef450196ddfd4ed7b7b3c007aaeccd947b7549728d8e78385ab226e58cb73a9",
+            "source": "prism",
+            "event_key": "stock_ai_agent:16233",
+            "content_sha256": "45491295b0dbdd5ed1fcfbcbedab704d08104592069fa5f5be4ba7f4ec08c27f",
             "affected_field": "research_priority",
-            "effect": "수익성·성장성·집중 위험 검증 우선순위 상향",
+            "direction": "INCREASE_RISK_VERIFICATION",
             "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          },
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16168",
-            "content_sha256": "cdf473ce5afe46316a69132a1949fd3bd431f45baaf6e5a0aa342da7ad1be48a",
-            "affected_field": "research_priority",
-            "effect": "수익성·성장성·집중 위험 검증 우선순위 상향",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          },
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16165",
-            "content_sha256": "d8f21bed67089cdd5e1ccd0a03a7b6bb1bdd5e7db88a3660ab59f98857fc59fe",
-            "affected_field": "research_priority",
-            "effect": "수익성·성장성·집중 위험 검증 우선순위 상향",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          },
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16164",
-            "content_sha256": "fe156d9ce4682c68f7cec5db305b5229b0322de9fa6d1cf20b3e0001ef456945",
-            "affected_field": "research_priority",
-            "effect": "수익성·성장성·집중 위험 검증 우선순위 상향",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          }
-        ]
-      },
-      {
-        "ticker": "PYPL",
-        "research_impact": "NO_CHANGE",
-        "rationale": "본문 없는 PDF의 비교기업 추출만 존재; 독립 종목 신호·가격 매핑 미검증",
-        "simulation_only": false,
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "NO_ACTION",
-          "blockers": [
-            "NO_ARCHIVED_TEXT"
-          ],
-          "required_rechecks": [
-            "새로운 공식 종목별 근거 확인"
-          ]
-        },
-        "source_contributions": [
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16169",
-            "content_sha256": "8615c170dbe31dd439e8a8e61c3eb504a1da61929d4d4753b4f6ee45e0eef076",
-            "affected_field": "research_priority",
-            "effect": "NO_CHANGE",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          }
-        ]
-      },
-      {
-        "ticker": "COIN",
-        "research_impact": "NO_CHANGE",
-        "rationale": "본문 없는 PDF의 비교기업 추출만 존재; 독립 종목 신호·가격 매핑 미검증",
-        "simulation_only": false,
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "NO_ACTION",
-          "blockers": [
-            "NO_ARCHIVED_TEXT"
-          ],
-          "required_rechecks": [
-            "새로운 공식 종목별 근거 확인"
-          ]
-        },
-        "source_contributions": [
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16169",
-            "content_sha256": "8615c170dbe31dd439e8a8e61c3eb504a1da61929d4d4753b4f6ee45e0eef076",
-            "affected_field": "research_priority",
-            "effect": "NO_CHANGE",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          }
-        ]
-      },
-      {
-        "ticker": "PFE",
-        "research_impact": "NO_CHANGE",
-        "rationale": "본문 없는 PDF의 비교기업 추출만 존재; 독립 종목 신호·가격 매핑 미검증",
-        "simulation_only": false,
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "NO_ACTION",
-          "blockers": [
-            "NO_ARCHIVED_TEXT"
-          ],
-          "required_rechecks": [
-            "새로운 공식 종목별 근거 확인"
-          ]
-        },
-        "source_contributions": [
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16168",
-            "content_sha256": "cdf473ce5afe46316a69132a1949fd3bd431f45baaf6e5a0aa342da7ad1be48a",
-            "affected_field": "research_priority",
-            "effect": "NO_CHANGE",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          }
-        ]
-      },
-      {
-        "ticker": "NVAX",
-        "research_impact": "NO_CHANGE",
-        "rationale": "본문 없는 PDF의 비교기업 추출만 존재; 독립 종목 신호·가격 매핑 미검증",
-        "simulation_only": false,
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "NO_ACTION",
-          "blockers": [
-            "NO_ARCHIVED_TEXT"
-          ],
-          "required_rechecks": [
-            "새로운 공식 종목별 근거 확인"
-          ]
-        },
-        "source_contributions": [
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16168",
-            "content_sha256": "cdf473ce5afe46316a69132a1949fd3bd431f45baaf6e5a0aa342da7ad1be48a",
-            "affected_field": "research_priority",
-            "effect": "NO_CHANGE",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          }
-        ]
-      },
-      {
-        "ticker": "HALO",
-        "research_impact": "NO_CHANGE",
-        "rationale": "가상 보유 snapshot만 존재; 실제 보유·매매로 전용하지 않음",
-        "simulation_only": true,
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "NO_ACTION",
-          "blockers": [
-            "simulation_only"
-          ],
-          "required_rechecks": [
-            "새로운 공식 종목별 근거 확인"
-          ]
-        },
-        "source_contributions": [
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16177",
-            "content_sha256": "f300bc4a5a9f008685ca55decb6b5b0c9b26c11dae8315bfed46d6428ee2b4c5",
-            "affected_field": "research_priority",
-            "effect": "NO_CHANGE",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          }
-        ]
-      },
-      {
-        "ticker": "IOVA",
-        "research_impact": "NO_CHANGE",
-        "rationale": "가상 보유 snapshot만 존재; 실제 보유·매매로 전용하지 않음",
-        "simulation_only": true,
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "NO_ACTION",
-          "blockers": [
-            "simulation_only"
-          ],
-          "required_rechecks": [
-            "새로운 공식 종목별 근거 확인"
-          ]
-        },
-        "source_contributions": [
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16177",
-            "content_sha256": "f300bc4a5a9f008685ca55decb6b5b0c9b26c11dae8315bfed46d6428ee2b4c5",
-            "affected_field": "research_priority",
-            "effect": "NO_CHANGE",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          }
-        ]
-      },
-      {
-        "ticker": "FRSH",
-        "research_impact": "NO_CHANGE",
-        "rationale": "가상 보유 snapshot만 존재; 실제 보유·매매로 전용하지 않음",
-        "simulation_only": true,
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "NO_ACTION",
-          "blockers": [
-            "simulation_only"
-          ],
-          "required_rechecks": [
-            "새로운 공식 종목별 근거 확인"
-          ]
-        },
-        "source_contributions": [
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16177",
-            "content_sha256": "f300bc4a5a9f008685ca55decb6b5b0c9b26c11dae8315bfed46d6428ee2b4c5",
-            "affected_field": "research_priority",
-            "effect": "NO_CHANGE",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          }
-        ]
-      },
-      {
-        "ticker": "BKH",
-        "research_impact": "NO_CHANGE",
-        "rationale": "가상 보유 snapshot만 존재; 실제 보유·매매로 전용하지 않음",
-        "simulation_only": true,
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "NO_ACTION",
-          "blockers": [
-            "simulation_only"
-          ],
-          "required_rechecks": [
-            "새로운 공식 종목별 근거 확인"
-          ]
-        },
-        "source_contributions": [
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16177",
-            "content_sha256": "f300bc4a5a9f008685ca55decb6b5b0c9b26c11dae8315bfed46d6428ee2b4c5",
-            "affected_field": "research_priority",
-            "effect": "NO_CHANGE",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          }
-        ]
-      },
-      {
-        "ticker": "BP",
-        "research_impact": "NO_CHANGE",
-        "rationale": "가상 보유 snapshot만 존재; 실제 보유·매매로 전용하지 않음",
-        "simulation_only": true,
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "NO_ACTION",
-          "blockers": [
-            "simulation_only"
-          ],
-          "required_rechecks": [
-            "새로운 공식 종목별 근거 확인"
-          ]
-        },
-        "source_contributions": [
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16177",
-            "content_sha256": "f300bc4a5a9f008685ca55decb6b5b0c9b26c11dae8315bfed46d6428ee2b4c5",
-            "affected_field": "research_priority",
-            "effect": "NO_CHANGE",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
-          }
-        ]
-      },
-      {
-        "ticker": "LLY",
-        "research_impact": "NO_CHANGE",
-        "rationale": "가상 보유 snapshot만 존재; 실제 보유·매매로 전용하지 않음",
-        "simulation_only": true,
-        "execution": {
-          "readiness": "RESEARCH_ONLY",
-          "action": "NO_ACTION",
-          "blockers": [
-            "simulation_only"
-          ],
-          "required_rechecks": [
-            "새로운 공식 종목별 근거 확인"
-          ]
-        },
-        "source_contributions": [
-          {
-            "surface": "prism",
-            "event_key": "stock_ai_agent:16177",
-            "content_sha256": "f300bc4a5a9f008685ca55decb6b5b0c9b26c11dae8315bfed46d6428ee2b4c5",
-            "affected_field": "research_priority",
-            "effect": "NO_CHANGE",
-            "evidence_weight": "LOW_LABELED",
-            "execution_gate_override": false
+            "reason": "초기 WATCH와 후속 NO_ENTRY의 충돌을 가시화. 같은 채널 반복은 독립 다중 출처가 아님."
           }
         ]
       }
     ],
     "coverage_receipt": {
-      "event_id": "prism:89b08720d25e025de04cd76f41fa4c12",
+      "event_id": "prism:07695789d799c17bc491f114f270f84b",
       "status": "COMPLETE",
-      "window_events": 17,
-      "transmitted_events": 17,
+      "window_events": 18,
+      "transmitted_events": 18,
       "truncated": false,
-      "new_events": 14,
+      "new_events": 18,
       "revised_events": 0
     },
     "model_receipt": {
@@ -565,41 +243,44 @@
     "source_summary": {
       "source": {
         "health": "OK",
-        "run_id": "prism_telegram_20261016_080729",
-        "last_run_at": "2026-10-16T08:07:41.117583+09:00",
+        "run_id": "prism_telegram_20261017_080327",
+        "last_run_at": "2026-10-17T08:03:38.050859+09:00",
         "status": "success",
         "stale_after_hours": 30
       },
       "coverage": {
-        "total_unique_events": 180,
-        "window_events": 17,
-        "transmitted_events": 17,
+        "total_unique_events": 185,
+        "window_events": 18,
+        "transmitted_events": 18,
         "truncated": false,
-        "oldest_occurred_at": "2026-10-15T00:00:52+00:00",
-        "newest_occurred_at": "2026-10-15T18:52:58+00:00"
+        "oldest_occurred_at": "2026-10-16T16:37:30+00:00",
+        "newest_occurred_at": "2026-10-16T18:56:36+00:00"
       },
       "delta": {
-        "new_events": 14,
+        "new_events": 18,
         "revised_events": 0,
-        "unchanged_events": 3,
+        "unchanged_events": 0,
         "delivered_event_keys": [
-          "stock_ai_agent:16177",
-          "stock_ai_agent:16176",
-          "stock_ai_agent:16175",
-          "stock_ai_agent:16174",
-          "stock_ai_agent:16173",
-          "stock_ai_agent:16172",
-          "stock_ai_agent:16171",
-          "stock_ai_agent:16170",
-          "stock_ai_agent:16169",
-          "stock_ai_agent:16168",
-          "stock_ai_agent:16167",
-          "stock_ai_agent:16166",
-          "stock_ai_agent:16165",
-          "stock_ai_agent:16164"
+          "stock_ai_agent:16246",
+          "stock_ai_agent:16245",
+          "stock_ai_agent:16244",
+          "stock_ai_agent:16243",
+          "stock_ai_agent:16242",
+          "stock_ai_agent:16241",
+          "stock_ai_agent:16240",
+          "stock_ai_agent:16239",
+          "stock_ai_agent:16238",
+          "stock_ai_agent:16237",
+          "stock_ai_agent:16236",
+          "stock_ai_agent:16235",
+          "stock_ai_agent:16234",
+          "stock_ai_agent:16233",
+          "stock_ai_agent:16232",
+          "stock_ai_agent:16231",
+          "stock_ai_agent:16230",
+          "stock_ai_agent:16229"
         ]
       },
-      "freshness_checked_at": "2026-10-16T08:34:29.550445+09:00",
       "evidence_policy": {
         "profile": "balanced_external",
         "material_thesis_effects": [
@@ -622,11 +303,97 @@
         "conflicting_signal_must_be_visible": true,
         "may_bypass_market_or_portfolio_execution_gate": false
       },
-      "limitations": [
-        "공식 외부 근거 미검증",
-        "PDF archived text 없음",
-        "실시간 시세·계좌 자료 없음"
+      "events_processed": [
+        {
+          "event_key": "stock_ai_agent:16246",
+          "content_sha256": "c30bc9cecc88ce6a57eae00749d13073e0288226bdb8f7ae4544ea0584268940"
+        },
+        {
+          "event_key": "stock_ai_agent:16245",
+          "content_sha256": "1f83b401422bba41c322a1a0b3c00ebd7f1d2d7b025f79efbe524cbc7962f714"
+        },
+        {
+          "event_key": "stock_ai_agent:16244",
+          "content_sha256": "eb6119b77be9ca09650a40dca7706339b6f5fd44e617863e00da57809dd5ae28"
+        },
+        {
+          "event_key": "stock_ai_agent:16243",
+          "content_sha256": "bb9e6c1b570b91faca6591ddac1d2b6030ad896cadc46b687d49ef1ec618efb4"
+        },
+        {
+          "event_key": "stock_ai_agent:16242",
+          "content_sha256": "6d62d4e1af1d0045ec1d5145fa697d96986f6c1ee925bf077ea9185a0e7863e4"
+        },
+        {
+          "event_key": "stock_ai_agent:16241",
+          "content_sha256": "365c2c3ad9061d8cdf279e7691727bca71dc9eb5b85a6804b24c026fe7ac90ce"
+        },
+        {
+          "event_key": "stock_ai_agent:16240",
+          "content_sha256": "5bc48b0ef3f2a814362e682761171faf8445423b69a57ef50c477f4f4ee3d850"
+        },
+        {
+          "event_key": "stock_ai_agent:16239",
+          "content_sha256": "e6c93c35a91e9384edba27fc2315aed3fd05eaacdfec462b19cb1eaca30a8057"
+        },
+        {
+          "event_key": "stock_ai_agent:16238",
+          "content_sha256": "ddf07c4603f72ed2bf9f305e6d25337e35458f83db7c3d0360fdddcb8aeac8a0"
+        },
+        {
+          "event_key": "stock_ai_agent:16237",
+          "content_sha256": "6771a43c5034911d331f2f615b3a304c2341b8f9cda67ca4a52782a3904bbca4"
+        },
+        {
+          "event_key": "stock_ai_agent:16236",
+          "content_sha256": "1ab2dcc7a9e34ed7a8bd8aad7d8b0f2a3246852da1d005bc6f8e8178ca16f393"
+        },
+        {
+          "event_key": "stock_ai_agent:16235",
+          "content_sha256": "3cd5179d11f09be3efd57318a432625a156411459662dce98cf18ae2054d2136"
+        },
+        {
+          "event_key": "stock_ai_agent:16234",
+          "content_sha256": "21e770de89d8da423cc53e328fa162dd02f7502382728be9e5df9cbbe30ff848"
+        },
+        {
+          "event_key": "stock_ai_agent:16233",
+          "content_sha256": "45491295b0dbdd5ed1fcfbcbedab704d08104592069fa5f5be4ba7f4ec08c27f"
+        },
+        {
+          "event_key": "stock_ai_agent:16232",
+          "content_sha256": "f19e3bfc8a7f9246b7a06018c4b14b126e281da3f5afdbfdda511b70aae958b6"
+        },
+        {
+          "event_key": "stock_ai_agent:16231",
+          "content_sha256": "9d7a4feb8b996000d79bb73d9e6285727d30e77055250a972eaf20df47845bd7"
+        },
+        {
+          "event_key": "stock_ai_agent:16230",
+          "content_sha256": "348aa56b98b8bb5eaf699abbb31dad7e73e2fa4c1f717e3be55f9b2dde566778"
+        },
+        {
+          "event_key": "stock_ai_agent:16229",
+          "content_sha256": "2f6898bc8a498fb04e777865bec5e952de4ddb83dcc3b88918dcb8dcb5759ed8"
+        }
       ],
+      "simulation_holdings": [
+        "BP",
+        "FRSH",
+        "BKH",
+        "HALO",
+        "LLY"
+      ],
+      "pdf_comparisons_unverified": [
+        "MUR",
+        "KOS",
+        "RBRK",
+        "NTSK",
+        "MTDR",
+        "SM",
+        "NOG"
+      ],
+      "btc_demo": "16229~16232: 본문의 데모 표기를 우선해 연구 참고로 한정; 독립 성과 검증 없음",
       "external_delivery_verified": false,
       "mobile_handoff": {
         "owner": "external_github_notification_pipeline",
@@ -634,9 +401,9 @@
         "work_sent_notification": false
       }
     },
-    "next_checkpoint": "2026-10-16T09:00:52+09:00 또는 다음 성공한 sanitized producer run 중 먼저 도래하는 시점"
+    "next_checkpoint": "다음 성공한 정제 생산자 실행 또는 신규·수정 이벤트; 첫 만료 2026-10-18T01:37:30+09:00"
   },
-  "report_id": "prism:91814fef449d0b9c99acb5a5bf4172c3",
-  "report_sha256": "91814fef449d0b9c99acb5a5bf4172c353bce57db602ced03580f6dfd24c6fb7",
-  "published_at": "2026-10-16T08:34:30.519151+09:00"
+  "report_id": "prism:6bdd7ef6a39cd2b62c1ab76704324057",
+  "report_sha256": "6bdd7ef6a39cd2b62c1ab767043240578354f5e709d2a69a9a18152a0104e300",
+  "published_at": "2026-10-17T08:40:19.549995+09:00"
 }
