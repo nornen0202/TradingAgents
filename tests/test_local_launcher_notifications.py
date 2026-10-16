@@ -308,14 +308,15 @@ exit 7
     assert observed == {'visible': False, 'repo': repo, 'archive': archive}
 
 
-def test_installer_registers_gui_launcher_without_changing_worker_arguments(tmp_path):
+@pytest.mark.parametrize('interval', [15, 30])
+def test_installer_registers_gui_launcher_without_changing_worker_arguments(tmp_path, interval):
     install = tmp_path / 'maintenance with spaces'
     repo = tmp_path / 'repo with spaces'
     archive = tmp_path / 'archive with spaces'
     receipt = tmp_path / 'actions.jsonl'
     env = {**os.environ, 'TA_INSTALLER': str(ROOT / 'tools/install_local_automation.ps1'),
            'TA_INSTALL': str(install), 'TA_REPO': str(repo), 'TA_ARCHIVE': str(archive),
-           'TA_ACTIONS': str(receipt)}
+           'TA_ACTIONS': str(receipt), 'TA_INTERVAL': str(interval)}
     result = ps(r'''
 $ErrorActionPreference = 'Stop'
 # Import before installing mocks: module autoload exports functions with these
@@ -325,9 +326,12 @@ $PSModuleAutoLoadingPreference = 'None'
 function global:Get-ScheduledTask { param($TaskPath, $ErrorAction) @() }
 function global:Register-ScheduledTask {
     param($TaskPath, $TaskName, $Action, $Trigger, $Principal, $Settings, [switch]$Force)
-    @{name=$TaskName;execute=$Action.Execute;arguments=$Action.Arguments;multiple=[string]$Settings.MultipleInstances;limit=$Settings.ExecutionTimeLimit} | ConvertTo-Json -Compress | Add-Content -LiteralPath $env:TA_ACTIONS -Encoding UTF8
+    $triggers=@($Trigger | ForEach-Object { @{type=$_.CimClass.CimClassName;at=$_.StartBoundary;interval=$_.Repetition.Interval;delay=$_.Delay;days=$_.DaysOfWeek} })
+    @{name=$TaskName;execute=$Action.Execute;arguments=$Action.Arguments;multiple=[string]$Settings.MultipleInstances;limit=$Settings.ExecutionTimeLimit;triggers=$triggers} | ConvertTo-Json -Depth 6 -Compress | Add-Content -LiteralPath $env:TA_ACTIONS -Encoding UTF8
 }
-& $env:TA_INSTALLER -RepositoryRoot $env:TA_REPO -ArchiveRoot $env:TA_ARCHIVE -InstallRoot $env:TA_INSTALL -NoStart
+$options=@{}
+if($env:TA_INTERVAL -ne '15'){$options.PollIntervalMinutes=[int]$env:TA_INTERVAL}
+& $env:TA_INSTALLER -RepositoryRoot $env:TA_REPO -ArchiveRoot $env:TA_ARCHIVE -InstallRoot $env:TA_INSTALL -NoStart @options
 ''', env)
     assert result.returncode == 0, result.stderr
     actions = [json.loads(line) for line in receipt.read_text(encoding='utf-8-sig').splitlines()]
@@ -340,6 +344,21 @@ function global:Register-ScheduledTask {
         assert action['name'] == f'LocalAutomation-{command}'
         assert action['multiple'] == 'IgnoreNew'
         assert action['limit'] == 'PT13H'
+        timer, logon, *critical = action['triggers']
+        assert timer['type'] == 'MSFT_TaskTimeTrigger'
+        assert timer['interval'] == f'PT{interval}M'
+        tick = datetime.fromisoformat(timer['at'])
+        assert tick.minute % interval == (2 if command == 'publish' else 0)
+        assert tick.second == 0
+        assert logon['type'] == 'MSFT_TaskLogonTrigger'
+        assert logon['delay'] == ('PT2M' if command == 'publish' else 'PT30S')
+        if command == 'run-due':
+            boundary, = critical
+            at = datetime.fromisoformat(boundary['at']).astimezone()
+            assert (at.hour, at.minute) == (17, 50)
+            assert boundary['type'] == 'MSFT_TaskWeeklyTrigger' and boundary['days'] == 62
+        else:
+            assert not critical
 
 
 @pytest.mark.parametrize('runtime', ['missing', 'invalid', 'failed', 'timeout', 'usable'])

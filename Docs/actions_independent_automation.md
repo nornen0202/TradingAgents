@@ -19,8 +19,8 @@ GitHub documents a separate [GitHub-controlled disabled state](https://docs.gith
 
 ## Independent production and durable publication
 
-`tradingagents.local_automation` has two Windows scheduled tasks, both checked
-every five minutes and at logon, with separate OS locks:
+`tradingagents.local_automation` has two Windows scheduled tasks, checked every
+15 minutes and at logon, with separate OS locks:
 
 - `run-due`: reuses the existing exchange-calendar windows, including Friday's
   US session after Korean midnight; checks complete same-market research in
@@ -73,6 +73,18 @@ The tasks start through `wscript.exe` and the installed
 PowerShell is created and waits for its exit code. Launching PowerShell directly
 with `-WindowStyle Hidden` can briefly open Windows Terminal on every tick;
 the Task Scheduler `Hidden` setting alone only hides the task in its UI.
+
+Production checks run on quarter hours; publishing checks run two minutes later
+(:02, :17, :32, :47). This cuts ordinary timer invocations from 576 to 192 per
+day while preserving the 01:00/03:00 and 10:30/13:30/14:30 local overlay
+boundaries. An additional weekday 17:50 production trigger preserves the US
+full-research admission boundary. New output can wait up to 15 minutes for the
+next publication check; processing and external delivery can take longer.
+Exchange calendars, freshness checks, deduplication, and retry budgets still
+decide whether a tick actually performs work. Logon checks are delayed by 30
+seconds for production and two minutes for publishing. The installer accepts
+`-PollIntervalMinutes` to override the default when needed; `-UpdateScriptsOnly`
+does not change an existing task's schedule.
 
 The first task ticks inspect **all** active trusted main-branch writer runs,
 including queued/waiting writers. They wait for those writers to finish and

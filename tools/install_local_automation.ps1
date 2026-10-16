@@ -3,6 +3,7 @@ param(
     [string] $RepositoryRoot = "C:\Projects\TradingAgents",
     [string] $ArchiveRoot = "C:\TradingAgentsData\archive",
     [string] $InstallRoot = "C:\TradingAgentsMaintenance",
+    [ValidateSet(5, 10, 15, 20, 30, 60)][int] $PollIntervalMinutes = 15,
     [switch] $UpdateScriptsOnly,
     [switch] $NoStart
 )
@@ -44,10 +45,24 @@ if ($PSCmdlet.ShouldProcess($installedScript, "Install independent local analysi
         $hiddenLauncher = Join-Path $InstallRoot 'run_powershell_hidden.vbs'
         $arguments = "//B //Nologo `"$hiddenLauncher`" `"$installedScript`" -Command $command -RepositoryRoot `"$RepositoryRoot`" -ArchiveRoot `"$ArchiveRoot`""
         $action = New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\wscript.exe') -Argument $arguments
-        $trigger = New-ScheduledTaskTrigger -Once -At ([DateTime]::Now.AddMinutes(1)) -RepetitionInterval (New-TimeSpan -Minutes 5)
+        # Quarter-hour production ticks retain the 01:00/03:00 and
+        # 10:30/13:30/14:30 overlay boundaries. Offset publishing to avoid
+        # contending for the shared source-fetch lock on every idle tick.
+        $offset = if ($command -eq 'publish') { 2 } else { 0 }
+        $now = [DateTime]::Now
+        $anchor = $now.Date.AddMinutes($offset)
+        $nextTick = $anchor.AddMinutes(([Math]::Floor(($now - $anchor).TotalMinutes / $PollIntervalMinutes) + 1) * $PollIntervalMinutes)
+        $trigger = New-ScheduledTaskTrigger -Once -At $nextTick -RepetitionInterval (New-TimeSpan -Minutes $PollIntervalMinutes)
         $logon = New-ScheduledTaskTrigger -AtLogOn -User $identity
+        $logon.Delay = if ($command -eq 'publish') { 'PT2M' } else { 'PT30S' }
+        $triggers = @($trigger, $logon)
+        if ($command -eq 'run-due') {
+            # The US full-research admission window opens at 17:50 KST,
+            # between quarter hours. Preserve that boundary explicitly.
+            $triggers += New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At ($now.Date.AddHours(17).AddMinutes(50))
+        }
         $settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Hidden -ExecutionTimeLimit (New-TimeSpan -Hours 13)
-        Register-ScheduledTask -TaskPath "\TradingAgents\" -TaskName $name -Action $action -Trigger @($trigger, $logon) -Principal $principal -Settings $settings -Force | Out-Null
+        Register-ScheduledTask -TaskPath "\TradingAgents\" -TaskName $name -Action $action -Trigger $triggers -Principal $principal -Settings $settings -Force | Out-Null
         if (-not $NoStart) { Start-ScheduledTask -TaskPath "\TradingAgents\" -TaskName $name }
     }
 }
