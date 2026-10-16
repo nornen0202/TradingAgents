@@ -1,0 +1,299 @@
+{
+  "version": 4,
+  "video_id": "ZdhaDE9YxfQ",
+  "title": "10월 16일 오늘 코스피 어떻게 흘러갈까?",
+  "url": "https://www.youtube.com/watch?v=ZdhaDE9YxfQ",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/ZdhaDE9YxfQ/maxresdefault.jpg",
+  "published_at": "2026-10-15T23:21:39+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1666,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 1666,
+    "segments": 86,
+    "duration_seconds": 135,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-16T08:45:58.638448+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 6,
+  "claim_status_summary": {
+    "unverified": 7,
+    "asr_uncertain": 3
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "전일 코스피가 7% 넘게 하락했으며 10월 16일에는 상승 출발 후 전일보다 소폭 높은 수준에서 마감할 것이라는 주장·전망.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.83,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "전일 하락률 7% 초과; 당일 상승 출발·소폭 상승 마감",
+        "observed": "시장 스냅샷 current_price 5554.22만 제공됨; 비교 기준 종가와 당일 OHLC는 미제공"
+      },
+      "investor_implication": "전일 급락 수치와 당일 전망 모두 확인 전에는 매수 근거로 확정할 수 없다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "코스피200 야간선물이 한때 약 1% 하락했다가 3.9% 넘게 상승 마감해 코스피 상승 출발을 시사했다는 주장.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.83,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "장중 약 -1%; 마감 +3.9% 초과",
+        "observed": "해당 야간장 가격자료 미제공"
+      },
+      "investor_implication": "상품과 등락률 기준을 확인하기 전에는 야간선물 수치를 개장 방향의 확정 신호로 사용할 수 없다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "야간선물 ±1.5% 이상 변동 시 같은 방향 출발 경향, 최근 10거래일 중 상승 출발 3회의 시가 하회 마감, 외국인 4일 초과 연속 매도 조건에서 상승 마감 약 60%라는 과거 통계 주장.",
+      "status": "asr_uncertain",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.83,
+      "asr_confidence": 0.4,
+      "numeric_parse": {
+        "claimed": "±1.5%; 최근 10일 중 3회 및 3회 모두 시가 하회; 4일 초과 연속 매도 조건에서 약 6/10",
+        "observed": "통계 원자료 미제공; 첫 통계의 적중 빈도는 판독 불가"
+      },
+      "investor_implication": "제시된 빈도를 당일 상승 확률이나 전략의 기대수익으로 해석할 수 없다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "외국인이 코스피에서 8거래일 연속 순매도했고 누적액은 18조 원 초과, 전일 순매도액은 3조 7천억 원 초과이며 매도 지속 시 반등이 약화될 수 있다는 주장.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.83,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "8거래일 연속 순매도; 누적 18조 원 초과; 전일 3.7조 원 초과",
+        "observed": "해당 기간 투자자별 수급자료 미제공"
+      },
+      "investor_implication": "연속일수와 금액을 확인하고 장중 추정치와 확정치를 구분해야 한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "전일 코스피 공포지수가 50을 크게 넘었으며 당일 장중 변동성이 클 수 있다는 주장.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [
+        "E4",
+        "E5"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.83,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "전일 공포지수 50 크게 초과",
+        "observed": "6월 기사에서 지칭한 12일 종가 89.91; 10월 15일 관측값 미제공"
+      },
+      "investor_implication": "6월의 변동성 수치를 10월의 위험 수준으로 대체해서는 안 된다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "미국 거래 하이닉스 ADR이 개장 전 7% 넘게 하락했다가 0.98% 하락 마감했으며 국내 주가 반등 출발 신호라는 주장.",
+      "status": "asr_uncertain",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.76,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "개장 전 -7% 초과; 마감 -0.98%",
+        "observed": "상품 식별정보 및 가격자료 미제공"
+      },
+      "investor_implication": "상품 식별 전에는 해당 가격을 국내 SK하이닉스의 선행 신호로 사용하지 않는 것이 타당하다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "삼성전자와 SK하이닉스가 코스피의 절반을 차지하며 두 종목의 약세가 다른 업종 상승을 상쇄할 수 있다는 주장.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.76,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "두 종목 합산 코스피 비중 약 50%",
+        "observed": "공식 구성비·동일 시점 시가총액 자료 미제공"
+      },
+      "investor_implication": "약 50%라는 수치에 근거한 지수 민감도 판단은 공식 구성비 확인 전까지 유보해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "젠슨 황이 코어위브 자금조달 비용 하락을 언급해 AI 기업 부채 우려가 완화되고 밤사이 반등에 기여했다는 주장.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.87,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "자금조달 비용 하락; 구체적 수치 없음",
+        "observed": "발언 원문 및 비교 가능한 조달조건 미제공"
+      },
+      "investor_implication": "발언의 존재, 실제 조달조건 개선, 시장 반응을 각각 확인하기 전에는 AI 부채 위험 완화의 근거로 확정할 수 없다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "미국 10년물 금리가 5.09%로 하락하고 다우는 1% 넘게 상승한 반면 반도체지수는 하락했으며, AI 불안이 안전자산 선호와 헬스케어·소비주 이동을 유발했다는 주장.",
+      "status": "asr_uncertain",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.75,
+      "asr_confidence": 0.4,
+      "numeric_parse": {
+        "claimed": "미국 10년물 5.09%; 다우 +1% 초과; 반도체지수 하락률 판독 불가",
+        "observed": "금리·지수·업종 자금흐름 자료 미제공"
+      },
+      "investor_implication": "전사 불확실한 수치를 시장 판단에 사용하지 말고, 가격 동행과 원인 해석을 구분해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "전일 원·달러 환율이 1,344원까지 상승했고 간밤 달러가 약해졌으며, 당일 환율이 낮게 출발하면 외국인 매도가 완화될 여지가 있다는 주장.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "전일 원·달러 환율 1,344원; 당일 더 낮은 개장 시 매도 완화 가능",
+        "observed": "환율·달러지표·동시간 외국인 수급 자료 미제공"
+      },
+      "investor_implication": "1,344원을 확정 기준선으로 삼기 전에 원음과 시장자료를 확인하고 실제 외국인 수급을 별도로 관찰해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피·코스피200 야간선물",
+      "status": "unverified",
+      "claims": [
+        "야간선물의 급반등을 근거로 코스피의 상승 출발과 전일 대비 소폭 상승 마감을 예상한다.",
+        "최근 상승 출발 후 밀린 사례와 외국인 연속 매도를 근거로, 상승 출발이 상승 마감을 보장하지 않는다고 주장한다.",
+        "공포지수가 높은 상황에서는 장중 변동성이 클 수 있어 아침 상승만 보고 추격 매수하는 것은 위험하다고 경고한다."
+      ],
+      "numeric_claims": [
+        "전일 코스피가 7% 넘게 하락했다고 발언한다.",
+        "코스피200 야간선물이 한때 약 1% 하락했다가 3.9% 넘게 상승 마감했다고 발언한다.",
+        "출처가 불명확한 최근 자료를 인용해 월요일·연휴 뒤를 제외한 날 야간선물이 ±1.5% 이상 움직이면 같은 방향으로 출발하는 경향이 있다고 주장하나, 빈도는 자막의 ‘열번 꼴’만으로 확정할 수 없다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-15T23:47:04.588648+00:00",
+        "current_price": 5554.22,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Alcoa (AA) Stock Looks Reasonable On Its 72% Three Year Run",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/alcoa-aa-stock-looks-reasonable-232132682.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-15T23:21:32+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Alcoa (AA) Stock Looks Reasonable On Its 72% Three Year Run Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "What Alcoa (AA) Said on Its Q3 Earnings Call",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/alcoa-aa-said-q3-earnings-230242270.html",
+      "publisher": "MarketBeat",
+      "published_at": "2026-10-15T23:02:42+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "What Alcoa (AA) Said on Its Q3 Earnings Call Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My por..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C5",
+      "title": "'50년만 최고' 성장 뒤...커지는 \"양극화\"",
+      "source_url": "https://www.jnilbo.com/news/articleView.html?idxno=90000042161",
+      "publisher": "Naver News",
+      "published_at": "2026-06-14T08:49:00+09:00",
+      "source_tier": "web",
+      "excerpt": "30일의 변동성을 측정하는 지수로 '한국형 공포지수'로도 불린다. 12일 종가는 89.91로 이 지수가 공식 발표되기 전부터 수집된 VKOSPI 데이터로 산출한 글로벌 금융위기 시절 최고치인 2008년 10월 29일(89.30)보다 높았다.... '50년만 최고' 성장 뒤...커지는 \"양극화\" --> 기사검색 검색 로그인 회원가입 정치 지방선거 국제뉴스 광주와 호남 통합특별시 광주 지자체 호남 지자체 대학·교육 사건과 현상 경제와 과학 문화와 예술 여행과..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C5",
+      "title": "50년 만의 고성장에도 저고용…불균형·변동성 직면한 한국경제",
+      "source_url": "https://www.yna.co.kr/view/AKR20260613049500002?input=1195m",
+      "publisher": "Naver News",
+      "published_at": "2026-06-14T06:01:00+09:00",
+      "source_tier": "news",
+      "excerpt": "30일의 변동성을 측정하는 지수로 '한국형 공포지수'로도 불린다. 12일 종가는 89.91로 이 지수가 공식 발표되기 전부터 수집된 VKOSPI 데이터로 산출한 글로벌 금융위기 시절 최고치인 2008년 10월 29일(89.30)보다 높았다...."
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C7",
+      "title": "하이닉스 60조·삼성전자 89조 넘게 벌었는데…주가는 왜? [스프]",
+      "source_url": "https://news.sbs.co.kr/news/endPage.do?news_id=N1008682742&plink=ORI&cooper=NAVER",
+      "publisher": "Naver News",
+      "published_at": "2026-07-31T09:01:00+09:00",
+      "source_tier": "news",
+      "excerpt": "발표 | SK 하이닉스 - 삼성전자 연도별 매출액·영업이익·영업이익률 | 삼성전자 - 2026년 2분기 실적발표 | TSMC - 연도별 코스피 사이드카 발생 현황 | 한국거래소 상장공시시스템(KIND) - V-KOSPI 지수 현황 | KRX Data..."
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

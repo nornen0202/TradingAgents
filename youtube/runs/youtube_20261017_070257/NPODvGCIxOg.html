@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 전력주는 AI가 폭락해도 끝나지 않는 이유</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261017_070257</p>
+    <h1>전력주는 AI가 폭락해도 끝나지 않는 이유</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=NPODvGCIxOg">원본 영상</a>
+    </div>
+  </header>
+  <h2>전력주, AI 투자 둔화에도 방어력이 있을까?</h2>
+<p><strong>핵심 판단: 고객군·제품별로 전력설비 기업을 구분하자는 분석 틀은 검토할 만하지만, 영상의 핵심 수치와 방어력 주장은 대부분 미검증이다.</strong> 10개 주장 중 효성중공업의 장중 급락만 일부 뒷받침된다. 이를 전력주 전반의 실적 안정성이나 주가 방어력이 입증된 것으로 해석할 수 없다.</p>
+<ul>
+<li>분석 대상: 경제사냥꾼, <a href="https://www.youtube.com/watch?v=NPODvGCIxOg">전력주는 AI가 폭락해도 끝나지 않는 이유</a></li>
+<li>영상 공개: 2026년 10월 16일, 길이 2분 7초</li>
+<li>분석 범위: 제공된 자동자막 추출·검색 발췌·주장별 검증 결과. 실시간 시세와 추가 원문 확인 자료는 없다.</li>
+</ul>
+<h3>1. 영상 주장과 확인된 사실</h3>
+<p>영상의 논리는 두 단계다. 먼저 <strong>AI 데이터센터 투자와 전력회사의 노후 설비 교체 수요를 분리</strong>하고, 다음으로 <strong>같은 전력회사 고객이라도 제품별 공급 부족과 경쟁 강도를 구분</strong>해야 한다는 것이다. 다만 이를 뒷받침할 기업 공시·수급 조사 원문은 제공되지 않았다.</p>
+<p>| 대상 | 영상 주장 | 확인된 사실/근거 및 판정 |</p>
+<p>|---|---|---|</p>
+<p>| 버티브 | AI 데이터센터 매출 비중이 85%여서 AI 투자 축소에 취약 | <strong>미검증.</strong> 매출 구성 공시가 없다. 전체 데이터센터 매출과 AI 전용 매출을 구분해야 한다. |</p>
+<p>| 버티브·허벨 | 같은 날 버티브는 약 6%, 허벨은 1% 미만 하락 | <strong>미검증.</strong> 비교 거래일과 실제 가격 자료가 없다. 하루 수익률만으로 고객군에 따른 방어력을 입증할 수도 없다. |</p>
+<p>| HD현대일렉트릭 | AI 데이터센터 수주 비중이 지난해 1.8%, 올해 목표 6.3%; AI 주문 제외 후 약 94% 잔존, 이익률 25% | <strong>미검증.</strong> 6.3%를 가정하면 잔여치는 93.7%라는 산술만 확인된다. 수주 목표는 실제 매출·이익과 다르며, 25%의 지표·기간도 불명확하다. 자막에는 3%라는 상충 수치도 있다. |</p>
+<p>| LS ELECTRIC | 상반기 북미 빅테크 수주 비중 37%; 제외 후 63% 잔존 | <strong>미검증.</strong> 100−37=63이라는 계산만 성립한다. 북미 빅테크 수주 전체를 AI 주문으로 볼 근거가 없다. |</p>
+<p>| 제룡전기 | 2분기 매출 41%, 영업이익 74% 감소; 소형 변압기 가격 경쟁이 원인 | <strong>미검증.</strong> 연도와 전년 동기·전분기 비교 기준이 없다. 가격·물량·환율 등 원인 분해도 확인되지 않았다. |</p>
+<p>| 미국 변압기 시장 | 소형 부족률 6%, 대형 부족률 30% | <strong>미검증.</strong> 조사기관·기준연도·산식·제품 분류가 없다. 부족률을 가격이나 이익률로 직접 연결할 수 없다. |</p>
+<p>| 효성중공업 주가 | ‘어제’ 하루 거의 15% 하락 | <strong>부분 뒷받침.</strong> 검색 발췌에는 15일 오전 10시 11분 기준 13.26% 하락이 나온다. 종가 약 15% 하락은 확인되지 않았다. |</p>
+<p>| 효성중공업 급락 원인 | 미국 인플레이션 충격과 AI 투자 경고가 복합 작용 | <strong>미검증.</strong> 물가지표·예상치·경고 발언 원문과 시각이 없다. 검색 발췌는 별도로 실적 부진 우려를 언급한다. |</p>
+<p>| 효성중공업 제품 경쟁력 | 미국 765kV 변압기의 거의 절반을 설치했고 765kV는 미국 최고 전압 | <strong>미검증.</strong> 점유율의 분모·기간·지역과 전압의 교류/직류·운용/계획 범위가 확인되지 않았다. |</p>
+<p>| 허벨·전력설비 업종 | 비AI 노후 교체 수요와 제품 공급 부족이 방어력을 제공 | <strong>미검증 투자 가설.</strong> 고객 구성, 확정 교체 투자액, 규제 승인, 제품별 공급 자료가 없다. |</p>
+<p><strong>미검증은 허위라는 뜻이 아니라, 제공된 증거로 사실성을 확정할 수 없다는 뜻이다.</strong> 모든 주장에 수동 확인이 필요하다.</p>
+<h3>2. 가장 유효한 외부 근거: 효성중공업 장중 급락</h3>
+<p>제공 자료 중 주장과 직접 연결되는 근거는 뉴스1 기사의 검색 발췌다. 발췌에 따르면 효성중공업은 <strong>15일 오전 10시 11분 전일 대비 13.26% 하락한 185만2,000원</strong>에 거래됐다. 다만 연·월은 발췌 본문만으로 완전히 확정되지 않으며, 재유통 기사 URL의 날짜가 2026년 10월 15일을 가리킨다. <a href="https://www.news1.kr/finance/general-stock/6320860">뉴스1 기사</a>, <a href="https://news.nate.com/view/20261015n10745">동일 기사 재유통본</a></p>
+<p>이 자료의 해석 범위는 제한적이다.</p>
+<ul>
+<li><strong>관측:</strong> 특정 장중 시점에 큰 폭의 하락이 보도됐다.</li>
+<li><strong>미확인:</strong> 해당 거래일의 종가 수익률과 영상 속 ‘어제’의 정확한 날짜.</li>
+<li><strong>대안 설명:</strong> 기사 발췌는 실적 부진 우려를 언급한다. 이는 검토할 설명이지, 급락 원인이 확정됐다는 뜻은 아니다.</li>
+<li><strong>중복 주의:</strong> 두 링크는 같은 뉴스1 기사의 유통본으로 보이며 독립적인 복수 확인이 아니다.</li>
+</ul>
+<p><a href="https://kr.investing.com/equities/hyosung-heavy-industries-historical-data">과거 가격 조회 페이지</a>도 검색됐지만, 제공 자료에는 실제 일별 가격 행이 없다. 따라서 해당 페이지가 발견됐다는 사실만으로 종가 하락률을 검증할 수 없다.</p>
+<h3>3. 강세 논리가 성립하려면</h3>
+<p>다음은 확인된 전망이 아니라 <strong>영상의 논리를 검증하기 위한 조건부 시나리오</strong>다.</p>
+<p>1. <strong>비AI 수요의 독립성:</strong> 전력회사의 교체·유지보수 예산이 AI 데이터센터 증설과 구분되고, AI 투자가 둔화해도 집행돼야 한다.</p>
+<p>2. <strong>수주잔고의 실적 전환:</strong> 비AI 주문이 실제로 유지되며 취소·납기 연기 없이 매출과 현금흐름으로 전환돼야 한다.</p>
+<p>3. <strong>제품별 공급 제약:</strong> 대형·초고압 제품의 공급 증설 속도보다 수요가 견조하고, 인증·납품 실적 등 경쟁 제약이 가격을 지지해야 한다.</p>
+<p>4. <strong>이익의 질:</strong> 판매가격 유지가 원가·환율·제품 구성 변화까지 반영한 이익률과 현금흐름으로 이어져야 한다.</p>
+<p>이 조건들이 확인되면 기업별 AI 민감도를 차별화해 볼 근거가 생긴다. 그러나 현재 자료만으로 HD현대일렉트릭·LS ELECTRIC·허벨 등의 방어력 순위를 정할 수는 없다.</p>
+<h3>4. 반론과 무효화 조건</h3>
+<p><strong>설비 수요가 남는 것, 기업 이익이 유지되는 것, 주가가 방어되는 것은 서로 다른 명제다.</strong> 실적이 유지돼도 높은 기대가 반영된 밸류에이션이나 할인율 변화로 주가는 하락할 수 있다. 현재 가격·밸류에이션 자료는 제공되지 않았다.</p>
+<p>| 논리 | 주요 반론 | 논리를 약화하거나 무효화할 관측 |</p>
+<p>|---|---|---|</p>
+<p>| 비AI 교체 수요가 안정적이다 | 고객의 자금조달·규제 승인·집행 일정에 영향을 받을 수 있다 | 교체 예산 축소, 승인 지연, 비AI 주문 취소·납기 연기 |</p>
+<p>| 대형 변압기 부족이 수익성을 지킨다 | 공급 증설이나 경쟁 진입으로 부족이 완화될 수 있다 | 납기 단축과 판매가격 하락이 동반되고 이익률까지 악화 |</p>
+<p>| 낮은 AI 수주 비중이 손실을 제한한다 | 수주 비중은 매출·이익 노출과 다르고 간접 영향도 존재한다 | 고객·용도 재분류 후 AI 연계 비중이 커지거나 비AI 주문까지 동반 감소 |</p>
+<p>| 설치 실적이 진입장벽을 뜻한다 | 과거 점유율이 향후 수주와 수익성을 보장하지 않는다 | 고객의 경쟁사 채택 확대, 신규 수주 점유율·가격 하락 |</p>
+<p>이 항목들은 발생이 확인된 사건이 아니라 향후 확인할 반증 기준이다.</p>
+<h3>5. 단기 체크포인트와 구체적 관찰 항목</h3>
+<p>다음 실적 발표·공시·고객 투자계획 업데이트에서 아래 항목을 대조할 필요가 있다. 구체적인 발표 일정은 제공되지 않았다.</p>
+<p>| 우선순위 | 확인할 자료 | 관찰 항목 |</p>
+<p>|---|---|---|</p>
+<p>| 1. 사건일·가격 | 거래소 일별 시세와 기사 원문 | 효성중공업 장중/종가 구분, 버티브·허벨 동일 거래일 수익률 |</p>
+<p>| 2. 기업별 노출 | 회사 공시·IR의 고객·용도별 수주 표 | 버티브 85%의 정의, HD현대일렉트릭 1.8%·6.3%의 기간과 목표/실적, LS ELECTRIC 37%의 분모 |</p>
+<p>| 3. 실적 전환 | 분기 실적·수주잔고·현금흐름 | 신규 수주, 취소·연기, 매출 전환, 영업이익률, 매출채권·재고 변화 |</p>
+<p>| 4. 제룡전기 감소 원인 | 단일분기 실적과 회사 설명 | 매출·영업이익 증감률 재계산, 가격·물량·환율·제품 구성의 기여 |</p>
+<p>| 5. 산업 수급 | 최초 수급 조사와 업체별 공급계획 | 부족률 산식, 제품 분류, 생산능력 증설, 납기·판매가격 추세 |</p>
+<p>| 6. 비AI 수요 확정성 | 전력회사 투자계획·규제 승인 자료 | 교체/증설 구분, 승인·집행액, AI 관련 투자와의 중복 여부 |</p>
+<p>| 7. 급락 인과관계 | 물가 발표·AI 경고 원문·기업 공시 | 발표시각과 한국 거래시간의 선후, 실제치/예상치, 실적 우려 등 대안 원인 |</p>
+<p>HD현대일렉트릭과 LS ELECTRIC의 비교는 <strong>동일 기간·동일 사업 범위·동일 수주 분모</strong>로 맞춘 뒤 수행해야 한다. 94%와 63%는 현재로서는 가정된 비중의 산술 잔여치일 뿐, 보장된 잔존 매출이나 이익이 아니다.</p>
+<h3>6. 데이터 품질과 신뢰도 해석</h3>
+<ul>
+<li><strong>타임스탬프:</strong> 모든 주장에 표시된 <code>00:00:02</code>는 00:02~02:07 공통 청크의 시작점이다. 개별 문장의 정확한 발화 시각이 아니다.</li>
+<li><strong>transcript_quality:</strong> 자동 한국어 자막의 상태는 <code>good</code>, 점수는 1.0이다. 이는 수집·형식 품질 지표이며 숫자나 사실의 정확성을 보증하지 않는다.</li>
+<li><strong>source_confidence:</strong> 기업·업종별 0.85~0.95로, 발화 추출의 명확성을 뜻한다. 사실성이나 투자 확신도와 다르다.</li>
+<li><strong>asr_confidence:</strong> HD현대일렉트릭 0.55, 제룡전기·핵심 교체 수요 주장 0.75, 효성중공업 설치 실적 0.88, 나머지는 대체로 0.90이다. 원음 대조가 아닌 추정치다. 특히 HD현대일렉트릭은 회사명 인식과 6.3%/3% 충돌로 불확실성이 크다.</li>
+<li><strong>상대시점:</strong> 제작일이 불명확해 ‘올해·지난해·작년’을 업로드일 기준 연도로 확정할 수 없다.</li>
+<li><strong>외부 증거:</strong> E1~E4는 오류·탐색 메뉴 중심이고 E5·E6·E10은 발췌가 비어 있다. 관련 없는 기사 제목은 근거로 사용하지 않았다. 수집 상태의 <code>verified</code> 표시는 개별 투자 주장이 검증됐다는 뜻이 아니다.</li>
+<li><strong>정보 시점:</strong> E1~E6·E10의 표시 발행시각은 영상 공개 이후다. 영상 당시 이용 가능했던 정보와 구분해야 한다.</li>
+<li><strong>폐쇄형 출처:</strong> Bloomberg·Morningstar 원문이나 별도의 폐쇄형 자료는 제공되지 않았다. 이에 의존하는 수치·주장은 <strong>미검증·수동 확인 필요</strong>로 남는다.</li>
+</ul>
+<h3>결론</h3>
+<p>영상에서 가져갈 핵심은 ‘전력주가 AI와 무관하게 안전하다’는 결론이 아니라, <strong>고객의 투자 목적·제품별 경쟁·수주의 실적 전환을 나눠 보자는 검증 틀</strong>이다. 현재 증거로는 효성중공업의 장중 급락 외 핵심 수치와 방어력 논리가 확인되지 않았다. 향후 판단의 중심은 비AI 주문의 실제 유지, 제품별 가격·납기, 이익·현금흐름 전환, 그리고 이를 반영한 밸류에이션이어야 한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;NPODvGCIxOg&quot;,
+  &quot;title&quot;: &quot;전력주는 AI가 폭락해도 끝나지 않는 이유&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=NPODvGCIxOg&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/NPODvGCIxOg/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-16T07:12:14+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1826,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1826,
+    &quot;segments&quot;: 78,
+    &quot;duration_seconds&quot;: 127,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-17T07:02:57.040836+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;partially_supported&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;버티브 매출의 85%가 AI 데이터센터에서 발생해 AI 투자 축소에 취약하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;AI 데이터센터 매출 비중 85%&quot;,
+        &quot;observed&quot;: &quot;관련 공시 및 매출 구성 수치 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;85%를 확정된 AI 매출 의존도로 사용하지 말고 회사 공시의 최종시장 분류와 기준기간을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;같은 미국 거래일 버티브는 약 6%, 허벨은 1% 미만 하락했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;버티브 약 -6%, 허벨 -1% 미만의 하락&quot;,
+        &quot;observed&quot;: &quot;동일 거래일 가격·수익률 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;동일 거래일의 전일 종가 대비 수익률을 확인하기 전에는 상대적 주가 방어 사례로 인용하지 않는 것이 적절하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;HD현대일렉트릭의 AI 데이터센터 수주 비중은 지난해 1.8%, 올해 목표 6.3%이며 AI 주문 제거 후 약 94%가 남고 매출 대비 이익은 25%다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난해 1.8%, 올해 목표 6.3%, 잔여 약 94%, 이익률 25%; 별도 발화 3%&quot;,
+        &quot;observed&quot;: &quot;외부 관측치 unavailable; 조건부 산술 100-6.3=93.7&quot;
+      },
+      &quot;investor_implication&quot;: &quot;94%를 확정된 잔존 매출이나 이익으로 해석하지 말아야 한다. 원음과 회사 원자료 확인이 선행되어야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;LS ELECTRIC의 올해 상반기 수주 중 북미 빅테크 비중은 37%이며 이를 제외하면 63%가 남아 HD현대일렉트릭보다 AI 의존도가 높다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.93,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;북미 빅테크 수주 37%, 제외 후 63%&quot;,
+        &quot;observed&quot;: &quot;외부 관측치 unavailable; 조건부 산술 100-37=63&quot;
+      },
+      &quot;investor_implication&quot;: &quot;37%를 AI 매출 손실률로 적용하거나 두 회사의 투자위험 순위를 확정하는 근거로 사용하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;제룡전기는 미국 전력회사에 소형 변압기를 공급하며 2분기 매출 41%, 영업이익 74% 감소의 원인은 가격 경쟁이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2분기 매출 -41%, 영업이익 -74%&quot;,
+        &quot;observed&quot;: &quot;분기 실적 및 비교 기준 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공시에서 단일분기 실적을 재계산하고 회사의 원인 설명을 확인하기 전에는 가격 경쟁에 따른 실적 악화 사례로 확정하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;작년 미국 소형 변압기 부족률은 6%, 대형 변압기는 30%이며 이 차이가 가격 경쟁과 방어력 차이를 만든다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;소형 부족률 6%, 대형 부족률 30%&quot;,
+        &quot;observed&quot;: &quot;해당 수급 조사 및 관측치 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;6%와 30%를 검증된 산업 수급 지표로 사용하지 말고 원조사와 실제 가격·납기 변화를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;효성중공업 주가가 &#x27;어제&#x27; 하루 거의 15% 하락했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.87,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E8&quot;,
+        &quot;E9&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;하루 약 -15%&quot;,
+        &quot;observed&quot;: &quot;검색 발췌상 15일 10:11 기준 -13.26%, 1,852,000원; 종가 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;큰 폭의 장중 하락은 일부 뒷받침되지만 &#x27;하루 거의 15%&#x27;는 종가 자료와 사건일 확인 후 인용해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;효성중공업 급락은 미국 인플레이션 충격과 AI 투자 경고가 복합적으로 작용한 결과다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;인플레이션 충격과 AI 투자 경고의 복합 영향&quot;,
+        &quot;observed&quot;: &quot;물가지표·예상치·발언 시각 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;급락을 두 거시 요인만으로 설명하지 말고 실적 우려와 기업 고유 공시, 사건 전후 시차를 함께 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;효성중공업이 미국 765kV급 대형 변압기의 거의 절반을 설치해 왔으며 765kV가 미국 최고 전압이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 765kV 변압기 설치 비중 거의 절반; 미국 최고 전압 765kV&quot;,
+        &quot;observed&quot;: &quot;설치 점유율 및 전압 적용 범위 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공급 실적과 고객 측 설치 자료를 확인하기 전에는 약 50% 점유율이나 기술적 우위를 확정하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;미국 전력회사의 노후 전선·변압기 교체는 AI 투자와 별도로 지속되며 고객군과 제품 공급 부족이 전력주의 방어력을 좌우한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없음&quot;,
+        &quot;observed&quot;: &quot;비AI 교체 투자와 고객 구성 자료 unavailable&quot;
+      },
+      &quot;investor_implication&quot;: &quot;핵심 논리는 검증할 투자 가설로 취급하고 비AI 수주잔고, 고객 투자 확정성, 제품별 경쟁과 밸류에이션을 확인해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Billionaire Investor Flags a Troubling Twist in AI Boom&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/ai/articles/billionaire-investor-flags-troubling-twist-210206609.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-16T21:02:06+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Billionaire Investor Flags a Troubling Twist in AI Boom Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Fin...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Bank of America Flags Major Warning for Stock Market&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/bank-america-flags-major-warning-202750047.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-16T20:27:50+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Bank of America Flags Major Warning for Stock Market Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Financ...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;General David Petraeus Joins Century CEO Jesse Gary for Fireside Chat on National Security Risks from Foreign Primary Aluminum Supply&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/economy/policy/articles/general-david-petraeus-joins-century-170500053.html&quot;,
+      &quot;publisher&quot;: &quot;PR Newswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-16T17:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;General David Petraeus Joins Century CEO Jesse Gary for Fireside Chat on National Security Risks from Foreign Primary Aluminum Supply Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Spo...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: S&amp;P 500, Nasdaq Break Key Levels As CoreWeave, Dell Dive; Tesla, SpaceX, Meta Loom&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/4342d021-69d3-3aa1-9753-76f72c9ba95d/dow-jones-futures%3A-s%26p-500%2C.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-16T21:08:07+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;U.S. Stocks Fall as Credit Fears Haunt Tech Sector&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/468c28d9-2882-37b1-9fe2-c54122046bd4/u.s.-stocks-fall-as-credit.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-16T21:39:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Hyosung Heavy Industries Corp (298040) 과거 가격 데이터 - Investing.com&quot;,
+      &quot;source_url&quot;: &quot;//duckduckgo.com/l/?uddg=https%3A%2F%2Fkr.investing.com%2Fequities%2Fhyosung%2Dheavy%2Dindustries%2Dhistorical%2Ddata&amp;rut=6b68b6c86f3395594e5f3f7fb6ac5c47cc7975ef3fe26876c88a459ef8f0b5c8&quot;,
+      &quot;publisher&quot;: &quot;duckduckgo.com&quot;,
+      &quot;published_at&quot;: null,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;선택된 날짜 범위 속 효성중공업 마감 종가, 오픈가, 고가, 저가, 변동 및 변동률%를 찾을 수 있습니다. 데이터는 일별, 주별, 월별로 볼 수 있습니다. 차트 아래에서는 선택한 날짜 동안의 데이터 요약을 찾을 수 있습니다.&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;세 달 만에 반토막 난 효성중공업…장 초반 13% 급락 [핫종목] - 뉴스1&quot;,
+      &quot;source_url&quot;: &quot;//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.news1.kr%2Ffinance%2Fgeneral%2Dstock%2F6320860&amp;rut=42dc1f6efecbaebd3d4d0c372061ba2359819a09e580d63ad1670049a3532f74&quot;,
+      &quot;publisher&quot;: &quot;duckduckgo.com&quot;,
+      &quot;published_at&quot;: null,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;15 일 한국거래소에 따르면 오전 10 시 11분 기준 효성중공업은 전일 대비 28만 3000원 (13.26%) 내린 185만 2000원에 거래 중이다. 효성중공업 주가는 지난 7월 1일 (387만 3000원) 대비 약 52% 하락했다. 지난 5월 7일 기록한 연중 최고가 (474만 2000원)와 비교하면 약 61% 급락한 수준이다. 주가 약세는 중동 지역의 ...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Bloom Energy vs. Constellation Energy: Which Energy Stock Is an AI-Driven Buy in 2026?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/bloom-energy-vs-constellation-energy-210701653.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-16T21:07:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

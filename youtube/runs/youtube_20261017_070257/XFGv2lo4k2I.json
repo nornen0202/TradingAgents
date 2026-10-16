@@ -1,0 +1,297 @@
+{
+  "version": 4,
+  "video_id": "XFGv2lo4k2I",
+  "title": "한국 정부는 이번 폭락을 왜 못 막을까?!",
+  "url": "https://www.youtube.com/watch?v=XFGv2lo4k2I",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/XFGv2lo4k2I/maxresdefault.jpg",
+  "published_at": "2026-10-16T05:37:10+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1940,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 1940,
+    "segments": 91,
+    "duration_seconds": 128,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-17T07:02:57.040836+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 7,
+  "claim_status_summary": {
+    "unverified": 7,
+    "asr_uncertain": 2,
+    "partially_supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "코스피가 7거래일 만에 21% 하락했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "7거래일 누적 하락률 21%",
+        "observed": "스냅샷 current_price 5668.05; 시작·종료일과 해당 구간 종가 자료 없음"
+      },
+      "investor_implication": "21%를 확인된 하락률로 인용하거나 이를 기준으로 매매 판단을 내릴 근거가 부족하다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "외국인이 이번 달에만 17조 8천억 원을 매도했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "월간 외국인 매도 17.8조 원",
+        "observed": "비교 가능한 수급 집계 없음"
+      },
+      "investor_implication": "17.8조 원을 확인된 외국인 자금 순유출 규모로 해석해서는 안 된다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "15일 코스피 거래대금의 공매도 비중은 3%이며 나머지 97%는 기존 보유주식 매도다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "공매도 3%, 나머지 매도 97%",
+        "observed": "실측 거래대금 없음; 97%는 주장된 3%의 산술적 여집합일 뿐 독립 관측값이 아님"
+      },
+      "investor_implication": "이 비중만으로 외국인 보유주식 매도가 급락의 대부분을 설명하거나 공매도 대책의 효과가 작다고 단정할 수 없다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "15일 금융당국이 긴급회의에서 허위 소문 추적, 증권사 대출조건 강화 경고, 상황 악화 시 비상계획 준비를 발표했다.",
+      "status": "asr_uncertain",
+      "confidence": 0.96,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "15일 긴급회의 및 세 가지 대응 내용",
+        "observed": "해당 회의의 공식 자료 없음"
+      },
+      "investor_implication": "대출조건 강화 지시인지 과도한 강화 자제 요청인지 확인하기 전에는 정책 방향을 투자 판단에 반영하기 어렵다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "2020년 비상조치는 공매도를 6개월 금지하고 신용매수 주식의 반대매매 기준을 완화했으며 국내 부채성 매도 억제에 집중했다.",
+      "status": "partially_supported",
+      "confidence": 0.93,
+      "supporting_evidence_ids": [
+        "E6"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.55,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "2020년 공매도 6개월 금지",
+        "observed": "E6: 2020-08-27 의결, 2021-03-15까지 6개월 추가 연장 보도; 최초 시행 기간 자료 없음"
+      },
+      "investor_implication": "과거 공매도 금지와 담보비율 관련 완화조치의 존재는 일부 뒷받침되지만 현재 대응의 범위나 효과까지 추정할 근거는 부족하다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "외국인은 미국 금리와 AI 기업 실적 때문에 매도하며 국내 공매도 제한과 반대매매 유예는 외국인 보유주식 매도를 막지 못한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "정량 수치 없음; 외국인 매도 원인과 정책 효과에 관한 주장",
+        "observed": "인과관계 및 정책 적용 범위 검증 자료 없음"
+      },
+      "investor_implication": "금리·AI 실적을 유일하거나 핵심적인 매도 원인으로 전제한 전략은 제공된 증거로 정당화되지 않는다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "15일 원·달러 환율이 9거래일 만의 최고치로 상승했고 외국인의 주식 매도 후 달러 환전이 원인이다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "15일 환율이 9거래일 만의 최고치",
+        "observed": "해당 일자 및 비교 기간 환율 자료 없음"
+      },
+      "investor_implication": "외국인 주식 매도 금액을 즉시 발생하는 달러 수요로 간주하거나 환율 방향을 단정할 수 없다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "2020년 한미 통화스와프 발표 다음 날 코스피가 7.44%, 2008년에는 발표 당일 11.95% 상승했고 외국인도 매수를 재개했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "2020년 +7.44%; 2008년 +11.95%; 외국인 매수 재개",
+        "observed": "발표 시각·일간 수익률·외국인 수급의 대조 자료 없음"
+      },
+      "investor_implication": "두 상승률을 검증된 정책 효과나 향후 기대수익률로 사용해서는 안 된다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "한미 통화스와프가 2021년 말 이후 가용하지 않다는 취지다.",
+      "status": "asr_uncertain",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "2021년 말 이후 가용 협정 부재 또는 잔액 부재",
+        "observed": "협정 상태와 미상환 잔액 모두 확인 자료 없음"
+      },
+      "investor_implication": "달러 지원 수단의 이용 가능 여부는 협정 상태를 확인해야 하며 인출 잔액만으로 판단할 수 없다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "한국 정부가 여러 차례 통화스와프를 요청했지만 미국은 한국에 달러가 부족하지 않다고 판단했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "여러 차례 요청; 정확한 횟수 미제시",
+        "observed": "요청·응답 기록 없음"
+      },
+      "investor_implication": "협정 체결 가능성이나 미국의 정책 의도를 이 주장만으로 추정할 수 없다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피·외국인 수급",
+      "status": "unverified",
+      "claims": [
+        "영상은 외국인이 미국 금리와 AI 기업 실적을 보고 매도하므로, 국내 공매도 제한이나 반대매매 유예만으로 외국인의 보유주식 매도를 막을 수 없다고 주장한다."
+      ],
+      "numeric_claims": [
+        "코스피가 7거래일 만에 21% 하락했다고 주장한다.",
+        "외국인이 이번 달에만 17조 8천억 원을 매도했다고 주장한다.",
+        "15일 코스피 거래대금 100원 중 공매도는 3원이고 나머지 97원은 보유주식 매도라고 설명한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-16T22:10:41.524624+00:00",
+        "current_price": 5668.05,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 3722.07,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "General David Petraeus Joins Century CEO Jesse Gary for Fireside Chat on National Security Risks from Foreign Primary Aluminum Supply",
+      "source_url": "https://finance.yahoo.com/economy/policy/articles/general-david-petraeus-joins-century-170500053.html",
+      "publisher": "PR Newswire",
+      "published_at": "2026-10-16T17:05:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "General David Petraeus Joins Century CEO Jesse Gary for Fireside Chat on National Security Risks from Foreign Primary Aluminum Supply Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Spo..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Alcoa plans to sell part of its Massena East site for $315M",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/alcoa-plans-sell-part-massena-162700154.html",
+      "publisher": "Manufacturing Dive",
+      "published_at": "2026-10-16T16:27:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Alcoa plans to sell part of its Massena East site for $315M Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C5",
+      "title": "증권사 '반대매매' 완화…실효성 두고 의견 '분분'",
+      "source_url": "http://www.shinailbo.co.kr/news/articleView.html?idxno=1574602",
+      "publisher": "Naver News",
+      "published_at": "2022-07-13T11:20:00+09:00",
+      "source_tier": "web",
+      "excerpt": "반대매매 규모도 크게 늘었다. 금융위원회는 지난 4일부터 오는 9월30일까지 3개월간 증시 급락에 따른 신용융자 반대매매 급증 우려 완화를 위해 증권사 신용융자 담보 비율 유지의무를 면제하고 있다. 이는 글로벌... 증권사 '반대매매' 완화…실효성 두고 의견 '분분' --> --> 주요서비스 바로가기 본문 바로가기 매체정보 바로가기 로그인 바로가기 기사검색 바로가기 --> UPDATE: 2026-10-17 (토) 로그인 회원가입 지면보기 정치 정치일반 청와..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C5",
+      "title": "[지난주 증권업계 주요이슈]\"반대매매 완화\" 줄줄이 동참나선 증권사들...",
+      "source_url": "https://www.youthdaily.co.kr/news/article.html?no=105343",
+      "publisher": "Naver News",
+      "published_at": "2022-07-10T00:02:00+09:00",
+      "source_tier": "news",
+      "excerpt": "이로써 국내 5대 증권사 중 아직 반대매매 완화 조치를 검토중인 곳은 삼성증권과 NH투자증권 두 곳만 남음. 앞서 금융당국은 지난 1일 금융시장 합동점검회의를 열고 증권사의 신용융자 담보비율 유지의무를 면제하는..."
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C9",
+      "title": "Dow Jones Futures: S&P 500, Nasdaq Break Key Levels As CoreWeave, Dell Dive; Tesla, SpaceX, Meta Loom",
+      "source_url": "https://finance.yahoo.com/m/4342d021-69d3-3aa1-9753-76f72c9ba95d/dow-jones-futures%3A-s%26p-500%2C.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-16T21:08:07+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
