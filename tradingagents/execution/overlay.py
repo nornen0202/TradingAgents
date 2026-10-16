@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY, STALE_INVALID_FOR_EXECUTION
+from tradingagents.dataflows.market_policy import MAX_EXECUTION_AGE, aware_datetime, observation_status, session_policy, source_use_policy
 from tradingagents.schemas.decision import explicit_price_range_conflicts
 from tradingagents.schemas import (
     ActionIfTriggered,
@@ -39,7 +40,17 @@ def evaluate_execution_state(
         "support_fail": False,
     }
 
-    staleness_seconds = int(max(0, (now - datetime.fromisoformat(market.asof)).total_seconds()))
+    current = aware_datetime(now)
+    observed = aware_datetime(market.asof)
+    staleness_seconds = int(max(0, (current - observed).total_seconds())) if current and observed else 0
+    if current is None or observed is None:
+        return _build_update(
+            contract, market, now, staleness_seconds=staleness_seconds,
+            decision_state=DecisionState.DEGRADED, decision_now=DecisionNow.NONE,
+            reason_codes=("invalid_market_data_timestamp",), trigger_status=trigger_status,
+            data_health="UNAVAILABLE", refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=ExecutionTimingState.DEGRADED,
+        )
     # Overlay bootstrap can reuse an archived contract without re-parsing its
     # decision. Validate that contract here without rewriting its source artifact.
     range_conflicts = explicit_price_range_conflicts({
@@ -60,7 +71,7 @@ def evaluate_execution_state(
     execution_eligibility = str(getattr(market, "execution_eligibility", "") or "").upper()
     freshness_class = str(getattr(market, "freshness_class", "") or "").upper()
 
-    if datetime.fromisoformat(market.asof) > now:
+    if observed > now:
         return _build_update(
             contract, market, now, staleness_seconds=0,
             decision_state=DecisionState.DEGRADED, decision_now=DecisionNow.NONE,
@@ -128,7 +139,8 @@ def evaluate_execution_state(
             execution_timing_state=timing_state,
         )
 
-    if staleness_seconds > max_data_age_seconds:
+    age_limit = min(MAX_EXECUTION_AGE, timedelta(seconds=max(0, max_data_age_seconds)))
+    if not observation_status(market.asof, as_of=now, max_age=age_limit)["eligible"]:
         timing_state = (
             ExecutionTimingState.STALE_TRIGGERABLE
             if contract.action_if_triggered != ActionIfTriggered.NONE
@@ -146,21 +158,6 @@ def evaluate_execution_state(
             data_health="STALE",
             refresh_checkpoint=refresh_checkpoint,
             execution_timing_state=timing_state,
-        )
-
-    if is_event_guard_active(contract.event_guard, now):
-        return _build_update(
-            contract,
-            market,
-            now,
-            staleness_seconds=staleness_seconds,
-            decision_state=DecisionState.WAIT,
-            decision_now=DecisionNow.NONE,
-            reason_codes=("pre_event_guard_active",),
-            trigger_status=trigger_status,
-            data_health="OK",
-            refresh_checkpoint=refresh_checkpoint,
-            execution_timing_state=ExecutionTimingState.WAITING,
         )
 
     intraday_low = market.day_low if market.day_low is not None else market.last_price
@@ -201,6 +198,17 @@ def evaluate_execution_state(
             data_health="OK",
             refresh_checkpoint=refresh_checkpoint,
             execution_timing_state=ExecutionTimingState.INVALIDATED,
+        )
+
+    if contract.action_if_triggered in {ActionIfTriggered.STARTER, ActionIfTriggered.ADD} and is_event_guard_active(
+        contract.event_guard, now, analysis_as_of=contract.analysis_asof
+    ):
+        return _build_update(
+            contract, market, now, staleness_seconds=staleness_seconds,
+            decision_state=DecisionState.WAIT, decision_now=DecisionNow.NONE,
+            reason_codes=("pre_event_guard_active",), trigger_status=trigger_status,
+            data_health="OK", refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=ExecutionTimingState.WAITING,
         )
 
     if contract.entry_valid_until:
@@ -548,6 +556,15 @@ def _build_update(
     refresh_checkpoint: str | None,
     execution_timing_state: ExecutionTimingState = ExecutionTimingState.WAITING,
 ) -> ExecutionUpdate:
+    if decision_now != DecisionNow.NONE:
+        session = session_policy(market.market_session)
+        source = source_use_policy(market.provider, use="execution")
+        blockers = tuple(item["reason"].lower() for item in (session, source) if item.get("reason"))
+        if blockers:
+            decision_now = DecisionNow.NONE
+            decision_state = DecisionState.WAIT
+            execution_timing_state = ExecutionTimingState.WAITING
+            reason_codes = (*reason_codes, *blockers)
     return ExecutionUpdate(
         ticker=contract.ticker,
         analysis_asof=contract.analysis_asof,

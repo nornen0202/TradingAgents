@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from enum import Enum
 from typing import Any
 
@@ -109,6 +109,19 @@ class EventGuard:
     block_new_position_within_days: int = 0
     allow_add_only_after_event: bool = False
     requires_post_event_rerun: bool = False
+    scheduled_at: str | None = None
+    known_at: str | None = None
+    published_at: str | None = None
+    event_id: str | None = None
+    event_version_id: str | None = None
+    market_timezone: str | None = None
+    minutes_before_event: int | None = None
+    minutes_after_publication: int = 15
+    first_seen_at: str | None = None
+    first_seen_cooldown_minutes: int = 30
+    exact_event_time_known: bool | None = None
+    is_amended: bool = False
+    guarded_events: tuple[dict[str, Any], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -116,6 +129,19 @@ class EventGuard:
             "block_new_position_within_days": self.block_new_position_within_days,
             "allow_add_only_after_event": self.allow_add_only_after_event,
             "requires_post_event_rerun": self.requires_post_event_rerun,
+            "scheduled_at": self.scheduled_at,
+            "known_at": self.known_at,
+            "published_at": self.published_at,
+            "event_id": self.event_id,
+            "event_version_id": self.event_version_id,
+            "market_timezone": self.market_timezone,
+            "minutes_before_event": self.minutes_before_event,
+            "minutes_after_publication": self.minutes_after_publication,
+            "first_seen_at": self.first_seen_at,
+            "first_seen_cooldown_minutes": self.first_seen_cooldown_minutes,
+            "exact_event_time_known": self.exact_event_time_known,
+            "is_amended": self.is_amended,
+            "guarded_events": [dict(event) for event in self.guarded_events],
         }
 
 
@@ -361,6 +387,7 @@ class IntradayMarketSnapshot:
     luld_status: dict[str, Any] | None = None
     reg_sho_status: dict[str, Any] | None = None
     news_halt_status: dict[str, Any] | None = None
+    chart_bars: tuple[dict[str, Any], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         microstructure = MicrostructureSnapshot(
@@ -459,6 +486,7 @@ class IntradayMarketSnapshot:
             "reg_sho_status": self.reg_sho_status,
             "news_halt_status": self.news_halt_status,
             "microstructure": microstructure,
+            "chart_bars": [dict(bar) for bar in self.chart_bars],
         }
 
 
@@ -523,15 +551,66 @@ class ExecutionUpdate:
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
 
 
-def is_event_guard_active(event_guard: EventGuard | None, now: datetime) -> bool:
+def is_event_guard_active(event_guard: EventGuard | None, now: datetime, *, analysis_as_of: str | None = None) -> bool:
+    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+    from tradingagents.dataflows.market_policy import aware_datetime
+
     if event_guard is None:
         return False
+    current = aware_datetime(now)
+    if current is None:
+        return True
+    if event_guard.guarded_events:
+        from dataclasses import fields
+        allowed = {item.name for item in fields(EventGuard)} - {"guarded_events"}
+        for window in event_guard.guarded_events:
+            if not isinstance(window, dict) or set(window) - allowed:
+                return True
+            if is_event_guard_active(EventGuard(**window), now, analysis_as_of=analysis_as_of):
+                return True
+    if event_guard.known_at is not None:
+        known = aware_datetime(event_guard.known_at)
+        if known is None:
+            return True
+        if known > current:
+            return False  # this event version was not yet known
+    if event_guard.first_seen_at is not None and event_guard.exact_event_time_known is False:
+        detected = aware_datetime(event_guard.first_seen_at)
+        if detected is None:
+            return True
+        if detected > current:
+            return False
+        # A first detection is useful prospectively but never proves an actual
+        # announcement time or permits historical reconstruction before it.
+        if current < detected + timedelta(minutes=max(0, event_guard.first_seen_cooldown_minutes)):
+            return True
+    if event_guard.published_at is not None:
+        published = aware_datetime(event_guard.published_at)
+        if not event_guard.known_at or published is None or published > current:
+            return True
+        if current < published + timedelta(minutes=max(0, event_guard.minutes_after_publication)):
+            return True
+        analysis = aware_datetime(analysis_as_of)
+        if event_guard.requires_post_event_rerun and (analysis is None or analysis < published):
+            return True
+        return False
+    if event_guard.scheduled_at is not None:
+        scheduled = aware_datetime(event_guard.scheduled_at)
+        if scheduled is None or not event_guard.known_at:
+            return True
+        window = timedelta(minutes=max(0, event_guard.minutes_before_event)) if event_guard.minutes_before_event is not None else timedelta(days=max(0, int(event_guard.block_new_position_within_days)))
+        if scheduled <= current:
+            return event_guard.requires_post_event_rerun or event_guard.allow_add_only_after_event
+        return scheduled - current <= window
     if not event_guard.earnings_date:
         return False
     try:
         event_day = date.fromisoformat(event_guard.earnings_date)
     except ValueError:
-        return False
-    now_day = now.date()
+        return True
+    try:
+        now_day = current.astimezone(ZoneInfo(event_guard.market_timezone)).date() if event_guard.market_timezone else current.date()
+    except (ZoneInfoNotFoundError, ValueError, TypeError):
+        return True
     delta = (event_day - now_day).days
     return 0 <= delta <= int(event_guard.block_new_position_within_days)

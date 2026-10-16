@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+import math
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -10,6 +11,7 @@ from tradingagents.external.prism_models import PrismExternalSignal, PrismSignal
 from tradingagents.external.prism_normalize import canonicalize_ticker, coerce_float, normalize_market
 
 from .models import ScannerCandidate, ScannerResult, TriggerType
+from .conditions import evaluate_condition, validate_condition
 
 
 def run_prism_like_scanner(
@@ -28,8 +30,13 @@ def run_prism_like_scanner(
     exclude_halted_or_low_liquidity: bool = True,
     external_signals: Iterable[PrismExternalSignal] | None = None,
     prism_candidate_market_filter: str = "same_market",
+    condition: dict[str, Any] | None = None,
     output_path: str | Path | None = None,
 ) -> ScannerResult:
+    cutoff = _aware_stamp(asof) if asof is not None else datetime.now(timezone.utc)
+    if cutoff is None:
+        raise ValueError("Scanner asof must be a timezone-aware ISO timestamp")
+    checked_condition = validate_condition(condition) if condition is not None else None
     warnings: list[str] = []
     rows = list(ohlcv_rows or [])
     if ohlcv_path and not rows:
@@ -47,9 +54,15 @@ def run_prism_like_scanner(
         warnings.append(
             f"PRISM 후보 {len(all_external_signals)}개 중 현재 시장 {market}와 일치하지 않아 {excluded_cross_market}개 제외"
         )
-    signal_by_ticker = best_prism_signal_by_ticker(filtered_external_signals)
+    timed_signals = [signal for signal in filtered_external_signals if (
+        _at_or_before(signal.source_asof, cutoff) and _at_or_before(signal.ingested_at, cutoff)
+    )]
+    excluded_signal_time = len(filtered_external_signals) - len(timed_signals)
+    signal_by_ticker = best_prism_signal_by_ticker(timed_signals)
     candidates: list[ScannerCandidate] = []
     excluded_cross_market_rows = 0
+    excluded_row_time = 0
+    excluded_conditions = 0
     normalized_market = normalize_market(market)
     for row in rows:
         ticker = _row_ticker(row, market=market)
@@ -58,6 +71,9 @@ def run_prism_like_scanner(
         row_market = normalize_market(row.get("market") or market, ticker=ticker)
         if normalized_market != "UNKNOWN" and row_market != normalized_market:
             excluded_cross_market_rows += 1
+            continue
+        if not row_available_as_of(row, cutoff):
+            excluded_row_time += 1
             continue
         candidate = _scan_row(
             row,
@@ -70,24 +86,32 @@ def run_prism_like_scanner(
             prism_signal=signal_by_ticker.get(ticker),
         )
         if candidate is not None:
+            if checked_condition is not None and not evaluate_condition(checked_condition, _condition_values(candidate)):
+                excluded_conditions += 1
+                continue
             candidates.append(candidate)
     if excluded_cross_market_rows:
         warnings.append(
             f"스캐너 입력 {len(rows)}개 중 현재 시장 {market}와 일치하지 않아 {excluded_cross_market_rows}개 제외"
         )
     candidates.sort(key=lambda item: item.final_score, reverse=True)
+    if excluded_row_time or excluded_signal_time:
+        warnings.append(f"scanner_temporal_exclusions:rows={excluded_row_time},signals={excluded_signal_time}")
     result = ScannerResult(
         run_id=run_id or f"scanner_{datetime.now().strftime('%Y%m%dT%H%M%S')}",
-        asof=asof or datetime.now().astimezone().isoformat(),
+        asof=cutoff.isoformat(),
         market=market,
         regime=regime,
         candidates=tuple(candidates[: max(0, int(max_candidates))]),
         warnings=tuple(warnings),
         source_counts={
             "scanner_discovered": len(candidates[: max(0, int(max_candidates))]),
-            "prism_imported_same_market": len(filtered_external_signals),
+            "prism_imported_same_market": len(timed_signals),
             "prism_excluded_cross_market": excluded_cross_market,
             "scanner_excluded_cross_market_rows": excluded_cross_market_rows,
+            "scanner_excluded_unavailable_rows": excluded_row_time,
+            "prism_excluded_unavailable_signals": excluded_signal_time,
+            "scanner_excluded_conditions": excluded_conditions,
         },
     )
     if output_path:
@@ -95,6 +119,55 @@ def run_prism_like_scanner(
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(result.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
     return result
+
+
+def _aware_stamp(value: Any) -> datetime | None:
+    try:
+        stamp = value if isinstance(value, datetime) else datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        return stamp if stamp.tzinfo is not None and stamp.utcoffset() is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _at_or_before(value: Any, cutoff: datetime) -> bool:
+    stamp = _aware_stamp(value)
+    return stamp is not None and stamp <= cutoff
+
+
+def row_available_as_of(row: dict[str, Any], cutoff: datetime) -> bool:
+    """Every declared time must be valid and observable by the analysis cutoff."""
+    keys = ("observed_at", "as_of", "asof", "available_at", "published_at", "timestamp",
+            "source_asof", "source_at", "bar_time", "bar_end", "date", "datetime",
+            "ingested_at", "retrieved_at", "updated_at", "corrected_at")
+    timestamps = [row[key] for key in keys if key in row]
+    return bool(timestamps) and all(_at_or_before(value, cutoff) for value in timestamps)
+
+
+def _condition_values(candidate: ScannerCandidate) -> dict[str, Any]:
+    row = candidate.raw
+    values = {**row, **{key: value for key, value in candidate.to_dict().items() if key != "raw"}}
+    for field, aliases in {
+        "open": ("open", "open_price"), "high": ("high", "high_price"),
+        "low": ("low", "low_price"), "close": ("close", "current_price", "price", "last_price"),
+        "prev_close": ("prev_close", "previous_close", "yesterday_close"),
+        "volume": ("volume", "current_volume"), "prev_volume": ("prev_volume", "previous_volume", "volume_prev"),
+        "trading_value": ("trading_value", "traded_value", "turnover", "value"),
+        "market_cap": ("market_cap", "market_cap_krw", "cap"),
+        "volume_ratio_to_market_avg": ("volume_ratio_to_market_avg", "market_volume_ratio"),
+        "high_52w": ("high_52w", "52w_high", "week_52_high"),
+        "sector_rank": ("sector_rank", "sector_momentum_rank"),
+        "sector_leadership_score": ("sector_leadership_score", "sector_score"),
+    }.items():
+        values[field] = _num(row, *aliases)
+    prev, close, open_ = values["prev_close"], values["close"], values["open"]
+    values["daily_change_pct"] = (close / prev - 1) * 100 if close is not None and prev else None
+    values["gap_pct"] = (open_ / prev - 1) * 100 if open_ is not None and prev else None
+    volume, prev_volume = values["volume"], values["prev_volume"]
+    values["volume_ratio"] = volume / prev_volume if volume is not None and prev_volume else None
+    high, low = values["high"], values["low"]
+    values["close_strength"] = (close - low) / (high - low) if high is not None and low is not None and high > low else None
+    values["halted"] = row.get("halted", row.get("is_halted"))
+    return values
 
 
 def _filter_scanner_prism_signals(
@@ -198,6 +271,20 @@ def _scan_row(
     exclude_halted_or_low_liquidity: bool,
     prism_signal: PrismExternalSignal | None,
 ) -> ScannerCandidate | None:
+    # Invalid declared numeric inputs must not become an absent optional gate.
+    numeric_keys = ("open", "open_price", "high", "high_price", "low", "low_price",
+                    "close", "current_price", "price", "last_price", "prev_close", "previous_close",
+                    "yesterday_close", "volume", "current_volume", "prev_volume", "previous_volume",
+                    "volume_prev", "trading_value", "traded_value", "turnover", "value",
+                    "market_cap", "market_cap_krw", "cap", "volume_ratio_to_market_avg",
+                    "market_volume_ratio", "high_52w", "52w_high", "week_52_high", "sector_rank",
+                    "sector_momentum_rank", "sector_leadership_score", "sector_score",
+                    "risk_reward_ratio", "rr", "stop_loss_pct")
+    for key in numeric_keys:
+        if key in row and row[key] is not None:
+            number = _num(row, key)
+            if number is None or number < 0:
+                return None
     ticker = _row_ticker(row, market=market)
     if not ticker:
         return None
@@ -222,6 +309,8 @@ def _scan_row(
     if volume_ratio_to_market is not None and volume_ratio_to_market < min_volume_ratio_to_market_avg:
         return None
     if close is None or open_price is None or high is None or low is None or prev_close in (None, 0):
+        return None
+    if min(open_price, high, low, close, prev_close) <= 0 or high < max(open_price, close) or low > min(open_price, close):
         return None
 
     change_pct = ((close - prev_close) / prev_close) * 100.0
@@ -294,7 +383,10 @@ def _num(row: dict[str, Any], *keys: str) -> float | None:
     for key in keys:
         value = row.get(key)
         if value not in (None, ""):
-            return coerce_float(value)
+            if isinstance(value, bool):
+                return None
+            result = coerce_float(value)
+            return result if result is not None and math.isfinite(result) else None
     return None
 
 

@@ -21,7 +21,7 @@
 
 - KR/US 예약은 작성 전에 반드시 prepare --refresh-market --producer-state-dir C:/Projects/TradingAgents/.runtime/local-automation 을 실행한다. 이번 조회에서 얻은 시세·VALID 계좌 및 전체 커버리지 검증 성공 전에는 이전 archive로 보고서를 작성하거나 ACK하지 않는다. MARKET_CLOSED/CALENDAR_UNVERIFIED/FRESH_INPUT_UNAVAILABLE이면 현재 보고서를 만들지 않고 정확한 상태를 반환한다. 게시 직전 실제 시각으로 다시 만료 여부를 검사하며 만료됐으면 갱신·prepare부터 다시 수행해 새 event에 보고서를 연결한다. 시각만 고쳐 쓰지 않는다.
 
-- 현재 실행으로 분류하는 READY_NOW/WAIT_FOR_TRIGGER는 게시 시점에 VALID 계좌 관측이 30분 미만이어야 한다. 계좌 시각 누락·미래·만료면 NEEDS_LIVE_RECHECK로 낮추고 action_now/action_if_triggered를 비운다. 이 조건은 publish 코드가 검사한다. 분석 시점 thesis는 별도 참고로 보존한다.
+- 현재 실행으로 분류하는 READY_NOW/WAIT_FOR_TRIGGER는 게시 시점에 VALID 계좌와 시세 관측이 각각 10분 미만이어야 한다(정확히 10분은 만료). 관측 시각과 발행·평가 시각을 분리하며 게시로 관측을 갱신하지 않는다. 시각 누락·미래·만료면 NEEDS_LIVE_RECHECK로 낮추고 action_now/action_if_triggered를 비운다. 휴장 중 달력으로 검증된 최근 정규장 종가는 연구 참고만 허용하며 실행 승격하지 않는다. 이 조건은 publish 코드가 검사한다. 분석 시점 thesis는 별도 참고로 보존한다.
 - 공개 웹 복구 입력이 필요할 경우 `python -m tradingagents.work verify-public --surface kr`로만 최신 커밋·해시·입력 시각을 검증한다. REFERENCE_ONLY/UNVERIFIED는 개인화 입력이 아니며 로컬 정본 packet을 대체하지 않는다. 검증 성공도 주문 승인이 아니다.
 
 - `current.freshness_receipt`를 `source_summary.freshness_receipt`에 그대로 복사한다. 최상위 `as_of`는 `market_data_oldest_at`과 정확히 일치시킨다(null이면 null). 게시·작성 시각으로 대체하지 않는다.

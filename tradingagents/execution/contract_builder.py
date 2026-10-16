@@ -65,7 +65,10 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                 invalid_intraday = _extract_level(decision.invalidators, ("intraday", "below"))
                 used_regex_fallback = used_regex_fallback or invalid_intraday is not None
 
-            event_guard = _extract_event_guard((*decision.watchlist_triggers, *decision.catalysts, *decision.invalidators))
+            event_guard = _event_guard_from_payload(
+                analysis_payload, ticker=ticker, analysis_asof=analysis_asof,
+                fallback=_extract_event_guard((*decision.watchlist_triggers, *decision.catalysts, *decision.invalidators)),
+            )
             vwap_pref = (
                 SessionVWAPPreference.ABOVE
                 if execution_levels.vwap_required
@@ -653,6 +656,52 @@ def _extract_event_guard(lines: tuple[str, ...]) -> EventGuard:
         allow_add_only_after_event=("add only after earnings" in joined),
         requires_post_event_rerun=("earnings" in joined or "guidance" in joined),
     )
+
+
+def _event_guard_from_payload(payload: dict[str, Any], *, ticker: str, analysis_asof: str,
+                              fallback: EventGuard) -> EventGuard:
+    from dataclasses import replace
+    from tradingagents.dataflows.event_timeline import build_event_timeline
+    from tradingagents.dataflows.market_policy import aware_datetime
+    from tradingagents.schemas.execution import is_event_guard_active
+
+    is_kr = ticker.upper().endswith((".KS", ".KQ")) or (len(ticker) == 6 and ticker.isdigit())
+    fallback = replace(fallback, known_at=analysis_asof, market_timezone="Asia/Seoul" if is_kr else "America/New_York")
+    if not aware_datetime(analysis_asof):
+        return fallback
+    records = payload.get("event_records") or []
+    if not isinstance(records, list) or not records:
+        return fallback
+    board = build_event_timeline(records, analysis_as_of=analysis_asof, ticker=ticker)
+    windows: list[EventGuard] = []
+    for event in board["events"]:
+        if event.get("status") == "cancelled":
+            continue
+        base = EventGuard(known_at=event["available_at"], event_id=event["event_id"],
+            event_version_id=event["version_id"], market_timezone=fallback.market_timezone,
+            is_amended=bool(event.get("is_amended")), minutes_after_publication=15)
+        if event.get("status") == "detected":
+            windows.append(replace(base, first_seen_at=event["first_seen_at"],
+                first_seen_cooldown_minutes=30, exact_event_time_known=False))
+        elif event.get("event_type") in {"earnings", "guidance", "disclosure"} and event.get("published_at"):
+            # Intraday 8-K and other actual disclosures need no invented
+            # scheduled timestamp to enforce the post-publication cooldown.
+            windows.append(replace(base, published_at=event["published_at"], scheduled_at=event.get("scheduled_at"),
+                exact_event_time_known=True, requires_post_event_rerun=event.get("event_type") in {"earnings", "guidance"}))
+        elif event.get("event_type") in {"earnings", "guidance"} and event.get("scheduled_at"):
+            windows.append(replace(base, scheduled_at=event["scheduled_at"], minutes_before_event=30,
+                block_new_position_within_days=1, requires_post_event_rerun=True))
+    if not windows:
+        return fallback
+    # Keep every independent event window. Selecting only the latest filing
+    # can otherwise drop a still-active first-seen or scheduled-event guard.
+    active = [window for window in windows if is_event_guard_active(window, aware_datetime(analysis_asof), analysis_as_of=analysis_asof)]
+    upcoming = [window for window in windows if window.scheduled_at and not window.published_at
+                and aware_datetime(window.scheduled_at) >= aware_datetime(analysis_asof)]
+    primary = active[0] if active else min(upcoming, key=lambda window: aware_datetime(window.scheduled_at)) if upcoming else windows[-1]
+    additional = tuple({key: value for key, value in window.to_dict().items() if key != "guarded_events"}
+                       for window in windows if window is not primary)
+    return replace(primary, guarded_events=additional)
 
 
 def _extract_vwap_preference(lines: tuple[str, ...]) -> SessionVWAPPreference:

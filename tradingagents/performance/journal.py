@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import sqlite3
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
 
 from .action_outcomes import initialize_action_tracker
+from .lifecycle import append_lifecycle_event, timestamp
+from .models import ACTION_TRACKER_SCHEMA
 
 
 def create_closed_trade_journal_entry(
@@ -62,23 +65,36 @@ def generate_closed_trade_review(
     return review
 
 
-def store_closed_trade_review(db_path: Path, review: Mapping[str, Any]) -> None:
-    initialize_action_tracker(db_path)
-    with sqlite3.connect(db_path) as conn:
-        conn.execute(
+def store_closed_trade_review(db_path: Path | sqlite3.Connection, review: Mapping[str, Any]) -> int:
+    if not isinstance(db_path, sqlite3.Connection):
+        initialize_action_tracker(db_path)
+        with sqlite3.connect(db_path) as conn:
+            return store_closed_trade_review(conn, review)
+    conn = db_path
+    _prepare_journal(conn)
+    identity = {key: review.get(key) for key in ("ticker", "entry_fill_id", "exit_fill_id", "entry_run_id", "exit_run_id", "realized_return_pct", "holding_days")}
+    review_id = review.get("review_id") or "review:" + hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
+    canonical = json.dumps({key: value for key, value in review.items() if key not in {"created_at", "ingested_at"}}, sort_keys=True, ensure_ascii=False, allow_nan=False)
+    previous = conn.execute("SELECT id,review_json FROM trade_journal WHERE review_id=?", (review_id,)).fetchone()
+    if previous:
+        if previous[1] is not None and previous[1] != canonical:
+            raise ValueError("Review ID reused with different outcome evidence")
+        return previous[0]
+    cursor = conn.execute(
             """
             INSERT INTO trade_journal (
               ticker, buy_run_id, sell_run_id, buy_context_json, sell_context_json,
               profit_rate, holding_days, missed_signals_json, overreacted_signals_json,
-              lessons_json, pattern_tags_json, one_line_summary, confidence_score, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              lessons_json, pattern_tags_json, one_line_summary, confidence_score, created_at,
+              review_id, signal_id, confirmed_at, settled_at, review_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 review.get("ticker"),
                 review.get("entry_run_id"),
                 review.get("exit_run_id"),
-                json.dumps({"entry_action": review.get("entry_action")}, ensure_ascii=False),
-                json.dumps({"exit_action": review.get("exit_action")}, ensure_ascii=False),
+                json.dumps(review.get("entry_context") or {"entry_action": review.get("entry_action")}, ensure_ascii=False),
+                json.dumps(review.get("exit_context") or {"exit_action": review.get("exit_action")}, ensure_ascii=False),
                 review.get("realized_return_pct"),
                 review.get("holding_days"),
                 json.dumps(review.get("missed_signals") or [], ensure_ascii=False),
@@ -88,17 +104,20 @@ def store_closed_trade_review(db_path: Path, review: Mapping[str, Any]) -> None:
                 review.get("judgment_evaluation"),
                 0.60,
                 review.get("created_at") or datetime.now().astimezone().isoformat(),
+                review_id, review.get("signal_id"), review.get("confirmed_at"), review.get("settled_at"),
+                canonical,
             ),
         )
-        for lesson in review.get("lessons") or []:
+    journal_id = cursor.lastrowid
+    for lesson in review.get("lessons") or []:
             if not isinstance(lesson, Mapping):
                 continue
             conn.execute(
                 """
                 INSERT INTO learned_intuitions (
                   category, condition, insight, confidence, supporting_trades,
-                  success_rate, source_journal_ids_json, is_active, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  success_rate, source_journal_ids_json, is_active, created_at, confirmed_at, settled_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     "closed_trade_review",
@@ -107,12 +126,96 @@ def store_closed_trade_review(db_path: Path, review: Mapping[str, Any]) -> None:
                     0.50,
                     1,
                     None,
-                    "[]",
+                    json.dumps([journal_id]),
                     1,
-                    datetime.now().astimezone().isoformat(),
+                    review.get("created_at") or datetime.now().astimezone().isoformat(),
+                    review.get("confirmed_at"), review.get("settled_at"),
                 ),
             )
-        conn.commit()
+    if review.get("signal_id") and review.get("confirmed_at") and review.get("settled_at"):
+        append_lifecycle_event(conn, event_id=review_id, signal_id=review["signal_id"], kind="RETROSPECTIVE",
+            mode=review.get("mode") or "actual", occurred_at=review.get("closed_at") or review["created_at"],
+            available_at=review["created_at"], confirmed_at=review["confirmed_at"], settled_at=review["settled_at"],
+            ingested_at=review.get("ingested_at") or review["created_at"], payload=dict(review))
+    return journal_id
+
+
+def _prepare_journal(conn: sqlite3.Connection) -> None:
+    for statement in ACTION_TRACKER_SCHEMA:
+        conn.execute(statement)
+    for table, columns in {
+        "trade_journal": {"review_id": "TEXT", "signal_id": "TEXT", "confirmed_at": "TEXT", "settled_at": "TEXT", "review_json": "TEXT"},
+        "learned_intuitions": {"confirmed_at": "TEXT", "settled_at": "TEXT"},
+    }.items():
+        existing = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+        for name, sql_type in columns.items():
+            if name not in existing:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {name} {sql_type}")
+    conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_trade_journal_review_id ON trade_journal(review_id)")
+
+
+def record_fill_retrospectives(conn: sqlite3.Connection, *, exit_event_id: str, evaluated_at: str | None = None) -> list[int]:
+    """FIFO reviews from known incremental fills, including both sides' costs.
+
+    Seed holdings have unknown acquisition basis and consume sells without a
+    fabricated realized return. Partial exits close only the matching lot slice.
+    """
+    rows = conn.execute("SELECT * FROM lifecycle_events WHERE kind IN ('ACCOUNT_SEED','FILL')").fetchall()
+    columns = [row[1] for row in conn.execute("PRAGMA table_info(lifecycle_events)")]
+    events = [{**dict(zip(columns, row)), "payload": json.loads(dict(zip(columns, row))["payload_json"])} for row in rows]
+    target = next((event for event in events if event["event_id"] == exit_event_id), None)
+    if not target or target["payload"].get("side") != "SELL":
+        return []
+    target_known = max(timestamp(target[k]) for k in ("occurred_at", "available_at", "confirmed_at", "settled_at", "ingested_at"))
+    cutoff = timestamp(evaluated_at) if evaluated_at is not None else target_known
+    if target_known > cutoff:
+        return []
+    symbol, currency = target["payload"]["ticker"], target["payload"].get("currency", "KRW")
+    lots, ids = [], []
+    for event in sorted(events, key=lambda item: (timestamp(item["occurred_at"]), item["event_id"])):
+        if event["mode"] != target["mode"] or any(timestamp(event[k]) > cutoff for k in ("occurred_at", "available_at", "confirmed_at", "settled_at", "ingested_at") if event.get(k)):
+            continue
+        payload = event["payload"]
+        if payload.get("currency", "KRW") != currency:
+            continue
+        if event["kind"] == "ACCOUNT_SEED":
+            quantity = (payload.get("positions") or {}).get(symbol, 0)
+            if quantity:
+                lots.append({"remaining": quantity, "event": None})
+            continue
+        if payload.get("ticker") != symbol:
+            continue
+        if payload["side"] == "BUY":
+            lots.append({"remaining": payload["quantity"], "event": event})
+            continue
+        remaining = payload["quantity"]
+        while remaining > 1e-9 and lots:
+            lot = lots[0]
+            closed = min(lot["remaining"], remaining)
+            entry = lot["event"]
+            if event["event_id"] == exit_event_id and entry:
+                buy = entry["payload"]
+                costs = buy["cost"] * closed / buy["quantity"] + payload["cost"] * closed / payload["quantity"]
+                profit = (payload["price"] - buy["price"]) * closed - costs
+                review = generate_closed_trade_review(entry_context={"ticker": symbol, "action": "BUY"},
+                    exit_context={"ticker": symbol, "action": "SELL"}, realized_return_pct=100 * profit / (buy["price"] * closed),
+                    holding_days=(timestamp(event["occurred_at"]) - timestamp(entry["occurred_at"])).days)
+                review.update(review_id=f"review:{entry['event_id']}:{exit_event_id}", entry_fill_id=entry["event_id"],
+                    exit_fill_id=exit_event_id, signal_id=event["signal_id"], entry_signal_id=entry["signal_id"],
+                    closed_quantity=closed, net_profit=profit, total_cost=costs, currency=currency, mode=event["mode"],
+                    measurement_scope="realized_fill_return_after_costs", created_at=cutoff.isoformat(),
+                    ingested_at=cutoff.isoformat(),
+                    closed_at=event["occurred_at"], confirmed_at=event["confirmed_at"], settled_at=event["settled_at"],
+                    entry_context=buy, exit_context=payload)
+                review["judgment_evaluation"] = "profitable_fill" if profit >= 0 else "unprofitable_fill"
+                ids.append(store_closed_trade_review(conn, review))
+            lot["remaining"] -= closed
+            remaining -= closed
+            if lot["remaining"] <= 1e-9:
+                lots.pop(0)
+        if event["event_id"] == exit_event_id:
+            break
+    return ids
 
 
 def _rule_based_lessons(*, realized_return_pct: float | None, exit_action: str) -> list[dict[str, Any]]:

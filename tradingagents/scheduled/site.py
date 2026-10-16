@@ -3219,6 +3219,8 @@ def _render_ticker_page(
         run_dir=run_dir,
         ticker_summary=ticker_summary,
     )
+    integrated_review_html = _render_ticker_review_section(run_dir=run_dir, manifest=manifest,
+                                                          ticker_summary=ticker_summary)
     body = f"""
     <nav class="breadcrumbs">
       <a href="../../index.html">Home</a>
@@ -3248,6 +3250,7 @@ def _render_ticker_page(
       </div>
     </section>
     {microstructure_status_html}
+    {integrated_review_html}
     {live_ticker_delta_html}
     {ticker_delta_html}
     {institutional_html}
@@ -3265,6 +3268,18 @@ def _render_ticker_page(
         body,
         prefix="../../",
     )
+
+
+def _render_ticker_review_section(*, run_dir: Path, manifest: dict, ticker_summary: dict) -> str:
+    from tradingagents.charting.report import build_review, render_review
+    from tradingagents.charting.bars import instant
+    ticker_dir = (run_dir / "tickers" / str(ticker_summary.get("ticker", ""))).resolve()
+    if not ticker_dir.is_relative_to(run_dir.resolve()) or not (ticker_dir / "chart_evidence.json").is_file():
+        return ""
+    cutoff = instant(manifest.get("finished_at") or ticker_summary.get("finished_at"))
+    if cutoff is None:
+        return ""
+    return render_review(build_review(ticker_dir, analysis_as_of=cutoff), public=True, fragment=True)
 
 
 def _render_ticker_institutional_section(*, run_dir: Path, ticker_summary: dict[str, Any]) -> str:

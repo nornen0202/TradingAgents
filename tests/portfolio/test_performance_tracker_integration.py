@@ -15,6 +15,7 @@ from tradingagents.performance.price_history import (
     _fetch_yfinance_price_history,
     load_price_history_for_recommendations,
 )
+from tradingagents.performance.models import OUTCOME_CALCULATION_VERSION
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.runner import _run_performance_tracking
 from tradingagents.scheduled.site import _render_performance_tracking_section
@@ -346,7 +347,7 @@ def test_due_recommendation_ids_bind_download_and_incremental_update(tmp_path, m
     assert outcomes[old_id] == 0.11
     assert outcomes[active_id] == 0.1
     assert outcomes[current_id] == 0.03
-    assert versions[active_id] == 2
+    assert versions[active_id] == OUTCOME_CALCULATION_VERSION
     assert "idx_action_outcomes_recommendation" in index_names
 
     second = load_price_history_for_recommendations(

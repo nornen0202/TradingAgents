@@ -97,11 +97,11 @@ def get_disclosures_sec_edgar(symbol: str, start_date: str, end_date: str) -> st
         try:
             published = datetime.fromisoformat(acceptance.replace("Z", "+00:00"))
             if published.tzinfo is None:
-                published = published.replace(tzinfo=timezone.utc)
-            if published > now or published.date().isoformat() > end_date:
+                continue
+            if published > now or not start_date <= published.date().isoformat() <= end_date:
                 continue
         except ValueError:
-            published = None
+            continue
         accession_path = str(accession).replace("-", "")
         # Build a canonical SEC index link, not an arbitrary vendor URL.
         url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession_path}/{accession}-index.html"
@@ -110,6 +110,8 @@ def get_disclosures_sec_edgar(symbol: str, start_date: str, end_date: str) -> st
             source="SEC EDGAR", published_at=published, url=url, symbol=symbol, raw_vendor="sec_edgar",
             summary=f"Filed {filing_date}; accepted {acceptance or 'UNVERIFIED'}; retrieved {now.isoformat()}. Filing metadata only; document content not retrieved.",
         ))
+    from .event_timeline import capture_disclosures
+    capture_disclosures(items, observed_at=now)
     oldest = min(dates) if dates else None
     complete_window = bool(oldest and (oldest <= start_date or not filings.get("files")))
     coverage = "OBSERVED" if items else "VERIFIED_ZERO" if complete_window else "PARTIAL_WINDOW"

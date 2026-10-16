@@ -23,6 +23,7 @@ import yfinance as yf
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.scheduled.failure_diagnostics import failure_diagnostics, format_failure_diagnostics
 from tradingagents.scheduled.research_observation import ResearchObservationRecorder
+from tradingagents.charting.capture import ChartCapture
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
@@ -1869,9 +1870,13 @@ def _run_single_ticker(
     graph = None
     stats_handler = None
     observation_recorder = ResearchObservationRecorder(ticker)
+    chart_capture = ChartCapture(ticker)
+    chart_token = chart_capture.activate()
 
     try:
         reset_tool_telemetry()
+        from tradingagents.dataflows.event_timeline import reset_event_capture
+        reset_event_capture(first_seen_db=config.storage.archive_dir / "event-first-seen.sqlite3")
         # Archive/run timestamps use the operator timezone. Research cutoffs
         # use the instrument's calendar date: KST midnight is still the prior
         # US regular session and must not advance its information cutoff.
@@ -2004,6 +2009,14 @@ def _run_single_ticker(
                 tool_events=tool_events,
             )
             analysis_payload["institutional_intelligence"] = institutional_outputs["summary"]
+            from tradingagents.dataflows.event_timeline import build_event_timeline, snapshot_event_records
+            analysis_payload["event_records"] = [*institutional_outputs.get("event_records", []),
+                                                 *snapshot_event_records(ticker=ticker)]
+            event_path = ticker_dir / "event_timeline.json"
+            timeline = build_event_timeline(analysis_payload["event_records"],
+                                            analysis_as_of=analysis_payload["finished_at"], ticker=ticker)
+            _write_json(event_path, timeline)
+            institutional_artifacts["event_timeline_json"] = _relative_to_run(run_dir, event_path)
             for artifact_key, filename, payload in (
                 ("public_equity_intelligence_json", "public_equity_intelligence.json", institutional_outputs["full"]),
                 ("source_quality_json", "source_quality.json", institutional_outputs["source_quality"]),
@@ -2044,6 +2057,9 @@ def _run_single_ticker(
         try:
             contract = build_execution_contract(ticker=ticker, analysis_payload=analysis_payload)
             execution_contract_payload = contract.to_dict()
+            execution_contract_payload["event_time"] = analysis_payload.get("finished_at")
+            execution_contract_payload["ingested_at"] = datetime.now(timezone.utc).isoformat()
+            execution_contract_payload["evaluated_at"] = execution_contract_payload["ingested_at"]
             execution_contract_path = ticker_dir / "execution_contract.json"
             _write_json(execution_contract_path, execution_contract_payload)
             execution_artifacts["execution_contract_json"] = _relative_to_run(run_dir, execution_contract_path)
@@ -2078,6 +2094,19 @@ def _run_single_ticker(
             execution_artifacts["intraday_execution_json"] = _relative_to_run(run_dir, intraday_execution_path)
         except Exception as exc:
             print(f"::warning::Execution contract build failed for {ticker}: {exc}")
+
+        from tradingagents.charting.report import build_review, render_review
+        try:
+            chart_path = ticker_dir / "chart_evidence.json"
+            chart_asof = datetime.now(timezone.utc).isoformat()
+            _write_json(chart_path, chart_capture.artifact(analysis_as_of=chart_asof))
+            execution_artifacts["chart_evidence_json"] = _relative_to_run(run_dir, chart_path)
+            review_path = ticker_dir / "investment_review.html"
+            review_path.write_text(render_review(build_review(ticker_dir, analysis_as_of=chart_asof)), encoding="utf-8")
+            execution_artifacts["investment_review_html"] = _relative_to_run(run_dir, review_path)
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            quality_flags.append("integrated_review_unavailable")
+            print(f"::warning::Integrated review unavailable: {type(exc).__name__}")
 
         return {
             "ticker": ticker,
@@ -2152,12 +2181,25 @@ def _run_single_ticker(
 
 
     finally:
+        chart_capture.reset(chart_token)
         close = getattr(graph, "close", None)
         if callable(close):
             try:
                 close()
             except Exception:
                 print("::warning::Could not fully close the completed analysis session.")
+
+
+def _refresh_integrated_review(ticker_dir: Path, summary: dict, *, run_dir: Path) -> None:
+    from tradingagents.charting.report import build_review, render_review
+    try:
+        path = ticker_dir / "investment_review.html"
+        review = build_review(ticker_dir, analysis_as_of=datetime.now(timezone.utc))
+        path.write_text(render_review(review), encoding="utf-8")
+        summary.setdefault("artifacts", {})["investment_review_html"] = _relative_to_run(run_dir, path)
+    except (OSError, ValueError, TypeError, KeyError) as exc:
+        summary.setdefault("quality_flags", []).append("integrated_review_unavailable")
+        print(f"::warning::Integrated review unavailable: {type(exc).__name__}")
 
 
 def _max_runtime_seconds(config: ScheduledAnalysisConfig) -> float | None:
@@ -2476,6 +2518,7 @@ def _augment_run_tickers_with_scanner(
                 exclude_halted_or_low_liquidity=config.scanner.exclude_halted_or_low_liquidity,
                 external_signals=external_signals_for_scanner,
                 prism_candidate_market_filter=scanner_filter,
+                condition=config.scanner.condition,
                 output_path=output_path,
             )
             warnings.extend(scanner_result.warnings)
@@ -5053,6 +5096,8 @@ def _run_execution_overlay_passes(
                     refresh_checkpoint=checkpoint_label,
                 )
                 update_payload = update.to_dict()
+                update_payload["ingested_at"] = datetime.now(timezone.utc).isoformat()
+                update_payload["evaluated_at"] = update_payload.get("execution_asof")
                 update_payload["intraday_snapshot_attempt"] = attempt_payload
                 ticker_dir = run_dir / "tickers" / ticker
                 checkpoint_dir = ticker_dir / "execution" / "checkpoints"
@@ -5108,6 +5153,7 @@ def _run_execution_overlay_passes(
                 md_path.write_text(md_text, encoding="utf-8")
                 summary["artifacts"]["execution_update_md"] = _relative_to_run(run_dir, md_path)
                 summary["execution_update"] = update_payload
+                _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir)
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 updates_by_ticker[ticker] = update_payload
@@ -5129,6 +5175,8 @@ def _run_execution_overlay_passes(
                     contract_payload=contract_dict,
                     now=datetime.now(ZoneInfo(config.run.timezone)),
                 )
+                update_payload["ingested_at"] = datetime.now(timezone.utc).isoformat()
+                update_payload["evaluated_at"] = update_payload.get("execution_asof")
                 _write_json(checkpoint_dir / _checkpoint_update_filename(checkpoint_label), update_payload)
                 update_path = ticker_dir / "execution_update.json"
                 _write_json(update_path, update_payload)
@@ -5165,6 +5213,7 @@ def _run_execution_overlay_passes(
                 )
                 summary["artifacts"]["execution_update_md"] = _relative_to_run(run_dir, md_path)
                 summary["execution_update"] = update_payload
+                _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir)
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 updates_by_ticker[ticker] = update_payload
@@ -6080,6 +6129,19 @@ class _ExecutionContractShim:
             block_new_position_within_days=int(guard_payload.get("block_new_position_within_days", 0) or 0),
             allow_add_only_after_event=bool(guard_payload.get("allow_add_only_after_event", False)),
             requires_post_event_rerun=bool(guard_payload.get("requires_post_event_rerun", False)),
+            scheduled_at=guard_payload.get("scheduled_at"),
+            known_at=guard_payload.get("known_at"),
+            published_at=guard_payload.get("published_at"),
+            event_id=guard_payload.get("event_id"),
+            event_version_id=guard_payload.get("event_version_id"),
+            market_timezone=guard_payload.get("market_timezone"),
+            minutes_before_event=guard_payload.get("minutes_before_event"),
+            minutes_after_publication=int(guard_payload.get("minutes_after_publication", 15)),
+            first_seen_at=guard_payload.get("first_seen_at"),
+            first_seen_cooldown_minutes=int(guard_payload.get("first_seen_cooldown_minutes", 30)),
+            exact_event_time_known=guard_payload.get("exact_event_time_known"),
+            is_amended=bool(guard_payload.get("is_amended", False)),
+            guarded_events=tuple(guard_payload.get("guarded_events") or ()),
         )
         return ExecutionContract(
             ticker=str(self.payload.get("ticker") or ""),

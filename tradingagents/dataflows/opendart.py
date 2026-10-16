@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+import re
+from datetime import date, datetime, timezone
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
@@ -90,6 +92,10 @@ def _resolve_corp_code(symbol: str) -> tuple[str | None, str | None]:
 
 
 def fetch_disclosures_opendart(symbol: str, start_date: str, end_date: str, *, page_count: int = 10) -> list[DisclosureItem]:
+    start, end = date.fromisoformat(start_date), date.fromisoformat(end_date)
+    if start > end:
+        raise ValueError("start_date must not exceed end_date")
+    today = datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Seoul")).date()
     corp_code, stock_code = _resolve_corp_code(symbol)
     if not corp_code or not stock_code:
         return []
@@ -125,11 +131,18 @@ def fetch_disclosures_opendart(symbol: str, start_date: str, end_date: str, *, p
 
     result: list[DisclosureItem] = []
     for item in disclosure_items:
+        if not isinstance(item, dict):
+            continue
         receipt_no = str(item.get("rcept_no", ""))
         receipt_dt = item.get("rcept_dt")
-        published_at = None
-        if receipt_dt:
-            published_at = datetime.strptime(receipt_dt, "%Y%m%d")
+        if not isinstance(receipt_dt, str) or re.fullmatch(r"\d{8}", receipt_dt) is None:
+            continue
+        try:
+            published_at = datetime.strptime(str(receipt_dt), "%Y%m%d")
+            if not start <= published_at.date() <= min(end, today):
+                continue
+        except (ValueError, TypeError):
+            continue
         report_name = str(item.get("report_nm", "Disclosure"))
         corp_name = str(item.get("corp_name", stock_code))
         result.append(
@@ -143,6 +156,8 @@ def fetch_disclosures_opendart(symbol: str, start_date: str, end_date: str, *, p
                 raw_vendor="opendart",
             )
         )
+    from .event_timeline import capture_disclosures
+    capture_disclosures(result, observed_at=datetime.now(timezone.utc))
     return result
 
 

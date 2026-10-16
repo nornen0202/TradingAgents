@@ -52,6 +52,7 @@ def _market(*, last_price: float, day_high: float, day_low: float, now=None):
         volume=1000,
         avg20_daily_volume=1000.0,
         relative_volume=1.2,
+        market_session="regular",
     )
 
 

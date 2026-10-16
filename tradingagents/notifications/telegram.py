@@ -15,14 +15,14 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterator, Sequence
+from tradingagents.dataflows.market_policy import MAX_EXECUTION_AGE, aware_datetime, observation_status
 
 
 LEDGER_SCHEMA = "tradingagents.telegram-notification-ledger/v1"
 MAX_TELEGRAM_TEXT_CHARS = 3_500
 DEFAULT_FAILURE_INCIDENT_COOLDOWN_MINUTES = 360
 _CURRENT_FRESHNESS = {"LIVE_CHECKPOINT", "CURRENT_SESSION", "CURRENT_RUN_FRESH", "FRESH"}
-_MAX_ACTION_DATA_AGE = timedelta(minutes=30)
-_MAX_CLOCK_SKEW = timedelta(minutes=5)
+_MAX_ACTION_DATA_AGE = MAX_EXECUTION_AGE
 
 
 class NotificationError(RuntimeError):
@@ -1268,16 +1268,15 @@ def _ticker_identity(value: Any) -> str:
 
 def _row_is_fresh_immediate(row: dict[str, Any], *, reference_time: datetime) -> bool:
     quality = row.get("quality") if isinstance(row.get("quality"), dict) else {}
-    asof = _try_datetime(str(row.get("market_data_asof") or ""))
-    age = reference_time - asof if asof is not None else None
+    current = aware_datetime(reference_time)
+    asof = aware_datetime(row.get("market_data_asof"))
     return bool(
         quality.get("generated_in_current_run") is True
         and quality.get("execution_ready") is True
         and str(quality.get("row_mode") or "").upper() == "IMMEDIATE"
         and str(quality.get("freshness_class") or "").upper() in _CURRENT_FRESHNESS
-        and age is not None
-        and age >= -_MAX_CLOCK_SKEW
-        and age <= _MAX_ACTION_DATA_AGE
+        and current is not None
+        and observation_status(asof, as_of=current, max_age=_MAX_ACTION_DATA_AGE)["eligible"]
     )
 
 

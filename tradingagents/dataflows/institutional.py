@@ -199,6 +199,10 @@ def build_public_equity_intelligence(
         tool_events=tool_events,
         earnings_event_pack=earnings_event_pack,
     )
+    from .event_timeline import imported_event_records
+    event_records = imported_event_records(imported_payloads, ticker=ticker)
+    event_pack = earnings_event_pack.to_dict()
+    event_pack["event_records"] = event_records
     return {
         "ticker": ticker,
         "asof": asof,
@@ -208,7 +212,8 @@ def build_public_equity_intelligence(
         "provider_catalog": provider_catalog(),
         "source_refs": [source.to_dict() for source in source_refs],
         "evidence_ledger": [item.to_dict() for item in evidence_items],
-        "earnings_event_pack": earnings_event_pack.to_dict(),
+        "earnings_event_pack": event_pack,
+        "event_records": event_records,
         "thesis_tracker": thesis_tracker.to_dict(),
         "warnings": _intelligence_warnings(coverage, source_quality_score),
     }
@@ -253,6 +258,7 @@ def build_public_equity_intelligence_artifacts(
             "source_quality_score": intelligence["source_quality_score"],
         },
         "earnings_event_pack": intelligence["earnings_event_pack"],
+        "event_records": intelligence["event_records"],
         "thesis_tracker": intelligence["thesis_tracker"],
         "full": intelligence,
     }

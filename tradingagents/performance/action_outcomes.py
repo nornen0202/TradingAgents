@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
+import math
 import sqlite3
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -10,11 +11,13 @@ from tradingagents.external.prism_normalize import normalize_market
 
 from .models import ACTION_TRACKER_SCHEMA, OUTCOME_CALCULATION_VERSION, ActionPerformanceSummary
 from .price_history import BENCHMARK_KEY
+from .lifecycle import append_lifecycle_event, initialize_lifecycle, stable_signal_id, timestamp, validate_event
 
 
 def initialize_action_tracker(db_path: Path) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(db_path) as conn:
+        initialize_lifecycle(conn)
         for statement in ACTION_TRACKER_SCHEMA:
             conn.execute(statement)
         _ensure_columns(conn, "action_recommendations", {
@@ -53,7 +56,7 @@ def initialize_action_tracker(db_path: Path) -> None:
         conn.commit()
 
 
-def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str | None = None) -> int:
+def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str | None = None, recorded_at: str | None = None) -> int:
     initialize_action_tracker(db_path)
     run_dir = Path(run_dir)
     manifest = _load_json(run_dir / "run.json")
@@ -72,9 +75,13 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
         )
     )
     inserted = 0
+    ingested_at = recorded_at or datetime.now(timezone.utc).isoformat()
     with sqlite3.connect(db_path) as conn:
         for row in rows:
             if _recommendation_exists(conn, row):
+                receipt = row.get("execution_receipt")
+                if isinstance(receipt, Mapping):
+                    record_execution_receipt(conn, row=row, receipt=receipt, recorded_at=ingested_at)
                 continue
             conn.execute(
                 """
@@ -119,6 +126,10 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
                 ),
             )
             inserted += 1
+            record_recommendation_evidence(conn, row, ingested_at=ingested_at)
+            receipt = row.get("execution_receipt")
+            if isinstance(receipt, Mapping):
+                record_execution_receipt(conn, row=row, receipt=receipt, recorded_at=ingested_at)
         conn.commit()
     return inserted
 
@@ -132,9 +143,13 @@ def update_action_outcomes(
     price_history_path: str | Path | None = None,
     refresh_window_days: int = 120,
     recommendation_ids: Sequence[int] | None = None,
+    recorded_at: str | None = None,
 ) -> None:
     initialize_action_tracker(db_path)
-    prices = _normalize_price_history(price_history or (_load_json(Path(price_history_path)) if price_history_path else {}))
+    # Validate locally even if the upstream adapter claims to apply end_date.
+    cutoff = date.fromisoformat(str(asof_date)[:10])
+    ingested_at = recorded_at or datetime.now(timezone.utc).isoformat()
+    prices = _normalize_price_history(price_history or (_load_json(Path(price_history_path)) if price_history_path else {}), asof_date=str(asof_date))
     benchmark_series = prices.get(BENCHMARK_KEY)
     price_tickers = sorted(key for key in prices if key != BENCHMARK_KEY)
     if not price_tickers:
@@ -193,6 +208,19 @@ def update_action_outcomes(
                 )
             )
         for row in recommendations:
+            try:
+                decision_time = timestamp(row["created_at"])
+                decision_cutoff = timestamp(str(asof_date) if "T" in str(asof_date) else cutoff.isoformat() + "T23:59:59.999999+00:00")
+                if decision_time > decision_cutoff:
+                    continue
+            except ValueError:
+                # Legacy date-only rows retain date-granularity metrics but are
+                # deliberately excluded from the evidence replay below.
+                try:
+                    if date.fromisoformat(str(row["created_at"])) > cutoff:
+                        continue
+                except ValueError:
+                    continue
             ticker = str(row["ticker"])
             series = prices.get(ticker)
             if not series:
@@ -236,6 +264,18 @@ def update_action_outcomes(
                     asof_date,
                 ),
             )
+            try:
+                decision_at = timestamp(row["created_at"]).isoformat()
+            except ValueError:
+                continue
+            known_at = str(asof_date) if "T" in str(asof_date) else cutoff.isoformat() + "T23:59:59.999999+00:00"
+            if timestamp(known_at) < timestamp(decision_at):
+                continue
+            signal_id = stable_signal_id(row["run_id"], row["ticker"], row["action"], row["source"] or "TradingAgents")
+            append_lifecycle_event(conn, event_id=f"outcome:{signal_id}:{known_at}:v{OUTCOME_CALCULATION_VERSION}", signal_id=signal_id,
+                kind="OUTCOME", occurred_at=decision_at, available_at=known_at, confirmed_at=known_at,
+                ingested_at=ingested_at,
+                payload={"ticker": row["ticker"], "measurement_scope": "counterfactual_recommendation_price_path", **returns})
         conn.commit()
 
 
@@ -340,6 +380,7 @@ def _portfolio_action_rows(
                 "full_size_allowed": lift.get("full_size_allowed") if lift else data_health.get("full_size_allowed"),
                 "was_executed": execution_evidence == "broker_fill",
                 "execution_evidence": execution_evidence,
+                "execution_receipt": action.get("execution_receipt"),
                 "skip_reason": (
                     None
                     if execution_evidence == "broker_fill"
@@ -494,10 +535,12 @@ def _benchmark_return(series: list[tuple[str, float]] | None, *, created_date: s
     return round((series[target_index][1] - base) / base, 6)
 
 
-def _normalize_price_history(payload: Mapping[str, Any]) -> dict[str, list[tuple[str, float]]]:
+def _normalize_price_history(payload: Mapping[str, Any], *, asof_date: str | None = None) -> dict[str, list[tuple[str, float]]]:
     result: dict[str, list[tuple[str, float]]] = {}
     if not isinstance(payload, Mapping):
         return result
+    cutoff = (timestamp(asof_date) if asof_date and "T" in asof_date else
+              timestamp(asof_date + "T23:59:59.999999+00:00") if asof_date else None)
     for ticker, raw_series in payload.items():
         series: list[tuple[str, float]] = []
         values = raw_series.get("prices") if isinstance(raw_series, Mapping) else raw_series
@@ -505,17 +548,40 @@ def _normalize_price_history(payload: Mapping[str, Any]) -> dict[str, list[tuple
             continue
         for item in values:
             if isinstance(item, Mapping):
-                date_text = str(item.get("date") or item.get("asof") or item.get("timestamp") or "")[:10]
+                raw_date = str(item.get("date") or item.get("asof") or item.get("timestamp") or "")
                 price = _float_or_none(item.get("close") or item.get("price") or item.get("last"))
             elif isinstance(item, (list, tuple)) and len(item) >= 2:
-                date_text = str(item[0])[:10]
+                raw_date = str(item[0])
                 price = _float_or_none(item[1])
             else:
                 continue
-            if date_text and price is not None:
+            date_text = raw_date[:10]
+            try:
+                date.fromisoformat(date_text)
+                bar_available = timestamp(raw_date if "T" in raw_date else raw_date + "T23:59:59.999999+00:00")
+            except ValueError:
+                continue
+            if cutoff and bar_available > cutoff:
+                continue
+            if isinstance(item, Mapping):
+                unavailable = False
+                for clock in ("available_at", "observed_at", "confirmed_at", "settled_at"):
+                    if clock in item:
+                        try:
+                            if cutoff and timestamp(item[clock]) > cutoff:
+                                unavailable = True
+                        except ValueError:
+                            unavailable = True
+                if unavailable:
+                    continue
+            if date_text and price is not None and math.isfinite(price) and price > 0:
                 series.append((date_text, price))
         if series:
-            result[str(ticker).upper()] = sorted(series, key=lambda row: row[0])
+            # A duplicate trading date cannot represent multiple future bars.
+            grouped: dict[str, set[float]] = {}
+            for day, value in series:
+                grouped.setdefault(day, set()).add(value)
+            result[str(ticker).upper()] = sorted((day, next(iter(values))) for day, values in grouped.items() if len(values) == 1)
     return result
 
 
@@ -735,9 +801,31 @@ def _performance_data_quality(
     }
     recommendations = int(row["recommendation_rows"] or 0) if row else 0
     matured_5d = int(row["matured_5d_rows"] or 0) if row else 0
-    broker_fills = int(row["broker_fill_linked_rows"] or 0) if row else 0
+    legacy_fill_claims = int(row["broker_fill_linked_rows"] or 0) if row else 0
+    # An old receipt label or a paper journal row cannot prove actual trading
+    # effectiveness. Require the immutable, confirmed and settled evidence chain.
+    now = datetime.now(timezone.utc)
+    actual_fills, paper_fills, actual_reviews = {}, {}, []
+    for stored in conn.execute("SELECT * FROM lifecycle_events WHERE kind IN ('FILL','RETROSPECTIVE')"):
+        event = dict(stored)
+        try:
+            event["payload"] = json.loads(event.pop("payload_json"))
+            validate_event(event)
+            if any(timestamp(event[key]) > now for key in ("occurred_at", "available_at", "confirmed_at", "settled_at", "ingested_at") if event.get(key)):
+                continue
+        except (ValueError, TypeError, KeyError):
+            continue
+        if event["kind"] == "FILL":
+            if event["mode"] == "actual":
+                actual_fills[event["event_id"]] = event
+            elif event["mode"] == "paper":
+                paper_fills[event["event_id"]] = event
+        elif event["mode"] == "actual":
+            actual_reviews.append(event["payload"])
+    broker_fills = len({event["signal_id"] for event in actual_fills.values()})
+    actual_closed = sum(review.get("entry_fill_id") in actual_fills and review.get("exit_fill_id") in actual_fills for review in actual_reviews)
     legacy_unverified = int(row["legacy_unverified_execution_rows"] or 0) if row else 0
-    actual_feedback_available = broker_fills > 0 and int(closed_trades or 0) > 0
+    actual_feedback_available = broker_fills > 0 and actual_closed > 0
     warnings = []
     if not actual_feedback_available:
         warnings.append("actual_trade_effectiveness_unavailable:no_linked_broker_fills_or_closed_trades")
@@ -764,6 +852,10 @@ def _performance_data_quality(
         "matured_60d_rows": int(row["matured_60d_rows"] or 0) if row else 0,
         "matured_5d_coverage": matured_5d / recommendations if recommendations else 0.0,
         "broker_fill_linked_rows": broker_fills,
+        "legacy_broker_fill_claim_rows": legacy_fill_claims,
+        "settled_actual_fill_events": len(actual_fills),
+        "paper_fill_events": len(paper_fills),
+        "actual_closed_trade_reviews": actual_closed,
         "closed_trade_journal_rows": int(closed_trades or 0),
         "legacy_unverified_execution_rows": legacy_unverified,
         "warnings": warnings,
@@ -801,6 +893,88 @@ def _recommendation_exists(conn: sqlite3.Connection, row: dict[str, Any]) -> boo
         (row["run_id"], row["ticker"], row["action"], row.get("source")),
     ).fetchone()
     return existing is not None
+
+
+def record_recommendation_evidence(conn: sqlite3.Connection, row: Mapping[str, Any], *, ingested_at: str) -> None:
+    try:
+        if timestamp(row.get("created_at")) > timestamp(ingested_at):
+            return
+    except ValueError:
+        return  # Legacy date-only rows are not invented point-in-time evidence.
+    signal_id = stable_signal_id(row["run_id"], row["ticker"], row["action"], row.get("source") or "TradingAgents")
+    payload = {key: row.get(key) for key in ("run_id", "ticker", "action", "risk_action", "source",
+                "recommended_price", "confidence", "skip_reason", "trigger_type")}
+    payload["source"] = row.get("source") or "TradingAgents"
+    append_lifecycle_event(conn, event_id=signal_id, signal_id=signal_id, kind="SIGNAL",
+        occurred_at=row["created_at"], available_at=row["created_at"], ingested_at=ingested_at, payload=payload)
+
+
+def record_execution_receipt(db: Path | sqlite3.Connection, *, row: Mapping[str, Any], receipt: Mapping[str, Any], recorded_at: str | None = None, strict: bool = False) -> bool:
+    """Import explicit, settled broker evidence; never infer fills from allocation.
+
+    One receipt represents one incremental fill, not cumulative order quantity.
+    Unknown costs, fill IDs or timing make it ineligible for historical replay.
+    Existing recommendation statistics remain backward compatible.
+    """
+    if _execution_evidence({"execution_receipt": receipt}) != "broker_fill":
+        if strict:
+            raise ValueError("Explicit supported broker fill status/source/quantity required")
+        return False
+    ingested_at = recorded_at or datetime.now(timezone.utc).isoformat()
+    try:
+        executed_at = receipt["executed_at"]
+        intent_at = receipt["intent_at"]
+        confirmed_at, settled_at = receipt["confirmed_at"], receipt["settled_at"]
+        available_at = receipt.get("available_at") or confirmed_at
+        for value in (executed_at, confirmed_at, settled_at, available_at, intent_at):
+            timestamp(value)
+        if timestamp(intent_at) > timestamp(executed_at):
+            if strict:
+                raise ValueError("Fill cannot precede intent")
+            return False
+        intent_id, fill_id = receipt["intent_id"], receipt["fill_id"]
+        if any(not isinstance(value, str) or not value.strip() or len(value) > 200 for value in (intent_id, fill_id)):
+            if strict:
+                raise ValueError("Stable intent and incremental fill IDs required")
+            return False
+        quantity, requested = receipt["filled_quantity"], receipt["requested_quantity"]
+        price, cost, side = receipt["fill_price"], receipt["cost"], receipt["side"]
+        if (not isinstance(requested, (int, float)) or isinstance(requested, bool)
+                or not math.isfinite(requested) or requested < quantity):
+            if strict:
+                raise ValueError("Requested quantity must cover incremental fill")
+            return False
+        signal_id = stable_signal_id(row["run_id"], row["ticker"], row["action"], row.get("source") or "TradingAgents")
+        payload = {"ticker": row["ticker"], "side": side, "quantity": quantity,
+                   "price": price, "cost": cost, "currency": receipt["currency"],
+                   "reference_price": row.get("recommended_price"), "broker_fill_id": fill_id}
+        # Validate before writing the intent so malformed fills cannot leave an
+        # apparent order link without usable execution evidence.
+        validate_event(dict(event_id="fill:actual:" + fill_id, signal_id=signal_id, intent_id=intent_id,
+            kind="FILL", mode="actual", occurred_at=executed_at, available_at=available_at,
+            confirmed_at=confirmed_at, settled_at=settled_at, ingested_at=ingested_at, payload=payload))
+    except (KeyError, ValueError, TypeError):
+        if strict:
+            raise ValueError("Receipt is missing required fields or contains invalid execution evidence") from None
+        return False
+    if not isinstance(db, sqlite3.Connection):
+        with sqlite3.connect(db) as conn:
+            return record_execution_receipt(conn, row=row, receipt=receipt, recorded_at=ingested_at, strict=strict)
+    append_lifecycle_event(db, event_id="intent:actual:" + intent_id, signal_id=signal_id,
+        intent_id=intent_id, kind="INTENT", mode="actual", occurred_at=intent_at,
+        available_at=receipt.get("intent_available_at") or intent_at, ingested_at=ingested_at, payload={"ticker": row["ticker"], "side": side,
+            "quantity": requested, "status": "OBSERVED_BROKER_INTENT"})
+    inserted = append_lifecycle_event(db, event_id="fill:actual:" + fill_id, signal_id=signal_id,
+        intent_id=intent_id, kind="FILL", mode="actual", occurred_at=executed_at,
+        available_at=available_at, confirmed_at=confirmed_at, settled_at=settled_at, ingested_at=ingested_at, payload=payload)
+    from .journal import record_fill_retrospectives
+    # Reimports also reconcile now-settled exits and out-of-order file imports.
+    exits = db.execute("SELECT event_id,payload_json FROM lifecycle_events WHERE kind='FILL' AND mode='actual'").fetchall()
+    for exit_id, encoded in exits:
+        candidate = json.loads(encoded)
+        if candidate.get("side") == "SELL" and candidate.get("ticker") == row["ticker"]:
+            record_fill_retrospectives(db, exit_event_id=exit_id, evaluated_at=ingested_at)
+    return inserted
 
 
 def _manifest_run_market(manifest: Mapping[str, Any]) -> str | None:

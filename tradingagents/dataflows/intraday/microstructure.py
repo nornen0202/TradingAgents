@@ -13,6 +13,7 @@ from tradingagents.dataflows.intraday.us_microstructure_sources import (
 from tradingagents.portfolio.instrument_identity import resolve_identity
 from tradingagents.portfolio.kis import KisClient
 from tradingagents.schemas import IntradayMarketSnapshot
+from tradingagents.charting.capture import normalize_kis_bars
 
 
 _DEFAULT_SUPPLEMENT_PROVIDER = object()
@@ -218,6 +219,7 @@ class KISMicrostructureProvider:
         asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
         return IntradayMarketSnapshot(
             ticker=ticker,
+            chart_bars=tuple(normalize_kis_bars(bars, observed_at=now_local, timezone_name=market_timezone)),
             asof=asof.isoformat(),
             provider=self.name,
             interval=interval,
@@ -458,6 +460,7 @@ class KISMicrostructureProvider:
             trade_tape_summary = supplement.trade_tape_summary
         return IntradayMarketSnapshot(
             ticker=ticker,
+            chart_bars=tuple(normalize_kis_bars(session_bars, observed_at=now_local, timezone_name=market_timezone)),
             asof=asof.isoformat(),
             provider=self.name,
             interval=interval,

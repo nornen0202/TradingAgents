@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass, field, replace
 from datetime import datetime, time
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
 from cli.utils import normalize_ticker_symbol
@@ -291,6 +291,7 @@ class ScannerSettings:
     max_daily_change_pct: float = 20.0
     min_volume_ratio_to_market_avg: float = 0.2
     exclude_halted_or_low_liquidity: bool = True
+    condition: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -935,6 +936,8 @@ def _load_prism_telegram_settings(raw: dict[str, object], *, base_dir: Path) -> 
 
 def _load_scanner_settings(raw: dict[str, object], *, base_dir: Path, default_market: str) -> ScannerSettings:
     raw = raw if isinstance(raw, dict) else {}
+    from tradingagents.scanner.conditions import validate_condition
+    condition = validate_condition(raw["condition"]) if raw.get("condition") is not None else None
     return ScannerSettings(
         enabled=bool(raw.get("enabled", False)),
         market=str(raw.get("market", default_market)).strip().upper() or default_market,
@@ -950,6 +953,7 @@ def _load_scanner_settings(raw: dict[str, object], *, base_dir: Path, default_ma
         max_daily_change_pct=float(raw.get("max_daily_change_pct", 20.0) or 20.0),
         min_volume_ratio_to_market_avg=float(raw.get("min_volume_ratio_to_market_avg", 0.2) or 0.2),
         exclude_halted_or_low_liquidity=bool(raw.get("exclude_halted_or_low_liquidity", True)),
+        condition=condition,
     )
 
 

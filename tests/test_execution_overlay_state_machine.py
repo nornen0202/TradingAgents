@@ -50,6 +50,7 @@ def _market(*, price: float, rvol: float, age_seconds: int = 0, now=None):
         volume=1000,
         avg20_daily_volume=1000.0,
         relative_volume=rvol,
+        market_session="regular",
     )
 
 

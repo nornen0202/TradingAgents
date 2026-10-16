@@ -16,12 +16,13 @@ from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.automation_calendar import automated_market_session_status
 from tradingagents.scheduled.market_calendar import market_session_state
 from tradingagents.scheduled.runner import execute_scheduled_run
+from tradingagents.dataflows.market_policy import MAX_EXECUTION_AGE, observation_status
 
 from .freshness import aware_datetime
 from .packet import build_surface_packet, resolve_archive_roots
 
 ROOT = Path(__file__).resolve().parents[2]
-MAX_PREPARE_AGE = timedelta(minutes=10)
+MAX_PREPARE_AGE = MAX_EXECUTION_AGE
 
 
 class ProducerBusy(RuntimeError):
@@ -76,7 +77,7 @@ def publish_freshness_blockers(packet: dict, *, now: datetime) -> list[str]:
     blockers = []
     for field in ("market_data_oldest_at", "market_data_latest_at", "account_as_of"):
         observed = aware_datetime(receipt.get(field))
-        if observed is None or observed > now or now - observed >= timedelta(minutes=30):
+        if not observation_status(receipt.get(field), as_of=now)["eligible"]:
             blockers.append(field.upper() + "_EXPIRED_OR_INVALID")
     if receipt.get("account_snapshot_health") != "VALID":
         blockers.append("ACCOUNT_NOT_VALID")

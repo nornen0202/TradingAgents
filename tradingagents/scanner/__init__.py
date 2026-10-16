@@ -1,4 +1,5 @@
 from .models import BuyMatrix, ScannerCandidate, ScannerResult, TriggerType
+from .conditions import evaluate_condition, validate_condition
 from .prism_like_scanner import run_prism_like_scanner
 from .sector_regime import apply_buy_matrix_overlay, evaluate_buy_matrix
 
@@ -9,5 +10,7 @@ __all__ = [
     "TriggerType",
     "apply_buy_matrix_overlay",
     "evaluate_buy_matrix",
+    "evaluate_condition",
+    "validate_condition",
     "run_prism_like_scanner",
 ]
