@@ -330,6 +330,8 @@ def _validate_input_for_method(method: str, args: tuple[Any, ...], kwargs: dict[
     if method in {"get_stock_data", "get_news", "get_company_news", "get_disclosures", "get_social_sentiment"}:
         _validate_date(str(arg(1, "start_date")), "start_date")
         _validate_date(str(arg(2, "end_date")), "end_date")
+        if str(arg(1, "start_date")) > str(arg(2, "end_date")):
+            raise VendorInputError("start_date must not be later than end_date")
 
     if method in {"get_fundamentals", "get_balance_sheet", "get_cashflow", "get_income_statement"}:
         curr_date = arg(1 if method == "get_fundamentals" else 2, "curr_date")

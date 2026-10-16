@@ -37,7 +37,11 @@ def invoke_structured_decision_with_retry(
         except StructuredDecisionValidationError as exc:
             last_error = exc
             if _attempt >= max(0, max_retries):
-                decision_json = _fallback_structured_decision_json(context=context, reason=str(exc))
+                decision_json = _fallback_structured_decision_json(
+                    context=context,
+                    reason=str(exc),
+                    reason_code="STRUCTURED_DECISION_INVALID",
+                )
                 return AIMessage(content=decision_json), decision_json
             repair_prompt = _build_repair_prompt(
                 context=context,
@@ -129,30 +133,39 @@ def _is_recoverable_codex_provider_error(exc: Exception) -> bool:
     )
 
 
-def _fallback_structured_decision_json(*, context: str, reason: str) -> str:
+def _fallback_structured_decision_json(
+    *, context: str, reason: str, reason_code: str = "CODEX_PROVIDER_UNAVAILABLE"
+) -> str:
+    provider_unavailable = reason_code == "CODEX_PROVIDER_UNAVAILABLE"
+    cause = "Codex provider fallback" if provider_unavailable else "structured-output validation fallback"
+    invalidator = (
+        "Codex provider timeout or malformed structured output prevented validated analysis."
+        if provider_unavailable else
+        "The LLM decision did not satisfy the required schema after bounded repair attempts."
+    )
     payload = {
         "rating": "NO_TRADE",
         "portfolio_stance": "NEUTRAL",
         "entry_action": "WAIT",
         "risk_action": "NONE",
         "risk_action_reason": "No validated LLM decision was available for this step.",
-        "risk_action_reason_codes": ["CODEX_PROVIDER_UNAVAILABLE"],
+        "risk_action_reason_codes": [reason_code],
         "risk_action_confidence": 0.1,
         "risk_action_level": None,
-        "profit_taking_plan": {"enabled": False, "reason_codes": ["CODEX_PROVIDER_UNAVAILABLE"]},
+        "profit_taking_plan": {"enabled": False, "reason_codes": [reason_code]},
         "setup_quality": "WEAK",
         "confidence": 0.1,
         "time_horizon": "short",
         "entry_logic": (
-            f"Do not initiate a new trade from the {context}; Codex provider fallback was used "
+            f"Do not initiate a new trade from the {context}; {cause} was used "
             "because no validated LLM synthesis was available."
         ),
         "exit_logic": "Keep existing risk controls unchanged and rerun the analysis before making a new decision.",
         "position_sizing": "Use 0% new capital until a validated analysis succeeds.",
         "risk_limits": "Treat this as a watchlist-only placeholder; require a successful rerun before execution.",
         "catalysts": ["Successful rerun with validated analyst and decision output."],
-        "invalidators": ["Codex provider timeout or malformed structured output prevented validated analysis."],
-        "watchlist_triggers": ["Rerun the scheduled analysis after Codex provider health recovers."],
+        "invalidators": [invalidator],
+        "watchlist_triggers": ["Rerun the analysis and require a schema-validated decision before execution."],
         "data_coverage": {
             "company_news_count": 0,
             "disclosures_count": 0,
@@ -160,7 +173,7 @@ def _fallback_structured_decision_json(*, context: str, reason: str) -> str:
             "macro_items_count": 0,
         },
         "execution_levels": {
-            "intraday_pilot_rule": "No pilot entry while the decision is provider-fallback only.",
+            "intraday_pilot_rule": "No pilot entry while the decision is an unvalidated fallback.",
             "close_confirm_rule": "Require a successful rerun before any close-confirmed entry.",
             "next_day_followthrough_rule": "Reassess on the next run with validated data and LLM synthesis.",
             "failed_breakout_rule": "Block new buying until a validated decision is available.",

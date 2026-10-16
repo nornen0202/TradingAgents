@@ -73,7 +73,9 @@ DEFAULT_CONFIG = {
     # Debate and discussion settings
     "max_debate_rounds": 2,
     "max_risk_discuss_rounds": 2,
-    "max_recur_limit": 100,
+    "max_recur_limit": 200,
+    # Bound each analyst independently, then summarize collected evidence.
+    "max_tool_rounds": 15,
     # Opt in after sizing API and local Codex capacity. Codex turns remain serialized.
     "parallel_analysts": False,
     "analyst_max_concurrency": 2,

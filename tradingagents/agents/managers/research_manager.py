@@ -18,7 +18,7 @@ def create_research_manager(llm, memory):
         investment_debate_state = state["investment_debate_state"]
 
         curr_situation = f"{market_research_report}\n\n{sentiment_report}\n\n{news_report}\n\n{fundamentals_report}"
-        past_memories = get_memory_matches(memory, curr_situation)
+        past_memories = get_memory_matches(memory, curr_situation, as_of=state.get("analysis_date") or state.get("trade_date"))
 
         past_memory_str = ""
         for rec in past_memories:

@@ -32,12 +32,15 @@ class PaperLimits:
     slippage_bps: float = 10
     fee_bps: float = 5
     sell_tax_bps: float = 20  # Conservative research assumption, not a tax quote.
+    # Optional cumulative loss cap from this paper experiment's NAV high water.
+    max_drawdown: float | None = None
 
     def __post_init__(self):
         if type(self.daily_loss_reduce_only) is not bool:
             raise ValueError("daily_loss_reduce_only must be boolean")
         if any(
-            not math.isfinite(float(v)) or float(v) < 0 for v in asdict(self).values()
+            not math.isfinite(float(v)) or float(v) < 0
+            for key, v in asdict(self).items() if key != "max_drawdown"
         ):
             raise ValueError("Limits must be finite and nonnegative")
         if not 0 < self.max_order_nav <= 1 or not 0 < self.max_single_name <= 1:
@@ -51,6 +54,12 @@ class PaperLimits:
             raise ValueError("Invalid daily limits")
         if type(self.max_daily_orders) is not int or self.max_daily_orders <= 0:
             raise ValueError("Daily order count must be a positive integer")
+        if self.max_drawdown is not None and (
+            isinstance(self.max_drawdown, bool)
+            or not isinstance(self.max_drawdown, (int, float))
+            or not 0 < self.max_drawdown < 1
+        ):
+            raise ValueError("max_drawdown must be a fraction between 0 and 1")
 
 
 def stamp(value: str) -> datetime:
@@ -145,6 +154,7 @@ class PaperBroker:
             self._set("seeded", True)
             self._set("seed_asof", snapshot["as_of"])
             self._set("seed_nav", total)
+            self._set("peak_nav", total)
             self._set("limits", asdict(self.limits))
             for p in positions:
                 self.db.execute(
@@ -171,7 +181,11 @@ class PaperBroker:
         try:
             if not self._get("seeded"):
                 raise ValueError("Seed account first")
-            if self._get("limits") != asdict(self.limits):
+            stored_limits = dict(self._get("limits"))
+            # Older ledgers predate this opt-in limit. None preserves their policy;
+            # enabling a cap still requires a separate experiment, as other limits do.
+            stored_limits.setdefault("max_drawdown", None)
+            if stored_limits != asdict(self.limits):
                 raise ValueError("Limits changed: use a separate paper experiment")
             previous = self._get("last_step")
             if at < stamp(self._get("seed_asof")):
@@ -226,12 +240,14 @@ class PaperBroker:
                 r["qty"] and r["ticker"] not in valid
                 for r in self.db.execute("SELECT * FROM positions")
             )
+            drawdown, drawdown_stop = self._update_drawdown(nav, not missing_marks)
             # A kill switch also cancels pending paper orders, including risk sells.
             for order in self.db.execute(
                 "SELECT * FROM orders WHERE status='PENDING'"
             ).fetchall():
                 if (
                     halted
+                    or (drawdown_stop and order["side"] == "BUY")
                     or (
                         risk_stop
                         and (
@@ -244,7 +260,12 @@ class PaperBroker:
                 ):
                     self.db.execute(
                         "UPDATE orders SET status='CANCELLED',reason=? WHERE id=?",
-                        ("kill_or_daily_stop_or_expired", order["id"]),
+                        (
+                            "max_drawdown_reached"
+                            if drawdown_stop and order["side"] == "BUY" and not halted
+                            else "kill_or_daily_stop_or_expired",
+                            order["id"],
+                        ),
                     )
                     continue
                 q = valid.get(order["ticker"])
@@ -309,6 +330,7 @@ class PaperBroker:
                     1 - self.limits.max_daily_loss
                 )
                 self._set("daily_stopped", risk_stop)
+                drawdown, drawdown_stop = self._update_drawdown(nav, not missing_marks)
             for s in signals:
                 key = hashlib.sha256(
                     f"{s['signal_id']}|{s['ticker']}|{s['action']}".encode()
@@ -325,6 +347,8 @@ class PaperBroker:
                     and (action == "BUY" or not self.limits.daily_loss_reduce_only)
                 ):
                     reason = "kill_or_daily_stop"
+                elif drawdown_stop and action == "BUY":
+                    reason = "max_drawdown_reached"
                 elif (
                     action not in {"BUY", "REDUCE", "SELL"}
                     or s.get("execution_ready") is not True
@@ -429,10 +453,12 @@ class PaperBroker:
                 "nav_krw": nav,
                 "cash_krw": cash,
                 "marks_complete": not missing_marks,
+                "peak_nav_krw": self._get("peak_nav", self._get("seed_nav")),
+                "drawdown_fraction": drawdown,
                 "trading_state": "HALTED"
                 if halted or (risk_stop and not self.limits.daily_loss_reduce_only)
                 else "REDUCING"
-                if risk_stop
+                if risk_stop or drawdown_stop
                 else "ACTIVE",
                 "orders": [
                     dict(r)
@@ -444,6 +470,24 @@ class PaperBroker:
         except Exception:
             self.db.execute("ROLLBACK")
             raise
+
+    def _update_drawdown(self, nav: float, marks_complete: bool):
+        """Only a complete account mark can raise the persistent NAV high water.
+
+        A missing mark cannot clear a previous breach. Fees/slippage are included
+        by rechecking NAV after each fill, before processing another pending buy.
+        """
+        if not marks_complete:
+            return None, self._get("drawdown_stopped", False)
+        peak = max(self._get("peak_nav", self._get("seed_nav")), nav)
+        drawdown = max(0.0, 1 - nav / peak)
+        stopped = (
+            self.limits.max_drawdown is not None
+            and nav <= peak * (1 - self.limits.max_drawdown)
+        )
+        self._set("peak_nav", peak)
+        self._set("drawdown_stopped", stopped)
+        return drawdown, stopped
 
 
 def order_nav_limit(limits: PaperLimits, side: str, quantity: int):
