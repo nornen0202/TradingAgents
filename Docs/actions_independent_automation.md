@@ -68,6 +68,12 @@ Codex authentication, and GitHub CLI authorization available. These are local
 Windows tasks, not ChatGPT heartbeat automations. They run when this computer
 is on and the configured user session is available.
 
+The tasks start through `wscript.exe` and the installed
+`run_powershell_hidden.vbs` launcher, which sets the hidden window state before
+PowerShell is created and waits for its exit code. Launching PowerShell directly
+with `-WindowStyle Hidden` can briefly open Windows Terminal on every tick;
+the Task Scheduler `Hidden` setting alone only hides the task in its UI.
+
 The first task ticks inspect **all** active trusted main-branch writer runs,
 including queued/waiting writers. They wait for those writers to finish and
 persist `actions-drained.json`; they do not cancel them. They do not wait on

@@ -12,7 +12,7 @@ if ($PSCmdlet.ShouldProcess($installedScript, "Install independent local analysi
     [IO.Directory]::CreateDirectory($InstallRoot) | Out-Null
     # Install the backward-compatible helper first, then atomically replace the
     # entrypoint. Running workers keep their already loaded script and source.
-    foreach ($filename in @('local_automation_launcher_notifications.ps1', 'run_local_automation.ps1')) {
+    foreach ($filename in @('run_powershell_hidden.vbs', 'local_automation_launcher_notifications.ps1', 'run_local_automation.ps1')) {
         $destination = Join-Path $InstallRoot $filename
         $temporary = "$destination.$([Guid]::NewGuid().ToString('N')).tmp"
         try {
@@ -39,8 +39,11 @@ if ($PSCmdlet.ShouldProcess($installedScript, "Install independent local analysi
     $principal = New-ScheduledTaskPrincipal -UserId $identity -LogonType Interactive -RunLevel Limited
     foreach ($command in @("run-due", "publish")) {
         $name = "LocalAutomation-$command"
-        $arguments = "-NoLogo -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$installedScript`" -Command $command -RepositoryRoot `"$RepositoryRoot`" -ArchiveRoot `"$ArchiveRoot`""
-        $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $arguments
+        # Set the initial window state before PowerShell starts. Its own
+        # -WindowStyle Hidden is applied after Windows can show a Terminal window.
+        $hiddenLauncher = Join-Path $InstallRoot 'run_powershell_hidden.vbs'
+        $arguments = "//B //Nologo `"$hiddenLauncher`" `"$installedScript`" -Command $command -RepositoryRoot `"$RepositoryRoot`" -ArchiveRoot `"$ArchiveRoot`""
+        $action = New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\wscript.exe') -Argument $arguments
         $trigger = New-ScheduledTaskTrigger -Once -At ([DateTime]::Now.AddMinutes(1)) -RepetitionInterval (New-TimeSpan -Minutes 5)
         $logon = New-ScheduledTaskTrigger -AtLogOn -User $identity
         $settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Hidden -ExecutionTimeLimit (New-TimeSpan -Hours 13)
