@@ -69,7 +69,7 @@ def test_execution_summary_model_selection_uses_deep_for_degraded_or_stale_updat
         update=_update(state="DEGRADED", data_health="STALE"),
     )
 
-    assert model == "gpt-6-astra"
+    assert model == "gpt-6.1-sol"
 
 
 def test_execution_summary_model_selection_honors_explicit_override(tmp_path: Path):
@@ -116,7 +116,7 @@ def test_workflow_exact_role_models_preserve_optional_summary_policy(tmp_path, m
     # Daily jobs export these role values; YouTube's base site uses TOML defaults.
     for role in ("DEEP", "QUICK", "OUTPUT", "WRITER", "JUDGE"):
         if workflow_name == "daily-codex-analysis.yml":
-            model = "gpt-6-astra" if role in {"DEEP", "JUDGE"} else "gpt-6.1-sol"
+            model = "gpt-6.1-sol"
             monkeypatch.setenv(f"TRADINGAGENTS_CODEX_{role}_MODEL", model)
         else:
             monkeypatch.delenv(f"TRADINGAGENTS_CODEX_{role}_MODEL", raising=False)
@@ -126,7 +126,7 @@ def test_workflow_exact_role_models_preserve_optional_summary_policy(tmp_path, m
     assert _execution_summary_model_for_update(config=config, update=_update(state="WAIT")) is None
     for update, model in (
         (_update(state="ACTIONABLE_NOW", now="STARTER_NOW"), "gpt-6.1-sol"),
-        (_update(state="DEGRADED", data_health="STALE"), "gpt-6-astra"),
+        (_update(state="DEGRADED", data_health="STALE"), "gpt-6.1-sol"),
     ):
         assert _execution_summary_model_for_update(config=config, update=update) == model
         overlay = replace(config, run=replace(config.run, run_mode="overlay_only"))

@@ -13,7 +13,7 @@ def _load_toml(path: Path) -> dict:
     return tomllib.loads(path.read_text(encoding="utf-8"))
 
 
-def test_daily_configs_keep_astra_high_and_production_universe_coverage():
+def test_daily_configs_keep_sol_xhigh_and_production_universe_coverage():
     for path in DAILY_CONFIGS:
         payload = _load_toml(path)
         run = payload["run"]
@@ -22,8 +22,8 @@ def test_daily_configs_keep_astra_high_and_production_universe_coverage():
         for role in ("quick", "output", "writer"):
             assert llm[f"{role}_model"] == "gpt-6.1-sol", path
         for role in ("deep", "judge"):
-            assert llm[f"{role}_model"] == "gpt-6-astra", path
-            assert llm[f"codex_{role}_reasoning_effort"] == "high", path
+            assert llm[f"{role}_model"] == "gpt-6.1-sol", path
+            assert llm[f"codex_{role}_reasoning_effort"] == "xhigh", path
         assert llm["codex_fallback_on_app_server_error"] is False, path
         performance = payload["portfolio_performance"]
         summary_image = payload["summary_image"]

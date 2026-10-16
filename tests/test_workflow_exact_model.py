@@ -41,8 +41,7 @@ def test_workflow_enforces_exact_model_before_export(tmp_path, monkeypatch, scri
                                fallback_used=fallback, account="test-account", models=[resolved])
 
     monkeypatch.setattr(codex_preflight, "run_codex_preflight", preflight)
-    expected_models = (["gpt-6.1-sol"] * 3 if script == SCRIPTS[2]
-                       else ["gpt-6-astra", "gpt-6.1-sol", "gpt-6.1-sol"])
+    expected_models = ["gpt-6.1-sol"] * 3
     exact_match = not fallback and all(model == resolved for model in expected_models)
     if exact_match:
         exec(compile(script, "workflow-preflight", "exec"), {})
@@ -73,9 +72,9 @@ def test_workflow_exports_exact_target_for_each_active_role(tmp_path, monkeypatc
     models = [line for line in exported if "_MODEL=" in line]
     assert len(models) in (4, 5)
     for line in models:
-        expected = "gpt-6-astra" if script != SCRIPTS[2] and any(role in line for role in ("_DEEP_", "_JUDGE_", "_SYNTHESIS_")) else "gpt-6.1-sol"
+        expected = "gpt-6.1-sol"
         assert line.endswith(f"={expected}")
-    assert len([line for line in models if line.endswith("=gpt-6-astra")]) == (0 if script == SCRIPTS[2] else 2)
+    assert len([line for line in models if line.endswith("=gpt-6-astra")]) == 0
     assert "TRADINGAGENTS_CODEX_PREFLIGHT_OK=1" in exported
 
 
@@ -92,7 +91,7 @@ def test_explicit_recovery_preserves_verified_source_cohort_models(tmp_path, mon
     def recovered_models(**kwargs):
         assert kwargs["source_run_id"] == "20261008T010000_full"
         assert (kwargs["quick_model"], kwargs["deep_model"], kwargs["output_model"]) == (
-            "gpt-6.1-sol", "gpt-6-astra", "gpt-6.1-sol",
+            "gpt-6.1-sol", "gpt-6.1-sol", "gpt-6.1-sol",
         )
         return ("gpt-6-sol",) * 3
 
