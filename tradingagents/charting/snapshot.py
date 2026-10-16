@@ -45,6 +45,12 @@ def get_replay_snapshot(ticker, as_of_ts, *, ticker_dir, db_paths=(), anchor=Non
             markers.append({"time": int(at.timestamp()), "position": "aboveBar", "shape": "square",
                             "text": ", ".join(execution["reason_codes"]), "category": "BLOCK_REASON"})
     levels = []
+    stored_vwap = finite(execution.get("session_vwap"))
+    if stored_vwap is not None and stored_vwap > 0:
+        levels.append({"price": stored_vwap, "label": "당일 VWAP · 실행 엔진", "style": "DOTTED",
+                       "market_data_asof": execution.get("market_data_asof"),
+                       "event_time": execution.get("market_data_asof"), "ingested_at": execution.get("ingested_at"),
+                       "evaluated_at": execution.get("execution_asof")})
     for item in review["plan"].get("structured_levels") or []:
         if not isinstance(item, dict):
             continue

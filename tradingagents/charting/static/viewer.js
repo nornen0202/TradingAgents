@@ -73,7 +73,7 @@ async function loadSnapshot() {
     renderProfile(snapshot.series);
     for (const item of snapshot.series) {
       const wrapper = document.createElement("div");
-      const label = document.createElement("h3"); label.textContent = item.interval;
+      const label = document.createElement("h3"); label.textContent = item.interval + " · UTC";
       const element = document.createElement("div"); element.className = "chart";
       const clocks = document.createElement("p"); clocks.className="muted";
       if(item.bars.length){const latest=item.bars[item.bars.length-1];clocks.textContent="최근 봉 " + latest.event_time + " · 관측 " + latest.ingested_at + " · 평가 " + latest.evaluated_at;}
@@ -85,7 +85,7 @@ async function loadSnapshot() {
       candles.setData(data);
       const vwap = chart.addSeries(LightweightCharts.LineSeries,{color:"#395dd1",lineWidth:2});
       vwap.setData(item.avwap.series.filter(row=>row.value !== null).map(row=>({time:Math.floor(Date.parse(row.timestamp)/1000),value:row.value})));
-      snapshot.price_levels.forEach(level=>candles.createPriceLine({price:level.price,title:level.label,lineStyle:LightweightCharts.LineStyle.Dashed,color:"#90642f"}));
+      snapshot.price_levels.forEach(level=>candles.createPriceLine({price:level.price,title:level.label,lineStyle:({DOTTED:LightweightCharts.LineStyle.Dotted,SOLID:LightweightCharts.LineStyle.Solid,DASHED:LightweightCharts.LineStyle.Dashed})[level.style] ?? LightweightCharts.LineStyle.Dashed,color:"#90642f"}));
       if (data.length) {
         const markers = snapshot.markers.filter(m=>m.time>=data[0].time && m.time<=data[data.length-1].time).map(({category,...marker})=>marker);
         LightweightCharts.createSeriesMarkers(candles, markers);

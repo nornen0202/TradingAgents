@@ -243,3 +243,42 @@ def test_same_observation_conflicts_are_excluded_instead_of_inferred_revision(tm
     result = build_review(directory, analysis_as_of=ASOF)
     bar = result["series"][0]["bars"][0]
     assert bar["close"] == 106 and not bar["is_amended"]  # No invented provider amendment flag.
+
+
+def test_stored_session_vwap_and_quote_metrics_are_copied_without_recalculation(tmp_path):
+    directory = archive(tmp_path)
+    execution = {"ticker": "AAPL", "execution_asof": "2026-10-09T20:03:00Z", "ingested_at": "2026-10-09T20:03:01Z",
+                 "market_data_asof": "2026-10-09T20:02:00Z", "decision_state": "WAIT", "reason_codes": ["stored_gate"],
+                 "session_vwap": 123, "last_price": 127, "relative_volume": 2.5}
+    write(directory / "execution_update.json", execution)
+    snapshot = get_replay_snapshot("AAPL", "2026-10-09T20:04:00Z", ticker_dir=directory)
+    for key in ("session_vwap", "last_price", "relative_volume"):
+        assert snapshot["execution"][key] == execution[key]
+    vwap = next(level for level in snapshot["price_levels"] if level["label"] == "당일 VWAP · 실행 엔진")
+    assert vwap["price"] == 123 and vwap["style"] == "DOTTED"
+    assert vwap["event_time"] == vwap["market_data_asof"] == execution["market_data_asof"]
+    assert vwap["ingested_at"] == execution["ingested_at"] and vwap["evaluated_at"] == execution["execution_asof"]
+    rendered = render_review(snapshot)
+    assert "당일 VWAP · 실행 엔진 123" in rendered and 'stroke-dasharray="1 3"' in rendered
+    assert execution["market_data_asof"] in rendered
+    for key, bad in (("session_vwap", float("nan")), ("last_price", -1), ("relative_volume", float("inf"))):
+        write(directory / "execution_update.json", {**execution, key: bad})
+        assert key not in build_review(directory, analysis_as_of="2026-10-09T20:04:00Z")["execution"]
+
+
+def test_future_engine_vwap_is_hidden_and_prior_checkpoint_vwap_is_restored(tmp_path):
+    directory = archive(tmp_path)
+    checkpoints = directory / "execution" / "checkpoints"
+    checkpoints.mkdir(parents=True)
+    old = {"ticker": "AAPL", "execution_asof": "2026-10-09T20:03:00Z", "ingested_at": "2026-10-09T20:03:01Z",
+           "market_data_asof": "2026-10-09T20:02:00Z", "decision_state": "WAIT", "session_vwap": 123}
+    write(checkpoints / "execution_update_first.json", old)
+    write(directory / "execution_update.json", {**old, "session_vwap": 999, "execution_asof": "2026-10-09T20:10:00Z",
+                                               "ingested_at": "2026-10-09T20:10:01Z", "market_data_asof": "2026-10-09T20:09:00Z"})
+    early = get_replay_snapshot("AAPL", "2026-10-09T20:02:59Z", ticker_dir=directory)
+    assert not any(level["label"] == "당일 VWAP · 실행 엔진" for level in early["price_levels"])
+    restored = get_replay_snapshot("AAPL", "2026-10-09T20:04:00Z", ticker_dir=directory)
+    assert restored["execution"]["session_vwap"] == 123
+    assert next(level["price"] for level in restored["price_levels"] if level["label"] == "당일 VWAP · 실행 엔진") == 123
+    late = get_replay_snapshot("AAPL", "2026-10-09T20:11:00Z", ticker_dir=directory)
+    assert late["execution"]["session_vwap"] == 999

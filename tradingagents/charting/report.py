@@ -57,7 +57,8 @@ def _latest_execution(directory, cutoff, ticker):
         return {}
     last = max(key for key, _ in candidates)
     peers = [payload for key, payload in candidates if key == last]
-    fields = ("decision_state", "decision_now", "reason_codes", "execution_asof", "market_data_asof", "valid_until")
+    fields = ("decision_state", "decision_now", "reason_codes", "execution_asof", "market_data_asof", "valid_until",
+              "session_vwap", "last_price", "relative_volume")
     # A same-clock disagreement is not a verifiable revision; do not pick by filename.
     identities = {json.dumps({key: payload[key] for key in fields if key in payload}, sort_keys=True) for payload in peers}
     return peers[0] if len(identities) == 1 else {}
@@ -114,6 +115,15 @@ def build_review(ticker_dir, *, analysis_as_of, anchor=None, lifecycle=None):
     bars = _bar_vintages(records, cutoff)
     bars["rejected"] = dict(Counter(bars["rejected"]) + source_rejected)
     visible_execution = _latest_execution(directory, cutoff, ticker)
+    execution_view = {key: visible_execution[key] for key in ("decision_state", "decision_now", "reason_codes", "execution_asof",
+                                                             "market_data_asof", "valid_until", "ingested_at", "evaluated_at") if key in visible_execution}
+    source_clock = instant(visible_execution.get("market_data_asof"))
+    evaluated_clock = instant(visible_execution.get("execution_asof"))
+    if source_clock is not None and evaluated_clock is not None and source_clock <= evaluated_clock <= cutoff:
+        for key in ("session_vwap", "last_price", "relative_volume"):
+            value = finite(visible_execution.get(key))
+            if value is not None and (value > 0 if key != "relative_volume" else value >= 0):
+                execution_view[key] = value
     contract = _load(directory / "execution_contract.json")
     analysis = _load(directory / "analysis.json")
     contract_known = instant(analysis.get("finished_at"))
@@ -159,7 +169,7 @@ def build_review(ticker_dir, *, analysis_as_of, anchor=None, lifecycle=None):
                        "profile": volume_profile(subset, analysis_as_of=cutoff)})
     return {"schema": "tradingagents.integrated-review/v1", "ticker": ticker,
             "analysis_as_of": cutoff.isoformat(), "read_only": True, "broker_orders_sent": 0,
-            "execution": {key: visible_execution[key] for key in ("decision_state", "decision_now", "reason_codes", "execution_asof", "market_data_asof", "valid_until") if key in visible_execution},
+            "execution": execution_view,
             "plan": {key: contract[key] for key in ("structured_levels", "breakout_trigger", "breakout_level", "pullback_buy_zone",
                                                     "invalidation_price", "invalid_if_close_below", "invalid_if_intraday_below",
                                                     "entry_valid_until") if key in contract},
@@ -172,7 +182,7 @@ def _escape(value):
     return html.escape(str(value if value is not None else "확인 불가"))
 
 
-def _candles(item, plan):
+def _candles(item, plan, execution=None):
     bars = item["bars"][-180:]
     if not bars:
         return "<p>완료 시각과 관측 시각을 검증할 수 있는 봉이 없습니다.</p>"
@@ -196,6 +206,9 @@ def _candles(item, plan):
             value = finite(zone.get(field))
             if value is not None and value > 0:
                 levels.append((label, value))
+    stored_vwap = finite((execution or {}).get("session_vwap"))
+    if stored_vwap is not None and stored_vwap > 0:
+        levels.append(("당일 VWAP · 실행 엔진", stored_vwap))
     low = min([b["low"] for b in bars] + [v for _, v in levels])
     high = max([b["high"] for b in bars] + [v for _, v in levels])
     padding = (high - low) * 0.08 or high * 0.01
@@ -213,7 +226,9 @@ def _candles(item, plan):
     points = " ".join(f'{58+(i+.5)*step:.2f},{y(vwap[b["timestamp"]]):.2f}' for i,b in enumerate(bars) if b["timestamp"] in vwap)
     marks.append(f'<polyline points="{points}" fill="none" stroke="#395dd1" stroke-width="2"/>')
     for label, value in levels:
-        marks.append(f'<path d="M58,{y(value):.2f}H758" stroke="#8d6137" stroke-dasharray="4 4"/><text x="60" y="{y(value)-3:.2f}" font-size="11">{_escape(label)} {value:g}</text>')
+        dash = "1 3" if label == "당일 VWAP · 실행 엔진" else "4 4"
+        source = f'<title>원 시세 관측 {_escape((execution or {}).get("market_data_asof"))}</title>' if label == "당일 VWAP · 실행 엔진" else ""
+        marks.append(f'<path d="M58,{y(value):.2f}H758" stroke="#8d6137" stroke-dasharray="{dash}">{source}</path><text x="60" y="{y(value)-3:.2f}" font-size="11">{_escape(label)} {value:g}</text>')
     marks.append(f'<text x="5" y="42" font-size="12">{high:.4g}</text><text x="5" y="300" font-size="12">{low:.4g}</text>')
     return ('<svg role="img" aria-label="가격 봉과 Anchored VWAP 및 계획 가격" viewBox="0 0 790 340">'
             + "".join(marks) + '</svg>'
@@ -228,7 +243,7 @@ def render_review(review, *, public=False, fragment=False):
     for item in review["series"]:
         profile = item["profile"]
         profile_rows = "".join(f'<tr><td>{b["low"]:.4g}–{b["high"]:.4g}</td><td>{b["volume"]:,.1f}</td></tr>' for b in profile["bins"])
-        charts.append(f'<details open><summary>{_escape(item["interval"])} 가격·계획</summary>{_candles(item, review["plan"])}'
+        charts.append(f'<details open><summary>{_escape(item["interval"])} 가격·계획</summary>{_candles(item, review["plan"], review["execution"])}'
                       '<p>파랑: Anchored VWAP (전형가격 × 봉 거래량 근사). 시간봉별 가격 조정 기준이 다를 수 있습니다.</p>'
                       f'<details><summary>Volume Profile 근사 · POC {_escape(profile["poc"])}</summary>'
                       '<p>각 봉의 저가~고가 구간에 거래량을 균등 배분합니다. 실제 가격별 체결량·호가 잔량을 뜻하지 않습니다.</p>'
