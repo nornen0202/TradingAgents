@@ -20,6 +20,9 @@ def main() -> int:
     prepare.add_argument("--archive-dir", type=Path)
     prepare.add_argument("--youtube-archive-dir", type=Path)
     prepare.add_argument("--prism-archive-dir", type=Path)
+    prepare.add_argument("--refresh-market", action="store_true",
+                         help="Require new broker quotes and a VALID account before preparing KR/US.")
+    prepare.add_argument("--producer-state-dir", type=Path, default=Path(".runtime/local-automation"))
 
     publish = subparsers.add_parser("publish")
     publish.add_argument("--surface", required=True, choices=("kr", "us", "youtube", "prism"))
@@ -70,12 +73,18 @@ def main() -> int:
     runtime = WorkRuntime(args.runtime_dir)
     try:
         if args.command == "prepare":
-            result = runtime.prepare(
-                args.surface,
-                archive_dir=args.archive_dir,
-                youtube_archive_dir=args.youtube_archive_dir,
-                prism_archive_dir=args.prism_archive_dir,
-            )
+            if args.refresh_market:
+                from .pre_report import prepare_market_report
+                result = prepare_market_report(runtime, args.surface,
+                    producer_state_dir=args.producer_state_dir, archive_dir=args.archive_dir,
+                    youtube_archive_dir=args.youtube_archive_dir, prism_archive_dir=args.prism_archive_dir)
+            else:
+                result = runtime.prepare(
+                    args.surface,
+                    archive_dir=args.archive_dir,
+                    youtube_archive_dir=args.youtube_archive_dir,
+                    prism_archive_dir=args.prism_archive_dir,
+                )
         elif args.command == "publish":
             try:
                 report_markdown = args.markdown_file.read_text(encoding="utf-8")
@@ -118,7 +127,7 @@ def main() -> int:
         print(json.dumps({"status": "ERROR", "error": str(exc)}, ensure_ascii=False))
         return 2
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    return 0
+    return 2 if result.get("status") in {"FRESH_INPUT_UNAVAILABLE", "CALENDAR_UNVERIFIED"} else 0
 
 
 if __name__ == "__main__":

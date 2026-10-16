@@ -139,6 +139,34 @@ def test_publish_does_not_archive_executable_report_with_stale_account(tmp_path:
     assert not (archive / "work-reports/us/latest.json").exists()
 
 
+def test_fresh_report_publish_rejects_expiry_even_when_execution_is_downgraded(tmp_path):
+    archive = tmp_path / "archive"
+    _write_market_run(archive, run_id="fresh-report", market="us", started_at="2026-07-14T14:00:00Z")
+    runtime = WorkRuntime(tmp_path / "runtime")
+    prepared = runtime.prepare("us", archive_dir=archive, fresh_report=True,
+                               now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc))
+    # A plain RESUME must not remove the already-required final freshness gate.
+    runtime.prepare("us", archive_dir=archive, now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc))
+    with pytest.raises(WorkRuntimeError, match="repeat prepare --refresh-market"):
+        runtime.publish("us", prepared["event_id"], prepared["source_sha256"],
+                        report_markdown="# Draft", structured_report=_structured_report(prepared),
+                        archive_dir=archive, now=datetime(2026, 7, 14, 14, 30, tzinfo=timezone.utc))
+    assert not (archive / "work-reports/us/latest.json").exists()
+    assert json.loads(runtime.state_path.read_text(encoding="utf-8"))["surfaces"]["us"]["pending_event_id"] == prepared["event_id"]
+
+
+def test_fresh_report_can_publish_before_real_input_expiry(tmp_path):
+    archive = tmp_path / "archive"
+    _write_market_run(archive, run_id="fresh-valid", market="us", started_at="2026-07-14T14:00:00Z")
+    runtime = WorkRuntime(tmp_path / "runtime")
+    prepared = runtime.prepare("us", archive_dir=archive, fresh_report=True,
+                               now=datetime(2026, 7, 14, 14, 5, tzinfo=timezone.utc))
+    result = runtime.publish("us", prepared["event_id"], prepared["source_sha256"],
+        report_markdown="# Fresh report", structured_report=_structured_report(prepared), archive_dir=archive,
+        now=datetime(2026, 7, 14, 14, 6, tzinfo=timezone.utc))
+    assert result["status"] == "PUBLISHED"
+
+
 @pytest.mark.parametrize("code", ["BUY_NOW", "BUY_ON_CONFIRMATION"])
 def test_conditional_buy_does_not_turn_into_research(code):
     row = work_packet._compact_market_row({"strategy_code": code, "quality": {"row_mode": "BLOCKED_STALE"}}, 1)

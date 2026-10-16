@@ -24,6 +24,15 @@ python -m tradingagents.work prepare --surface <surface> --archive-dir C:\Tradin
 
 Interpret the JSON result:
 
+For **KR/US scheduled reports**, add `--refresh-market --producer-state-dir C:\Projects\TradingAgents\.runtime\local-automation` to prepare. This is mandatory before composing: it acquires the producer lock, reuses the completed research baseline, and fetches new broker quotes and a VALID account snapshot. It verifies actual source clocks and complete holdings/watchlist coverage before creating the immutable event. This command is the narrow authorized producer exception to the archive-only consumer rule above; never fetch credentials or broker APIs yourself. Keep Sol / Extra High for report synthesis.
+
+- `MARKET_CLOSED` / `CALENDAR_UNVERIFIED`: do not create a current report, ACK, or invent live prices. Return the actual session state.
+- `BUSY_NO_STATE_ADVANCE`: wait for the healthy producer within the existing bounded timing barrier, then retry; never launch a duplicate producer.
+- `FRESH_INPUT_UNAVAILABLE`: return the exact safe blockers, do not compose from the previous archive, and do not ACK.
+- On `NEW`/`RESUME`, preserve the returned `pre_report_refresh` receipt. Before publish recheck genuine quote/account ages and every row's expiry against the actual clock. If any input is expired, do not publish/ACK a current report: repeat the refresh/prepare and rebind the draft to the new event, or return `PENDING_PUBLISH` if refresh is blocked. Never merely advance `generated_at` or `valid_until`.
+
+YouTube/PRISM remain archive-only and do not use `--refresh-market`.
+
 - `NEW`: read `prompt_path` and `packet_path`, then render the report.
 - `RESUME`: render the same immutable pending event; do not invent a new delivery ID.
 - `NOOP`: return a one-line no-change/source-health result. Do not repeat the prior report and do not acknowledge again.

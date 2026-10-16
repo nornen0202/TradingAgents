@@ -74,7 +74,9 @@ def test_coverage_is_independent_of_failed_delivery():
 
 
 @pytest.mark.parametrize("clock,expected", [
-    ("10:29", None), ("10:30", "1030"), ("13:29", "1030"),
+    ("10:29", None), ("10:30", "1030"), ("12:49", "1030"),
+    ("12:50", "1250"), ("13:00", "1250"), ("13:09", "1250"),
+    ("13:10", "1310"), ("13:29", "1310"),
     ("13:30", "1330"), ("14:29", "1330"), ("14:30", "1430"),
     ("14:50", "1430"), ("14:51", None),
 ])
@@ -109,6 +111,21 @@ def test_old_kr_refresh_does_not_cover_pre_work_refresh_and_calendar_still_holds
     held = watchdog.due_targets(now, kr_overlay_checkpoints=local.KR_WORK_OVERLAY_CHECKPOINTS,
         market_status_resolver=lambda **kwargs: SimpleNamespace(is_session=False))
     assert not any(t.name.startswith("intraday-overlay-kr-") for t in held)
+
+
+@pytest.mark.parametrize("clock,expected", [
+    ("2026-10-15T23:19:00+09:00", "1015-2240"),
+    ("2026-10-15T23:20:00+09:00", "1015-2320"),
+    ("2026-10-15T23:30:00+09:00", "1015-2320"),
+    ("2026-10-15T23:40:00+09:00", "1015-2340"),
+    ("2026-10-16T00:00:00+09:00", "1016-0000"),
+])
+def test_us_web_report_has_preparation_and_final_recheck_slots(clock, expected):
+    watchdog = local.script("scheduled_actions_watchdog")
+    targets = watchdog.due_targets(datetime.fromisoformat(clock),
+        us_overlay_checkpoints=local.US_WORK_OVERLAY_CHECKPOINTS,
+        market_status_resolver=lambda **kwargs: SimpleNamespace(is_session=True))
+    assert any(t.name == f"intraday-overlay-us-{expected}" for t in targets)
 
 
 @pytest.mark.parametrize("change", [
