@@ -1,0 +1,117 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:7441b85092999c118e9ef3f3b8464cdc",
+  "source_sha256": "ba5355dffe4b3afab295183f9dd9240b2e96ec1491559090f2f5724dd2631997",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "4982d0db0e5a97f3b0f392bdff489a6940be0d2d88e7ea94533edbdb009b4556",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 — 2026-10-17 08:31 KST\n\n**NO_ACTIONABLE_DELTA · 소스 정상 · 연구 전용**\n\n- 신규 0건·수정 0건: NO_ACTIONABLE_DELTA. 중복 60건은 재분석에서 제외했습니다.\n- 72시간 범위 99건 중 60건 전송·39건 생략으로 부분 범위입니다.\n- balanced_external 추가 반영 근거가 없어 순위·투자 확신도·기존 위험 한도 안의 비중·연구 우선순위를 변경하지 않습니다.\n\n수집 실행 `youtube_20261017_070257`은 2026-10-17T07:47:10.523737+09:00에 성공했습니다. 검증 시각 2026-10-17T08:31:51.506604+09:00 기준 수집 경과 0.745시간(한도 36시간), 범위 최장 경과 61.274시간(한도 72시간)입니다. 수집·범위 시각은 파싱 가능하며 미래 시각이나 순서 역전이 없습니다. 신규 개별 이벤트 시각은 전달된 이벤트가 없어 검증 대상이 없습니다.\n\n범위의 최초 발생은 2026-10-14T19:15:26+09:00, 최종 발생은 2026-10-16T23:00:31+09:00입니다. 현재 자료의 가장 이른 신선도 경계는 2026-10-17T19:15:26+09:00입니다. 72시간 전수 검증이나 이전 영상 주장의 재검증을 뜻하지 않습니다.\n\n이번에 새로 확정하거나 반증한 핵심 주장은 없습니다. 기존 미검증 주장·ASR 불확실성은 해소된 것으로 간주하지 않습니다. 신규 USER_PRIMARY/HIGH 근거가 없으므로 반복 가중치를 적용하지 않습니다. KR·US 종목별 연구 변경과 현재 주문·목표가·손절가를 만들지 않습니다. 실행 적격은 false이며, 후속 시장 전략에는 신선한 시세·계좌·위험 게이트 검증이 필요합니다.\n\n다음 확인은 신선한 수집 실행, 신규·수정 event key, 생략된 39건의 범위입니다. 새 핵심 주장과 종목 영향이 전달되면 실제 공개 시각이 확인되는 공식 원자료로 검증합니다. 모델 정보는 CONFIGURED_NOT_RUNTIME_VERIFIED 상태를 유지합니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:7441b85092999c118e9ef3f3b8464cdc\",\"status\":\"PARTIAL\",\"window_events\":99,\"transmitted_events\":60,\"truncated\":true,\"new_events\":0,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}\n\n로컬 보고서 보존은 외부 전달 증거가 아닙니다. Telegram·Pages 전달은 외부 영수증 확인 전 미검증입니다.",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:7441b85092999c118e9ef3f3b8464cdc",
+      "source_sha256": "ba5355dffe4b3afab295183f9dd9240b2e96ec1491559090f2f5724dd2631997"
+    },
+    "title": "YouTube 검증 델타 — 2026-10-17 08:31 KST",
+    "generated_at": "2026-10-17T08:31:51.506604+09:00",
+    "as_of": "2026-10-17T07:47:10.523737+09:00",
+    "source_health": "OK",
+    "report_mode": "NO_ACTIONABLE_DELTA",
+    "summary": [
+      "신규 0건·수정 0건: NO_ACTIONABLE_DELTA. 중복 60건은 재분석에서 제외했습니다.",
+      "72시간 범위 99건 중 60건 전송·39건 생략으로 부분 범위입니다.",
+      "balanced_external 추가 반영 근거가 없어 순위·투자 확신도·기존 위험 한도 안의 비중·연구 우선순위를 변경하지 않습니다."
+    ],
+    "top_actions": [],
+    "strategies": [],
+    "coverage_receipt": {
+      "event_id": "youtube:7441b85092999c118e9ef3f3b8464cdc",
+      "status": "PARTIAL",
+      "window_events": 99,
+      "transmitted_events": 60,
+      "truncated": true,
+      "new_events": 0,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "youtube_20261017_070257",
+        "last_run_at": "2026-10-17T07:47:10.523737+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 408,
+        "window_events": 99,
+        "transmitted_events": 60,
+        "truncated": true,
+        "oldest_occurred_at": "2026-10-14T10:15:26+00:00",
+        "newest_occurred_at": "2026-10-16T14:00:31+00:00"
+      },
+      "delta": {
+        "new_events": 0,
+        "revised_events": 0,
+        "unchanged_events": 60,
+        "delivered_event_keys": []
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "source_contributions": [],
+      "external_delivery_verified": false,
+      "execution_eligible": false,
+      "freshness_checked_at": "2026-10-17T08:31:51.506604+09:00",
+      "freshness_boundary": "2026-10-17T10:15:26+00:00",
+      "no_incremental_evidence_reason": "balanced_external 추가 반영 근거가 없어 순위·투자 확신도·기존 위험 한도 안의 비중·연구 우선순위를 변경하지 않습니다."
+    },
+    "next_checkpoint": "신선한 수집과 신규·수정 키 확인. 생략 39건은 검증 완료로 간주하지 않음."
+  },
+  "report_id": "youtube:e39d038c3f4cb952283e0e1e01f01988",
+  "report_sha256": "e39d038c3f4cb952283e0e1e01f0198844e9c36375eea8ed967254ca38bc4270",
+  "published_at": "2026-10-17T08:31:55.714772+09:00"
+}
