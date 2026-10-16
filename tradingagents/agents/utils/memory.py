@@ -111,28 +111,44 @@ class FinancialSituationMemory:
         if limit <= 0:
             return []
         cutoff = as_of or self.as_of
-        if cutoff:
-            date.fromisoformat(cutoff)
+        cutoff_date = date.fromisoformat(cutoff) if cutoff else None
+        eligible = []
+        for idx in range(len(self.documents)):
+            metadata = self.metadata[idx] if idx < len(self.metadata) else {}
+            if cutoff_date:
+                # Both the realized outcome and its settlement must be known.
+                # Do not treat an earlier outcome tag as permission to reveal an
+                # unsettled return, or an undated legacy memory as historical.
+                known = metadata.get("outcome_known_at") or metadata.get("settlement_date")
+                dates = [known]
+                if "settlement_date" in metadata:
+                    dates.append(metadata["settlement_date"])
+                if "trade_date" in metadata:
+                    dates.append(metadata["trade_date"])
+                try:
+                    if any(date.fromisoformat(str(value)) > cutoff_date for value in dates):
+                        continue
+                except (TypeError, ValueError):
+                    continue
+            if metadata_filters and any(metadata.get(key) != value for key, value in metadata_filters.items()):
+                continue
+            eligible.append((idx, metadata))
+        if not eligible:
+            return []
+
         query_tokens = self._tokenize(current_situation)
         query_tags = self._extract_regime_tags(current_situation)
-        scores = self.bm25.get_scores(query_tokens)
+        # Filtering only the returned rows still lets future entries change IDF,
+        # average document length and ranking. Build the index from eligible
+        # evidence so adding future memories cannot alter a historical query.
+        index = self.bm25 if len(eligible) == len(self.documents) else BM25Okapi(
+            [self._tokenize(self.documents[idx]) or ["_empty_"] for idx, _ in eligible]
+        )
+        scores = index.get_scores(query_tokens)
         max_score = max(scores) if max(scores) > 0 else 1
 
         ranked_results = []
-        for idx, score in enumerate(scores):
-            metadata = self.metadata[idx] if idx < len(self.metadata) else {}
-            if cutoff:
-                known = metadata.get("outcome_known_at")
-                try:
-                    known_date = date.fromisoformat(str(known))
-                except ValueError:
-                    continue
-                if known_date > date.fromisoformat(cutoff):
-                    continue
-            if metadata_filters:
-                if any(metadata.get(key) != value for key, value in metadata_filters.items()):
-                    continue
-
+        for (idx, metadata), score in zip(eligible, scores):
             normalized_bm25 = score / max_score if max_score > 0 else 0
             doc_tags = set(metadata.get("regime_tags", []))
             tag_score = len(query_tags & doc_tags) / len(query_tags | doc_tags) if (query_tags or doc_tags) else 0

@@ -32,7 +32,7 @@ def _filter_reports_by_date(result, curr_date: str):
             if strict and not publication:
                 return False
             filed = date.fromisoformat(publication) if publication else fiscal
-            return fiscal.isoformat() <= curr_date and filed.isoformat() <= curr_date
+            return fiscal <= filed and fiscal.isoformat() <= curr_date and filed.isoformat() <= curr_date
         except (KeyError, TypeError, ValueError):
             return False
 

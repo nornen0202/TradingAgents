@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from tradingagents.agents.utils.decision_retry import invoke_structured_decision_with_retry
 
 
@@ -147,3 +149,32 @@ def test_structured_decision_retry_returns_safe_fallback_after_exhausted_repairs
     parsed = json.loads(decision_json)
     assert parsed["rating"] == "NO_TRADE"
     assert llm.calls == 2
+    assert parsed["risk_action_reason_codes"] == ["STRUCTURED_DECISION_INVALID"]
+    assert "Codex" not in parsed["entry_logic"]
+    assert "schema" in parsed["invalidators"][0]
+
+
+def test_structured_decision_retry_keeps_transport_failure_distinct_from_invalid_decision():
+    class UnavailableLLM:
+        def invoke(self, prompt):
+            raise RuntimeError("Timed out waiting for Codex app-server")
+
+    _response, decision_json = invoke_structured_decision_with_retry(
+        UnavailableLLM(),
+        "Return a decision.",
+        context="portfolio manager final decision",
+    )
+
+    parsed = json.loads(decision_json)
+    assert parsed["risk_action_reason_codes"] == ["CODEX_PROVIDER_UNAVAILABLE"]
+
+
+def test_structured_decision_retry_does_not_relabel_unrecognized_provider_errors():
+    class FailingLLM:
+        def invoke(self, prompt):
+            raise RuntimeError("Authentication failed")
+
+    with pytest.raises(RuntimeError, match="Authentication failed"):
+        invoke_structured_decision_with_retry(
+            FailingLLM(), "Return a decision.", context="trader execution plan"
+        )

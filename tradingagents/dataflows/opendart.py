@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
@@ -13,7 +13,7 @@ import requests
 from .api_keys import get_api_key
 from .config import get_config
 from .news_models import DisclosureItem, format_disclosure_items_report
-from .vendor_exceptions import VendorConfigurationError, VendorMalformedResponseError, VendorTransientError
+from .vendor_exceptions import VendorConfigurationError, VendorInputError, VendorMalformedResponseError, VendorTransientError
 
 
 _OPENDART_API_BASE = "https://opendart.fss.or.kr/api"
@@ -90,6 +90,15 @@ def _resolve_corp_code(symbol: str) -> tuple[str | None, str | None]:
 
 
 def fetch_disclosures_opendart(symbol: str, start_date: str, end_date: str, *, page_count: int = 10) -> list[DisclosureItem]:
+    try:
+        lower = datetime.strptime(start_date, "%Y-%m-%d").date()
+        upper = datetime.strptime(end_date, "%Y-%m-%d").date()
+        if lower.isoformat() != start_date or upper.isoformat() != end_date:
+            raise ValueError("Noncanonical disclosure date")
+    except (TypeError, ValueError) as exc:
+        raise VendorInputError("Disclosure dates must be YYYY-MM-DD") from exc
+    if lower > upper:
+        raise VendorInputError("start_date must not be later than end_date")
     corp_code, stock_code = _resolve_corp_code(symbol)
     if not corp_code or not stock_code:
         return []
@@ -111,10 +120,17 @@ def fetch_disclosures_opendart(symbol: str, start_date: str, end_date: str, *, p
     except requests.RequestException as exc:
         raise VendorTransientError(f"OpenDART disclosure request failed: {exc}") from exc
 
-    payload = response.json()
+    try:
+        payload = response.json()
+    except ValueError as exc:
+        raise VendorMalformedResponseError("OpenDART returned invalid disclosure JSON.") from exc
+    if not isinstance(payload, dict):
+        raise VendorMalformedResponseError("OpenDART disclosure payload must be an object.")
     status = payload.get("status")
-    if status in {"013", "020"}:
+    if status == "013":
         return []
+    if status == "020":
+        raise VendorTransientError("OpenDART disclosure request limit exceeded (status 020).")
     if status != "000":
         message = payload.get("message", "Unknown OpenDART error")
         raise VendorMalformedResponseError(f"OpenDART returned status {status}: {message}")
@@ -125,11 +141,21 @@ def fetch_disclosures_opendart(symbol: str, start_date: str, end_date: str, *, p
 
     result: list[DisclosureItem] = []
     for item in disclosure_items:
+        if not isinstance(item, dict):
+            continue
         receipt_no = str(item.get("rcept_no", ""))
         receipt_dt = item.get("rcept_dt")
-        published_at = None
-        if receipt_dt:
+        if not isinstance(receipt_dt, str) or len(receipt_dt) != 8 or not receipt_dt.isdigit():
+            continue
+        try:
             published_at = datetime.strptime(receipt_dt, "%Y%m%d")
+        except (TypeError, ValueError):
+            continue
+        # Treat the server's search arguments as a request, not proof that every
+        # returned row is eligible. Unknown and out-of-window filings are withheld.
+        if not lower <= published_at.date() <= upper:
+            continue
+        published_at = published_at.replace(tzinfo=timezone(timedelta(hours=9)))
         report_name = str(item.get("report_nm", "Disclosure"))
         corp_name = str(item.get("corp_name", stock_code))
         result.append(

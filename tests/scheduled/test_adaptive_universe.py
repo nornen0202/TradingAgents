@@ -190,6 +190,25 @@ def test_history_ignores_future_other_market_overlay_and_unvalidated_runs(tmp_pa
     assert set(history) == {"GOOD"}
 
 
+def test_history_excludes_invalid_decision_fallback_without_quality_flags(tmp_path):
+    path = tmp_path / "runs" / "2026" / "invalid-output" / "run.json"
+    path.parent.mkdir(parents=True)
+    payload = decision()
+    payload["rating"] = "NO_TRADE"
+    payload["risk_action_reason_codes"] = ["STRUCTURED_DECISION_INVALID"]
+    path.write_text(json.dumps({
+        "run_id": "invalid-output",
+        "finished_at": (NOW - timedelta(days=1)).isoformat(),
+        "status": "success",
+        "settings": {"market": "US", "run_mode": "full"},
+        "tickers": [{"ticker": "AAPL", "status": "success", "decision": payload}],
+    }), encoding="utf-8")
+
+    history, _, _ = au.read_history(tmp_path, market="US", asof=NOW, days=30)
+
+    assert not history
+
+
 def test_overlay_never_reranks_the_frozen_daily_universe(tmp_path):
     config, universe = setup(tmp_path)
     config.run.run_mode = "overlay_only"

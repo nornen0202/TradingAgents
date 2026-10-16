@@ -20,6 +20,7 @@ import pandas as pd
 
 from tradingagents.scanner.prism_like_scanner import _ticker_identity_key
 from tradingagents.schemas import parse_structured_decision, StructuredDecisionValidationError
+from tradingagents.schemas.decision_status import is_unvalidated_decision
 
 SECTORS = ("Basic Materials", "Communication Services", "Consumer Cyclical",
            "Consumer Defensive", "Energy", "Financial Services", "Healthcare",
@@ -120,7 +121,7 @@ def read_history(archive: Path, *, market, asof, days, profile_name=None):
                 continue
             try:
                 decision = parse_structured_decision(row.get("decision"))
-                if "CODEX_PROVIDER_UNAVAILABLE" in decision.risk_action_reason_codes:
+                if is_unvalidated_decision(decision):
                     continue
             except (StructuredDecisionValidationError, TypeError, ValueError):
                 continue

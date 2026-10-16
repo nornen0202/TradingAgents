@@ -8,6 +8,7 @@ from langgraph.graph import StateGraph, START, END
 from tradingagents.agents.utils.agent_states import AgentState
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.graph.trading_graph import TradingAgentsGraph
+from tradingagents.graph.propagation import Propagator
 
 
 def test_sqlite_resume_does_not_rerun_completed_nodes_and_config_isolated(tmp_path):
@@ -51,3 +52,33 @@ def test_sqlite_resume_does_not_rerun_completed_nodes_and_config_isolated(tmp_pa
         state, _ = graph.prepare_run("AAPL", "2026-03-02")
         assert state is not None
         graph.close()
+
+
+@pytest.mark.parametrize("change", [
+    {"max_debate_rounds": 9},
+    {"max_risk_discuss_rounds": 9},
+    {"parallel_analysts": True},
+    {"max_tool_rounds": 4},
+    {"analysts": ["market", "news"]},
+    {"analysts": ["news", "market"]},
+    {"analysis_date": "2026-03-03"},
+])
+def test_checkpoint_identity_separates_topology_and_analysis_settings(change):
+    graph = object.__new__(TradingAgentsGraph)
+    graph.config = deepcopy(DEFAULT_CONFIG)
+    graph.selected_analysts = ["market"]
+    graph.callbacks = []
+    graph._checkpoint_connection = object()
+    graph.propagator = Propagator()
+    graph.graph = Mock()
+    graph.graph.get_state.return_value = SimpleNamespace(values={})
+    memories = [SimpleNamespace() for _ in range(5)]
+    (graph.bull_memory, graph.bear_memory, graph.trader_memory,
+     graph.invest_judge_memory, graph.portfolio_manager_memory) = memories
+    _, initial_args = graph.prepare_run("AAPL", "2026-03-02")
+    initial_id = initial_args["config"]["configurable"]["thread_id"]
+    if "analysts" in change:
+        graph.selected_analysts = change["analysts"]
+    graph.config.update({key: value for key, value in change.items() if key not in {"analysts", "analysis_date"}})
+    _, changed_args = graph.prepare_run("AAPL", "2026-03-02", analysis_date=change.get("analysis_date"))
+    assert changed_args["config"]["configurable"]["thread_id"] != initial_id

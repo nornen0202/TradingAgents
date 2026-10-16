@@ -9,6 +9,7 @@ from tradingagents.agents import *
 from tradingagents.agents.utils.agent_states import AgentState
 
 from .conditional_logic import ConditionalLogic
+from .analyst_safety import bounded_analyst
 
 
 _REPORT_KEYS = {
@@ -24,7 +25,8 @@ def _analyst_subgraph(analyst_type, analyst, tools):
 
     Only its report crosses the output boundary: sibling analysts never share
     tool responses or concurrently update the parent message/sender channels.
-    The parent's recursion limit bounds each branch's tool loop.
+    Analyst wrappers enforce their own tool budget; the parent's recursion limit
+    remains a separate graph-wide emergency stop.
     """
     output = TypedDict(f"{analyst_type.capitalize()}Report", {_REPORT_KEYS[analyst_type]: str})
     workflow = StateGraph(AgentState, output_schema=output)
@@ -54,6 +56,7 @@ class GraphSetup:
         invest_judge_memory,
         portfolio_manager_memory,
         conditional_logic: ConditionalLogic,
+        max_tool_rounds: int = 15,
     ):
         """Initialize with required components."""
         self.quick_thinking_llm = quick_thinking_llm
@@ -65,6 +68,9 @@ class GraphSetup:
         self.invest_judge_memory = invest_judge_memory
         self.portfolio_manager_memory = portfolio_manager_memory
         self.conditional_logic = conditional_logic
+        if isinstance(max_tool_rounds, bool) or not isinstance(max_tool_rounds, int) or max_tool_rounds < 1:
+            raise ValueError("max_tool_rounds must be a positive integer")
+        self.max_tool_rounds = max_tool_rounds
 
     def setup_graph(
         self, selected_analysts=None, *, checkpointer=None, parallel_analysts=False
@@ -145,6 +151,10 @@ class GraphSetup:
 
         # Add analyst nodes to the graph
         for analyst_type, node in analyst_nodes.items():
+            node = bounded_analyst(
+                node, kind=analyst_type, report_key=_REPORT_KEYS[analyst_type],
+                llm=self.quick_thinking_llm, max_tool_rounds=self.max_tool_rounds,
+            )
             if parallel_analysts:
                 workflow.add_node(
                     f"{analyst_type.capitalize()} Analyst",
