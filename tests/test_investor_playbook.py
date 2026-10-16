@@ -60,8 +60,9 @@ def test_invalid_decision_is_review_not_hold():
     assert build_investor_playbook({"final_trade_decision": "not a decision"})["status"] == "REVIEW"
 
 
-def test_provider_placeholder_is_review_even_though_its_schema_is_valid(tmp_path):
-    raw = _fallback_structured_decision_json(context="risk judge", reason="timeout")
+@pytest.mark.parametrize("reason_code", ["CODEX_PROVIDER_UNAVAILABLE", "STRUCTURED_DECISION_INVALID"])
+def test_unvalidated_placeholder_is_review_even_though_its_schema_is_valid(tmp_path, reason_code):
+    raw = _fallback_structured_decision_json(context="risk judge", reason="failed", reason_code=reason_code)
     assert SignalProcessor().process_signal(raw) == "REVIEW"
     state = {"final_trade_decision": raw}
     assert build_investor_playbook(state)["reason"] == "decision_unvalidated"

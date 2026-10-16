@@ -146,6 +146,7 @@ class TradingAgentsGraph:
             self.invest_judge_memory,
             self.portfolio_manager_memory,
             self.conditional_logic,
+            max_tool_rounds=self.config.get("max_tool_rounds", 15),
         )
 
         max_concurrency = None
@@ -194,7 +195,7 @@ class TradingAgentsGraph:
         args = self.propagator.get_graph_args(callbacks=self.callbacks if callbacks is None else callbacks)
         if self._checkpoint_connection is not None:
             identity = {
-                "version": 2, "ticker": self.ticker, "trade_date": trade_date,
+                "version": 3, "ticker": self.ticker, "trade_date": trade_date,
                 "analysis_date": analysis_date or trade_date, "analysts": self.selected_analysts,
                 "config": {key: value for key, value in self.config.items() if key not in {"api_keys_path", "results_dir", "project_dir", "data_cache_dir", "checkpoint_dir", "memory_dir"}},
             }

@@ -25,7 +25,7 @@ def create_portfolio_manager(llm, memory):
         trader_plan = state["trader_investment_plan"]
 
         curr_situation = f"{market_research_report}\n\n{sentiment_report}\n\n{news_report}\n\n{fundamentals_report}"
-        past_memories = get_memory_matches(memory, curr_situation)
+        past_memories = get_memory_matches(memory, curr_situation, as_of=state.get("analysis_date") or state.get("trade_date"))
 
         past_memory_str = ""
         for rec in past_memories:

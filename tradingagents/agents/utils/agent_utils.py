@@ -284,8 +284,10 @@ def build_instrument_context(
     )
 
 
-def get_memory_matches(memory, current_situation: str, n_matches: int | None = None):
+def get_memory_matches(memory, current_situation: str, n_matches: int | None = None, *, as_of: str | None = None):
     """Retrieve memory matches while respecting configurable defaults."""
+    if as_of:
+        return memory.get_memories(current_situation, n_matches=n_matches, as_of=as_of)
     return memory.get_memories(current_situation, n_matches=n_matches)
 
 

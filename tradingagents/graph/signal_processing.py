@@ -1,6 +1,7 @@
 # TradingAgents/graph/signal_processing.py
 
 from tradingagents.schemas import parse_structured_decision
+from tradingagents.schemas.decision_status import is_unvalidated_decision
 
 
 class SignalProcessor:
@@ -11,6 +12,6 @@ class SignalProcessor:
 
     def process_signal(self, full_signal: str) -> str:
         decision = parse_structured_decision(full_signal)
-        if "CODEX_PROVIDER_UNAVAILABLE" in decision.risk_action_reason_codes:
+        if is_unvalidated_decision(decision):
             return "REVIEW"
         return decision.rating.value

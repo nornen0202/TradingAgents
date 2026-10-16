@@ -8,6 +8,7 @@ import math
 from typing import Any, Mapping
 
 from tradingagents.schemas import parse_structured_decision, StructuredDecisionValidationError
+from tradingagents.schemas.decision_status import is_unvalidated_decision
 
 
 def _number(value, *, positive=False):
@@ -71,7 +72,7 @@ def build_investor_playbook(state: Mapping[str, Any], *, cost_bps: float = 10) -
         decision = parse_structured_decision(raw)
     except (StructuredDecisionValidationError, TypeError, ValueError):
         return {**base, "status": "REVIEW", "reason": "invalid_decision", "economics": None}
-    if "CODEX_PROVIDER_UNAVAILABLE" in decision.risk_action_reason_codes:
+    if is_unvalidated_decision(decision):
         return {**base, "status": "REVIEW", "reason": "decision_unvalidated", "economics": None}
     levels = decision.execution_levels.levels
     def prices(kinds, side):
