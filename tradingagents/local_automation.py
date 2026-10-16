@@ -446,9 +446,9 @@ def ensure_branch_pages(state):
         raise ValueError("Independent Pages publishing source was not applied")
 
 
-def publish(archive, state, runtime_dir, *, rebuild=False):
+def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=False):
     from tradingagents.notifications.local import reconcile_safely
-    reconcile_safely(archive, state)
+    reconcile_safely(archive, state, publication_locked=publication_locked)
     fingerprint = archive_fingerprint(archive)
     receipt_path = state / "publication.json"
     receipt = read_json(receipt_path, {})
@@ -500,7 +500,7 @@ def publish(archive, state, runtime_dir, *, rebuild=False):
         receipt.update(status="DELIVERY_VERIFIED", verified_at=datetime.now(timezone.utc).isoformat(), public_url=PUBLIC_BASE)
         atomic_write_json(receipt_path, receipt)
         complete_handoffs(site, runtime_dir, receipt)
-        reconcile_safely(archive, state)
+        reconcile_safely(archive, state, publication_locked=publication_locked)
     return receipt
 
 
@@ -549,7 +549,8 @@ def main():
                 result = {"fingerprint": archive_fingerprint(args.archive_dir), "status": "DRY_RUN"}
             else:
                 try:
-                    result = publish(args.archive_dir, args.state_dir, args.runtime_dir, rebuild=args.rebuild)
+                    result = publish(args.archive_dir, args.state_dir, args.runtime_dir,
+                                     rebuild=args.rebuild, publication_locked=True)
                 except Exception as exc:
                     from tradingagents.notifications.local import queue_failure, reconcile_safely
                     # Daily identity and incident cooldown prevent a five-minute
@@ -557,7 +558,7 @@ def main():
                     day = datetime.now(ZoneInfo("Asia/Seoul")).date().isoformat()
                     queue_failure(args.state_dir, stage="publish", source_key=day,
                                   error_type=type(exc).__name__, finished_at=datetime.now(timezone.utc).isoformat())
-                    reconcile_safely(args.archive_dir, args.state_dir)
+                    reconcile_safely(args.archive_dir, args.state_dir, publication_locked=True)
                     raise
             print(json.dumps(result, ensure_ascii=False))
     except TimeoutError:

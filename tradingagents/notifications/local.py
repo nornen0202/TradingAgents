@@ -157,13 +157,16 @@ def reconcile(state, *, now=None, runner=subprocess.run):
                                             "attempts": attempt, "dispatched_at": now.isoformat()})
 
 
-def reconcile_safely(archive, state):
+def reconcile_safely(archive, state, *, publication_locked=False):
     from .advisory import queue_completed as queue_advisory_completed
     # One unavailable advisory/API must not starve independent failures or
     # already queued market completions of their notification dispatch.
     for prepare in (queue_completed, queue_advisory_completed):
         try:
-            prepare(archive, state)
+            if prepare is queue_advisory_completed:
+                prepare(archive, state, publication_locked=publication_locked)
+            else:
+                prepare(archive, state)
         except Exception as exc:
             print(json.dumps({"notification_status": "PENDING", "error_type": type(exc).__name__}))
     try:
