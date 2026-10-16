@@ -213,3 +213,54 @@ def test_packet_http_verification_rejects_stale_or_extra_bytes(tmp_path, monkeyp
     for data, expected in [(path.read_bytes(), True), (b"old", False), (path.read_bytes() + b"x", False)]:
         monkeypatch.setattr(advisory, "urlopen", lambda request, timeout: Response(data))
         assert advisory.verify_packet_live(tmp_path, "youtube") is expected
+
+
+@pytest.mark.parametrize("surface", ["youtube", "prism"])
+def test_rebuild_cannot_queue_new_packet_under_previous_verified_receipt(tmp_path, monkeypatch, surface):
+    archive, state, *_ = fixture(tmp_path, monkeypatch, surface)
+    # A publisher has rebuilt the packet but has not replaced its old verified
+    # receipt yet. The independent run-due reconciler must not admit this mix.
+    with local.interprocess_file_lock(state / "publish.lock", timeout=0):
+        advisory.queue_completed(archive, state, now=NOW)
+        assert not list((state / "notifications/events").glob("*.json"))
+        write(state / "publication.json", {"status": "PAGES_PENDING"})
+    advisory.queue_completed(archive, state, now=NOW)
+    assert not list((state / "notifications/events").glob("*.json"))
+    write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
+    advisory.queue_completed(archive, state, now=NOW)
+    advisory.queue_completed(archive, state, now=NOW)
+    assert len(list((state / "notifications/events").glob("*.json"))) == 1
+
+
+@pytest.mark.parametrize("surface", ["youtube", "prism"])
+def test_advisory_admission_keeps_publisher_excluded_until_event_is_bound(tmp_path, monkeypatch, surface):
+    archive, state, *_ = fixture(tmp_path, monkeypatch, surface)
+    original_api = advisory.github
+
+    def api(endpoint):
+        with pytest.raises(TimeoutError):
+            with local.interprocess_file_lock(state / "publish.lock", timeout=0):
+                pytest.fail("publisher could replace the packet during admission")
+        return original_api(endpoint)
+
+    advisory.queue_completed(archive, state, now=NOW, api=api)
+    assert len(list((state / "notifications/events").glob("*.json"))) == 1
+
+
+@pytest.mark.parametrize("surface", ["youtube", "prism"])
+def test_publisher_owner_can_queue_verified_advisory_without_reentering_lock(tmp_path, monkeypatch, surface):
+    archive, state, *_ = fixture(tmp_path, monkeypatch, surface)
+    monkeypatch.setattr(local, "reconcile", lambda _: None)
+    with local.interprocess_file_lock(state / "publish.lock", timeout=0):
+        local.reconcile_safely(archive, state, publication_locked=True)
+    assert len(list((state / "notifications/events").glob("*.json"))) == 1
+
+
+def test_busy_publisher_does_not_starve_other_notification_dispatch(tmp_path, monkeypatch):
+    archive, state, *_ = fixture(tmp_path, monkeypatch)
+    calls = []
+    monkeypatch.setattr(local, "reconcile", lambda _: calls.append("existing notification"))
+    with local.interprocess_file_lock(state / "publish.lock", timeout=0):
+        local.reconcile_safely(archive, state)
+    assert calls == ["existing notification"]
+    assert not list((state / "notifications/events").glob("*.json"))

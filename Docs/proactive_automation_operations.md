@@ -93,6 +93,18 @@ ambiguous producers and missing canonical evidence still fail closed. Resume the
 existing publication/notification lane after deployment; do not recollect PRISM
 or repeat its Work acknowledgement to recover this notice.
 
+On October 17, the independent run-due reconciler saw a newly rebuilt YouTube
+packet while the previous publication receipt was still `DELIVERY_VERIFIED`.
+It queued a notice before the publisher recorded `PAGES_PENDING`, and the sender
+correctly refused the unverified delivery. Advisory admission now shares the
+publisher lock across receipt, packet and producer checks. A busy publisher
+defers only new advisory admission; existing failures and queued notices still
+reconcile. The publisher passes its existing lock ownership without reentering
+the non-reentrant lock. Actual live verification, immutable identities and the
+three-attempt/15-minute retry contract remain required. Resume a failed notice
+through the existing reconciler after its cooldown; do not reset its receipt,
+recollect the source or repeat the Work ACK.
+
 The outbox retains the existing three-attempt budget, 15-minute dispatch cooldown,
 active-workflow ownership check and atomic Telegram delivery ledger. A broken
 collector or GitHub read cannot block unrelated queued failures or the other

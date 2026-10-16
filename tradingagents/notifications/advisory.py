@@ -148,7 +148,20 @@ def queue_surface(archive, state, surface, *, now, api=None):
                   "upstream_run_id": run, "upstream_run_attempt": attempt})
 
 
-def queue_completed(archive, state, *, now=None, api=None):
+def queue_completed(archive, state, *, now=None, api=None, publication_locked=False):
+    """Read the receipt and packet together; only the publisher may reuse its lock."""
+    if publication_locked:
+        return _queue_completed_locked(archive, state, now=now, api=api)
+    try:
+        with interprocess_file_lock(state / "publish.lock", timeout=0):
+            return _queue_completed_locked(archive, state, now=now, api=api)
+    except TimeoutError:
+        # A rebuild can expose a new packet before replacing the previous
+        # DELIVERY_VERIFIED receipt. Leave admission to the owning publisher.
+        return
+
+
+def _queue_completed_locked(archive, state, *, now=None, api=None):
     from .local import read
     now = now or datetime.now(timezone.utc)
     if read(state / "publication.json").get("status") != "DELIVERY_VERIFIED":
