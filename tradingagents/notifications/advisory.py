@@ -58,9 +58,24 @@ def packet_covers(packet, surface, manifest):
             and source.get("status") == "success" and source.get("health") == "OK")
 
 
+def collection_contains_manifest(collection, manifest):
+    """Match immutable observations to the precision of the GitHub step clock."""
+    from .local import timestamp
+
+    start = timestamp(collection.get("started_at"))
+    raw_finish = collection.get("completed_at")
+    finish = timestamp(raw_finish)
+    began, ended = timestamp(manifest.get("started_at")), timestamp(manifest.get("finished_at"))
+    # GitHub's whole-second completion labels the entire second, while the
+    # canonical producer retains microseconds. Never admit the next second or
+    # add tolerance to a completion that already supplies fractional precision.
+    within_end = ended < finish + timedelta(seconds=1) if "." not in raw_finish else ended <= finish
+    return start <= finish and start <= began <= ended and within_end
+
+
 def admitted(run, jobs, surface, manifest):
     """A build alone is insufficient; publish=false and native deployments stay out."""
-    from .local import REPOSITORY, timestamp
+    from .local import REPOSITORY
     spec = SPECS[surface]
     if (run.get("status") != "completed" or run.get("conclusion") != "success"
             or run.get("head_branch") != "main"
@@ -80,9 +95,7 @@ def admitted(run, jobs, surface, manifest):
               and step.get("conclusion") == "success"]
     if len(collections) != 1 or len(stamps) != 1:
         return False
-    collection = collections[0]
-    return (timestamp(collection.get("started_at")) <= timestamp(manifest.get("started_at"))
-            <= timestamp(manifest.get("finished_at")) <= timestamp(collection.get("completed_at")))
+    return collection_contains_manifest(collections[0], manifest)
 
 
 def producer_for(surface, manifest, *, api=None):

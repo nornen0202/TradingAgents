@@ -243,6 +243,33 @@ def _run_covers_target(
             successful_matches.add(job_name)
 
     event = run.get("event", "unknown")
+    # Local publication deliberately skips deploy/youtube_coverage. Suppress
+    # collection retries only after real collection and stamped input succeeded;
+    # a green runtime-gate no-op or publish=false is not collection coverage.
+    if (
+        status == "completed"
+        and os.environ.get("TRADINGAGENTS_AUTOMATION_BACKEND", "").strip().lower() == "local"
+        and target_profile == "youtube"
+        and target_job_names == {"build_youtube_pages", "youtube_coverage"}
+        and "build_youtube_pages" in successful_matches
+    ):
+        required_steps = {
+            "Run YouTube verification reports",
+            "Rebuild merged site and Work context after YouTube collection",
+            "Stamp rollback-resistant Pages snapshot",
+        }
+        for job in jobs:
+            if job.get("name") != "build_youtube_pages":
+                continue
+            completed_steps = {
+                step.get("name") for step in job.get("steps", [])
+                if step.get("status") == "completed" and step.get("conclusion") == "success"
+            }
+            if required_steps.issubset(completed_steps):
+                return True, (
+                    f"Prior {event} run {run_id} has completed YouTube collection and stamped local publication inputs; "
+                    "delivery remains owned by the local publisher."
+                )
     if active_matches:
         return True, f"Prior {event} run {run_id} has active target job(s): {', '.join(active_matches)}."
     if status != "completed" and successful_matches:

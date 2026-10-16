@@ -17,7 +17,7 @@ import urllib.error
 from zoneinfo import ZoneInfo
 
 from tradingagents.atomic_io import atomic_write_json
-from tradingagents.notifications.advisory import SPECS, canonical
+from tradingagents.notifications.advisory import SPECS, canonical, collection_contains_manifest
 
 REPOSITORY = "nornen0202/TradingAgents"
 WORKFLOWS = {spec[0]: surface for surface, spec in SPECS.items()}
@@ -197,8 +197,7 @@ class LocalCoverageClient:
         # damaged manifest must not block today's independent collectors.
         for path in candidate_paths(self.archive, surface, start, finish):
             manifest = read(path, reason="CANONICAL_INVALID")
-            began = timestamp(manifest["started_at"])
-            if start <= began <= finish and began <= timestamp(manifest["finished_at"]) <= finish:
+            if collection_contains_manifest(step, manifest):
                 try:
                     verified, _ = canonical(self.archive, surface, manifest["run_id"])
                 except Exception as exc:

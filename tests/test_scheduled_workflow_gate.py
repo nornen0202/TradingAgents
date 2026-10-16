@@ -312,6 +312,94 @@ def test_scheduled_youtube_does_not_count_runtime_gate_noop_as_coverage():
     assert "running now" in reason
 
 
+def _local_youtube_jobs():
+    return [
+        {
+            "name": "build_youtube_pages", "status": "completed", "conclusion": "success",
+            "steps": [
+                {"name": name, "status": "completed", "conclusion": "success"}
+                for name in (
+                    "Run YouTube verification reports",
+                    "Rebuild merged site and Work context after YouTube collection",
+                    "Stamp rollback-resistant Pages snapshot",
+                )
+            ],
+        },
+        {"name": "deploy", "status": "completed", "conclusion": "skipped"},
+        {"name": "youtube_coverage", "status": "completed", "conclusion": "skipped"},
+    ]
+
+
+@pytest.mark.parametrize("backend,should_collect", [("local", False), ("github", True), ("", True)])
+def test_youtube_local_collection_suppresses_backup_without_cloud_deployment(monkeypatch, backend, should_collect):
+    monkeypatch.setenv("TRADINGAGENTS_AUTOMATION_BACKEND", backend)
+    client = FakeClient(
+        runs=[{
+            "id": 333, "event": "workflow_dispatch", "status": "completed",
+            "conclusion": "success", "created_at": "2026-10-15T22:09:06Z",
+        }],
+        jobs={333: _local_youtube_jobs()},
+    )
+    _, should_run, reason = gate.decide_schedule_gate(
+        event_name="schedule", schedule="20 20 * * *", requested_profile="",
+        manual_default_profile="", workflow_file="daily-youtube-reports.yml",
+        current_run_id=444, client=client, targets=_youtube_targets(),
+        now_kst=_kst("2026-10-16T08:43:10"),
+    )
+    assert should_run is should_collect
+    if not should_collect:
+        assert "completed YouTube collection and stamped local publication inputs" in reason
+        assert "delivery remains owned by the local publisher" in reason
+
+
+@pytest.mark.parametrize("step_index", [0, 1, 2])
+@pytest.mark.parametrize("step_result", ["skipped", "failure", "missing"])
+def test_local_youtube_requires_actual_collection_and_snapshot(monkeypatch, step_index, step_result):
+    monkeypatch.setenv("TRADINGAGENTS_AUTOMATION_BACKEND", "local")
+    jobs = _local_youtube_jobs()
+    if step_result == "missing":
+        del jobs[0]["steps"][step_index]
+    else:
+        jobs[0]["steps"][step_index]["conclusion"] = step_result
+    covered, _ = gate._run_covers_target(
+        client=FakeClient(jobs={333: jobs}),
+        run={"id": 333, "status": "completed", "conclusion": "success"},
+        current_run_id=444, target_job_names={"build_youtube_pages", "youtube_coverage"},
+        target_profile="youtube",
+    )
+    assert not covered
+
+
+@pytest.mark.parametrize("title,result", [
+    ("[request_scope=custom_sources]", "success"),
+    ("[request_scope=default_universe]", "failure"),
+])
+def test_local_youtube_does_not_credit_custom_or_failed_run(monkeypatch, title, result):
+    monkeypatch.setenv("TRADINGAGENTS_AUTOMATION_BACKEND", "local")
+    covered, _ = gate._run_covers_target(
+        client=FakeClient(jobs={333: _local_youtube_jobs()}),
+        run={"id": 333, "status": "completed", "conclusion": result, "display_title": title},
+        current_run_id=444, target_job_names={"build_youtube_pages", "youtube_coverage"},
+        target_profile="youtube",
+    )
+    assert not covered
+
+
+def test_both_youtube_gates_receive_backend_owner():
+    import yaml
+
+    workflow = yaml.safe_load(Path(".github/workflows/daily-youtube-reports.yml").read_text(encoding="utf-8"))
+    gates = [
+        step for job in workflow["jobs"].values() for step in job.get("steps", [])
+        if step.get("run") == "python .github/scripts/scheduled_workflow_gate.py"
+    ]
+    assert len(gates) == 2
+    assert all(
+        step["env"]["TRADINGAGENTS_AUTOMATION_BACKEND"] == "${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND }}"
+        for step in gates
+    )
+
+
 def test_scheduled_youtube_waits_for_active_build_before_coverage_marker():
     client = FakeClient(
         runs=[{"id": 335, "event": "schedule", "status": "in_progress", "conclusion": ""}],

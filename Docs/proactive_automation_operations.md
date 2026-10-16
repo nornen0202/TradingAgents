@@ -72,6 +72,27 @@ publication; it does not claim a new investment analysis or Work report. Work AC
 and handoff remain silent. Rebuilding a packet or retrying a tick cannot create a
 second completion event for the same immutable advisory run.
 
+On October 16, backup YouTube schedules recollected after successful local-backend
+runs because the shared gate required `youtube_coverage`, which depends on the
+deliberately skipped cloud deployment. Both schedule and runner-acquisition gates
+now receive the repository backend setting. With local ownership, a successful
+default-universe run covers collection only when its actual verification, merged
+site rebuild and snapshot-stamp steps all succeeded. Gate-only no-ops, custom
+sources, `publish=false` and failed runs do not establish this coverage. Cloud
+ownership still requires the existing end-to-end coverage marker. This prevents
+another collection; it does not prove live publication or notification, which
+must still be verified independently through the local publisher and receipts.
+
+The same check found PRISM's successful `08:07:41.117583` completion excluded by
+GitHub's `08:07:41` step boundary, leaving its completion notice unqueued. Recovery
+and notification admission now share one precision-aware containment check: a
+whole-second GitHub end contains observations before the next second; fractional
+GitHub ends retain their exact bound. Manifest timestamps, hashes and execution
+validity are unchanged. Wrong attempts, reversed intervals, the next second,
+ambiguous producers and missing canonical evidence still fail closed. Resume the
+existing publication/notification lane after deployment; do not recollect PRISM
+or repeat its Work acknowledgement to recover this notice.
+
 The outbox retains the existing three-attempt budget, 15-minute dispatch cooldown,
 active-workflow ownership check and atomic Telegram delivery ledger. A broken
 collector or GitHub read cannot block unrelated queued failures or the other

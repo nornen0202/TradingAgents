@@ -80,6 +80,38 @@ def test_completed_producer_published_exact_source_sends_once(tmp_path, monkeypa
     assert local.read(state / "notifications/results" / events[0].name)["message_ids"] == [42]
 
 
+@pytest.mark.parametrize("surface", ["youtube", "prism"])
+def test_fractional_completion_matches_whole_second_github_step_once(tmp_path, monkeypatch, surface):
+    archive, state, manifest, path, packet, _, jobs = fixture(tmp_path, monkeypatch, surface)
+    finished = datetime.fromisoformat(manifest["finished_at"])
+    jobs[0]["steps"][0]["completed_at"] = finished.isoformat()
+    manifest["finished_at"] = finished.replace(microsecond=117583).isoformat()
+    write(path, manifest)
+    packet["body"]["source"]["last_run_at"] = manifest["finished_at"]
+    packet["source_sha256"] = sha256_json(packet["body"])
+    write(state / "site/work/v1" / surface / "latest.json", packet)
+    advisory.queue_surface(archive, state, surface, now=NOW)
+    advisory.queue_surface(archive, state, surface, now=NOW)
+    events = list((state / "notifications/events").glob("*.json"))
+    assert len(events) == 1
+    assert local.notify(events[0].stem, archive, state, dry_run=True)["status"] == "DRY_RUN"
+
+
+@pytest.mark.parametrize("completed,finished,expected", [
+    ("2026-10-15T23:07:41Z", "2026-10-16T08:07:41.999999+09:00", True),
+    ("2026-10-15T23:07:41Z", "2026-10-16T08:07:42+09:00", False),
+    ("2026-10-15T23:07:41.100Z", "2026-10-16T08:07:41.117583+09:00", False),
+    ("2026-10-15T23:07:41.117583Z", "2026-10-16T08:07:41.117583+09:00", True),
+    ("2026-10-15T23:07:41.000Z", "2026-10-16T08:07:41.000001+09:00", False),
+    ("2026-10-15T23:07:41Z", "2026-10-16T08:07:28+09:00", False),
+])
+def test_advisory_attempt_respects_timestamp_precision(tmp_path, monkeypatch, completed, finished, expected):
+    _, _, manifest, _, _, run, jobs = fixture(tmp_path, monkeypatch, "prism")
+    jobs[0]["steps"][0].update(started_at="2026-10-15T23:07:29Z", completed_at=completed)
+    manifest.update(started_at="2026-10-16T08:07:29.975497+09:00", finished_at=finished)
+    assert advisory.admitted(run, jobs, "prism", manifest) is expected
+
+
 @pytest.mark.parametrize("change", ["gate", "publish_false", "failed", "cloud_deployed", "superseded", "wrong_attempt_time", "untrusted"])
 def test_no_event_for_non_publish_or_non_native_skipped_deploy(tmp_path, monkeypatch, change):
     archive, state, _, _, _, run, jobs = fixture(tmp_path, monkeypatch)
