@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:fb44b01cf99c3fc99fdf0777a8afbce6",
+  "event_id": "us:fc0d943f6a3bbe0879a4ff2bb3b1bae3",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "28ccef5622f4181bc3518b4a17864a5471d37a8b69183d84abc04a7aec734cbd",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "2ac26bd3a2d88b7831816b736f760301d9d2d9a97fc10338fe72baf3917848cd",
-  "source_sha256": "3aa10344d5a27a74b6e0c66117134b6d4e3f11ce99f0724e6716f449b2757ba9",
+  "source_sha256": "da07cf8b5f980e4e8a77dea5c5a2addda6e7c8dd48db2048bb9336a33da3d68a",
   "body": {
     "kind": "market",
     "market": "US",
@@ -935,17 +935,17 @@
       "youtube": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 411,
-          "window_events": 108,
+          "total_unique_events": 412,
+          "window_events": 109,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-14T05:00:51+00:00",
-          "newest_occurred_at": "2026-10-15T23:02:29+00:00",
+          "newest_occurred_at": "2026-10-15T23:21:39+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 96,
+          "omitted_events": 97,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 48
+          "omitted_before_context_selection": 49
         },
         "events": [
           {
@@ -2238,19 +2238,15 @@
             }
           },
           {
-            "event_key": "v2N5urNCy38",
-            "content_sha256": "370c89c0d285273612cf728e8bc4b0d1bab82967a6ba65bd7dec8476b6c03557",
-            "occurred_at": "2026-10-15T22:04:13+00:00",
+            "event_key": "ZdhaDE9YxfQ",
+            "content_sha256": "e9b6636b481e816be9ef9d86cd5ece2a83cba8be787679e82da19b2a4d7f6297",
+            "occurred_at": "2026-10-15T23:21:39+00:00",
             "relevance": {
               "tickers": [
-                "^KS11",
-                "000660",
-                "005930",
-                "128940"
+                "^KS11"
               ],
               "markets": [
-                "US",
-                "KR"
+                "US"
               ],
               "themes": [],
               "match_basis": "verified_entities",
@@ -2259,84 +2255,59 @@
               "score": 20
             },
             "summary": {
-              "video_id": "v2N5urNCy38",
-              "title": "10월 16일 투자자들이 꼭 알아야 하는 투자 포인트",
+              "video_id": "ZdhaDE9YxfQ",
+              "title": "10월 16일 오늘 코스피 어떻게 흘러갈까?",
               "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=v2N5urNCy38",
+              "source_url": "https://www.youtube.com/watch?v=ZdhaDE9YxfQ",
               "claim_status_summary": {
-                "unverified": 9,
-                "asr_uncertain": 1,
-                "partially_supported": 1
+                "unverified": 7,
+                "asr_uncertain": 3
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "전일 코스피가 7% 넘게 하락하고 외국인이 3조7000억 원 넘게 순매도했지만 롯데쇼핑·신세계·현대백화점·알테오젠·파마리서치는 외국인 순매수였다는 주장.",
+                  "claim_text": "전일 코스피가 7% 넘게 하락했으며 10월 16일에는 상승 출발 후 전일보다 소폭 높은 수준에서 마감할 것이라는 주장·전망.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "시장 급락 규모와 외국인의 선별 매수를 확인된 사실로 사용하지 말고 종목별 수급을 별도로 확인해야 한다."
+                  "investor_implication": "전일 급락 수치와 당일 전망 모두 확인 전에는 매수 근거로 확정할 수 없다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "코어위브 재무 우려가 SK하이닉스 하락 요인이었고 젠슨 황의 자금조달 비용 하락 발언 이후 코어위브 낙폭이 2%대로 줄었다는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "AI 고객사의 자금조달 개선이나 그에 따른 SK하이닉스 반등을 확정적 투자 근거로 삼기 어렵다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "미국에서 거래되는 SK하이닉스 ADR이 정규장에 0.98% 하락하고 시간외에 0.62% 상승했다는 주장.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.97,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "상품과 거래 세션이 확인되기 전에는 국내 SK하이닉스의 개장 방향을 판단하는 신호로 사용하기 어렵다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "삼성전자가 전일 9.48% 하락해 21만 원에 마감했다는 주장.",
+                  "claim_text": "코스피200 야간선물이 한때 약 1% 하락했다가 3.9% 넘게 상승 마감해 코스피 상승 출발을 시사했다는 주장.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "낙폭과 가격대를 근거로 저가 매수 여부를 판단하기 전에 공식 일별 시세를 확인해야 한다."
+                  "investor_implication": "상품과 등락률 기준을 확인하기 전에는 야간선물 수치를 개장 방향의 확정 신호로 사용할 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "야간선물 ±1.5% 이상 변동 시 같은 방향 출발 경향, 최근 10거래일 중 상승 출발 3회의 시가 하회 마감, 외국인 4일 초과 연속 매도 조건에서 상승 마감 약 60%라는 과거 통계 주장.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "제시된 빈도를 당일 상승 확률이나 전략의 기대수익으로 해석할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "외국인이 코스피에서 8거래일 연속 순매도했고 누적액은 18조 원 초과, 전일 순매도액은 3조 7천억 원 초과이며 매도 지속 시 반등이 약화될 수 있다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "연속일수와 금액을 확인하고 장중 추정치와 확정치를 구분해야 한다."
                 }
               ],
               "entities": [
                 {
                   "ticker": "^KS11",
-                  "name": "코스피",
+                  "name": "코스피·코스피200 야간선물",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "128940",
-                  "name": "한미약품",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 }
               ]
@@ -3219,20 +3190,20 @@
               "e66Ec943kiM",
               "UMIka6hqIEc",
               "3E-pgHrkpng",
-              "v2N5urNCy38"
+              "ZdhaDE9YxfQ"
             ],
             "coverage": {
-              "total_unique_events": 411,
-              "window_events": 108,
+              "total_unique_events": 412,
+              "window_events": 109,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-14T05:00:51+00:00",
-              "newest_occurred_at": "2026-10-15T23:02:29+00:00",
+              "newest_occurred_at": "2026-10-15T23:21:39+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 96,
+              "omitted_events": 97,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 48
+              "omitted_before_context_selection": 49
             }
           },
           "prism": {

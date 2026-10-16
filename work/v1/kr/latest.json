@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:182b39ffd1b1fbbacc4efbccb6c436de",
+  "event_id": "kr:8058151bfbb7a22abd1ca08877a4885a",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "c8841b735958409f8713a6ad25339e660992c3937436b9c8a56f6db16de44607",
   "skill_sha256": "b483762e26bf8c1fefe7a68660eea55c3b7fc3eda99e1ccaabe7480a3fc67789",
   "task_manifest_sha256": "c1849436fbbfbf1e3be8f22f1dd63ec8393884e2a6915342368f7a384683b31a",
   "workflow_contract_sha256": "331fbacec805e278747da999980cf5a224f49874e457a74f3a10be4532a85414",
-  "source_sha256": "01ff9bbfe774d01aace8d24cf2e271770266ba837c115c7dfd38de24d7f5f428",
+  "source_sha256": "d79865021301fd304e089d06cf96cc91aeb9f5883448387baa95ac5f7906a999",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -661,17 +661,17 @@
       "youtube": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 411,
-          "window_events": 108,
+          "total_unique_events": 412,
+          "window_events": 109,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-14T05:00:51+00:00",
-          "newest_occurred_at": "2026-10-15T23:02:29+00:00",
+          "newest_occurred_at": "2026-10-15T23:21:39+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 96,
+          "omitted_events": 97,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 48
+          "omitted_before_context_selection": 49
         },
         "events": [
           {
@@ -1972,15 +1972,12 @@
             }
           },
           {
-            "event_key": "Y9wDXyYLGeQ",
-            "content_sha256": "d80cf9e5986db06951cb4e398a038597e8bf267bbb258ec9d35ad15d99c5d90e",
-            "occurred_at": "2026-10-15T23:02:29+00:00",
+            "event_key": "ZdhaDE9YxfQ",
+            "content_sha256": "e9b6636b481e816be9ef9d86cd5ece2a83cba8be787679e82da19b2a4d7f6297",
+            "occurred_at": "2026-10-15T23:21:39+00:00",
             "relevance": {
               "tickers": [
-                "SPX",
-                "^KS11",
-                "TSM",
-                "CRWV"
+                "^KS11"
               ],
               "markets": [
                 "US"
@@ -1992,80 +1989,56 @@
               "score": 0
             },
             "summary": {
-              "video_id": "Y9wDXyYLGeQ",
-              "title": "연말까지 미국 증시 신고가 전망…한국 증시 반등 가능성은? | 문남중 대신증권 리서치센터 수석연구위원 [글로벌 인터뷰]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=Y9wDXyYLGeQ",
+              "video_id": "ZdhaDE9YxfQ",
+              "title": "10월 16일 오늘 코스피 어떻게 흘러갈까?",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=ZdhaDE9YxfQ",
               "claim_status_summary": {
-                "unverified": 11,
-                "contradicted": 1
+                "unverified": 7,
+                "asr_uncertain": 3
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "S&P 500은 10월 6일 신고가를 기록했고 10월 +0.95%, 연초 이후 약 +15%, 현재 7,800~7,900이며, 연말까지 신고가와 내년 6월 이전 우호적 투자환경이 이어진다는 주장.",
+                  "claim_text": "전일 코스피가 7% 넘게 하락했으며 10월 16일에는 상승 출발 후 전일보다 소폭 높은 수준에서 마감할 것이라는 주장·전망.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "제시된 지수·수익률 및 상승 전망을 검증된 투자 근거로 사용하지 않는다."
+                  "investor_implication": "전일 급락 수치와 당일 전망 모두 확인 전에는 매수 근거로 확정할 수 없다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "코스피는 10월 -18.8% 또는 약 -19%, 연초 이후 +40%이며, 7월 29일 5,200선에서 반등하는 과정에서 SK하이닉스가 상한가를 기록했고 미국 증시·TSMC 실적으로 다시 반등할 가능성이 높다는 주장.",
+                  "claim_text": "코스피200 야간선물이 한때 약 1% 하락했다가 3.9% 넘게 상승 마감해 코스피 상승 출발을 시사했다는 주장.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "과거 급락·상한가 사례와 현재 반등 가능성을 구분하고 KRX 원시세를 먼저 확인한다."
+                  "investor_implication": "상품과 등락률 기준을 확인하기 전에는 야간선물 수치를 개장 방향의 확정 신호로 사용할 수 없다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "S&P 500 3분기 EPS 성장률 전망이 26.7%에서 29.5%로 상향됐고 3개 분기 연속 25% 이상·8개 분기 연속 두 자릿수 성장했으며, 금융업종 전망도 현재 약 3%로 상향됐다는 주장.",
-                  "status": "unverified",
+                  "claim_text": "야간선물 ±1.5% 이상 변동 시 같은 방향 출발 경향, 최근 10거래일 중 상승 출발 3회의 시가 하회 마감, 외국인 4일 초과 연속 매도 조건에서 상승 마감 약 60%라는 과거 통계 주장.",
+                  "status": "asr_uncertain",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "같은 기관·정의·기준일의 자료로 실적 상향을 확인하기 전에는 이익 성장 수치를 투자 판단에 반영하지 않는다."
+                  "investor_implication": "제시된 빈도를 당일 상승 확률이나 전략의 기대수익으로 해석할 수 없다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "TSMC 3분기 매출·EPS 예상 상회, 순이익 +68.7%, 6개 분기 연속 사상 최대, 영업이익률 58.7%·가이던스 58% 초과, 4분기 매출 QoQ +14%·YoY +8%, 연간 전망 상향 및 2026~2028년 설비투자 확대라는 주장.",
+                  "claim_text": "외국인이 코스피에서 8거래일 연속 순매도했고 누적액은 18조 원 초과, 전일 순매도액은 3조 7천억 원 초과이며 매도 지속 시 반등이 약화될 수 있다는 주장.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "마진·성장률·설비투자를 공식 IR 원문과 대조하기 전에는 반도체 수요나 한국 주가 안정의 확인된 근거로 사용하지 않는다."
+                  "investor_implication": "연속일수와 금액을 확인하고 장중 추정치와 확정치를 구분해야 한다."
                 }
               ],
               "entities": [
                 {
-                  "ticker": "SPX",
-                  "name": "미국 증시·S&P 500",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
                   "ticker": "^KS11",
-                  "name": "한국 증시·코스피",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "TSM",
-                  "name": "TSMC",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "CRWV",
-                  "name": "코어위브",
+                  "name": "코스피·코스피200 야간선물",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2939,20 +2912,20 @@
               "5OMTQD4L_sU",
               "xvBCcCtChJU",
               "OvrJZQEFnuE",
-              "Y9wDXyYLGeQ"
+              "ZdhaDE9YxfQ"
             ],
             "coverage": {
-              "total_unique_events": 411,
-              "window_events": 108,
+              "total_unique_events": 412,
+              "window_events": 109,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-14T05:00:51+00:00",
-              "newest_occurred_at": "2026-10-15T23:02:29+00:00",
+              "newest_occurred_at": "2026-10-15T23:21:39+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 96,
+              "omitted_events": 97,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 48
+              "omitted_before_context_selection": 49
             }
           },
           "prism": {
