@@ -24,6 +24,7 @@ pytestmark = pytest.mark.skipif(os.name != "nt" or not POWERSHELL, reason="Windo
 ROOT = Path(__file__).resolve().parents[1]
 HELPER = ROOT / "tools/local_automation_launcher_notifications.ps1"
 WRAPPER = ROOT / "tools/run_local_automation.ps1"
+HIDDEN_LAUNCHER = ROOT / "tools/run_powershell_hidden.vbs"
 OBSERVED = "2026-10-12T08:00:00+00:00"
 
 
@@ -278,11 +279,67 @@ def test_atomic_script_update_does_not_touch_schedule_or_runtime(sandbox):
     result = ps('& $env:TA_TEST_INSTALLER -RepositoryRoot $env:TA_TEST_REPO '
                 '-InstallRoot $env:TA_TEST_INSTALL -UpdateScriptsOnly', env)
     assert result.returncode == 0, result.stderr
-    for source in [HELPER, WRAPPER]:
+    for source in [HIDDEN_LAUNCHER, HELPER, WRAPPER]:
         assert (install / source.name).read_bytes() == source.read_bytes()
     assert not (Path(env['TA_TEST_REPO']) / '.runtime').exists()
     assert not (tmp_path / 'calls.txt').exists()
     assert not list(install.glob('*.tmp'))
+
+
+def test_hidden_launcher_hides_console_preserves_arguments_and_exit(tmp_path):
+    script = tmp_path / 'console probe 한글.ps1'
+    result_path = tmp_path / 'result.json'
+    script.write_text(r'''
+param([string]$RepositoryRoot, [string]$ArchiveRoot)
+Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public class ConsoleProbe { [DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow(); [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h); }'
+$h = [ConsoleProbe]::GetConsoleWindow()
+@{visible=[ConsoleProbe]::IsWindowVisible($h);repo=$RepositoryRoot;archive=$ArchiveRoot} | ConvertTo-Json | Set-Content -LiteralPath $env:TA_HIDDEN_RESULT -Encoding UTF8
+exit 7
+''', encoding='utf-8-sig')
+    repo = str(tmp_path / 'repository with spaces 한글')
+    archive = str(tmp_path / 'archive with spaces')
+    result = subprocess.run(
+        [str(Path(os.environ['SystemRoot']) / 'System32/wscript.exe'), '//B', '//Nologo',
+         str(HIDDEN_LAUNCHER), str(script), '-RepositoryRoot', repo, '-ArchiveRoot', archive],
+        env={**os.environ, 'TA_HIDDEN_RESULT': str(result_path)}, timeout=20,
+    )
+    assert result.returncode == 7
+    observed = json.loads(result_path.read_text(encoding='utf-8-sig'))
+    assert observed == {'visible': False, 'repo': repo, 'archive': archive}
+
+
+def test_installer_registers_gui_launcher_without_changing_worker_arguments(tmp_path):
+    install = tmp_path / 'maintenance with spaces'
+    repo = tmp_path / 'repo with spaces'
+    archive = tmp_path / 'archive with spaces'
+    receipt = tmp_path / 'actions.jsonl'
+    env = {**os.environ, 'TA_INSTALLER': str(ROOT / 'tools/install_local_automation.ps1'),
+           'TA_INSTALL': str(install), 'TA_REPO': str(repo), 'TA_ARCHIVE': str(archive),
+           'TA_ACTIONS': str(receipt)}
+    result = ps(r'''
+$ErrorActionPreference = 'Stop'
+# Import before installing mocks: module autoload exports functions with these
+# names and would otherwise replace the mocks when a constructor is first used.
+Import-Module ScheduledTasks, Microsoft.PowerShell.Management, Microsoft.PowerShell.Utility
+$PSModuleAutoLoadingPreference = 'None'
+function global:Get-ScheduledTask { param($TaskPath, $ErrorAction) @() }
+function global:Register-ScheduledTask {
+    param($TaskPath, $TaskName, $Action, $Trigger, $Principal, $Settings, [switch]$Force)
+    @{name=$TaskName;execute=$Action.Execute;arguments=$Action.Arguments;multiple=[string]$Settings.MultipleInstances;limit=$Settings.ExecutionTimeLimit} | ConvertTo-Json -Compress | Add-Content -LiteralPath $env:TA_ACTIONS -Encoding UTF8
+}
+& $env:TA_INSTALLER -RepositoryRoot $env:TA_REPO -ArchiveRoot $env:TA_ARCHIVE -InstallRoot $env:TA_INSTALL -NoStart
+''', env)
+    assert result.returncode == 0, result.stderr
+    actions = [json.loads(line) for line in receipt.read_text(encoding='utf-8-sig').splitlines()]
+    assert len(actions) == 2
+    for action, command in zip(actions, ['run-due', 'publish']):
+        assert Path(action['execute']).name.lower() == 'wscript.exe'
+        assert action['arguments'] == (
+            f'//B //Nologo "{install / HIDDEN_LAUNCHER.name}" "{install / WRAPPER.name}" '
+            f'-Command {command} -RepositoryRoot "{repo}" -ArchiveRoot "{archive}"')
+        assert action['name'] == f'LocalAutomation-{command}'
+        assert action['multiple'] == 'IgnoreNew'
+        assert action['limit'] == 'PT13H'
 
 
 @pytest.mark.parametrize('runtime', ['missing', 'invalid', 'failed', 'timeout', 'usable'])
