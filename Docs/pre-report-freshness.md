@@ -10,7 +10,7 @@ The refresh checks exchange and official market calendars, acquires the same pro
 
 Before preparing an event it requires the selected producer to be the new run, genuine non-future quote/account clocks from this invocation and less than ten minutes old, VALID account health, complete holdings/watchlist coverage, and resolved research less than 36 hours old. Minute-resolution quote clocks are allowed within the invocation's first minute. An expired cache, missing account, partial universe, failed overlay, unknown calendar, competing producer, or session ending during refresh cannot create or acknowledge a report event.
 
-The fresh-report requirement is persisted in pending Work state. At publish, actual quote/account ages must remain below 30 minutes and every row must remain valid even when the draft has downgraded execution readiness. A failed publish leaves the event pending and the canonical published report unchanged. The writer must refresh/prepare again and rebind the draft, rather than extend timestamps or acknowledge the failed report.
+The fresh-report requirement is persisted in pending Work state. At publish, actual quote/account ages must remain strictly below 10 minutes (600 seconds is expired) and every row must remain valid even when the draft has downgraded execution readiness. A failed publish leaves the event pending and the canonical published report unchanged. The writer must refresh/prepare again and rebind the draft, rather than extend timestamps or acknowledge the failed report.
 
 ## Web Scheduled tasks
 

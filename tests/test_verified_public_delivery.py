@@ -10,7 +10,7 @@ from tradingagents.work.public_delivery import (
 )
 from tradingagents.work.runtime import WorkRuntimeError, validate_account_execution
 
-NOW = datetime(2026, 7, 11, 10, 10, tzinfo=timezone.utc)
+NOW = datetime(2026, 7, 11, 10, 9, tzinfo=timezone.utc)
 SHA = "a" * 40
 
 
@@ -27,7 +27,7 @@ def payload():
                     "summary": {"position_count": 1, "available_cash_krw": 0, "total_equity_krw": 100},
                     "positions": [{"ticker": "TEST", "quantity": 1, "sellable_quantity": 1}]},
         "rows": [{"ticker": "TEST", "last_price": 100, "market_data_asof": "2026-07-11T10:00:00Z",
-                  "quality_at_build": {"row_valid_until": "2026-07-11T10:30:00Z"}}],
+                  "quality_at_build": {"row_valid_until": "2026-07-11T10:10:00Z"}}],
         "report": {},
     }
 
@@ -77,7 +77,7 @@ def test_nonce_discovery_pins_all_files_and_verifies_bytes():
     assert result["not_order_authorization"] is True
     assert result["head_commit"] != result["commit"]
     assert result["byte_integrity_verified"] is True
-    assert result["diagnostics"]["age_seconds"]["account"] == 600
+    assert result["diagnostics"]["age_seconds"]["account"] == 540
     refs = [url for url in urls if "/git/ref/" in url]
     assert len(refs) == 2 and refs[0] != refs[1]
     assert all("request_id=" in url for url in refs)
@@ -178,3 +178,14 @@ def test_publish_account_guard_rejects_stale_missing_future_and_invalid(readines
         with pytest.raises(WorkRuntimeError, match="VALID account"):
             validate_account_execution(strategies, {**good, **change}, now=NOW)
     validate_account_execution([{"execution": {"readiness": "NEEDS_LIVE_RECHECK"}}], {}, now=NOW)
+
+
+def test_exact_ten_minute_boundary_blocks_all_public_clocks_and_account_execution():
+    at = datetime(2026, 7, 11, 10, 10, tzinfo=timezone.utc)
+    blockers = validate_input(payload(), market="kr", now=at)
+    assert "ACCOUNT_EXPIRED_OR_INVALID" in blockers
+    assert "QUOTE_EXPIRED_OR_INVALID" in blockers
+    assert "ROW_QUOTE_EXPIRED_OR_INVALID" in blockers
+    with pytest.raises(WorkRuntimeError):
+        validate_account_execution([{"execution": {"readiness": "READY_NOW"}}],
+            {"account_as_of": "2026-07-11T10:00:00Z", "account_snapshot_health": "VALID"}, now=at)

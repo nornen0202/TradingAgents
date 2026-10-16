@@ -60,6 +60,10 @@ class EvidenceItem:
     period: str | None = None
     magnitude: str | None = None
     quality: float = 0.5
+    kind: str | None = None
+    known_at: str | None = None
+    published_at: str | None = None
+    observed_at: str | None = None
 
     @classmethod
     def from_mapping(cls, payload: dict[str, Any], *, ticker: str) -> "EvidenceItem":
@@ -79,6 +83,10 @@ class EvidenceItem:
             period=_clean_text(payload.get("period")) or None,
             magnitude=_clean_text(payload.get("magnitude")) or None,
             quality=max(0.0, min(_clean_float(payload.get("quality"), default=0.5), 1.0)),
+            kind=_clean_text(payload.get("kind")) or None,
+            known_at=_clean_text(payload.get("known_at")) or None,
+            published_at=_clean_text(payload.get("published_at")) or None,
+            observed_at=_clean_text(payload.get("observed_at")) or None,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -92,6 +100,10 @@ class EvidenceItem:
             "magnitude": self.magnitude,
             "quality": round(self.quality, 4),
             "source_refs": [source.to_dict() for source in self.source_refs],
+            "kind": self.kind,
+            "known_at": self.known_at,
+            "published_at": self.published_at,
+            "observed_at": self.observed_at,
         }
 
 

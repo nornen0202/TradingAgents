@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from tradingagents.schemas.decision import explicit_price_range_conflicts
+from tradingagents.dataflows.market_policy import MAX_EXECUTION_AGE
 
 from .freshness import aware_datetime, source_freshness_receipt
 
@@ -1018,7 +1019,7 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None
             continue
         quality = row.get("quality") if isinstance(row.get("quality"), dict) else {}
         parsed = aware_datetime(row.get("market_data_asof"))
-        valid_until = parsed + timedelta(minutes=30) if parsed else None
+        valid_until = parsed + MAX_EXECUTION_AGE if parsed else None
         invalid = parsed is None or parsed > current_now
         expired = bool(valid_until and valid_until <= current_now.astimezone(valid_until.tzinfo))
         quality["row_valid_until"] = valid_until.isoformat() if valid_until else None
@@ -1899,7 +1900,7 @@ def _market_guardrails(surface: str, bundle: dict[str, Any], *, now: datetime) -
     ]
     actionable_validities = [value for value in actionable_validities if value is not None]
     fallback = min(asofs) if asofs else None
-    valid_datetime = min(actionable_validities) if actionable_validities else (fallback + timedelta(minutes=30) if fallback else None)
+    valid_datetime = min(actionable_validities) if actionable_validities else (fallback + MAX_EXECUTION_AGE if fallback else None)
     valid_until = valid_datetime.isoformat() if valid_datetime else None
     required = ["실시간 호가와 주문 가능 상태 재확인", "계좌 현금·미체결 주문 재확인"]
     if surface == "kr":

@@ -122,6 +122,12 @@ def load_ohlcv(symbol: str, curr_date: str) -> pd.DataFrame:
     if not use_cache and not validated.attrs.get("source"):
         data.to_csv(data_file, index=False)
 
+    # Reuse this exact validated input for the private chart, without refetching.
+    from tradingagents.charting.capture import capture_daily_frame
+    try:
+        capture_daily_frame(symbol, validated, curr_date=curr_date)
+    except (ValueError, TypeError, KeyError, OverflowError) as exc:
+        logger.warning("Chart capture unavailable: %s", type(exc).__name__)
     return validated
 
 

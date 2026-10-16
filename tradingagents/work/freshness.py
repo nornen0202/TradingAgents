@@ -1,16 +1,14 @@
 """Source clocks for Work consumers. Publication never renews input data."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 
+from tradingagents.dataflows.market_policy import (
+    MAX_EXECUTION_AGE, aware_datetime, latest_regular_session_context,
+    observation_status, research_observation_policy,
+)
 
-def aware_datetime(value: Any) -> datetime | None:
-    try:
-        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-        return parsed if parsed.tzinfo is not None else None
-    except (TypeError, ValueError):
-        return None
 
 
 def source_freshness_receipt(
@@ -18,16 +16,29 @@ def source_freshness_receipt(
     analysis_manifest: dict[str, Any], public: bool,
 ) -> dict[str, Any]:
     rows = [row for row in bundle.get("strategy_table", []) if isinstance(row, dict)]
+    clocks = [observation_status(row.get("market_data_asof"), as_of=now) for row in rows]
     observations = [aware_datetime(row.get("market_data_asof")) for row in rows]
-    valid = [value for value in observations if value is not None]
-    invalid = len(observations) - len(valid)
-    future = sum(value > now for value in valid)
-    expired = sum(value + timedelta(minutes=30) <= now for value in valid)
+    valid = [value for value in observations if value is not None and value <= now]
+    invalid = sum(clock["status"] in {"MISSING", "INVALID"} for clock in clocks)
+    future = sum(clock["status"] == "FUTURE" for clock in clocks)
+    expired = sum(value + MAX_EXECUTION_AGE <= now for value in valid)
     state = "MISSING" if not rows or invalid else "INVALID" if future else "STALE" if expired else "FRESH"
     summaries = [item for item in analysis_manifest.get("tickers", []) if isinstance(item, dict)]
     dates = sorted({str(item["trade_date"]) for item in summaries if item.get("trade_date")})
     analysis_times = [aware_datetime(item.get("finished_at")) for item in analysis_manifest.get("tickers", []) if isinstance(item, dict)]
-    analysis_times = [value for value in analysis_times if value is not None]
+    analysis_times = [value for value in analysis_times if value is not None and value <= now]
+    market = str(bundle.get("market") or manifest.get("market") or "").upper()
+    calendar = latest_regular_session_context(market, as_of=now)
+    research_receipts = []
+    for row in rows:
+        interval = str(row.get("interval") or row.get("market_data_interval") or
+                       ("1d" if row.get("level_basis") == "daily_close" else "unknown"))
+        policy = research_observation_policy(row.get("market_data_asof"), as_of=now,
+            session=calendar["session"], interval=interval,
+            latest_regular_close_at=calendar["latest_regular_close_at"], verified_session=calendar["verified_session"])
+        research_receipts.append({"ticker": row.get("ticker"), "research_valid": policy["research_valid"],
+                                  "category": policy["category"], "execution_eligible": False})
+    research_valid = sum(row["research_valid"] for row in research_receipts)
     receipt = {
         "schema": "tradingagents.source-freshness/v1",
         "producer_run_id": manifest.get("run_id"),
@@ -42,12 +53,19 @@ def source_freshness_receipt(
         "market_data_latest_at": max(valid).isoformat() if valid else None,
         "market_data_status": state,
         "publication_does_not_refresh_inputs": True,
+        "execution_max_age_seconds": MAX_EXECUTION_AGE.total_seconds(),
+        "research_market_data_status": "VALID" if rows and research_valid == len(rows) else "PARTIAL" if research_valid else "UNVERIFIED",
+        "research_market_data_receipts": research_receipts,
+        "research_calendar_verified": calendar["verified_session"],
+        "latest_regular_close_at": calendar["latest_regular_close_at"],
+        "research_does_not_enable_execution": True,
     }
     if not public:
         receipt.update(
             market_data_row_count=len(rows),
             market_data_observed_count=len(valid),
             market_data_missing_count=invalid,
+            market_data_future_count=future,
             market_data_research_observation_count=sum(
                 row.get("market_data_basis") == "RESEARCH_OBSERVATION" for row in rows
             ),

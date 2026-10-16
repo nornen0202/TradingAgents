@@ -54,9 +54,9 @@ def test_long_refresh_and_incomplete_coverage_block():
 def test_final_publish_clock_cannot_be_renewed_by_report_timestamp():
     item = packet()
     item["body"]["current"]["bundle"] = {"strategy_table": [
-        {"execution": {"valid_until": (NOW + timedelta(minutes=30)).isoformat()}}]}
-    assert pre.publish_freshness_blockers(item, now=NOW + timedelta(minutes=29)) == []
-    assert pre.publish_freshness_blockers(item, now=NOW + timedelta(minutes=30))
+        {"execution": {"valid_until": (NOW + timedelta(minutes=10)).isoformat()}}]}
+    assert pre.publish_freshness_blockers(item, now=NOW + timedelta(minutes=9, seconds=59)) == []
+    assert pre.publish_freshness_blockers(item, now=NOW + timedelta(minutes=10))
     item["body"]["current"]["bundle"]["strategy_table"][0]["execution"]["valid_until"] = NOW.isoformat()
     assert "ROW_VALIDITY_EXPIRED_OR_MISSING" in pre.publish_freshness_blockers(item, now=NOW)
 

@@ -1435,13 +1435,11 @@ def _validate_report_thesis_direction(
 def validate_account_execution(strategies: list[dict], freshness: Any, *, now: datetime) -> None:
     if not any(str((row.get("execution") or {}).get("readiness") or "").strip().upper() in {"READY_NOW", "WAIT_FOR_TRIGGER"} for row in strategies):
         return
-    from .freshness import aware_datetime
+    from tradingagents.dataflows.market_policy import observation_status
     receipt = freshness if isinstance(freshness, dict) else {}
-    observed = aware_datetime(receipt.get("account_as_of"))
-    if (now.tzinfo is None or observed is None or observed > now
-            or now - observed >= timedelta(minutes=30)
+    if (now.tzinfo is None or not observation_status(receipt.get("account_as_of"), as_of=now)["eligible"]
             or receipt.get("account_snapshot_health") != "VALID"):
-        raise WorkRuntimeError("Executable market report requires a VALID account observation less than 30 minutes old")
+        raise WorkRuntimeError("Executable market report requires a VALID account observation less than 10 minutes old")
 
 
 def _validate_report_execution_gate(

@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
-OUTCOME_CALCULATION_VERSION = 2
+OUTCOME_CALCULATION_VERSION = 3
 
 
 ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
@@ -62,7 +62,7 @@ ACTION_TRACKER_SCHEMA: tuple[str, ...] = (
       avoided_drawdown_20d REAL,
       missed_upside_20d REAL,
       outcome_label TEXT,
-      calculation_version INTEGER DEFAULT 2,
+      calculation_version INTEGER DEFAULT 3,
       updated_at TEXT,
       FOREIGN KEY(recommendation_id) REFERENCES action_recommendations(id)
     )

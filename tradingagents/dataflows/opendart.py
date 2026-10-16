@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
@@ -99,6 +101,7 @@ def fetch_disclosures_opendart(symbol: str, start_date: str, end_date: str, *, p
         raise VendorInputError("Disclosure dates must be YYYY-MM-DD") from exc
     if lower > upper:
         raise VendorInputError("start_date must not be later than end_date")
+    today = datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Seoul")).date()
     corp_code, stock_code = _resolve_corp_code(symbol)
     if not corp_code or not stock_code:
         return []
@@ -145,7 +148,7 @@ def fetch_disclosures_opendart(symbol: str, start_date: str, end_date: str, *, p
             continue
         receipt_no = str(item.get("rcept_no", ""))
         receipt_dt = item.get("rcept_dt")
-        if not isinstance(receipt_dt, str) or len(receipt_dt) != 8 or not receipt_dt.isdigit():
+        if not isinstance(receipt_dt, str) or re.fullmatch(r"\d{8}", receipt_dt) is None:
             continue
         try:
             published_at = datetime.strptime(receipt_dt, "%Y%m%d")
@@ -153,8 +156,10 @@ def fetch_disclosures_opendart(symbol: str, start_date: str, end_date: str, *, p
             continue
         # Treat the server's search arguments as a request, not proof that every
         # returned row is eligible. Unknown and out-of-window filings are withheld.
-        if not lower <= published_at.date() <= upper:
+        if not lower <= published_at.date() <= min(upper, today):
             continue
+        # This is a date-only compatibility value, not a verified midnight
+        # publication. The event bridge preserves DART as first-seen evidence.
         published_at = published_at.replace(tzinfo=timezone(timedelta(hours=9)))
         report_name = str(item.get("report_nm", "Disclosure"))
         corp_name = str(item.get("corp_name", stock_code))
@@ -169,6 +174,8 @@ def fetch_disclosures_opendart(symbol: str, start_date: str, end_date: str, *, p
                 raw_vendor="opendart",
             )
         )
+    from .event_timeline import capture_disclosures
+    capture_disclosures(result, observed_at=datetime.now(timezone.utc))
     return result
 
 

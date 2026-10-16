@@ -188,7 +188,7 @@ def _status_html(status: dict[str, Any]) -> str:
         "market_data_latest_at": "입력 시세 시각 (가장 최근 값)",
         "market_data_status": "빌드 당시 시세 상태",
     }
-    content = '<p>게시·페이지 생성만으로 입력 자료가 갱신되지 않습니다. 시세 유효시간은 최대 30분이며 현재 시각에 다시 판정해야 합니다.</p><dl>'
+    content = '<p>게시·페이지 생성만으로 입력 자료가 갱신되지 않습니다. 실행용 시세·계좌 관측은 10분 미만이어야 하며 현재 시각에 다시 판정해야 합니다. 휴장 중 검증된 최근 정규장 종가는 연구 참고용입니다.</p><dl>'
     content += ''.join(f'<dt>{label}</dt><dd>{html.escape(str(receipt.get(key) or "미확인"))}</dd>' for key, label in labels.items()) + '</dl>'
     content += f'<p>생산 상태: {html.escape(str(status.get("source_health")))}</p>'
     report = status.get("integrated_report") or {}

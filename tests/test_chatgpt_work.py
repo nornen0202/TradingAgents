@@ -1142,7 +1142,7 @@ def test_work_packet_expires_rows_independently(tmp_path: Path):
     assert rows["AAPL"]["thesis"]["label_ko"] == "보유 유지"
     assert rows["AAPL"]["execution"]["readiness"] == "NEEDS_LIVE_RECHECK"
     assert rows["AAPL"]["execution"]["source_readiness"] == "WAIT_FOR_TRIGGER"
-    assert packet["body"]["guardrails"]["valid_until"] == "2026-07-14T11:05:00-04:00"
+    assert packet["body"]["guardrails"]["valid_until"] == "2026-07-14T10:45:00-04:00"
 
 
 def test_runtime_prepare_resume_ack_and_noop(tmp_path: Path):

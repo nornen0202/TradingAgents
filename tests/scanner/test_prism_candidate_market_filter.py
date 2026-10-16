@@ -43,6 +43,7 @@ def test_kr_scanner_excludes_us_ohlcv_rows_even_when_fixture_is_mixed():
         ohlcv_rows=[
             {
                 "ticker": "AAPL",
+                "observed_at": "2026-01-01T00:00:00+00:00",
                 "display_name": "Apple",
                 "market": "US",
                 "open": 190,
@@ -57,6 +58,7 @@ def test_kr_scanner_excludes_us_ohlcv_rows_even_when_fixture_is_mixed():
             },
             {
                 "ticker": "000660",
+                "observed_at": "2026-01-01T00:00:00+00:00",
                 "display_name": "SK하이닉스",
                 "market": "KR",
                 "open": 196000,

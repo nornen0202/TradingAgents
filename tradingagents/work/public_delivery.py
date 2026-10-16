@@ -13,11 +13,12 @@ from datetime import datetime, timedelta, timezone
 from urllib.request import Request, urlopen
 
 from .freshness import aware_datetime
+from tradingagents.dataflows.market_policy import MAX_EXECUTION_AGE
 
 REPO = "nornen0202/TradingAgents"
 REF = f"https://api.github.com/repos/{REPO}/git/ref/heads/public-context"
 RAW = f"https://raw.githubusercontent.com/{REPO}"
-MAX_AGE = timedelta(minutes=30)
+MAX_AGE = MAX_EXECUTION_AGE
 
 
 class PublicDeliveryError(ValueError):

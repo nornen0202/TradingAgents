@@ -14,6 +14,8 @@ import math
 from pathlib import Path
 import sqlite3
 
+from tradingagents.performance.lifecycle import append_lifecycle_event, initialize_lifecycle, stable_signal_id
+
 
 @dataclass(frozen=True)
 class PaperLimits:
@@ -93,6 +95,12 @@ class PaperBroker:
                 filled_at TEXT, fill_price REAL, cost REAL);
             CREATE TABLE IF NOT EXISTS observations(at TEXT PRIMARY KEY, nav REAL NOT NULL, cash REAL NOT NULL);
         """)
+        initialize_lifecycle(self.db)
+        columns = {row[1] for row in self.db.execute("PRAGMA table_info(orders)")}
+        if "signal_id" not in columns:
+            self.db.execute("ALTER TABLE orders ADD COLUMN signal_id TEXT")
+        if "signal_fingerprint" not in columns:
+            self.db.execute("ALTER TABLE orders ADD COLUMN signal_fingerprint TEXT")
 
     def close(self):
         self.db.close()
@@ -156,6 +164,11 @@ class PaperBroker:
             self._set("seed_nav", total)
             self._set("peak_nav", total)
             self._set("limits", asdict(self.limits))
+            append_lifecycle_event(self.db, event_id="paper:account_seed", signal_id="paper:account",
+                kind="ACCOUNT_SEED", mode="paper", occurred_at=snapshot["as_of"], available_at=snapshot["as_of"],
+                ingested_at=snapshot["as_of"],
+                payload={"cash": valuation_cash, "currency": "KRW", "positions": {
+                    p["canonical_ticker"]: p["quantity"] for p in positions}})
             for p in positions:
                 self.db.execute(
                     "INSERT INTO positions VALUES (?,?,?)",
@@ -267,6 +280,11 @@ class PaperBroker:
                             order["id"],
                         ),
                     )
+                    if order["signal_id"]:
+                        append_lifecycle_event(self.db, event_id="cancel:paper:" + order["id"],
+                            signal_id=order["signal_id"], intent_id=order["id"], kind="CANCEL", mode="paper",
+                            occurred_at=now, available_at=now, ingested_at=now,
+                            payload={"ticker": order["ticker"], "reason": "kill_or_daily_stop_or_expired"})
                     continue
                 q = valid.get(order["ticker"])
                 if not q or stamp(q["as_of"]) <= stamp(order["created_at"]):
@@ -319,6 +337,15 @@ class PaperBroker:
                     "UPDATE orders SET status='FILLED',filled_at=?,fill_price=?,cost=? WHERE id=?",
                     (now, fill, fees, order["id"]),
                 )
+                if order["signal_id"]:
+                    append_lifecycle_event(self.db, event_id="fill:paper:" + order["id"], signal_id=order["signal_id"],
+                        intent_id=order["id"], kind="FILL", mode="paper", occurred_at=now, available_at=now,
+                        ingested_at=now,
+                        confirmed_at=now, settled_at=now, payload={"ticker": order["ticker"], "side": order["side"],
+                            "quantity": qty, "price": fill, "cost": fees, "currency": "KRW", "reference_price": q["price_krw"]})
+                    if order["side"] == "SELL":
+                        from tradingagents.performance.journal import record_fill_retrospectives
+                        record_fill_retrospectives(self.db, exit_event_id="fill:paper:" + order["id"])
                 self._set("turnover", self._get("turnover") + qty * fill)
                 nav = (
                     cash
@@ -335,9 +362,13 @@ class PaperBroker:
                 key = hashlib.sha256(
                     f"{s['signal_id']}|{s['ticker']}|{s['action']}".encode()
                 ).hexdigest()
-                if self.db.execute(
-                    "SELECT 1 FROM orders WHERE id=?", (key,)
-                ).fetchone():
+                fingerprint = hashlib.sha256(json.dumps(s, sort_keys=True, allow_nan=False).encode()).hexdigest()
+                correlation = (stable_signal_id(s["run_id"], s["ticker"], s.get("signal_action") or s["action"], s.get("source") or "TradingAgents")
+                               if s.get("run_id") else str(s["signal_id"]))
+                existing = self.db.execute("SELECT signal_fingerprint FROM orders WHERE id=?", (key,)).fetchone()
+                if existing:
+                    if existing[0] and existing[0] != fingerprint:
+                        raise ValueError("Paper signal ID reused with different evidence")
                     continue
                 q = valid.get(s["ticker"])
                 action = s["action"]
@@ -354,11 +385,7 @@ class PaperBroker:
                     or s.get("execution_ready") is not True
                 ):
                     reason = "no_explicit_executable_action"
-                elif (
-                    not s.get("valid_until")
-                    or at >= stamp(s["valid_until"])
-                    or at < stamp(s["available_at"])
-                ):
+                elif not _signal_available(s, at):
                     reason = "signal_expired_or_future"
                 elif not q:
                     reason = "quote_not_executable"
@@ -420,7 +447,7 @@ class PaperBroker:
                         reason = "cash_floor_or_concentration"
                 limit = price * (1.003 if side == "BUY" else 0.997) if price else 0
                 self.db.execute(
-                    "INSERT INTO orders(id,ticker,side,qty,limit_price,created_at,status,reason,expires_at) VALUES (?,?,?,?,?,?,?,?,?)",
+                    "INSERT INTO orders(id,ticker,side,qty,limit_price,created_at,status,reason,expires_at,signal_id,signal_fingerprint) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                     (
                         key,
                         s["ticker"],
@@ -431,8 +458,17 @@ class PaperBroker:
                         "REJECTED" if reason else "PENDING",
                         reason or "next_snapshot_required",
                         s.get("valid_until") or now,
+                        correlation,
+                        fingerprint,
                     ),
                 )
+                append_lifecycle_event(self.db, event_id="intent:paper:" + key, signal_id=correlation,
+                    intent_id=key, kind="INTENT", mode="paper", occurred_at=now, available_at=now,
+                    ingested_at=now,
+                    payload={"ticker": s["ticker"], "side": side, "quantity": qty, "limit_price": limit,
+                        "status": "REJECTED" if reason else "PENDING", "reason": reason or "next_snapshot_required",
+                        "signal_available_at": s.get("available_at"), "signal_action": s.get("signal_action") or action,
+                        "risk_reducing": action in {"REDUCE", "SELL"}})
                 if not reason:
                     self._set("order_count", self._get("order_count") + 1)
             self._set("cash", cash)
@@ -496,6 +532,13 @@ def order_nav_limit(limits: PaperLimits, side: str, quantity: int):
     if quantity == 1:
         return max(limits.max_order_nav, limits.one_share_nav_ceiling)
     return limits.max_order_nav
+
+
+def _signal_available(signal: dict, at: datetime) -> bool:
+    try:
+        return stamp(signal["available_at"]) <= at < stamp(signal["valid_until"])
+    except (ValueError, TypeError, KeyError):
+        return False
 
 
 def kis_demo_order_preview(*, ticker: str, side: str, quantity: int, limit_price: int):

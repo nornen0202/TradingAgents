@@ -131,6 +131,9 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
         signals.append(
             {
                 "signal_id": f"{bundle.get('analysis_source_run_id')}:{ticker}:{action}",
+                "run_id": bundle.get("analysis_source_run_id") or meta.get("run_id") or run.name,
+                "signal_action": raw.get("decision_now") if mapping.get(raw.get("decision_now")) else raw.get("portfolio_action_now"),
+                "source": "TradingAgents",
                 "ticker": ticker,
                 "action": action,
                 "quantity": size.quantity or None,
