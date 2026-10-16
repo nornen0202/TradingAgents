@@ -13,7 +13,7 @@ from tradingagents.graph.setup import GraphSetup
 
 
 @pytest.mark.parametrize("parallel_analysts", [False, True])
-def test_compiled_graph_uses_astra_for_every_investment_decision(monkeypatch, parallel_analysts):
+def test_compiled_graph_uses_sol_for_every_investment_decision(monkeypatch, parallel_analysts):
     """Exercise real decision/debate nodes, replacing only external evidence IO."""
     decision = json.dumps({
         "rating": "HOLD", "portfolio_stance": "NEUTRAL", "entry_action": "WAIT",
@@ -45,7 +45,7 @@ def test_compiled_graph_uses_astra_for_every_investment_decision(monkeypatch, pa
     graph = setup.setup_graph(["market"], parallel_analysts=parallel_analysts)
     result = graph.invoke(Propagator().create_initial_state("AAPL", "2026-10-08"))
 
-    assert deep.model == "gpt-6-astra"
+    assert deep.model == "gpt-6.1-sol"
     assert deep.invoke.call_count == 3
     research_prompt, trader_messages, portfolio_prompt = [call.args[0] for call in deep.invoke.call_args_list]
     assert "As the research manager" in research_prompt

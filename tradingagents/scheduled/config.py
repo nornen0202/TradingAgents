@@ -70,17 +70,17 @@ class LLMSettings:
     quick_think_backend_url: str | None = None
     deep_think_backend_url: str | None = None
     output_think_backend_url: str | None = None
-    deep_model: str = "gpt-6-astra"
+    deep_model: str = "gpt-6.1-sol"
     quick_model: str = "gpt-6.1-sol"
     output_model: str = "gpt-6.1-sol"
     writer_model: str = "gpt-6.1-sol"
-    judge_model: str = "gpt-6-astra"
+    judge_model: str = "gpt-6.1-sol"
     codex_reasoning_effort: str = "medium"
     codex_quick_reasoning_effort: str = "medium"
-    codex_deep_reasoning_effort: str = "high"
+    codex_deep_reasoning_effort: str = "xhigh"
     codex_output_reasoning_effort: str = "medium"
     codex_writer_reasoning_effort: str = "medium"
-    codex_judge_reasoning_effort: str = "high"
+    codex_judge_reasoning_effort: str = "xhigh"
     codex_execution_summary_reasoning_effort: str = "medium"
     codex_summary: str = "none"
     codex_personality: str = "none"
@@ -481,8 +481,8 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             deep_think_backend_url=_optional_string(llm_raw.get("deep_think_backend_url")),
             output_think_backend_url=_optional_string(llm_raw.get("output_think_backend_url")),
             deep_model=deep_model_override
-            or str(llm_raw.get("deep_model", "gpt-6-astra")).strip()
-            or "gpt-6-astra",
+            or str(llm_raw.get("deep_model", "gpt-6.1-sol")).strip()
+            or "gpt-6.1-sol",
             quick_model=quick_model_override
             or str(llm_raw.get("quick_model", "gpt-6.1-sol")).strip()
             or "gpt-6.1-sol",
@@ -493,17 +493,17 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             or str(llm_raw.get("writer_model", "gpt-6.1-sol")).strip()
             or "gpt-6.1-sol",
             judge_model=judge_model_override
-            or str(llm_raw.get("judge_model", "gpt-6-astra")).strip()
-            or "gpt-6-astra",
+            or str(llm_raw.get("judge_model", "gpt-6.1-sol")).strip()
+            or "gpt-6.1-sol",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_quick_reasoning_effort=str(
                 llm_raw.get("codex_quick_reasoning_effort", "medium")
             ).strip()
             or "medium",
             codex_deep_reasoning_effort=str(
-                llm_raw.get("codex_deep_reasoning_effort", "high")
+                llm_raw.get("codex_deep_reasoning_effort", "xhigh")
             ).strip()
-            or "high",
+            or "xhigh",
             codex_output_reasoning_effort=str(
                 llm_raw.get("codex_output_reasoning_effort", "medium")
             ).strip()
@@ -513,9 +513,9 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             ).strip()
             or "medium",
             codex_judge_reasoning_effort=str(
-                llm_raw.get("codex_judge_reasoning_effort", "high")
+                llm_raw.get("codex_judge_reasoning_effort", "xhigh")
             ).strip()
-            or "high",
+            or "xhigh",
             codex_execution_summary_reasoning_effort=str(
                 llm_raw.get("codex_execution_summary_reasoning_effort", "medium")
             ).strip()
