@@ -24,8 +24,13 @@ from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = "nornen0202/TradingAgents"
 PUBLIC_BASE = "https://nornen0202.github.io/TradingAgents"
-KR_WORK_OVERLAY_CHECKPOINTS = (wall_time(10, 30), wall_time(13, 30), wall_time(14, 30))
-US_WORK_OVERLAY_CHECKPOINTS = (wall_time(1, 0), wall_time(3, 0), wall_time(22, 40))
+# Include producer slots ten minutes before web Scheduled reports (13:00 KR,
+# 23:30 US). The independent five-minute publication lane must also finish;
+# consumers still verify real quote/account clocks and never trust these slots.
+KR_WORK_OVERLAY_CHECKPOINTS = (wall_time(10, 30), wall_time(12, 50), wall_time(13, 10),
+                               wall_time(13, 30), wall_time(14, 30))
+US_WORK_OVERLAY_CHECKPOINTS = (wall_time(0, 0), wall_time(1, 0), wall_time(3, 0),
+                               wall_time(22, 40), wall_time(23, 20), wall_time(23, 40))
 
 
 class LocalStorageHeadroomError(RuntimeError):

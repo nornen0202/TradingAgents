@@ -44,6 +44,7 @@ class WorkRuntime:
         youtube_archive_dir: Path | None = None,
         prism_archive_dir: Path | None = None,
         now: datetime | None = None,
+        fresh_report: bool = False,
     ) -> dict[str, Any]:
         key = surface.lower()
         with self.lock("state"):
@@ -123,6 +124,8 @@ class WorkRuntime:
                         surface_state[field] = None
                 surface_state.update(
                     {
+                        "requires_fresh_publish": bool(fresh_report or (
+                            pending == event_id and surface_state.get("requires_fresh_publish"))),
                         "pending_event_id": event_id,
                         "pending_source_sha256": packet["source_sha256"],
                         "pending_packet_path": str(event_path.resolve()),
@@ -202,6 +205,13 @@ class WorkRuntime:
                 raise WorkRuntimeError("Publish source SHA-256 does not match the immutable Work packet")
             if surface_state.get("pending_source_sha256") != source_sha256:
                 raise WorkRuntimeError("Publish source SHA-256 does not match canonical pending state")
+
+            if surface_state.get("requires_fresh_publish"):
+                from .pre_report import publish_freshness_blockers
+                blockers = publish_freshness_blockers(packet, now=effective_now)
+                if blockers:
+                    raise WorkRuntimeError("Fresh report inputs expired or invalid; repeat prepare --refresh-market: "
+                                           + ", ".join(blockers))
 
             draft = json.loads(json.dumps(structured_report, ensure_ascii=False))
             _validate_report_draft(
