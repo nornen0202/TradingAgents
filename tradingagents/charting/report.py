@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import html
 import json
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from .bars import finite, instant, validate_bars
@@ -20,31 +21,99 @@ def _load(path, *, list_allowed=False):
         return {}
 
 
+def _checkpoint_payloads(directory, stem):
+    """Read both current and historical checkpoint filenames without trusting names as clocks."""
+    checkpoint_dir = directory / "execution" / "checkpoints"
+    paths = {directory / f"{stem}.json"}
+    paths.update(checkpoint_dir.glob(f"{stem}_*.json"))
+    paths.update(checkpoint_dir.glob(f"*_{stem}.json"))
+    payloads, seen = [], set()
+    for path in sorted(paths):
+        payload = _load(path)
+        identity = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        if payload and identity not in seen:
+            seen.add(identity)
+            payloads.append(payload)
+    return payloads
+
+
+def _snapshot_visible(payload, cutoff):
+    # A later repackaging cannot introduce its contents into an earlier frame.
+    # Legacy snapshots without container clocks retain only individually dated bars.
+    clock_fields = ("ingested_at", "observed_at", "published_at", "evaluated_at", "asof", "asof_utc", "asof_local")
+    clocks = [instant(payload[key]) for key in clock_fields if payload.get(key) is not None]
+    return all(clock is not None and clock <= cutoff for clock in clocks)
+
+
+def _latest_execution(directory, cutoff, ticker):
+    candidates = []
+    for payload in _checkpoint_payloads(directory, "execution_update"):
+        evaluated = instant(payload.get("execution_asof") or payload.get("evaluated_at") or payload.get("asof"))
+        ingested = instant(payload.get("ingested_at"))
+        matches = not payload.get("ticker") or str(payload["ticker"]).upper() == str(ticker).upper()
+        if matches and evaluated is not None and ingested is not None and evaluated <= ingested <= cutoff:
+            candidates.append(((ingested, evaluated), payload))
+    if not candidates:
+        return {}
+    last = max(key for key, _ in candidates)
+    peers = [payload for key, payload in candidates if key == last]
+    fields = ("decision_state", "decision_now", "reason_codes", "execution_asof", "market_data_asof", "valid_until")
+    # A same-clock disagreement is not a verifiable revision; do not pick by filename.
+    identities = {json.dumps({key: payload[key] for key in fields if key in payload}, sort_keys=True) for payload in peers}
+    return peers[0] if len(identities) == 1 else {}
+
+
+def _bar_vintages(records, cutoff):
+    """Latest observed vintage per candle; same-observation conflicts remain excluded."""
+    vintages, rejected = defaultdict(list), Counter()
+    for raw, from_micro in records:
+        checked = validate_bars([raw], analysis_as_of=cutoff)
+        rejected.update(checked["rejected"])
+        for bar in checked["bars"]:
+            vintages[(instant(bar["timestamp"]), bar["interval"])].append((bar, from_micro))
+    selected, micro_used = [], False
+    value_fields = ("open", "high", "low", "close", "volume", "session_id")
+    for key in sorted(vintages):
+        peers = vintages[key]
+        latest = max(instant(bar["observed_at"]) for bar, _ in peers)
+        peers = [(bar, source) for bar, source in peers if instant(bar["observed_at"]) == latest]
+        signatures = {tuple(bar[field] for field in value_fields) for bar, _ in peers}
+        if len(signatures) != 1:
+            rejected["conflicting_duplicate"] += len(peers)
+            continue
+        bar, from_micro = max(peers, key=lambda pair: (instant(pair[0]["available_at"]), pair[1]))
+        selected.append(bar)
+        micro_used = micro_used or from_micro
+    return {"bars": selected, "rejected": dict(rejected), "micro_used": micro_used}
+
+
 def build_review(ticker_dir, *, analysis_as_of, anchor=None, lifecycle=None):
     directory = Path(ticker_dir)
     cutoff = instant(analysis_as_of)
     if cutoff is None:
         raise ValueError("analysis_as_of must include a timezone")
-    capture, micro = _load(directory / "chart_evidence.json"), _load(directory / "microstructure_snapshot.json")
+    capture = _load(directory / "chart_evidence.json")
     from tradingagents.dataflows.market_policy import source_use_policy
     ticker = capture.get("ticker") or directory.name
     capture_entitled = source_use_policy(capture.get("provider") or "local_archive", entitlement=capture.get("entitlement"))["allowed"]
-    micro_entitled = source_use_policy(micro.get("provider") or "local_archive", entitlement=micro.get("entitlement"))["allowed"]
-    micro_matches = not micro.get("ticker") or str(micro["ticker"]).upper() == str(ticker).upper()
     capture_rows = capture.get("bars") or []
-    micro_rows = micro.get("chart_bars") or []
-    bars = validate_bars([*(capture_rows if capture_entitled else []),
-                          *(micro_rows if micro_entitled and micro_matches else [])], analysis_as_of=cutoff)
+    records = [(row, False) for row in capture_rows] if capture_entitled else []
+    source_rejected = Counter()
     if not capture_entitled:
-        bars["rejected"]["source_not_entitled"] = len(capture_rows)
-    if not micro_entitled or not micro_matches:
-        bars["rejected"]["source_not_entitled" if not micro_entitled else "ticker_mismatch"] = len(micro_rows)
-    execution = _load(directory / "execution_update.json")
-    execution_at = instant(execution.get("execution_asof") or execution.get("evaluated_at") or execution.get("asof"))
-    execution_ingested = instant(execution.get("ingested_at"))
-    # Do not attach today's plan or reasons to an earlier replay frame.
-    visible_execution = (execution if execution_at is not None and execution_ingested is not None
-                         and max(execution_at, execution_ingested) <= cutoff else {})
+        source_rejected["source_not_entitled"] += len(capture_rows)
+    for micro in _checkpoint_payloads(directory, "microstructure_snapshot"):
+        if not _snapshot_visible(micro, cutoff):
+            continue
+        micro_rows = micro.get("chart_bars") or []
+        micro_entitled = source_use_policy(micro.get("provider") or "local_archive", entitlement=micro.get("entitlement"))["allowed"]
+        micro_matches = not micro.get("ticker") or str(micro["ticker"]).upper() == str(ticker).upper()
+        if not micro_entitled or not micro_matches:
+            source_rejected["source_not_entitled" if not micro_entitled else "ticker_mismatch"] += len(micro_rows)
+            continue
+        records.extend((row, True) for row in micro_rows)
+    bars = _bar_vintages(records, cutoff)
+    bars["rejected"] = dict(Counter(bars["rejected"]) + source_rejected)
+    visible_execution = _latest_execution(directory, cutoff, ticker)
     contract = _load(directory / "execution_contract.json")
     analysis = _load(directory / "analysis.json")
     contract_known = instant(analysis.get("finished_at"))
@@ -96,7 +165,7 @@ def build_review(ticker_dir, *, analysis_as_of, anchor=None, lifecycle=None):
                                                     "entry_valid_until") if key in contract},
             "evidence": verified, "unverified_evidence_count": unverified, "events": timeline,
             "series": series, "rejected_bars": bars["rejected"], "lifecycle": lifecycle or {},
-            "public_display_allowed": capture.get("public_display_allowed") is True and capture_entitled and not micro.get("chart_bars")}
+            "public_display_allowed": capture.get("public_display_allowed") is True and capture_entitled and not bars["micro_used"]}
 
 
 def _escape(value):

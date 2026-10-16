@@ -87,12 +87,22 @@ def disclosure_event_records(items: Iterable[Any], *, observed_at: Any,
         identity = str(get("url") or "")
         if not identity:
             continue
+        vendor = str(get("raw_vendor") or "").strip().lower()
         published = aware_datetime(get("published_at"))
+        if vendor == "opendart" and not (
+            str(get("precision") or "").strip().lower() == "timestamp"
+            or get("exact_event_time_known") is True
+        ):
+            # list.json supplies a receipt DAY. Its legacy DisclosureItem API
+            # represents that day as aware KST midnight; timezone awareness
+            # does not turn that compatibility value into an actual release
+            # time. Only a future explicitly precise adapter can opt in.
+            published = None
         version = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:24]
         title = str(get("title") or "")
         is_amended = any(marker in title.lower() for marker in ("정정", "amend", "10-k/a", "10-q/a", "8-k/a"))
         first_seen = EventFirstSeenStore(first_seen_db).observe(identity, detected_at=observed, is_amended=is_amended) if first_seen_db else None
-        detected_only = published is None and str(get("raw_vendor") or "").lower() == "opendart" and first_seen is not None
+        detected_only = published is None and vendor == "opendart" and first_seen is not None
         records.append({"event_id": version, "version_id": version, "ticker": get("symbol"),
                         "event_type": "disclosure", "title": get("title"), "url": identity,
                         "provider": get("raw_vendor"), "status": "detected" if detected_only else "published",

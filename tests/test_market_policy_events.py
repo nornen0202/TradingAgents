@@ -370,3 +370,23 @@ def test_actionable_notification_uses_same_strict_quote_clock(age, eligible):
     assert _row_is_fresh_immediate(row, reference_time=NOW) is eligible
     row["market_data_asof"] = "2026-10-16T14:00:00"
     assert not _row_is_fresh_immediate(row, reference_time=NOW)
+
+
+def test_aware_kst_dart_receipt_day_remains_first_detection_without_actual_release(tmp_path):
+    from zoneinfo import ZoneInfo
+    # OpenDART's existing list API returns a timezone-aware midnight for its
+    # day-only receipt. This preserves compatibility but proves no exact time.
+    midnight = datetime(2026, 10, 16, tzinfo=ZoneInfo("Asia/Seoul"))
+    item = {"url": "https://dart.fss.or.kr/receipt/day-only", "title": "[정정] receipt",
+            "raw_vendor": "opendart", "symbol": "005930", "published_at": midnight}
+    record = disclosure_event_records([item], observed_at=NOW, first_seen_db=tmp_path / "seen.sqlite3")[0]
+    assert record["status"] == "detected" and record["published_at"] is None
+    assert record["known_at"] == record["first_seen_at"] == NOW.isoformat()
+    assert record["exact_event_time_known"] is False
+    board = build_event_timeline([record], analysis_as_of=NOW)
+    assert board["events"][0]["event_time"] is None
+    assert board["events"][0]["published_at"] is None
+    assert not build_event_timeline([record], analysis_as_of=NOW-timedelta(seconds=1))["events"]
+    for precise in ({"precision": "timestamp"}, {"exact_event_time_known": True}):
+        exact = disclosure_event_records([{**item, **precise}], observed_at=NOW)[0]
+        assert exact["published_at"] == midnight.isoformat() and exact["exact_event_time_known"] is True

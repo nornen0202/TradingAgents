@@ -20,9 +20,11 @@ function table(title, headings, rows) {
 function renderPerformance(history) {
   const signals = history.signals || [], fills = history.fills || [], intents = history.intents || [];
   byId("performance").replaceChildren(
-    table("추천 사후 가격 경로", ["판단", "연결 의도", "체결 기록", "5거래일 가격 변화"], signals.filter(row=>row.recommendation).map(row=>[
+    table("추천 사후 가격 경로", ["판단", "연결 의도", "체결 기록", "5거래일 가격 변화", "기준지수", "지수 대비"], signals.filter(row=>row.recommendation).map(row=>[
       row.recommendation.action || "확인 불가", (row.intent_ids||[]).length, (row.fill_event_ids||[]).length,
-      typeof row.recommendation_outcome?.return_5d === "number" ? number(row.recommendation_outcome.return_5d*100)+"%" : "관측 대기"])),
+      typeof row.recommendation_outcome?.return_5d === "number" ? number(row.recommendation_outcome.return_5d*100)+"%" : "관측 대기",
+      typeof row.recommendation_outcome?.benchmark_return_5d === "number" ? number(row.recommendation_outcome.benchmark_return_5d*100)+"%" : "관측 대기",
+      typeof row.recommendation_outcome?.benchmark_excess_5d === "number" ? number(row.recommendation_outcome.benchmark_excess_5d*100)+"%p" : "관측 대기"])),
     table("주문 의도", ["방향", "신청 수량", "체결 수량", "상태"], intents.map(row=>[
       row.side==="BUY"?"매수":"매도",number(row.quantity),number(row.filled_quantity),row.status])),
     table("비용을 반영한 체결", ["구분", "방향", "수량", "가격", "비용", "불리한 슬리피지", "정산 시각"], fills.map(row=>[
@@ -57,7 +59,11 @@ async function loadSnapshot() {
     byId("verdict").textContent = snapshot.execution_verdict
       ? "당시 판단: " + snapshot.execution_verdict + " · " + snapshot.execution.execution_asof
       : "판단 기록 없음";
-    byId("freshness").textContent = "실행 시세: " + snapshot.freshness_status + " · 연구 자료: " + snapshot.research_status;
+    const freshnessLabels = {FRESH:"10분 미만",STALE:"10분 경과·재확인 필요",MISSING:"관측 시각 없음",INVALID:"시각 확인 필요",FUTURE:"미래 시각 차단"};
+    const researchLabels = {FRESH_REGULAR_SESSION:"정규장 자료 확인",EXTENDED_SESSION_RESEARCH_ONLY:"장전·장후 참고 자료",LATEST_REGULAR_CLOSE_RESEARCH_ONLY:"최근 정규장 종가 확인",UNVERIFIED_RESEARCH_INPUT:"유효성 미확인"};
+    byId("freshness").textContent = "실행 시세: " + (freshnessLabels[snapshot.freshness_status]||snapshot.freshness_status)
+      + " · 연구 자료: " + (researchLabels[snapshot.research_status]||snapshot.research_status);
+    byId("freshness").title = snapshot.freshness_status + " / " + snapshot.research_status;
     list("reasons", snapshot.block_reasons);
     list("facts", snapshot.evidence_summary.facts.map(row => row.claim));
     list("inferences", snapshot.evidence_summary.inferences.map(row => row.claim));
@@ -65,7 +71,6 @@ async function loadSnapshot() {
     list("events", snapshot.events.events.map(row => (row.title || "공시") + " · 발표 " + (row.published_at || "시각 미확인") + " · 최초 감지 " + (row.first_seen_at || "별도 기록 없음") + " · 관측 " + row.observed_at + " · 정정 " + (row.is_amended ? "예" : "아니오") + " · 버전 " + row.version_id));
     renderPerformance(snapshot.lifecycle);
     renderProfile(snapshot.series);
-    if (snapshot.research_status) byId("freshness").append(document.createElement("br"), document.createTextNode("리서치 자료: "+snapshot.research_status));
     for (const item of snapshot.series) {
       const wrapper = document.createElement("div");
       const label = document.createElement("h3"); label.textContent = item.interval;

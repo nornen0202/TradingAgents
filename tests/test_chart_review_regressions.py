@@ -188,3 +188,58 @@ def test_shared_snapshot_rejects_future_queries_and_fixture_clock_is_explicit(tm
     with pytest.raises(SystemExit):
         main(["--ticker", "AAPL", "--ticker-dir", str(directory), "--as-of", "2099-01-01T00:00:00Z",
               "--output", str(tmp_path / "future.html")])
+
+
+def test_prior_checkpoint_restores_decision_and_original_bar_vintage(tmp_path):
+    directory = archive(tmp_path)
+    checkpoints = directory / "execution" / "checkpoints"
+    checkpoints.mkdir(parents=True)
+    old_execution = {"ticker": "AAPL", "execution_asof": "2026-10-09T20:05:00Z", "ingested_at": "2026-10-09T20:05:01Z",
+                     "market_data_asof": "2026-10-09T20:04:00Z", "decision_state": "WAIT", "reason_codes": ["old_volume_block"]}
+    old_bar = candle(timestamp="2026-10-09T19:59:00Z", available_at="2026-10-09T20:00:00Z",
+                     observed_at="2026-10-09T20:04:00Z", interval="1m")
+    old_micro = {"ticker": "AAPL", "provider": "fixture", "published_at": "2026-10-09T20:05:01Z", "chart_bars": [old_bar, {"invalid": "old row"}]}
+    write(checkpoints / "execution_update_open.json", old_execution)
+    write(checkpoints / "microstructure_snapshot_open.json", old_micro)
+    write(directory / "execution_update.json", old_execution)
+    write(directory / "microstructure_snapshot.json", old_micro)
+    early = build_review(directory, analysis_as_of="2026-10-09T20:06:00Z")
+    new_execution = {**old_execution, "execution_asof": "2026-10-09T20:10:00Z", "ingested_at": "2026-10-09T20:10:01Z",
+                     "decision_state": "APPROVED", "reason_codes": ["FUTURE_ENGINE_REASON"]}
+    revised_bar = {**old_bar, "observed_at": "2026-10-09T20:09:00Z", "available_at": "2026-10-09T20:08:00Z", "close": 106}
+    next_bar = {**revised_bar, "timestamp": "2026-10-09T20:00:00Z", "close": 107}
+    new_micro = {**old_micro, "published_at": "2026-10-09T20:10:01Z", "chart_bars": [revised_bar, next_bar]}
+    write(checkpoints / "close_execution_update.json", new_execution)
+    write(checkpoints / "close_microstructure_snapshot.json", new_micro)
+    write(directory / "execution_update.json", new_execution)
+    write(directory / "microstructure_snapshot.json", new_micro)
+    assert build_review(directory, analysis_as_of="2026-10-09T20:06:00Z") == early
+    assert early["execution"]["reason_codes"] == ["old_volume_block"]
+    assert "FUTURE_ENGINE_REASON" not in json.dumps(early)
+    assert next(item for item in early["series"] if item["interval"] == "1m")["bars"][0]["close"] == 105
+    late = build_review(directory, analysis_as_of="2026-10-09T20:11:00Z")
+    assert late["execution"]["reason_codes"] == ["FUTURE_ENGINE_REASON"]
+    assert [row["close"] for row in next(item for item in late["series"] if item["interval"] == "1m")["bars"]] == [106, 107]
+
+
+def test_future_checkpoint_source_diagnostics_do_not_change_prior_frame(tmp_path):
+    directory = archive(tmp_path, public_display_allowed=True)
+    early = build_review(directory, analysis_as_of="2026-10-09T20:06:00Z")
+    checkpoints = directory / "execution" / "checkpoints"
+    checkpoints.mkdir(parents=True)
+    future = {"published_at": "2026-10-09T21:00:00Z", "ticker": "WRONG", "provider": "tradingview_mcp",
+              "chart_bars": [candle(), {"invalid": "FUTURE_DIAGNOSTIC"}]}
+    write(checkpoints / "microstructure_snapshot_future.json", future)
+    write(directory / "microstructure_snapshot.json", future)
+    assert build_review(directory, analysis_as_of="2026-10-09T20:06:00Z") == early
+    assert early["public_display_allowed"] is True
+
+
+def test_same_observation_conflicts_are_excluded_instead_of_inferred_revision(tmp_path):
+    directory = archive(tmp_path, bars=[candle(), candle(close=106)])
+    assert build_review(directory, analysis_as_of=ASOF)["series"] == []
+    write(directory / "chart_evidence.json", {"ticker": "AAPL", "provider": "fixture", "bars": [candle(),
+          candle(close=106, available_at="2026-10-09T20:02:00Z", observed_at="2026-10-09T20:03:00Z")]})
+    result = build_review(directory, analysis_as_of=ASOF)
+    bar = result["series"][0]["bars"][0]
+    assert bar["close"] == 106 and not bar["is_amended"]  # No invented provider amendment flag.
