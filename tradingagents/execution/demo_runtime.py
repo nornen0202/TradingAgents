@@ -1,0 +1,455 @@
+"""Continuous strategy execution on fixed KIS VTS hosts after proven validation.
+
+No live broker routing, model call, fabricated signal or inferred settlement.
+The existing strategy supplies direction and budget; the demo account supplies
+capacity. Validation probes and local shadow trades are never strategy fills.
+"""
+from __future__ import annotations
+
+from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
+from decimal import Decimal, ROUND_DOWN, ROUND_UP
+import hashlib
+import json
+import math
+from pathlib import Path
+import sqlite3
+import tomllib
+from zoneinfo import ZoneInfo
+
+from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
+from . import demo_validation as validation
+from .archive_paper import build_step
+from .kis_demo import DemoCredentials, KisDemoClient
+from .kis_paper import KisPaperBroker, PaperOrderPolicy, _fresh, _tick
+from .paper_runtime import _latest_source, _runtime_session
+
+SCHEMA = "tradingagents.kis-strategy-runtime/v1"
+MODE = "KIS_DEMO_STRATEGY"
+CAPS = {"KR": 100_000, "US": 500}
+ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
+TERMINAL = {"FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED"}
+DECISIONS = {"STARTER_NOW": "BUY", "ADD_NOW": "BUY", "BUY_NOW": "BUY",
+             "REDUCE_NOW": "SELL", "EXIT_NOW": "SELL", "TAKE_PROFIT_NOW": "SELL"}
+at = validation._at
+
+
+def read(path, default=None):
+    return validation._read(path, default)
+
+
+def universe():
+    with (Path(__file__).resolve().parents[2] / "config/portfolio_profiles.toml").open("rb") as stream:
+        profiles = tomllib.load(stream)["profiles"]
+    return {market: tuple(sorted(profiles[f"{market.lower()}_kis_default"]["watch_tickers"])) for market in ZONES}
+
+
+def validation_gate(root, market, now):
+    """Validate original per-market proofs, journal and owner, not public JSON."""
+    state = validation._valid_state(read(root / f"{market.lower()}-campaign.json"), market, now)
+    validation._journal_evidence(state, root / f"{market.lower()}-vts.sqlite")
+    if state["status"] != "VERIFIED" or state["finished"] is not True:
+        raise ValueError("VALIDATION_REQUIRED")
+    with sqlite3.connect((root / f"{market.lower()}-vts.sqlite").resolve().as_uri() + "?mode=ro", uri=True) as db:
+        owners = db.execute("SELECT scope FROM owner").fetchall()
+        if len(owners) != 1 or db.execute("SELECT 1 FROM requests WHERE status='UNKNOWN'").fetchone() or db.execute("SELECT 1 FROM reconciliation_issues").fetchone():
+            raise ValueError("VALIDATION_REQUIRED")
+    return owners[0][0]
+
+
+@contextmanager
+def broker_context(market, path, clock, tickers, scope):
+    from .demo_token_cache import cache_demo_authentication
+    client = broker = None
+    try:
+        if market == "KR":
+            client = KisDemoClient(DemoCredentials.from_local_settings(), utcnow=clock)
+        else:
+            from .kis_demo_us import KisDemoUSClient, credentials_from_settings
+            client = KisDemoUSClient(credentials_from_settings(), utcnow=clock)
+        if scope != client.credentials.scope():
+            raise ValueError("VALIDATED_ACCOUNT_CHANGED")
+        cache_demo_authentication(client, market=market)
+        if market == "KR":
+            broker = KisPaperBroker(path, client, PaperOrderPolicy(tuple(t[:6] for t in tickers)), paper_enabled=True, clock=clock)
+        else:
+            from .kis_paper_us import KisPaperUSBroker, USPaperOrderPolicy
+            broker = KisPaperUSBroker(path, client, USPaperOrderPolicy((), allowed_tickers=tickers), paper_enabled=True, clock=clock)
+        yield broker
+    finally:
+        if broker:
+            broker.close()
+        if client:
+            client.close()
+
+
+def current_quote(market, ticker, clock):
+    """Dated native-currency observations; a venue is resolved by its endpoint."""
+    from tradingagents.portfolio.kis import KisClient
+    client = KisClient.from_api_keys(environment="real")  # This class exposes reads only.
+    code = ticker[:6] if market == "KR" else ticker
+    config = {"ticker": code, "currency": "KRW" if market == "KR" else "USD", "zone": ZONES[market], "instrument_type": "STOCK"}
+    try:
+        if market == "KR":
+            chart = client.domestic_time_itemchartprice(code, input_hour=clock().astimezone(ZoneInfo(ZONES[market])).strftime("%H%M%S"), include_past_data="N")
+            return validation.normalize_validation_quote(market=market, chart=chart, orderbook={}, observed_at=clock(), instrument=config)
+        for venue, exchange in (("NAS", "NASD"), ("NYS", "NYSE"), ("AMS", "AMEX")):
+            payload = client.overseas_time_itemchartprice(code, exchange=venue, nmin="1", include_previous="0")
+            chart = payload[0] if isinstance(payload, tuple) else payload
+            if not isinstance(chart, dict) or not chart.get("output2"):
+                continue
+            book = client.overseas_asking_price(code, exchange=venue)
+            return validation.normalize_validation_quote(market=market, chart=chart, orderbook=book, observed_at=clock(), instrument={**config, "exchange": exchange})
+        raise ValueError("QUOTE_UNVERIFIED")
+    finally:
+        client.session.close()
+
+
+def candidates(source, market, now, tickers):
+    """Consume actual completed strategy/proposal pairs with original clocks."""
+    snapshot, step, selected = build_step(source, now.isoformat())
+    if selected != market.lower():
+        raise ValueError("SOURCE_MARKET_MISMATCH")
+    proposals = read(source / "portfolio-private/proposed_orders.json")["orders"]
+    rows, seen = [], set()
+    for original in step["signals"]:
+        ticker, decision = original["ticker"], original["signal_action"]
+        if ticker not in tickers or decision not in DECISIONS or original["execution_ready"] is not True:
+            continue
+        available, expiry = at(original["available_at"]), at(original["valid_until"])
+        if not available <= now < expiry or (now - available).total_seconds() >= 120:
+            continue
+        side = DECISIONS[decision]
+        matches = [p for p in proposals if p.get("canonical_ticker") == ticker and str(p.get("side")).upper() == side]
+        if len(matches) != 1 or (ticker, side) in seen:
+            raise ValueError("AMBIGUOUS_STRATEGY_PROPOSAL")
+        seen.add((ticker, side))
+        proposal = matches[0]
+        delta = proposal.get("delta_krw_now")
+        if isinstance(delta, bool) or not isinstance(delta, (int, float)) or not math.isfinite(delta) or (delta <= 0 if side == "BUY" else delta >= 0):
+            continue
+        identity = "strategy-v1:" + market + ":" + hashlib.sha256(f"{source.name}|{ticker}|{side}".encode()).hexdigest()
+        signal = {**original, "ticker": ticker[:6] if market == "KR" else ticker, "signal_id": identity,
+                  "decision_now": {"BUY_NOW": "STARTER_NOW", "TAKE_PROFIT_NOW": "REDUCE_NOW"}.get(decision, decision)}
+        rows.append({"id": identity, "ticker": ticker, "side": side, "signal": signal, "proposal": proposal,
+                     "fx": (snapshot.get("cash_diagnostics") or {}).get("fx_quote"), "run_id": source.name})
+    # Reduce existing strategy risk before allocating cash to a new buy.
+    return sorted(rows, key=lambda row: (row["side"] == "BUY", row["ticker"]))
+
+
+def limit_price(quote, side, market):
+    price = quote.get("ask" if side == "BUY" else "bid", quote["last_price"])
+    tick = Decimal(str(_tick(int(price), quote["instrument_type"]))) if market == "KR" else Decimal(".01")
+    value = (Decimal(str(price)) / tick).to_integral_value(rounding=ROUND_UP if side == "BUY" else ROUND_DOWN) * tick
+    return int(value) if market == "KR" else float(value)
+
+
+def quantity(candidate, price, account, market, owned, now):
+    """Cap the explicit proposal, never copy real holdings or invent a budget."""
+    proposal = candidate["proposal"]
+    qty = proposal.get("estimated_qty")
+    if qty is not None and (isinstance(qty, bool) or not isinstance(qty, (int, float)) or not math.isfinite(qty) or qty <= 0 or int(qty) != qty):
+        raise ValueError("PROPOSAL_QUANTITY_INVALID")
+    budget = abs(proposal["delta_krw_now"])
+    if market == "US" and qty is None:
+        fx = candidate.get("fx") or {}
+        if (fx.get("base_currency") != "USD" or fx.get("quote_currency") != "KRW"
+                or fx.get("kind") != "BROKER_REFERENCE_RATE" or fx.get("source") != "kis.inquire_present_balance.output2.frst_bltn_exrt"
+                or not 0 <= (now - at(fx.get("observed_at"))).total_seconds() <= 120):
+            raise ValueError("BUDGET_FX_UNVERIFIED")
+        budget /= validation._number(fx.get("rate"))
+    planned = int(qty) if qty is not None else math.floor(budget / price)
+    if market == "KR":
+        planned = min(planned, math.floor(budget / price))
+    result = min(planned, math.floor(CAPS[market] / price))
+    if candidate["side"] == "BUY":
+        suffix = "krw" if market == "KR" else "usd"
+        result = min(result, account["cash_only_buying_quantity"], math.floor(account[f"cash_only_buying_power_{suffix}"] / (price * 1.003)))
+    else:
+        position = next((p for p in account["positions"] if p["ticker"] == candidate["signal"]["ticker"]), {})
+        result = min(result, owned.get(candidate["ticker"], 0), position.get("sellable_quantity", 0))
+    if type(result) is not int or result <= 0:
+        raise ValueError("NO_STRATEGY_QUANTITY_WITHIN_LIMITS")
+    return result
+
+
+def initialize(db):
+    db.execute("""CREATE TABLE IF NOT EXISTS strategy_attempts (
+        id TEXT PRIMARY KEY, ticker TEXT NOT NULL, run_id TEXT NOT NULL,
+        prepared_at TEXT NOT NULL, terms TEXT NOT NULL, state TEXT NOT NULL)""")
+    db.execute("CREATE TABLE IF NOT EXISTS strategy_valuations(observed_at TEXT PRIMARY KEY, payload TEXT NOT NULL)")
+    db.executescript("""
+        CREATE TRIGGER IF NOT EXISTS strategy_terms_no_update BEFORE UPDATE OF id,ticker,run_id,prepared_at,terms ON strategy_attempts
+            BEGIN SELECT RAISE(ABORT,'Strategy intent terms are immutable'); END;
+        CREATE TRIGGER IF NOT EXISTS strategy_attempts_no_delete BEFORE DELETE ON strategy_attempts
+            BEGIN SELECT RAISE(ABORT,'Strategy consumption cannot be reset'); END;
+    """)
+
+
+def verify_owned(account, owned, market, scope, now):
+    """A reset/manual reduction must not leave fictional strategy holdings."""
+    _fresh(account, now=now, seconds=120)
+    if account.get("complete") is not True or account.get("environment") != "demo" or account.get("account_scope") != scope:
+        raise ValueError("STRATEGY_ACCOUNT_UNVERIFIED")
+    positions = account.get("positions")
+    if not isinstance(positions, list):
+        raise ValueError("STRATEGY_ACCOUNT_UNVERIFIED")
+    quantities = {}
+    for position in positions:
+        code, qty = position.get("ticker"), position.get("quantity")
+        if not isinstance(code, str) or code in quantities or type(qty) is not int or qty < 0:
+            raise ValueError("STRATEGY_ACCOUNT_UNVERIFIED")
+        quantities[code] = qty
+    if any(quantities.get(ticker[:6] if market == "KR" else ticker, 0) < qty for ticker, qty in owned.items()):
+        raise ValueError("STRATEGY_ACCOUNT_POSITION_MISMATCH")
+
+
+def summary(db, now, market, marks=None):
+    """Read cumulative observations once per intent; partial fills never double count."""
+    marks = marks or {}
+    orders, owned, buy, sell, complete = [], {}, 0.0, 0.0, True
+    for row in db.execute("SELECT * FROM strategy_attempts ORDER BY prepared_at,id"):
+        if at(row["prepared_at"]) > now:
+            raise ValueError("FUTURE_STRATEGY_ATTEMPT")
+        terms = json.loads(row["terms"])
+        request = db.execute("SELECT status FROM requests WHERE id=?", (row["id"],)).fetchone()
+        original = db.execute("SELECT terms FROM paper_intents WHERE id=?", (row["id"],)).fetchone()
+        if (request and not original) or (original and json.loads(original[0]) != terms):
+            raise ValueError("STRATEGY_BROKER_TERMS_MISMATCH")
+        status = request[0] if request else row["state"]
+        evidence, observed, last_qty, last_amount = {}, None, 0, 0
+        for item in db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=? ORDER BY observed_at", (row["id"],)):
+            observed_at = at(item[0])
+            if not at(row["prepared_at"]) <= observed_at <= now:
+                raise ValueError("INVALID_STRATEGY_OBSERVATION_CLOCK")
+            current = json.loads(item[1])
+            qty, amount = current.get("filled_qty"), current.get("fill_notional")
+            if type(qty) is not int or qty < last_qty or qty > terms["quantity"]:
+                raise ValueError("INVALID_STRATEGY_FILL")
+            if amount is not None and (isinstance(amount, bool) or not isinstance(amount, (int, float)) or not math.isfinite(amount) or amount < 0 or (last_amount is not None and (amount < last_amount or (qty == last_qty and amount != last_amount)))):
+                raise ValueError("INVALID_STRATEGY_CASHFLOW")
+            last_qty, last_amount = qty, amount
+            evidence, observed = current, observed_at
+        filled, amount = evidence.get("filled_qty", 0), evidence.get("fill_notional", 0 if not evidence else None)
+        status = evidence.get("status", status)
+        if status == "PREPARED":
+            status = "UNKNOWN"
+        owned[row["ticker"]] = owned.get(row["ticker"], 0) + filled * (1 if terms["side"] == "BUY" else -1)
+        if filled and amount is None:
+            complete = False
+        elif terms["side"] == "BUY":
+            buy += amount or 0
+        else:
+            sell += amount or 0
+        cancellation = db.execute("SELECT status FROM requests WHERE id=?", ("cancel:" + row["id"],)).fetchone()
+        orders.append({"id": row["id"], "ticker": row["ticker"], "run_id": row["run_id"], "side": terms["side"],
+            "quantity": terms["quantity"], "limit_price": terms["limit_price"], "filled_quantity": filled,
+            "average_fill_price": amount / filled if filled and amount is not None else None,
+            "status": status, "cancel_status": "CONFIRMED" if status == "CANCELLED" else cancellation[0] if cancellation else None,
+            "prepared_at": row["prepared_at"], "observed_at": observed.isoformat() if observed else None})
+    if any(qty < 0 for qty in owned.values()):
+        raise ValueError("STRATEGY_HOLDINGS_NEGATIVE")
+    value, mark_times = 0.0, []
+    for ticker, qty in owned.items():
+        if not qty:
+            continue
+        quote = marks.get(ticker)
+        try:
+            _fresh(quote or {}, now=now, seconds=120)
+            if (quote.get("ticker") != (ticker[:6] if market == "KR" else ticker)
+                    or quote.get("currency") != ("KRW" if market == "KR" else "USD")
+                    or quote.get("provider") != "kis" or quote.get("session") != "regular"):
+                raise ValueError("VALUATION_IDENTITY_UNVERIFIED")
+            value += qty * validation._number(quote["last_price"])
+            mark_times.append(quote["observed_at"])
+        except Exception:
+            complete = False
+    counts = {key: sum(order["status"] == key for order in orders) for key in
+              ("ACKNOWLEDGED", "OPEN", "PARTIAL", "FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED", "UNKNOWN", "UNRESOLVED")}
+    history = [json.loads(row[1]) for row in db.execute("SELECT * FROM strategy_valuations ORDER BY observed_at DESC LIMIT 60") if at(row[0]) <= now]
+    return {"orders": orders[-100:], "order_counts": counts, "owned": owned, "performance_history": list(reversed(history)),
+            "performance": {"currency": "KRW" if market == "KR" else "USD", "basis": "STRATEGY_GROSS_CASHFLOWS_PLUS_MARKED_HOLDINGS",
+                "status": "NO_FILLS" if not any(o["filled_quantity"] for o in orders) else "AVAILABLE" if complete else "INCOMPLETE",
+                "gross_pnl": round(sell - buy + value, 4) if complete and any(o["filled_quantity"] for o in orders) else None,
+                "net_pnl": None, "fees_known": False, "settlement_known": False,
+                "observed_at": now.isoformat(), "mark_times": mark_times}}
+
+
+def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate):
+    now, path = at(clock()), root / f"{market.lower()}-strategy.sqlite"
+    result = {"status": "WAITING_VALIDATION", "blockers": [], "gate_passed": False, "orders": [], "order_counts": {}, "performance": None}
+    def finish(status, *blockers):
+        result.update(status=status, blockers=list(blockers), checked_at=at(clock()).isoformat())
+        if at(result["checked_at"]) < now:
+            raise ValueError("RUNTIME_CLOCK_REGRESSED")
+        return result
+    try:
+        scope = gate(validation_root, market, now)
+        result["gate_passed"] = True
+    except Exception:
+        scope = None
+    if path.exists():
+        with sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True) as db:
+            db.row_factory = sqlite3.Row
+            result.update(summary(db, now, market))
+            if scope is None:
+                scope = db.execute("SELECT scope FROM owner").fetchone()[0]
+    if not result["gate_passed"] and not path.exists():
+        return finish("WAITING_VALIDATION", "VALIDATION_REQUIRED")
+    session = session_resolver(market=market, now_local=now)
+    if session.get("source") != "exchange_calendars":
+        return finish("BLOCKED", "CALENDAR_UNVERIFIED")
+    if session.get("phase") in {None, "unknown"}:
+        return finish("BLOCKED", "CALENDAR_UNVERIFIED")
+    if session.get("is_open") is not True or session.get("phase") != "regular":
+        return finish("MARKET_CLOSED", "MARKET_CLOSED")
+    if not at(session["session_open"]) <= now < at(session["session_close"]):
+        return finish("BLOCKED", "CALENDAR_UNVERIFIED")
+    halted = (root / "HALT").exists() or (validation_root / "HALT").exists()
+    near_close = at(session["session_close"]) - now <= timedelta(minutes=10)
+    issues, marks = [], {}
+    with broker_factory(market, path, clock, tickers, scope) as broker:
+        initialize(broker.db)
+        # Always reconcile/clean up outstanding requests before considering buys.
+        for order in summary(broker.db, at(clock()), market)["orders"]:
+            if order["status"] in TERMINAL and not (order["filled_quantity"] and order["average_fill_price"] is None):
+                continue
+            if order["status"] == "UNKNOWN":
+                issues.append("AMBIGUOUS_ORDER")
+                continue
+            try:
+                report = broker.reconcile(intent_id=order["id"])
+                if report.get("status") in {"OPEN", "PARTIAL"} and (halted or near_close or not result["gate_passed"] or at(clock()) - at(order["prepared_at"]) >= timedelta(minutes=5)):
+                    if at(clock()).astimezone(ZoneInfo(ZONES[market])).date() != at(order["prepared_at"]).astimezone(ZoneInfo(ZONES[market])).date():
+                        issues.append("PREVIOUS_SESSION_ORDER_UNRESOLVED")
+                    else:
+                        broker.cancel(intent_id=order["id"])
+                if report.get("status") in {"UNKNOWN", "UNRESOLVED"}:
+                    issues.append("AMBIGUOUS_ORDER")
+            except Exception:
+                issues.append("ORDER_REPORT_UNVERIFIED")
+        current = summary(broker.db, at(clock()), market)
+        pending = any(o["status"] not in TERMINAL for o in current["orders"])
+        holdings_verified = True
+        held = next((ticker for ticker, qty in current["owned"].items() if qty), None)
+        if held:
+            try:
+                q = quote_loader(market, held, clock)
+                terms = {"ticker": held[:6] if market == "KR" else held, "limit_price": limit_price(q, "BUY", market)}
+                if market == "US":
+                    terms["exchange"] = q["exchange"]
+                account = account_loader(market, broker, terms, clock)
+                verify_owned(account, current["owned"], market, scope, at(clock()))
+                marks[held] = q
+            except Exception:
+                holdings_verified = False
+                issues.append("STRATEGY_ACCOUNT_POSITION_UNVERIFIED")
+        if broker.db.execute("SELECT 1 FROM requests WHERE status='UNKNOWN'").fetchone() or broker.db.execute("SELECT 1 FROM reconciliation_issues").fetchone():
+            issues.append("AMBIGUOUS_ORDER")
+        source = _latest_source(archive, market.lower(), at(clock()))
+        try:
+            signals = candidates(source, market, at(clock()), tickers) if source else []
+        except Exception:
+            signals = []
+            issues.append("SOURCE_EVIDENCE_UNVERIFIED")
+        result["source_run_id"] = source.name if source else None
+        if not result["gate_passed"]:
+            issues.append("VALIDATION_REQUIRED")
+        if halted:
+            issues.append("HALTED")
+        if near_close or at(clock()) - at(session["session_open"]) < timedelta(minutes=2):
+            issues.append("SESSION_EDGE")
+        if not signals:
+            issues.append("NO_FRESH_EXECUTABLE_STRATEGY")
+        today = at(clock()).astimezone(ZoneInfo(ZONES[market])).date()
+        attempts_today = sum(at(row[0]).astimezone(ZoneInfo(ZONES[market])).date() == today
+                             for row in broker.db.execute("SELECT prepared_at FROM strategy_attempts"))
+        if attempts_today >= 3:
+            issues.append("DAILY_ORDER_LIMIT")
+        # One intent per tick, and no overlapping strategy orders: account views
+        # cannot silently consume the same cash or holdings across symbols.
+        if not pending and not issues:
+            considered = 0
+            for candidate in signals:
+                if broker.db.execute("SELECT 1 FROM strategy_attempts WHERE id=?", (candidate["id"],)).fetchone():
+                    continue
+                considered += 1
+                if considered > 3:
+                    break
+                try:
+                    quote = quote_loader(market, candidate["ticker"], clock)
+                    _fresh(quote, now=at(clock()), seconds=120)
+                    price = limit_price(quote, candidate["side"], market)
+                    terms = {"ticker": candidate["signal"]["ticker"], "side": candidate["side"], "limit_price": price}
+                    if market == "US":
+                        terms["exchange"] = quote["exchange"]
+                    account = account_loader(market, broker, terms, clock)
+                    terms["quantity"] = quantity(candidate, price, account, market, current["owned"], at(clock()))
+                except Exception as exc:
+                    reason = str(exc)
+                    issues.append(reason if reason in {"NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "BUDGET_FX_UNVERIFIED", "PROPOSAL_QUANTITY_INVALID"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
+                    continue
+                if (root / "HALT").exists() or (validation_root / "HALT").exists():
+                    issues.append("HALTED")
+                    break
+                entry_deadline = min(at(candidate["signal"]["valid_until"]), at(session["session_close"]) - timedelta(minutes=10))
+                if at(clock()) >= at(session["session_close"]) - timedelta(minutes=10):
+                    issues.append("SESSION_EDGE")
+                    break
+                signal = {**candidate["signal"], "valid_until": entry_deadline.isoformat()}
+                broker.db.execute("INSERT INTO strategy_attempts VALUES (?,?,?,?,?,?)", (candidate["id"], candidate["ticker"], candidate["run_id"], at(clock()).isoformat(), json.dumps(terms, sort_keys=True), "PREPARED"))
+                try:
+                    broker.submit(intent_id=candidate["id"], **terms, signal=signal, quote=quote, account=account)
+                except Exception:
+                    # If no broker intent exists, deterministic validation failed.
+                    # A persisted intent without a response remains ambiguous.
+                    if not broker.db.execute("SELECT 1 FROM paper_intents WHERE id=?", (candidate["id"],)).fetchone():
+                        broker.db.execute("UPDATE strategy_attempts SET state='BLOCKED' WHERE id=?", (candidate["id"],))
+                    issues.append("SUBMISSION_BLOCKED_OR_UNRESOLVED")
+                break
+        current = summary(broker.db, at(clock()), market)
+        for ticker, qty in current["owned"].items():
+            if qty and holdings_verified:
+                try:
+                    if ticker not in marks:
+                        marks[ticker] = quote_loader(market, ticker, clock)
+                except Exception:
+                    issues.append("VALUATION_UNVERIFIED")
+        result.update(summary(broker.db, at(clock()), market, marks))
+        performance = result["performance"]
+        if performance["status"] == "AVAILABLE":
+            broker.db.execute("INSERT OR IGNORE INTO strategy_valuations VALUES (?,?)", (performance["observed_at"], json.dumps(performance, sort_keys=True)))
+            result["performance_history"] = [json.loads(row[0]) for row in reversed(broker.db.execute("SELECT payload FROM strategy_valuations ORDER BY observed_at DESC LIMIT 60").fetchall())]
+    return finish("BLOCKED" if issues and issues != ["NO_FRESH_EXECUTABLE_STRATEGY"] else "WAITING_SIGNAL" if issues else "ACTIVE", *sorted(set(issues)))
+
+
+def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quote_loader=None, account_loader=None, session_resolver=None, gate=None, tickers=None):
+    archive, root, validation_root = Path(archive), Path(root), Path(validation_root)
+    clock = clock or (lambda: datetime.now(timezone.utc))
+    start = at(clock())
+    with interprocess_file_lock(root / "strategy.lock", timeout=0), interprocess_file_lock(validation_root / "campaign.lock", timeout=0):
+        try:
+            config = read(root / "enabled.json", {})
+        except (ValueError, OSError):
+            config = {}
+        enabled = isinstance(config, dict) and config.get("mode") == MODE and config.get("enabled") is True and config.get("real_orders_enabled") is False
+        markets = {}
+        for market in ZONES:
+            if not enabled:
+                markets[market] = {"status": "DISABLED", "checked_at": at(clock()).isoformat(), "blockers": [], "gate_passed": False}
+                continue
+            try:
+                markets[market] = advance(archive, root, validation_root, market, clock=clock, tickers=(tickers or universe())[market],
+                    broker_factory=broker_factory or broker_context, quote_loader=quote_loader or current_quote,
+                    account_loader=account_loader or validation.current_account, session_resolver=session_resolver or _runtime_session,
+                    gate=gate or validation_gate)
+            except Exception:
+                markets[market] = {"status": "BLOCKED", "checked_at": at(clock()).isoformat(), "gate_passed": False, "blockers": ["RUNTIME_EVIDENCE_UNVERIFIED"]}
+        finished = at(clock())
+        if finished < start or any(at(row["checked_at"]) > finished for row in markets.values()):
+            raise ValueError("RUNTIME_CLOCK_REGRESSED")
+        import os
+        receipt = {"schema": SCHEMA, "mode": MODE, "enabled": enabled, "real_orders_enabled": False,
+                   "checked_at": finished.isoformat(), "source_revision": os.getenv("TRADINGAGENTS_SOURCE_SHA"), "markets": markets}
+        atomic_write_json(archive / "paper/kis-strategy-runtime.json", receipt)
+        return receipt

@@ -258,3 +258,76 @@ def kis_validation_health(archive_dir, *, analysis_as_of):
 
 def now_utc():
     return datetime.now(timezone.utc)
+
+
+def kis_strategy_health(archive_dir, *, analysis_as_of):
+    """Fixed local projection; no account balances, secrets or broker IDs."""
+    import math
+    cutoff = instant(analysis_as_of)
+    if cutoff is None:
+        raise ValueError("Aware cutoff required")
+    result = {"status": "UNAVAILABLE", "read_only": True, "real_orders_enabled": False, "markets": {}}
+    raw = _json(Path(archive_dir) / "paper/kis-strategy-runtime.json") if archive_dir else {}
+    checked = instant(raw.get("checked_at"))
+    if (raw.get("schema") != "tradingagents.kis-strategy-runtime/v1" or raw.get("mode") != "KIS_DEMO_STRATEGY"
+            or raw.get("real_orders_enabled") is not False or checked is None or checked > cutoff
+            or not isinstance(raw.get("markets"), dict)):
+        return result
+    result.update(status="AVAILABLE", checked_at=checked.isoformat(), stale=(cutoff-checked).total_seconds() > 180, enabled=raw.get("enabled") is True)
+    def number(value):
+        return value if not isinstance(value, bool) and isinstance(value, (int, float)) and math.isfinite(value) else None
+    statuses = {"DISABLED", "WAITING_VALIDATION", "WAITING_SIGNAL", "MARKET_CLOSED", "BLOCKED", "ACTIVE"}
+    order_states = {"ACKNOWLEDGED", "OPEN", "PARTIAL", "FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED", "UNKNOWN", "UNRESOLVED"}
+    for market in ("KR", "US"):
+        row = raw["markets"].get(market)
+        if not isinstance(row, dict):
+            continue
+        observed = instant(row.get("checked_at"))
+        if row.get("status") not in statuses or observed is None or observed > checked:
+            continue
+        view = {"status": row["status"], "checked_at": observed.isoformat(), "gate_passed": row.get("gate_passed") is True,
+                "blockers": [b for b in (row.get("blockers") if isinstance(row.get("blockers"), list) else []) if isinstance(b, str) and re.fullmatch(r"[A-Z_]{1,80}", b)],
+                "order_counts": {}, "orders": [], "performance": None, "performance_history": []}
+        for key, value in (row.get("order_counts") if isinstance(row.get("order_counts"), dict) else {}).items():
+            if key in order_states and type(value) is int and value >= 0:
+                view["order_counts"][key] = value
+        for order in (row.get("orders") if isinstance(row.get("orders"), list) else [])[-100:]:
+            if not isinstance(order, dict):
+                continue
+            prepared, known = instant(order.get("prepared_at")), instant(order.get("observed_at"))
+            if prepared is None or prepared > observed or (order.get("observed_at") is not None and (known is None or not prepared <= known <= observed)):
+                continue
+            if (order.get("status") not in order_states or order.get("side") not in {"BUY", "SELL"}
+                    or not isinstance(order.get("ticker"), str) or not re.fullmatch(r"[A-Z0-9.]{1,16}", order["ticker"])
+                    or not isinstance(order.get("run_id"), str) or not _CODE.fullmatch(order["run_id"])):
+                continue
+            values = {key: number(order.get(key)) for key in ("quantity", "limit_price", "filled_quantity", "average_fill_price")}
+            if type(values["quantity"]) is not int or type(values["filled_quantity"]) is not int or not 0 <= values["filled_quantity"] <= values["quantity"] or values["quantity"] <= 0:
+                continue
+            if values["filled_quantity"] and known is None:
+                continue
+            if order["status"] == "FILLED" and values["filled_quantity"] != values["quantity"]:
+                continue
+            view["orders"].append({**values, **{key: order[key] for key in ("ticker", "run_id", "side", "status")},
+                "prepared_at": prepared.isoformat(), "observed_at": known.isoformat() if known else None,
+                "cancel_status": order.get("cancel_status") if order.get("cancel_status") in {"CONFIRMED", "ACKNOWLEDGED", "UNKNOWN", "REJECTED", "NOT_SENT"} else None})
+        def performance_view(perf):
+            if not isinstance(perf, dict):
+                return None
+            known = instant(perf.get("observed_at"))
+            marks = perf.get("mark_times", [])
+            if (known is not None and known <= observed and perf.get("status") in {"AVAILABLE", "INCOMPLETE", "NO_FILLS"}
+                    and perf.get("currency") == ("KRW" if market == "KR" else "USD")
+                    and perf.get("basis") == "STRATEGY_GROSS_CASHFLOWS_PLUS_MARKED_HOLDINGS"
+                    and isinstance(marks, list) and all(instant(value) is not None and 0 <= (known-instant(value)).total_seconds() <= 120 for value in marks)):
+                return {"status": perf["status"], "currency": perf["currency"], "observed_at": known.isoformat(),
+                    "gross_pnl": number(perf.get("gross_pnl")) if perf["status"] == "AVAILABLE" else None,
+                    "net_pnl": None, "fees_known": False, "settlement_known": False}
+            return None
+        view["performance"] = performance_view(row.get("performance"))
+        for perf in (row.get("performance_history") if isinstance(row.get("performance_history"), list) else [])[-60:]:
+            projected = performance_view(perf)
+            if projected is not None and projected["status"] == "AVAILABLE":
+                view["performance_history"].append(projected)
+        result["markets"][market] = view
+    return result

@@ -19,7 +19,7 @@ from tradingagents.performance.lifecycle import append_lifecycle_event, initiali
 from tradingagents.scheduled.market_calendar import market_session_state
 from .kis_demo import DEMO_HOST, DemoError, DemoOrderJournal
 from .kis_demo_us import KisDemoUSClient, EXCHANGES, NEW_YORK, SEOUL
-from .kis_paper import _clock, _number, _integer, _broker_number, _stable, _fresh
+from .kis_paper import _clock, _number, _integer, _broker_number, _stable, _fresh, execution_notional
 from .paper import stamp
 
 
@@ -57,10 +57,17 @@ class USPaperOrderPolicy:
     max_account_age_seconds: int = 120
     max_limit_distance_bps: int = 100
     reserve_cost_bps: int = 30
+    # Strategy universes can resolve the venue from a current dated quote.
+    # The ticker allowlist stays immutable; quote and order venue must agree.
+    allowed_tickers: tuple[str, ...] = ()
 
     def __post_init__(self):
-        if not isinstance(self.allowed_instruments, tuple) or not self.allowed_instruments or len(set(self.allowed_instruments)) != len(self.allowed_instruments):
+        if not isinstance(self.allowed_instruments, tuple) or not (self.allowed_instruments or self.allowed_tickers) or len(set(self.allowed_instruments)) != len(self.allowed_instruments):
             raise DemoError("Explicit unique US ticker/exchange allowlist required")
+        if not isinstance(self.allowed_tickers, tuple) or len(set(self.allowed_tickers)) != len(self.allowed_tickers):
+            raise DemoError("Explicit unique strategy universe required")
+        for ticker in self.allowed_tickers:
+            _instrument(ticker, "NASD")
         for item in self.allowed_instruments:
             if not isinstance(item, tuple) or len(item) != 2:
                 raise DemoError("Explicit ticker/exchange tuple required")
@@ -271,7 +278,10 @@ class KisPaperUSBroker:
                 BEGIN SELECT RAISE(ABORT,'Paper intent is immutable'); END;
         """)
         initialize_lifecycle(self.db)
-        encoded = json.dumps(asdict(policy), sort_keys=True)
+        policy_fields = asdict(policy)
+        if not policy.allowed_tickers:
+            policy_fields.pop("allowed_tickers")  # Preserve existing journal identities.
+        encoded = json.dumps(policy_fields, sort_keys=True)
         with interprocess_file_lock(self.path.with_suffix(self.path.suffix + ".paper.lock")):
             previous = self.db.execute("SELECT policy FROM paper_policy WHERE scope=?", (client.credentials.scope(),)).fetchone()
             if previous and previous[0] != encoded:
@@ -293,7 +303,7 @@ class KisPaperUSBroker:
             raise DemoError("Paper trading requires explicit VTS opt-in")
         session = self._session(now)
         ticker, exchange, side, quantity, price = (terms[k] for k in ("ticker", "exchange", "side", "quantity", "limit_price"))
-        if (ticker, exchange) not in self.policy.allowed_instruments:
+        if (ticker, exchange) not in self.policy.allowed_instruments and ticker not in self.policy.allowed_tickers:
             raise DemoError("Ticker is outside paper allowlist")
         if not all(isinstance(item, Mapping) for item in (signal, quote, account)):
             raise DemoError("Explicit signal, quote and account evidence required")
@@ -459,10 +469,12 @@ class KisPaperUSBroker:
             received_at = _clock(self.clock())
             if received_at < now:
                 raise DemoError("VTS observation clock regressed during the read")
-            self._validate_order_clocks(intent_id, rows, received_at)
+            report = self._validate_order_clocks(intent_id, rows, received_at)
             # Reuse exactly this verified response instead of a second network
             # call that could change underneath validation.
             result = self.journal.reconcile(intent_id=intent_id, trade_date=trade_date, reports=rows)
+            terms = json.loads(self.db.execute("SELECT terms FROM paper_intents WHERE id=?", (intent_id,)).fetchone()[0])
+            result["fill_notional"] = execution_notional(report, result.get("filled_qty", 0), terms, market="US")
             ingested_at = _clock(self.clock())
             if ingested_at < received_at:
                 raise DemoError("VTS ingestion clock precedes the received observation")
