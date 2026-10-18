@@ -178,6 +178,12 @@ def initialize(db):
         id TEXT PRIMARY KEY, ticker TEXT NOT NULL, run_id TEXT NOT NULL,
         prepared_at TEXT NOT NULL, terms TEXT NOT NULL, state TEXT NOT NULL)""")
     db.execute("CREATE TABLE IF NOT EXISTS strategy_valuations(observed_at TEXT PRIMARY KEY, payload TEXT NOT NULL)")
+    db.executescript("""
+        CREATE TRIGGER IF NOT EXISTS strategy_terms_no_update BEFORE UPDATE OF id,ticker,run_id,prepared_at,terms ON strategy_attempts
+            BEGIN SELECT RAISE(ABORT,'Strategy intent terms are immutable'); END;
+        CREATE TRIGGER IF NOT EXISTS strategy_attempts_no_delete BEFORE DELETE ON strategy_attempts
+            BEGIN SELECT RAISE(ABORT,'Strategy consumption cannot be reset'); END;
+    """)
 
 
 def verify_owned(account, owned, market, scope, now):
@@ -207,6 +213,9 @@ def summary(db, now, market, marks=None):
             raise ValueError("FUTURE_STRATEGY_ATTEMPT")
         terms = json.loads(row["terms"])
         request = db.execute("SELECT status FROM requests WHERE id=?", (row["id"],)).fetchone()
+        original = db.execute("SELECT terms FROM paper_intents WHERE id=?", (row["id"],)).fetchone()
+        if (request and not original) or (original and json.loads(original[0]) != terms):
+            raise ValueError("STRATEGY_BROKER_TERMS_MISMATCH")
         status = request[0] if request else row["state"]
         evidence, observed, last_qty, last_amount = {}, None, 0, 0
         for item in db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=? ORDER BY observed_at", (row["id"],)):

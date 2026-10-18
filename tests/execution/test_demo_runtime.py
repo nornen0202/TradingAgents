@@ -384,3 +384,14 @@ def test_reset_or_manual_reduction_cannot_leave_fictitious_performance(h):
     assert value["performance"]["status"] == "INCOMPLETE"
     assert value["performance"]["gross_pnl"] is None
     assert len(h.orders) == 1
+
+
+def test_strategy_consumption_and_terms_cannot_be_reset(h):
+    h.tick()
+    with sqlite3.connect(h.root / f"{h.market.lower()}-strategy.sqlite") as db:
+        with pytest.raises(sqlite3.IntegrityError):
+            db.execute("UPDATE strategy_attempts SET terms='{}'")
+        with pytest.raises(sqlite3.IntegrityError):
+            db.execute("DELETE FROM strategy_attempts")
+    h.tick()
+    assert len(h.orders) == 1
