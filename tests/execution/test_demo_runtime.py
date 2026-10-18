@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import sqlite3
 from zoneinfo import ZoneInfo
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -58,7 +59,10 @@ class Harness:
 
     def request(self, method, url, **kwargs):
         self.calls.append((method, url))
-        assert url.startswith("https://openapivts.koreainvestment.com:29443/")
+        target = urlsplit(url)
+        assert target.scheme == "https" and target.netloc == "openapivts.koreainvestment.com:29443"
+        assert target.hostname == "openapivts.koreainvestment.com" and target.port == 29443
+        assert target.username is None and target.password is None and not target.query and not target.fragment
         assert kwargs["allow_redirects"] is False
         if url.endswith("tokenP"):
             return Response({"access_token": "fixture-token", "expires_in": 86400})
