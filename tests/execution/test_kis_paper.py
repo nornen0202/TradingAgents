@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import json
+from urllib.parse import urlsplit
 
 import pytest
 import requests
@@ -93,7 +94,16 @@ def test_guarded_success_is_acknowledged_not_filled_and_is_durable(tmp_path):
     assert receipt["live_orders_enabled"] is False
     assert len(s.calls) == 2
     for method, url, kwargs in s.calls:
-        assert url.startswith("https://openapivts.koreainvestment.com:29443/")
+        parsed = urlsplit(url)
+        assert parsed.scheme == "https"
+        assert parsed.netloc == "openapivts.koreainvestment.com:29443"
+        assert parsed.hostname == "openapivts.koreainvestment.com" and parsed.port == 29443
+        assert parsed.username is None and parsed.password is None
+        assert not parsed.query and not parsed.fragment
+        assert (method, parsed.path) in {
+            ("POST", "/oauth2/tokenP"),
+            ("POST", "/uapi/domestic-stock/v1/trading/order-cash"),
+        }
         assert kwargs["allow_redirects"] is False
     assert s.calls[-1][2]["headers"]["tr_id"] == "VTTC0012U"
     assert s.calls[-1][2]["json"]["ORD_DVSN"] == "00"

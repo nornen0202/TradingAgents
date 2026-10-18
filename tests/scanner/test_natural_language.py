@@ -107,3 +107,19 @@ def test_cli_outputs_compatible_dsl_and_never_overwrites_on_uncertainty(tmp_path
 def test_gross_invalid_input_is_rejected(text, market):
     with pytest.raises(ValueError):
         compile_condition_text(text, market=market)
+
+
+def test_bounded_long_whitespace_draft_keeps_whole_request_validation():
+    # Exercise the maximum-size user-facing path that previously repartitioned
+    # the same whitespace run in both tokenizer and numeric suffix matching.
+    padding = " " * 3800
+    draft = compile_condition_text("volume >= 10" + padding + "unsupported")
+    assert draft["status"] == "needs_clarification"
+    assert draft["condition"] is None
+    assert draft["normalized_rules"] == []
+    # Long whitespace is still valid between explicit numeric components and
+    # around the Korean connector; the fix does not trim unsupported content.
+    tree = compiled("volume >= 10" + padding + "주")
+    assert tree == {"field": "volume", "op": "gte", "value": 10}
+    tree = compiled("volume >= 10" + " " * 1800 + "및" + " " * 1800 + "not halted")
+    assert evaluate_condition(tree, {"volume": 10, "halted": False})

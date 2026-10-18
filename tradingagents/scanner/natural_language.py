@@ -66,7 +66,6 @@ _OPS = {
     "==": "eq", "=": "eq", "같음": "eq", "equals": "eq", "equal to": "eq",
     "!=": "ne", "≠": "ne", "다름": "ne", "not equal to": "ne",
 }
-_OP_RE = "|".join(re.escape(op) for op in sorted(_OPS, key=len, reverse=True))
 _MONEY = {"open", "high", "low", "close", "prev_close", "trading_value", "market_cap", "high_52w"}
 _PERCENT = {"daily_change_pct", "gap_pct", "stop_loss_pct"}
 _RATIO = {"volume_ratio", "volume_ratio_to_market_avg", "risk_reward_ratio"}
@@ -75,10 +74,8 @@ _SCALES = {"": 1, "k": 1_000, "thousand": 1_000, "천": 1_000,
            "억": 100_000_000, "b": 1_000_000_000, "billion": 1_000_000_000,
            "조": 1_000_000_000_000, "trillion": 1_000_000_000_000}
 _NUMBER = r"[+-]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
-_VALUE_RE = re.compile(
-    rf"(?P<number>{_NUMBER})\s*(?P<scale>thousand|million|billion|trillion|천|만|억|조|[kmb])?\s*"
-    r"(?P<unit>krw|usd|원|달러|\$|%|퍼센트|배|x|주|shares?)?", re.IGNORECASE,
-)
+_NUMBER_RE = re.compile(_NUMBER)
+_UNITS = frozenset({"", "krw", "usd", "원", "달러", "$", "%", "퍼센트", "배", "x", "주", "share", "shares"})
 
 
 class _Clarification(ValueError):
@@ -99,21 +96,40 @@ def _field_prefix(text: str) -> tuple[str, str]:
 
 
 def _comparison(rest: str) -> tuple[str, str]:
-    prefix = re.fullmatch(rf"({_OP_RE})\s*(.+)", rest, flags=re.IGNORECASE)
-    suffix = re.fullmatch(rf"(.+?)\s*({_OP_RE})", rest, flags=re.IGNORECASE)
-    if prefix:
-        return _OPS[prefix[1].casefold()], prefix[2].strip()
-    if suffix:
-        return _OPS[suffix[2].casefold()], suffix[1].strip()
+    # Operators are a fixed allowlist. String slicing avoids a lazy wildcard
+    # competing with whitespace on a long, unsupported suffix.
+    folded = rest.casefold()
+    for alias in sorted(_OPS, key=len, reverse=True):
+        if folded.startswith(alias):
+            value = rest[len(alias):].strip()
+            if value:
+                return _OPS[alias], value
+        if folded.endswith(alias):
+            value = rest[:-len(alias)].strip()
+            if value:
+                return _OPS[alias], value
     raise _Clarification("비교 기준이 필요합니다. 예: '거래량 배수 1.5배 이상', 'daily change >= 3%'.")
 
 
 def _numeric_value(field: str, raw: str, markets: set[str]) -> int | float:
-    match = _VALUE_RE.fullmatch(raw)
+    # Consume the number once, then inspect a finite set of literal suffixes.
+    # Adjacent optional whitespace/scale groups in a full-match regex would
+    # repeatedly partition long whitespace runs on a malformed final unit.
+    match = _NUMBER_RE.match(raw)
     if match is None:
         raise _Clarification(f"{_LABELS[field]}의 수치·단위·기간을 해석할 수 없습니다: {raw!r}.")
-    number = float(match["number"].replace(",", ""))
-    scale, unit = (match["scale"] or "").casefold(), (match["unit"] or "").casefold()
+    remainder = raw[match.end():].strip().casefold()
+    scale, unit = "", remainder
+    if remainder not in _UNITS:
+        for candidate in sorted((value for value in _SCALES if value), key=len, reverse=True):
+            if remainder.startswith(candidate):
+                suffix = remainder[len(candidate):].strip()
+                if suffix in _UNITS:
+                    scale, unit = candidate, suffix
+                    break
+        else:
+            raise _Clarification(f"{_LABELS[field]}의 수치·단위·기간을 해석할 수 없습니다: {raw!r}.")
+    number = float(match[0].replace(",", ""))
     number *= _SCALES[scale]
     if not math.isfinite(number) or abs(number) > 1e18:
         raise _Clarification("조건의 수치는 유한한 값이며 절대값 10^18 이하여야 합니다.")
@@ -178,7 +194,10 @@ def _atom(text: str, markets: set[str]) -> dict[str, Any]:
 
 def _tokenize(text: str) -> list[str]:
     # Quotes preserve text values containing operators, commas or parentheses.
-    parts = re.split(r'''("[^"\n]*"|'[^'\n]*'|\(|\)|&&|\|\||\bAND\b|\bOR\b|\bNOT\b(?!\s+equal\s+to)|그리고|또는|혹은|아니면|\s+및\s+)''', text, flags=re.IGNORECASE)
+    # Match the connector itself, leaving surrounding whitespace in its atom.
+    # Consuming an unanchored whitespace run before '및' retried every starting
+    # space when that connector was absent (quadratic re.split search).
+    parts = re.split(r'''("[^"\n]*"|'[^'\n]*'|\(|\)|&&|\|\||\bAND\b|\bOR\b|\bNOT\b(?!\s+equal\s+to)|그리고|또는|혹은|아니면|(?<=\s)및(?=\s))''', text, flags=re.IGNORECASE)
     tokens: list[str] = []
     atom = ""
     operators = {"and": "AND", "&&": "AND", "그리고": "AND", "및": "AND",
