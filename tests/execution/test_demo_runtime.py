@@ -147,6 +147,9 @@ def test_gate_independent_no_client_before_success_and_closed_no_network(h):
     h.gate_open = True
     assert h.tick(session_resolver=lambda **kw: {"source": "exchange_calendars", "is_open": False, "phase": "closed"})["status"] == "MARKET_CLOSED"
     assert not h.calls
+    unknown = h.tick(session_resolver=lambda **kw: {"source": "exchange_calendars", "is_open": False, "phase": "unknown"})
+    assert unknown["status"] == "BLOCKED" and unknown["blockers"] == ["CALENDAR_UNVERIFIED"]
+    assert not h.calls
 
 
 def test_real_broker_lifecycle_restart_duplicate_and_marked_pnl(h):

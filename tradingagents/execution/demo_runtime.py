@@ -299,6 +299,8 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
     session = session_resolver(market=market, now_local=now)
     if session.get("source") != "exchange_calendars":
         return finish("BLOCKED", "CALENDAR_UNVERIFIED")
+    if session.get("phase") in {None, "unknown"}:
+        return finish("BLOCKED", "CALENDAR_UNVERIFIED")
     if session.get("is_open") is not True or session.get("phase") != "regular":
         return finish("MARKET_CLOSED", "MARKET_CLOSED")
     if not at(session["session_open"]) <= now < at(session["session_close"]):
