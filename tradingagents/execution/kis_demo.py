@@ -134,7 +134,13 @@ class KisDemoClient:
     def close(self):
         self.session.close()
 
-    def _http(self, method, path, *, deadline=None, **kwargs):
+    def _now(self):
+        value = self.utcnow()
+        if not isinstance(value, datetime) or value.tzinfo is None or value.utcoffset() is None:
+            raise DemoNotSentError("Aware transport clock required")
+        return value.astimezone(timezone.utc)
+
+    def _http(self, method, path, *, deadline=None, not_before=None, **kwargs):
         allowed = {
             ("POST", "/oauth2/tokenP"),
             ("GET", PREFIX + "inquire-balance"),
@@ -146,8 +152,14 @@ class KisDemoClient:
         if (method, path) not in allowed:
             raise DemoNotSentError("Request is outside the VTS path allowlist")
         _assert_no_http_retries(self.session)
+        started = self._now()
+        if not_before is not None and started < not_before:
+            raise DemoNotSentError("VTS clock regressed before transport")
         self.pacer.wait()
-        if deadline is not None and self.utcnow() >= stamp(deadline):
+        sent_at = self._now()
+        if sent_at < started:
+            raise DemoNotSentError("VTS clock regressed during pacing")
+        if deadline is not None and sent_at >= stamp(deadline):
             raise DemoNotSentError("VTS request deadline elapsed before sending")
         try:
             response = self.session.request(
@@ -162,12 +174,20 @@ class KisDemoClient:
             payload = response.json()
             if not isinstance(payload, dict):
                 raise DemoError("VTS invalid response")
+            try:
+                received_at = self._now()
+            except DemoNotSentError:
+                raise DemoError("VTS response clock unavailable after transport") from None
+            if received_at < sent_at:
+                # A write might already be accepted: retain UNKNOWN rather than
+                # classify a post-transport clock failure as safely NOT_SENT.
+                raise DemoError("VTS clock regressed during response")
             return payload, response.headers
         except (requests.RequestException, ValueError):
             raise DemoError("VTS response unavailable or invalid") from None
 
     def authenticate(self):
-        now = self.utcnow()
+        now = self._now()
         if self._token and now < self._expires:
             return
         payload, _ = self._http(
@@ -205,6 +225,7 @@ class KisDemoClient:
         body=None,
         continuation="",
         deadline=None,
+        not_before=None,
     ):
         allowed = {
             ("GET", "inquire-balance", "VTTC8434R"),
@@ -219,12 +240,17 @@ class KisDemoClient:
         supplied = body if body is not None else params or {}
         if any(supplied.get(k) != v for k, v in self._account().items()):
             raise DemoNotSentError("VTS account scope mismatch")
+        started = self._now()
+        if not_before is not None and started < stamp(not_before):
+            raise DemoNotSentError("VTS clock regressed since intent validation")
         try:
             self.authenticate()
         except DemoError:
             raise DemoNotSentError(
                 "VTS authentication failed before sending the request"
             ) from None
+        if self._now() < started:
+            raise DemoNotSentError("VTS clock regressed during authentication")
         headers = {
             "authorization": f"Bearer {self._token}",
             "appkey": self.credentials.app_key,
@@ -242,6 +268,7 @@ class KisDemoClient:
             params=params,
             json=body,
             deadline=deadline,
+            not_before=started,
         )
 
     def _pages(self, endpoint, tr_id, params):
@@ -398,7 +425,7 @@ class DemoOrderJournal:
                     raise DemoError("Intent ID reused with different order content")
                 self.db.execute("COMMIT")
                 return {"status": row["status"], **json.loads(row["response"])}
-            if endpoint == "order-cash" and (
+            if endpoint in {"order-cash", "order"} and (
                 self.db.execute(
                     "SELECT 1 FROM requests WHERE status='UNKNOWN'"
                 ).fetchone()
@@ -435,7 +462,7 @@ class DemoOrderJournal:
         status, result = "UNKNOWN", {}
         try:
             payload, _ = self.client.request(
-                "POST", endpoint, tr_id, body=body, deadline=deadline
+                "POST", endpoint, tr_id, body=body, deadline=deadline, not_before=now
             )
             output = payload.get("output") or {}
             if not isinstance(output, dict):

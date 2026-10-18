@@ -518,7 +518,7 @@ def complete_handoffs(site, runtime_dir, publication):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("run-due", "publish", "paper", "review"))
+    parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis"))
     parser.add_argument("--archive-dir", type=Path, required=True)
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--runtime-dir", type=Path, required=True)
@@ -535,6 +535,27 @@ def main():
     prepare_environment()
     # These are independent consumers. They neither acquire producer ownership
     # nor dispatch report notifications, and cannot send a real broker order.
+    if args.command == "validate-kis":
+        if args.dry_run:
+            print(json.dumps({"status": "DRY_RUN", "mode": "KIS_DEMO", "live_orders_enabled": False}))
+            return 0
+        validation_state = args.state_dir / "kis-validation"
+        try:
+            config = json.loads((validation_state / "enabled.json").read_text(encoding="utf-8-sig"))
+            enabled = (isinstance(config, dict) and config.get("mode") == "KIS_DEMO_SESSION_VALIDATION"
+                       and config.get("enabled") is True and config.get("real_orders_enabled") is False)
+        except (OSError, ValueError):
+            enabled = False
+        if not enabled:
+            print(json.dumps({"status": "DISABLED", "mode": "KIS_DEMO", "live_orders_enabled": False}))
+            return 0
+        from tradingagents.execution.demo_validation import run_campaign
+        try:
+            result = run_campaign(args.archive_dir, validation_state, run=True)
+        except TimeoutError:
+            result = {"status": "VALIDATION_ALREADY_RUNNING", "mode": "KIS_DEMO", "live_orders_enabled": False}
+        print(json.dumps(result, ensure_ascii=True))
+        return 0
     if args.command == "paper":
         if args.dry_run:
             print(json.dumps({"status": "DRY_RUN", "mode": "LOCAL_PAPER_ONLY", "broker_orders_sent": 0}))

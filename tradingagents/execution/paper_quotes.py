@@ -28,6 +28,33 @@ def _number(value):
     return result
 
 
+def normalized_orderbook(payload, market):
+    """Join identity/clock and price fields from one current broker response.
+
+    The US API returns dymd/dhms/code in output1 and pbid1/pask1 in output2.
+    Domestic identity is in output2. Neither response part may silently replace
+    conflicting fields from the other part; vbid/vask remain volume only.
+    """
+    if market not in {"kr", "us"} or not isinstance(payload, dict):
+        raise ValueError("ORDERBOOK_MISSING")
+    merged = {}
+    for field in ("output1", "output2"):
+        item = payload.get(field)
+        if item is None:
+            continue
+        if not isinstance(item, dict):
+            raise ValueError("ORDERBOOK_INVALID_PART")
+        for key, value in item.items():
+            if key in merged and merged[key] != value:
+                raise ValueError("ORDERBOOK_CONFLICTING_PARTS")
+            merged[key] = value
+    if not merged:
+        raise ValueError("ORDERBOOK_MISSING")
+    if market == "us" and merged.get("curr") not in {None, "", "USD"}:
+        raise ValueError("ORDERBOOK_CURRENCY_MISMATCH")
+    return merged
+
+
 def normalize_quote(*, ticker, market, chart, orderbook, observed_at, fx_quote=None):
     at = instant(observed_at)
     if at is None or market not in {"kr", "us"}:
@@ -51,9 +78,7 @@ def normalize_quote(*, ticker, market, chart, orderbook, observed_at, fx_quote=N
     from tradingagents.scheduled.market_calendar import market_session_state
     if not market_session_state(market=market, now_local=quote_at).get("is_open"):
         raise ValueError("PRICE_OUTSIDE_REGULAR_SESSION")
-    book = orderbook.get("output1") or orderbook.get("output2")
-    if not isinstance(book, dict):
-        raise ValueError("ORDERBOOK_MISSING")
+    book = normalized_orderbook(orderbook, market)
     expected_symbol = ticker[:6] if market == "kr" else ticker
     if any(str(book[key]).strip().upper() != expected_symbol for key in ("code", "symbol", "pdno", "stck_shrn_iscd")
            if book.get(key) not in (None, "")):
