@@ -387,9 +387,17 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     reason = str(exc)
                     issues.append(reason if reason in {"NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "BUDGET_FX_UNVERIFIED", "PROPOSAL_QUANTITY_INVALID"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
                     continue
+                if (root / "HALT").exists() or (validation_root / "HALT").exists():
+                    issues.append("HALTED")
+                    break
+                entry_deadline = min(at(candidate["signal"]["valid_until"]), at(session["session_close"]) - timedelta(minutes=10))
+                if at(clock()) >= at(session["session_close"]) - timedelta(minutes=10):
+                    issues.append("SESSION_EDGE")
+                    break
+                signal = {**candidate["signal"], "valid_until": entry_deadline.isoformat()}
                 broker.db.execute("INSERT INTO strategy_attempts VALUES (?,?,?,?,?,?)", (candidate["id"], candidate["ticker"], candidate["run_id"], at(clock()).isoformat(), json.dumps(terms, sort_keys=True), "PREPARED"))
                 try:
-                    broker.submit(intent_id=candidate["id"], **terms, signal=candidate["signal"], quote=quote, account=account)
+                    broker.submit(intent_id=candidate["id"], **terms, signal=signal, quote=quote, account=account)
                 except Exception:
                     # If no broker intent exists, deterministic validation failed.
                     # A persisted intent without a response remains ambiguous.

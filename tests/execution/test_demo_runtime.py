@@ -395,3 +395,22 @@ def test_strategy_consumption_and_terms_cannot_be_reset(h):
             db.execute("DELETE FROM strategy_attempts")
     h.tick()
     assert len(h.orders) == 1
+
+
+def test_account_read_crossing_entry_cutoff_does_not_submit(h):
+    h.now = h.now.replace(hour=15, minute=19 if h.market == "KR" else 49, second=55)
+    h.source()
+    def delayed(*args):
+        account = h.account(*args)
+        h.now += timedelta(seconds=10)
+        return account
+    value = h.tick(account_loader=delayed)
+    assert "SESSION_EDGE" in value["blockers"] and not h.orders
+
+
+def test_halt_created_during_read_prevents_submission(h):
+    def halt(*args):
+        (h.root / "HALT").touch()
+        return h.account(*args)
+    value = h.tick(account_loader=halt)
+    assert "HALTED" in value["blockers"] and not h.orders
