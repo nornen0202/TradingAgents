@@ -7,6 +7,7 @@ argument. Dedicated credentials are loaded by the existing protected local setup
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 
@@ -44,6 +45,7 @@ def main(argv=None):
     try:
         if args.command in {"readiness", "probe"}:
             result = {**check(connect=args.command == "probe"), "host": DEMO_HOST,
+                      "market": "KR", "checked_at": datetime.now(timezone.utc).isoformat(),
                       "live_orders_enabled": False, "paper_order_connection_verified": False}
         else:
             if args.command in {"submit", "cancel"} and not args.paper_enabled:

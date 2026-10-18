@@ -164,5 +164,35 @@ def paper_health(path, *, analysis_as_of):
     return result
 
 
+def kis_demo_health(archive_dir, *, analysis_as_of):
+    """Project fixed KIS read-probe receipts without account or order access.
+
+    Receipt freshness is not a claim that an order path has been tested. A
+    successful read remains distinct from unverified submission/cancellation.
+    Unknown, undated and future receipts expose no data at this cutoff.
+    """
+    cutoff = instant(analysis_as_of)
+    if cutoff is None:
+        raise ValueError("KIS read status cutoff requires a timezone")
+    result = {"as_of": cutoff.isoformat(), "read_only": True, "markets": {}}
+    states = {"READ_CONNECTION_VERIFIED", "READY_TO_PROBE", "MISSING_DEMO_SETTINGS",
+              "CONFIGURATION_UNREADABLE", "CONNECTION_UNVERIFIED"}
+    root = (Path(archive_dir) / "paper").resolve() if archive_dir is not None else None
+    for market, filename in (("KR", "kis-readiness.json"), ("US", "kis-us-readiness.json")):
+        view = {"status": "UNAVAILABLE", "checked_at": None, "market": market, "mode": "KIS_DEMO",
+                "orders_submitted": 0, "live_orders_enabled": False, "paper_order_connection_verified": False}
+        path = (root / filename).resolve() if root is not None else None
+        raw = _json(path) if path is not None and path.is_relative_to(root) else {}
+        checked = instant(raw.get("checked_at"))
+        if (raw.get("mode") == "KIS_DEMO" and raw.get("market") == market
+                and raw.get("status") in states and checked is not None and checked <= cutoff
+                and type(raw.get("orders_submitted")) is int and raw["orders_submitted"] == 0
+                and raw.get("live_orders_enabled") is False and raw.get("real_account_access") is False
+                and raw.get("paper_order_connection_verified") is False):
+            view.update(status=raw["status"], checked_at=checked.isoformat())
+        result["markets"][market] = view
+    return result
+
+
 def now_utc():
     return datetime.now(timezone.utc)

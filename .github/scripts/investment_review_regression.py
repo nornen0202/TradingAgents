@@ -83,6 +83,7 @@ async def probe(websocket_url, page_url):
               if (!document.querySelector('#reasons').textContent.includes('volume_rule_not_met')) throw Error('Engine reasons missing');
               if (window.reviewSnapshot.broker_orders_sent !== 0) throw Error('Viewer is not read only');
               if (!document.querySelector('#paper-health').textContent.includes('휴장·장 종료')) throw Error('Paper status absent');
+              if (!document.querySelector('#kis-demo-health').textContent.includes('조회 점검 기록 없음') || !document.querySelector('#kis-demo-health').textContent.includes('미검증')) throw Error('KIS read/order distinction absent');
               if (document.querySelector('#paper-health').textContent.includes('PRIVATE_DO_NOT_DISPLAY')) throw Error('Private path leaked');
               if (!document.querySelector('#experiment-cards').textContent.includes('paired-test')) throw Error('Experiment card absent');
               if (!document.querySelector('#experiment-cards').textContent.includes('수익률·낙폭을 표시하지 않습니다')) throw Error('Unobserved performance fabricated');

@@ -10,7 +10,7 @@ from urllib.request import Request, urlopen
 
 import pytest
 
-from tradingagents.charting.operations import archive_catalog, paper_health
+from tradingagents.charting.operations import archive_catalog, paper_health, kis_demo_health
 from tradingagents.charting.server import make_handler
 from tradingagents.execution.experiments import ExperimentRegistry
 
@@ -42,6 +42,14 @@ def health_fixture():
             "source_run_id": "known-run", "source_revision": "abc123",
             "order_counts": {"PENDING": 1, "FILLED": 0, "REJECTED": 2, "CANCELLED": 0},
             "blockers": ["MARKET_CLOSED", "private path C:/SECRET/ACCOUNT"]}}}
+
+
+def kis_read_fixture(market="KR", **changes):
+    return {"mode": "KIS_DEMO", "market": market, "status": "READ_CONNECTION_VERIFIED", "checked_at": "2026-10-16T11:59:00Z",
+            "orders_submitted": 0, "live_orders_enabled": False, "real_account_access": False,
+            "paper_order_connection_verified": False, "account": "PRIVATE-ACCOUNT", "app_key": "SECRET-KEY",
+            "app_secret": "SECRET-CREDENTIAL", "holdings": [{"ticker": "PRIVATE", "qty": 123}],
+            "path": "C:/PRIVATE/settings", **changes}
 
 
 def test_archive_selection_is_dynamic_per_ticker_and_point_in_time(tmp_path):
@@ -80,6 +88,8 @@ def test_persistent_server_sees_new_runs_and_pure_research_apis_without_writes(t
     run(archive, "original")
     status_path = tmp_path / "paper.json"
     write(status_path, health_fixture())
+    write(archive / "paper/kis-readiness.json", kis_read_fixture())
+    write(archive / "paper/kis-us-readiness.json", kis_read_fixture("US"))
     absent_registry = tmp_path / "not-created.sqlite"
     server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(archive_dir=archive,
               experiment_registry=absent_registry, paper_status_path=status_path))
@@ -103,7 +113,11 @@ def test_persistent_server_sees_new_runs_and_pure_research_apis_without_writes(t
         assert not absent_registry.exists()
         assert get("/api/paper-health")["markets"]["kr"]["status"] == "MARKET_CLOSED"
         assert "SECRET" not in json.dumps(get("/api/paper-health"))
-        for route in ("/api/condition-draft", "/api/experiment-cards"):
+        kis = get("/api/kis-demo-health", path="C:/PRIVATE/settings")
+        assert kis["markets"]["KR"]["status"] == "READ_CONNECTION_VERIFIED"
+        assert kis["markets"]["US"]["status"] == "READ_CONNECTION_VERIFIED"
+        assert "SECRET" not in json.dumps(kis) and "PRIVATE" not in json.dumps(kis)
+        for route in ("/api/condition-draft", "/api/experiment-cards", "/api/kis-demo-health"):
             with pytest.raises(HTTPError) as error:
                 urlopen(Request(base + route, method="POST", data=b"{}"))
             assert error.value.code == 501
@@ -111,6 +125,30 @@ def test_persistent_server_sees_new_runs_and_pure_research_apis_without_writes(t
         server.shutdown()
         worker.join(timeout=5)
         server.server_close()
+
+
+@pytest.mark.parametrize("changes", [{"checked_at": None}, {"checked_at": "bad"}, {"checked_at": "2026-10-16"},
+    {"checked_at": "2026-10-17T11:00:00Z"}, {"mode": "real"}, {"market": "US"}, {"orders_submitted": True},
+    {"orders_submitted": 1}, {"live_orders_enabled": True}, {"real_account_access": True},
+    {"paper_order_connection_verified": True}, {"status": "PRIVATE_SECRET"}])
+def test_kis_read_health_rejects_future_untimed_or_unsafe_receipts(tmp_path, changes):
+    before = kis_demo_health(tmp_path, analysis_as_of=ASOF)
+    write(tmp_path / "paper/kis-readiness.json", kis_read_fixture(**changes))
+    assert kis_demo_health(tmp_path, analysis_as_of=ASOF) == before
+
+
+def test_kis_health_whitelist_distinguishes_read_connection_and_unverified_orders(tmp_path):
+    write(tmp_path / "paper/kis-readiness.json", kis_read_fixture())
+    write(tmp_path / "paper/kis-us-readiness.json", kis_read_fixture("US", status="CONNECTION_UNVERIFIED"))
+    result = kis_demo_health(tmp_path, analysis_as_of=ASOF)
+    assert result["markets"]["KR"]["status"] == "READ_CONNECTION_VERIFIED"
+    assert result["markets"]["US"]["status"] == "CONNECTION_UNVERIFIED"
+    for view in result["markets"].values():
+        assert set(view) == {"status", "checked_at", "market", "mode", "orders_submitted", "live_orders_enabled", "paper_order_connection_verified"}
+        assert view["orders_submitted"] == 0 and view["paper_order_connection_verified"] is False
+    assert "SECRET" not in json.dumps(result) and "PRIVATE" not in json.dumps(result)
+    with pytest.raises(ValueError, match="timezone"):
+        kis_demo_health(tmp_path, analysis_as_of="2026-10-16")
 
 
 def test_experiment_cards_api_reads_frozen_registry_and_filters_future(tmp_path):

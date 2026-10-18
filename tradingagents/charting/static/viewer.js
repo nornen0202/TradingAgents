@@ -52,6 +52,14 @@ function renderHealth(health) {
     paragraph("운영 점검 시각과 실제 시세·체결 시각은 별개입니다. 휴장 중 점검이 성공해도 체결 기록이 새로 생기지 않습니다."));
   if(health.markets.us)byId("paper-health").append(paragraph("원화 현금 모의 포트폴리오 / 미국 주식은 증권사 기준환율 평가 / 실제 달러계좌 수익률과 다름"));
 }
+function renderKisHealth(health) {
+  const labels={READ_CONNECTION_VERIFIED:"조회 연결 확인",READY_TO_PROBE:"조회 점검 대기",MISSING_DEMO_SETTINGS:"모의 연결 설정 필요",CONFIGURATION_UNREADABLE:"모의 설정 확인 필요",CONNECTION_UNVERIFIED:"조회 연결 미확인",UNAVAILABLE:"이 시점의 조회 점검 기록 없음"};
+  const markets=health.markets||{};
+  byId("kis-demo-health").replaceChildren(table("KIS 모의 조회 점검",["시장","조회 연결","확인 시각","주문 연결","이 조회 점검에서 전송한 주문"],["KR","US"].map(market=>{
+    const row=markets[market]||{};
+    return [market==="KR"?"한국":"미국",labels[row.status]||labels.UNAVAILABLE,row.checked_at||"기록 없음","미검증",row.checked_at?0:"기록 없음"];
+  })),paragraph("조회 성공은 주문·부분 체결·취소 검증 완료를 뜻하지 않습니다. 이 화면에는 주문 기능이 없으며 실계좌 자동 주문은 비활성입니다."));
+}
 function renderCards(payload) {
   const cards=payload.cards||[];
   const nodes=[];
@@ -92,7 +100,7 @@ function list(id, values) {
 }
 function clearSnapshot() {
   charts.forEach(chart=>chart.remove());charts=[];byId("charts").replaceChildren();
-  ["verdict","freshness","profile","performance","unverified","source-context","paper-health","experiment-cards"].forEach(id=>byId(id).textContent="");
+  ["verdict","freshness","profile","performance","unverified","source-context","paper-health","kis-demo-health","experiment-cards"].forEach(id=>byId(id).textContent="");
   ["reasons","facts","inferences","events"].forEach(id=>list(id,[]));window.reviewSnapshot=null;
 }
 async function loadSnapshot() {
@@ -114,10 +122,11 @@ async function loadSnapshot() {
       byId("source-context").textContent+=" · 차트 갱신 "+(capture.status==="REFRESHED"?"확인":"자료 확보 실패·원본 유지")+" "+capture.checked_at;
       if(capture.error_type)byId("source-context").textContent+=" ("+capture.error_type+")";
     }
-    const secondary=await Promise.allSettled([getJson("/api/paper-health?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at)),getJson("/api/experiment-cards?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at))]);
+    const secondary=await Promise.allSettled([getJson("/api/paper-health?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at)),getJson("/api/experiment-cards?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at)),getJson("/api/kis-demo-health?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at))]);
     if(version!==requestVersion)return;
     if(secondary[0].status==="fulfilled")renderHealth(secondary[0].value);else byId("paper-health").replaceChildren(paragraph("모의 운영 상태를 읽지 못했습니다."));
     if(secondary[1].status==="fulfilled")renderCards(secondary[1].value);else byId("experiment-cards").replaceChildren(paragraph("실험 카드를 읽지 못했습니다."));
+    if(secondary[2].status==="fulfilled")renderKisHealth(secondary[2].value);else byId("kis-demo-health").replaceChildren(paragraph("모의 서버 조회 점검 기록을 읽지 못했습니다."));
     byId("verdict").textContent = snapshot.execution_verdict
       ? "당시 판단: " + snapshot.execution_verdict + " · " + snapshot.execution.execution_asof
       : "판단 기록 없음";

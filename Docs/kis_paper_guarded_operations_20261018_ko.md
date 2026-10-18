@@ -116,3 +116,30 @@ python -m tools.kis_paper --output .runtime/kis-paper-status.json status --journ
 - [매수가능: VTTC8908R·미수 없는 금액/수량](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_psbl_order/inquire_psbl_order.py)
 - [주문시각·누적 체결수량의 필드 정의](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_daily_ccld/chk_inquire_daily_ccld.py)
 - [실전 ID만 있는 취소가능수량 예제](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_psbl_rvsecncl/inquire_psbl_rvsecncl.py)
+
+## 국내·해외 모의 접속정보의 분리와 접속 확인
+
+국내 모의 전용 묶음은 기존 Windows 사용자 암호화 저장소를 사용한다.
+해외 모의 전용 묶음은 별도 `kis-demo-us.dpapi`로 보관하며 국내·실전 키로 대체하지 않는다.
+두 계좌번호가 같아도 앱 키의 이용 범위를 혼합하지 않는다. 비밀값과 실제 계좌 응답은 저장소·보고서에 포함하지 않는다.
+
+2026-10-18 08:20:05 UTC의 국내 모의 서버 인증·잔고·당일 주문 조회가 실제 응답으로 확인되었다.
+확인 당시 잔고 행·주문 행은 각각 0개였으며 주문을 전송하지 않았다. 이 확인은 주문 접수·체결 검증이 아니다.
+같은 날 08:21:29 UTC에는 해외 전용 키로 NASDAQ·NYSE·AMEX 잔고 및 당일 주문 조회도 실제 성공했다. 보유·주문은 0건이며 주문은 전송하지 않았다.
+최신 상태는 로컬 비공개 `archive/paper/kis-readiness.json`과 `kis-us-readiness.json`의 실제 관측시각으로 확인한다.
+과거 접속 성공을 현재 연결이나 모의 체결 성공으로 해석하지 않는다.
+
+해외 확인기는 `python -m tools.check_kis_demo_us --output <비공개-상태파일> --connect`로 실행한다.
+인증만 POST를 허용하며 해외 잔고·주문체결 내역은 GET만 허용한다. 주문·취소·정정 기능은 없다.
+호스트는 모의 서버에 고정하고 리디렉션·HTTP 자동 재시도·실전 대체 경로를 허용하지 않는다.
+해외 잔고는 NASD·NYSE·AMEX를 각각 조회하고 주문내역은 모의 API의 전체 조회 제약을 따른다.
+조회일은 뉴욕 현지 날짜로 지정하고, 반환 주문의 현지 주문일과 별도의 국내 주문일·당사 주문시각을 다시 검증한다.
+미래·누락·잘못된 날짜·조회 범위 밖 주문·완결되지 않은 연속조회는 접속 검증을 실패 처리한다.
+잔고는 현재 수신 시점의 확인 자료이며 과거 분석용 자료로 소급하지 않는다.
+화면·진단에는 성공 여부·실제 확인시각·행 개수만 표시하고 계좌번호·현금·보유 금액은 내보내지 않는다.
+
+공식 해외 모의 지원 근거:
+
+- [해외 잔고: VTTS3012R와 모의 거래소 코드](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_balance/inquire_balance.py)
+- [해외 주문체결: VTTS3035R와 모의 조회 제약](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_ccnl/inquire_ccnl.py)
+- [주문일·국내 주문일·당사 주문시각 필드](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_ccnl/chk_inquire_ccnl.py)
