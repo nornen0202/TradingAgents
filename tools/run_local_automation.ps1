@@ -1,7 +1,8 @@
 param(
-    [ValidateSet("run-due", "publish")][string] $Command,
+    [ValidateSet("run-due", "publish", "paper", "review")][string] $Command,
     [string] $RepositoryRoot = "C:\Projects\TradingAgents",
     [string] $ArchiveRoot = "C:\TradingAgentsData\archive",
+    [ValidateRange(1024, 65535)][int] $ReviewPort = 8766,
     [switch] $DryRun
 )
 $ErrorActionPreference = "Stop"
@@ -86,6 +87,7 @@ try {
         "--archive-dir", $ArchiveRoot, "--state-dir", $stateRoot,
         "--runtime-dir", (Join-Path $RepositoryRoot ".runtime\chatgpt-work"))
     if ($DryRun) { $arguments += "--dry-run" }
+    if ($Command -eq 'review') { $arguments += @('--review-port', [string]$ReviewPort) }
     # Windows PowerShell converts redirected native stderr to error records.
     # A recoverable Python warning must not terminate the worker mid-attempt.
     $savedErrorActionPreference = $ErrorActionPreference

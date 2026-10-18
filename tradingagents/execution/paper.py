@@ -105,6 +105,34 @@ class PaperBroker:
     def close(self):
         self.db.close()
 
+    def expire_pending(self, *, now: str, halted: bool = False):
+        """Cancel expired local intents without fabricating a market observation.
+
+        Closed-market maintenance must not reset the daily NAV baseline using
+        yesterday's marks. This operation never fills or queues an order.
+        """
+        at = stamp(now)
+        self.db.execute("BEGIN IMMEDIATE")
+        try:
+            clocks = [self._get(key) for key in ("last_step", "seed_asof", "last_maintenance_at")]
+            if any(value and at < stamp(value) for value in clocks):
+                raise ValueError("Cannot expire paper orders before the last observation")
+            for order in self.db.execute("SELECT * FROM orders WHERE status='PENDING'").fetchall():
+                if not halted and at < stamp(order["expires_at"]) and at.date() == stamp(order["created_at"]).date():
+                    continue
+                reason = "runtime_halt" if halted else "expired"
+                self.db.execute("UPDATE orders SET status='CANCELLED',reason=? WHERE id=?", (reason, order["id"]))
+                if order["signal_id"]:
+                    append_lifecycle_event(self.db, event_id="cancel:paper:" + order["id"],
+                        signal_id=order["signal_id"], intent_id=order["id"], kind="CANCEL", mode="paper",
+                        occurred_at=now, available_at=now, ingested_at=now,
+                        payload={"ticker": order["ticker"], "reason": reason})
+            self._set("last_maintenance_at", now)
+            self.db.execute("COMMIT")
+        except Exception:
+            self.db.execute("ROLLBACK")
+            raise
+
     def _get(self, key, default=None):
         row = self.db.execute("SELECT value FROM state WHERE key=?", (key,)).fetchone()
         return json.loads(row[0]) if row else default
@@ -114,7 +142,7 @@ class PaperBroker:
             "INSERT OR REPLACE INTO state VALUES (?,?)", (key, json.dumps(value))
         )
 
-    def seed(self, snapshot: dict):
+    def seed(self, snapshot: dict, *, account_scope: str | None = None):
         """One-time clone; never re-import a changing live account over paper fills."""
         stamp(snapshot["as_of"])
         if snapshot.get("snapshot_health", "VALID") not in {
@@ -164,6 +192,8 @@ class PaperBroker:
             self._set("seed_nav", total)
             self._set("peak_nav", total)
             self._set("limits", asdict(self.limits))
+            if account_scope is not None:
+                self._set("account_scope", account_scope)
             append_lifecycle_event(self.db, event_id="paper:account_seed", signal_id="paper:account",
                 kind="ACCOUNT_SEED", mode="paper", occurred_at=snapshot["as_of"], available_at=snapshot["as_of"],
                 ingested_at=snapshot["as_of"],
@@ -201,6 +231,9 @@ class PaperBroker:
             if stored_limits != asdict(self.limits):
                 raise ValueError("Limits changed: use a separate paper experiment")
             previous = self._get("last_step")
+            maintenance_at = self._get("last_maintenance_at")
+            if maintenance_at and at < stamp(maintenance_at):
+                raise ValueError("Clock precedes paper maintenance")
             if at < stamp(self._get("seed_asof")):
                 raise ValueError("Cannot observe before account snapshot")
             if previous and at <= stamp(previous):
@@ -233,6 +266,10 @@ class PaperBroker:
                 ).fetchone()[0]
             )
             day = at.date().isoformat()
+            missing_marks = any(
+                r["qty"] and r["ticker"] not in valid
+                for r in self.db.execute("SELECT * FROM positions")
+            )
             if self._get("day") != day:
                 self._set("day", day)
                 baseline = (
@@ -241,18 +278,19 @@ class PaperBroker:
                     and stamp(self._get("seed_asof")).date() == at.date()
                     else nav
                 )
-                self._set("day_start_nav", baseline)
+                self._set("day_start_nav", baseline if not missing_marks else None)
+                self._set("day_baseline_pending", missing_marks)
                 self._set("turnover", 0)
                 self._set("order_count", 0)
+                self._set("daily_stopped", missing_marks)
+            elif self._get("day_baseline_pending", False) and not missing_marks:
+                self._set("day_start_nav", nav)
+                self._set("day_baseline_pending", False)
                 self._set("daily_stopped", False)
-            risk_stop = self._get("daily_stopped", False) or nav <= self._get(
-                "day_start_nav"
+            risk_stop = self._get("day_baseline_pending", False) or self._get("daily_stopped", False) or nav <= (
+                self._get("day_start_nav") or nav
             ) * (1 - self.limits.max_daily_loss)
             self._set("daily_stopped", risk_stop)
-            missing_marks = any(
-                r["qty"] and r["ticker"] not in valid
-                for r in self.db.execute("SELECT * FROM positions")
-            )
             drawdown, drawdown_stop = self._update_drawdown(nav, not missing_marks)
             # A kill switch also cancels pending paper orders, including risk sells.
             for order in self.db.execute(
@@ -322,7 +360,7 @@ class PaperBroker:
                     raise ValueError("Paper position would become short")
                 if (
                     self._get("turnover") + qty * fill
-                    > self._get("day_start_nav") * self.limits.max_daily_turnover
+                    > (self._get("day_start_nav") or nav) * self.limits.max_daily_turnover
                     or qty * fill
                     > nav * order_nav_limit(self.limits, order["side"], qty)
                 ):
@@ -353,7 +391,7 @@ class PaperBroker:
                         "SELECT coalesce(sum(qty*price),0) FROM positions"
                     ).fetchone()[0]
                 )
-                risk_stop = risk_stop or nav <= self._get("day_start_nav") * (
+                risk_stop = risk_stop or nav <= (self._get("day_start_nav") or nav) * (
                     1 - self.limits.max_daily_loss
                 )
                 self._set("daily_stopped", risk_stop)

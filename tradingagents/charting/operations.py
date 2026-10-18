@@ -1,0 +1,198 @@
+"""Read-only local archive discovery and explicitly scoped operational receipts."""
+from __future__ import annotations
+
+from datetime import datetime, timezone
+from functools import lru_cache
+import json
+from pathlib import Path
+import re
+
+from .bars import instant, validate_bars
+
+
+def _json(path):
+    try:
+        value = json.loads(Path(path).read_text(encoding="utf-8"))
+        return value if isinstance(value, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+@lru_cache(maxsize=2048)
+def _cached_manifest(path, modified_ns, size):
+    # Filesystem metadata only invalidates parsed bytes; it never determines
+    # data availability. Timestamp eligibility is checked afresh per request.
+    return _json(path)
+
+
+def _manifest(path):
+    try:
+        stat = path.stat()
+        return _cached_manifest(str(path), stat.st_mtime_ns, stat.st_size)
+    except OSError:
+        return {}
+
+
+def known_artifacts(directory, cutoff):
+    """Coverage is based on known records, never mutable file existence."""
+    from .report import _checkpoint_payloads, _snapshot_visible
+    from tradingagents.dataflows.event_timeline import build_event_timeline
+    from tradingagents.dataflows.market_policy import source_use_policy
+    chart = False
+    for payload in _checkpoint_payloads(directory, "chart_evidence"):
+        if (_snapshot_visible(payload, cutoff)
+                and (not payload.get("ticker") or str(payload["ticker"]).upper() == directory.name.upper())
+                and source_use_policy(payload.get("provider") or "local_archive", entitlement=payload.get("entitlement"))["allowed"]
+                and validate_bars(payload.get("bars") or [], analysis_as_of=cutoff)["bars"]):
+            chart = True
+            break
+    board = _json(directory / "event_timeline.json")
+    records = board.get("records") or [version for event in board.get("events", []) if isinstance(event, dict)
+                                        for version in event.get("versions", [event])]
+    events = bool(build_event_timeline(records, analysis_as_of=cutoff, ticker=directory.name)["events"])
+    receipts = []
+    for item in _checkpoint_payloads(directory, "chart_capture_status"):
+        checked = instant(item.get("checked_at"))
+        if (item.get("schema") == "tradingagents.chart-capture-status/v1" and checked is not None and checked <= cutoff
+                and item.get("ticker") == directory.name and item.get("status") in {"REFRESHED", "UNAVAILABLE"}):
+            error_type = item.get("error_type")
+            count = item.get("completed_bar_count")
+            receipts.append((checked, {"status": item["status"], "checked_at": checked.isoformat(),
+                "error_type": error_type if isinstance(error_type, str) and re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", error_type) else None,
+                "completed_bar_count": count if type(count) is int and count >= 0 else None}))
+    status = max(receipts, key=lambda pair: pair[0])[1] if receipts else None
+    return {"chart_capture_available": chart, "event_board_available": events, "chart_capture_status": status}
+
+
+def archive_catalog(archive_dir, *, analysis_as_of, only_ticker=None, include_coverage=True):
+    """Discover the latest completed producer per ticker, at the requested cutoff.
+
+    Directory names and the global latest pointer are never data clocks. Return
+    paths only to the server caller; ``public_context`` is safe for localhost UI.
+    Re-scan on demand so a long-running viewer sees new KR/US runs without restart.
+    """
+    cutoff = instant(analysis_as_of)
+    if cutoff is None:
+        raise ValueError("Archive cutoff requires a timezone")
+    root = (Path(archive_dir) / "runs").resolve()
+    selected = {}
+    for manifest_path in root.glob("*/*/run.json"):
+        run_dir = manifest_path.parent.resolve()
+        if not run_dir.is_relative_to(root):
+            continue
+        manifest = _manifest(manifest_path)
+        started, finished = instant(manifest.get("started_at")), instant(manifest.get("finished_at"))
+        run_id = str(manifest.get("run_id") or "")
+        if (started is None or finished is None or not started <= finished <= cutoff
+                or run_id != run_dir.name or manifest.get("status") == "running"):
+            continue
+        summaries = manifest.get("tickers")
+        for summary in summaries if isinstance(summaries, list) else []:
+            if not isinstance(summary, dict) or summary.get("status") != "success":
+                continue
+            ticker = str(summary.get("ticker") or "")
+            if only_ticker is not None and ticker != only_ticker:
+                continue
+            ticker_dir = (run_dir / "tickers" / ticker).resolve()
+            ticker_root = (run_dir / "tickers").resolve()
+            if not ticker or not ticker_dir.is_relative_to(ticker_root) or not ticker_dir.is_dir():
+                continue
+            key = (started, run_id)
+            if ticker in selected and selected[ticker]["key"] >= key:
+                continue
+            selected[ticker] = {"key": key, "ticker_dir": ticker_dir, "_manifest": manifest, "_summary": summary}
+    # Inspect candle/event vintages only for the selected sources, rather than
+    # every historical candidate encountered while finding the newest run.
+    for entry in selected.values():
+        manifest, summary = entry.pop("_manifest"), entry.pop("_summary")
+        ticker_dir = entry["ticker_dir"]
+        research_finished = instant(_json(ticker_dir / "analysis.json").get("finished_at"))
+        settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
+        entry["public_context"] = {"run_id": manifest["run_id"], "run_started_at": instant(manifest["started_at"]).isoformat(),
+                   "run_finished_at": instant(manifest["finished_at"]).isoformat(),
+                   "research_finished_at": research_finished.isoformat() if research_finished is not None and research_finished <= cutoff else None,
+                   "market": settings.get("market"), "run_mode": settings.get("run_mode"),
+                   "source_analysis_run_id": manifest.get("overlay_source_run_id"),
+                   "quality_flags": [item for item in (summary.get("quality_flags") or []) if isinstance(item, str) and _CODE.fullmatch(item)],
+                   **(known_artifacts(ticker_dir, cutoff) if include_coverage else {})}
+    return selected
+
+
+_CODE = re.compile(r"^[A-Za-z0-9_.:-]{1,160}$")
+
+
+def paper_health(path, *, analysis_as_of):
+    """Expose status/counters only: never ledger paths, account IDs or balances."""
+    cutoff = instant(analysis_as_of)
+    if cutoff is None:
+        raise ValueError("Paper status cutoff requires a timezone")
+    result = {"status": "UNAVAILABLE", "mode": "LOCAL_PAPER_ONLY", "real_orders_enabled": False,
+              "broker_orders_sent": 0, "markets": {}, "checked_at": None}
+    raw = _json(path) if path is not None else {}
+    checked = instant(raw.get("checked_at"))
+    markets = raw.get("markets")
+    if (raw.get("schema") != "tradingagents.paper-runtime/v1" or checked is None or checked > cutoff
+            or raw.get("mode") != "LOCAL_PAPER_ONLY" or raw.get("real_orders_enabled") is not False
+            or raw.get("broker_orders_sent") != 0 or not isinstance(markets, dict)):
+        return result
+    result.update(status="AVAILABLE", checked_at=checked.isoformat(), enabled=raw.get("enabled") is True,
+                  stale=(cutoff - checked).total_seconds() > 600)
+    allowed_states = {"MARKET_CLOSED", "WAITING_SOURCE", "ACTIVE", "VALUATION_ONLY", "BLOCKED", "ERROR"}
+    for key in ("kr", "us"):
+        source = markets.get(key)
+        if not isinstance(source, dict):
+            continue
+        market_checked = instant(source.get("checked_at"))
+        if market_checked is None or market_checked > cutoff:
+            continue
+        view = {"status": source.get("status") if source.get("status") in allowed_states else "ERROR",
+                "checked_at": market_checked.isoformat(), "order_counts": {}, "blockers": []}
+        for clock in ("last_observation_at", "last_fill_at", "last_quote_at", "last_success_at"):
+            value = instant(source.get(clock))
+            view[clock] = value.isoformat() if value is not None and value <= cutoff else None
+        for field in ("source_run_id", "source_revision"):
+            value = source.get(field)
+            view[field] = value if isinstance(value, str) and _CODE.fullmatch(value) else None
+        blockers = source.get("blockers")
+        view["blockers"] = [value for value in blockers if isinstance(value, str) and _CODE.fullmatch(value)] if isinstance(blockers, list) else []
+        counts = source.get("order_counts")
+        counts = counts if isinstance(counts, dict) else {}
+        for state in ("PENDING", "FILLED", "REJECTED", "CANCELLED"):
+            value = counts.get(state)
+            view["order_counts"][state] = value if type(value) is int and value >= 0 else 0
+        result["markets"][key] = view
+    return result
+
+
+def kis_demo_health(archive_dir, *, analysis_as_of):
+    """Project fixed KIS read-probe receipts without account or order access.
+
+    Receipt freshness is not a claim that an order path has been tested. A
+    successful read remains distinct from unverified submission/cancellation.
+    Unknown, undated and future receipts expose no data at this cutoff.
+    """
+    cutoff = instant(analysis_as_of)
+    if cutoff is None:
+        raise ValueError("KIS read status cutoff requires a timezone")
+    result = {"as_of": cutoff.isoformat(), "read_only": True, "markets": {}}
+    states = {"READ_CONNECTION_VERIFIED", "READY_TO_PROBE", "MISSING_DEMO_SETTINGS",
+              "CONFIGURATION_UNREADABLE", "CONNECTION_UNVERIFIED"}
+    root = (Path(archive_dir) / "paper").resolve() if archive_dir is not None else None
+    for market, filename in (("KR", "kis-readiness.json"), ("US", "kis-us-readiness.json")):
+        view = {"status": "UNAVAILABLE", "checked_at": None, "market": market, "mode": "KIS_DEMO",
+                "orders_submitted": 0, "live_orders_enabled": False, "paper_order_connection_verified": False}
+        path = (root / filename).resolve() if root is not None else None
+        raw = _json(path) if path is not None and path.is_relative_to(root) else {}
+        checked = instant(raw.get("checked_at"))
+        if (raw.get("mode") == "KIS_DEMO" and raw.get("market") == market
+                and raw.get("status") in states and checked is not None and checked <= cutoff
+                and type(raw.get("orders_submitted")) is int and raw["orders_submitted"] == 0
+                and raw.get("live_orders_enabled") is False and raw.get("real_account_access") is False
+                and raw.get("paper_order_connection_verified") is False):
+            view.update(status=raw["status"], checked_at=checked.isoformat())
+        result["markets"][market] = view
+    return result
+
+
+def now_utc():
+    return datetime.now(timezone.utc)

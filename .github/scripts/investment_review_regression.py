@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import base64
+from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer
 import json
 from pathlib import Path
@@ -14,6 +15,7 @@ from threading import Thread
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import mobile_layout_regression as layout
 from tradingagents.charting.server import make_handler
+from tradingagents.execution.experiments import ExperimentRegistry
 
 OUTPUT = None
 
@@ -35,6 +37,21 @@ def fixture(root):
                                           "known_at": "2026-10-16T10:00:00Z", "published_at": "2026-10-16T09:00:00Z", "observed_at": "2026-10-16T10:00:00Z"}]}}
     for name, payload in payloads.items():
         (directory / name).write_text(json.dumps(payload), encoding="utf-8")
+    status_path = root / "paper-status.json"
+    status_path.write_text(json.dumps({"schema":"tradingagents.paper-runtime/v1","mode":"LOCAL_PAPER_ONLY",
+        "enabled":True,"broker_orders_sent":0,"real_orders_enabled":False,"checked_at":"2026-10-16T11:00:00Z",
+        "markets":{"kr":{"status":"MARKET_CLOSED","checked_at":"2026-10-16T11:00:00Z",
+        "last_quote_at":"2026-10-16T06:29:00Z","last_fill_at":None,"blockers":["MARKET_CLOSED"],
+        "ledger_path":"PRIVATE_DO_NOT_DISPLAY","order_counts":{"PENDING":1,"FILLED":0,"REJECTED":0,"CANCELLED":0}}}}))
+    registry_path = root / "experiments.sqlite"
+    registry = ExperimentRegistry(registry_path, clock=lambda:datetime(2026,10,16,8,tzinfo=timezone.utc))
+    registry.register({"id":"paired-test","hypothesis":"검증 전 성과를 만들어 내지 않는 실험 카드", "universe":["TEST"],
+        "capital":10000,"currency":"USD","benchmark":"SPY","costs":{"fee_bps":1,"slippage_bps":2},
+        "baseline_rules":{"strategy":"fixed"},"ai_rules":{"strategy":"candidate"},
+        "training_end":"2026-10-15T20:00:00Z","forward_start":"2026-10-19T13:30:00Z","forward_end":"2026-12-01T21:00:00Z"})
+    registry.freeze("paired-test")
+    registry.close()
+    return status_path, registry_path
 
 
 async def probe(websocket_url, page_url):
@@ -65,16 +82,31 @@ async def probe(websocket_url, page_url):
               if (window.__pwned || document.querySelector('#facts img')) throw Error('Evidence executed markup');
               if (!document.querySelector('#reasons').textContent.includes('volume_rule_not_met')) throw Error('Engine reasons missing');
               if (window.reviewSnapshot.broker_orders_sent !== 0) throw Error('Viewer is not read only');
+              if (!document.querySelector('#paper-health').textContent.includes('휴장·장 종료')) throw Error('Paper status absent');
+              if (!document.querySelector('#kis-demo-health').textContent.includes('조회 점검 기록 없음') || !document.querySelector('#kis-demo-health').textContent.includes('미검증')) throw Error('KIS read/order distinction absent');
+              if (document.querySelector('#paper-health').textContent.includes('PRIVATE_DO_NOT_DISPLAY')) throw Error('Private path leaked');
+              if (!document.querySelector('#experiment-cards').textContent.includes('paired-test')) throw Error('Experiment card absent');
+              if (!document.querySelector('#experiment-cards').textContent.includes('수익률·낙폭을 표시하지 않습니다')) throw Error('Unobserved performance fabricated');
               if (document.documentElement.scrollWidth > innerWidth+2) throw Error('Viewport overflow');
               return {width:innerWidth,canvas:document.querySelectorAll('#charts canvas').length,readOnly:true};
             })()''')
+            if result["width"] != width:
+                raise RuntimeError(f"Mobile layout viewport expanded from {width} to {result['width']}")
+            await evaluate("document.querySelector('#condition-text').value='거래대금 100억원 이상 그리고 전일 대비 거래량 1.5배 이상 그리고 거래정지 제외'; compileCondition()")
+            if not await evaluate("window.conditionDraft?.status === 'compiled' && document.querySelector('#condition-draft').textContent.includes('저장·활성화 안 됨')"):
+                raise RuntimeError("Explicit natural-language draft failed")
+            await evaluate("document.querySelector('#condition-text').value='거래량이 많은 종목'; compileCondition()")
+            if not await evaluate("window.conditionDraft?.condition === null"):
+                raise RuntimeError("Vague condition acquired an invented threshold")
+            result["natural_language_draft"] = True
+            result["paper_and_experiment_status"] = True
             if OUTPUT and width in (390, 1440):
                 shot = await call("Page.captureScreenshot", {"format": "png", "captureBeyondViewport": False})
                 (OUTPUT / f"investment-review-{width}.png").write_bytes(base64.b64decode(shot["data"]))
             await evaluate("document.querySelector('#asof').value='2026-10-16T08:00:00Z'; loadSnapshot()")
             await evaluate('''(() => {
               if (window.reviewSnapshot.series.length || window.reviewSnapshot.execution_verdict) throw Error('Future data in replay');
-              if (document.querySelector('#charts canvas') || document.querySelector('#facts').children.length) throw Error('Stale future view remained');
+              if (document.querySelector('#charts canvas') || document.querySelector('#facts').textContent.includes('<img')) throw Error('Stale future view remained');
               return true;
             })()''')
             result["replay_excludes_future"] = True
@@ -96,8 +128,8 @@ def main():
         OUTPUT.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="ta-review-ui-") as temporary:
         root = Path(temporary)
-        fixture(root)
-        server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(root))
+        status_path, registry_path = fixture(root)
+        server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(root, experiment_registry=registry_path, paper_status_path=status_path))
         worker = Thread(target=server.serve_forever, daemon=True)
         worker.start()
         try:

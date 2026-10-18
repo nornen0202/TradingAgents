@@ -518,18 +518,43 @@ def complete_handoffs(site, runtime_dir, publication):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("run-due", "publish"))
+    parser.add_argument("command", choices=("run-due", "publish", "paper", "review"))
     parser.add_argument("--archive-dir", type=Path, required=True)
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--runtime-dir", type=Path, required=True)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--rebuild", action="store_true")
+    parser.add_argument("--review-port", type=int, default=8766)
     args = parser.parse_args()
+    if not 1024 <= args.review_port <= 65535:
+        parser.error("--review-port must be between 1024 and 65535")
     args.archive_dir = args.archive_dir.resolve()
     args.state_dir = args.state_dir.resolve()
     args.runtime_dir = args.runtime_dir.resolve()
     args.state_dir.mkdir(parents=True, exist_ok=True)
     prepare_environment()
+    # These are independent consumers. They neither acquire producer ownership
+    # nor dispatch report notifications, and cannot send a real broker order.
+    if args.command == "paper":
+        if args.dry_run:
+            print(json.dumps({"status": "DRY_RUN", "mode": "LOCAL_PAPER_ONLY", "broker_orders_sent": 0}))
+            return 0
+        from tradingagents.execution.paper_runtime import tick
+        try:
+            result = tick(args.archive_dir, args.state_dir / "paper")
+        except TimeoutError:
+            result = {"status": "PAPER_ALREADY_RUNNING", "broker_orders_sent": 0}
+        print(json.dumps(result, ensure_ascii=True))
+        return 0
+    if args.command == "review":
+        if args.dry_run:
+            print(json.dumps({"status": "DRY_RUN", "read_only": True, "broker_orders_sent": 0}))
+            return 0
+        from tradingagents.charting.server import serve
+        serve(archive_dir=args.archive_dir, port=args.review_port,
+              db_paths=[args.archive_dir / "performance.sqlite", args.archive_dir / "paper/kr.sqlite", args.archive_dir / "paper/us.sqlite"],
+              experiment_registry=args.archive_dir / "experiments.sqlite", paper_status_path=args.archive_dir / "paper/status.json")
+        return 0
     lane_acquired = False
     try:
         with interprocess_file_lock(args.state_dir / f"{args.command}.lock", timeout=0):

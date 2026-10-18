@@ -789,6 +789,15 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     elif config.performance.enabled and not portfolio_only:
         manifest["performance"] = {"status": "skipped", "reason": "overlay_fast_path"}
 
+    # Recommendation capture happens after individual research workers finish.
+    # Refresh their local views only now so the signal/journal connection is
+    # present in the same run's deliverable. No journal is copied to the site.
+    review_databases = [config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")]
+    for ticker_summary in ticker_summaries:
+        ticker_dir = run_dir / "tickers" / str(ticker_summary.get("ticker") or "")
+        if ticker_summary.get("status") == "success" and (ticker_dir / "analysis.json").is_file():
+            _refresh_integrated_review(ticker_dir, ticker_summary, run_dir=run_dir, db_paths=review_databases)
+
     manifest["run_quality"] = _compute_run_quality(manifest=manifest)
     manifest["usefulness_rank"] = manifest["run_quality"]["usefulness_rank"]
 
@@ -2009,14 +2018,6 @@ def _run_single_ticker(
                 tool_events=tool_events,
             )
             analysis_payload["institutional_intelligence"] = institutional_outputs["summary"]
-            from tradingagents.dataflows.event_timeline import build_event_timeline, snapshot_event_records
-            analysis_payload["event_records"] = [*institutional_outputs.get("event_records", []),
-                                                 *snapshot_event_records(ticker=ticker)]
-            event_path = ticker_dir / "event_timeline.json"
-            timeline = build_event_timeline(analysis_payload["event_records"],
-                                            analysis_as_of=analysis_payload["finished_at"], ticker=ticker)
-            _write_json(event_path, timeline)
-            institutional_artifacts["event_timeline_json"] = _relative_to_run(run_dir, event_path)
             for artifact_key, filename, payload in (
                 ("public_equity_intelligence_json", "public_equity_intelligence.json", institutional_outputs["full"]),
                 ("source_quality_json", "source_quality.json", institutional_outputs["source_quality"]),
@@ -2049,6 +2050,19 @@ def _run_single_ticker(
                 "security_readiness": "watch_only",
                 "warnings": [warning],
             }
+        # Captured public disclosures remain available even if an optional
+        # institutional pack cannot be built. Preserve their original clocks.
+        from tradingagents.dataflows.event_timeline import build_event_timeline, snapshot_event_records
+        analysis_payload["event_records"] = [*institutional_outputs.get("event_records", []),
+                                             *snapshot_event_records(ticker=ticker)]
+        try:
+            event_path = ticker_dir / "event_timeline.json"
+            _write_json(event_path, build_event_timeline(analysis_payload["event_records"],
+                        analysis_as_of=datetime.now(timezone.utc), ticker=ticker))
+            institutional_artifacts["event_timeline_json"] = _relative_to_run(run_dir, event_path)
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            quality_flags.append("event_timeline_unavailable")
+            print(f"::warning::Event timeline unavailable: {type(exc).__name__}")
         analysis_path = ticker_dir / "analysis.json"
         _write_json(analysis_path, analysis_payload)
         execution_artifacts: dict[str, str] = {}
@@ -2099,7 +2113,14 @@ def _run_single_ticker(
         try:
             chart_path = ticker_dir / "chart_evidence.json"
             chart_asof = datetime.now(timezone.utc).isoformat()
-            _write_json(chart_path, chart_capture.artifact(analysis_as_of=chart_asof))
+            chart_payload = chart_capture.artifact(analysis_as_of=chart_asof)
+            _write_json(chart_path, chart_payload)
+            analysis_payload["chart_capture"] = {"evaluated_at": chart_asof,
+                "completed_bar_count": len(chart_payload.get("bars") or []),
+                "rejected": chart_payload.get("rejected") or {},
+                "source": "existing_analysis_inputs", "additional_provider_requests": 0}
+            if not chart_payload.get("bars"):
+                quality_flags.append("chart_bars_unavailable")
             execution_artifacts["chart_evidence_json"] = _relative_to_run(run_dir, chart_path)
             review_path = ticker_dir / "investment_review.html"
             review_path.write_text(render_review(build_review(ticker_dir, analysis_as_of=chart_asof)), encoding="utf-8")
@@ -2107,6 +2128,9 @@ def _run_single_ticker(
         except (OSError, ValueError, TypeError, KeyError) as exc:
             quality_flags.append("integrated_review_unavailable")
             print(f"::warning::Integrated review unavailable: {type(exc).__name__}")
+        # Optional rendering flags must be present in the durable analysis,
+        # not only the in-memory ticker summary returned to the scheduler.
+        _write_json(analysis_path, analysis_payload)
 
         return {
             "ticker": ticker,
@@ -2190,15 +2214,20 @@ def _run_single_ticker(
                 print("::warning::Could not fully close the completed analysis session.")
 
 
-def _refresh_integrated_review(ticker_dir: Path, summary: dict, *, run_dir: Path) -> None:
-    from tradingagents.charting.report import build_review, render_review
+def _refresh_integrated_review(ticker_dir: Path, summary: dict, *, run_dir: Path, db_paths=()) -> None:
+    from tradingagents.charting.report import render_review
+    from tradingagents.charting.snapshot import get_replay_snapshot
     try:
         path = ticker_dir / "investment_review.html"
-        review = build_review(ticker_dir, analysis_as_of=datetime.now(timezone.utc))
+        review = get_replay_snapshot(ticker_dir.name, datetime.now(timezone.utc),
+                                     ticker_dir=ticker_dir, db_paths=db_paths)
         path.write_text(render_review(review), encoding="utf-8")
         summary.setdefault("artifacts", {})["investment_review_html"] = _relative_to_run(run_dir, path)
     except (OSError, ValueError, TypeError, KeyError) as exc:
-        summary.setdefault("quality_flags", []).append("integrated_review_unavailable")
+        flags = list(summary.get("quality_flags") or [])
+        if "integrated_review_unavailable" not in flags:
+            flags.append("integrated_review_unavailable")
+        summary["quality_flags"] = flags
         print(f"::warning::Integrated review unavailable: {type(exc).__name__}")
 
 
@@ -3967,6 +3996,13 @@ def _bootstrap_overlay_inputs_from_latest_run(
             "daily_thesis_json",
             "close_plan_json",
             "intraday_execution_json",
+            "chart_evidence_json",
+            "event_timeline_json",
+            "evidence_ledger_json",
+            "source_quality_json",
+            "earnings_event_pack_json",
+            "public_equity_intelligence_json",
+            "thesis_tracker_json",
         ):
             copied_artifact = _copy_bootstrap_artifact(
                 source_run_dir=source_run_dir,
@@ -3977,6 +4013,10 @@ def _bootstrap_overlay_inputs_from_latest_run(
             )
             if copied_artifact:
                 copied_source_artifacts[artifact_key] = copied_artifact
+        copied_source_artifacts.update(_copy_integrated_review_sources(
+            source_ticker_dir=source_analysis.parent, target_ticker_dir=target_ticker_dir,
+            source_run_dir=source_run_dir, run_dir=run_dir,
+            existing_artifacts=copied_source_artifacts))
         copied_source_artifacts.update(
             _copy_latest_microstructure_artifacts(
                 archive_dir=config.storage.archive_dir,
@@ -4037,6 +4077,47 @@ def _bootstrap_overlay_inputs_from_latest_run(
     if not summaries:
         raise RuntimeError("No successful tickers available in latest run to bootstrap overlay-only mode.")
     return summaries, source_run_id
+
+
+def _copy_integrated_review_sources(*, source_ticker_dir: Path, target_ticker_dir: Path,
+                                    source_run_dir: Path, run_dir: Path,
+                                    existing_artifacts: dict[str, str]) -> dict[str, str]:
+    """Preserve known local chart refreshes absent from older immutable manifests.
+
+    These are acquired-now vintages, not a rerun of the original analysis.
+    Copy only recognized source files, with all their original timing intact.
+    """
+    root = (source_run_dir / "tickers").resolve()
+    source = source_ticker_dir.resolve()
+    if not source.is_relative_to(root):
+        return {}
+    copied = {}
+    for filename, artifact_key in (
+        ("chart_evidence.json", "chart_evidence_json"),
+        ("chart_capture_status.json", "chart_capture_status_json"),
+        ("event_timeline.json", "event_timeline_json"),
+        ("evidence_ledger.json", "evidence_ledger_json"),
+        ("earnings_event_pack.json", "earnings_event_pack_json"),
+    ):
+        path = source / filename
+        if artifact_key in existing_artifacts or not path.is_file() or not path.resolve().is_relative_to(root):
+            continue
+        target = target_ticker_dir / filename
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, target)
+        copied[artifact_key] = _relative_to_run(run_dir, target)
+    for pattern in ("chart_evidence_*.json", "chart_capture_status_*.json",
+                    "execution_update_reobserved_*.json", "execution_contract_reobserved_*.json"):
+        for path in (source / "execution/checkpoints").glob(pattern):
+            if not path.is_file() or not path.resolve().is_relative_to(root):
+                continue
+            target = target_ticker_dir / "execution/checkpoints" / path.name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if target.exists() and target.read_bytes() != path.read_bytes():
+                raise RuntimeError("Integrated review vintage identity conflict")
+            if not target.exists():
+                shutil.copy2(path, target)
+    return copied
 
 
 def _copy_bootstrap_artifact(
@@ -5153,7 +5234,8 @@ def _run_execution_overlay_passes(
                 md_path.write_text(md_text, encoding="utf-8")
                 summary["artifacts"]["execution_update_md"] = _relative_to_run(run_dir, md_path)
                 summary["execution_update"] = update_payload
-                _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir)
+                _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir,
+                    db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 updates_by_ticker[ticker] = update_payload
@@ -5213,7 +5295,8 @@ def _run_execution_overlay_passes(
                 )
                 summary["artifacts"]["execution_update_md"] = _relative_to_run(run_dir, md_path)
                 summary["execution_update"] = update_payload
-                _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir)
+                _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir,
+                    db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 updates_by_ticker[ticker] = update_payload

@@ -3274,12 +3274,17 @@ def _render_ticker_review_section(*, run_dir: Path, manifest: dict, ticker_summa
     from tradingagents.charting.report import build_review, render_review
     from tradingagents.charting.bars import instant
     ticker_dir = (run_dir / "tickers" / str(ticker_summary.get("ticker", ""))).resolve()
-    if not ticker_dir.is_relative_to(run_dir.resolve()) or not (ticker_dir / "chart_evidence.json").is_file():
+    if not ticker_dir.is_relative_to((run_dir / "tickers").resolve()):
         return ""
+    if not (ticker_dir / "chart_evidence.json").is_file():
+        return '<section class="section"><h2>차트·근거 통합 검토</h2><p>이 분석에는 검증된 차트 수집 기록이 없습니다. 기존 판단·근거 보고서를 확인하고 새 전체 분석이 완료되면 로컬 통합 화면에서 검토하세요.</p></section>'
     cutoff = instant(manifest.get("finished_at") or ticker_summary.get("finished_at"))
     if cutoff is None:
         return ""
-    return render_review(build_review(ticker_dir, analysis_as_of=cutoff), public=True, fragment=True)
+    try:
+        return render_review(build_review(ticker_dir, analysis_as_of=cutoff), public=True, fragment=True)
+    except (OSError, ValueError, TypeError, KeyError):
+        return '<section class="section"><h2>차트·근거 통합 검토</h2><p>통합 자료를 검증하지 못했습니다. 새 분석과 로컬 자료 상태를 확인해 주세요.</p></section>'
 
 
 def _render_ticker_institutional_section(*, run_dir: Path, ticker_summary: dict[str, Any]) -> str:

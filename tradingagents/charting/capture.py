@@ -14,6 +14,7 @@ _ACTIVE = ContextVar("tradingagents_chart_capture", default=None)
 class ChartCapture:
     def __init__(self, ticker):
         self.ticker, self._rows, self._lock = ticker, [], Lock()
+        self._providers = set()
 
     def activate(self):
         return _ACTIVE.set(self)
@@ -22,16 +23,19 @@ class ChartCapture:
     def reset(token):
         _ACTIVE.reset(token)
 
-    def add(self, rows):
+    def add(self, rows, *, provider="yfinance"):
         with self._lock:
             self._rows.extend(rows)
+            self._providers.add(provider)
 
     def artifact(self, *, analysis_as_of):
         with self._lock:
             result = validate_bars(self._rows, analysis_as_of=analysis_as_of)
+            providers = sorted(self._providers)
         return {**result, "ticker": self.ticker, "public_display_allowed": False,
                 "execution_authorized": False, "source": "existing_analysis_inputs",
-                "provider": "yfinance",
+                "provider": providers[0] if len(providers) == 1 else "local_archive",
+                "providers": providers,
                 "price_basis": "provider_adjustment_basis; never combine daily and intraday"}
 
 
@@ -61,7 +65,8 @@ def capture_daily_frame(ticker, frame, *, curr_date):
         rows.append({**{key: row.get(key.title()) for key in ("open", "high", "low", "close", "volume")},
                      "timestamp": completed.isoformat(), "available_at": completed.isoformat(),
                      "observed_at": observed.isoformat(), "session_id": day, "interval": "1d"})
-    recorder.add(rows)
+    source = str(frame.attrs.get("source") or "")
+    recorder.add(rows, provider="kis" if source.startswith("KIS domestic_daily_itemchartprice") else "yfinance")
 
 
 def normalize_kis_bars(rows, *, observed_at, timezone_name):
