@@ -79,7 +79,9 @@ class DemoCredentials:
 class RequestPacer:
     """One process/app-key request spacing; no retries of reads or writes."""
 
-    def __init__(self, *, interval=1.1, clock=time.monotonic, sleep=time.sleep):
+    # Actual VTS balance pagination returned EGW00201 at 1.1s spacing; 2.2s
+    # completed the same read sequence. Keep headroom without retrying writes.
+    def __init__(self, *, interval=2.2, clock=time.monotonic, sleep=time.sleep):
         self.interval, self.clock, self.sleep = interval, clock, sleep
         self.last = None
         self.lock = threading.Lock()
