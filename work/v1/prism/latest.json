@@ -1,20 +1,20 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "prism",
-  "event_id": "prism:b53c0e175410cd403f9c49469216ec44",
+  "event_id": "prism:8d71c4eb255d74fb0127fd58293d6ca6",
   "prompt_contract_version": "prism-work-v5",
   "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
-  "source_sha256": "d1a7fc4af79e1f60962d70302620291c2ed457fce1af0e60f94b54526cbdf2d6",
+  "source_sha256": "ed2e2b2295b098a985be61aa43b63a47dcf8a1dc8dfb9305adf216c840ddd0a9",
   "body": {
     "kind": "prism",
-    "source_health": "EMPTY",
+    "source_health": "OK",
     "source": {
-      "health": "EMPTY",
-      "run_id": "prism_telegram_20261017_080327",
-      "last_run_at": "2026-10-17T08:03:38.050859+09:00",
+      "health": "OK",
+      "run_id": "prism_telegram_20261018_091628",
+      "last_run_at": "2026-10-18T09:16:30.058383+09:00",
       "status": "success",
       "stale_after_hours": 30
     },
@@ -43,14 +43,175 @@
       "may_bypass_market_or_portfolio_execution_gate": false
     },
     "coverage": {
-      "total_unique_events": 175,
-      "window_events": 0,
-      "transmitted_events": 0,
+      "total_unique_events": 180,
+      "window_events": 5,
+      "transmitted_events": 5,
       "truncated": false,
-      "oldest_occurred_at": null,
-      "newest_occurred_at": null
+      "oldest_occurred_at": "2026-10-17T21:33:27+00:00",
+      "newest_occurred_at": "2026-10-17T23:57:27+00:00"
     },
-    "events": [],
+    "events": [
+      {
+        "event_key": "stock_ai_agent:16266",
+        "content_sha256": "ade7f53d4256b46c3f3733537363f9ce22d931685643014ac51f4c89f2553751",
+        "occurred_at": "2026-10-17T23:57:27+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16266",
+          "posted_at": "2026-10-17T23:57:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16266",
+          "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/18 08:56:20 KST 💵 청산 결과 정리 수량: 0.01 BTC 진입 → 청산: 81,050.00 USDT → 81,443.30 USDT 보유 시간: 143.9분 확정 순손익: -4.54 USDT • 시작 계좌 9,427.52 USDT 대비 -0.05% • 수수료 0.61 USDT · 펀딩 0.00 USDT 반영 💰 종료 후...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 260,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16265",
+        "content_sha256": "2512864180bf16125625d8cddc8f998f41459ef698cac02c3c0b6e9d1122a32f",
+        "occurred_at": "2026-10-17T23:16:28+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16265",
+          "posted_at": "2026-10-17T23:16:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16265",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/18 08:16:24 KST 📦 보유량 0.01 BTC · 평단 81,050.00 USDT 💰 계좌 순자산: 9,424.65 USDT • 총 증거금 81.81 USDT(계좌 0.87%) · 10배 · 교차 🛡 손절 SL 81,480.00 USDT · 남은 전량 • 예상 손익: -4.30 USDT · 계좌 -0.05% (1배 -0.53% /...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 762,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16264",
+        "content_sha256": "11a063dd710a4237141e66723237a9a1fdedb3aa50bfebd3cdf6a2d0a5f6559d",
+        "occurred_at": "2026-10-17T23:11:27+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16264",
+          "posted_at": "2026-10-17T23:11:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16264",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/18 08:11:22 KST 📦 보유량 0.01 BTC · 평단 81,050.00 USDT 💰 계좌 순자산: 9,424.63 USDT • 총 증거금 81.81 USDT(계좌 0.87%) · 10배 · 교차 🛡 손절 SL 81,550.00 → 81,480.00 USDT · 남은 전량 • 예상 손익: -4.30 USDT · 계좌 -0.05%...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 713,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16263",
+        "content_sha256": "36b6590e9738ed13784f477f8764ce7137947ba9ddf99a804180eb805788ef97",
+        "occurred_at": "2026-10-17T23:06:27+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16263",
+          "posted_at": "2026-10-17T23:06:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16263",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/18 08:06:22 KST 📦 보유량 0.01 BTC · 평단 81,050.00 USDT 💰 계좌 순자산: 9,424.79 USDT • 총 증거금 81.80 USDT(계좌 0.87%) · 10배 · 교차 🛡 손절 SL 81,680.00 → 81,550.00 USDT · 남은 전량 • 예상 손익: -5.00 USDT · 계좌 -0.05%...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 713,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16262",
+        "content_sha256": "1be6aa6d1d0764b9c316064b17ae1e4f641e39bea1c81c2c058ec2697e4a6197",
+        "occurred_at": "2026-10-17T21:33:27+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16262",
+          "posted_at": "2026-10-17T21:33:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16262",
+          "preview": "📌 BTC 데모 첫 진입 체결 · 숏 🕐 10/18 06:32:25 KST 🧾 이번 체결: 0.01 BTC · 81,050.00 USDT • 체결금액(명목): 810.50 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0 BTC → 0.01 BTC · 관측 기준 • 평단 81,050.00 USDT 💰 계좌 순자산: 9,427.92 USDT • 총 증거금 81.48 USDT(계좌...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 824,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      }
+    ],
     "guardrails": {
       "untrusted_content": true,
       "advisory_only": true,

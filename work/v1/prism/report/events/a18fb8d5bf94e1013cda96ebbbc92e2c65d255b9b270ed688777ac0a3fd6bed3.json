@@ -1,0 +1,171 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:2fec84c1ac320f568f4fe7c15c252de0",
+  "source_sha256": "49fffc7736d3c6eb56592224a8e11690a6be90d8d5d5f3b788f7c936c7ca7c06",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 리서치 델타 · 2026-10-18\n\n신규 5건은 BTC 데모 진입·보호 변경·종료 기록. 실제 주식 리서치에 반영할 새 근거는 없어 NO_ACTIONABLE_DELTA.\n\n- 소스 정상: 생산 성공 09:16:30 KST. 검증 시각 2026-10-18T11:57:45+09:00; 생산 경과 2.69시간으로 30시간 한도 내.\n- 5건 모두 최근 24시간 내이며 미래·역전 시각 없음. 신규 5, 수정 0, 중복 제외 0; 전송 5/5, 생략 0, 잘림 없음. 이는 현재 창의 이벤트 커버리지이며 보유·관심종목 전수 커버리지를 뜻하지 않음.\n- 본문은 BTC 데모지만 정규화 simulation_only=false. 충돌을 명시하고 전부 시뮬레이션 참고로만 처리.\n\n| 이벤트 | 발생 KST | 연구상 변화 |\n|---|---|---|\n| stock_ai_agent:16262 | 10/18 06:33:27 | BTC 데모 숏 진입 기록 |\n| stock_ai_agent:16263 | 10/18 08:06:27 | 데모 보호 조건 변경 |\n| stock_ai_agent:16264 | 10/18 08:11:27 | 데모 보호 조건 재변경 |\n| stock_ai_agent:16265 | 10/18 08:16:28 | 데모 보호 조건 확인 |\n| stock_ai_agent:16266 | 10/18 08:57:27 | 데모 종료·정산 주장; 독립 확인 안 됨 |\n\n실제 주식 신호와 기타 공식 근거는 이번 델타에 없다. 계좌·가격·손익 숫자는 실제 투자 근거로 전환하지 않는다. 첨부·전체 원문을 독립 검증한 것으로 해석하지 않는다.\n\nbalanced_external: 다섯 이벤트는 같은 채널의 한 데모 연속 기록이며 독립 다중 출처 합의가 아니다. LOW_LABELED로 제한한다. 종목 매핑이 없으므로 KR·US 종목 순위, thesis 신뢰도 및 위험 한도 내 비중은 변경하지 않는다. 후속 리서치에는 다섯 event key에 연결해 데모 분류 충돌 확인 우선순위를 높인다. 실행은 RESEARCH_ONLY이며 시장·계좌·위험 게이트를 유지한다.\n\n다음 확인: 다음 성공한 sanitized 생산 또는 새/수정 이벤트 도착 시. 실제 종목 후보가 생기면 기업 IR·공시·거래소 근거와 최신 시세를 별도 검증한다. 데모 메타데이터 정합성 확인 전 실제 실행 근거로 사용하지 않는다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:2fec84c1ac320f568f4fe7c15c252de0\",\"status\":\"COMPLETE\",\"window_events\":5,\"transmitted_events\":5,\"truncated\":false,\"new_events\":5,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}\n\n로컬 보고서 저장과 Work ACK는 외부 전달 증명이 아니다. Telegram·Pages 전달 확인은 대기 중이다.",
+  "structured_report": {
+    "schema": "tradingagents.work-report/v1",
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:2fec84c1ac320f568f4fe7c15c252de0",
+      "source_sha256": "49fffc7736d3c6eb56592224a8e11690a6be90d8d5d5f3b788f7c936c7ca7c06"
+    },
+    "title": "PRISM 리서치 델타 · BTC 데모 5건, 주식 실행 변화 없음",
+    "generated_at": "2026-10-18T02:57:45.592710+00:00",
+    "as_of": "2026-10-17T23:57:27+00:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH",
+    "summary": "신규 5건은 BTC 데모 진입·보호 변경·종료 기록. 실제 주식 리서치에 반영할 새 근거는 없어 NO_ACTIONABLE_DELTA.",
+    "top_actions": [],
+    "strategies": [],
+    "coverage_receipt": {
+      "event_id": "prism:2fec84c1ac320f568f4fe7c15c252de0",
+      "status": "COMPLETE",
+      "window_events": 5,
+      "transmitted_events": 5,
+      "truncated": false,
+      "new_events": 5,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261018_091628",
+        "last_run_at": "2026-10-18T09:16:30.058383+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 180,
+        "window_events": 5,
+        "transmitted_events": 5,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-17T21:33:27+00:00",
+        "newest_occurred_at": "2026-10-17T23:57:27+00:00"
+      },
+      "delta": {
+        "new_events": 5,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:16266",
+          "stock_ai_agent:16265",
+          "stock_ai_agent:16264",
+          "stock_ai_agent:16263",
+          "stock_ai_agent:16262"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "execution_eligible": false,
+      "no_relevant_evidence_reason": "주식 종목 매핑 없는 BTC 데모 연속 기록만 전달됨. 종목 순위·신뢰도·비중 변경 없음.",
+      "classification_conflict": "본문 데모와 simulation_only=false 충돌; 시뮬레이션으로 보수적 처리",
+      "source_contributions": [
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16266",
+          "content_sha256": "ade7f53d4256b46c3f3733537363f9ce22d931685643014ac51f4c89f2553751",
+          "affected_field": "research_priority",
+          "direction": "INCREASE_DATA_QUALITY_VERIFICATION",
+          "evidence_weight": "LOW_LABELED",
+          "reason": "데모 분류 정합성 확인 우선; 종목 및 실행 영향 없음"
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16265",
+          "content_sha256": "2512864180bf16125625d8cddc8f998f41459ef698cac02c3c0b6e9d1122a32f",
+          "affected_field": "research_priority",
+          "direction": "INCREASE_DATA_QUALITY_VERIFICATION",
+          "evidence_weight": "LOW_LABELED",
+          "reason": "데모 분류 정합성 확인 우선; 종목 및 실행 영향 없음"
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16264",
+          "content_sha256": "11a063dd710a4237141e66723237a9a1fdedb3aa50bfebd3cdf6a2d0a5f6559d",
+          "affected_field": "research_priority",
+          "direction": "INCREASE_DATA_QUALITY_VERIFICATION",
+          "evidence_weight": "LOW_LABELED",
+          "reason": "데모 분류 정합성 확인 우선; 종목 및 실행 영향 없음"
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16263",
+          "content_sha256": "36b6590e9738ed13784f477f8764ce7137947ba9ddf99a804180eb805788ef97",
+          "affected_field": "research_priority",
+          "direction": "INCREASE_DATA_QUALITY_VERIFICATION",
+          "evidence_weight": "LOW_LABELED",
+          "reason": "데모 분류 정합성 확인 우선; 종목 및 실행 영향 없음"
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:16262",
+          "content_sha256": "1be6aa6d1d0764b9c316064b17ae1e4f641e39bea1c81c2c058ec2697e4a6197",
+          "affected_field": "research_priority",
+          "direction": "INCREASE_DATA_QUALITY_VERIFICATION",
+          "evidence_weight": "LOW_LABELED",
+          "reason": "데모 분류 정합성 확인 우선; 종목 및 실행 영향 없음"
+        }
+      ],
+      "freshness_checked_at": "2026-10-18T02:57:45.592710+00:00",
+      "external_delivery_verified": false
+    },
+    "next_checkpoint": "다음 성공한 sanitized 생산 또는 새/수정 이벤트; 데모 분류 정합성과 실제 종목 공식 근거 확인",
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    }
+  },
+  "report_id": "prism:a18fb8d5bf94e1013cda96ebbbc92e2c",
+  "report_sha256": "a18fb8d5bf94e1013cda96ebbbc92e2c65d255b9b270ed688777ac0a3fd6bed3",
+  "published_at": "2026-10-18T11:57:51.018576+09:00"
+}
