@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("run-due", "publish")][string] $Command,
+    [ValidateSet("run-due", "publish", "paper", "review")][string] $Command,
     [string] $RepositoryRoot = "C:\Projects\TradingAgents",
     [string] $ArchiveRoot = "C:\TradingAgentsData\archive",
     [switch] $DryRun

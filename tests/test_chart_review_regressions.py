@@ -55,7 +55,10 @@ def test_invalid_or_unentitled_evidence_cannot_enter_fact_view(tmp_path, changes
     directory = archive(tmp_path)
     write(directory / "evidence_ledger.json", [evidence(**changes)])
     review = build_review(directory, analysis_as_of=ASOF)
-    assert review["evidence"] == [] and review["unverified_evidence_count"] == 1
+    # Future ingestion is wholly absent from an earlier frame, including its
+    # diagnostics; other present-time invalid records remain accounted for.
+    expected = 0 if changes.get("observed_at") == "2026-10-19T00:00:00Z" else 1
+    assert review["evidence"] == [] and review["unverified_evidence_count"] == expected
 
 
 @pytest.mark.parametrize("provider,entitlement", [("tradingview_mcp", None), ("custom_vendor", None),

@@ -102,6 +102,13 @@ def _pacer(credentials):
         return _PACERS.setdefault(key, RequestPacer())
 
 
+def _assert_no_http_retries(session):
+    for adapter in getattr(session, "adapters", {}).values():
+        retries = getattr(adapter, "max_retries", None)
+        if retries is not None and getattr(retries, "total", 0) not in {0, False}:
+            raise DemoNotSentError("VTS transport forbids automatic HTTP retries")
+
+
 class KisDemoClient:
     def __init__(
         self,
@@ -114,6 +121,10 @@ class KisDemoClient:
     ):
         self.credentials = credentials
         self.session = session or requests.Session()
+        # A caller-supplied HTTP retry adapter could silently duplicate a write.
+        # Test transports expose only request(); real Requests sessions must use
+        # the default zero-retry adapters for every mounted scheme.
+        _assert_no_http_retries(self.session)
         self.timeout = max(1, min(float(timeout), 30))
         self._token = None
         self._expires = datetime.min.replace(tzinfo=timezone.utc)
@@ -124,6 +135,17 @@ class KisDemoClient:
         self.session.close()
 
     def _http(self, method, path, *, deadline=None, **kwargs):
+        allowed = {
+            ("POST", "/oauth2/tokenP"),
+            ("GET", PREFIX + "inquire-balance"),
+            ("GET", PREFIX + "inquire-daily-ccld"),
+            ("GET", PREFIX + "inquire-psbl-order"),
+            ("POST", PREFIX + "order-cash"),
+            ("POST", PREFIX + "order-rvsecncl"),
+        }
+        if (method, path) not in allowed:
+            raise DemoNotSentError("Request is outside the VTS path allowlist")
+        _assert_no_http_retries(self.session)
         self.pacer.wait()
         if deadline is not None and self.utcnow() >= stamp(deadline):
             raise DemoNotSentError("VTS request deadline elapsed before sending")
@@ -187,6 +209,7 @@ class KisDemoClient:
         allowed = {
             ("GET", "inquire-balance", "VTTC8434R"),
             ("GET", "inquire-daily-ccld", "VTTC0081R"),
+            ("GET", "inquire-psbl-order", "VTTC8908R"),
             ("POST", "order-cash", "VTTC0012U"),
             ("POST", "order-cash", "VTTC0011U"),
             ("POST", "order-rvsecncl", "VTTC0013U"),
@@ -278,7 +301,10 @@ class KisDemoClient:
         return rows, totals
 
     def orders(self, trade_date: str):
-        datetime.strptime(trade_date, "%Y%m%d")
+        if not isinstance(trade_date, str) or not re.fullmatch(r"[0-9]{8}", trade_date):
+            raise DemoError("Explicit eight-digit order date required")
+        if datetime.strptime(trade_date, "%Y%m%d").date() > self.utcnow().astimezone(ZoneInfo("Asia/Seoul")).date():
+            raise DemoError("Future order date is not allowed")
         return self._pages(
             "inquire-daily-ccld",
             "VTTC0081R",
@@ -299,6 +325,20 @@ class KisDemoClient:
                 "CTX_AREA_NK100": "",
             },
         )[0]
+
+    def buying_power(self, *, ticker: str, limit_price: int):
+        """Cash-only buying capacity; never use margin-inclusive max_buy_amt."""
+        if not re.fullmatch(r"[0-9]{6}", str(ticker)) or type(limit_price) is not int or limit_price <= 0:
+            raise DemoNotSentError("KR ticker and integer limit required")
+        payload, _ = self.request("GET", "inquire-psbl-order", "VTTC8908R", params={
+            **self._account(), "PDNO": ticker, "ORD_UNPR": str(limit_price),
+            # Official cash-only quantity guidance uses market-order division
+            # for the capacity query. The submitted order remains limit-only.
+            "ORD_DVSN": "01", "CMA_EVLU_AMT_ICLD_YN": "N", "OVRS_ICLD_YN": "N",
+        })
+        if str(payload.get("rt_cd")) != "0" or not isinstance(payload.get("output"), dict):
+            raise DemoError("VTS cash buying capacity unavailable")
+        return payload["output"]
 
 
 class DemoOrderJournal:
@@ -450,7 +490,7 @@ class DemoOrderJournal:
             intent_id, "order-cash", preview["tr_id"], body, now, deadline=valid_until
         )
 
-    def reconcile(self, *, intent_id, trade_date):
+    def reconcile(self, *, intent_id, trade_date, reports=None):
         row = self.db.execute(
             "SELECT * FROM requests WHERE id=?", (intent_id,)
         ).fetchone()
@@ -471,7 +511,9 @@ class DemoOrderJournal:
                 "requires_manual_reconciliation": row["status"] == "UNKNOWN",
             }
         try:
-            reports = self.client.orders(trade_date)
+            reports = self.client.orders(trade_date) if reports is None else reports
+            if not isinstance(reports, list) or any(not isinstance(item, dict) for item in reports):
+                raise DemoError("VTS invalid order rows")
         except DemoError:
             self._block(intent_id, "broker_query_unavailable")
             raise
@@ -571,7 +613,7 @@ class DemoOrderJournal:
             raise
         return receipt
 
-    def cancel(self, *, intent_id, trade_date, now):
+    def cancel(self, *, intent_id, trade_date, now, reconciled_receipt=None, deadline=None):
         if (
             stamp(now).astimezone(ZoneInfo("Asia/Seoul")).strftime("%Y%m%d")
             != trade_date
@@ -586,7 +628,8 @@ class DemoOrderJournal:
         ).fetchone()
         if previous:
             return {"status": previous["status"], **json.loads(previous["response"])}
-        receipt = self.reconcile(intent_id=intent_id, trade_date=trade_date)
+        receipt = (self.reconcile(intent_id=intent_id, trade_date=trade_date)
+                   if reconciled_receipt is None else reconciled_receipt)
         if (
             receipt["status"] not in {"OPEN", "PARTIAL"}
             or receipt.get("remaining_qty", 0) <= 0
@@ -610,7 +653,7 @@ class DemoOrderJournal:
             "VTTC0013U",
             body,
             now,
-            deadline=(
+            deadline=deadline or (
                 stamp(now)
                 .astimezone(ZoneInfo("Asia/Seoul"))
                 .replace(hour=0, minute=0, second=0, microsecond=0)

@@ -52,7 +52,7 @@ def _latest_execution(directory, cutoff, ticker):
         ingested = instant(payload.get("ingested_at"))
         matches = not payload.get("ticker") or str(payload["ticker"]).upper() == str(ticker).upper()
         if matches and evaluated is not None and ingested is not None and evaluated <= ingested <= cutoff:
-            candidates.append(((ingested, evaluated), payload))
+            candidates.append(((evaluated, ingested), payload))
     if not candidates:
         return {}
     last = max(key for key, _ in candidates)
@@ -61,6 +61,24 @@ def _latest_execution(directory, cutoff, ticker):
               "session_vwap", "last_price", "relative_volume")
     # A same-clock disagreement is not a verifiable revision; do not pick by filename.
     identities = {json.dumps({key: payload[key] for key in fields if key in payload}, sort_keys=True) for payload in peers}
+    return peers[0] if len(identities) == 1 else {}
+
+
+def _latest_contract(directory, cutoff, ticker, analysis):
+    analysis_known = instant(analysis.get("finished_at"))
+    candidates = []
+    for payload in _checkpoint_payloads(directory, "execution_contract"):
+        known = instant(payload.get("event_time")) if payload.get("event_time") is not None else analysis_known
+        ingested = instant(payload.get("ingested_at"))
+        matches = not payload.get("ticker") or str(payload["ticker"]).upper() == str(ticker).upper()
+        if (matches and analysis_known is not None and known is not None and ingested is not None
+                and analysis_known <= known <= ingested <= cutoff):
+            candidates.append(((known, ingested), payload))
+    if not candidates:
+        return {}
+    latest = max(key for key, _ in candidates)
+    peers = [payload for key, payload in candidates if key == latest]
+    identities = {json.dumps(payload, sort_keys=True, separators=(",", ":")) for payload in peers}
     return peers[0] if len(identities) == 1 else {}
 
 
@@ -97,11 +115,21 @@ def build_review(ticker_dir, *, analysis_as_of, anchor=None, lifecycle=None):
     from tradingagents.dataflows.market_policy import source_use_policy
     ticker = capture.get("ticker") or directory.name
     capture_entitled = source_use_policy(capture.get("provider") or "local_archive", entitlement=capture.get("entitlement"))["allowed"]
-    capture_rows = capture.get("bars") or []
-    records = [(row, False) for row in capture_rows] if capture_entitled else []
+    capture_public_allowed = capture.get("public_display_allowed") is True
+    records = []
     source_rejected = Counter()
-    if not capture_entitled:
-        source_rejected["source_not_entitled"] += len(capture_rows)
+    for vintage in _checkpoint_payloads(directory, "chart_evidence"):
+        if not _snapshot_visible(vintage, cutoff):
+            continue
+        rows = vintage.get("bars") or []
+        allowed = source_use_policy(vintage.get("provider") or "local_archive", entitlement=vintage.get("entitlement"))["allowed"]
+        matches = not vintage.get("ticker") or str(vintage["ticker"]).upper() == str(ticker).upper()
+        if not allowed or not matches:
+            source_rejected["source_not_entitled" if not allowed else "ticker_mismatch"] += len(rows)
+            continue
+        if rows and vintage.get("public_display_allowed") is not True:
+            capture_public_allowed = False
+        records.extend((row, False) for row in rows)
     for micro in _checkpoint_payloads(directory, "microstructure_snapshot"):
         if not _snapshot_visible(micro, cutoff):
             continue
@@ -116,7 +144,8 @@ def build_review(ticker_dir, *, analysis_as_of, anchor=None, lifecycle=None):
     bars["rejected"] = dict(Counter(bars["rejected"]) + source_rejected)
     visible_execution = _latest_execution(directory, cutoff, ticker)
     execution_view = {key: visible_execution[key] for key in ("decision_state", "decision_now", "reason_codes", "execution_asof",
-                                                             "market_data_asof", "valid_until", "ingested_at", "evaluated_at") if key in visible_execution}
+                                                             "market_data_asof", "valid_until", "ingested_at", "evaluated_at",
+                                                             "provenance", "archive_observed_at") if key in visible_execution}
     source_clock = instant(visible_execution.get("market_data_asof"))
     evaluated_clock = instant(visible_execution.get("execution_asof"))
     if source_clock is not None and evaluated_clock is not None and source_clock <= evaluated_clock <= cutoff:
@@ -124,19 +153,15 @@ def build_review(ticker_dir, *, analysis_as_of, anchor=None, lifecycle=None):
             value = finite(visible_execution.get(key))
             if value is not None and (value > 0 if key != "relative_volume" else value >= 0):
                 execution_view[key] = value
-    contract = _load(directory / "execution_contract.json")
     analysis = _load(directory / "analysis.json")
-    contract_known = instant(analysis.get("finished_at"))
-    contract_ingested = instant(contract.get("ingested_at"))
-    contract = contract if (contract_known is not None and contract_ingested is not None
-                            and contract_known <= contract_ingested <= cutoff) else {}
+    contract = _latest_contract(directory, cutoff, ticker, analysis)
     from tradingagents.dataflows.event_timeline import build_event_timeline
     events = _load(directory / "event_timeline.json")
     pack = _load(directory / "earnings_event_pack.json")
     records = events.get("records") or [version for event in events.get("events", [])
                                         for version in event.get("versions", [event])] or pack.get("event_records") or []
     timeline = build_event_timeline(records,
-                                    analysis_as_of=cutoff)
+                                    analysis_as_of=cutoff, ticker=ticker)
     evidence = _load(directory / "evidence_ledger.json", list_allowed=True)
     items = evidence if isinstance(evidence, list) else evidence.get("evidence_items", evidence.get("items", []))
     verified, unverified = [], 0
@@ -147,6 +172,10 @@ def build_review(ticker_dir, *, analysis_as_of, anchor=None, lifecycle=None):
         known = instant(item.get("known_at"))
         published = instant(item.get("published_at"))
         observed = instant(item.get("observed_at"))
+        if any(value is not None and value > cutoff for value in (known, published, observed)):
+            # A later observation must not even change an earlier exclusion
+            # count or the apparent amount of evidence awaiting validation.
+            continue
         refs = item.get("source_refs") or []
         allowed = all(isinstance(ref, dict) and source_use_policy(ref.get("provider"), entitlement=ref.get("entitlement"))["allowed"] for ref in refs)
         if item.get("provider"):
@@ -175,7 +204,7 @@ def build_review(ticker_dir, *, analysis_as_of, anchor=None, lifecycle=None):
                                                     "entry_valid_until") if key in contract},
             "evidence": verified, "unverified_evidence_count": unverified, "events": timeline,
             "series": series, "rejected_bars": bars["rejected"], "lifecycle": lifecycle or {},
-            "public_display_allowed": capture.get("public_display_allowed") is True and capture_entitled and not bars["micro_used"]}
+            "public_display_allowed": capture_public_allowed and capture_entitled and not bars["micro_used"]}
 
 
 def _escape(value):
