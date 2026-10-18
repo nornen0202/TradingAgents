@@ -13,7 +13,7 @@ import requests
 
 from .demo_secrets import DEMO_KEYS, load_demo_settings, storage_path
 from .kis_demo import (
-    DEMO_HOST, DemoCredentials, DemoError, _assert_no_http_retries, _pacer,
+    DEMO_HOST, DemoCredentials, DemoError, DemoNotSentError, _assert_no_http_retries, _pacer,
 )
 
 PREFIX = "/uapi/overseas-stock/v1/trading/"
@@ -71,10 +71,10 @@ class KisDemoUSReadClient:
     def _now(self):
         value = self.utcnow()
         if not isinstance(value, datetime) or value.tzinfo is None or value.utcoffset() is None:
-            raise DemoError("Aware observation clock required")
+            raise DemoNotSentError("Aware observation clock required")
         return value.astimezone(timezone.utc)
 
-    def _http(self, method, path, **kwargs):
+    def _http(self, method, path, *, not_before=None, **kwargs):
         if (method, path) not in {
             ("POST", "/oauth2/tokenP"),
             ("GET", PREFIX + "inquire-balance"),
@@ -82,7 +82,13 @@ class KisDemoUSReadClient:
         }:
             raise DemoError("Request is outside the read-only US VTS allowlist")
         _assert_no_http_retries(self.session)
+        started = self._now()
+        if not_before is not None and started < not_before:
+            raise DemoNotSentError("US VTS clock regressed before transport")
         self.pacer.wait()
+        sent_at = self._now()
+        if sent_at < started:
+            raise DemoNotSentError("US VTS clock regressed during pacing")
         try:
             response = self.session.request(
                 method, DEMO_HOST + path, timeout=self.timeout,
@@ -93,6 +99,12 @@ class KisDemoUSReadClient:
             payload = response.json()
             if not isinstance(payload, dict):
                 raise DemoError("US VTS invalid response")
+            try:
+                received_at = self._now()
+            except DemoNotSentError:
+                raise DemoError("US VTS response clock unavailable after transport") from None
+            if received_at < sent_at:
+                raise DemoError("US VTS clock regressed during response")
             return payload, response.headers
         except (requests.RequestException, ValueError):
             raise DemoError("US VTS response unavailable or invalid") from None
@@ -127,8 +139,9 @@ class KisDemoUSReadClient:
             raise DemoError("Request is outside the read-only US VTS allowlist")
         if any(params.get(key) != value for key, value in self._account().items()):
             raise DemoError("US VTS account scope mismatch")
+        started = self._now()
         self.authenticate()
-        return self._http("GET", PREFIX + endpoint, params=params, headers={
+        return self._http("GET", PREFIX + endpoint, params=params, not_before=started, headers={
             "authorization": f"Bearer {self._token}", "appkey": self.credentials.app_key,
             "appsecret": self.credentials.app_secret, "tr_id": tr_id,
             "custtype": "P", "content-type": "application/json", "tr_cont": continuation,
@@ -200,3 +213,101 @@ class KisDemoUSReadClient:
                 raise DemoError("US VTS future or inconsistent order time")
             selected.append(row)
         return selected
+
+
+class KisDemoUSClient(KisDemoUSReadClient):
+    """Dedicated VTS writes; the separate read client remains incapable of writes.
+
+    Explicit US sell VTS ID follows the official API description/legacy example,
+    not the newer sample's generic leading-character replacement (1006 != 1001).
+    """
+    def _http(self, method, path, *, deadline=None, not_before=None, **kwargs):
+        allowed = {("POST", "/oauth2/tokenP"),
+                   *( ("GET", PREFIX + endpoint) for endpoint in
+                      ("inquire-balance", "inquire-ccnl", "inquire-psamount") ),
+                   ("POST", PREFIX + "order"), ("POST", PREFIX + "order-rvsecncl")}
+        if (method, path) not in allowed:
+            raise DemoNotSentError("Request is outside the US VTS allowlist")
+        _assert_no_http_retries(self.session)
+        started = self._now()
+        if not_before is not None and started < not_before:
+            raise DemoNotSentError("US VTS clock regressed before transport")
+        self.pacer.wait()
+        sent_at = self._now()
+        if sent_at < started:
+            raise DemoNotSentError("US VTS clock regressed during pacing")
+        if deadline is not None:
+            from .paper import stamp
+            if sent_at >= stamp(deadline):
+                raise DemoNotSentError("US VTS request deadline elapsed before sending")
+        try:
+            response = self.session.request(method, DEMO_HOST + path, timeout=self.timeout,
+                                           allow_redirects=False, **kwargs)
+            if not 200 <= response.status_code < 300:
+                raise DemoError("US VTS HTTP response rejected")
+            payload = response.json()
+            if not isinstance(payload, dict):
+                raise DemoError("US VTS invalid response")
+            try:
+                received_at = self._now()
+            except DemoNotSentError:
+                raise DemoError("US VTS response clock unavailable after transport") from None
+            if received_at < sent_at:
+                raise DemoError("US VTS clock regressed during response")
+            return payload, response.headers
+        except (requests.RequestException, ValueError):
+            raise DemoError("US VTS response unavailable or invalid") from None
+
+    def request(self, *args, params=None, body=None, continuation="", deadline=None, not_before=None):
+        # Existing complete read pagination uses the two-argument form; the
+        # shared durable journal uses the explicit method form for writes.
+        if len(args) == 2:
+            method, endpoint, tr_id = "GET", *args
+        elif len(args) == 3:
+            method, endpoint, tr_id = args
+        else:
+            raise DemoNotSentError("Explicit US VTS method and endpoint required")
+        allowed = {("GET", "inquire-balance", "VTTS3012R"),
+                   ("GET", "inquire-ccnl", "VTTS3035R"),
+                   ("GET", "inquire-psamount", "VTTS3007R"),
+                   ("POST", "order", "VTTT1002U"), ("POST", "order", "VTTT1001U"),
+                   ("POST", "order-rvsecncl", "VTTT1004U")}
+        if (method, endpoint, tr_id) not in allowed or continuation not in {"", "N"}:
+            raise DemoNotSentError("Request is outside the US VTS allowlist")
+        supplied = body if body is not None else params or {}
+        if any(supplied.get(key) != value for key, value in self._account().items()):
+            raise DemoNotSentError("US VTS account scope mismatch")
+        if method == "POST" and (supplied.get("OVRS_EXCG_CD") not in EXCHANGES
+                or supplied.get("ORD_SVR_DVSN_CD") != "0"
+                or (endpoint == "order" and supplied.get("ORD_DVSN") != "00")
+                or (endpoint == "order-rvsecncl" and
+                    (supplied.get("RVSE_CNCL_DVSN_CD") != "02" or supplied.get("OVRS_ORD_UNPR") != "0"))):
+            raise DemoNotSentError("US VTS permits regular US limit orders and cancellations only")
+        started = self._now()
+        if not_before is not None:
+            from .paper import stamp
+            if started < stamp(not_before):
+                raise DemoNotSentError("US VTS clock regressed since intent validation")
+        try:
+            self.authenticate()
+        except DemoError:
+            raise DemoNotSentError("US VTS authentication failed before sending request") from None
+        if self._now() < started:
+            raise DemoNotSentError("US VTS clock regressed during authentication")
+        return self._http(method, PREFIX + endpoint, params=params, json=body, deadline=deadline, not_before=started,
+                          headers={"authorization": f"Bearer {self._token}",
+                                   "appkey": self.credentials.app_key, "appsecret": self.credentials.app_secret,
+                                   "tr_id": tr_id, "custtype": "P", "content-type": "application/json",
+                                   "tr_cont": continuation})
+
+    def buying_power(self, *, ticker, exchange, limit_price):
+        from .kis_paper_us import _price, _instrument
+        _instrument(ticker, exchange)
+        price = _price(limit_price)
+        payload, headers = self.request("GET", "inquire-psamount", "VTTS3007R", params={
+            **self._account(), "OVRS_EXCG_CD": exchange, "OVRS_ORD_UNPR": price, "ITEM_CD": ticker})
+        flag = next((str(v).strip() for k, v in headers.items() if k.lower() == "tr_cont"), "")
+        if (str(payload.get("rt_cd")) != "0" or not isinstance(payload.get("output"), dict)
+                or flag not in {"", "D", "E"}):
+            raise DemoError("US VTS complete buying capacity unavailable")
+        return payload["output"]

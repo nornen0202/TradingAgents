@@ -304,6 +304,39 @@ def _us_observation():
     return {"ticker": "AAPL", "market": "us", "chart": chart, "orderbook": book, "observed_at": at, "fx_quote": fx}
 
 
+def _split_us_observation():
+    values = _us_observation()
+    book = values["orderbook"]
+    combined = book["output1"]
+    book["output1"] = {"code": "AAPL", "curr": "USD", "dymd": combined["dymd"], "dhms": combined["dhms"]}
+    book["output2"] = {key: combined[key] for key in ("pbid1", "pask1", "vbid1", "vask1")}
+    book["output3"] = {"iep": "0"}
+    return values
+
+
+def test_actual_us_response_separates_header_and_price_fields():
+    result = normalize_quote(**_split_us_observation())
+    assert result["price_usd"] == 100
+    assert result["spread_bps"] == pytest.approx(2)
+    assert result["orderbook_date_basis"] == "EXPLICIT"
+
+
+@pytest.mark.parametrize("change", ["missing_date", "future", "invalid_date", "empty_prices", "wrong_symbol", "conflict", "wrong_currency", "malformed_part"])
+def test_split_us_response_cannot_hide_bad_identity_or_clock(change):
+    values = _split_us_observation()
+    header, prices = values["orderbook"]["output1"], values["orderbook"]["output2"]
+    if change == "missing_date": header.pop("dymd")
+    elif change == "future": header["dymd"] = "20261020"
+    elif change == "invalid_date": header["dymd"] = "20260230"
+    elif change == "empty_prices": prices.clear()
+    elif change == "wrong_symbol": header["code"] = "MSFT"
+    elif change == "conflict": prices["code"] = "MSFT"
+    elif change == "wrong_currency": header["curr"] = "HKD"
+    else: values["orderbook"]["output2"] = []
+    with pytest.raises(ValueError):
+        normalize_quote(**values)
+
+
 @pytest.mark.parametrize("changed", [
     {"dymd": "20261020"}, {"dhms": "100001"}, {"dymd": "20261018"}, {"dhms": "095700"},
     {"dymd": "not-a-date"}, {"dymd": "20260230"}, {"dhms": "250001"},

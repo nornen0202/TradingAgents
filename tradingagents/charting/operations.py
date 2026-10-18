@@ -133,7 +133,7 @@ def paper_health(path, *, analysis_as_of):
     markets = raw.get("markets")
     if (raw.get("schema") != "tradingagents.paper-runtime/v1" or checked is None or checked > cutoff
             or raw.get("mode") != "LOCAL_PAPER_ONLY" or raw.get("real_orders_enabled") is not False
-            or raw.get("broker_orders_sent") != 0 or not isinstance(markets, dict)):
+            or type(raw.get("broker_orders_sent")) is not int or raw["broker_orders_sent"] != 0 or not isinstance(markets, dict)):
         return result
     result.update(status="AVAILABLE", checked_at=checked.isoformat(), enabled=raw.get("enabled") is True,
                   stale=(cutoff - checked).total_seconds() > 600)
@@ -143,13 +143,14 @@ def paper_health(path, *, analysis_as_of):
         if not isinstance(source, dict):
             continue
         market_checked = instant(source.get("checked_at"))
-        if market_checked is None or market_checked > cutoff:
+        if market_checked is None or market_checked > checked:
             continue
         view = {"status": source.get("status") if source.get("status") in allowed_states else "ERROR",
-                "checked_at": market_checked.isoformat(), "order_counts": {}, "blockers": []}
+                "checked_at": market_checked.isoformat(), "stale": (cutoff - market_checked).total_seconds() > 600,
+                "order_counts": {}, "blockers": []}
         for clock in ("last_observation_at", "last_fill_at", "last_quote_at", "last_success_at"):
             value = instant(source.get(clock))
-            view[clock] = value.isoformat() if value is not None and value <= cutoff else None
+            view[clock] = value.isoformat() if value is not None and value <= market_checked else None
         for field in ("source_run_id", "source_revision"):
             value = source.get(field)
             view[field] = value if isinstance(value, str) and _CODE.fullmatch(value) else None
@@ -191,6 +192,67 @@ def kis_demo_health(archive_dir, *, analysis_as_of):
                 and raw.get("paper_order_connection_verified") is False):
             view.update(status=raw["status"], checked_at=checked.isoformat())
         result["markets"][market] = view
+    return result
+
+
+def kis_validation_health(archive_dir, *, analysis_as_of):
+    """Read only bounded VTS validation proofs; never infer fills from ACKs.
+
+    The fixed receipt is written by the session-validation worker. Each stage
+    needs its own broker source and post-response observation clock. This view
+    is not a broker query and never returns accounts, orders, prices or paths.
+    """
+    cutoff = instant(analysis_as_of)
+    if cutoff is None:
+        raise ValueError("KIS validation cutoff requires a timezone")
+    sources = {"submitted": "KIS_DEMO_BROKER_ACK", "filled": "KIS_DEMO_BROKER_REPORT",
+               "cancelled": "KIS_DEMO_BROKER_REPORT"}
+    empty_stages = lambda: {stage: {"verified": False, "observed_at": None} for stage in sources}
+    result = {"as_of": cutoff.isoformat(), "read_only": True, "live_orders_enabled": False,
+              "markets": {market: {"market": market, "mode": "KIS_DEMO", "status": "UNAVAILABLE",
+                "checked_at": None, "stages": empty_stages(), "blocker": None} for market in ("KR", "US")}}
+    root = (Path(archive_dir) / "paper").resolve() if archive_dir is not None else None
+    path = (root / "kis-session-validation.json").resolve() if root is not None else None
+    raw = _json(path) if path is not None and path.is_relative_to(root) else {}
+    checked = instant(raw.get("checked_at"))
+    if (raw.get("schema") != "tradingagents.kis-session-validation/v1" or raw.get("mode") != "KIS_DEMO"
+            or raw.get("live_orders_enabled") is not False or checked is None or checked > cutoff
+            or not isinstance(raw.get("markets"), dict)):
+        return result
+    states = {"WAITING_SESSION", "RUNNING", "VERIFIED", "BLOCKED", "ATTENTION"}
+    blockers = {"MARKET_CLOSED", "CALENDAR_UNVERIFIED", "SESSION_EDGE", "HALTED", "EVIDENCE_UNAVAILABLE",
+                "AMBIGUOUS_ORDER", "AMBIGUOUS_CANCELLATION", "ORDER_REJECTED", "ORDER_NOT_SENT",
+                "CAMPAIGN_BUDGET_EXHAUSTED", "CANCELLATION_RACE", "FILL_NOT_OBSERVED", "STATE_INVALID",
+                "JOURNAL_RECOVERY_REQUIRED", "DAY_ORDER_REQUIRES_REVIEW", "CANCELLATION_REJECTED",
+                "ORDER_REPORT_UNVERIFIED", "CANCELLATION_NOT_CONFIRMED"}
+    for market, view in result["markets"].items():
+        row = raw["markets"].get(market)
+        if not isinstance(row, dict):
+            continue
+        observed = instant(row.get("checked_at"))
+        if row.get("status") not in states or observed is None or observed > checked:
+            continue
+        stages = row.get("stages")
+        if not isinstance(stages, dict):
+            continue
+        proofs = empty_stages()
+        for stage, source in sources.items():
+            proof = stages.get(stage)
+            if not isinstance(proof, dict):
+                continue
+            at = instant(proof.get("observed_at"))
+            if proof.get("verified") is True and proof.get("source") == source and at is not None and at <= observed:
+                proofs[stage] = {"verified": True, "observed_at": at.isoformat()}
+        # A claimed completion without every genuine stage stays unverified.
+        status = row["status"]
+        if status == "VERIFIED" and not all(proof["verified"] for proof in proofs.values()):
+            status = "ATTENTION"
+        view.update(status=status, checked_at=observed.isoformat(), stages=proofs)
+        # Raw errors can include broker payloads or secrets; only known codes
+        # cross this boundary, and new codes require an explicit UI contract.
+        blocker = row.get("blocker")
+        if blocker:
+            view["blocker"] = blocker if isinstance(blocker, str) and blocker in blockers else "OPERATOR_REVIEW_REQUIRED"
     return result
 
 

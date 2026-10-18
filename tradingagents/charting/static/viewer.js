@@ -47,7 +47,7 @@ function renderHealth(health) {
   if(health.status!=="AVAILABLE") { byId("paper-health").replaceChildren(paragraph("이 시점의 모의 운영 상태 기록이 없습니다. 주문·체결 여부를 추정하지 않습니다."));return; }
   byId("paper-health").replaceChildren(paragraph("최근 운영 점검: "+health.checked_at+(health.stale?" · 10분 경과·운영 확인 필요":"")+" · "+(health.enabled?"모의 운용 설정 켜짐":"모의 운용 설정 꺼짐")+" · 실주문 전송 0건"),
     table("시장별 모의 상태",["시장","현재 상태","최근 시세 관측","최근 모의 체결","대기 / 체결 / 거절 / 취소","차단 이유"],Object.entries(health.markets).map(([key,row])=>[
-      key.toUpperCase(),labels[row.status]||row.status,row.last_quote_at||row.last_observation_at||"아직 없음",row.last_fill_at||"아직 없음",
+      key.toUpperCase(),(labels[row.status]||row.status)+(row.stale?" · 점검 10분 경과":""),row.last_quote_at||row.last_observation_at||"아직 없음",row.last_fill_at||"아직 없음",
       ["PENDING","FILLED","REJECTED","CANCELLED"].map(state=>number(row.order_counts[state])).join(" / "),row.blockers.join(", ")||"없음"])),
     paragraph("운영 점검 시각과 실제 시세·체결 시각은 별개입니다. 휴장 중 점검이 성공해도 체결 기록이 새로 생기지 않습니다."));
   if(health.markets.us)byId("paper-health").append(paragraph("원화 현금 모의 포트폴리오 / 미국 주식은 증권사 기준환율 평가 / 실제 달러계좌 수익률과 다름"));
@@ -55,10 +55,35 @@ function renderHealth(health) {
 function renderKisHealth(health) {
   const labels={READ_CONNECTION_VERIFIED:"조회 연결 확인",READY_TO_PROBE:"조회 점검 대기",MISSING_DEMO_SETTINGS:"모의 연결 설정 필요",CONFIGURATION_UNREADABLE:"모의 설정 확인 필요",CONNECTION_UNVERIFIED:"조회 연결 미확인",UNAVAILABLE:"이 시점의 조회 점검 기록 없음"};
   const markets=health.markets||{};
-  byId("kis-demo-health").replaceChildren(table("KIS 모의 조회 점검",["시장","조회 연결","확인 시각","주문 연결","이 조회 점검에서 전송한 주문"],["KR","US"].map(market=>{
+  byId("kis-demo-health").replaceChildren(table("KIS 모의 조회 점검",["시장","조회 연결","확인 시각","이 조회 점검의 범위","이 조회 점검에서 전송한 주문"],["KR","US"].map(market=>{
     const row=markets[market]||{};
-    return [market==="KR"?"한국":"미국",labels[row.status]||labels.UNAVAILABLE,row.checked_at||"기록 없음","미검증",row.checked_at?0:"기록 없음"];
-  })),paragraph("조회 성공은 주문·부분 체결·취소 검증 완료를 뜻하지 않습니다. 이 화면에는 주문 기능이 없으며 실계좌 자동 주문은 비활성입니다."));
+    return [market==="KR"?"한국":"미국",labels[row.status]||labels.UNAVAILABLE,row.checked_at||"기록 없음","잔고·주문내역 조회",row.checked_at?0:"기록 없음"];
+  })),paragraph("조회 성공은 주문·체결·취소 검증 완료를 뜻하지 않습니다. 주문 검증 결과는 아래 별도 기록으로 확인합니다."));
+}
+function renderKisValidation(health) {
+  const labels={WAITING_SESSION:"다음 정규장 대기",RUNNING:"모의 서버 검증 진행",VERIFIED:"주문·체결·취소 확인 완료",BLOCKED:"조건 차단 · 확인 필요",ATTENTION:"미확정 결과 · 확인 필요",UNAVAILABLE:"이 시점의 주문 검증 기록 없음"};
+  const blockers={MARKET_CLOSED:"정규장 대기",CALENDAR_UNVERIFIED:"거래일 확인 대기",SESSION_EDGE:"개장·마감 인접 시간 대기",HALTED:"운영 중지 설정",EVIDENCE_UNAVAILABLE:"현재 시세·계좌 확인 필요",AMBIGUOUS_ORDER:"주문 응답 미확정",AMBIGUOUS_CANCELLATION:"취소 응답 미확정",ORDER_REJECTED:"모의 주문 거절",ORDER_NOT_SENT:"주문 전송 전 차단",CAMPAIGN_BUDGET_EXHAUSTED:"검증 한도 도달",CANCELLATION_RACE:"취소 전 체결 발생",FILL_NOT_OBSERVED:"체결 확인 대기",STATE_INVALID:"운영 기록 확인 필요",JOURNAL_RECOVERY_REQUIRED:"주문 기록 복구 확인 필요",DAY_ORDER_REQUIRES_REVIEW:"당일 미완료 주문 확인 필요",CANCELLATION_REJECTED:"취소 거절",ORDER_REPORT_UNVERIFIED:"증권사 주문내역 확인 필요",CANCELLATION_NOT_CONFIRMED:"취소 완료 확인 대기",OPERATOR_REVIEW_REQUIRED:"운영 확인 필요"};
+  const markets=health.markets||{};
+  const clock=value=>value?new Date(value).toLocaleString("ko-KR",{timeZone:"Asia/Seoul",hour12:false})+" KST":"기록 없음";
+  const stage=proof=>proof?.verified===true?"확인 · "+clock(proof.observed_at):"미검증";
+  const heading=document.createElement("h3");heading.textContent="KIS 모의 주문·체결·취소 검증";
+  const cards=document.createElement("div");cards.style.cssText="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:12px";
+  for(const market of ["KR","US"]){
+    const row=markets[market]||{};
+    const card=document.createElement("article");card.style.cssText="min-width:0;border:1px solid #dce4ee;border-radius:8px;padding:12px";
+    const title=document.createElement("h4");title.style.margin="0 0 8px";title.textContent=(market==="KR"?"한국":"미국")+" · "+(labels[row.status]||labels.UNAVAILABLE);card.append(title);
+    if(row.blocker)card.append(paragraph(blockers[row.blocker]||blockers.OPERATOR_REVIEW_REQUIRED));
+    card.append(paragraph("최근 점검: "+clock(row.checked_at)),table("검증 단계",["항목","증권사 결과"],[["모의 주문 접수",stage(row.stages?.submitted)],["모의 체결 확인",stage(row.stages?.filled)],["모의 취소 확인",stage(row.stages?.cancelled)]]));cards.append(card);
+  }
+  byId("kis-validation-health").replaceChildren(heading,cards,paragraph("접수는 체결과 다르며, 취소 요청 접수만으로 취소 완료를 표시하지 않습니다. 표시 시각은 증권사 결과를 확인한 한국 시각이며 실제 체결·정산 시각과 다를 수 있습니다. 이 화면은 읽기전용입니다."));
+  if(Object.values(markets).some(row=>["ATTENTION","BLOCKED"].includes(row.status)))byId("kis-validation-health").append(paragraph("추가 확인이 필요한 기록이 있습니다. 미확정 주문은 자동 재전송하지 않습니다."));
+}
+async function loadOperational(asof,version) {
+  const views=[['paper-health',renderHealth,"모의 운영 상태를 읽지 못했습니다."],['kis-demo-health',renderKisHealth,"모의 서버 조회 점검 기록을 읽지 못했습니다."],['kis-validation-health',renderKisValidation,"모의 서버 주문 검증 기록을 읽지 못했습니다."]];
+  views.forEach(([id])=>byId(id).replaceChildren(paragraph("운영 기록을 확인하고 있습니다.")));
+  const results=await Promise.allSettled(views.map(([id])=>getJson("/api/"+id+"?as_of="+encodeURIComponent(asof))));
+  if(version!==requestVersion)return;
+  views.forEach(([id,render,error],index)=>results[index].status==="fulfilled"?render(results[index].value):byId(id).replaceChildren(paragraph(error)));
 }
 function renderCards(payload) {
   const cards=payload.cards||[];
@@ -100,13 +125,15 @@ function list(id, values) {
 }
 function clearSnapshot() {
   charts.forEach(chart=>chart.remove());charts=[];byId("charts").replaceChildren();
-  ["verdict","freshness","profile","performance","unverified","source-context","paper-health","kis-demo-health","experiment-cards"].forEach(id=>byId(id).textContent="");
+  ["verdict","freshness","profile","performance","unverified","source-context","experiment-cards"].forEach(id=>byId(id).textContent="");
   ["reasons","facts","inferences","events"].forEach(id=>list(id,[]));window.reviewSnapshot=null;
 }
 async function loadSnapshot() {
   const version = ++requestVersion;
   byId("status").textContent = "기준 시각의 자료를 확인하고 있습니다.";
   const params = new URLSearchParams({ ticker: byId("ticker").value, as_of: byId("asof").value });
+  // Operational receipts must remain visible even when a ticker has no chart.
+  const operational = loadOperational(params.get("as_of"),version);
   if (byId("anchor").value) params.set("anchor", byId("anchor").value);
   try {
     const response = await fetch("/api/snapshot?" + params);
@@ -122,11 +149,9 @@ async function loadSnapshot() {
       byId("source-context").textContent+=" · 차트 갱신 "+(capture.status==="REFRESHED"?"확인":"자료 확보 실패·원본 유지")+" "+capture.checked_at;
       if(capture.error_type)byId("source-context").textContent+=" ("+capture.error_type+")";
     }
-    const secondary=await Promise.allSettled([getJson("/api/paper-health?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at)),getJson("/api/experiment-cards?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at)),getJson("/api/kis-demo-health?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at))]);
+    const secondary=await Promise.allSettled([getJson("/api/experiment-cards?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at)),operational]);
     if(version!==requestVersion)return;
-    if(secondary[0].status==="fulfilled")renderHealth(secondary[0].value);else byId("paper-health").replaceChildren(paragraph("모의 운영 상태를 읽지 못했습니다."));
-    if(secondary[1].status==="fulfilled")renderCards(secondary[1].value);else byId("experiment-cards").replaceChildren(paragraph("실험 카드를 읽지 못했습니다."));
-    if(secondary[2].status==="fulfilled")renderKisHealth(secondary[2].value);else byId("kis-demo-health").replaceChildren(paragraph("모의 서버 조회 점검 기록을 읽지 못했습니다."));
+    if(secondary[0].status==="fulfilled")renderCards(secondary[0].value);else byId("experiment-cards").replaceChildren(paragraph("실험 카드를 읽지 못했습니다."));
     byId("verdict").textContent = snapshot.execution_verdict
       ? "당시 판단: " + snapshot.execution_verdict + " · " + snapshot.execution.execution_asof
       : "판단 기록 없음";
@@ -171,6 +196,8 @@ async function loadSnapshot() {
     if (version === requestVersion) {
       clearSnapshot();byId("status").textContent = error.message;
     }
+  } finally {
+    await operational;
   }
 }
 async function refreshCatalog() {
@@ -179,7 +206,7 @@ async function refreshCatalog() {
   byId("ticker").replaceChildren(...tickers.map(ticker=>{const option=document.createElement("option");option.value=ticker;option.textContent=ticker;return option;}));
   if(tickers.includes(selected))byId("ticker").value=selected;
   list("candidates",tickers);
-  if(!tickers.length){clearSnapshot();byId("status").textContent="이 시점까지 완료된 분석이 없습니다.";return false;}return true;
+  if(!tickers.length){const version=++requestVersion;clearSnapshot();byId("status").textContent="이 시점까지 완료된 분석이 없습니다.";await loadOperational(byId("asof").value,version);return false;}return true;
 }
 async function start() {
   byId("asof").value = new Date().toISOString();
