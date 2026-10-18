@@ -12,6 +12,7 @@ from urllib.request import Request, urlopen
 from uuid import uuid4
 
 from tradingagents.atomic_io import interprocess_file_lock
+from tradingagents.prism_telegram.completion import collection_complete
 from tradingagents.work.packet import sha256_json
 from .telegram import NotificationError
 
@@ -42,7 +43,7 @@ def canonical(archive, surface, run_id):
     complete = (summary.get("total_videos", 0) > 0
                 and summary.get("total_videos") == summary.get("successful_videos")
                 and summary.get("failed_videos") == 0) if surface == "youtube" else (
-                    summary.get("messages", 0) > 0 and summary.get("warnings") == 0)
+                    collection_complete(manifest) and summary["messages"] > 0)
     if manifest.get("run_id") != run_id or manifest.get("status") != "success" or not complete:
         raise NotificationError("Canonical advisory run did not complete successfully.")
     return manifest, hashlib.sha256(paths[0].read_bytes()).hexdigest()

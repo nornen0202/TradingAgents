@@ -21,6 +21,7 @@ from tradingagents.external.prism_telegram_common import (
 from tradingagents.external.prism_telegram_preview import parse_public_preview_html
 from tradingagents.prism_telegram.config import PrismTelegramDailyConfig, PrismTelegramSiteSettings, PrismTelegramSourceSettings, PrismTelegramStorageSettings
 from tradingagents.prism_telegram.runner import execute_prism_telegram_run
+from tradingagents.prism_telegram.completion import collection_complete
 
 
 def test_public_preview_parser_extracts_text_document_and_time():
@@ -310,6 +311,24 @@ def test_prism_telegram_runner_writes_public_site_without_private_pdf_path(tmp_p
     assert private_pdf.as_posix() not in public_text
     feed = json.loads((site_dir / "prism-telegram" / "feed.json").read_text(encoding="utf-8"))
     assert feed["items"][0]["message_id"] == "12051"
+
+
+def test_successful_collection_without_ticker_signals_retains_informational_warning(tmp_path):
+    config = PrismTelegramDailyConfig(
+        source=PrismTelegramSourceSettings(enabled=True, mode="public_preview", channel="stock_ai_agent"),
+        storage=PrismTelegramStorageSettings(archive_dir=tmp_path / "archive", site_dir=tmp_path / "site"),
+        site=PrismTelegramSiteSettings(),
+    )
+    collection = PrismTelegramCollection(
+        enabled=True, ok=True, source_kind=PrismSourceKind.TELEGRAM_PUBLIC_PREVIEW,
+        source="https://t.me/s/stock_ai_agent",
+        messages=(PrismTelegramMessage(message_id="1", text="Weekly channel update"),),
+    )
+    manifest = execute_prism_telegram_run(config, publish=False, collection_fetcher=lambda _: collection)
+    assert manifest["status"] == "success"
+    assert manifest["summary"] == {"messages": 1, "signals": 0, "warnings": 1}
+    assert manifest["warnings"] == ["telegram_no_ticker_level_signals_found"]
+    assert collection_complete(manifest)
 
 
 def test_bot_api_missing_token_falls_back_to_public_preview():

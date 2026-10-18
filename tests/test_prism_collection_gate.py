@@ -32,6 +32,14 @@ def test_late_native_and_recovery_probe_skip_completed_collection_even_without_p
     assert collect(tmp_path, automatic=False)  # Explicit manual collection stays available.
 
 
+def test_successful_no_signal_collection_is_not_recollected(tmp_path):
+    path = manifest(tmp_path, summary={"messages": 5, "signals": 0, "warnings": 1},
+                    warnings=["telegram_no_ticker_level_signals_found"])
+    before = path.read_bytes()
+    assert not collect(tmp_path)
+    assert path.read_bytes() == before
+
+
 def test_current_session_remains_due_after_failed_or_other_source_or_previous_day_collection(tmp_path):
     manifest(tmp_path, status="partial_failure")
     manifest(tmp_path, start=NOW - timedelta(hours=2), channel="other")

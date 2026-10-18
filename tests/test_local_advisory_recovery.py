@@ -165,6 +165,22 @@ def test_successful_canonical_collection_covers_local_skipped_deploy(tmp_path, m
     assert not client.dispatched
 
 
+def test_no_signal_prism_success_covers_recovery_without_duplicate_dispatch(tmp_path, monkeypatch, watchdog):
+    monkeypatch.delenv(recovery.SPECS["prism"][4], raising=False)
+    path = write_manifest(tmp_path / "archive", "prism")
+    value = json.loads(path.read_text())
+    value.update(summary={"messages": 5, "signals": 0, "warnings": 1},
+                 warnings=["telegram_no_ticker_level_signals_found"])
+    path.write_text(json.dumps(value), encoding="utf-8")
+    before = path.read_bytes()
+    client = Client({PRISM: [run_record("prism")]},
+                    {10: [build("prism"), {"name": "deploy", "conclusion": "skipped"}]})
+    targets = [target for target in watchdog.due_targets(NOW) if target.workflow_file == PRISM]
+    assert recovery.has_unbound_completion(tmp_path / "archive", targets[0], NOW)
+    assert recover(tmp_path, watchdog, client, targets=targets)[0]["status"] == "ADVISORY_COVERED_OR_HELD"
+    assert not client.dispatched and path.read_bytes() == before
+
+
 @pytest.mark.parametrize("surface", ["youtube", "prism"])
 @pytest.mark.parametrize("end_offset,expected", [(".117583", "ADVISORY_COVERED_OR_HELD"),
                                                  (".999999", "ADVISORY_COVERED_OR_HELD"),

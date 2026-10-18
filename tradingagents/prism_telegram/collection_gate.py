@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 
 from tradingagents.local_advisory_recovery import RecoveryDiagnostic, read, timestamp
 from tradingagents.prism_telegram.config import load_prism_telegram_config
+from tradingagents.prism_telegram.completion import collection_complete
 
 
 def should_collect(*, archive: Path, channel: str, now: datetime, automatic: bool) -> bool:
@@ -34,9 +35,7 @@ def should_collect(*, archive: Path, channel: str, now: datetime, automatic: boo
             continue
         try:
             started, finished = timestamp(manifest["started_at"]), timestamp(manifest["finished_at"])
-            summary = manifest["summary"]
-            if (manifest["run_id"] != path.parent.name or type(summary["messages"]) is not int
-                    or summary["messages"] < 0 or summary["warnings"] != 0
+            if (manifest["run_id"] != path.parent.name or not collection_complete(manifest)
                     or not window <= started <= finished <= now):
                 raise ValueError("Incomplete session evidence")
         except (KeyError, TypeError, ValueError, AttributeError) as exc:
