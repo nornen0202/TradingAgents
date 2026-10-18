@@ -524,7 +524,10 @@ def main():
     parser.add_argument("--runtime-dir", type=Path, required=True)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--rebuild", action="store_true")
+    parser.add_argument("--review-port", type=int, default=8766)
     args = parser.parse_args()
+    if not 1024 <= args.review_port <= 65535:
+        parser.error("--review-port must be between 1024 and 65535")
     args.archive_dir = args.archive_dir.resolve()
     args.state_dir = args.state_dir.resolve()
     args.runtime_dir = args.runtime_dir.resolve()
@@ -548,7 +551,7 @@ def main():
             print(json.dumps({"status": "DRY_RUN", "read_only": True, "broker_orders_sent": 0}))
             return 0
         from tradingagents.charting.server import serve
-        serve(archive_dir=args.archive_dir, port=8765,
+        serve(archive_dir=args.archive_dir, port=args.review_port,
               db_paths=[args.archive_dir / "performance.sqlite", args.archive_dir / "paper/kr.sqlite", args.archive_dir / "paper/us.sqlite"],
               experiment_registry=args.archive_dir / "experiments.sqlite", paper_status_path=args.archive_dir / "paper/status.json")
         return 0

@@ -5,10 +5,10 @@
 ## 화면 실행
 
 ```powershell
-python tools/serve_investment_review.py --archive-dir C:/TradingAgentsData/archive --tracker-db C:/TradingAgentsData/archive/performance.sqlite --tracker-db C:/TradingAgentsData/archive/paper/kr.sqlite --tracker-db C:/TradingAgentsData/archive/paper/us.sqlite --paper-status C:/TradingAgentsData/archive/paper/status.json --experiment-registry C:/TradingAgentsData/archive/experiments.sqlite
+python tools/serve_investment_review.py --archive-dir C:/TradingAgentsData/archive --tracker-db C:/TradingAgentsData/archive/performance.sqlite --tracker-db C:/TradingAgentsData/archive/paper/kr.sqlite --tracker-db C:/TradingAgentsData/archive/paper/us.sqlite --paper-status C:/TradingAgentsData/archive/paper/status.json --experiment-registry C:/TradingAgentsData/archive/experiments.sqlite --port 8766
 ```
 
-브라우저에서 `http://127.0.0.1:8765/`를 엽니다. 서버는 로컬 컴퓨터에서만 접근할 수 있습니다. 기존의 단일 실행 폴더 지정도 계속 지원합니다.
+브라우저에서 `http://127.0.0.1:8766/`를 엽니다. 서버는 로컬 컴퓨터에서만 접근할 수 있습니다. 기존의 단일 실행 폴더 지정도 계속 지원합니다.
 
 - **현재 운영 따라가기**: 1분마다 종목별 최신 완료 분석과 모의 상태를 다시 읽습니다. 한국과 미국의 마지막 실행이 서로 덮어쓰지 않습니다.
 - **기준 시각 변경**: 따라가기가 해제됩니다. 그 시점까지 완료된 분석과 관측·확정·정산된 기록만 표시합니다. 이후 생긴 차트·체결·실험 결과가 과거 화면에 섞이지 않습니다.

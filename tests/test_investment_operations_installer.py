@@ -23,7 +23,7 @@ function global:Register-ScheduledTask {
  @{name=$TaskName;path=$TaskPath;exe=$Action.Execute;arguments=$Action.Arguments;limit=$Settings.ExecutionTimeLimit;multiple=[string]$Settings.MultipleInstances;period=$Trigger[0].Repetition.Interval} |
  ConvertTo-Json -Compress | Add-Content -LiteralPath $env:TA_RECEIPT -Encoding utf8
 }
-& $env:TA_INSTALLER -RepositoryRoot $env:TA_REPO -ArchiveRoot $env:TA_ARCHIVE -InstallRoot $env:TA_INSTALL -NoStart
+& $env:TA_INSTALLER -RepositoryRoot $env:TA_REPO -ArchiveRoot $env:TA_ARCHIVE -InstallRoot $env:TA_INSTALL -ReviewPort 18766 -NoStart
 '''
     result = subprocess.run(["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script],
                             env=env, capture_output=True, text=True, timeout=30)
@@ -33,6 +33,8 @@ function global:Register-ScheduledTask {
     assert [t["period"] for t in tasks] == ["PT1M", "PT15M"]
     assert tasks[0]["limit"] == "PT10M"
     assert tasks[1]["limit"] == "PT0S"
+    assert "-ReviewPort 18766" in tasks[1]["arguments"]
+    assert "-ReviewPort" not in tasks[0]["arguments"]
     for task in tasks:
         assert task["exe"].lower().endswith("wscript.exe")
         assert "run_powershell_hidden.vbs" in task["arguments"]

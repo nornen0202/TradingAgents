@@ -3,6 +3,7 @@ param(
     [string] $RepositoryRoot = "C:\Projects\TradingAgents",
     [string] $ArchiveRoot = "C:\TradingAgentsData\archive",
     [string] $InstallRoot = "C:\TradingAgentsMaintenance",
+    [ValidateRange(1024, 65535)][int] $ReviewPort = 8766,
     [switch] $NoStart
 )
 $ErrorActionPreference = 'Stop'
@@ -26,6 +27,7 @@ if ($PSCmdlet.ShouldProcess($stateRoot, 'Enable persistent local-only paper simu
         $launcher = Join-Path $InstallRoot 'run_powershell_hidden.vbs'
         $script = Join-Path $InstallRoot 'run_local_automation.ps1'
         $arguments = "//B //Nologo `"$launcher`" `"$script`" -Command $command -RepositoryRoot `"$RepositoryRoot`" -ArchiveRoot `"$ArchiveRoot`""
+        if ($command -eq 'review') { $arguments += " -ReviewPort $ReviewPort" }
         $action = New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\wscript.exe') -Argument $arguments
         $minutes = if ($command -eq 'paper') { 1 } else { 15 }
         $periodic = New-ScheduledTaskTrigger -Once -At ([DateTime]::Now.AddSeconds(30)) -RepetitionInterval (New-TimeSpan -Minutes $minutes)
@@ -37,5 +39,5 @@ if ($PSCmdlet.ShouldProcess($stateRoot, 'Enable persistent local-only paper simu
         Register-ScheduledTask -TaskPath '\TradingAgents\' -TaskName $name -Action $action -Trigger @($periodic,$logon) -Principal $principal -Settings $settings -Force | Out-Null
         if (-not $NoStart) { Start-ScheduledTask -TaskPath '\TradingAgents\' -TaskName $name }
     }
-    Write-Output 'Local paper simulation enabled. Private review: http://127.0.0.1:8765 (this PC only). Real order routing remains disabled.'
+    Write-Output "Local paper simulation enabled. Private review: http://127.0.0.1:$ReviewPort (this PC only). Real order routing remains disabled."
 }
