@@ -110,7 +110,7 @@ def test_throttle_spacing_and_expiry_rechecked_before_network(tmp_path):
     pacer.wait()
     pacer.wait()
     pacer.wait()
-    assert clock[0] == pytest.approx(2.2)
+    assert clock[0] == pytest.approx(4.4)  # Two conservative 2.2s VTS gaps.
     c, s = client(ack())
     from datetime import datetime
 
