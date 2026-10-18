@@ -9,7 +9,7 @@ from urllib.parse import parse_qs, urlparse
 
 from .bars import instant
 from .snapshot import get_replay_snapshot
-from .operations import archive_catalog, known_artifacts, paper_health, kis_demo_health, kis_validation_health, now_utc
+from .operations import archive_catalog, known_artifacts, paper_health, kis_demo_health, kis_validation_health, kis_strategy_health, now_utc
 
 STATIC = Path(__file__).parent / "static"
 
@@ -72,6 +72,8 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                     self.reply(200, json.dumps(kis_demo_health(archive_dir, analysis_as_of=at)), "application/json; charset=utf-8")
                 elif parsed.path == "/api/kis-validation-health":
                     self.reply(200, json.dumps(kis_validation_health(archive_dir, analysis_as_of=at)), "application/json; charset=utf-8")
+                elif parsed.path == "/api/kis-strategy-health":
+                    self.reply(200, json.dumps(kis_strategy_health(archive_dir, analysis_as_of=at), allow_nan=False), "application/json; charset=utf-8")
                 elif parsed.path == "/api/condition-draft":
                     from tradingagents.scanner.natural_language import compile_condition_text
                     draft = compile_condition_text(query.get("text", [""])[0], market=query.get("market", [None])[0])

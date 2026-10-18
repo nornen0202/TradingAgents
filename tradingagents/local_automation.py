@@ -518,7 +518,7 @@ def complete_handoffs(site, runtime_dir, publication):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis"))
+    parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis"))
     parser.add_argument("--archive-dir", type=Path, required=True)
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--runtime-dir", type=Path, required=True)
@@ -535,6 +535,21 @@ def main():
     prepare_environment()
     # These are independent consumers. They neither acquire producer ownership
     # nor dispatch report notifications, and cannot send a real broker order.
+    if args.command == "strategy-kis":
+        if args.dry_run:
+            print(json.dumps({"status": "DRY_RUN", "mode": "KIS_DEMO_STRATEGY", "real_orders_enabled": False}))
+            return 0
+        from tradingagents.execution.demo_runtime import tick
+        try:
+            receipt = tick(args.archive_dir, args.state_dir / "kis-strategy", args.state_dir / "kis-validation")
+            # Detailed orders/performance belong only in the local read-only UI.
+            result = {"mode": receipt["mode"], "checked_at": receipt["checked_at"], "real_orders_enabled": False,
+                      "markets": {key: {field: row.get(field) for field in ("status", "blockers", "order_counts", "checked_at")}
+                                  for key, row in receipt["markets"].items()}}
+        except TimeoutError:
+            result = {"status": "DEMO_WORKER_ALREADY_RUNNING", "real_orders_enabled": False}
+        print(json.dumps(result, ensure_ascii=True))
+        return 0
     if args.command == "validate-kis":
         if args.dry_run:
             print(json.dumps({"status": "DRY_RUN", "mode": "KIS_DEMO", "live_orders_enabled": False}))

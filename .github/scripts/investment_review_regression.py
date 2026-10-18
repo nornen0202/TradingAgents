@@ -66,6 +66,16 @@ def fixture(root):
                     "source": "KIS_DEMO_BROKER_ACK" if stage == "submitted" else "KIS_DEMO_BROKER_REPORT",
                     "order_id": "PRIVATE_DO_NOT_DISPLAY"} for stage in ("submitted", "filled", "cancelled")}},
             "US": {"status": "WAITING_SESSION", "checked_at": "2026-10-16T11:00:00Z", "stages": {}}}}))
+    (paper / "kis-strategy-runtime.json").write_text(json.dumps({
+        "schema": "tradingagents.kis-strategy-runtime/v1", "mode": "KIS_DEMO_STRATEGY", "enabled": True,
+        "real_orders_enabled": False, "checked_at": "2026-10-16T11:00:00Z", "markets": {
+            "KR": {"status": "ACTIVE", "checked_at": "2026-10-16T11:00:00Z", "gate_passed": True,
+                "orders": [{"ticker": "005930.KS", "run_id": "fixture-strategy", "side": "BUY", "quantity": 1,
+                    "filled_quantity": 1, "limit_price": 70000, "average_fill_price": 69900, "status": "FILLED",
+                    "prepared_at": "2026-10-16T10:59:00Z", "observed_at": "2026-10-16T10:59:10Z", "broker_order_id": "PRIVATE_DO_NOT_DISPLAY"}],
+                "performance": {"basis": "STRATEGY_GROSS_CASHFLOWS_PLUS_MARKED_HOLDINGS", "status": "AVAILABLE", "currency": "KRW",
+                    "gross_pnl": 100, "observed_at": "2026-10-16T11:00:00Z", "mark_times": ["2026-10-16T10:59:50Z"]}},
+            "US": {"status": "WAITING_VALIDATION", "checked_at": "2026-10-16T11:00:00Z", "gate_passed": False, "blockers": ["VALIDATION_REQUIRED"]}}}))
     return status_path, registry_path
 
 
@@ -101,6 +111,8 @@ async def probe(websocket_url, page_url):
               if (!document.querySelector('#kis-demo-health').textContent.includes('조회 점검 기록 없음') || !document.querySelector('#kis-demo-health').textContent.includes('잔고·주문내역 조회')) throw Error('KIS read/order distinction absent');
               if (!document.querySelector('#kis-validation-health').textContent.includes('주문·체결·취소 확인 완료') || !document.querySelector('#kis-validation-health').textContent.includes('다음 정규장 대기') || !document.querySelector('#kis-validation-health').textContent.includes('미검증')) throw Error('KIS execution stage distinction absent');
               if (document.body.textContent.includes('PRIVATE_DO_NOT_DISPLAY')) throw Error('Private metadata leaked');
+              const strategy=document.querySelector('#kis-strategy-health').textContent;
+              if (!strategy.includes('fixture-strategy') || !strategy.includes('체결 완료') || !strategy.includes('100 KRW') || !strategy.includes('정규장 검증 통과 대기') || !strategy.includes('순손익은 표시하지 않습니다')) throw Error('KIS strategy execution/performance missing');
               if (!document.querySelector('#experiment-cards').textContent.includes('paired-test')) throw Error('Experiment card absent');
               if (!document.querySelector('#experiment-cards').textContent.includes('수익률·낙폭을 표시하지 않습니다')) throw Error('Unobserved performance fabricated');
               if (document.documentElement.scrollWidth > innerWidth+2) throw Error('Viewport overflow');
@@ -127,6 +139,7 @@ async def probe(websocket_url, page_url):
               if (window.reviewSnapshot?.series.length || window.reviewSnapshot?.execution_verdict) throw Error('Future data in replay');
               if (document.querySelector('#charts canvas') || document.querySelector('#facts').textContent.includes('<img')) throw Error('Stale future view remained');
               if (document.querySelector('#kis-validation-health').textContent.includes('확인 완료')) throw Error('Future execution validation in replay');
+              if (document.querySelector('#kis-strategy-health').textContent.includes('fixture-strategy')) throw Error('Future strategy execution in replay');
               return true;
             })()''')
             result["replay_excludes_future"] = True

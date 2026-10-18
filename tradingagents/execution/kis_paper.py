@@ -63,6 +63,24 @@ def _stable(value: Any) -> str:
     return value
 
 
+def execution_notional(row, quantity, terms, *, market):
+    """Optional broker cumulative cash amount; never substitute the limit price.
+
+    Missing/malformed amounts preserve quantity reconciliation but make monetary
+    performance unavailable. This is gross execution cash flow, not settlement.
+    """
+    if not quantity:
+        return 0.0
+    try:
+        amount = _broker_number(row.get("tot_ccld_amt" if market == "KR" else "ft_ccld_amt3"))
+        limit = quantity * terms["limit_price"]
+        if amount <= 0 or (terms["side"] == "BUY" and amount > limit + .01) or (terms["side"] == "SELL" and amount < limit - .01):
+            return None
+        return amount
+    except (DemoError, TypeError, KeyError):
+        return None
+
+
 def _fresh(mapping: Mapping, *, now: datetime, seconds: int) -> None:
     observed, ingested = _clock(mapping.get("observed_at")), _clock(mapping.get("ingested_at"))
     if observed > ingested or ingested > now or not observation_status(observed, as_of=now, max_age=timedelta(seconds=seconds))["eligible"]:
@@ -347,10 +365,12 @@ class KisPaperBroker:
             received_at = _clock(self.clock())
             if received_at < now:
                 raise DemoError("VTS observation clock regressed during the read")
-            self._validate_order_clocks(intent_id, rows, received_at)
+            report = self._validate_order_clocks(intent_id, rows, received_at)
             # Reuse exactly this verified response instead of a second network
             # call that could change underneath validation.
             result = self.journal.reconcile(intent_id=intent_id, trade_date=trade_date, reports=rows)
+            terms = json.loads(self.db.execute("SELECT terms FROM paper_intents WHERE id=?", (intent_id,)).fetchone()[0])
+            result["fill_notional"] = execution_notional(report, result.get("filled_qty", 0), terms, market="KR")
             ingested_at = _clock(self.clock())
             if ingested_at < received_at:
                 raise DemoError("VTS ingestion clock precedes the received observation")

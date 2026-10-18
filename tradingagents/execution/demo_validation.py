@@ -163,9 +163,9 @@ def _journal_evidence(state, path):
         db.close()
 
 
-def normalize_validation_quote(*, market, chart, orderbook, observed_at):
+def normalize_validation_quote(*, market, chart, orderbook, observed_at, instrument=None):
     """Use dated completed bars and dated books; USD validation needs no FX."""
-    config, now = MARKETS[market], _at(observed_at)
+    config, now = instrument or MARKETS[market], _at(observed_at)
     zone = ZoneInfo(config["zone"])
     for payload in (chart,) if market == "KR" else (chart, orderbook):
         if not isinstance(payload, dict) or str(payload.get("rt_cd")) != "0":
@@ -182,7 +182,7 @@ def normalize_validation_quote(*, market, chart, orderbook, observed_at):
     if not 0 <= (now - price_at).total_seconds() <= 120:
         raise ValueError("Stale price")
     result = {"ticker": config["ticker"], "provider": "kis", "currency": config["currency"],
-              "session": "regular", "execution_ready": True, "instrument_type": "ETF" if market == "KR" else "STOCK",
+              "session": "regular", "execution_ready": True, "instrument_type": config.get("instrument_type", "ETF" if market == "KR" else "STOCK"),
               "last_price": _number(bar["close"]), "observed_at": price_at.isoformat(),
               "ingested_at": now.isoformat(), "price_basis": "DATED_COMPLETED_BAR"}
     book = normalized_orderbook(orderbook, market.lower()) if isinstance(orderbook, dict) else None

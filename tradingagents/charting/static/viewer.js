@@ -79,11 +79,34 @@ function renderKisValidation(health) {
   if(Object.values(markets).some(row=>["ATTENTION","BLOCKED"].includes(row.status)))byId("kis-validation-health").append(paragraph("추가 확인이 필요한 기록이 있습니다. 미확정 주문은 자동 재전송하지 않습니다."));
 }
 async function loadOperational(asof,version) {
-  const views=[['paper-health',renderHealth,"모의 운영 상태를 읽지 못했습니다."],['kis-demo-health',renderKisHealth,"모의 서버 조회 점검 기록을 읽지 못했습니다."],['kis-validation-health',renderKisValidation,"모의 서버 주문 검증 기록을 읽지 못했습니다."]];
+  const views=[['kis-strategy-health',renderKisStrategy,"KIS 전략 운영 기록을 읽지 못했습니다."],['paper-health',renderHealth,"모의 운영 상태를 읽지 못했습니다."],['kis-demo-health',renderKisHealth,"모의 서버 조회 점검 기록을 읽지 못했습니다."],['kis-validation-health',renderKisValidation,"모의 서버 주문 검증 기록을 읽지 못했습니다."]];
   views.forEach(([id])=>byId(id).replaceChildren(paragraph("운영 기록을 확인하고 있습니다.")));
   const results=await Promise.allSettled(views.map(([id])=>getJson("/api/"+id+"?as_of="+encodeURIComponent(asof))));
   if(version!==requestVersion)return;
   views.forEach(([id,render,error],index)=>results[index].status==="fulfilled"?render(results[index].value):byId(id).replaceChildren(paragraph(error)));
+}
+function renderKisStrategy(payload) {
+  const target=byId("kis-strategy-health");
+  if(payload.status!=="AVAILABLE"){target.replaceChildren(paragraph("지속 모의매매 운영 기록 대기"));return;}
+  const labels={DISABLED:"운용 꺼짐",WAITING_VALIDATION:"정규장 검증 통과 대기",WAITING_SIGNAL:"유효한 새 전략 신호 대기",MARKET_CLOSED:"정규장 대기",BLOCKED:"조건 차단 · 이유 확인",ACTIVE:"전략 모의 운용 중"};
+  const reasons={STRATEGY_ACCOUNT_POSITION_UNVERIFIED:"모의계좌 보유 수량과 전략 체결 기록 대조 필요",SOURCE_EVIDENCE_UNVERIFIED:"원래 전략 보고서의 시각·판단 근거 확인 필요",DAILY_ORDER_LIMIT:"오늘의 원주문 시도 한도 도달",NO_STRATEGY_QUANTITY_WITHIN_LIMITS:"모의 보유 수량·주문 한도 내 수량 없음",BUDGET_FX_UNVERIFIED:"전략 예산의 달러 환산 근거 확인 필요",PROPOSAL_QUANTITY_INVALID:"제안 수량 확인 필요",CANDIDATE_EVIDENCE_UNVERIFIED:"후보의 최신 시세·계좌 근거 확인 필요",VALIDATION_REQUIRED:"이 시장의 주문·체결·취소 검증 필요",NO_FRESH_EXECUTABLE_STRATEGY:"유효 시간 내 실행 가능한 새 전략 없음",HALTED:"운영 중지 설정",MARKET_CLOSED:"정규장 대기",SESSION_EDGE:"개장·마감 인접 시간",CALENDAR_UNVERIFIED:"거래일 확인 필요",AMBIGUOUS_ORDER:"미확정 주문 확인 필요",ORDER_REPORT_UNVERIFIED:"주문내역 확인 필요",SUBMISSION_BLOCKED_OR_UNRESOLVED:"주문 조건 차단 또는 응답 확인 필요",VALUATION_UNVERIFIED:"평가 시세 미확인",RUNTIME_EVIDENCE_UNVERIFIED:"전략·시세·계좌 근거 확인 필요",PREVIOUS_SESSION_ORDER_UNRESOLVED:"이전 거래일 미완료 주문 확인 필요"};
+  const states={ACKNOWLEDGED:"접수",OPEN:"미체결",PARTIAL:"부분체결",FILLED:"체결 완료",CANCELLED:"취소 완료",REJECTED:"거절",NOT_SENT:"미전송",BLOCKED:"조건 차단",UNKNOWN:"응답 미확정",UNRESOLVED:"대조 필요"};
+  const clock=value=>value?new Date(value).toLocaleString("ko-KR",{timeZone:"Asia/Seoul",hour12:false}):"확인 전";
+  target.replaceChildren(paragraph("최근 점검: "+clock(payload.checked_at)+(payload.stale?" · 3분 이상 경과·운영 확인 필요":"")+" · 실계좌 자동 주문 비활성"));
+  for(const market of ["KR","US"]){
+    const row=payload.markets?.[market];if(!row)continue;
+    const card=document.createElement("article");card.className="panel";
+    const title=document.createElement("h3");title.textContent=(market==="KR"?"국내":"미국")+" · "+labels[row.status];card.append(title);
+    card.append(paragraph("정규장 연결 검증: "+(row.gate_passed?"통과":"대기")+" · "+(row.blockers||[]).map(code=>reasons[code]||"운영 확인 필요").join(" / ")));
+    const perf=row.performance;
+    card.append(paragraph("전략 누적 평가손익(비용 전): "+(perf?.status==="AVAILABLE"?number(perf.gross_pnl)+" "+perf.currency:perf?.status==="NO_FILLS"?"아직 체결 없음":"체결 금액·평가 시세 확인 대기")));
+    if(row.performance_history?.length)card.append(table("최근 확인한 성과",["평가 확인 시각 (한국시간)","누적 평가손익 · 비용 전"],row.performance_history.slice(-10).reverse().map(p=>[clock(p.observed_at),number(p.gross_pnl)+" "+p.currency])));
+    card.append(table("전략 주문·체결·취소",["종목 / 전략 실행","방향","주문 / 체결 수량","지정가 / 평균 체결가","상태 / 취소","마지막 확인 (한국시간)"],(row.orders||[]).slice().reverse().map(order=>[
+      order.ticker+" / "+order.run_id,order.side==="BUY"?"매수":"매도",number(order.quantity)+" / "+number(order.filled_quantity),number(order.limit_price)+" / "+number(order.average_fill_price),
+      (states[order.status]||"확인 필요")+" / "+(order.cancel_status==="CONFIRMED"?"취소 확인":order.cancel_status==="ACKNOWLEDGED"?"취소 요청 접수":order.cancel_status?"취소 결과 확인 필요":"—"),clock(order.observed_at||order.prepared_at)])));
+    target.append(card);
+  }
+  target.append(paragraph("손익은 이 전략의 확인된 체결 대금과 보유 수량의 최신 시세 평가를 합산합니다. 국내는 원화, 미국은 달러로 구분하며 계좌 전체 수익률이 아닙니다. 비용·정산이 확인되지 않아 순손익은 표시하지 않습니다. 접수는 체결과 다릅니다."));
 }
 function renderCards(payload) {
   const cards=payload.cards||[];
