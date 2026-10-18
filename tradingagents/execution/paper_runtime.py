@@ -89,8 +89,11 @@ def _summary(broker):
 
 def advance_market(archive, state, market, *, now=None, clock=None, account_loader=None, quote_factory=None,
                    session_resolver=None, limits=None):
-    clock = clock or (lambda: datetime.now(timezone.utc))
-    now = instant(now or clock())
+    # An explicit fixed ``now`` remains a deterministic offline clock unless a
+    # caller supplies an advancing one. Production callers supply neither.
+    fixed_now = instant(now) if now is not None else None
+    clock = clock or ((lambda: fixed_now) if now is not None else (lambda: datetime.now(timezone.utc)))
+    now = instant(now if now is not None else clock())
     if now is None or market not in {"kr", "us"}:
         raise ValueError("Aware real clock and kr/us required")
     limits = limits or PaperLimits()
@@ -106,6 +109,13 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
 
     def finish(status, blockers=(), **fields):
         result.update(status=status, blockers=list(blockers), **fields)
+        completed = instant(clock())
+        known_clocks = [now] + [instant(result.get(key)) for key in ("last_observation_at", "last_fill_at")]
+        if completed is None or any(value is not None and completed < value for value in known_clocks):
+            raise ValueError("Paper receipt completion clock precedes its observations")
+        # Counters and state are known after account/quote reads and ledger
+        # updates finish, never at the earlier request-start timestamp.
+        result["checked_at"] = completed.isoformat()
         atomic_write_json(status_path, result)
         return result
 
@@ -226,18 +236,23 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
         return finish("ERROR", ("PAPER_TICK_FAILED",), error_type=type(exc).__name__, attempted_source_run_id=source.name if source else None)
 
 
-def tick(archive, state, *, now=None, **kwargs):
+def tick(archive, state, *, now=None, clock=None, **kwargs):
     archive, state = Path(archive).resolve(), Path(state).resolve()
     state.mkdir(parents=True, exist_ok=True)
-    at = instant(now or datetime.now(timezone.utc))
+    fixed_now = instant(now) if now is not None else None
+    clock = clock or ((lambda: fixed_now) if now is not None else (lambda: datetime.now(timezone.utc)))
+    at = instant(now if now is not None else clock())
     if at is None:
         raise ValueError("Aware now required")
     with interprocess_file_lock(state / "paper.lock", timeout=0):
         enabled = _read(state / "enabled.json", {})
         if enabled.get("mode") != "LOCAL_PAPER_ONLY" or enabled.get("enabled") is not True:
             return {"schema": SCHEMA, "status": "DISABLED", "broker_orders_sent": 0, "real_orders_enabled": False}
-        markets = {market: advance_market(archive, state, market, now=at, **kwargs) for market in ("kr", "us")}
-        result = {"schema": SCHEMA, "mode": "LOCAL_PAPER_ONLY", "enabled": True, "checked_at": at.isoformat(),
+        markets = {market: advance_market(archive, state, market, now=at, clock=clock, **kwargs) for market in ("kr", "us")}
+        completed = instant(clock())
+        if completed is None or completed < at or any(completed < instant(receipt["checked_at"]) for receipt in markets.values()):
+            raise ValueError("Paper tick completion clock precedes a market receipt")
+        result = {"schema": SCHEMA, "mode": "LOCAL_PAPER_ONLY", "enabled": True, "checked_at": completed.isoformat(),
                   "broker_orders_sent": 0, "real_orders_enabled": False, "markets": markets}
         atomic_write_json(archive / "paper/status.json", result)
         return result

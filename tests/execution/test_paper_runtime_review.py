@@ -13,7 +13,8 @@ import pytest
 
 from tradingagents.execution.paper import PaperBroker
 from tradingagents.execution.paper_quotes import normalize_quote
-from tradingagents.execution.paper_runtime import advance_market
+from tradingagents.execution.paper_runtime import advance_market, tick
+from tradingagents.charting.operations import paper_health
 
 
 AT = datetime.fromisoformat("2026-10-19T10:00:00+09:00")
@@ -117,6 +118,73 @@ def test_existing_ledger_keeps_observing_and_fills_existing_intent_without_new_s
         assert broker.db.execute("SELECT COUNT(*) FROM observations").fetchone()[0] == 2
     finally:
         broker.close()
+
+
+def test_status_counts_are_available_only_after_reads_and_both_markets_complete(tmp_path, monkeypatch):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    ledger = archive / "paper" / "kr.sqlite"
+    broker = PaperBroker(ledger)
+    try:
+        broker.seed(_account(positions=[_position()]), account_scope=SCOPE)
+        broker.step(now=AT.isoformat(), quotes={TICKER: _quote(AT)}, signals=[_signal()])
+    finally:
+        broker.close()
+    state.mkdir()
+    (state / "enabled.json").write_text(json.dumps({"mode": "LOCAL_PAPER_ONLY", "enabled": True}))
+    moment = [AT + timedelta(seconds=30)]
+    started = moment[0]
+
+    def account_loader(_):
+        moment[0] += timedelta(seconds=5)
+        return _account(moment[0], positions=[_position()])
+
+    class DelayedQuotes:
+        def fetch(self, tickers, **_):
+            moment[0] += timedelta(seconds=5)
+            return {ticker: _quote(moment[0]) for ticker in tickers}, {}
+
+        def close(self):
+            moment[0] += timedelta(seconds=1)
+
+    original_step = PaperBroker.step
+
+    def delayed_step(self, **kwargs):
+        result = original_step(self, **kwargs)
+        moment[0] += timedelta(seconds=2)
+        return result
+
+    def session_resolver(*, market, **_):
+        if market == "us":
+            moment[0] += timedelta(seconds=3)
+            return {"is_open": False, "phase": "closed"}
+        return {"is_open": True, "phase": "regular"}
+
+    monkeypatch.setattr(PaperBroker, "step", delayed_step)
+    receipt = tick(archive, state, now=started, clock=lambda: moment[0], account_loader=account_loader,
+                   quote_factory=DelayedQuotes, session_resolver=session_resolver)
+    kr = receipt["markets"]["kr"]
+    assert kr["order_counts"]["FILLED"] == 1
+    assert datetime.fromisoformat(kr["last_fill_at"]) == AT + timedelta(seconds=41)
+    assert datetime.fromisoformat(kr["checked_at"]) == AT + timedelta(seconds=43)
+    assert datetime.fromisoformat(receipt["markets"]["us"]["checked_at"]) == AT + timedelta(seconds=46)
+    assert datetime.fromisoformat(receipt["checked_at"]) == moment[0] == AT + timedelta(seconds=46)
+    status_path = archive / "paper" / "status.json"
+    for before in (started, AT + timedelta(seconds=39), AT + timedelta(seconds=41), moment[0] - timedelta(microseconds=1)):
+        hidden = paper_health(status_path, analysis_as_of=before)
+        assert hidden["status"] == "UNAVAILABLE" and hidden["markets"] == {}
+    visible = paper_health(status_path, analysis_as_of=moment[0])
+    assert visible["markets"]["kr"]["order_counts"]["FILLED"] == 1
+    assert visible["markets"]["kr"]["last_fill_at"] == kr["last_fill_at"]
+
+
+def test_explicit_now_without_advancing_clock_keeps_receipts_deterministic(tmp_path):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    state.mkdir()
+    (state / "enabled.json").write_text(json.dumps({"mode": "LOCAL_PAPER_ONLY", "enabled": True}))
+    receipt = tick(archive, state, now=AT,
+                   session_resolver=lambda **_: {"is_open": False, "phase": "closed"})
+    assert datetime.fromisoformat(receipt["checked_at"]) == AT
+    assert all(datetime.fromisoformat(market["checked_at"]) == AT for market in receipt["markets"].values())
 
 
 def test_same_market_different_account_source_cannot_create_any_intent(tmp_path):
