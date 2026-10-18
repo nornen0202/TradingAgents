@@ -80,6 +80,45 @@ def test_completed_producer_published_exact_source_sends_once(tmp_path, monkeypa
     assert local.read(state / "notifications/results" / events[0].name)["message_ids"] == [42]
 
 
+def test_no_signal_prism_completion_queues_once_and_describes_zero_signals(tmp_path, monkeypatch):
+    archive, state, manifest, path, *_ = fixture(tmp_path, monkeypatch, "prism")
+    manifest.update(summary={"messages": 5, "signals": 0, "warnings": 1},
+                    warnings=["telegram_no_ticker_level_signals_found"])
+    write(path, manifest)
+    before = path.read_bytes()
+    for _ in range(2):
+        advisory.queue_completed(archive, state, now=NOW)
+    events = list((state / "notifications/events").glob("*.json"))
+    assert len(events) == 1
+    text, _, _ = advisory.compose(local.read(events[0]), archive, state)
+    assert "메시지 5건 · 신호 0건" in text
+    assert path.read_bytes() == before
+
+
+@pytest.mark.parametrize("changes", [
+    {"warnings": ["telegram_no_ticker_level_signals_found", "transport_failed"]},
+    {"warnings": ["transport_failed"]},
+    {"warnings": []}, {"warnings": "telegram_no_ticker_level_signals_found"},
+    {"summary": {"messages": 5, "signals": 1, "warnings": 1}},
+    {"summary": {"messages": 5, "signals": False, "warnings": 1}},
+    {"summary": {"messages": 5, "warnings": 1}},
+    {"summary": {"messages": 5, "signals": 0, "warnings": 2}},
+    {"summary": {"messages": 0, "signals": 0, "warnings": 1}},
+    {"summary": {"messages": True, "signals": 0, "warnings": 1}},
+    {"summary": {"messages": 5, "signals": 0, "warnings": True}},
+    {"summary": {"messages": 5, "signals": 0, "warnings": 0}},
+    {"status": "partial_failure"},
+])
+def test_unknown_or_inconsistent_prism_warning_still_blocks_completion(tmp_path, monkeypatch, changes):
+    archive, _, manifest, path, *_ = fixture(tmp_path, monkeypatch, "prism")
+    manifest.update(summary={"messages": 5, "signals": 0, "warnings": 1},
+                    warnings=["telegram_no_ticker_level_signals_found"])
+    manifest.update(changes)
+    write(path, manifest)
+    with pytest.raises(NotificationError):
+        advisory.canonical(archive, "prism", manifest["run_id"])
+
+
 @pytest.mark.parametrize("surface", ["youtube", "prism"])
 def test_fractional_completion_matches_whole_second_github_step_once(tmp_path, monkeypatch, surface):
     archive, state, manifest, path, packet, _, jobs = fixture(tmp_path, monkeypatch, surface)

@@ -114,6 +114,16 @@ GitHub attempt, live `work/v1/<surface>/latest.json`, and finally the matching
 notifications continue through the original workflow; do not replay them through
 the advisory completion lane or dispatch the producer again merely to send a notice.
 
+On October 18, PRISM successfully collected five messages with zero ticker-level
+signals. The producer's informational `telegram_no_ticker_level_signals_found`
+warning was incorrectly rejected by both recovery and notification admission.
+Those lanes now share a completion check that accepts only that exact single
+warning, positive message count and zero signal count. Unknown, mixed or
+inconsistent warnings still require diagnosis. Collection status, immutable source
+hash, exact producer attempt, publication lock and live packet checks remain
+required. Resume the existing notification lane after deploying this repair;
+do not recollect messages or repeat Work ACK to deliver a zero-signal notice.
+
 Completion text distinguishes full investment research from an overlay's quote
 and account refresh. A verified strategy data publication does not establish a
 new Work briefing or a newly completed full analysis; overlay notices explicitly
