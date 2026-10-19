@@ -1,24 +1,24 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:c139d2632208506063d8e2599825edaa",
+  "event_id": "kr:de4a5ba10142a4f189e6e50359f3837e",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "a72e95420df2bdbf27008d2fc88ea82b9aa78c1222a888149cb844d5f0402a46",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "97fde7add4383c59c23330c927f073c5c281e98221519d9aeab3615f11917f8a",
-  "source_sha256": "9fb5ff4562b261dfd4152cc5051cca4aab6ed993191a6342b36586907f5d2be0",
+  "source_sha256": "23ef79efb9f21c3a509bf59a2886c30e15e4af4250d43ef721cd4cfb370e9fd2",
   "body": {
     "kind": "market",
     "market": "KR",
     "session_id": "KR:2026-10-19",
-    "source_health": "OK",
+    "source_health": "STALE",
     "source": {
       "run_id": "20261019T144010_pre-report-kr-overlay",
       "last_run_at": "2026-10-19T14:42:21.819519+09:00",
       "status": "success"
     },
-    "report_mode": "READY",
+    "report_mode": "OUTAGE",
     "current": {
       "run_id": "20261019T144010_pre-report-kr-overlay",
       "started_at": "2026-10-19T14:40:10.363855+09:00",
@@ -35,194 +35,194 @@
         "analysis_trade_date_latest": "2026-10-16",
         "market_data_oldest_at": "2026-10-19T14:40:00+09:00",
         "market_data_latest_at": "2026-10-19T14:40:00+09:00",
-        "market_data_status": "FRESH",
+        "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 600.0,
-        "research_market_data_status": "VALID",
+        "research_market_data_status": "UNVERIFIED",
         "research_market_data_receipts": [
           {
             "ticker": "033780.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "267260.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "010140.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "090430.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "051900.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "096770.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "000660.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "278470.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "010120.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "042700.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "035420.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "034020.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "403870.KQ",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "005930.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "058470.KQ",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "353200.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "083450.KQ",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "006400.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "105560.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "010950.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "018880.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "007810.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "396300.KQ",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "086790.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "131290.KQ",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "036930.KQ",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "373220.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "018260.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "011790.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "452190.KQ",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           }
         ],
         "research_calendar_verified": true,
-        "latest_regular_close_at": "2026-10-16T06:30:00+00:00",
+        "latest_regular_close_at": "2026-10-19T06:30:00+00:00",
         "research_does_not_enable_execution": true
       },
       "latest_attempt": {
@@ -257,9 +257,9 @@
         "checkpoint": "14:40",
         "checkpoint_timezone": "Asia/Seoul",
         "quality": {
-          "report_mode": "READY",
-          "decision_ready": true,
-          "conditional_strategy_ready": true,
+          "report_mode": "OUTAGE",
+          "decision_ready": false,
+          "conditional_strategy_ready": false,
           "quality_label_ko": "장중 투자 판단 가능",
           "fresh_row_ratio": 1.0,
           "conditional_row_ratio": 1.0,
@@ -281,15 +281,15 @@
             "day_high": 193800.0,
             "day_low": 189400.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "intraday invalidation breached"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -311,15 +311,15 @@
             "day_high": 516000.0,
             "day_low": 485000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -341,15 +341,15 @@
             "day_high": 139600.0,
             "day_low": 135300.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -371,15 +371,15 @@
             "day_high": 278000.0,
             "day_low": 270000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -401,15 +401,15 @@
             "day_high": 164300.0,
             "day_low": 148800.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "relative volume unconfirmed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -431,15 +431,15 @@
             "day_high": 1268000.0,
             "day_low": 1208000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -461,15 +461,15 @@
             "day_high": 339000.0,
             "day_low": 322500.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "돌파 후 안착 실패"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -491,15 +491,15 @@
             "day_high": 163300.0,
             "day_low": 150000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -521,15 +521,15 @@
             "day_high": 210000.0,
             "day_low": 197400.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -551,15 +551,15 @@
             "day_high": 182300.0,
             "day_low": 175100.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -581,15 +581,15 @@
             "day_high": 66100.0,
             "day_low": 62000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -611,15 +611,15 @@
             "day_high": 219500.0,
             "day_low": 206500.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -641,15 +641,15 @@
             "day_high": 70100.0,
             "day_low": 67000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -671,15 +671,15 @@
             "day_high": 133400.0,
             "day_low": 124100.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -701,15 +701,15 @@
             "day_high": 593000.0,
             "day_low": 510000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -731,15 +731,15 @@
             "day_high": 163200.0,
             "day_low": 156700.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -761,15 +761,15 @@
             "day_high": 158200.0,
             "day_low": 151300.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -791,15 +791,15 @@
             "day_high": 4010.0,
             "day_low": 3710.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -821,15 +821,15 @@
             "day_high": 64000.0,
             "day_low": 60000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "risk action close confirmation required"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -851,15 +851,15 @@
             "day_high": 9500.0,
             "day_low": 8510.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "돌파 후 안착 실패"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -881,15 +881,15 @@
             "day_high": 123900.0,
             "day_low": 119400.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -911,15 +911,15 @@
             "day_high": 296000.0,
             "day_low": 267500.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -941,15 +941,15 @@
             "day_high": 210000.0,
             "day_low": 197700.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -971,15 +971,15 @@
             "day_high": 433000.0,
             "day_low": 394000.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "pilot ready"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -1001,15 +1001,15 @@
             "day_high": 204000.0,
             "day_low": 192800.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "support zone failed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -1031,15 +1031,15 @@
             "day_high": 99800.0,
             "day_low": 88600.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "relative volume unconfirmed"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -1061,15 +1061,15 @@
             "day_high": 5220.0,
             "day_low": 4830.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [
               "waiting for trigger"
             ],
             "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": true,
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
@@ -1128,16 +1128,16 @@
       "youtube": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 365,
-          "window_events": 39,
+          "total_unique_events": 349,
+          "window_events": 35,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-16T07:00:15+00:00",
+          "oldest_occurred_at": "2026-10-16T08:30:16+00:00",
           "newest_occurred_at": "2026-10-18T11:00:19+00:00",
-          "available_events_before_context_cap": 39,
+          "available_events_before_context_cap": 35,
           "context_event_cap": 12,
-          "omitted_events": 27,
-          "omitted_due_to_context_cap": 27,
+          "omitted_events": 23,
+          "omitted_due_to_context_cap": 23,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -2458,84 +2458,80 @@
             }
           },
           {
-            "event_key": "7eZkWzoJwPk",
-            "content_sha256": "3d283e1813bfd3273fb4db0ac43dc048e92e83104988837cd86f081ee861a896",
-            "occurred_at": "2026-10-16T07:00:15+00:00",
+            "event_key": "KC325ejEias",
+            "content_sha256": "d297b6ae2a7e07016bcd5e376e59aa1f6af3df2fe180dcc4e9a4cee7389fb31f",
+            "occurred_at": "2026-10-17T08:30:22+00:00",
             "relevance": {
               "tickers": [
-                "005930",
+                "NVDA",
                 "000660",
-                "CRWV",
-                "TSM",
-                "NVDA"
+                "MU"
               ],
               "markets": [
-                "KR",
-                "US"
+                "US",
+                "KR"
               ],
               "themes": [],
               "match_basis": "verified_entities",
               "matched_tickers": [
-                "000660",
-                "005930"
+                "000660"
               ],
               "market_match": true,
-              "score": 220
+              "score": 120
             },
             "summary": {
-              "video_id": "7eZkWzoJwPk",
-              "title": "[#글로벌인사이트]  “반도체 폭락장 또 오나?” 삼성전자·SK하이닉스 흔들 마지막 변수… 앤트로픽·TSMC 리스크 총점검 ㅣ세미콘 리서치랩 노근창 대표",
+              "video_id": "KC325ejEias",
+              "title": "SK하이닉스 실적 좋아도 주가 못 오르나? / 2027년 반도체 피크아웃 우려의 실체  | 유창희 대표",
               "channel": "815Money talk",
-              "source_url": "https://www.youtube.com/watch?v=7eZkWzoJwPk",
+              "source_url": "https://www.youtube.com/watch?v=KC325ejEias",
               "claim_status_summary": {
-                "asr_uncertain": 1,
-                "unverified": 11
+                "unverified": 10
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "초반 Coherent 또는 CoreWeave가 5% 이상, Micron이 약 1%, KOSPI 관련 선물이 약 4% 상승했고 Oracle도 상승했다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.99,
+                  "claim_text": "다음 주 베를린 GTC 개최, 내년 Rubin·800V 도입, Meta 광연결 인재 영입·투자와 RF머트리얼즈의 연관성을 주장하며 광연결 시장의 2028년 본격 성장을 전망한다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "반등 수치를 현재 시장 상황이나 매매 신호로 사용하기 어렵다."
+                  "investor_implication": "공식 행사 일정과 기술별 상용화·고객 도입 시점을 확인하기 전에는 관련 종목의 매출 발생 시기를 확정하지 않는다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "삼성전자 주가는 6만 원 미만이며 2026년 예상 PBR은 삼성전자 1.1배·SK하이닉스 1.2배로 저평가됐다.",
+                  "claim_text": "NVIDIA의 차년도 최소 70% 성장 전망과 자사주 매입 확대, Broadcom의 연속 두 배 성장 전망 및 Dell의 유사 전망이 주가 상승에 기여했다고 주장한다.",
                   "status": "unverified",
-                  "confidence": 0.99,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "영상의 가격과 예상 PBR을 현재 밸류에이션으로 인용하지 말고 동일 기준일의 주가와 당시 예상 BPS로 재계산해야 한다."
+                  "investor_implication": "성장률을 기업 전체 실적 전망으로 적용하거나 자사주 발표를 주가 상승의 확정 원인으로 해석할 근거가 부족하다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "CoreWeave의 DDTL 금리는 2.25%, 무담보 금리는 9.75% 또는 9.625%, 유통 채무 수익률은 15%이며 이자 부담이 순손실과 투자 축소 위험을 만든다.",
+                  "claim_text": "SK하이닉스 실적 컨센서스가 7.9조~8조 원이고 자사주 매입이 약 90% 진행돼 다음 주 초 종료되며, 직전 실적 발표에서 주주환원 언급이 없었고 ADR 관련 발언 제한이 해제됐다고 주장한다.",
                   "status": "unverified",
-                  "confidence": 0.99,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "2.25%를 총 조달금리로 단정하거나 15%를 기존 전체 채무의 지급금리로 적용해서는 안 된다. 투자 축소 위험과 단기 지급능력은 별도 검증이 필요하다."
+                  "investor_implication": "주주환원 기대와 공식 결정은 구분해야 하며, 매입 종료나 ADR 관련 설명을 확인된 촉매로 취급할 수 없다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "CoreWeave는 비교 대상 미국 기업 매출의 2.4%이며 운영 용량 1.5GW, 미국 데이터센터 40GW 대비 약 3.8%, 계약 용량 4.2GW와 세계 주문량 대비 1.6%, 올해 신규 센터 8개를 보유한다.",
+                  "claim_text": "SK하이닉스 130만 원·주간 약 30% 하락·직전 실적 발표일 10% 이상 하락, 삼성전자 28만 원에서 21만~22만 원 하락, 별도 기간의 삼성전자 약 30% 대비 하이닉스 거의 40% 하락 및 소부장 종목의 6월 고점과 상이한 흐름을 주장한다.",
                   "status": "unverified",
-                  "confidence": 0.99,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "산술 일치만으로 사업 규모나 산업 충격의 제한성을 입증할 수 없다. 운영 중인 용량과 미래 계약 용량을 구분해야 한다."
+                  "investor_implication": "비교 기준일과 수정주가를 맞추기 전에는 상대 낙폭이나 반등 여력을 투자 판단에 사용하기 어렵다."
                 }
               ],
               "entities": [
                 {
-                  "ticker": "005930",
-                  "name": "삼성전자",
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
                   "status": "unverified",
                   "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 },
                 {
@@ -2547,24 +2543,8 @@
                   ]
                 },
                 {
-                  "ticker": "CRWV",
-                  "name": "CoreWeave",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "TSM",
-                  "name": "TSMC",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "NVIDIA",
+                  "ticker": "MU",
+                  "name": "마이크론",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2579,7 +2559,7 @@
       "prism": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 189,
+          "total_unique_events": 187,
           "window_events": 9,
           "transmitted_events": 9,
           "truncated": false,
@@ -2819,19 +2799,19 @@
               "85XbEvN4fls",
               "-743r-0N1Qs",
               "oIyKi4495kc",
-              "7eZkWzoJwPk"
+              "KC325ejEias"
             ],
             "coverage": {
-              "total_unique_events": 365,
-              "window_events": 39,
+              "total_unique_events": 349,
+              "window_events": 35,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-16T07:00:15+00:00",
+              "oldest_occurred_at": "2026-10-16T08:30:16+00:00",
               "newest_occurred_at": "2026-10-18T11:00:19+00:00",
-              "available_events_before_context_cap": 39,
+              "available_events_before_context_cap": 35,
               "context_event_cap": 12,
-              "omitted_events": 27,
-              "omitted_due_to_context_cap": 27,
+              "omitted_events": 23,
+              "omitted_due_to_context_cap": 23,
               "omitted_before_context_selection": 0
             }
           },
@@ -2849,7 +2829,7 @@
               "stock_ai_agent:16279"
             ],
             "coverage": {
-              "total_unique_events": 189,
+              "total_unique_events": 187,
               "window_events": 9,
               "transmitted_events": 9,
               "truncated": false,
@@ -2871,10 +2851,10 @@
       "immediate_requires_row_mode": "IMMEDIATE",
       "market_data_asof": "2026-10-19T14:40:00+09:00",
       "valid_until": "2026-10-19T14:50:00+09:00",
-      "expired_at_build": false,
-      "decision_ready": true,
-      "conditional_strategy_ready": true,
-      "report_mode": "READY",
+      "expired_at_build": true,
+      "decision_ready": false,
+      "conditional_strategy_ready": false,
+      "report_mode": "OUTAGE",
       "required_rechecks": [
         "실시간 호가와 주문 가능 상태 재확인",
         "계좌 현금·미체결 주문 재확인",

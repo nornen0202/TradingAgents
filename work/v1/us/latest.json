@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:15b02b59f483a09d9246247e55d27c0e",
+  "event_id": "us:b1354fafa11879966c1b1707026799c5",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
-  "source_sha256": "cc1e28b87a46220fda30606182d4377442412b45d0e2a14278c781c3ba89ca95",
+  "source_sha256": "b08840f05944466c8136cbc089daeb8e0f7b6e1917b7a8a9f9b06b71feae9527",
   "body": {
     "kind": "market",
     "market": "US",
@@ -1122,16 +1122,16 @@
       "youtube": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 365,
-          "window_events": 39,
+          "total_unique_events": 349,
+          "window_events": 35,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-16T07:00:15+00:00",
+          "oldest_occurred_at": "2026-10-16T09:12:21+00:00",
           "newest_occurred_at": "2026-10-18T22:00:14+00:00",
-          "available_events_before_context_cap": 39,
+          "available_events_before_context_cap": 35,
           "context_event_cap": 12,
-          "omitted_events": 27,
-          "omitted_due_to_context_cap": 27,
+          "omitted_events": 23,
+          "omitted_due_to_context_cap": 23,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -1652,16 +1652,15 @@
             }
           },
           {
-            "event_key": "7eZkWzoJwPk",
-            "content_sha256": "3d283e1813bfd3273fb4db0ac43dc048e92e83104988837cd86f081ee861a896",
-            "occurred_at": "2026-10-16T07:00:15+00:00",
+            "event_key": "TT1koVS5fOo",
+            "content_sha256": "216e4b3204de514fb287c8f90a1ab6309f43242b0a8c14a24eb6398ab7f0da8d",
+            "occurred_at": "2026-10-18T08:00:06+00:00",
             "relevance": {
               "tickers": [
                 "005930",
                 "000660",
-                "CRWV",
-                "TSM",
-                "NVDA"
+                "402340",
+                "TSM"
               ],
               "markets": [
                 "KR",
@@ -1670,57 +1669,57 @@
               "themes": [],
               "match_basis": "verified_entities",
               "matched_tickers": [
-                "NVDA",
                 "TSM"
               ],
               "market_match": true,
-              "score": 220
+              "score": 120
             },
             "summary": {
-              "video_id": "7eZkWzoJwPk",
-              "title": "[#글로벌인사이트]  “반도체 폭락장 또 오나?” 삼성전자·SK하이닉스 흔들 마지막 변수… 앤트로픽·TSMC 리스크 총점검 ㅣ세미콘 리서치랩 노근창 대표",
+              "video_id": "TT1koVS5fOo",
+              "title": "“솔리다임 상장이 SK하이닉스에 독이 되나?” 외국인은 하닉 팔고 삼성전자 사들이나… 삼전 주가 어디까지 갈까?ㅣ이지환 대표",
               "channel": "815Money talk",
-              "source_url": "https://www.youtube.com/watch?v=7eZkWzoJwPk",
+              "source_url": "https://www.youtube.com/watch?v=TT1koVS5fOo",
               "claim_status_summary": {
-                "asr_uncertain": 1,
-                "unverified": 11
+                "partially_supported": 2,
+                "unverified": 8,
+                "asr_uncertain": 2
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "초반 Coherent 또는 CoreWeave가 5% 이상, Micron이 약 1%, KOSPI 관련 선물이 약 4% 상승했고 Oracle도 상승했다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.99,
+                  "claim_text": "삼성전자 약 +3%·외국인 약 80만 주 매수, SK하이닉스 +0.67%·외국인 매도와 누적 상승폭 차이를 근거로 외국인의 삼성전자 선호를 해석한다. 국내 증시의 7거래일 연속 하락 후 약 2% 반등과 과거 장중 급등 후 하락 마감 사례도 제시한다.",
+                  "status": "partially_supported",
+                  "confidence": 0.3,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "반등 수치를 현재 시장 상황이나 매매 신호로 사용하기 어렵다."
+                  "investor_implication": "지수 반등의 제한적 근거와 개별 종목 선호 논리를 구분해야 한다. 외국인 매수 및 상대 저평가를 확인된 투자 신호로 사용할 수 없다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "삼성전자 주가는 6만 원 미만이며 2026년 예상 PBR은 삼성전자 1.1배·SK하이닉스 1.2배로 저평가됐다.",
+                  "claim_text": "솔리다임 IPO·매각으로 투자수익 두 배 이상 또는 시장가치 10배가 가능하지만, 대금의 주주환원 여부에 대한 우려가 SK하이닉스 외국인 매도에 영향을 준다는 해석이다.",
                   "status": "unverified",
-                  "confidence": 0.99,
+                  "confidence": 0.05,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "영상의 가격과 예상 PBR을 현재 밸류에이션으로 인용하지 말고 동일 기준일의 주가와 당시 예상 BPS로 재계산해야 한다."
+                  "investor_implication": "솔리다임 거래에 따른 희석이나 가치 환원을 확정적으로 반영할 수 없다. 거래 구조와 자금 사용계획 확인이 우선이다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "CoreWeave의 DDTL 금리는 2.25%, 무담보 금리는 9.75% 또는 9.625%, 유통 채무 수익률은 15%이며 이자 부담이 순손실과 투자 축소 위험을 만든다.",
+                  "claim_text": "SK스퀘어가 반도체 수직계열화에서 자산 매각으로 전환했고 두산 관련 매각이 그 사례이며, 지주회사 역할과 주주가치 제고 방향이 불명확하다는 평가다.",
                   "status": "unverified",
-                  "confidence": 0.99,
+                  "confidence": 0.05,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "2.25%를 총 조달금리로 단정하거나 15%를 기존 전체 채무의 지급금리로 적용해서는 안 된다. 투자 축소 위험과 단기 지급능력은 별도 검증이 필요하다."
+                  "investor_implication": "다른 SK 계열사의 거래를 SK스퀘어의 전략으로 혼동하지 않도록 거래 주체와 지분구조를 먼저 확인해야 한다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "CoreWeave는 비교 대상 미국 기업 매출의 2.4%이며 운영 용량 1.5GW, 미국 데이터센터 40GW 대비 약 3.8%, 계약 용량 4.2GW와 세계 주문량 대비 1.6%, 올해 신규 센터 8개를 보유한다.",
+                  "claim_text": "TSMC가 3nm를 먼저 양산하고 2nm 주문 대부분을 확보했으며, 공급 제약으로 넘친 대형 IT 고객 물량이 삼성전자 파운드리 수주와 적자 개선에 기여한다는 주장이다.",
                   "status": "unverified",
-                  "confidence": 0.99,
+                  "confidence": 0.05,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "산술 일치만으로 사업 규모나 산업 충격의 제한성을 입증할 수 없다. 운영 중인 용량과 미래 계약 용량을 구분해야 한다."
+                  "investor_implication": "첨단 공정 경쟁력 회복과 적자 축소를 확인된 실적 개선으로 간주할 수 없다."
                 }
               ],
               "entities": [
@@ -1741,24 +1740,16 @@
                   ]
                 },
                 {
-                  "ticker": "CRWV",
-                  "name": "CoreWeave",
+                  "ticker": "402340",
+                  "name": "SK스퀘어",
                   "status": "unverified",
                   "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 },
                 {
                   "ticker": "TSM",
                   "name": "TSMC",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "NVIDIA",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2162,19 +2153,20 @@
             }
           },
           {
-            "event_key": "TT1koVS5fOo",
-            "content_sha256": "216e4b3204de514fb287c8f90a1ab6309f43242b0a8c14a24eb6398ab7f0da8d",
-            "occurred_at": "2026-10-18T08:00:06+00:00",
+            "event_key": "L2GG_DeUDa0",
+            "content_sha256": "cb27f3b80649b0b84348c760f080c9298782fe82f066190aabd4271afb9dc684",
+            "occurred_at": "2026-10-16T23:00:13+00:00",
             "relevance": {
               "tickers": [
+                "^KS11",
                 "005930",
                 "000660",
-                "402340",
+                "009150",
                 "TSM"
               ],
               "markets": [
-                "KR",
-                "US"
+                "US",
+                "KR"
               ],
               "themes": [],
               "match_basis": "verified_entities",
@@ -2185,54 +2177,63 @@
               "score": 120
             },
             "summary": {
-              "video_id": "TT1koVS5fOo",
-              "title": "“솔리다임 상장이 SK하이닉스에 독이 되나?” 외국인은 하닉 팔고 삼성전자 사들이나… 삼전 주가 어디까지 갈까?ㅣ이지환 대표",
-              "channel": "815Money talk",
-              "source_url": "https://www.youtube.com/watch?v=TT1koVS5fOo",
+              "video_id": "L2GG_DeUDa0",
+              "title": "지옥 같은 코스피에서 살아남을 단어 '양극단' | 윤지호 경제평론가 [주말인터뷰]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=L2GG_DeUDa0",
               "claim_status_summary": {
-                "partially_supported": 2,
-                "unverified": 8,
+                "unverified": 10,
                 "asr_uncertain": 2
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "삼성전자 약 +3%·외국인 약 80만 주 매수, SK하이닉스 +0.67%·외국인 매도와 누적 상승폭 차이를 근거로 외국인의 삼성전자 선호를 해석한다. 국내 증시의 7거래일 연속 하락 후 약 2% 반등과 과거 장중 급등 후 하락 마감 사례도 제시한다.",
-                  "status": "partially_supported",
-                  "confidence": 0.3,
+                  "claim_text": "2026-10-14 녹화 전날 두 달 만에 코스피 매도 사이드카가 발동했고, 장중 5,900선 초반까지 하락한 뒤 6,000선을 지켰다.",
+                  "status": "unverified",
+                  "confidence": 0.98,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "지수 반등의 제한적 근거와 개별 종목 선호 논리를 구분해야 한다. 외국인 매수 및 상대 저평가를 확인된 투자 신호로 사용할 수 없다."
+                  "investor_implication": "6,000선을 확인된 지지선으로 취급하지 말고 해당 거래일의 거래소 시세와 사이드카 공지를 확인해야 한다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "솔리다임 IPO·매각으로 투자수익 두 배 이상 또는 시장가치 10배가 가능하지만, 대금의 주주환원 여부에 대한 우려가 SK하이닉스 외국인 매도에 영향을 준다는 해석이다.",
+                  "claim_text": "외국인 매도에는 리밸런싱과 지배구조 우려가 작용했고 개인·연기금이 대응했다. 연간 외국인 매도는 역대 최대가 될 수 있으며 일본 개혁은 2012년부터 거래소 주도로 진행됐다.",
                   "status": "unverified",
-                  "confidence": 0.05,
+                  "confidence": 0.98,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "솔리다임 거래에 따른 희석이나 가치 환원을 확정적으로 반영할 수 없다. 거래 구조와 자금 사용계획 확인이 우선이다."
+                  "investor_implication": "외국인 매도 소진이나 연기금의 추가 매수 여력을 전제로 투자 판단을 내리기에는 근거가 부족하다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "SK스퀘어가 반도체 수직계열화에서 자산 매각으로 전환했고 두산 관련 매각이 그 사례이며, 지주회사 역할과 주주가치 제고 방향이 불명확하다는 평가다.",
-                  "status": "unverified",
-                  "confidence": 0.05,
+                  "claim_text": "전체 및 반도체 두 회사 제외 이익 증가율 전망, 삼성전자·SK하이닉스 PER 약 2~3배, 2028년 이익 전망 상향이 양극단 투자 전략의 근거다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.98,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "다른 SK 계열사의 거래를 SK스퀘어의 전략으로 혼동하지 않도록 거래 주체와 지분구조를 먼저 확인해야 한다."
+                  "investor_implication": "낮은 PER과 전망 상향을 확인된 저평가 근거로 사용하기 전에 동일 기준일·동일 이익연도로 재계산해야 한다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "TSMC가 3nm를 먼저 양산하고 2nm 주문 대부분을 확보했으며, 공급 제약으로 넘친 대형 IT 고객 물량이 삼성전자 파운드리 수주와 적자 개선에 기여한다는 주장이다.",
+                  "claim_text": "삼성전기의 MLCC·FC-BGA 성장과 증설 후 영업레버리지가 높은 PER 및 2027~2028년 성장을 정당화한다.",
                   "status": "unverified",
-                  "confidence": 0.05,
-                  "supporting_evidence_ids": [],
+                  "confidence": 0.96,
+                  "supporting_evidence_ids": [
+                    "E5"
+                  ],
                   "manual_check_required": true,
-                  "investor_implication": "첨단 공정 경쟁력 회복과 적자 축소를 확인된 실적 개선으로 간주할 수 없다."
+                  "investor_implication": "증설 자체보다 매출 증가, 가동률 및 감가상각 반영 후 이익률을 확인해야 한다."
                 }
               ],
               "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·한국 주식시장",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
                 {
                   "ticker": "005930",
                   "name": "삼성전자",
@@ -2250,8 +2251,8 @@
                   ]
                 },
                 {
-                  "ticker": "402340",
-                  "name": "SK스퀘어",
+                  "ticker": "009150",
+                  "name": "삼성전기",
                   "status": "unverified",
                   "verification_notes": [
                     "시장 데이터 조회 실패: no_usable_market_fields"
@@ -2526,16 +2527,14 @@
             }
           },
           {
-            "event_key": "L2GG_DeUDa0",
-            "content_sha256": "cb27f3b80649b0b84348c760f080c9298782fe82f066190aabd4271afb9dc684",
-            "occurred_at": "2026-10-16T23:00:13+00:00",
+            "event_key": "KC325ejEias",
+            "content_sha256": "d297b6ae2a7e07016bcd5e376e59aa1f6af3df2fe180dcc4e9a4cee7389fb31f",
+            "occurred_at": "2026-10-17T08:30:22+00:00",
             "relevance": {
               "tickers": [
-                "^KS11",
-                "005930",
+                "NVDA",
                 "000660",
-                "009150",
-                "TSM"
+                "MU"
               ],
               "markets": [
                 "US",
@@ -2544,75 +2543,64 @@
               "themes": [],
               "match_basis": "verified_entities",
               "matched_tickers": [
-                "TSM"
+                "NVDA"
               ],
               "market_match": true,
               "score": 120
             },
             "summary": {
-              "video_id": "L2GG_DeUDa0",
-              "title": "지옥 같은 코스피에서 살아남을 단어 '양극단' | 윤지호 경제평론가 [주말인터뷰]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=L2GG_DeUDa0",
+              "video_id": "KC325ejEias",
+              "title": "SK하이닉스 실적 좋아도 주가 못 오르나? / 2027년 반도체 피크아웃 우려의 실체  | 유창희 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=KC325ejEias",
               "claim_status_summary": {
-                "unverified": 10,
-                "asr_uncertain": 2
+                "unverified": 10
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "2026-10-14 녹화 전날 두 달 만에 코스피 매도 사이드카가 발동했고, 장중 5,900선 초반까지 하락한 뒤 6,000선을 지켰다.",
+                  "claim_text": "다음 주 베를린 GTC 개최, 내년 Rubin·800V 도입, Meta 광연결 인재 영입·투자와 RF머트리얼즈의 연관성을 주장하며 광연결 시장의 2028년 본격 성장을 전망한다.",
                   "status": "unverified",
-                  "confidence": 0.98,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "6,000선을 확인된 지지선으로 취급하지 말고 해당 거래일의 거래소 시세와 사이드카 공지를 확인해야 한다."
+                  "investor_implication": "공식 행사 일정과 기술별 상용화·고객 도입 시점을 확인하기 전에는 관련 종목의 매출 발생 시기를 확정하지 않는다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "외국인 매도에는 리밸런싱과 지배구조 우려가 작용했고 개인·연기금이 대응했다. 연간 외국인 매도는 역대 최대가 될 수 있으며 일본 개혁은 2012년부터 거래소 주도로 진행됐다.",
+                  "claim_text": "NVIDIA의 차년도 최소 70% 성장 전망과 자사주 매입 확대, Broadcom의 연속 두 배 성장 전망 및 Dell의 유사 전망이 주가 상승에 기여했다고 주장한다.",
                   "status": "unverified",
-                  "confidence": 0.98,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "외국인 매도 소진이나 연기금의 추가 매수 여력을 전제로 투자 판단을 내리기에는 근거가 부족하다."
+                  "investor_implication": "성장률을 기업 전체 실적 전망으로 적용하거나 자사주 발표를 주가 상승의 확정 원인으로 해석할 근거가 부족하다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "전체 및 반도체 두 회사 제외 이익 증가율 전망, 삼성전자·SK하이닉스 PER 약 2~3배, 2028년 이익 전망 상향이 양극단 투자 전략의 근거다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.98,
+                  "claim_text": "SK하이닉스 실적 컨센서스가 7.9조~8조 원이고 자사주 매입이 약 90% 진행돼 다음 주 초 종료되며, 직전 실적 발표에서 주주환원 언급이 없었고 ADR 관련 발언 제한이 해제됐다고 주장한다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "낮은 PER과 전망 상향을 확인된 저평가 근거로 사용하기 전에 동일 기준일·동일 이익연도로 재계산해야 한다."
+                  "investor_implication": "주주환원 기대와 공식 결정은 구분해야 하며, 매입 종료나 ADR 관련 설명을 확인된 촉매로 취급할 수 없다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "삼성전기의 MLCC·FC-BGA 성장과 증설 후 영업레버리지가 높은 PER 및 2027~2028년 성장을 정당화한다.",
+                  "claim_text": "SK하이닉스 130만 원·주간 약 30% 하락·직전 실적 발표일 10% 이상 하락, 삼성전자 28만 원에서 21만~22만 원 하락, 별도 기간의 삼성전자 약 30% 대비 하이닉스 거의 40% 하락 및 소부장 종목의 6월 고점과 상이한 흐름을 주장한다.",
                   "status": "unverified",
-                  "confidence": 0.96,
-                  "supporting_evidence_ids": [
-                    "E5"
-                  ],
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "증설 자체보다 매출 증가, 가동률 및 감가상각 반영 후 이익률을 확인해야 한다."
+                  "investor_implication": "비교 기준일과 수정주가를 맞추기 전에는 상대 낙폭이나 반등 여력을 투자 판단에 사용하기 어렵다."
                 }
               ],
               "entities": [
                 {
-                  "ticker": "^KS11",
-                  "name": "코스피·한국 주식시장",
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 },
                 {
@@ -2624,16 +2612,8 @@
                   ]
                 },
                 {
-                  "ticker": "009150",
-                  "name": "삼성전기",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "TSM",
-                  "name": "TSMC",
+                  "ticker": "MU",
+                  "name": "마이크론",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2648,7 +2628,7 @@
       "prism": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 189,
+          "total_unique_events": 187,
           "window_events": 9,
           "transmitted_events": 9,
           "truncated": false,
@@ -2881,26 +2861,26 @@
               "Qmx3pgh3vQg",
               "gqeSqgWv9Jg",
               "-743r-0N1Qs",
-              "7eZkWzoJwPk",
+              "TT1koVS5fOo",
               "G_-gvmaHLXE",
               "qjrAdBB7h5U",
               "A5LZFk6AYf4",
-              "TT1koVS5fOo",
+              "L2GG_DeUDa0",
               "_v8rV9CnW5Q",
               "HUk6v2EgUy4",
-              "L2GG_DeUDa0"
+              "KC325ejEias"
             ],
             "coverage": {
-              "total_unique_events": 365,
-              "window_events": 39,
+              "total_unique_events": 349,
+              "window_events": 35,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-16T07:00:15+00:00",
+              "oldest_occurred_at": "2026-10-16T09:12:21+00:00",
               "newest_occurred_at": "2026-10-18T22:00:14+00:00",
-              "available_events_before_context_cap": 39,
+              "available_events_before_context_cap": 35,
               "context_event_cap": 12,
-              "omitted_events": 27,
-              "omitted_due_to_context_cap": 27,
+              "omitted_events": 23,
+              "omitted_due_to_context_cap": 23,
               "omitted_before_context_selection": 0
             }
           },
@@ -2918,7 +2898,7 @@
               "stock_ai_agent:16279"
             ],
             "coverage": {
-              "total_unique_events": 189,
+              "total_unique_events": 187,
               "window_events": 9,
               "transmitted_events": 9,
               "truncated": false,
