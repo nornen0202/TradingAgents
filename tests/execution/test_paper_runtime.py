@@ -1,7 +1,6 @@
 from copy import deepcopy
 from datetime import datetime, timedelta
 import json
-from pathlib import Path
 
 import pytest
 
@@ -133,6 +132,18 @@ def raw_quote():
 
 
 BOOK = {"rt_cd": "0", "output1": {"bidp1": "19995", "askp1": "20005", "aspr_acpt_hour": "100000"}}
+
+
+def test_clock_correction_never_changes_broker_event_or_accepts_future_book():
+    book = deepcopy(BOOK)
+    book['output1']['aspr_acpt_hour'] = '100001'
+    with pytest.raises(ValueError, match='ORDERBOOK_CLOCK_STALE_OR_FUTURE'):
+        normalize_quote(ticker=TICKER, market='kr', chart=raw_quote(), orderbook=book, observed_at=AT)
+    corrected = AT + timedelta(seconds=2)
+    result = normalize_quote(ticker=TICKER, market='kr', chart=raw_quote(), orderbook=book, observed_at=corrected)
+    assert result['orderbook_event_at'] == (AT + timedelta(seconds=1)).isoformat()
+    assert result['observed_at'] == corrected.isoformat()
+    assert book['output1']['aspr_acpt_hour'] == '100001'
 
 
 def test_completed_dated_quote_keeps_source_time_and_rejects_bad_records():
