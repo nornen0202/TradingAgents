@@ -2317,6 +2317,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     return '<div class="plan-overview"><p>수량 산정 ' + esc(counts.sized_count ?? 0) + '종목 · 0주 ' + esc(counts.zero_count ?? 0) + '종목 · 산출 보류 ' + esc(counts.unsized_count ?? 0) + '종목</p>'
       + (reasons ? '<p>' + esc(reasons) + '</p>' : '')
       + ('new_buy_budget_krw' in cash ? '<p>신규 매수 예산 ' + esc(planMoney(cash.new_buy_budget_krw, 'KRW')) + ' · 최소 보유 현금 ' + esc(planMoney(cash.min_cash_buffer_krw, 'KRW')) + ' · 주문가능금액 ' + esc(planMoney(cash.buying_power_krw, 'KRW')) + '</p>' : '')
+      + ('available_cash_krw' in cash ? '<p>가용 현금 ' + esc(planMoney(cash.available_cash_krw, 'KRW')) + ' · 최소 현금 기준까지 부족 ' + esc(planMoney(cash.cash_buffer_shortfall_krw, 'KRW')) + '</p>' : '')
       + (plan.market === 'US' ? '<p>수량 환산 기준 USD/KRW ' + (Number.isFinite(numeric(plan.fx_krw_per_usd)) ? esc(fmt(plan.fx_krw_per_usd)) + ' · ' + esc(dateTime(plan.fx_asof)) : '확인 필요') + ' · 실제 환전 체결 호가와 구별</p>' : '') + '</div>';
   }
   function tradeSummaryRow(entry, item) {
@@ -2341,7 +2342,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
       const costKnown = Number.isFinite(numeric(plan.estimated_net_cash));
       const label = !costKnown && Number.isFinite(numeric(amount)) ? '거래대금 · 비용 미확정' : plan.action === 'SELL' ? '상단 기준 예상 수령액' : plan.action === 'BUY' ? '상단 기준 예상 지출' : '추가 거래 금액';
       const funding = plan.one_share_funding;
-      return '<strong class="plan-value">' + esc(planMoney(Number.isFinite(numeric(amount)) ? Math.abs(Number(amount)) : null, plan.currency)) + '</strong><small>' + esc(label) + (Number.isFinite(fee) ? ' · 수수료·거래세 ' + esc(planMoney(fee, plan.currency)) : '') + '</small>' + (funding && plan.quantity === 0 ? '<small>1주 필요자금 ' + esc(planMoney(funding.required_krw, 'KRW')) + '</small><small>현금 부족 ' + esc(planMoney(funding.cash_shortfall_krw, 'KRW')) + ' · 배정 부족 ' + esc(planMoney(funding.allocation_shortfall_krw, 'KRW')) + '</small>' : '');
+      return '<strong class="plan-value">' + esc(planMoney(Number.isFinite(numeric(amount)) ? Math.abs(Number(amount)) : null, plan.currency)) + '</strong><small>' + esc(label) + (Number.isFinite(fee) ? ' · 수수료·거래세 ' + esc(planMoney(fee, plan.currency)) : '') + '</small>' + (funding && plan.quantity === 0 ? '<small>1주 필요자금 ' + esc(planMoney(funding.required_krw, 'KRW')) + '</small><small>매수 예산 부족 ' + esc(planMoney(funding.cash_shortfall_krw, 'KRW')) + ' · 배정 부족 ' + esc(planMoney(funding.allocation_shortfall_krw, 'KRW')) + '</small>' : '');
     });
     const conditions = planParts(plans, (plan) => {
       const quantity = numeric(plan.quantity);
