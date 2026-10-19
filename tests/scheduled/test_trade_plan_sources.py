@@ -1,5 +1,6 @@
 import json
 import pytest
+from datetime import datetime
 
 from tradingagents.scheduled.trade_plan_sources import load_trade_plan_sources
 from tradingagents.scheduled.trade_plan import build_trade_plan
@@ -166,7 +167,7 @@ def test_loader_never_returns_raw_exception_text(source, monkeypatch):
 
     root, _, _, _, market, _ = source
 
-    def fail(path):
+    def fail(path, **kwargs):
         raise ValueError("PRIVATE-ACCOUNT C:/private/account_snapshot.json")
 
     monkeypatch.setattr(sources, "_object", fail)
@@ -294,3 +295,47 @@ def test_known_sizing_constraints_are_preserved(source):
     snapshot["constraints"]["max_single_name_weight"] = 1.2
     save()
     assert load_trade_plan_sources(root, market)["account_snapshot"] is None
+
+
+def test_large_valid_analysis_keeps_small_account_and_fx_available(source):
+    root, _, snapshot, manifest, market, save = source
+    manifest["ticker_analysis"] = "x" * (2 * 1024 * 1024 + 100)
+    snapshot["cash_diagnostics"]["fx_quote"] = {
+        "base_currency": "USD", "quote_currency": "KRW", "rate": 1342.4,
+        "observed_at": "2026-01-02T10:02:10+09:00",
+        "source": "kis.inquire_present_balance.output2.frst_bltn_exrt",
+    }
+    save()
+    result = load_trade_plan_sources(root, market, analysis_as_of=datetime.fromisoformat("2026-01-02T10:04:00+09:00"))
+    assert result["status"] == "EXACT_RUN_ACCOUNT"
+    assert result["fx_krw_per_usd"] == 1342.4
+    assert "ticker_analysis" not in result
+
+
+def test_manifest_still_has_a_bounded_read(source, monkeypatch):
+    import tradingagents.scheduled.trade_plan_sources as sources
+    root, _, _, _, market, _ = source
+    monkeypatch.setattr(sources, "_MAX_MANIFEST_BYTES", 10)
+    result = load_trade_plan_sources(root, market)
+    assert result["account_snapshot"] is None
+    assert result["reason"] == "SOURCE_ARTIFACT_TOO_LARGE"
+
+
+@pytest.mark.parametrize("observed", [None, "bad-date", "2026-01-02T10:04:00+09:00", "2026-01-02T09:59:00+09:00", "2026-01-02T10:02:00"])
+def test_fx_rejects_unknown_or_outside_run_timestamps(source, observed):
+    root, _, snapshot, _, market, save = source
+    snapshot["cash_diagnostics"]["fx_quote"] = {
+        "base_currency": "USD", "quote_currency": "KRW", "rate": 1342.4,
+        "observed_at": observed, "source": "kis.inquire_present_balance.output2.frst_bltn_exrt",
+    }
+    save()
+    result = load_trade_plan_sources(root, market, analysis_as_of=datetime.fromisoformat("2026-01-02T10:03:00+09:00"))
+    assert result["account_snapshot"] is not None
+    assert result["fx_krw_per_usd"] is None
+
+
+def test_cutoff_excludes_later_account_execution_even_if_available_on_disk(source):
+    root, _, _, _, market, _ = source
+    result = load_trade_plan_sources(root, market, analysis_as_of=datetime.fromisoformat("2026-01-02T10:01:00+09:00"))
+    assert result["account_snapshot"] is None
+    assert result["fx_krw_per_usd"] is None

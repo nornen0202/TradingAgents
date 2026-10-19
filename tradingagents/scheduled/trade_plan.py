@@ -18,6 +18,7 @@ from tradingagents.schemas.decision import explicit_price_range_conflicts
 
 
 _ACCOUNT_SOURCE_MESSAGES = {
+    "SOURCE_ARTIFACT_TOO_LARGE": "원본 분석 파일이 읽기 한도를 넘어 계좌·환율 확인을 보류했습니다.",
     "SOURCE_RUN_PARTIAL_FAILURE": "원분석 실행에서 일부 종목 분석이 실패하여 동일 실행 계좌를 이용한 수량 산정을 보류했습니다.",
     "SOURCE_RUN_INCOMPLETE": "원분석 실행이 정상 완료되지 않아 동일 실행 계좌를 이용한 수량 산정을 보류했습니다.",
     "PORTFOLIO_RUN_INCOMPLETE": "같은 실행의 계좌 분석이 정상 완료되지 않아 수량 산정을 보류했습니다.",
@@ -274,11 +275,17 @@ def build_trade_plan(
     currency = "KRW" if market == "KR" else "USD"
     clock = now or datetime.now(timezone.utc)
     snapshot = _mapping(account_snapshot)
+    snapshot_time = _timestamp(snapshot.get("as_of"))
+    if snapshot and (snapshot_time is None or snapshot_time > clock):
+        snapshot = {}  # Future/undated accounts are not sizing evidence.
     costs = _cost_profile(fee_config, market)
     commission = costs["commission_rate"]
     if commission is not None and not 0 <= commission < 1:
         commission = None
     fx = 1.0 if market == "KR" else _positive(fx_krw_per_usd)
+    fx_time = _timestamp(fx_asof)
+    if market == "US" and (fx_time is None or fx_time > clock):
+        fx = None
     fx_reserve_rate = costs["fx_spread_scenario"] if market == "US" else 0.0
     available = _number(snapshot.get("available_cash_krw"))
     buying_power = _number(snapshot.get("buying_power_krw"))
@@ -392,6 +399,7 @@ def build_trade_plan(
             }
         )
         quantity = None
+        cash_before = cash_left
         sizing_basis = None
         fx_budget_reserve = 0.0
         sell_fraction = (
@@ -635,6 +643,64 @@ def build_trade_plan(
         if price_range_blocked:
             status = "RECHECK"
             target_weight = None
+        # Explain a zero without silently changing the allocation or rounding
+        # a partial risk reduction up to a full share. Alternatives are review
+        # information only, and never enter quantity or the shared cash ledger.
+        unit_krw = high * fx if high is not None and fx is not None else None
+        unit_buy_cost = (
+            unit_krw * (1 + commission) * (1 + fx_reserve_rate)
+            if unit_krw is not None and commission is not None and fx_reserve_rate is not None
+            else None
+        )
+        target_quantity = (
+            abs(delta) / (unit_buy_cost if side == "BUY" else unit_krw)
+            if side in {"BUY", "SELL"} and delta is not None
+            and (unit_buy_cost if side == "BUY" else unit_krw)
+            else None
+        )
+        zero_reason = None
+        minimum_lot_review = None
+        sizing_notes = []
+        if quantity == 0:
+            if phase == "OBSERVE":
+                zero_reason = "NO_TRADE_INTENT"
+            elif side == "BUY" and initial_budget == 0:
+                zero_reason = "NO_BUYING_POWER" if buying_power == 0 else "CASH_BUFFER_SHORTFALL"
+                sizing_notes.append(
+                    f"주문가능금액과 가용 현금 중 작은 금액에서 최소 보유 현금 {buffer:,.0f}원을 빼면 신규 매수 예산은 0원입니다."
+                )
+            elif delta == 0:
+                zero_reason = "ZERO_ALLOCATION"
+            elif side == "SELL" and shares_left.get(identity) == 0:
+                zero_reason = "NO_SELLABLE_WHOLE_SHARE"
+            elif target_quantity is not None and target_quantity < 1:
+                zero_reason = "ALLOCATION_BELOW_ONE_SHARE"
+            elif side == "BUY":
+                zero_reason = "REMAINING_CASH_BELOW_ONE_SHARE"
+            if side == "SELL" and target_quantity is not None and 0 < target_quantity < 1:
+                sizing_notes.append(f"배정액에 해당하는 목표 감축은 {target_quantity:.3f}주로, 정수 1주 미만입니다.")
+                held_qty = _positive(_mapping(positions.get(identity)).get("quantity"))
+                if held_qty and (shares_left.get(identity) or 0) >= 1 and not pending_unknown and identity not in pending_tickers and not price_range_blocked:
+                    min_trade = _number(constraints.get("min_trade_krw"))
+                    minimum_lot_review = {
+                        "quantity": 1, "holding_fraction": 1 / held_qty,
+                        "gross_amount": high, "currency": currency,
+                        "allocation_excess_krw": max(0, unit_krw - abs(delta)),
+                        "below_min_trade": min_trade is not None and unit_krw < min_trade,
+                        "requires_reallocation": True, "order_ready": False,
+                    }
+                    sizing_notes.append(
+                        f"최소 단위 1주 매도는 보유량의 {100 / held_qty:.1f}%이며 원래 배정액을 초과합니다. 유지 또는 1주 감축을 별도로 결정해야 합니다. 자동 올림하지 않습니다."
+                    )
+        one_share_funding = None
+        if side == "BUY" and unit_buy_cost is not None and not price_range_blocked:
+            one_share_funding = {
+                "required_krw": unit_buy_cost,
+                "cash_shortfall_krw": max(0, unit_buy_cost - cash_before) if cash_before is not None else None,
+                "allocation_shortfall_krw": max(0, unit_buy_cost - max(delta, 0)) if delta is not None else None,
+            }
+        if sizing_notes:
+            reasons = sizing_notes + reasons
         condition = (
             source.get("risk_condition_ko")
             if side == "SELL"
@@ -656,6 +722,11 @@ def build_trade_plan(
                 "phase": phase,
                 "quantity": quantity,
                 "quantity_basis": sizing_basis,
+                "zero_reason_code": zero_reason,
+                "allocated_amount_krw": delta,
+                "target_quantity": target_quantity,
+                "one_share_funding": one_share_funding,
+                "minimum_lot_review": minimum_lot_review,
                 **price,
                 "currency": currency,
                 "estimated_gross_low": gross_low,
@@ -697,6 +768,11 @@ def build_trade_plan(
         "account_fresh": account_fresh,
         "fx_krw_per_usd": fx if market == "US" else None,
         "fx_asof": fx_asof if market == "US" else None,
+        "capital_context": {
+            "available_cash_krw": available, "buying_power_krw": buying_power,
+            "min_cash_buffer_krw": buffer, "new_buy_budget_krw": initial_budget,
+            "cash_buffer_shortfall_krw": max(0, buffer - available) if buffer is not None and available is not None else None,
+        },
         "fee_evidence_asof": costs["evidence_as_of"],
         "rows": rows,
         "summary": {
@@ -706,6 +782,9 @@ def build_trade_plan(
             "sized_count": sum(
                 r["quantity"] is not None and r["quantity"] > 0 for r in rows
             ),
+            "zero_count": sum(r["quantity"] == 0 for r in rows),
+            "unsized_count": sum(r["quantity"] is None for r in rows),
+            "zero_reason_counts": {code: sum(r["zero_reason_code"] == code for r in rows) for code in sorted({r["zero_reason_code"] for r in rows if r["zero_reason_code"]})},
             "buy_budget_used_krw": initial_budget - cash_left
             if initial_budget is not None and cash_left is not None
             else None,

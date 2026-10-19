@@ -17,6 +17,7 @@ from typing import Any
 _RUN_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,159}")
 _TICKER = re.compile(r"[A-Z0-9][A-Z0-9.^=-]{0,23}")
 _MAX_JSON_BYTES = 2 * 1024 * 1024
+_MAX_MANIFEST_BYTES = 16 * 1024 * 1024
 _SOURCE_REASON_CODES = frozenset(
     {
         "SOURCE_RUN_PARTIAL_FAILURE",
@@ -24,6 +25,7 @@ _SOURCE_REASON_CODES = frozenset(
         "PORTFOLIO_RUN_INCOMPLETE",
         "PENDING_ORDERS_UNVERIFIED",
         "EXACT_RUN_ACCOUNT_NOT_VERIFIED",
+        "SOURCE_ARTIFACT_TOO_LARGE",
     }
 )
 
@@ -38,13 +40,15 @@ class _SourceUnavailable(ValueError):
         super().__init__(self.code)
 
 
-def _object(path: Path) -> dict[str, Any]:
-    if not path.is_file() or path.stat().st_size > _MAX_JSON_BYTES:
-        raise ValueError("missing_or_oversized_artifact")
+def _object(path: Path, *, max_bytes: int = _MAX_JSON_BYTES) -> dict[str, Any]:
+    if not path.is_file():
+        raise ValueError("missing_artifact")
+    if path.stat().st_size > max_bytes:
+        raise _SourceUnavailable("SOURCE_ARTIFACT_TOO_LARGE")
     with path.open("rb") as handle:
-        content = handle.read(_MAX_JSON_BYTES + 1)
-    if len(content) > _MAX_JSON_BYTES:
-        raise ValueError("oversized_artifact")
+        content = handle.read(max_bytes + 1)
+    if len(content) > max_bytes:
+        raise _SourceUnavailable("SOURCE_ARTIFACT_TOO_LARGE")
     value = json.loads(content)
     if not isinstance(value, dict):
         raise ValueError("invalid_artifact_object")
@@ -156,7 +160,7 @@ def _sizing_snapshot(snapshot: dict[str, Any]) -> dict[str, Any]:
 
 
 def load_trade_plan_sources(
-    archive_dir: Path, market_payload: dict[str, Any]
+    archive_dir: Path, market_payload: dict[str, Any], *, analysis_as_of: datetime | None = None,
 ) -> dict[str, Any]:
     """Load identifier-free sizing inputs bound to the displayed source run.
 
@@ -173,6 +177,9 @@ def load_trade_plan_sources(
         "fx_status": "EXPLICIT_USD_KRW_REFERENCE_UNAVAILABLE",
     }
     try:
+        cutoff = analysis_as_of or datetime.now(timezone.utc)
+        if cutoff.tzinfo is None:
+            raise ValueError("cutoff_timezone_missing")
         market = str(market_payload.get("market") or "").upper()
         run_id = market_payload.get("run_id")
         source = market_payload.get("source") or {}
@@ -195,7 +202,9 @@ def load_trade_plan_sources(
         if not manifest_path.is_relative_to(runs_root):
             raise ValueError("run_path_outside_archive")
         run_dir = manifest_path.parent
-        manifest = _object(manifest_path)
+        # Run manifests contain all ticker analyses and legitimately exceed the
+        # small private account limit. Keep independent, bounded reads for both.
+        manifest = _object(manifest_path, max_bytes=_MAX_MANIFEST_BYTES)
         manifest_market = (manifest.get("settings") or {}).get(
             "market"
         ) or manifest.get("market")
@@ -233,7 +242,7 @@ def load_trade_plan_sources(
             raise ValueError("account_capture_time_mismatch")
         started = _time(manifest.get("started_at"))
         finished = _time(manifest.get("finished_at"))
-        if not started <= observed <= finished <= datetime.now(timezone.utc):
+        if not started <= observed <= finished <= cutoff:
             raise ValueError("account_capture_outside_source_run")
         safe = _sizing_snapshot(snapshot)
         expected = coverage.get("canonical_holding_tickers")
