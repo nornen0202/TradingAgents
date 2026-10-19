@@ -74,6 +74,11 @@ def _sizing_snapshot(snapshot: dict[str, Any]) -> dict[str, Any]:
     if snapshot.get("snapshot_health") != "VALID" or snapshot.get("currency") != "KRW":
         raise ValueError("account_snapshot_not_valid")
     result = {"as_of": snapshot["as_of"], "snapshot_health": "VALID", "currency": "KRW"}
+    if snapshot.get("account_value_krw") is not None:
+        nav = _number(snapshot["account_value_krw"])
+        if nav <= 0:
+            raise ValueError("invalid_account_value")
+        result["account_value_krw"] = nav
     for key in ("available_cash_krw", "buying_power_krw", "settled_cash_krw"):
         # A missing cash field must not silently become zero or another cash field.
         result[key] = _number(snapshot.get(key))

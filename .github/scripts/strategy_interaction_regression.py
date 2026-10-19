@@ -83,13 +83,15 @@ def fixture() -> dict[str, Any]:
                 "valid_until": item["guardrails"]["valid_until"],
                 "order_ready": False,
             })
+        plans[2]["quantity_revision"] = {"target_shares":2.1,"revised_quantity":3,"holding_fraction":1,"full_exit":True,"risk_reduction":True}
         item["trade_plan"] = {
             "schema": "tradingagents.manual-trade-plan/v1",
             "market": market.upper(),
             "currency": currency,
             "account_asof": payload["generated_at"],
             "account_fresh": True,
-            "capital_context": {"new_buy_budget_krw": 0, "min_cash_buffer_krw": 2500000, "buying_power_krw": 107553},
+            "capital_context": {"new_buy_budget_krw": 0, "min_cash_buffer_krw": 2000000, "buying_power_krw": 107553, "account_value_krw": 10000000, "previous_cash_buffer_krw": 2500000},
+            "capital_policy": {"id":"balanced-capital-v1", "effective_at":payload["generated_at"], "cash_reserve_nav_ratio":.2, "cash_reserve_floor_krw":100000},
             "rows": plans,
             "summary": {"row_count": 4, "buy_count": 3, "sell_count": 1, "sized_count": 2, "zero_count": 1, "unsized_count": 1, "zero_reason_counts":{"CASH_BUFFER_SHORTFALL": 1}},
             "assumptions": ["입력 계좌 기준 검토 수량", "실제 주문은 직접 확인 후 실행"],

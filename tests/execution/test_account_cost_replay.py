@@ -247,3 +247,52 @@ def test_runner_records_blocked_market_without_fabricating_results(
     assert result["results"][0]["market"] == "US"
     assert result["data_quality"]["KR"]["missing_price_dates"] == ["2026-01-02"]
     assert result["implementation_sha256"]["ledger"]
+
+
+def test_cash_policy_replay_preserves_reserve_and_excludes_future_prices():
+    frame = data(
+        dates=["2026-01-01", "2026-01-02", "2026-01-05"], closes=[100, 100, 10000]
+    )
+    metrics, curve, trades = simulate_account(
+        frame,
+        "balanced_80_20",
+        start="2026-01-02",
+        end="2026-01-02",
+        initial_krw=1000,
+        scenario=CostScenario(0.01),
+        fx_krw_per_unit=pd.Series(1.0, index=pd.date_range("2026-01-01", "2026-01-05")),
+        price_basis="unadjusted_no_splits",
+        cash_reserve_ratio=0.2,
+        fixed_cash_reserve_krw=100,
+        liquidate_at_end=False,
+    )
+    assert trades[0]["quantity"] == 7
+    assert curve[0]["cash_local"] == 293
+    assert metrics["final_krw"] == 993
+    assert metrics["end"] == "2026-01-02"
+
+
+def test_cash_replay_rounds_retained_position_not_small_sale():
+    frame = data(
+        dates=["2026-01-01", "2026-01-02", "2026-04-01"], closes=[100, 100, 200]
+    )
+    kwargs = dict(
+        start="2026-01-02",
+        end="2026-04-01",
+        initial_krw=1000,
+        scenario=CostScenario(0),
+        fx_krw_per_unit=pd.Series(1.0, index=pd.date_range("2026-01-01", "2026-04-01")),
+        price_basis="unadjusted_no_splits",
+        cash_reserve_ratio=0.25,
+        liquidate_at_end=False,
+    )
+    # Prior close creates a five-point drift; size is resolved at the next open.
+    _, _, orders = simulate_account(frame, "balanced_80_20", **kwargs)
+    assert len(orders) == 2
+    assert orders[0]["quantity"] == 7
+    assert orders[1]["side"] == "SELL" and orders[1]["quantity"] == 1
+    assert orders[1]["signal_date"] == "2026-01-02"
+    _, _, legacy = simulate_account(
+        frame, "balanced_80_20", sell_rounding="legacy_delta_floor", **kwargs
+    )
+    assert len(legacy) == 1

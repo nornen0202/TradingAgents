@@ -1,0 +1,37 @@
+{
+  "analysis_as_of": "2026-10-19",
+  "inputs": {
+    "KR": {
+      "ticker": "069500.KS",
+      "rows": 1869,
+      "joint_calendar_absent_rows": 1,
+      "large_moves_over_15pct": {
+        "2026-07-31": 0.24174131340217953
+      },
+      "start": "2019-01-02",
+      "end": "2026-09-18",
+      "sha256": "13ddb7dd646f29054c1b0ca4c1c25468ad8efe98a729ad909ba38a4a9445d884",
+      "initial_krw": 9676532
+    },
+    "US": {
+      "ticker": "SPY",
+      "rows": 1939,
+      "joint_calendar_absent_rows": 0,
+      "large_moves_over_15pct": {},
+      "start": "2019-01-02",
+      "end": "2026-09-18",
+      "sha256": "d4801cef67b46894edbec34fde1ec0c453491c11d77a3844c58bab67794ec7dd",
+      "initial_krw": 24752712
+    }
+  },
+  "fx_sha256": "936aeefebb4e006a52430c250b10fffab3468948090343463a95f9a67df47daa",
+  "experiments": 384,
+  "limitations": [
+    "Account-sized single-ETF proxy, not reconstruction of current holdings or archived LLM signals",
+    "Retrospective comparison; validation period was not untouched prospective evidence",
+    "Current fee/tax scenarios replayed over history; annual allowance assumed exhausted",
+    "No dividend pay dates: receivables never reused; cash earns zero; USD cash carries FX exposure",
+    "Quarterly review with five percentage point band; trading at next open; delays 0/1 sessions",
+    "KR historical source not independently verified; no optimality claim"
+  ]
+}

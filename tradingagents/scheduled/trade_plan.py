@@ -15,6 +15,12 @@ from typing import Any
 
 from tradingagents.execution.risk_trigger import risk_trigger
 from tradingagents.schemas.decision import explicit_price_range_conflicts
+from tradingagents.portfolio.capital_policy import (
+    buy_budget,
+    cash_reserve,
+    is_risk_reduction,
+    reduction_quantity,
+)
 
 
 _ACCOUNT_SOURCE_MESSAGES = {
@@ -261,6 +267,7 @@ def build_trade_plan(
     fx_krw_per_usd: float | None = None,
     fx_asof: str | None = None,
     now: datetime | None = None,
+    capital_policy: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build manual scenarios from explicit allocations, not free-text guesses.
 
@@ -290,6 +297,19 @@ def build_trade_plan(
     available = _number(snapshot.get("available_cash_krw"))
     buying_power = _number(snapshot.get("buying_power_krw"))
     buffer = _number(_mapping(snapshot.get("constraints")).get("min_cash_buffer_krw"))
+    old_buffer = buffer
+    nav = _positive(snapshot.get("account_value_krw"))
+    policy = _mapping(capital_policy)
+    effective = _timestamp(policy.get("effective_at"))
+    if (
+        not policy.get("enabled")
+        or effective is None
+        or effective > clock
+        or nav is None
+    ):
+        policy = {}
+    if policy:
+        buffer = cash_reserve(nav, policy)
     # Both cash and orderability must be known. In particular, 0 is evidence.
     initial_budget = (
         max(0.0, min(available, buying_power) - buffer)
@@ -300,6 +320,8 @@ def build_trade_plan(
         else None
     )
     cash_left = initial_budget
+    if policy and available is not None and buying_power is not None:
+        initial_budget = cash_left = buy_budget(available, buying_power, buffer)
     pending_unknown, pending_buy, pending_tickers = _pending_constraints(snapshot)
     positions = {
         _identity(p.get("canonical_ticker")): p
@@ -348,7 +370,8 @@ def build_trade_plan(
         thesis = _mapping(source.get("thesis"))
         price_range_blocked = bool(
             explicit_price_range_conflicts(thesis)
-            or "structured_price_range_conflict" in _items(_mapping(source.get("execution")).get("blockers"))
+            or "structured_price_range_conflict"
+            in _items(_mapping(source.get("execution")).get("blockers"))
             or "structured_price_range_conflict" in _items(action.get("gate_reasons"))
         )
         held = source.get("is_held") is True or (
@@ -413,7 +436,9 @@ def build_trade_plan(
             sell_fraction is not None and delta != 0 and (delta is None or delta < 0)
         )
         if price_range_blocked:
-            reasons.append("분석 원문과 가격 범위가 일치하지 않아 재확인 전에는 행동·수량을 산정하지 않습니다.")
+            reasons.append(
+                "분석 원문과 가격 범위가 일치하지 않아 재확인 전에는 행동·수량을 산정하지 않습니다."
+            )
         elif side in {"HOLD", "WAIT"}:
             quantity = 0
             reasons.append(
@@ -529,6 +554,92 @@ def build_trade_plan(
                 reasons.append(
                     "배정 금액·잔여 현금 또는 매도 가능 수량이 1주 기준에 못 미칩니다."
                 )
+        quantity_revision = None
+        risk_integer = False
+        if (
+            policy
+            and side == "SELL"
+            and quantity is not None
+            and delta is not None
+            and delta < 0
+            and fx is not None
+            and price["price_high"] is not None
+        ):
+            held_qty = _positive(_mapping(positions.get(identity)).get("quantity"))
+            available_before = (shares_left.get(identity) or 0) + quantity
+            if held_qty and available_before > 0:
+                action_code = (
+                    current_action
+                    if phase == "NOW"
+                    else action.get("action_if_triggered", "")
+                )
+                risk_integer = is_risk_reduction(action, action_code)
+                raw_target = abs(delta) / (price["price_high"] * fx)
+                if structured_sell:
+                    raw_target = min(raw_target, held_qty * sell_fraction)
+                planned_key = (
+                    "planned_sell_quantity_now"
+                    if phase == "NOW"
+                    else "planned_sell_quantity_if_triggered"
+                )
+                planned = _number(action.get(planned_key))
+                if (
+                    action.get("quantity_policy") == policy.get("id")
+                    and planned is not None
+                    and planned >= 0
+                    and planned.is_integer()
+                ):
+                    raw_target = planned
+                core = (
+                    _number(
+                        _mapping(action.get("profit_taking_plan")).get(
+                            "keep_core_fraction"
+                        )
+                    )
+                    or 0
+                )
+                if core > 1 and core <= 100:
+                    core /= 100
+                revised = reduction_quantity(
+                    raw_target,
+                    available_before,
+                    held=held_qty,
+                    keep_core=core,
+                    risk_reduction=risk_integer,
+                )
+                quantity_revision = {
+                    "policy_id": policy["id"],
+                    "original_quantity": quantity,
+                    "target_shares": raw_target,
+                    "revised_quantity": revised,
+                    "holding_fraction": revised / held_qty,
+                    "risk_reduction": risk_integer,
+                    "full_exit": revised >= held_qty,
+                    "recalculated_at": clock.isoformat(),
+                }
+                quantity = revised
+                shares_left[identity] = available_before - revised
+                sizing_basis = (
+                    "BALANCED_INTEGER_RISK_REDUCTION"
+                    if risk_integer
+                    else "BALANCED_NEAREST_WITH_CORE"
+                )
+                if revised > 0:
+                    reasons = [
+                        r
+                        for r in reasons
+                        if "정수 1주에 못 미칩니다" not in r
+                        and "1주 기준에 못 미칩니다" not in r
+                    ]
+                    reasons.insert(
+                        0,
+                        f"정수 수량 전략: 목표 {raw_target:.3f}주 → {revised}주, 보유량의 {100 * revised / held_qty:.1f}% 감축. "
+                        + (
+                            "위험 축소 최소 단위를 적용합니다."
+                            if risk_integer
+                            else "가까운 정수 수량과 잔여 핵심 보유를 적용합니다."
+                        ),
+                    )
         if side in {"BUY", "SELL"} and price["price_kind"] in {
             "TRIGGER",
             "TRIGGER_RANGE",
@@ -606,6 +717,8 @@ def build_trade_plan(
         target_weight = action.get(
             "target_weight_now" if phase == "NOW" else "target_weight_if_triggered"
         )
+        if quantity_revision:
+            target_weight = None  # Recompute portfolio weights after the trigger and fill.
         if quantity is not None and quantity > 0:
             min_trade = _number(constraints.get("min_trade_krw"))
             if (
@@ -613,6 +726,7 @@ def build_trade_plan(
                 and fx is not None
                 and gross_high is not None
                 and gross_high * fx < min_trade
+                and not risk_integer
             ):
                 constraint_reasons.append(
                     f"계획 거래대금이 계좌 최소 거래금액 {min_trade:,.0f}원 미만입니다. 표시 수량은 참고값이며 실행 수량을 재검토합니다."
@@ -649,12 +763,15 @@ def build_trade_plan(
         unit_krw = high * fx if high is not None and fx is not None else None
         unit_buy_cost = (
             unit_krw * (1 + commission) * (1 + fx_reserve_rate)
-            if unit_krw is not None and commission is not None and fx_reserve_rate is not None
+            if unit_krw is not None
+            and commission is not None
+            and fx_reserve_rate is not None
             else None
         )
         target_quantity = (
             abs(delta) / (unit_buy_cost if side == "BUY" else unit_krw)
-            if side in {"BUY", "SELL"} and delta is not None
+            if side in {"BUY", "SELL"}
+            and delta is not None
             and (unit_buy_cost if side == "BUY" else unit_krw)
             else None
         )
@@ -665,9 +782,13 @@ def build_trade_plan(
             if phase == "OBSERVE":
                 zero_reason = "NO_TRADE_INTENT"
             elif side == "BUY" and initial_budget == 0:
-                zero_reason = "NO_BUYING_POWER" if buying_power == 0 else "CASH_BUFFER_SHORTFALL"
+                zero_reason = (
+                    "NO_BUYING_POWER" if buying_power == 0 else "CASH_BUFFER_SHORTFALL"
+                )
                 sizing_notes.append(
                     f"주문가능금액과 가용 현금 중 작은 금액에서 최소 보유 현금 {buffer:,.0f}원을 빼면 신규 매수 예산은 0원입니다."
+                    if not policy
+                    else f"가용 현금에서 최소 보유 현금 {buffer:,.0f}원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다."
                 )
             elif delta == 0:
                 zero_reason = "ZERO_ALLOCATION"
@@ -677,17 +798,33 @@ def build_trade_plan(
                 zero_reason = "ALLOCATION_BELOW_ONE_SHARE"
             elif side == "BUY":
                 zero_reason = "REMAINING_CASH_BELOW_ONE_SHARE"
-            if side == "SELL" and target_quantity is not None and 0 < target_quantity < 1:
-                sizing_notes.append(f"배정액에 해당하는 목표 감축은 {target_quantity:.3f}주로, 정수 1주 미만입니다.")
+            if (
+                side == "SELL"
+                and target_quantity is not None
+                and 0 < target_quantity < 1
+            ):
+                sizing_notes.append(
+                    f"배정액에 해당하는 목표 감축은 {target_quantity:.3f}주로, 정수 1주 미만입니다."
+                )
                 held_qty = _positive(_mapping(positions.get(identity)).get("quantity"))
-                if held_qty and (shares_left.get(identity) or 0) >= 1 and not pending_unknown and identity not in pending_tickers and not price_range_blocked:
+                if (
+                    held_qty
+                    and (shares_left.get(identity) or 0) >= 1
+                    and not pending_unknown
+                    and identity not in pending_tickers
+                    and not price_range_blocked
+                ):
                     min_trade = _number(constraints.get("min_trade_krw"))
                     minimum_lot_review = {
-                        "quantity": 1, "holding_fraction": 1 / held_qty,
-                        "gross_amount": high, "currency": currency,
+                        "quantity": 1,
+                        "holding_fraction": 1 / held_qty,
+                        "gross_amount": high,
+                        "currency": currency,
                         "allocation_excess_krw": max(0, unit_krw - abs(delta)),
-                        "below_min_trade": min_trade is not None and unit_krw < min_trade,
-                        "requires_reallocation": True, "order_ready": False,
+                        "below_min_trade": min_trade is not None
+                        and unit_krw < min_trade,
+                        "requires_reallocation": True,
+                        "order_ready": False,
                     }
                     sizing_notes.append(
                         f"최소 단위 1주 매도는 보유량의 {100 / held_qty:.1f}%이며 원래 배정액을 초과합니다. 유지 또는 1주 감축을 별도로 결정해야 합니다. 자동 올림하지 않습니다."
@@ -696,8 +833,12 @@ def build_trade_plan(
         if side == "BUY" and unit_buy_cost is not None and not price_range_blocked:
             one_share_funding = {
                 "required_krw": unit_buy_cost,
-                "cash_shortfall_krw": max(0, unit_buy_cost - cash_before) if cash_before is not None else None,
-                "allocation_shortfall_krw": max(0, unit_buy_cost - max(delta, 0)) if delta is not None else None,
+                "cash_shortfall_krw": max(0, unit_buy_cost - cash_before)
+                if cash_before is not None
+                else None,
+                "allocation_shortfall_krw": max(0, unit_buy_cost - max(delta, 0))
+                if delta is not None
+                else None,
             }
         if sizing_notes:
             reasons = sizing_notes + reasons
@@ -722,6 +863,7 @@ def build_trade_plan(
                 "phase": phase,
                 "quantity": quantity,
                 "quantity_basis": sizing_basis,
+                "quantity_revision": quantity_revision,
                 "zero_reason_code": zero_reason,
                 "allocated_amount_krw": delta,
                 "target_quantity": target_quantity,
@@ -768,10 +910,19 @@ def build_trade_plan(
         "account_fresh": account_fresh,
         "fx_krw_per_usd": fx if market == "US" else None,
         "fx_asof": fx_asof if market == "US" else None,
+        "capital_policy": {**policy, "calculated_at": clock.isoformat()}
+        if policy
+        else None,
         "capital_context": {
-            "available_cash_krw": available, "buying_power_krw": buying_power,
-            "min_cash_buffer_krw": buffer, "new_buy_budget_krw": initial_budget,
-            "cash_buffer_shortfall_krw": max(0, buffer - available) if buffer is not None and available is not None else None,
+            "account_value_krw": nav,
+            "previous_cash_buffer_krw": old_buffer,
+            "available_cash_krw": available,
+            "buying_power_krw": buying_power,
+            "min_cash_buffer_krw": buffer,
+            "new_buy_budget_krw": initial_budget,
+            "cash_buffer_shortfall_krw": max(0, buffer - available)
+            if buffer is not None and available is not None
+            else None,
         },
         "fee_evidence_asof": costs["evidence_as_of"],
         "rows": rows,
@@ -784,7 +935,12 @@ def build_trade_plan(
             ),
             "zero_count": sum(r["quantity"] == 0 for r in rows),
             "unsized_count": sum(r["quantity"] is None for r in rows),
-            "zero_reason_counts": {code: sum(r["zero_reason_code"] == code for r in rows) for code in sorted({r["zero_reason_code"] for r in rows if r["zero_reason_code"]})},
+            "zero_reason_counts": {
+                code: sum(r["zero_reason_code"] == code for r in rows)
+                for code in sorted(
+                    {r["zero_reason_code"] for r in rows if r["zero_reason_code"]}
+                )
+            },
             "buy_budget_used_krw": initial_budget - cash_left
             if initial_budget is not None and cash_left is not None
             else None,
