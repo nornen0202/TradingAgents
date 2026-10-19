@@ -207,3 +207,21 @@ def test_balanced_allocation_quantizes_risk_before_cash_projection_and_respects_
     )
     assert limited.actions[0].delta_krw_now == 0
     assert limited.actions[0].planned_sell_quantity_now == 0
+
+    # USD prices converted to KRW retain fractional won; neither monetary
+    # truncation nor binary floating-point floor may drop an approved share.
+    from tradingagents.portfolio.allocation import _apply_execution_constraints
+
+    price = 421.14 * 1342.4
+    us_position = replace(position, quantity=12, available_qty=12,
+                          market_price_krw=price, market_value_krw=12 * price)
+    us_account = replace(account, positions=(us_position,), total_equity_krw=20_000_000)
+    us_action = replace(action, delta_krw_now=-3 * price, planned_sell_quantity_now=3)
+    result = _apply_execution_constraints([us_action], us_account, _profile(us_account))[0]
+    assert result.planned_sell_quantity_now == 3
+    assert result.delta_krw_now == -3 * price
+    capped_account = replace(us_account, constraints=replace(
+        us_account.constraints, max_daily_turnover_ratio=(2.5 * price) / 20_000_000))
+    result = _apply_execution_constraints([us_action], capped_account, _profile(capped_account))[0]
+    assert result.planned_sell_quantity_now == 2
+    assert abs(result.delta_krw_now) <= 2.5 * price

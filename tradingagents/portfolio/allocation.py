@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from math import floor
 
 from .account_models import AccountSnapshot, PortfolioAction, PortfolioCandidate, PortfolioProfile, PortfolioRecommendation
 from .gates import infer_market_regime
@@ -1328,7 +1329,9 @@ def _apply_execution_constraints(
     constrained: list[PortfolioAction] = []
 
     for action in actions:
-        delta_now = int(action.delta_krw_now)
+        # Converted US share prices can include fractions of a won. Truncating
+        # the amount first would silently remove one already-sized share.
+        delta_now = action.delta_krw_now if action.quantity_policy and action.delta_krw_now < 0 else int(action.delta_krw_now)
         gate_reasons = list(action.gate_reasons)
         current_position = snapshot.find_position(action.canonical_ticker)
         current_value = int(current_position.market_value_krw if current_position else 0)
@@ -1358,7 +1361,7 @@ def _apply_execution_constraints(
         risk_integer = bool(action.quantity_policy) and is_risk_reduction(action.to_dict(), action.action_now)
         if action.quantity_policy and delta_now < 0 and current_position and current_position.market_price_krw > 0:
             # Hard turnover/order caps cannot leave a fractional executable lot.
-            delta_now = -(abs(delta_now) // current_position.market_price_krw) * current_position.market_price_krw
+            delta_now = -floor(abs(delta_now) / current_position.market_price_krw + 1e-10) * current_position.market_price_krw
         if 0 < abs(delta_now) < snapshot.constraints.min_trade_krw and not (delta_now < 0 and risk_integer):
             delta_now = 0
             gate_reasons.append("min_trade_floor_after_caps")
@@ -1375,7 +1378,7 @@ def _apply_execution_constraints(
                     **action.__dict__,
                     "action_now": _normalize_action_value(action.action_now, delta_now),
                     "delta_krw_now": delta_now,
-                    "planned_sell_quantity_now": abs(delta_now) // current_position.market_price_krw if action.planned_sell_quantity_now is not None and current_position and current_position.market_price_krw > 0 else action.planned_sell_quantity_now,
+                    "planned_sell_quantity_now": floor(abs(delta_now) / current_position.market_price_krw + 1e-10) if action.planned_sell_quantity_now is not None and current_position and current_position.market_price_krw > 0 else action.planned_sell_quantity_now,
                     "target_weight_now": round(_weight_after_delta(current_value, delta_now, account_value), 4),
                     "gate_reasons": tuple(dict.fromkeys(gate_reasons)),
                 }
