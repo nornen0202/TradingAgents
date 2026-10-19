@@ -431,6 +431,19 @@ def verify_live(site):
     return True
 
 
+def wait_for_live_publication(site):
+    # Pages deploys after the push. A single immediate check can stay pending
+    # forever when each following tick first rebuilds a newer producer snapshot.
+    # Keep the publication lock and exact-byte checks; never rebuild or dispatch
+    # again within this bounded propagation window. Errors use the normal path.
+    for attempt in range(5):
+        if verify_live(site):
+            return True
+        if attempt < 4:
+            time.sleep(15)
+    return False
+
+
 def ensure_branch_pages(state):
     settings = json.loads(subprocess.check_output(["gh", "api", f"repos/{REPOSITORY}/pages"], text=True, timeout=30))
     if settings.get("build_type") == "legacy" and settings.get("source") == {"branch": "gh-pages", "path": "/"}:
@@ -496,7 +509,7 @@ def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=Fa
                 os.environ["GH_TOKEN"] = previous_token
         receipt["mirror_verified"] = True
         atomic_write_json(receipt_path, receipt)
-    if verify_live(site):
+    if wait_for_live_publication(site):
         receipt.update(status="DELIVERY_VERIFIED", verified_at=datetime.now(timezone.utc).isoformat(), public_url=PUBLIC_BASE)
         atomic_write_json(receipt_path, receipt)
         complete_handoffs(site, runtime_dir, receipt)
