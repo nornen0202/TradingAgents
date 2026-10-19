@@ -140,6 +140,92 @@ def test_completion_message_distinguishes_research_from_quote_refresh(tmp_path, 
     assert "공개 전략 데이터 반영" in text
 
 
+def pre_report_completed(archive, market="kr", **changes):
+    values = {"run_id": f"20261012T130000_pre-report-{market}-overlay",
+              "label": f"pre-report-{market}-overlay",
+              "settings": {"market": market.upper(), "run_mode": "overlay_only"}}
+    values.update(changes)
+    return completed(archive, "overlay_only", **values)
+
+
+@pytest.mark.parametrize("market", ["kr", "us"])
+def test_pre_report_refresh_queues_and_sends_once_after_exact_live_publication(tmp_path, monkeypatch, market):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    manifest = pre_report_completed(archive, market)
+    write(state / "notifications/enabled.json", {"started_at": (NOW - timedelta(days=1)).isoformat()})
+    write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
+    published_strategy(state, manifest)
+    strategy = local.read(state / "site/mobile/strategy.json")
+    strategy["markets"][market] = strategy["markets"].pop("kr")
+    write(state / "site/mobile/strategy.json", strategy)
+    monkeypatch.setattr(automation, "verify_live", lambda _: True)
+    sent = []
+
+    class Client:
+        chat_id = "123"
+        def __init__(self, **kwargs): pass
+        def ensure_private_chat(self): pass
+        def send_message(self, message, *, buttons):
+            sent.append(message)
+            return 42
+
+    monkeypatch.setattr(local, "TelegramBotClient", Client)
+    local.queue_completed(archive, state, now=NOW)
+    local.queue_completed(archive, state, now=NOW + timedelta(minutes=1))
+    events = list((state / "notifications/events").glob("*.json"))
+    assert len(events) == 1
+    assert local.notify(events[0].stem, archive, state)["status"] == "SENT"
+    assert local.notify(events[0].stem, archive, state)["status"] == "NOOP"
+    assert len(sent) == 1
+    assert sent[0].splitlines()[0] == f"TradingAgents {market.upper()} 시세·계좌 갱신 완료"
+    assert "새로운 전체 분석 완료가 아닙니다" in sent[0]
+
+
+@pytest.mark.parametrize("changes", [
+    {"label": "pre-report-us-overlay"},
+    {"label": "pre-report-kr-overlay-custom"},
+    {"label": "manual-readonly-postclose-kr"},
+    {"settings": {"market": "KR", "run_mode": "full"}},
+    {"settings": {"market": "KR"}},
+    {"settings": {"market": "XX", "run_mode": "overlay_only"}},
+])
+def test_pre_report_producer_identity_is_exact_and_fails_closed(tmp_path, monkeypatch, changes):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    manifest = pre_report_completed(archive, **changes)
+    write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
+    published_strategy(state, manifest)
+    monkeypatch.setattr(automation, "verify_live", lambda _: True)
+    local.queue_completed(archive, state, now=NOW)
+    assert not list((state / "notifications/events").glob("*.json"))
+    event = {"kind": "success", "run_id": manifest["run_id"], "market": "kr",
+             "finished_at": manifest["finished_at"]}
+    with pytest.raises(NotificationError, match="successfully"):
+        local.compose(event, archive, state)
+
+
+@pytest.mark.parametrize("failure", ["previous_source", "pending_publication", "live_mismatch", "incomplete"])
+def test_pre_report_refresh_keeps_existing_delivery_guards(tmp_path, monkeypatch, failure):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    manifest = pre_report_completed(archive)
+    write(state / "notifications/enabled.json", {"started_at": (NOW - timedelta(days=1)).isoformat()})
+    write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
+    published_strategy(state, manifest)
+    monkeypatch.setattr(automation, "verify_live", lambda _: failure != "live_mismatch")
+    if failure == "previous_source":
+        published_strategy(state, {**manifest, "run_id": "previous"})
+    elif failure == "pending_publication":
+        write(state / "publication.json", {"status": "PAGES_PENDING"})
+    elif failure == "incomplete":
+        manifest["active_universe"]["coverage"]["complete"] = False
+        write(archive / "runs/2026" / manifest["run_id"] / "run.json", manifest)
+    local.queue_completed(archive, state, now=NOW)
+    if failure in {"previous_source", "pending_publication"}:
+        assert not list((state / "notifications/events").glob("*.json"))
+    with pytest.raises(NotificationError):
+        local.compose({"kind": "success", "run_id": manifest["run_id"], "market": "kr",
+                       "finished_at": manifest["finished_at"]}, archive, state)
+
+
 def test_dispatch_is_not_sent_and_active_owner_prevents_retry(tmp_path, monkeypatch):
     archive, state, _, key = prepared(tmp_path, monkeypatch)
     calls = []
