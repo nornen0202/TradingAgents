@@ -102,6 +102,7 @@ _MICROSTRUCTURE_BOOTSTRAP_ARTIFACT_KEYS = (
     "microstructure_checkpoint_report_md",
 )
 _DEFAULT_CODEX_PARALLEL_TICKER_CAP = 4
+_EXECUTION_SNAPSHOT_INTERVAL = "1m"
 _OVERLAY_BASELINE_MAX_AGE = timedelta(hours=96)
 _OVERLAY_BASELINE_FUTURE_SKEW = timedelta(minutes=15)
 _OVERLAY_BASELINE_MAX_NEWER_SESSIONS = 1
@@ -805,7 +806,10 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     # Refresh their local views only now so the signal/journal connection is
     # present in the same run's deliverable. No journal is copied to the site.
     review_databases = [config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")]
-    for ticker_summary in ticker_summaries:
+    # Overlay checkpoints already rendered every updated ticker's review. Only
+    # full research can capture new recommendations above; a second identical
+    # chart/journal render in the fast path delays expiring execution signals.
+    for ticker_summary in (ticker_summaries if run_mode not in {"overlay_only", "selective_rerun_only"} else []):
         ticker_dir = run_dir / "tickers" / str(ticker_summary.get("ticker") or "")
         if ticker_summary.get("status") == "success" and (ticker_dir / "analysis.json").is_file():
             _refresh_integrated_review(ticker_dir, ticker_summary, run_dir=run_dir, db_paths=review_databases)
@@ -5154,7 +5158,7 @@ def _run_execution_overlay_passes(
             attempt_payload = _build_intraday_attempt_payload(
                 ticker=ticker,
                 checkpoint_label=checkpoint_label,
-                interval="5m",
+                interval=_EXECUTION_SNAPSHOT_INTERVAL,
                 success=False,
                 attempted_at=datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
             )
@@ -5373,7 +5377,7 @@ def _fetch_overlay_market_snapshots(
             try:
                 result: IntradayMarketSnapshot | Exception = fetch_intraday_market_snapshot(
                     ticker,
-                    interval="5m",
+                    interval=_EXECUTION_SNAPSHOT_INTERVAL,
                     market_timezone=timezone_name,
                     checkpoint_id=checkpoint_label,
                 )

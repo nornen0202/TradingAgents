@@ -66,6 +66,7 @@ checkpoints_kst = ["12:35"]
     }
 
     def raise_fetch(*args, **kwargs):
+        assert kwargs["interval"] == "1m"
         raise RuntimeError("intraday feed down")
 
     monkeypatch.setattr("tradingagents.scheduled.runner.fetch_intraday_market_snapshot", raise_fetch)

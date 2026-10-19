@@ -39,13 +39,17 @@ def replay_action_history(
                 event = dict(row)
                 try:
                     event["payload"] = json.loads(event.pop("payload_json"))
+                    # A ticker projection never uses other symbols. Filter before
+                    # expensive clock/schema validation so chart generation does
+                    # not scan and validate the entire account once per ticker.
+                    if ticker and (not isinstance(event["payload"], dict) or
+                                   str(event["payload"].get("ticker", "")).upper() != ticker.upper()):
+                        continue
                     validate_event(event)
                     clocks = [event[key] for key in ("occurred_at", "available_at", "confirmed_at", "settled_at", "ingested_at") if event.get(key)]
                     if any(timestamp(value) > cutoff for value in clocks):
                         continue
                 except (ValueError, TypeError, KeyError):
-                    continue
-                if ticker and str(event["payload"].get("ticker", "")).upper() != ticker.upper():
                     continue
                 previous = visible.get(event["event_id"])
                 if previous and previous != event:

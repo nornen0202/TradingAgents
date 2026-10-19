@@ -44,6 +44,27 @@ def test_empty_and_missing_are_read_only_and_require_explicit_asof(tmp_path):
         replay_action_history(missing, analysis_as_of="2026-09-21")
 
 
+def test_ticker_projection_preserves_cutoff_and_skips_unrelated_validation(tmp_path, monkeypatch):
+    from tradingagents.performance import replay
+    path = tmp_path / "events.sqlite"
+    put(path)
+    put(path, event_id="future-a", available_at=T3)
+    for index in range(20):
+        put(path, event_id=f"other-{index}", payload={"ticker": "B", "action": "BUY"})
+    expected = [event for event in replay_action_history(path, analysis_as_of=T2)["events"]
+                if event["payload"]["ticker"] == "A"]
+    original = replay.validate_event
+    validated = []
+    def validate(event):
+        validated.append(event["payload"]["ticker"])
+        return original(event)
+    monkeypatch.setattr(replay, "validate_event", validate)
+    projected = replay_action_history(path, analysis_as_of=T2, ticker="a")
+    assert projected["events"] == expected
+    assert projected["accounts"] == {}
+    assert validated == ["A", "A"]
+
+
 @pytest.mark.parametrize("clock,value", [
     ("occurred_at", None), ("available_at", None), ("available_at", "bad"),
     ("available_at", "2026-09-21T10:00:00"), ("confirmed_at", None), ("settled_at", None),
