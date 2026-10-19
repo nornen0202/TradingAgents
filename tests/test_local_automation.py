@@ -439,7 +439,7 @@ def test_each_changed_generation_finishes_delivery_before_next_producer(monkeypa
     archive, state, runtime, calls = delayed_publication
     generations = iter(("first-overlay", "next-overlay"))
     monkeypatch.setattr(local, "archive_fingerprint", lambda _: next(generations))
-    observations = iter((False, False, True, False, True))
+    observations = iter((False, False, False, False, False, True, False, True))
     monkeypatch.setattr(local, "verify_live", lambda _: next(observations))
 
     first = local.publish(archive, state, runtime, publication_locked=True)
@@ -450,7 +450,7 @@ def test_each_changed_generation_finishes_delivery_before_next_producer(monkeypa
     assert [v.get("status") for v in calls["reconcile"]] == [
         None, "DELIVERY_VERIFIED", "DELIVERY_VERIFIED", "DELIVERY_VERIFIED"]
     assert len(calls["build"]) == len(calls["push"]) == len(calls["mirror"]) == 2
-    assert calls["sleep"] == [15, 15, 15]
+    assert calls["sleep"] == [15] * 6
 
 
 def test_unpropagated_snapshot_stays_pending_and_resumes_without_republishing(monkeypatch, delayed_publication):
@@ -462,8 +462,8 @@ def test_unpropagated_snapshot_stays_pending_and_resumes_without_republishing(mo
     pending = local.publish(archive, state, runtime, publication_locked=True)
 
     assert pending["status"] == "PAGES_PENDING"
-    assert len(probes) == 5
-    assert calls["sleep"] == [15] * 4
+    assert len(probes) == 7
+    assert calls["sleep"] == [15] * 6
     assert not calls["handoff"]
     assert len(calls["reconcile"]) == 1
     monkeypatch.setattr(local, "verify_live", lambda _: True)

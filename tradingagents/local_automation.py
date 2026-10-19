@@ -436,10 +436,10 @@ def wait_for_live_publication(site):
     # forever when each following tick first rebuilds a newer producer snapshot.
     # Keep the publication lock and exact-byte checks; never rebuild or dispatch
     # again within this bounded propagation window. Errors use the normal path.
-    for attempt in range(5):
+    for attempt in range(7):
         if verify_live(site):
             return True
-        if attempt < 4:
+        if attempt < 6:
             time.sleep(15)
     return False
 
