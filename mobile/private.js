@@ -807,6 +807,17 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     const comparator = {'>=': ' 이상', '>': ' 초과', '<=': ' 이하', '<': ' 미만'}[plan.price_comparator] || '';
     return band + (plan.price_kind === 'TRIGGER' ? comparator : '');
   }
+  function planOverview(plan) {
+    if (!plan || !Array.isArray(plan.rows)) return '';
+    const counts = plan.summary || {}, cash = plan.capital_context || {};
+    const labels = {NO_TRADE_INTENT:'관망·추가 매매 없음', ZERO_ALLOCATION:'배정 없음', CASH_BUFFER_SHORTFALL:'현금 보유 기준 부족', NO_BUYING_POWER:'주문가능금액 없음', NO_SELLABLE_WHOLE_SHARE:'매도가능 정수 수량 없음', ALLOCATION_BELOW_ONE_SHARE:'목표 수량 1주 미만', REMAINING_CASH_BELOW_ONE_SHARE:'잔여 예산 1주 미만'};
+    const reasons = Object.entries(counts.zero_reason_counts || {}).map(([key, count]) => (labels[key] || key) + ' ' + count + '종목').join(' · ');
+    return '<div class="plan-overview"><p>수량 산정 ' + esc(counts.sized_count ?? 0) + '종목 · 0주 ' + esc(counts.zero_count ?? 0) + '종목 · 산출 보류 ' + esc(counts.unsized_count ?? 0) + '종목</p>'
+      + (reasons ? '<p>' + esc(reasons) + '</p>' : '')
+      + ('new_buy_budget_krw' in cash ? '<p>신규 매수 예산 ' + esc(planMoney(cash.new_buy_budget_krw, 'KRW')) + ' · 최소 보유 현금 ' + esc(planMoney(cash.min_cash_buffer_krw, 'KRW')) + ' · 주문가능금액 ' + esc(planMoney(cash.buying_power_krw, 'KRW')) + '</p>' : '')
+      + ('available_cash_krw' in cash ? '<p>가용 현금 ' + esc(planMoney(cash.available_cash_krw, 'KRW')) + ' · 최소 현금 기준까지 부족 ' + esc(planMoney(cash.cash_buffer_shortfall_krw, 'KRW')) + '</p>' : '')
+      + (plan.market === 'US' ? '<p>수량 환산 기준 USD/KRW ' + (Number.isFinite(numeric(plan.fx_krw_per_usd)) ? esc(fmt(plan.fx_krw_per_usd)) + ' · ' + esc(dateTime(plan.fx_asof)) : '확인 필요') + ' · 실제 환전 체결 호가와 구별</p>' : '') + '</div>';
+  }
   function tradeSummaryRow(entry, item) {
     const ticker = entry.dataset.ticker;
     const direction = entry.querySelector('.strategy-direction').textContent;
@@ -817,22 +828,26 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     const quantities = planParts(plans, (plan) => {
       const qty = numeric(plan.quantity);
       const valid = Number.isInteger(qty) && qty >= 0;
-      return '<strong class="plan-value">' + (valid ? esc(fmt(qty)) + '주' : '산출 보류') + '</strong><small>' + esc(valid && qty === 0 ? plan.status_label || '추가 거래 없음' : '입력 계좌 기준 검토 수량') + '</small>';
+      const labels = {NO_TRADE_INTENT:'관망·추가 매매 없음', ZERO_ALLOCATION:'추가 배정 없음', CASH_BUFFER_SHORTFALL:'현금 보유 기준 부족', NO_BUYING_POWER:'주문가능금액 없음', ALLOCATION_BELOW_ONE_SHARE:'목표 수량 1주 미만', NO_SELLABLE_WHOLE_SHARE:'매도가능 정수 수량 없음', REMAINING_CASH_BELOW_ONE_SHARE:'잔여 예산 부족'};
+      const lot = plan.minimum_lot_review;
+      return '<strong class="plan-value">' + (valid ? esc(fmt(qty)) + '주' : '산출 보류') + '</strong><small>' + esc(valid && qty === 0 ? labels[plan.zero_reason_code] || plan.status_label || '추가 거래 없음' : '입력 계좌 기준 검토 수량') + '</small>'
+        + (lot ? '<details class="plan-lot-review"><summary>최소 단위 1주 비교</summary><small>보유량의 ' + esc((Number(lot.holding_fraction) * 100).toFixed(1)) + '% · 거래대금 ' + esc(planMoney(lot.gross_amount, lot.currency)) + '</small><small>배정액 초과 ' + esc(planMoney(lot.allocation_excess_krw, 'KRW')) + (lot.below_min_trade ? ' · 최소 거래금액 미달' : '') + '</small><small>별도 감축 결정 필요 · 주문 수량에 포함되지 않음</small></details>' : '');
     });
-    const prices = planParts(plans, (plan) => '<strong class="plan-value">' + esc(planPrice(plan)) + '</strong><small>' + esc(['TRIGGER', 'TRIGGER_RANGE', 'REFERENCE'].includes(plan.price_kind) ? '발동 기준 · 체결 범위 아님' : plan.price_kind === 'NONE' ? '추가 거래 계획 없음' : '분석의 가격 범위') + '</small>');
+    const prices = planParts(plans, (plan) => '<strong class="plan-value">' + esc(planPrice(plan)) + '</strong><small>' + esc(['TRIGGER', 'TRIGGER_RANGE', 'REFERENCE'].includes(plan.price_kind) ? '발동 기준 · 체결 범위 아님' : plan.price_kind === 'NONE' ? '추가 거래 계획 없음' : '분석의 가격 범위') + '</small>' + (plan.price_confirmation ? '<small>확인 방식: ' + esc(({close:'종가 확인', intraday:'장중 확인', two_bar:'2개 봉 확인'})[String(plan.price_confirmation).toLowerCase()] || plan.price_confirmation) + '</small>' : ''));
     const amounts = planParts(plans, (plan) => {
       const amount = plan.estimated_net_cash ?? plan.estimated_gross_high;
       const fee = numeric(plan.estimated_fees);
       const costKnown = Number.isFinite(numeric(plan.estimated_net_cash));
       const label = !costKnown && Number.isFinite(numeric(amount)) ? '거래대금 · 비용 미확정' : plan.action === 'SELL' ? '상단 기준 예상 수령액' : plan.action === 'BUY' ? '상단 기준 예상 지출' : '추가 거래 금액';
-      return '<strong class="plan-value">' + esc(planMoney(Number.isFinite(numeric(amount)) ? Math.abs(Number(amount)) : null, plan.currency)) + '</strong><small>' + esc(label) + (Number.isFinite(fee) ? ' · 수수료·거래세 ' + esc(planMoney(fee, plan.currency)) : '') + '</small>';
+      const funding = plan.one_share_funding;
+      return '<strong class="plan-value">' + esc(planMoney(Number.isFinite(numeric(amount)) ? Math.abs(Number(amount)) : null, plan.currency)) + '</strong><small>' + esc(label) + (Number.isFinite(fee) ? ' · 수수료·거래세 ' + esc(planMoney(fee, plan.currency)) : '') + '</small>' + (funding && plan.quantity === 0 ? '<small>1주 필요자금 ' + esc(planMoney(funding.required_krw, 'KRW')) + '</small><small>매수 예산 부족 ' + esc(planMoney(funding.cash_shortfall_krw, 'KRW')) + ' · 배정 부족 ' + esc(planMoney(funding.allocation_shortfall_krw, 'KRW')) + '</small>' : '');
     });
     const conditions = planParts(plans, (plan) => {
       const quantity = numeric(plan.quantity);
       const deadline = Date.parse(plan.valid_until || '');
       const planRecheck = plan.status === 'RECHECK' || !Number.isFinite(deadline) || deadline <= Date.now() || (item.trade_plan || {}).account_fresh !== true;
       const current = entry.dataset.readiness === 'READY' && plan.phase === 'NOW' && quantity > 0 && plan.status === 'CONDITIONAL' && !planRecheck;
-      const state = current ? '검토 가능 · 주문 전 최종 확인' : plan.phase === 'OBSERVE' ? '현재 주문 없음' : planRecheck || entry.dataset.readiness === 'RECHECK' || entry.dataset.readiness === 'RESEARCH' ? '현재 주문 없음 · 시세·계좌 재확인' : '조건 충족 전 주문 없음';
+      const state = current ? '검토 가능 · 주문 전 최종 확인' : plan.phase === 'OBSERVE' ? '현재 주문 없음' : planRecheck || entry.dataset.readiness === 'RECHECK' || entry.dataset.readiness === 'RESEARCH' ? '현재 주문 없음 · 시세·계좌 재확인' : !Number.isFinite(quantity) ? '현재 주문 없음 · 수량 산정 보류' : quantity === 0 ? '현재 주문 없음 · 수량·배정 재검토' : '조건 충족 전 주문 없음';
       const reasons = fullConditions(plan.reasons);
       const trigger = fullConditions(plan.condition, plan.trigger_conditions);
       const issue = Array.isArray(plan.reasons) ? plan.reasons[0] : '';
@@ -930,7 +945,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
       + '<label for="sort-' + market + '">정렬<select id="sort-' + market + '"><option value="priority">우선순위</option><option value="name">종목명순</option><option value="change">등락률순 ↓</option></select></label></div>'
       + '<nav class="strategy-filters" aria-label="종목 유형">' + groups.map((group, index) => '<button type="button" data-group-target="' + group + '" data-label="' + ['핵심','보유','관심','신규','전체'][index] + '" aria-pressed="false"></button>').join('') + '</nav>'
       + '<p class="result-count" role="status" aria-live="polite" aria-atomic="true"></p>'
-      + '<section class="strategy-summary" id="summary-' + market + '" tabindex="-1"><h3>전체 전략 한눈에</h3><p class="readiness-note">매매 전략표 · 수량 → 가격 → 발동 조건 순서로 확인하세요. 종목명을 누르면 상세 근거가 열립니다.</p><p class="plan-source-note">' + esc((item.trade_plan || {}).account_asof ? '수량 기준 계좌 ' + dateTime(item.trade_plan.account_asof) : '수량 기준 계좌 확인 불가') + ' · KR 원화 / US 달러</p><details class="plan-method"><summary>수량·비용 계산 기준</summary><p>' + esc(fullConditions((item.trade_plan || {}).assumptions) || '정수 수량과 수수료를 반영한 검토안입니다. 자료가 부족하면 수량·가격을 임의로 만들지 않습니다.') + '</p><p>조건부 계획은 현재 주문과 구분합니다. 여러 계획은 동시에 실행하는 주문 묶음이 아닙니다. 매도 예정 대금을 미리 매수 예산으로 쓰지 않으며, 종목별 상세 근거와 현재 상태를 함께 확인하세요.</p></details><div class="filter-empty" hidden><p>검색 조건에 맞는 종목이 없습니다.</p><button type="button" class="reset-filters">검색·필터 초기화</button></div><div class="summary-scroll" role="region" aria-label="종목별 매매 전략표 · 스크롤하여 전체 보기" tabindex="0"><table><thead><tr><th scope="col">종목</th><th scope="col">전략</th><th scope="col">검토 수량</th><th scope="col">가격 범위·기준</th><th scope="col">예상 금액</th><th scope="col">발동 조건·현재 상태</th></tr></thead><tbody></tbody></table></div></section>'
+      + '<section class="strategy-summary" id="summary-' + market + '" tabindex="-1"><h3>전체 전략 한눈에</h3><p class="readiness-note">매매 전략표 · 수량 → 가격 → 발동 조건 순서로 확인하세요. 종목명을 누르면 상세 근거가 열립니다.</p><p class="plan-source-note">' + esc((item.trade_plan || {}).account_asof ? '수량 기준 계좌 ' + dateTime(item.trade_plan.account_asof) : '수량 기준 계좌 확인 불가') + ' · KR 원화 / US 달러</p>' + planOverview(item.trade_plan) + '<details class="plan-method"><summary>수량·비용 계산 기준</summary><p>' + esc(fullConditions((item.trade_plan || {}).assumptions) || '정수 수량과 수수료를 반영한 검토안입니다. 자료가 부족하면 수량·가격을 임의로 만들지 않습니다.') + '</p><p>조건부 계획은 현재 주문과 구분합니다. 여러 계획은 동시에 실행하는 주문 묶음이 아닙니다. 매도 예정 대금을 미리 매수 예산으로 쓰지 않으며, 종목별 상세 근거와 현재 상태를 함께 확인하세요.</p></details><div class="filter-empty" hidden><p>검색 조건에 맞는 종목이 없습니다.</p><button type="button" class="reset-filters">검색·필터 초기화</button></div><div class="summary-scroll" role="region" aria-label="종목별 매매 전략표 · 스크롤하여 전체 보기" tabindex="0"><table><thead><tr><th scope="col">종목</th><th scope="col">전략</th><th scope="col">검토 수량</th><th scope="col">가격 범위·기준</th><th scope="col">예상 금액</th><th scope="col">발동 조건·현재 상태</th></tr></thead><tbody></tbody></table></div></section>'
       + '<div class="cards" id="cards-' + market + '"></div>' + integratedReport(item) + integratedReport(item, 'reference_report');
     const search = panel.querySelector('input');
     const sort = panel.querySelector('select');
