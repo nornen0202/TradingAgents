@@ -100,7 +100,7 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
     state = Path(producer_state_dir)
     receipt_path = state / "pre-report" / f"{surface}.json"
     receipt = {"schema": "tradingagents.pre-report-refresh/v1", "surface": surface,
-               "status": "ERROR", "event_created": False, "orders_submitted": False}
+               "status": "ERROR", "event_created": False, "live_orders_submitted": False}
 
     def finish(**fields):
         receipt.update(fields, checked_at=datetime.now(timezone.utc).isoformat())
@@ -145,7 +145,8 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
             receipt_path.parent.mkdir(parents=True, exist_ok=True)
             with (receipt_path.parent / f"{surface}-worker.log").open("a", encoding="utf-8") as log:
                 with redirect_stdout(log), redirect_stderr(log):
-                    manifest = execute_scheduled_run(config, run_label=f"pre-report-{surface}-overlay", skip_site_build=True)
+                    manifest = execute_scheduled_run(config, run_label=f"pre-report-{surface}-overlay",
+                                                     skip_site_build=True, paper_state_dir=state)
             now = datetime.now(timezone.utc)
             packet = build_surface_packet(surface, archive_dir=archive,
                 youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, now=now)

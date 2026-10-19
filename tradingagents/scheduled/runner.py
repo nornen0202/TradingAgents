@@ -47,7 +47,7 @@ from tradingagents.execution.reporting import (
     render_execution_summary_markdown,
     render_execution_update_markdown,
 )
-from tradingagents.execution.selective_rerun import collect_event_signals, find_selective_rerun_targets
+from tradingagents.execution.selective_rerun import collect_event_news, collect_event_signals, find_selective_rerun_targets
 from tradingagents.external.prism_conflicts import (
     best_prism_signal_by_ticker,
     build_prism_coverage_summary,
@@ -271,6 +271,7 @@ def execute_scheduled_run(
     resume_from_run: str | None = None,
     finalize_from_run: str | None = None,
     finalization_source_config: Path | None = None,
+    paper_state_dir: Path | None = None,
 ) -> dict[str, Any]:
     tz = ZoneInfo(config.run.timezone)
     started_at = datetime.now(tz)
@@ -285,12 +286,13 @@ def execute_scheduled_run(
                                  tz=tz, started_at=started_at, run_timer_start=run_timer_start,
                                  run_id=run_id, run_dir=run_dir, resume_from_run=resume_from_run,
                                  finalize_from_run=finalize_from_run,
-                                 finalization_source_config=finalization_source_config)
+                                 finalization_source_config=finalization_source_config,
+                                 paper_state_dir=paper_state_dir)
 
 
 def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
                       run_timer_start, run_id, run_dir, resume_from_run=None,
-                      finalize_from_run=None, finalization_source_config=None):
+                      finalize_from_run=None, finalization_source_config=None, paper_state_dir=None):
     reset_llm_usage()
 
     run_mode = str(config.run.run_mode or "full").strip().lower()
@@ -475,6 +477,17 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         )
 
     reset_llm_usage()
+    # News collection can involve many slow network calls. Finish it BEFORE
+    # collecting the short-lived price observations, and reuse the same dated
+    # evidence in the report delta instead of fetching it a second time.
+    news_as_of = datetime.now(tz)
+    news_context = {} if portfolio_only else collect_event_news(
+        ticker_summaries=ticker_summaries, analysis_as_of=news_as_of,
+    )
+    event_signals = {} if portfolio_only else collect_event_signals(
+        run_dir=run_dir, ticker_summaries=ticker_summaries,
+        analysis_as_of=news_as_of, news_context=news_context,
+    )
     execution_updates: dict[str, dict[str, Any]] = {}
     execution_refresh_budget_available = True
     if config.execution.execution_refresh_enabled and not portfolio_only:
@@ -534,7 +547,6 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             "selected_checkpoints": [],
         }
 
-    event_signals = {} if portfolio_only else collect_event_signals(run_dir=run_dir, ticker_summaries=ticker_summaries)
     selective_rerun_targets: dict[str, list[str]] = {}
     selective_rerun_results: list[dict[str, Any]] = []
     if config.execution.execution_selective_rerun_enabled and execution_updates and not portfolio_only:
@@ -704,7 +716,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     if selective_rerun_results:
         manifest["selective_rerun_results"] = selective_rerun_results
 
-    live_context_delta = build_live_context_delta(run_dir=run_dir, manifest=manifest)
+    live_context_delta = build_live_context_delta(run_dir=run_dir, manifest=manifest, news_context=news_context)
     if live_context_delta:
         live_delta_json_path = run_dir / "live_context_delta.json"
         live_delta_md_path = run_dir / "report_vs_live_delta.md"
@@ -833,6 +845,10 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     _publish_completed_run_manifest(
         archive_dir=config.storage.archive_dir, run_dir=run_dir, manifest=manifest,
     )
+    # Only the explicitly configured local producer wakes existing opted-in
+    # consumers. Their original locks, journals and risk gates remain in force.
+    from tradingagents.execution.delivery import handoff_completed_run
+    handoff_completed_run(config.storage.archive_dir, manifest, state_root=paper_state_dir)
     if skip_site_build:
         print("Skipped static site build for this run.", flush=True)
     else:

@@ -15,6 +15,11 @@ from tradingagents.charting.bars import instant
 from tradingagents.charting.capture import normalize_kis_bars
 from tradingagents.portfolio.kis import KisClient
 
+# HHDFS76200100 output1.dymd/dhms is the KIS Korea clock, unlike
+# HHDFS76950200 minute-bar xymd/xhms (exchange-local). Never choose a timezone
+# by whichever makes a response fresh: that could admit old/future evidence.
+KIS_ORDERBOOK_ZONE = ZoneInfo("Asia/Seoul")
+
 
 def _number(value):
     if isinstance(value, bool):
@@ -104,7 +109,7 @@ def normalize_quote(*, ticker, market, chart, orderbook, observed_at, fx_quote=N
     if not re.fullmatch(r"\d{8}", book_day) or not re.fullmatch(r"\d{6}", str(book_time)):
         raise ValueError("ORDERBOOK_CLOCK_INVALID")
     try:
-        book_at = datetime.strptime(book_day + str(book_time), "%Y%m%d%H%M%S").replace(tzinfo=ZoneInfo(zone))
+        book_at = datetime.strptime(book_day + str(book_time), "%Y%m%d%H%M%S").replace(tzinfo=KIS_ORDERBOOK_ZONE)
     except ValueError:
         raise ValueError("ORDERBOOK_CLOCK_INVALID") from None
     if not 0 <= (at - book_at).total_seconds() <= 120:

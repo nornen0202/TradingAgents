@@ -533,6 +533,8 @@ def main():
     args.runtime_dir = args.runtime_dir.resolve()
     args.state_dir.mkdir(parents=True, exist_ok=True)
     prepare_environment()
+    if args.command in {"run-due", "publish"} and not args.dry_run:
+        os.environ["TRADINGAGENTS_LOCAL_PAPER_STATE_DIR"] = str(args.state_dir)
     # These are independent consumers. They neither acquire producer ownership
     # nor dispatch report notifications, and cannot send a real broker order.
     if args.command == "strategy-kis":

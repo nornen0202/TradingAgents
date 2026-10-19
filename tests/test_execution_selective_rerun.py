@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 from tradingagents.execution.selective_rerun import collect_event_signals, find_selective_rerun_targets
@@ -43,9 +44,10 @@ def test_collect_event_signals_detects_keywords(tmp_path: Path):
     import tradingagents.execution.selective_rerun as module
 
     original = module._fetch_fresh_headlines
-    module._fetch_fresh_headlines = lambda _ticker: ""
+    module._fetch_fresh_headlines = lambda _ticker, **kwargs: ""
     try:
-        signals = collect_event_signals(run_dir=run_dir, ticker_summaries=summaries)
+        signals = collect_event_signals(run_dir=run_dir, ticker_summaries=summaries,
+                                        analysis_as_of=datetime.now(timezone.utc))
     finally:
         module._fetch_fresh_headlines = original
 

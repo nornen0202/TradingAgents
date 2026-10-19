@@ -207,7 +207,8 @@ def normalize_validation_quote(*, market, chart, orderbook, observed_at, instrum
     raw = str(day or "") + str(raw_time or "")
     if not re.fullmatch(r"[0-9]{14}", raw):
         raise ValueError("Book date/time required")
-    book_at = datetime.strptime(raw, "%Y%m%d%H%M%S").replace(tzinfo=zone)
+    from .paper_quotes import KIS_ORDERBOOK_ZONE
+    book_at = datetime.strptime(raw, "%Y%m%d%H%M%S").replace(tzinfo=KIS_ORDERBOOK_ZONE)
     if not 0 <= (now - book_at).total_seconds() <= 120:
         raise ValueError("Book future or stale")
     result.update(bid=bid, ask=ask, observed_at=min(price_at, book_at).isoformat(),

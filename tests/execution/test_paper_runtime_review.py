@@ -298,7 +298,7 @@ def _us_observation():
         "xymd": "20261019", "xhms": "095900", "open": "100", "high": "101",
         "low": "99", "last": "100", "evol": "1000"}]}
     book = {"rt_cd": "0", "output1": {"pbid1": 99.99, "pask1": 100.01,
-            "dymd": "20261019", "dhms": "100000", "vbid1": 7000, "vask1": 7000}}
+            "dymd": "20261019", "dhms": "230000", "vbid1": 7000, "vask1": 7000}}
     fx = {"observed_at": at.isoformat(), "base_currency": "USD", "quote_currency": "KRW", "rate": 1400,
           "source": "kis.inquire_present_balance.output2.frst_bltn_exrt", "kind": "BROKER_REFERENCE_RATE"}
     return {"ticker": "AAPL", "market": "us", "chart": chart, "orderbook": book, "observed_at": at, "fx_quote": fx}
@@ -338,7 +338,7 @@ def test_split_us_response_cannot_hide_bad_identity_or_clock(change):
 
 
 @pytest.mark.parametrize("changed", [
-    {"dymd": "20261020"}, {"dhms": "100001"}, {"dymd": "20261018"}, {"dhms": "095700"},
+    {"dymd": "20261020"}, {"dhms": "230001"}, {"dymd": "20261018"}, {"dhms": "225700"},
     {"dymd": "not-a-date"}, {"dymd": "20260230"}, {"dhms": "250001"},
     {"dymd": None}, {"dhms": None}, {"dymd": ""}, {"dhms": ""},
 ])
@@ -360,5 +360,5 @@ def test_orderbook_quantities_never_substitute_for_bid_ask_prices():
     changed_volumes["orderbook"]["output1"].update(vbid1=1e18, vask1=1)
     first, second = normalize_quote(**good), normalize_quote(**changed_volumes)
     assert first["spread_bps"] == second["spread_bps"] == pytest.approx(2)
-    assert first["orderbook_event_at"] == first["observed_at"]
+    assert datetime.fromisoformat(first["orderbook_event_at"]) == datetime.fromisoformat(first["observed_at"])
     assert first["price_usd"] == 100 and first["price_krw"] == 140_000

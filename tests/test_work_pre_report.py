@@ -73,6 +73,7 @@ def wired(tmp_path, monkeypatch):
     runtime = SimpleNamespace(prepare=lambda *a, **kw: prepared.append(kw) or {"result": "NEW", "event_id": "new"})
 
     def execute(config, **kw):
+        assert kw["paper_state_dir"] == tmp_path
         print("Broker collection progress")
         configs.append(config)
         return {"run_id": "refreshed", "status": "success"}
