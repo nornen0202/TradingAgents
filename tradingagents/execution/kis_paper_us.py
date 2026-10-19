@@ -26,6 +26,22 @@ from .paper import stamp
 SCHEMA = "tradingagents.kis-us-paper/v1"
 
 
+def _same_order_number(left, right):
+    """KIS ACK zero-pads ODNO to ten digits; inquiry may omit those zeros.
+
+    Preserve stored originals and only canonicalize this ten-digit
+    decimal representation for matching. Account, session, clocks, immutable
+    terms and uniqueness are independently verified by the caller.
+    """
+    if not isinstance(left, str) or not isinstance(right, str) or not left or not right:
+        return False
+    if left.isdecimal() or right.isdecimal():
+        if not re.fullmatch(r"[0-9]{1,10}", left) or not re.fullmatch(r"[0-9]{1,10}", right):
+            return False
+        return bool(left.lstrip("0")) and left.lstrip("0") == right.lstrip("0")
+    return left == right
+
+
 def _instrument(ticker, exchange):
     if not isinstance(ticker, str) or not re.fullmatch(r"[A-Z][A-Z0-9.]{0,9}", ticker) or exchange not in EXCHANGES:
         raise DemoError("Explicit supported US ticker and exchange required")
@@ -168,7 +184,7 @@ class USOrderJournal(DemoOrderJournal):
         if not isinstance(reports, list) or any(not isinstance(row, dict) for row in reports):
             self._block(intent_id, "invalid_us_order_rows")
             raise DemoError("US VTS invalid order rows")
-        matches = [row for row in reports if str(row.get("odno")) == broker_id]
+        matches = [row for row in reports if _same_order_number(row.get("odno"), broker_id)]
         if len(matches) != 1:
             self._block(intent_id, "missing_or_duplicate_us_order")
             return {"status": "UNRESOLVED", "requires_manual_reconciliation": True}
@@ -194,7 +210,8 @@ class USOrderJournal(DemoOrderJournal):
             cancel = self.db.execute("SELECT response,status FROM requests WHERE id=?", ("cancel:" + intent_id,)).fetchone()
             if not cancelled and cancel and cancel["status"] == "ACKNOWLEDGED":
                 cancel_id = json.loads(cancel["response"]).get("broker_order_id")
-                children = [r for r in reports if str(r.get("odno")) == cancel_id and str(r.get("orgn_odno")) == broker_id]
+                children = [r for r in reports if _same_order_number(r.get("odno"), cancel_id)
+                            and _same_order_number(r.get("orgn_odno"), broker_id)]
                 if len(children) == 1:
                     child = children[0]
                     cancelled = (child.get("rvse_cncl_dvsn") == "02"
@@ -435,7 +452,7 @@ class KisPaperUSBroker:
         if not request:
             raise DemoError("Unknown paper intent")
         broker_id = json.loads(request["response"]).get("broker_order_id")
-        matches = [row for row in rows if str(row.get("odno")) == broker_id]
+        matches = [row for row in rows if _same_order_number(row.get("odno"), broker_id)]
         if len(matches) != 1:
             raise DemoError("Missing or duplicate VTS order report")
         row = matches[0]
