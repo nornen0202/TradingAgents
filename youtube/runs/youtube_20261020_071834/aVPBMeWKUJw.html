@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 삼전닉스 대항마?.. 정작 주가 -32% 폭락중인 창신메모리 근황</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261020_071834</p>
+    <h1>삼전닉스 대항마?.. 정작 주가 -32% 폭락중인 창신메모리 근황</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=aVPBMeWKUJw">원본 영상</a>
+    </div>
+  </header>
+  <h2>CXMT 경쟁력과 주가 하락 주장: 투자자 검증 보고서</h2>
+<p>분석 기준: 2026년 10월 20일 제공 자료 · <a href="https://www.youtube.com/watch?v=aVPBMeWKUJw">경제사냥꾼 영상</a>, 2026년 10월 19일 게시</p>
+<h3>1. 핵심 결론</h3>
+<p><strong>중국 메모리의 기술 격차와 경쟁 압력을 다룬 보도는 있으나, 영상의 핵심인 주가 하락폭·실적 규모·성장 둔화·하락 원인은 검증되지 않았다.</strong> 전체 주장 검증 상태는 <code>unverified</code>다. 자료 수집 성공이나 일부 증거의 <code>verified</code> 표시는 투자 주장 전체의 사실 확인을 뜻하지 않는다.</p>
+<p>CXMT를 중국 최대 DRAM 제조업체로 소개하고 상장을 다룬 기사도 있다. 그러나 공식 상장 법인·종목코드·상장일·공모가를 확인할 문서가 없어, 영상의 가격과 실적을 동일 기업에 연결하는 작업이 선행돼야 한다. <strong>주가 하락을 경쟁력 약화의 증거로, 기술 격차를 한국 업체의 수익성 보장으로 해석하기에는 근거가 부족하다.</strong></p>
+<h3>2. 영상 주장과 확인된 사실/근거</h3>
+<p>모든 주장에 붙은 <strong>00:02는 단일 자막 청크의 시작점</strong>이다. 실제 개별 발언 위치는 확인되지 않았으며, 청크는 00:02~02:05를 포괄한다.</p>
+<p>| 항목 | 영상 주장 요약 | 확인된 사실/근거와 판단 |</p>
+<p>|---|---|---|</p>
+<p>| 기업·상장 C1 | CXMT는 중국 최대 DRAM 업체이며 전년 7월 공모가 8.66위안으로 상장 | E1·E8에 최대 업체 및 상장 관련 보도가 있다. 다만 ‘최대’의 측정 기준과 공식 상장 조건은 미확인. <strong>부분 뒷받침</strong> |</p>
+<p>| 주가 C2 | 고점 61.8위안에서 약 40위안으로, 32% 이상 하락 | 실제 가격·종목·거래일 자료가 없다. 제시값의 산술상 하락률은 <strong>약 35.28%</strong>지만 실제 시세 검증은 아님. <strong>미검증</strong> |</p>
+<p>| 매출 C3 | 1~9월 예상 매출 2,650억~2,700억 위안, 전년 대비 8배 이상 증가 | 실적예고·전년 비교값·금액 단위 모두 미확인. <strong>미검증</strong> |</p>
+<p>| 이익 C4 | 순이익 1,300억 위안 이상, 2분기 528억 대비 3분기 534억~549억 위안 | 동일 회계 기준이라는 가정에서 분기 증가율은 <strong>약 1.14~3.98%</strong>. 금액·단위·기간·전망치 여부는 미확인. <strong>미검증</strong> |</p>
+<p>| 주가 연동 C5 | 13·14일 한국 메모리주와 중국 종목이 함께 하락했고, 중국 종목은 각각 2.79%·2.21% 하락 | E5 제목은 CXMT 소식과 한국 양사 하락을 연결한다. 일별 가격과 발표 시각은 없어 정확한 수익률·인과관계·지속적 동조화는 미확인. <strong>부분 뒷받침</strong> |</p>
+<p>| 기술 격차 C7 | HBM 3년, 일반 DRAM 2년 뒤처짐 | 여러 보도에 기술 격차 평가가 있으나 수치·평가자·비교 기준이 다름. <strong>격차 평가의 존재만 부분 뒷받침</strong> |</p>
+<p>| 규제·과거 사례 C8·C9 | 미국 장비 제한이 추격을 막으며 푸젠진화 생산 중단이 선례 | 규정 원문·기업별 적용·실제 조달 차질 자료가 없다. 푸젠진화 사례는 자막의 중단 주체도 불명확. <strong>미검증/음성인식 불확실</strong> |</p>
+<h4>가장 유의미한 외부 근거</h4>
+<ul>
+<li><strong>기업 소개·상장 관련 보도:</strong> <a href="https://www.businesskorea.co.kr/news/articleView.html?idxno=273116">BusinessKorea, 2026-07-15</a>와 <a href="https://economychosun.com/site/data/html_dir/2026/08/01/2026080100023.html">이코노미조선, 2026-08-10</a>. 공식 투자설명서를 대체하지는 못한다.</li>
+<li><strong>기술 격차와 경쟁 우려:</strong> <a href="https://www.businesskorea.co.kr/news/articleView.html?idxno=278792">BusinessKorea, 2026-10-14</a>는 DRAM 1~2년, HBM 3년 초과의 격차 평가를 소개한다.</li>
+<li><strong>다른 평가 기준:</strong> <a href="https://www.koreaherald.com/article/10821616?ref=naver">The Korea Herald, 2026-07-27</a>는 로이터 취재원을 인용해 HBM 두 세대 차이를 전한다. <a href="https://www.koreatimes.co.kr/path/A2026060217350001113">The Korea Times, 2026-06-06</a>는 범용 DRAM 약 3년, HBM 약 4년을 제시한다. <strong>세대 차이와 연수 차이를 동일 척도로 환산하거나, 기사 간 차이를 기술 추격 속도로 해석할 수 없다.</strong></li>
+</ul>
+<h3>3. 상승 논리와 반론</h3>
+<h4>삼성전자·SK하이닉스에 우호적인 해석</h4>
+<p>보도된 기술 격차가 실제 양산 수율·성능·고객 인증 차이로 이어진다면, 한국 업체의 첨단 제품 경쟁력에 우호적인 조건이다. 중국 업체의 이익 증가가 기대보다 약하다는 사실까지 공식 실적으로 확인된다면, 단기간에 기존 선두를 대체한다는 우려도 재평가될 수 있다.</p>
+<p>다만 현재 자료는 기술 격차에 관한 <strong>보도상 평가</strong>를 제공할 뿐, 한국 양사의 향후 이익이나 가격 결정력을 입증하지 않는다. 영상의 미검증 실적 숫자를 이 논리의 확정 근거로 사용할 수 없다.</p>
+<h4>CXMT에 우호적인 해석과 영상에 대한 반론</h4>
+<p>E8은 한국 업체의 HBM 생산 확대와 CXMT의 범용 DRAM 시장 수혜 가능성을 연결한다. 이는 첨단 HBM에서 뒤처져도 다른 제품군에서는 경쟁 압력이 커질 수 있다는 가설을 뒷받침한다. 다만 시장점유율·수익성 개선이 실제 확인된 것은 아니다.</p>
+<p>또한 다음 구분이 중요하다.</p>
+<ul>
+<li>낮은 전분기 이익 증가율이 사실이더라도 <strong>매출 정체와 같은 뜻은 아니다.</strong> 이전 분기 성장률도 없으므로 성장 ‘둔화’ 자체가 입증되지 않았다.</li>
+<li>주가 하락은 기대·밸류에이션·업종 움직임 등과 구분해야 한다. <strong>하락만으로 자체 실적 부진이나 경쟁력 상실을 확정할 수 없다.</strong></li>
+<li>경쟁 기업도 업황 요인으로 함께 움직일 수 있다. 이틀 동반 하락은 독립적 경쟁자가 아니라는 증거가 아니다.</li>
+</ul>
+<h3>4. 데이터 품질과 인용의 한계</h3>
+<p>자동자막의 <code>transcript_quality</code>는 <strong>good, 1.0</strong>이지만, 금액·기업명·발언 의미의 정확도를 보증하지 않는다. 원음 기반 <code>asr_confidence</code>는 제공되지 않았으며 검증 결과의 <strong>0.0은 미측정 표시</strong>이지 오인식 확정이 아니다.</p>
+<p>검증 단계의 <code>source_confidence</code>는 C1 <strong>0.60</strong>, C5 <strong>0.45</strong>, C7 <strong>0.65</strong>다. 나머지는 <strong>0.0</strong>으로, 해당 주장을 검증할 근거가 확보되지 않았다는 의미다. 추출 단계의 기업별 점수 0.55·0.40은 자막 속 주장 귀속에 대한 평가여서 사실 검증 점수와 구분해야 한다. 또한 판정 <code>confidence</code>가 높아도 ‘미검증이라는 판단’에 대한 신뢰도일 수 있으며, 주장 자체가 참일 확률이 아니다.</p>
+<p>핵심 제한은 다음과 같다.</p>
+<ul>
+<li>공식 실적 공시·상장 문서·규제 원문과 시장데이터가 없다. ‘오늘·작년·13일·14일’을 게시일만으로 확정 날짜에 대응시키지 않았다.</li>
+<li>상장 연도는 영상의 상대적 표현과 2026년 상장 관련 자료 사이에 불일치 가능성이 있다. 소셜미디어의 종목코드·상장일은 공식 확인값으로 채택하지 않았다.</li>
+<li>소셜미디어·블로그 검색 발췌는 독립적 시세 검증에 부족하다. 에너지 업종 기사 E4는 CXMT 매출과 무관해 제외했다. 기사 간 원취재원 독립성도 미확인이다.</li>
+<li>상하이 증권사 책임자 인용 C6은 성명·소속·원문이 없다. <strong>미검증·수동 확인 필요</strong>다.</li>
+<li>삼성전자·SK하이닉스 ‘인수’ 표현 C10은 실제 의향인지 자막 오류인지 알 수 없다. 인수 촉매로 해석할 근거가 없다.</li>
+<li><strong>Bloomberg·Morningstar 및 기타 폐쇄형 원문은 제공되지 않았다. 관련 주장이나 인용은 미검증·수동 확인 필요</strong>이며, 출처 불명 인용을 이들 매체에 임의 귀속할 수 없다.</li>
+</ul>
+<h3>5. 단기 체크포인트와 논리 무효화 조건</h3>
+<p>아래 항목은 확인 우선순위이며, 자료에 다음 공시·발표의 확정 일정은 없다.</p>
+<p>| 관찰 항목 | 구체적으로 확인할 자료 | 기존 해석을 재검토할 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 기업·상장 식별 | 거래소 문서의 법인명·코드·상장일·공모가 | 다른 기업의 가격·실적이 섞였다면 영상의 종목별 수치 연결은 무효 |</p>
+<p>| 실적의 비교 가능성 | 원문 통화·단위·소수점·누적/분기 구분·연결 범위·순이익 정의 | 숫자나 회계 범위가 다르면 1~4% 계산을 투자 근거로 사용할 수 없음 |</p>
+<p>| 성장의 질 | 분기 매출·출하량·평균판매가격·이익률·일회성 손익 | 비교 가능한 실적이 성장을 보여주면 ‘성장 정체’ 해석 재검토 |</p>
+<p>| 가격·이벤트 반응 | 날짜별 종가와 고점 기준, 발표 시각, 시장·업종 대비 수익률 | 시장 요인으로 설명되거나 하락이 발표에 선행하면 발표 원인론 약화 |</p>
+<p>| 기술 경쟁력 | 제품 세대·수율·상업 양산·고객 인증·실제 공급 | 범용 DRAM 공급 확대는 한국 업체의 해당 시장 우위를, 첨단 제품 인증 진전은 기술 격차 지속 논리를 재검토할 신호 |</p>
+<p>| 장비 규제 영향 | 영상 시점의 유효 규정·허가 요건·대상 법인과 실제 조달 기록 | 허가·대체 조달·양산 진전이 확인되면 ‘장비 차단으로 추격 불가’ 해석 약화 |</p>
+<h3>결론</h3>
+<p>현재 근거로 말할 수 있는 것은 <strong>CXMT 경쟁 우려와 기술 격차에 관한 보도가 존재한다는 점</strong>이다. 고점 대비 하락폭, 대규모 실적 수치, 성장 정체와 주가 하락의 인과관계는 아직 확인되지 않았다. 투자자가 우선 관찰할 대상은 가격 하락 자체보다 <strong>동일 법인의 공식 실적, 제품별 실제 공급·인증, 규제의 기업별 사업 영향</strong>이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;aVPBMeWKUJw&quot;,
+  &quot;title&quot;: &quot;삼전닉스 대항마?.. 정작 주가 -32% 폭락중인 창신메모리 근황&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=aVPBMeWKUJw&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/aVPBMeWKUJw/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-19T09:30:57+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1813,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1813,
+    &quot;segments&quot;: 83,
+    &quot;duration_seconds&quot;: 125,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-20T07:18:34.388791+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 9,
+  &quot;claim_status_summary&quot;: {
+    &quot;partially_supported&quot;: 3,
+    &quot;unverified&quot;: 5,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;CXMT는 중국 최대 DRAM 제조사이며 작년 7월 공모가 8.66위안으로 상장했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.9,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E1&quot;,
+        &quot;E8&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.6,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;작년 7월 상장; 공모가 8.66위안&quot;,
+        &quot;observed&quot;: &quot;상장 관련 보도는 있으나 공식 상장일·공모가 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;상장 법인과 종목코드를 공식 문서로 확정하기 전에는 영상의 주가·실적을 CXMT에 귀속해 평가하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;8월 고점 61.8위안에서 오늘 오후 40위안 선까지 내려 고점 대비 32% 이상 하락했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;61.8위안 → 약 40위안; 32% 이상 하락&quot;,
+        &quot;observed&quot;: &quot;조건부 계산: (40/61.8-1)×100 = 약 -35.28%; 실제 가격은 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;계산상 정합성과 실제 주가 검증을 구분해야 하며, 하락폭만으로 저평가를 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;올해 1~9월 예상 매출은 2,650억~2,700억 위안이며 전년 동기 대비 8배 이상 증가했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1~9월 매출 2,650억~2,700억 위안; 전년 대비 8배 이상 증가&quot;,
+        &quot;observed&quot;: &quot;원문 금액·단위·전년 동기 매출 모두 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매출 규모와 성장률을 밸류에이션이나 시장점유율 추정에 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;지난해 적자에서 올해 순이익 1,300억 위안 이상을 예상하지만, 2분기 528억 대비 3분기 534억~549억으로 전분기 대비 약 1~4% 성장에 그친다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;순이익 1,300억 위안 이상; 2분기 528억; 3분기 534억~549억; 전분기 대비 1~4%&quot;,
+        &quot;observed&quot;: &quot;조건부 계산: (534/528-1)×100 = 약 1.14%, (549/528-1)×100 = 약 3.98%; 실제 실적 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;산술상 증가율은 맞지만 이익 규모와 성장 둔화라는 투자 논거는 검증되지 않았다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;13일·14일 CXMT 발표 영향으로 삼성전자와 SK하이닉스가 급락했고 중국 종목도 각각 2.79%, 2.21% 하락했으며, 이는 동조화와 자체 실적 부진을 보여준다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.88,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E5&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.45,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;13일·14일 중국 종목 각각 -2.79%, -2.21%; 한국 두 종목 급락&quot;,
+        &quot;observed&quot;: &quot;한국 두 종목 하락 관련 보도 제목만 확인; 정확한 거래일별 등락률은 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;경쟁 우려에 관한 보도는 있으나 이를 확정된 이벤트 효과나 종목 간 상관관계로 해석하면 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;상하이 주요 증권사 리서치 책임자는 한국 메모리주 상승이 중국 메모리주에도 촉매가 된다고 말했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없음&quot;,
+        &quot;observed&quot;: &quot;발언 원문 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출처 불명 인용을 기관의 공식 견해나 검증된 주가 관계로 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;중국 분석가들은 중국의 기술 수준이 첨단 HBM에서 3년, 일반 DRAM에서 2년 뒤처졌다고 평가한다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.93,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E5&quot;,
+        &quot;E6&quot;,
+        &quot;E7&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.65,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;HBM 3년; 일반 DRAM 2년 뒤처짐&quot;,
+        &quot;observed&quot;: &quot;E5: HBM 3년 초과·DRAM 1~2년; E6: HBM 두 세대; E7: HBM 약 4년·범용 DRAM 약 3년&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기술 격차가 있다는 평가에는 보도상 근거가 있지만 고정된 추격 소요기간이나 수익성 전망으로 환산해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;미국의 최신 장비 접근 차단으로 중국 메모리 제조사는 필요한 장비 확보와 기술 추격에 제약을 받는다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없음&quot;,
+        &quot;observed&quot;: &quot;정책명·시행일·적용 범위 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;구체적인 규제 적용과 조달 차질을 확인하기 전에는 기술 추격 불가능이나 생산 차질을 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;푸젠진화는 2018년 미국의 장비 수출 차단 직후 대량생산 계획을 중단했으나, 자막은 중단 주체를 삼성으로 표기한다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2018년; 수출 차단 직후 대량생산 계획 중단&quot;,
+        &quot;observed&quot;: &quot;규제·중단 시점 및 대상 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;원음과 당시 자료 확인 전에는 푸젠진화 사례를 CXMT의 생산 중단 가능성을 입증하는 선례로 제시하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;CXMT가 삼성전자와 SK하이닉스를 인수하겠다고 주장했다는 발화가 실제 인수 의향인지 경쟁·추월 표현의 오인식인지 불명확하다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없음; 삼성전자·SK하이닉스 인수 발언&quot;,
+        &quot;observed&quot;: &quot;발언 의미 및 인수 의향 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실제 인수 계획이나 거래 가능성을 투자 촉매로 제시해서는 안 된다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;CXMT Launches Record IPO, Challenging Global DRAM Oligopoly&quot;,
+      &quot;source_url&quot;: &quot;https://www.businesskorea.co.kr/news/articleView.html?idxno=273116&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-07-15T18:04:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;Changxin Memory Technologies (CXMT), the core company leading China&#x27;s &#x27;memory semiconductor independence&#x27; and the country&#x27;s largest DRAM manufacturer, has finally emerged as a hot potato in the... CXMT Launches Record IPO, Challenging Global DRAM Oligopoly...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;일평 on X: \&quot;일평 창신메모리 (長鑫科技·CXMT, 688825) 종목 분석 2026 ...&quot;,
+      &quot;source_url&quot;: &quot;//duckduckgo.com/l/?uddg=https%3A%2F%2Fx.com%2Filpyung98%2Fstatus%2F2111446683456507999&amp;rut=f532366f97edf04c270c2c6e38aebf56e293ee6b6b32a40eb2258af7ab7f50ae&quot;,
+      &quot;publisher&quot;: &quot;duckduckgo.com&quot;,
+      &quot;published_at&quot;: null,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;일평 on X: \&quot;일평 창신메모리 (長鑫科技·CXMT, 688825) 종목 분석 2026년 10월 17일 기준 한눈에 보기 창신메모리는 중국 유일의 DRAM 종합반도체 (IDM) 기업이자 세계 4위 DRAM 업체로, 지난 7월 27일 상하이 커촹반 (科創板)에 상장한 뒤 석 달 만에 A주 시가총액 1위 자리를 ...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;하이닉스 10% 끌어내린 창신메모리 (Cxmt), 정작 자기 주가는 고점 ...&quot;,
+      &quot;source_url&quot;: &quot;//duckduckgo.com/l/?uddg=https%3A%2F%2Fblog.naver.com%2Fcareerplaner%2F224441736940&amp;rut=cc0c3156be7d34ed7d4cb37d26b941bffe4528f5647024e3d5632b7dc666c268&quot;,
+      &quot;publisher&quot;: &quot;duckduckgo.com&quot;,
+      &quot;published_at&quot;: null,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;셀 크기를 \&quot;2×3\&quot;에서 \&quot;2×2\&quot;로 줄이겠다는 발표 하나가 한국 반도체 대장주 두 종목을 하루 만에 7~10% 끌어내렸습니다. 발표의 주인공은 중국 D램 업체 창신메모리, 영문명 CXMT입니다. 그런데 이번 CXMT 쇼크를 따라가다 보니 묘한 장면이 하나 보이더라고요. 한국 반도체주를 흔든 바로 그 회사의 주가도 ...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Forget Tech. Energy Will Be The Big Winner This Earnings Season.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/2bba9727-a5dc-3eb3-821b-571b920f9856/forget-tech.-energy-will-be.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T21:33:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Samsung, SK Hynix Sink on CXMT DRAM Tease&quot;,
+      &quot;source_url&quot;: &quot;https://www.businesskorea.co.kr/news/articleView.html?idxno=278792&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-10-14T15:48:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;While the dominant assessment is that the technological gap between South Korea and China is one to two years for DRAM and more than three years for high bandwidth memory (HBM), market tension is...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Where CXMT’s IPO money is going: The DRAM gap Korea left&quot;,
+      &quot;source_url&quot;: &quot;https://www.koreaherald.com/article/10821616?ref=naver&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-07-27T14:42:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;In HBM, sources told Reuters, CXMT remains two generations behind. Korean analysts mostly treat... begin to play a much more influential role in the global memory supply chain in two to three years.\&quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;[십년마일검 ‘중국판 삼전닉스’ 상장 첫날 中 시총 1위] 트럼프 딜레...&quot;,
+      &quot;source_url&quot;: &quot;https://economychosun.com/site/data/html_dir/2026/08/01/2026080100023.html&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-08-10T10:38:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;중국 최대 D램 제조 업체 CXMT(창신메모리)가 상하이 커촹반(중국판 나스닥)에 상장한 이날 시총이... CXMT는 삼성전자와 SK하이닉스가 고부가가치인 HBM(고대역폭 메모리) 생산을 늘리자, 범용 D램 시장에서 수혜를...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;[Who Is ?] 이재용 삼성전자 회장&quot;,
+      &quot;source_url&quot;: &quot;https://www.businesspost.co.kr/BP?command=article_view&amp;num=401320&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2025-07-01T08:26:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;SK하이닉스가 보유한 고대역폭메모리(HBM) 기술력이 삼성전자와 실적 차이를 만든 것으로 분석된다.... 중국의 창신메모리(CXMT)는 대중적으로 사용되는 D램인 &#x27;DDR4&#x27; 제품을 대량으로 생산하며 반도체 가격을...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

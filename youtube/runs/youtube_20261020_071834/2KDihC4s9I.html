@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - SK하이닉스, 다시 오를 수 있을까? ‘월가 전설’ 테크 애널리스트가 말하는 전망</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261020_071834</p>
+    <h1>SK하이닉스, 다시 오를 수 있을까? ‘월가 전설’ 테크 애널리스트가 말하는 전망</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=-2KDihC4s9I">원본 영상</a>
+    </div>
+  </header>
+  <h2>SK하이닉스 재평가론: AI 수요가 실적과 현금흐름으로 이어지는가</h2>
+<p>분석 기준: 2026년 10월 20일 · <a href="https://www.youtube.com/watch?v=-2KDihC4s9I">PLUS TV 영상</a> · 게시일 2026년 10월 19일</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심은 <strong>AI 투자 장기화가 SK하이닉스의 HBM 경쟁력과 메모리 가격 결정력을 뒷받침하고, 수혜가 소프트웨어·보안·전력 인프라로 확산될 것이라는 댄 아이브스의 전망</strong>이다.</p>
+<p>그러나 제공된 주장 검증 결과는 <strong>C1~C9·C11 미검증, C10·C12 자동자막 불확실</strong>이다. 수집·처리 성공이나 자료의 <code>verified</code> 표시는 투자 논거가 입증됐다는 뜻이 아니다. 특히 SK하이닉스의 HBM 실적·가격·재고·현재 밸류에이션을 직접 확인할 자료가 부족해, 영상만으로 재평가 폭이나 시기를 판단하기 어렵다.</p>
+<p><strong>메모리 가치 괴리 40~50%는 SK하이닉스의 확정 상승 여력이나 목표주가가 아니다.</strong> 장기 AI 수요 전망과 현재 주가의 매력도 역시 별도로 검증해야 한다.</p>
+<h3>2. 영상 주장과 확인된 사실/근거</h3>
+<p>아래 시각은 개별 문장의 정확한 시점이 아니라 제공된 청크 시작점이다.</p>
+<p>| 주제·시각 | 영상 주장 | 확인된 사실/근거와 한계 |</p>
+<p>| --- | --- | --- |</p>
+<p>| AI 장기 주기 · 00:00·05:53 | 구축 진행률 15% 미만, 10~12년 주기의 초기 단계 | 진행률의 분모·산정 모형과 독립 측정값이 없다. 인터뷰이의 시장관이다. |</p>
+<p>| SK하이닉스·HBM · 05:53·11:36·17:47 | 삼성전자보다 HBM·가격 결정력에서 유리하며, 메모리 수급 균형은 2029년까지 어렵다는 평가 | 동일 기간 출하·인증·가격·생산능력·재고 비교가 없다. 제공된 SK 공시는 IR 개최 안내이며 경쟁 우위를 입증하지 않는다. |</p>
+<p>| 빅테크 투자 · 11:36·23:57 | 진행자는 연간 지출 약 7,250억 달러를 인용하고, 인터뷰이는 메모리 배분 7~10%를 추정 | 포함 기업·기준연도·리스 처리·원추산 기관이 없다. 연간 FCF 3,000억~4,000억 달러 주장도 공시 합산표가 없다. |</p>
+<p>| 마이크론 가치평가 · 17:47 | PER 6배는 메모리 경기순환 우려를 과도하게 반영 | 호스트 스냅샷은 선행 약 4.37배·후행 약 12.17배다. 녹화일과 이익 기준이 달라 단순 반증은 불가능하다. |</p>
+<p>| 수혜 확산 · 29:49·36:03·42:04 | AI 소프트웨어·보안·네오클라우드·전력 인프라가 후속 수혜 | 회사별 AI 매출·ARR·수주 전환·이익 기여를 입증하는 자료는 없다. 산업 수요와 개별 기업 수익을 구분해야 한다. |</p>
+<p>| 애플·테슬라 · 29:49·42:04·48:14 | 애플 AI 전략에 주당 75달러 추가 가치, Tesla·SpaceX 합병 가능성 80% 이상 | 제휴 공식 문서·가치평가 모형·합병 계약이 제공되지 않았다. 추가 가치와 합병 확률 모두 주관적 전망이다. |</p>
+<h4>실제로 확보된 근거의 범위</h4>
+<ul>
+<li><strong>공식 공시:</strong> 10월 14일 <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261014800385">SK하이닉스 IR 개최 안내</a>가 제공됐다. 행사 안내의 존재는 확인되지만, 발췌에는 HBM 실적이나 가격·재고 수치가 없다. 삼성전자 공시도 지분·보유 상황 관련으로 HBM 경쟁력을 검증하지 못한다.</li>
+<li><strong>시장 관측값:</strong> 10월 19일 23:03 UTC 전후 호스트 수집 yfinance 스냅샷에서 NVDA 시가총액은 약 5.242조 달러, PLTR는 약 4,666억 달러다. 이는 조회 시점 관측값이며 영상의 미래 시가총액 목표를 입증하지 않는다. SK하이닉스·삼성전자의 가격·PER 필드는 조회 실패로 비어 있다.</li>
+<li><strong>뉴스 발췌:</strong> 10월 20일 <a href="https://www.viewsnnews.com/article?q=239125">반도체주 반등 보도</a>는 SK하이닉스 ADR의 4.67% 상승을 언급한다. 다만 법인·증권 식별자·거래소·상장 효력일이 없어 영상의 ‘SK 미국 상장’ 발언을 확정할 수 없다. ADR 거래, 자회사 상장, 모회사 직접 상장은 구별해야 한다.</li>
+</ul>
+<p>외부 검색 E1~E11에는 핵심 주장을 직접 지지하는 항목이 없다. E1~E3는 금·광산 관련으로 무관하고, E4는 관련 본문을 확인하기 어려우며, E5~E11은 발췌가 비어 있다. 이 자료들의 제목만으로 공급 부족·투자 확대·수익화를 추론하지 않았다. 검색 근거 부족은 곧 주장에 대한 반증도 아니다.</p>
+<h3>3. 강세 논리가 성립하려면</h3>
+<p>영상의 논리는 <strong>AI 인프라 투자 지속 → GPU·HBM 수요 확대 → 공급자의 가격·제품 믹스 개선 → 이익·현금흐름 증가</strong>로 정리된다. 이후 기업 AI 도입이 확산되면서 소프트웨어·보안·전력으로 수혜가 넓어진다는 구상이다. 이는 검증할 가설이지 현재 입증된 인과관계는 아니다.</p>
+<p>SK하이닉스에서는 다음 연결고리가 중요하다.</p>
+<p>1. <strong>투자 계획이 실제 집행으로 이어지는가:</strong> 하이퍼스케일러의 CAPEX 발표뿐 아니라 데이터센터 준공·전력 연결·서버 가동을 확인해야 한다.</p>
+<p>2. <strong>HBM 경쟁력이 수익으로 전환되는가:</strong> 제품 세대별 고객 인증, 출하 확대, 수율·원가, 가격 조건이 매출과 마진 개선으로 이어져야 한다.</p>
+<p>3. <strong>공급 증가에도 수익성이 유지되는가:</strong> 삼성전자·마이크론을 포함한 증설과 고객 인증 확대를 수요 증가와 함께 봐야 한다.</p>
+<p>4. <strong>이익 증가가 투자 부담을 넘는가:</strong> 설비투자로 회계상 이익과 현금흐름이 다르게 움직일 수 있으므로 CAPEX 이후 현금창출력까지 확인해야 한다.</p>
+<h3>4. 반론과 재평가론의 무효화 조건</h3>
+<p>| 반론 | 구체적 관찰 신호 | 강세론에 미치는 의미 |</p>
+<p>| --- | --- | --- |</p>
+<p>| AI 투자의 수익화 지연 | 클라우드·AI 사용량과 매출 둔화, 투자 대비 FCF 약화 | 장기 투자 지속 능력과 메모리 주문 가시성이 낮아질 수 있다. |</p>
+<p>| 공급 확대·경기순환 재개 | 경쟁사 인증·출하 증가와 동시에 가격 약화·재고 증가 | 장기 희소성과 가격 결정력 논거가 약해진다. |</p>
+<p>| 전력·허가 병목 | 준공 지연, 전력 연결 지연, 장비 설치·매출 전환 지연 | 주문 적체가 반드시 실현 매출을 뜻하지 않게 된다. |</p>
+<p>| 높은 가격에 따른 수요 조정 | 고객의 사양 변경·구매 연기·계약 축소 | 메모리 가격 상승이 오히려 수요 확대를 제약할 수 있다. |</p>
+<p>| 자금조달·순환 금융 부담 | 차입 비용 상승, 투자 축소, 고객·공급사 간 자금 의존 확대 | 발표된 수요의 지속성과 독립성을 재검토해야 한다. |</p>
+<p>| 기대가 이미 가격에 반영 | 실적 개선에도 요구되는 성장률·배수가 과도하게 높음 | 사업 호조가 주가 상승을 보장하지 않는다. |</p>
+<p><strong>재평가론의 핵심 무효화 조건</strong>은 수요·투자 축소와 공급 확대가 겹쳐 HBM 가격·마진·현금흐름이 지속적으로 악화되는 경우다. 단일 분기의 변동보다 주문·출하·재고·가이던스의 일관된 방향을 확인하는 편이 중요하다. 현재 자료로는 특정 가격이나 수치 기준의 무효화선을 정할 수 없다.</p>
+<p>밸류에이션 비교에도 주의가 필요하다. 영상의 현재 PER와 1999~2000년 매출배수는 서로 다른 지표이므로 거품 부재의 직접 근거가 되지 않는다. 호스트 스냅샷에서도 PLTR·CRWD·TSLA의 선행 PER는 각각 약 82.56배·141.57배·169.74배로 차이가 크다. 다만 추정 EPS의 기간·산정 방식이 충분히 제공되지 않아 이 수치만으로 고평가를 확정할 수도 없다.</p>
+<h3>5. 주변 종목·거시 전망의 취급</h3>
+<ul>
+<li><strong>2027년 최선호주:</strong> 추출된 명단은 NVDA·MSFT·PLTR·AAPL·CRWD다. 인터뷰이의 선호이며 수익률 보증이 아니다. SK의 AI 30·ETF 편입은 운영 주체·상품명·공식 보유내역 확인이 필요하다.</li>
+<li><strong>애플:</strong> 제미니 협력 범위와 아이폰·iOS·전체 기기 설치기반을 공식 자료로 구분해야 한다. 주당 75달러는 기간·매출·마진 가정이 없는 평가다.</li>
+<li><strong>보안·소프트웨어:</strong> 에이전트 확산 가설과 실제 ARR·유료 사용량·현금흐름을 분리해야 한다. CRWD의 2025년 상승률 138%는 연말 조정종가가 없어 확인되지 않았고, 보안 예산 5~10%는 증가율인지 비중인지 불명확하다.</li>
+<li><strong>테슬라·SpaceX:</strong> 합병 확률 80% 이상은 인터뷰이의 주관적 전망이다. 거래 문서와 로보택시 유료 운행·옵티머스 외부 판매·인식 매출 확인이 우선이다. 미국 공시 제공기관의 이용 불가는 ‘관련 공시가 없다’는 뜻이 아니다.</li>
+<li><strong>거시 수치:</strong> AI 도입률 5% 미만, 데이터센터 800~1,000개, 투자 승수 5~6배·8~10배, 한국 기술산업 3~4배 성장에는 조사·집계 정의나 모형이 없다. 기업 매출·주가 전망에 직접 적용할 수 없다.</li>
+<li><strong>정책·금리·유가:</strong> 승인 부결 10~15%는 법안·관할·분모가 없고, 10년물 금리 4.5% 이하 전망은 시간축이 불명확하다. 유가 자막은 숫자 변화와 방향 표현이 모순돼 실제 시장 흐름의 근거에서 제외한다.</li>
+</ul>
+<h3>6. 데이터 품질과 신뢰도</h3>
+<p>자막은 자동 한국어이며 <code>transcript_quality</code>는 good·1.0이다. 이는 자료 처리 품질을 나타낼 뿐 <strong>숫자·고유명사·사실 정확도가 100%라는 뜻은 아니다.</strong> 검토 범위는 00:00~52:40으로 전체 52:48 중 마지막 약 8초가 포함되지 않는다.</p>
+<p>| 검증 항목 | source_confidence | asr_confidence | 해석 |</p>
+<p>| --- | ---: | ---: | --- |</p>
+<p>| C2 HBM·수급 전망 | 0.10 | 0.50 | 직접 근거 부족, 수급비율 등 전사 확인 필요 |</p>
+<p>| C5 빅테크 지출 | 0.05 | 0.75 | 숫자 전사보다 원추산·회계 기준 부재가 핵심 |</p>
+<p>| C6 가치평가·목표 | 0.40 | 0.75 | 일부 시장 관측값은 있으나 영상 기준과 미정렬 |</p>
+<p>| C9 정책·금리 | 0.05 | 0.35 | 정책 근거와 시간축 모두 불충분 |</p>
+<p>| C10 유가 | 0.05 | 0.15 | 방향 표현 불일치로 확정 해석 곤란 |</p>
+<p>| C11 Tesla·SpaceX | 0.10 | 0.75 | 발언 해석과 별개로 거래·상용화 근거 부족 |</p>
+<p>위 값은 주장 검증 단계의 평가다. 추출 단계의 높은 <code>source_confidence</code>와 달리, 여기서는 외부 근거의 적합성·충분성을 평가한다. <code>asr_confidence</code> 역시 원음 없이 추정한 전사 신뢰도다. 미검증 판정의 높은 <code>confidence</code>는 주장 자체가 참일 확률을 뜻하지 않는다.</p>
+<p>녹화일이 없어 ‘올해·내년·내년 말’을 게시일 기준 절대연도로 바꾸지 않았다. E1~E11은 모두 게시 이후 발행돼 녹화 당시 정보로 소급할 수도 없다. ‘HMM/HBM’, 불명확한 수급비율·금리·기업명은 원음 확인이 필요하다.</p>
+<p><strong>Bloomberg·Morningstar의 원문 근거는 제공되지 않았다.</strong> 해당 매체나 기타 폐쇄형·유료 자료에 의존하는 주장은 미검증·수동 확인 필요로 취급한다. 제공되지 않은 내부 가치평가 모형이나 전망 보고서도 독립 검증 완료로 볼 수 없다.</p>
+<h3>7. 단기 체크포인트</h3>
+<p>| 확인 시점 | 구체적 관찰 항목 |</p>
+<p>| --- | --- |</p>
+<p>| 다음 공식 실적·IR | SK하이닉스 HBM 출하·제품 믹스·가격 설명·재고·마진·CAPEX·현금흐름. 현재 자료에는 다음 발표일이 없다. |</p>
+<p>| 경쟁사 실적 발표 | 삼성전자·마이크론의 동일 기간 인증·출하·생산능력·재고를 비교해 공급 경쟁 변화를 점검한다. |</p>
+<p>| 하이퍼스케일러 실적 | 투자 계획과 집행 차이, 리스 포함 여부, 클라우드·AI 매출 성장, 투자 후 FCF를 대조한다. |</p>
+<p>| 데이터센터 진행 공지 | 착공·준공·가동을 구분하고 전력 확보·허가 지연이 장비 수요에 미치는 영향을 확인한다. |</p>
+<p>| 상장·ETF·거래 발표 | SK 관련 법인·증권·거래소·효력일, AI 30·ETF 공식 보유내역, Tesla·SpaceX 계약 문서를 확인한다. |</p>
+<p>| 원영상 재확인 | 녹화일·화자·수급비율·금리 시간축·유가 방향·강세론 재검토 조건을 우선 확인한다. |</p>
+<h3>결론</h3>
+<p>이 영상은 SK하이닉스를 중심으로 AI 투자 장기화와 수혜 확산을 설명하는 강세 시나리오다. 하지만 핵심 수급·투자·가치평가 수치는 아직 독립적으로 입증되지 않았다. 투자자가 추적할 핵심은 전망의 크기보다 <strong>HBM 수요와 경쟁력이 실제 가격·마진·현금흐름으로 연결되는지, 공급 확대와 고객 투자 부담이 그 연결을 약화시키는지</strong>다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;-2KDihC4s9I&quot;,
+  &quot;title&quot;: &quot;SK하이닉스, 다시 오를 수 있을까? ‘월가 전설’ 테크 애널리스트가 말하는 전망&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=-2KDihC4s9I&quot;,
+  &quot;channel&quot;: &quot;PLUS TV (플러스 TV)&quot;,
+  &quot;channel_id&quot;: &quot;UCuHUaZo43N9PgOCjs3Hg2Uw&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@plus_tv_official/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/-2KDihC4s9I/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-19T08:00:03+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 27599,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 27599,
+    &quot;segments&quot;: 1210,
+    &quot;duration_seconds&quot;: 3168,
+    &quot;repeated_ngram_ratio&quot;: 0.004
+  },
+  &quot;generated_at&quot;: &quot;2026-10-20T07:18:34.388791+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 11,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;AI 구축은 진행률 15% 미만인 장기 주기의 초기이며, 2027년 최선호주는 NVDA·MSFT·PLTR·AAPL·CRWD다. SK의 AI 30·ETF 편입 및 최선호주 중 네 기업이 매그니피센트 세븐이라는 설명도 확인 대상이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.1,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;진행률 15% 미만; 10~12년 주기의 3년 차; 최선호주 5개 중 4개가 매그니피센트 세븐&quot;,
+        &quot;observed&quot;: &quot;독립적인 진행률·주기 측정값과 명단 대조 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;진행률과 추천 명단은 인터뷰이의 평가·선호로 표시하고, ETF 편입이나 수익 실현의 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;SK하이닉스는 HBM·가격 결정력에서 삼성전자보다 유리하며, 메모리는 큰 가치 괴리와 장기 공급 부족을 보인다. AI 칩 수요/공급 13:1 및 엔비디아의 화웨이 대비 2년 우위도 제시된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:53&quot;,
+      &quot;source_confidence&quot;: 0.1,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;상위 5~10개 수혜 기업; 가치 괴리 40~50%; 반도체 균형 2028년 말~2029년 초; 메모리 균형 2029년; AI 칩 13:1; 경쟁력 2년 격차&quot;,
+        &quot;observed&quot;: &quot;관련 공급·재고·가격·성능 측정값 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;40~50% 가치 괴리를 SK하이닉스의 확정 상승 여력으로 전환하지 않는다. HBM 실적과 경쟁사 공급 확대를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;‘SK가 미국 증시에 상장했다’는 발언의 상장 주체·증권 형태·완료 시점을 검증한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:36&quot;,
+      &quot;source_confidence&quot;: 0.25,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;녹화일 이전 미국 상장 완료를 시사&quot;,
+        &quot;observed&quot;: &quot;상장 완료일·거래소·증권 종류 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미국 직접 상장이 완료됐다고 단정하지 말고 공식 거래소 공지와 공시에서 거래 구조를 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;미국 기업 AI 도입률은 5% 미만이며 데이터센터·AI 투자 확대와 큰 경제적 파급효과가 예상된다. 한국 기술산업의 수배 성장과 AI 순고용 증가도 전망한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.05,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;AI 도입률 5% 미만; 12~18개월 내 데이터센터 800~1,000개; 4~5년 투자 4~5조 달러; CAPEX 승수 5~6배; 칩 투자 파급효과 8~10배; 한국 기술산업 5~10년 내 3~4배; 10년 순고용 증가&quot;,
+        &quot;observed&quot;: &quot;대응하는 조사·건설 목록·투자 집계·모형·고용 통계 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거시 성장 수치를 기업 매출이나 주가 상승률에 직접 적용하지 않는다. 실제 사용량·투자 집행·수익화를 별도로 추적한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;빅테크의 올해 지출은 약 7,250억 달러이고 메모리 비중은 7~10%이며, 합산 자산 수조 달러와 연간 잉여현금흐름 3,000억~4,000억 달러가 투자 여력을 뒷받침한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:36&quot;,
+      &quot;source_confidence&quot;: 0.05,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지출 7,250억 달러; 메모리 배분 7~10%; 자산 수조 달러; 연간 FCF 3,000억~4,000억 달러&quot;,
+        &quot;observed&quot;: &quot;해당 기업군의 공시 수치와 합산 계산 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;대규모 자산을 즉시 사용 가능한 현금으로 해석하지 않는다. 투자 후 현금흐름과 조달 비용을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;기술주·마이크론의 낮은 PER와 역사적 비교가 강세론을 뒷받침하며, SK하이닉스의 과거 두 배 상승 및 나스닥·기술주·하이퍼스케일러·NVDA·PLTR의 추가 상승을 제시한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.4,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기술주 PER 23배·20배 초반·17배; MU 6배; 과거 P/S 28~30배; SK 두 배 상승 후 하락; 나스닥 32,000~35,000; 기술주 +25~30%; 하이퍼스케일러 +30~40%; NVDA 6~7조 달러; PLTR 1조 달러&quot;,
+        &quot;observed&quot;: &quot;MU 선행 4.373741배·후행 12.1740885배; NVDA 시가총액 약 5.242조 달러; PLTR 약 0.467조 달러; 나머지 대응 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;저평가·거품 부재를 확정하지 않는다. 가격 목표는 실적·배수·희석주식수 가정이 필요한 시나리오로 취급한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;애플의 제미니 협력과 대규모 기기 기반, 메타의 이용자 기반이 AI 수익화 기회이며 애플에는 주당 75달러의 추가 가치가 가능하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:29:49&quot;,
+      &quot;source_confidence&quot;: 0.1,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;아이폰 15억 대; iOS 기기 25억 대; Meta 이용자 36억 명; 애플 추가 가치 주당 75달러&quot;,
+        &quot;observed&quot;: &quot;해당 기기·이용자 수와 AI 가치평가를 검증할 자료 없음; AAPL 조회 주가 약 342.94달러&quot;
+      },
+      &quot;investor_implication&quot;: &quot;협력 체결·출시 범위와 기기 기반을 먼저 확인하고, 주당 75달러를 보장된 상승액으로 표시하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;AI 에이전트가 보안 수요를 확대하고 소프트웨어·네오클라우드·전력 인프라에 수혜를 준다. CRWD의 2025년 주가 상승률은 138%이며 보안 예산은 5~10% 늘 수 있다고 제시한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:29:49&quot;,
+      &quot;source_confidence&quot;: 0.15,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;CRWD 2025년 +138%; 보안 예산 5~10%; 개인별 에이전트 5~6개&quot;,
+        &quot;observed&quot;: &quot;연간 수익률 계산용 가격·예산 조사·에이전트 보급 통계 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;산업 수요 확대와 개별 기업의 이익 증가를 구분한다. ARR·매출 전환·전력 및 자금조달 비용을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;중간선거 결과에 따라 데이터센터 관련 법안·승인의 10~15%가 부결될 수 있으며 미국 10년물 금리는 4.5% 이하로 낮아질 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:23:57&quot;,
+      &quot;source_confidence&quot;: 0.05,
+      &quot;asr_confidence&quot;: 0.35,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;부결 가능 비중 10~15%; 미국 10년물 금리 4.5% 이하; 불명확한 5.3·4점대&quot;,
+        &quot;observed&quot;: &quot;정책 원문·분모·금리 기준값·확정된 목표기간 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;선거 조건부 전망을 시행된 정책으로 보도하지 않는다. 금리 하락을 전제로 한 투자비용·밸류에이션 개선도 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;유가가 배럴당 100달러에서 60~70달러로 ‘오르면’이라는 자막과 중동 안정화·물가 완화 시나리오를 검증한다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:29:49&quot;,
+      &quot;source_confidence&quot;: 0.05,
+      &quot;asr_confidence&quot;: 0.15,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;배럴당 100달러에서 60~70달러로 ‘상승’&quot;,
+        &quot;observed&quot;: &quot;기재된 수치상 방향은 하락; 실제 시장가격은 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실제 유가 하락이나 물가·금리 개선이 확인된 것으로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;Tesla·SpaceX의 내년 말 합병 확률은 80% 이상이며, 2027년부터 AI 사업의 실적·가치 기여와 향후 1~2년 주가 강세를 전망한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:42:04&quot;,
+      &quot;source_confidence&quot;: 0.1,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;합병 확률 80% 이상; 내년 말; 2027년 AI 기여; 1~2년 주가 강세; 2~3년 전환 전략&quot;,
+        &quot;observed&quot;: &quot;관련 거래·상용화·미래 실적 입증 자료 없음; TSLA 조회 주가 약 368.06달러&quot;
+      },
+      &quot;investor_implication&quot;: &quot;80%는 인터뷰이의 주관적 전망으로 표시한다. 합병과 AI 매출을 기정사실로 기업가치에 반영하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;자동 한국어 자막의 숫자·고유명사·발언 귀속과 강세론 재검토 조건을 확인하며, 청크 시각 및 검토 범위의 한계를 반영한다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:48:14&quot;,
+      &quot;source_confidence&quot;: 0.6,
+      &quot;asr_confidence&quot;: 0.25,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;검토 범위 52:40; 영상 52:48; 품질 점수 1.0; ‘350만 마일(약 58만 km)’&quot;,
+        &quot;observed&quot;: &quot;메타데이터상 3,168초; 검토 범위와 약 8초 차이; 거리 원문·환산 근거 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;강세론의 재검토 조건을 매수 권고로 뒤집어 전달하지 않도록 원음을 확인하고, 불명확한 수치·기업명은 확정 보도에서 제외한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;000660&quot;,
+      &quot;name&quot;: &quot;SK하이닉스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;메모리를 전통적 호황·불황 산업보다 AI 초장기 수요의 수혜 분야로 보며, HBM과 가격 결정력에서 SK하이닉스가 삼성전자보다 유리하다고 평가한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;SK를 전체 기술업계 상위 5~10위권 수혜 기업으로 평가.&quot;,
+        &quot;메모리 기업 가치가 자신이 보는 미래 가치와 40~50% 괴리됐다는 평가이며, 개별 종목 목표주가는 제시하지 않음.&quot;,
+        &quot;메모리주가 향후 12~18개월 큰 상승을 보일 수 있다는 전망.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;000660&quot;,
+        &quot;as_of&quot;: &quot;2026-10-19T23:03:28.915644+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;005930&quot;,
+      &quot;name&quot;: &quot;삼성전자&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;삼성의 전환 과정을 마이크로소프트의 클라우드 전환에 비유하며, 메모리뿐 아니라 스마트폰·AI 기기 및 사업 확장에 긍정적이라고 평가한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;005930&quot;,
+        &quot;as_of&quot;: &quot;2026-10-19T23:03:31.011089+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;MU&quot;,
+      &quot;name&quot;: &quot;마이크론&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;마이크론의 낮은 밸류에이션은 투자자의 전통적 메모리 경기순환 우려를 반영하지만, 인터뷰이는 과도한 조정으로 평가한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;마이크론이 PER 6배에 거래된다는 발언.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;MU&quot;,
+        &quot;as_of&quot;: &quot;2026-10-19T23:03:32.780614+00:00&quot;,
+        &quot;current_price&quot;: 904.9000244140625,
+        &quot;market_cap&quot;: 1023824892161.437,
+        &quot;forward_pe&quot;: 4.373741,
+        &quot;trailing_pe&quot;: 12.1740885,
+        &quot;fifty_two_week_high&quot;: 1255.0,
+        &quot;fifty_two_week_low&quot;: 192.4,
+        &quot;average_target_price&quot;: 1560.5652,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아 및 반도체 공급망&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;엔비디아의 경쟁력을 칩뿐 아니라 소프트웨어와 물리적 AI에서 찾으며, 공급 부족은 AMD·TSMC·인텔과 메모리 기업에도 기회를 제공한다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;진행자가 AI 칩 수요 대 공급을 13대 1로 언급.&quot;,
+        &quot;중국 관점에서 하위급 엔비디아 칩도 화웨이보다 2년 앞선다는 평가.&quot;,
+        &quot;엔비디아 관련 논의에서 시가총액 4조~5조 달러를 넘어 6조~7조 달러 진입을 전망.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-19T23:03:35.330077+00:00&quot;,
+        &quot;current_price&quot;: 217.08999633789062,
+        &quot;market_cap&quot;: 5242072141571.045,
+        &quot;forward_pe&quot;: 13.640933,
+        &quot;trailing_pe&quot;: 27.445007,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 164.27,
+        &quot;average_target_price&quot;: 328.71695,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;PLTR&quot;,
+      &quot;name&quot;: &quot;팔란티어&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;팔란티어를 AI 소프트웨어의 판도를 바꿀 기업으로 평가하며, 모델의 상품화 이후 독점 데이터와 데이터 통제권이 핵심 가치가 될 것이라고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;향후 2~3년 팔란티어 시가총액 1조 달러 전망.&quot;,
+        &quot;주가 15·50·100·200달러를 회의론자의 반응을 설명하는 예시로 제시했으며 목표주가로 명시하지 않음.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;PLTR&quot;,
+        &quot;as_of&quot;: &quot;2026-10-19T23:03:38.056122+00:00&quot;,
+        &quot;current_price&quot;: 194.14999389648438,
+        &quot;market_cap&quot;: 466553789224.895,
+        &quot;forward_pe&quot;: 82.56291,
+        &quot;trailing_pe&quot;: 167.37068,
+        &quot;fifty_two_week_high&quot;: 212.94,
+        &quot;fifty_two_week_low&quot;: 106.37,
+        &quot;average_target_price&quot;: 206.42693,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AAPL&quot;,
+      &quot;name&quot;: &quot;애플&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;애플을 소비자 AI의 유통 관문으로 평가하고, 구글 제미니와의 협력이 적절한 전략이라고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;아이폰 15억 대와 iOS 기기 25억 대의 소비자 기반을 보유한다는 발언.&quot;,
+        &quot;AI 전략이 주당 75달러의 추가 가치로 이어질 수 있다는 전망.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AAPL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-19T23:03:41.054626+00:00&quot;,
+        &quot;current_price&quot;: 342.94000244140625,
+        &quot;market_cap&quot;: 5004928124830.322,
+        &quot;forward_pe&quot;: 35.80553,
+        &quot;trailing_pe&quot;: 39.32798,
+        &quot;fifty_two_week_high&quot;: 348.15,
+        &quot;fifty_two_week_low&quot;: 243.42,
+        &quot;average_target_price&quot;: 329.3759,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;CRWD&quot;,
+      &quot;name&quot;: &quot;크라우드스트라이크 및 사이버보안&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;AI 에이전트가 공격 표면과 취약 엔드포인트를 늘려 크라우드스트라이크·팔로알토·지스케일러·루브릭의 기회를 확대한다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;진행자는 크라우드스트라이크 주가가 2025년 138% 상승했다고 발언.&quot;,
+        &quot;사이버보안 예산이 5~10% 정도 늘어날 수 있다고 전망하나 증가율·비중 표현은 원문 확인 필요.&quot;,
+        &quot;개인별 에이전트 5~6개를 공격 표면 확대의 가정으로 제시.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CRWD&quot;,
+        &quot;as_of&quot;: &quot;2026-10-19T23:03:44.325769+00:00&quot;,
+        &quot;current_price&quot;: 228.10000610351562,
+        &quot;market_cap&quot;: 233559543709.8023,
+        &quot;forward_pe&quot;: 141.56886,
+        &quot;trailing_pe&quot;: 3801.6667,
+        &quot;fifty_two_week_high&quot;: 286.99,
+        &quot;fifty_two_week_low&quot;: 85.68,
+        &quot;average_target_price&quot;: 246.15,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;TSLA&quot;,
+      &quot;name&quot;: &quot;테슬라·SpaceX&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;테슬라가 전기차에서 로보택시·옵티머스 중심 AI 기업으로 전환하고 SpaceX와 결합해 대형 하이퍼스케일러로 발전할 수 있다고 전망한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;향후 1~2년 테슬라가 최고의 주식이 될 가능성을 언급.&quot;,
+        &quot;내년 말까지 테슬라·SpaceX 합병 가능성을 80% 이상으로 평가.&quot;,
+        &quot;AI 사업의 수익·기업가치 영향이 2027년부터 시작될 것으로 전망.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSLA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-19T23:03:47.523226+00:00&quot;,
+        &quot;current_price&quot;: 368.05999755859375,
+        &quot;market_cap&quot;: 1453670404193.1904,
+        &quot;forward_pe&quot;: 169.73727,
+        &quot;trailing_pe&quot;: 340.7963,
+        &quot;fifty_two_week_high&quot;: 498.83,
+        &quot;fifty_two_week_low&quot;: 297.38,
+        &quot;average_target_price&quot;: 397.83212,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Forget GLD. Investors Sent $500 Million to the Cheaper SPDR Gold Fund&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/forget-gld-investors-sent-500-224732534.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T22:47:32+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Forget GLD. Investors Sent $500 Million to the Cheaper SPDR Gold Fund Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather N...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Coeur Mining (CDE) Stock Looks Undervalued Despite Recent Market Pressure&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/coeur-mining-cde-stock-looks-221948382.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T22:19:48+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Coeur Mining (CDE) Stock Looks Undervalued Despite Recent Market Pressure Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weath...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: AMD, Nvidia Lead AI Trade Higher; Meta, Netflix, SpaceX, Tesla Earnings On Deck&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/fc8c5a2b-d77d-3107-a23a-2331f80e2b71/dow-jones-futures%3A-amd%2C.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T22:18:57+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures: AMD, Nvidia Lead AI Trade Higher; Meta, Netflix, SpaceX, Tesla Earnings On Deck Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tec...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Cleveland-Cliffs Stock Jumps on Bumper 2027 Profit Forecast&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/6a1d52de-b06f-3643-93d5-94f5df8390ff/cleveland-cliffs-stock-jumps.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T20:27:11+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Porvair Targets 16%-18% Margins as Capital Markets Day Sets Growth Blueprint&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/porvair-targets-16-18-margins-190221721.html&quot;,
+      &quot;publisher&quot;: &quot;MarketBeat&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T19:02:21+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Amazon vs. Home Depot: Which Consumer Stock Is a Better Buy in 2026?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/amazon-vs-home-depot-consumer-214414304.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T21:44:14+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Billionaire David Tepper’s Appaloosa Management Has 31% of its portfolio Invested in These 2 Artificial Intelligence (AI) Stocks&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/billionaire-david-tepper-appaloosa-management-220401463.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T22:04:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Applied Materials, Lam Research, Marvell Technology, Micron, and Semtech Shares Skyrocket, What You Need To Know&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/applied-materials-lam-research-marvell-212855831.html&quot;,
+      &quot;publisher&quot;: &quot;StockStory&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T21:28:55+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E11&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Forget Tech. Energy Will Be The Big Winner This Earnings Season.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/2bba9727-a5dc-3eb3-821b-571b920f9856/forget-tech.-energy-will-be.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T21:33:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

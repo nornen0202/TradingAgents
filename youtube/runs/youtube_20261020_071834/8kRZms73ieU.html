@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 캐시 우드가 주목하는 AI 혁명과 비트코인의 미래 | 김동환, 박지원, 캐시 우드(Cathie Wood) ARK Invest CEO [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261020_071834</p>
+    <h1>캐시 우드가 주목하는 AI 혁명과 비트코인의 미래 | 김동환, 박지원, 캐시 우드(Cathie Wood) ARK Invest CEO [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=8kRZms73ieU">원본 영상</a>
+    </div>
+  </header>
+  <h2>캐시 우드의 AI·비트코인 전망: 투자 논리와 검증 공백</h2>
+<p><a href="https://www.youtube.com/watch?v=8kRZms73ieU">삼프로TV 영상</a> · 업로드 2026-10-19 · 길이 29분 41초 · 분석 기준 2026-10-20</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 강세 논리는 <strong>AI 확산이 메모리·클라우드·상거래 인프라 수요를 키우고, 비트코인은 분산투자와 신흥국 가치 저장 수요의 수혜를 받는다</strong>는 것이다.</p>
+<p>그러나 제공된 검증 결과에서는 <strong>12개 주장 모두 독립 검증이 완료되지 않았다.</strong> 이 중 메모리 가격 수치, AI 서비스명, AI 클라우드 투자 대상 등 3개 주장은 자동자막 불확실성으로 분류됐다. 나머지 9개도 공시·정책 원문·계약·가격 시계열 부족으로 미검증이다. 이는 거짓으로 판명됐다는 뜻은 아니다.</p>
+<p>투자자가 우선 확인할 것은 전망의 크기보다 <strong>대상 기업의 정확한 식별, 실제 매출·현금흐름, 규제의 법적 상태, 수치의 산출 기준</strong>이다. 비트코인 75만 달러, 금과의 상관계수 0.1, 실효 법인세율 8% 등은 현재 자료만으로 가치평가의 확정 입력값으로 사용할 수 없다.</p>
+<h3>2. 확인된 사실·근거의 범위</h3>
+<p><strong>제공 자료에는 핵심 투자 주장을 직접 입증하거나 반박하는 독립 근거가 없다.</strong> 수집된 외부 기사 4건의 한계는 다음과 같다.</p>
+<p>| 수집 근거 | 실제 확보된 내용 | 검증에 사용할 수 없는 부분 |</p>
+<p>|---|---|---|</p>
+<p>| E1: <a href="https://finance.yahoo.com/markets/stocks/articles/billionaire-david-tepper-appaloosa-management-220401463.html">AI 주식 관련 기사</a> | 기사 제목과 페이지 오류·탐색 문구 위주 | 한국 기업의 HBM 경쟁력, 중국 업체의 영향, 주가 수치 |</p>
+<p>| E2: <a href="https://finance.yahoo.com/markets/stocks/articles/applied-materials-lam-research-marvell-212855831.html">Micron 등 반도체 주식 기사</a> | 제목에 관련 기업이 등장하지만 실질 본문 미확보 | HBM 매출·수익성·투자 규모와 주가 등락의 원인 |</p>
+<p>| E3: <a href="https://finance.yahoo.com/m/19b44d1f-62e7-367a-9e15-8de133b8d450/chip-stocks-catch-a-break.html">반도체 주식 반등 관련 기사</a> | 기사 제목과 페이지 오류·탐색 문구 위주 | 영상이 언급한 특정 거래일의 움직임과 산업 전망 |</p>
+<p>| E4: <a href="https://finance.yahoo.com/markets/stocks/articles/amazon-vs-home-depot-consumer-214414304.html">Amazon·Home Depot 비교 기사</a> | 제목만 있고 본문 발췌 없음 | 외부 AI 접근 제한, Shopify 주문 처리, OpenAI·Walmart 협력 변경 |</p>
+<p>이 링크들은 <strong>수집 상태를 확인하는 출처이지 영상 주장의 입증 자료가 아니다.</strong> 수집 결과에 붙은 <code>verified</code> 표시도 개별 투자 주장의 사실 확인을 뜻하지 않는다.</p>
+<p>호스트는 KWEB 가격을 2026-10-19 22:51:35 UTC 기준 약 24.28로 조회했다. 다만 이 조회 대상이 영상의 AI 클라우드 기업이라는 연결 근거가 없어, 하루 15% 하락이나 ARK의 연속 매수를 검증하지 못한다. 공시 공급자 이용 불가 역시 공시 자체가 없다는 의미는 아니다.</p>
+<h3>3. 영상 주장과 검증 결과</h3>
+<p>아래 시각은 정확한 발화 시각이 아니라 <strong>관련 자막 청크의 시작점</strong>이다.</p>
+<p>| 주제·관련 시각 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| <strong>C1 메모리·HBM</strong> · 00:17, 10:36 | AI 수요와 한국 기업의 HBM 경쟁력이 중국 경쟁의 영향을 완화하지만 메모리 변동성은 지속 | 기업 IR·실적·경쟁사 양산 자료 미제공. SK하이닉스 관련 ‘300만 달러→120만 달러’는 대상·단위 불명으로 원음 확인 필요 |</p>
+<p>| <strong>C2 금리·달러·세제</strong> · 00:17, 19:58 | 금리 상승은 성장 기대를 반영하며 규제 완화·가속상각이 달러를 지지. 2028년 말까지 실효 법인세율 ‘적어도 8%’ 언급 | 녹화일, 금리 분해 자료, 세법·산식·국제 비교 없음. 실질금리 상승을 실질성장 기대와 동일시하는 해석도 별도 검토 필요 |</p>
+<p>| <strong>C3 AI 상거래</strong> · 00:17 | Amazon의 외부 AI 접근 제한 속 Shopify·Meta가 유리. OpenAI·Walmart 협력의 3~6개월 후 재검토 언급 | 정책·계약·협력 변경 발표 없음. E4는 이를 뒷받침하지 못하며 협력 실패로 확정할 수 없음 |</p>
+<p>| <strong>C4 소비자 AI 서비스</strong> · 00:17, 10:36 | 자막상 ‘뮤즈’의 주간 평균 사용자 200만 명, 생산성 부문 28일 연속 1위, 직원의 1,500달러 발견 일화 | 서비스명·Meta 관련성·지표 정의·앱 순위 조건 모두 미확인. 200만 명은 일일 이용자 수로 제시된 수치가 아님 |</p>
+<p>| <strong>C5 ARK 비상장 투자</strong> · 10:36 | Meta 등 매도는 Kalshi 투자 재원 마련 목적. 해당 ETF가 Kalshi·OpenAI를 보유하며 Kalshi 보유 유일 ETF일 가능성 | 상품명·ETF 여부·직간접 보유 구조·기준일 미확인. 매도 동기는 발언자의 설명이며 유일성도 검증되지 않음 |</p>
+<p>| <strong>C6 AI 클라우드</strong> · 10:36 | 자막상 ‘KWEB·코리’를 하루 15% 하락 후 이틀 연속 매수. Jensen Huang 지원 발언 인용 | 기업 식별부터 불확실. CoreWeave는 검색 가설일 뿐 확정 대상이 아님. 거래 기록·지원 계약·Coinbase 관련 법원 근거 없음 |</p>
+<p>| <strong>C7 AI 칩 구조</strong> · 10:36 | Cerebras는 공개시장 기업, NVIDIA는 Groq를 사실상 인수했으며 두 기술은 HBM에 비의존 | 상장 완료·거래 구조·제품별 기술 문서 미제공. Groq·Grok 명칭도 원음 확인 필요 |</p>
+<p>| <strong>C8 BTC·금·기관 배분</strong> · 10:36, 19:58 | 2019년 이후 수익률 상관계수 0.1, BTC/금 장기 상승 추세. 기관의 1% 배분을 예시로 제시 | 가격 시계열·빈도·산식·차트·기관 자금 흐름 없음. 1%는 실제 배분 통계가 아님 |</p>
+<p>| <strong>C9 미국 암호자산 규제</strong> · 10:36, 19:58 | CLARITY 미통과가 기관 진입을 지연했고 SEC·CFTC가 명확화 조치를 제시 | 법안 번호·입법 단계·기관 발표 원문 미제공. 지침과 법률의 효력을 구분할 수 없음 |</p>
+<p>| <strong>C10 BTC 목표가격</strong> · 19:58 | 기본 시나리오 약 75만 달러, 신흥국 가치 저장 수요가 성장 동력 | 목표 연도·ARK 원 보고서·산식·수정 이력 없음. 목표 시점을 임의로 보충할 수 없음 |</p>
+<p>| <strong>C11 스테이블코인</strong> · 19:58 | 스테이블코인은 결제, BTC는 가치 저장 역할. 발행사·거래소별 이자 공유 차이 언급 | 지역·상품별 약관과 용도별 통계 없음. 토큰 자체 이자와 거래소 보상을 구분해야 함. Art Laffer 인용·1971년 관련 설명도 제공 근거로 대조 불가 |</p>
+<p>| <strong>C12 Cloudflare</strong> · 19:58 | 인터넷의 20%를 보호하며 AI 에이전트 상거래의 게이트키퍼가 될 것 | 20%의 분모·기준일·원출처 없음. 현재 제품 기능·계약·미래 수익화도 별도 확인 필요 |</p>
+<h3>4. 강세 논리와 반론</h3>
+<h4>AI: 수요 확대가 기업 이익으로 연결되는가</h4>
+<p><strong>영상의 강세 논리:</strong> AI 활용이 확대되면 메모리와 클라우드 수요가 늘고, 에이전트 상거래가 주문 처리·보안·결제 인프라의 사업 기회를 확대한다.</p>
+<p><strong>반론과 검증 기준:</strong> 수요 증가만으로 모든 공급자의 이익 증가가 보장되지는 않는다. 메모리는 HBM과 범용 제품을 구분해야 하며, 가격·증설·제품 구성이 수익성에 미치는 영향을 확인해야 한다. 클라우드는 계약 규모뿐 아니라 대금 회수, 부채 만기, 자금조달 비용이 중요하다. 상거래·보안은 이용량 증가가 유료 계약과 매출로 전환되는지 확인해야 한다.</p>
+<p>Cerebras·Groq 관련 기술 주장이 확인되더라도 제품별 적용 범위를 먼저 따져야 한다. 이를 곧바로 HBM 전체 수요의 대체로 확대 해석할 근거는 없다.</p>
+<h4>비트코인: 낮은 상관관계가 지속적 수요를 만드는가</h4>
+<p><strong>영상의 강세 논리:</strong> 금·기타 자산과의 낮은 상관관계가 기관 배분을 유도하고, 신흥국의 구매력 보존 수요가 장기 성장을 뒷받침한다.</p>
+<p><strong>반론과 검증 기준:</strong> 단일 기간의 상관계수는 향후 분산효과를 보장하지 않는다. 일간·주간·월간 수익률과 시장 스트레스 구간을 나눠 확인해야 한다. 낮은 상관관계와 실제 기관 유입도 별개이므로 보유 공시·펀드 흐름이 필요하다. 신흥국의 스테이블코인 이용을 BTC 보유 수요로 자동 연결하거나 결제·저축 수요를 중복 계산해서도 안 된다.</p>
+<p>75만 달러는 시점과 가정이 없는 전망 수치다. 영상도 월별 상승 시점을 예측하지 않는다는 취지이므로 단기 가격 전망으로 읽기 어렵다.</p>
+<h4>거시: 성장 기대와 할인율 부담의 균형</h4>
+<p><strong>영상의 강세 논리:</strong> 실질성장 기대와 투자 유인이 금리·달러 상승을 뒷받침하며 AI 기업은 그 환경에서도 성장할 수 있다.</p>
+<p><strong>반론과 검증 기준:</strong> 금리 상승의 원인을 성장 하나로 단정할 자료가 없다. 동일 기간 명목금리·실질금리·기대인플레이션을 대조하고 기업의 성장률과 자금조달 비용을 함께 봐야 한다. 가속상각의 효과도 기업별 적용 자산·시기·세무 조건을 확인해야 하며 ‘8%’를 공통 세율로 적용할 수 없다.</p>
+<h3>5. 단기 체크포인트와 관찰 항목</h3>
+<p>녹화일과 공식 발표 일정이 제공되지 않아 특정 날짜를 촉매로 제시할 수 없다. 다음 공개자료 확보·실적 발표 때 확인할 항목은 다음과 같다.</p>
+<p>| 우선순위 | 구체적 관찰 항목 | 판단에 주는 의미 |</p>
+<p>|---|---|---|</p>
+<p>| <strong>1. 명칭·숫자 확정</strong> | 원음에서 SK하이닉스 수치, KWEB·코리, 뮤즈, Groq·Grok, 세율 표현 대조 | 다른 기업·지표에 근거를 잘못 연결하는 오류 방지 |</p>
+<p>| <strong>2. 메모리 실적</strong> | 기업별 HBM 매출·출하·투자, 범용 메모리 가격, 중국 경쟁사 양산 자료 | AI 수요가 제품 구성과 수익성 개선으로 이어지는지 확인 |</p>
+<p>| <strong>3. 클라우드 재무</strong> | 대상 식별 후 계약 지급·해지 조건, 고객 집중도, 부채 만기·담보·현금흐름 | 수요 전망과 채무 이행 능력 구분 |</p>
+<p>| <strong>4. ARK 공시</strong> | 정확한 상품명·법적 구조, 기준일별 Kalshi·OpenAI 노출, 매매·현금 비중 | 비상장 투자 경로와 유동성·평가 위험 확인 |</p>
+<p>| <strong>5. AI 상거래·보안</strong> | 공식 접근 정책, 주문 처리 계약, 협력 변경 발표, 유료 사용·매출 지표 | 미래 생태계 전망이 현재 사업 성과로 전환되는지 확인 |</p>
+<p>| <strong>6. BTC·금 통계</strong> | 동일 통화·마감 기준 수익률로 상관계수 재계산, BTC/금 추세, 실제 기관 흐름 | 분산투자 논리와 수요 유입의 독립 확인 |</p>
+<p>| <strong>7. 규제·세제·보상</strong> | CLARITY 입법 이력, SEC·CFTC 조치의 법적 성격, 가속상각 조건, 지역별 보상 약관 | 정책 기대와 실제 적용 가능한 권리·혜택 구분 |</p>
+<h3>6. 강세 논리가 약화되거나 무효화되는 조건</h3>
+<p>아래는 현재 확인된 사건이 아니라 <strong>향후 점검할 조건</strong>이다.</p>
+<ul>
+<li><strong>메모리:</strong> AI 관련 수요가 늘어도 가격 하락·경쟁·증설 부담으로 수익성이 개선되지 않으면 ‘AI 수요가 경기순환을 완화한다’는 논리가 약해진다.</li>
+<li><strong>클라우드:</strong> 계약이 현금 유입으로 연결되지 않거나 차환 부담이 커지면 수요 성장만으로 부채 위험을 설명하기 어렵다. 지원 발언도 실제 보증·계약을 대체하지 못한다.</li>
+<li><strong>에이전트 상거래:</strong> 사용자 증가가 유료 거래·매출로 이어지지 않거나 접근·제휴 조건이 불리해지면 플랫폼 우위 전망을 재검토해야 한다.</li>
+<li><strong>비트코인:</strong> 스트레스 구간에서 위험자산과의 동조화가 높아지고 기관 유입·신흥국 보유 수요가 확인되지 않으면 분산효과·수요 확대 논리가 약해진다.</li>
+<li><strong>정책:</strong> 규제 명확화가 지연·축소되거나 세제 혜택의 적용 범위가 영상 설명보다 좁으면 정책 수혜 가정을 수정해야 한다.</li>
+</ul>
+<h3>7. 데이터 품질과 최종 해석</h3>
+<p>자동자막의 <code>transcript_quality</code>는 <strong>good·1.0</strong>, 경고 없음으로 제공됐다. 그러나 이는 고유명사·수치·단위의 정확성을 보증하지 않는다. 원음은 대조되지 않았으며 전체 29분 41초 중 제공 청크 바깥 구간도 확인되지 않았다.</p>
+<p><code>source_confidence</code>는 <strong>주장을 자막에서 추출한 확신도</strong>, <code>asr_confidence</code>는 <strong>전사 모호성을 반영한 정성적 추정값</strong>이다. 둘 다 사실성이나 투자 성공 확률이 아니다.</p>
+<p>| 주장 | source_confidence | asr_confidence |</p>
+<p>|---|---:|---:|</p>
+<p>| C1 메모리·가격 수치 | 0.83 | 0.30 |</p>
+<p>| C4 뮤즈·사용자 수 | 0.61 | 0.30 |</p>
+<p>| C6 AI 클라우드 대상 | 0.49 | 0.20 |</p>
+<p>| C8 BTC·금 상관관계 | 0.90 | 0.80 |</p>
+<p>| C10 BTC 75만 달러 | 0.90 | 0.85 |</p>
+<p>| C12 Cloudflare 20% | 0.91 | 0.85 |</p>
+<p>높은 추출 신뢰도와 독립 검증은 별개다. C7의 source_confidence 0.0은 별도 점수 미제공 표시이며, 검증 판정의 confidence 0.99도 주장이 참일 확률이 아니라 미검증 상태 판정에 대한 확신도다.</p>
+<p>업로드일은 2026-10-19이지만 녹화일은 미상이다. 따라서 ‘최근·어제·오늘’을 특정 거래일로 바꿀 수 없다. Bloomberg·Morningstar 등 폐쇄형 자료는 제공되지 않아 <strong>미검증·수동 확인 필요</strong>다. 개인의 1,500달러 발견 일화, 사적 대화에 근거한 Art Laffer 인용, 미제공 BTC/금 차트 역시 독립 확인이 필요하다.</p>
+<p><strong>결론:</strong> 이 영상은 AI와 디지털자산의 장기 수요를 설명하는 투자 가설로 읽을 수 있다. 다만 제공 자료에서는 핵심 수치와 기업·정책 사실의 검증이 완료되지 않았다. 다음 판단의 핵심은 전망 자체보다 정확한 대상 식별, 공식 자료 확보, 그리고 수요가 실적·현금흐름·실제 자금 유입으로 연결되는지 여부다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;8kRZms73ieU&quot;,
+  &quot;title&quot;: &quot;캐시 우드가 주목하는 AI 혁명과 비트코인의 미래 | 김동환, 박지원, 캐시 우드(Cathie Wood) ARK Invest CEO [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=8kRZms73ieU&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/8kRZms73ieU/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-19T03:30:03+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 9233,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 9233,
+    &quot;segments&quot;: 480,
+    &quot;duration_seconds&quot;: 1781,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-20T07:18:34.388791+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;asr_uncertain&quot;: 3,
+    &quot;unverified&quot;: 9
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;AI 수요와 한국 기업의 HBM 경쟁력이 중국 업체 진입 영향을 완화하지만 메모리 변동성은 지속된다. SK하이닉스 관련 ‘300만 달러→120만 달러’ 수치도 제시됐다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:17&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.3,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;300만 달러에서 120만 달러로 하락&quot;,
+        &quot;observed&quot;: &quot;대상·단위 및 대응 시세 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;불명확한 가격 수치를 가치평가에 사용하지 말고, HBM 실적과 범용 메모리 경쟁 자료를 별도로 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;최근 금리 상승은 인플레이션보다 실질성장 기대 때문이며 규제 완화·가속상각이 달러 강세를 지지한다. 2028년 말까지 실효 법인세율 ‘적어도 8%’·세계 최저와 과거 정책의 달러·금 효과를 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:58&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2028년 말까지 실효 법인세율 적어도 8%; 1980~1990년대 정책 효과&quot;,
+        &quot;observed&quot;: &quot;세율·적용 기간·역사적 시계열 및 인과관계 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;8%를 미국 기업 전반의 적용 세율로 모델에 반영하거나 금리 상승을 성장 호재로 단정할 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;Amazon은 외부 AI 접근을 제한하고 Shopify·Meta는 에이전트 상거래에 유리하다. Instagram의 Shopify 주문 처리 이용과 OpenAI·Walmart 협력의 3~6개월 후 재검토를 언급한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:17&quot;,
+      &quot;source_confidence&quot;: 0.71,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;OpenAI·Walmart 협력 3~6개월 뒤 재검토&quot;,
+        &quot;observed&quot;: &quot;시작일·변경일·변경 내용 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;플랫폼별 사업 우위나 협력 실패를 확인된 사실로 보고 매출 전망에 반영할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;자막상 Muse·뮤즈 서비스는 주간 평균 사용자 200만 명, iOS 생산성 부문 28일 연속 1위이며 ChatGPT 이후 최초다. ARK 직원은 프롬프트 하나로 미수령 금액 1,500달러를 찾았다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:17&quot;,
+      &quot;source_confidence&quot;: 0.61,
+      &quot;asr_confidence&quot;: 0.3,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;주간 평균 사용자 200만 명; 28일 연속 1위; 미수령 금액 1,500달러&quot;,
+        &quot;observed&quot;: &quot;서비스 식별 및 모든 수치의 독립 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;사용자 수와 앱 순위를 Meta의 이용자 성장 또는 수익화 근거로 연결하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;ARK의 Meta 등 매도는 Kalshi 투자 재원 마련 목적이며 해당 ETF는 Kalshi·OpenAI를 보유하고 미국에서 Kalshi를 보유한 유일 ETF일 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:36&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국에서 Kalshi 보유 유일 ETF일 가능성&quot;,
+        &quot;observed&quot;: &quot;보유 상품 수와 상품 구조 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;ETF 여부와 비상장 노출 구조를 확인하기 전에는 유동성·평가 위험이나 해당 자산 접근성을 판단하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;자막상 KWEB·코리라는 AI 클라우드 대상을 하루 15% 급락 후 이틀 연속 매수했으며 Jensen Huang의 신용등급·지원 발언과 Coinbase 관련 매수·판결 사례를 인용한다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:36&quot;,
+      &quot;source_confidence&quot;: 0.49,
+      &quot;asr_confidence&quot;: 0.2,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;하루 15% 하락; 이틀 연속 매수&quot;,
+        &quot;observed&quot;: &quot;호스트의 KWEB 조회가는 2026-10-19T22:51:35Z 기준 약 24.28이나 발언 대상·거래일·수익률과 연결되지 않음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;티커를 추정 교정해 주문하거나 발언을 채무 보증·신용위험 해소로 해석해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;Cerebras는 공개시장 기업이고 NVIDIA가 Groq를 사실상 인수했으며 두 기업의 기술은 HBM에 의존하지 않는다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:36&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수치 주장 없음&quot;,
+        &quot;observed&quot;: &quot;상장·거래 구조·기술 범위 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기업의 투자 가능 여부나 거래 구조, HBM 수요 대체 효과를 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;2019년 이후 BTC와 금의 수익률 상관계수는 0.1이고 BTC/금 비율의 장기 상승 추세가 유지된다. 낮은 상관관계가 기관 배분을 유도하며 1% 배분은 예시다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:36&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2019년 이후 상관계수 0.1; 기관 배분 1% 예시&quot;,
+        &quot;observed&quot;: &quot;상관계수 재계산 불가; 실제 배분율 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;0.1을 고정된 분산투자 효과로 사용하거나 1%를 관측된 기관 배분율로 인용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;CLARITY 법안 미통과가 기관 진입을 지연했고 SEC·CFTC가 자체 명확화 조치를 제시했으며 행정부 교체 시 규제가 바뀔 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:36&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수치 주장 없음&quot;,
+        &quot;observed&quot;: &quot;법안 처리일·조치 시행일 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;입법 진행 상태와 행정 지침을 구분하기 전에는 규제 불확실성의 해소 여부를 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;비트코인 기본 시나리오 가격은 약 75만 달러이며 신흥국의 구매력·부 보존 수요가 장기 성장을 뒷받침한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:58&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기본 시나리오 약 750,000달러&quot;,
+        &quot;observed&quot;: &quot;목표 연도·시나리오 분류·산식 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;목표 시점과 산식이 없는 75만 달러를 기대수익률이나 매수 기준으로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;신흥국에서 스테이블코인은 결제, BTC는 가치 저장을 맡는 보완 관계다. Tether는 이자를 지급하지 않고 Circle·Coinbase는 이자를 공유하며 Art Laffer 견해와 1971년 금본위제 이탈을 인용한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:58&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국의 금본위제 이탈 연도 1971년&quot;,
+        &quot;observed&quot;: &quot;제공 증거로 연도와 제도적 의미 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;특정 플랫폼 보상을 모든 토큰 보유자의 이자 수익으로 일반화하거나 결제·저축 수요를 중복 계산하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;Cloudflare는 인터넷의 20%를 보호하며 에이전트 상거래·API 결제에서 우호적·적대적 AI 상호작용을 구분하는 게이트키퍼가 될 것이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:58&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;인터넷의 20% 보호&quot;,
+        &quot;observed&quot;: &quot;분모·기준일·원출처 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;20%를 전체 인터넷 지배력으로 환산하거나 에이전트 결제를 확정 매출로 반영할 근거가 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;KWEB&quot;,
+      &quot;name&quot;: &quot;자막상 KWEB·코리로 표기된 AI 클라우드 투자 대상&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;부채 우려로 급락한 투자 대상을 AI 클라우드 수요 확대와 하이퍼스케일러 계약 이행 능력에 근거해 매수했다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;최근 하루 주가 하락률을 15%로 언급.&quot;,
+        &quot;이틀 연속 매수했다고 설명.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;KWEB&quot;,
+        &quot;as_of&quot;: &quot;2026-10-19T22:51:35.031403+00:00&quot;,
+        &quot;current_price&quot;: 24.280000686645508,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: 12.658013,
+        &quot;fifty_two_week_high&quot;: 41.6,
+        &quot;fifty_two_week_low&quot;: 23.23,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Billionaire David Tepper’s Appaloosa Management Has 31% of its portfolio Invested in These 2 Artificial Intelligence (AI) Stocks&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/billionaire-david-tepper-appaloosa-management-220401463.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T22:04:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Billionaire David Tepper’s Appaloosa Management Has 31% of its portfolio Invested in These 2 Artificial Intelligence (AI) Stocks Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports M...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Applied Materials, Lam Research, Marvell Technology, Micron, and Semtech Shares Skyrocket, What You Need To Know&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/applied-materials-lam-research-marvell-212855831.html&quot;,
+      &quot;publisher&quot;: &quot;StockStory&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T21:28:55+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Applied Materials, Lam Research, Marvell Technology, Micron, and Semtech Shares Skyrocket, What You Need To Know Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Poli...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Amazon vs. Home Depot: Which Consumer Stock Is a Better Buy in 2026?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/amazon-vs-home-depot-consumer-214414304.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-19T21:44:14+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

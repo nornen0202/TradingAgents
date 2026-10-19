@@ -1,0 +1,495 @@
+{
+  "version": 4,
+  "video_id": "jydV15Xpy7c",
+  "title": "코어위브에서 시작된 AI 금융위기 공포…2008년과는 다르다고 보는 이유ㅣ명민준, 서수진, 유창희 [주린이 구조대]",
+  "url": "https://www.youtube.com/watch?v=jydV15Xpy7c",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/jydV15Xpy7c/maxresdefault.jpg",
+  "published_at": "2026-10-19T11:00:31+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 23868,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 23868,
+    "segments": 1481,
+    "duration_seconds": 3049,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-20T07:18:34.388791+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 8,
+  "claim_status_summary": {
+    "unverified": 8,
+    "partially_supported": 2,
+    "asr_uncertain": 2
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "코어위브의 금융비용 상승이 부도·시스템 위기 우려로 확대됐지만 다른 기업이 정리할 수 있어 2008년형 위기로 번지지 않을 것이라는 의견이다.",
+      "status": "unverified",
+      "confidence": 0.08,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:58",
+      "source_confidence": 0.92,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "2008년 금융위기 등과 비교",
+        "observed": "위기 전염 경로나 손실흡수력을 비교할 정량 자료 없음"
+      },
+      "investor_implication": "시스템 위기 가능성이 낮다는 해석을 검증된 사실로 사용하지 말고 만기별 부채·현금·담보·대주단 익스포저를 확인해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "당일 코스피 종가 5,768·약 1.8% 상승, 개인 순매도 총 2조 원·개장 직후 약 1조 원, 최근 7거래일 약 20% 하락을 언급했다.",
+      "status": "partially_supported",
+      "confidence": 0.4,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.89,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "코스피 5,768, +약 1.8%; 개인 순매도 2조 원·개장 직후 1조 원; 7거래일 약 -20%",
+        "observed": "^KS11 current_price 5,768.01; 상승률·수급·7거래일 수익률 자료 없음"
+      },
+      "investor_implication": "지수 수준의 일치만으로 투매 종료나 저점 형성을 판단할 수 없다. 거래일·세션별 가격과 투자자별 수급을 확인해야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "삼성전자·SK하이닉스 포함 12개월 선행 PER이 3.7배, 제외하면 6.6배이며 제외 기준 최근 10년 최저라고 주장했다.",
+      "status": "unverified",
+      "confidence": 0.02,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:34:05",
+      "source_confidence": 0.89,
+      "asr_confidence": 0.64,
+      "numeric_parse": {
+        "claimed": "12개월 선행 PER 포함 3.7배·제외 6.6배; 제외 기준 10년 최저",
+        "observed": "비교 가능한 선행 PER·역사적 시계열 없음"
+      },
+      "investor_implication": "저평가와 역사적 최저라는 판단을 투자 근거로 사용하기 전에 원보고서와 추정이익 민감도를 확인해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "국민연금 국내 주식 비중이 20.5%이며 코스피가 5,200~5,300으로 내려가면 20% 아래가 되어 적극 매수할 수 있다는 뉴스를 인용했다.",
+      "status": "unverified",
+      "confidence": 0.02,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:58",
+      "source_confidence": 0.8,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "국내 주식 20.5%; 코스피 5,200~5,300이면 20% 미만",
+        "observed": "국민연금 비중·배분 규정·민감도 계산 자료 없음"
+      },
+      "investor_implication": "특정 지수 수준에서 국민연금이 반드시 매수한다는 하방 지지 가정으로 사용하면 안 된다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "한국의 MSCI 신흥국 비중을 22%에서 20%로 정정했고 인도네시아의 신흥국 분류 제외를 언급했다. 해외 이탈 자금의 한국 유입은 가설이다.",
+      "status": "unverified",
+      "confidence": 0.02,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:20:53",
+      "source_confidence": 0.73,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "한국 비중 약 22%에서 20%로 정정",
+        "observed": "MSCI 공식 비중 자료 없음"
+      },
+      "investor_implication": "20% 비중이나 국가분류 변경을 확정 사실로 인용하지 말고, 외국인 유입 가능성은 시나리오로만 다뤄야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "삼성전기가 글로벌 기업과 약 3,600억 원의 패키지 기판 공급계약을 체결했고 전년 매출 대비 3.2%, 공급 기간은 내년 연간, 상대방은 비공개라고 소개했다.",
+      "status": "partially_supported",
+      "confidence": 0.62,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:27:16",
+      "source_confidence": 0.96,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "약 3,600억 원; 매출 대비 3.2%; 내년 1월 1일~12월 31일; 당시 약 +2%",
+        "observed": "뉴스 발췌 약 3,604억·3,605억 원; 애프터마켓 종료 +2.69%; 비율·기간·발언 시점 가격 미확인"
+      },
+      "investor_implication": "계약 보도와 대략적인 규모는 뒷받침되지만 투자 판단 전 공시 본문에서 기간·해지 조건·매출 기여를 확인해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "블랙스톤의 데이터센터 금융 규모, 8월 엔비디아·금융기관 5~6곳의 자금 조성과 약 30% 지급보증을 언급하고 금융기관의 투자 지속 여부를 강조했다.",
+      "status": "asr_uncertain",
+      "confidence": 0.02,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:27:16",
+      "source_confidence": 0.76,
+      "asr_confidence": 0.25,
+      "numeric_parse": {
+        "claimed": "'2,억 달러 이상'; '3,억 불'; 금융기관 5~6곳; 지급보증 약 30%",
+        "observed": "금액 복원 불가; 참여기관·보증 비율·분모를 대조할 공식 자료 없음"
+      },
+      "investor_implication": "누락 금액이나 지급보증을 임의 복원해 자금 안전성을 계산하지 말고 원음과 공식 거래 구조를 확인해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "삼성전자·SK하이닉스의 다음 주 실적 발표, 8월 각각 30조 원·40조 원 자사주 매입 발표와 메모리 가격 상승을 주장했다. 영업이익 수치는 단위·기간·귀속이 불확실하다.",
+      "status": "asr_uncertain",
+      "confidence": 0.04,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:27:16",
+      "source_confidence": 0.77,
+      "asr_confidence": 0.28,
+      "numeric_parse": {
+        "claimed": "자사주 삼성전자 30조 원·SK하이닉스 40조 원; 이익 107조·120조·80조·85~90조·400~500조·320~400조 원",
+        "observed": "해당 금액을 확인할 자료 없음; IR 안내 목록만 존재"
+      },
+      "investor_implication": "전사된 이익이나 환원 금액을 밸류에이션에 사용하지 말고 회사별 공식 수치·기간·취득 및 소각 여부를 먼저 확인해야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "삼성SDI·LG에너지솔루션이 조정장에서 상대적으로 견조했고 ESS 주도 가능성을 제시했다. 알테오젠은 당일 1.7% 상승했으며 금리 상승세 둔화 때 바이오가 먼저 움직였다고 설명했다.",
+      "status": "unverified",
+      "confidence": 0.02,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:40:38",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.84,
+      "numeric_parse": {
+        "claimed": "알테오젠 당일 +1.7%",
+        "observed": "해당 거래일·세션의 가격 자료 없음"
+      },
+      "investor_implication": "ESS·바이오 주도 전환은 조건부 전망으로 제시하고 시장 대비 수익률·낙폭·실제 수주를 확인해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "유가 100달러 초과, 프랑스 불안·계엄 가능성, 마이크로소프트 영국 데이터센터 취소와 지난주 국채금리 '5.34'를 언급했다.",
+      "status": "unverified",
+      "confidence": 0.01,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:58",
+      "source_confidence": 0.8,
+      "asr_confidence": 0.42,
+      "numeric_parse": {
+        "claimed": "유가 100달러 초과; 국채금리 '5.34'",
+        "observed": "유가 상품·단위·시각 및 국채 국가·만기·단위 미확인"
+      },
+      "investor_implication": "미확인 거시 사건들을 하나의 위기 근거로 연결하지 말고 각 사건과 금융상품을 개별 확인해야 한다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "오전 저점 유지·5일선 회복을 중시하며 지수 반등·재하락 범위를 제시했다. 삼성전자·SK하이닉스 회복 시 소부장 강세를 전망했다.",
+      "status": "unverified",
+      "confidence": 0.03,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:52",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.72,
+      "numeric_parse": {
+        "claimed": "코스닥 850; 코스피 반등 6,250~6,300 또는 6,150~6,200, 재하락 5,000·4,500; 삼성전자 25만~26만 원·SK하이닉스 140만~160만 원",
+        "observed": "전망 조건과 결과를 평가할 가격 시계열 없음"
+      },
+      "investor_implication": "제시 가격대를 확정 매수·매도 기준으로 사용하지 말고 시나리오 조건과 관측 기간을 명시해야 한다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "19일 월요일부터 신용·미수 제한이 시행됐고 대주주 양도세 부담이 이미 반영 중이라고 설명했다. 미국 양당이 상하원을 나눠 가졌을 때 증시 상승 탄력이 가장 좋았다고 주장했다.",
+      "status": "unverified",
+      "confidence": 0.02,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.85,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "19일 월요일 시행; 11~12월 세금·셧다운 우려; 분점 의회 시 최고 상승 탄력",
+        "observed": "시행 공지·세법 원문·정치체제별 수익률 통계 없음"
+      },
+      "investor_implication": "정책 적용 여부는 공식 공지로 확인하고 세금·선거 관련 수급과 주가 영향은 별도 분석해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "CRWV",
+      "name": "코어위브",
+      "status": "unverified",
+      "claims": [
+        "AI 투자로 돈을 벌 수 있느냐는 기존 논쟁이 코어위브의 부도·시스템 위기 우려로 확대됐지만, 문제가 발생해도 다른 기업이 정리할 수 있어 전면적 금융위기와는 다르다는 출연자의 해석이다."
+      ],
+      "numeric_claims": [
+        "2008년 금융위기, 닷컴버블, 2010년대 초 유럽 재정위기와 비교했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "CRWV",
+        "as_of": "2026-10-19T22:43:16.224138+00:00",
+        "current_price": 61.119998931884766,
+        "market_cap": 33709916525.135353,
+        "forward_pe": -33.096516,
+        "trailing_pe": null,
+        "fifty_two_week_high": 141.79,
+        "fifty_two_week_low": 59.25,
+        "average_target_price": 140.57895,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "^KS11",
+      "name": "코스피·코스닥",
+      "status": "unverified",
+      "claims": [
+        "개인 투매 이후 반등과 낮아진 밸류에이션을 저점 형성의 단서로 보지만, 이번 주에는 추가 상승폭보다 당일 오전 저점 유지와 5일선 회복이 중요하다는 판단이다."
+      ],
+      "numeric_claims": [
+        "당일 코스피가 5,768, 약 1.8% 상승으로 마감했다고 발언했다.",
+        "개인 순매도는 당일 총 2조 원, 개장 직후 약 1조 원으로 언급됐다.",
+        "조건부 반등 범위로 코스닥 850, 코스피 6,250~6,300을 제시했고, 이후에는 6,150~6,200도 언급했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-19T22:43:18.003515+00:00",
+        "current_price": 5768.01,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "009150",
+      "name": "삼성전기",
+      "status": "unverified",
+      "claims": [
+        "글로벌 대형 기업과 패키지 기판 공급계약을 체결했다는 공시·속보를 소개했다."
+      ],
+      "numeric_claims": [
+        "계약 규모 3,600억 원, 지난해 매출액 대비 3.2%라고 소개했다.",
+        "공급 기간은 내년 1월 1일부터 12월 31일까지라고 발언했다.",
+        "속보 시각은 오후 5시 26분, 당시 주가는 약 2% 상승으로 언급됐다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "009150",
+        "as_of": "2026-10-19T22:43:19.162639+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "BX",
+      "name": "블랙스톤·AI 데이터센터 금융",
+      "status": "unverified",
+      "claims": [
+        "AI 신용 불안을 판단하려면 차입 기업의 해명보다 데이터센터에 자금을 공급하는 블랙스톤의 실적 발표와 투자 지속 발언이 중요하다고 주장했다."
+      ],
+      "numeric_claims": [
+        "블랙스톤의 데이터센터 대여 규모는 자동자막에 '2,억 달러 이상'으로 기록돼 금액을 확정할 수 없다.",
+        "8월 엔비디아와 금융기관 5~6곳이 자금을 조성했다고 설명했으나 규모는 '3,억 불'로 불명확하다.",
+        "엔비디아가 약 30% 지급보증을 제공한다고 발언했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "BX",
+        "as_of": "2026-10-19T22:43:21.495510+00:00",
+        "current_price": 107.08999633789062,
+        "market_cap": 80384440709.38873,
+        "forward_pe": 14.460854,
+        "trailing_pe": 23.957495,
+        "fifty_two_week_high": 165.14,
+        "fifty_two_week_low": 101.73,
+        "average_target_price": 139.90909,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "반도체 가격 상승과 가까운 분기의 실적 전망에 집중해야 하며, 실적 발표와 주주환원 구체화가 반등 기대를 높일 수 있다고 주장했다."
+      ],
+      "numeric_claims": [
+        "다음 주 실적 발표를 언급했다.",
+        "자사주 매입 가능성을 30조~40조 원으로 언급하고, 별도로 8월 삼성전자 30조 원 발표가 있었다고 발언했다.",
+        "영업이익 관련 수치는 현재 107조 원, 다음 분기 120조 원 이상, 내년 400조~500조 원으로 전사됐으나 단위·기간 확인이 필요하다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-10-19T22:43:24.151185+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "출연자는 보유 전략을 유지하되 추세 기준과 반등 이후 시장 분위기를 점검하고, 실적·주주환원 발표를 확인하겠다고 밝혔다."
+      ],
+      "numeric_claims": [
+        "추세를 고민할 기준으로 120만 원을 언급했고, 대화 중 120만8,000원이라는 가격이 제시됐다.",
+        "다음 주 실적 발표와 8월 40조 원 자사주 매입 발표를 언급했다.",
+        "영업이익은 이번 분기 약 80조 원, 다음 분기 85조~90조 원 이상으로 전사됐다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-10-19T22:43:26.038040+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Stock Market Today, Oct. 19: IREN Rallies on AI Infrastructure Sentiment Rebound",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-19-220513155.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-19T22:05:13+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Stock Market Today, Oct. 19: IREN Rallies on AI Infrastructure Sentiment Rebound Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Original..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Stock Market Today, Oct. 19: CoreWeave Rebounds on Goldman Sachs Buy Upgrade and $139 Price Target",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-19-212501721.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-19T21:25:01+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Stock Market Today, Oct. 19: CoreWeave Rebounds on Goldman Sachs Buy Upgrade and $139 Price Target Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tec..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Coeur Mining (CDE) Stock Looks Undervalued Despite Recent Market Pressure",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/coeur-mining-cde-stock-looks-221948382.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-19T22:19:48+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Coeur Mining (CDE) Stock Looks Undervalued Despite Recent Market Pressure Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weath..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "Forget Tech. Energy Will Be The Big Winner This Earnings Season.",
+      "source_url": "https://finance.yahoo.com/m/2bba9727-a5dc-3eb3-821b-571b920f9856/forget-tech.-energy-will-be.html",
+      "publisher": "Barrons.com",
+      "published_at": "2026-10-19T21:33:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C3",
+      "title": "Cleveland-Cliffs Stock Jumps on Bumper 2027 Profit Forecast",
+      "source_url": "https://finance.yahoo.com/m/6a1d52de-b06f-3643-93d5-94f5df8390ff/cleveland-cliffs-stock-jumps.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-19T20:27:11+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C6",
+      "title": "Porvair Targets 16%-18% Margins as Capital Markets Day Sets Growth Blueprint",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/porvair-targets-16-18-margins-190221721.html",
+      "publisher": "MarketBeat",
+      "published_at": "2026-10-19T19:02:21+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C8",
+      "title": "Applied Digital Soars 10%, IREN Up 5%, CoreWeave Up 2% as AI Infrastructure Selloff Reverses",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/applied-digital-soars-10-iren-205114269.html",
+      "publisher": "TIKR",
+      "published_at": "2026-10-19T20:51:14+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

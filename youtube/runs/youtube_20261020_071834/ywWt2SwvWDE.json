@@ -1,0 +1,539 @@
+{
+  "version": 4,
+  "video_id": "ywWt2SwvWDE",
+  "title": "JP모건 제이미다이먼 CEO \"미국 경기 좋다\"…코어위브, 반등 출발 이후 변동성 확대 [월가 뉴스레터]",
+  "url": "https://www.youtube.com/watch?v=ywWt2SwvWDE",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/ywWt2SwvWDE/maxresdefault.jpg",
+  "published_at": "2026-10-19T22:01:19+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 21687,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 21687,
+    "segments": 1179,
+    "duration_seconds": 2714,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-20T07:18:34.388791+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 10,
+  "claim_status_summary": {
+    "partially_supported": 2,
+    "unverified": 6,
+    "asr_uncertain": 2
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "주요 지수와 AI 종목이 반등했고 소프트웨어가 반도체보다 강했으며, 기술주 펀드 유출입이 매주 반전하고 헤지펀드 매도는 10년 만에 가장 빨랐다.",
+      "status": "partially_supported",
+      "confidence": 0.35,
+      "supporting_evidence_ids": [
+        "E4"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.92,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "S&P 500 +0.4%, 나스닥 +1.1%, 러셀 2000 +0.3%, 다우 약보합; 반도체 ETF 8~9거래일 하락; DXY 101.9; 헤지펀드 매도 속도 10년 내 최고",
+        "observed": "E4 제목에서 지수 방향만 확인된다. 정확한 지수·개별주 등락률, DXY 및 수급 수치는 제공되지 않았다."
+      },
+      "investor_implication": "기술주 반등 방향과 소프트웨어 우위·수급 정상화를 구분해야 한다. 후자의 투자 논거는 아직 확인되지 않았다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "다이먼과 주요 투자은행은 경기·주식시장에 낙관적이지만, BofA는 남은 두 회의 금리 인상을 전망했다. JP모건 장기수익률, 동결 확률 및 강세장 역사 통계도 제시됐다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:49",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "60/40 연 7%, 미국 주식 7.5%, 기간 10~15년; 우량주 +6%·동일가중 -4%·경기순환주 -10%, 이후 7.5%; 남은 두 회의 인상; 10월 28일 FOMC 동결 확률 80%; 강세장 5년 차 평균 +21%",
+        "observed": "대조 가능한 보고서 수치, 공식 회의 일정, 확률 스냅샷 및 역사적 표본이 제공되지 않았다."
+      },
+      "investor_implication": "확인되지 않은 금리 경로·시장확률이나 역사적 평균을 자산배분의 확정 전제로 사용하지 않아야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "초기 유가 약 98달러 하락 설명은 후반 WTI +2.2%·약 103달러로 정정됐으며, 차이는 월물 교체 때문이라고 했다. 정상회담과 미·이란 합의 가능성도 언급했다.",
+      "status": "unverified",
+      "confidence": 0.15,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:26:54",
+      "source_confidence": 0.95,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "초기 약 98달러로 하락 → 후반 WTI 약 103달러, +2.2%로 정정",
+        "observed": "CL=F current_price 98.18000030517578달러. 계약코드·전일 가격·동일 시점 등락률은 없다."
+      },
+      "investor_implication": "정정 사실을 기록하되 103달러·상승률·롤오버 원인은 미확정으로 유지해야 한다. 협상설을 공급 위험 해소로 해석할 근거도 없다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "차세대 AI 모델 출시가 임박했고 특화 엔지니어링 모델은 100배 빠르고 150배 저렴하며, 앤트로픽 연내 IPO 확률은 70~80%라고 했다.",
+      "status": "asr_uncertain",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:20:07",
+      "source_confidence": 0.69,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "속도 100배, 비용 150배 우위; 앤트로픽 연내 IPO 확률 70~80%; OpenAI 차세대 모델 몇 주 내 출시",
+        "observed": "모델 식별 자료, 비교 조건, 공식 일정 및 확률시장 기록이 제공되지 않았다."
+      },
+      "investor_implication": "기업과 모델을 식별하기 전에는 경쟁 구도·기업가치 판단의 근거로 사용할 수 없다. 수치 주장도 미검증이다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "코어위브는 상승 출발 후 하락 마감했고 Goldman은 중립에서 매수로 상향하면서 목표가를 139달러에서 106달러로 낮췄다. Nscale 평가액 하락과 Anthropic의 추가 컴퓨팅 협상도 보도됐다고 했다.",
+      "status": "partially_supported",
+      "confidence": 0.3,
+      "supporting_evidence_ids": [
+        "E7"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:26:54",
+      "source_confidence": 0.93,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "CRWV +3~4% 출발 후 하락 마감; 목표가 139→106달러; NBIS +2.8%; Nscale 300억→160억~190억 달러; 추가 컴퓨팅 협상 450억 달러",
+        "observed": "E7 제목은 목표가 139달러를 제시한다. CRWV 스냅샷은 약 61.12달러이나 당일 수익률·가격 경로는 없다. 나머지 금액·등락률 자료는 없다."
+      },
+      "investor_implication": "매수 상향 보도와 목표가 하향 주장을 분리해야 한다. 목표가 충돌이 해결되기 전에는 이를 상승 여력 계산에 사용하지 않아야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "JP모건의 인텔 중립 상향은 주가 하락 후 위험보상 개선에 근거했다. CPU 점유율 하락과 파운드리 수율 부진, 도시바 HDD 증설의 WDC 부담도 언급했다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:26:54",
+      "source_confidence": 0.92,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "서버 CPU 점유율 77→53%, PC CPU 점유율 81→68%",
+        "observed": "동일 기준 점유율 자료가 없다. INTC 스냅샷 약 92.03달러는 점유율·수율·등급 변경의 증거가 아니다."
+      },
+      "investor_implication": "등급 상향을 사업 회복 확인으로 해석할 수 없고, 경쟁사 증설의 WDC 손익 영향도 검증되지 않았다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "모건스탠리는 Amazon 목표가를 335달러에서 350달러로, Bernstein은 Datadog 목표가를 237달러에서 350달러로 높였고 AI 토큰 소비가 전분기 대비 최소 50% 증가할 것으로 예상했다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:33:28",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "AMZN 목표가 335→350달러; DDOG 237→350달러; AI 토큰 소비 전분기 대비 최소 +50%",
+        "observed": "개별 보고서 목표가·토큰 소비 자료는 없다. 제공된 평균 목표가는 AMZN 약 331.46달러, DDOG 약 290.38달러로 집계 대상이 달라 직접 반증도 아니다."
+      },
+      "investor_implication": "에이전트 확산이라는 투자 가설과 AWS·Bedrock·Datadog의 실제 매출 기여를 구분해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "스페이스X로 전사된 기업이 GPU 임대 실적을 발표하고 미국 어린이에게 주식 1주를 배포한다고 했다. Tesla 12월 3일 주총과 2027년 2월 1일 이전 합병 확률 70%도 언급했다.",
+      "status": "asr_uncertain",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:33:28",
+      "source_confidence": 0.55,
+      "asr_confidence": 0.4,
+      "numeric_parse": {
+        "claimed": "미식별 기업 주가 140~150달러, 미국 어린이당 1주; Tesla 주총 12월 3일; 2027년 2월 1일 이전 합병 확률 70%",
+        "observed": "대상 기업 가격·배포 조건·주총 날짜·합병 확률을 직접 확인할 자료가 없다. TSLA 가격 스냅샷은 미식별 기업의 주가 검증에 사용할 수 없다."
+      },
+      "investor_implication": "미식별 기업의 실적·주식 배포를 Tesla 투자 근거와 결합하지 않아야 한다. 합병 확률을 거래 확정으로 해석할 수 없다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "Apple은 10월 28일 새 Mac과 터치스크린 노트북을 출시할 가능성이 있고, KeyBanc은 초기 iPhone 판매 효과와 밸류에이션을 이유로 비중축소를 유지했다고 했다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:33:28",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "신제품 출시일 10월 28일",
+        "observed": "공식 일정 자료가 없다. AAPL 가격 스냅샷은 제품 출시일이나 분석가 등급을 확인하지 못한다."
+      },
+      "investor_implication": "출시설과 공식 제품 사양을 구분하고, 초기 판매 호조가 지속 매출로 이어지는지는 추가 자료로 확인해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "Strategy는 비트코인을 추가 매수했고, 비트코인은 8만1천 달러 미만에서 약 8만2천 달러로 회복했다. MSTR은 하락했으며 Tom Lee는 암호화폐 위험보상을 긍정적으로 평가했다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:40:05",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "BTC 약 82,000달러, 전날 81,000달러 미만; MSTR 하락",
+        "observed": "BTC 가격 자료가 없다. MSTR 스냅샷은 약 136.02달러이나 비교 종가가 없어 하락 여부를 확인할 수 없다."
+      },
+      "investor_implication": "추가 매수와 BTC·MSTR 괴리는 공시 및 동일 시점 가격으로 확인해야 한다. 주관적 위험보상 평가는 수익 보장이 아니다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "CL=F",
+      "name": "WTI 원유 및 지정학",
+      "status": "unverified",
+      "claims": [
+        "미국·러시아·중국 정상회담 및 미국·이란 합의 가능성을 유가 완화 재료로 설명했지만, 후반에 월물 교체에 따른 데이터 차이를 확인하고 실제 WTI는 상승했다고 정정했다."
+      ],
+      "numeric_claims": [
+        "초반에는 유가가 주말 100달러 이상에서 약 98달러로 내려왔다고 설명했다.",
+        "후반 정정에서는 WTI가 밤사이 2.2% 상승해 배럴당 약 103달러에 거래됐다고 밝혔다.",
+        "월스트리트저널 보도로 푸틴이 트럼프·시진핑에게 3자 회담을 제안했다고 소개했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "CL=F",
+        "as_of": "2026-10-19T22:40:00.415888+00:00",
+        "current_price": 98.18000030517578,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 119.48,
+        "fifty_two_week_low": 54.98,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "CRWV",
+      "name": "코어위브 및 네오클라우드",
+      "status": "unverified",
+      "claims": [
+        "골드만삭스의 코어위브 매수 상향에도 주가가 상승 출발 후 하락 마감했으며, 컴퓨팅 공급과잉 우려와 앤트로픽의 추가 용량 확보 보도가 충돌해 네오클라우드 변동성이 지속된다고 설명했다."
+      ],
+      "numeric_claims": [
+        "코어위브는 약 3~4% 상승 출발 후 하락 마감했다고 설명했다.",
+        "골드만삭스가 코어위브 등급을 중립에서 매수로 올리면서 목표가는 139달러에서 106달러로 낮췄다고 소개했다.",
+        "네비우스는 2.8% 상승했다고 소개했다."
+      ],
+      "verification_notes": [
+        "Bloomberg/Morningstar 등 폐쇄형 출처 주장은 자동 검증하지 못했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "CRWV",
+        "as_of": "2026-10-19T22:40:01.187015+00:00",
+        "current_price": 61.119998931884766,
+        "market_cap": 33709916525.135353,
+        "forward_pe": -33.096516,
+        "trailing_pe": null,
+        "fifty_two_week_high": 141.79,
+        "fifty_two_week_low": 59.25,
+        "average_target_price": 140.57895,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "INTC",
+      "name": "인텔",
+      "status": "unverified",
+      "claims": [
+        "JP모건의 비중축소→중립 상향은 사업 개선 확신보다는 주가 하락 이후 위험·보상 균형이 나아졌다는 판단이라고 설명했다."
+      ],
+      "numeric_claims": [
+        "서버 CPU 점유율이 77%에서 53%, PC CPU 점유율이 81%에서 68%로 하락했다고 언급했으나 비교 기간은 제시하지 않았다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "INTC",
+        "as_of": "2026-10-19T22:40:04.006215+00:00",
+        "current_price": 92.02999877929688,
+        "market_cap": 483574050355.2333,
+        "forward_pe": 43.721794,
+        "trailing_pe": null,
+        "fifty_two_week_high": 142.35,
+        "fifty_two_week_low": 32.89,
+        "average_target_price": 118.04651,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "AMZN",
+      "name": "아마존",
+      "status": "unverified",
+      "claims": [
+        "모건스탠리가 AWS·베드록의 매출 기여와 AI 쇼핑·에이전트 수혜를 근거로 아마존을 선호 종목에 포함하고 목표가를 높였다고 소개했다."
+      ],
+      "numeric_claims": [
+        "비중확대 등급을 유지하고 목표가를 335달러에서 350달러로 상향했다고 설명했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "AMZN",
+        "as_of": "2026-10-19T22:40:06.570421+00:00",
+        "current_price": 262.45001220703125,
+        "market_cap": 2830868128640.2666,
+        "forward_pe": 25.131308,
+        "trailing_pe": 21.11424,
+        "fifty_two_week_high": 287.2,
+        "fifty_two_week_low": 196.0,
+        "average_target_price": 331.46103,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "DDOG",
+      "name": "데이터독",
+      "status": "unverified",
+      "claims": [
+        "에이전트 AI 확산과 토큰 소비 증가가 감시·관측 수요를 늘려 데이터독에 유리하다는 번스타인의 분석을 소개했다."
+      ],
+      "numeric_claims": [
+        "번스타인이 목표가를 237달러에서 350달러로 높였다고 설명했다.",
+        "전체 시장의 AI 토큰 소비가 전분기 대비 최소 50% 증가할 것으로 예상한다고 소개했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "DDOG",
+        "as_of": "2026-10-19T22:40:08.313256+00:00",
+        "current_price": 260.3599853515625,
+        "market_cap": 93488767988.75195,
+        "forward_pe": 87.18889,
+        "trailing_pe": 520.72,
+        "fifty_two_week_high": 300.68,
+        "fifty_two_week_low": 98.01,
+        "average_target_price": 290.37915,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "TSLA",
+      "name": "테슬라",
+      "status": "unverified",
+      "claims": [
+        "연례 주주총회와 스페이스X 합병 기대를 연말·연초의 주요 주가 변수로 제시했다."
+      ],
+      "numeric_claims": [
+        "연례 주주총회가 12월 3일 예정이라고 설명했다.",
+        "2027년 2월 1일 이전 테슬라·스페이스X 합병 가능성이 70%까지 올랐다고 언급했으나 확률 출처는 제시하지 않았다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "TSLA",
+        "as_of": "2026-10-19T22:40:11.166596+00:00",
+        "current_price": 368.05999755859375,
+        "market_cap": 1453670404193.1904,
+        "forward_pe": 169.73727,
+        "trailing_pe": 340.7963,
+        "fifty_two_week_high": 498.83,
+        "fifty_two_week_low": 297.38,
+        "average_target_price": 397.83212,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "AAPL",
+      "name": "애플",
+      "status": "unverified",
+      "claims": [
+        "새 맥과 터치스크린 노트북 출시 가능성을 소개했지만, 키뱅크는 아이폰 초기 판매 강세의 지속성과 주가 수준을 의심하며 비중축소를 유지했다고 설명했다."
+      ],
+      "numeric_claims": [
+        "신제품 출시일로 10월 28일을 제시했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "AAPL",
+        "as_of": "2026-10-19T22:40:13.943768+00:00",
+        "current_price": 342.94000244140625,
+        "market_cap": 5004928124830.322,
+        "forward_pe": 35.80553,
+        "trailing_pe": 39.32798,
+        "fifty_two_week_high": 348.15,
+        "fifty_two_week_low": 243.42,
+        "average_target_price": 329.3759,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "MSTR",
+      "name": "스트래티지 및 비트코인",
+      "status": "unverified",
+      "claims": [
+        "스트래티지가 비트코인을 추가 매수했으며, 톰 리는 암호화폐의 위험·보상 비율이 여전히 매력적이라고 평가했다고 소개했다."
+      ],
+      "numeric_claims": [
+        "초반 비트코인 가격으로 약 8만2,000달러를 제시하고 전날에는 8만1,000달러를 밑돌았다고 설명했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "MSTR",
+        "as_of": "2026-10-19T22:40:31.502606+00:00",
+        "current_price": 136.02000427246094,
+        "market_cap": 57597272678.62108,
+        "forward_pe": 2.748434,
+        "trailing_pe": null,
+        "fifty_two_week_high": 306.16,
+        "fifty_two_week_low": 81.81,
+        "average_target_price": 239.26666,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Coeur Mining (CDE) Stock Looks Undervalued Despite Recent Market Pressure",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/coeur-mining-cde-stock-looks-221948382.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-19T22:19:48+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Coeur Mining (CDE) Stock Looks Undervalued Despite Recent Market Pressure Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weath..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Basic Materials Roundup: Market Talk",
+      "source_url": "https://finance.yahoo.com/m/d7192cfe-562b-30df-89af-59602850e51c/basic-materials-roundup%3A.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-19T20:55:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Basic Materials Roundup: Market Talk Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfolio N..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Stock market today: Dow slips, S&P 500, Nasdaq rise as tech stocks rebound",
+      "source_url": "https://finance.yahoo.com/markets/live/stock-market-today-dow-sp-500-nasdaq-futures-mixed-amid-volatile-week-112734828.html",
+      "publisher": "Yahoo Finance",
+      "published_at": "2026-10-19T20:48:47+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Stock market today: Dow slips, S&P 500, Nasdaq rise as tech stocks rebound Oops, something went wrong Skip to navigation Skip to main content Skip to right column Yahoo Finance Home News Finance Sports More News US Politics World Tech Science Originals Weat..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "Cleveland-Cliffs Stock Jumps on Bumper 2027 Profit Forecast",
+      "source_url": "https://finance.yahoo.com/m/6a1d52de-b06f-3643-93d5-94f5df8390ff/cleveland-cliffs-stock-jumps.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-19T20:27:11+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C3",
+      "title": "Stock Market Today, Oct. 19: IREN Rallies on AI Infrastructure Sentiment Rebound",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-19-220513155.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-19T22:05:13+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C3",
+      "title": "Stock Market Today, Oct. 19: CoreWeave Rebounds on Goldman Sachs Buy Upgrade and $139 Price Target",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-19-212501721.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-19T21:25:01+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C5",
+      "title": "Porvair Targets 16%-18% Margins as Capital Markets Day Sets Growth Blueprint",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/porvair-targets-16-18-margins-190221721.html",
+      "publisher": "MarketBeat",
+      "published_at": "2026-10-19T19:02:21+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C6",
+      "title": "Did Foundry Win Just Shift Intel (INTC) Investment Narrative?",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/did-foundry-win-just-shift-221539389.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-19T22:15:39+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E10",
+      "claim_id": "C7",
+      "title": "Amazon vs. Home Depot: Which Consumer Stock Is a Better Buy in 2026?",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/amazon-vs-home-depot-consumer-214414304.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-19T21:44:14+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
