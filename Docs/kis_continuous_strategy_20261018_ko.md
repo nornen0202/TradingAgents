@@ -44,3 +44,9 @@
 2026-10-18은 휴장이므로 실제 장중 체결·취소·성과는 이후 정규장 관측으로 확인해야 한다. 오프라인 검증은 두 시장의 실제 전송 계층을 모의 HTTP 응답으로 실행하고, 승인 전 무통신, 실제 조건 충족 후 주문, 재시작/중복/응답 유실, 부분체결/취소, 미래·누락·잘못된 시각, 계좌 불일치, 모의 자금·보유 한도, 금액 누락·역행, 화면의 과거 시점 필터링을 확인한다.
 
 체결 금액 필드는 KIS 공식 [국내 주문체결 조회](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_daily_ccld/chk_inquire_daily_ccld.py)의 `tot_ccld_amt`, [미국 주문체결 조회](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_ccnl/chk_inquire_ccnl.py)의 `ft_ccld_amt3`를 사용한다. 해당 값과 체결 수량·원주문 조건이 검증되는 경우에만 금액 성과에 반영한다.
+
+## 2026-10-19 정규장 운영에서 확인한 보완
+
+- Windows 예약 작업은 Codex MSIX 앱의 가상화된 LocalAppData 저장소를 공유하지 않을 수 있다. 이번 운영에서는 앱 안에서 보이던 DPAPI 설정이 예약 작업에서는 존재하지 않았다. 사용자 범위 DPAPI 암호문만 실제 사용자 저장소에 복사하고, 예약 작업과 동일한 실행 계정에서 국내·미국 설정 복호화와 브로커 생성까지 검증했다. 평문 키를 저장하거나 계좌 정보를 출력하지 않았다.
+- 국내 VTS는 취소 완료 후 원주문에 `cncl_yn=N`, `cncl_cfrm_qty=1`, 잔량 0을 반환하고, 별도 취소 주문 행에 `cncl_yn=Y`를 표시했다. 원주문의 확인 취소 수량과 원주문 수량·체결·잔량이 일치할 때만 취소 완료로 해석한다. 잔량 0만으로는 취소로 간주하지 않는다. 기존 주문 식별자와 원장을 유지한 읽기 조회로 복구하며 재주문하지 않는다.
+- [KIS 공식 일별주문체결조회 예제](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_daily_ccld/chk_inquire_daily_ccld.py)의 취소확인수량 별칭 `cnc_cfrm_qty`도 지원한다. 두 필드가 함께 오면 값이 같아야 한다. 누락·음수·비정상 형식·불일치·미래 또는 잘못된 주문시각은 검증을 우회할 수 없다.

@@ -503,3 +503,66 @@ def test_cli_defaults_offline_and_requires_opt_in_before_credentials(tmp_path, m
     result = json.loads(capsys.readouterr().out)
     assert result["status"] == "BLOCKED"
     assert not (tmp_path / "none.sqlite").exists()
+
+@pytest.mark.parametrize('field', ['cncl_cfrm_qty', 'cnc_cfrm_qty'])
+@pytest.mark.parametrize('quantity,filled', [(1, 0), (2, 1)])
+def test_original_order_confirmed_cancel_quantity_closes_remainder(tmp_path, field, quantity, filled):
+    b, _, _, moment = make(tmp_path, ack(), report(quantity=quantity, filled=filled, remaining=0,
+        **{field: str(quantity-filled)}), policy=PaperOrderPolicy(('005930',), max_order_krw=200000))
+    b.submit(**order(b, quantity=quantity))
+    moment[0] += timedelta(seconds=2)
+    result = b.reconcile(intent_id='vts-intent-1')
+    assert result['status'] == 'CANCELLED'
+    assert result['filled_qty'] == filled and result['remaining_qty'] == 0
+    assert result['settlement_known'] is False
+    assert b.db.execute('SELECT count(*) FROM reconciliation_issues').fetchone()[0] == 0
+    b.close()
+
+
+@pytest.mark.parametrize('changes', [
+    {'cncl_cfrm_qty': '-1'}, {'cncl_cfrm_qty': '1.0'}, {'cncl_cfrm_qty': ''},
+    {'cncl_cfrm_qty': None}, {'cncl_cfrm_qty': True}, {'cncl_cfrm_qty': '2'},
+    {'cncl_cfrm_qty': '1', 'cnc_cfrm_qty': '0'},
+    {'cncl_cfrm_qty': '1', 'rmn_qty': '1'},
+    {'cncl_cfrm_qty': '1', 'tot_ccld_qty': '1'},
+])
+def test_invalid_confirmed_cancellation_quantity_blocks(tmp_path, changes):
+    b, _, _, _ = make(tmp_path, ack(), report(remaining=0, **changes))
+    b.submit(**order(b))
+    with pytest.raises(DemoError, match='cancellation quantity'):
+        b.reconcile(intent_id='vts-intent-1')
+    assert b.db.execute('SELECT count(*) FROM reconciliation_issues').fetchone()[0] == 1
+    assert b.db.execute('SELECT count(*) FROM lifecycle_events WHERE kind="CANCEL"').fetchone()[0] == 0
+    b.close()
+
+
+@pytest.mark.parametrize('changes', [{}, {'cncl_cfrm_qty': '0'}])
+def test_zero_remainder_without_cancel_evidence_stays_unresolved(tmp_path, changes):
+    b, _, _, _ = make(tmp_path, ack(), report(remaining=0, **changes))
+    b.submit(**order(b))
+    assert b.reconcile(intent_id='vts-intent-1')['status'] == 'UNRESOLVED'
+    b.close()
+
+
+def test_confirmed_quantity_recovers_existing_unresolved_order_without_resubmit(tmp_path):
+    b, _, s, moment = make(tmp_path, ack(), report(remaining=0),
+        report(remaining=0, cncl_cfrm_qty='1', cnc_cfrm_qty='1'))
+    b.submit(**order(b))
+    assert b.reconcile(intent_id='vts-intent-1')['status'] == 'UNRESOLVED'
+    moment[0] += timedelta(seconds=1)
+    assert b.reconcile(intent_id='vts-intent-1')['status'] == 'CANCELLED'
+    assert b.db.execute('SELECT count(*) FROM reconciliation_issues').fetchone()[0] == 0
+    assert sum(url.endswith('order-cash') for _, url, _ in s.calls) == 1
+    b.close()
+
+@pytest.mark.parametrize('changes', [
+    {'ord_dt': '20261020'}, {'ord_dt': ''}, {'ord_dt': 'invalid'},
+    {'ord_tmd': '100101'}, {'ord_tmd': None},
+])
+def test_confirmed_cancel_quantity_cannot_bypass_order_clock_validation(tmp_path, changes):
+    b, _, _, _ = make(tmp_path, ack(), report(remaining=0, cncl_cfrm_qty='1', **changes))
+    b.submit(**order(b))
+    with pytest.raises(DemoError):
+        b.reconcile(intent_id='vts-intent-1')
+    assert b.db.execute('SELECT count(*) FROM lifecycle_events WHERE kind="CANCEL"').fetchone()[0] == 0
+    b.close()
