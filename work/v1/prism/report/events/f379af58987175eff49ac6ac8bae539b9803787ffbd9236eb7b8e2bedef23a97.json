@@ -1,0 +1,381 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:9eddd16d7531bf9382818b7b9526d74f",
+  "source_sha256": "cda6779ff73a4bf1941d0f82520165fe34373ae4b464632ba6411bb47b3e9b6c",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-20\n\n기준: 2026-10-20T08:37:52.384656+09:00 · 소스 정상(OK) · 연구 전용\n\n- **세 후보 모두 후속 미진입:** SNDK는 추세, TWLO는 모멘텀, MRNA는 펀더멘털 검증을 우선합니다. 앞선 관심 신호를 현재 매수 판단으로 사용하지 않습니다.\n- **balanced_external 반영:** 세 종목의 공식 위험 검증 연구 우선순위를 높입니다. 단일 PRISM 계열의 반복 신호는 독립 다중 출처가 아니므로 근거 가중치는 LOW_LABELED이며 순위·확신도·비중 상향은 유보합니다.\n- **시뮬레이터와 자료 한계:** 5종목 HOLD 스냅샷은 가상 보유 내역입니다. 본문 없는 PDF와 차트 안내는 검증된 투자 근거로 승격하지 않습니다.\n\n신규 14 · 수정 0 · 중복 제외 0 · 현재 창 전송 14/14 · 생략 0 · 잘림 없음.\n생산 성공: 2026-10-20 08:23:30 KST(작성 시 약 0.24시간 경과, 허용 30시간).\n현재 창 이벤트: 2026-10-20 03:36:47–03:51:20 KST. 이벤트·게시·신호 기준시각 모두 최근 24시간 이내이며 미래·역전 시각은 없습니다. COMPLETE는 전송된 이벤트 범위에 관한 확인이며 첨부 원문 검증이나 보유·관심종목 전수 커버리지를 뜻하지 않습니다.\n\n| 종목 | 신규 연구 변화 및 충돌 | 후속 확인 |\n|---|---|---|\n| SNDK | 관심 16335 → 미진입 16345. 두 이동평균 추세 차단 주장 | 조정주가·이동평균 재계산, 기업행사 및 실적 공시 확인 |\n| TWLO | 관심 16335 → 미진입 16346. 점수·모멘텀 기준 미달 주장 | 공식 실적·현금흐름, 동일 시점 거래량·모멘텀 확인 |\n| MRNA | 관심 16335 → 미진입 16347. 수익성·성장성 기준 미달 주장 | 공식 IR·공시로 현금소진·매출·임상 진행 확인 |\n\n각 번호의 정식 event key는 `stock_ai_agent:<번호>`입니다. SNDK의 보조 자료는 16336/16339/16342, TWLO는 16337/16340/16343, MRNA는 16338/16341/16344입니다. 16335의 본문은 가상 운용 과정임을 명시하므로 정규화의 simulation_only=false보다 보수적으로 해석합니다. 후속 미진입도 실제 계좌의 주문·체결 사실을 뜻하지 않습니다.\n\n16339–16341은 NO_ARCHIVED_TEXT로 PDF 전문이 없습니다. 16342–16344는 차트 안내만 있어 피벗·상대강도·거래량을 확인하지 못했습니다. PFE·NVAX·MU는 PDF 비교 대상 언급일 뿐 신규 후보로 추가하지 않습니다. 16340의 FCF는 표시명상 잉여현금흐름 문맥이므로 동명 티커 매핑 근거에서 제외합니다. 신호 점수 0.81/1.0 또는 0.2/0.4는 출처 내부 점수이며 자체 투자 확신도로 변환하지 않습니다. 과거 장중 가격·목표·손절은 현재 실행 가격으로 제시하지 않습니다.\n\n가상 포트폴리오 16348: HALO·LLY·FRSH·BKH·BP, 5/10종목·3.89/10슬롯. HOLD는 시뮬레이터 참고이며 실제 보유·가용 비중·개별 목표가를 추론하지 않습니다. 암호자산 이벤트는 이번 델타에 없습니다.\n\nUS 후속 브리핑에는 세 종목의 미진입 사유 검증을 우선 전달합니다. 공식 근거가 확인되기 전에는 우호적인 순위·thesis confidence·위험 한도 내 비중을 높이지 않습니다. 기존 보유의 축소·매도 판단은 이 자료만으로 생성하지 않습니다. KR 직접 신호는 없어 특정 종목으로 전이하지 않습니다. 시장·계좌·위험 실행 게이트는 계속 적용됩니다.\n\n다음 확인: 새롭거나 수정된 정제 이벤트가 도착할 때, 또는 첫 이벤트가 24시간 창에서 만료되는 2026-10-21 03:36:47 KST 이전. 생산자 신선도 한계는 2026-10-21 14:23:30 KST이며 이벤트별 24시간 만료가 먼저 적용됩니다. 후속 검증이 실패하거나 소스가 오래되면 현재 근거 사용을 보류하고 재분석합니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:9eddd16d7531bf9382818b7b9526d74f\",\"status\":\"COMPLETE\",\"window_events\":14,\"transmitted_events\":14,\"truncated\":false,\"new_events\":14,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}\n\n로컬 보고서 발행과 Work ACK는 외부 전송 영수증이 아닙니다. Telegram·Pages 전달 여부는 외부 영수증 확인 대기입니다.",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:9eddd16d7531bf9382818b7b9526d74f",
+      "source_sha256": "cda6779ff73a4bf1941d0f82520165fe34373ae4b464632ba6411bb47b3e9b6c"
+    },
+    "title": "PRISM 연구 델타 · 2026-10-20",
+    "generated_at": "2026-10-20T08:37:52.384656+09:00",
+    "as_of": "2026-10-19T18:51:20+00:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH",
+    "summary": "신규 14개: SNDK·TWLO·MRNA 관심 신호 뒤 미진입. 공식 위험 검증 연구 우선순위 상향; 순위·확신도·비중 상향 유보.",
+    "top_actions": [
+      {
+        "ticker": "SNDK",
+        "readiness": "RESEARCH_ONLY",
+        "action": "추세 검증 우선"
+      },
+      {
+        "ticker": "TWLO",
+        "readiness": "RESEARCH_ONLY",
+        "action": "모멘텀 검증 우선"
+      },
+      {
+        "ticker": "MRNA",
+        "readiness": "RESEARCH_ONLY",
+        "action": "펀더멘털 검증 우선"
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "SNDK",
+        "research_impact": "후속 미진입 메시지는 50일선 대비 -13.9%, 하락 중인 20일선 대비 -15.7%라고 주장합니다. 거래소 가격·기업행사 조정 여부와 이동평균을 같은 기준일로 재계산해야 합니다.",
+        "research_priority": "추세 검증 우선",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "as_of": "2026-10-19T18:51:20+00:00",
+          "valid_until": null,
+          "required_rechecks": [
+            "공식 공시·IR 검증",
+            "신선한 시세·계좌 및 기존 위험 한도 검증"
+          ],
+          "blockers": [
+            "advisory_only",
+            "execution_eligible=false"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16345",
+            "affected_field": "research_priority",
+            "direction": "increase",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "후속 미진입 메시지는 50일선 대비 -13.9%, 하락 중인 20일선 대비 -15.7%라고 주장합니다. 거래소 가격·기업행사 조정 여부와 이동평균을 같은 기준일로 재계산해야 합니다.",
+            "context_event_keys": [
+              "stock_ai_agent:16335",
+              "stock_ai_agent:16336",
+              "stock_ai_agent:16339",
+              "stock_ai_agent:16342"
+            ],
+            "execution_gate_override": false
+          }
+        ],
+        "later_thesis_effect": {
+          "ranking": "상향 유보",
+          "confidence": "상향 유보",
+          "position_size_within_existing_risk_limits": "증액 근거로 사용하지 않음",
+          "research_priority": "관심 신호만 있던 경우보다 위험 검증 우선순위 상향"
+        }
+      },
+      {
+        "ticker": "TWLO",
+        "research_impact": "후속 미진입은 유효 점수 3점/최소 5점, 모멘텀 0개/최소 1개를 제시합니다. 앞선 관심 신호 및 장중 상승 서술과 구분하고 공식 실적·현금흐름과 거래량을 확인해야 합니다.",
+        "research_priority": "모멘텀 검증 우선",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "as_of": "2026-10-19T18:51:20+00:00",
+          "valid_until": null,
+          "required_rechecks": [
+            "공식 공시·IR 검증",
+            "신선한 시세·계좌 및 기존 위험 한도 검증"
+          ],
+          "blockers": [
+            "advisory_only",
+            "execution_eligible=false"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16346",
+            "affected_field": "research_priority",
+            "direction": "increase",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "후속 미진입은 유효 점수 3점/최소 5점, 모멘텀 0개/최소 1개를 제시합니다. 앞선 관심 신호 및 장중 상승 서술과 구분하고 공식 실적·현금흐름과 거래량을 확인해야 합니다.",
+            "context_event_keys": [
+              "stock_ai_agent:16335",
+              "stock_ai_agent:16337",
+              "stock_ai_agent:16340",
+              "stock_ai_agent:16343"
+            ],
+            "execution_gate_override": false
+          }
+        ],
+        "later_thesis_effect": {
+          "ranking": "상향 유보",
+          "confidence": "상향 유보",
+          "position_size_within_existing_risk_limits": "증액 근거로 사용하지 않음",
+          "research_priority": "관심 신호만 있던 경우보다 위험 검증 우선순위 상향"
+        }
+      },
+      {
+        "ticker": "MRNA",
+        "research_impact": "후속 미진입은 수익성·성장성 게이트 탈락을 제시합니다. 앞선 관심 신호의 높은 점수는 독립 신뢰도가 아니며 기업 IR·공시의 현금소진·매출 및 임상 진행을 확인해야 합니다.",
+        "research_priority": "펀더멘털 검증 우선",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "as_of": "2026-10-19T18:51:20+00:00",
+          "valid_until": null,
+          "required_rechecks": [
+            "공식 공시·IR 검증",
+            "신선한 시세·계좌 및 기존 위험 한도 검증"
+          ],
+          "blockers": [
+            "advisory_only",
+            "execution_eligible=false"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:16347",
+            "affected_field": "research_priority",
+            "direction": "increase",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "후속 미진입은 수익성·성장성 게이트 탈락을 제시합니다. 앞선 관심 신호의 높은 점수는 독립 신뢰도가 아니며 기업 IR·공시의 현금소진·매출 및 임상 진행을 확인해야 합니다.",
+            "context_event_keys": [
+              "stock_ai_agent:16335",
+              "stock_ai_agent:16338",
+              "stock_ai_agent:16341",
+              "stock_ai_agent:16344"
+            ],
+            "execution_gate_override": false
+          }
+        ],
+        "later_thesis_effect": {
+          "ranking": "상향 유보",
+          "confidence": "상향 유보",
+          "position_size_within_existing_risk_limits": "증액 근거로 사용하지 않음",
+          "research_priority": "관심 신호만 있던 경우보다 위험 검증 우선순위 상향"
+        }
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:9eddd16d7531bf9382818b7b9526d74f",
+      "status": "COMPLETE",
+      "window_events": 14,
+      "transmitted_events": 14,
+      "truncated": false,
+      "new_events": 14,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261020_082317",
+        "last_run_at": "2026-10-20T08:23:30.896624+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "producer_age_hours": 0.2393022311111111,
+      "coverage": {
+        "total_unique_events": 201,
+        "window_events": 14,
+        "transmitted_events": 14,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-19T18:36:47+00:00",
+        "newest_occurred_at": "2026-10-19T18:51:20+00:00"
+      },
+      "delta": {
+        "new_events": 14,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:16348",
+          "stock_ai_agent:16347",
+          "stock_ai_agent:16346",
+          "stock_ai_agent:16345",
+          "stock_ai_agent:16344",
+          "stock_ai_agent:16343",
+          "stock_ai_agent:16342",
+          "stock_ai_agent:16341",
+          "stock_ai_agent:16340",
+          "stock_ai_agent:16339",
+          "stock_ai_agent:16338",
+          "stock_ai_agent:16337",
+          "stock_ai_agent:16336",
+          "stock_ai_agent:16335"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "validated_at": "2026-10-20T08:37:52.384656+09:00",
+      "event_receipts": [
+        {
+          "event_key": "stock_ai_agent:16348",
+          "content_sha256": "f14b7aa40e5970589184d20f766f01049fdb46391f8831a4c903ce2b454ad014",
+          "occurred_at": "2026-10-19T18:51:20+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16347",
+          "content_sha256": "e3535650e37d05411c749c9c2baac2d7d3a2559775f0fd37f8b552a79176c06b",
+          "occurred_at": "2026-10-19T18:51:17+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16346",
+          "content_sha256": "c4078eab4a5fb656ece105ae4acce3721cb5ae78d8a81a2da387205d87737949",
+          "occurred_at": "2026-10-19T18:51:15+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16345",
+          "content_sha256": "3e8ce1a92838cf45db2b7f246495cc132e1f0b453b7f8b1df360c3ddd9e2c296",
+          "occurred_at": "2026-10-19T18:51:10+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16344",
+          "content_sha256": "b56cedfbb1575a6fd3bb4862ca1524466a95960e14c8b2e662aa90a437164aff",
+          "occurred_at": "2026-10-19T18:43:33+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16343",
+          "content_sha256": "fe52766dafffb8f90447f8bebb46987e2283e67bb8d076e5df5ad8e2a29ff2f0",
+          "occurred_at": "2026-10-19T18:43:20+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16342",
+          "content_sha256": "4b23df540261fe15c75f77049cec22fba029a79b7f2f9c33c5d9fabca82ff1b2",
+          "occurred_at": "2026-10-19T18:43:07+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16341",
+          "content_sha256": "abe1cc9f43291b2436c936eaf19eb76c3509af09f5a6d21b2541720bc3353c94",
+          "occurred_at": "2026-10-19T18:42:52+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16340",
+          "content_sha256": "6e7b3efb2514122585d3f950bfa7f956689682629f2e2c7da4f7f19354c748e9",
+          "occurred_at": "2026-10-19T18:42:48+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16339",
+          "content_sha256": "4dd9252bd6dc0e183bce869839bb210cb1157790d525f0f75120b111afcef2ea",
+          "occurred_at": "2026-10-19T18:42:38+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16338",
+          "content_sha256": "a05a63dbe73af54b70d200b4c1f1eefd68014517c94e9e5a6d710e67ff894465",
+          "occurred_at": "2026-10-19T18:42:31+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16337",
+          "content_sha256": "c8fc40476510d8ce125a387e167b5cba20c741399c22a872db038b47ef4854a8",
+          "occurred_at": "2026-10-19T18:42:25+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16336",
+          "content_sha256": "4ae79143dc07f96517e9d18bf7ef238031cda9f34637c24e48f8487b07fef040",
+          "occurred_at": "2026-10-19T18:42:21+00:00"
+        },
+        {
+          "event_key": "stock_ai_agent:16335",
+          "content_sha256": "cec28c268a93c4802e3db4081f54cd643c050e294066ed769949fa452daa1f79",
+          "occurred_at": "2026-10-19T18:36:47+00:00"
+        }
+      ],
+      "limitations": [
+        "PDF 16339-16341 NO_ARCHIVED_TEXT",
+        "차트 16342-16344 안내만 전송",
+        "16340 FCF는 잉여현금흐름 문맥으로 티커 매핑 제외",
+        "16335 가상운용 본문을 우선하여 보수 해석",
+        "독립 외부 검증 미수행"
+      ],
+      "simulation": {
+        "event_key": "stock_ai_agent:16348",
+        "tickers": [
+          "HALO",
+          "LLY",
+          "FRSH",
+          "BKH",
+          "BP"
+        ],
+        "research_only": true
+      },
+      "excluded_comparison_tickers": [
+        "PFE",
+        "NVAX",
+        "MU"
+      ],
+      "excluded_ambiguous_tickers": [
+        "FCF"
+      ],
+      "ranking_change": false,
+      "confidence_change": false,
+      "sizing_change": false,
+      "research_priority_change": true,
+      "execution_eligible": false,
+      "external_delivery_verified": false
+    },
+    "next_checkpoint": {
+      "trigger": "새 정제 이벤트 또는 수정 이벤트; 첫 이벤트 24시간 만료 전 재확인",
+      "first_event_expiry": "2026-10-21T03:36:47+09:00",
+      "official_evidence_needed": [
+        "SNDK 조정주가·추세·공식 실적",
+        "TWLO 공식 실적·현금흐름·거래량",
+        "MRNA 공식 매출·현금소진·임상 공시"
+      ]
+    },
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    }
+  },
+  "report_id": "prism:f379af58987175eff49ac6ac8bae539b",
+  "report_sha256": "f379af58987175eff49ac6ac8bae539b9803787ffbd9236eb7b8e2bedef23a97",
+  "published_at": "2026-10-20T08:37:57.060901+09:00"
+}
