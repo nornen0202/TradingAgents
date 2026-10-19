@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "run_id": "prism_telegram_20261017_080327",
+  "channel": "stock_ai_agent",
+  "message_id": "16246",
+  "posted_at": "2026-10-16T18:56:36+00:00",
+  "source_url": "https://t.me/stock_ai_agent/16246",
+  "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-17 03:56) 🔸 현재 보유: 5/10개 🔸 사용 비중: 3.89/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: BP p.l.c.(BP) +3.46% ⚠️ 최저 수익: Freshworks Inc.(FRSH) -1.55% 🔸 보유 종목: - Freshworks Inc.(FRSH) [Technology] 매수가:...",
+  "signals": [
+    {
+      "canonical_ticker": "BP",
+      "display_name": "BP p.l.c.",
+      "market": "US",
+      "source_asof": "2026-10-16T18:56:36+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "confidence": 0.45,
+      "warnings": []
+    },
+    {
+      "canonical_ticker": "FRSH",
+      "display_name": "Freshworks Inc.",
+      "market": "US",
+      "source_asof": "2026-10-16T18:56:36+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "confidence": 0.45,
+      "warnings": []
+    },
+    {
+      "canonical_ticker": "BKH",
+      "display_name": "Black Hills Corporation",
+      "market": "US",
+      "source_asof": "2026-10-16T18:56:36+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 73.5,
+      "target_price": 91.88,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    },
+    {
+      "canonical_ticker": "HALO",
+      "display_name": "Halozyme Therapeutics, Inc.",
+      "market": "US",
+      "source_asof": "2026-10-16T18:56:36+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 111.5,
+      "target_price": 141.53,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    },
+    {
+      "canonical_ticker": "LLY",
+      "display_name": "Eli Lilly and Company",
+      "market": "US",
+      "source_asof": "2026-10-16T18:56:36+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 1208.74,
+      "target_price": 1514.05,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    }
+  ],
+  "simulation_only": true,
+  "actionability": "research_only",
+  "execution_eligible": false
+}
