@@ -816,6 +816,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
       + (reasons ? '<p>' + esc(reasons) + '</p>' : '')
       + ('new_buy_budget_krw' in cash ? '<p>신규 매수 예산 ' + esc(planMoney(cash.new_buy_budget_krw, 'KRW')) + ' · 최소 보유 현금 ' + esc(planMoney(cash.min_cash_buffer_krw, 'KRW')) + ' · 주문가능금액 ' + esc(planMoney(cash.buying_power_krw, 'KRW')) + '</p>' : '')
       + ('available_cash_krw' in cash ? '<p>가용 현금 ' + esc(planMoney(cash.available_cash_krw, 'KRW')) + ' · 최소 현금 기준까지 부족 ' + esc(planMoney(cash.cash_buffer_shortfall_krw, 'KRW')) + '</p>' : '')
+      + (plan.capital_policy ? '<p>균형 전략 · 현금 기준 순자산의 ' + esc(fmt(plan.capital_policy.cash_reserve_nav_ratio * 100)) + '% (최소 ' + esc(planMoney(plan.capital_policy.cash_reserve_floor_krw, 'KRW')) + ') · 순자산 ' + esc(planMoney(cash.account_value_krw, 'KRW')) + ' · 원분석 현금 기준 ' + esc(planMoney(cash.previous_cash_buffer_krw, 'KRW')) + '</p><p>위험 축소는 목표 감축량을 정수 단위로 올림합니다. 익절·자금 이동은 가까운 정수와 핵심 보유 기준을 적용합니다. 조건 확인 후 매도하고, 체결·정산 확인 후 매수 예산을 다시 계산합니다.</p><p>정책 적용 ' + esc(dateTime(plan.capital_policy.effective_at)) + ' · 자료 기준 계좌와 별도 · <a href="https://github.com/nornen0202/TradingAgents/blob/main/Docs/balanced_capital_policy_ko.md">현금·수량 검증 근거</a></p>' : '')
       + (plan.market === 'US' ? '<p>수량 환산 기준 USD/KRW ' + (Number.isFinite(numeric(plan.fx_krw_per_usd)) ? esc(fmt(plan.fx_krw_per_usd)) + ' · ' + esc(dateTime(plan.fx_asof)) : '확인 필요') + ' · 실제 환전 체결 호가와 구별</p>' : '') + '</div>';
   }
   function tradeSummaryRow(entry, item) {
@@ -830,7 +831,9 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
       const valid = Number.isInteger(qty) && qty >= 0;
       const labels = {NO_TRADE_INTENT:'관망·추가 매매 없음', ZERO_ALLOCATION:'추가 배정 없음', CASH_BUFFER_SHORTFALL:'현금 보유 기준 부족', NO_BUYING_POWER:'주문가능금액 없음', ALLOCATION_BELOW_ONE_SHARE:'목표 수량 1주 미만', NO_SELLABLE_WHOLE_SHARE:'매도가능 정수 수량 없음', REMAINING_CASH_BELOW_ONE_SHARE:'잔여 예산 부족'};
       const lot = plan.minimum_lot_review;
+      const revision = plan.quantity_revision;
       return '<strong class="plan-value">' + (valid ? esc(fmt(qty)) + '주' : '산출 보류') + '</strong><small>' + esc(valid && qty === 0 ? labels[plan.zero_reason_code] || plan.status_label || '추가 거래 없음' : '입력 계좌 기준 검토 수량') + '</small>'
+        + (revision && revision.revised_quantity > 0 ? '<small>원목표 ' + esc(Number(revision.target_shares).toFixed(3)) + '주 → ' + esc(fmt(revision.revised_quantity)) + '주 · 보유 ' + esc((revision.holding_fraction * 100).toFixed(1)) + '% 감축' + (revision.full_exit ? ' · 전량 매도' : '') + '</small><small>' + (revision.risk_reduction ? '위험 축소 최소 단위' : '익절·조정 정수 배분') + ' · 조건 확인 후 검토</small>' : '')
         + (lot ? '<details class="plan-lot-review"><summary>최소 단위 1주 비교</summary><small>보유량의 ' + esc((Number(lot.holding_fraction) * 100).toFixed(1)) + '% · 거래대금 ' + esc(planMoney(lot.gross_amount, lot.currency)) + '</small><small>배정액 초과 ' + esc(planMoney(lot.allocation_excess_krw, 'KRW')) + (lot.below_min_trade ? ' · 최소 거래금액 미달' : '') + '</small><small>별도 감축 결정 필요 · 주문 수량에 포함되지 않음</small></details>' : '');
     });
     const prices = planParts(plans, (plan) => '<strong class="plan-value">' + esc(planPrice(plan)) + '</strong><small>' + esc(['TRIGGER', 'TRIGGER_RANGE', 'REFERENCE'].includes(plan.price_kind) ? '발동 기준 · 체결 범위 아님' : plan.price_kind === 'NONE' ? '추가 거래 계획 없음' : '분석의 가격 범위') + '</small>' + (plan.price_confirmation ? '<small>확인 방식: ' + esc(({close:'종가 확인', intraday:'장중 확인', two_bar:'2개 봉 확인'})[String(plan.price_confirmation).toLowerCase()] || plan.price_confirmation) + '</small>' : ''));
