@@ -334,6 +334,11 @@ def run_due(archive, state, *, now=None, dry_run=False):
         # Re-evaluate calendars and archives on the next tick, after a long run.
         return decisions
     if not any(item["status"] == "DUE" for item in decisions):
+        from tradingagents.execution.refresh_runtime import refresh_due
+        refreshes = refresh_due(archive, state, now=now, dry_run=dry_run)
+        decisions.extend(refreshes)
+        if refreshes:
+            return decisions
         from tradingagents.local_advisory_recovery import recover_due
         decisions.extend(recover_due(archive, state, watchdog=watchdog, targets=targets, now=now, dry_run=dry_run))
     return decisions
