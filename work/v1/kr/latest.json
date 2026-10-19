@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:82e5ba0b05c54abac521590aac4015f6",
+  "event_id": "kr:328972de444d93a0d8ef9570d55d2702",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "a72e95420df2bdbf27008d2fc88ea82b9aa78c1222a888149cb844d5f0402a46",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "97fde7add4383c59c23330c927f073c5c281e98221519d9aeab3615f11917f8a",
-  "source_sha256": "a6197a6a09c547e2a131c1e529a32fa21ad0ebb04d822c2f495893ffed793fca",
+  "source_sha256": "89b3f63e442cb99fbcd414d56a787d1ee6cdd65338029eaf0522e82c0e1b1815",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -2446,21 +2446,229 @@
         "execution_eligible": false
       },
       "prism": {
-        "source_health": "MISSING",
+        "source_health": "OK",
         "coverage": {
-          "total_unique_events": 0,
-          "window_events": 0,
-          "transmitted_events": 0,
+          "total_unique_events": 187,
+          "window_events": 9,
+          "transmitted_events": 9,
           "truncated": false,
-          "oldest_occurred_at": null,
-          "newest_occurred_at": null,
-          "available_events_before_context_cap": 0,
+          "oldest_occurred_at": "2026-10-18T16:56:26+00:00",
+          "newest_occurred_at": "2026-10-18T22:00:57+00:00",
+          "available_events_before_context_cap": 9,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
           "omitted_before_context_selection": 0
         },
-        "events": [],
+        "events": [
+          {
+            "event_key": "stock_ai_agent:16287",
+            "content_sha256": "f8723c4c5a5539a8ea1da9c1aa7a4fe281262528cc131e7682a4fe9cb6a1663b",
+            "occurred_at": "2026-10-18T22:00:57+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16287",
+              "posted_at": "2026-10-18T22:00:57+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16287",
+              "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/19 07:00:20 KST 💵 청산 결과 정리 수량: 0.015 BTC 진입 → 청산: 81,014.50 USDT → 81,157.73 USDT 보유 시간: 304.2분 확정 순손익: -2.86 USDT • 시작 계좌 9,426.94 USDT 대비 -0.03% • 수수료 0.71 USDT · 펀딩 0.00 USDT 반영 💰 종료 후...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16286",
+            "content_sha256": "7fced26bf80f0a7ddf1583bc527ae907898ec711aa49a4068cb603074961de50",
+            "occurred_at": "2026-10-18T19:23:31+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16286",
+              "posted_at": "2026-10-18T19:23:31+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16286",
+              "preview": "✂️ BTC 데모 부분 청산 체결 · 숏 🕐 10/19 04:23:14 KST 사유: 부분 익절 🧾 이번 체결: 0.007 BTC · 81,057.30 USDT • 체결금액(명목): 567.40 USDT · 증거금 아님 • 이번 청산 가격손익: -0.30 USDT · 계좌 -0.00% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전체 포...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16285",
+            "content_sha256": "1711a5765d285061155b167637a39390a9c004b5bf40a6c4da3a3d7081ae643a",
+            "occurred_at": "2026-10-18T19:12:32+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16285",
+              "posted_at": "2026-10-18T19:12:32+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16285",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/19 04:12:27 KST 📦 보유량 0.015 BTC · 평단 81,014.50 USDT 💰 계좌 순자산: 9,424.80 USDT • 총 증거금 122.45 USDT(계좌 1.30%) · 10배 · 교차 🛡 손절 SL 81,250.00 USDT · 남은 전량 • 예상 손익: -3.53 USDT · 계좌 -0.04% (1배 -0.29%...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16284",
+            "content_sha256": "acecea26f9cb0d5c29d03a93ef89c74d1d4c4aaf8ea14252af1fb19f97302738",
+            "occurred_at": "2026-10-18T18:47:32+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16284",
+              "posted_at": "2026-10-18T18:47:32+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16284",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/19 03:47:26 KST 📦 보유량 0.015 BTC · 평단 81,014.50 USDT 💰 계좌 순자산: 9,424.69 USDT • 총 증거금 122.46 USDT(계좌 1.30%) · 10배 · 교차 🛡 손절 SL 81,250.00 USDT · 남은 전량 • 예상 손익: -3.53 USDT · 계좌 -0.04% (1배 -0.29%...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16283",
+            "content_sha256": "d028fedc964c33ce4df7a8b8840ee096974d3a45b2f3ff4e11ce3ea6c77a3ebf",
+            "occurred_at": "2026-10-18T17:57:30+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16283",
+              "posted_at": "2026-10-18T17:57:30+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16283",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/19 02:57:25 KST 📦 보유량 0.015 BTC · 평단 81,014.50 USDT 💰 계좌 순자산: 9,424.61 USDT • 총 증거금 122.47 USDT(계좌 1.30%) · 10배 · 교차 🛡 손절 SL 81,300.00 → 81,250.00 USDT · 남은 전량 • 예상 손익: -3.53 USDT · 계좌 -0.04...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16282",
+            "content_sha256": "a89733c3eab6bb0cc2607eed1f8577c6bc77c6f4e13f9ec8ae40ce6253e41aaa",
+            "occurred_at": "2026-10-18T17:22:30+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16282",
+              "posted_at": "2026-10-18T17:22:30+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16282",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/19 02:22:24 KST 📦 보유량 0.015 BTC · 평단 81,014.50 USDT 💰 계좌 순자산: 9,425.12 USDT • 총 증거금 122.42 USDT(계좌 1.30%) · 10배 · 교차 🛡 손절 SL 81,400.00 → 81,300.00 USDT · 남은 전량 • 예상 손익: -4.28 USDT · 계좌 -0.05...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16281",
+            "content_sha256": "e85e7163837a1acb611a8af1a452cf8b9a6f82d90b95718ca5a2dabec6c4315e",
+            "occurred_at": "2026-10-18T17:16:30+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16281",
+              "posted_at": "2026-10-18T17:16:30+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16281",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/19 02:16:25 KST 📦 보유량 0.015 BTC · 평단 81,014.50 USDT 💰 계좌 순자산: 9,424.71 USDT • 총 증거금 122.46 USDT(계좌 1.30%) · 10배 · 교차 🛡 손절 SL 81,680.00 → 81,400.00 USDT · 남은 전량 • 예상 손익: -5.78 USDT · 계좌 -0.06...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16280",
+            "content_sha256": "e45dd1ecc23b9a474bc6cafba6892a7dbafb5e38af6a6bee96de5383837f8bb0",
+            "occurred_at": "2026-10-18T17:02:42+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16280",
+              "posted_at": "2026-10-18T17:02:42+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16280",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/19 02:02:29 KST 📦 보유량 0.015 BTC · 평단 81,014.50 USDT 💰 계좌 순자산: 9,424.78 USDT • 총 증거금 122.45 USDT(계좌 1.30%) · 10배 · 교차 🛡 손절 SL 81,750.00 → 81,680.00 USDT · 남은 전량 • 예상 손익: -9.98 USDT · 계좌 -0.11...",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16279",
+            "content_sha256": "e2121a156d57169023331719799024a673a4c9752f7207a13b94c8caceb5e4e0",
+            "occurred_at": "2026-10-18T16:56:26+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16279",
+              "posted_at": "2026-10-18T16:56:26+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16279",
+              "preview": "📌 BTC 데모 첫 진입 체결 · 숏 🕐 10/19 01:56:11 KST 🧾 이번 체결: 0.015 BTC · 81,014.50 USDT • 체결금액(명목): 1,215.22 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0.015 BTC · 관측 기준 • 평단 81,014.50 USDT 💰 계좌 순자산: 9,426.56 USDT • 총 증거금 122.26 USDT(계좌 1....",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          }
+        ],
         "execution_eligible": false
       },
       "receipt_contract": {
@@ -2497,16 +2705,26 @@
             }
           },
           "prism": {
-            "source_health": "MISSING",
-            "event_keys": [],
+            "source_health": "OK",
+            "event_keys": [
+              "stock_ai_agent:16287",
+              "stock_ai_agent:16286",
+              "stock_ai_agent:16285",
+              "stock_ai_agent:16284",
+              "stock_ai_agent:16283",
+              "stock_ai_agent:16282",
+              "stock_ai_agent:16281",
+              "stock_ai_agent:16280",
+              "stock_ai_agent:16279"
+            ],
             "coverage": {
-              "total_unique_events": 0,
-              "window_events": 0,
-              "transmitted_events": 0,
+              "total_unique_events": 187,
+              "window_events": 9,
+              "transmitted_events": 9,
               "truncated": false,
-              "oldest_occurred_at": null,
-              "newest_occurred_at": null,
-              "available_events_before_context_cap": 0,
+              "oldest_occurred_at": "2026-10-18T16:56:26+00:00",
+              "newest_occurred_at": "2026-10-18T22:00:57+00:00",
+              "available_events_before_context_cap": 9,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,
