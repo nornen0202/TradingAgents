@@ -66,6 +66,62 @@ def test_buys_share_one_cash_ledger_with_fees_and_upper_range():
     assert "private-id" not in json.dumps(result)
 
 
+def test_zero_allocation_explains_buffer_and_one_share_funding_without_extra_buy():
+    account = snapshot(cash=976652, buying_power=107553)
+    account["constraints"]["min_cash_buffer_krw"] = 2500000
+    result = plan([row(delta=0)], account)
+    r = result["rows"][0]
+    assert r["quantity"] == 0
+    assert r["zero_reason_code"] == "CASH_BUFFER_SHORTFALL"
+    assert r["one_share_funding"]["required_krw"] == pytest.approx(100.147)
+    assert r["one_share_funding"]["cash_shortfall_krw"] == pytest.approx(100.147)
+    assert result["capital_context"]["new_buy_budget_krw"] == 0
+    assert result["capital_context"]["cash_buffer_shortfall_krw"] == 1523348
+    assert result["summary"]["buy_budget_used_krw"] == 0
+
+
+def test_tiny_risk_reduction_offers_one_share_comparison_not_automatic_round_up():
+    account = snapshot(0, 0, [{"canonical_ticker": "AAA", "quantity": 1, "available_qty": 1}])
+    account["constraints"]["min_trade_krw"] = 1000
+    r = plan([row(held=True, delta=-15, action="REDUCE_IF_TRIGGERED")], account)["rows"][0]
+    assert r["quantity"] == 0
+    assert r["target_quantity"] == .15
+    assert r["zero_reason_code"] == "ALLOCATION_BELOW_ONE_SHARE"
+    assert r["minimum_lot_review"] == {
+        "quantity": 1, "holding_fraction": 1, "gross_amount": 100,
+        "currency": "KRW", "allocation_excess_krw": 85,
+        "below_min_trade": True, "requires_reallocation": True, "order_ready": False,
+    }
+    assert r["estimated_net_cash"] == 0
+
+
+def test_missing_fx_never_fabricates_one_share_risk_comparison():
+    account = snapshot(positions=[{"canonical_ticker": "GLDM", "quantity": 4, "available_qty": 4}])
+    item = row("GLDM", held=True, delta=-100000, action="REDUCE_IF_TRIGGERED", price=80)
+    missing = build_trade_plan({"market":"US", "rows":[item]}, account_snapshot=account, now=NOW)["rows"][0]
+    assert missing["quantity"] is None
+    assert missing["minimum_lot_review"] is None
+    fixed = build_trade_plan({"market":"US", "rows":[item]}, account_snapshot=account, fx_krw_per_usd=1342.4, fx_asof="2026-10-02T02:00:00Z", now=NOW)["rows"][0]
+    assert fixed["quantity"] == 0
+    assert fixed["target_quantity"] == pytest.approx(100000/(80*1342.4))
+    assert fixed["minimum_lot_review"]["holding_fraction"] == .25
+
+
+@pytest.mark.parametrize("asof", [None, "broken", "2026-10-02T04:00:00Z", "2026-10-02T02:00:00"])
+def test_future_or_undated_fx_is_not_used_for_sizing(asof):
+    r = build_trade_plan({"market":"US", "rows":[row(delta=600000)]}, account_snapshot=snapshot(1000000,1000000), fx_krw_per_usd=1400, fx_asof=asof, now=NOW)
+    assert r["fx_krw_per_usd"] is None
+    assert r["rows"][0]["quantity"] is None
+
+
+def test_future_account_is_not_used_for_sizing_or_budget():
+    account = snapshot()
+    account["as_of"] = "2026-10-03T02:00:00Z"
+    r = plan([row()], account)
+    assert r["rows"][0]["quantity"] is None
+    assert r["capital_context"]["new_buy_budget_krw"] is None
+
+
 def test_zero_orderability_is_not_missing_or_replaced_by_cash():
     result = plan([row()], snapshot(cash=50_000, buying_power=0))["rows"][0]
     assert result["quantity"] == 0

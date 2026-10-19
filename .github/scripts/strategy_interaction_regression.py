@@ -51,6 +51,8 @@ def fixture() -> dict[str, Any]:
                 "action_now": "HOLD" if ticker in {template["ticker"], "BETA"} else "WAIT",
                 "phase": "CONDITIONAL",
                 "quantity": quantity,
+                "zero_reason_code": "CASH_BUFFER_SHORTFALL" if quantity == 0 else None,
+                "one_share_funding": {"required_krw": 135000, "cash_shortfall_krw": 135000, "allocation_shortfall_krw": 135000} if quantity == 0 else None,
                 "price_low": 99 * unit if known else None,
                 "price_high": 101.5 * unit if known else None,
                 "price_kind": "TRIGGER_RANGE" if known else "UNAVAILABLE",
@@ -87,8 +89,9 @@ def fixture() -> dict[str, Any]:
             "currency": currency,
             "account_asof": payload["generated_at"],
             "account_fresh": True,
+            "capital_context": {"new_buy_budget_krw": 0, "min_cash_buffer_krw": 2500000, "buying_power_krw": 107553},
             "rows": plans,
-            "summary": {"row_count": 4, "buy_count": 3, "sell_count": 1, "sized_count": 2},
+            "summary": {"row_count": 4, "buy_count": 3, "sell_count": 1, "sized_count": 2, "zero_count": 1, "unsized_count": 1, "zero_reason_counts":{"CASH_BUFFER_SHORTFALL": 1}},
             "assumptions": ["입력 계좌 기준 검토 수량", "실제 주문은 직접 확인 후 실행"],
         }
     return payload

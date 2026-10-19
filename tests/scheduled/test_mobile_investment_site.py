@@ -1064,7 +1064,7 @@ def test_trade_plan_is_built_for_both_views_without_leaking_account_inputs(tmp_p
             action['risk_action_level'] = {'level_type': 'SUPPORT', 'price': 100}
         return result
 
-    def sources(archive, payload):
+    def sources(archive, payload, **kwargs):
         assert payload['run_id'] == 'run-' + payload['market'].lower()
         return {
             'status': 'EXACT_RUN_ACCOUNT', 'fx_status': 'BROKER_REFERENCE_RATE',
@@ -1101,7 +1101,7 @@ def test_trade_plan_retains_verified_source_failure_reason_in_public_payload(tmp
 
     monkeypatch.setattr(mobile, 'build_surface_packet',
                         lambda market, **kwargs: _packet(market, public=kwargs.get('public', False)))
-    monkeypatch.setattr(mobile, 'load_trade_plan_sources', lambda archive, payload: {
+    monkeypatch.setattr(mobile, 'load_trade_plan_sources', lambda archive, payload, **kwargs: {
         'account_snapshot': None, 'status': 'UNAVAILABLE',
         'reason': 'SOURCE_RUN_PARTIAL_FAILURE',
     })
