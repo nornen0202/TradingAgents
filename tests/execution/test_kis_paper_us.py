@@ -382,9 +382,10 @@ def test_lost_cancel_response_blocks_new_writes_and_never_resends(tmp_path):
 
 
 @pytest.mark.parametrize("padded", [False, True])
-def test_cancel_child_must_prove_link_and_completion(tmp_path, padded):
+@pytest.mark.parametrize("label", ["완료", ""])
+def test_cancel_child_must_prove_link_and_completion(tmp_path, padded, label):
     child = {**report().payload["output"][0], "odno": "456", "orgn_odno": "123", "rvse_cncl_dvsn": "02",
-             "prcs_stat_name": "완료", "nccs_qty": "0"}
+             "prcs_stat_name": label, "nccs_qty": "0"}
     final = report(remaining=0)
     final.payload["output"].append(child)
     b, _, _, _ = make(tmp_path, ack("0000000123" if padded else "123"), report(),
@@ -393,6 +394,32 @@ def test_cancel_child_must_prove_link_and_completion(tmp_path, padded):
     b.cancel(intent_id="us-intent-1")
     assert b.reconcile(intent_id="us-intent-1")["status"] == "CANCELLED"
     b.close()
+
+
+@pytest.mark.parametrize("changes", [
+    {"nccs_qty": "1"}, {"ft_ccld_qty": "1"}, {"ft_ord_qty": "2"},
+    {"orgn_odno": "124"}, {"rvse_cncl_dvsn": "01"}, {"sll_buy_dvsn_cd": "01"},
+    {"rjct_rson": "REJECTED"}, {"prcs_stat_name": "접수"}, {"prcs_stat_name": None},
+    {"ft_ord_qty": ""}, {"nccs_qty": None}, {"thco_ord_tmd": "230059"},
+])
+def test_blank_cancel_label_needs_complete_matching_broker_quantity_proof(tmp_path, changes):
+    child = {**report().payload["output"][0], "odno": "456", "orgn_odno": "123", "rvse_cncl_dvsn": "02",
+             "prcs_stat_name": "", "nccs_qty": "0", **changes}
+    final = report(remaining=0)
+    final.payload["output"].append(child)
+    b, _, _, _ = make(tmp_path, ack("0000000123"), report(), ack("0000000456"), final)
+    try:
+        b.submit(**order(b))
+        b.cancel(intent_id="us-intent-1")
+        try:
+            result = b.reconcile(intent_id="us-intent-1")
+        except DemoError:
+            pass
+        else:
+            assert result["status"] == "UNRESOLVED"
+        assert b.db.execute("SELECT COUNT(*) FROM reconciliation_issues").fetchone()[0] == 1
+    finally:
+        b.close()
 
 
 def test_pending_buy_reservations_and_daily_limit(tmp_path):

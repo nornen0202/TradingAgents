@@ -207,20 +207,38 @@ class USOrderJournal(DemoOrderJournal):
             # An original order marked explicitly cancelled is evidence. Generic
             # 'complete' or a zero remainder alone never implies cancellation.
             cancelled = row.get("prcs_stat_name") in {"취소", "취소완료"} and row.get("rjct_rson") in {"", "0", "0000"}
-            cancel = self.db.execute("SELECT response,status FROM requests WHERE id=?", ("cancel:" + intent_id,)).fetchone()
+            cancel = self.db.execute("SELECT response,status,created_at FROM requests WHERE id=?", ("cancel:" + intent_id,)).fetchone()
             if not cancelled and cancel and cancel["status"] == "ACKNOWLEDGED":
                 cancel_id = json.loads(cancel["response"]).get("broker_order_id")
                 children = [r for r in reports if _same_order_number(r.get("odno"), cancel_id)
                             and _same_order_number(r.get("orgn_odno"), broker_id)]
                 if len(children) == 1:
                     child = children[0]
+                    saved_cancel = self.db.execute("SELECT body FROM intents WHERE id=?", ("cancel:" + intent_id,)).fetchone()
+                    cancel_terms = json.loads(saved_cancel[0]) if saved_cancel else {}
+                    child_clock = datetime.strptime(str(child.get("dmst_ord_dt", "")) + str(child.get("thco_ord_tmd", "")),
+                                                    "%Y%m%d%H%M%S").replace(tzinfo=SEOUL)
+                    # VTS can leave prcs_stat_name empty even on confirmed
+                    # cancellation rows. Require both original and linked child
+                    # to have zero remainder, plus the exact recorded cancel
+                    # quantity and zero child fills; an ACK or empty label alone
+                    # is never completion evidence.
                     cancelled = (child.get("rvse_cncl_dvsn") == "02"
-                                 and child.get("prcs_stat_name") in {"완료", "취소완료"}
+                                 and child.get("prcs_stat_name") in {"", "완료", "취소완료"}
                                  and child.get("rjct_rson") in {"", "0", "0000"}
+                                 and row.get("rjct_rson") in {"", "0", "0000"}
+                                 and cancel_terms.get("RVSE_CNCL_DVSN_CD") == "02"
+                                 and _same_order_number(cancel_terms.get("ORGN_ODNO"), broker_id)
+                                 and remaining == 0
+                                 and _broker_number(child.get("nccs_qty"), integer=True) == 0
+                                 and _broker_number(child.get("ft_ccld_qty"), integer=True) == 0
+                                 and child_clock >= _clock(cancel["created_at"]).replace(microsecond=0)
                                  and child.get("pdno") == terms["PDNO"]
                                  and child.get("ovrs_excg_cd") == terms["OVRS_EXCG_CD"]
                                  and child.get("tr_crcy_cd") == "USD"
-                                 and _broker_number(child.get("ft_ord_qty"), integer=True) == ordered - filled)
+                                 and child.get("sll_buy_dvsn_cd") == row.get("sll_buy_dvsn_cd")
+                                 and _broker_number(child.get("ft_ord_qty"), integer=True)
+                                     == _broker_number(cancel_terms.get("ORD_QTY"), integer=True) == ordered - filled)
             if cancelled and remaining:
                 raise DemoError("Cancelled US order still has a remainder")
             status = ("FILLED" if filled == ordered else "CANCELLED" if cancelled else
