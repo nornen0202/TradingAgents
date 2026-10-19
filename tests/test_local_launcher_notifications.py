@@ -308,7 +308,7 @@ exit 7
     assert observed == {'visible': False, 'repo': repo, 'archive': archive}
 
 
-@pytest.mark.parametrize('interval', [15, 30])
+@pytest.mark.parametrize('interval', [5, 15, 30])
 def test_installer_registers_gui_launcher_without_changing_worker_arguments(tmp_path, interval):
     install = tmp_path / 'maintenance with spaces'
     repo = tmp_path / 'repo with spaces'
@@ -330,7 +330,7 @@ function global:Register-ScheduledTask {
     @{name=$TaskName;execute=$Action.Execute;arguments=$Action.Arguments;multiple=[string]$Settings.MultipleInstances;limit=$Settings.ExecutionTimeLimit;triggers=$triggers} | ConvertTo-Json -Depth 6 -Compress | Add-Content -LiteralPath $env:TA_ACTIONS -Encoding UTF8
 }
 $options=@{}
-if($env:TA_INTERVAL -ne '15'){$options.PollIntervalMinutes=[int]$env:TA_INTERVAL}
+if($env:TA_INTERVAL -ne '5'){$options.PollIntervalMinutes=[int]$env:TA_INTERVAL}
 & $env:TA_INSTALLER -RepositoryRoot $env:TA_REPO -ArchiveRoot $env:TA_ARCHIVE -InstallRoot $env:TA_INSTALL -NoStart @options
 ''', env)
     assert result.returncode == 0, result.stderr
