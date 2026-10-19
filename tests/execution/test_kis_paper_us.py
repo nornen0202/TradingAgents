@@ -88,6 +88,50 @@ def test_explicit_opt_in_and_vts_only_exact_tr_mapping(tmp_path):
     b.close()
 
 
+@pytest.mark.parametrize("left,right,expected", [
+    ("0000000123", "123", True), ("123", "0000000123", True),
+    ("0000000123", "124", False), ("0000000000", "0", False),
+    ("+123", "123", False), ("123 ", "123", False), ("123.0", "123", False),
+    ("00000000123", "123", False), ("１２３", "123", False),
+    (123, "123", False), (None, "123", False), ("", "", False),
+])
+def test_order_identity_only_normalizes_decimal_zero_padding(left, right, expected):
+    from tradingagents.execution.kis_paper_us import _same_order_number
+    assert _same_order_number(left, right) is expected
+
+
+def test_original_padded_ack_reconciles_without_rewrite_or_resubmit(tmp_path):
+    b, c, session, _ = make(tmp_path, ack("0000000123"), report())
+    try:
+        b.submit(**order(b))
+        original = b.db.execute("SELECT response FROM requests WHERE id='us-intent-1'").fetchone()[0]
+        b.journal._block("us-intent-1", "unverified_paper_reconciliation")
+        result = b.reconcile(intent_id="us-intent-1")
+        assert result["status"] == "OPEN" and result["remaining_qty"] == 1
+        assert b.db.execute("SELECT response FROM requests WHERE id='us-intent-1'").fetchone()[0] == original
+        assert b.db.execute("SELECT COUNT(*) FROM reconciliation_issues").fetchone()[0] == 0
+        assert sum(method == "POST" and url.endswith('/order') for method, url, _ in session.calls) == 1
+    finally:
+        b.close()
+
+
+@pytest.mark.parametrize("change", ["duplicate", "different", "wrong_terms", "future"])
+def test_padded_ack_does_not_bypass_unique_original_evidence(tmp_path, change):
+    response = report()
+    if change == "duplicate": response.payload['output'].append({**response.payload['output'][0], 'odno': '0000000123'})
+    if change == "different": response.payload['output'][0]['odno'] = '124'
+    if change == "wrong_terms": response.payload['output'][0]['pdno'] = 'MSFT'
+    if change == "future": response.payload['output'][0]['thco_ord_tmd'] = '230101'
+    b, c, session, _ = make(tmp_path, ack("0000000123"), response)
+    try:
+        b.submit(**order(b))
+        with pytest.raises(DemoError):
+            b.reconcile(intent_id='us-intent-1')
+        assert b.db.execute("SELECT COUNT(*) FROM reconciliation_issues").fetchone()[0] == 1
+    finally:
+        b.close()
+
+
 def test_ack_is_not_fill_and_retry_after_restart_does_not_write(tmp_path):
     b, c, s, _ = make(tmp_path, ack())
     args = order(b)
@@ -337,16 +381,45 @@ def test_lost_cancel_response_blocks_new_writes_and_never_resends(tmp_path):
     b.close()
 
 
-def test_cancel_child_must_prove_link_and_completion(tmp_path):
+@pytest.mark.parametrize("padded", [False, True])
+@pytest.mark.parametrize("label", ["완료", ""])
+def test_cancel_child_must_prove_link_and_completion(tmp_path, padded, label):
     child = {**report().payload["output"][0], "odno": "456", "orgn_odno": "123", "rvse_cncl_dvsn": "02",
-             "prcs_stat_name": "완료", "nccs_qty": "0"}
+             "prcs_stat_name": label, "nccs_qty": "0"}
     final = report(remaining=0)
     final.payload["output"].append(child)
-    b, _, _, _ = make(tmp_path, ack(), report(), ack("456"), final)
+    b, _, _, _ = make(tmp_path, ack("0000000123" if padded else "123"), report(),
+                       ack("0000000456" if padded else "456"), final)
     b.submit(**order(b))
     b.cancel(intent_id="us-intent-1")
     assert b.reconcile(intent_id="us-intent-1")["status"] == "CANCELLED"
     b.close()
+
+
+@pytest.mark.parametrize("changes", [
+    {"nccs_qty": "1"}, {"ft_ccld_qty": "1"}, {"ft_ord_qty": "2"},
+    {"orgn_odno": "124"}, {"rvse_cncl_dvsn": "01"}, {"sll_buy_dvsn_cd": "01"},
+    {"rjct_rson": "REJECTED"}, {"prcs_stat_name": "접수"}, {"prcs_stat_name": None},
+    {"ft_ord_qty": ""}, {"nccs_qty": None}, {"thco_ord_tmd": "230059"},
+])
+def test_blank_cancel_label_needs_complete_matching_broker_quantity_proof(tmp_path, changes):
+    child = {**report().payload["output"][0], "odno": "456", "orgn_odno": "123", "rvse_cncl_dvsn": "02",
+             "prcs_stat_name": "", "nccs_qty": "0", **changes}
+    final = report(remaining=0)
+    final.payload["output"].append(child)
+    b, _, _, _ = make(tmp_path, ack("0000000123"), report(), ack("0000000456"), final)
+    try:
+        b.submit(**order(b))
+        b.cancel(intent_id="us-intent-1")
+        try:
+            result = b.reconcile(intent_id="us-intent-1")
+        except DemoError:
+            pass
+        else:
+            assert result["status"] == "UNRESOLVED"
+        assert b.db.execute("SELECT COUNT(*) FROM reconciliation_issues").fetchone()[0] == 1
+    finally:
+        b.close()
 
 
 def test_pending_buy_reservations_and_daily_limit(tmp_path):
