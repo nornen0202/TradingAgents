@@ -168,7 +168,7 @@ def test_quote_invalid_clocks_empty_and_values_are_not_retrieval_timestamped(cas
 def test_us_requires_separate_observed_reference_rate():
     observed = datetime.fromisoformat("2026-10-19T10:00:00-04:00")
     chart = {"rt_cd": "0", "output2": [{"xymd": "20261019", "xhms": "095900", "open": "100", "high": "101", "low": "99", "last": "100", "evol": "100"}]}
-    book = {"rt_cd": "0", "output1": {"pbid1": 99.99, "pask1": 100.01, "dymd": "20261019", "dhms": "100000"}}
+    book = {"rt_cd": "0", "output1": {"pbid1": 99.99, "pask1": 100.01, "dymd": "20261019", "dhms": "230000"}}
     with pytest.raises(ValueError, match="FX_REFERENCE"):
         normalize_quote(ticker="AAPL", market="us", chart=chart, orderbook=book, observed_at=observed)
     fx = {"observed_at": observed.isoformat(), "base_currency": "USD", "quote_currency": "KRW", "rate": 1400,

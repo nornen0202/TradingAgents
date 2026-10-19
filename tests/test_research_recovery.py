@@ -324,6 +324,7 @@ def test_runner_retries_only_failed_ticker_and_recomputes_full_coverage(recovery
     monkeypatch.setattr(runner, "_run_single_ticker", analyze)
     monkeypatch.setattr(runner, "_augment_run_tickers_with_scanner", lambda **_: pytest.fail("Must not reselect frozen cohort"))
     monkeypatch.setattr(runner, "collect_event_signals", lambda **_: {})
+    monkeypatch.setattr(runner, "collect_event_news", lambda **_: {})
     monkeypatch.setattr(runner, "build_live_context_delta", lambda **_: {})
     monkeypatch.setattr(runner, "build_and_write_decision_bundle", lambda **_: {})
     manifest = runner.execute_scheduled_run(recovery["config"], skip_site_build=True,
@@ -393,6 +394,7 @@ def test_completed_research_finalization_runs_no_graph_and_preserves_source(fina
     monkeypatch.setattr(runner, "_run_single_ticker", lambda **_: pytest.fail("Completed research must not rerun"))
     monkeypatch.setattr(runner, "_augment_run_tickers_with_scanner", lambda **_: pytest.fail("Frozen selection must not rerun"))
     monkeypatch.setattr(runner, "collect_event_signals", lambda **_: {})
+    monkeypatch.setattr(runner, "collect_event_news", lambda **_: {})
     monkeypatch.setattr(runner, "build_live_context_delta", lambda **_: {})
     monkeypatch.setattr(runner, "build_and_write_decision_bundle", lambda **_: {})
     manifest = runner.execute_scheduled_run(finalization["config"], skip_site_build=True,

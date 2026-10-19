@@ -272,7 +272,7 @@ def chart_and_book(market="KR", day="20261019", time="095900"):
         book = {"stck_bsop_date": day, "aspr_acpt_hour": "100000", "bidp1": "39995", "askp1": "40005"}
     else:
         bar = {"xymd": day, "xhms": time, "open": "250", "high": "251", "low": "249", "last": "250", "evol": "10"}
-        book = {"dymd": day, "dhms": "100000", "pbid1": "249.99", "pask1": "250.01"}
+        book = {"dymd": day, "dhms": "230000", "pbid1": "249.99", "pask1": "250.01"}
     return {"rt_cd": "0", "output2": [bar]}, {"rt_cd": "0", "output1": book}
 
 
@@ -316,8 +316,8 @@ def test_domestic_undated_book_is_excluded_without_inventing_date_or_bid_ask():
     assert dv._terms("KR", quote, "fill")["limit_price"] == 40005
 
 
-@pytest.mark.parametrize("date,time", [(None, "100000"), ("bad", "100000"), ("20261020", "100000"),
-                                    ("20261019", "100001"), ("20261019", None), ("20261019", "095000")])
+@pytest.mark.parametrize("date,time", [(None, "230000"), ("bad", "230000"), ("20261020", "230000"),
+                                    ("20261019", "230001"), ("20261019", None), ("20261019", "225000")])
 def test_us_book_missing_invalid_future_stale_date_blocks(date, time):
     chart, book = chart_and_book("US")
     book["output1"].update(dymd=date, dhms=time)
@@ -442,6 +442,27 @@ def test_realistic_us_split_header_and_book_are_normalized_together():
     with pytest.raises(ValueError):
         dv.normalize_validation_quote(market="US", chart=chart, orderbook=book,
             observed_at=datetime.fromisoformat("2026-10-19T10:00:00-04:00"))
+
+
+@pytest.mark.parametrize("observed,day,bar_time,book_day,book_time", [
+    ("2026-10-19T22:33:59+09:00", "20261019", "093200", "20261019", "223359"),
+    ("2026-10-20T02:00:00+09:00", "20261019", "125900", "20261020", "020000"),
+    ("2026-11-03T00:00:00+09:00", "20261102", "095900", "20261103", "000000"),
+])
+def test_us_book_korea_clock_across_midnight_and_dst(observed, day, bar_time, book_day, book_time):
+    chart, book = chart_and_book("US", day, bar_time)
+    book["output1"].update(dymd=book_day, dhms=book_time)
+    now = datetime.fromisoformat(observed)
+    quote = dv.normalize_validation_quote(market="US", chart=chart, orderbook=book, observed_at=now)
+    assert quote["execution_ready"] is True
+    assert 0 <= (now - datetime.fromisoformat(quote["observed_at"])).total_seconds() <= 120
+    # Fixed timezone interpretation must never choose a convenient zone or
+    # substitute retrieval time to admit future/stale broker timestamps.
+    for delta in (timedelta(seconds=1), timedelta(seconds=-121), timedelta(days=-1)):
+        bad = now + delta
+        book["output1"].update(dymd=bad.strftime("%Y%m%d"), dhms=bad.strftime("%H%M%S"))
+        with pytest.raises(ValueError, match="Book future or stale"):
+            dv.normalize_validation_quote(market="US", chart=chart, orderbook=book, observed_at=now)
 
 
 @pytest.mark.parametrize("status", ["ACTIVE", "VALUATION_ONLY"])

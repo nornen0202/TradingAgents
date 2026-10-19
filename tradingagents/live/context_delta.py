@@ -12,6 +12,7 @@ def build_live_context_delta(
     *,
     run_dir: Path,
     manifest: dict[str, Any],
+    news_context: dict[str, str] | None = None,
 ) -> dict[str, Any] | None:
     ticker_summaries = [item for item in (manifest.get("tickers") or []) if isinstance(item, dict)]
     if not ticker_summaries:
@@ -27,6 +28,8 @@ def build_live_context_delta(
             market=str(((manifest.get("settings") or {}).get("market")) or ""),
             as_of=str((ticker_summary.get("execution_update") or {}).get("execution_asof") or manifest.get("started_at") or ""),
             analysis_payload=ticker_summary,
+            **({"news_text": news_context.get(str(ticker_summary.get("ticker") or ""), "")}
+               if news_context is not None else {}),
         )
         market_delta["news_delta"] = news_delta
         if is_live_action_change(market_delta) or news_delta:

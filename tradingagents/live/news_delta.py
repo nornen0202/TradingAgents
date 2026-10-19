@@ -22,11 +22,12 @@ def build_news_delta(
     market: str,
     as_of: str | None,
     analysis_payload: dict[str, Any] | None = None,
+    news_text: str | None = None,
 ) -> list[str]:
     analysis_payload = analysis_payload or {}
     tags = _tags_from_analysis_payload(analysis_payload)
 
-    fetched = _fetch_latest_news_text(
+    fetched = news_text if news_text is not None else _fetch_latest_news_text(
         ticker=ticker,
         market=market,
         as_of=as_of,

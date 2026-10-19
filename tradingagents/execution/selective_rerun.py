@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -43,6 +44,8 @@ def collect_event_signals(
     *,
     run_dir: Path,
     ticker_summaries: list[dict[str, Any]],
+    analysis_as_of: datetime,
+    news_context: dict[str, str] | None = None,
 ) -> dict[str, list[str]]:
     keyword_map = {
         "earnings": "earnings",
@@ -73,7 +76,8 @@ def collect_event_signals(
         text_fields = [
             str(payload.get("decision") or ""),
             json.dumps((payload.get("tool_telemetry") or {}).get("events") or [], ensure_ascii=False),
-            _fetch_fresh_headlines(ticker),
+            (news_context.get(ticker, "") if news_context is not None
+             else _fetch_fresh_headlines(ticker, analysis_as_of=analysis_as_of)),
         ]
         joined = " ".join(text_fields).lower()
         detected: set[str] = set()
@@ -85,14 +89,38 @@ def collect_event_signals(
     return signals
 
 
-def _fetch_fresh_headlines(ticker: str) -> str:
+def collect_event_news(*, ticker_summaries: list[dict[str, Any]], analysis_as_of: datetime) -> dict[str, str]:
+    """Collect once before price acquisition, never on the execution delivery path."""
+    return {ticker: _fetch_fresh_headlines(ticker, analysis_as_of=analysis_as_of)
+            for ticker in dict.fromkeys(str(row.get("ticker") or "").strip().upper()
+                                       for row in ticker_summaries
+                                       if row.get("status") == "success" and (row.get("artifacts") or {}).get("analysis_json"))
+            if ticker}
+
+
+def _fetch_fresh_headlines(ticker: str, *, analysis_as_of: datetime) -> str:
+    if analysis_as_of.tzinfo is None:
+        raise ValueError("Aware analysis_as_of required")
     try:
         news_items = yf.Ticker(ticker).news or []
     except Exception:
         return ""
     headlines: list[str] = []
     for item in news_items[:10]:
-        title = str((item or {}).get("title") or "").strip()
+        if not isinstance(item, dict):
+            continue
+        content = item.get("content") if isinstance(item.get("content"), dict) else item
+        value = content.get("pubDate", item.get("providerPublishTime"))
+        try:
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                published = datetime.fromtimestamp(value, timezone.utc)
+            else:
+                published = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+            if published.tzinfo is None or not analysis_as_of - timedelta(days=3) <= published <= analysis_as_of:
+                continue
+        except (ValueError, TypeError, OverflowError, OSError):
+            continue
+        title = str(content.get("title") or "").strip()
         if title:
             headlines.append(title)
     return " | ".join(headlines)
