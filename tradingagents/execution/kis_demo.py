@@ -576,7 +576,28 @@ class DemoOrderJournal:
         except (KeyError, TypeError, ValueError):
             self._block(intent_id, "order_terms_or_fill_mismatch")
             raise DemoError("VTS invalid fill quantities") from None
-        cancelled = str(r.get("cncl_yn", "")).upper() == "Y"
+        # VTS keeps cncl_yn=N on the original order after a successful cancel;
+        # its confirmed cancelled quantity closes the original remainder. The
+        # separate cancellation row has cncl_yn=Y and a different order ID.
+        # Accept only explicit, consistent quantities on the matched original.
+        confirmed = None
+        try:
+            values = [r[key] for key in ("cncl_cfrm_qty", "cnc_cfrm_qty") if key in r]
+            if values:
+                if any(not isinstance(value, str) or not re.fullmatch(r"[0-9]+", value) for value in values):
+                    raise ValueError()
+                quantities = {int(value) for value in values}
+                if len(quantities) != 1:
+                    raise ValueError()
+                confirmed = quantities.pop()
+                if confirmed > ordered - filled or (confirmed > 0 and filled + remaining + confirmed != ordered):
+                    raise ValueError()
+        except (TypeError, ValueError):
+            self._block(intent_id, "invalid_confirmed_cancellation_quantity")
+            raise DemoError("VTS cancellation quantity missing or inconsistent") from None
+        cancelled = str(r.get("cncl_yn", "")).upper() == "Y" or (
+            confirmed is not None and confirmed > 0 and remaining == 0
+        )
         if cancelled and remaining:
             self._block(intent_id, "cancelled_with_remainder")
             raise DemoError("VTS cancelled order still reports a remainder")
